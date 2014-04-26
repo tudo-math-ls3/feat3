@@ -479,3 +479,68 @@ DenseVectorNorm2Test<Mem::Main, Algo::MKL, double> mkl_dv_norm2_test_double;
 DenseVectorNorm2Test<Mem::CUDA, Algo::CUDA, float> cuda_dv_norm2_test_float;
 DenseVectorNorm2Test<Mem::CUDA, Algo::CUDA, double> cuda_dv_norm2_test_double;
 #endif
+
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_,
+  typename IT_>
+class DenseVectorComponentInvertTest
+  : public FullTaggedTest<Mem_, DT_, Algo_, IT_>
+{
+public:
+  typedef DenseVector<Mem_, DT_, IT_> VectorType;
+
+  DenseVectorComponentInvertTest()
+    : FullTaggedTest<Mem_, DT_, Algo_, IT_>("DenseVectorComponentInvertTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ alpha(Math::pi<DT_>());
+
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      // create a vector
+      DenseVector<Mem::Main, DT_, IT_> tvec(size);
+      for (Index i(0); i < size; ++i)
+      {
+        tvec(i, DT_(7.63) * DT_(i % 3 + 1) - DT_(9.3));
+      }
+      VectorType vec;
+      vec.convert(tvec);
+
+      VectorType vec2(vec.clone());
+      vec2.template component_invert<Algo_>(vec2, alpha);
+      vec2.template component_product<Algo_>(vec2, vec);
+      for (Index i(0); i < size; ++i)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(vec2(i), alpha, eps);
+      }
+
+      VectorType vec3(size);
+      vec3.template component_invert<Algo_>(vec);
+      for (Index i(0); i < size; ++i)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(vec3(i), DT_(1.0) / vec(i), eps);
+      }
+    }
+  }
+};
+
+DenseVectorComponentInvertTest<Mem::Main, Algo::Generic, float, Index> dv_component_invert_test_float;
+DenseVectorComponentInvertTest<Mem::Main, Algo::Generic, double, Index> dv_component_invert_test_double;
+#ifdef FEAST_HAVE_QUADMATH
+DenseVectorComponentInvertTest<Mem::Main, Algo::Generic, __float128, Index> dv_component_invert_test_float128;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+//DenseVectorComponentInvertTest<Mem::Main, Algo::MKL, float, Index> mkl_dv_component_invert_test_float;
+//DenseVectorComponentInvertTest<Mem::Main, Algo::MKL, double, Index> mkl_dv_component_invert_test_double;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+DenseVectorComponentInvertTest<Mem::CUDA, Algo::CUDA, float, Index> cuda_dv_component_invert_test_float;
+DenseVectorComponentInvertTest<Mem::CUDA, Algo::CUDA, double, Index> cuda_dv_component_invert_test_double;
+#endif
