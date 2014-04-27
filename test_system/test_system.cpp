@@ -1,12 +1,28 @@
 #include <test_system/test_system.hpp>
 #include <test_system/cuda.hpp>
 
+#ifdef FEAST_TESTING_VC
+extern "C" {
+unsigned int __stdcall GetErrorMode(void);
+unsigned int __stdcall SetErrorMode(unsigned int);
+unsigned int _set_abort_behavior(unsigned int,unsigned int);
+}
+#endif // FEAST_TESTING_VC
+
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 int main(int argc, char** argv)
 {
-  std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
+#ifdef FEAST_TESTING_VC
+  // disable any error prompts for testing
+  SetErrorMode(GetErrorMode() | 0x8003);
+  // disable handling of abort function
+  _set_abort_behavior(0, 0x1);
+#else
+  std::cout << "CTEST_FULL_OUTPUT" << std::endl;
+#endif
+
   int result(EXIT_SUCCESS);
 #ifdef FEAST_BACKENDS_CUDA
   bool cudadevicereset(false);
