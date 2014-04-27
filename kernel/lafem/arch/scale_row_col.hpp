@@ -44,7 +44,7 @@ namespace FEAST
             const IT_ max(Arl[row]);
             for(IT_ n(0); n < max ; n++)
             {
-              *tr = *Ax * x[row];
+              *tr = *tAx * x[row];
 
               tAx += stride;
               tr += stride;
@@ -110,7 +110,7 @@ namespace FEAST
             const IT_ max(Arl[row]);
             for(IT_ n(0); n < max ; n++)
             {
-              *tr = *Ax * x[*tAj];
+              *tr = *tAx * x[*tAj];
 
               tAj += stride;
               tAx += stride;

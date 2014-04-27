@@ -304,3 +304,92 @@ SparseMatrixELLScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_el
 SparseMatrixELLScaleTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_ell_scale_test_float_ulong;
 SparseMatrixELLScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_ell_scale_test_double_ulong;
 #endif
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixELLScaleRowColTest
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+{
+public:
+  SparseMatrixELLScaleRowColTest()
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixELLScaleRowColTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(2) ; size < 3e2 ; size*=3)
+    {
+      const DT_ pi(Math::pi<DT_>());
+      const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
+
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(2));
+          else if((row == col+1) || (row+1 == col))
+            a_local(row, col, DT_(-1));
+        }
+      }
+
+      SparseMatrixELL<Mem_, DT_, IT_> a(a_local);
+      SparseMatrixELL<Mem_, DT_, IT_> b(a.clone());
+
+      // Scale rows
+      DenseVector<Mem_, DT_, IT_> s1(a.rows());
+      for (Index i(0); i < s1.size(); ++i)
+      {
+        s1(i, pi * (i % 3 + 1) - DT_(5.21) + DT_(i));
+      }
+      b.template scale_rows<Algo_>(b, s1);
+      for (Index row(0) ; row < a.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a.columns() ; ++col)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(b(row, col), a(row, col) * s1(row), eps);
+        }
+      }
+
+      // Scale rows
+      DenseVector<Mem_, DT_, IT_> s2(a.columns());
+      for (Index i(0); i < s2.size(); ++i)
+      {
+        s2(i, pi * (i % 3 + 1) - DT_(5.21) + DT_(i));
+      }
+      b.template scale_cols<Algo_>(a, s2);
+      for (Index row(0) ; row < a.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a.columns() ; ++col)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(b(row, col), a(row, col) * s2(col), eps);
+        }
+      }
+    }
+  }
+};
+SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, float, unsigned int> sm_ell_scale_row_col_test_float_uint;
+SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, double, unsigned int> sm_ell_scale_row_col_test_double_uint;
+SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, float, unsigned long> sm_ell_scale_row_col_test_float_ulong;
+SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, double, unsigned long> sm_ell_scale_row_col_test_double_ulong;
+#ifdef FEAST_HAVE_QUADMATH
+SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, __float128, unsigned int> sm_ell_scale_row_col_test_float128_uint;
+SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, __float128, unsigned long> sm_ell_scale_row_col_test_float128_ulong;
+#endif
+// #ifdef FEAST_BACKENDS_MKL
+// SparseMatrixELLScaleRowColTest<Mem::Main, Algo::MKL, float, unsigned int> mkl_sm_ell_scale_row_col_test_float_uint;
+// SparseMatrixELLScaleRowColTest<Mem::Main, Algo::MKL, double, unsigned int> mkl_sm_ell_scale_row_col_test_double_uint;
+// SparseMatrixELLScaleRowColTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sm_ell_scale_row_col_test_float_ulong;
+// SparseMatrixELLScaleRowColTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sm_ell_scale_row_col_test_double_ulong;
+// #endif
+// #ifdef FEAST_BACKENDS_CUDA
+// SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_ell_scale_row_col_test_float_uint;
+// SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_ell_scale_row_col_test_double_uint;
+// SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_ell_scale_row_col_test_float_ulong;
+// SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_ell_scale_row_col_test_double_ulong;
+// #endif
