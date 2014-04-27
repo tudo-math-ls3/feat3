@@ -5,7 +5,6 @@
 extern "C" {
 unsigned int __stdcall GetErrorMode(void);
 unsigned int __stdcall SetErrorMode(unsigned int);
-unsigned int _set_abort_behavior(unsigned int,unsigned int);
 }
 #endif // FEAST_TESTING_VC
 
