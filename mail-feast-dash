@@ -66,10 +66,14 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   sys.exit()
 
 dt = datetime.datetime.today()
+yesterday_dt = datetime.datetime.today() - datetime.timedelta(days=1)
 #dt = datetime.datetime(2013, 12, 11)
 starttime = datetime.datetime(dt.year, dt.month, dt.day)
 endtime = datetime.datetime(dt.year, dt.month, dt.day, 23, 59)
 runs = Run.select().where(Run.starttime.between(time.mktime(starttime.timetuple()), time.mktime(endtime.timetuple())))
+yesterday_starttime = datetime.datetime(yesterday_dt.year, yesterday_dt.month, yesterday_dt.day)
+yesterday_endtime = datetime.datetime(yesterday_dt.year, yesterday_dt.month, yesterday_dt.day, 23, 59)
+yesterday_runs = Run.select().where(Run.starttime.between(time.mktime(yesterday_starttime.timetuple()), time.mktime(yesterday_endtime.timetuple())))
 
 detailed_report = ""
 failed_report = ""
@@ -79,6 +83,9 @@ passed_runs = []
 master_failures = 0
 develop_failures = 0
 rest_failures = 0
+yesterday_master_failures = 0
+yesterday_develop_failures = 0
+yesterday_rest_failures = 0
 
 for run in runs:
   config_warning = get_messages(run, "configure", "warning")
@@ -89,8 +96,30 @@ for run in runs:
 
   if config_warning.count() + config_error.count() + build_warning.count() + build_error.count() + test_failed.count() > 0:
     failed_runs.append(run)
+    if run.branch == "master":
+      master_failures += 1
+    elif run.branch == "develop":
+      develop_failures += 1
+    else:
+      rest_failures += 1
+
   else:
     passed_runs.append(run)
+
+for run in yesterday_runs:
+  config_warning = get_messages(run, "configure", "warning")
+  config_error = get_messages(run, "configure", "error")
+  build_warning = get_messages(run, "build", "warning")
+  build_error = get_messages(run, "build", "error")
+  test_failed = get_messages(run, "test", "failed")
+
+  if config_warning.count() + config_error.count() + build_warning.count() + build_error.count() + test_failed.count() > 0:
+    if run.branch == "master":
+      yesterday_master_failures += 1
+    elif run.branch == "develop":
+      yesterday_develop_failures += 1
+    else:
+      yesterday_rest_failures += 1
 
 if len(failed_runs) == 0:
   failed_report = "No run failed\n\n"
@@ -105,13 +134,6 @@ else:
     test_passed = get_messages(run, "test", "passed")
 
     failed_report += "  " + run.hostname + " " + run.branch + " "+ run.build + " C: " + str(config_warning.count()) + " " + str(config_error.count()) + " B: " + str(build_warning.count()) + " " + str(build_error.count()) + " T: " + str(test_failed.count()) + " " + str(test_passed.count()) + "\n"
-
-    if run.branch == "master":
-      master_failures += 1
-    elif run.branch == "develop":
-      develop_failures += 1
-    else:
-      rest_failures += 1
 
 if len(passed_runs) == 0:
   passed_report = "No run passed without failure\n\n"
@@ -173,7 +195,7 @@ mail_subject = "Subject: [FEAST-DASH] Summary Mail - "
 if len(failed_runs) == 0:
   mail_subject += "All runs passed"
 else:
-  mail_subject += str(len(failed_runs))+ "/" + str(len(failed_runs) + len(passed_runs)) + " runs failed: M:"+str(master_failures)+" D:"+str(develop_failures)+" R:"+str(rest_failures)
+  mail_subject += str(len(failed_runs))+ "/" + str(len(failed_runs) + len(passed_runs)) + " runs failed: M:"+str(master_failures)+"("+ str(yesterday_master_failures)+")" +" D:"+str(develop_failures)+"("+str(yesterday_develop_failures)+")"+" R:"+str(rest_failures)+"("+str(yesterday_rest_failures)+")"
 mail_from = "dirk.ribbrock@math.tu-dortmund.de"
 mail_to = [i.email for i in Subscriber.select()]
 
