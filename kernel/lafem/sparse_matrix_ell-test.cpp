@@ -4,6 +4,7 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/util/binary_stream.hpp>
+#include <kernel/util/random.hpp>
 
 #include <cstdio>
 #include <sstream>
