@@ -14,7 +14,9 @@ def configure_gcc(cpu, buildid):
     print ("GNU Compiler version less then 4.7 is not supported, please update your compiler!")
     sys.exit(1)
 
-  cxxflags = "-pipe -std=c++11 -ggdb -gdwarf-4"
+  cxxflags = "-pipe -std=c++11 -ggdb"
+  if platform.system() != "Darwin":
+    cxxflags += " -gdwarf-4"
 
   if major >= 4  and minor >= 9:
     cxxflags += " -fdiagnostics-color=always"
