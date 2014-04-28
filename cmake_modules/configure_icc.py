@@ -15,8 +15,8 @@ def configure_icc(cpu, buildid):
 
   cxxflags = "-std=c++11 -g"
 
-  # do not use stone old clang libc++ from apple, hopefully any gcc headers are present
-  if platform.system() == "Darwin":
+  # do not use stone old clang libc++ from apple with icc14, hopefully any gcc headers are present
+  if platform.system() == "Darwin" and major == 14:
     cxxflags += " -no-use-clang-env"
 
   if "debug" in buildid:
