@@ -15,8 +15,6 @@ def configure_gcc(cpu, buildid):
     sys.exit(1)
 
   cxxflags = "-pipe -std=c++11 -ggdb"
-  if platform.system() != "Darwin":
-    cxxflags += " -gdwarf-4"
 
   if major >= 4  and minor >= 9:
     cxxflags += " -fdiagnostics-color=always"
