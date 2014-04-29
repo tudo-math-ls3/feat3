@@ -289,6 +289,89 @@ namespace FEAST
     WRAP_QUAD_MATH1(tan)
 
     /**
+     * \brief Returns the hyperbolic sine of a value.
+     *
+     * \param[in] x The value to calculate the hyperbolic sine from.
+     *
+     * \returns sinh(x)
+     */
+    template<typename T_>
+    inline T_ sinh(T_ x)
+    {
+      // use the exponential sum formula:
+      //            infty  x^(2*n+1)
+      // sinh(x) :=  sum  -----------
+      //             n=0   (2*n+1)!
+      T_ y(x), yl(x+T_(1)), z(x);
+      T_ fn(1.0);
+      int n(1);
+      do
+      {
+        // update 1/(2*n+1)!
+        fn /= T_(++n);
+        fn /= T_(++n);
+        yl = y;
+        y += (z *= x*x) * T_(fn);
+      } while(yl != y);
+
+      return y;
+    }
+
+    // wrap std::sinh
+    WRAP_STD_MATH1(sinh)
+    WRAP_QUAD_MATH1(sinh)
+
+    /**
+     * \brief Returns the hyperbolic cosine of a value.
+     *
+     * \param[in] x The value to calculate the hyperbolic cosine from.
+     *
+     * \returns cosh(x)
+     */
+    template<typename T_>
+    inline T_ cosh(T_ x)
+    {
+      // use the exponential sum formula:
+      //            infty   x^(2*n)
+      // cosh(x) :=  sum   ---------
+      //             n=0     (2*n)!
+      T_ y(T_(1)), yl(T_(0)), z(T_(1));
+      T_ fn(1.0);
+      int n(0);
+      do
+      {
+        // update 1/(2*n)!
+        fn /= T_(++n);
+        fn /= T_(++n);
+        yl = y;
+        y += (z *= x*x) * T_(fn);
+      } while(yl != y);
+
+      return y;
+    }
+
+    // wrap std::cosh
+    WRAP_STD_MATH1(cosh)
+    WRAP_QUAD_MATH1(cosh)
+
+    /**
+     * \brief Returns the hyperbolic tangent of a value.
+     *
+     * \param[in] x The value to calculate the hyperbolic tangent from.
+     *
+     * \returns tanh(x)
+     */
+    template<typename T_>
+    inline T_ tanh(T_ x)
+    {
+      return sinh(x) / cosh(x);
+    }
+
+    // wrap std::tanh
+    WRAP_STD_MATH1(tanh)
+    WRAP_QUAD_MATH1(tanh)
+
+    /**
      * \brief Returns the exponential of a value.
      *
      * \param[in] x The value to calculate the exponential from.

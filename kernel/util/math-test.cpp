@@ -66,6 +66,8 @@ public:
     test_sqrt();
     test_sin();
     test_cos();
+    test_sinh();
+    test_cosh();
     test_exp();
     test_log();
     test_log10();
@@ -108,6 +110,24 @@ public:
 
     // test against std
     TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos<DT_>(DT_(0.7)), Math::cos(DT_(0.7)), tol);
+  }
+
+  void test_sinh() const
+  {
+    // test exact
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sinh<DT_>(DT_(0)), DT_(0), tol);
+
+    // test against std
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sinh<DT_>(DT_(0.7)), Math::sinh(DT_(0.7)), tol);
+  }
+
+  void test_cosh() const
+  {
+    // test exact
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::cosh<DT_>(DT_(0)), DT_(1), tol);
+
+    // test against std
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::cosh<DT_>(DT_(0.7)), Math::cosh(DT_(0.7)), tol);
   }
 
   void test_exp() const
