@@ -20,7 +20,7 @@ namespace FEAST
      * The type of the sub-matrix.
      *
      * \tparam blocks_
-     * The bumber of sub-matrix blocks.
+     * The number of sub-matrix blocks.
      *
      * \author Peter Zajac
      */

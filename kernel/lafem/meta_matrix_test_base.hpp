@@ -13,6 +13,7 @@
 #include <kernel/lafem/power_diag_matrix.hpp>
 #include <kernel/lafem/power_col_matrix.hpp>
 #include <kernel/lafem/power_row_matrix.hpp>
+#include <kernel/lafem/power_full_matrix.hpp>
 #include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 
@@ -128,23 +129,26 @@ namespace FEAST
       /// scalar matrix type D
       typedef typename Helper::ScalarMatrixD ScalarMatrixD;
 
-      /// velocity matrix type
-      typedef PowerDiagMatrix<ScalarMatrixA, 2> VeloMatrix;
+      /// velocity matrix type (diagonal)
+      typedef PowerDiagMatrix<ScalarMatrixA, 2> VeloDiagMatrix;
+      /// velocity matrix type (full)
+      typedef PowerFullMatrix<ScalarMatrixA, 2, 2> VeloFullMatrix;
       /// gradient matrix type
       typedef PowerColMatrix<ScalarMatrixB, 2> GradMatrix;
       /// divergence matrix type
       typedef PowerRowMatrix<ScalarMatrixD, 2> DiveMatrix;
 
       /// system matrix type
-      typedef SaddlePointMatrix<VeloMatrix, GradMatrix, DiveMatrix> SystemMatrix;
+      typedef SaddlePointMatrix<VeloDiagMatrix, GradMatrix, DiveMatrix> SystemDiagMatrix;
+      typedef SaddlePointMatrix<VeloFullMatrix, GradMatrix, DiveMatrix> SystemFullMatrix;
 
       explicit MetaMatrixTestBase(const String & name) :
         FEAST::TestSystem::FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>(name)
       {
       }
 
-      /// generate test matrix
-      static void gen_system(Index m, SystemMatrix& mat_sys, SystemVector& vec_sol, SystemVector& vec_rhs)
+      /// generate test matrix with diagonal velocity blocks
+      static void gen_system(Index m, SystemDiagMatrix& mat_sys, SystemVector& vec_sol, SystemVector& vec_rhs)
       {
         /// create two pointstars
         PointstarFactoryFD<DataType_> ps_fd(m, Index(2));
@@ -167,9 +171,9 @@ namespace FEAST
         mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(1)>().convert(mat_fd);
 
         // set solution vector
-        vec_sol.template at<Index(0)>().template at<Index(0)>().convert(vec_bubble);
-        vec_sol.template at<Index(0)>().template at<Index(1)>().convert(vec_eigen);
-        vec_sol.template at<Index(1)>().convert(vec_eigen);
+        vec_sol.template at<Index(0)>().template at<Index(0)>().convert(vec_bubble); // u1
+        vec_sol.template at<Index(0)>().template at<Index(1)>().convert(vec_eigen); // u2
+        vec_sol.template at<Index(1)>().convert(vec_eigen); // p
 
         // create vectors for rhs computation
         DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs1(vec_bubble.size());
@@ -177,11 +181,60 @@ namespace FEAST
         DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs3(vec_bubble.size());
 
         // compute rhs vector (by exploiting the eigenvector property)
-        mat_fe.template apply<Algo::Generic>(vec_rhs1, vec_bubble);
-        vec_rhs1.template axpy<Algo::Generic>(vec_eigen, vec_rhs1, ps_fd.lambda_min());
-        vec_rhs2.template scale<Algo::Generic>(vec_eigen, ps_fd.lambda_min() + ps_fe.lambda_min());
-        mat_fd.template apply<Algo::Generic>(vec_rhs3, vec_bubble);
-        vec_rhs3.template axpy<Algo::Generic>(vec_eigen, vec_rhs3, ps_fd.lambda_min());
+        mat_fe.template apply<Algo::Generic>(vec_rhs1, vec_bubble); // A11*u1
+        vec_rhs1.template axpy<Algo::Generic>(vec_eigen, vec_rhs1, ps_fd.lambda_min()); // B1*p
+        vec_rhs2.template scale<Algo::Generic>(vec_eigen, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
+        mat_fd.template apply<Algo::Generic>(vec_rhs3, vec_bubble); // D1*u1
+        vec_rhs3.template axpy<Algo::Generic>(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
+
+        // set rhs vector
+        vec_rhs.template at<Index(0)>().template at<Index(0)>().convert(vec_rhs1);
+        vec_rhs.template at<Index(0)>().template at<Index(1)>().convert(vec_rhs2);
+        vec_rhs.template at<Index(1)>().convert(vec_rhs3);
+      }
+
+      /// generate test matrix with full velocity blocks
+      static void gen_system(Index m, SystemFullMatrix& mat_sys, SystemVector& vec_sol, SystemVector& vec_rhs)
+      {
+        /// create two pointstars
+        PointstarFactoryFD<DataType_> ps_fd(m, Index(2));
+        PointstarFactoryFE<DataType_> ps_fe(m);
+
+        /// generate the corresponding CSR matrices
+        const SparseMatrixCSR<Mem::Main, DataType_, IndexType_> mat_fd(ps_fd.matrix_csr());
+        const SparseMatrixCSR<Mem::Main, DataType_, IndexType_> mat_fe(ps_fe.matrix_csr());
+
+        // generate Q2-bubble and eigenvector
+        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen(ps_fd.eigenvector_min());
+        const DenseVector<Mem::Main, DataType_, IndexType_> vec_bubble(ps_fd.vector_q2_bubble());
+
+        // set system matrix
+        mat_sys.template at<Index(0),Index(0)>().template at<Index(0),Index(0)>().convert(mat_fe);
+        mat_sys.template at<Index(0),Index(0)>().template at<Index(1),Index(1)>().convert(mat_fe);
+        mat_sys.template at<Index(0),Index(0)>().template at<Index(0),Index(1)>().convert(mat_fd);
+        mat_sys.template at<Index(0),Index(0)>().template at<Index(1),Index(0)>().convert(mat_fd);
+        mat_sys.template at<Index(0),Index(1)>().template at<Index(0),Index(0)>().convert(mat_fd);
+        mat_sys.template at<Index(0),Index(1)>().template at<Index(1),Index(0)>().convert(mat_fd);
+        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(0)>().convert(mat_fd);
+        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(1)>().convert(mat_fd);
+
+        // set solution vector
+        vec_sol.template at<Index(0)>().template at<Index(0)>().convert(vec_bubble); // u1
+        vec_sol.template at<Index(0)>().template at<Index(1)>().convert(vec_eigen); // u2
+        vec_sol.template at<Index(1)>().convert(vec_eigen); // p
+
+        // create vectors for rhs computation
+        DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs1(vec_bubble.size());
+        DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs2(vec_bubble.size());
+        DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs3(vec_bubble.size());
+
+        // compute rhs vector (by exploiting the eigenvector property)
+        mat_fe.template apply<Algo::Generic>(vec_rhs1, vec_bubble); // A11*u1
+        mat_fd.template apply<Algo::Generic>(vec_rhs2, vec_bubble); // A21*u1
+        vec_rhs1.template axpy<Algo::Generic>(vec_eigen, vec_rhs1, ps_fd.lambda_min() + ps_fd.lambda_min()); // A12*u2 + B1*p
+        vec_rhs2.template axpy<Algo::Generic>(vec_eigen, vec_rhs2, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
+        mat_fd.template apply<Algo::Generic>(vec_rhs3, vec_bubble); // D1*u1
+        vec_rhs3.template axpy<Algo::Generic>(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
 
         // set rhs vector
         vec_rhs.template at<Index(0)>().template at<Index(0)>().convert(vec_rhs1);

@@ -142,7 +142,7 @@ public:
   typedef typename VT_::DataType   DT_;
   typedef typename VT_::MemType    Mem_;
   typedef MetaMatrixTestBase<Algo_, DT_, Index> BaseClass;
-  typedef typename BaseClass::SystemMatrix SystemMatrix;
+  typedef typename BaseClass::SystemDiagMatrix SystemMatrix;
   typedef typename BaseClass::SystemVector SystemVector;
 
   BiCGStabSaddlePointTest(String pname, Index opt = 0)

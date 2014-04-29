@@ -29,7 +29,7 @@ public:
   typedef Algo_ AlgoType;
   typedef typename MT_::DataType DataType;
   typedef MetaMatrixTestBase<Algo_, DataType, Index> BaseClass;
-  typedef typename BaseClass::SystemMatrix SystemMatrix;
+  typedef typename BaseClass::SystemDiagMatrix SystemMatrix;
   typedef typename BaseClass::SystemVector SystemVector;
 
   typedef typename SystemVector::MemType Mem_;

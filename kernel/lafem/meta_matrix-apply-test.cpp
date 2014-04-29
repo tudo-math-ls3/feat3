@@ -15,6 +15,7 @@ using namespace FEAST::TestSystem;
  *  - PowerColMatrix
  *  - PowerRowMatrix
  *  - PowerDiagMatrix
+ *  - PowerFullMatrix
  *  - SaddlePointMatrix
  *
  * \author Peter Zajac
@@ -27,22 +28,46 @@ public:
   typedef Algo_ AlgoType;
   typedef DataType_ DataType;
   typedef MetaMatrixTestBase<Algo_, DataType_, IndexType_> BaseClass;
-  typedef typename BaseClass::SystemMatrix SystemMatrix;
-  typedef typename BaseClass::SystemVector SystemVector;
 
   MetaMatrixApplyTest() : BaseClass("MetaMatrixApplyTest") {}
 
   virtual void run() const
   {
+    test_diag();
+    test_full();
+  }
+
+  void test_diag() const
+  {
     const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
 
     // generate a test system: A,x,b
-    SystemMatrix mat_sys;
-    SystemVector vec_sol, vec_rhs;
+    typename BaseClass::SystemDiagMatrix mat_sys;
+    typename BaseClass::SystemVector vec_sol, vec_rhs;
     this->gen_system(7, mat_sys, vec_sol, vec_rhs);
 
     // test t <- b - A*x
-    SystemVector vec_tmp(mat_sys.create_vector_l());
+    typename BaseClass::SystemVector vec_tmp(mat_sys.create_vector_l());
+    mat_sys.template apply<AlgoType>(vec_tmp, vec_sol, vec_rhs, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
+
+    // test t <- A*x; t <- t - b
+    mat_sys.template apply<AlgoType>(vec_tmp, vec_sol);
+    vec_tmp.template axpy<AlgoType>(vec_rhs, vec_tmp, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
+  }
+
+  void test_full() const
+  {
+    const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
+
+    // generate a test system: A,x,b
+    typename BaseClass::SystemFullMatrix mat_sys;
+    typename BaseClass::SystemVector vec_sol, vec_rhs;
+    this->gen_system(7, mat_sys, vec_sol, vec_rhs);
+
+    // test t <- b - A*x
+    typename BaseClass::SystemVector vec_tmp(mat_sys.create_vector_l());
     mat_sys.template apply<AlgoType>(vec_tmp, vec_sol, vec_rhs, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
 
