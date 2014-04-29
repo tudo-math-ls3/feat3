@@ -39,6 +39,8 @@ def run_test(build_id, branch, myDB):
   r = Run.create(branch=branch, hostname=hostname, build=build_id, starttime=time.time())
   r.save()
   m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="directories", body="Source: " + src_dirname + "\n" + "Build: " + build_dirname + "\n" + "Dumpfile: " + dump_filename_full)
+  if note != "":
+    r.notes = note
   m.save()
 
   #prepare build dir
@@ -215,12 +217,15 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  setup port of sql server.")
   print ("scratch=dir")
   print ("  set scratch directory for build files.")
+  print ("note=text")
+  print ("  set note for all runs."
   sys.exit();
 
 dump_filename = ""
 scratch = ""
 sqlhost = "augias"
 sqlport = 3306
+note = ""
 
 for i in range(1, len(sys.argv)):
   if sys.argv[i].startswith("dump="):
@@ -231,6 +236,8 @@ for i in range(1, len(sys.argv)):
     sqlport = int(sys.argv[i].replace("sqlport=", "", 1))
   if sys.argv[i].startswith("scratch="):
     scratch = sys.argv[i].replace("scratch=", "", 1)
+  if sys.argv[i].startswith("note="):
+    note = sys.argv[i].replace("note=", "", 1)
 
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 myDB = pw.MySQLDatabase("feastdash", host=sqlhost, port=sqlport, user="feastdash", passwd="feastdash", threadlocals=True)
