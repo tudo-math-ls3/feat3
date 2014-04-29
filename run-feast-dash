@@ -37,10 +37,10 @@ def run_test(build_id, branch, myDB):
 
   #create test run in database
   r = Run.create(branch=branch, hostname=hostname, build=build_id, starttime=time.time())
-  r.save()
-  m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="directories", body="Source: " + src_dirname + "\n" + "Build: " + build_dirname + "\n" + "Dumpfile: " + dump_filename_full)
   if note != "":
     r.notes = note
+  r.save()
+  m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="directories", body="Source: " + src_dirname + "\n" + "Build: " + build_dirname + "\n" + "Dumpfile: " + dump_filename_full)
   m.save()
 
   #prepare build dir
