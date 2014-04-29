@@ -23,29 +23,37 @@ using namespace FEAST::TestSystem;
 * \tparam Mem_
 * description missing
 *
+* \tparam Algo_
+* description missing
+*
 * \tparam DT_
+* description missing
+*
+* \tparam IT_
 * description missing
 *
 * \author Dirk Ribbrock
 */
 template<
   typename Mem_,
-  typename DT_>
+  typename Algo_,
+  typename DT_,
+  typename IT_>
 class SparseMatrixConversionTest
-  : public TaggedTest<Mem_, DT_>
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
 
 public:
 
   SparseMatrixConversionTest()
-    : TaggedTest<Mem_, DT_>("sparse_matrix_conversion_test")
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("sparse_matrix_conversion_test")
   {
   }
 
   virtual void run() const
   {
 
-    SparseMatrixCOO<Mem::Main, DT_> a(121, 121);
+    SparseMatrixCOO<Mem_, DT_, IT_> a(121, 121);
     for (Index row(0) ; row < a.rows() ; ++row)
     {
       for (Index col(0) ; col < a.columns() ; ++col)
@@ -58,40 +66,43 @@ public:
     }
 
     {
-      SparseMatrixCOO<Mem::Main, DT_> coo_m1;
+      SparseMatrixCOO<Mem_, DT_, IT_> coo_m1;
       coo_m1.convert(a);
-      SparseMatrixELL<Mem::Main, DT_> ell_m1(coo_m1);
-      SparseMatrixCOO<Mem::Main, DT_> coo_m2(ell_m1);
+      SparseMatrixELL<Mem_, DT_, IT_> ell_m1(coo_m1);
+      SparseMatrixCOO<Mem_, DT_, IT_> coo_m2(ell_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
-      SparseMatrixCSR<Mem::Main, DT_> csr_m1(coo_m1);
-      SparseMatrixCOO<Mem::Main, DT_> coo_m3(csr_m1);
+      SparseMatrixCSR<Mem_, DT_, IT_> csr_m1(coo_m1);
+      SparseMatrixCOO<Mem_, DT_, IT_> coo_m3(csr_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
     }
 
     {
-      SparseMatrixELL<Mem::Main, DT_> ell_m1(a);
-      SparseMatrixCOO<Mem::Main, DT_> coo_m1(ell_m1);
-      SparseMatrixELL<Mem::Main, DT_> ell_m2(coo_m1);
+      SparseMatrixELL<Mem_, DT_, IT_> ell_m1(a);
+      SparseMatrixCOO<Mem_, DT_, IT_> coo_m1(ell_m1);
+      SparseMatrixELL<Mem_, DT_, IT_> ell_m2(coo_m1);
       TEST_CHECK_EQUAL(ell_m2, ell_m1);
-      SparseMatrixCSR<Mem::Main, DT_> csr_m1(ell_m1);
-      SparseMatrixELL<Mem::Main, DT_> ell_m3(csr_m1);
+      SparseMatrixCSR<Mem_, DT_, IT_> csr_m1(ell_m1);
+      SparseMatrixELL<Mem_, DT_, IT_> ell_m3(csr_m1);
       TEST_CHECK_EQUAL(ell_m3, ell_m1);
     }
 
     {
-      SparseMatrixCSR<Mem::Main, DT_> csr_m1(a);
-      SparseMatrixCOO<Mem::Main, DT_> coo_m1(csr_m1);
-      SparseMatrixCSR<Mem::Main, DT_> csr_m2(coo_m1);
+      SparseMatrixCSR<Mem_, DT_, IT_> csr_m1(a);
+      SparseMatrixCOO<Mem_, DT_, IT_> coo_m1(csr_m1);
+      SparseMatrixCSR<Mem_, DT_, IT_> csr_m2(coo_m1);
       TEST_CHECK_EQUAL(csr_m2, csr_m1);
-      SparseMatrixELL<Mem::Main, DT_> ell_m1(csr_m1);
-      SparseMatrixCSR<Mem::Main, DT_> csr_m3(ell_m1);
+      SparseMatrixELL<Mem_, DT_, IT_> ell_m1(csr_m1);
+      SparseMatrixCSR<Mem_, DT_, IT_> csr_m3(ell_m1);
       TEST_CHECK_EQUAL(csr_m3, csr_m1);
     }
 
   }
 };
-SparseMatrixConversionTest<Mem::Main, float> sparse_matrix_conversion_test_float;
-SparseMatrixConversionTest<Mem::Main, double> sparse_matrix_conversion_test_double;
+SparseMatrixConversionTest<Mem::Main, NotSet, float, unsigned int> sparse_matrix_conversion_test_float_uint;
+SparseMatrixConversionTest<Mem::Main, NotSet, double, unsigned int> sparse_matrix_conversion_test_double_uint;
+SparseMatrixConversionTest<Mem::Main, NotSet, float, unsigned long> sparse_matrix_conversion_test_float_ulong;
+SparseMatrixConversionTest<Mem::Main, NotSet, double, unsigned long> sparse_matrix_conversion_test_double_ulong;
+
 
 /**
 * \brief Test class for sparse matrix conversions.
@@ -209,22 +220,24 @@ SparseMatrixCudaConversionTest<Mem::CUDA, double> sparse_matrix_cuda_conversion_
  *
  * \test test description missing
  *
+ * \tparam Algo_
+ * description missing
+ *
  * \tparam MT_
  * description missing
  *
  * \author Christoph Lohmann
  */
-template<typename MT_>
+template<typename Algo_, typename MT_>
 class SparseMatrixBandedConversionTest
-  : public TaggedTest<typename MT_::MemType, typename MT_::DataType>
+  : public FullTaggedTest<typename MT_::MemType, Algo_, typename MT_::DataType, typename MT_::IndexType>
 {
 public:
   SparseMatrixBandedConversionTest()
-    : TaggedTest<typename MT_::MemType, typename MT_::DataType>("sparse_matrix_banded_conversion_test: " + MT_::name())
+    : FullTaggedTest<typename MT_::MemType, Algo_, typename MT_::DataType, typename MT_::IndexType>("sparse_matrix_banded_conversion_test: " + MT_::name())
   {
   }
 
-  typedef Algo::Generic Algo_;
   typedef typename MT_::MemType Mem_;
   typedef typename MT_::DataType DT_;
   typedef typename MT_::IndexType IT_;
@@ -277,22 +290,32 @@ public:
   }
 };
 
-SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::Main, float> > sparse_matrix_banded_csr_conversion_test_float;
-SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::Main, double> > sparse_matrix_banded_csr_conversion_test_double;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCSR<Mem::Main, float, unsigned int> > sparse_matrix_banded_csr_conversion_test_float_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCSR<Mem::Main, double, unsigned int> > sparse_matrix_banded_csr_conversion_test_double_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixELL<Mem::Main, float, unsigned int> > sparse_matrix_banded_ell_conversion_test_float_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixELL<Mem::Main, double, unsigned int> > sparse_matrix_banded_ell_conversion_test_double_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCOO<Mem::Main, float, unsigned int> > sparse_matrix_banded_coo_conversion_test_float_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCOO<Mem::Main, double, unsigned int> > sparse_matrix_banded_coo_conversion_test_double_uint;
 
-SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::Main, float> > sparse_matrix_banded_ell_conversion_test_float;
-SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::Main, double> > sparse_matrix_banded_ell_conversion_test_double;
-
-SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, float> > sparse_matrix_banded_coo_conversion_test_float;
-SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, double> > sparse_matrix_banded_coo_conversion_test_double;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCSR<Mem::Main, float, unsigned long> > sparse_matrix_banded_csr_conversion_test_float_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCSR<Mem::Main, double, unsigned long> > sparse_matrix_banded_csr_conversion_test_double_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixELL<Mem::Main, float, unsigned long> > sparse_matrix_banded_ell_conversion_test_float_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixELL<Mem::Main, double, unsigned long> > sparse_matrix_banded_ell_conversion_test_double_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCOO<Mem::Main, float, unsigned long> > sparse_matrix_banded_coo_conversion_test_float_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCOO<Mem::Main, double, unsigned long> > sparse_matrix_banded_coo_conversion_test_double_ulong;
 
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::CUDA, float> > cuda_sparse_matrix_banded_csr_conversion_test_float;
-SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::CUDA, double> > cuda_sparse_matrix_banded_csr_conversion_test_double;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCSR<Mem::CUDA, float, unsigned int> > cuda_sparse_matrix_banded_csr_conversion_test_float_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCSR<Mem::CUDA, double, unsigned int> > cuda_sparse_matrix_banded_csr_conversion_test_double_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixELL<Mem::CUDA, float, unsigned int> > cuda_sparse_matrix_banded_ell_conversion_test_float_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixELL<Mem::CUDA, double, unsigned int> > cuda_sparse_matrix_banded_ell_conversion_test_double_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCOO<Mem::CUDA, float, unsigned int> > cuda_sparse_matrix_banded_coo_conversion_test_float_uint;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCOO<Mem::CUDA, double, unsigned int> > cuda_sparse_matrix_banded_coo_conversion_test_double_uint;
 
-SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::CUDA, float> > cuda_sparse_matrix_banded_ell_conversion_test_float;
-SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::CUDA, double> > cuda_sparse_matrix_banded_ell_conversion_test_double;
-
-SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::CUDA, float> > cuda_sparse_matrix_banded_coo_conversion_test_float;
-SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::CUDA, double> > cuda_sparse_matrix_banded_coo_conversion_test_double;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCSR<Mem::CUDA, float, unsigned long> > cuda_sparse_matrix_banded_csr_conversion_test_float_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCSR<Mem::CUDA, double, unsigned long> > cuda_sparse_matrix_banded_csr_conversion_test_double_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixELL<Mem::CUDA, float, unsigned long> > cuda_sparse_matrix_banded_ell_conversion_test_float_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixELL<Mem::CUDA, double, unsigned long> > cuda_sparse_matrix_banded_ell_conversion_test_double_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCOO<Mem::CUDA, float, unsigned long> > cuda_sparse_matrix_banded_coo_conversion_test_float_ulong;
+SparseMatrixBandedConversionTest<NotSet, SparseMatrixCOO<Mem::CUDA, double, unsigned long> > cuda_sparse_matrix_banded_coo_conversion_test_double_ulong;
 #endif
