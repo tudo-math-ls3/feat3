@@ -23,24 +23,26 @@ using namespace FEAST::TestSystem;
 */
 template<
   typename Mem_,
-  typename DT_>
+  typename Algo_,
+  typename DT_,
+  typename IT_>
 class SparseMatrixCOOTest
-  : public TaggedTest<Mem_, DT_>
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
 public:
   SparseMatrixCOOTest()
-    : TaggedTest<Mem_, DT_>("SparseMatrixCOOTest")
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixCOOTest")
   {
   }
 
   virtual void run() const
   {
-    SparseMatrixCOO<Mem_, DT_> zero1;
-    SparseMatrixCOO<Mem::Main, DT_> zero2;
+    SparseMatrixCOO<Mem_, DT_, IT_> zero1;
+    SparseMatrixCOO<Mem::Main, DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
 
-    SparseMatrixCOO<Mem_, DT_> x;
-    SparseMatrixCOO<Mem_, DT_> a(10, 10);
+    SparseMatrixCOO<Mem_, DT_, IT_> x;
+    SparseMatrixCOO<Mem_, DT_, IT_> a(10, 10);
     a(5,5,5);
     a(1,2,7);
     a(5,5,2);
@@ -64,7 +66,7 @@ public:
     TEST_CHECK_EQUAL(a(1, 2), 7.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);
 
-    SparseMatrixCOO<Mem_, DT_> b;
+    SparseMatrixCOO<Mem_, DT_, IT_> b;
     b.convert(a);
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
@@ -73,7 +75,7 @@ public:
     TEST_CHECK_EQUAL(a(0,2), b(0,2));
     TEST_CHECK_EQUAL(a, b);
 
-    SparseMatrixCOO<Mem_, DT_> c(b.clone());
+    SparseMatrixCOO<Mem_, DT_, IT_> c(b.clone());
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
     TEST_CHECK_NOT_EQUAL((void*)c.row_indices(), (void*)b.row_indices());
     c(1,2,3);
@@ -93,7 +95,7 @@ public:
     decltype(c) d(c.layout());
     TEST_CHECK_NOT_EQUAL((void*)d.row_indices(), (void*)c.row_indices());
 
-    SparseMatrixCOO<Mem_, DT_> f(10, 10);
+    SparseMatrixCOO<Mem_, DT_, IT_> f(10, 10);
     for (Index row(0) ; row < f.rows() ; ++row)
     {
       for (Index col(0) ; col < f.columns() ; ++col)
@@ -108,28 +110,33 @@ public:
     BinaryStream bs;
     f.write_out(FileMode::fm_coo, bs);
     bs.seekg(0);
-    SparseMatrixCOO<Mem_, DT_> g(FileMode::fm_coo, bs);
+    SparseMatrixCOO<Mem_, DT_, IT_> g(FileMode::fm_coo, bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
     f.write_out(FileMode::fm_m, ts);
-    SparseMatrixCOO<Mem_, DT_> i(FileMode::fm_m, ts);
+    SparseMatrixCOO<Mem_, DT_, IT_> i(FileMode::fm_m, ts);
     TEST_CHECK_EQUAL(i, f);
 
     std::stringstream ms;
     f.write_out(FileMode::fm_mtx, ms);
-    SparseMatrixCOO<Mem_, DT_> j(FileMode::fm_mtx, ms);
+    SparseMatrixCOO<Mem_, DT_, IT_> j(FileMode::fm_mtx, ms);
     TEST_CHECK_EQUAL(j, f);
   }
 };
-SparseMatrixCOOTest<Mem::Main, float> sparse_matrix_coo_test_float;
-SparseMatrixCOOTest<Mem::Main, double> sparse_matrix_coo_test_double;
+SparseMatrixCOOTest<Mem::Main, NotSet, float, unsigned int> sparse_matrix_coo_test_float_uint;
+SparseMatrixCOOTest<Mem::Main, NotSet, double, unsigned int> sparse_matrix_coo_test_double_uint;
+SparseMatrixCOOTest<Mem::Main, NotSet, float, unsigned long> sparse_matrix_coo_test_float_ulong;
+SparseMatrixCOOTest<Mem::Main, NotSet, double, unsigned long> sparse_matrix_coo_test_double_ulong;
 #ifdef FEAST_HAVE_QUADMATH
-SparseMatrixCOOTest<Mem::Main, float> sparse_matrix_coo_test_float128;
+SparseMatrixCOOTest<Mem::Main, NotSet, __float128, unsigned int> sparse_matrix_coo_test_float128_uint;
+SparseMatrixCOOTest<Mem::Main, NotSet, __float128, unsigned long> sparse_matrix_coo_test_float128_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixCOOTest<Mem::CUDA, float> cuda_sparse_matrix_coo_test_float;
-SparseMatrixCOOTest<Mem::CUDA, double> cuda_sparse_matrix_coo_test_double;
+SparseMatrixCOOTest<Mem::CUDA, NotSet, float, unsigned int> cuda_sparse_matrix_coo_test_float_uint;
+SparseMatrixCOOTest<Mem::CUDA, NotSet, double, unsigned int> cuda_sparse_matrix_coo_test_double_uint;
+SparseMatrixCOOTest<Mem::CUDA, NotSet, float, unsigned long> cuda_sparse_matrix_coo_test_float_ulong;
+SparseMatrixCOOTest<Mem::CUDA, NotSet, double, unsigned long> cuda_sparse_matrix_coo_test_double_ulong;
 #endif
 
 template<

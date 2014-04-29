@@ -160,9 +160,9 @@ namespace FEAST
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
             String srow(line, 0, end);
-            Index row((Index)atol(srow.c_str()));
+            IT_ row((IT_)atol(srow.c_str()));
             --row;
-            _rows() = std::max(row+1, this->rows());
+            _rows() = std::max((Index)row+1, this->rows());
             line.erase(0, end);
 
             begin = line.find_first_not_of(" ");
@@ -274,7 +274,7 @@ namespace FEAST
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
             String srow(line, 0, end);
-            Index row((Index)atol(srow.c_str()));
+            IT_ row((IT_)atol(srow.c_str()));
             --row;
             line.erase(0, end);
 
