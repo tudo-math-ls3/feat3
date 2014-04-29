@@ -218,7 +218,7 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("scratch=dir")
   print ("  set scratch directory for build files.")
   print ("note=text")
-  print ("  set note for all runs."
+  print ("  set note for all runs.")
   sys.exit();
 
 dump_filename = ""
