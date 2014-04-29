@@ -896,10 +896,10 @@ namespace FEAST
               // iteration over all rows which contain the offsets between offset i and offset j
               for (Index l(std::max(START_OFFSET(i), END_OFFSET(j))); l < std::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
               {
-                tArl[l] = j - i;
+                tArl[l] = IT_(j - i);
                 for (Index a(i); a < j; ++a)
                 {
-                  tAj[l + (a - i) * _stride()] = l + coffsets[a] + 1 - crows;
+                  tAj[l + (a - i) * _stride()] = IT_(l + coffsets[a] + 1 - crows);
                   tAx[l + (a - i) * _stride()] = cval[a * crows + l];
                 }
               }
@@ -1444,7 +1444,7 @@ namespace FEAST
             for (Index j(i); j < i + ptxarl[i] * txstride; j += txstride)
             {
               const Index k(ptxaj[j]);
-              ptaj[k + ptarl[k] * tstride] = i;
+              ptaj[k + ptarl[k] * tstride] = IT_(i);
               ptax[k + ptarl[k] * tstride] = ptxax[j];
               ++ptarl[k];
             }

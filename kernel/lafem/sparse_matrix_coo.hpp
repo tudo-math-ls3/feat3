@@ -790,7 +790,7 @@ namespace FEAST
             for (Index i(cother.row_ptr()[row]) ; i < end ; ++i)
             {
               tval[ue] = cother.val()[i];
-              trow[ue] = row;
+              trow[ue] = IT_(row);
               tcolumn[ue] = cother.col_ind()[i];
               ++ue;
             }
@@ -980,8 +980,8 @@ namespace FEAST
                 for (Index a(i); a < j; ++a)
                 {
                   tval[ue] = cval[a * crows + l];
-                  tcol_ind[ue] = l + coffsets[a] + 1 - crows;
-                  trow_ind[ue] = l;
+                  tcol_ind[ue] = IT_(l + coffsets[a] + 1 - crows);
+                  trow_ind[ue] = IT_(l);
                   ++ue;
                 }
               }

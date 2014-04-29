@@ -847,7 +847,7 @@ namespace FEAST
             ++k;
           }
 
-          Index ue(0);
+          IT_ ue(0);
           // iteration over all offsets of the lower triangular matrix
           for (Index i(k + 1); i > 0;)
           {
@@ -864,7 +864,7 @@ namespace FEAST
                 for (Index a(i); a < j; ++a)
                 {
                   tval[ue] = cval[a * crows + l];
-                  tcol_ind[ue] = l + coffsets[a] + 1 - crows;
+                  tcol_ind[ue] = IT_(l + coffsets[a] + 1 - crows);
                   ++ue;
                 }
                 trow_ptr[l + 1] = ue;
@@ -1458,7 +1458,7 @@ namespace FEAST
               const Index l(ptxcol_ind[k]);
               const Index j(ptrow_ptr[l]);
               ptval[j] = ptxval[k];
-              ptcol_ind[j] = i;
+              ptcol_ind[j] = IT_(i);
               ++ptrow_ptr[l];
             }
           }
