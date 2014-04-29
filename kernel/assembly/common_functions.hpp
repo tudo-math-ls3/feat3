@@ -599,6 +599,233 @@ namespace FEAST
         }
       }; // class DistanceFunction
 
+      /**
+       * \brief Heaviside static function
+       *
+       * This class implements the StaticFunction interface representing the function
+       *                           ( 0, x  < 0
+       *   - 1D: u(x)     = H(x) = (
+       *                           ( 1, x >= 0
+       *   - 2D: u(x,y)   = H(x)*H(y)
+       *   - 3D: u(x,y,z) = H(x)*H(y)*H(z)
+       *
+       * \author Jordi Paul
+       */
+      template<typename DataType_>
+      class HeavisideStatic
+      {
+
+      public:
+
+        /// 1D: function value
+        static DataType_ eval(DataType_ x)
+        {
+          return ( x < DataType_(0) ) ? DataType_(0) : DataType_(1);
+        }
+
+        /// 2D: function value
+        static DataType_ eval(DataType_ x, DataType_ y)
+        {
+          return eval(x)*eval(y);
+        }
+
+        /// 3D: function value
+        static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return eval(x)*eval*(y)*eval(z);
+        }
+
+      }; // class HeavisideStatic<...>
+
+      /**
+       * \brief Heaviside function
+       *
+       * This class implements the StaticFunction interface representing the function
+       *                           ( 0, x  < 0
+       *   - 1D: u(x)     = H(x) = (
+       *                           ( 1, x >= 0
+       *   - 2D: u(x,y)   = H(x)*H(y)
+       *   - 3D: u(x,y,z) = H(x)*H(y)*H(z)
+       *
+       *   This class supports only values.
+       *
+       * \author Jordi Paul
+       */
+      typedef StaticWrapperFunction<HeavisideStatic, true, false, false> HeavisideFunction;
+
+      /**
+       * \brief Regularised Heaviside static function
+       *
+       * This class implements the StaticFunction interface representing the function
+       *                           ( 0,               x  < 0
+       *   - 1D: u(x)     = H(x) = (
+       *                           ( 2 (cosh(x) - 1), x >= 0
+       *   - 2D: u(x,y)   = H(x)*H(y)
+       *   - 3D: u(x,y,z) = H(x)*H(y)*H(z)
+       *
+       * \author Jordi Paul
+       */
+      template<typename DataType_>
+      class HeavisideRegStatic
+      {
+
+      public:
+
+        /// 1D: function value
+        static DataType_ eval(DataType_ x)
+        {
+          return ( x < DataType_(0) ) ? DataType_(0) : DataType_(2)*(Math::cosh(x) - DataType_(1));
+        }
+
+        /// 2D: function value
+        static DataType_ eval(DataType_ x, DataType_ y)
+        {
+          return eval(x)*eval(y);
+        }
+
+        /// 3D: function value
+        static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return eval(x)*eval*(y)*eval(z);
+        }
+
+        /// 1D: X-derivative
+        static DataType_ der_x(DataType_ x)
+        {
+          return ( x < DataType_(0) ) ? DataType_(0) : DataType_(2)*Math::sinh(x);
+        }
+
+        /// 2D: X-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y)
+        {
+          return der_x(x)*eval(y);
+        }
+
+        /// 2D: Y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y)
+        {
+          return eval(x)*der_x(y);
+        }
+
+        /// 3D: X-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_x(x)*eval(y)*eval(z);
+        }
+
+        /// 3D: Y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return eval(x)*der_x(y)*eval(z);
+        }
+
+        /// 3D: Z-derivative
+        static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return eval(x)*eval(y)*der_x(z);
+        }
+
+        /// 1D: XX-derivative
+        static DataType_ der_xx(DataType_ x)
+        {
+          return ( x < DataType_(0) ) ? DataType_(0) : DataType_(2)*Math::cosh(x);
+        }
+
+        /// 2D: XX-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ y)
+        {
+          return der_xx(x)*eval(y);
+        }
+
+        /// 2D: YY-derivative
+        static DataType_ der_yy(DataType_ x, DataType_ y)
+        {
+          return eval(x)*der_xx(y);
+        }
+
+        /// 2D: XY-derivative
+        static DataType_ der_xy(DataType_ x, DataType_ y)
+        {
+          return der_x(x)*der_x(y);
+        }
+
+        /// 2D: YX-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y)
+        {
+          return der_xy(x, y);
+        }
+
+        /// 3D: XX-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_xx(x)*eval(y)*eval(z);
+        }
+
+        /// 3D: YY-derivative
+        static DataType_ der_yy(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return eval(x)*der_xx(y)*eval(z);
+        }
+
+        /// 3D: ZZ-derivative
+        static DataType_ der_zz(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return eval(x)*eval(y)*der_xx(z);
+        }
+
+        /// 3D: XY-derivative
+        static DataType_ der_xy(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_x(x)*der_x(y)*eval(z);
+        }
+
+        /// 3D: YX-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_x(x)*der_x(y)*eval(z);
+        }
+
+        /// 3D: XZ-derivative
+        static DataType_ der_xz(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_x(x)*eval(y)*der_x(z);
+        }
+
+        /// 3D: ZX-derivative
+        static DataType_ der_zx(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_xz(x, y, z);
+        }
+
+        /// 3D: YZ-derivative
+        static DataType_ der_yz(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return eval(x)*der_x(y)*der_x(z);
+        }
+
+        /// 3D: ZY-derivative
+        static DataType_ der_zy(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_yz(x, y, z);
+        }
+
+      }; // class HeavisideRegStatic<...>
+
+      /**
+       * \brief Regularised Heaviside function
+       *
+       * This class implements the StaticFunction interface representing the function
+       *                           ( 0,               x  < 0
+       *   - 1D: u(x)     = H(x) = (
+       *                           ( 2 (cosh(x) - 1), x >= 0
+       *   - 2D: u(x,y)   = H(x)*H(y)
+       *   - 3D: u(x,y,z) = H(x)*H(y)*H(z)
+       *
+       *   This class supports function values, gradients and hessians for all dimensions.
+       *
+       * \author Jordi Paul
+       */
+      typedef StaticWrapperFunction<HeavisideRegStatic, true, true, true> HeavisideRegFunction;
     } // namespace Common
   } // namespace Assembly
 } // namespace FEAST
