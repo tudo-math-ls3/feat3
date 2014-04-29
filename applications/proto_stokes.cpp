@@ -30,7 +30,6 @@ for further application development.
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/transposition.hpp>
 
 using namespace FEAST;
 
@@ -290,8 +289,8 @@ public:
       ::assemble_matrix2(_matrix_b2, gradient_y, _space_v, _space_p, cubature_factory_velo, -DataType(1));
 
     // build velocity divergence matrices D1 and D2 by transposing B1 and B2
-    _matrix_d1 = LAFEM::Transposition<AlgoType>::value(_matrix_b1);
-    _matrix_d2 = LAFEM::Transposition<AlgoType>::value(_matrix_b2);
+    _matrix_d1.transpose(_matrix_b1);
+    _matrix_d2.transpose(_matrix_b2);
   }
 
   // assembles prolongation and restriction matrices
@@ -326,8 +325,8 @@ public:
     _prol_p.scale_rows<AlgoType>(_prol_p, weight_p);
 
     // transpose to obtain restriction matrices
-    _rest_v = LAFEM::Transposition<AlgoType>::value(_prol_v);
-    _rest_p = LAFEM::Transposition<AlgoType>::value(_prol_p);
+    _rest_v.transpose(_prol_v);
+    _rest_p.transpose(_prol_p);
   }
 
   // assembles the boundary conditions

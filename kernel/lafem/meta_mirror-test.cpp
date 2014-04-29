@@ -5,7 +5,6 @@
 #include <kernel/lafem/tuple_mirror.hpp>
 #include <kernel/lafem/power_mirror.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
-#include <kernel/lafem/transposition.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -81,8 +80,10 @@ public:
     ScalarMatrix gather_y(gen_mir_y(m));
 
     // transpose for scatter
-    ScalarMatrix scatter_x(Transposition<AlgoType>::value(gather_x));
-    ScalarMatrix scatter_y(Transposition<AlgoType>::value(gather_y));
+    ScalarMatrix scatter_x;
+    scatter_x.transpose(gather_x);
+    ScalarMatrix scatter_y;
+    scatter_y.transpose(gather_y);
 
     // create the meta-mirrors
     MetaMirror mirror_x(PowerMirror2(ScalarMirror(gather_x.clone(), scatter_x.clone())), ScalarMirror(gather_x.clone(), scatter_x.clone()));

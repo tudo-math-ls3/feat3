@@ -136,6 +136,7 @@ public:
     TEST_CHECK_EQUAL(j, f);
   }
 };
+
 SparseMatrixCSRTest<Mem::Main, NotSet, float, unsigned long> cpu_sparse_matrix_csr_test_float_ulong;
 SparseMatrixCSRTest<Mem::Main, NotSet, double, unsigned long> cpu_sparse_matrix_csr_test_double_ulong;
 SparseMatrixCSRTest<Mem::Main, NotSet, float, unsigned int> cpu_sparse_matrix_csr_test_float_uint;
@@ -242,6 +243,7 @@ SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_csr
 SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_csr_apply_test_double_uint;
 #endif
 
+
 template<
   typename Mem_,
   typename Algo_,
@@ -293,6 +295,7 @@ public:
     }
   }
 };
+
 SparseMatrixCSRScaleTest<Mem::Main, Algo::Generic, float, unsigned int> sm_csr_scale_test_float_uint;
 SparseMatrixCSRScaleTest<Mem::Main, Algo::Generic, double, unsigned int> sm_csr_scale_test_double_uint;
 SparseMatrixCSRScaleTest<Mem::Main, Algo::Generic, float, unsigned long> sm_csr_scale_test_float_ulong;
@@ -313,6 +316,7 @@ SparseMatrixCSRScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_cs
 SparseMatrixCSRScaleTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_csr_scale_test_float_ulong;
 SparseMatrixCSRScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_csr_scale_test_double_ulong;
 #endif
+
 
 template<
   typename Mem_,
@@ -382,6 +386,7 @@ public:
     }
   }
 };
+
 SparseMatrixCSRScaleRowColTest<Mem::Main, Algo::Generic, float, unsigned int> sm_csr_scale_row_col_test_float_uint;
 SparseMatrixCSRScaleRowColTest<Mem::Main, Algo::Generic, double, unsigned int> sm_csr_scale_row_col_test_double_uint;
 SparseMatrixCSRScaleRowColTest<Mem::Main, Algo::Generic, float, unsigned long> sm_csr_scale_row_col_test_float_ulong;
@@ -402,6 +407,7 @@ SparseMatrixCSRScaleRowColTest<Mem::Main, Algo::Generic, __float128, unsigned lo
 // SparseMatrixCSRScaleRowColTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_csr_scale_row_col_test_float_ulong;
 // SparseMatrixCSRScaleRowColTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_csr_scale_row_col_test_double_ulong;
 // #endif
+
 
 /**
  * \brief Test class for the convertion from SparseMatrixBanded to SparseMatrixCSR
@@ -478,3 +484,100 @@ public:
 
 SparseMatrixCSRbandedTest<Mem::Main, float> cpu_sparse_matrix_csr_banded_test_float;
 SparseMatrixCSRbandedTest<Mem::Main, double> cpu_sparse_matrix_csr_banded_test_double;
+
+
+/**
+ * \brief Test class for the transposition of a SparseMatrixCSR
+ *
+ * \test test description missing
+ *
+ * \tparam Mem_
+ * description missing
+ *
+ * \tparam Algo_
+ * description missing
+ *
+ * \tparam DT_
+ * description missing
+ *
+ * \tparam IT_
+ * description missing
+ *
+ * \author Christoph Lohmann
+ */
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSRTranspositionTest
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+{
+
+public:
+  typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
+
+  SparseMatrixCSRTranspositionTest()
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixCSRTranspositionTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(2) ; size < 3e2 ; size*=4)
+    {
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
+
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(2));
+          else if(row == col+1)
+            a_local(row, col, DT_(-1));
+          else if(row+1 == col)
+            a_local(row, col, DT_(-3));
+        }
+      }
+      MatrixType a;
+      a.convert(a_local);
+
+      MatrixType b;
+      b.transpose(a);
+
+      for (Index i(0) ; i < a.rows() ; ++i)
+      {
+        for (Index j(0) ; j < a.columns() ; ++j)
+        {
+          TEST_CHECK_EQUAL(b(j, i), a(i, j));
+        }
+      }
+
+      b.transpose();
+
+      TEST_CHECK_EQUAL(a, b);
+    }
+  }
+};
+
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::Generic, float, unsigned int> sm_csr_transposition_test_float_uint;
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::Generic, double, unsigned int> sm_csr_transposition_test_double_uint;
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::Generic, float, unsigned long> sm_csr_transposition_test_float_ulong;
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::Generic, double, unsigned long> sm_csr_transposition_test_double_ulong;
+#ifdef FEAST_HAVE_QUADMATH
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::Generic, __float128, unsigned int> sm_csr_transposition_test_float128_uint;
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::Generic, __float128, unsigned long> sm_csr_transposition_test_float128_ulong;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::MKL, float, unsigned int> mkl_sm_csr_transposition_test_float_uint;
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::MKL, double, unsigned int> mkl_sm_csr_transposition_test_double_uint;
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sm_csr_transposition_test_float_ulong;
+SparseMatrixCSRTranspositionTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sm_csr_transposition_test_double_ulong;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixCSRTranspositionTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_csr_transposition_test_float_uint;
+SparseMatrixCSRTranspositionTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_csr_transposition_test_double_uint;
+SparseMatrixCSRTranspositionTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_csr_transposition_test_float_ulong;
+SparseMatrixCSRTranspositionTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_csr_transposition_test_double_ulong;
+#endif

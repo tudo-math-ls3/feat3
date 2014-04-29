@@ -18,7 +18,6 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
-#include <kernel/lafem/transposition.hpp>
 
 #include <map>
 #include <algorithm>
@@ -1627,11 +1626,8 @@ namespace FEAST
          */
         void transpose()
         {
-          SparseMatrixCOO<Mem::Main, DT_, IT_> tx;
-          tx.convert(*this);
-          auto tx_t(Transposition<Algo::Generic>::value(tx));
           SparseMatrixCOO<Mem_, DT_, IT_> x_t;
-          x_t.convert(tx_t);
+          x_t.transpose(*this);
           this->assign(x_t);
         }
 
@@ -1644,7 +1640,50 @@ namespace FEAST
         {
           SparseMatrixCOO<Mem::Main, DT_, IT_> tx;
           tx.convert(x);
-          auto tx_t(Transposition<Algo::Generic>::value(tx));
+
+          const Index txrows(tx.rows());
+          const Index txcolumns(tx.columns());
+          const Index txused_elements(tx.used_elements());
+
+          const IT_ * ptxrow_ind(tx.row_indices());
+          const IT_ * ptxcol_ind(tx.column_indices());
+          const DT_ * ptxval(tx.val());
+
+          DenseVector<Mem::Main, IT_, IT_> tcol_ind(txused_elements);
+          DenseVector<Mem::Main, DT_, IT_> tval(txused_elements);
+          DenseVector<Mem::Main, IT_, IT_> trow_ind(txused_elements);
+
+          IT_ * ptcol_ind(tcol_ind.elements());
+          DT_ * ptval(tval.elements());
+          IT_ * ptrow_ind(trow_ind.elements());
+
+          DenseVector<Mem::Main, IT_, IT_> trow_ptr(txcolumns + 1, IT_(0));
+          IT_ * ptrow_ptr(trow_ptr.elements());
+
+          for (Index i(0); i < txused_elements; ++i)
+          {
+            ++ptrow_ptr[ptxcol_ind[i] + 1];
+          }
+
+          ptrow_ptr[0] = 0;
+
+          for (Index i(1); i < txcolumns - 1; ++i)
+          {
+            ptrow_ptr[i + 1] += ptrow_ptr[i];
+          }
+
+          for (Index i(0); i < txused_elements; ++i)
+          {
+            const Index l(ptxcol_ind[i]);
+            const Index j(ptrow_ptr[l]);
+            ptval[j] = ptxval[i];
+            ptcol_ind[j] = ptxrow_ind[i];
+            ptrow_ind[j] = ptxcol_ind[i];
+            ++ptrow_ptr[l];
+          }
+
+          SparseMatrixCOO<Mem::Main, DT_, IT_> tx_t(txcolumns, txrows, trow_ind, tcol_ind, tval);
+
           SparseMatrixCOO<Mem_, DT_, IT_> x_t;
           x_t.convert(tx_t);
           this->assign(x_t);

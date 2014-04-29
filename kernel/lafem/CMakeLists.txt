@@ -57,7 +57,6 @@ SET (test_list
   sparse_matrix_csr_blocked-test
   sparse_matrix_ell-test
   sparse_vector-test
-  transposition-test
   umfpack-test
 )
 

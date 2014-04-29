@@ -21,7 +21,6 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
-#include <kernel/lafem/transposition.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -1386,11 +1385,8 @@ namespace FEAST
          */
         void transpose()
         {
-          SparseMatrixELL<Mem::Main, DT_, IT_> tx;
-          tx.convert(*this);
-          auto tx_t(Transposition<Algo::Generic>::value(tx));
           SparseMatrixELL<Mem_, DT_, IT_> x_t;
-          x_t.convert(tx_t);
+          x_t.transpose(*this);
           this->assign(x_t);
         }
 
@@ -1403,7 +1399,59 @@ namespace FEAST
         {
           SparseMatrixELL<Mem::Main, DT_, IT_> tx;
           tx.convert(x);
-          auto tx_t(Transposition<Algo::Generic>::value(tx));
+
+          const Index txrows(tx.rows());
+          const Index txcolumns(tx.columns());
+          const Index txused_elements(tx.used_elements());
+          const Index txstride(tx.stride());
+
+          const DT_ * ptxax(tx.Ax());
+          const IT_ * ptxaj(tx.Aj());
+          const IT_ * ptxarl(tx.Arl());
+
+          const Index alignment(32);
+          const Index tstride(alignment * ((txcolumns + alignment - 1)/ alignment));
+
+          DenseVector<Mem::Main, IT_, IT_> tarl(txcolumns, IT_(0));
+          IT_ * ptarl(tarl.elements());
+
+          for (Index i(0); i < txrows; ++i)
+          {
+            for (Index j(i); j < i + ptxarl[i] * txstride; j += txstride)
+            {
+              ++ptarl[ptxaj[j]];
+            }
+          }
+
+          Index tnum_cols_per_row(0);
+          for (Index i(0); i < txcolumns; ++i)
+          {
+            if (tnum_cols_per_row < ptarl[i])
+            {
+              tnum_cols_per_row = ptarl[i];
+            }
+            ptarl[i] = 0;
+          }
+
+          DenseVector<Mem::Main, IT_, IT_> taj(tstride * tnum_cols_per_row);
+          DenseVector<Mem::Main, DT_, IT_> tax(tstride * tnum_cols_per_row);
+
+          IT_ * ptaj(taj.elements());
+          DT_ * ptax(tax.elements());
+
+          for (Index i(0); i < txrows; ++i)
+          {
+            for (Index j(i); j < i + ptxarl[i] * txstride; j += txstride)
+            {
+              const Index k(ptxaj[j]);
+              ptaj[k + ptarl[k] * tstride] = i;
+              ptax[k + ptarl[k] * tstride] = ptxax[j];
+              ++ptarl[k];
+            }
+          }
+
+          SparseMatrixELL<Mem::Main, DT_, IT_> tx_t(txcolumns, txrows, tstride, tnum_cols_per_row, txused_elements, tax, taj, tarl);
+
           SparseMatrixELL<Mem_, DT_, IT_> x_t;
           x_t.convert(tx_t);
           this->assign(x_t);

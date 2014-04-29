@@ -14,18 +14,18 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief Test class for the sparse matrix ell class.
-*
-* \test test description missing
-*
-* \tparam Mem_
-* description missing
-*
-* \tparam DT_
-* description missing
-*
-* \author Dirk Ribbrock
-*/
+ * \brief Test class for the sparse matrix ell class.
+ *
+ * \test test description missing
+ *
+ * \tparam Mem_
+ * description missing
+ *
+ * \tparam DT_
+ * description missing
+ *
+ * \author Dirk Ribbrock
+ */
 template<
   typename Mem_,
   typename Algo_,
@@ -132,6 +132,7 @@ public:
     TEST_CHECK_EQUAL(j, f);
   }
 };
+
 SparseMatrixELLTest<Mem::Main, NotSet, float, unsigned long> cpu_sparse_matrix_ell_test_float_ulong;
 SparseMatrixELLTest<Mem::Main, NotSet, double, unsigned long> cpu_sparse_matrix_ell_test_double_ulong;
 SparseMatrixELLTest<Mem::Main, NotSet, float, unsigned int> cpu_sparse_matrix_ell_test_float_uint;
@@ -218,6 +219,7 @@ public:
     }
   }
 };
+
 SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, float, unsigned long> sm_ell_apply_test_float_ulong;
 SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, double, unsigned long> sm_ell_apply_test_double_ulong;
 SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, float, unsigned int> sm_ell_apply_test_float_uint;
@@ -232,6 +234,7 @@ SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_e
 SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_ell_apply_test_float_uint;
 SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_ell_apply_test_double_uint;
 #endif
+
 
 template<
   typename Mem_,
@@ -285,6 +288,7 @@ public:
     }
   }
 };
+
 SparseMatrixELLScaleTest<Mem::Main, Algo::Generic, float, unsigned int> sm_ell_scale_test_float_uint;
 SparseMatrixELLScaleTest<Mem::Main, Algo::Generic, double, unsigned int> sm_ell_scale_test_double_uint;
 SparseMatrixELLScaleTest<Mem::Main, Algo::Generic, float, unsigned long> sm_ell_scale_test_float_ulong;
@@ -305,6 +309,7 @@ SparseMatrixELLScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_el
 SparseMatrixELLScaleTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_ell_scale_test_float_ulong;
 SparseMatrixELLScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_ell_scale_test_double_ulong;
 #endif
+
 
 template<
   typename Mem_,
@@ -374,6 +379,7 @@ public:
     }
   }
 };
+
 SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, float, unsigned int> sm_ell_scale_row_col_test_float_uint;
 SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, double, unsigned int> sm_ell_scale_row_col_test_double_uint;
 SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, float, unsigned long> sm_ell_scale_row_col_test_float_ulong;
@@ -394,6 +400,7 @@ SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, __float128, unsigned lo
 // SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_ell_scale_row_col_test_float_ulong;
 // SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_ell_scale_row_col_test_double_ulong;
 // #endif
+
 
 /**
  * \brief Test class for the convertion from SparseMatrixBanded to SparseMatrixELL
@@ -467,5 +474,103 @@ public:
     }
   }
 };
+
 SparseMatrixELLbandedTest<Mem::Main, float> cpu_sparse_matrix_ell_banded_test_float;
 SparseMatrixELLbandedTest<Mem::Main, double> cpu_sparse_matrix_ell_banded_test_double;
+
+
+/**
+ * \brief Test class for the transposition of a SparseMatrixELL
+ *
+ * \test test description missing
+ *
+ * \tparam Mem_
+ * description missing
+ *
+ * \tparam Algo_
+ * description missing
+ *
+ * \tparam DT_
+ * description missing
+ *
+ * \tparam IT_
+ * description missing
+ *
+ * \author Christoph Lohmann
+ */
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixELLTranspositionTest
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+{
+
+public:
+  typedef SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
+
+  SparseMatrixELLTranspositionTest()
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixELLTranspositionTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(2) ; size < 3e2 ; size*=4)
+    {
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
+
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(2));
+          else if(row == col+1)
+            a_local(row, col, DT_(-1));
+          else if(row+1 == col)
+            a_local(row, col, DT_(-3));
+        }
+      }
+      MatrixType a;
+      a.convert(a_local);
+
+      MatrixType b;
+      b.transpose(a);
+
+      for (Index i(0) ; i < a.rows() ; ++i)
+      {
+        for (Index j(0) ; j < a.columns() ; ++j)
+        {
+          TEST_CHECK_EQUAL(b(j, i), a(i, j));
+        }
+      }
+
+      b.transpose();
+
+      TEST_CHECK_EQUAL(a, b);
+    }
+  }
+};
+
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::Generic, float, unsigned int> sm_ell_transposition_test_float_uint;
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::Generic, double, unsigned int> sm_ell_transposition_test_double_uint;
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::Generic, float, unsigned long> sm_ell_transposition_test_float_ulong;
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::Generic, double, unsigned long> sm_ell_transposition_test_double_ulong;
+#ifdef FEAST_HAVE_QUADMATH
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::Generic, __float128, unsigned int> sm_ell_transposition_test_float128_uint;
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::Generic, __float128, unsigned long> sm_ell_transposition_test_float128_ulong;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::MKL, float, unsigned int> mkl_sm_ell_transposition_test_float_uint;
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::MKL, double, unsigned int> mkl_sm_ell_transposition_test_double_uint;
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sm_ell_transposition_test_float_ulong;
+SparseMatrixELLTranspositionTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sm_ell_transposition_test_double_ulong;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixELLTranspositionTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_ell_transposition_test_float_uint;
+SparseMatrixELLTranspositionTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_ell_transposition_test_double_uint;
+SparseMatrixELLTranspositionTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_ell_transposition_test_float_ulong;
+SparseMatrixELLTranspositionTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_ell_transposition_test_double_ulong;
+#endif

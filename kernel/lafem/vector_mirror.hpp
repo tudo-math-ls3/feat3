@@ -5,7 +5,6 @@
 // includes, FEAST
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/transposition.hpp>
 
 namespace FEAST
 {
