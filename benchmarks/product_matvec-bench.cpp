@@ -17,11 +17,23 @@ void run()
   typedef typename SM_::DataType DT_;
   typedef typename SM_::IndexType IT_;
   typedef typename SM_::MemType Mem_;
-  typedef PointstarFactoryFE<DT_> PSF_;
 
-  PSF_ factory(2500);
+  DenseVector<Mem::Main, Index> num_of_nodes(4);
+  DenseVector<Mem::Main, DT_> dimensions(3);
+
+    num_of_nodes(0, 2);
+    num_of_nodes(1, 130);
+    num_of_nodes(2, 150);
+    num_of_nodes(3, 280);
+
+    dimensions(0, DT_(3.0));
+    dimensions(1, DT_(0.47));
+    dimensions(2, DT_(4.0));
+
+  // generate FD matrix A
+  PointstarFactoryFD2<DT_> factory(num_of_nodes, dimensions);
   SM_ sys;
-  sys.convert(factory.matrix_csr());
+  sys.convert(factory.matrix_banded());
   Index size(sys.rows());
   std::cout<<Mem_::name()<<" "<<Algo_::name()<<" "<<SM_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<std::endl;
   std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<std::endl;
@@ -75,11 +87,13 @@ int main(int argc, char ** argv)
 {
   run<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, Index> >();
   run<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned int> >();
-  run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, Index> >();
+  //run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, Index> >();
   run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned int> >();
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> >();
   run<Algo::MKL, SparseMatrixCSR<Mem::Main, double> >();
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> >();
+  run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, Index> >();
+  run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, unsigned int> >();
 }
