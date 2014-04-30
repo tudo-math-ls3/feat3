@@ -28,7 +28,7 @@ void run()
   {
     TimeStamp at, bt;
     at.stamp();
-    for (Index i(0) ; i < iters ; ++i)
+    for (Index j(0) ; j < iters ; ++j)
     {
       y.template axpy<Algo_>(x, y, s);
     }
