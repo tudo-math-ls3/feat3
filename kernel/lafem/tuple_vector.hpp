@@ -46,6 +46,8 @@ namespace FEAST
       typedef typename First_::MemType MemType;
       /// sub-vector data-type
       typedef typename First_::DataType DataType;
+      /// sub-vector index-type
+      typedef typename First_::IndexType IndexType;
 
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
@@ -290,6 +292,7 @@ namespace FEAST
       };
       typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
+      typedef typename First_::IndexType IndexType;
 
     protected:
       First_ _first;

@@ -47,6 +47,8 @@ namespace FEAST
       typedef typename SubVectorType::MemType MemType;
       /// sub-vector data type
       typedef typename SubVectorType::DataType DataType;
+      /// sub-vector index type
+      typedef typename SubVectorType::IndexType IndexType;
 
       /// dummy enum
       enum
@@ -396,6 +398,7 @@ namespace FEAST
 
       typedef typename SubVectorType::MemType MemType;
       typedef typename SubVectorType::DataType DataType;
+      typedef typename SubVectorType::IndexType IndexType;
 
       enum
       {
