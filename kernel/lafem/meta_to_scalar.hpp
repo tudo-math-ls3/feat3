@@ -643,7 +643,7 @@ namespace FEAST
       template<typename VT_>
       static DenseVector<typename VT_::MemType, typename VT_::DataType> value(const VT_ & a)
       {
-        DenseVector<typename VT_::MemType, typename VT_::DataType> vec(a.size());
+        DenseVector<typename VT_::MemType, typename VT_::DataType, typename VT_::IndexType> vec(a.size());
         auto * pvec(vec.elements());
 
         _set_vec(a, pvec);

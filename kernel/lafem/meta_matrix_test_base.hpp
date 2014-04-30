@@ -151,8 +151,8 @@ namespace FEAST
       static void gen_system(Index m, SystemDiagMatrix& mat_sys, SystemVector& vec_sol, SystemVector& vec_rhs)
       {
         /// create two pointstars
-        PointstarFactoryFD<DataType_> ps_fd(m, Index(2));
-        PointstarFactoryFE<DataType_> ps_fe(m);
+        PointstarFactoryFD<DataType_, IndexType_> ps_fd(m, Index(2));
+        PointstarFactoryFE<DataType_, IndexType_> ps_fe(m);
 
         /// generate the corresponding CSR matrices
         const SparseMatrixCSR<Mem::Main, DataType_, IndexType_> mat_fd(ps_fd.matrix_csr());

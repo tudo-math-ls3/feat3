@@ -19,7 +19,7 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename DataType_>
+    template<typename DataType_, typename IndexType_ = Index>
     class PointstarFactoryBase
     {
     protected:
@@ -42,7 +42,7 @@ namespace FEAST
        * \returns
        * The m^d x m^d pointstar matrix
        */
-      virtual SparseMatrixCSR<Mem::Main, DataType_> matrix_csr() const = 0;
+      virtual SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix_csr() const = 0;
 
       /**
        * \brief Computes the smallest eigenvalue of the pointstar matrix.
@@ -80,7 +80,7 @@ namespace FEAST
        * \returns
        * The m^d x m^d eigenvector
        */
-      virtual DenseVector<Mem::Main, DataType_> eigenvector_min() const
+      virtual DenseVector<Mem::Main, DataType_, IndexType_> eigenvector_min() const
       {
         // compute vector length
         Index neq(1);
@@ -88,7 +88,7 @@ namespace FEAST
           neq *= _m;
 
         // create vector
-        DenseVector<Mem::Main, DataType_> vector(neq, DataType_(1));
+        DenseVector<Mem::Main, DataType_, IndexType_> vector(neq, DataType_(1));
         DataType_* v = vector.elements();
 
         // compute x scaling factor
@@ -115,7 +115,7 @@ namespace FEAST
        * \returns
        * The m^d x m^d Q2-bubble vector
        */
-      DenseVector<Mem::Main, DataType_> vector_q2_bubble() const
+      DenseVector<Mem::Main, DataType_, IndexType_> vector_q2_bubble() const
       {
         // compute vector length
         Index neq(1);
@@ -123,7 +123,7 @@ namespace FEAST
           neq *= _m;
 
         // create vector
-        DenseVector<Mem::Main, DataType_> vector(neq, DataType_(1));
+        DenseVector<Mem::Main, DataType_, IndexType_> vector(neq, DataType_(1));
         DataType_* v = vector.elements();
 
         // compute x scaling factor
@@ -157,9 +157,9 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename DataType_>
+    template<typename DataType_, typename IndexType_ = Index>
     class PointstarFactoryFD :
-      public PointstarFactoryBase<DataType_>
+      public PointstarFactoryBase<DataType_, IndexType_>
     {
     public:
       /**
@@ -172,7 +172,7 @@ namespace FEAST
        * The dimension of the grid. Must be >= 1.
        */
       PointstarFactoryFD(Index m, Index d = Index(2)) :
-        PointstarFactoryBase<DataType_>(m, d)
+        PointstarFactoryBase<DataType_, IndexType_>(m, d)
       {
       }
 
@@ -182,11 +182,11 @@ namespace FEAST
        * \returns
        * The m^d x m^d FD-stye pointstar matrix.
        */
-      virtual SparseMatrixCSR<Mem::Main, DataType_> matrix_csr() const override
+      virtual SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix_csr() const override
       {
         // declare some variables
         Index i,j,k,l,n,neq,nnze,bpl,rpb,rps,b;
-        Index *epr,*dor,*ior,*col_idx;
+        IndexType_ *epr,*dor,*ior,*col_idx;
         DataType_ *data;
         const Index m(this->_m), d(this->_d);
 
@@ -201,11 +201,11 @@ namespace FEAST
         }
 
         // create five vectors
-        DenseVector<Mem::Main, Index> vec_row_ptr(neq+Index(1));
-        DenseVector<Mem::Main, Index> vec_col_idx(nnze);
-        DenseVector<Mem::Main, Index> vec_dor(neq, Index(0));
-        DenseVector<Mem::Main, Index> vec_epr(neq, Index(1));
-        DenseVector<Mem::Main, DataType_> vec_data(nnze);
+        DenseVector<Mem::Main, IndexType_, IndexType_> vec_row_ptr(neq+IndexType_(1));
+        DenseVector<Mem::Main, IndexType_, IndexType_> vec_col_idx(nnze);
+        DenseVector<Mem::Main, IndexType_, IndexType_> vec_dor(neq, IndexType_(0));
+        DenseVector<Mem::Main, IndexType_, IndexType_> vec_epr(neq, IndexType_(1));
+        DenseVector<Mem::Main, DataType_, IndexType_> vec_data(nnze);
 
         // get data
         data = vec_data.elements();
@@ -313,7 +313,7 @@ namespace FEAST
         for(i = 0; i < neq; ++i)
         {
           epr[i] = ior[i+1] - dor[i] - 1;
-          col_idx[dor[i]] = i;
+          col_idx[dor[i]] = IndexType_(i);
         }
 
         /* Now we need to calculate the indices for the off-main-diagonal
@@ -347,8 +347,8 @@ namespace FEAST
             for(i = 0; i < rpb - rps; ++i)
             {
               /* and this is where the magic happens */
-              col_idx[dor[k+i]+epr[k+i]] = k + i + rps;
-              col_idx[dor[neq-k-i-1]-epr[k+i]] = neq - k - i - rps - 1;
+              col_idx[dor[k+i]+epr[k+i]] = IndexType_(k + i + rps);
+              col_idx[dor[neq-k-i-1]-epr[k+i]] = IndexType_(neq - k - i - rps - 1);
             }
 
             for(i = 0; i < rpb - rps; ++i)
@@ -363,7 +363,7 @@ namespace FEAST
         }
 
         // return the matrix
-        return SparseMatrixCSR<Mem::Main, DataType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
+        return SparseMatrixCSR<Mem::Main, DataType_, IndexType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
       }
 
       /**
@@ -413,9 +413,9 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename DataType_>
+    template<typename DataType_, typename IndexType_ = Index>
     class PointstarFactoryFE :
-      public PointstarFactoryBase<DataType_>
+      public PointstarFactoryBase<DataType_, IndexType_>
     {
     public:
       /**
@@ -425,7 +425,7 @@ namespace FEAST
        * The number of inner nodes per dimension. Must be >= 3.
        */
       PointstarFactoryFE(Index m) :
-        PointstarFactoryBase<DataType_>(m, Index(2))
+        PointstarFactoryBase<DataType_, IndexType_>(m, Index(2))
       {
       }
 
@@ -437,11 +437,11 @@ namespace FEAST
        * \returns
        * The m^d x m^d FE-stye pointstar matrix.
        */
-      virtual SparseMatrixCSR<Mem::Main, DataType_> matrix_csr() const override
+      virtual SparseMatrixCSR<Mem::Main, DataType_, IndexType_> matrix_csr() const override
       {
         // declare some variables
         Index i,j,k,l,n,neq,nnze,bpl,rpb,rps,b;
-        Index *epr,*dor,*ior,*col_idx;
+        IndexType_ *epr,*dor,*ior,*col_idx;
         DataType_ *data;
         const Index m(this->_m), d(this->_d);
 
@@ -455,11 +455,11 @@ namespace FEAST
         }
 
         // create five vectors
-        DenseVector<Mem::Main, Index> vec_row_ptr(neq+Index(1));
-        DenseVector<Mem::Main, Index> vec_col_idx(nnze, neq);
-        DenseVector<Mem::Main, Index> vec_dor(neq, Index(0));
-        DenseVector<Mem::Main, Index> vec_epr(neq, Index(1));
-        DenseVector<Mem::Main, DataType_> vec_data(nnze);
+        DenseVector<Mem::Main, IndexType_, IndexType_> vec_row_ptr(neq+IndexType_(1));
+        DenseVector<Mem::Main, IndexType_, IndexType_> vec_col_idx(nnze, IndexType_(neq));
+        DenseVector<Mem::Main, IndexType_, IndexType_> vec_dor(neq, IndexType_(0));
+        DenseVector<Mem::Main, IndexType_, IndexType_> vec_epr(neq, IndexType_(1));
+        DenseVector<Mem::Main, DataType_, IndexType_> vec_data(nnze);
 
         // get data
         data = vec_data.elements();
@@ -571,7 +571,7 @@ namespace FEAST
         {
           epr[i] = 1;
           for(j = ior[i]; j < ior[i+1]; ++j)
-            col_idx[j] = neq+i;
+            col_idx[j] = IndexType_(neq+i);
         }
 
         /* blocks per level */
@@ -634,7 +634,7 @@ namespace FEAST
           col_idx[i] -= neq;
 
         // return the matrix
-        return SparseMatrixCSR<Mem::Main, DataType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
+        return SparseMatrixCSR<Mem::Main, DataType_, IndexType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
       }
 
       /**
@@ -678,19 +678,19 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template<typename DataType_>
+    template<typename DataType_, typename IndexType_>
     class PointstarFactoryBase2
     {
     protected:
       /// vector with number of subintervalls per dimension (plus a leading 2).
-      const DenseVector<Mem::Main, Index> & _num_of_subintervalls;
+      const DenseVector<Mem::Main, IndexType_, IndexType_> & _num_of_subintervalls;
       /// vector with lengths of the n-dimensional hypercube
-      const DenseVector<Mem::Main, DataType_> & _dimensions;
+      const DenseVector<Mem::Main, DataType_, IndexType_> & _dimensions;
       /// number of dimensions
       const Index _d;
 
-      PointstarFactoryBase2(const DenseVector<Mem::Main, Index> & num_of_subintervalls,
-                            const DenseVector<Mem::Main, DataType_> & dimensions) :
+      PointstarFactoryBase2(const DenseVector<Mem::Main, IndexType_, IndexType_> & num_of_subintervalls,
+                            const DenseVector<Mem::Main, DataType_, IndexType_> & dimensions) :
         _num_of_subintervalls(num_of_subintervalls),
         _dimensions(dimensions),
         _d(_dimensions.size())
@@ -711,7 +711,7 @@ namespace FEAST
        * \returns
        * The m^d x m^d pointstar matrix
        */
-      virtual SparseMatrixBanded<Mem::Main, DataType_, Index> matrix_banded() const = 0;
+      virtual SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix_banded() const = 0;
 
       /**
        * \brief Computes the smallest eigenvalue of the pointstar matrix.
@@ -749,7 +749,7 @@ namespace FEAST
        * \returns
        * The m^d x m^d eigenvector
        */
-      virtual DenseVector<Mem::Main, DataType_> eigenvector_min() const = 0;
+      virtual DenseVector<Mem::Main, DataType_, IndexType_> eigenvector_min() const = 0;
 
       /**
        * \brief Computes a Q2-bubble vector.
@@ -760,7 +760,7 @@ namespace FEAST
        * \returns
        * The m^d x m^d Q2-bubble vector
        */
-      virtual DenseVector<Mem::Main, DataType_> vector_q2_bubble() const = 0;
+      virtual DenseVector<Mem::Main, DataType_, IndexType_> vector_q2_bubble() const = 0;
     }; // PointstarFactoryBase2
 
     /**
@@ -773,9 +773,9 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template<typename DataType_>
+    template<typename DataType_, typename IndexType_ = Index>
     class PointstarFactoryFD2 :
-      public PointstarFactoryBase2<DataType_>
+      public PointstarFactoryBase2<DataType_, IndexType_>
     {
     public:
       /**
@@ -786,9 +786,9 @@ namespace FEAST
        * \param[in] dimensions
        * The vector with lengths of the n-dimensional hypercube
        */
-      PointstarFactoryFD2(const DenseVector<Mem::Main, Index> & num_of_subintervalls,
-                          const DenseVector<Mem::Main, DataType_> & dimensions) :
-        PointstarFactoryBase2<DataType_>(num_of_subintervalls, dimensions)
+      PointstarFactoryFD2(const DenseVector<Mem::Main, IndexType_, IndexType_> & num_of_subintervalls,
+                          const DenseVector<Mem::Main, DataType_, IndexType_> & dimensions) :
+        PointstarFactoryBase2<DataType_, IndexType_>(num_of_subintervalls, dimensions)
       {
       }
 
@@ -798,16 +798,16 @@ namespace FEAST
        * \returns
        * The m^d x m^d FD-stye pointstar matrix.
        */
-      virtual SparseMatrixBanded<Mem::Main, DataType_> matrix_banded() const override
+      virtual SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix_banded() const override
       {
         const Index d(this->_d);
-        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
         const DataType_ * const pdim(this->_dimensions.elements());
 
         /**
          * Create matrix-structure
          */
-        SparseMatrixBanded<Mem::Main, DataType_> matrix(PointstarStructureFD<Algo::Generic>::value<DataType_>(this->_num_of_subintervalls));
+        SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix(PointstarStructureFD<Algo::Generic>::value<DataType_, IndexType_>(this->_num_of_subintervalls));
         const Index neq(matrix.rows());
         DataType_ * const pval(matrix.val());
 
@@ -871,7 +871,7 @@ namespace FEAST
       virtual DataType_ lambda_min() const override
       {
         DataType_ x(DataType_(0.0));
-        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
         const DataType_ * const pdim(this->_dimensions.elements());
 
         for (Index i(0); i < this->_d; ++i)
@@ -896,7 +896,7 @@ namespace FEAST
       virtual DataType_ lambda_max() const override
       {
         DataType_ x(DataType_(0.0));
-        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
         const DataType_ * const pdim(this->_dimensions.elements());
 
         for (Index i(0); i < this->_d; ++i)
@@ -908,9 +908,9 @@ namespace FEAST
         return 2 * x;
       }
 
-      virtual DenseVector<Mem::Main, DataType_> eigenvector_min() const override
+      virtual DenseVector<Mem::Main, DataType_, IndexType_> eigenvector_min() const override
       {
-        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
         const Index d(this->_d);
 
         // compute vector length
@@ -921,7 +921,7 @@ namespace FEAST
         }
 
         // create vector
-        DenseVector<Mem::Main, DataType_> vector(size, DataType_(1));
+        DenseVector<Mem::Main, DataType_, IndexType_> vector(size, DataType_(1));
         DataType_* v = vector.elements();
 
         for(Index i(0); i < size; ++i)
@@ -947,10 +947,10 @@ namespace FEAST
        * \returns
        * The m^d x m^d Q2-bubble vector
        */
-      DenseVector<Mem::Main, DataType_> vector_q2_bubble() const override
+      DenseVector<Mem::Main, DataType_, IndexType_> vector_q2_bubble() const override
       {
         const Index d(this->_d);
-        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
         const DataType_ * const pdim(this->_dimensions.elements());
 
         // compute vector length
@@ -961,7 +961,7 @@ namespace FEAST
         }
 
         // create vector
-        DenseVector<Mem::Main, DataType_> vector(size, DataType_(1));
+        DenseVector<Mem::Main, DataType_, IndexType_> vector(size, DataType_(1));
         DataType_* v = vector.elements();
 
         for(Index i(0); i < size; ++i)

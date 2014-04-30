@@ -3,7 +3,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/pointstar_factory.hpp>
+// #include <kernel/lafem/pointstar_factory.hpp> // TODO: delete include
 #include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/lafem/meta_to_scalar.hpp>
 #include <kernel/lafem/meta_matrix_test_base.hpp>
@@ -99,18 +99,17 @@ public:
   }
 };
 
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, Index> > meta_matrix_to_coo_test_generic_float_uint;
-// MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned int> > meta_matrix_to_coo_test_generic_float_uint;
-// MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned int> > meta_matrix_to_coo_test_generic_double_uint;
-// MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned long> > meta_matrix_to_coo_test_generic_float_ulong;
-// MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned long> > meta_matrix_to_coo_test_generic_double_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned int> > meta_matrix_to_coo_test_generic_float_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned int> > meta_matrix_to_coo_test_generic_double_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned long> > meta_matrix_to_coo_test_generic_float_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned long> > meta_matrix_to_coo_test_generic_double_ulong;
 
-// MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned int> > meta_matrix_to_csr_test_generic_float_uint;
-// MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> > meta_matrix_to_csr_test_generic_double_uint;
-// MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned long> > meta_matrix_to_csr_test_generic_float_ulong;
-// MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned long> > meta_matrix_to_csr_test_generic_double_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned int> > meta_matrix_to_csr_test_generic_float_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> > meta_matrix_to_csr_test_generic_double_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned long> > meta_matrix_to_csr_test_generic_float_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned long> > meta_matrix_to_csr_test_generic_double_ulong;
 
-// MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned int> > meta_matrix_to_ell_test_generic_float_uint;
-// MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> > meta_matrix_to_ell_test_generic_double_uint;
-// MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned long> > meta_matrix_to_ell_test_generic_float_ulong;
-// MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned long> > meta_matrix_to_ell_test_generic_double_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned int> > meta_matrix_to_ell_test_generic_float_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> > meta_matrix_to_ell_test_generic_double_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned long> > meta_matrix_to_ell_test_generic_float_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned long> > meta_matrix_to_ell_test_generic_double_ulong;
