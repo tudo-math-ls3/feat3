@@ -269,7 +269,12 @@ namespace FEAST
         {
           this->_copy_content(x);
         }
-        ///@}
+
+        Index get_length_of_line(const Index /*row*/) const
+        {
+          return this->columns();
+        }
+      ///@}
     };
 
     /**

@@ -992,6 +992,63 @@ namespace FEAST
         }
 
         /**
+         * \brief Conversion method
+         *
+         * \param[in] a The input matrix.
+         *
+         * Converts any matrix to SparseMatrixCOO-format
+         */
+        template <typename MT_>
+        void convert(const MT_ & a)
+        {
+          CONTEXT("When converting SparseMatrixCOO");
+
+          const Index arows(a.rows());
+          const Index acolumns(a.columns());
+          const Index aused_elements(a.used_elements());
+
+          DenseVector<Mem_, DT_, IT_> tval(aused_elements);
+          DenseVector<Mem_, IT_, IT_> tcol_ind(aused_elements);
+          DenseVector<Mem_, IT_, IT_> trow_ind(aused_elements);
+
+          DT_ * pval(tval.elements());
+          IT_ * pcol_ind(tcol_ind.elements());
+          IT_ * prow_ind(trow_ind.elements());
+
+          DenseVector<Mem_, IT_, IT_> trow_ptr(arows + 1);
+          IT_ * prow_ptr(trow_ptr.elements());
+
+          for (Index i(0); i < arows; ++i)
+          {
+            prow_ptr[i + 1] = IT_(a.get_length_of_line(i));
+          }
+
+          prow_ptr[0] = IT_(0);
+
+          for (Index i(1); i < arows + 1; ++i)
+          {
+            prow_ptr[i] += prow_ptr[i - 1];
+          }
+
+          for (Index i(0); i < arows; ++i)
+          {
+            a.set_line(i, pval + prow_ptr[i], pcol_ind + prow_ptr[i], 0);
+          }
+
+          for (Index i(0); i < arows; ++i)
+          {
+            for (Index k(prow_ptr[i]); k < prow_ptr[i+1]; ++k)
+            {
+              prow_ind[k] = IT_(i);
+            }
+          }
+
+          SparseMatrixCOO<Mem_, DT_, IT_> ta(arows, acolumns, trow_ind, tcol_ind, tval);
+
+          this->assign(ta);
+        }
+
+        /**
          * \brief Write out matrix to file.
          *
          * \param[in] mode The used file format.
@@ -1697,6 +1754,51 @@ namespace FEAST
         {
           return VectorTypeR(this->columns());
         }
+
+      Index get_length_of_line(const Index row) const
+      {
+        const IT_ * prow(this->row_indices());
+        const Index tused_elements(this->used_elements());
+
+        Index i(0);
+        while (prow[i] < row)
+        {
+          ++i;
+        }
+
+        Index j(i);
+        while (j < tused_elements && prow[j] == row)
+        {
+          ++j;
+        }
+        return (j - i);
+      }
+
+      void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
+                    const Index col_start, const Index stride = 1) const
+      {
+        const IT_ * prow(this->row_indices());
+        const IT_ * pcol(this->column_indices());
+        const DT_ * pval(this->val());
+
+        const Index tused_elements(this->used_elements());
+
+        Index start(0);
+        while (prow[start] < row)
+        {
+          ++start;
+        }
+
+        for (Index i(0); start + i < tused_elements; ++i)
+        {
+          if (prow[start + i] != row)
+          {
+            return;
+          }
+          pval_set[i * stride] = pval[start + i];
+          pcol_set[i * stride] = pcol[start + i] + IT_(col_start);
+        }
+      }
     };
 
     /**

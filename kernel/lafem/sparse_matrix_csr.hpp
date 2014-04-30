@@ -888,6 +888,52 @@ namespace FEAST
         }
 
         /**
+         * \brief Conversion method
+         *
+         * \param[in] a The input matrix.
+         *
+         * Converts any matrix to SparseMatrixCSR-format
+         */
+        template <typename MT_>
+        void convert(const MT_ & a)
+        {
+          CONTEXT("When converting SparseMatrixCSR");
+
+          const Index arows(a.rows());
+          const Index acolumns(a.columns());
+          const Index aused_elements(a.used_elements());
+
+          DenseVector<Mem_, DT_, IT_> tval(aused_elements);
+          DenseVector<Mem_, IT_, IT_> tcol_ind(aused_elements);
+          DenseVector<Mem_, IT_, IT_> trow_ptr(arows + 1);
+
+          DT_ * pval(tval.elements());
+          IT_ * pcol_ind(tcol_ind.elements());
+          IT_ * prow_ptr(trow_ptr.elements());
+
+          for (Index i(0); i < arows; ++i)
+          {
+            prow_ptr[i + 1] = IT_(a.get_length_of_line(i));
+          }
+
+          prow_ptr[0] = IT_(0);
+
+          for (Index i(1); i < arows + 1; ++i)
+          {
+            prow_ptr[i] += prow_ptr[i - 1];
+          }
+
+          for (Index i(0); i < arows; ++i)
+          {
+            a.set_line(i, pval + prow_ptr[i], pcol_ind + prow_ptr[i], 0);
+          }
+
+          SparseMatrixCSR ta(arows, acolumns, tcol_ind, tval, trow_ptr);
+
+          this->assign(ta);
+        }
+
+        /**
          * \brief Assignment operator
          *
          * \param[in] layout A sparse matrix layout.
@@ -1480,6 +1526,27 @@ namespace FEAST
         VectorTypeR create_vector_r() const
         {
           return VectorTypeR(this->columns());
+        }
+
+        Index get_length_of_line(const Index row) const
+        {
+          const IT_ * prow_ptr(this->row_ptr());
+          return prow_ptr[row + 1] - prow_ptr[row];
+        }
+
+        void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
+                             const Index col_start, const Index stride = 1) const
+        {
+          const IT_ * prow_ptr(this->row_ptr());
+          const IT_ * pcol_ind(this->col_ind());
+          const DT_ * pval(this->val());
+
+          const Index start(prow_ptr[row]);
+          for (Index i(0); i < prow_ptr[row + 1] - prow_ptr[row]; ++i)
+          {
+            pval_set[i * stride] = pval[start + i];
+            pcol_set[i * stride] = pcol_ind[start + i] + IT_(col_start);
+          }
         }
 
         /* ******************************************************************* */

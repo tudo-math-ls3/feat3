@@ -300,6 +300,38 @@ namespace FEAST
       {
         return VectorTypeR(block_a().create_vector_r(), block_b().create_vector_r());
       }
+
+      Index get_length_of_line(const Index row) const
+      {
+        const Index arows(this->block_a().rows());
+
+        if (row < arows)
+        {
+          return this->block_a().get_length_of_line(row) + this->block_b().get_length_of_line(row);
+        }
+        else
+        {
+          return this->block_d().get_length_of_line(row - arows);
+        }
+      }
+
+      void set_line(const Index row, typename MatrixA_::DataType * const pval_set, typename MatrixA_::IndexType * const pcol_set,
+                    const Index col_start, const Index stride = 1) const
+      {
+        const Index arows(this->block_a().rows());
+
+        if (row < arows)
+        {
+          const Index length_of_a(this->block_a().get_length_of_line(row));
+
+          this->block_a().set_line(row, pval_set, pcol_set, col_start, stride);
+          this->block_b().set_line(row, pval_set + stride * length_of_a, pcol_set + stride * length_of_a, col_start + this->block_a().columns(), stride);
+        }
+        else
+        {
+          this->block_d().set_line(row - arows, pval_set, pcol_set, col_start, stride);
+        }
+      }
     }; // class SaddlePointMatrix<...>
 
     /// \cond internal

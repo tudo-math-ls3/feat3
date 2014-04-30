@@ -276,6 +276,18 @@ namespace FEAST
           rest()(index - first().size(), value);
         }
       }
+
+      void set_vec(DataType * const pval_set) const
+      {
+        this->first().set_vec(pval_set);
+        this->rest().set_vec(pval_set + this->first().size());
+      }
+
+      void set_vec_inv(const DataType * const pval_set)
+      {
+        this->first().set_vec_inv(pval_set);
+        this->rest().set_vec_inv(pval_set + this->first().size());
+      }
     }; // class TupleVector<...>
 
     /// \cond internal
@@ -456,7 +468,32 @@ namespace FEAST
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
         first()(index, value);
       }
-    };
+
+#ifdef FEAST_COMPILER_MICROSOFT
+      // compiler hack...
+      void set_vec(DataType * const pval_set) const
+      {
+        static_assert(sizeof...(First_) == std::size_t(1), "invalid TupleVector size");
+        this->first().set_vec(pval_set);
+      }
+
+      void set_vec_inv(const DataType * const pval_set)
+      {
+        static_assert(sizeof...(First_) == std::size_t(1), "invalid TupleVector size");
+        this->first().set_vec_inv(pval_set);
+      }
+#else // all other compilers
+      void set_vec(DataType * const pval_set) const
+      {
+        this->first().set_vec(pval_set);
+      }
+
+      void set_vec_inv(const DataType * const pval_set)
+      {
+        this->first().set_vec_inv(pval_set);
+      }
+#endif
+};
     /// \endcond
 
     /// \cond internal

@@ -263,6 +263,36 @@ namespace FEAST
       {
         return base().create_vector_r();
       }
+
+      Index get_length_of_line(const Index row) const
+      {
+        const Index brows(this->base().rows());
+
+        if (row < brows)
+        {
+          return this->base().get_length_of_line(row);
+        }
+        else
+        {
+          return this->last().get_length_of_line(row - brows);
+        }
+      }
+
+      void set_line(const Index row, typename SubType_::DataType * const pval_set, typename SubType_::IndexType * const pcol_set,
+                    const Index col_start, const Index stride = 1) const
+      {
+        const Index brows(this->base().rows());
+
+        if (row < brows)
+        {
+          this->base().set_line(row, pval_set, pcol_set, col_start, stride);
+        }
+        else
+        {
+          this->last().set_line(row - brows, pval_set, pcol_set, col_start, stride);
+        }
+      }
+
     };
 
     /// \cond internal
@@ -418,6 +448,18 @@ namespace FEAST
       {
         return last().create_vector_r();
       }
+
+      Index get_length_of_line(const Index row) const
+      {
+        return this->last().get_length_of_line(row);
+      }
+
+      void set_line(const Index row, typename SubType_::DataType * const pval_set, typename SubType_::IndexType * const pcol_set,
+                    const Index col_start, const Index stride = 1) const
+      {
+        this->last().set_line(row, pval_set, pcol_set, col_start, stride);
+      }
+
     };
     /// \endcond
   } // namespace LAFEM

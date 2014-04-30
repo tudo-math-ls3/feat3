@@ -379,6 +379,18 @@ namespace FEAST
           last()(index - base().size(), value);
         }
       }
+
+      void set_vec(DataType * const pval_set) const
+      {
+        this->base().set_vec(pval_set);
+        this->last().set_vec(pval_set + this->base().size());
+      }
+
+      void set_vec_inv(const DataType * const pval_set)
+      {
+        this->base().set_vec_inv(pval_set);
+        this->last().set_vec_inv(pval_set + this->base().size());
+      }
     }; // class PowerVector<...>
 
     /// \cond internal
@@ -573,6 +585,17 @@ namespace FEAST
 
         last()(index, value);
       }
+
+      void set_vec(DataType * const pval_set) const
+      {
+        this->last().set_vec(pval_set);
+      }
+
+      void set_vec_inv(const DataType * const pval_set)
+      {
+        this->last().set_vec_inv(pval_set);
+      }
+
     }; // class PowerVector<...,1>
     /// \cond internal
 

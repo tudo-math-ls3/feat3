@@ -433,6 +433,59 @@ namespace FEAST
         }
 
         /**
+         * \brief Conversion method
+         *
+         * \param[in] a The input vector.
+         *
+         * Converts any vector to DenseVector-format
+         */
+        template <typename VT_>
+        void convert(const VT_ & a)
+        {
+          CONTEXT("When converting DenseVector");
+
+          DenseVector<Mem_, DT_, IT_> tvec(a.size());
+          auto * pvec(tvec.elements());
+
+          a.set_vec(pvec);
+
+          this->assign(tvec);
+        }
+
+        /**
+         * \brief Performs \f$this \leftarrow x\f$.
+         *
+         * \param[in] x The vector to be copied (could be of any format; must have same size).
+         */
+        template<typename VT_>
+        void copy(const VT_ & b)
+        {
+          if (this->size() != b.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vectors have not the same size!");
+
+          auto * const pa(this->elements());
+
+          b.set_vec(pa);
+        }
+
+        /**
+         * \brief Performs \f$x \leftarrow this\f$.
+         *
+         * \param[in] x The target-vector to be copied to (could be of any format; must have same size).
+         */
+        template<typename VT_>
+        void copy_inv(VT_ & a) const
+        {
+          if (this->size() != a.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vectors have not the same size!");
+
+          const auto * const pb(this->elements());
+
+          a.set_vec_inv(pb);
+        }
+
+
+        /**
          * \brief Write out vector to file.
          *
          * \param[in] mode The used file format.
@@ -843,7 +896,29 @@ namespace FEAST
           // fallback
           return Math::sqr(this->norm2<Algo_>());
         }
-        ///@}
+
+        void set_vec(DT_ * const pval_set) const
+        {
+          const DT_ * pvec(this->elements());
+          const Index n(this->size());
+
+          for (Index i(0); i < n; ++i)
+          {
+            pval_set[i] = pvec[i];
+          }
+        }
+
+        void set_vec_inv(const DT_ * const pval_set)
+        {
+          DT_ * pvec(this->elements());
+          const Index n(this->size());
+
+          for (Index i(0); i < n; ++i)
+          {
+            pvec[i] = pval_set[i];
+          }
+        }
+      ///@}
     }; // class DenseVector<...>
 
 

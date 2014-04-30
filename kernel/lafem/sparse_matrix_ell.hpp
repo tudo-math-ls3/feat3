@@ -846,8 +846,6 @@ namespace FEAST
           IT_ * tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_num_cols_per_row() * _stride());
           MemoryPool<Mem::Main>::instance()->set_memory(tAj, IT_(0), _num_cols_per_row() * _stride());
 
-
-
           for (Index i(k + 1); i > 0;)
           {
             --i;
@@ -895,6 +893,54 @@ namespace FEAST
             MemoryPool<Mem::Main>::instance()->release_memory(tAj);
             MemoryPool<Mem::Main>::instance()->release_memory(tArl);
           }
+        }
+
+        /**
+         * \brief Conversion method
+         *
+         * \param[in] a The input matrix.
+         *
+         * Converts any matrix to SparseMatrixELL-format
+         */
+        template <typename MT_>
+        void convert(const MT_ & a)
+        {
+          CONTEXT("When converting SparseMatrixELL");
+
+          const Index arows(a.rows());
+          const Index acolumns(a.columns());
+          const Index aused_elements(a.used_elements());
+
+          Index alignment(32);
+          const Index tastride(alignment * ((arows + alignment - 1)/ alignment));
+
+          DenseVector<Mem_, IT_, IT_> arl(arows);
+          IT_ * parl(arl.elements());
+
+          Index tanum_cols_per_row(0);
+          for (Index i(0); i < arows; ++i)
+          {
+            parl[i] = IT_(a.get_length_of_line(i));
+            if (tanum_cols_per_row < parl[i])
+            {
+              tanum_cols_per_row = parl[i];
+            }
+          }
+
+          DenseVector<Mem_, DT_, IT_> ax(tastride * tanum_cols_per_row);
+          DenseVector<Mem_, IT_, IT_> aj(tastride * tanum_cols_per_row);
+
+          DT_ * pax(ax.elements());
+          IT_ * paj(aj.elements());
+
+          for (Index i(0); i < arows; ++i)
+          {
+            a.set_line(i, pax + i, paj + i, 0, tastride);
+          }
+
+          SparseMatrixELL<Mem_, DT_, IT_> ta(arows, acolumns, tastride, tanum_cols_per_row, aused_elements, ax, aj, arl);
+
+          this->assign(ta);
         }
 
         /**
@@ -1515,6 +1561,28 @@ namespace FEAST
         VectorTypeR create_vector_r() const
         {
           return VectorTypeR(this->columns());
+        }
+
+        Index get_length_of_line(const Index row) const
+        {
+          return this->Arl()[row];
+        }
+
+        void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
+                              const Index col_start, const Index stride_in = 1) const
+        {
+          const IT_ * parl(this->Arl());
+          const IT_ * paj(this->Aj() + row);
+          const DT_ * pax(this->Ax() + row);
+          const Index astride(this->stride());
+
+          const Index length(parl[row]);
+
+          for (Index i(0); i < length; ++i)
+          {
+            pval_set[i * stride_in] = pax[i * astride];
+            pcol_set[i * stride_in] = paj[i * astride] + IT_(col_start);
+          }
         }
     };
 

@@ -5,7 +5,6 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 #include <kernel/lafem/saddle_point_matrix.hpp>
-#include <kernel/lafem/meta_to_scalar.hpp>
 #include <kernel/lafem/meta_matrix_test_base.hpp>
 
 #include <kernel/lafem/bicgstab.hpp>
@@ -161,11 +160,13 @@ public:
     SystemVector vec_sol, vec_rhs;
     this->gen_system(7, mat_sys, vec_sol, vec_rhs);
 
-    MT_ mat_sys_scalar (MatMetaToScalar<Algo_>::template value<MT_::layout_id>(mat_sys));
+    MT_ mat_sys_scalar;
+    mat_sys_scalar.convert(mat_sys);
 
     Index size(mat_sys_scalar.rows());
     VT_ x(size, DT_(1));
-    VT_ ref(VecMetaToScalar<Algo_>::value(vec_sol));
+    VT_ ref;
+    ref.convert(vec_sol);
     VT_ ref_local;
     ref_local.convert(ref);
     VT_ b(size);
