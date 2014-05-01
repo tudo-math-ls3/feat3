@@ -351,7 +351,7 @@ for branch in branches:
       run_test("serial-gcc-debug-coverage-mkl-quadmath-valgrind" + addition, branch, myDB)
   elif is_found ("nvcc") and is_found("g++"):
       run_test("serial-gcc-debug-coverage-mkl-quadmath-cudamemcheck" + addition, branch, myDB)
-'''
+  '''
   if is_found ("valgrind") and is_found ("nvcc") and is_found("icpc"):
       run_test("serial-icc-debug-coverage-mkl-quadmath-valgrind-cudamemcheck" + addition, branch, myDB)
   elif is_found ("valgrind") and is_found("icpc"):
@@ -365,7 +365,7 @@ for branch in branches:
       run_test("serial-clang-debug-coverage-mkl-valgrind" + addition, branch, myDB)
   elif is_found ("nvcc") and is_found("clang++"):
       run_test("serial-clang-debug-coverage-mkl-cudamemcheck" + addition, branch, myDB)
-'''
+  '''
   if is_found("mpic++"):
     if is_found("g++"):
       run_test("mpi-gcc-debug-coverage-quadmath-mkl" + addition, branch, myDB)
