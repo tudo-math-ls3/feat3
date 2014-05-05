@@ -13,5 +13,3 @@ class ALGLIB(ThirdpartyPackage):
     self.url = "http://www.alglib.net/translator/re/" + self.filename
     self.cmake_flags = " -DFEAST_HAVE_ALGLIB:BOOL=ON"
     self.trunk_dirname = trunk_dirname
-    self.unpacker = "unzip -q "
-    self.unpack_target = " -d " + self.trunk_dirname + os.sep + self.dirname

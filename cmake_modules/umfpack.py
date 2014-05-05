@@ -13,8 +13,6 @@ class UMFPACK(ThirdpartyPackage):
     self.url = "http://www.cise.ufl.edu/research/sparse/umfpack/" + self.filename
     self.cmake_flags = " -DFEAST_HAVE_UMFPACK:BOOL=ON"
     self.trunk_dirname = trunk_dirname
-    self.unpacker = "tar xf "
-    self.unpack_target = " -C " + trunk_dirname + os.sep
 
 # Overwrite add function to take care of the dependencies AMD and SuiteSparse_config
   def add(self):
@@ -33,8 +31,6 @@ class AMD(ThirdpartyPackage):
     self.url = "http://www.cise.ufl.edu/research/sparse/amd/" + self.filename
     self.cmake_flags = ""
     self.trunk_dirname = trunk_dirname
-    self.unpacker = "tar xf "
-    self.unpack_target = " -C " + trunk_dirname + os.sep
 
 class SuiteSparse_config(ThirdpartyPackage):
 
@@ -45,5 +41,3 @@ class SuiteSparse_config(ThirdpartyPackage):
     self.url = "http://www.cise.ufl.edu/research/sparse/SuiteSparse_config/" + self.filename
     self.cmake_flags = ""
     self.trunk_dirname = trunk_dirname
-    self.unpacker = "tar xf "
-    self.unpack_target = " -C " + trunk_dirname + os.sep

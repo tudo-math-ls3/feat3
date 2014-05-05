@@ -23,10 +23,6 @@ class ThirdpartyPackage(object):
     self.trunk_dirname = trunk_dirname
     # This is added to the cmake_flags
     self.cmake_flags = "NullCmakeFlags"
-    # Packages come in different formats (.zip, .tar etc., so the unpacker is different each time)
-    self.unpacker = "NullUnpacker"
-    # Due to different syntax, the same is true for the target directory
-    self.unpack_target = "NullUnpackTarget"
 
 # How to add a third party package to the build process
   def add(self):
@@ -37,13 +33,48 @@ class ThirdpartyPackage(object):
       print (self.name +" enabled, but could not find a directory with name " + target_dirname+ ", checking for file...")
       if not os.path.isfile(target_filename):
         print(target_filename + " not found, attempting to automatically download it from " + self.url + "...")
-        dlcmd = "wget " + self.url + " -O " + target_filename
-        subprocess.call(dlcmd, shell=True)
+        download(self.url,target_filename)
 
-      unpkcmd = self.unpacker + target_filename + self.unpack_target
-      print("Unpacking :"+ unpkcmd +"...")
-      subprocess.call(unpkcmd, shell=True)
+      self.unpack()
     return
+
+  def unpack(self):
+    target_filename = self.trunk_dirname+os.sep+self.filename
+
+    if(self.filename.endswith(".zip")):
+      import zipfile
+      print(target_filename)
+      archive = zipfile.ZipFile(target_filename, "r")
+      for f in archive.namelist():
+        if f.startswith('..') or f.startswith(os.sep):
+          print("Error: File "+self.filename+" contains absolute path or one starting with '..' ")
+          print("This is an unsafe operation, aborting.")
+          sys.exit(1)
+    elif(self.filename.endswith("tar.gz")):
+      import tarfile
+      archive = tarfile.open(target_filename, "r")
+      for f in archive.getnames():
+        if f.startswith('..') or f.startswith(os.sep):
+          print("Error: File "+self.filename+" contains absolute path or one starting with '..' ")
+          print("This is an unsafe operation, aborting.")
+          sys.exit(1)
+
+    archive.extractall(self.trunk_dirname)
+
+    return
+
+# Downloads a file from url and saves it to filename
+def download(url,filename):
+  import sys
+  if sys.version < '3':
+    import urllib
+    urllib.urlretrieve(url, filename)
+  else:
+    import urllib.request
+    import shutil
+    with urllib.request.urlopen(url) as response, open(filename, 'wb') as out_file:
+      shutil.copyfileobj(response, out_file)
+  return
 
 # Find available third party packages by parsing all .py files in the cmake_modules folder
 def available_packages(files_path,target_path,name=''):
