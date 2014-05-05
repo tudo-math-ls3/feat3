@@ -38,15 +38,15 @@ namespace FEAST
        * \returns
        * The m^d x m^d FE-stye pointstar matrix.
        */
-      template<typename DataType_>
-      static SparseMatrixBanded<Mem::Main, DataType_> value(const Index fe_order,
-                                                            const DenseVector<Mem::Main, Index> & num_of_subintervalls)
+      template<typename DataType_, typename IndexType_>
+      static SparseMatrixBanded<Mem::Main, DataType_, IndexType_> value(const Index fe_order,
+                                                            const std::vector<IndexType_> & num_of_subintervalls)
       {
         // get number of dimensions
         const Index d(num_of_subintervalls.size());
 
         // save pointer of input-vector
-        const Index * const pnos(num_of_subintervalls.elements());
+        const IndexType_ * const pnos(num_of_subintervalls.data());
 
         // output of errors if wrong input
         ASSERT(d >= Index(1), "You need at least 1 dimension");
@@ -57,7 +57,7 @@ namespace FEAST
         }
 
         // calculate size of matrix and number of offsets
-        Index size(1);
+        IndexType_ size(1);
         Index noo(1);
         for (Index i(0); i < d; ++i)
         {
@@ -66,11 +66,11 @@ namespace FEAST
         }
 
         // allocate memory for vectors of matrix
-        DenseVector<Mem::Main, Index> vec_offsets(noo);
-        DenseVector<Mem::Main, DataType_> vec_val(noo * size);
+        DenseVector<Mem::Main, IndexType_, IndexType_> vec_offsets(noo);
+        DenseVector<Mem::Main, DataType_, IndexType_> vec_val(noo * size);
 
         // fill offsets-vector
-        Index * const poffsets(vec_offsets.elements());
+        IndexType_ * const poffsets(vec_offsets.elements());
         const Index h_off((noo - 1) / 2);
 
         // save position of main-diagonal
@@ -84,14 +84,14 @@ namespace FEAST
           {
             for (Index l(0); l < k; ++l)
             {
-              poffsets[h_off - k1 + l + k * j] = poffsets[h_off - k1 + l] + j * m;
-              poffsets[h_off - k1 + l - k * j] = poffsets[h_off - k1 + l] - j * m;
+              poffsets[h_off - k1 + l + k * j] = poffsets[h_off - k1 + l] + IndexType_(j * m);
+              poffsets[h_off - k1 + l - k * j] = poffsets[h_off - k1 + l] - IndexType_(j * m);
             }
           }
         }
 
         // return the matrix
-        return SparseMatrixBanded<Mem::Main, DataType_>(size, size, vec_val, vec_offsets);
+        return SparseMatrixBanded<Mem::Main, DataType_, IndexType_>(size, size, vec_val, vec_offsets);
       }
     }; // struct PointstarStructureFE
 

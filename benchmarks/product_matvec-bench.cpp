@@ -2,7 +2,7 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/pointstar_factory.hpp>
+#include <kernel/lafem/pointstar_structure.hpp>
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/util/type_traits.hpp>
 
@@ -18,26 +18,19 @@ void run()
   typedef typename SM_::IndexType IT_;
   typedef typename SM_::MemType Mem_;
 
-  DenseVector<Mem::Main, Index> num_of_nodes(4);
-  DenseVector<Mem::Main, DT_> dimensions(3);
+  std::vector<IT_> num_of_nodes;
+  num_of_nodes.push_back(1200);
+  num_of_nodes.push_back(1200);
 
-    num_of_nodes(0, 2);
-    num_of_nodes(1, 130);
-    num_of_nodes(2, 150);
-    num_of_nodes(3, 280);
-
-    dimensions(0, DT_(3.0));
-    dimensions(1, DT_(0.47));
-    dimensions(2, DT_(4.0));
-
-  // generate FD matrix A
-  PointstarFactoryFD2<DT_> factory(num_of_nodes, dimensions);
+  // generate FE matrix A
+  SparseMatrixBanded<Mem::Main, DT_, IT_> bm(PointstarStructureFE<Algo::Generic>::template value<DT_>(1, num_of_nodes));
+  for (Index i(0) ; i < bm.get_elements_size().at(0) ; ++i)
+    bm.val()[i] = DT_((i%4) + 1);
   SM_ sys;
-  sys.convert(factory.matrix_banded());
+  sys.convert(bm);
   Index size(sys.rows());
   std::cout<<Mem_::name()<<" "<<Algo_::name()<<" "<<SM_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<std::endl;
   std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<std::endl;
-  //DenseVector<Mem_, DT_, IT_> b(factory.vector_q2_bubble());
   DenseVector<Mem_, DT_, IT_> b(size, DT_(1.234));
   DenseVector<Mem_, DT_, IT_> x(size, DT_(4711));
 

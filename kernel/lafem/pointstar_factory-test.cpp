@@ -136,10 +136,10 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(w.template norm2<Algo::Generic>(), DataType_(0), tol);
 
 
-    DenseVector<Mem::Main, Index> num_of_nodes2(3);
-    num_of_nodes2(0, 5);
-    num_of_nodes2(1, 4);
-    num_of_nodes2(2, 3);
+    std::vector<Index> num_of_nodes2;
+    num_of_nodes2.push_back(5);
+    num_of_nodes2.push_back(4);
+    num_of_nodes2.push_back(3);
 
     MatrixType b(PointstarStructureFE<Algo::Generic>::value<DataType_>(3, num_of_nodes2));
   }
