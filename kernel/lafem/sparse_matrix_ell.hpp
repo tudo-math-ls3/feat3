@@ -326,6 +326,9 @@ namespace FEAST
         typedef DenseVector<Mem_, DT_, IT_> VectorTypeR;
         /// Our used layout type
         static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_ell;
+        /// Our 'base' class type
+        template <typename Mem2_, typename DT2_, typename IT2_ = IT_>
+        using ContainerType = class SparseMatrixELL<Mem2_, DT2_, IT2_>;
 
         /**
          * \brief Constructor

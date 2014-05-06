@@ -52,6 +52,9 @@ namespace FEAST
       typedef PowerVector<typename SubMatrixType::VectorTypeL, blocks_> VectorTypeL;
       /// Compatible R-vector type
       typedef typename SubMatrixType::VectorTypeR VectorTypeR;
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      using ContainerType = class PowerColMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
 
       /// dummy enum
       enum
@@ -278,7 +281,7 @@ namespace FEAST
         }
       }
 
-      void set_line(const Index row, typename SubType_::DataType * const pval_set, typename SubType_::IndexType * const pcol_set,
+      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
                     const Index col_start, const Index stride = 1) const
       {
         const Index brows(this->base().rows());
@@ -313,6 +316,9 @@ namespace FEAST
       typedef PowerVector<typename SubMatrixType::VectorTypeL, 1> VectorTypeL;
       /// Compatible R-vector type
       typedef typename SubMatrixType::VectorTypeR VectorTypeR;
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      using ContainerType = class PowerColMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
 
       enum
       {
@@ -454,7 +460,7 @@ namespace FEAST
         return this->last().get_length_of_line(row);
       }
 
-      void set_line(const Index row, typename SubType_::DataType * const pval_set, typename SubType_::IndexType * const pcol_set,
+      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
                     const Index col_start, const Index stride = 1) const
       {
         this->last().set_line(row, pval_set, pcol_set, col_start, stride);

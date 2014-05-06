@@ -48,6 +48,10 @@ namespace FEAST
       typedef typename First_::DataType DataType;
       /// sub-vector index-type
       typedef typename First_::IndexType IndexType;
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      using ContainerType = class TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
+                                              typename RestClass::template ContainerType<Mem2_, DT2_, IT2_> >;
 
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
@@ -305,6 +309,8 @@ namespace FEAST
       typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;
+      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      using ContainerType = typename First_::template ContainerType<Mem2_, DT2_, IT2_>;
 
     protected:
       First_ _first;

@@ -49,6 +49,9 @@ namespace FEAST
       typedef typename SubVectorType::DataType DataType;
       /// sub-vector index type
       typedef typename SubVectorType::IndexType IndexType;
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, count_>;
 
       /// dummy enum
       enum
