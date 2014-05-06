@@ -21,16 +21,20 @@ class ThirdpartyPackage(object):
     self.filename = "NullFilename"
     # Absolute path of the FEAST2 directory. Crude, but works.
     self.trunk_dirname = trunk_dirname
+    # Where to extract the archive. Needed because sometimes the archive's files are not in an appropriately named
+    # subfolder
+    self.target_dirname = trunk_dirname
     # This is added to the cmake_flags
     self.cmake_flags = "NullCmakeFlags"
 
 # How to add a third party package to the build process
   def add(self):
     # Directory where the package is expected
-    target_dirname = self.trunk_dirname+os.sep+self.dirname
     target_filename = self.trunk_dirname+os.sep+self.filename
-    if not os.path.isdir(target_dirname):
-      print (self.name +" enabled, but could not find a directory with name " + target_dirname+ ", checking for file...")
+    # This is the folder where the third party package is assumed to be. Not to be confused with self.target_dirname
+    expected_dirname = self.trunk_dirname+os.sep+self.dirname
+    if not os.path.isdir(expected_dirname):
+      print (self.name +" enabled, but could not find a directory with name " + expected_dirname+ ", checking for file...")
       if not os.path.isfile(target_filename):
         print(target_filename + " not found, attempting to automatically download it from " + self.url + "...")
         download(self.url,target_filename)
@@ -43,7 +47,6 @@ class ThirdpartyPackage(object):
 
     if(self.filename.endswith(".zip")):
       import zipfile
-      print(target_filename)
       archive = zipfile.ZipFile(target_filename, "r")
       for f in archive.namelist():
         if f.startswith('..') or f.startswith(os.sep):
@@ -59,7 +62,7 @@ class ThirdpartyPackage(object):
           print("This is an unsafe operation, aborting.")
           sys.exit(1)
 
-    archive.extractall(self.trunk_dirname)
+    archive.extractall(self.target_dirname)
 
     return
 
