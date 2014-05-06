@@ -447,12 +447,17 @@ namespace FEAST
         {
           CONTEXT("When converting DenseVector");
 
-          DenseVector<Mem_, DT_, IT_> tvec(a.size());
+          typename VT_::template ContainerType<Mem::Main, DT_, IT_> ta;
+          ta.convert(a);
+
+          DenseVector<Mem::Main, DT_, IT_> tvec(ta.size());
           auto * pvec(tvec.elements());
 
-          a.set_vec(pvec);
+          ta.set_vec(pvec);
+          DenseVector<Mem::Main, DT_, IT_> vec;
+          vec.convert(tvec);
 
-          this->assign(tvec);
+          this->assign(vec);
         }
 
         /**
@@ -466,9 +471,14 @@ namespace FEAST
           if (this->size() != b.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vectors have not the same size!");
 
-          auto * const pa(this->elements());
+          // auto * const pa(this->elements());
+          // b.set_vec(pa);
 
-          b.set_vec(pa);
+          // \TODO: This is only temporarily
+          DenseVector a;
+          a.convert(b);
+
+          this->assign(a);
         }
 
         /**
@@ -482,9 +492,20 @@ namespace FEAST
           if (this->size() != a.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vectors have not the same size!");
 
-          const auto * const pb(this->elements());
+          // const auto * const pb(this->elements());
+          // a.set_vec_inv(pb);
 
-          a.set_vec_inv(pb);
+          // \TODO: This is only temporarily
+          typename VT_::template ContainerType<Mem::Main, DT_, IT_> ta;
+          ta.convert(a);
+
+          DenseVector<Mem::Main, DT_, IT_> t_this;
+          t_this.convert(*this);
+
+          const auto * const pb(t_this.elements());
+          ta.set_vec_inv(pb);
+
+          a.convert(ta);
         }
 
 
