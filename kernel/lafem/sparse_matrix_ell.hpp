@@ -910,40 +910,45 @@ namespace FEAST
         {
           CONTEXT("When converting SparseMatrixELL");
 
-          const Index arows(a.rows());
-          const Index acolumns(a.columns());
-          const Index aused_elements(a.used_elements());
+          typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
+          ta.convert(a);
+
+          const Index arows(ta.rows());
+          const Index acolumns(ta.columns());
+          const Index aused_elements(ta.used_elements());
 
           Index alignment(32);
           const Index tastride(alignment * ((arows + alignment - 1)/ alignment));
 
-          DenseVector<Mem_, IT_, IT_> arl(arows);
+          DenseVector<Mem::Main, IT_, IT_> arl(arows);
           IT_ * parl(arl.elements());
 
           Index tanum_cols_per_row(0);
           for (Index i(0); i < arows; ++i)
           {
-            parl[i] = IT_(a.get_length_of_line(i));
+            parl[i] = IT_(ta.get_length_of_line(i));
             if (tanum_cols_per_row < parl[i])
             {
               tanum_cols_per_row = parl[i];
             }
           }
 
-          DenseVector<Mem_, DT_, IT_> ax(tastride * tanum_cols_per_row);
-          DenseVector<Mem_, IT_, IT_> aj(tastride * tanum_cols_per_row);
+          DenseVector<Mem::Main, DT_, IT_> ax(tastride * tanum_cols_per_row);
+          DenseVector<Mem::Main, IT_, IT_> aj(tastride * tanum_cols_per_row);
 
           DT_ * pax(ax.elements());
           IT_ * paj(aj.elements());
 
           for (Index i(0); i < arows; ++i)
           {
-            a.set_line(i, pax + i, paj + i, 0, tastride);
+            ta.set_line(i, pax + i, paj + i, 0, tastride);
           }
 
-          SparseMatrixELL<Mem_, DT_, IT_> ta(arows, acolumns, tastride, tanum_cols_per_row, aused_elements, ax, aj, arl);
+          SparseMatrixELL<Mem::Main, DT_, IT_> ta_ell(arows, acolumns, tastride, tanum_cols_per_row, aused_elements, ax, aj, arl);
+          SparseMatrixELL<Mem_, DT_, IT_> a_ell;
+          a_ell.convert(ta_ell);
 
-          this->assign(ta);
+          this->assign(a_ell);
         }
 
         /**

@@ -1006,24 +1006,27 @@ namespace FEAST
         {
           CONTEXT("When converting SparseMatrixCOO");
 
-          const Index arows(a.rows());
-          const Index acolumns(a.columns());
-          const Index aused_elements(a.used_elements());
+          typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
+          ta.convert(a);
 
-          DenseVector<Mem_, DT_, IT_> tval(aused_elements);
-          DenseVector<Mem_, IT_, IT_> tcol_ind(aused_elements);
-          DenseVector<Mem_, IT_, IT_> trow_ind(aused_elements);
+          const Index arows(ta.rows());
+          const Index acolumns(ta.columns());
+          const Index aused_elements(ta.used_elements());
+
+          DenseVector<Mem::Main, DT_, IT_> tval(aused_elements);
+          DenseVector<Mem::Main, IT_, IT_> tcol_ind(aused_elements);
+          DenseVector<Mem::Main, IT_, IT_> trow_ind(aused_elements);
 
           DT_ * pval(tval.elements());
           IT_ * pcol_ind(tcol_ind.elements());
           IT_ * prow_ind(trow_ind.elements());
 
-          DenseVector<Mem_, IT_, IT_> trow_ptr(arows + 1);
+          DenseVector<Mem::Main, IT_, IT_> trow_ptr(arows + 1);
           IT_ * prow_ptr(trow_ptr.elements());
 
           for (Index i(0); i < arows; ++i)
           {
-            prow_ptr[i + 1] = IT_(a.get_length_of_line(i));
+            prow_ptr[i + 1] = IT_(ta.get_length_of_line(i));
           }
 
           prow_ptr[0] = IT_(0);
@@ -1035,7 +1038,7 @@ namespace FEAST
 
           for (Index i(0); i < arows; ++i)
           {
-            a.set_line(i, pval + prow_ptr[i], pcol_ind + prow_ptr[i], 0);
+            ta.set_line(i, pval + prow_ptr[i], pcol_ind + prow_ptr[i], 0);
           }
 
           for (Index i(0); i < arows; ++i)
@@ -1046,9 +1049,11 @@ namespace FEAST
             }
           }
 
-          SparseMatrixCOO<Mem_, DT_, IT_> ta(arows, acolumns, trow_ind, tcol_ind, tval);
+          SparseMatrixCOO<Mem::Main, DT_, IT_> ta_coo(arows, acolumns, trow_ind, tcol_ind, tval);
+          SparseMatrixCOO<Mem_, DT_, IT_> a_coo;
+          a_coo.convert(ta_coo);
 
-          this->assign(ta);
+          this->assign(a_coo);
         }
 
         /**

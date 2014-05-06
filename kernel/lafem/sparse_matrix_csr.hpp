@@ -902,13 +902,16 @@ namespace FEAST
         {
           CONTEXT("When converting SparseMatrixCSR");
 
-          const Index arows(a.rows());
-          const Index acolumns(a.columns());
-          const Index aused_elements(a.used_elements());
+          typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
+          ta.convert(a);
 
-          DenseVector<Mem_, DT_, IT_> tval(aused_elements);
-          DenseVector<Mem_, IT_, IT_> tcol_ind(aused_elements);
-          DenseVector<Mem_, IT_, IT_> trow_ptr(arows + 1);
+          const Index arows(ta.rows());
+          const Index acolumns(ta.columns());
+          const Index aused_elements(ta.used_elements());
+
+          DenseVector<Mem::Main, DT_, IT_> tval(aused_elements);
+          DenseVector<Mem::Main, IT_, IT_> tcol_ind(aused_elements);
+          DenseVector<Mem::Main, IT_, IT_> trow_ptr(arows + 1);
 
           DT_ * pval(tval.elements());
           IT_ * pcol_ind(tcol_ind.elements());
@@ -916,7 +919,7 @@ namespace FEAST
 
           for (Index i(0); i < arows; ++i)
           {
-            prow_ptr[i + 1] = IT_(a.get_length_of_line(i));
+            prow_ptr[i + 1] = IT_(ta.get_length_of_line(i));
           }
 
           prow_ptr[0] = IT_(0);
@@ -928,12 +931,14 @@ namespace FEAST
 
           for (Index i(0); i < arows; ++i)
           {
-            a.set_line(i, pval + prow_ptr[i], pcol_ind + prow_ptr[i], 0);
+            ta.set_line(i, pval + prow_ptr[i], pcol_ind + prow_ptr[i], 0);
           }
 
-          SparseMatrixCSR ta(arows, acolumns, tcol_ind, tval, trow_ptr);
+          SparseMatrixCSR<Mem::Main, DT_, IT_> ta_csr(arows, acolumns, tcol_ind, tval, trow_ptr);
+          SparseMatrixCSR<Mem_, DT_, IT_> a_csr;
+          a_csr.convert(ta_csr);
 
-          this->assign(ta);
+          this->assign(a_csr);
         }
 
         /**
