@@ -292,6 +292,22 @@ namespace FEAST
         this->first().set_vec_inv(pval_set);
         this->rest().set_vec_inv(pval_set + this->first().size());
       }
+
+      /**
+       * \brief Convertion method
+       *
+       * \param[in] other The source Vector.
+       *
+       * Use source vector content as content of current vector
+       */
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const typename TupleVector::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      {
+        CONTEXT("When converting TupleVector");
+
+        this->first().convert(other.first());
+        this->rest().convert(other.rest());
+      }
     }; // class TupleVector<...>
 
     /// \cond internal
@@ -499,7 +515,22 @@ namespace FEAST
         this->first().set_vec_inv(pval_set);
       }
 #endif
-};
+
+      /**
+       * \brief Convertion method
+       *
+       * \param[in] other The source Vector.
+       *
+       * Use source vector content as content of current vector
+       */
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const TupleVector<typename TupleVector::template ContainerType<Mem2_, DT2_, IT2_> > & other)
+      {
+        CONTEXT("When converting TupleVector");
+
+        this->first().convert(other.first());
+      }
+    };
     /// \endcond
 
     /// \cond internal

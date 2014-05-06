@@ -394,6 +394,22 @@ namespace FEAST
         this->base().set_vec_inv(pval_set);
         this->last().set_vec_inv(pval_set + this->base().size());
       }
+
+      /**
+       * \brief Convertion method
+       *
+       * \param[in] other The source Vector.
+       *
+       * Use source vector content as content of current vector
+       */
+      template <typename Mem2_, typename DT2_, typename IT2_>
+        void convert(const typename PowerVector::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      {
+        CONTEXT("When converting PowerVector");
+
+        this->base().convert(other.base());
+        this->last().convert(other.last());
+      }
     }; // class PowerVector<...>
 
     /// \cond internal
@@ -414,6 +430,8 @@ namespace FEAST
       typedef typename SubVectorType::MemType MemType;
       typedef typename SubVectorType::DataType DataType;
       typedef typename SubVectorType::IndexType IndexType;
+      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
 
       enum
       {
@@ -599,6 +617,20 @@ namespace FEAST
         this->last().set_vec_inv(pval_set);
       }
 
+      /**
+       * \brief Convertion method
+       *
+       * \param[in] other The source Vector.
+       *
+       * Use source vector content as content of current vector
+       */
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const typename PowerVector::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      {
+        CONTEXT("When converting PowerVector");
+
+        this->last().convert(other.last());
+      }
     }; // class PowerVector<...,1>
     /// \cond internal
 

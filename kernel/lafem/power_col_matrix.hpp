@@ -296,6 +296,21 @@ namespace FEAST
         }
       }
 
+      /**
+       * \brief Convertion method
+       *
+       * \param[in] other The source Matrix.
+       *
+       * Use source matrix content as content of current matrix
+       */
+      template <typename Mem2_, typename DT2_, typename IT2_>
+        void convert(const typename PowerColMatrix::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      {
+        CONTEXT("When converting PowerColMatrix");
+
+        this->base().convert(other.base());
+        this->last().convert(other.last());
+      }
     };
 
     /// \cond internal
@@ -466,6 +481,20 @@ namespace FEAST
         this->last().set_line(row, pval_set, pcol_set, col_start, stride);
       }
 
+      /**
+       * \brief Convertion method
+       *
+       * \param[in] other The source Matrix.
+       *
+       * Use source matrix content as content of current matrix
+       */
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const typename PowerColMatrix::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      {
+        CONTEXT("When converting PowerColMatrix");
+
+        this->last().convert(other.last());
+      }
     };
     /// \endcond
   } // namespace LAFEM

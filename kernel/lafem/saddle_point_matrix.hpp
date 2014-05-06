@@ -339,6 +339,23 @@ namespace FEAST
           this->block_d().set_line(row - arows, pval_set, pcol_set, col_start, stride);
         }
       }
+
+      /**
+       * \brief Convertion method
+       *
+       * \param[in] other The source Matrix.
+       *
+       * Use source matrix content as content of current matrix
+       */
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const typename SaddlePointMatrix::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      {
+        CONTEXT("When converting SaddlePointMatrix");
+
+        this->block_a().convert(other.block_a());
+        this->block_b().convert(other.block_b());
+        this->block_d().convert(other.block_d());
+      }
     }; // class SaddlePointMatrix<...>
 
     /// \cond internal
