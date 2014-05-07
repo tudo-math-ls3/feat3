@@ -284,7 +284,9 @@ void Axpy<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const y, const 
       --j;
 
       // iteration over all rows which contain the offsets between offset i and offset j
-      for (Index l(Math::max(START_OFFSET(i), END_OFFSET(j))); l < Math::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
+      const Index start(Math::max(START_OFFSET(i), END_OFFSET(j)));
+      const Index stop(Math::min(START_OFFSET(i-1), END_OFFSET(j-1)));
+      for (Index l(start); l < stop; ++l)
       {
         DT_ s(0);
         for (Index a(i); a < j; ++a)
