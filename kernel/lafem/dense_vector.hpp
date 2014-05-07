@@ -197,6 +197,57 @@ namespace FEAST
           return this->_scalar_index.at(0);
         }
 
+        /// \cond internal
+        template <typename VT_, typename IT2_>
+        void _convert(const typename VT_::template ContainerType<Mem_, DT_, IT2_> & a)
+        {
+          DenseVector<Mem_, DT_, IT_> vec(a.size());
+          a.set_vec(vec.elements());
+
+          this->assign(vec);
+        }
+
+        template <typename VT_>
+        void _convert(const VT_ & a)
+        {
+          typename VT_::template ContainerType<Mem_, DT_, IT_> ta;
+          ta.convert(a);
+
+          this->convert(a);
+        }
+
+        template <typename VT_, typename Mem2_, typename IT2_>
+        void _copy(const typename VT_::template ContainerType<Mem2_, DT_, IT2_> & a)
+        {
+          if (std::is_same<Mem_, Mem2_>::value)
+          {
+            a.set_vec(this->elements());
+          }
+          else
+          {
+            typename VT_::template ContainerType<Mem_, DT_, IT2_> ta;
+            ta.convert(a);
+
+            this->copy(ta);
+          }
+        }
+
+        template <typename VT_, typename Mem2_, typename IT2_>
+        void _copy_inv(typename VT_::template ContainerType<Mem2_, DT_, IT2_> & a) const
+        {
+          if (std::is_same<Mem_, Mem2_>::value)
+          {
+            a.set_vec_inv(this->elements());
+          }
+          else
+          {
+            DenseVector<Mem2_, DT_, IT_> t_this;
+            t_this.convert(*this);
+
+            t_this.copy_inv(a);
+          }
+        }
+
       public:
         /// Our datatype
         typedef DT_ DataType;
@@ -447,17 +498,7 @@ namespace FEAST
         {
           CONTEXT("When converting DenseVector");
 
-          typename VT_::template ContainerType<Mem::Main, DT_, IT_> ta;
-          ta.convert(a);
-
-          DenseVector<Mem::Main, DT_, IT_> tvec(ta.size());
-          auto * pvec(tvec.elements());
-
-          ta.set_vec(pvec);
-          DenseVector<Mem::Main, DT_, IT_> vec;
-          vec.convert(tvec);
-
-          this->assign(vec);
+          this->template _convert<VT_>(a);
         }
 
         /**
@@ -466,19 +507,12 @@ namespace FEAST
          * \param[in] x The vector to be copied (could be of any format; must have same size).
          */
         template<typename VT_>
-        void copy(const VT_ & b)
+        void copy(const VT_ & a)
         {
-          if (this->size() != b.size())
+          if (this->size() != a.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vectors have not the same size!");
 
-          // auto * const pa(this->elements());
-          // b.set_vec(pa);
-
-          // \TODO: This is only temporarily
-          DenseVector a;
-          a.convert(b);
-
-          this->assign(a);
+          this->template _copy<VT_>(a);
         }
 
         /**
@@ -492,22 +526,8 @@ namespace FEAST
           if (this->size() != a.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vectors have not the same size!");
 
-          // const auto * const pb(this->elements());
-          // a.set_vec_inv(pb);
-
-          // \TODO: This is only temporarily
-          typename VT_::template ContainerType<Mem::Main, DT_, IT_> ta;
-          ta.convert(a);
-
-          DenseVector<Mem::Main, DT_, IT_> t_this;
-          t_this.convert(*this);
-
-          const auto * const pb(t_this.elements());
-          ta.set_vec_inv(pb);
-
-          a.convert(ta);
+          this->template _copy_inv<VT_>(a);
         }
-
 
         /**
          * \brief Write out vector to file.
@@ -926,25 +946,13 @@ namespace FEAST
         /// Writes the vector-entries in an allocated array
         void set_vec(DT_ * const pval_set) const
         {
-          const DT_ * pvec(this->elements());
-          const Index n(this->size());
-
-          for (Index i(0); i < n; ++i)
-          {
-            pval_set[i] = pvec[i];
-          }
+          MemoryPool<Mem_>::copy(pval_set, this->elements(), this->size());
         }
 
         /// Writes data of an array in the vector
         void set_vec_inv(const DT_ * const pval_set)
         {
-          DT_ * pvec(this->elements());
-          const Index n(this->size());
-
-          for (Index i(0); i < n; ++i)
-          {
-            pvec[i] = pval_set[i];
-          }
+          MemoryPool<Mem_>::copy(this->elements(), pval_set, this->size());
         }
         /// \end cond
     }; // class DenseVector<...>

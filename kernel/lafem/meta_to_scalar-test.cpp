@@ -60,10 +60,9 @@ public:
     {
       vec_sol(i, DT_(1));
       mat_sys.template apply<AlgoType>(vec_rhs, vec_sol);
-      vec_rhs_scalar2.copy(vec_rhs);
-
       DenseVector<Mem_, DT_, IT_> vec_sol_scalar;
       vec_sol_scalar.convert(vec_sol);
+      vec_rhs_scalar2.copy(vec_rhs);
       mat_sys_scalar.template apply<AlgoType>(vec_rhs_scalar, vec_sol_scalar);
 
       for (Index j(0); j < vec_rhs_scalar.size(); ++j)
