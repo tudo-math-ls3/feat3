@@ -102,17 +102,40 @@ public:
   }
 };
 
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned int> > meta_matrix_to_coo_test_generic_float_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned int> > meta_matrix_to_coo_test_generic_double_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned long> > meta_matrix_to_coo_test_generic_float_ulong;
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned long> > meta_matrix_to_coo_test_generic_double_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned int> > cpu_meta_matrix_to_coo_test_generic_float_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned int> > cpu_meta_matrix_to_coo_test_generic_double_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_coo_test_generic_float_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_coo_test_generic_double_ulong;
 
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned int> > meta_matrix_to_csr_test_generic_float_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> > meta_matrix_to_csr_test_generic_double_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned long> > meta_matrix_to_csr_test_generic_float_ulong;
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned long> > meta_matrix_to_csr_test_generic_double_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned int> > cpu_meta_matrix_to_csr_test_generic_float_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> > cpu_meta_matrix_to_csr_test_generic_double_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_csr_test_generic_float_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_csr_test_generic_double_ulong;
 
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned int> > meta_matrix_to_ell_test_generic_float_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> > meta_matrix_to_ell_test_generic_double_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned long> > meta_matrix_to_ell_test_generic_float_ulong;
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned long> > meta_matrix_to_ell_test_generic_double_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned int> > cpu_meta_matrix_to_ell_test_generic_float_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> > cpu_meta_matrix_to_ell_test_generic_double_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_ell_test_generic_float_ulong;
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_ell_test_generic_double_ulong;
+
+// TODO: Alle fehlenden Tests hinzufuegen
+#ifdef FEAST_HAVE_QUADMATH
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_coo_test_generic_float128_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_coo_test_generic_float128_ulong;
+
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_csr_test_generic_float128_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_csr_test_generic_float128_ulong;
+
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_ell_test_generic_float128_uint;
+MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_ell_test_generic_float128_ulong;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+MetaToScalarTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, float, unsigned int> > cuda_meta_matrix_to_csr_test_generic_float_uint;
+MetaToScalarTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned int> > cuda_meta_matrix_to_csr_test_generic_double_uint;
+MetaToScalarTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_csr_test_generic_float_ulong;
+MetaToScalarTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned long> > cuda_meta_matrix_to_csr_test_generic_double_ulong;
+
+MetaToScalarTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, float, unsigned int> > cuda_meta_matrix_to_ell_test_generic_float_uint;
+MetaToScalarTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned int> > cuda_meta_matrix_to_ell_test_generic_double_uint;
+MetaToScalarTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_ell_test_generic_float_ulong;
+MetaToScalarTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned long> > cuda_meta_matrix_to_ell_test_generic_double_ulong;
+#endif
