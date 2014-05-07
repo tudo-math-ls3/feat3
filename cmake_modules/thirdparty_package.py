@@ -69,14 +69,15 @@ class ThirdpartyPackage(object):
 # Downloads a file from url and saves it to filename
 def download(url,filename):
   import sys
-  if sys.version < '3':
+  if sys.version_info[0] < 3:
     import urllib
     urllib.urlretrieve(url, filename)
   else:
     import urllib.request
     import shutil
-    with urllib.request.urlopen(url) as response, open(filename, 'wb') as out_file:
-      shutil.copyfileobj(response, out_file)
+    with urllib.request.urlopen(url) as response:
+      with open(filename, 'wb') as out_file:
+        shutil.copyfileobj(response, out_file)
   return
 
 # Find available third party packages by parsing all .py files in the cmake_modules folder
