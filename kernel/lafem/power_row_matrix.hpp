@@ -267,11 +267,14 @@ namespace FEAST
         return VectorTypeR(base().create_vector_r(), last().create_vector_r());
       }
 
+      /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
         return this->base().get_length_of_line(row) + this->last().get_length_of_line(row);
       }
 
+      /// \cond internal
+      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
       void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
                     const Index col_start, const Index stride = 1) const
       {
@@ -280,6 +283,7 @@ namespace FEAST
         this->base().set_line(row, pval_set, pcol_set, col_start, stride);
         this->last().set_line(row, pval_set + stride * length_of_base, pcol_set + stride * length_of_base, col_start + this->base().columns(), stride);
       }
+      /// \end cond
 
       /**
        * \brief Convertion method
@@ -455,11 +459,13 @@ namespace FEAST
         return VectorTypeR(last().create_vector_r());
       }
 
+      /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
         return this->last().get_length_of_line(row);
       }
 
+      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
       void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
                     const Index col_start, const Index stride = 1) const
       {

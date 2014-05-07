@@ -308,6 +308,7 @@ namespace FEAST
         return VectorTypeR(block_a().create_vector_r(), block_b().create_vector_r());
       }
 
+      /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
         const Index arows(this->block_a().rows());
@@ -322,6 +323,8 @@ namespace FEAST
         }
       }
 
+      /// \cond internal
+      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
       void set_line(const Index row, typename MatrixA_::DataType * const pval_set, typename MatrixA_::IndexType * const pcol_set,
                     const Index col_start, const Index stride = 1) const
       {
@@ -339,6 +342,7 @@ namespace FEAST
           this->block_d().set_line(row - arows, pval_set, pcol_set, col_start, stride);
         }
       }
+      /// \end cond
 
       /**
        * \brief Convertion method

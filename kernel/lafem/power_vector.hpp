@@ -383,17 +383,21 @@ namespace FEAST
         }
       }
 
+      /// \cond internal
+      /// Writes the vector-entries in an allocated array
       void set_vec(DataType * const pval_set) const
       {
         this->base().set_vec(pval_set);
         this->last().set_vec(pval_set + this->base().size());
       }
 
+      /// Writes data of an array in the vector
       void set_vec_inv(const DataType * const pval_set)
       {
         this->base().set_vec_inv(pval_set);
         this->last().set_vec_inv(pval_set + this->base().size());
       }
+      /// \end cond
 
       /**
        * \brief Convertion method

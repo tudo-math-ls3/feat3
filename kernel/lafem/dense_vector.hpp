@@ -920,7 +920,10 @@ namespace FEAST
           // fallback
           return Math::sqr(this->norm2<Algo_>());
         }
+        ///@}
 
+        /// \cond internal
+        /// Writes the vector-entries in an allocated array
         void set_vec(DT_ * const pval_set) const
         {
           const DT_ * pvec(this->elements());
@@ -932,6 +935,7 @@ namespace FEAST
           }
         }
 
+        /// Writes data of an array in the vector
         void set_vec_inv(const DT_ * const pval_set)
         {
           DT_ * pvec(this->elements());
@@ -942,7 +946,7 @@ namespace FEAST
             pvec[i] = pval_set[i];
           }
         }
-      ///@}
+        /// \end cond
     }; // class DenseVector<...>
 
 

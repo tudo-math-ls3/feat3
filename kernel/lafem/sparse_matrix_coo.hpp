@@ -1763,50 +1763,54 @@ namespace FEAST
           return VectorTypeR(this->columns());
         }
 
-      Index get_length_of_line(const Index row) const
-      {
-        const IT_ * prow(this->row_indices());
-        const Index tused_elements(this->used_elements());
-
-        Index i(0);
-        while (prow[i] < row)
+        /// Returns the number of NNZ-elements of the selected row
+        Index get_length_of_line(const Index row) const
         {
-          ++i;
-        }
+          const IT_ * prow(this->row_indices());
+          const Index tused_elements(this->used_elements());
 
-        Index j(i);
-        while (j < tused_elements && prow[j] == row)
-        {
-          ++j;
-        }
-        return (j - i);
-      }
-
-      void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
-                    const Index col_start, const Index stride = 1) const
-      {
-        const IT_ * prow(this->row_indices());
-        const IT_ * pcol(this->column_indices());
-        const DT_ * pval(this->val());
-
-        const Index tused_elements(this->used_elements());
-
-        Index start(0);
-        while (prow[start] < row)
-        {
-          ++start;
-        }
-
-        for (Index i(0); start + i < tused_elements; ++i)
-        {
-          if (prow[start + i] != row)
+          Index i(0);
+          while (prow[i] < row)
           {
-            return;
+            ++i;
           }
-          pval_set[i * stride] = pval[start + i];
-          pcol_set[i * stride] = pcol[start + i] + IT_(col_start);
+
+          Index j(i);
+          while (j < tused_elements && prow[j] == row)
+          {
+            ++j;
+          }
+          return (j - i);
         }
-      }
+
+        /// \cond internal
+        /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
+        void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
+                      const Index col_start, const Index stride = 1) const
+        {
+          const IT_ * prow(this->row_indices());
+          const IT_ * pcol(this->column_indices());
+          const DT_ * pval(this->val());
+
+          const Index tused_elements(this->used_elements());
+
+          Index start(0);
+          while (prow[start] < row)
+          {
+            ++start;
+          }
+
+          for (Index i(0); start + i < tused_elements; ++i)
+          {
+            if (prow[start + i] != row)
+            {
+              return;
+            }
+            pval_set[i * stride] = pval[start + i];
+            pcol_set[i * stride] = pcol[start + i] + IT_(col_start);
+          }
+        }
+        /// \end cond
     };
 
     /**

@@ -1571,11 +1571,14 @@ namespace FEAST
           return VectorTypeR(this->columns());
         }
 
+        /// Returns the number of NNZ-elements of the selected row
         Index get_length_of_line(const Index row) const
         {
           return this->Arl()[row];
         }
 
+        /// \cond internal
+        /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
         void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
                               const Index col_start, const Index stride_in = 1) const
         {
@@ -1592,6 +1595,7 @@ namespace FEAST
             pcol_set[i * stride_in] = paj[i * astride] + IT_(col_start);
           }
         }
+        /// \end cond
     };
 
     /**
