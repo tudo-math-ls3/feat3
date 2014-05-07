@@ -201,6 +201,12 @@ namespace FEAST
         return base().used_elements() + last().used_elements();
       }
 
+      /// Returns a descriptive string for this container.
+      static String name()
+      {
+        return String("PowerColMatrix<") + SubMatrixType::name() + "," + stringify(blocks_) + ">";
+      }
+
       /**
        * \brief Clears this matrix.
        *

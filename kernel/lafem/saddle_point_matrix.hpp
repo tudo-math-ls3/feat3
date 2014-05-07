@@ -252,6 +252,14 @@ namespace FEAST
         return _matrix_a.used_elements() + _matrix_b.used_elements() + _matrix_d.used_elements();
       }
 
+      /// Returns a descriptive string for this container.
+      static String name()
+      {
+        return String("SaddePointMatrix<") + MatrixTypeA::name() + "," +
+          MatrixTypeB::name() + "," +
+          MatrixTypeD::name() + ">";
+      }
+
       /**
        * \brief Applies this matrix onto a vector.
        *
