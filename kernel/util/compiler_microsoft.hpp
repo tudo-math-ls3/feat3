@@ -97,6 +97,10 @@
 // This is an annoying optimisation information.
 #  pragma warning(disable: 4711)
 
+// C4738: storing 32-bit float result in memory, possible loss of performance
+// This is an optimisation warning, which arises from the strict fp-model.
+#  pragma warning(disable: 4738)
+
 // C4820: 'bytes' bytes padding added after construct 'member_name'
 // This warning is disabled as it is mass-produced when compiling standard libraries.
 #  pragma warning(disable: 4820)
