@@ -183,7 +183,8 @@ namespace FEAST
           }
         }
 
-        /** \brief Assignment operation
+        /**
+         * \brief Assignment operation
          *
          * Assigns contents of another container
          *

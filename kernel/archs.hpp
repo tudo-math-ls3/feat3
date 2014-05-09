@@ -15,6 +15,9 @@
 
 namespace FEAST
 {
+    /**
+     * \brief FEAST::Archs namespace
+     */
     namespace Archs
     {
       /**
@@ -72,6 +75,9 @@ namespace FEAST
     }
 
 
+    /**
+     * \brief FEAST::Mem namespace
+     */
     namespace Mem
     {
       /**
@@ -112,6 +118,9 @@ namespace FEAST
       };
     }
 
+    /**
+     * \brief FEAST::Algo namespace
+     */
     namespace Algo
     {
       /**

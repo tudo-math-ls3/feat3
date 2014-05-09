@@ -1,0 +1,39 @@
+/** \page lafem_design LAFEM design description
+
+This page describes ideas and concepts used throughout the whole lafem subsystem.
+
+\section sec_overview Overview
+LAFEM comprises a wide range of different linear algebra containers and their corresponding operations.
+Although many operations are different for each container, many concepts are common to all containers and shall be described in this document.
+
+\section container_properties Container properties
+All Containers have at least the first three template parameters in common, describing memory location, floating point format and indexing data type.
+
+The structs in FEAST::Mem are used to control, if the containers contents will be stored in the cpus main memory or in gpu memory, allocated by the cuda runtime.
+
+The second template parameter is used as the datatype for the allocation of all floating point based arrays.
+
+The third template parameter is used as the datatype for the allocation of all indexing related arrays, e.g. the column index array in a CSR Matrix.
+
+
+\section la_ops LA Operations
+All operations are member functions of the related containers.
+With little exceptions, the object which hosts the function call will contain the calculation result.
+\note Namely the BLAS2-like operations of axpy and apply break this rule by being a member of the corresponding matrix.
+
+All operations are function templates, which expect a struct from FEAST::Algo to specify which architectural and algorithmical specialisation of the operation shall be used.
+
+\note Not all Algo structs are compatible with all Mem structs. For example FEAST::Algo::CUDA is incompatible with FEAST::Mem::Main.
+
+\section data_handling Data handling
+All containers provide at least three different member functions for proper conversion and data movement.
+
+- clone: creates a deep copy from scratch
+\see FEAST::LAFEM::Container::clone()
+
+- convert: try to reuse existing arrays for shallow copy, convert and transfer where nessesary.
+
+- copy: copy container contents only, floating point format and indexing datatype must be identical.
+
+\note There does not exist a copy constructor nor copy assignment operator. This prevents the user from triggering unwanted copy operations and memory transfers.
+**/
