@@ -678,19 +678,19 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template<typename DataType_, typename IndexType_>
+    template<typename DataType_, typename IndexType_ = Index>
     class PointstarFactoryBase2
     {
     protected:
       /// vector with number of subintervalls per dimension (plus a leading 2).
-      const DenseVector<Mem::Main, IndexType_, IndexType_> & _num_of_subintervalls;
+      const std::vector<IndexType_> & _num_of_subintervalls;
       /// vector with lengths of the n-dimensional hypercube
-      const DenseVector<Mem::Main, DataType_, IndexType_> & _dimensions;
+      const std::vector<DataType_> & _dimensions;
       /// number of dimensions
       const Index _d;
 
-      PointstarFactoryBase2(const DenseVector<Mem::Main, IndexType_, IndexType_> & num_of_subintervalls,
-                            const DenseVector<Mem::Main, DataType_, IndexType_> & dimensions) :
+      PointstarFactoryBase2(const std::vector<IndexType_> & num_of_subintervalls,
+                            const std::vector<DataType_> & dimensions) :
         _num_of_subintervalls(num_of_subintervalls),
         _dimensions(dimensions),
         _d(_dimensions.size())
@@ -700,7 +700,7 @@ namespace FEAST
 
         for (Index i(1); i <= _d; ++i)
         {
-          ASSERT(_num_of_subintervalls(i) >= Index(4), "You need at least 4 subintervalls per dimension");
+          ASSERT(_num_of_subintervalls[i] >= Index(4), "You need at least 4 subintervalls per dimension");
         }
       }
 
@@ -786,8 +786,8 @@ namespace FEAST
        * \param[in] dimensions
        * The vector with lengths of the n-dimensional hypercube
        */
-      PointstarFactoryFD2(const DenseVector<Mem::Main, IndexType_, IndexType_> & num_of_subintervalls,
-                          const DenseVector<Mem::Main, DataType_, IndexType_> & dimensions) :
+      PointstarFactoryFD2(const std::vector<IndexType_> & num_of_subintervalls,
+                          const std::vector<DataType_> & dimensions) :
         PointstarFactoryBase2<DataType_, IndexType_>(num_of_subintervalls, dimensions)
       {
       }
@@ -801,8 +801,8 @@ namespace FEAST
       virtual SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix_banded() const override
       {
         const Index d(this->_d);
-        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
-        const DataType_ * const pdim(this->_dimensions.elements());
+        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
+        const std::vector<DataType_> & pdim(this->_dimensions);
 
         /**
          * Create matrix-structure
@@ -871,8 +871,8 @@ namespace FEAST
       virtual DataType_ lambda_min() const override
       {
         DataType_ x(DataType_(0.0));
-        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
-        const DataType_ * const pdim(this->_dimensions.elements());
+        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
+        const std::vector<DataType_> & pdim(this->_dimensions);
 
         for (Index i(0); i < this->_d; ++i)
         {
@@ -896,8 +896,8 @@ namespace FEAST
       virtual DataType_ lambda_max() const override
       {
         DataType_ x(DataType_(0.0));
-        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
-        const DataType_ * const pdim(this->_dimensions.elements());
+        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
+        const std::vector<DataType_> & pdim(this->_dimensions);
 
         for (Index i(0); i < this->_d; ++i)
         {
@@ -910,7 +910,7 @@ namespace FEAST
 
       virtual DenseVector<Mem::Main, DataType_, IndexType_> eigenvector_min() const override
       {
-        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
+        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
         const Index d(this->_d);
 
         // compute vector length
@@ -950,8 +950,8 @@ namespace FEAST
       DenseVector<Mem::Main, DataType_, IndexType_> vector_q2_bubble() const override
       {
         const Index d(this->_d);
-        const IndexType_ * const pnos(this->_num_of_subintervalls.elements());
-        const DataType_ * const pdim(this->_dimensions.elements());
+        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
+        const std::vector<DataType_> & pdim(this->_dimensions);
 
         // compute vector length
         Index size(1);

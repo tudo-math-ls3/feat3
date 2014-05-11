@@ -87,17 +87,17 @@ PointstarFactoryTest<double> pointstar_factory_test_double;
 
 
 
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class PointstarStructureTest :
-  public FEAST::TestSystem::TaggedTest<Mem::Main, DataType_>
+  public FEAST::TestSystem::FullTaggedTest<Mem::Main, NotSet, DataType_, IndexType_>
 {
 public:
-  typedef DenseVector<Mem::Main, DataType_> VectorType;
-  typedef SparseMatrixBanded<Mem::Main, DataType_> MatrixType;
+  typedef DenseVector<Mem::Main, DataType_, IndexType_> VectorType;
+  typedef SparseMatrixBanded<Mem::Main, DataType_, IndexType_> MatrixType;
 
 public:
   PointstarStructureTest() :
-    FEAST::TestSystem::TaggedTest<Mem::Main, DataType_>("PointstarStructureTest")
+    FEAST::TestSystem::FullTaggedTest<Mem::Main, NotSet, DataType_, IndexType_>("PointstarStructureTest")
   {
   }
 
@@ -105,20 +105,20 @@ public:
   {
     const DataType_ tol(Math::pow(Math::eps<DataType_>(), DataType_(0.8)));
 
-    DenseVector<Mem::Main, Index> num_of_nodes(4);
-    DenseVector<Mem::Main, DataType_> dimensions(3);
 
-    num_of_nodes(0, 2);
-    num_of_nodes(1, 9);
-    num_of_nodes(2, 11);
-    num_of_nodes(3, 24);
+    std::vector<IndexType_> num_of_subintervalls;
+    num_of_subintervalls.push_back(2);
+    num_of_subintervalls.push_back(9);
+    num_of_subintervalls.push_back(11);
+    num_of_subintervalls.push_back(24);
 
-    dimensions(0, DataType_(3.0));
-    dimensions(1, DataType_(0.47));
-    dimensions(2, DataType_(4.0));
+    std::vector<DataType_> dimensions;
+    dimensions.push_back(DataType_(3.0));
+    dimensions.push_back(DataType_(0.47));
+    dimensions.push_back(DataType_(4.0));
 
     // generate FD matrix A
-    PointstarFactoryFD2<DataType_> factory(num_of_nodes, dimensions);
+    PointstarFactoryFD2<DataType_, IndexType_> factory(num_of_subintervalls, dimensions);
     MatrixType a(factory.matrix_banded());
 
     // compute smallest and largest eigenvalues of A
@@ -136,13 +136,16 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(w.template norm2<Algo::Generic>(), DataType_(0), tol);
 
 
-    std::vector<Index> num_of_nodes2;
-    num_of_nodes2.push_back(5);
-    num_of_nodes2.push_back(4);
-    num_of_nodes2.push_back(3);
+    std::vector<IndexType_> num_of_subintervalls2;
+    num_of_subintervalls2.push_back(5);
+    num_of_subintervalls2.push_back(4);
+    num_of_subintervalls2.push_back(3);
 
-    MatrixType b(PointstarStructureFE<Algo::Generic>::value<DataType_>(Index(3), num_of_nodes2));
+    MatrixType b(PointstarStructureFE<Algo::Generic>::value<DataType_>(3, num_of_subintervalls2));
   }
 };
 
-PointstarStructureTest<double> pointstar_structure_test_double;
+PointstarStructureTest<float, unsigned int> pointstar_structure_test_float_uint;
+PointstarStructureTest<float, unsigned long> pointstar_structure_test_float_ulong;
+PointstarStructureTest<double, unsigned int> pointstar_structure_test_double_uint;
+PointstarStructureTest<double, unsigned long> pointstar_structure_test_double_ulong;
