@@ -5,23 +5,23 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
-template<typename DataType_>
+template<typename DataType_, typename IndexType_>
 class PointstarFactoryTest :
-  public FEAST::TestSystem::TaggedTest<Mem::Main, DataType_>
+  public FEAST::TestSystem::FullTaggedTest<Mem::Main, NotSet, DataType_, IndexType_>
 {
 public:
-  typedef DenseVector<Mem::Main, DataType_> VectorType;
-  typedef SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
+  typedef DenseVector<Mem::Main, DataType_, IndexType_> VectorType;
+  typedef SparseMatrixCSR<Mem::Main, DataType_, IndexType_> MatrixType;
 
 public:
   PointstarFactoryTest() :
-    FEAST::TestSystem::TaggedTest<Mem::Main, DataType_>("PointstarFactoryTest")
+    FEAST::TestSystem::FullTaggedTest<Mem::Main, NotSet, DataType_, IndexType_>("PointstarFactoryTest")
   {
   }
 
   virtual void run() const
   {
-    const DataType_ tol(Math::pow(Math::eps<DataType_>(), DataType_(0.8)));
+    const DataType_ tol(Math::pow(Math::eps<DataType_>(), DataType_(0.7)));
 
     // Test FD poinstars
     // dimension loop: d=1,2,3,4
@@ -31,7 +31,7 @@ public:
       for(Index m(3); m < 6; ++m)
       {
         // generate FD matrix A
-        PointstarFactoryFD<DataType_> factory(m, d);
+        PointstarFactoryFD<DataType_, IndexType_> factory(m, d);
         MatrixType a(factory.matrix_csr());
 
         // compute smallest and largest eigenvalues of A
@@ -55,7 +55,7 @@ public:
     for(Index m(3); m < 9; ++m)
     {
       // generate 2D FE matrix A
-      PointstarFactoryFE<DataType_> factory(m);
+      PointstarFactoryFE<DataType_, IndexType_> factory(m);
       MatrixType a(factory.matrix_csr());
 
       // compute smallest and largest eigenvalues of A
@@ -77,7 +77,10 @@ public:
   }
 };
 
-PointstarFactoryTest<double> pointstar_factory_test_double;
+PointstarFactoryTest<float, unsigned int> pointstar_factory_test_float_uint;
+PointstarFactoryTest<float, unsigned long> pointstar_factory_test_float_ulong;
+PointstarFactoryTest<double, unsigned int> pointstar_factory_test_double_uint;
+PointstarFactoryTest<double, unsigned long> pointstar_factory_test_double_ulong;
 
 
 

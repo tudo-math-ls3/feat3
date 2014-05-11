@@ -801,8 +801,8 @@ namespace FEAST
       virtual SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix_banded() const override
       {
         const Index d(this->_d);
-        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
-        const std::vector<DataType_> & pdim(this->_dimensions);
+        const IndexType_ * const pnos(this->_num_of_subintervalls.data());
+        const DataType_ * const pdim(this->_dimensions.data());
 
         /**
          * Create matrix-structure
@@ -871,8 +871,8 @@ namespace FEAST
       virtual DataType_ lambda_min() const override
       {
         DataType_ x(DataType_(0.0));
-        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
-        const std::vector<DataType_> & pdim(this->_dimensions);
+        const IndexType_ * const pnos(this->_num_of_subintervalls.data());
+        const DataType_ * const pdim(this->_dimensions.data());
 
         for (Index i(0); i < this->_d; ++i)
         {
@@ -896,8 +896,8 @@ namespace FEAST
       virtual DataType_ lambda_max() const override
       {
         DataType_ x(DataType_(0.0));
-        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
-        const std::vector<DataType_> & pdim(this->_dimensions);
+        const IndexType_ * const pnos(this->_num_of_subintervalls.data());
+        const DataType_ * const pdim(this->_dimensions.data());
 
         for (Index i(0); i < this->_d; ++i)
         {
@@ -910,7 +910,7 @@ namespace FEAST
 
       virtual DenseVector<Mem::Main, DataType_, IndexType_> eigenvector_min() const override
       {
-        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
+        const IndexType_ * const pnos(this->_num_of_subintervalls.data());
         const Index d(this->_d);
 
         // compute vector length
@@ -950,8 +950,8 @@ namespace FEAST
       DenseVector<Mem::Main, DataType_, IndexType_> vector_q2_bubble() const override
       {
         const Index d(this->_d);
-        const std::vector<IndexType_> & pnos(this->_num_of_subintervalls);
-        const std::vector<DataType_> & pdim(this->_dimensions);
+        const IndexType_ * const pnos(this->_num_of_subintervalls.data());
+        const DataType_ * const pdim(this->_dimensions.data());
 
         // compute vector length
         Index size(1);
