@@ -600,13 +600,13 @@ public:
 
 typedef Assembly::StaticWrapperFunction<RhsFunc> RhsFunction;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, typename MatrixType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlPartitioningTest2D:
   public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
-    MeshControlPartitioningTest2D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlPartitioningTest2D<" + tag + ">")
+    MeshControlPartitioningTest2D(const String & tag) :
+      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlPartitioningTest2D<" + tag + ", " + MatrixType_::name() + ">")
     {
     }
 
@@ -839,7 +839,7 @@ class MeshControlPartitioningTest2D:
       // create space
       Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
 
-      SparseMatrixCSR<Mem::Main, double> mat_sys;
+      MatrixType_ mat_sys;
       Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
       mat_sys.format();
       Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
@@ -896,5 +896,8 @@ class MeshControlPartitioningTest2D:
 
     }
 };
-MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > meshcontrolpart_testvv("std::vector, std::vector");
-MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > meshcontrolpart_testvd("std::vector, std::deque");
+MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_csr("std::vector, std::vector");
+MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_csr("std::vector, std::deque");
+
+MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixELL<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_ell("std::vector, std::vector");
+MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixELL<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_ell("std::vector, std::deque");
