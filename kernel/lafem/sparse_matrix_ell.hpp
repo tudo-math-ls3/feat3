@@ -21,6 +21,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
+#include <kernel/adjacency/graph.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -510,6 +511,61 @@ namespace FEAST
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] graph The.graph to create the matrix from
+         *
+         * Creates a ELL matrix based on a given adjacency graph, representing the sparsity pattern.
+         */
+        explicit SparseMatrixELL(const Adjacency::Graph & graph) :
+          Container<Mem_, DT_, IT_>(0)
+        {
+          CONTEXT("When creating SparseMatrixELL");
+
+          Index num_rows = graph.get_num_nodes_domain();
+          Index num_cols = graph.get_num_nodes_image();
+          Index num_nnze = graph.get_num_indices();
+
+          const Index alignment(32);
+          const Index tstride(alignment * ((num_cols + alignment - 1)/ alignment));
+
+          const Index * dom_ptr(graph.get_domain_ptr());
+          const Index * img_idx(graph.get_image_idx());
+
+          // create temporary vector
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> tarl(num_rows);
+          IT_ * ptarl(tarl.elements());
+
+          Index tnum_cols_per_row(0);
+          for (Index i(0); i < num_rows; ++i)
+          {
+            ptarl[i] = dom_ptr[i + 1] - dom_ptr[i];
+            if (ptarl[i] > tnum_cols_per_row)
+              tnum_cols_per_row = ptarl[i];
+          }
+
+          // create temporary vectors
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> taj(tnum_cols_per_row * tstride);
+          LAFEM::DenseVector<Mem::Main, DT_, IT_> tax(tnum_cols_per_row * tstride, DT_(0));
+          IT_ * ptaj(taj.elements());
+
+          for (Index row(0); row < num_rows; ++row)
+          {
+            Index target(0);
+            for (Index i(0); i < ptarl[row]; ++i)
+            {
+              const Index row_start(dom_ptr[row]);
+              ptaj[row + target * tstride] = img_idx[row_start + i];
+              target++;
+            }
+          }
+
+          // build the matrix
+          this->assign(SparseMatrixELL<Mem::Main, DT_, IT_>(num_rows, num_cols, tstride,
+                                                            tnum_cols_per_row, num_nnze, tax, taj, tarl));
         }
 
         /**
