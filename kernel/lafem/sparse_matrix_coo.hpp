@@ -18,6 +18,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
+#include <kernel/adjacency/graph.hpp>
 
 #include <map>
 #include <algorithm>
@@ -587,6 +588,46 @@ namespace FEAST
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] graph The.graph to create the matrix from
+         *
+         * Creates a COO matrix based on a given adjacency graph, representing the sparsity pattern.
+         */
+        explicit SparseMatrixCOO(const Adjacency::Graph & graph) :
+          Container<Mem_, DT_, IT_>(0)
+        {
+          CONTEXT("When creating SparseMatrixCOO");
+
+          Index num_rows = graph.get_num_nodes_domain();
+          Index num_cols = graph.get_num_nodes_image();
+          Index num_nnze = graph.get_num_indices();
+
+          // create temporary vectors
+          LAFEM::DenseVector<Mem::Main, IT_> vrow_idx(num_nnze);
+          LAFEM::DenseVector<Mem::Main, IT_> vcol_idx(num_nnze);
+          LAFEM::DenseVector<Mem::Main, DT_> vdata(num_nnze, DT_(0));
+
+          const Index * dom_ptr(graph.get_domain_ptr());
+          const Index * img_idx(graph.get_image_idx());
+          Index * prow_idx(vrow_idx.elements());
+          Index * pcol_idx(vcol_idx.elements());
+
+          // build col-idx and row-idx
+          for (Index i(0); i < num_rows; ++i)
+          {
+            for (Index j(dom_ptr[i]); j < dom_ptr[i+1]; ++j)
+            {
+              prow_idx[j] = IT_(i);
+              pcol_idx[j] = img_idx[j];
+            }
+          }
+
+          // build the matrix
+          this->assign(SparseMatrixCOO<Mem::Main, DT_, IT_>(num_rows, num_cols, vrow_idx, vcol_idx, vdata));
         }
 
         /**
