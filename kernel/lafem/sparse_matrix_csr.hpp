@@ -437,14 +437,14 @@ namespace FEAST
           Index num_nnze = graph.get_num_indices();
 
           // create temporary vectors
-          LAFEM::DenseVector<Mem::Main, IT_> vrow_ptr(num_rows+1);
-          LAFEM::DenseVector<Mem::Main, IT_> vcol_idx(num_nnze);
-          LAFEM::DenseVector<Mem::Main, DT_> vdata(num_nnze, DT_(0));
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> vrow_ptr(num_rows+1);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> vcol_idx(num_nnze);
+          LAFEM::DenseVector<Mem::Main, DT_, IT_> vdata(num_nnze, DT_(0));
 
-          const Index* dom_ptr(graph.get_domain_ptr());
-          const Index* img_idx(graph.get_image_idx());
-          Index* prow_ptr(vrow_ptr.elements());
-          Index* pcol_idx(vcol_idx.elements());
+          const Index * dom_ptr(graph.get_domain_ptr());
+          const Index * img_idx(graph.get_image_idx());
+          IT_ * prow_ptr(vrow_ptr.elements());
+          IT_ * pcol_idx(vcol_idx.elements());
 
           // build row-end
           prow_ptr[0] = dom_ptr[0];
