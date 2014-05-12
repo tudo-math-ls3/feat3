@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
 
@@ -182,6 +183,55 @@ namespace FEAST
 
       template<typename Algo_>
       void filter_offdiag_col_mat(SparseMatrixCSR<Mem_, DT_, IT_> &) const
+      {
+        // nothing to do here
+      }
+
+      /**
+       * \brief Applies the filter onto a system matrix.
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       */
+      template<typename Algo_>
+      void filter_mat(SparseMatrixELL<Mem_, DT_, IT_> & matrix) const
+      {
+        const Index tstride(matrix.stride());
+        const Index * paj(matrix.Aj());
+        const Index * parl(matrix.Arl());
+        DT_* pax(matrix.Ax());
+
+        for(Index i(0); i < _sv.used_elements(); ++i)
+        {
+          Index ix(_sv.indices()[i]);
+          // replace by unit row
+          for(Index j(ix); j < ix + tstride * parl[ix]; j += tstride)
+          {
+            pax[j] = (paj[j] == ix) ? DT_(1) : DT_(0);
+          }
+        }
+      }
+
+      template<typename Algo_>
+      void filter_offdiag_row_mat(SparseMatrixELL<Mem_, DT_, IT_> & matrix) const
+      {
+        const Index tstride(matrix.stride());
+        const Index * parl(matrix.Arl());
+        DT_* pax(matrix.Ax());
+
+        for(Index i(0); i < _sv.used_elements(); ++i)
+        {
+          Index ix(_sv.indices()[i]);
+          // replace by null row
+          for(Index j(ix); j < ix + tstride * parl[ix]; j += tstride)
+          {
+            pax[j] = DT_(0);
+          }
+        }
+      }
+
+      template<typename Algo_>
+      void filter_offdiag_col_mat(SparseMatrixELL<Mem_, DT_, IT_> &) const
       {
         // nothing to do here
       }
