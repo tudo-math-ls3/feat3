@@ -453,7 +453,7 @@ namespace FEAST
 
           // build col-idx
           for(Index i(0); i < num_nnze; ++i)
-          pcol_idx[i] = img_idx[i];
+            pcol_idx[i] = img_idx[i];
 
           // build the matrix
           this->assign(SparseMatrixCSR<Mem::Main, DT_, IT_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
