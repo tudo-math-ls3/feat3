@@ -235,7 +235,7 @@ namespace FEAST
     {
     public:
       /**
-       * \brief Assembles a CSR-Matrix from a Graph.
+       * \brief Assembles a matrix from a Graph.
        *
        * \tparam MatrixType_
        * The type of the lafem matrix to be assembled.
@@ -269,19 +269,19 @@ namespace FEAST
     {
     public:
       /**
-       * \brief Assembles a CSR-Matrix from a test-trial-space pair.
+       * \brief Assembles a matrix from a test-trial-space pair.
        *
        * \param[out] matrix
-       * A reference to the CSR-matrix to be assembled.
+       * A reference to the matrix to be assembled.
        *
        * \param[in] test_space, trial_space
        * The test- and trial-spaces to be used for the assembly.
        */
       template<
-        typename DataType_,
+        typename MatrixType_,
         typename TestSpace_,
         typename TrialSpace_>
-      static void assemble2(LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix,
+      static void assemble2(MatrixType_ & matrix,
         const TestSpace_& test_space, const TrialSpace_& trial_space)
       {
         // assemble Graph
@@ -290,18 +290,18 @@ namespace FEAST
       }
 
       /**
-       * \brief Assembles a CSR-Matrix from a single space.
+       * \brief Assembles a matrix from a single space.
        *
        * \param[out] matrix
-       * A reference to the CSR-matrix to be assembled.
+       * A reference to the matrix to be assembled.
        *
        * \param[in] space
        * The space to be used for the assembly.
        */
       template<
-        typename DataType_,
+        typename MatrixType_,
         typename Space_>
-      static void assemble1(LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix, const Space_& space)
+      static void assemble1(MatrixType_ & matrix, const Space_& space)
       {
         // assemble Graph
         SymbolicMatrixAssemblerBase::assemble(matrix,
@@ -320,19 +320,19 @@ namespace FEAST
     {
     public:
       /**
-       * \brief Assembles a CSR-Matrix from a fine-coarse-space pair.
+       * \brief Assembles a matrix from a fine-coarse-space pair.
        *
        * \param[out] matrix
-       * A reference to the CSR-matrix to be assembled.
+       * A reference to the matrix to be assembled.
        *
        * \param[in] fine_space, coarse_space
        * The fine and coarse spaces to be used for the assembly.
        */
       template<
-        typename DataType_,
+        typename MatrixType_,
         typename FineSpace_,
         typename CoarseSpace_>
-      static void assemble(LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix,
+      static void assemble(MatrixType_ & matrix,
         const FineSpace_& fine_space, const CoarseSpace_& coarse_space)
       {
         // assemble Graph
