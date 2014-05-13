@@ -566,6 +566,139 @@ namespace FEAST
     }; // class ScatterAxpy<LAFEM::SparseMatrixCOO<Mem::Main,...>>
 
     /**
+     * \brief Gather-Axpy specialisation for SparseMatrixCOO
+     *
+     * \author Christoph Lohmann
+     */
+    template<typename DataType_, typename IndexType_>
+    class GatherAxpy< LAFEM::SparseMatrixCOO<Mem::Main, DataType_, IndexType_> >
+    {
+    public:
+      typedef LAFEM::SparseMatrixCOO<Mem::Main, DataType_, IndexType_> MatrixType;
+      typedef Mem::Main MemType;
+      typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
+
+    private:
+#ifdef DEBUG
+      IndexType_ _deadcode;
+#endif
+      Index _num_rows;
+      Index _num_cols;
+      Index _used_elements;
+      const IndexType_* _row_idx;
+      const IndexType_* _col_idx;
+      IndexType_* _col_ptr;
+      const DataType_ *_data;
+
+    public:
+      explicit GatherAxpy(const MatrixType& matrix) :
+#ifdef DEBUG
+        _deadcode(~IndexType_(0)),
+#endif
+        _num_rows(matrix.rows()),
+        _num_cols(matrix.columns()),
+        _used_elements(matrix.used_elements()),
+        _row_idx(matrix.row_indices()),
+        _col_idx(matrix.column_indices()),
+        _col_ptr(nullptr),
+        _data(matrix.val())
+      {
+        // allocate column-pointer array
+        _col_ptr = new IndexType_[matrix.columns()];
+#ifdef DEBUG
+        for(Index i(0); i < _num_cols; ++i)
+        {
+          _col_ptr[i] = _deadcode;
+        }
+#endif
+      }
+
+      virtual ~GatherAxpy()
+      {
+        if(_col_ptr != nullptr)
+        {
+          delete [] _col_ptr;
+        }
+      }
+
+      template<typename LocalData_>
+      void operator()(
+                      LocalData_& loc_mat,
+                      DataType_ alpha = DataType_(1))
+      {
+        // loop over all local row entries
+        for(Index i(0); i < loc_mat.get_num_rows(); ++i)
+        {
+          // loop over all row entry contributations
+          for(Index ic(0); ic < loc_mat.get_num_row_contribs(i); ++ic)
+          {
+            // fetch row index
+            Index ix = loc_mat.get_row_index(i, ic);
+
+            // build column pointer for this row entry contribution
+            IndexType_ k(0);
+            while (_row_idx[k] < ix)
+            {
+              ++k;
+            }
+            while (k < _used_elements && _row_idx[k] <= ix)
+            {
+              _col_ptr[_col_idx[k]] = k;
+              ++k;
+            }
+
+            // loop over all local column entries
+            for(Index j(0); j < loc_mat.get_num_cols(); ++j)
+            {
+              // clear  accumulation entry
+              DataType_ dx(DataType_(0));
+
+              // loop over all column entry contributions
+              for(Index jc(0); jc < loc_mat.get_num_col_contribs(j); ++jc)
+              {
+                // fetch column index
+                Index jx = loc_mat.get_col_index(j, jc);
+
+#ifdef DEBUG
+                // ensure that the column pointer is valid for this index
+                ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
+#endif
+
+                // update accumulator
+                dx += DataType_(loc_mat.get_col_weight(j, jc)) * _data[_col_ptr[jx]];
+
+                // continue with next column contribution
+              }
+
+              // update local matrix data
+              loc_mat(i,j) += alpha * DataType_(loc_mat.get_row_weight(i, ic)) * dx;
+
+              // continue with next column entry
+            }
+
+#ifdef DEBUG
+            // reformat column-pointer array
+            k = IndexType_(0);
+            while (_row_idx[k] < ix)
+            {
+              ++k;
+            }
+            while (k < _used_elements && _row_idx[k] <= ix)
+            {
+              _col_ptr[_col_idx[k]] = _deadcode;
+              ++k;
+            }
+#endif
+
+            // continue with next row contribution
+          }
+          // continue with next row entry
+        }
+      }
+    }; // class GatherAxpy<LAFEM::SparseMatrixCOO<Mem::Main,...>>
+
+    /**
      * \brief Scatter-Axpy specialisation for SparseMatrixELL
      *
      * \author Christoph Lohmann
