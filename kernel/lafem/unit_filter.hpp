@@ -194,6 +194,67 @@ namespace FEAST
        * A reference to the matrix to be filtered.
        */
       template<typename Algo_>
+      void filter_mat(SparseMatrixCOO<Mem_, DT_, IT_> & matrix) const
+      {
+        const Index tused_elements(matrix.used_elements());
+        const Index* row_idx(matrix.row_indices());
+        const Index* col_idx(matrix.column_indices());
+        DT_* v(matrix.val());
+
+        for(Index i(0); i < _sv.used_elements(); ++i)
+        {
+          Index ix(_sv.indices()[i]);
+          // replace by unit row
+          Index j(0);
+          while(row_idx[j] < ix)
+          {
+            ++j;
+          }
+          while (j < tused_elements && row_idx[j] <= ix)
+          {
+            v[j] = (col_idx[j] == ix) ? DT_(1) : DT_(0);
+            ++j;
+          }
+        }
+      }
+
+      template<typename Algo_>
+      void filter_offdiag_row_mat(SparseMatrixCOO<Mem_, DT_, IT_> & matrix) const
+      {
+        const Index tused_elements(matrix.used_elements());
+        const Index* row_idx(matrix.row_indices());
+        DT_* v(matrix.val());
+
+        for(Index i(0); i < _sv.used_elements(); ++i)
+        {
+          Index ix(_sv.indices()[i]);
+          // replace by null row
+          Index j(0);
+          while(row_idx[j] < ix)
+          {
+            ++j;
+          }
+          while (j < tused_elements && row_idx[j] <= ix)
+          {
+            v[j] = DT_(0);
+            ++j;
+          }
+        }
+      }
+
+      template<typename Algo_>
+      void filter_offdiag_col_mat(SparseMatrixCOO<Mem_, DT_, IT_> &) const
+      {
+        // nothing to do here
+      }
+
+      /**
+       * \brief Applies the filter onto a system matrix.
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       */
+      template<typename Algo_>
       void filter_mat(SparseMatrixELL<Mem_, DT_, IT_> & matrix) const
       {
         const Index tstride(matrix.stride());
