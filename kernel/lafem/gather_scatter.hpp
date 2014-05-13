@@ -5,6 +5,8 @@
 // includes, FEAST-LAFEM
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_coo.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 
 namespace FEAST
 {
