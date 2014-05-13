@@ -899,5 +899,8 @@ class MeshControlPartitioningTest2D:
 MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_csr("std::vector, std::vector");
 MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_csr("std::vector, std::deque");
 
+MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCOO<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_coo("std::vector, std::vector");
+MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCOO<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_coo("std::vector, std::deque");
+
 MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixELL<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_ell("std::vector, std::vector");
 MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixELL<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_ell("std::vector, std::deque");
