@@ -13,12 +13,14 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-template<typename DataType_>
+template<typename MatrixType_>
 class BilinearOperatorTest :
-  public TestSystem::TaggedTest<Archs::None, DataType_>
+  public TestSystem::FullTaggedTest<Archs::None, Archs::None, typename MatrixType_::DataType, typename MatrixType_::IndexType>
 {
-  typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
-  typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
+  typedef typename MatrixType_::MemType MemType_;
+  typedef typename MatrixType_::DataType DataType_;
+  typedef typename MatrixType_::IndexType IndexType_;
+  typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 
@@ -29,7 +31,7 @@ class BilinearOperatorTest :
 
 public:
   BilinearOperatorTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("BilinearOperatorTest")
+    TestSystem::FullTaggedTest<Archs::None, Archs::None, DataType_, IndexType_>("BilinearOperatorTest<" + MatrixType_::name() + ">")
   {
   }
 
@@ -60,8 +62,8 @@ public:
     // create space
     QuadSpaceQ0 space(trafo);
 
-    // create a CSR matrices
-    MatrixType matrix;
+    // create a matrix
+    MatrixType_ matrix;
     Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, space);
     matrix.format();
 
@@ -72,13 +74,16 @@ public:
     Assembly::Common::IdentityOperator operat;
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, operat, space, cubature_factory);
 
+    // create CSR-matrix of matrix
+    SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_matrix;
+    tmp_matrix.convert(matrix);
     // fetch the matrix arrays
-    DataType_* data = matrix.val();
+    DataType_* data = tmp_matrix.val();
 
     const DataType_ v = DataType_(1) / DataType_(mesh.get_num_entities(2));
 
     // loop over all matrix rows
-    for(Index i(0); i < matrix.rows(); ++i)
+    for(Index i(0); i < tmp_matrix.rows(); ++i)
     {
       // validate entry
       TEST_CHECK_EQUAL_WITHIN_EPS(data[i], v, eps);
@@ -96,8 +101,8 @@ public:
     // create space
     QuadSpaceQ1 space(trafo);
 
-    // create two CSR matrices
-    MatrixType matrix_1, matrix_2;
+    // create two matrices
+    MatrixType_ matrix_1, matrix_2;
     Assembly::SymbolicMatrixAssembler<>::assemble1(matrix_1, space);
     Assembly::SymbolicMatrixAssembler<>::assemble1(matrix_2, space);
     matrix_1.format();
@@ -133,7 +138,7 @@ public:
     // create local matrix data
     Assembly::LocalMatrixData<Tiny::Matrix<DataType_,4,4>, DofMapping, DofMapping>
       lmd1(dof_mapping,dof_mapping), lmd2(dof_mapping,dof_mapping);
-    LAFEM::GatherAxpy<MatrixType> gather1(matrix_1), gather2(matrix_2);
+    LAFEM::GatherAxpy<MatrixType_> gather1(matrix_1), gather2(matrix_2);
 
     // some constants
     static const DataType_ zero = DataType_(0);
@@ -192,5 +197,17 @@ public:
 
 };
 
-BilinearOperatorTest<float> bilinear_operator_test_float;
-BilinearOperatorTest<double> bilinear_operator_test_double;
+BilinearOperatorTest<SparseMatrixCSR<Mem::Main, float, unsigned int> > bilinear_operator_test_csr_float_uint;
+BilinearOperatorTest<SparseMatrixCSR<Mem::Main, float, unsigned long> > bilinear_operator_test_csr_float_ulong;
+BilinearOperatorTest<SparseMatrixCSR<Mem::Main, double, unsigned int> > bilinear_operator_test_csr_double_uint;
+BilinearOperatorTest<SparseMatrixCSR<Mem::Main, double, unsigned long> > bilinear_operator_test_csr_double_ulong;
+
+BilinearOperatorTest<SparseMatrixCOO<Mem::Main, float, unsigned int> > bilinear_operator_test_coo_float_uint;
+BilinearOperatorTest<SparseMatrixCOO<Mem::Main, float, unsigned long> > bilinear_operator_test_coo_float_ulong;
+BilinearOperatorTest<SparseMatrixCOO<Mem::Main, double, unsigned int> > bilinear_operator_test_coo_double_uint;
+BilinearOperatorTest<SparseMatrixCOO<Mem::Main, double, unsigned long> > bilinear_operator_test_coo_double_ulong;
+
+BilinearOperatorTest<SparseMatrixELL<Mem::Main, float, unsigned int> > bilinear_operator_test_ell_float_uint;
+BilinearOperatorTest<SparseMatrixELL<Mem::Main, float, unsigned long> > bilinear_operator_test_ell_float_ulong;
+BilinearOperatorTest<SparseMatrixELL<Mem::Main, double, unsigned int> > bilinear_operator_test_ell_double_uint;
+BilinearOperatorTest<SparseMatrixELL<Mem::Main, double, unsigned long> > bilinear_operator_test_ell_double_ulong;
