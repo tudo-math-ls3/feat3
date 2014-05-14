@@ -147,7 +147,7 @@ namespace FEAST
        * A reference to the matrix to be filtered.
        */
       template<typename Algo_>
-      void filter_mat(SparseMatrixCSR<Mem_, DT_, IT_> & matrix) const
+      void filter_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
         const Index* col_idx(matrix.col_ind());
@@ -165,7 +165,7 @@ namespace FEAST
       }
 
       template<typename Algo_>
-      void filter_offdiag_row_mat(SparseMatrixCSR<Mem_, DT_, IT_> & matrix) const
+      void filter_offdiag_row_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
         DT_* v(matrix.val());
@@ -182,7 +182,7 @@ namespace FEAST
       }
 
       template<typename Algo_>
-      void filter_offdiag_col_mat(SparseMatrixCSR<Mem_, DT_, IT_> &) const
+      void filter_offdiag_col_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> &) const
       {
         // nothing to do here
       }
@@ -194,7 +194,7 @@ namespace FEAST
        * A reference to the matrix to be filtered.
        */
       template<typename Algo_>
-      void filter_mat(SparseMatrixCOO<Mem_, DT_, IT_> & matrix) const
+      void filter_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index tused_elements(matrix.used_elements());
         const Index* row_idx(matrix.row_indices());
@@ -219,7 +219,7 @@ namespace FEAST
       }
 
       template<typename Algo_>
-      void filter_offdiag_row_mat(SparseMatrixCOO<Mem_, DT_, IT_> & matrix) const
+      void filter_offdiag_row_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index tused_elements(matrix.used_elements());
         const Index* row_idx(matrix.row_indices());
@@ -243,7 +243,7 @@ namespace FEAST
       }
 
       template<typename Algo_>
-      void filter_offdiag_col_mat(SparseMatrixCOO<Mem_, DT_, IT_> &) const
+      void filter_offdiag_col_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> &) const
       {
         // nothing to do here
       }
@@ -255,7 +255,7 @@ namespace FEAST
        * A reference to the matrix to be filtered.
        */
       template<typename Algo_>
-      void filter_mat(SparseMatrixELL<Mem_, DT_, IT_> & matrix) const
+      void filter_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index tstride(matrix.stride());
         const Index * paj(matrix.Aj());
@@ -274,7 +274,7 @@ namespace FEAST
       }
 
       template<typename Algo_>
-      void filter_offdiag_row_mat(SparseMatrixELL<Mem_, DT_, IT_> & matrix) const
+      void filter_offdiag_row_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index tstride(matrix.stride());
         const Index * parl(matrix.Arl());
@@ -292,7 +292,7 @@ namespace FEAST
       }
 
       template<typename Algo_>
-      void filter_offdiag_col_mat(SparseMatrixELL<Mem_, DT_, IT_> &) const
+      void filter_offdiag_col_mat(SparseMatrixELL<Mem::Main, DT_, IT_> &) const
       {
         // nothing to do here
       }
