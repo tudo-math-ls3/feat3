@@ -44,6 +44,8 @@ namespace FEAST
      * _scalar_index[4]: number of offsets \n
      * _scalar_dt[0]: zero element
      *
+     * Refer to \ref lafem_design for general usage informations.
+     *
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>

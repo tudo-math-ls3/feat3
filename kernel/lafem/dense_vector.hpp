@@ -43,6 +43,8 @@ namespace FEAST
      * _elements[0]: raw number values \n
      * _scalar_index[0]: container size
      *
+     * Refer to \ref lafem_design for general usage informations.
+     *
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>

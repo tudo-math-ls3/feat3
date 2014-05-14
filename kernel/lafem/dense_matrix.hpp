@@ -29,6 +29,8 @@ namespace FEAST
      * _scalar_index[1]: row count \n
      * _scalar_index[2]: column count
      *
+     * Refer to \ref lafem_design for general usage informations.
+     *
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>

@@ -49,6 +49,8 @@ namespace FEAST
      * _scalar_index[3]: non zero element count (used elements) (multiple of blocksize)\n
      * _scalar_dt[0]: zero element
      *
+     * Refer to \ref lafem_design for general usage informations.
+     *
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
