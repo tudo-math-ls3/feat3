@@ -11,12 +11,14 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-template<typename DataType_>
+template<typename MatrixType_>
 class GridTransferTest :
-  public TestSystem::TaggedTest<Archs::None, DataType_>
+  public TestSystem::FullTaggedTest<Archs::None, Archs::None, typename MatrixType_::DataType, typename MatrixType_::IndexType>
 {
-  typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
-  typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
+  typedef typename MatrixType_::MemType MemType_;
+  typedef typename MatrixType_::DataType DataType_;
+  typedef typename MatrixType_::IndexType IndexType_;
+  typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 
@@ -27,7 +29,7 @@ class GridTransferTest :
 
 public:
   GridTransferTest() :
-    TestSystem::TaggedTest<Archs::None, DataType_>("GridTransferTest")
+    TestSystem::FullTaggedTest<Archs::None, Archs::None, DataType_, IndexType_>("GridTransferTest<" + MatrixType_::name() + ">")
   {
   }
 
@@ -65,7 +67,7 @@ public:
     QuadSpaceQ1 space_c(trafo_c);
 
     // assemble matrix structure
-    MatrixType prol_matrix;
+    MatrixType_ prol_matrix;
     VectorType weight_vector(space_f.get_num_dofs());
     Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(prol_matrix, space_f, space_c);
 
@@ -74,9 +76,11 @@ public:
     TEST_CHECK_EQUAL(prol_matrix.columns(), 4u);
     TEST_CHECK_EQUAL(prol_matrix.used_elements(), 36u);
 
-    // fetch matrix arrays
-    const Index* row_ptr = prol_matrix.row_ptr();
-    const Index* col_idx = prol_matrix.col_ind();
+    // fetch matrix arrays of matrix in CSR-format
+    SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_prol_matrix;
+    tmp_prol_matrix.convert(prol_matrix);
+    const IndexType_ * row_ptr = tmp_prol_matrix.row_ptr();
+    const IndexType_ * col_idx = tmp_prol_matrix.col_ind();
 
     // check matrix structure; has to be a dense 9x4 matrix
     for(Index i(0); i < 9; ++i)
@@ -101,9 +105,6 @@ public:
     weight_vector.template component_invert<Algo::Generic>(weight_vector);
     prol_matrix.template scale_rows<Algo::Generic>(prol_matrix, weight_vector);
 
-    // fetch matrix data
-    const DataType_* data = prol_matrix.val();
-
     // reference data array
     const DataType_ d0 = DataType_(0);
     const DataType_ d1 = DataType_(1);
@@ -121,9 +122,13 @@ public:
       d0, d2, d0, d2,
       d4, d4, d4, d4
     };
-    for(Index i(0); i < 36; ++i)
+
+    for (Index i(0); i < prol_matrix.rows(); ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(data[i], data_ref[i], eps);
+      for (Index j(0); j < prol_matrix.columns(); ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(prol_matrix(i,j), data_ref[i * prol_matrix.columns() + j], eps);
+      }
     }
   }
 
@@ -141,7 +146,7 @@ public:
     QuadSpaceQ1T space_c(trafo_c);
 
     // assemble matrix structure
-    MatrixType prol_matrix;
+    MatrixType_ prol_matrix;
     VectorType weight_vector(space_f.get_num_dofs());
     Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(prol_matrix, space_f, space_c);
 
@@ -150,9 +155,11 @@ public:
     TEST_CHECK_EQUAL(prol_matrix.columns(), 4u);
     TEST_CHECK_EQUAL(prol_matrix.used_elements(), 48u);
 
-    // fetch matrix arrays
-    const Index* row_ptr = prol_matrix.row_ptr();
-    const Index* col_idx = prol_matrix.col_ind();
+    // fetch matrix arrays of matrix in CSR-format
+    SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_prol_matrix;
+    tmp_prol_matrix.convert(prol_matrix);
+    const IndexType_ * row_ptr = tmp_prol_matrix.row_ptr();
+    const IndexType_ * col_idx = tmp_prol_matrix.col_ind();
 
     // check matrix structure; has to be a dense 9x4 matrix
     for(Index i(0); i < 12; ++i)
@@ -177,9 +184,6 @@ public:
     weight_vector.template component_invert<Algo::Generic>(weight_vector);
     prol_matrix.template scale_rows<Algo::Generic>(prol_matrix, weight_vector);
 
-    // fetch matrix data
-    const DataType_* data = prol_matrix.val();
-
     // reference data array
     const DataType_ d0 = DataType_(0);
     const DataType_ d1 = DataType_(1);
@@ -201,12 +205,27 @@ public:
       d18, d18, d58, d18,
       d18, d18, d18, d58
     };
-    for(Index i(0); i < 48; ++i)
+    for (Index i(0); i < prol_matrix.rows(); ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(data[i], data_ref[i], eps);
+      for (Index j(0); j < prol_matrix.columns(); ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(prol_matrix(i,j), data_ref[i * prol_matrix.columns() + j], eps);
+      }
     }
   }
 };
 
-GridTransferTest<float> grid_transfer_test_float;
-GridTransferTest<double> grid_transfer_test_double;
+GridTransferTest<SparseMatrixCSR<Mem::Main, float, unsigned int> > grid_transfer_test_csr_float_uint;
+GridTransferTest<SparseMatrixCSR<Mem::Main, float, unsigned long> > grid_transfer_test_csr_float_ulong;
+GridTransferTest<SparseMatrixCSR<Mem::Main, double, unsigned int> > grid_transfer_test_csr_double_uint;
+GridTransferTest<SparseMatrixCSR<Mem::Main, double, unsigned long> > grid_transfer_test_csr_double_ulong;
+
+GridTransferTest<SparseMatrixCOO<Mem::Main, float, unsigned int> > grid_transfer_test_coo_float_uint;
+GridTransferTest<SparseMatrixCOO<Mem::Main, float, unsigned long> > grid_transfer_test_coo_float_ulong;
+GridTransferTest<SparseMatrixCOO<Mem::Main, double, unsigned int> > grid_transfer_test_coo_double_uint;
+GridTransferTest<SparseMatrixCOO<Mem::Main, double, unsigned long> > grid_transfer_test_coo_double_ulong;
+
+GridTransferTest<SparseMatrixELL<Mem::Main, float, unsigned int> > grid_transfer_test_ell_float_uint;
+GridTransferTest<SparseMatrixELL<Mem::Main, float, unsigned long> > grid_transfer_test_ell_float_ulong;
+GridTransferTest<SparseMatrixELL<Mem::Main, double, unsigned int> > grid_transfer_test_ell_double_uint;
+GridTransferTest<SparseMatrixELL<Mem::Main, double, unsigned long> > grid_transfer_test_ell_double_ulong;
