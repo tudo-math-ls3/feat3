@@ -20,15 +20,16 @@ namespace FEAST
      */
     enum class SparsePreconType
     {
-      pt_jacobi         = 0,
-        pt_gauss_seidel = 1,
-        pt_polynomial   = 2,
-        pt_ilu          = 3,
-        pt_sor          = 4,
-        pt_ssor         = 5,
-        pt_spai         = 6,
-        pt_none
-        };
+      pt_none = 0,
+      pt_file,
+      pt_jacobi,
+      pt_gauss_seidel,
+      pt_polynomial,
+      pt_ilu,
+      pt_sor,
+      pt_ssor,
+      pt_spai
+    };
 
     /**
      * \brief Preconditioner base class
@@ -102,7 +103,7 @@ namespace FEAST
        * \brief apply the preconditioner
        *
        * \param[out] out The preconditioner result.
-       * \param[in] in The vector, which is applied to the preconditioning
+       * \param[in] in The vector, which is applied to the preconditioning.
        */
       virtual void apply(VT_ & out, const VT_ & in) override
       {
@@ -114,6 +115,72 @@ namespace FEAST
         {
           out.template scale<Algo_>(in, _damping);
         }
+      }
+    };
+
+    /**
+     * \brief File-Preconditioner.
+     *
+     * This class represents the a preconditioner, using a supplied matrix file as input.
+     *
+     * \author Dirk Ribbrock
+     */
+    template <typename Algo_, typename MT_, typename VT_>
+    class FilePreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    {
+    private:
+      MT_ _mat;
+
+    public:
+      /// Our algotype
+      typedef Algo_ AlgoType;
+      /// Our datatype
+      typedef typename MT_::DataType DataType;
+      /// Our memory architecture type
+      typedef typename MT_::MemType MemType;
+      /// Our vectortype
+      typedef VT_ VectorType;
+      /// Our matrixtype
+      typedef MT_ MatrixType;
+      /// Our used precon type
+      const static SparsePreconType PreconType = SparsePreconType::pt_file;
+
+      virtual ~FilePreconditioner()
+      {
+      }
+      /**
+       * \brief Constructor
+       *
+       * param[in] mode A FileMode
+       *
+       * param[in] filename A filename to the input matrix
+       *
+       * Creates a Matrix preconditioner from given source matrix file name.
+       */
+      FilePreconditioner(const FileMode mode, const String filename) :
+        _mat(mode, filename)
+      {
+      }
+
+      /**
+       * \brief Returns a descriptive string.
+       *
+       * \returns A string describing the container.
+       */
+      static String name()
+      {
+        return "File_Preconditioner";
+      }
+
+      /**
+       * \brief apply the preconditioner
+       *
+       * \param[out] out The preconditioner result.
+       * \param[in] in The vector to be preconditioned.
+       */
+      virtual void apply(VT_ & out, const VT_ & in) override
+      {
+        _mat.template apply<Algo_>(out, in);
       }
     };
 
