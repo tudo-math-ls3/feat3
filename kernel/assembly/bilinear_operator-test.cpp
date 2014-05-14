@@ -211,3 +211,14 @@ BilinearOperatorTest<SparseMatrixELL<Mem::Main, float, unsigned int> > bilinear_
 BilinearOperatorTest<SparseMatrixELL<Mem::Main, float, unsigned long> > bilinear_operator_test_ell_float_ulong;
 BilinearOperatorTest<SparseMatrixELL<Mem::Main, double, unsigned int> > bilinear_operator_test_ell_double_uint;
 BilinearOperatorTest<SparseMatrixELL<Mem::Main, double, unsigned long> > bilinear_operator_test_ell_double_ulong;
+
+#ifdef FEAST_HAVE_QUADMATH
+BilinearOperatorTest<SparseMatrixCSR<Mem::Main, __float128, unsigned int> > bilinear_operator_test_csr_float128_uint;
+BilinearOperatorTest<SparseMatrixCSR<Mem::Main, __float128, unsigned long> > bilinear_operator_test_csr_float128_ulong;
+
+BilinearOperatorTest<SparseMatrixCOO<Mem::Main, __float128, unsigned int> > bilinear_operator_test_coo_float128_uint;
+BilinearOperatorTest<SparseMatrixCOO<Mem::Main, __float128, unsigned long> > bilinear_operator_test_coo_float128_ulong;
+
+BilinearOperatorTest<SparseMatrixELL<Mem::Main, __float128, unsigned int> > bilinear_operator_test_ell_float128_uint;
+BilinearOperatorTest<SparseMatrixELL<Mem::Main, __float128, unsigned long> > bilinear_operator_test_ell_float128_ulong;
+#endif

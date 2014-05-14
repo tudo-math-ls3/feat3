@@ -229,3 +229,14 @@ GridTransferTest<SparseMatrixELL<Mem::Main, float, unsigned int> > grid_transfer
 GridTransferTest<SparseMatrixELL<Mem::Main, float, unsigned long> > grid_transfer_test_ell_float_ulong;
 GridTransferTest<SparseMatrixELL<Mem::Main, double, unsigned int> > grid_transfer_test_ell_double_uint;
 GridTransferTest<SparseMatrixELL<Mem::Main, double, unsigned long> > grid_transfer_test_ell_double_ulong;
+
+#ifdef FEAST_HAVE_QUADMATH
+GridTransferTest<SparseMatrixCSR<Mem::Main, __float128, unsigned int> > grid_transfer_test_csr_float128_uint;
+GridTransferTest<SparseMatrixCSR<Mem::Main, __float128, unsigned long> > grid_transfer_test_csr_float128_ulong;
+
+GridTransferTest<SparseMatrixCOO<Mem::Main, __float128, unsigned int> > grid_transfer_test_coo_float128_uint;
+GridTransferTest<SparseMatrixCOO<Mem::Main, __float128, unsigned long> > grid_transfer_test_coo_float128_ulong;
+
+GridTransferTest<SparseMatrixELL<Mem::Main, __float128, unsigned int> > grid_transfer_test_ell_float128_uint;
+GridTransferTest<SparseMatrixELL<Mem::Main, __float128, unsigned long> > grid_transfer_test_ell_float128_ulong;
+#endif
