@@ -24,6 +24,15 @@ void ScaleRows<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const a, cons
 }
 
 template <typename DT_, typename IT_>
+void ScaleRows<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const IT_ * const row_idx, const IT_ * const /*col_idx*/, const DT_ * const x, const Index, const Index, const Index used_elements)
+{
+  for (Index i(0) ; i < used_elements ; ++i)
+  {
+      r[i] = a[i] * x[row_idx[i]];
+  }
+}
+
+template <typename DT_, typename IT_>
 void ScaleRows<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const Ax, const IT_ * const /*Aj*/, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows)
 {
   for (Index row(0) ; row < rows ; ++row)
@@ -56,6 +65,15 @@ void ScaleCols<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const a, cons
     {
       r[i] = a[i] * x[col_ind[i]];
     }
+  }
+}
+
+template <typename DT_, typename IT_>
+void ScaleCols<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const IT_ * const /*row_idx*/, const IT_ * const col_idx, const DT_ * const x, const Index, const Index, const Index used_elements)
+{
+  for (Index i(0) ; i < used_elements ; ++i)
+  {
+    r[i] = a[i] * x[col_idx[i]];
   }
 }
 
