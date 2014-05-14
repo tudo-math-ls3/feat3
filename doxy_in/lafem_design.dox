@@ -13,7 +13,7 @@ The structs in FEAST::Mem are used to control, if the containers contents will b
 
 The second template parameter is used as the datatype for the allocation of all floating point based arrays.
 
-The third template parameter is used as the datatype for the allocation of all indexing related arrays, e.g. the column index array in a CSR Matrix.
+The third template parameter is used as the datatype for the allocation of all indexing related arrays, e.g. the column index array in a FEAST::LAFEM::SparseMatrixCSR.
 
 
 \section la_ops LA Operations
@@ -39,7 +39,14 @@ All containers provide at least three different member functions for proper conv
 
 \section container_reset Container Reset
 All containers offer the format() and clear() operations:
-- clear simply frees all allocated arrays and leaves the container in an undefined state.
+- clear: simply frees all allocated arrays and leaves the container in an undefined state.
 
-- format resets all non values to zero or any other provided value, but does not free any arrays.
+- format: resets all non values to zero or any other provided value, but does not free any arrays.
+
+\section sparse_layout Sparse Layout
+Every sparse matrix consists of its non-zero data arrays and a data layout (stored in various different arrays).
+
+A FEAST::LAFEM::SparseLayout object can be retrieved by any matrix via the corresponding layout() member function to create another matrix with the same shared (except FEAST::LAFEM::SparseMatrixCOO and FEAST::LAFEM::SparseVector, which enforce deep copies) data layout.
+
+Thus empty matrices with identical layout can be created easily and memory consumption can be reduced by reusing existing data layout arrays.
 **/
