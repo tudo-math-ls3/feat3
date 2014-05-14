@@ -36,4 +36,10 @@ All containers provide at least three different member functions for proper conv
 - copy: copy container contents only, floating point format and indexing datatype must be identical.
 
 \note There does not exist a copy constructor nor copy assignment operator. This prevents the user from triggering unwanted copy operations and memory transfers.
+
+\section container_reset Container Reset
+All containers offer the format() and clear() operations:
+- clear simply frees all allocated arrays and leaves the container in an undefined state.
+
+- format resets all non values to zero or any other provided value, but does not free any arrays.
 **/
