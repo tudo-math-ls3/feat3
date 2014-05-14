@@ -112,7 +112,7 @@ namespace FEAST
         }
         else
         {
-          out.template scale<Algo_>(out, _damping);
+          out.template scale<Algo_>(in, _damping);
         }
       }
     };
