@@ -71,7 +71,7 @@ public:
     TEST_CHECK_NOT_EQUAL(c, e);
 
     a.format();
-    TEST_CHECK_EQUAL(a.used_elements(), Index(0));
+    TEST_CHECK_EQUAL(a.used_elements(), Index(2));
     TEST_CHECK_EQUAL(a(3), DT_(0));
 
   }

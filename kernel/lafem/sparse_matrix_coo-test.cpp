@@ -52,6 +52,8 @@ public:
     TEST_CHECK_EQUAL(a(5, 5), 2.);
 
     a.format();
+    TEST_CHECK_EQUAL(a.used_elements(), Index(2));
+    TEST_CHECK_EQUAL(a(5, 5), DT_(0));
     a(1,2,7);
     a(5,5,8);
     a(5,5,2);

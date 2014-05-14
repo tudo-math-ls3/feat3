@@ -413,34 +413,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Reset all elements of the container to a given value or zero if missing.
-         *
-         * \param[in] value The value to be set (defaults to 0)
-         *
-         */
-        void format(DT_ value = DT_(0))
-        {
-          CONTEXT("When clearing SparseVector");
-
-          if (value == DT_(0))
-          {
-            MemoryPool<Mem_>::instance()->release_memory(elements());
-            MemoryPool<Mem_>::instance()->release_memory(indices());
-
-            this->_elements.clear();
-            this->_indices.clear();
-            this->_elements_size.clear();
-            this->_indices_size.clear();
-            _used_elements() = 0;
-            _allocated_elements() = 0;
-          }
-          else
-          {
-            ((Container<Mem_, DT_, IT_> &)*this).format(value);
-          }
-        }
-
-        /**
          * \brief Retrieve non zero element count.
          *
          * \returns Non zero element count.
