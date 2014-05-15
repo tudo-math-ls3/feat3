@@ -34,7 +34,7 @@ namespace FEAST
     /**
      * \brief Dense data vector class template.
      *
-     * \tparam Mem_ The memory architecture to be used.
+     * \tparam Mem_ The \ref FEAST::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indextype to be used.
      *
@@ -568,6 +568,8 @@ namespace FEAST
         /**
          * \brief Calculate \f$this \leftarrow \alpha x + y\f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[in] x The first summand vector to be scaled.
          * \param[in] y The second summand vector
          * \param[in] alpha A scalar to multiply x with.
@@ -601,6 +603,8 @@ namespace FEAST
         /**
          * \brief Calculate \f$this_i \leftarrow x_i \cdot y_i\f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[in] x The first factor.
          * \param[in] y The second factor.
          */
@@ -617,6 +621,8 @@ namespace FEAST
 
         /**
          * \brief Calculate \f$this_i \leftarrow x_i \cdot y_i + z_i\f$
+         *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
          *
          * \param[in] x The first factor.
          * \param[in] y The second factor.
@@ -641,6 +647,8 @@ namespace FEAST
         /**
          * \brief Performs \f$ this_i \leftarrow \alpha / x_i \f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[in] x
          * The vector whose components serve as denominators.
          *
@@ -659,6 +667,8 @@ namespace FEAST
         /**
          * \brief Calculate \f$this \leftarrow \alpha x \f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[in] x The vector to be scaled.
          * \param[in] alpha A scalar to scale x with.
          */
@@ -674,6 +684,8 @@ namespace FEAST
         /**
          * \brief Calculate \f$r \leftarrow this \cdot x\f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[out] r The dot product result.
          * \param[in] x The other vector.
          */
@@ -688,6 +700,9 @@ namespace FEAST
 
         /**
          * \brief Calculates and returns the euclid norm of this vector.
+         *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          */
         template <typename Algo_>
         DT_ norm2() const
@@ -697,6 +712,9 @@ namespace FEAST
 
         /**
          * \brief Calculates and returns the squared euclid norm of this vector.
+         *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          */
         template <typename Algo_>
         DT_ norm2sqr() const

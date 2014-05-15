@@ -33,6 +33,9 @@ namespace FEAST
 
     /**
      * \brief Preconditioner base class
+     *
+     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+     *
      */
     template <typename Algo_, typename MT_, typename VT_>
     class Preconditioner
@@ -50,6 +53,8 @@ namespace FEAST
      * \brief No preconditioner.
      *
      * This class represents a dummy for a preconditioner.
+     *
+     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
      *
      * \author Dirk Ribbrock
      */
@@ -123,6 +128,8 @@ namespace FEAST
      *
      * This class represents the a preconditioner, using a supplied matrix file as input.
      *
+     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+     *
      * \author Dirk Ribbrock
      */
     template <typename Algo_, typename MT_, typename VT_>
@@ -189,6 +196,8 @@ namespace FEAST
      * \brief Jacobi-Preconditioner.
      *
      * This class represents the Jacobi-Preconditioner \f$M = D\f$.
+     *
+     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
      *
      * \author Dirk Ribbrock
      */
@@ -3687,6 +3696,8 @@ namespace FEAST
      * \brief Polynomial-Preconditioner.
      *
      * This class represents the Neumann-Polynomial-Preconditioner \f$M^{-1} = \sum_{k=0}^m (I - \tilde M^{-1}A)^k \tilde M^{-1}\f$
+     *
+     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
      *
      * \author Christoph Lohmann
      */

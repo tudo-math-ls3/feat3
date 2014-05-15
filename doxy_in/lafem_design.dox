@@ -28,8 +28,7 @@ All operations are function templates, which expect a struct from FEAST::Algo to
 \section data_handling Data handling
 All containers provide at least three different member functions for proper conversion and data movement.
 
-- clone: creates a deep copy from scratch
-\see FEAST::LAFEM::Container::clone()
+- \ref FEAST::LAFEM::Container::clone() "clone": creates a deep copy from scratch
 
 - convert: try to reuse existing arrays for shallow copy, convert and transfer where nessesary.
 

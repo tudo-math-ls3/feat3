@@ -31,7 +31,7 @@ namespace FEAST
     /**
      * \brief CSR based blocked sparse matrix.
      *
-     * \tparam Mem_ The memory architecture to be used.
+     * \tparam Mem_ The \ref FEAST::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
      *
@@ -467,6 +467,8 @@ namespace FEAST
         /**
          * \brief Calculate \f$this \leftarrow y + \alpha x\f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[in] x The first summand matrix to be scaled.
          * \param[in] y The second summand matrix
          * \param[in] alpha A scalar to multiply x with.
@@ -508,6 +510,8 @@ namespace FEAST
         /**
          * \brief Calculate \f$this \leftarrow \alpha x \f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[in] x The matrix to be scaled.
          * \param[in] alpha A scalar to scale x with.
          */
@@ -545,6 +549,8 @@ namespace FEAST
         /**
          * \brief Calculate \f$ r \leftarrow this\cdot x \f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.
          */
@@ -562,6 +568,8 @@ namespace FEAST
 
         /**
          * \brief Calculate \f$ r \leftarrow this\cdot x \f$
+         *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
          *
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.
@@ -581,6 +589,8 @@ namespace FEAST
         /**
          * \brief Calculate \f$ r \leftarrow this\cdot x \f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.
          */
@@ -598,6 +608,8 @@ namespace FEAST
 
         /**
          * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+         *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
          *
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.
@@ -638,6 +650,8 @@ namespace FEAST
 
         /**
          * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+         *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
          *
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.
@@ -680,6 +694,8 @@ namespace FEAST
         /**
          * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
          *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.
          * \param[in] y The summand vector.
@@ -720,6 +736,8 @@ namespace FEAST
 
         /**
          * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+         *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
          *
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.

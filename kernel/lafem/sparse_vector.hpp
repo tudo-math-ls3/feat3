@@ -17,7 +17,7 @@ namespace FEAST
     /**
      * \brief Sparse vector class template.
      *
-     * \tparam Mem_ The memory architecture to be used.
+     * \tparam Mem_ The \ref FEAST::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
      *
