@@ -623,7 +623,7 @@ namespace FEAST
             for (Index j(dom_ptr[i]); j < dom_ptr[i+1]; ++j)
             {
               prow_idx[j] = IT_(i);
-              pcol_idx[j] = img_idx[j];
+              pcol_idx[j] = IT_(img_idx[j]);
             }
           }
 

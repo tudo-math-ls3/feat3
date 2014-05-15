@@ -542,7 +542,7 @@ namespace FEAST
           Index tnum_cols_per_row(0);
           for (Index i(0); i < num_rows; ++i)
           {
-            ptarl[i] = dom_ptr[i + 1] - dom_ptr[i];
+            ptarl[i] = IT_(dom_ptr[i + 1] - dom_ptr[i]);
             if (ptarl[i] > tnum_cols_per_row)
               tnum_cols_per_row = ptarl[i];
           }
@@ -558,7 +558,7 @@ namespace FEAST
             for (Index i(0); i < ptarl[row]; ++i)
             {
               const Index row_start(dom_ptr[row]);
-              ptaj[row + target * tstride] = img_idx[row_start + i];
+              ptaj[row + target * tstride] = IT_(img_idx[row_start + i]);
               target++;
             }
           }

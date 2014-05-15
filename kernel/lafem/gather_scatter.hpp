@@ -771,10 +771,10 @@ namespace FEAST
             DataType_ iw = alpha * DataType_(loc_mat.get_row_weight(i, ic));
 
             // fetch row index
-            Index ix = loc_mat.get_row_index(i, ic);
+            IndexType_ ix = IndexType_(loc_mat.get_row_index(i, ic));
 
             // build column pointer for this row entry contribution
-            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += _stride)
+            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += IndexType_(_stride))
             {
               _col_ptr[_aj[k]] = k;
             }
@@ -806,7 +806,7 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += _stride)
+            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += IndexType_(_stride))
             {
               _col_ptr[_aj[k]] = _deadcode;
             }
@@ -886,10 +886,10 @@ namespace FEAST
           for(Index ic(0); ic < loc_mat.get_num_row_contribs(i); ++ic)
           {
             // fetch row index
-            Index ix = loc_mat.get_row_index(i, ic);
+            IndexType_ ix = IndexType_(loc_mat.get_row_index(i, ic));
 
             // build column pointer for this row entry contribution
-            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += _stride)
+            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += IndexType_(_stride))
             {
               _col_ptr[_aj[k]] = k;
             }
@@ -925,7 +925,7 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += _stride)
+            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += IndexType_(_stride))
             {
               _col_ptr[_aj[k]] = _deadcode;
             }

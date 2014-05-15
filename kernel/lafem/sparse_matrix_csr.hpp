@@ -447,13 +447,13 @@ namespace FEAST
           IT_ * pcol_idx(vcol_idx.elements());
 
           // build row-end
-          prow_ptr[0] = dom_ptr[0];
+          prow_ptr[0] = IT_(dom_ptr[0]);
           for(Index i(0); i < num_rows; ++i)
-            prow_ptr[i+1] = dom_ptr[i+1];
+            prow_ptr[i+1] = IT_(dom_ptr[i+1]);
 
           // build col-idx
           for(Index i(0); i < num_nnze; ++i)
-            pcol_idx[i] = img_idx[i];
+            pcol_idx[i] = IT_(img_idx[i]);
 
           // build the matrix
           this->assign(SparseMatrixCSR<Mem::Main, DT_, IT_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
