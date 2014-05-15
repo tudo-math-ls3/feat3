@@ -1314,6 +1314,8 @@ namespace FEAST
           this->_copy_content(x);
         }
 
+        ///@name Linear algebra operations
+        ///@{
         /**
          * \brief Calculate \f$this \leftarrow y + \alpha x\f$
          *
@@ -1572,6 +1574,7 @@ namespace FEAST
         {
           return VectorTypeR(this->columns());
         }
+        ///@}
     };
 
     /**

@@ -563,6 +563,8 @@ namespace FEAST
           this->_copy_content(x);
         }
 
+        ///@name Linear algebra operations
+        ///@{
         /**
          * \brief Calculate \f$this \leftarrow \alpha x + y\f$
          *
@@ -702,6 +704,7 @@ namespace FEAST
           // fallback
           return Math::sqr(this->norm2<Algo_>());
         }
+        ///@}
     }; // class DenseVector<...>
 
 

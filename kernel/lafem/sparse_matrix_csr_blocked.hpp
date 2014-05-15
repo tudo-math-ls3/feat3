@@ -462,6 +462,8 @@ namespace FEAST
           this->_copy_content(x);
         }
 
+        ///@name Linear algebra operations
+        ///@{
         /**
          * \brief Calculate \f$this \leftarrow y + \alpha x\f$
          *
@@ -754,6 +756,7 @@ namespace FEAST
             Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.raw_elements(), y.raw_elements(),
               this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
           }
+          ///@}
         }
     };
 

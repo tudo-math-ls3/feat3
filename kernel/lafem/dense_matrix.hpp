@@ -267,6 +267,7 @@ namespace FEAST
         {
           this->_copy_content(x);
         }
+        ///@}
     };
 
     /**

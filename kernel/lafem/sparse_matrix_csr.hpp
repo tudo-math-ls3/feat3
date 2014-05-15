@@ -1345,6 +1345,8 @@ namespace FEAST
           this->_copy_content(x);
         }
 
+        ///@name Linear algebra operations
+        ///@{
         /**
          * \brief Calculate \f$this \leftarrow y + \alpha x\f$
          *
@@ -1622,6 +1624,7 @@ namespace FEAST
           ASSERT(domain_node < rows(), "Domain node index out of range");
           return &this->_indices.at(0)[this->_indices.at(1)[domain_node + 1]];
         }
+        ///@}
     };
 
     /**
