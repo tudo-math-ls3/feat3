@@ -76,6 +76,103 @@ namespace FEAST
         }
         r[row] = sum;
       }
+
+      template <typename DT_, typename IT_>
+      __global__ void cuda_product_matvec_banded(DT_ * r, const DT_ * x, const DT_ * val, const IT_ * offsets, const Index num_of_offsets, const Index rows, const Index columns)
+      {
+        /*
+        const Index m(offsets[4] - offsets[1]);
+        const Index n(rows);
+
+        const DT_ * ll(val);
+        const DT_ * ld(val + rows);
+        const DT_ * lu(val + 2 * rows);
+        const DT_ * dl(val + 3 * rows);
+        const DT_ * dd(val + 4 * rows);
+        const DT_ * du(val + 5 * rows);
+        const DT_ * ul(val + 6 * rows);
+        const DT_ * ud(val + 7 * rows);
+        const DT_ * uu(val + 8 * rows);
+
+        extern __shared__ DT_  smvf_cache[];
+
+        unsigned long idx = blockDim.x*blockIdx.x+threadIdx.x;
+
+        // runs from 0 to blockDim.x-1
+        unsigned long lindex = threadIdx.x;
+
+        DT_* Dcache = smvf_cache;
+        DT_* Lcache = smvf_cache + blockDim.x + 2;
+        DT_* Ucache = smvf_cache + 2 * (blockDim.x + 2);
+
+        // prefetch chunks from iteration vector
+        //
+        //
+        // data needed for DD, DU, DL: each thread loads one element, the first and last one load the border cases
+        // x_0 ... x_blockdim-1 into c_1...c_blockdim
+        if (idx < n) Dcache[lindex + 1] = x[idx];
+        if (idx >= m && idx - m < n) Lcache[lindex + 1] = x[idx - m];
+        if (idx + m < n) Ucache[lindex + 1] = x[idx + m];
+        if (lindex == 0)
+        {
+          // x_-1 in c_0
+          if (blockDim.x * blockIdx.x - 1 < n) Dcache[0] = x[blockDim.x * blockIdx.x - 1];
+          if (blockDim.x * blockIdx.x - m - 1 < n) Lcache[0] = x[blockDim.x * blockIdx.x - m - 1];
+          if (blockDim.x * blockIdx.x + m - 1 < n) Ucache[0] = x[blockDim.x * blockIdx.x + m - 1];
+        }
+        if (lindex == blockDim.x - 1)
+        {
+          // x_blockdim in c_blockdim+1
+          if (blockDim.x * (blockIdx.x + 1) < n) Dcache[blockDim.x + 1] = x[blockDim.x * (blockIdx.x + 1)];
+          if (blockDim.x * (blockIdx.x + 1) - m < n) Lcache[blockDim.x + 1] = x[blockDim.x * (blockIdx.x + 1) - m];
+          if (blockDim.x * (blockIdx.x + 1) + m  < n) Ucache[blockDim.x + 1] = x[blockDim.x * (blockIdx.x + 1) + m];
+        }
+        __syncthreads();
+        // now, compute
+        if (idx < n)
+        {
+          DT_ ytemp1 = dd[idx] * Dcache[lindex + 1];
+          if (idx > 0) ytemp1 += dl[idx] * Dcache[lindex];
+          if (idx < n - 1) ytemp1 += du[idx] * Dcache[lindex + 2];
+
+          if (idx > m) ytemp1 += ll[idx] * Lcache[lindex];
+          if (idx > m - 1) ytemp1 += ld[idx] * Lcache[lindex + 1];
+          if (idx > m - 2) ytemp1 += lu[idx] * Lcache[lindex + 2];
+
+          if (idx < n - m + 1) ytemp1 += ul[idx] * Ucache[lindex];
+          if (idx < n - m) ytemp1 += ud[idx] * Ucache[lindex + 1];
+          if (idx < n - m - 1) ytemp1 += uu[idx] * Ucache[lindex + 2];
+          r[idx] = ytemp1;
+        }
+*/
+        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+          if (idx >= rows)
+          return;
+
+        const Index k1(rows - 1);
+        const Index k2(rows + columns - 1);
+
+        Index start(0);
+
+        while (k1 > offsets[start] + idx)
+        {
+          ++start;
+        }
+
+        Index end(start);
+
+        while (end < num_of_offsets && idx + offsets[end] <= k2)
+        {
+          ++end;
+        }
+
+        DT_ gamma(DT_(0.0));
+        for (Index diag(start); diag < end; ++diag)
+        {
+          gamma += val[rows * diag + idx] * x[idx + offsets[diag] - rows + 1];
+        }
+        r[idx] = gamma;
+      }
     }
   }
 }
@@ -147,3 +244,19 @@ template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(float *, const float * c
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
+
+template <typename DT_, typename IT_>
+void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
+{
+  Index blocksize(128);
+  dim3 grid;
+  dim3 block;
+  block.x = blocksize;
+  grid.x = (unsigned)ceil((rows)/(double)(block.x));
+
+  FEAST::LAFEM::Intern::cuda_product_matvec_banded<<<grid, block, 3 * (block.x + 2) * sizeof(DT_)>>>(r, x, val, offsets, num_of_offsets, rows, columns);
+}
+//template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+//template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+//template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);

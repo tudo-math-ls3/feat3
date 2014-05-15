@@ -98,6 +98,108 @@ void ProductMatVec<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const val
 template <typename DT_, typename IT_>
 void ProductMatVec<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
 {
+  /*
+  const Index m(offsets[4] - offsets[1]);
+
+  const DT_ * ll(val);
+  const DT_ * ld(val + rows);
+  const DT_ * lu(val + 2 * rows);
+  const DT_ * dl(val + 3 * rows);
+  const DT_ * dd(val + 4 * rows);
+  const DT_ * du(val + 5 * rows);
+  const DT_ * ul(val + 6 * rows);
+  const DT_ * ud(val + 7 * rows);
+  const DT_ * uu(val + 8 * rows);
+
+  Index index(0);
+  r[index] = dd[index] * x[index]
+    + du[index] * x[index + 1]
+    + ul[index] * x[index + m - 1]
+    + ud[index] * x[index + m]
+    + uu[index] * x[index + m + 1];
+
+  index = 1;
+  for (Index si(index) ; si < m - 1 ; ++si)
+  {
+    r[si] = dd[si] * x[si]
+      + dl[si] * x[si - 1]
+      + du[si] * x[si + 1]
+      + ul[si] * x[si + m - 1]
+      + ud[si] * x[si + m]
+      + uu[si] * x[si + m + 1];
+  }
+
+  index = m - 1;
+  r[index] = dd[index] * x[index]
+    + lu[index] * x[index - m + 1]
+    + dl[index] * x[index - 1]
+    + du[index] * x[index + 1]
+    + ul[index] * x[index + m - 1]
+    + ud[index] * x[index + m]
+    + uu[index] * x[index + m + 1];
+
+    index = m;
+    r[index] = dd[index] * x[index]
+      + lu[index] * x[index - m + 1]
+      + ld[index] * x[index - m]
+      + dl[index] * x[index - 1]
+      + du[index] * x[index + 1]
+      + ul[index] * x[index + m - 1]
+      + ud[index] * x[index + m]
+      + uu[index] * x[index + m + 1];
+
+    index = m + 1;
+    for (Index si(index) ; si < rows - m - 1 ; ++si)
+    {
+      r[si] = dd[si] * x[si]
+        + ll[si] * x[si - m - 1]
+        + lu[si] * x[si - m + 1]
+        + ld[si] * x[si - m]
+        + dl[si] * x[si - 1]
+        + du[si] * x[si + 1]
+        + ul[si] * x[si + m - 1]
+        + ud[si] * x[si + m]
+        + uu[si] * x[si + m + 1];
+    }
+
+    index = rows - m - 1;
+    r[index] = dd[index] * x[index]
+      + ll[index] * x[index - m - 1]
+      + lu[index] * x[index - m + 1]
+      + ld[index] * x[index - m]
+      + dl[index] * x[index - 1]
+      + du[index] * x[index + 1]
+      + ul[index] * x[index + m - 1]
+      + ud[index] * x[index + m];
+
+    index = rows - m;
+    r[index] = dd[index] * x[index]
+      + ll[index] * x[index - m - 1]
+      + lu[index] * x[index - m + 1]
+      + ld[index] * x[index - m]
+      + dl[index] * x[index - 1]
+      + du[index] * x[index + 1]
+      + ul[index] * x[index + m - 1];
+
+    index = rows - m + 1;
+    for (Index si(index) ; si < rows - 1 ; ++si)
+    {
+      r[si] = dd[si]  * x[si]
+        + ll[si] * x[si - m - 1]
+        + lu[si] * x[si - m + 1]
+        + ld[si] * x[si - m]
+        + dl[si] * x[si - 1]
+        + du[si] * x[si + 1];
+    }
+
+    index = rows - 1;
+    r[index] = dd[index] * x[index]
+      + ll[index] * x[index - m - 1]
+      + lu[index] * x[index - m + 1]
+      + ld[index] * x[index - m]
+      + dl[index] * x[index - 1];
+    */
+
 #ifdef START_OFFSET
 #warning Overwriting definition of START_OFFSET
 #undef START_OFFSET
@@ -144,39 +246,6 @@ void ProductMatVec<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const 
   }
 #undef START_OFFSET
 #undef END_OFFSET
-
-  /**
-   * \TODO: Implementation for CUDA
-   */
-
-  /*
-     const Index k1(rows - 1);
-     const Index k2(rows + columns - 1);
-
-     for (Index i(0); i < rows; ++i)
-     {
-     Index start(0);
-
-     while (k1 > offsets[start] + i)
-     {
-     ++start;
-     }
-
-     Index end(start);
-
-     while (end < num_of_offsets && i + offsets[end] <= k2)
-     {
-     ++end;
-     }
-
-     DT_ gamma(DT_(0.0));
-     for (Index diag(start); diag < end; ++diag)
-     {
-     gamma += val[rows * diag + i] * x[i + offsets[diag] - rows + 1];
-     }
-     r[i] = gamma;
-     }
-     */
 }
 
 #endif // KERNEL_LAFEM_ARCH_PRODUCT_MATVEC_GENERIC_HPP

@@ -76,6 +76,9 @@ namespace FEAST
 
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows);
+
+        template <typename DT_, typename IT_>
+        static void banded(DT_ * r, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
       };
 
     } // namespace Arch

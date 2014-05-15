@@ -19,8 +19,8 @@ void run()
   typedef typename SM_::MemType Mem_;
 
   std::vector<IT_> num_of_nodes;
-  num_of_nodes.push_back(1200);
-  num_of_nodes.push_back(1200);
+  num_of_nodes.push_back(1300);
+  num_of_nodes.push_back(1300);
 
   // generate FE matrix A
   SparseMatrixBanded<Mem::Main, DT_, IT_> bm(PointstarStructureFE<Algo::Generic>::template value<DT_>(1, num_of_nodes));
@@ -31,7 +31,9 @@ void run()
   Index size(sys.rows());
   std::cout<<Mem_::name()<<" "<<Algo_::name()<<" "<<SM_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<std::endl;
   std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<std::endl;
-  DenseVector<Mem_, DT_, IT_> b(size, DT_(1.234));
+  DenseVector<Mem_, DT_, IT_> b(size);
+  for (Index i (0) ; i < b.size() ; ++i)
+    b(i, DT_(i%100) / DT_(100));
   DenseVector<Mem_, DT_, IT_> x(size, DT_(4711));
 
   std::vector<double> times;
@@ -87,6 +89,7 @@ int main(int argc, char ** argv)
   run<Algo::MKL, SparseMatrixCSR<Mem::Main, double> >();
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> >();
+  run<Algo::CUDA, SparseMatrixBanded<Mem::CUDA, double, Index> >();
   run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, unsigned int> >();
 }
