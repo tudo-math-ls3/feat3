@@ -1144,10 +1144,7 @@ namespace FEAST
             const Index end(temp.row_ptr()[row + 1]);
             for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
             {
-              if (temp.val()[i] != DT_(0))
-              {
-                file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
-              }
+              file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
             }
           }
           file << "];" << std::endl;
@@ -1186,10 +1183,7 @@ namespace FEAST
             const Index end(temp.row_ptr()[row + 1]);
             for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
             {
-              if (temp.val()[i] != DT_(0))
-              {
-                file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
-              }
+              file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
             }
           }
         }

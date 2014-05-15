@@ -1108,10 +1108,7 @@ namespace FEAST
           const Index dim(num_cols_per_row() * stride());
           for (Index i(0) ; i < dim ; ++i)
           {
-            if (temp.Ax()[i] != DT_(0))
-            {
-              file << (i%stride()) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << temp.Ax()[i] << ";" << std::endl;
-            }
+            file << (i%stride()) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << temp.Ax()[i] << ";" << std::endl;
           }
           file << "];" << std::endl;
           file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
@@ -1147,10 +1144,7 @@ namespace FEAST
           const Index dim(num_cols_per_row() * stride());
           for (Index i(0) ; i < dim ; ++i)
           {
-            if (temp.Ax()[i] != DT_(0))
-            {
-              file << (i%stride()) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << temp.Ax()[i] << ";" << std::endl;
-            }
+            file << (i%stride()) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << temp.Ax()[i] << ";" << std::endl;
           }
         }
 
