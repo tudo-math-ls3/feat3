@@ -13,7 +13,7 @@ namespace FEAST
   namespace LAFEM
   {
     /**
-     * Supported File modes.
+     * Supported layout ids.
      */
     enum class SparseLayoutId
     {

@@ -16,7 +16,7 @@ namespace FEAST
   namespace LAFEM
   {
     /**
-     * Supported File modes.
+     * Supported sparse precon types.
      */
     enum class SparsePreconType
     {
