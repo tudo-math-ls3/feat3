@@ -36,7 +36,9 @@ namespace FEAST
      * This class represents a sparse matrix, that stores its diagonal entries
      * Data survey: \n
      * _elements[0]: raw non zero number values \n
-     * _indices[0]: vector of offsets (main diagonal has offset rows-1)\n
+     * _indices[0]: vector of offsets (bottom-left diagonal has offset 0,
+     *                                 main diagonal has offset rows - 1 and
+     *                                 top-right diagonal has offset row + columns - 1)\n
      *
      * _scalar_index[0]: container size \n
      * _scalar_index[1]: row count \n
@@ -44,6 +46,26 @@ namespace FEAST
      * _scalar_index[3]: non zero element count (used elements) \n
      * _scalar_index[4]: number of offsets \n
      * _scalar_dt[0]: zero element
+     *
+     * This class saves a sparse-matrix with a banded structure. For each diagonal of
+     * the matrix with non-zero elements there must be reserved memory for the whole
+     * diagonal. For faster access on the matrix-elements each diagonal get the virtual
+     * length of the row-count of the matrix. They are enlarged to the left and right
+     * side of the matrix as shown in the following layout.
+     *       +--                  --+
+     *  \    | \           \      \ |
+     *   \   |\ \           \      \|
+     *    \  | \ \           \      |
+     *     \ |  \ \           \     |\
+     *      \|   \ \           \    | \
+     *       |    \ \           \   |  \
+     *       |\    \ \           \  |   \
+     *       +--                  --+
+     * To get the position of the diagonals in the matrix, the matching offsets are
+     * saved from left to right in the offsets-array.
+     * - The first diagonal is the one at the bottom-left and gets the offset = 1,
+     * - the main diaognal has the offset = rows - 1
+     * - and the last offset at the top-right has the offset = rows + columns - 1.
      *
      * Refer to \ref lafem_design for general usage informations.
      *
