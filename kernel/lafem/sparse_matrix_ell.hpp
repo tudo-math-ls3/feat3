@@ -1162,7 +1162,7 @@ namespace FEAST
             const IT_ max(temp.Arl()[row]);
             for(IT_ n(0); n < max ; n++)
             {
-              file << stringify(row + 1) << " " << *tAj + 1 << " " << std::scientific << *tAx << ";" << std::endl;
+              file << stringify(row + 1) << " " << *tAj + 1 << " " << std::scientific << *tAx << std::endl;
 
               tAj += stride();
               tAx += stride();
