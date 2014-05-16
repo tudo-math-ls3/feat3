@@ -1105,10 +1105,21 @@ namespace FEAST
           temp.convert(*this);
 
           file << "data = [" << std::endl;
-          const Index dim(num_cols_per_row() * stride());
-          for (Index i(0) ; i < dim ; ++i)
+          for (Index row(0) ; row < rows() ; ++row)
           {
-            file << (i%stride()) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << temp.Ax()[i] << ";" << std::endl;
+            const IT_ * tAj(temp.Aj());
+            const DT_ * tAx(temp.Ax());
+            tAj += row;
+            tAx += row;
+
+            const IT_ max(temp.Arl()[row]);
+            for(IT_ n(0); n < max ; n++)
+            {
+              file << stringify(row + 1) << " " << *tAj + 1 << " " << std::scientific << *tAx << ";" << std::endl;
+
+              tAj += stride();
+              tAx += stride();
+            }
           }
           file << "];" << std::endl;
           file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
@@ -1141,10 +1152,21 @@ namespace FEAST
           file << "%%MatrixMarket matrix coordinate real general" << std::endl;
           file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;
 
-          const Index dim(num_cols_per_row() * stride());
-          for (Index i(0) ; i < dim ; ++i)
+          for (Index row(0) ; row < rows() ; ++row)
           {
-            file << (i%stride()) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << temp.Ax()[i] << ";" << std::endl;
+            const IT_ * tAj(temp.Aj());
+            const DT_ * tAx(temp.Ax());
+            tAj += row;
+            tAx += row;
+
+            const IT_ max(temp.Arl()[row]);
+            for(IT_ n(0); n < max ; n++)
+            {
+              file << stringify(row + 1) << " " << *tAj + 1 << " " << std::scientific << *tAx << ";" << std::endl;
+
+              tAj += stride();
+              tAx += stride();
+            }
           }
         }
 
