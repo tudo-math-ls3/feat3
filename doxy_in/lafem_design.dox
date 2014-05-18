@@ -2,11 +2,14 @@
 
 This page describes ideas and concepts used throughout the whole lafem subsystem.
 
-\section sec_overview Overview
+\section lafem_sec_overview Overview
 LAFEM comprises a wide range of different linear algebra containers and their corresponding operations.
+
+All Containers are derived vom FEAST::LAFEM::Container, thus its page contains a list of all currently available containers.
+
 Although many operations are different for each container, many concepts are common to all containers and shall be described in this document.
 
-\section container_properties Container properties
+\section lafem_sec_container_properties Container properties
 All Containers have at least the first three template parameters in common, describing memory location, floating point format and indexing data type.
 
 The structs in FEAST::Mem are used to control, if the containers contents will be stored in the cpus main memory or in gpu memory, allocated by the cuda runtime.
@@ -16,7 +19,7 @@ The second template parameter is used as the datatype for the allocation of all 
 The third template parameter is used as the datatype for the allocation of all indexing related arrays, e.g. the column index array in a FEAST::LAFEM::SparseMatrixCSR.
 
 
-\section la_ops LA Operations
+\section lafem_sec_ops LA Operations
 All operations are member functions of the related containers.
 With little exceptions, the object which hosts the function call will contain the calculation result.
 \note Namely the BLAS2-like operations of axpy and apply break this rule by being a member of the corresponding matrix.
@@ -25,7 +28,15 @@ All operations are function templates, which expect a struct from FEAST::Algo to
 
 \note Not all Algo structs are compatible with all Mem structs. For example FEAST::Algo::CUDA is incompatible with FEAST::Mem::Main.
 
-\section data_handling Data handling
+A typical call may look like these:
+\code{.cpp}
+// compute dot product
+double d = vector1.dot<Algo::Generic>(vector2);
+// compute matrix vector product
+system_matrix.apply<Algo::CUDA>(y, rhs);
+\endcode
+
+\section lafem_sec_data_handling Data handling
 All containers provide at least three different member functions for proper conversion and data movement.
 
 - \ref FEAST::LAFEM::Container::clone() "clone": creates a deep copy from scratch
@@ -36,13 +47,13 @@ All containers provide at least three different member functions for proper conv
 
 \note There does not exist a copy constructor nor copy assignment operator. This prevents the user from triggering unwanted copy operations and memory transfers.
 
-\section container_reset Container Reset
+\section lafem_sec_container_reset Container Reset
 All containers offer the format() and clear() operations:
 - clear: simply frees all allocated arrays and leaves the container in an undefined state.
 
 - format: resets all non values to zero or any other provided value, but does not free any arrays.
 
-\section sparse_layout Sparse Layout
+\section lafem_sec_sparse_layout Sparse Layout
 Every sparse matrix consists of its non-zero data arrays and a data layout (stored in various different arrays).
 
 A FEAST::LAFEM::SparseLayout object can be retrieved by any matrix via the corresponding layout() member function to create another matrix with the same shared (except FEAST::LAFEM::SparseMatrixCOO and FEAST::LAFEM::SparseVector, which enforce deep copies) data layout.

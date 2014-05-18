@@ -1,10 +1,15 @@
 /**
-\mainpage The mainpage documentation
+\mainpage FEAST - Finite Element Assembly and Solution Tools
 
 \tableofcontents
 
-This is a simple example of a mainpage you can create yourself.
-Place this inside of a file called `mainpage.dox` and use doxygen.
-If you specified `INPUT` or `FILE_PATTERNS` in your Doxyfile please
-add `.dox` to your file patterns or `mainpage.dox` to your INPUT files.
+\section main_sec_overview Overview
+The FEAST library consists of several different subsystems, which together make up what is called the FEAST "kernel".
+\image html feast_subsystems.svg "Overview of FEAST components"
+
+\section main_sec_subsystems Subsystems
+The subsystems are in detail:
+\secreflist
+\refitem lafem_design LAFEM
+\endsecreflist
 **/
