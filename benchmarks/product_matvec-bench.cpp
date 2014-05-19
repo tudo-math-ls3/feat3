@@ -7,9 +7,48 @@
 #include <kernel/util/type_traits.hpp>
 
 #include <iostream>
+#include <functional>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
+
+template <typename Mem_>
+void run_bench(std::function<void (void)> func, double flops, double bytes)
+{
+  std::vector<double> times;
+  Index iters(25);
+  for (Index i(0) ; i < 10 ; ++i)
+  {
+    TimeStamp at, bt;
+    at.stamp();
+    for (Index j(0) ; j < iters ; ++j)
+    {
+      func();
+    }
+    MemoryPool<Mem_>::synchronize();
+    bt.stamp();
+    times.push_back(bt.elapsed(at));
+  }
+
+  double mean(0);
+  for (auto & time : times)
+    mean += time;
+  mean /= double(times.size());
+  std::cout<<"TOE: "<<std::fixed<<mean<<std::endl;
+  flops *= iters;
+  flops /= mean;
+  flops /= 1000; // kilo
+  flops /= 1000; // mega
+  flops /= 1000; // giga
+  std::cout<<"GFlop/s: "<<flops<<std::endl;
+  bytes *= iters;
+  bytes /= mean;
+  bytes /= 1024; // kilo
+  bytes /= 1024; // mega
+  bytes /= 1024; // giga
+  std::cout<<"GByte/s: "<<bytes<<std::endl;
+  std::cout<<"=============================================="<<std::endl;
+}
 
 template <typename Algo_, typename SM_>
 void run()
@@ -36,46 +75,19 @@ void run()
     b(i, DT_(i%100) / DT_(100));
   DenseVector<Mem_, DT_, IT_> x(size, DT_(4711));
 
-  std::vector<double> times;
-  Index iters(25);
-  for (Index i(0) ; i < 10 ; ++i)
-  {
-    TimeStamp at, bt;
-    at.stamp();
-    for (Index j(0) ; j < iters ; ++j)
-    {
-      sys.template apply<Algo_>(x, b);
-    }
-    MemoryPool<Mem_>::synchronize();
-    bt.stamp();
-    times.push_back(bt.elapsed(at));
-  }
-
-  double mean(0);
-  for (auto & time : times)
-    mean += time;
-  mean /= DT_(times.size());
-  std::cout<<"control norm: "<<x.template norm2<Algo_>()<<std::endl;
-  std::cout<<"TOE: "<<std::fixed<<mean<<std::endl;
   double flops(sys.used_elements());
   flops *= 2;
-  flops *= iters;
-  flops /= mean;
-  flops /= 1000; // kilo
-  flops /= 1000; // mega
-  flops /= 1000; // giga
-  std::cout<<"GFlop/s: "<<flops<<std::endl;
+
   double bytes(sys.used_elements());
   bytes *= 2;
   bytes += size;
   bytes *= sizeof(DT_);
-  bytes *= iters;
-  bytes /= mean;
-  bytes /= 1024; // kilo
-  bytes /= 1024; // mega
-  bytes /= 1024; // giga
-  std::cout<<"GByte/s: "<<bytes<<std::endl;
-  std::cout<<"=============================================="<<std::endl;
+
+  //sys.template apply<Algo_>(x, b);
+  auto func = [&] () { sys.template apply<Algo_>(x, b); };
+  run_bench<Mem_>(func, flops, bytes);
+
+  std::cout<<"control norm: "<<x.template norm2<Algo_>()<<std::endl;
 }
 
 int main(int argc, char ** argv)
