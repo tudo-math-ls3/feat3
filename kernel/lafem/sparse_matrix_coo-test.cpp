@@ -117,13 +117,8 @@ public:
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
-    f.write_out(FileMode::fm_m, ts);
-    SparseMatrixCOO<Mem_, DT_, IT_> i(FileMode::fm_m, ts);
-    TEST_CHECK_EQUAL(i, f);
-
-    std::stringstream ms;
-    f.write_out(FileMode::fm_mtx, ms);
-    SparseMatrixCOO<Mem_, DT_, IT_> j(FileMode::fm_mtx, ms);
+    f.write_out(FileMode::fm_mtx, ts);
+    SparseMatrixCOO<Mem_, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
   }
 };

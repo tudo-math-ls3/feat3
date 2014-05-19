@@ -35,26 +35,14 @@ TARGET_LINK_LIBRARIES(dbg-nodefunc feast)
 ADD_EXECUTABLE(dbg-patch dbg_patch/dbg_patch.cpp)
 TARGET_LINK_LIBRARIES(dbg-patch feast)
 
-ADD_EXECUTABLE(csr2m io/csr_to_m.cpp)
-TARGET_LINK_LIBRARIES (csr2m feast)
-
 ADD_EXECUTABLE(csr2mtx io/csr_to_mtx.cpp)
 TARGET_LINK_LIBRARIES (csr2mtx feast)
-
-ADD_EXECUTABLE(ell2m io/ell_to_m.cpp)
-TARGET_LINK_LIBRARIES (ell2m feast)
 
 ADD_EXECUTABLE(ell2mtx io/ell_to_mtx.cpp)
 TARGET_LINK_LIBRARIES (ell2mtx feast)
 
-ADD_EXECUTABLE(m2csr io/m_to_csr.cpp)
-TARGET_LINK_LIBRARIES (m2csr feast)
-
 ADD_EXECUTABLE(mtx2csr io/mtx_to_csr.cpp)
 TARGET_LINK_LIBRARIES (mtx2csr feast)
-
-ADD_EXECUTABLE(m2ell io/m_to_ell.cpp)
-TARGET_LINK_LIBRARIES (m2ell feast)
 
 ADD_EXECUTABLE(mtx2ell io/mtx_to_ell.cpp)
 TARGET_LINK_LIBRARIES (mtx2ell feast)
@@ -64,12 +52,6 @@ TARGET_LINK_LIBRARIES (csr2ell feast)
 
 ADD_EXECUTABLE(ell2csr io/ell_to_csr.cpp)
 TARGET_LINK_LIBRARIES (ell2csr feast)
-
-ADD_EXECUTABLE(m2mtx io/m_to_mtx.cpp)
-TARGET_LINK_LIBRARIES (m2mtx feast)
-
-ADD_EXECUTABLE(mtx2m io/mtx_to_m.cpp)
-TARGET_LINK_LIBRARIES (mtx2m feast)
 
 ADD_EXECUTABLE(dv2exp io/dv_to_exp.cpp)
 TARGET_LINK_LIBRARIES (dv2exp feast)

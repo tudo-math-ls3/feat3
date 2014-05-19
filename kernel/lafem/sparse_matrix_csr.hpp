@@ -57,109 +57,12 @@ namespace FEAST
     class SparseMatrixCSR : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
       private:
-        void _read_from_m(String filename)
-        {
-          std::ifstream file(filename.c_str(), std::ifstream::in);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-          _read_from_m(file);
-          file.close();
-        }
-
-        void _read_from_m(std::istream& file)
-        {
-          std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_dt.push_back(DT_(0));
-
-          Index ue(0);
-          String line;
-          std::getline(file, line);
-          while(!file.eof())
-          {
-            std::getline(file, line);
-
-            if(line.find("]", 0) < line.npos)
-              break;
-
-            if(line[line.size()-1] == ';')
-              line.resize(line.size()-1);
-
-            String::size_type begin(line.find_first_not_of(" "));
-            line.erase(0, begin);
-            String::size_type end(line.find_first_of(" "));
-            String srow(line, 0, end);
-            IT_ row((IT_)atol(srow.c_str()));
-            --row;
-            _rows() = std::max(row+1, IT_(this->rows()));
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String scol(line, 0, end);
-            Index col((Index)atol(scol.c_str()));
-            --col;
-            _columns() = std::max(col+1, this->columns());
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String sval(line, 0, end);
-            DT_ tval((DT_)atof(sval.c_str()));
-
-            entries[row].insert(std::pair<IT_, DT_>(col, tval));
-            ++ue;
-          }
-          _size() = this->rows() * this->columns();
-          _used_elements() = ue;
-
-          DT_ * tval = new DT_[ue];
-          IT_ * tcol_ind = new IT_[ue];
-          IT_ * trow_ptr = new IT_[rows() + 1];
-
-          IT_ idx(0);
-          Index row_idx(0);
-          for (auto row : entries)
-          {
-            trow_ptr[row_idx] = idx;
-            for (auto col : row.second )
-            {
-              tcol_ind[idx] = col.first;
-              tval[idx] = col.second;
-              ++idx;
-            }
-            row.second.clear();
-            ++row_idx;
-          }
-          trow_ptr[rows()] = IT_(ue);
-          entries.clear();
-
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
-          this->_elements_size.push_back(_used_elements());
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
-          this->_indices_size.push_back(_used_elements());
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(rows() + 1));
-          this->_indices_size.push_back(rows() + 1);
-
-          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
-          MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
-          MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, rows() + 1);
-
-          delete[] tval;
-          delete[] tcol_ind;
-          delete[] trow_ptr;
-        }
-
         void _read_from_mtx(String filename)
         {
           std::ifstream file(filename.c_str(), std::ifstream::in);
           if (! file.is_open())
             throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-          _read_from_m(file);
+          _read_from_mtx(file);
           file.close();
         }
 
@@ -474,9 +377,6 @@ namespace FEAST
 
           switch(mode)
           {
-            case FileMode::fm_m:
-              _read_from_m(filename);
-              break;
             case FileMode::fm_mtx:
               _read_from_mtx(filename);
               break;
@@ -503,9 +403,6 @@ namespace FEAST
 
           switch(mode)
           {
-            case FileMode::fm_m:
-              _read_from_m(file);
-              break;
             case FileMode::fm_mtx:
               _read_from_mtx(file);
               break;
@@ -1020,9 +917,6 @@ namespace FEAST
             case FileMode::fm_csr:
               write_out_csr(filename);
               break;
-            case FileMode::fm_m:
-              write_out_m(filename);
-              break;
             case FileMode::fm_mtx:
               write_out_mtx(filename);
               break;
@@ -1045,9 +939,6 @@ namespace FEAST
           {
             case FileMode::fm_csr:
               write_out_csr(file);
-              break;
-            case FileMode::fm_m:
-              write_out_m(file);
               break;
             case FileMode::fm_mtx:
               write_out_mtx(file);
@@ -1115,43 +1006,6 @@ namespace FEAST
           delete[] ccol_ind;
           delete[] crow_ptr;
           delete[] cval;
-        }
-
-        /**
-         * \brief Write out matrix to matlab m file.
-         *
-         * \param[in] filename The file where the matrix shall be stored.
-         */
-        void write_out_m(String filename) const
-        {
-          std::ofstream file(filename.c_str(), std::ofstream::out);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-          write_out_m(file);
-          file.close();
-        }
-
-        /**
-         * \brief Write out matrix to matlab m file.
-         *
-         * \param[in] file The stream that shall be written to.
-         */
-        void write_out_m(std::ostream& file) const
-        {
-          SparseMatrixCSR<Mem::Main, DT_, IT_> temp;
-          temp.convert(*this);
-
-          file << "data = [" << std::endl;
-          for (Index row(0) ; row < rows() ; ++row)
-          {
-            const Index end(temp.row_ptr()[row + 1]);
-            for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
-            {
-              file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
-            }
-          }
-          file << "];" << std::endl;
-          file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
         }
 
         /**

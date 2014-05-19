@@ -123,10 +123,6 @@ public:
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
-    f.write_out(FileMode::fm_m, ts);
-    SparseMatrixELL<Mem::Main, DT_, IT_> i(FileMode::fm_m, ts);
-    TEST_CHECK_EQUAL(i, f);
-
     f.write_out(FileMode::fm_mtx, ts);
     SparseMatrixELL<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);

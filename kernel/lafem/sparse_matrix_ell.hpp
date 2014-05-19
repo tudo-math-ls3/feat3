@@ -62,124 +62,12 @@ namespace FEAST
     class SparseMatrixELL : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
       private:
-        void _read_from_m(String filename)
-        {
-          std::ifstream file(filename.c_str(), std::ifstream::in);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-          _read_from_m(file);
-          file.close();
-        }
-
-        void _read_from_m(std::istream& file)
-        {
-          std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_dt.push_back(DT_(0));
-
-          Index ue(0);
-          String line;
-          std::getline(file, line);
-          while(!file.eof())
-          {
-            std::getline(file, line);
-
-            if(line.find("]", 0) < line.npos)
-              break;
-
-            if(line[line.size()-1] == ';')
-              line.resize(line.size()-1);
-
-            String::size_type begin(line.find_first_not_of(" "));
-            line.erase(0, begin);
-            String::size_type end(line.find_first_of(" "));
-            String srow(line, 0, end);
-            IT_ row((IT_)atol(srow.c_str()));
-            --row;
-            _rows() = std::max(Index(row+1), this->rows());
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String scol(line, 0, end);
-            Index col((Index)atol(scol.c_str()));
-            --col;
-            _columns() = std::max(col+1, this->columns());
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String sval(line, 0, end);
-            DT_ val((DT_)atof(sval.c_str()));
-
-            entries[row].insert(std::pair<IT_, DT_>(col, val));
-            ++ue;
-          }
-          _size() = this->rows() * this->columns();
-          _used_elements() = ue;
-          _num_cols_per_row() = 0;
-
-          IT_* tArl = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_rows());
-
-          Index idx(0);
-          for (auto row : entries)
-          {
-            tArl[idx] = IT_(row.second.size());
-            _num_cols_per_row() = std::max(_num_cols_per_row(), Index(tArl[idx]));
-            ++idx;
-          }
-
-          Index alignment(32);
-          _stride() = alignment * ((_rows() + alignment - 1)/ alignment);
-
-          DT_* tAx = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(_num_cols_per_row() * _stride());
-          MemoryPool<Mem::Main>::instance()->set_memory(tAx, DT_(0), _num_cols_per_row() * _stride());
-          IT_* tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_num_cols_per_row() * _stride());
-          MemoryPool<Mem::Main>::instance()->set_memory(tAj, IT_(0), _num_cols_per_row() * _stride());
-
-          Index row_idx(0);
-          for (auto row : entries)
-          {
-            Index target(0);
-            for (auto col : row.second )
-            {
-              tAj[row_idx + target * stride()] = col.first;
-              tAx[row_idx + target * stride()] = col.second;
-              ++target;
-            }
-            row.second.clear();
-            ++row_idx;
-          }
-          entries.clear();
-
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_num_cols_per_row() * _stride()));
-          this->_elements_size.push_back(_num_cols_per_row() * _stride());
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_num_cols_per_row() * _stride()));
-          this->_indices_size.push_back(_num_cols_per_row() * _stride());
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_rows()));
-          this->_indices_size.push_back(_rows());
-
-          MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tAx, _num_cols_per_row() * _stride());
-          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tAj, _num_cols_per_row() * _stride());
-          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), tArl, _rows());
-
-          MemoryPool<Mem::Main>::instance()->release_memory(tAx);
-          MemoryPool<Mem::Main>::instance()->release_memory(tAj);
-          MemoryPool<Mem::Main>::instance()->release_memory(tArl);
-        }
-
         void _read_from_mtx(String filename)
         {
           std::ifstream file(filename.c_str(), std::ifstream::in);
           if (! file.is_open())
             throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-          _read_from_m(file);
+          _read_from_mtx(file);
           file.close();
         }
 
@@ -583,9 +471,6 @@ namespace FEAST
 
           switch(mode)
           {
-            case FileMode::fm_m:
-              _read_from_m(filename);
-              break;
             case FileMode::fm_mtx:
               _read_from_mtx(filename);
               break;
@@ -612,9 +497,6 @@ namespace FEAST
 
           switch(mode)
           {
-            case FileMode::fm_m:
-              _read_from_m(file);
-              break;
             case FileMode::fm_mtx:
               _read_from_mtx(file);
               break;
@@ -1046,9 +928,6 @@ namespace FEAST
             case FileMode::fm_ell:
               write_out_ell(filename);
               break;
-            case FileMode::fm_m:
-              write_out_m(filename);
-              break;
             case FileMode::fm_mtx:
               write_out_mtx(filename);
               break;
@@ -1071,9 +950,6 @@ namespace FEAST
           {
             case FileMode::fm_ell:
               write_out_ell(file);
-              break;
-            case FileMode::fm_m:
-              write_out_m(file);
               break;
             case FileMode::fm_mtx:
               write_out_mtx(file);
@@ -1137,51 +1013,6 @@ namespace FEAST
 
           delete[] cAj;
           delete[] cAx;
-        }
-
-        /**
-         * \brief Write out matrix to matlab m file.
-         *
-         * \param[in] filename The file where the matrix shall be stored.
-         */
-        void write_out_m(String filename) const
-        {
-          std::ofstream file(filename.c_str(), std::ofstream::out);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-          write_out_m(file);
-          file.close();
-        }
-
-        /**
-         * \brief Write out matrix to matlab m file.
-         *
-         * \param[in] file The stream that shall be written to.
-         */
-        void write_out_m(std::ostream& file) const
-        {
-          SparseMatrixELL<Mem::Main, DT_, IT_> temp;
-          temp.convert(*this);
-
-          file << "data = [" << std::endl;
-          for (Index row(0) ; row < rows() ; ++row)
-          {
-            const IT_ * tAj(temp.Aj());
-            const DT_ * tAx(temp.Ax());
-            tAj += row;
-            tAx += row;
-
-            const IT_ max(temp.Arl()[row]);
-            for(IT_ n(0); n < max ; n++)
-            {
-              file << stringify(row + 1) << " " << *tAj + 1 << " " << std::scientific << *tAx << ";" << std::endl;
-
-              tAj += stride();
-              tAx += stride();
-            }
-          }
-          file << "];" << std::endl;
-          file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
         }
 
         /**

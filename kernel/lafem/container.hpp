@@ -63,7 +63,6 @@ namespace FEAST
     {
       fm_exp = 0, /**< Exponential ascii */
       fm_dv, /**< Binary data */
-      fm_m, /**< Matlab ascii */
       fm_mtx, /**< Matrix market ascii */
       fm_ell, /**< Binary ell data */
       fm_csr, /**< Binary csr data */
