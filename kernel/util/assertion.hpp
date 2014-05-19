@@ -91,8 +91,17 @@ namespace FEAST
  */
 #if defined (FEAST_STDC_ASSERT)
 // define as standard C assert
-#  define ASSERT(expr, msg) assert(expr)
-#  define ASSERT_(expr) assert(expr)
+#  if defined(FEAST_COMPILER_MICROSOFT)
+//   Note: The MSC assert macro has a "bug": the __LINE__ macro, which is internally used by the
+//         "assert" macro, is of type 'long', whereas the function receiving the value of
+//         __LINE__ interprets it as 'unsigned int', which triggers a warning C4365.
+//         The following is a hack to make the MSC compiler shut up about its own flaws.
+#    define ASSERT(expr, msg) __pragma(warning(push)) __pragma(warning(disable:4365)) assert(expr) __pragma(warning(pop))
+#    define ASSERT_(expr) __pragma(warning(push)) __pragma(warning(disable:4365)) assert(expr) __pragma(warning(pop))
+#  else
+#    define ASSERT(expr, msg) assert(expr)
+#    define ASSERT_(expr) assert(expr)
+#  endif
 #elif defined (DEBUG)
 // use FEAST::Assertion exception
 #  define ASSERT(expr, msg) \
