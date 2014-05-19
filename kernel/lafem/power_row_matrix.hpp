@@ -298,8 +298,13 @@ namespace FEAST
        *
        * Use source matrix content as content of current matrix
        */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template< typename SubType_>
+      void convert(const PowerRowMatrix<SubType_, blocks_>& other)
+#else
       template <typename Mem2_, typename DT2_, typename IT2_>
-        void convert(const typename PowerRowMatrix::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+#endif
       {
         CONTEXT("When converting PowerRowMatrix");
 
@@ -485,8 +490,13 @@ namespace FEAST
        *
        * Use source matrix content as content of current matrix
        */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template< typename SubType_>
+      void convert(const PowerRowMatrix<SubType_, Index(1)>& other)
+#else
       template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const typename PowerRowMatrix::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+#endif
       {
         CONTEXT("When converting PowerRowMatrix");
 

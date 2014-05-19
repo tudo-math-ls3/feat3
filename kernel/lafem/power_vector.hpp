@@ -406,8 +406,13 @@ namespace FEAST
        *
        * Use source vector content as content of current vector
        */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template<typename SubType2_>
+      void convert(const PowerVector<SubType2_, count_>& other)
+#else
       template <typename Mem2_, typename DT2_, typename IT2_>
-        void convert(const typename PowerVector::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+#endif
       {
         CONTEXT("When converting PowerVector");
 
@@ -435,7 +440,7 @@ namespace FEAST
       typedef typename SubVectorType::DataType DataType;
       typedef typename SubVectorType::IndexType IndexType;
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
-      using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
+      using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, Index(1)>;
 
       enum
       {
@@ -628,8 +633,13 @@ namespace FEAST
        *
        * Use source vector content as content of current vector
        */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template<typename SubType2_>
+      void convert(const PowerVector<SubType2_, Index(1)>& other)
+#else
       template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const typename PowerVector::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+#endif
       {
         CONTEXT("When converting PowerVector");
 

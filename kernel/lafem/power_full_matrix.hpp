@@ -54,6 +54,10 @@ namespace FEAST
       typedef PowerVector<typename SubMatrixType::VectorTypeL, height_> VectorTypeL;
       /// Compatible R-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeR, width_> VectorTypeR;
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      using ContainerType = class PowerFullMatrix<
+        typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, width_, height_>;
 
       /// dummy enum
       enum
@@ -178,6 +182,14 @@ namespace FEAST
       {
         BaseClass::template apply<Algo_>(r, x, y, alpha);
       }
+
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+      {
+        CONTEXT("When converting PowerFullMatrix");
+        BaseClass::convert(other);
+      }
+
     }; // class PowerFullMatrix
   } // namespace LAFEM
 } // namespace FEAST
