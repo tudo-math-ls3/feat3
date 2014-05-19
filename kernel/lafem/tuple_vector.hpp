@@ -48,10 +48,13 @@ namespace FEAST
       typedef typename First_::DataType DataType;
       /// sub-vector index-type
       typedef typename First_::IndexType IndexType;
+      /// helper class template for ContainerType template
+      template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
+      using ContHelper = typename RestClass::template
+        ContHelper<Mem2_, DT2_, IT2_, RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_>>;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
-      using ContainerType = class TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
-                                              typename RestClass::template ContainerType<Mem2_, DT2_, IT2_> >;
+      using ContainerType = ContHelper<Mem2_, DT2_, IT2_>;
 
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
@@ -305,7 +308,7 @@ namespace FEAST
        * Use source vector content as content of current vector
        */
       template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const typename TupleVector::template ContainerType<Mem2_, DT2_, IT2_> & other)
+      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
       {
         CONTEXT("When converting TupleVector");
 
@@ -329,8 +332,16 @@ namespace FEAST
       typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;
+      template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
+      using ContHelper = class TupleVector<RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
+
+#ifdef FEAST_COMPILER_MICROSOFT
+      template <typename Mem2_, typename DT2_, typename IT2_, typename... Dummy_>
+      using ContainerType = class TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_>, Dummy_...>;
+#else
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
-      using ContainerType = typename First_::template ContainerType<Mem2_, DT2_, IT2_>;
+      using ContainerType = class TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
+#endif
 
     protected:
       First_ _first;
@@ -495,20 +506,6 @@ namespace FEAST
         first()(index, value);
       }
 
-#ifdef FEAST_COMPILER_MICROSOFT
-      // compiler hack...
-      void set_vec(DataType * const pval_set) const
-      {
-        static_assert(sizeof...(First_) == std::size_t(1), "invalid TupleVector size");
-        this->first().set_vec(pval_set);
-      }
-
-      void set_vec_inv(const DataType * const pval_set)
-      {
-        static_assert(sizeof...(First_) == std::size_t(1), "invalid TupleVector size");
-        this->first().set_vec_inv(pval_set);
-      }
-#else // all other compilers
       void set_vec(DataType * const pval_set) const
       {
         this->first().set_vec(pval_set);
@@ -518,7 +515,6 @@ namespace FEAST
       {
         this->first().set_vec_inv(pval_set);
       }
-#endif
 
       /**
        * \brief Convertion method
@@ -527,9 +523,16 @@ namespace FEAST
        *
        * Use source vector content as content of current vector
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const TupleVector<typename TupleVector::template ContainerType<Mem2_, DT2_, IT2_> > & other)
+#ifdef FEAST_COMPILER_MICROSOFT
+      template <typename Mem2_, typename DT2_, typename IT2_, typename... Dummy_>
+      void convert(const ContainerType<Mem2_, DT2_, IT2_, Dummy_...>& other)
       {
+        static_assert(sizeof...(Dummy_) == std::size_t(0), "invalid TupleVector size");
+#else
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const ContainerType<Mem2_, DT2_, IT2_>& other)
+      {
+#endif
         CONTEXT("When converting TupleVector");
 
         this->first().convert(other.first());
