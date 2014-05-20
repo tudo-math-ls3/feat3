@@ -10,7 +10,7 @@ def configure_clang(cpu, buildid):
   print ("Detected clang version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
   if major < 3  or (major == 3 and minor < 3):
-    print ("Clang Compiler version less then 3.3 is not supported, please update your compiler!")
+    print ("Error: Clang Compiler version less then 3.3 is not supported, please update your compiler!")
     sys.exit(1)
 
   cxxflags = "-pipe  -std=c++11 -ggdb -fcolor-diagnostics -m64"
@@ -27,7 +27,7 @@ def configure_clang(cpu, buildid):
     cxxflags += " -O3"
     if cpu == "unknown":
       cxxflags += " -mtune=generic"
-      print ("cpu type not detected, using -mtune=generic instead.")
+      print ("Warning: cpu type not detected, using -mtune=generic instead.")
 
     # INTEL
     elif cpu == "i486":
@@ -101,6 +101,6 @@ def configure_clang(cpu, buildid):
 
     else:
       cxxflags += " -march=native"
-      print ("Detected cpu type not supported by configure_clang.py, using -march=native instead.")
+      print ("Warning: Detected cpu type not supported by configure_clang.py, using -march=native instead.")
 
   return cxxflags

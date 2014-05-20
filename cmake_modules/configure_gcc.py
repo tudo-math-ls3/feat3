@@ -11,7 +11,7 @@ def configure_gcc(cpu, buildid):
   print ("Detected gcc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
   if major < 4  or (major == 4 and minor < 7):
-    print ("GNU Compiler version less then 4.7 is not supported, please update your compiler!")
+    print ("Error: GNU Compiler version less then 4.7 is not supported, please update your compiler!")
     sys.exit(1)
 
   cxxflags = "-pipe -std=c++11 -ggdb"
@@ -40,7 +40,7 @@ def configure_gcc(cpu, buildid):
     cxxflags += " -O3"
     if cpu == "unknown":
       cxxflags += " -mtune=generic"
-      print ("cpu type not detected, using -mtune=generic instead.")
+      print ("Warning: cpu type not detected, using -mtune=generic instead.")
 
     # INTEL
     elif cpu == "i486":
@@ -138,6 +138,6 @@ def configure_gcc(cpu, buildid):
 
     else:
       cxxflags += " -march=native"
-      print ("Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
+      print ("Warning: Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
 
   return cxxflags

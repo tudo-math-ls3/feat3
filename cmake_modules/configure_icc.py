@@ -10,7 +10,7 @@ def configure_icc(cpu, buildid):
   print ("Detected icc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
   if major < 14  or (major == 14 and minor == 0 and minor2 < 1):
-    print ("Intel Compiler version less then 14.0.2 is not supported, please update your compiler!")
+    print ("Error: Intel Compiler version less then 14.0.2 is not supported, please update your compiler!")
     sys.exit(1)
 
   cxxflags = "-std=c++11 -g"
@@ -26,7 +26,7 @@ def configure_icc(cpu, buildid):
     if cpu == "unknown":
       # generate code for every simd unit, existing so far
       cxxflags += " -axCORE-AVX2"
-      print ("cpu type not detected, using generic sse support instead.")
+      print ("Warning: cpu type not detected, using generic sse support instead.")
 
     # INTEL
     elif cpu == "i486":
@@ -47,7 +47,7 @@ def configure_icc(cpu, buildid):
       cxxflags += " -xsse2"
     elif cpu == "coreduo":
       cxxflags += " -xsse3"
-    elif cpu == "pentryn":
+    elif cpu == "penryn":
       cxxflags += " -xsse4.1"
     elif cpu == "nehalem":
       cxxflags += " -xsse4.2"
@@ -100,7 +100,7 @@ def configure_icc(cpu, buildid):
     elif cpu == "magnycours":
       cxxflags += " -msse3"
     else:
-      print ("Detected cpu type not supported by configure_icc.py, using generic sse support instead")
+      print ("Warning: Detected cpu type not supported by configure_icc.py, using generic sse support instead")
       # generate code for every simd unit, existing so far
       cxxflags += " -axCORE-AVX2"
 
