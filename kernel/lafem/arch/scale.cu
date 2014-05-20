@@ -1,5 +1,8 @@
 // includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/scale.hpp>
+#include <kernel/util/exception.hpp>
 
 namespace FEAST
 {
@@ -34,6 +37,12 @@ void Scale<Mem::CUDA, Algo::CUDA>::value(DT_ * r, const DT_ * const x, const DT_
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_scale<<<grid, block>>>(r, x, s, size);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Scale<Mem::CUDA, Algo::CUDA>::value(float *, const float * const, const float, const Index);
 template void Scale<Mem::CUDA, Algo::CUDA>::value(double *, const double * const, const double, const Index);

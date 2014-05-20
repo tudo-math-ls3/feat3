@@ -1,8 +1,10 @@
 // includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
-#include "cusparse_v2.h"
+#include <kernel/util/exception.hpp>
 
 namespace FEAST
 {
@@ -74,6 +76,12 @@ void Defect<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_defect_csr<<<grid, block>>>(r, rhs, x, val, col_ind, row_ptr, rows);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Defect<Mem::CUDA, Algo::CUDA>::csr(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
 template void Defect<Mem::CUDA, Algo::CUDA>::csr(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
@@ -98,6 +106,12 @@ void Defect<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const rhs, const DT
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_defect_ell<<<grid, block>>>(r, rhs, x, Ax, Aj, Arl, stride, rows);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Defect<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
 template void Defect<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);

@@ -1,5 +1,8 @@
 // includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
+#include <kernel/util/exception.hpp>
 #include "cusparse_v2.h"
 
 namespace FEAST
@@ -92,6 +95,12 @@ void ProductMatVec<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const val, c
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_product_matvec_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::csr(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::csr(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
@@ -127,6 +136,12 @@ void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const Ax, co
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_product_matvec_ell<<<grid, block>>>(r, x, Ax, Aj, Arl, stride, rows);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);

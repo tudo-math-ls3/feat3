@@ -1,9 +1,12 @@
 // includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/sum.hpp>
+#include <kernel/util/exception.hpp>
 
 namespace FEAST
 {
@@ -139,6 +142,12 @@ void Axpy<Mem::CUDA, Algo::CUDA>::dv(DT_ * r, const DT_ a, const DT_ * const x, 
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_axpy<<<grid, block>>>(r, a, x, y, size);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 
 template void Axpy<Mem::CUDA, Algo::CUDA>::dv(float *, const float, const float * const, const float * const, const Index);
@@ -154,6 +163,12 @@ void Axpy<Mem::CUDA, Algo::CUDA>::dv(DT_ * r, const DT_ * const a, const DT_ * c
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_axpyv<<<grid, block>>>(r, a, x, y, size);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Axpy<Mem::CUDA, Algo::CUDA>::dv(float *, const float * const, const float * const, const float * const, const Index);
 template void Axpy<Mem::CUDA, Algo::CUDA>::dv(double *, const double * const, const double * const, const double * const, const Index);
@@ -168,6 +183,12 @@ void Axpy<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x,
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_axpy_mv_csr<<<grid, block>>>(r, a, x, y, val, col_ind, row_ptr, rows);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Axpy<Mem::CUDA, Algo::CUDA>::csr(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
 template void Axpy<Mem::CUDA, Algo::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
@@ -192,6 +213,12 @@ void Axpy<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const a, const DT_ * 
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_axpy_mv_v_csr<<<grid, block>>>(r, a, x, y, val, col_ind, row_ptr, rows);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Axpy<Mem::CUDA, Algo::CUDA>::csr(float *, const float * const, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
 template void Axpy<Mem::CUDA, Algo::CUDA>::csr(double *, const double * const, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
@@ -216,6 +243,12 @@ void Axpy<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x,
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_axpy_mv_ell<<<grid, block>>>(r, a, x, y, Ax, Aj, Arl, stride, rows);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 
 template void Axpy<Mem::CUDA, Algo::CUDA>::ell(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
@@ -233,6 +266,12 @@ void Axpy<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const a, const DT_ * 
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAST::LAFEM::Intern::cuda_axpy_mv_v_ell<<<grid, block>>>(r, a, x, y, Ax, Aj, Arl, stride, rows);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 
 template void Axpy<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index);

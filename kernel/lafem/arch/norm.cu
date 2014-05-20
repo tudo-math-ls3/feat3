@@ -1,5 +1,8 @@
 // includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/norm.hpp>
+#include <kernel/util/exception.hpp>
 
 // includes, CUDA
 #include <cublas.h>

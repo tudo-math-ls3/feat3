@@ -2,6 +2,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
+#include <kernel/util/exception.hpp>
 
 // includes, CUDA
 #include <cublas.h>
