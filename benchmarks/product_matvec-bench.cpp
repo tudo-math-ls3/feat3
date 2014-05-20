@@ -15,11 +15,21 @@ using namespace FEAST::LAFEM;
 template <typename Mem_>
 void run_bench(std::function<void (void)> func, double flops, double bytes)
 {
+  Index iters(1);
+  TimeStamp at, bt;
+  at.stamp();
+  func();
+  MemoryPool<Mem_>::synchronize();
+  bt.stamp();
+  double test_run_time(bt.elapsed(at));
+  std::cout<<"test time: "<<test_run_time<<std::endl;
+  if (test_run_time < 0.1)
+    iters = Index(0.1 / test_run_time) + 1;
+  std::cout<<"iters: "<<iters<<std::endl;
+
   std::vector<double> times;
-  Index iters(25);
   for (Index i(0) ; i < 10 ; ++i)
   {
-    TimeStamp at, bt;
     at.stamp();
     for (Index j(0) ; j < iters ; ++j)
     {
