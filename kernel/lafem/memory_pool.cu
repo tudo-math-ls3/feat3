@@ -91,13 +91,15 @@ void MemoryPool<Mem::CUDA>::release_memory(void * address)
 template <typename DT_>
 void MemoryPool<Mem::CUDA>::download(DT_ * dest, const DT_ * const src, const Index count)
 {
-  cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToHost);
+  if (cudaSuccess != cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToHost))
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::download failed!");
 }
 
 template <typename DT_>
 void MemoryPool<Mem::CUDA>::upload(DT_ * dest, const DT_ * const src, const Index count)
 {
-  cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyHostToDevice);
+  if (cudaSuccess != cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyHostToDevice))
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::upload failed!");
 }
 
 template <typename DT_>
@@ -105,7 +107,8 @@ DT_ MemoryPool<Mem::CUDA>::get_element(const DT_ * data, const Index index)
 {
   const void * src(data + index);
   DT_ value;
-  cudaMemcpy(&value, src, sizeof(DT_), cudaMemcpyDeviceToHost);
+  if (cudaSuccess != cudaMemcpy(&value, src, sizeof(DT_), cudaMemcpyDeviceToHost))
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::get_element failed!");
   return value;
 }
 
@@ -118,6 +121,9 @@ void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index
   block.x = blocksize;
   grid.x = (unsigned)ceil((count)/(double)(block.x));
   FEAST::LAFEM::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::set_memory failed!\n" + stringify(cudaGetErrorString(last_error)));
 }
 
 template <typename DT_>
@@ -126,7 +132,8 @@ void MemoryPool<Mem::CUDA>::copy(DT_ * dest, const DT_ * src, const Index count)
   if (dest == src)
     return;
 
-  cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToDevice);
+  if (cudaSuccess != cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToDevice))
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::copy failed!");
 }
 
 void MemoryPool<Mem::CUDA>::synchronize()
