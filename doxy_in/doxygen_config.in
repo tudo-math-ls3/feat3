@@ -678,6 +678,8 @@ WARN_LOGFILE           = ./doc/warnings.log
 INPUT                  = @FEAST_SOURCE_DIR@/test_system \
                          @FEAST_SOURCE_DIR@/kernel \
                          @FEAST_SOURCE_DIR@/applications \
+                         @FEAST_SOURCE_DIR@/tools \
+                         @FEAST_SOURCE_DIR@/benchmarks \
                          @FEAST_SOURCE_DIR@/doxy_in
 
 # This tag can be used to specify the character encoding of the source files
