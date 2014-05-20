@@ -307,8 +307,8 @@ namespace FEAST
        *
        * Use source vector content as content of current vector
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+      template <typename First2_, typename... Rest2_>
+      void convert(const TupleVector<First2_, Rest2_...>& other)
       {
         CONTEXT("When converting TupleVector");
 
@@ -524,13 +524,13 @@ namespace FEAST
        * Use source vector content as content of current vector
        */
 #ifdef FEAST_COMPILER_MICROSOFT
-      template <typename Mem2_, typename DT2_, typename IT2_, typename... Dummy_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_, Dummy_...>& other)
+      template <typename First2_, typename... Rest2_>
+      void convert(const TupleVector<First2_, Rest2_...>& other)
       {
-        static_assert(sizeof...(Dummy_) == std::size_t(0), "invalid TupleVector size");
+        static_assert(sizeof...(Rest2_) == std::size_t(0), "invalud TupleVector size");
 #else
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_>& other)
+      template <typename First2_>
+      void convert(const TupleVector<First2_>& other)
       {
 #endif
         CONTEXT("When converting TupleVector");
