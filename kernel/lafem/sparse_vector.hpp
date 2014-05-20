@@ -40,6 +40,89 @@ namespace FEAST
     class SparseVector : public Container<Mem_, DT_, IT_>, public VectorBase
     {
       private:
+        void _read_from_mtx(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          _read_from_mtx(file);
+          file.close();
+        }
+
+        void _read_from_mtx(std::istream& file)
+        {
+          Index rows;
+          Index nnz;
+          String line;
+          std::getline(file, line);
+          {
+            std::getline(file, line);
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srows(line, 0, end);
+            rows = (Index)atol(srows.c_str());
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scols(line, 0, end);
+            Index cols((Index)atol(scols.c_str()));
+            line.erase(0, end);
+            if (cols != 1)
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no sparse-vector-file");
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String snnz(line, 0, end);
+            nnz = (Index)atol(snnz.c_str());
+            line.erase(0, end);
+          }
+
+          DenseVector<Mem::Main, IT_, IT_> ind(nnz);
+          DenseVector<Mem::Main, DT_, IT_> val(nnz);
+
+          IT_ * pind(ind.elements());
+          DT_ * pval(val.elements());
+
+          while(!file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              break;
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            IT_ row((IT_)atol(srow.c_str()));
+            --row;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ tval((DT_)atof(sval.c_str()));
+
+            *pval = tval;
+            *pind = row;
+            ++pval;
+            ++pind;
+          }
+          SparseVector<Mem::Main, DT_, IT_> tmp(rows, val, ind);
+          tmp.sort();
+          this->assign(tmp);
+        }
+
         template <typename T1_, typename T2_>
         static void _insertion_sort(T1_ * key, T2_ * val1, Index size)
         {
@@ -165,6 +248,52 @@ namespace FEAST
           Container<Mem_, DT_, IT_>(std::forward<SparseVector>(other))
         {
           CONTEXT("When moving SparseVector");
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] mode The used file format.
+         * \param[in] filename The source file.
+         *
+         * Creates a vector based on the source file.
+         */
+        explicit SparseVector(FileMode mode, String filename) :
+          Container<Mem_, DT_, IT_>(0)
+        {
+          CONTEXT("When creating SparseVector");
+
+          switch(mode)
+          {
+            case FileMode::fm_mtx:
+              _read_from_mtx(filename);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] mode The used file format.
+         * \param[in] file The source filestream.
+         *
+         * Creates a vector based on the source filestream.
+         */
+        explicit SparseVector(FileMode mode, std::istream& file) :
+          Container<Mem_, DT_, IT_>(0)
+        {
+          CONTEXT("When creating SparseVector");
+
+          switch(mode)
+          {
+            case FileMode::fm_mtx:
+              _read_from_mtx(file);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
         }
 
         /**
@@ -380,6 +509,82 @@ namespace FEAST
                 && junk < used_elements())
               ++junk;
             _used_elements() -= junk;
+          }
+        }
+
+        /**
+         * \brief Write out vector to file.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out(FileMode mode, String filename) const
+        {
+          CONTEXT("When writing out SparseVector");
+
+          switch(mode)
+          {
+            case FileMode::fm_mtx:
+              write_out_mtx(filename);
+              break;
+            default:
+                throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Write out vector to file.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out(FileMode mode, std::ostream& file) const
+        {
+          CONTEXT("When writing out SparseVector");
+
+          switch(mode)
+          {
+            case FileMode::fm_mtx:
+              write_out_mtx(file);
+              break;
+            default:
+                throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Write out matrix to MatrixMarktet mtx file.
+         *
+         * \param[in] filename The file where the vector shall be stored.
+         */
+        void write_out_mtx(String filename) const
+        {
+          std::ofstream file(filename.c_str(), std::ofstream::out);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          write_out_mtx(file);
+          file.close();
+        }
+
+        /**
+         * \brief Write out matrix to MatrixMarktet mtx file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_mtx(std::ostream& file) const
+        {
+          SparseVector<Mem::Main, DT_, IT_> temp;
+          temp.convert(*this);
+
+          file << "%%MatrixMarket matrix coordinate real general" << std::endl;
+          file << temp.size() << " " << 1 << " " << temp.used_elements() << std::endl;
+
+          const Index u_elem(temp.used_elements());
+          const IT_ * pind(temp.indices());
+          const DT_ * pval(temp.elements());
+          for (Index i(0) ; i < u_elem ; ++i, ++pind, ++pval)
+          {
+              file << *pind+1 << " " << 1 << " " << std::scientific << *pval << std::endl;
           }
         }
 

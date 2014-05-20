@@ -46,6 +46,11 @@ public:
     TEST_CHECK_EQUAL(a(3), DT_(3));
     TEST_CHECK_EQUAL(a(2), DT_(0));
 
+    std::stringstream ts;
+    a.write_out(FileMode::fm_mtx, ts);
+    SparseVector<Mem::Main, DT_> j(FileMode::fm_mtx, ts);
+    TEST_CHECK_EQUAL(j, a);
+
     SparseVector<Mem_, DT_> b;
     b.convert(a);
     TEST_CHECK_EQUAL(a, b);
@@ -73,7 +78,6 @@ public:
     a.format();
     TEST_CHECK_EQUAL(a.used_elements(), Index(2));
     TEST_CHECK_EQUAL(a(3), DT_(0));
-
   }
 };
 SparseVectorTest<Mem::Main, float> cpu_sparse_vector_test_float;
