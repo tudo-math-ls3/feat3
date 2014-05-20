@@ -219,6 +219,8 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  set scratch directory for build files.")
   print ("note=text")
   print ("  set note for all runs.")
+  print ("nothirdparty")
+  print ("  do not use thirdparty libraries at all.")
   sys.exit();
 
 dump_filename = ""
@@ -226,6 +228,7 @@ scratch = ""
 sqlhost = "augias"
 sqlport = 3306
 note = ""
+nothirdparty = False
 
 for i in range(1, len(sys.argv)):
   if sys.argv[i].startswith("dump="):
@@ -238,6 +241,8 @@ for i in range(1, len(sys.argv)):
     scratch = sys.argv[i].replace("scratch=", "", 1)
   if sys.argv[i].startswith("note="):
     note = sys.argv[i].replace("note=", "", 1)
+  if sys.argv[i].startswith("nothirdparty"):
+    nothirdparty = True
 
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 myDB = pw.MySQLDatabase("feastdash", host=sqlhost, port=sqlport, user="feastdash", passwd="feastdash", threadlocals=True)
@@ -319,8 +324,10 @@ if random.choice([True, False]):
       os.unlink(i)
     else:
       print("Warning: Could not delete thirparty file: " + i)
-addition = addition + "-alglib"
-addition = addition + "-umfpack"
+
+if (not nothirdparty):
+  addition = addition + "-alglib"
+  addition = addition + "-umfpack"
 
 #iterate over all branches, that are queued for testing
 branches = BranchQueue.select()
