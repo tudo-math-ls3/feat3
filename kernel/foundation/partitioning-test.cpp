@@ -738,7 +738,7 @@ class PartitioningTest3D:
       for( Index j(0) ; j < 15 ; j++)
       {
         TEST_CHECK_EQUAL(p0.comm_halos.at(j)->get_overlap(), 0ul);
-        TEST_CHECK_EQUAL(p0.comm_halos.at(j)->get_level(), ref_level[j]);
+        TEST_CHECK_EQUAL(Index(p0.comm_halos.at(j)->get_level()), ref_level[j]);
         TEST_CHECK_EQUAL(p0.comm_halos.at(j)->get_other(), ref_other[j]);
         TEST_CHECK_EQUAL(p0.comm_halos.at(j)->size(), 1ul);
         TEST_CHECK_EQUAL(p0.comm_halos.at(j)->get_element(0), ref_element[j]);
