@@ -74,12 +74,12 @@ namespace FEAST
             std::getline(file,line);
             if (file.eof())
               throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
-            if (line.at(0) != '%')
+
+            String::size_type begin(line.find_first_not_of(" "));
+            if (line.at(begin) != '%')
               break;
           }
           {
-            std::getline(file, line);
-
             String::size_type begin(line.find_first_not_of(" "));
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));

@@ -84,9 +84,21 @@ namespace FEAST
           Index ue(0);
           String line;
           std::getline(file, line);
+          if (line.find("%%MatrixMarket matrix coordinate real general") == String::npos)
           {
-            std::getline(file, line);
+            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
+          }
+          while(!file.eof())
+          {
+            std::getline(file,line);
+            if (file.eof())
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
 
+            String::size_type begin(line.find_first_not_of(" "));
+            if (line.at(begin) != '%')
+              break;
+          }
+          {
             String::size_type begin(line.find_first_not_of(" "));
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
