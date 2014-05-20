@@ -1,12 +1,13 @@
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/util/time_stamp.hpp>
 #include <kernel/util/type_traits.hpp>
+#include <benchmarks/benchmark.hpp>
 
 #include <iostream>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
+using namespace FEAST::Benchmark;
 
 template <typename Algo_, typename VT_>
 void run()
@@ -22,44 +23,15 @@ void run()
   DenseVector<Mem_, DT_, IT_> y(size, DT_(4711));
   DT_ s(23);
 
-  std::vector<double> times;
-  const Index iters(25);
-  for (Index i(0) ; i < 25 ; ++i)
-  {
-    TimeStamp at, bt;
-    at.stamp();
-    for (Index j(0) ; j < iters ; ++j)
-    {
-      y.template axpy<Algo_>(x, y, s);
-    }
-    MemoryPool<Mem_>::synchronize();
-    bt.stamp();
-    times.push_back(bt.elapsed(at));
-  }
-
-  double mean(0);
-  for (auto & time : times)
-    mean += time;
-  mean /= DT_(times.size());
-  std::cout<<"TOE: "<<std::fixed<<mean<<std::endl;
   double flops(size);
   flops *= 2;
-  flops *= iters;
-  flops /= mean;
-  flops /= 1000; // kilo
-  flops /= 1000; // mega
-  flops /= 1000; // giga
-  std::cout<<"GFlop/s: "<<flops<<std::endl;
+
   double bytes(size);
   bytes *= 3;
   bytes *= sizeof(DT_);
-  bytes *= iters;
-  bytes /= mean;
-  bytes /= 1024; // kilo
-  bytes /= 1024; // mega
-  bytes /= 1024; // giga
-  std::cout<<"GByte/s: "<<bytes<<std::endl;
-  std::cout<<"=============================================="<<std::endl;
+
+  auto func = [&] () { y.template axpy<Algo_>(x, y, s); };
+  run_bench<Mem_>(func, flops, bytes);
 }
 
 int main(int argc, char ** argv)

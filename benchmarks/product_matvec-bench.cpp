@@ -3,62 +3,14 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/pointstar_structure.hpp>
-#include <kernel/util/time_stamp.hpp>
 #include <kernel/util/type_traits.hpp>
+#include <benchmarks/benchmark.hpp>
 
 #include <iostream>
-#include <functional>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
-
-template <typename Mem_>
-void run_bench(std::function<void (void)> func, double flops, double bytes)
-{
-  Index iters(1);
-  TimeStamp at, bt;
-  at.stamp();
-  func();
-  MemoryPool<Mem_>::synchronize();
-  bt.stamp();
-  double test_run_time(bt.elapsed(at));
-  std::cout<<"test time: "<<test_run_time<<std::endl;
-  if (test_run_time < 0.1)
-    iters = Index(0.1 / test_run_time) + 1;
-  std::cout<<"iters: "<<iters<<std::endl;
-
-  std::vector<double> times;
-  for (Index i(0) ; i < 10 ; ++i)
-  {
-    at.stamp();
-    for (Index j(0) ; j < iters ; ++j)
-    {
-      func();
-    }
-    MemoryPool<Mem_>::synchronize();
-    bt.stamp();
-    times.push_back(bt.elapsed(at));
-  }
-
-  double mean(0);
-  for (auto & time : times)
-    mean += time;
-  mean /= double(times.size());
-  std::cout<<"TOE: "<<std::fixed<<mean<<std::endl;
-  flops *= iters;
-  flops /= mean;
-  flops /= 1000; // kilo
-  flops /= 1000; // mega
-  flops /= 1000; // giga
-  std::cout<<"GFlop/s: "<<flops<<std::endl;
-  bytes *= iters;
-  bytes /= mean;
-  bytes /= 1024; // kilo
-  bytes /= 1024; // mega
-  bytes /= 1024; // giga
-  std::cout<<"GByte/s: "<<bytes<<std::endl;
-  std::cout<<"=============================================="<<std::endl;
-}
+using namespace FEAST::Benchmark;
 
 template <typename Algo_, typename SM_>
 void run()
@@ -93,7 +45,6 @@ void run()
   bytes += size;
   bytes *= sizeof(DT_);
 
-  //sys.template apply<Algo_>(x, b);
   auto func = [&] () { sys.template apply<Algo_>(x, b); };
   run_bench<Mem_>(func, flops, bytes);
 
