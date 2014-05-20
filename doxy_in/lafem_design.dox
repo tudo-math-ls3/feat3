@@ -36,6 +36,19 @@ double d = vector1.dot<Algo::Generic>(vector2);
 system_matrix.apply<Algo::CUDA>(y, rhs);
 \endcode
 
+\note
+You need to announce the operation as a template, if you call it from inside a function or class, which is a template itself.
+\code{.cpp}
+template <typename bazz>
+void foo()
+{
+  // compute dot product
+  double d = vector1.template dot<Algo::Generic>(vector2);
+  // compute matrix vector product
+  system_matrix.template apply<Algo::CUDA>(y, rhs);
+}
+\endcode
+
 \section lafem_sec_data_handling Data handling
 All containers provide at least three different member functions for proper conversion and data movement.
 
