@@ -51,6 +51,73 @@ namespace FEAST
     class DenseVector : public Container<Mem_, DT_, IT_>, public VectorBase
     {
       private:
+        void _read_from_mtx(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          _read_from_mtx(file);
+          file.close();
+        }
+
+        void _read_from_mtx(std::istream& file)
+        {
+          Index rows;
+          String line;
+          std::getline(file, line);
+          if (line.find("%%MatrixMarket matrix array real general") == String::npos)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-vector-file");
+          }
+          while(!file.eof())
+          {
+            std::getline(file,line);
+            if (file.eof())
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+            if (line.at(0) != '%')
+              break;
+          }
+          {
+            std::getline(file, line);
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srows(line, 0, end);
+            rows = (Index)atol(srows.c_str());
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scols(line, 0, end);
+            Index cols((Index)atol(scols.c_str()));
+            line.erase(0, end);
+            if (cols != 1)
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no dense-vector-file");
+          }
+
+          DenseVector<Mem::Main, DT_, IT_> tmp(rows);
+          DT_ * pval(tmp.elements());
+
+          while(!file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              break;
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String sval(line, 0, end);
+            DT_ tval((DT_)atof(sval.c_str()));
+
+            *pval = tval;
+            ++pval;
+          }
+          this->assign(tmp);
+        }
+
         void _read_from_exp(String filename)
         {
           std::ifstream file(filename.c_str(), std::ifstream::in);
@@ -237,6 +304,9 @@ namespace FEAST
 
           switch(mode)
           {
+            case FileMode::fm_mtx:
+              _read_from_mtx(filename);
+              break;
             case FileMode::fm_exp:
               _read_from_exp(filename);
               break;
@@ -263,6 +333,9 @@ namespace FEAST
 
           switch(mode)
           {
+            case FileMode::fm_mtx:
+              _read_from_mtx(file);
+              break;
             case FileMode::fm_exp:
               _read_from_exp(file);
               break;
@@ -371,6 +444,9 @@ namespace FEAST
 
           switch(mode)
           {
+            case FileMode::fm_mtx:
+              write_out_mtx(filename);
+              break;
             case FileMode::fm_exp:
               write_out_exp(filename);
               break;
@@ -394,6 +470,9 @@ namespace FEAST
 
           switch(mode)
           {
+            case FileMode::fm_mtx:
+              write_out_mtx(file);
+              break;
             case FileMode::fm_exp:
               write_out_exp(file);
               break;
@@ -402,6 +481,41 @@ namespace FEAST
               break;
             default:
               throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Write out matrix to MatrixMarktet mtx file.
+         *
+         * \param[in] filename The file where the vector shall be stored.
+         */
+        void write_out_mtx(String filename) const
+        {
+          std::ofstream file(filename.c_str(), std::ofstream::out);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          write_out_mtx(file);
+          file.close();
+        }
+
+        /**
+         * \brief Write out matrix to MatrixMarktet mtx file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_mtx(std::ostream& file) const
+        {
+          DenseVector<Mem::Main, DT_, IT_> temp;
+          temp.convert(*this);
+
+          const Index tsize(temp.size());
+          file << "%%MatrixMarket matrix array real general" << std::endl;
+          file << tsize << " " << 1 << std::endl;
+
+          const DT_ * pval(temp.elements());
+          for (Index i(0) ; i < tsize ; ++i, ++pval)
+          {
+              file << std::scientific << *pval << std::endl;
           }
         }
 

@@ -93,18 +93,24 @@ public:
     for (Index i(0) ; i < k.size() ; ++i)
       k(i, DT_(i) / DT_(12));
 
-    std::stringstream ts;
-    k.write_out(FileMode::fm_exp, ts);
-    DenseVector<Mem_, DT_> l(FileMode::fm_exp, ts);
+    std::stringstream mts;
+    k.write_out(FileMode::fm_mtx, mts);
+    DenseVector<Mem_, DT_> l(FileMode::fm_mtx, mts);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-4);
+
+    std::stringstream ts;
+    k.write_out(FileMode::fm_exp, ts);
+    DenseVector<Mem_, DT_> m(FileMode::fm_exp, ts);
+    for (Index i(0) ; i < k.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-4);
 
     BinaryStream bs;
     k.write_out(FileMode::fm_dv, bs);
     bs.seekg(0);
-    DenseVector<Mem_, DT_> m(FileMode::fm_dv, bs);
+    DenseVector<Mem_, DT_> n(FileMode::fm_dv, bs);
     for (Index i(0) ; i < k.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-5);
+      TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), 1e-5);
   }
 };
 DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;
