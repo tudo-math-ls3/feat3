@@ -599,8 +599,8 @@ namespace FEAST
               {
                 for(j = 0; j < epr[k+i]; ++j)
                 {
-                  col_idx[ior[k+i]+2*n*epr[k+i]+j+epr[k+i]] += rps;
-                  col_idx[ior[neq-k-i]-2*n*epr[k+i]-j-epr[k+i]-1] -= rps;
+                  col_idx[ior[k+i]+2*n*epr[k+i]+j+epr[k+i]] += IndexType_(rps);
+                  col_idx[ior[neq-k-i]-2*n*epr[k+i]-j-epr[k+i]-1] -= IndexType_(rps);
                 }
               }
               epr[k+i] *= 2;
@@ -614,8 +614,8 @@ namespace FEAST
               {
                 for(j = 0; j < epr[k+i]; ++j)
                 {
-                  col_idx[ior[k+i]+3*n*epr[k+i]+j+2*epr[k+i]] += rps;
-                  col_idx[ior[neq-k-i]-3*n*epr[k+i]-j-2*epr[k+i]-1] -= rps;
+                  col_idx[ior[k+i]+3*n*epr[k+i]+j+2*epr[k+i]] += IndexType_(rps);
+                  col_idx[ior[neq-k-i]-3*n*epr[k+i]-j-2*epr[k+i]-1] -= IndexType_(rps);
                 }
               }
               epr[k+i] *= 3;
@@ -631,7 +631,7 @@ namespace FEAST
 
         // finally, update col_idx
         for(i = 0; i < nnze; ++i)
-          col_idx[i] -= neq;
+          col_idx[i] -= IndexType_(neq);
 
         // return the matrix
         return SparseMatrixCSR<Mem::Main, DataType_, IndexType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
@@ -693,7 +693,7 @@ namespace FEAST
                             const std::vector<DataType_> & dimensions) :
         _num_of_subintervalls(num_of_subintervalls),
         _dimensions(dimensions),
-        _d(_dimensions.size())
+        _d(Index(_dimensions.size()))
       {
         ASSERT(_d >= Index(1), "You need at least 1 dimension");
         ASSERT(_d + 1 == _num_of_subintervalls.size(), "Vector-sizes do not match (n_1 = n_2 + 1)!");

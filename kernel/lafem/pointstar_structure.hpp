@@ -45,7 +45,7 @@ namespace FEAST
         const IndexType_ * const pnos(num_of_subintervalls.data());
 
         // get number of dimensions
-        const Index d(num_of_subintervalls.size());
+        const Index d(Index(num_of_subintervalls.size()));
 
         // output of errors if wrong input
         ASSERT(d >= IndexType_(1), "You need at least 1 dimension");
@@ -60,7 +60,7 @@ namespace FEAST
         Index noo(1);
         for (Index i(0); i < d; ++i)
         {
-          size *= pnos[i] * fe_order - 1;
+          size *= pnos[i] * IndexType_(fe_order) - 1;
           noo *=  2 * fe_order + 1;
         }
 
@@ -123,7 +123,7 @@ namespace FEAST
       {
         const IndexType_ * const pnos(num_of_subintervalls.data());
 
-        const Index d(num_of_subintervalls.size() - 1);
+        const Index d(Index(num_of_subintervalls.size()) - 1);
 
         // calculate dimension of the matrix
         IndexType_ size(1);
