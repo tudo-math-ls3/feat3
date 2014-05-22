@@ -77,10 +77,14 @@ namespace FEAST
           Index ue(0);
           String line;
           std::getline(file, line);
-          if (line.find("%%MatrixMarket matrix coordinate real general") == String::npos)
+          const bool general((line.find("%%MatrixMarket matrix coordinate real general") != String::npos) ? true : false);
+          const bool symmetric((line.find("%%MatrixMarket matrix coordinate real symmetric") != String::npos) ? true : false);
+
+          if (symmetric == false && general == false)
           {
             throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
           }
+
           while(!file.eof())
           {
             std::getline(file,line);
@@ -109,6 +113,7 @@ namespace FEAST
             _columns() = col;
             _size() = this->rows() * this->columns();
           }
+
           while(!file.eof())
           {
             std::getline(file, line);
@@ -127,7 +132,7 @@ namespace FEAST
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String scol(line, 0, end);
-            Index col((Index)atol(scol.c_str()));
+            IT_ col((IT_)atol(scol.c_str()));
             --col;
             line.erase(0, end);
 
@@ -137,8 +142,13 @@ namespace FEAST
             String sval(line, 0, end);
             DT_ tval((DT_)atof(sval.c_str()));
 
-            entries[row].insert(std::pair<IT_, DT_>(col, tval));
+            entries[(unsigned int)row].insert(std::pair<IT_, DT_>(col, tval));
             ++ue;
+            if (symmetric == true && row != col)
+            {
+              entries[(unsigned int)col].insert(std::pair<IT_, DT_>(row, tval));
+              ++ue;
+            }
           }
           _size() = this->rows() * this->columns();
           _used_elements() = ue;
