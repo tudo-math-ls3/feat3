@@ -39,26 +39,26 @@ namespace FEAST
        * The m^d x m^d FE-stye pointstar matrix.
        */
       template<typename DataType_, typename IndexType_>
-      static SparseMatrixBanded<Mem::Main, DataType_, IndexType_> value(const Index fe_order,
+      static SparseMatrixBanded<Mem::Main, DataType_, IndexType_> value(const IndexType_ fe_order,
                                                             const std::vector<IndexType_> & num_of_subintervalls)
       {
         // get number of dimensions
-        const Index d(num_of_subintervalls.size());
+        const Index d(IndexType_(num_of_subintervalls.size()));
 
         // save pointer of input-vector
         const IndexType_ * const pnos(num_of_subintervalls.data());
 
         // output of errors if wrong input
-        ASSERT(d >= Index(1), "You need at least 1 dimension");
+        ASSERT(d >= IndexType_(1), "You need at least 1 dimension");
 
-        for (Index i(0); i < d; ++i)
+        for (IndexType_ i(0); i < d; ++i)
         {
-          ASSERT(pnos[i] >= Index(3), "You need at least 3 subintervalls per dimension");
+          ASSERT(pnos[i] >= IndexType_(3), "You need at least 3 subintervalls per dimension");
         }
 
         // calculate size of matrix and number of offsets
         IndexType_ size(1);
-        Index noo(1);
+        IndexType_ noo(1);
         for (Index i(0); i < d; ++i)
         {
           size *= pnos[i] * fe_order - 1;
@@ -71,21 +71,21 @@ namespace FEAST
 
         // fill offsets-vector
         IndexType_ * const poffsets(vec_offsets.elements());
-        const Index h_off((noo - 1) / 2);
+        const IndexType_ h_off((noo - 1) / 2);
 
         // save position of main-diagonal
         poffsets[h_off] = size - 1;
 
-        for (Index i(0), k(1), m(1); i < d; ++i, k *= 2 * fe_order + 1, m *= pnos[i - 1] * fe_order - 1)
+        for (IndexType_ i(0), k(1), m(1); i < d; ++i, k *= 2 * fe_order + 1, m *= pnos[i - 1] * fe_order - 1)
         {
-          Index k1((k - 1) / 2);
+          IndexType_ k1((k - 1) / 2);
 
-          for (Index j(1); j <= fe_order; ++j)
+          for (IndexType_ j(1); j <= fe_order; ++j)
           {
-            for (Index l(0); l < k; ++l)
+            for (IndexType_ l(0); l < k; ++l)
             {
-              poffsets[h_off - k1 + l + k * j] = poffsets[h_off - k1 + l] + IndexType_(j * m);
-              poffsets[h_off - k1 + l - k * j] = poffsets[h_off - k1 + l] - IndexType_(j * m);
+              poffsets[h_off - k1 + l + k * j] = poffsets[h_off - k1 + l] + j * m;
+              poffsets[h_off - k1 + l - k * j] = poffsets[h_off - k1 + l] - j * m;
             }
           }
         }
@@ -122,7 +122,7 @@ namespace FEAST
       template<typename DataType_>
       static SparseMatrixBanded<Mem::Main, DataType_> value(const DenseVector<Mem::Main, Index> & num_of_subintervalls)
       {
-        const Index d(num_of_subintervalls.size() - 1);
+        const Index d(Index(num_of_subintervalls.size()) - 1);
         const Index * const pnos(num_of_subintervalls.elements());
 
         // calculate dimension of the matrix

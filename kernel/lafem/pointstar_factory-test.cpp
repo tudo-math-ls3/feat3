@@ -141,7 +141,7 @@ public:
     num_of_nodes2.push_back(4);
     num_of_nodes2.push_back(3);
 
-    MatrixType b(PointstarStructureFE<Algo::Generic>::value<DataType_>(3, num_of_nodes2));
+    MatrixType b(PointstarStructureFE<Algo::Generic>::value<DataType_>(Index(3), num_of_nodes2));
   }
 };
 
