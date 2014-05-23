@@ -372,7 +372,7 @@ public:
         }
       }
 
-      b.transpose();
+      b = b.transpose();
 
       TEST_CHECK_EQUAL(a, b);
     }

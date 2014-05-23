@@ -1406,13 +1406,15 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow this^\top \f$
+         * \brief Calculate \f$this^\top \f$
+         *
+         * \return The transposed matrix
          */
-        void transpose()
+        SparseMatrixCSR transpose()
         {
-          SparseMatrixCSR<Mem_, DT_, IT_> x_t;
+          SparseMatrixCSR x_t;
           x_t.transpose(*this);
-          this->assign(x_t);
+          return x_t;
         }
 
         /**
