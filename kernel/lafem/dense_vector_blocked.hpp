@@ -183,6 +183,8 @@ namespace FEAST
          *
          * Create a deep copy of itself.
          *
+         * \return A deep copy of itself.
+         *
          */
         DenseVectorBlocked clone() const
         {
@@ -423,10 +425,11 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$r \leftarrow this \cdot x\f$
+         * \brief Calculate \f$this \leftarrow this \cdot x\f$
          *
-         * \param[out] r The dot product result.
          * \param[in] x The other vector.
+         *
+         * \return The calculated dot product.
          */
         template <typename Algo_>
         DataType dot(const DenseVectorBlocked & x) const
@@ -439,6 +442,8 @@ namespace FEAST
 
         /**
          * \brief Calculates and returns the euclid norm of this vector.
+         *
+         * \return The calculated norm.
          */
         template <typename Algo_>
         DT_ norm2() const
@@ -448,6 +453,8 @@ namespace FEAST
 
         /**
          * \brief Calculates and returns the squared euclid norm of this vector.
+         *
+         * \return The calculated norm.
          */
         template <typename Algo_>
         DT_ norm2sqr() const

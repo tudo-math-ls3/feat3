@@ -145,6 +145,8 @@ namespace FEAST
          *
          * Create a deep copy of itself.
          *
+         * \return A deep copy of itself.
+         *
          */
         DenseMatrix clone() const
         {

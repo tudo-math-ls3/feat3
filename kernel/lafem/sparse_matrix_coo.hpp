@@ -679,7 +679,10 @@ namespace FEAST
         /** \brief Clone operation
          *
          * Create a deep copy of itself.
+         *
          * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
+         *
+         * \return A deep copy of itself.
          *
          */
         SparseMatrixCOO clone(bool clone_indices = true) const
