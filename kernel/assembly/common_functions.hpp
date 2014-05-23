@@ -600,6 +600,140 @@ namespace FEAST
       }; // class DistanceFunction
 
       /**
+       * \brief Scaled and displaced analytic distance function
+       *
+       * This class implements the AnalyticFunction interface representing the scaled and displaced distance function
+       * \f$ f(x) = a + b \| x - x_0 \|_2 \f$
+       *
+       * This class supports function values, gradient and hessians for all dimensions.
+       *
+       * WARNING: Because the function is differentiable everywhere except for 0, Bad Things (TM) might happen if
+       * someone wants to compute the gradient or hessian there.
+       *
+       * \tparam ImgPointType_
+       * The type of \f$ x_0 \f$.
+       *
+       * \author Jordi Paul
+       */
+      template<typename ImgPointType_>
+      class DistanceFunctionSD :
+        public AnalyticFunction
+      {
+      public:
+        typedef typename ImgPointType_::DataType DataType;
+        /** \copydoc AnalyticFunction::FunctionCapabilites */
+        enum FunctionCapabilities
+        {
+          can_value = 1,
+          can_grad = 1,
+          can_hess = 1
+        };
+
+        /** \copydoc AnalyticFunction::ConfigTraits */
+        template<typename Config_>
+        struct ConfigTraits
+        {
+          struct TrafoConfig :
+            public Trafo::ConfigBase
+          {
+            enum
+            {
+              need_img_point = 1
+            };
+          };
+        };
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public AnalyticFunction::Evaluator<EvalTraits_>
+        {
+        public:
+          /// trafo evaluator data
+          typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
+          /// trafo data type
+          typedef typename EvalTraits_::TrafoData TrafoData;
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+          /// type for the points the analytic function is evaluated at
+          typedef typename EvalTraits_::ImagePointType ImgPointType;
+
+        private:
+          const DistanceFunctionSD& _function;
+
+        public:
+          explicit Evaluator(const DistanceFunctionSD& function) :
+            _function(function)
+          {
+          }
+
+          ValueType value(const TrafoData& tau) const
+          {
+            ImgPointType tmp (tau.img_point - _function._point);
+            return _function._a + _function._b*tmp.norm_euclid();
+          }
+
+          GradientType gradient(const TrafoData& tau) const
+          {
+            GradientType grad(DataType(0));
+            DataType norm(value(tau));
+
+            for(Index d(0); d < TrafoData::image_dim; ++d)
+              grad(d,tau.img_point[d] - _function._point(d));
+
+            return _function._b*grad/norm;
+          }
+
+          HessianType hessian(const TrafoData& tau) const
+          {
+            HessianType hess(DataType(0));
+            DataType norm(value(tau));
+            norm = DataType(1)/norm;
+            DataType denom = Math::sqr(_function._b)*Math::sqr(norm)*norm;
+
+            for(Index i(0); i < TrafoData::image_dim; ++i)
+            {
+              hess(i,i, DataType(1)*norm);
+              for(Index j(0); j < TrafoData::image_dim; ++i)
+                hess(i,j,
+                    ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
+            }
+
+            return hess;
+          }
+        }; // class DistanceFunctionSD::Evaluator<...>
+
+      private:
+        /// The point to which the distance to is calculated
+        ImgPointType_ _point;
+        /// Displacement of the function
+        DataType _a;
+        /// Scaling factor
+        DataType _b;
+
+      public:
+        /// Constructor
+        explicit DistanceFunctionSD(const ImgPointType_ x0_, const DataType a_, const DataType b_) :
+          _point(x0_),
+          _a(a_),
+          _b(b_)
+        {
+        }
+
+        /// Sets _point to x0_
+        void set_point(const ImgPointType_ x0_)
+        {
+          _point = x0_;
+        }
+      }; // class DistanceFunctionSD
+
+      /**
        * \brief Heaviside static function
        *
        * This class implements the StaticFunction interface representing the function
