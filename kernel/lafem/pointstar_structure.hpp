@@ -77,7 +77,7 @@ namespace FEAST
 
         for (Index i(0), k(1), m(1); i < d; ++i, k *= 2 * fe_order + 1, m *= pnos[i - 1] * fe_order - 1)
         {
-          IndexType_ k1((k - 1) / 2);
+          Index k1((k - 1) / 2);
 
           for (IndexType_ j(1); j <= fe_order; ++j)
           {
