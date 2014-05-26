@@ -200,6 +200,22 @@ public:
       SparseMatrixELL<Mem_,DT_, IT_> a(a_local);
 
       DenseVector<Mem_, DT_, IT_> r(size);
+
+      // apply-test for alpha = 0.0
+      a.template apply<Algo_>(r, x, y, DT_(0.0));
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), r(i), 1e-2);
+
+      // apply-test for alpha = -1.0
+      a.template apply<Algo_>(r, x, y, DT_(-1.0));
+      a.template apply<Algo_>(ref, x);
+      ref.template scale<Algo_>(ref, DT_(-1.0));
+      ref.template axpy<Algo_>(ref, y);
+
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(ref(i), r(i), 1e-2);
+
+      // apply-test for alpha = 4711.1
       //r.template axpy<Algo_>(s, a, x, y);
       a.template apply<Algo_>(r, x, y, s);
       result_local.copy(r);
