@@ -130,8 +130,7 @@ namespace FEAST
             ++pval;
             ++pind;
           }
-          SparseVector<Mem::Main, DT_, IT_> tmp(rows, val, ind);
-          tmp.sort();
+          SparseVector<Mem::Main, DT_, IT_> tmp(rows, val, ind, false);
           this->assign(tmp);
         }
 
@@ -219,12 +218,12 @@ namespace FEAST
          * \param[in] size The size of the created vector.
          * \param[in] elements A list of non zero elements.
          * \param[in] indices A list of non zero element indices.
-         *
-         * \note The elements must be sorted by their indices.
+         * \param[in] sorted Indicates, if the elements are sorted by their indices: sorted = true (default)
          *
          * Creates a vector with a given size.
          */
-        explicit SparseVector(Index size_in, DenseVector<Mem_, DT_, IT_> & elements_in, DenseVector<Mem_, IT_, IT_> & indices_in) :
+        explicit SparseVector(Index size_in, DenseVector<Mem_, DT_, IT_> & elements_in,
+                              DenseVector<Mem_, IT_, IT_> & indices_in, bool sorted = true) :
           Container<Mem_, DT_, IT_>(size_in)
         {
           CONTEXT("When creating SparseVector");
@@ -235,7 +234,7 @@ namespace FEAST
           this->_scalar_index.push_back(elements_in.size());
           this->_scalar_index.push_back(elements_in.size());
           this->_scalar_index.push_back(1000);
-          this->_scalar_index.push_back(1);
+          this->_scalar_index.push_back(sorted);
           this->_scalar_dt.push_back(DT_(0));
 
           this->_elements.push_back(elements_in.elements());
