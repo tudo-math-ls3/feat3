@@ -63,7 +63,7 @@ public:
   void asm_unit_quad_q0() const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create a quad mesh
     Geometry::UnitCubeFactory<QuadMesh> mesh_factory;

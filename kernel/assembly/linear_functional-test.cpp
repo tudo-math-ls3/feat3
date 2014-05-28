@@ -50,7 +50,7 @@ public:
   void test_unit_2d_q1(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -100,7 +100,7 @@ public:
   void test_unit_2d_q0(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -130,7 +130,7 @@ public:
     const Geometry::IndexSet<4> index_set(mesh.get_index_set<2,0>());
 
     // get the constant pi
-    const DataType_ pi = Math::Limits<DataType_>::pi();
+    const DataType_ pi = Math::pi<DataType_>();
 
     // loop over all quads
     for(Index i(0); i < num_quads; ++i)

@@ -57,7 +57,7 @@ public:
   // constructor
   TinyAlgebraTest(const std::string& test_name) :
     TaggedTest<Archs::None, DataType_>(test_name),
-    _eps(Math::Limits<DataType_>::epsilon())
+    _eps(Math::eps<DataType_>())
   {
   }
 

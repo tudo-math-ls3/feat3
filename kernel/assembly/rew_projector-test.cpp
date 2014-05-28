@@ -51,7 +51,7 @@ public:
   void test_unit_2d() const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.4));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
 
     // create coarse mesh
     Geometry::RefinedUnitCubeFactory<QuadMesh> unit_factory(3);

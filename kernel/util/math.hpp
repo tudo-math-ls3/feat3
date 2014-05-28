@@ -719,12 +719,6 @@ namespace FEAST
     class Limits :
       public std::numeric_limits<T_>
     {
-    public:
-      /// Returns the mathematical constant pi = 3.14...
-      static T_ pi()
-      {
-        return Math::pi<T_>();
-      }
     }; // class Limits<...>
 
 #ifdef FEAST_HAVE_QUADMATH

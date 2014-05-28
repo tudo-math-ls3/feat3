@@ -63,7 +63,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create a quad mesh
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
@@ -124,7 +124,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create a quad mesh
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
@@ -186,7 +186,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create a cube mesh
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
@@ -254,7 +254,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create a cube mesh
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
@@ -345,7 +345,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create a quad mesh
     Geometry::UnitCubeFactory<QuadMeshType> quad_mesh_factory;
@@ -412,7 +412,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create a quad mesh
     Geometry::UnitCubeFactory<QuadMeshType> quad_mesh_factory;
@@ -482,7 +482,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create a cube mesh
     Geometry::UnitCubeFactory<QuadMeshType> quad_mesh_factory;
@@ -556,7 +556,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create a cube mesh
     Geometry::UnitCubeFactory<QuadMeshType> quad_mesh_factory;

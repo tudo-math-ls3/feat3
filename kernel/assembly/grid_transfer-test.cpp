@@ -56,7 +56,7 @@ public:
   void test_unit_2d_q1(QuadMesh& mesh_f, QuadMesh& mesh_c) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create trafos
     QuadTrafo trafo_f(mesh_f);
@@ -135,7 +135,7 @@ public:
   void test_unit_2d_q1t(QuadMesh& mesh_f, QuadMesh& mesh_c) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
 
     // create trafos
     QuadTrafo trafo_f(mesh_f);

@@ -58,7 +58,7 @@ namespace FEAST
         _vec_dual(std::forward<VectorType>(vec_dual)),
         _volume(volume)
       {
-        ASSERT(_volume > Math::Limits<DT_>::epsilon(), "domain volume must not be zero");
+        ASSERT(_volume > Math::eps<DT_>(), "domain volume must not be zero");
       }
 
       /// move ctor
