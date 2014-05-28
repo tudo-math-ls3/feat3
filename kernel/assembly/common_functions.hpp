@@ -480,8 +480,8 @@ namespace FEAST
        *
        * This class supports function values, gradient and hessians for all dimensions.
        *
-       * WARNING: Because the function is differentiable everywhere except for 0, Bad Things (TM) might happen if
-       * someone wants to compute the gradient or hessian there.
+       * WARNING: Because the function is differentiable everywhere except for x_0, Bad Things (TM) might happen if
+       * someone wants to compute the gradient or hessian there, as the functions return 0.
        *
        * \tparam ImgPointType_
        * The type of \f$ x_0 \f$.
@@ -556,29 +556,43 @@ namespace FEAST
             GradientType grad(DataType(0));
             DataType norm(value(tau));
 
-            for(Index d(0); d < TrafoData::image_dim; ++d)
-              grad(d,tau.img_point[d] - _function._point(d));
+            if(norm <= Math::eps<DataType>())
+            {
+              return grad;
+            }
+            else
+            {
+              for(Index d(0); d < TrafoData::image_dim; ++d)
+                grad(d,tau.img_point[d] - _function._point(d));
 
-            return grad/norm;
+              return grad/norm;
+            }
           }
 
           HessianType hessian(const TrafoData& tau) const
           {
             HessianType hess(DataType(0));
             DataType norm(value(tau));
-            norm = DataType(1)/norm;
-            DataType denom = Math::sqr(norm)*norm;
-
-            for(Index i(0); i < TrafoData::image_dim; ++i)
+            if(norm <= Math::eps<DataType>())
             {
-              hess(i,i, DataType(1)*norm);
-              for(Index j(0); j < TrafoData::image_dim; ++i)
-                hess(i,j,
-                    ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
+              return hess;
             }
+            else
+            {
+              norm = DataType(1)/norm;
+              DataType denom = Math::sqr(norm)*norm;
+
+              for(Index i(0); i < TrafoData::image_dim; ++i)
+              {
+                hess(i,i, DataType(1)*norm);
+                for(Index j(0); j < TrafoData::image_dim; ++i)
+                  hess(i,j,
+                  ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
+              }
 
 
-            return hess;
+              return hess;
+            }
           }
         }; // class DistanceFunction::Evaluator<...>
 
@@ -607,8 +621,8 @@ namespace FEAST
        *
        * This class supports function values, gradient and hessians for all dimensions.
        *
-       * WARNING: Because the function is differentiable everywhere except for 0, Bad Things (TM) might happen if
-       * someone wants to compute the gradient or hessian there.
+       * WARNING: Because the function is differentiable everywhere except for x_0, Bad Things (TM) might happen if
+       * someone wants to compute the gradient or hessian there, as the functions return 0.
        *
        * \tparam ImgPointType_
        * The type of \f$ x_0 \f$.
@@ -683,29 +697,43 @@ namespace FEAST
           {
             GradientType grad(DataType(0));
             DataType norm(value(tau));
+            if(norm <= Math::eps<DataType>())
+            {
+              return grad;
+            }
+            else
+            {
 
-            for(Index d(0); d < TrafoData::image_dim; ++d)
-              grad(d,tau.img_point[d] - _function._point(d));
+              for(Index d(0); d < TrafoData::image_dim; ++d)
+                grad(d,tau.img_point[d] - _function._point(d));
 
-            return _function._b*grad/norm;
+              return _function._b*grad/norm;
+            }
           }
 
           HessianType hessian(const TrafoData& tau) const
           {
             HessianType hess(DataType(0));
             DataType norm(value(tau));
-            norm = DataType(1)/norm;
-            DataType denom = Math::sqr(_function._b)*Math::sqr(norm)*norm;
-
-            for(Index i(0); i < TrafoData::image_dim; ++i)
+            if(norm <= Math::eps<DataType>())
             {
-              hess(i,i, DataType(1)*norm);
-              for(Index j(0); j < TrafoData::image_dim; ++i)
-                hess(i,j,
-                    ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
+              return hess;
             }
+            else
+            {
+              norm = DataType(1)/norm;
+              DataType denom = Math::sqr(_function._b)*Math::sqr(norm)*norm;
 
-            return hess;
+              for(Index i(0); i < TrafoData::image_dim; ++i)
+              {
+                hess(i,i, DataType(1)*norm);
+                for(Index j(0); j < TrafoData::image_dim; ++i)
+                  hess(i,j,
+                  ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
+              }
+
+              return hess;
+            }
           }
         }; // class DistanceFunctionSD::Evaluator<...>
 
