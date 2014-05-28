@@ -48,6 +48,8 @@ namespace FEAST
       typedef typename First_::DataType DataType;
       /// sub-vector index-type
       typedef typename First_::IndexType IndexType;
+
+#ifdef FEAST_COMPILER_MICROSOFT
       /// helper class template for ContainerType template
       template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
       using ContHelper = typename RestClass::template
@@ -55,12 +57,21 @@ namespace FEAST
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
       using ContainerType = ContHelper<Mem2_, DT2_, IT2_>;
+#else
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      using ContainerType = TupleVector<
+        typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
+        typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
+#endif
 
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
         "sub-vectors have different mem-types");
       static_assert(std::is_same<DataType, typename RestClass::DataType>::value,
         "sub-vectors have different data-types");
+      static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value,
+        "sub-vectors have different index-types");
 
     protected:
       /// the first sub-vector
@@ -332,10 +343,10 @@ namespace FEAST
       typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;
-      template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
-      using ContHelper = class TupleVector<RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
 
 #ifdef FEAST_COMPILER_MICROSOFT
+      template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
+      using ContHelper = class TupleVector<RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
       template <typename Mem2_, typename DT2_, typename IT2_, typename... Dummy_>
       using ContainerType = class TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_>, Dummy_...>;
 #else
