@@ -34,6 +34,12 @@
 #    define FEAST_COMPILER "Intel C/C++ compiler"
 #  endif
 
+#define FEAST_DISABLE_WARNINGS _Pragma("warning(push,0)") \
+  _Pragma("warning(disable:177)") \    // variable "*" was declared but never referenced
+  _Pragma("warning(disable:858)")      // type qualifier on return type is meaningless
+
+#define FEAST_RESTORE_WARNINGS _Pragma("warning(pop)")
+
 #endif // !defined(FEAST_COMPILER) && defined(__INTEL_COMPILER)
 
 #endif // KERNEL_UTIL_COMPILER_INTEL_HPP

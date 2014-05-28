@@ -186,4 +186,34 @@ This macro can be defined to enable live-tracing of the context stack.
 
 <b>Effects:</b><br>
 If defined, the context live-trace system is enabled.
+
+<hr><hr>
+\section preproc_sec_misc Miscellaneous Macros
+This section enlists various macros which do not fit into any other section.
+
+\subsection ppm_feast_warnings FEAST_DISABLE_WARNINGS / FEAST_RESTORE_WARNINGS
+This macro pair can be used to modify the compiler's diagnostics settings to suppress warnings for the inclusion of
+third-party header includes.
+
+\attention This macro pair is meant only for third-party includes and shall \b not be used to suppress warning arising
+from FEAST code!
+
+\note This macro pair may not be supported by all compilers. Furthermore, some warnings cannot be disabled, so there is
+no guarantee that the compiler will remain quiet even if this macro pair is in use.
+
+<b>Example:</b><br>
+\code{.cpp}
+#include <kernel/base_header.hpp>
+
+// suppress warnings for third-party header
+FEAST_DISABLE_WARNINGS
+
+// include third-party header producing compiler warnings
+#include <thirdparty/some_library/wicked_header.h>
+
+// restore previous diagnostics settings
+FEAST_RESTORE_WARNINGS
+
+// ...
+\endcode
 **/

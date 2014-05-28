@@ -37,6 +37,9 @@
 #    define FEAST_COMPILER "Microsoft C/C++ compiler"
 #  endif
 
+#define FEAST_DISABLE_WARNINGS __pragma(warning(push, 0))
+#define FEAST_RESTORE_WARNINGS __pragma(warning(pop))
+
 // define the noinline specifier
 #define NOINLINE __declspec(noinline)
 

@@ -55,6 +55,15 @@
 #define NOINLINE
 #endif
 
+// If the compiler does not support disabling/restoring warnings, we'll define the corresponding
+// macros as empty.
+#ifndef FEAST_DISABLE_WARNINGS
+#define FEAST_DISABLE_WARNINGS
+#endif
+#ifndef FEAST_RESTORE_WARNINGS
+#define FEAST_RESTORE_WARNINGS
+#endif
+
 ///\endcond
 // end of block hidden from doxygen
 

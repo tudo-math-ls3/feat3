@@ -1,6 +1,8 @@
 #include <kernel/lafem/umfpack.hpp>
 #ifdef FEAST_HAVE_UMFPACK
+FEAST_DISABLE_WARNINGS
 #include <umfpack.h>
+FEAST_RESTORE_WARNINGS
 
 namespace FEAST
 {

@@ -28,6 +28,12 @@
 #  define FEAST_COMPILER "GNU C++ compiler 2.x.x (or older)"
 #endif
 
+#define FEAST_DISABLE_WARNINGS _Pragma("GCC diagnostic push") \
+  _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
+  _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"")
+
+#define FEAST_RESTORE_WARNINGS _Pragma("GCC diagnostic pop")
+
 // define the noinline specifier
 #define NOINLINE __attribute__((noinline))
 
