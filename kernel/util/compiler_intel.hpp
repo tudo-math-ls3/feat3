@@ -35,8 +35,8 @@
 #  endif
 
 #define FEAST_DISABLE_WARNINGS _Pragma("warning(push,0)") \
-  _Pragma("warning(disable:177)") \    // variable "*" was declared but never referenced
-  _Pragma("warning(disable:858)")      // type qualifier on return type is meaningless
+  _Pragma("warning(disable:177)") \
+  _Pragma("warning(disable:858)")
 
 #define FEAST_RESTORE_WARNINGS _Pragma("warning(pop)")
 
