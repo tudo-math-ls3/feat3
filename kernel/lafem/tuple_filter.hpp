@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/lafem/tuple_vector.hpp>
+#include <kernel/lafem/meta_element.hpp>
 
 namespace FEAST
 {
@@ -133,7 +134,6 @@ namespace FEAST
         static_assert(i_ < Index(num_blocks), "invalid sub-filter index");
         return TupleElement<i_, First_, Rest_...>::get(*this);
       }
-
 
       /** \copydoc UnitFilter::filter_rhs() */
       template<typename Algo_, typename Ty_, typename... Tv_>

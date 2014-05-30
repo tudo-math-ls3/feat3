@@ -3,7 +3,7 @@
 #define KERNEL_LAFEM_POWER_VECTOR_HPP 1
 
 // includes, FEAST
-#include <kernel/base_header.hpp>
+#include <kernel/lafem/meta_element.hpp>
 
 // includes, system
 #include <iostream>
@@ -30,15 +30,14 @@ namespace FEAST
     template<
       typename SubType_,
       Index count_>
-    class PowerVector :
-      protected PowerVector<SubType_, count_ - 1>
+    class PowerVector
     {
       // declare this class template as a friend for recursive inheritance
       template<typename, Index>
       friend class PowerVector;
 
       /// base-class typedef
-      typedef PowerVector<SubType_, count_ - 1> BaseClass;
+      typedef PowerVector<SubType_, count_ - 1> RestClass;
 
     public:
       /// sub-vector type
@@ -53,16 +52,14 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
       using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, count_>;
 
-      /// dummy enum
-      enum
-      {
         /// number of vector blocks
-        num_blocks = count_
-      };
+      static constexpr Index num_blocks = count_;
 
     protected:
-      /// the last sub-vector
-      SubVectorType _sub_vector;
+      /// the first sub-vector
+      SubVectorType _first;
+      /// the remaining part
+      RestClass _rest;
 
     public:
       /// default CTOR
@@ -77,8 +74,8 @@ namespace FEAST
        * The size of any sub-vector of this power-vector.
        */
       explicit PowerVector(Index sub_size) :
-        BaseClass(sub_size),
-        _sub_vector(sub_size)
+        _first(sub_size),
+        _rest(sub_size)
       {
       }
 
@@ -92,22 +89,22 @@ namespace FEAST
        * The value that the sub-vectors are to be initialised with.
        */
       explicit PowerVector(Index sub_size, DataType value) :
-        BaseClass(sub_size, value),
-        _sub_vector(sub_size, value)
+        _first(sub_size, value),
+        _rest(sub_size, value)
       {
       }
 
       /// base-class constructor; for internal use only
-      explicit PowerVector(BaseClass&& other_base, SubVectorType&& last_sub) :
-        BaseClass(std::move(other_base)),
-        _sub_vector(std::move(last_sub))
+      explicit PowerVector(SubVectorType&& the_first, RestClass&& the_rest) :
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest))
       {
       }
 
       /// move CTOR
       PowerVector(PowerVector&& other) :
-        BaseClass(static_cast<BaseClass&&>(other)),
-        _sub_vector(std::move(other._sub_vector))
+        _first(std::move(other._first)),
+        _rest(std::move(other._rest))
       {
       }
 
@@ -116,8 +113,8 @@ namespace FEAST
       {
         if(this != &other)
         {
-          base().operator=(static_cast<BaseClass&&>(other));
-          _sub_vector = std::move(other._sub_vector);
+          _first = std::move(other._first);
+          _rest = std::move(other._rest);
         }
         return *this;
       }
@@ -137,9 +134,7 @@ namespace FEAST
        */
       PowerVector clone() const
       {
-        SubVectorType s;
-        s.clone(_sub_vector);
-        return PowerVector(base().clone(), std::move(s));
+        return PowerVector(_first.clone(), _rest.clone());
       }
 
       /**
@@ -155,7 +150,7 @@ namespace FEAST
       SubVectorType& at()
       {
         static_assert(i_ < count_, "invalid sub-vector index");
-        return static_cast<PowerVector<SubType_, i_+1>&>(*this)._sub_vector;
+        return PowerElement<i_, SubVectorType>::get(*this);
       }
 
       /** \copydoc at() */
@@ -163,28 +158,28 @@ namespace FEAST
       const SubVectorType& at() const
       {
         static_assert(i_ < count_, "invalid sub-vector index");
-        return static_cast<const PowerVector<SubType_, i_+1>&>(*this)._sub_vector;
+        return PowerElement<i_, SubVectorType>::get(*this);
       }
 
       /// \cond internal
-      SubVectorType& last()
+      SubVectorType& first()
       {
-        return _sub_vector;
+        return _first;
       }
 
-      const SubVectorType& last() const
+      const SubVectorType& first() const
       {
-        return _sub_vector;
+        return _first;
       }
 
-      PowerVector<SubType_, count_ - 1>& base()
+      RestClass& rest()
       {
-        return static_cast<BaseClass&>(*this);
+        return _rest;
       }
 
-      const PowerVector<SubType_, count_ - 1>& base() const
+      const RestClass& rest() const
       {
-        return static_cast<const BaseClass&>(*this);
+        return _rest;
       }
       /// \endcond
 
@@ -197,7 +192,7 @@ namespace FEAST
       /// Returns the total number of scalar entries of this power-vector.
       Index size() const
       {
-        return base().size() + last().size();
+        return first().size() + rest().size();
       }
 
       /**
@@ -208,8 +203,8 @@ namespace FEAST
        */
       void format(DataType value = DataType(0))
       {
-        base().format(value);
-        last().format(value);
+        first().format(value);
+        rest().format(value);
       }
 
       /// Returns a descriptive string for this container.
@@ -226,8 +221,8 @@ namespace FEAST
       template<typename SubType2_>
       void copy(const PowerVector<SubType2_, count_>& x)
       {
-        base().copy(x.base());
-        last().copy(x.last());
+        first().copy(x.first());
+        rest().copy(x.rest());
       }
 
       /**
@@ -245,8 +240,8 @@ namespace FEAST
       template<typename Algo_>
       void axpy(const PowerVector& x, const PowerVector& y, DataType alpha = DataType(1))
       {
-        base().template axpy<Algo_>(x.base(), y.base(), alpha);
-        last().template axpy<Algo_>(x.last(), y.last(), alpha);
+        first().template axpy<Algo_>(x.first(), y.first(), alpha);
+        rest().template axpy<Algo_>(x.rest(), y.rest(), alpha);
       }
 
       /**
@@ -258,8 +253,8 @@ namespace FEAST
       template <typename Algo_>
       void component_product(const PowerVector & x, const PowerVector & y)
       {
-        base().template component_product<Algo_>(x.base(), y.base());
-        last().template component_product<Algo_>(x.last(), y.last());
+        first().template component_product<Algo_>(x.first(), y.first());
+        rest().template component_product<Algo_>(x.rest(), y.rest());
       }
 
       /**
@@ -272,8 +267,8 @@ namespace FEAST
       template <typename Algo_>
       void component_product(const PowerVector & x, const PowerVector & y, const PowerVector& z)
       {
-        base().template component_product<Algo_>(x.base(), y.base(), z.base());
-        last().template component_product<Algo_>(x.last(), y.last(), z.last());
+        first().template component_product<Algo_>(x.first(), y.first(), z.first());
+        rest().template component_product<Algo_>(x.rest(), y.rest(), z.rest());
       }
 
       /**
@@ -288,8 +283,8 @@ namespace FEAST
       template<typename Algo_>
       void component_invert(const PowerVector& x, DataType alpha = DataType(1))
       {
-        base().template component_invert<Algo_>(x.base(), alpha);
-        last().template component_invert<Algo_>(x.last(), alpha);
+        first().template component_invert<Algo_>(x.first(), alpha);
+        rest().template component_invert<Algo_>(x.rest(), alpha);
       }
 
       /**
@@ -304,8 +299,8 @@ namespace FEAST
       template<typename Algo_>
       void scale(const PowerVector& x, DataType alpha)
       {
-        base().template scale<Algo_>(x.base(), alpha);
-        last().template scale<Algo_>(x.last(), alpha);
+        first().template scale<Algo_>(x.first(), alpha);
+        rest().template scale<Algo_>(x.rest(), alpha);
       }
 
       /**
@@ -317,7 +312,7 @@ namespace FEAST
       template<typename Algo_>
       DataType dot(const PowerVector& x) const
       {
-        return base().template dot<Algo_>(x.base()) + last().template dot<Algo_>(x.last());
+        return first().template dot<Algo_>(x.first()) + rest().template dot<Algo_>(x.rest());
       }
 
       /**
@@ -326,7 +321,7 @@ namespace FEAST
       template<typename Algo_>
       DataType norm2sqr() const
       {
-        return base().template norm2sqr<Algo_>() + last().template norm2sqr<Algo_>();
+        return first().template norm2sqr<Algo_>() + rest().template norm2sqr<Algo_>();
       }
 
       /**
@@ -351,13 +346,13 @@ namespace FEAST
 
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
 
-        if (index < base().size())
+        if (index < first().size())
         {
-          return base()(index);
+          return first()(index);
         }
         else
         {
-          return last()(index - base().size());
+          return rest()(index - first().size());
         }
       }
 
@@ -373,13 +368,13 @@ namespace FEAST
 
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
 
-        if (index < base().size())
+        if (index < first().size())
         {
-          base()(index, value);
+          first()(index, value);
         }
         else
         {
-          last()(index - base().size(), value);
+          rest()(index - first().size(), value);
         }
       }
 
@@ -387,15 +382,15 @@ namespace FEAST
       /// Writes the vector-entries in an allocated array
       void set_vec(DataType * const pval_set) const
       {
-        this->base().set_vec(pval_set);
-        this->last().set_vec(pval_set + this->base().size());
+        this->first().set_vec(pval_set);
+        this->rest().set_vec(pval_set + this->first().size());
       }
 
       /// Writes data of an array in the vector
       void set_vec_inv(const DataType * const pval_set)
       {
-        this->base().set_vec_inv(pval_set);
-        this->last().set_vec_inv(pval_set + this->base().size());
+        this->first().set_vec_inv(pval_set);
+        this->rest().set_vec_inv(pval_set + this->first().size());
       }
       /// \end cond
 
@@ -416,8 +411,8 @@ namespace FEAST
       {
         CONTEXT("When converting PowerVector");
 
-        this->base().convert(other.base());
-        this->last().convert(other.last());
+        this->first().convert(other.first());
+        this->rest().convert(other.rest());
       }
     }; // class PowerVector<...>
 
@@ -442,13 +437,10 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
       using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, Index(1)>;
 
-      enum
-      {
-        num_blocks = 1
-      };
+      static constexpr Index num_blocks = 1;
 
     protected:
-      SubVectorType _sub_vector;
+      SubVectorType _first;
 
     public:
       PowerVector()
@@ -456,22 +448,22 @@ namespace FEAST
       }
 
       explicit PowerVector(Index sub_size)
-        : _sub_vector(sub_size)
+        : _first(sub_size)
       {
       }
 
       explicit PowerVector(Index sub_size, DataType value)
-        : _sub_vector(sub_size, value)
+        : _first(sub_size, value)
       {
       }
 
-      explicit PowerVector(SubVectorType&& sub_vector) :
-        _sub_vector(std::move(sub_vector))
+      explicit PowerVector(SubVectorType&& the_first) :
+        _first(std::move(the_first))
       {
       }
 
       PowerVector(PowerVector&& other) :
-        _sub_vector(std::move(other._sub_vector))
+        _first(std::move(other._first))
       {
       }
 
@@ -479,7 +471,7 @@ namespace FEAST
       {
         if(this != &other)
         {
-          _sub_vector = std::move(other._sub_vector);
+          _first = std::move(other._first);
         }
         return *this;
       }
@@ -495,33 +487,31 @@ namespace FEAST
 
       PowerVector clone() const
       {
-        SubVectorType s;
-        s.clone(_sub_vector);
-        return PowerVector(std::move(s));
+        return PowerVector(_first.clone());
       }
 
       template<Index i>
       SubVectorType& at()
       {
         static_assert(i == 0, "invalid sub-vector index");
-        return _sub_vector;
+        return _first;
       }
 
       template<Index i>
       const SubVectorType& at() const
       {
         static_assert(i == 0, "invalid sub-vector index");
-        return _sub_vector;
+        return _first;
       }
 
-      SubVectorType& last()
+      SubVectorType& first()
       {
-        return _sub_vector;
+        return _first;
       }
 
-      const SubVectorType& last() const
+      const SubVectorType& first() const
       {
-        return _sub_vector;
+        return _first;
       }
 
       Index blocks() const
@@ -531,12 +521,12 @@ namespace FEAST
 
       Index size() const
       {
-        return _sub_vector.size();
+        return _first.size();
       }
 
       void format(DataType value = DataType(0))
       {
-        _sub_vector.format(value);
+        _first.format(value);
       }
 
       static String name()
@@ -547,49 +537,49 @@ namespace FEAST
       template<typename SubType2_>
       void copy(const PowerVector<SubType2_, 1>& x)
       {
-        last().copy(x.last());
+        first().copy(x.first());
       }
 
       template<typename Algo_>
       void axpy(const PowerVector& x, const PowerVector& y, DataType alpha = DataType(1))
       {
-        last().template axpy<Algo_>(x.last(), y.last(), alpha);
+        first().template axpy<Algo_>(x.first(), y.first(), alpha);
       }
 
       template <typename Algo_>
       void component_product(const PowerVector & x, const PowerVector & y)
       {
-        last().template component_product<Algo_>(x.last(), y.last());
+        first().template component_product<Algo_>(x.first(), y.first());
       }
 
       template <typename Algo_>
       void component_product(const PowerVector & x, const PowerVector & y, const PowerVector& z)
       {
-        last().template component_product<Algo_>(x.last(), y.last(), z.last());
+        first().template component_product<Algo_>(x.first(), y.first(), z.first());
       }
 
       template<typename Algo_>
       void component_invert(const PowerVector& x, DataType alpha = DataType(1))
       {
-        last().template component_invert<Algo_>(x.last(), alpha);
+        first().template component_invert<Algo_>(x.first(), alpha);
       }
 
       template<typename Algo_>
       void scale(const PowerVector& x, DataType alpha)
       {
-        last().template scale<Algo_>(x.last(), alpha);
+        first().template scale<Algo_>(x.first(), alpha);
       }
 
       template<typename Algo_>
       DataType dot(const PowerVector& x) const
       {
-        return last().template dot<Algo_>(x.last());
+        return first().template dot<Algo_>(x.first());
       }
 
       template<typename Algo_>
       DataType norm2sqr() const
       {
-        return last().template norm2sqr<Algo_>();
+        return first().template norm2sqr<Algo_>();
       }
 
       template<typename Algo_>
@@ -604,7 +594,7 @@ namespace FEAST
 
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
 
-        return last()(index);
+        return first()(index);
       }
 
       void operator()(Index index, DataType value)
@@ -613,17 +603,17 @@ namespace FEAST
 
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
 
-        last()(index, value);
+        first()(index, value);
       }
 
       void set_vec(DataType * const pval_set) const
       {
-        this->last().set_vec(pval_set);
+        this->first().set_vec(pval_set);
       }
 
       void set_vec_inv(const DataType * const pval_set)
       {
-        this->last().set_vec_inv(pval_set);
+        this->first().set_vec_inv(pval_set);
       }
 
       /**
@@ -643,7 +633,7 @@ namespace FEAST
       {
         CONTEXT("When converting PowerVector");
 
-        this->last().convert(other.last());
+        this->first().convert(other.first());
       }
     }; // class PowerVector<...,1>
     /// \cond internal
@@ -652,14 +642,14 @@ namespace FEAST
     template <typename SubType_, Index count_>
     inline void dump_power_vector(std::ostream & os, const PowerVector<SubType_, count_>& x)
     {
-      dump_power_vector(os, x.base());
-      os << "," << x.last();
+      os << "," << x.first();
+      dump_power_vector(os, x.rest());
     }
 
     template <typename SubType_>
     inline void dump_power_vector(std::ostream & os, const PowerVector<SubType_, 1>& x)
     {
-      os << x.last();
+      os << x.first();
     }
 
     template <typename SubType_, Index count_>

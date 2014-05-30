@@ -2,19 +2,14 @@
 #ifndef KERNEL_LAFEM_TUPLE_MIRROR_HPP
 #define KERNEL_LAFEM_TUPLE_MIRROR_HPP 1
 
+#include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
-#include <kernel/lafem/vector_mirror.hpp>
+#include <kernel/lafem/meta_element.hpp>
 
 namespace FEAST
 {
   namespace LAFEM
   {
-    template<
-      Index i_,
-      typename First_,
-      typename... Rest_>
-    struct TupleMirrorElement;
-
     /**
      * \brief TupleVector meta-mirror class template
      *
@@ -126,15 +121,15 @@ namespace FEAST
       }
 
       template<Index i_>
-      typename TupleMirrorElement<i_, First_, Rest_...>::Type& at()
+      typename TupleElement<i_, First_, Rest_...>::Type& at()
       {
-        return TupleMirrorElement<i_, First_, Rest_...>::get(*this);
+        return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
       template<Index i_>
-      typename TupleMirrorElement<i_, First_, Rest_...>::Type const& at() const
+      typename TupleElement<i_, First_, Rest_...>::Type const& at() const
       {
-        return TupleMirrorElement<i_, First_, Rest_...>::get(*this);
+        return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
       /** \copydoc VectorMirror::gather_prim() */
@@ -244,6 +239,20 @@ namespace FEAST
         return _first.size();
       }
 
+      template<Index i_>
+      First_& at()
+      {
+        static_assert(i_ == 0, "invalid sub-mirror index");
+        return _first;
+      }
+
+      template<Index i_>
+      const First_& at() const
+      {
+        static_assert(i_ == 0, "invalid sub-mirror index");
+        return _first;
+      }
+
 #ifdef FEAST_COMPILER_MICROSOFT
       // The MSVC compiler has a bug, which does not allow us to specify 'Tv_' as a single
       // template parameter rather than a parameter pack.
@@ -327,43 +336,6 @@ namespace FEAST
 #endif // FEAST_COMPILER_MICROSOFT
     };
     /// \endcond
-
-    template<
-      Index i_,
-      typename First_,
-      typename... Rest_>
-    struct TupleMirrorElement
-    {
-      typedef typename TupleMirrorElement<i_-1, Rest_...>::Type Type;
-
-      static Type& get(TupleMirror<First_, Rest_...>& meta)
-      {
-        return TupleMirrorElement<i_-1, Rest_...>::get(meta.rest());
-      }
-
-      static const Type& get(const TupleMirror<First_, Rest_...>& meta)
-      {
-        return TupleMirrorElement<i_-1, Rest_...>::get(meta.rest());
-      }
-    };
-
-    template<
-      typename First_,
-      typename... Rest_>
-    struct TupleMirrorElement<0, First_, Rest_...>
-    {
-      typedef First_ Type;
-
-      static Type& get(TupleMirror<First_, Rest_...>& meta)
-      {
-        return meta.first();
-      }
-
-      static const Type& get(const TupleMirror<First_, Rest_...>& meta)
-      {
-        return meta.first();
-      }
-    };
   } // namespace LAFEM
 } // namespace FEAST
 

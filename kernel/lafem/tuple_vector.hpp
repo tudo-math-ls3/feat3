@@ -3,7 +3,7 @@
 #define KERNEL_LAFEM_TUPLE_VECTOR_HPP 1
 
 // includes, FEAST
-#include <kernel/lafem/tuple_element.hpp>
+#include <kernel/lafem/meta_element.hpp>
 
 // includes, system
 #include <iostream>

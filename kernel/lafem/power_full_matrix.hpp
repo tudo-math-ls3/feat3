@@ -33,11 +33,10 @@ namespace FEAST
       typename SubType_,
       Index width_,
       Index height_>
-    class PowerFullMatrix :
-      protected PowerColMatrix<PowerRowMatrix<SubType_, width_>, height_>
+    class PowerFullMatrix
     {
-      /// base-class typedef
-      typedef  PowerColMatrix<PowerRowMatrix<SubType_, width_>, height_> BaseClass;
+      /// container-class typedef
+      typedef  PowerColMatrix<PowerRowMatrix<SubType_, width_>, height_> ContClass;
 
     public:
       /// sub-matrix type
@@ -59,19 +58,19 @@ namespace FEAST
       using ContainerType = class PowerFullMatrix<
         typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, width_, height_>;
 
-      /// dummy enum
-      enum
-      {
         /// number of row blocks (vertical size)
-        num_row_blocks = height_,
+      static constexpr Index num_row_blocks = height_;
         /// number of column blocks (horizontal size)
-        num_col_blocks = width_
-      };
+      static constexpr Index num_col_blocks = width_;
+
+    protected:
+      // the container
+      ContClass _container;
 
     protected:
       /// base-class emplacement constructor
-      explicit PowerFullMatrix(BaseClass&& base) :
-        BaseClass(base)
+      explicit PowerFullMatrix(ContClass&& cont) :
+        _container(cont)
       {
       }
 
@@ -83,20 +82,23 @@ namespace FEAST
 
       /// sub-matrix layout ctor
       explicit PowerFullMatrix(const SparseLayout<MemType, IndexType, layout_id>& layout) :
-        BaseClass(layout)
+        _container(layout)
       {
       }
 
       /// move ctor
       PowerFullMatrix(PowerFullMatrix&& other) :
-        BaseClass(static_cast<BaseClass&&>(other))
+        _container(std::move(other._container))
       {
       }
 
       /// move-assign operator
       PowerFullMatrix& operator=(PowerFullMatrix&& other)
       {
-        BaseClass::operator=(static_cast<BaseClass&&>(other));
+        if(this != &other)
+        {
+          _container = std::move(other._container);
+        }
         return *this;
       }
 
@@ -115,7 +117,7 @@ namespace FEAST
        */
       PowerFullMatrix clone() const
       {
-        return PowerFullMatrix(BaseClass::clone());
+        return PowerFullMatrix(_container.clone());
       }
 
       /**
@@ -135,7 +137,7 @@ namespace FEAST
       {
         static_assert(i_ < height_, "invalid sub-matrix index");
         static_assert(j_ < width_, "invalid sub-matrix index");
-        return static_cast<BaseClass&>(*this).template at<i_, Index(0)>().template at<Index(0),j_>();
+        return _container.template at<i_, Index(0)>().template at<Index(0),j_>();
       }
 
       /** \copydoc at() */
@@ -144,7 +146,7 @@ namespace FEAST
       {
         static_assert(i_ < height_, "invalid sub-matrix index");
         static_assert(j_ < width_, "invalid sub-matrix index");
-        return static_cast<const BaseClass&>(*this).template at<i_, Index(0)>().template at<Index(0),j_>();
+        return _container.template at<i_, Index(0)>().template at<Index(0),j_>();
       }
 
       /// \cond internal
@@ -163,33 +165,32 @@ namespace FEAST
       // MSVC compiler crashes with an internal error if they are missing...
       VectorTypeL create_vector_l() const
       {
-        return BaseClass::create_vector_l();
+        return _container.create_vector_l();
       }
 
       VectorTypeR create_vector_r() const
       {
-        return BaseClass::create_vector_r();
+        return _container.create_vector_r();
       }
 
       template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x)
       {
-        BaseClass::template apply<Algo_>(r, x);
+        _container.template apply<Algo_>(r, x);
       }
 
       template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1))
       {
-        BaseClass::template apply<Algo_>(r, x, y, alpha);
+        _container.template apply<Algo_>(r, x, y, alpha);
       }
 
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
       {
         CONTEXT("When converting PowerFullMatrix");
-        BaseClass::convert(other);
+        _container.convert(other._container);
       }
-
     }; // class PowerFullMatrix
   } // namespace LAFEM
 } // namespace FEAST

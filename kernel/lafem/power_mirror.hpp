@@ -17,60 +17,52 @@ namespace FEAST
       struct PowerMirrorHelper
       {
         template<typename SM_, typename BV_, typename PV_>
-        static Index gather_prim(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
+        static void gather_prim(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
         {
-          Index off = PowerMirrorHelper<i_-1>::gather_prim(sm, bv, pv.base(), bo);
-          sm.gather_prim(bv, pv.last(), off);
-          return off + sm.size();
+          sm.gather_prim(bv, pv.first(), bo);
+          PowerMirrorHelper<i_-1>::gather_prim(sm, bv, pv.rest(), bo + sm.size());
         }
         template<typename SM_, typename BV_, typename PV_>
-        static Index gather_dual(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
+        static void gather_dual(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
         {
-          Index off = PowerMirrorHelper<i_-1>::gather_dual(sm, bv, pv.base(), bo);
-          sm.gather_dual(bv, pv.last(), off);
-          return off + sm.size();
+          sm.gather_dual(bv, pv.first(), bo);
+          PowerMirrorHelper<i_-1>::gather_dual(sm, bv, pv.rest(), bo + sm.size());
         }
         template<typename SM_, typename PV_, typename BV_>
-        static Index scatter_prim(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
+        static void scatter_prim(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
         {
-          Index off = PowerMirrorHelper<i_-1>::scatter_prim(sm, pv.base(), bv, bo);
-          sm.scatter_prim(pv.last(), bv, off);
-          return off + sm.size();
+          sm.scatter_prim(pv.first(), bv, bo);
+          PowerMirrorHelper<i_-1>::scatter_prim(sm, pv.rest(), bv, bo + sm.size());
         }
         template<typename SM_, typename PV_, typename BV_>
-        static Index scatter_dual(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
+        static void scatter_dual(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
         {
-          Index off = PowerMirrorHelper<i_-1>::scatter_dual(sm, pv.base(), bv, bo);
-          sm.scatter_dual(pv.last(), bv, off);
-          return off + sm.size();
+          sm.scatter_dual(pv.first(), bv, bo);
+          PowerMirrorHelper<i_-1>::scatter_dual(sm, pv.rest(), bv, bo + sm.size());
         }
       };
       template<>
       struct PowerMirrorHelper<Index(1)>
       {
         template<typename SM_, typename BV_, typename PV_>
-        static Index gather_prim(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
+        static void gather_prim(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
         {
-          sm.gather_prim(bv, pv.last(), bo);
-          return bo + sm.size();
+          sm.gather_prim(bv, pv.first(), bo);
         }
         template<typename SM_, typename BV_, typename PV_>
-        static Index gather_dual(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
+        static void gather_dual(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
         {
-          sm.gather_dual(bv, pv.last(), bo);
-          return bo + sm.size();
+          sm.gather_dual(bv, pv.first(), bo);
         }
         template<typename SM_, typename PV_, typename BV_>
-        static Index scatter_prim(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
+        static void scatter_prim(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
         {
-          sm.scatter_prim(pv.last(), bv, bo);
-          return bo + sm.size();
+          sm.scatter_prim(pv.first(), bv, bo);
         }
         template<typename SM_, typename PV_, typename BV_>
-        static Index scatter_dual(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
+        static void scatter_dual(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
         {
-          sm.scatter_dual(pv.last(), bv, bo);
-          return bo + sm.size();
+          sm.scatter_dual(pv.first(), bv, bo);
         }
       };
     } // namespace Intern

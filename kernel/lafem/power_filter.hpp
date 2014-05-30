@@ -3,6 +3,7 @@
 #define KERNEL_LAFEM_POWER_FILTER_HPP 1
 
 #include <kernel/lafem/power_vector.hpp>
+#include <kernel/lafem/meta_element.hpp>
 
 namespace FEAST
 {
@@ -27,15 +28,14 @@ namespace FEAST
     template<
       typename SubFilter_,
       Index count_>
-    class PowerFilter :
-      protected PowerFilter<SubFilter_, count_-1>
+    class PowerFilter
     {
       // declare this class template as a friend for recursive inheritance
       template<typename,Index>
       friend class PowerFilter;
 
       /// base-class typedef
-      typedef PowerFilter<SubFilter_, count_-1> BaseClass;
+      typedef PowerFilter<SubFilter_, count_-1> RestClass;
 
     public:
       /// sub-filter type
@@ -53,13 +53,15 @@ namespace FEAST
       };
 
     protected:
-      /// the last sub-filter
-      SubFilterType _last;
+      /// the first sub-filter
+      SubFilterType _first;
+      /// the remaining part
+      RestClass _rest;
 
       /// base-class ctor; for internal use only
-      explicit PowerFilter(BaseClass&& other_base, SubFilterType&& other_last) :
-        BaseClass(std::move(other_base)),
-        _last(std::move(other_last))
+      explicit PowerFilter(SubFilterType&& the_first, RestClass&& the_rest) :
+        _first(the_first),
+        _rest(the_rest)
       {
       }
 
@@ -71,8 +73,8 @@ namespace FEAST
 
       /// move CTOR
       PowerFilter(PowerFilter&& other) :
-        BaseClass(static_cast<BaseClass&&>(other)),
-        _last(std::move(other._last))
+        _first(std::move(other._first)),
+        _rest(std::move(other._rest))
       {
       }
 
@@ -81,8 +83,8 @@ namespace FEAST
       {
         if(this != &other)
         {
-          base().operator=(static_cast<BaseClass&&>(other));
-          _last = std::move(other._last);
+          _first = std::move(other._first);
+          _rest = std::move(other._rest);
         }
         return *this;
       }
@@ -90,28 +92,28 @@ namespace FEAST
       /// Creates and returns a deep copy of this filter.
       PowerFilter clone() const
       {
-        return PowerFilter(base().clone(), last().clone());
+        return PowerFilter(first().clone(), rest().clone());
       }
 
       /// \cond internal
-      BaseClass& base()
+      SubFilterType& first()
       {
-        return static_cast<BaseClass&>(*this);
+        return _first;
       }
 
-      const BaseClass& base() const
+      const SubFilterType& first() const
       {
-        return static_cast<const BaseClass&>(*this);
+        return _first;
       }
 
-      SubFilterType& last()
+      RestClass& rest()
       {
-        return _last;
+        return _rest;
       }
 
-      const SubFilterType& last() const
+      const RestClass& rest() const
       {
-        return _last;
+        return _rest;
       }
       /// \endcond
 
@@ -119,46 +121,46 @@ namespace FEAST
       SubFilterType& at()
       {
         static_assert(i_ < count_, "invalid sub-filter index");
-        return static_cast<PowerFilter<SubFilter_, i_+1>&>(*this)._last;
+        return PowerElement<i_, SubFilterType>::get(*this);
       }
 
       template<Index i_>
       const SubFilterType& at() const
       {
         static_assert(i_ < count_, "invalid sub-filter index");
-        return static_cast<const PowerFilter<SubFilter_, i_+1>&>(*this)._last;
+        return PowerElement<i_, SubFilterType>::get(*this);
       }
 
       /** \copydoc UnitFilter::filter_rhs() */
       template<typename Algo_, typename SubVector_>
       void filter_rhs(PowerVector<SubVector_, count_>& vector) const
       {
-        base().template filter_rhs<Algo_>(vector.base());
-        last().template filter_rhs<Algo_>(vector.last());
+        first().template filter_rhs<Algo_>(vector.first());
+        rest().template filter_rhs<Algo_>(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_sol() */
       template<typename Algo_, typename SubVector_>
       void filter_sol(PowerVector<SubVector_, count_>& vector) const
       {
-        base().template filter_sol<Algo_>(vector.base());
-        last().template filter_sol<Algo_>(vector.last());
+        first().template filter_sol<Algo_>(vector.first());
+        rest().template filter_sol<Algo_>(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_def() */
       template<typename Algo_, typename SubVector_>
       void filter_def(PowerVector<SubVector_, count_>& vector) const
       {
-        base().template filter_def<Algo_>(vector.base());
-        last().template filter_def<Algo_>(vector.last());
+        first().template filter_def<Algo_>(vector.first());
+        rest().template filter_def<Algo_>(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_cor() */
       template<typename Algo_, typename SubVector_>
       void filter_cor(PowerVector<SubVector_, count_>& vector) const
       {
-        base().template filter_cor<Algo_>(vector.base());
-        last().template filter_cor<Algo_>(vector.last());
+        first().template filter_cor<Algo_>(vector.first());
+        rest().template filter_cor<Algo_>(vector.rest());
       }
     }; // class PowerFilter<...>
 
@@ -178,10 +180,10 @@ namespace FEAST
       };
 
     protected:
-      SubFilterType _last;
+      SubFilterType _first;
 
-      explicit PowerFilter(SubFilterType&& other_last) :
-        _last(std::move(other_last))
+      explicit PowerFilter(SubFilterType&& the_first) :
+        _first(the_first)
       {
       }
 
@@ -192,67 +194,70 @@ namespace FEAST
 
       /// move CTOR
       PowerFilter(PowerFilter&& other) :
-        _last(std::move(other._last))
+        _first(std::move(other._first))
       {
       }
 
       PowerFilter& operator=(PowerFilter&& other)
       {
-        _last = std::move(other._last);
+        if(this != &other)
+        {
+          _first = std::move(other._first);
+        }
         return *this;
       }
 
       PowerFilter clone() const
       {
-        return PowerFilter(last().clone());
+        return PowerFilter(first().clone());
       }
 
-      SubFilterType& last()
+      SubFilterType& first()
       {
-        return _last;
+        return _first;
       }
 
-      const SubFilterType& last() const
+      const SubFilterType& first() const
       {
-        return _last;
+        return _first;
       }
 
       template<Index i_>
       SubFilterType& at()
       {
         static_assert(i_ != 0, "invalid sub-filter index");
-        return _last;
+        return _first;
       }
 
       template<Index i_>
       const SubFilterType& at() const
       {
         static_assert(i_ != 0, "invalid sub-filter index");
-        return _last;
+        return _first;
       }
 
       template<typename Algo_, typename SubVector_>
       void filter_rhs(PowerVector<SubVector_, 1>& vector) const
       {
-        last().template filter_rhs<Algo_>(vector.last());
+        first().template filter_rhs<Algo_>(vector.first());
       }
 
       template<typename Algo_, typename SubVector_>
       void filter_sol(PowerVector<SubVector_, 1>& vector) const
       {
-        last().template filter_sol<Algo_>(vector.last());
+        first().template filter_sol<Algo_>(vector.first());
       }
 
       template<typename Algo_, typename SubVector_>
       void filter_def(PowerVector<SubVector_, 1>& vector) const
       {
-        last().template filter_def<Algo_>(vector.last());
+        first().template filter_def<Algo_>(vector.first());
       }
 
       template<typename Algo_, typename SubVector_>
       void filter_cor(PowerVector<SubVector_, 1>& vector) const
       {
-        last().template filter_cor<Algo_>(vector.last());
+        first().template filter_cor<Algo_>(vector.first());
       }
     };
     /// \endcond

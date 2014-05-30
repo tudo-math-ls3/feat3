@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
+#include <kernel/lafem/meta_element.hpp>
 
 namespace FEAST
 {
@@ -27,15 +28,14 @@ namespace FEAST
     template<
       typename SubType_,
       Index blocks_>
-    class PowerDiagMatrix :
-      protected PowerDiagMatrix<SubType_, blocks_-1>
+    class PowerDiagMatrix
     {
       // declare this class template as a friend for recursive inheritance
       template<typename, Index>
       friend class PowerDiagMatrix;
 
-      /// base-class typedef
-      typedef PowerDiagMatrix<SubType_, blocks_-1> BaseClass;
+      /// rest-class typedef
+      typedef PowerDiagMatrix<SubType_, blocks_-1> RestClass;
 
     public:
       /// sub-matrix type
@@ -56,23 +56,21 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
       using ContainerType = class PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
 
-      /// dummy enum
-      enum
-      {
         /// number of row blocks (vertical size)
-        num_row_blocks = blocks_,
+      static constexpr Index num_row_blocks = blocks_;
         /// number of column blocks (horizontal size)
-        num_col_blocks = blocks_
-      };
+      static constexpr Index num_col_blocks = blocks_;
 
     protected:
-      /// the last sub-matrix
-      SubMatrixType _sub_matrix;
+      /// the first sub-matrix
+      SubMatrixType _first;
+      /// the remaining part
+      RestClass _rest;
 
       /// base-class constructor; this one is protected for a reason
-      explicit PowerDiagMatrix(BaseClass&& other_base, SubMatrixType&& last_sub) :
-        BaseClass(std::move(other_base)),
-        _sub_matrix(std::move(last_sub))
+      explicit PowerDiagMatrix(SubMatrixType&& the_first, RestClass&& the_rest) :
+        _first(the_first),
+        _rest(the_rest)
       {
       }
 
@@ -84,23 +82,26 @@ namespace FEAST
 
       /// sub-matrix layout ctor
       explicit PowerDiagMatrix(const SparseLayout<MemType, IndexType, layout_id>& layout) :
-        BaseClass(layout),
-        _sub_matrix(layout)
+        _first(layout),
+        _rest(layout)
       {
       }
 
       /// move ctor
       PowerDiagMatrix(PowerDiagMatrix&& other) :
-        BaseClass(static_cast<BaseClass&&>(other)),
-        _sub_matrix(std::move(other._sub_matrix))
+        _first(std::move(other._first)),
+        _rest(std::move(other._rest))
       {
       }
 
       /// move-assign operator
       PowerDiagMatrix& operator=(PowerDiagMatrix&& other)
       {
-        base().operator=(static_cast<BaseClass&&>(other));
-        _sub_matrix = std::move(other._sub_matrix);
+        if(this != &other)
+        {
+          _first = std::move(other._first);
+          _rest = std::move(other._rest);
+        }
         return *this;
       }
 
@@ -119,7 +120,7 @@ namespace FEAST
        */
       PowerDiagMatrix clone() const
       {
-        return PowerDiagMatrix(base().clone(), _sub_matrix.clone());
+        return PowerDiagMatrix(_first.clone(), _rest.clone());
       }
 
       /**
@@ -139,7 +140,7 @@ namespace FEAST
       {
         static_assert(i_ == j_, "invalid sub-matrix index");
         static_assert(i_ < blocks_, "invalid sub-matrix index");
-        return static_cast<PowerDiagMatrix<SubType_, i_+1>&>(*this)._sub_matrix;
+        return PowerElement<i_, SubMatrixType>::get(*this);
       }
 
       /** \copydoc at() */
@@ -148,28 +149,28 @@ namespace FEAST
       {
         static_assert(i_ == j_, "invalid sub-matrix index");
         static_assert(i_ < blocks_, "invalid sub-matrix index");
-        return static_cast<const PowerDiagMatrix<SubType_, i_+1>&>(*this)._sub_matrix;
+        return PowerElement<i_, SubMatrixType>::get(*this);
       }
 
       /// \cond internal
-      SubMatrixType& last()
+      SubMatrixType& first()
       {
-        return _sub_matrix;
+        return _first;
       }
 
-      const SubMatrixType& last() const
+      const SubMatrixType& first() const
       {
-        return _sub_matrix;
+        return _first;
       }
 
-      PowerDiagMatrix<SubType_, blocks_-1>& base()
+      RestClass& rest()
       {
-        return static_cast<BaseClass&>(*this);
+        return _rest;
       }
 
-      const PowerDiagMatrix<SubType_, blocks_-1>& base() const
+      const RestClass& rest() const
       {
-        return static_cast<const BaseClass&>(*this);
+        return _rest;
       }
 
       Index row_blocks() const
@@ -186,19 +187,19 @@ namespace FEAST
       /// Returns the total number of rows in this matrix.
       Index rows() const
       {
-        return base().rows() + last().rows();
+        return first().rows() + rest().rows();
       }
 
       /// Returns the total number of columns in this matrix.
       Index columns() const
       {
-        return base().columns() + last().columns();
+        return first().columns() + rest().columns();
       }
 
       /// Returns the total number of non-zeros in this matrix.
       Index used_elements() const
       {
-        return base().used_elements() + last().used_elements();
+        return first().used_elements() + rest().used_elements();
       }
 
       /// Returns a descriptive string for this container.
@@ -213,10 +214,10 @@ namespace FEAST
        * \param[in] value
        * The value to which the matrix' entries are to be set to.
        */
-      void clear(DataType value = DataType(0))
+      void format(DataType value = DataType(0))
       {
-        base().clear(value);
-        last().clear(value);
+        first().format(value);
+        rest().format(value);
       }
 
       /**
@@ -234,8 +235,8 @@ namespace FEAST
       template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x)
       {
-        base().template apply<Algo_>(r.base(), x.base());
-        last().template apply<Algo_>(r.last(), x.last());
+        first().template apply<Algo_>(r.first(), x.first());
+        rest().template apply<Algo_>(r.rest(), x.rest());
       }
 
       /**
@@ -257,34 +258,34 @@ namespace FEAST
       template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1))
       {
-        base().template apply<Algo_>(r.base(), x.base(), y.base(), alpha);
-        last().template apply<Algo_>(r.last(), x.last(), y.last(), alpha);
+        first().template apply<Algo_>(r.first(), x.first(), y.first(), alpha);
+        rest().template apply<Algo_>(r.rest(), x.rest(), y.rest(), alpha);
       }
 
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
-        return VectorTypeL(base().create_vector_l(), last().create_vector_l());
+        return VectorTypeL(first().create_vector_l(), rest().create_vector_l());
       }
 
       /// Returns a new compatible R-Vector.
       VectorTypeR create_vector_r() const
       {
-        return VectorTypeR(base().create_vector_r(), last().create_vector_r());
+        return VectorTypeR(first().create_vector_r(), rest().create_vector_r());
       }
 
       /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
-        const Index brows(this->base().rows());
+        const Index brows(this->first().rows());
 
         if (row < brows)
         {
-          return this->base().get_length_of_line(row);
+          return this->first().get_length_of_line(row);
         }
         else
         {
-          return this->last().get_length_of_line(row - brows);
+          return this->rest().get_length_of_line(row - brows);
         }
       }
 
@@ -293,16 +294,16 @@ namespace FEAST
       void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
                      const Index col_start, const Index stride = 1) const
       {
-        const Index brows(this->base().rows());
-        const Index bcolumns(this->base().columns());
+        const Index brows(this->first().rows());
+        const Index bcolumns(this->first().columns());
 
         if (row < brows)
         {
-          this->base().set_line(row, pval_set, pcol_set, col_start, stride);
+          this->first().set_line(row, pval_set, pcol_set, col_start, stride);
         }
         else
         {
-          this->last().set_line(row - brows, pval_set, pcol_set, col_start + bcolumns, stride);
+          this->rest().set_line(row - brows, pval_set, pcol_set, col_start + bcolumns, stride);
         }
       }
       /// \end cond
@@ -324,8 +325,8 @@ namespace FEAST
       {
         CONTEXT("When converting PowerDiagMatrix");
 
-        this->base().convert(other.base());
-        this->last().convert(other.last());
+        this->first().convert(other.first());
+        this->rest().convert(other.rest());
       }
     };
 
@@ -351,18 +352,15 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
       using ContainerType = class PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
 
-      enum
-      {
-        num_row_blocks = 1,
-        num_col_blocks = 1
-      };
+      static constexpr Index num_row_blocks = 1;
+      static constexpr Index num_col_blocks = 1;
 
     protected:
-      SubMatrixType _sub_matrix;
+      SubMatrixType _first;
 
       /// base-class constructor; this one is protected for a reason
-      explicit PowerDiagMatrix(SubMatrixType&& last_sub) :
-        _sub_matrix(std::move(last_sub))
+      explicit PowerDiagMatrix(SubMatrixType&& the_first) :
+        _first(std::move(the_first))
       {
       }
 
@@ -374,20 +372,23 @@ namespace FEAST
 
       /// sub-matrix layout ctor
       explicit PowerDiagMatrix(const SparseLayout<MemType, IndexType, layout_id>& layout) :
-        _sub_matrix(layout)
+        _first(layout)
       {
       }
 
       /// move ctor
       PowerDiagMatrix(PowerDiagMatrix&& other) :
-        _sub_matrix(std::move(other._sub_matrix))
+        _first(std::move(other._first))
       {
       }
 
       /// move-assign operator
       PowerDiagMatrix& operator=(PowerDiagMatrix&& other)
       {
-        _sub_matrix = std::move(other._sub_matrix);
+        if(this != &other)
+        {
+          _first = std::move(other._first);
+        }
         return *this;
       }
 
@@ -403,7 +404,7 @@ namespace FEAST
 
       PowerDiagMatrix clone() const
       {
-        return PowerDiagMatrix(_sub_matrix.clone());
+        return PowerDiagMatrix(_first.clone());
       }
 
       template<Index i, Index j>
@@ -411,7 +412,7 @@ namespace FEAST
       {
         static_assert(i == 0, "invalid sub-matrix index");
         static_assert(j == 0, "invalid sub-matrix index");
-        return _sub_matrix;
+        return _first;
       }
 
       template<Index i, Index j>
@@ -419,17 +420,17 @@ namespace FEAST
       {
         static_assert(i == 0, "invalid sub-matrix index");
         static_assert(j == 0, "invalid sub-matrix index");
-        return _sub_matrix;
+        return _first;
       }
 
-      SubMatrixType& last()
+      SubMatrixType& first()
       {
-        return _sub_matrix;
+        return _first;
       }
 
-      const SubMatrixType& last() const
+      const SubMatrixType& first() const
       {
-        return _sub_matrix;
+        return _first;
       }
 
       Index row_blocks() const
@@ -444,58 +445,58 @@ namespace FEAST
 
       Index rows() const
       {
-        return last().rows();
+        return first().rows();
       }
 
       Index columns() const
       {
-        return last().columns();
+        return first().columns();
       }
 
       Index used_elements() const
       {
-        return last().used_elements();
+        return first().used_elements();
       }
 
-      void clear(DataType value = DataType(0))
+      void format(DataType value = DataType(0))
       {
-        last().clear(value);
+        first().format(value);
       }
 
       template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x)
       {
-        last().template apply<Algo_>(r.last(), x.last());
+        first().template apply<Algo_>(r.first(), x.first());
       }
 
       template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1))
       {
-        last().template apply<Algo_>(r.last(), x.last(), y.last(), alpha);
+        first().template apply<Algo_>(r.first(), x.first(), y.first(), alpha);
       }
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
-        return VectorTypeL(last().create_vector_l());
+        return VectorTypeL(first().create_vector_l());
       }
 
       /// Returns a new compatible R-Vector.
       VectorTypeR create_vector_r() const
       {
-        return VectorTypeR(last().create_vector_r());
+        return VectorTypeR(first().create_vector_r());
       }
 
       /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
-        return this->last().get_length_of_line(row);
+        return this->first().get_length_of_line(row);
       }
 
       /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
       void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
                     const Index col_start, const Index stride = 1) const
       {
-        this->last().set_line(row, pval_set, pcol_set, col_start, stride);
+        this->first().set_line(row, pval_set, pcol_set, col_start, stride);
       }
 
       /**
@@ -515,7 +516,7 @@ namespace FEAST
       {
         CONTEXT("When converting PowerDiagMatrix");
 
-        this->last().convert(other.last());
+        this->first().convert(other.first());
       }
     };
     /// \endcond
