@@ -664,7 +664,7 @@ int main(int /*argc*/, char** /*argv*/)
     // compute new defect
     DataType def = levels.back()->calc_defect(vec_sol_x, vec_sol_y, vec_sol_p, vec_rhs_x, vec_rhs_y, vec_rhs_p);
     std::cout << "Iteration " << (i+1) << " | Defect: " << scientify(def) << std::endl;
-    if((def / def0) <= 1E-8)
+    if((def / def0) <= DataType(1E-8))
       break;
   }
 
