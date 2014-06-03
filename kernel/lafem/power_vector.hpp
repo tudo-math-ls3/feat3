@@ -52,8 +52,11 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
       using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, count_>;
 
-        /// number of vector blocks
-      static constexpr Index num_blocks = count_;
+      /// number of vector blocks
+      enum
+      {
+        num_blocks = count_
+      };
 
     protected:
       /// the first sub-vector
@@ -437,7 +440,10 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
       using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, Index(1)>;
 
-      static constexpr Index num_blocks = 1;
+      enum
+      {
+        num_blocks = 1
+      };
 
     protected:
       SubVectorType _first;
