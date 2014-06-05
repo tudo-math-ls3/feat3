@@ -480,7 +480,7 @@ namespace FEAST
        *
        * This class supports function values, gradient and hessians for all dimensions.
        *
-       * WARNING: Because the function is differentiable everywhere except for x_0, Bad Things (TM) might happen if
+       * \warning Because the function is differentiable everywhere except for x_0, Bad Things (TM) might happen if
        * someone wants to compute the gradient or hessian there, as the functions return 0.
        *
        * \tparam ImgPointType_
@@ -621,7 +621,7 @@ namespace FEAST
        *
        * This class supports function values, gradient and hessians for all dimensions.
        *
-       * WARNING: Because the function is differentiable everywhere except for x_0, Bad Things (TM) might happen if
+       * \warning Because the function is differentiable everywhere except for x_0, Bad Things (TM) might happen if
        * someone wants to compute the gradient or hessian there, as the functions return 0.
        *
        * \tparam ImgPointType_
