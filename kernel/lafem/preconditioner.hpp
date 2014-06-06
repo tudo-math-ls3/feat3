@@ -670,27 +670,29 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Mem_, typename DT_>
-    class ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                            DenseVector<Mem_, DT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                              DenseVector<Mem_, DT_> >
+    template <typename Mem_, typename DT_, typename IT_>
+    class ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+                            DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+                              DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixCSR<Mem_, DT_> & _A;
-      SparseMatrixCSR<Mem_, DT_> _LU;
+      const SparseMatrixCSR<Mem_, DT_, IT_> & _A;
+      SparseMatrixCSR<Mem_, DT_, IT_> _LU;
 
     public:
       /// Our algotype
       typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
+      /// Our indextype
+      typedef IT_ IndexType;
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_> VectorType;
+      typedef DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCSR<Mem_, DT_> MatrixType;
+      typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ilu;
 
@@ -707,7 +709,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const Index p) :
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const Index p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -717,7 +719,7 @@ namespace FEAST
 
         if (p == 0)
         {
-          _LU = SparseMatrixCSR<Mem_, DT_>(A.layout());
+          _LU = SparseMatrixCSR<Mem_, DT_, IT_>(A.layout());
 
           _copy_entries(false);
         }
@@ -739,7 +741,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & LU) :
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & LU) :
         _A(LU)
       {
         if (_LU.columns() != _LU.rows())
@@ -758,8 +760,8 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and layout
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A,
-                        const SparseLayout<Mem_, typename SparseMatrixCSR<Mem_, DT_>::IndexType, SparseMatrixCSR<Mem_, DT_>::layout_id> & layout) :
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A,
+                        const SparseLayout<Mem_, IT_, SparseMatrixCSR<Mem_, DT_, IT_>::layout_id> & layout) :
         _A(A),
         _LU(layout)
       {
@@ -798,8 +800,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in) override
+      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
+                         const DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -807,11 +809,11 @@ namespace FEAST
         // create pointers
         DT_ * pout(out.elements());
         const DT_ * pval(_LU.val());
-        const Index * pcol_ind(_LU.col_ind());
-        const Index * prow_ptr(_LU.row_ptr());
+        const IT_ * pcol_ind(_LU.col_ind());
+        const IT_ * prow_ptr(_LU.row_ptr());
         const Index n(_LU.rows());
 
-        Index col;
+        IT_ col;
 
         // __forward-insertion__
         // iteration over all rows
@@ -857,16 +859,16 @@ namespace FEAST
          */
 
         DT_ * plu(_LU.val());
-        const Index * pcol(_LU.col_ind());
-        const Index * prow_ptr(_LU.row_ptr());
+        const IT_ * pcol(_LU.col_ind());
+        const IT_ * prow_ptr(_LU.row_ptr());
         const Index n(_LU.rows());
 
         // integer work array of length n
         //   for saving the position of the diagonal-entries
-        Index * pw = new Index[n];
+        IT_ * pw = new IT_[n];
 
-        Index row_start;
-        Index row_end;
+        IT_ row_start;
+        IT_ row_end;
 
         // iteration over all columns
         for (Index i(0); i < n; ++i)
@@ -876,13 +878,13 @@ namespace FEAST
 
           // iteration over all elements on the left side of the main-diagonal
           // k -> \tilde a_{ik}
-          Index k = row_start;
+          IT_ k = row_start;
           while (pcol[k] < i)
           {
             plu[k] /= plu[pw[pcol[k]]];
-            Index m(pw[pcol[k]] + 1);
+            IT_ m(pw[pcol[k]] + 1);
             // m -> \tilde a_{kj}
-            for (Index j(k+1); j < row_end; ++j)
+            for (IT_ j(k+1); j < row_end; ++j)
             {
               // j -> \tilde a_{ij}
               while (m < prow_ptr[pcol[k] + 1])
@@ -919,20 +921,20 @@ namespace FEAST
          */
 
         const Index n(_A.rows());
-        const Index * pacol(_A.col_ind());
-        const Index * parow(_A.row_ptr());
+        const IT_ * pacol(_A.col_ind());
+        const IT_ * parow(_A.row_ptr());
 
         // type of list-entries
-        typedef std::pair<int, Index> PAIR_;
+        typedef std::pair<int, IT_> PAIR_;
         // lists for saving the non-zero entries of L per row
         std::list<PAIR_> * ll = new std::list<PAIR_>[n];
 
         // vector for saving the iterators to the diag-entries
-        std::list<PAIR_>::iterator * pldiag = new std::list<PAIR_>::iterator[n];
+        typename std::list<PAIR_>::iterator * pldiag = new typename std::list<PAIR_>::iterator[n];
         // auxillary-iterators
-        std::list<PAIR_>::iterator it, it1, it2;
+        typename std::list<PAIR_>::iterator it, it1, it2;
 
-        Index col_begin, col_end, col, col2;
+        IT_ col_begin, col_end, col, col2;
         int l, l2, neues_level;
 
         // fill list with non-zero entries of A
@@ -943,7 +945,7 @@ namespace FEAST
           col_begin = parow[row];
           col_end = parow[row + 1] - 1;
 
-          for (Index k(col_begin); k <= col_end; ++k)
+          for (IT_ k(col_begin); k <= col_end; ++k)
           {
             col = pacol[k];
 
@@ -1007,13 +1009,13 @@ namespace FEAST
           nnz += Index(ll[i].size());
         }
 
-        DenseVector<Mem_, DT_> val(nnz);
-        DenseVector<Mem_, Index> col_ind(nnz);
-        DenseVector<Mem_, Index> row_ptr(n+1);
-        Index * pcol_ind(col_ind.elements());
-        Index * prow_ptr(row_ptr.elements());
+        DenseVector<Mem_, DT_, IT_> val(nnz);
+        DenseVector<Mem_, IT_, IT_> col_ind(nnz);
+        DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
+        IT_ * pcol_ind(col_ind.elements());
+        IT_ * prow_ptr(row_ptr.elements());
 
-        Index k1(0);
+        IT_ k1(0);
         prow_ptr[0] = 0;
 
         for (Index i(0); i < n; ++i)
@@ -1026,7 +1028,7 @@ namespace FEAST
           prow_ptr[i+1] = k1;
         }
 
-        _LU = SparseMatrixCSR<Mem_, DT_>(n, n, col_ind, val, row_ptr);
+        _LU = SparseMatrixCSR<Mem_, DT_, IT_>(n, n, col_ind, val, row_ptr);
 
         delete[] ll;
         delete[] pldiag;
@@ -1049,12 +1051,12 @@ namespace FEAST
         else
         {
           DT_ * plu(_LU.val());
-          const Index * plucol(_LU.col_ind());
-          const Index * plurow(_LU.row_ptr());
+          const IT_ * plucol(_LU.col_ind());
+          const IT_ * plurow(_LU.row_ptr());
 
           const DT_ * pa(_A.val());
-          const Index * pacol(_A.col_ind());
-          const Index * parow(_A.row_ptr());
+          const IT_ * pacol(_A.col_ind());
+          const IT_ * parow(_A.row_ptr());
 
           const Index n(_LU.rows());
           Index k;
@@ -1062,7 +1064,7 @@ namespace FEAST
           for (Index i(0); i < n; ++i)
           {
             k = parow[i];
-            for (Index j(plurow[i]); j < plurow[i + 1]; ++j)
+            for (IT_ j(plurow[i]); j < plurow[i + 1]; ++j)
             {
               plu[j] = DT_(0.0);
               while (k < parow[i + 1] && plucol[j] >= pacol[k])
@@ -1089,27 +1091,29 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Mem_, typename DT_>
-    class ILUPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
-                            DenseVector<Mem_, DT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
-                              DenseVector<Mem_, DT_> >
+    template <typename Mem_, typename DT_, typename IT_>
+    class ILUPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+                            DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+                              DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixELL<Mem_, DT_> & _A;
-      SparseMatrixELL<Mem_, DT_> _LU;
+      const SparseMatrixELL<Mem_, DT_, IT_> & _A;
+      SparseMatrixELL<Mem_, DT_, IT_> _LU;
 
     public:
       /// Our algotype
       typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
+      /// Our indextype
+      typedef IT_ IndexType;
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_> VectorType;
+      typedef DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixELL<Mem_, DT_> MatrixType;
+      typedef SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ilu;
 
@@ -1126,7 +1130,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const Index p) :
+      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const Index p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -1136,7 +1140,7 @@ namespace FEAST
 
         if (p == 0)
         {
-          _LU = SparseMatrixELL<Mem_, DT_>(A.layout());
+          _LU = SparseMatrixELL<Mem_, DT_, IT_>(A.layout());
 
           _copy_entries(false);
         }
@@ -1158,7 +1162,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & LU) :
+      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & LU) :
         _A(LU)
       {
         if (_LU.columns() != _LU.rows())
@@ -1178,8 +1182,8 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and layout
        */
-      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A,
-                        const SparseLayout<Mem_, typename SparseMatrixELL<Mem_, DT_>::IndexType, SparseMatrixELL<Mem_, DT_>::layout_id> & layout) :
+      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A,
+                        const SparseLayout<Mem_, IT_, SparseMatrixELL<Mem_, DT_>::layout_id> & layout) :
         _A(A),
         _LU(layout)
       {
@@ -1219,8 +1223,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in) override
+      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
+                         const DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -1228,8 +1232,8 @@ namespace FEAST
         // create pointers
         DT_ * pout(out.elements());
         const DT_ * pval(_LU.Ax());
-        const Index * paj(_LU.Aj());
-        const Index * parl(_LU.Arl());
+        const IT_ * paj(_LU.Aj());
+        const IT_ * parl(_LU.Arl());
         const Index stride(_LU.stride());
         const Index n(_LU.rows());
 
@@ -1280,20 +1284,20 @@ namespace FEAST
 
         const Index n(_A.rows());
         DT_ * plu(_LU.Ax());
-        const Index * pj(_LU.Aj());
-        const Index * prl(_LU.Arl());
+        const IT_ * pj(_LU.Aj());
+        const IT_ * prl(_LU.Arl());
         const Index stride(_LU.stride());
 
         // integer work array of length n
         //   for saving the position of the diagonal-entries
-        Index * pw = new Index[n];
+        IT_ * pw = new IT_[n];
 
         // iteration over all columns
-        for (Index i(0); i < n; ++i)
+        for (IT_ i(0); i < IT_(n); ++i)
         {
           // iteration over all elements on the left side of the main-diagonal
           // k -> \tilde a_{ik}
-          Index k = i;
+          IT_ k(i);
           while (pj[k] < i)
           {
             plu[k] /= plu[pw[pj[k]]];
@@ -1335,19 +1339,19 @@ namespace FEAST
          */
 
         const Index n(_A.rows());
-        const Index * paj(_A.Aj());
-        const Index * parl(_A.Arl());
+        const IT_ * paj(_A.Aj());
+        const IT_ * parl(_A.Arl());
         const Index stride(_A.stride());
 
         // type of list-entries
-        typedef std::pair<int, Index> PAIR_;
+        typedef std::pair<int, IT_> PAIR_;
         // list for saving the non-zero entries of L
         std::list<PAIR_> * ll = new std::list<PAIR_>[n];
 
         // vector for saving the iterators to the diag-entries
-        std::list<PAIR_>::iterator * pldiag = new std::list<PAIR_>::iterator[n];
+        typename std::list<PAIR_>::iterator * pldiag = new typename std::list<PAIR_>::iterator[n];
         // auxillary-iterators
-        std::list<PAIR_>::iterator it, it1, it2;
+        typename std::list<PAIR_>::iterator it, it1, it2;
 
         Index col, col2;
         int l, l2, neues_level;
@@ -1424,11 +1428,11 @@ namespace FEAST
           nnz += Index(ll[i].size());
         }
 
-        DenseVector<Mem_, DT_> lux(num_cols_per_row * stride);
-        DenseVector<Mem_, Index> luj(num_cols_per_row * stride);
-        DenseVector<Mem_, Index> lurl(n);
-        Index * pluj(luj.elements());
-        Index * plurl(lurl.elements());
+        DenseVector<Mem_, DT_, IT_> lux(num_cols_per_row * stride);
+        DenseVector<Mem_, IT_, IT_> luj(num_cols_per_row * stride);
+        DenseVector<Mem_, IT_, IT_> lurl(n);
+        IT_ * pluj(luj.elements());
+        IT_ * plurl(lurl.elements());
 
         Index used_elements(nnz);
         Index k1(0);
@@ -1440,11 +1444,11 @@ namespace FEAST
           {
             pluj[i + k1 * stride] = it->second;
           }
-          plurl[i] = Index(ll[i].size());
+          plurl[i] = IT_(ll[i].size());
         }
 
-        _LU = SparseMatrixELL<Mem_, DT_>(n, n, stride, num_cols_per_row,
-                                       used_elements, lux, luj , lurl);
+        _LU = SparseMatrixELL<Mem_, DT_, IT_>(n, n, stride, num_cols_per_row,
+                                              used_elements, lux, luj , lurl);
 
         delete[] ll;
         delete[] pldiag;
@@ -1467,12 +1471,12 @@ namespace FEAST
         else
         {
           DT_ * plu(_LU.Ax());
-          const Index * pluj(_LU.Aj());
-          const Index * plurl(_LU.Arl());
+          const IT_ * pluj(_LU.Aj());
+          const IT_ * plurl(_LU.Arl());
 
           const DT_ * pa(_A.Ax());
-          const Index * paj(_A.Aj());
-          const Index * parl(_A.Arl());
+          const IT_ * paj(_A.Aj());
+          const IT_ * parl(_A.Arl());
           const Index stride(_A.stride());
 
           const Index n(_A.rows());
@@ -1513,26 +1517,28 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Mem_, typename DT_>
-    class ILUPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                            DenseVector<Mem_, DT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                              DenseVector<Mem_, DT_> >
+    template <typename Mem_, typename DT_, typename IT_>
+    class ILUPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+                            DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+                              DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                        DenseVector<Mem_, DT_> > _precond;
+      ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+                        DenseVector<Mem_, DT_, IT_> > _precond;
     public:
       /// Our algotype
       typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
+      /// Our indextype
+      typedef IT_ IndexType;
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_> VectorType;
+      typedef DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCOO<Mem_, DT_> MatrixType;
+      typedef SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ilu;
 
@@ -1549,8 +1555,8 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A, const Index p) :
-        _precond(SparseMatrixCSR<Mem_, DT_> (A), p)
+      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const Index p) :
+        _precond(SparseMatrixCSR<Mem_, DT_, IT_> (A), p)
       {
       }
 
@@ -1563,8 +1569,8 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_> & LU) :
-        _precond(SparseMatrixCSR<Mem_, DT_> (LU))
+      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & LU) :
+        _precond(SparseMatrixCSR<Mem_, DT_, IT_> (LU))
       {
       }
 
@@ -1584,8 +1590,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in) override
+      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
+                         const DenseVector<Mem_, DT_, IT_> & in) override
       {
         _precond.apply(out, in);
       }
