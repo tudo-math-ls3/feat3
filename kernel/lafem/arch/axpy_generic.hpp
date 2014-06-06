@@ -84,8 +84,8 @@ void Axpy<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ a, const DT_ * const
   for (Index row(0) ; row < rows ; ++row)
   {
     DT_ sum(0);
-    const Index end(row_ptr[row + 1]);
-    for (Index i(row_ptr[row]) ; i < end ; ++i)
+    const IT_ end(row_ptr[row + 1]);
+    for (IT_ i(row_ptr[row]) ; i < end ; ++i)
     {
       sum += val[i] * x[col_ind[i]];
     }
@@ -175,12 +175,12 @@ void Axpy<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ a, const DT_ * const
     tAj += row;
     tAx += row;
 
-    const Index max(Arl[row]);
-    for(Index n(0); n < max ; n++)
+    const IT_ max(Arl[row]);
+    for(IT_ n(0); n < max ; n++)
     {
       const DT_ A_ij = *tAx;
 
-      const Index col = *tAj;
+      const IT_ col = *tAj;
       sum += A_ij * x[col];
 
       tAj += stride;
@@ -221,7 +221,7 @@ void Axpy<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ a, const DT_ * const
     const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index used_elements)
 {
   Index iter(0);
-  for (Index row(0); row < rows; ++row)
+  for (IT_ row(0); row < IT_(rows); ++row)
   {
     DT_ sum(DT_(0));
     while (iter < used_elements && row_ptr[iter] == row)

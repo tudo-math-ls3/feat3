@@ -711,8 +711,8 @@ namespace FEAST
           for (Index i(0) ; i < _rows() ; ++i)
           {
             tArl[i] = cother.row_ptr()[i + 1] - cother.row_ptr()[i];
-            if (tArl[i] > _num_cols_per_row())
-              _num_cols_per_row() = tArl[i];
+            if (tArl[i] > IT_(_num_cols_per_row()))
+              _num_cols_per_row() = Index(tArl[i]);
           }
 
           Index alignment(32);
@@ -726,9 +726,9 @@ namespace FEAST
           for (Index row(0); row < _rows() ; ++row)
           {
             Index target(0);
-            for (Index i(0) ; i < tArl[row] ; ++i)
+            for (IT_ i(0) ; i < tArl[row] ; ++i)
             {
-              const Index row_start(cother.row_ptr()[row]);
+              const IT_ row_start(cother.row_ptr()[row]);
               //if(cother.val()[row_start + i] != DT_(0))
               {
                 tAj[row + target * _stride()] = (cother.col_ind())[row_start + i];
@@ -1150,10 +1150,10 @@ namespace FEAST
           ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix ell row size " + stringify(rows()) + " !");
           ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix ell column size " + stringify(columns()) + " !");
 
-          Index max(MemoryPool<Mem_>::get_element(this->_indices.at(1), row));
-          for (Index i(row), j(0) ; j < max && MemoryPool<Mem_>::get_element(this->_indices.at(0), i) <= col ; i += stride(), ++j)
+          Index max(Index(MemoryPool<Mem_>::get_element(this->_indices.at(1), row)));
+          for (Index i(row), j(0) ; j < max && Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)) <= col ; i += stride(), ++j)
           {
-            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == col)
+            if (Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)) == col)
               return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
           }
           return zero_element();

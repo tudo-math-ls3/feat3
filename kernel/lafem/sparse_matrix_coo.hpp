@@ -753,8 +753,8 @@ namespace FEAST
 
           for (Index row(0), ue(0) ; row < other.rows() ; ++row)
           {
-            const Index end(cother.row_ptr()[row + 1]);
-            for (Index i(cother.row_ptr()[row]) ; i < end ; ++i)
+            const IT_ end(cother.row_ptr()[row + 1]);
+            for (IT_ i(cother.row_ptr()[row]) ; i < end ; ++i)
             {
               tval[ue] = cother.val()[i];
               trow[ue] = IT_(row);
@@ -1255,7 +1255,7 @@ namespace FEAST
             _insertion_sort(row_indices(), val(), column_indices(), used_elements());
 
             Index row_start(0);
-            for (Index rowi(0) ; rowi < rows() ; ++rowi)
+            for (IT_ rowi(0) ; rowi < IT_(rows()) ; ++rowi)
             {
               Index offset(0);
               // explore range of elements in given row
@@ -1308,19 +1308,19 @@ namespace FEAST
           Index i(0);
           while (i < used_elements())
           {
-            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) >= row)
+            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) >= IT_(row))
               break;
             ++i;
           }
 
           while (i < used_elements())
           {
-            if (MemoryPool<Mem_>::get_element(this->_indices.at(1),i) >= col || MemoryPool<Mem_>::get_element(this->_indices.at(0), i) > row)
+            if (MemoryPool<Mem_>::get_element(this->_indices.at(1),i) >= IT_(col) || MemoryPool<Mem_>::get_element(this->_indices.at(0), i) > IT_(row))
               break;
             ++i;
           }
 
-          if(i < used_elements() && MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == row && MemoryPool<Mem_>::get_element(this->_indices.at(1), i) == col)
+          if(i < used_elements() && MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == IT_(row) && MemoryPool<Mem_>::get_element(this->_indices.at(1), i) == IT_(col))
           {
             return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
           }

@@ -1136,11 +1136,11 @@ namespace FEAST
           ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(rows()) + " !");
           ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(columns()) + " !");
 
-          for (Index i(MemoryPool<Mem_>::get_element(this->_indices.at(1), row)) ; i < MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1) ; ++i)
+          for (Index i(Index(MemoryPool<Mem_>::get_element(this->_indices.at(1), row))) ; i < Index(MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1)) ; ++i)
           {
-            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == col)
+            if (Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)) == col)
               return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
-            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) > col)
+            if (Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)) > col)
               return zero_element();
           }
           return zero_element();

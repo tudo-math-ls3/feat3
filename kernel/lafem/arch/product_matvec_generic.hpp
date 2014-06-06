@@ -83,7 +83,7 @@ template <typename DT_, typename IT_>
 void ProductMatVec<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const val, const IT_ * const row_ptr, const IT_ * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements)
 {
   Index iter(0);
-  for (Index row(0); row < rows; ++row)
+  for (IT_ row(0); row < IT_(rows); ++row)
   {
     DT_ sum(DT_(0));
     while (iter < used_elements && row_ptr[iter] == row)
