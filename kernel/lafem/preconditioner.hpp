@@ -91,7 +91,6 @@ namespace FEAST
       static_assert(std::is_same<IndexType, typename VT_::IndexType>::value,
                     "matrix and vector have different mem-types");
 
-
       virtual ~NonePreconditioner()
       {
       }
@@ -155,6 +154,8 @@ namespace FEAST
       typedef Algo_ AlgoType;
       /// Our datatype
       typedef typename MT_::DataType DataType;
+      /// Our indextype
+      typedef typename MT_::IndexType IndexType;
       /// Our memory architecture type
       typedef typename MT_::MemType MemType;
       /// Our vectortype
@@ -163,6 +164,14 @@ namespace FEAST
       typedef MT_ MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_file;
+
+      // ensure matrix and vector have the same mem-, data- and index-type
+      static_assert(std::is_same<MemType, typename VT_::MemType>::value,
+                    "matrix and vector have different mem-types");
+      static_assert(std::is_same<DataType, typename VT_::DataType>::value,
+                    "matrix and vector have different mem-types");
+      static_assert(std::is_same<IndexType, typename VT_::IndexType>::value,
+                    "matrix and vector have different mem-types");
 
       virtual ~FilePreconditioner()
       {
