@@ -1962,28 +1962,30 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Mem_, typename DT_>
-    class SSORPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                             DenseVector<Mem_, DT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                              DenseVector<Mem_, DT_> >
+    template <typename Mem_, typename DT_, typename IT_>
+    class SSORPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+                             DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+                              DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixCSR<Mem_, DT_> & _A;
+      const SparseMatrixCSR<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
-      DenseVector<Mem_, DT_> _diag;
+      DenseVector<Mem_, DT_, IT_> _diag;
 
     public:
       /// Our algotype
       typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
+      /// Our indextype
+      typedef IT_ IndexType;
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_> VectorType;
+      typedef DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCSR<Mem_, DT_> MatrixType;
+      typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ssor;
 
@@ -1999,7 +2001,7 @@ namespace FEAST
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const DT_ omega = DT_(1.3)) :
+      SSORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1.3)) :
         _A(A),
         _omega(omega),
         _diag(A.rows())
@@ -2038,8 +2040,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in) override
+      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
+                         const DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -2047,8 +2049,8 @@ namespace FEAST
         // create pointers
         DT_ * pout(out.elements());
         const DT_ * pval(_A.val());
-        const Index * pcol_ind(_A.col_ind());
-        const Index * prow_ptr(_A.row_ptr());
+        const IT_ * pcol_ind(_A.col_ind());
+        const IT_ * prow_ptr(_A.row_ptr());
         const Index n(_A.rows());
 
         Index col;
@@ -2103,28 +2105,30 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Mem_, typename DT_>
-    class SSORPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                             DenseVector<Mem_, DT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                              DenseVector<Mem_, DT_> >
+    template <typename Mem_, typename DT_, typename IT_>
+    class SSORPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+                             DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+                              DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixCOO<Mem_, DT_> & _A;
+      const SparseMatrixCOO<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
-      DenseVector<Mem_, DT_> _diag;
+      DenseVector<Mem_, DT_, IT_> _diag;
 
     public:
       /// Our algotype
       typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
+      /// Our indextype
+      typedef IT_ IndexType;
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
-      typedef DenseVector<Mem_, DT_> VectorType;
+      typedef DenseVector<Mem_, DT_, IT_> VectorType;
       /// Our matrixtype
-      typedef SparseMatrixCOO<Mem_, DT_> MatrixType;
+      typedef SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
       /// Our used precon type
       const static SparsePreconType PreconType = SparsePreconType::pt_ssor;
 
@@ -2140,7 +2144,7 @@ namespace FEAST
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A, const DT_ omega = DT_(1.3)) :
+      SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1.3)) :
         _A(A),
         _omega(omega),
         _diag(A.rows())
@@ -2179,8 +2183,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in) override
+      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
+                         const DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -2188,8 +2192,8 @@ namespace FEAST
         // create pointers
         DT_ * pout(out.elements());
         const DT_ * pval(_A.val());
-        const Index * pcol(_A.column_indices());
-        const Index * prow(_A.row_indices());
+        const IT_ * pcol(_A.column_indices());
+        const IT_ * prow(_A.row_indices());
         const Index n(_A.rows());
 
         Index col(0);
@@ -2251,22 +2255,24 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Mem_, typename DT_>
-    class SSORPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
-                             DenseVector<Mem_, DT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
-                              DenseVector<Mem_, DT_> >
+    template <typename Mem_, typename DT_, typename IT_>
+    class SSORPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+                             DenseVector<Mem_, DT_, IT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+                              DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      const SparseMatrixELL<Mem_, DT_> & _A;
+      const SparseMatrixELL<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
-      DenseVector<Mem_, DT_> _diag;
+      DenseVector<Mem_, DT_, IT_> _diag;
 
     public:
       /// Our algotype
       typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
+      /// Our indextype
+      typedef IT_ IndexType;
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our vectortype
@@ -2288,7 +2294,7 @@ namespace FEAST
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const DT_ omega = DT_(1.3)) :
+      SSORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1.3)) :
         _A(A),
         _omega(omega),
         _diag(A.rows())
@@ -2327,8 +2333,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in) override
+      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
+                         const DenseVector<Mem_, DT_, IT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -2336,9 +2342,9 @@ namespace FEAST
         // create pointers
         DT_ * pout(out.elements());
         const DT_ * pval(_A.Ax());
-        const Index * paj(_A.Aj());
+        const IT_ * paj(_A.Aj());
         const Index stride(_A.stride());
-        const Index * parl(_A.Arl());
+        const IT_ * parl(_A.Arl());
 
         const Index n(_A.rows());
 
