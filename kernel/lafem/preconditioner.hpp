@@ -2409,20 +2409,20 @@ namespace FEAST
       {
       };
 
-      template <typename Mem_, typename DT_>
-      class SPAIPreconditionerMTdepending<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                                          DenseVector<Mem_, DT_> >
-        : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                                DenseVector<Mem_, DT_> >
+      template <typename Mem_, typename DT_, typename IT_>
+      class SPAIPreconditionerMTdepending<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+                                          DenseVector<Mem_, DT_, IT_> >
+        : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+                                DenseVector<Mem_, DT_, IT_> >
       {
       private:
-        typedef std::pair<DT_, Index> PAIR_;
-        typedef SparseMatrixCSR<Mem_, DT_> MatrixType;
-        typedef DenseVector<Mem_, DT_> VectorType;
+        typedef std::pair<DT_, IT_> PAIR_;
+        typedef SparseMatrixCSR<Mem_, DT_, IT_> MatrixType;
+        typedef DenseVector<Mem_, DT_, IT_> VectorType;
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> _layout;
+        const SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2438,7 +2438,7 @@ namespace FEAST
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> && layout) :
+                                      SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
           _m((Index) -1),
@@ -2454,8 +2454,8 @@ namespace FEAST
         {
           const Index n(_A.rows());
 
-          const Index * playoutcol(_layout.get_indices().at(0));
-          const Index * playoutrow(_layout.get_indices().at(1));
+          const IT_ * playoutcol(_layout.get_indices().at(0));
+          const IT_ * playoutrow(_layout.get_indices().at(1));
 
           for (Index i(0); i < n; ++i)
           {
@@ -2469,8 +2469,8 @@ namespace FEAST
         void create_a_columnwise ()
         {
           const DT_ * pval(_A.val());
-          const Index * pcol_ind(_A.col_ind());
-          const Index * prow_ptr(_A.row_ptr());
+          const IT_ * pcol_ind(_A.col_ind());
+          const IT_ * prow_ptr(_A.row_ptr());
           const Index n(_A.columns());
 
           for (Index i(0); i < n; ++i)
@@ -2493,13 +2493,13 @@ namespace FEAST
             nnz += Index(_m_columns[k].size());
           }
 
-          DenseVector<Mem_, DT_> val(nnz);
-          DenseVector<Mem_, Index> col_ind(nnz);
-          DenseVector<Mem_, Index> row_ptr(n+1);
+          DenseVector<Mem_, DT_, IT_> val(nnz);
+          DenseVector<Mem_, IT_, IT_> col_ind(nnz);
+          DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
           DT_ * pval = val.elements();
-          Index * pcol_ind = col_ind.elements();
-          Index * prow_ptr = row_ptr.elements();
-          Index nz(0);
+          IT_ * pcol_ind = col_ind.elements();
+          IT_ * prow_ptr = row_ptr.elements();
+          IT_ nz(0);
           prow_ptr[0] = 0;
 
           for (Index k(0); k < n; ++k)
@@ -2520,8 +2520,8 @@ namespace FEAST
         {
           const Index n(_A.rows());
 
-          DenseVector<Mem_, Index> trow_ptr(n + 1, Index(0));
-          Index * ptrow_ptr(trow_ptr.elements());
+          DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, Index(0));
+          IT_ * ptrow_ptr(trow_ptr.elements());
 
           ptrow_ptr[0] = 0;
 
@@ -2540,12 +2540,12 @@ namespace FEAST
             ptrow_ptr[i + 1] += ptrow_ptr[i];
           }
 
-          DenseVector<Mem_, Index> tcol_ind(used_elements);
-          DenseVector<Mem_, DT_> tval(used_elements);
-          Index * ptcol_ind(tcol_ind.elements());
+          DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
+          DenseVector<Mem_, DT_, IT_> tval(used_elements);
+          IT_ * ptcol_ind(tcol_ind.elements());
           DT_ * ptval(tval.elements());
 
-          for (Index i(0); i < n; ++i)
+          for (IT_ i(0); i < IT_(n); ++i)
           {
             for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
             {
@@ -2563,7 +2563,7 @@ namespace FEAST
           }
           ptrow_ptr[0] = 0;
 
-          _M = SparseMatrixCSR<Mem_, DT_>(n, n, tcol_ind, tval, trow_ptr);
+          _M = MatrixType(n, n, tcol_ind, tval, trow_ptr);
         } // function create_m
 
         void create_m_without_new_entries ()
@@ -2574,19 +2574,19 @@ namespace FEAST
           {
             const Index used_elements(n * (1 + 2 * _m) - _m * (_m + 1));
 
-            DenseVector<Mem_, DT_> val(used_elements);
-            DenseVector<Mem_, Index> col_ind(used_elements);
-            DenseVector<Mem_, Index> row_ptr(n+1);
+            DenseVector<Mem_, DT_, IT_> val(used_elements);
+            DenseVector<Mem_, IT_, IT_> col_ind(used_elements);
+            DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
             DT_ * pval(val.elements());
-            Index * pcol_ind(col_ind.elements());
-            Index * prow_ptr(row_ptr.elements());
+            IT_ * pcol_ind(col_ind.elements());
+            IT_ * prow_ptr(row_ptr.elements());
 
-            prow_ptr[0] = 0;
+            prow_ptr[0] = IT_(0);
 
-            Index k(0);
-            for (Index i(0); i < n; ++i)
+            IT_ k(0);
+            for (IT_ i(0); i < IT_(n); ++i)
             {
-              for (Index l((_m > i) ? 0 : i - _m); l < Math::min(n, _m + i + 1); ++l)
+              for (IT_ l((_m > i) ? 0 : i - IT_(_m)); l < Math::min(n, _m + i + 1); ++l)
               {
                 pcol_ind[k] = l;
                 ++k;
@@ -2598,7 +2598,7 @@ namespace FEAST
             {
               for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
               {
-                const Index tmp(std::min(it_J->second, _m));
+                const IT_ tmp(std::min(it_J->second, IT_(_m)));
                 pval[prow_ptr[it_J->second] + i - it_J->second + tmp] = it_J->first;
               }
             }
@@ -2610,14 +2610,14 @@ namespace FEAST
             _M = MatrixType(_layout);
 
             DT_ * pval(_M.val());
-            const Index * pcol_ind(_M.col_ind());
-            const Index * prow_ptr(_M.row_ptr());
+            const IT_ * pcol_ind(_M.col_ind());
+            const IT_ * prow_ptr(_M.row_ptr());
 
             for (Index i(0); i < n; ++i)
             {
               for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
               {
-                Index k = prow_ptr[it_J->second];
+                IT_ k = prow_ptr[it_J->second];
 
                 while (pcol_ind[k] != i)
                 {
@@ -2633,8 +2633,8 @@ namespace FEAST
         void apply_m_transpose (VectorType & out, const VectorType & in)
         {
           const Index n(_M.rows());
-          const Index * pmcol(_M.col_ind());
-          const Index * pmrow(_M.row_ptr());
+          const IT_ * pmcol(_M.col_ind());
+          const IT_ * pmrow(_M.row_ptr());
           const DT_ * pm(_M.val());
           const DT_ * pin(in.elements());
           DT_ * pout(out.elements());
@@ -2655,20 +2655,20 @@ namespace FEAST
       };
 
 
-      template <typename Mem_, typename DT_>
-      class SPAIPreconditionerMTdepending<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                                          DenseVector<Mem_, DT_> >
-        : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                                DenseVector<Mem_, DT_> >
+      template <typename Mem_, typename DT_, typename IT_>
+      class SPAIPreconditionerMTdepending<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+                                          DenseVector<Mem_, DT_, IT_> >
+        : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+                                DenseVector<Mem_, DT_, IT_> >
       {
       private:
-        typedef std::pair<DT_, Index> PAIR_;
-        typedef SparseMatrixCOO<Mem_, DT_> MatrixType;
-        typedef DenseVector<Mem_, DT_> VectorType;
+        typedef std::pair<DT_, IT_> PAIR_;
+        typedef SparseMatrixCOO<Mem_, DT_, IT_> MatrixType;
+        typedef DenseVector<Mem_, DT_, IT_> VectorType;
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> _layout;
+        const SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2684,7 +2684,7 @@ namespace FEAST
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> && layout) :
+                                      SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
           _m((Index) -1),
@@ -2698,8 +2698,8 @@ namespace FEAST
 
         void create_initial_m_columns ()
         {
-          const Index * playoutcol(_layout.get_indices().at(1));
-          const Index * playoutrow(_layout.get_indices().at(0));
+          const IT_ * playoutcol(_layout.get_indices().at(1));
+          const IT_ * playoutrow(_layout.get_indices().at(0));
           const Index used_elements(_layout.get_scalar_index().at(3));
 
           for (Index i(0); i < used_elements; ++i)
@@ -2711,8 +2711,8 @@ namespace FEAST
         void create_a_columnwise ()
         {
           const DT_ * pa(_A.get_elements().at(0));
-          const Index * pacol(_A.get_indices().at(1));
-          const Index * parow(_A.get_indices().at(0));
+          const IT_ * pacol(_A.get_indices().at(1));
+          const IT_ * parow(_A.get_indices().at(0));
           const Index used_elements(_A.get_scalar_index().at(3));
 
           for (Index i(0); i < used_elements; ++i)
@@ -2732,15 +2732,15 @@ namespace FEAST
             nnz += Index(_m_columns[k].size());
           }
 
-          DenseVector<Mem_, DT_> val(nnz);
-          DenseVector<Mem_, Index> col_ind(nnz);
-          DenseVector<Mem_, Index> row_ind(nnz);
+          DenseVector<Mem_, DT_, IT_> val(nnz);
+          DenseVector<Mem_, IT_, IT_> col_ind(nnz);
+          DenseVector<Mem_, IT_, IT_> row_ind(nnz);
           DT_ * pval = val.elements();
-          Index * pcol_ind = col_ind.elements();
-          Index * prow_ind = row_ind.elements();
+          IT_ * pcol_ind = col_ind.elements();
+          IT_ * prow_ind = row_ind.elements();
           Index nz(0);
 
-          for (Index k(0); k < n; ++k)
+          for (IT_ k(0); k < IT_(n); ++k)
           {
             for (auto it_J = _m_columns[k].begin(); it_J != _m_columns[k].end(); ++it_J)
             {
@@ -2758,8 +2758,8 @@ namespace FEAST
         {
           const Index n(_A.rows());
 
-          DenseVector<Mem_, Index> trow_ptr(n + 1, Index(0));
-          Index * ptrow_ptr(trow_ptr.elements());
+          DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, Index(0));
+          IT_ * ptrow_ptr(trow_ptr.elements());
 
           Index used_elements(0);
           for (Index i(0); i < n; ++i)
@@ -2770,21 +2770,21 @@ namespace FEAST
               ++ptrow_ptr[it_J->second + 1];
             }
           }
-          ptrow_ptr[0] = 0;
+          ptrow_ptr[0] = IT_(0);
 
           for (Index i(1); i < n - 1; ++i)
           {
             ptrow_ptr[i + 1] += ptrow_ptr[i];
           }
 
-          DenseVector<Mem_, Index> tcol_ind(used_elements);
-          DenseVector<Mem_, Index> trow_ind(used_elements);
-          DenseVector<Mem_, DT_> tval(used_elements);
-          Index * ptcol_ind(tcol_ind.elements());
-          Index * ptrow_ind(trow_ind.elements());
+          DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
+          DenseVector<Mem_, IT_, IT_> trow_ind(used_elements);
+          DenseVector<Mem_, DT_, IT_> tval(used_elements);
+          IT_ * ptcol_ind(tcol_ind.elements());
+          IT_ * ptrow_ind(trow_ind.elements());
           DT_ * ptval(tval.elements());
 
-          for (Index i(0); i < n; ++i)
+          for (IT_ i(0); i < IT_(n); ++i)
           {
             for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
             {
@@ -2797,7 +2797,7 @@ namespace FEAST
             }
           }
 
-          _M = SparseMatrixCOO<Mem_, DT_>(n, n, trow_ind, tcol_ind, tval);
+          _M = MatrixType(n, n, trow_ind, tcol_ind, tval);
         } // function create_m
 
         void create_m_without_new_entries ()
@@ -2808,21 +2808,21 @@ namespace FEAST
           {
             const Index used_elements(n * (1 + 2 * _m) - _m * (_m + 1));
 
-            DenseVector<Mem_, DT_> val(used_elements);
-            DenseVector<Mem_, Index> col_ind(used_elements);
-            DenseVector<Mem_, Index> row_ind(used_elements);
-            DenseVector<Mem_, Index> row_ptr(n+1);
+            DenseVector<Mem_, DT_, IT_> val(used_elements);
+            DenseVector<Mem_, IT_, IT_> col_ind(used_elements);
+            DenseVector<Mem_, IT_, IT_> row_ind(used_elements);
+            DenseVector<Mem_, IT_, IT_> row_ptr(n+1);
             DT_ * pval(val.elements());
-            Index * pcol_ind(col_ind.elements());
-            Index * prow_ind(row_ind.elements());
-            Index * prow_ptr(row_ptr.elements());
+            IT_ * pcol_ind(col_ind.elements());
+            IT_ * prow_ind(row_ind.elements());
+            IT_ * prow_ptr(row_ptr.elements());
 
-            prow_ptr[0] = 0;
+            prow_ptr[0] = IT_(0);
 
-            Index k(0);
-            for (Index i(0); i < n; ++i)
+            IT_ k(0);
+            for (IT_ i(0); i < IT_(n); ++i)
             {
-              for (Index l((_m > i) ? 0 : i - _m); l < Math::min(n, _m + i + 1); ++l)
+              for (IT_ l((_m > i) ? 0 : i - IT_(_m)); l < Math::min(n, _m + i + 1); ++l)
               {
                 pcol_ind[k] = l;
                 prow_ind[k] = i;
@@ -2835,7 +2835,7 @@ namespace FEAST
             {
               for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
               {
-                const Index tmp(std::min(it_J->second, _m));
+                const Index tmp(std::min(it_J->second, IT_(_m)));
                 pval[prow_ptr[it_J->second] + i - it_J->second + tmp] = it_J->first;
               }
             }
@@ -2861,8 +2861,8 @@ namespace FEAST
           const Index used_elements(_M.used_elements());
           const Index n(_M.rows());
           const DT_ * pval(_M.val());
-          const Index * pcol(_M.column_indices());
-          const Index * prow(_M.row_indices());
+          const IT_ * pcol(_M.column_indices());
+          const IT_ * prow(_M.row_indices());
           const DT_ * pin(in.elements());
           DT_ * pout(out.elements());
 
@@ -2879,20 +2879,20 @@ namespace FEAST
       };
 
 
-      template <typename Mem_, typename DT_>
-      class SPAIPreconditionerMTdepending<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
-                                          DenseVector<Mem_, DT_> >
-        : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
-                                DenseVector<Mem_, DT_> >
+      template <typename Mem_, typename DT_, typename IT_>
+      class SPAIPreconditionerMTdepending<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+                                          DenseVector<Mem_, DT_, IT_> >
+        : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+                                DenseVector<Mem_, DT_, IT_> >
       {
       private:
-        typedef std::pair<DT_, Index> PAIR_;
-        typedef SparseMatrixELL<Mem_, DT_> MatrixType;
-        typedef DenseVector<Mem_, DT_> VectorType;
+        typedef std::pair<DT_, IT_> PAIR_;
+        typedef SparseMatrixELL<Mem_, DT_, IT_> MatrixType;
+        typedef DenseVector<Mem_, DT_, IT_> VectorType;
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> _layout;
+        const SparseLayout<Mem_, IT_, MatrixType::layout_id> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2908,7 +2908,7 @@ namespace FEAST
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> && layout) :
+                                      SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
           _m((Index) -1),
@@ -2924,8 +2924,8 @@ namespace FEAST
         {
           const Index n(_A.rows());
 
-          const Index * playoutj(_layout.get_indices().at(0));
-          const Index * playoutrl(_layout.get_indices().at(1));
+          const IT_ * playoutj(_layout.get_indices().at(0));
+          const IT_ * playoutrl(_layout.get_indices().at(1));
           const Index stride(_layout.get_scalar_index().at(3));
 
           for (Index i(0); i < n; ++i)
@@ -2941,8 +2941,8 @@ namespace FEAST
         {
           const Index n(_A.rows());
           const DT_ * pval(_A.get_elements().at(0));
-          const Index * paj(_A.get_indices().at(0));
-          const Index * parl(_A.get_indices().at(1));
+          const IT_ * paj(_A.get_indices().at(0));
+          const IT_ * parl(_A.get_indices().at(1));
           const Index stride(_A.get_scalar_index().at(3));
 
           for (Index i(0); i < n; ++i)
@@ -2969,12 +2969,12 @@ namespace FEAST
             nnz += Index(_m_columns[i].size());
           }
 
-          DenseVector<Mem_, DT_> mx(num_cols_per_row * stride);
-          DenseVector<Mem_, Index> mj(num_cols_per_row * stride);
-          DenseVector<Mem_, Index> mrl(n);
+          DenseVector<Mem_, DT_, IT_> mx(num_cols_per_row * stride);
+          DenseVector<Mem_, IT_, IT_> mj(num_cols_per_row * stride);
+          DenseVector<Mem_, IT_, IT_> mrl(n);
           DT_ * pmx(mx.elements());
-          Index * pmj(mj.elements());
-          Index * pmrl(mrl.elements());
+          IT_ * pmj(mj.elements());
+          IT_ * pmrl(mrl.elements());
 
           Index used_elements(nnz);
           Index k1(0);
@@ -2987,11 +2987,11 @@ namespace FEAST
               pmj[i + k1 * stride] = it_J->second;
               pmx[i + k1 * stride] = it_J->first;
             }
-            pmrl[i] = Index(_m_columns[i].size());
+            pmrl[i] = IT_(_m_columns[i].size());
           }
 
           _M = MatrixType(n, n, stride, num_cols_per_row,
-                 used_elements, mx, mj , mrl);
+                          used_elements, mx, mj , mrl);
         } // function create_m_transpose
 
         void create_m()
@@ -2999,8 +2999,8 @@ namespace FEAST
           const Index n(_A.rows());
           const Index tstride(_A.stride());
 
-          DenseVector<Mem_, Index> trl(n, Index(0));
-          Index * ptrl(trl.elements());
+          DenseVector<Mem_, IT_, IT_> trl(n, Index(0));
+          IT_ * ptrl(trl.elements());
 
           Index used_elements(0);
           for (Index i(0); i < n; ++i)
@@ -3022,13 +3022,13 @@ namespace FEAST
             ptrl[i] = 0;
           }
 
-          DenseVector<Mem_, Index> tj(tstride * num_cols_per_row);
-          DenseVector<Mem_, DT_> tx(tstride * num_cols_per_row);
+          DenseVector<Mem_, IT_, IT_> tj(tstride * num_cols_per_row);
+          DenseVector<Mem_, DT_, IT_> tx(tstride * num_cols_per_row);
 
-          Index * ptj(tj.elements());
+          IT_ * ptj(tj.elements());
           DT_ * ptx(tx.elements());
 
-          for (Index i(0); i < n; ++i)
+          for (IT_ i(0); i < IT_(n); ++i)
           {
             for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
             {
@@ -3039,7 +3039,7 @@ namespace FEAST
             }
           }
 
-          _M = SparseMatrixELL<Mem_, DT_>(n, n, tstride, num_cols_per_row, used_elements, tx, tj, trl);
+          _M = MatrixType(n, n, tstride, num_cols_per_row, used_elements, tx, tj, trl);
         } // function create_m
 
         void create_m_without_new_entries ()
@@ -3051,29 +3051,29 @@ namespace FEAST
             const Index stride(_A.stride());
             Index num_cols_per_row(2 * _m + 1);
 
-            DenseVector<Mem_, DT_> mx(stride * num_cols_per_row);
-            DenseVector<Mem_, Index> mj(stride * num_cols_per_row);
-            DenseVector<Mem_, Index> mrl(n);
+            DenseVector<Mem_, DT_, IT_> mx(stride * num_cols_per_row);
+            DenseVector<Mem_, IT_ ,IT_> mj(stride * num_cols_per_row);
+            DenseVector<Mem_, IT_, IT_> mrl(n);
             DT_ * pmx(mx.elements());
-            Index * pmj(mj.elements());
-            Index * pmrl(mrl.elements());
+            IT_ * pmj(mj.elements());
+            IT_ * pmrl(mrl.elements());
 
             for (Index i(0); i < n; ++i)
             {
               Index k(i);
-              for (Index l((_m > i) ? 0 : i - _m); l < Math::min(n, _m + i + 1); ++l)
+              for (IT_ l(IT_((_m > i) ? 0 : i - _m)); l < Math::min(n, _m + i + 1); ++l)
               {
                 pmj[k] = l;
                 k += stride;
               }
-              pmrl[i] = _m + 1 + std::min(std::min(i, _m), n - i - 1);
+              pmrl[i] = IT_(_m + 1 + std::min(std::min(i, _m), n - i - 1));
             }
 
             for (Index i(0); i < n; ++i)
             {
               for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
               {
-                const Index tmp(std::min(it_J->second, _m));
+                const Index tmp(std::min(it_J->second, IT_(_m)));
                 pmx[it_J->second + stride * (i - it_J->second + tmp)] = it_J->first;
               }
             }
@@ -3085,7 +3085,7 @@ namespace FEAST
             _M = MatrixType(_layout);
 
             DT_ * pmx(_M.Ax());
-            const Index * pmj(_M.Aj());
+            const IT_ * pmj(_M.Aj());
             const Index stride(_M.stride());
 
             for (Index i(0); i < n; ++i)
@@ -3110,8 +3110,8 @@ namespace FEAST
           const Index n(_M.rows());
           const Index stride(_M.stride());
           const DT_ * pmx(_M.Ax());
-          const Index * pmj(_M.Aj());
-          const Index * pmrl(_M.Arl());
+          const IT_ * pmj(_M.Aj());
+          const IT_ * pmrl(_M.Arl());
           const DT_ * pin(in.elements());
           DT_ * pout(out.elements());
 
@@ -3139,7 +3139,8 @@ namespace FEAST
     private:
       typedef typename MT_::DataType DT_;
       typedef typename MT_::MemType Mem_;
-      typedef std::pair<DT_, Index> PAIR_;
+      typedef typename MT_::IndexType IT_;
+      typedef std::pair<DT_, IT_> PAIR_;
 
       using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_A;
       using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_m;
@@ -3161,6 +3162,8 @@ namespace FEAST
       typedef Algo_ AlgoType;
       /// Our datatype
       typedef typename MT_::DataType DataType;
+      /// Our indextype
+      typedef typename MT_::IndexType IndexType;
       /// Our memory architecture type
       typedef typename MT_::MemType MemType;
       /// Our vectortype
@@ -3306,8 +3309,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector, which is applied to the preconditioning
        */
-      virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in) override
+      virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
+                         const DenseVector<Mem_, DT_, IT_> & in) override
       {
         if (_max_iter > 0 && _transpose == true)
         {
