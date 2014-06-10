@@ -309,7 +309,7 @@ namespace FEAST
         this->first().set_vec_inv(pval_set);
         this->rest().set_vec_inv(pval_set + this->first().size());
       }
-      /// \end cond
+      /// \endcond
 
       /**
        * \brief Convertion method

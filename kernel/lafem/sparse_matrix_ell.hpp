@@ -1595,7 +1595,7 @@ namespace FEAST
             pcol_set[i * stride_in] = paj[i * astride] + IT_(col_start);
           }
         }
-        /// \end cond
+        /// \endcond
     };
 
     /**

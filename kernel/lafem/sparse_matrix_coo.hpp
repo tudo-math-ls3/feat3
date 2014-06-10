@@ -1810,7 +1810,7 @@ namespace FEAST
             pcol_set[i * stride] = pcol[start + i] + IT_(col_start);
           }
         }
-        /// \end cond
+        /// \endcond
     };
 
     /**

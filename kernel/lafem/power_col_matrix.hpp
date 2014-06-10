@@ -305,7 +305,7 @@ namespace FEAST
           this->rest().set_line(row - brows, pval_set, pcol_set, col_start, stride);
         }
       }
-      /// \end cond
+      /// \endcond
 
       /**
        * \brief Convertion method

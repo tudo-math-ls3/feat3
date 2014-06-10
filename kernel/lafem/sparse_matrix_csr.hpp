@@ -1559,7 +1559,7 @@ namespace FEAST
             pcol_set[i * stride] = pcol_ind[start + i] + IT_(col_start);
           }
         }
-        /// \end cond
+        /// \endcond
 
         /* ******************************************************************* */
         /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */

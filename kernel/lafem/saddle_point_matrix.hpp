@@ -350,7 +350,7 @@ namespace FEAST
           this->block_d().set_line(row - arows, pval_set, pcol_set, col_start, stride);
         }
       }
-      /// \end cond
+      /// \endcond
 
       /**
        * \brief Convertion method

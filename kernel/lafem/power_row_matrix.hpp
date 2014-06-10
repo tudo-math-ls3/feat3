@@ -290,7 +290,7 @@ namespace FEAST
         this->first().set_line(row, pval_set, pcol_set, col_start, stride);
         this->rest().set_line(row, pval_set + stride * length_of_base, pcol_set + stride * length_of_base, col_start + this->first().columns(), stride);
       }
-      /// \end cond
+      /// \endcond
 
       /**
        * \brief Convertion method
