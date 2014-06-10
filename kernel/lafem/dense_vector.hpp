@@ -247,6 +247,7 @@ namespace FEAST
             t_this.copy_inv(a);
           }
         }
+        /// \endcond
 
       public:
         /// Our datatype
@@ -954,7 +955,7 @@ namespace FEAST
         {
           MemoryPool<Mem_>::copy(this->elements(), pval_set, this->size());
         }
-        /// \end cond
+        /// \endcond
     }; // class DenseVector<...>
 
 
