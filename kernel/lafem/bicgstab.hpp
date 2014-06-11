@@ -24,7 +24,7 @@ namespace FEAST
       {
         typedef typename VT_::DataType DT_;
 
-        DT_ defnorm, defnorm_0, defnorm_00(1e14);
+        DT_ defnorm, defnorm_0, defnorm_00(DT_(1e14));
         Index iter = 0;
         DT_ rho_tilde, rho_tilde_old, alpha_tilde, omega_tilde, beta_tilde, gamma_tilde;
         //bool early_exit = 0;

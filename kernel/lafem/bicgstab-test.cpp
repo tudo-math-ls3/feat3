@@ -291,14 +291,14 @@ public:
     sys.template apply<Algo_>(b, ref);
 
     Preconditioner<Algo_, MT_, VT_> * precond(Precon<Algo_, PType_>::template get<MT_, VT_>(sys, _opt));
-    BiCGStab<Algo_>::value(x, sys, b, *precond, 1000, 1e-12);
+    BiCGStab<Algo_>::value(x, sys, b, *precond, 1000, (typeid(DT_) == typeid(float)) ? DT_(1e-8) : DT_(1e-12));
     delete precond;
 
     ref_local.copy(ref);
     // check, if the result is correct
     for (Index i(0) ; i < size ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref_local(i), 1e-8);
+      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref_local(i), (typeid(DT_) == typeid(float)) ? 1e-6 : 1e-10);
     }
   }
 

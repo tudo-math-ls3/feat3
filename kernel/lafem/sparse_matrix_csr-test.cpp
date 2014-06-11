@@ -232,6 +232,13 @@ public:
 
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+
+      a.template apply<Algo_>(r, x);
+      result_local.copy(r);
+      a.template apply<Algo_>(ref, x);
+      ref_local.copy(ref);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
     }
   }
 };
