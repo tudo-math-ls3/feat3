@@ -174,13 +174,13 @@ namespace FEAST
       }
 
       template<typename Algo_>
-      void apply(VectorTypeL& r, const VectorTypeR& x)
+      void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
         _container.template apply<Algo_>(r, x);
       }
 
       template<typename Algo_>
-      void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1))
+      void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
         _container.template apply<Algo_>(r, x, y, alpha);
       }
