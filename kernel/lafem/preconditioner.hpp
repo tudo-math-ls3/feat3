@@ -87,9 +87,9 @@ namespace FEAST
       static_assert(std::is_same<MemType, typename VT_::MemType>::value,
                     "matrix and vector have different mem-types");
       static_assert(std::is_same<DataType, typename VT_::DataType>::value,
-                    "matrix and vector have different mem-types");
+                    "matrix and vector have different data-types");
       static_assert(std::is_same<IndexType, typename VT_::IndexType>::value,
-                    "matrix and vector have different mem-types");
+                    "matrix and vector have different index-types");
 
       virtual ~NonePreconditioner()
       {
@@ -169,9 +169,9 @@ namespace FEAST
       static_assert(std::is_same<MemType, typename VT_::MemType>::value,
                     "matrix and vector have different mem-types");
       static_assert(std::is_same<DataType, typename VT_::DataType>::value,
-                    "matrix and vector have different mem-types");
+                    "matrix and vector have different data-types");
       static_assert(std::is_same<IndexType, typename VT_::IndexType>::value,
-                    "matrix and vector have different mem-types");
+                    "matrix and vector have different index-types");
 
       virtual ~FilePreconditioner()
       {
@@ -248,9 +248,9 @@ namespace FEAST
       static_assert(std::is_same<MemType, typename VT_::MemType>::value,
                     "matrix and vector have different mem-types");
       static_assert(std::is_same<DataType, typename VT_::DataType>::value,
-                    "matrix and vector have different mem-types");
+                    "matrix and vector have different data-types");
       static_assert(std::is_same<IndexType, typename VT_::IndexType>::value,
-                    "matrix and vector have different mem-types");
+                    "matrix and vector have different index-types");
 
       virtual ~JacobiPreconditioner()
       {
