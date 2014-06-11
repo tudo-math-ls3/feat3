@@ -500,7 +500,7 @@ namespace FEAST
             bytes += Index(_indices_size.at(i) * sizeof(IT_));
           }
 
-          bytes += Index(_scalar_index.size() * sizeof(IT_));
+          bytes += Index(_scalar_index.size() * sizeof(Index));
           bytes += Index(_scalar_dt.size() * sizeof(DT_));
 
           return bytes;
