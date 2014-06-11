@@ -291,14 +291,14 @@ public:
     sys.template apply<Algo_>(b, ref);
 
     Preconditioner<Algo_, MT_, VT_> * precond(Precon<Algo_, PType_>::template get<MT_, VT_>(sys, _opt));
-    BiCGStab<Algo_>::value(x, sys, b, *precond, 1000, (typeid(DT_) == typeid(float)) ? DT_(1e-8) : DT_(1e-12));
+    BiCGStab<Algo_>::value(x, sys, b, *precond, 1000, 1e-12);
     delete precond;
 
     ref_local.copy(ref);
     // check, if the result is correct
     for (Index i(0) ; i < size ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref_local(i), (typeid(DT_) == typeid(float)) ? 1e-6 : 1e-10);
+      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref_local(i), 1e-10);
     }
   }
 
@@ -1467,61 +1467,61 @@ BiCGStabTest<PointstarFactoryFE<double>,
 bicgstab_test_cuda_ell_spai_double_uint_83("spai", 83);*/
 
 
-BiCGStabTest<PointstarFactoryFE<float>,
+BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
              Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, float, unsigned int> >
-bicgstab_test_cuda_csr_none_float_uint("none");
+             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
+bicgstab_test_cuda_csr_none_double_ulong("none");
 
-/*BiCGStabTest<PointstarFactoryFE<float>,
+/*BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
              Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, float, unsigned int> >
-bicgstab_test_cuda_coo_none_float_uint("none");*/
+             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
+bicgstab_test_cuda_coo_none_double_ulong("none");*/
 
-BiCGStabTest<PointstarFactoryFE<float>,
+BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
              Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, float, unsigned int> >
-bicgstab_test_cuda_ell_none_float_uint("none");
+             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
+bicgstab_test_cuda_ell_none_double_ulong("none");
 
 
-BiCGStabTest<PointstarFactoryFE<float>,
+BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
              Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, float, unsigned int> >
-bicgstab_test_cuda_csr_jac_float_uint("jacobi");
+             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
+bicgstab_test_cuda_csr_jac_double_ulong("jacobi");
 
-/*BiCGStabTest<PointstarFactoryFE<float>,
+/*BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
              Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, float, unsigned int> >
-bicgstab_test_cuda_coo_jac_float_uint("jacobi");*/
+             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
+bicgstab_test_cuda_coo_jac_double_ulong("jacobi");*/
 
-BiCGStabTest<PointstarFactoryFE<float>,
+BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
              Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, float, unsigned int> >
-bicgstab_test_cuda_ell_jac_float_uint("jacobi");
+             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
+bicgstab_test_cuda_ell_jac_double_ulong("jacobi");
 
 
-/*BiCGStabTest<PointstarFactoryFE<float>,
+/*BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
              Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, float, unsigned int> >
-bicgstab_test_cuda_csr_gs_float_uint("gauss-seidel");
+             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
+bicgstab_test_cuda_csr_gs_double_ulong("gauss-seidel");
 
-BiCGStabTest<PointstarFactoryFE<float>,
+BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
              Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, float, unsigned int> >
-bicgstab_test_cuda_coo_gs_float_uint("gauss-seidel");
+             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
+bicgstab_test_cuda_coo_gs_double_ulong("gauss-seidel");
 
-BiCGStabTest<PointstarFactoryFE<float>,
+BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
              Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, float, unsigned int> >
-bicgstab_test_cuda_ell_gs_float_uint("gauss-seidel");*/
+             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
+bicgstab_test_cuda_ell_gs_double_ulong("gauss-seidel");*/
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
