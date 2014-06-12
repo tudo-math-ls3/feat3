@@ -2520,7 +2520,7 @@ namespace FEAST
         {
           const Index n(_A.rows());
 
-          DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, Index(0));
+          DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, IT_(0));
           IT_ * ptrow_ptr(trow_ptr.elements());
 
           ptrow_ptr[0] = 0;
@@ -2758,7 +2758,7 @@ namespace FEAST
         {
           const Index n(_A.rows());
 
-          DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, Index(0));
+          DenseVector<Mem_, IT_, IT_> trow_ptr(n + 1, IT_(0));
           IT_ * ptrow_ptr(trow_ptr.elements());
 
           Index used_elements(0);
@@ -2999,7 +2999,7 @@ namespace FEAST
           const Index n(_A.rows());
           const Index tstride(_A.stride());
 
-          DenseVector<Mem_, IT_, IT_> trl(n, Index(0));
+          DenseVector<Mem_, IT_, IT_> trl(n, IT_(0));
           IT_ * ptrl(trl.elements());
 
           Index used_elements(0);
