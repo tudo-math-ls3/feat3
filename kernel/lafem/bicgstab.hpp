@@ -31,16 +31,16 @@ namespace FEAST
         bool restarted = false;
         bool converged = 0;
 
-        VT_ r(b.size());
-        VT_ r_tilde(b.size());
-        VT_ r_tilde_0(b.size());
-        VT_ p_tilde(b.size());
-        VT_ v(b.size());
-        VT_ v_tilde(b.size());
-        VT_ s(b.size());
-        VT_ s_tilde(b.size());
-        VT_ t(b.size());
-        VT_ t_tilde(b.size());
+        VT_ r(A.create_vector_l());
+        VT_ r_tilde(A.create_vector_l());
+        VT_ r_tilde_0(A.create_vector_l());
+        VT_ p_tilde(A.create_vector_l());
+        VT_ v(A.create_vector_l());
+        VT_ v_tilde(A.create_vector_l());
+        VT_ s(A.create_vector_l());
+        VT_ s_tilde(A.create_vector_l());
+        VT_ t(A.create_vector_l());
+        VT_ t_tilde(A.create_vector_l());
 
         do
         {
