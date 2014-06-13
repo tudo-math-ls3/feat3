@@ -5,7 +5,7 @@
 #include <kernel/util/exception.hpp>
 
 // includes, CUDA
-#include <cublas.h>
+#include <cublas_v2.h>
 
 namespace FEAST
 {
@@ -13,14 +13,20 @@ namespace FEAST
   {
     namespace Intern
     {
+      extern cublasHandle_t cublas_handle;
+
       float cuda_dot_product(const float * x, const float * y, const Index size)
       {
-        return cublasSdot(size, x, 1, y, 1);
+        float result;
+        cublasSdot(cublas_handle, size, x, 1, y, 1, &result);
+        return result;
       }
 
       double cuda_dot_product(const double * x, const double * y, const Index size)
       {
-        return cublasDdot(size, x, 1, y, 1);
+        double result;
+        cublasDdot(cublas_handle, size, x, 1, y, 1, &result);
+        return result;
       }
     }
   }
@@ -33,9 +39,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_>
 DT_ DotProduct<Mem::CUDA, Algo::CUDA>::value(const DT_ * const x, const DT_ * const y, const Index size)
 {
-  cublasInit();
   DT_ result = Intern::cuda_dot_product(x, y, size);
-  cublasShutdown();
   return result;
 }
 

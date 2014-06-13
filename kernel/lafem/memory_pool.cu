@@ -1,6 +1,8 @@
 // includes, FEAST
 #include <kernel/lafem/memory_pool.hpp>
 
+#include <cublas_v2.h>
+
 #include <cstdio>
 
 namespace FEAST
@@ -9,6 +11,8 @@ namespace FEAST
   {
     namespace Intern
     {
+      cublasHandle_t cublas_handle;
+
       template <typename DT_>
       __global__ void cuda_set_memory(DT_ * ptr, const DT_ val, const Index count)
       {
@@ -27,6 +31,7 @@ using namespace FEAST::LAFEM;
 
 MemoryPool<Mem::CUDA>::MemoryPool()
 {
+  cublasCreate(&Intern::cublas_handle);
 }
 
 MemoryPool<Mem::CUDA>::~MemoryPool()
@@ -40,6 +45,8 @@ MemoryPool<Mem::CUDA>::~MemoryPool()
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "Pending cuda errors occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+
+  cublasDestroy(Intern::cublas_handle);
 }
 
 template <typename DT_>
