@@ -1,6 +1,8 @@
 #include <test_system/test_system.hpp>
 #include <test_system/cuda.hpp>
 
+#include <cstring>
+
 #ifdef FEAST_TESTING_VC
 extern "C" {
 unsigned int __stdcall GetErrorMode(void);
@@ -29,28 +31,61 @@ int main(int argc, char** argv)
 
   if(argc > 1)
   {
+    bool all_filter(false);
     std::list<String> labels;
     for(int i(1) ; i < argc ; ++i)
     {
+      if (0 == strcmp(argv[i], "and"))
+      {
+        all_filter = true;
+        continue;
+      }
+#ifdef FEAST_BACKENDS_CUDA
+      if (0 == strcmp(argv[i], "cudadevicereset"))
+      {
+        cudadevicereset = true;
+        continue;
+      }
+#endif
+
       labels.push_back(argv[i]);
     }
 
-#ifdef FEAST_BACKENDS_CUDA
-    if (find(labels.begin(), labels.end(), "cudadevicereset") != labels.end())
-      cudadevicereset = true;
-#endif
     for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
         i != i_end ; )
     {
-      if((find(labels.begin(), labels.end(), (*i)->get_memory_name()) == labels.end()) &&
-          (find(labels.begin(), labels.end(), (*i)->get_algo_name()) == labels.end()) &&
-          (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()) &&
-          (find(labels.begin(), labels.end(), (*i)->get_index_name()) == labels.end()) )
+      // any_filter: run test if any one label matches
+      if (all_filter == false)
       {
-        i = TestList::instance()->erase(i);
-        continue;
+        if((find(labels.begin(), labels.end(), (*i)->get_memory_name()) == labels.end()) &&
+            (find(labels.begin(), labels.end(), (*i)->get_algo_name()) == labels.end()) &&
+            (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()) &&
+            (find(labels.begin(), labels.end(), (*i)->get_index_name()) == labels.end()) )
+        {
+          i = TestList::instance()->erase(i);
+          continue;
+        }
+        ++i;
       }
-      ++i;
+      // all_filter: run test if every single label matches
+      else
+      {
+        bool deleted(false);
+        for (auto li(labels.begin()) ; li != labels.end() ; ++li)
+        {
+          if(*li != (*i)->get_memory_name() &&
+              *li != (*i)->get_algo_name() &&
+              *li != (*i)->get_prec_name() &&
+              *li != (*i)->get_index_name())
+          {
+            i = TestList::instance()->erase(i);
+            deleted = true;
+            break;
+          }
+        }
+        if (!deleted)
+          ++i;
+      }
     }
   }
 
