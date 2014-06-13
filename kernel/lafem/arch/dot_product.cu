@@ -18,14 +18,16 @@ namespace FEAST
       float cuda_dot_product(const float * x, const float * y, const Index size)
       {
         float result;
-        cublasSdot(cublas_handle, size, x, 1, y, 1, &result);
+        if (CUBLAS_STATUS_SUCCESS != cublasSdot(cublas_handle, size, x, 1, y, 1, &result))
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasSdot failed!");
         return result;
       }
 
       double cuda_dot_product(const double * x, const double * y, const Index size)
       {
         double result;
-        cublasDdot(cublas_handle, size, x, 1, y, 1, &result);
+        if (CUBLAS_STATUS_SUCCESS != cublasDdot(cublas_handle, size, x, 1, y, 1, &result))
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasDdot failed!");
         return result;
       }
     }
