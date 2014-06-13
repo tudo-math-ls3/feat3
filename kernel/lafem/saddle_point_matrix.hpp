@@ -273,7 +273,7 @@ namespace FEAST
        * The multiplicant vector.
        */
       template<typename Algo_>
-      void apply(VectorTypeL& r, const VectorTypeR& x)
+      void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
         block_a().template apply<Algo_>(r.template at<0>(), x.template at<0>());
         block_b().template apply<Algo_>(r.template at<0>(), x.template at<1>(), r.template at<0>(), DataType(1));
@@ -297,7 +297,7 @@ namespace FEAST
        * \param[in] alpha A scalar to scale the product with.
        */
       template<typename Algo_>
-      void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1))
+      void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
         block_a().template apply<Algo_>(r.template at<0>(), x.template at<0>(), y.template at<0>(), alpha);
         block_b().template apply<Algo_>(r.template at<0>(), x.template at<1>(), r.template at<0>(), alpha);
