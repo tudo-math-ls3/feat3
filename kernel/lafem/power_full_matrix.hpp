@@ -159,10 +159,19 @@ namespace FEAST
       {
         return Index(num_col_blocks);
       }
+
+      Index get_length_of_line(const Index row) const
+      {
+        return _container.get_length_of_line(row);
+      }
+
+      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
+                     const Index col_start, const Index stride = 1) const
+      {
+        _container.set_line(row, pval_set, pcol_set, col_start, stride);
+      }
       /// \endcond
 
-      // Note: The following function definitions may seem pointless, but unfortunately the
-      // MSVC compiler crashes with an internal error if they are missing...
       VectorTypeL create_vector_l() const
       {
         return _container.create_vector_l();
@@ -171,6 +180,35 @@ namespace FEAST
       VectorTypeR create_vector_r() const
       {
         return _container.create_vector_r();
+      }
+
+      /// Returns the total number of rows in this matrix.
+      Index rows() const
+      {
+        return _container.rows();
+      }
+
+      /// Returns the total number of columns in this matrix.
+      Index columns() const
+      {
+        return _container.columns();
+      }
+
+      /// Returns the total number of non-zeros in this matrix.
+      Index used_elements() const
+      {
+        return _container.used_elements();
+      }
+
+      /// Returns a descriptive string for this container.
+      static String name()
+      {
+        return String("PowerFullMatrix<") + SubMatrixType::name() + "," + stringify(width_) + "," + stringify(height_) + ">";
+      }
+
+      void format(DataType value = DataType(0))
+      {
+        _container.format(value);
       }
 
       template<typename Algo_>
@@ -185,8 +223,14 @@ namespace FEAST
         _container.template apply<Algo_>(r, x, y, alpha);
       }
 
+#ifdef FEAST_COMPILER_MICROSOFT
+      template< typename SubType_>
+      void convert(const PowerFullMatrix<SubType_, width_, height_>& other)
+#else
+
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+#endif
       {
         CONTEXT("When converting PowerFullMatrix");
         _container.convert(other._container);
