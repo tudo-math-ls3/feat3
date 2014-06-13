@@ -1286,7 +1286,7 @@ namespace FEAST
         DT_ * plu(_LU.Ax());
         const IT_ * pj(_LU.Aj());
         const IT_ * prl(_LU.Arl());
-        const Index stride(_LU.stride());
+        IT_ stride(IT_(_LU.stride()));
 
         // integer work array of length n
         //   for saving the position of the diagonal-entries
