@@ -9,16 +9,23 @@
 
 namespace FEAST
 {
-  namespace LAFEM
+  namespace Util
   {
     namespace Intern
     {
       extern cublasHandle_t cublas_handle;
+    }
+  }
+
+  namespace LAFEM
+  {
+    namespace Intern
+    {
 
       float cuda_dot_product(const float * x, const float * y, const Index size)
       {
         float result;
-        if (CUBLAS_STATUS_SUCCESS != cublasSdot(cublas_handle, size, x, 1, y, 1, &result))
+        if (CUBLAS_STATUS_SUCCESS != cublasSdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result))
           throw InternalError(__func__, __FILE__, __LINE__, "cublasSdot failed!");
         return result;
       }
@@ -26,7 +33,7 @@ namespace FEAST
       double cuda_dot_product(const double * x, const double * y, const Index size)
       {
         double result;
-        if (CUBLAS_STATUS_SUCCESS != cublasDdot(cublas_handle, size, x, 1, y, 1, &result))
+        if (CUBLAS_STATUS_SUCCESS != cublasDdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result))
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDdot failed!");
         return result;
       }

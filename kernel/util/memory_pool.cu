@@ -1,5 +1,5 @@
 // includes, FEAST
-#include <kernel/lafem/memory_pool.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 #include <cublas_v2.h>
 #include "cusparse_v2.h"
@@ -8,7 +8,7 @@
 
 namespace FEAST
 {
-  namespace LAFEM
+  namespace Util
   {
     namespace Intern
     {
@@ -29,7 +29,7 @@ namespace FEAST
 
 
 using namespace FEAST;
-using namespace FEAST::LAFEM;
+using namespace FEAST::Util;
 
 MemoryPool<Mem::CUDA>::MemoryPool()
 {
@@ -135,7 +135,7 @@ void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index
   dim3 block;
   block.x = blocksize;
   grid.x = (unsigned)ceil((count)/(double)(block.x));
-  FEAST::LAFEM::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
+  FEAST::Util::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::set_memory failed!\n" + stringify(cudaGetErrorString(last_error)));

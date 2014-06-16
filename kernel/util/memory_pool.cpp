@@ -1,11 +1,11 @@
 // includes, FEAST
-#include <kernel/lafem/memory_pool.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 #include <cstdio>
 
 
 using namespace FEAST;
-using namespace FEAST::LAFEM;
+using namespace FEAST::Util;
 
 MemoryPool<Mem::Main>::MemoryPool()
 {

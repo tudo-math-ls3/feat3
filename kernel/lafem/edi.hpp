@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/memory_pool.hpp>
+#include <kernel/util/memory_pool.hpp>
 #include <kernel/archs.hpp>
 
 
@@ -46,7 +46,7 @@ namespace FEAST
         {
           //if (_armed)
           {
-            MemoryPool<Mem_>::set_memory(_address, _value);
+            Util::MemoryPool<Mem_>::set_memory(_address, _value);
           }
         }
 

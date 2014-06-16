@@ -176,9 +176,9 @@ namespace FEAST
         this->_indices_size.push_back(offsets_in.size());
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+          Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+          Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -261,10 +261,10 @@ namespace FEAST
 
         for (Index i(0); i < this->_scalar_index.at(4); ++i)
         {
-          const Index toffset(MemoryPool<Mem_>::get_element(this->_indices.at(0), i));
+          const Index toffset(Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i));
           if (row + toffset + 1 == col + trows)
           {
-            return MemoryPool<Mem_>::get_element(this->_elements.at(0), i * trows + row);
+            return Util::MemoryPool<Mem_>::get_element(this->_elements.at(0), i * trows + row);
           }
         }
         return zero_element();
@@ -583,9 +583,9 @@ namespace FEAST
       else
       {
         offsets_a = new IT_[a.num_of_offsets()];
-        MemoryPool<Mem_>::instance()->template download<IT_>(offsets_a, a.offsets(), a.num_of_offsets());
+        Util::MemoryPool<Mem_>::instance()->template download<IT_>(offsets_a, a.offsets(), a.num_of_offsets());
         val_a = new DT_[a.num_of_offsets() * a.rows()];
-        MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
+        Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
       }
       if(std::is_same<Mem::Main, Mem_>::value)
       {
@@ -595,9 +595,9 @@ namespace FEAST
       else
       {
         offsets_b = new IT_[b.num_of_offsets()];
-        MemoryPool<Mem_>::instance()->template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
+        Util::MemoryPool<Mem_>::instance()->template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
         val_b = new DT_[b.num_of_offsets() * b.rows()];
-        MemoryPool<Mem_>::instance()->template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
+        Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
       }
 
       bool ret(true);

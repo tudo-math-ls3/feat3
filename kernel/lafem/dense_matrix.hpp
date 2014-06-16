@@ -89,7 +89,7 @@ namespace FEAST
           this->_scalar_index.push_back(rows_in);
           this->_scalar_index.push_back(columns_in);
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
           this->_elements_size.push_back(this->_scalar_index.at(0));
         }
 
@@ -110,9 +110,9 @@ namespace FEAST
           this->_scalar_index.at(0) = rows_in * columns_in;
           this->_scalar_index.push_back(rows_in);
           this->_scalar_index.push_back(columns_in);
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
           this->_elements_size.push_back(this->_scalar_index.at(0));
-          MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));
         }
 
         /**
@@ -203,7 +203,7 @@ namespace FEAST
 
           ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
           ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
-          return MemoryPool<Mem_>::get_element(this->_elements.at(0), row * this->columns() + col);
+          return Util::MemoryPool<Mem_>::get_element(this->_elements.at(0), row * this->columns() + col);
         }
 
         /**
@@ -219,7 +219,7 @@ namespace FEAST
 
           ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
           ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
-          MemoryPool<Mem_>::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
+          Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
         }
 
         /**
@@ -314,14 +314,14 @@ namespace FEAST
       else
       {
         ta = new DT_[a.size()];
-        MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.elements(), a.size());
+        Util::MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.elements(), a.size());
       }
       if(std::is_same<Mem::Main, Mem2_>::value)
         tb = (DT_*)b.elements();
       else
       {
         tb = new DT_[b.size()];
-        MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.elements(), b.size());
+        Util::MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.elements(), b.size());
       }
 
       for (Index i(0) ; i < a.size() ; ++i)

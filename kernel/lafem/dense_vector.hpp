@@ -157,9 +157,9 @@ namespace FEAST
           }
 
           _size() = Index(data.size());
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(data.size())));
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(data.size())));
           this->_elements_size.push_back(Index(data.size()));
-          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
+          Util::MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
         }
 
         void _read_from_dv(String filename)
@@ -181,15 +181,15 @@ namespace FEAST
           double * ctemp = new double[std::size_t(tsize)];
           file.read((char *)ctemp, (long)(tsize * sizeof(double)));
 
-          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((_size()));
+          DT_ * temp = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((_size()));
           for (Index i(0) ; i < tsize ; ++i)
           {
             temp[i] = (DT_)ctemp[i];
           }
           delete[] ctemp;
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_size()));
-          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), temp, _size());
-          MemoryPool<Mem::Main>::instance()->release_memory(temp);
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_size()));
+          Util::MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), temp, _size());
+          Util::MemoryPool<Mem::Main>::instance()->release_memory(temp);
         }
 
         Index & _size()
@@ -283,7 +283,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size_in));
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size_in));
           this->_elements_size.push_back(size_in);
         }
 
@@ -300,10 +300,10 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size_in));
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size_in));
           this->_elements_size.push_back(size_in);
 
-          MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, size_in);
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, size_in);
         }
 
         /**
@@ -323,9 +323,9 @@ namespace FEAST
           this->_elements_size.push_back(size_in);
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+            Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+            Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
         /**
@@ -482,9 +482,9 @@ namespace FEAST
           this->_elements_size.push_back(this->size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+            Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+            Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
         /**
@@ -638,15 +638,15 @@ namespace FEAST
          */
         void write_out_exp(std::ostream& file) const
         {
-          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->size()));
-          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->size());
+          DT_ * temp = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->size()));
+          Util::MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->size());
 
           for (Index i(0) ; i < this->size() ; ++i)
           {
             file << std::scientific << temp[i] << std::endl;
           }
 
-          MemoryPool<Mem::Main>::instance()->release_memory(temp);
+          Util::MemoryPool<Mem::Main>::instance()->release_memory(temp);
         }
 
         /**
@@ -674,14 +674,14 @@ namespace FEAST
             std::cout<<"Warning: You are writing out an dense vector with less than double precission!"<<std::endl;
 
           const Index csize(this->size());
-          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(csize);
-          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), csize);
+          DT_ * temp = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(csize);
+          Util::MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), csize);
           double * ctemp = new double[csize];
           for (Index i(0) ; i < csize ; ++i)
           {
             ctemp[i] = (double)temp[i];
           }
-          MemoryPool<Mem::Main>::instance()->release_memory(temp);
+          Util::MemoryPool<Mem::Main>::instance()->release_memory(temp);
 
           uint64_t tsize(csize);
           file.write((const char *)&tsize, sizeof(uint64_t));
@@ -717,7 +717,7 @@ namespace FEAST
           CONTEXT("When retrieving DenseVector element");
 
           ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->size()) + " !");
-          return MemoryPool<Mem_>::get_element(this->_elements.at(0), index);
+          return Util::MemoryPool<Mem_>::get_element(this->_elements.at(0), index);
         }
 
         /**
@@ -731,7 +731,7 @@ namespace FEAST
           CONTEXT("When setting DenseVector element");
 
           ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->size()) + " !");
-          MemoryPool<Mem_>::set_memory(this->_elements.at(0) + index, value);
+          Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0) + index, value);
         }
 
         /**
@@ -742,7 +742,7 @@ namespace FEAST
          */
         EDI<Mem_, DT_> edi(Index index)
         {
-          EDI<Mem_, DT_> t(MemoryPool<Mem_>::get_element(this->_elements.at(0), index), this->_elements.at(0) + index);
+          EDI<Mem_, DT_> t(Util::MemoryPool<Mem_>::get_element(this->_elements.at(0), index), this->_elements.at(0) + index);
           return t;
         }
 
@@ -947,13 +947,13 @@ namespace FEAST
         /// Writes the vector-entries in an allocated array
         void set_vec(DT_ * const pval_set) const
         {
-          MemoryPool<Mem_>::copy(pval_set, this->elements(), this->size());
+          Util::MemoryPool<Mem_>::copy(pval_set, this->elements(), this->size());
         }
 
         /// Writes data of an array in the vector
         void set_vec_inv(const DT_ * const pval_set)
         {
-          MemoryPool<Mem_>::copy(this->elements(), pval_set, this->size());
+          Util::MemoryPool<Mem_>::copy(this->elements(), pval_set, this->size());
         }
         /// \endcond
     }; // class DenseVector<...>
@@ -989,14 +989,14 @@ namespace FEAST
       else
       {
         ta = new DT_[a.size()];
-        MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.elements(), a.size());
+        Util::MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.elements(), a.size());
       }
       if(std::is_same<Mem::Main, Mem2_>::value)
         tb = (DT_*)b.elements();
       else
       {
         tb = new DT_[b.size()];
-        MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.elements(), b.size());
+        Util::MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.elements(), b.size());
       }
 
       for (Index i(0) ; i < a.size() ; ++i)

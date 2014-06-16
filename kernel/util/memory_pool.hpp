@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_LAFEM_MEMORY_POOL_HPP
-#define KERNEL_LAFEM_MEMORY_POOL_HPP 1
+#ifndef KERNEL_UTIL_MEMORY_POOL_HPP
+#define KERNEL_UTIL_MEMORY_POOL_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -15,7 +15,7 @@
 
 namespace FEAST
 {
-  namespace LAFEM
+  namespace Util
   {
     namespace Intern
     {
@@ -168,7 +168,7 @@ namespace FEAST
 
         static void reset_device();
     };
-  } // namespace LAFEM
+  } // namespace Util
 } // namespace FEAST
 
-#endif // KERNEL_LAFEM_MEMORY_POOL_HPP
+#endif // KERNEL_UTIL_MEMORY_POOL_HPP

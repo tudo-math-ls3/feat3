@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/memory_pool.hpp>
+#include <kernel/util/memory_pool.hpp>
 #include <kernel/archs.hpp>
 
 #include <vector>
@@ -30,7 +30,7 @@ namespace FEAST
           own.assign(other.begin(), other.end());
 
           for (Index i(0) ; i < own.size() ; ++i)
-            MemoryPool<MT_>::instance()->increase_memory(own.at(i));
+            Util::MemoryPool<MT_>::instance()->increase_memory(own.at(i));
         }
 
         template <typename MT_, typename T1_, typename T2_>
@@ -131,14 +131,14 @@ namespace FEAST
           {
             if (_elements_size.at(i) != other.get_elements_size().at(i))
               throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
-            MemoryPool<Mem_>::template copy<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
+            Util::MemoryPool<Mem_>::template copy<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
           }
 
           for (Index i(0) ; i < _indices.size() ; ++i)
           {
             if (_indices_size.at(i) != other.get_indices_size().at(i))
               throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
-            MemoryPool<Mem_>::template copy<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
+            Util::MemoryPool<Mem_>::template copy<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
           }
         }
 
@@ -162,9 +162,9 @@ namespace FEAST
             if (_elements_size.at(i) != other.get_elements_size().at(i))
               throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
             if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
-              MemoryPool<Mem2_>::template download<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
+              Util::MemoryPool<Mem2_>::template download<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
             else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
-              MemoryPool<Mem_>::template upload<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
+              Util::MemoryPool<Mem_>::template upload<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
             else
               throw InternalError(__func__, __FILE__, __LINE__, "Memory Backend not known!");
           }
@@ -174,9 +174,9 @@ namespace FEAST
             if (_indices_size.at(i) != other.get_indices_size().at(i))
               throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
             if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
-              MemoryPool<Mem2_>::template download<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
+              Util::MemoryPool<Mem2_>::template download<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
             else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
-              MemoryPool<Mem_>::template upload<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
+              Util::MemoryPool<Mem_>::template upload<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
             else
               throw InternalError(__func__, __FILE__, __LINE__, "Memory Backend not known!");
           }
@@ -196,9 +196,9 @@ namespace FEAST
           CONTEXT("When assigning Container");
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements.clear();
           this->_indices.clear();
@@ -222,7 +222,7 @@ namespace FEAST
             for (Index i(0) ; i < this->_elements_size.size() ; ++i)
             {
               const Index tsize(this->_elements_size.at(i));
-              this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(tsize));
+              this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(tsize));
 
               DT_ * pthis(nullptr);
               DT2_ * pother(nullptr);
@@ -241,7 +241,7 @@ namespace FEAST
               else
               {
                 pother = new DT2_[tsize];
-                MemoryPool<Mem2_>::template download<DT2_>(pother, other.get_elements().at(i), tsize);
+                Util::MemoryPool<Mem2_>::template download<DT2_>(pother, other.get_elements().at(i), tsize);
               }
 
               for (Index j(0) ; j < tsize ; ++j)
@@ -249,7 +249,7 @@ namespace FEAST
 
               if (! std::is_same<Mem_, Mem::Main>::value)
               {
-                MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(i), pthis, tsize);
+                Util::MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(i), pthis, tsize);
                 delete[] pthis;
               }
               if (!std::is_same<Mem2_, Mem::Main>::value)
@@ -266,7 +266,7 @@ namespace FEAST
             for (Index i(0) ; i < this->_indices_size.size() ; ++i)
             {
               const Index tsize(this->_indices_size.at(i));
-              this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(tsize));
+              this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(tsize));
 
               IT_ * pthis(nullptr);
               IT2_ * pother(nullptr);
@@ -287,7 +287,7 @@ namespace FEAST
               else
               {
                 pother = new IT2_[tsize];
-                MemoryPool<Mem2_>::template download<IT2_>(pother, other.get_indices().at(i), tsize);
+                Util::MemoryPool<Mem2_>::template download<IT2_>(pother, other.get_indices().at(i), tsize);
               }
 
               for (Index j(0) ; j < tsize ; ++j)
@@ -295,7 +295,7 @@ namespace FEAST
 
               if (! std::is_same<Mem_, Mem::Main>::value)
               {
-                MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(i), pthis, tsize);
+                Util::MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(i), pthis, tsize);
                 delete[] pthis;
               }
               if (!std::is_same<Mem2_, Mem::Main>::value)
@@ -328,9 +328,9 @@ namespace FEAST
           CONTEXT("When destroying Container");
 
           for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(_elements.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(_elements.at(i));
           for (Index i(0) ; i < _indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(_indices.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(_indices.at(i));
         }
 
         /**
@@ -368,7 +368,7 @@ namespace FEAST
           CONTEXT("When formating Container");
 
           for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
+            Util::MemoryPool<Mem_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
         }
 
         /**
@@ -380,9 +380,9 @@ namespace FEAST
           CONTEXT("When clearing Container");
 
           for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           for (Index i(0) ; i < _indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements.clear();
           this->_indices.clear();
@@ -410,30 +410,30 @@ namespace FEAST
           this->_indices_size.assign(other._indices_size.begin(), other._indices_size.end());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           this->_elements.clear();
           for (Index i(0) ; i < other._elements.size() ; ++i)
           {
-            this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
-            MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
+            this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
+            Util::MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
           }
 
           if (clone_indices)
           {
             for (Index i(0) ; i < this->_indices.size() ; ++i)
-              MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+              Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
             this->_indices.clear();
             for (Index i(0) ; i < other._indices.size() ; ++i)
             {
-              this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
-              MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
+              this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
+              Util::MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
             }
           }
           else
           {
             this->_indices.assign(other._indices.begin(), other._indices.end());
             for (Index i(0) ; i < this->_indices.size() ; ++i)
-              MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+              Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
           }
         }
 
@@ -469,9 +469,9 @@ namespace FEAST
             return;
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements = std::move(other._elements);
           this->_indices = std::move(other._indices);

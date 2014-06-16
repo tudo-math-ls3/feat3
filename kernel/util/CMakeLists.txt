@@ -9,9 +9,19 @@ INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 # list of util source files
 ADD_LIBRARY(kernel-util STATIC
   exception.cpp
+  memory_pool.cpp
   mesh_streamer.cpp
   param_section.cpp
 )
+
+if (FEAST_BACKENDS_CUDA)
+  CUDA_ADD_LIBRARY(kernel-util-cuda
+    memory_pool.cu
+    STATIC
+  )
+  CUDA_ADD_CUBLAS_TO_TARGET(kernel-util-cuda)
+  TARGET_LINK_LIBRARIES(kernel-util kernel-util-cuda)
+endif(FEAST_BACKENDS_CUDA)
 
 # list of util tests
 SET (test_list

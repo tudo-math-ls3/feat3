@@ -8,12 +8,18 @@
 
 namespace FEAST
 {
-  namespace LAFEM
+  namespace Util
   {
     namespace Intern
     {
       extern cusparseHandle_t cusparse_handle;
+    }
+  }
 
+  namespace LAFEM
+  {
+    namespace Intern
+    {
       template <typename DT_>
       __global__ void cuda_product_matvec_csr(DT_ * r, const DT_ * b, const DT_ * val, const unsigned long * col_ind,
           const unsigned long * row_ptr, const Index count)
@@ -37,7 +43,7 @@ namespace FEAST
           const float * csrVal, const int * csrRowPtr, const int *csrColInd,
           const float * x, const float * beta, float * y)
       {
-        cusparseScsrmv(cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+        cusparseScsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
             csrColInd, x, beta, y);
       }
 
@@ -47,7 +53,7 @@ namespace FEAST
           const double * csrVal, const int * csrRowPtr, const int *csrColInd,
           const double * x, const double * beta, double * y)
       {
-        cusparseDcsrmv(cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+        cusparseDcsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
             csrColInd, x, beta, y);
       }
 

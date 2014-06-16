@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/memory_pool.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 #include <vector>
 
@@ -79,7 +79,7 @@ namespace FEAST
         _scalar_index(scalar_index)
       {
         for(auto i : this->_indices)
-          MemoryPool<Mem_>::instance()->increase_memory(i);
+          Util::MemoryPool<Mem_>::instance()->increase_memory(i);
       }
 
       /// move constructor
@@ -94,7 +94,7 @@ namespace FEAST
       virtual ~SparseLayout()
       {
         for(auto i : this->_indices)
-          MemoryPool<Mem_>::instance()->release_memory(i);
+          Util::MemoryPool<Mem_>::instance()->release_memory(i);
       }
 
       /// move operator=

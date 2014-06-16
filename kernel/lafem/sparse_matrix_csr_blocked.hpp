@@ -125,9 +125,9 @@ namespace FEAST
           this->_scalar_dt.push_back(DT_(0));
 
           for (auto i : this->_indices)
-            MemoryPool<Mem_>::instance()->increase_memory(i);
+            Util::MemoryPool<Mem_>::instance()->increase_memory(i);
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(raw_used_elements()));
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(raw_used_elements()));
           this->_elements_size.push_back(raw_used_elements());
         }
 
@@ -162,9 +162,9 @@ namespace FEAST
           this->_indices_size.push_back(row_ptr_in.size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+            Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+            Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
         /**
@@ -242,9 +242,9 @@ namespace FEAST
           CONTEXT("When assigning SparseMatrixCSRBlocked");
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements.clear();
           this->_indices.clear();
@@ -259,9 +259,9 @@ namespace FEAST
           this->_scalar_dt.push_back(DT_(0));
 
           for (auto i : this->_indices)
-            MemoryPool<Mem_>::instance()->increase_memory(i);
+            Util::MemoryPool<Mem_>::instance()->increase_memory(i);
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(raw_used_elements()));
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(raw_used_elements()));
           this->_elements_size.push_back(raw_used_elements());
 
           return *this;
@@ -282,15 +282,15 @@ namespace FEAST
           ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(rows()) + " !");
           ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(columns()) + " !");
 
-          for (Index i(MemoryPool<Mem_>::get_element(this->_indices.at(1), row)) ; i < MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1) ; ++i)
+          for (Index i(Util::MemoryPool<Mem_>::get_element(this->_indices.at(1), row)) ; i < Util::MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1) ; ++i)
           {
-            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == col)
+            if (Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == col)
             {
               Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> t;
-              MemoryPool<Mem_>::download((DT_*)t.v, this->_elements.at(0) + i * BlockHeight_ * BlockWidth_, BlockHeight_ * BlockWidth_);
+              Util::MemoryPool<Mem_>::download((DT_*)t.v, this->_elements.at(0) + i * BlockHeight_ * BlockWidth_, BlockHeight_ * BlockWidth_);
               return t;
             }
-            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) > col)
+            if (Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i) > col)
               break; //return zero element
           }
 
@@ -822,11 +822,11 @@ namespace FEAST
       else
       {
         col_ind_a = new IT_[a.used_elements()];
-        MemoryPool<Mem_>::instance()->template download<IT_>(col_ind_a, a.col_ind(), a.used_elements());
+        Util::MemoryPool<Mem_>::instance()->template download<IT_>(col_ind_a, a.col_ind(), a.used_elements());
         val_a = new DT_[a.raw_used_elements()];
-        MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.raw_val(), a.raw_used_elements());
+        Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.raw_val(), a.raw_used_elements());
         row_ptr_a = new IT_[a.rows() + 1];
-        MemoryPool<Mem_>::instance()->template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
+        Util::MemoryPool<Mem_>::instance()->template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
       }
       if(std::is_same<Mem::Main, Mem2_>::value)
       {
@@ -837,11 +837,11 @@ namespace FEAST
       else
       {
         col_ind_b = new IT_[b.used_elements()];
-        MemoryPool<Mem2_>::instance()->template download<IT_>(col_ind_b, b.col_ind(), b.used_elements());
+        Util::MemoryPool<Mem2_>::instance()->template download<IT_>(col_ind_b, b.col_ind(), b.used_elements());
         val_b = new DT_[b.raw_used_elements()];
-        MemoryPool<Mem2_>::instance()->template download<DT_>(val_b, b.raw_val(), b.raw_used_elements());
+        Util::MemoryPool<Mem2_>::instance()->template download<DT_>(val_b, b.raw_val(), b.raw_used_elements());
         row_ptr_b = new IT_[b.rows() + 1];
-        MemoryPool<Mem2_>::instance()->template download<IT_>(row_ptr_b, b.row_ptr(), b.rows() + 1);
+        Util::MemoryPool<Mem2_>::instance()->template download<IT_>(row_ptr_b, b.row_ptr(), b.rows() + 1);
       }
 
       for (Index i(0) ; i < a.used_elements() ; ++i)

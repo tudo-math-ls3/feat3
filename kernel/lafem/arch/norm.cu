@@ -9,16 +9,22 @@
 
 namespace FEAST
 {
-  namespace LAFEM
+  namespace Util
   {
     namespace Intern
     {
       extern cublasHandle_t cublas_handle;
+    }
+  }
 
+  namespace LAFEM
+  {
+    namespace Intern
+    {
       float cuda_norm2(const float * x, const Index size)
       {
         float result;
-        if (CUBLAS_STATUS_SUCCESS != cublasSnrm2(cublas_handle, size, x, 1, &result))
+        if (CUBLAS_STATUS_SUCCESS != cublasSnrm2(Util::Intern::cublas_handle, size, x, 1, &result))
           throw InternalError(__func__, __FILE__, __LINE__, "cublasSnrm2 failed!");
         return result;
       }
@@ -26,7 +32,7 @@ namespace FEAST
       double cuda_norm2(const double * x, const Index size)
       {
         double result;
-        if (CUBLAS_STATUS_SUCCESS != cublasDnrm2(cublas_handle, size, x, 1, &result))
+        if (CUBLAS_STATUS_SUCCESS != cublasDnrm2(Util::Intern::cublas_handle, size, x, 1, &result))
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDnrm2 failed!");
         return result;
       }

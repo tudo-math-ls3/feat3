@@ -10,7 +10,6 @@ ADD_SUBDIRECTORY( arch )
 
 # list of lafem source files
 SET (kernel-lafem-list
-  memory_pool.cpp
   )
 
 if (FEAST_HAVE_UMFPACK)
@@ -23,14 +22,6 @@ endif (FEAST_HAVE_UMFPACK)
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch kernel-util kernel-adjacency)
 
-if (FEAST_BACKENDS_CUDA)
-  CUDA_ADD_LIBRARY(kernel-lafem-cuda
-    memory_pool.cu
-    STATIC
-  )
-  CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-cuda)
-  TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-cuda)
-endif(FEAST_BACKENDS_CUDA)
 
 # list of lafem tests
 SET (test_list
