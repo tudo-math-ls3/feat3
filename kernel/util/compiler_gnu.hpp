@@ -28,6 +28,12 @@
 #  define FEAST_COMPILER "GNU C++ compiler 2.x.x (or older)"
 #endif
 
+#if(_GCC_VER >= 40900)
+#  define FEAST_IVDEP _Pragma("GCC ivdep")
+#else
+#  define FEAST_IVDEP
+#endif
+
 #define FEAST_DISABLE_WARNINGS _Pragma("GCC diagnostic push") \
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"")

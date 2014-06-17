@@ -24,6 +24,8 @@
 #    define FEAST_COMPILER "SunStudio/OracleStudio C/C++ compiler (unknown version)"
 #  endif
 
+#  define FEAST_IVDEP
+
 #endif // !defined(FEAST_COMPILER) && defined(__SUNPRO_CC)
 
 #endif // KERNEL_UTIL_COMPILER_ORACLE_HPP

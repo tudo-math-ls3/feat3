@@ -96,6 +96,11 @@ on this macro.
 This macro is defined if the PGI C++ compiler is detected. Unfortunately, it is not known if the compiler's version can
 be deduced at compile-time, therefore this macro is simply defined as 1.
 
+<hr>
+\subsection ppm_feast_ivdep FEAST_IVDEP
+This macro can be used to instruct the compiler to ignore assumed vector dependencies. To use this loop pragma, place it
+immediately before - not in - a loop definition. The pragma takes effect for the scope of the loop that follows it.
+
 <hr><hr>
 \section preproc_sec_backends Backend / Library Macros
 This section enlists macros defined by the build system, which specify what types of third-party libraries and backends

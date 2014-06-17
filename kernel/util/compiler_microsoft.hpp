@@ -37,6 +37,8 @@
 #    define FEAST_COMPILER "Microsoft C/C++ compiler"
 #  endif
 
+#  define FEAST_IVDEP __pragma(loop(ivdep))
+
 #define FEAST_DISABLE_WARNINGS __pragma(warning(push, 0))
 #define FEAST_RESTORE_WARNINGS __pragma(warning(pop))
 

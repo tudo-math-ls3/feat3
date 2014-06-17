@@ -19,6 +19,8 @@
 # define FEAST_COMPILER_PGI 1
 # define FEAST_COMPILER "PGI C/C++ compiler"
 
+# define FEAST_IVDEP
+
 // PGI compiler does not support "nullptr", do not define HAVE_CPP0X_NULLPTR 1
 
 #endif // !defined(FEAST_COMPILER) && defined(__PGI)

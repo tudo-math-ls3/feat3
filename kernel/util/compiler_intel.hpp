@@ -34,6 +34,8 @@
 #    define FEAST_COMPILER "Intel C/C++ compiler"
 #  endif
 
+#  define FEAST_IVDEP _Pragma("ivdep")
+
 // Note: The ICC 14.0.x compilers have a bug which causes the compiler to choke
 // on _Pragma statements in preprocessed include files; see
 // https://software.intel.com/en-us/forums/topic/515154?language=en
