@@ -36,7 +36,11 @@ void run()
 
 int main(int argc, char ** argv)
 {
+#ifdef FEAST_BACKENDS_CUDA
   run<Algo::CUDA, DenseVector<Mem::CUDA, double, Index> >();
+#endif
   run<Algo::Generic, DenseVector<Mem::Main, double, Index> >();
+#ifdef FEAST_BACKENDS_MKL
   run<Algo::MKL, DenseVector<Mem::Main, double, Index> >();
+#endif
 }

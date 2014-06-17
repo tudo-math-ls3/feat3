@@ -4,7 +4,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/time_stamp.hpp>
-#include <kernel/lafem/memory_pool.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 #include <functional>
 
@@ -28,7 +28,7 @@ namespace FEAST
       TimeStamp at, bt;
       at.stamp();
       func();
-      MemoryPool<Mem_>::synchronize();
+      Util::MemoryPool<Mem_>::synchronize();
       bt.stamp();
       double test_run_time(bt.elapsed(at));
       std::cout<<"test time: "<<test_run_time<<std::endl;
@@ -44,7 +44,7 @@ namespace FEAST
         {
           func();
         }
-        MemoryPool<Mem_>::synchronize();
+        Util::MemoryPool<Mem_>::synchronize();
         bt.stamp();
         times.push_back(bt.elapsed(at));
       }
