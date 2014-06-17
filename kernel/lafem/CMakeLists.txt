@@ -9,7 +9,10 @@ INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 ADD_SUBDIRECTORY( arch )
 
 # list of lafem source files
+# currently empty, but neccessary for sub library dependencies
+# TODO remove dummy as soon as possible
 SET (kernel-lafem-list
+  empty.cpp
   )
 
 if (FEAST_HAVE_UMFPACK)
