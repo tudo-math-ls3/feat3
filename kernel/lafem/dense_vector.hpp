@@ -944,6 +944,7 @@ namespace FEAST
         ///@}
 
         /// \cond internal
+
         /// Writes the vector-entries in an allocated array
         void set_vec(DT_ * const pval_set) const
         {

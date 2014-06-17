@@ -1,8 +1,6 @@
 /**
 \mainpage FEAST - Finite Element Analysis & Solution Tools
 
-\tableofcontents
-
 \section main_sec_overview Overview
 The FEAST library consists of several different subsystems, which together make up what is called the FEAST "kernel".
 \image html feast_subsystems.svg "Overview of FEAST components"
