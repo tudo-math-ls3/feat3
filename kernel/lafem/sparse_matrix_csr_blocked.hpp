@@ -777,148 +777,146 @@ namespace FEAST
             Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.raw_elements(), y.raw_elements(),
               this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
           }
-          ///@}
         }
-    };
+        ///@}
 
-    /**
-     * \brief SparseMatrixCSRBlocked comparison operator
-     *
-     * \param[in] a A matrix to compare with.
-     * \param[in] b A matrix to compare with.
-     */
-    template <typename Mem_, typename Mem2_, typename DT_, typename IT_, Index BH_, Index BW_>
-    bool operator== (const SparseMatrixCSRBlocked<Mem_, DT_, IT_, BH_, BW_> & a, const SparseMatrixCSRBlocked<Mem2_, DT_, IT_, BH_, BW_> & b)
-    {
-      CONTEXT("When comparing SparseMatrixCSRBlockeds");
-
-      if (a.rows() != b.rows())
-        return false;
-      if (a.columns() != b.columns())
-        return false;
-      if (a.used_elements() != b.used_elements())
-        return false;
-      if (a.zero_element() != b.zero_element())
-        return false;
-
-      if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
-        return true;
-
-      IT_ * col_ind_a;
-      IT_ * col_ind_b;
-      DT_ * val_a;
-      DT_ * val_b;
-      IT_ * row_ptr_a;
-      IT_ * row_ptr_b;
-
-      bool ret(true);
-
-      if(std::is_same<Mem::Main, Mem_>::value)
-      {
-        col_ind_a = (IT_*)a.col_ind();
-        val_a = (DT_*)a.val();
-        row_ptr_a = (IT_*)a.row_ptr();
-      }
-      else
-      {
-        col_ind_a = new IT_[a.used_elements()];
-        Util::MemoryPool<Mem_>::instance()->template download<IT_>(col_ind_a, a.col_ind(), a.used_elements());
-        val_a = new DT_[a.raw_used_elements()];
-        Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.raw_val(), a.raw_used_elements());
-        row_ptr_a = new IT_[a.rows() + 1];
-        Util::MemoryPool<Mem_>::instance()->template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
-      }
-      if(std::is_same<Mem::Main, Mem2_>::value)
-      {
-        col_ind_b = (IT_*)b.col_ind();
-        val_b = (DT_*)b.val();
-        row_ptr_b = (IT_*)b.row_ptr();
-      }
-      else
-      {
-        col_ind_b = new IT_[b.used_elements()];
-        Util::MemoryPool<Mem2_>::instance()->template download<IT_>(col_ind_b, b.col_ind(), b.used_elements());
-        val_b = new DT_[b.raw_used_elements()];
-        Util::MemoryPool<Mem2_>::instance()->template download<DT_>(val_b, b.raw_val(), b.raw_used_elements());
-        row_ptr_b = new IT_[b.rows() + 1];
-        Util::MemoryPool<Mem2_>::instance()->template download<IT_>(row_ptr_b, b.row_ptr(), b.rows() + 1);
-      }
-
-      for (Index i(0) ; i < a.used_elements() ; ++i)
-      {
-        if (col_ind_a[i] != col_ind_b[i])
+        /**
+         * \brief SparseMatrixCSRBlocked comparison operator
+         *
+         * \param[in] a A matrix to compare with.
+         * \param[in] b A matrix to compare with.
+         */
+        template <typename Mem2_>
+        friend bool operator== (const SparseMatrixCSRBlocked & a, const SparseMatrixCSRBlocked<Mem2_, DT_, IT_, BlockHeight_, BlockWidth_> & b)
         {
-          ret = false;
-          break;
-        }
-      }
-      if (ret)
-      {
-        for (Index i(0) ; i < a.raw_used_elements() ; ++i)
-        {
-          if (val_a[i] != val_b[i])
+          CONTEXT("When comparing SparseMatrixCSRBlockeds");
+
+          if (a.rows() != b.rows())
+            return false;
+          if (a.columns() != b.columns())
+            return false;
+          if (a.used_elements() != b.used_elements())
+            return false;
+          if (a.zero_element() != b.zero_element())
+            return false;
+
+          if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
+            return true;
+
+          IT_ * col_ind_a;
+          IT_ * col_ind_b;
+          DT_ * val_a;
+          DT_ * val_b;
+          IT_ * row_ptr_a;
+          IT_ * row_ptr_b;
+
+          bool ret(true);
+
+          if(std::is_same<Mem::Main, Mem_>::value)
           {
-            ret = false;
-            break;
+            col_ind_a = (IT_*)a.col_ind();
+            val_a = (DT_*)a.val();
+            row_ptr_a = (IT_*)a.row_ptr();
           }
-        }
-      }
-      if (ret)
-      {
-        for (Index i(0) ; i < a.rows() + 1; ++i)
-        {
-          if (row_ptr_a[i] != row_ptr_b[i])
+          else
           {
-            ret = false;
-            break;
+            col_ind_a = new IT_[a.used_elements()];
+            Util::MemoryPool<Mem_>::instance()->template download<IT_>(col_ind_a, a.col_ind(), a.used_elements());
+            val_a = new DT_[a.raw_used_elements()];
+            Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.raw_val(), a.raw_used_elements());
+            row_ptr_a = new IT_[a.rows() + 1];
+            Util::MemoryPool<Mem_>::instance()->template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
           }
-        }
-      }
-
-      if(! std::is_same<Mem::Main, Mem_>::value)
-      {
-        delete[] col_ind_a;
-        delete[] val_a;
-        delete[] row_ptr_a;
-      }
-      if(! std::is_same<Mem::Main, Mem2_>::value)
-      {
-        delete[] col_ind_b;
-        delete[] val_b;
-        delete[] row_ptr_b;
-      }
-
-      return ret;
-    }
-
-    /**
-     * \brief SparseMatrixCSRBlocked streaming operator
-     *
-     * \param[in] lhs The target stream.
-     * \param[in] b The matrix to be streamed.
-     */
-    template <typename Mem_, typename DT_, typename IT_, Index BH_, Index BW_>
-    std::ostream &
-    operator<< (std::ostream & lhs, const SparseMatrixCSRBlocked<Mem_, DT_, IT_, BH_, BW_> & b)
-    {
-      lhs << "[" << std::endl;
-      for (Index i(0) ; i < b.rows() ; ++i)
-      {
-        for (Index k(0) ; k < BH_ ; ++k)
-        {
-          lhs << "[";
-          for (Index j(0) ; j < b.columns() ; ++j)
+          if(std::is_same<Mem::Main, Mem2_>::value)
           {
-            for (Index l(0) ; l < BW_ ; ++l)
-              lhs << "  " << b(i, j).v[k][l];
+            col_ind_b = (IT_*)b.col_ind();
+            val_b = (DT_*)b.val();
+            row_ptr_b = (IT_*)b.row_ptr();
+          }
+          else
+          {
+            col_ind_b = new IT_[b.used_elements()];
+            Util::MemoryPool<Mem2_>::instance()->template download<IT_>(col_ind_b, b.col_ind(), b.used_elements());
+            val_b = new DT_[b.raw_used_elements()];
+            Util::MemoryPool<Mem2_>::instance()->template download<DT_>(val_b, b.raw_val(), b.raw_used_elements());
+            row_ptr_b = new IT_[b.rows() + 1];
+            Util::MemoryPool<Mem2_>::instance()->template download<IT_>(row_ptr_b, b.row_ptr(), b.rows() + 1);
+          }
+
+          for (Index i(0) ; i < a.used_elements() ; ++i)
+          {
+            if (col_ind_a[i] != col_ind_b[i])
+            {
+              ret = false;
+              break;
+            }
+          }
+          if (ret)
+          {
+            for (Index i(0) ; i < a.raw_used_elements() ; ++i)
+            {
+              if (val_a[i] != val_b[i])
+              {
+                ret = false;
+                break;
+              }
+            }
+          }
+          if (ret)
+          {
+            for (Index i(0) ; i < a.rows() + 1; ++i)
+            {
+              if (row_ptr_a[i] != row_ptr_b[i])
+              {
+                ret = false;
+                break;
+              }
+            }
+          }
+
+          if(! std::is_same<Mem::Main, Mem_>::value)
+          {
+            delete[] col_ind_a;
+            delete[] val_a;
+            delete[] row_ptr_a;
+          }
+          if(! std::is_same<Mem::Main, Mem2_>::value)
+          {
+            delete[] col_ind_b;
+            delete[] val_b;
+            delete[] row_ptr_b;
+          }
+
+          return ret;
+        }
+
+        /**
+         * \brief SparseMatrixCSRBlocked streaming operator
+         *
+         * \param[in] lhs The target stream.
+         * \param[in] b The matrix to be streamed.
+         */
+        friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixCSRBlocked & b)
+        {
+          lhs << "[" << std::endl;
+          for (Index i(0) ; i < b.rows() ; ++i)
+          {
+            for (Index k(0) ; k < BlockHeight_ ; ++k)
+            {
+              lhs << "[";
+              for (Index j(0) ; j < b.columns() ; ++j)
+              {
+                for (Index l(0) ; l < BlockWidth_ ; ++l)
+                  lhs << "  " << b(i, j).v[k][l];
+              }
+              lhs << "]" << std::endl;
+            }
           }
           lhs << "]" << std::endl;
-        }
-      }
-      lhs << "]" << std::endl;
 
-      return lhs;
-    }
+          return lhs;
+        }
+    };
 
   } // namespace LAFEM
 } // namespace FEAST

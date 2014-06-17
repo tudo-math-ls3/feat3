@@ -693,52 +693,51 @@ namespace FEAST
         {
           return "SparseVector";
         }
+
+
+        /**
+         * \brief SparseVector comparison operator
+         *
+         * \param[in] a A vector to compare with.
+         * \param[in] b A vector to compare with.
+         */
+        template <typename Mem2_> friend bool operator== (const SparseVector & a, const SparseVector<Mem2_, DT_, IT_> & b)
+        {
+          CONTEXT("When comparing SparseVectors");
+
+          if (a.size() != b.size())
+            return false;
+          if (a.get_elements().size() != b.get_elements().size())
+            return false;
+          if (a.get_indices().size() != b.get_indices().size())
+            return false;
+
+          for (Index i(0) ; i < a.size() ; ++i)
+            if (a(i) != b(i))
+              return false;
+
+          return true;
+        }
+
+        /**
+         * \brief SparseVector streaming operator
+         *
+         * \param[in] lhs The target stream.
+         * \param[in] b The vector to be streamed.
+         */
+        friend std::ostream & operator<< (std::ostream & lhs, const SparseVector & b)
+        {
+          lhs << "[";
+          for (Index i(0) ; i < b.size() ; ++i)
+          {
+            lhs << "  " << b(i);
+          }
+          lhs << "]";
+
+          return lhs;
+        }
     }; // class SparseVector<...>
 
-
-    /**
-     * \brief SparseVector comparison operator
-     *
-     * \param[in] a A vector to compare with.
-     * \param[in] b A vector to compare with.
-     */
-    template <typename Mem_, typename Mem2_, typename DT_, typename IT_> bool operator== (const SparseVector<Mem_, DT_, IT_> & a, const SparseVector<Mem2_, DT_, IT_> & b)
-    {
-      CONTEXT("When comparing SparseVectors");
-
-      if (a.size() != b.size())
-        return false;
-      if (a.get_elements().size() != b.get_elements().size())
-        return false;
-      if (a.get_indices().size() != b.get_indices().size())
-        return false;
-
-      for (Index i(0) ; i < a.size() ; ++i)
-        if (a(i) != b(i))
-          return false;
-
-      return true;
-    }
-
-    /**
-     * \brief SparseVector streaming operator
-     *
-     * \param[in] lhs The target stream.
-     * \param[in] b The vector to be streamed.
-     */
-    template <typename Mem_, typename DT_, typename IT_>
-    std::ostream &
-    operator<< (std::ostream & lhs, const SparseVector<Mem_, DT_, IT_> & b)
-    {
-      lhs << "[";
-      for (Index i(0) ; i < b.size() ; ++i)
-      {
-        lhs << "  " << b(i);
-      }
-      lhs << "]";
-
-      return lhs;
-    }
 
   } // namespace LAFEM
 } // namespace FEAST

@@ -544,120 +544,119 @@ namespace FEAST
       {
         return VectorTypeR(this->columns());
       }
-    };
 
-    /**
-     * \brief SparseMatrixBanded comparison operator
-     *
-     * \param[in] a A matrix to compare with.
-     * \param[in] b A matrix to compare with.
-     */
-    template <typename Mem_, typename Mem2_, typename DT_, typename IT_> bool operator== (const SparseMatrixBanded<Mem_, DT_, IT_> & a, const SparseMatrixBanded<Mem2_, DT_, IT_> & b)
-    {
-      CONTEXT("When comparing SparseMatrixBandeds");
 
-      if (a.rows() != b.rows())
-        return false;
-      if (a.columns() != b.columns())
-        return false;
-      if (a.num_of_offsets() != b.num_of_offsets())
-        return false;
-      if (a.used_elements() != b.used_elements())
-        return false;
-      if (a.zero_element() != b.zero_element())
-        return false;
-
-      if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
-        return true;
-
-      IT_ * offsets_a;
-      IT_ * offsets_b;
-      DT_ * val_a;
-      DT_ * val_b;
-
-      if(std::is_same<Mem::Main, Mem_>::value)
+      /**
+       * \brief SparseMatrixBanded comparison operator
+       *
+       * \param[in] a A matrix to compare with.
+       * \param[in] b A matrix to compare with.
+       */
+      template <typename Mem2_> friend bool operator== (const SparseMatrixBanded & a, const SparseMatrixBanded<Mem2_, DT_, IT_> & b)
       {
-        offsets_a = (IT_*)a.offsets();
-        val_a = (DT_*)a.val();
-      }
-      else
-      {
-        offsets_a = new IT_[a.num_of_offsets()];
-        Util::MemoryPool<Mem_>::instance()->template download<IT_>(offsets_a, a.offsets(), a.num_of_offsets());
-        val_a = new DT_[a.num_of_offsets() * a.rows()];
-        Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
-      }
-      if(std::is_same<Mem::Main, Mem_>::value)
-      {
-        offsets_b = (IT_*)b.offsets();
-        val_b = (DT_*)b.val();
-      }
-      else
-      {
-        offsets_b = new IT_[b.num_of_offsets()];
-        Util::MemoryPool<Mem_>::instance()->template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
-        val_b = new DT_[b.num_of_offsets() * b.rows()];
-        Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
-      }
+        CONTEXT("When comparing SparseMatrixBandeds");
 
-      bool ret(true);
+        if (a.rows() != b.rows())
+          return false;
+        if (a.columns() != b.columns())
+          return false;
+        if (a.num_of_offsets() != b.num_of_offsets())
+          return false;
+        if (a.used_elements() != b.used_elements())
+          return false;
+        if (a.zero_element() != b.zero_element())
+          return false;
 
-      for (Index i(0); i < a.num_of_offsets(); ++i)
-      {
-        if (offsets_a[i] != offsets_b[i])
+        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
+          return true;
+
+        IT_ * offsets_a;
+        IT_ * offsets_b;
+        DT_ * val_a;
+        DT_ * val_b;
+
+        if(std::is_same<Mem::Main, Mem_>::value)
         {
-          ret = false;
-          break;
+          offsets_a = (IT_*)a.offsets();
+          val_a = (DT_*)a.val();
         }
-      }
-
-      for (Index i(0) ; i < a.num_of_offsets() * a.rows() ; ++i)
-      {
-        if (val_a[i] != val_b[i])
+        else
         {
-          ret = false;
-          break;
+          offsets_a = new IT_[a.num_of_offsets()];
+          Util::MemoryPool<Mem_>::instance()->template download<IT_>(offsets_a, a.offsets(), a.num_of_offsets());
+          val_a = new DT_[a.num_of_offsets() * a.rows()];
+          Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
         }
-      }
-
-      if(! std::is_same<Mem::Main, Mem_>::value)
-      {
-        delete[] offsets_a;
-        delete[] val_a;
-      }
-      if(! std::is_same<Mem::Main, Mem2_>::value)
-      {
-        delete[] offsets_b;
-        delete[] val_b;
-      }
-
-      return ret;
-    }
-
-    /**
-     * \brief SparseMatrixBanded streaming operator
-     *
-     * \param[in] lhs The target stream.
-     * \param[in] b The matrix to be streamed.
-     */
-    template <typename Mem_, typename DT_, typename IT_>
-    std::ostream &
-    operator<< (std::ostream & lhs, const SparseMatrixBanded<Mem_, DT_, IT_> & b)
-    {
-      lhs << "[" << std::endl;
-      for (Index i(0) ; i < b.rows() ; ++i)
-      {
-        lhs << "[";
-        for (Index j(0) ; j < b.columns() ; ++j)
+        if(std::is_same<Mem::Main, Mem_>::value)
         {
-          lhs << "  " << b(i, j);
+          offsets_b = (IT_*)b.offsets();
+          val_b = (DT_*)b.val();
+        }
+        else
+        {
+          offsets_b = new IT_[b.num_of_offsets()];
+          Util::MemoryPool<Mem_>::instance()->template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
+          val_b = new DT_[b.num_of_offsets() * b.rows()];
+          Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
+        }
+
+        bool ret(true);
+
+        for (Index i(0); i < a.num_of_offsets(); ++i)
+        {
+          if (offsets_a[i] != offsets_b[i])
+          {
+            ret = false;
+            break;
+          }
+        }
+
+        for (Index i(0) ; i < a.num_of_offsets() * a.rows() ; ++i)
+        {
+          if (val_a[i] != val_b[i])
+          {
+            ret = false;
+            break;
+          }
+        }
+
+        if(! std::is_same<Mem::Main, Mem_>::value)
+        {
+          delete[] offsets_a;
+          delete[] val_a;
+        }
+        if(! std::is_same<Mem::Main, Mem2_>::value)
+        {
+          delete[] offsets_b;
+          delete[] val_b;
+        }
+
+        return ret;
+      }
+
+      /**
+       * \brief SparseMatrixBanded streaming operator
+       *
+       * \param[in] lhs The target stream.
+       * \param[in] b The matrix to be streamed.
+       */
+      friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixBanded & b)
+      {
+        lhs << "[" << std::endl;
+        for (Index i(0) ; i < b.rows() ; ++i)
+        {
+          lhs << "[";
+          for (Index j(0) ; j < b.columns() ; ++j)
+          {
+            lhs << "  " << b(i, j);
+          }
+          lhs << "]" << std::endl;
         }
         lhs << "]" << std::endl;
-      }
-      lhs << "]" << std::endl;
 
-      return lhs;
-    }
+        return lhs;
+      }
+    };
 
   } // namespace LAFEM
 } // namespace FEAST

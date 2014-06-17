@@ -1597,151 +1597,149 @@ namespace FEAST
           }
         }
         /// \endcond
-    };
 
-    /**
-     * \brief SparseMatrixELL comparison operator
-     *
-     * \param[in] a A matrix to compare with.
-     * \param[in] b A matrix to compare with.
-     */
-    template <typename Mem_, typename Mem2_, typename DT_, typename IT_> bool operator== (const SparseMatrixELL<Mem_, DT_, IT_> & a, const SparseMatrixELL<Mem2_, DT_, IT_> & b)
-    {
-      CONTEXT("When comparing SparseMatrixELLs");
-
-      if (a.rows() != b.rows())
-        return false;
-      if (a.columns() != b.columns())
-        return false;
-      if (a.used_elements() != b.used_elements())
-        return false;
-      if (a.zero_element() != b.zero_element())
-        return false;
-      if (a.stride() != b.stride())
-        return false;
-      if (a.num_cols_per_row() != b.num_cols_per_row())
-        return false;
-
-      if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
-        return true;
-
-      IT_ * aj_a;
-      IT_ * aj_b;
-      DT_ * ax_a;
-      DT_ * ax_b;
-      IT_ * arl_a;
-      IT_ * arl_b;
-
-      bool ret(true);
-
-      if(std::is_same<Mem::Main, Mem_>::value)
-      {
-        aj_a = (IT_*)a.Aj();
-        ax_a = (DT_*)a.Ax();
-        arl_a = (IT_*)a.Arl();
-      }
-      else
-      {
-        aj_a = new IT_[a.stride() * a.num_cols_per_row()];
-        Util::MemoryPool<Mem_>::instance()->template download<IT_>(aj_a, a.Aj(), a.stride() * a.num_cols_per_row());
-        ax_a = new DT_[a.stride() * a.num_cols_per_row()];
-        Util::MemoryPool<Mem_>::instance()->template download<DT_>(ax_a, a.Ax(), a.stride() * a.num_cols_per_row());
-        arl_a = new IT_[a.rows()];
-        Util::MemoryPool<Mem_>::instance()->template download<IT_>(arl_a, a.Arl(), a.rows());
-      }
-      if(std::is_same<Mem::Main, Mem2_>::value)
-      {
-        aj_b = (IT_*)b.Aj();
-        ax_b = (DT_*)b.Ax();
-        arl_b = (IT_*)b.Arl();
-      }
-      else
-      {
-        aj_b = new IT_[b.stride() * b.num_cols_per_row()];
-        Util::MemoryPool<Mem2_>::instance()->template download<IT_>(aj_b, b.Aj(), b.stride() * b.num_cols_per_row());
-        ax_b = new DT_[b.stride() * b.num_cols_per_row()];
-        Util::MemoryPool<Mem2_>::instance()->template download<DT_>(ax_b, b.Ax(), b.stride() * b.num_cols_per_row());
-        arl_b = new IT_[b.rows()];
-        Util::MemoryPool<Mem2_>::instance()->template download<IT_>(arl_b, b.Arl(), b.rows());
-      }
-
-      for (Index i(0) ; i < a.rows() ; ++i)
-      {
-        if(arl_a[i] != arl_b[i])
-          ret = false;
-        break;
-      }
-
-      if (ret)
-      {
-        Index stride(a.stride());
-        for (Index row(0) ; row < a.rows() ; ++row)
+        /**
+         * \brief SparseMatrixELL comparison operator
+         *
+         * \param[in] a A matrix to compare with.
+         * \param[in] b A matrix to compare with.
+         */
+        template <typename Mem2_> friend bool operator== (const SparseMatrixELL & a, const SparseMatrixELL<Mem2_, DT_, IT_> & b)
         {
-          const IT_ * tAj(aj_a);
-          const DT_ * tAx(ax_a);
-          const IT_ * tAj2(aj_b);
-          const DT_ * tAx2(ax_b);
-          tAj += row;
-          tAx += row;
-          tAj2 += row;
-          tAx2 += row;
+          CONTEXT("When comparing SparseMatrixELLs");
 
-          const IT_ max(arl_a[row]);
-          for(IT_ n(0); n < max ; n++)
+          if (a.rows() != b.rows())
+            return false;
+          if (a.columns() != b.columns())
+            return false;
+          if (a.used_elements() != b.used_elements())
+            return false;
+          if (a.zero_element() != b.zero_element())
+            return false;
+          if (a.stride() != b.stride())
+            return false;
+          if (a.num_cols_per_row() != b.num_cols_per_row())
+            return false;
+
+          if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
+            return true;
+
+          IT_ * aj_a;
+          IT_ * aj_b;
+          DT_ * ax_a;
+          DT_ * ax_b;
+          IT_ * arl_a;
+          IT_ * arl_b;
+
+          bool ret(true);
+
+          if(std::is_same<Mem::Main, Mem_>::value)
           {
-            if (*tAj != *tAj2 || *tAx != *tAx2)
-            {
-              ret = false;
-              break;
-            }
-            tAj += stride;
-            tAx += stride;
-            tAj2 += stride;
-            tAx2 += stride;
+            aj_a = (IT_*)a.Aj();
+            ax_a = (DT_*)a.Ax();
+            arl_a = (IT_*)a.Arl();
           }
+          else
+          {
+            aj_a = new IT_[a.stride() * a.num_cols_per_row()];
+            Util::MemoryPool<Mem_>::instance()->template download<IT_>(aj_a, a.Aj(), a.stride() * a.num_cols_per_row());
+            ax_a = new DT_[a.stride() * a.num_cols_per_row()];
+            Util::MemoryPool<Mem_>::instance()->template download<DT_>(ax_a, a.Ax(), a.stride() * a.num_cols_per_row());
+            arl_a = new IT_[a.rows()];
+            Util::MemoryPool<Mem_>::instance()->template download<IT_>(arl_a, a.Arl(), a.rows());
+          }
+          if(std::is_same<Mem::Main, Mem2_>::value)
+          {
+            aj_b = (IT_*)b.Aj();
+            ax_b = (DT_*)b.Ax();
+            arl_b = (IT_*)b.Arl();
+          }
+          else
+          {
+            aj_b = new IT_[b.stride() * b.num_cols_per_row()];
+            Util::MemoryPool<Mem2_>::instance()->template download<IT_>(aj_b, b.Aj(), b.stride() * b.num_cols_per_row());
+            ax_b = new DT_[b.stride() * b.num_cols_per_row()];
+            Util::MemoryPool<Mem2_>::instance()->template download<DT_>(ax_b, b.Ax(), b.stride() * b.num_cols_per_row());
+            arl_b = new IT_[b.rows()];
+            Util::MemoryPool<Mem2_>::instance()->template download<IT_>(arl_b, b.Arl(), b.rows());
+          }
+
+          for (Index i(0) ; i < a.rows() ; ++i)
+          {
+            if(arl_a[i] != arl_b[i])
+              ret = false;
+            break;
+          }
+
+          if (ret)
+          {
+            Index stride(a.stride());
+            for (Index row(0) ; row < a.rows() ; ++row)
+            {
+              const IT_ * tAj(aj_a);
+              const DT_ * tAx(ax_a);
+              const IT_ * tAj2(aj_b);
+              const DT_ * tAx2(ax_b);
+              tAj += row;
+              tAx += row;
+              tAj2 += row;
+              tAx2 += row;
+
+              const IT_ max(arl_a[row]);
+              for(IT_ n(0); n < max ; n++)
+              {
+                if (*tAj != *tAj2 || *tAx != *tAx2)
+                {
+                  ret = false;
+                  break;
+                }
+                tAj += stride;
+                tAx += stride;
+                tAj2 += stride;
+                tAx2 += stride;
+              }
+            }
+          }
+
+          if(! std::is_same<Mem::Main, Mem_>::value)
+          {
+            delete[] aj_a;
+            delete[] ax_a;
+            delete[] arl_a;
+          }
+          if(! std::is_same<Mem::Main, Mem2_>::value)
+          {
+            delete[] aj_b;
+            delete[] ax_b;
+            delete[] arl_b;
+          }
+
+          return ret;
         }
-      }
 
-      if(! std::is_same<Mem::Main, Mem_>::value)
-      {
-        delete[] aj_a;
-        delete[] ax_a;
-        delete[] arl_a;
-      }
-      if(! std::is_same<Mem::Main, Mem2_>::value)
-      {
-        delete[] aj_b;
-        delete[] ax_b;
-        delete[] arl_b;
-      }
-
-      return ret;
-    }
-
-    /**
-     * \brief SparseMatrixELL streaming operator
-     *
-     * \param[in] lhs The target stream.
-     * \param[in] b The matrix to be streamed.
-     */
-    template <typename Mem_, typename DT_, typename IT_>
-    std::ostream &
-    operator<< (std::ostream & lhs, const SparseMatrixELL<Mem_, DT_, IT_> & b)
-    {
-      lhs << "[" << std::endl;
-      for (Index i(0) ; i < b.rows() ; ++i)
-      {
-        lhs << "[";
-        for (Index j(0) ; j < b.columns() ; ++j)
+        /**
+         * \brief SparseMatrixELL streaming operator
+         *
+         * \param[in] lhs The target stream.
+         * \param[in] b The matrix to be streamed.
+         */
+        friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixELL & b)
         {
-          lhs << "  " << b(i, j);
-        }
-        lhs << "]" << std::endl;
-      }
-      lhs << "]" << std::endl;
+          lhs << "[" << std::endl;
+          for (Index i(0) ; i < b.rows() ; ++i)
+          {
+            lhs << "[";
+            for (Index j(0) ; j < b.columns() ; ++j)
+            {
+              lhs << "  " << b(i, j);
+            }
+            lhs << "]" << std::endl;
+          }
+          lhs << "]" << std::endl;
 
-      return lhs;
-    }
+          return lhs;
+        }
+    };
 
   } // namespace LAFEM
 } // namespace FEAST

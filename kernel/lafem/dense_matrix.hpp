@@ -278,92 +278,90 @@ namespace FEAST
           return this->columns();
         }
       ///@}
-    };
 
-    /**
-     * \brief DenseMatrix comparison operator
-     *
-     * \param[in] a A matrix to compare with.
-     * \param[in] b A matrix to compare with.
-     */
-    template <typename Mem_, typename Mem2_, typename DT_, typename IT_> bool operator== (const DenseMatrix<Mem_, DT_, IT_> & a, const DenseMatrix<Mem2_, DT_, IT_> & b)
-    {
-      CONTEXT("When comparing DenseMatrices");
-
-      if (a.size() != b.size())
-        return false;
-      if (a.get_elements().size() != b.get_elements().size())
-        return false;
-      if (a.get_indices().size() != b.get_indices().size())
-        return false;
-      if (a.rows() != b.rows())
-        return false;
-      if (a.columns() != b.columns())
-        return false;
-
-      if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
-        return true;
-
-      bool ret(true);
-
-      DT_ * ta;
-      DT_ * tb;
-
-      if(std::is_same<Mem::Main, Mem_>::value)
-        ta = (DT_*)a.elements();
-      else
-      {
-        ta = new DT_[a.size()];
-        Util::MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.elements(), a.size());
-      }
-      if(std::is_same<Mem::Main, Mem2_>::value)
-        tb = (DT_*)b.elements();
-      else
-      {
-        tb = new DT_[b.size()];
-        Util::MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.elements(), b.size());
-      }
-
-      for (Index i(0) ; i < a.size() ; ++i)
-        if (ta[i] != tb[i])
+        /**
+         * \brief DenseMatrix comparison operator
+         *
+         * \param[in] a A matrix to compare with.
+         * \param[in] b A matrix to compare with.
+         */
+        template <typename Mem2_> friend bool operator== (const DenseMatrix & a, const DenseMatrix<Mem2_, DT_, IT_> & b)
         {
-          ret = false;
-          break;
+          CONTEXT("When comparing DenseMatrices");
+
+          if (a.size() != b.size())
+            return false;
+          if (a.get_elements().size() != b.get_elements().size())
+            return false;
+          if (a.get_indices().size() != b.get_indices().size())
+            return false;
+          if (a.rows() != b.rows())
+            return false;
+          if (a.columns() != b.columns())
+            return false;
+
+          if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
+            return true;
+
+          bool ret(true);
+
+          DT_ * ta;
+          DT_ * tb;
+
+          if(std::is_same<Mem::Main, Mem_>::value)
+            ta = (DT_*)a.elements();
+          else
+          {
+            ta = new DT_[a.size()];
+            Util::MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.elements(), a.size());
+          }
+          if(std::is_same<Mem::Main, Mem2_>::value)
+            tb = (DT_*)b.elements();
+          else
+          {
+            tb = new DT_[b.size()];
+            Util::MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.elements(), b.size());
+          }
+
+          for (Index i(0) ; i < a.size() ; ++i)
+            if (ta[i] != tb[i])
+            {
+              ret = false;
+              break;
+            }
+
+          if(! std::is_same<Mem::Main, Mem_>::value)
+            delete[] ta;
+          if(! std::is_same<Mem::Main, Mem2_>::value)
+            delete[] tb;
+
+          return ret;
         }
 
-      if(! std::is_same<Mem::Main, Mem_>::value)
-        delete[] ta;
-      if(! std::is_same<Mem::Main, Mem2_>::value)
-        delete[] tb;
-
-      return ret;
-    }
-
-    /**
-     * \brief DenseMatrix streaming operator
-     *
-     * \param[in] lhs The target stream.
-     * \param[in] b The matrix to be streamed.
-     */
-    template <typename Mem_, typename DT_, typename IT_>
-      std::ostream &
-      operator<< (std::ostream & lhs, const DenseMatrix<Mem_, DT_, IT_> & b)
-      {
-        lhs << "[" << std::endl;
-        for (Index i(0) ; i < b.rows() ; ++i)
+        /**
+         * \brief DenseMatrix streaming operator
+         *
+         * \param[in] lhs The target stream.
+         * \param[in] b The matrix to be streamed.
+         */
+        friend std::ostream & operator<< (std::ostream & lhs, const DenseMatrix & b)
         {
-          lhs << "[";
-          for (Index j(0) ; j < b.columns() ; ++j)
+          lhs << "[" << std::endl;
+          for (Index i(0) ; i < b.rows() ; ++i)
           {
-            lhs << "  " << b(i, j);
+            lhs << "[";
+            for (Index j(0) ; j < b.columns() ; ++j)
+            {
+              lhs << "  " << b(i, j);
+            }
+            lhs << "]" << std::endl;
           }
           lhs << "]" << std::endl;
-        }
-        lhs << "]" << std::endl;
 
-        return lhs;
-      }
-  } // namespace LAFEM
+          return lhs;
+        }
+  };
+} // namespace LAFEM
 } // namespace FEAST
 
 #endif // KERNEL_LAFEM_DENSE_MATRIX_HPP

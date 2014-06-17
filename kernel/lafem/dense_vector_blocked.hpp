@@ -463,85 +463,83 @@ namespace FEAST
           return Math::sqr(this->norm2<Algo_>());
         }
         ///@}
-    }; // class DenseVectorBlocked<...>
 
-
-    /**
-     * \brief DenseVectorBlocked comparison operator
-     *
-     * \param[in] a A vector to compare with.
-     * \param[in] b A vector to compare with.
-     */
-    template <typename Mem_, typename Mem2_, typename DT_, typename IT_, Index BlockSize_> bool operator== (const DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & a, const DenseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & b)
-    {
-      CONTEXT("When comparing DenseVectorBlockeds");
-
-      if (a.size() != b.size())
-        return false;
-      if (a.get_elements().size() != b.get_elements().size())
-        return false;
-      if (a.get_indices().size() != b.get_indices().size())
-        return false;
-
-      if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
-        return true;
-
-      bool ret(true);
-
-      DT_ * ta;
-      DT_ * tb;
-
-      if(std::is_same<Mem::Main, Mem_>::value)
-        ta = (DT_*)a.elements();
-      else
-      {
-        ta = new DT_[a.raw_size()];
-        Util::MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.raw_elements(), a.raw_size());
-      }
-      if(std::is_same<Mem::Main, Mem2_>::value)
-        tb = (DT_*)b.elements();
-      else
-      {
-        tb = new DT_[b.raw_size()];
-        Util::MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.raw_elements(), b.raw_size());
-      }
-
-      for (Index i(0) ; i < a.raw_size() ; ++i)
-        if (ta[i] != tb[i])
+        /**
+         * \brief DenseVectorBlocked comparison operator
+         *
+         * \param[in] a A vector to compare with.
+         * \param[in] b A vector to compare with.
+         */
+        template <typename Mem2_> friend bool operator== (const DenseVectorBlocked & a, const DenseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & b)
         {
-          ret = false;
-          break;
+          CONTEXT("When comparing DenseVectorBlockeds");
+
+          if (a.size() != b.size())
+            return false;
+          if (a.get_elements().size() != b.get_elements().size())
+            return false;
+          if (a.get_indices().size() != b.get_indices().size())
+            return false;
+
+          if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
+            return true;
+
+          bool ret(true);
+
+          DT_ * ta;
+          DT_ * tb;
+
+          if(std::is_same<Mem::Main, Mem_>::value)
+            ta = (DT_*)a.elements();
+          else
+          {
+            ta = new DT_[a.raw_size()];
+            Util::MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.raw_elements(), a.raw_size());
+          }
+          if(std::is_same<Mem::Main, Mem2_>::value)
+            tb = (DT_*)b.elements();
+          else
+          {
+            tb = new DT_[b.raw_size()];
+            Util::MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.raw_elements(), b.raw_size());
+          }
+
+          for (Index i(0) ; i < a.raw_size() ; ++i)
+            if (ta[i] != tb[i])
+            {
+              ret = false;
+              break;
+            }
+
+          if(! std::is_same<Mem::Main, Mem_>::value)
+            delete[] ta;
+          if(! std::is_same<Mem::Main, Mem2_>::value)
+            delete[] tb;
+
+          return ret;
         }
 
-      if(! std::is_same<Mem::Main, Mem_>::value)
-        delete[] ta;
-      if(! std::is_same<Mem::Main, Mem2_>::value)
-        delete[] tb;
+        /**
+         * \brief DenseVectorBlocked streaming operator
+         *
+         * \param[in] lhs The target stream.
+         * \param[in] b The vector to be streamed.
+         */
+        friend std::ostream & operator<< (std::ostream & lhs, const DenseVectorBlocked & b)
+        {
+          lhs << "[";
+          for (Index i(0) ; i < b.size() ; ++i)
+          {
+            Tiny::Vector<DT_, BlockSize_> t = b(i);
+            for (Index j(0) ; j < BlockSize_ ; ++j)
+              lhs << "  " << t[j];
+          }
+          lhs << "]";
 
-      return ret;
-    }
+          return lhs;
+        }
+    }; // class DenseVectorBlocked<...>
 
-    /**
-     * \brief DenseVectorBlocked streaming operator
-     *
-     * \param[in] lhs The target stream.
-     * \param[in] b The vector to be streamed.
-     */
-    template <typename Mem_, typename DT_, typename IT_, Index BlockSize_>
-    std::ostream &
-    operator<< (std::ostream & lhs, const DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & b)
-    {
-      lhs << "[";
-      for (Index i(0) ; i < b.size() ; ++i)
-      {
-        Tiny::Vector<DT_, BlockSize_> t = b(i);
-        for (Index j(0) ; j < BlockSize_ ; ++j)
-          lhs << "  " << t[j];
-      }
-      lhs << "]";
-
-      return lhs;
-    }
 
   } // namespace LAFEM
 } // namespace FEAST

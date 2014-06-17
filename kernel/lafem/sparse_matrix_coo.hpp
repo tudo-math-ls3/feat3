@@ -88,8 +88,8 @@ namespace FEAST
         }
 
         /*template <typename T1_, typename T2_, typename T3_>
-        static void _comb_sort(T1_ * key, T2_ * val1, T3_ * val2, Index size)
-        {
+          static void _comb_sort(T1_ * key, T2_ * val1, T3_ * val2, Index size)
+          {
           const float shrink = 1.3f;
           T1_ swap_key;
           T2_ swap1;
@@ -98,34 +98,34 @@ namespace FEAST
           bool swapped = false;
           while ((gap > 1) || swapped)
           {
-            if (gap > 1)
-            {
-              gap = (Index)((float)gap / shrink);
-            }
-
-            swapped = false;
-
-            for (Index i = 0 ; gap + i < size ; ++i)
-            {
-              if (Util::MemoryPool<Mem_>::get_element(key, i) > Util::MemoryPool<Mem_>::get_element(key, i + gap))
-              {
-                swap_key = Util::MemoryPool<Mem_>::get_element(key, i);
-                Util::MemoryPool<Mem_>::copy(key + i, key + i + gap, 1);
-                Util::MemoryPool<Mem_>::set_memory(key + i + gap, swap_key);
-
-                swap1 = Util::MemoryPool<Mem_>::get_element(val1, i);
-                Util::MemoryPool<Mem_>::copy(val1 + i, val1 + i + gap, 1);
-                Util::MemoryPool<Mem_>::set_memory(val1 + i + gap, swap1);
-
-                swap2 = Util::MemoryPool<Mem_>::get_element(val2, i);
-                Util::MemoryPool<Mem_>::copy(val2 + i, val2 + i + gap, 1);
-                Util::MemoryPool<Mem_>::set_memory(val2 + i + gap, swap2);
-
-                swapped = true;
-              }
-            }
+          if (gap > 1)
+          {
+          gap = (Index)((float)gap / shrink);
           }
-        }*/
+
+          swapped = false;
+
+          for (Index i = 0 ; gap + i < size ; ++i)
+          {
+          if (Util::MemoryPool<Mem_>::get_element(key, i) > Util::MemoryPool<Mem_>::get_element(key, i + gap))
+          {
+          swap_key = Util::MemoryPool<Mem_>::get_element(key, i);
+          Util::MemoryPool<Mem_>::copy(key + i, key + i + gap, 1);
+          Util::MemoryPool<Mem_>::set_memory(key + i + gap, swap_key);
+
+          swap1 = Util::MemoryPool<Mem_>::get_element(val1, i);
+          Util::MemoryPool<Mem_>::copy(val1 + i, val1 + i + gap, 1);
+          Util::MemoryPool<Mem_>::set_memory(val1 + i + gap, swap1);
+
+          swap2 = Util::MemoryPool<Mem_>::get_element(val2, i);
+          Util::MemoryPool<Mem_>::copy(val2 + i, val2 + i + gap, 1);
+          Util::MemoryPool<Mem_>::set_memory(val2 + i + gap, swap2);
+
+          swapped = true;
+          }
+          }
+          }
+          }*/
 
         void _read_from_mtx(String filename)
         {
@@ -310,7 +310,7 @@ namespace FEAST
 
           double * cval = new double[elements];
           file.read((char *)cval, (long)(elements * sizeof(double)));
-           DT_ * tval_ptr = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(elements);
+          DT_ * tval_ptr = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(elements);
           for (Index i(0) ; i < elements ; ++i)
             tval_ptr[i] = DT_(cval[i]);
           delete[] cval;
@@ -389,16 +389,16 @@ namespace FEAST
          */
         explicit SparseMatrixCOO() :
           Container<Mem_, DT_, IT_> (0)
-        {
-          CONTEXT("When creating SparseMatrixCOO");
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(1000);
-          this->_scalar_index.push_back(1);
-          this->_scalar_dt.push_back(DT_(0));
-        }
+      {
+        CONTEXT("When creating SparseMatrixCOO");
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(1000);
+        this->_scalar_index.push_back(1);
+        this->_scalar_dt.push_back(DT_(0));
+      }
 
         /**
          * \brief Constructor
@@ -409,16 +409,16 @@ namespace FEAST
          */
         explicit SparseMatrixCOO(Index dimensions) :
           Container<Mem_, DT_, IT_>(dimensions * dimensions)
-        {
-          CONTEXT("When creating SparseMatrixCOO");
-          this->_scalar_index.push_back(dimensions);
-          this->_scalar_index.push_back(dimensions);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(1000);
-          this->_scalar_index.push_back(1);
-          this->_scalar_dt.push_back(DT_(0));
-        }
+      {
+        CONTEXT("When creating SparseMatrixCOO");
+        this->_scalar_index.push_back(dimensions);
+        this->_scalar_index.push_back(dimensions);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(1000);
+        this->_scalar_index.push_back(1);
+        this->_scalar_dt.push_back(DT_(0));
+      }
 
         /**
          * \brief Constructor
@@ -430,16 +430,16 @@ namespace FEAST
          */
         explicit SparseMatrixCOO(Index rows_in, Index columns_in) :
           Container<Mem_, DT_, IT_>(rows_in * columns_in)
-        {
-          CONTEXT("When creating SparseMatrixCOO");
-          this->_scalar_index.push_back(rows_in);
-          this->_scalar_index.push_back(columns_in);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(1000);
-          this->_scalar_index.push_back(1);
-          this->_scalar_dt.push_back(DT_(0));
-        }
+      {
+        CONTEXT("When creating SparseMatrixCOO");
+        this->_scalar_index.push_back(rows_in);
+        this->_scalar_index.push_back(columns_in);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(1000);
+        this->_scalar_index.push_back(1);
+        this->_scalar_dt.push_back(DT_(0));
+      }
 
         /**
          * \brief Constructor
@@ -450,19 +450,19 @@ namespace FEAST
          */
         explicit SparseMatrixCOO(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
           Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
-        {
-          CONTEXT("When creating SparseMatrixCOO");
-          this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
-          this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
-          this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
-          this->_scalar_dt.push_back(DT_(0));
+      {
+        CONTEXT("When creating SparseMatrixCOO");
+        this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
+        this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
+        this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
+        this->_scalar_dt.push_back(DT_(0));
 
-          for (auto i : this->_indices)
-            Util::MemoryPool<Mem_>::instance()->increase_memory(i);
+        for (auto i : this->_indices)
+          Util::MemoryPool<Mem_>::instance()->increase_memory(i);
 
-          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_allocated_elements()));
-          this->_elements_size.push_back(_allocated_elements());
-        }
+        this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_allocated_elements()));
+        this->_elements_size.push_back(_allocated_elements());
+      }
 
         /**
          * \brief Constructor
@@ -474,11 +474,11 @@ namespace FEAST
         template <typename MT_>
         explicit SparseMatrixCOO(const MT_ & other) :
           Container<Mem_, DT_, IT_>(other.size())
-        {
-          CONTEXT("When creating SparseMatrixCOO");
+      {
+        CONTEXT("When creating SparseMatrixCOO");
 
-          convert(other);
-        }
+        convert(other);
+      }
 
         /**
          * \brief Constructor
@@ -492,30 +492,30 @@ namespace FEAST
          * Creates a matrix with given dimensions and content.
          */
         explicit SparseMatrixCOO(const Index rows_in, const Index columns_in, DenseVector<Mem_, IT_, IT_> & row_ind,
-            DenseVector<Mem_, IT_, IT_> & col_ind, DenseVector<Mem_, DT_, IT_> & val_in) :
+        DenseVector<Mem_, IT_, IT_> & col_ind, DenseVector<Mem_, DT_, IT_> & val_in) :
           Container<Mem_, DT_, IT_>(rows_in * columns_in)
-        {
-          CONTEXT("When creating SparseMatrixCOO");
-          this->_scalar_index.push_back(rows_in);
-          this->_scalar_index.push_back(columns_in);
-          this->_scalar_index.push_back(val_in.size());
-          this->_scalar_index.push_back(val_in.size());
-          this->_scalar_index.push_back(1000);
-          this->_scalar_index.push_back(0);
-          this->_scalar_dt.push_back(DT_(0));
+      {
+        CONTEXT("When creating SparseMatrixCOO");
+        this->_scalar_index.push_back(rows_in);
+        this->_scalar_index.push_back(columns_in);
+        this->_scalar_index.push_back(val_in.size());
+        this->_scalar_index.push_back(val_in.size());
+        this->_scalar_index.push_back(1000);
+        this->_scalar_index.push_back(0);
+        this->_scalar_dt.push_back(DT_(0));
 
-          this->_elements.push_back(val_in.elements());
-          this->_elements_size.push_back(val_in.size());
-          this->_indices.push_back(row_ind.elements());
-          this->_indices_size.push_back(row_ind.size());
-          this->_indices.push_back(col_ind.elements());
-          this->_indices_size.push_back(col_ind.size());
+        this->_elements.push_back(val_in.elements());
+        this->_elements_size.push_back(val_in.size());
+        this->_indices.push_back(row_ind.elements());
+        this->_indices_size.push_back(row_ind.size());
+        this->_indices.push_back(col_ind.elements());
+        this->_indices_size.push_back(col_ind.size());
 
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
-        }
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+      }
 
         /**
          * \brief Constructor
@@ -526,36 +526,36 @@ namespace FEAST
          */
         explicit SparseMatrixCOO(const Adjacency::Graph & graph) :
           Container<Mem_, DT_, IT_>(0)
+      {
+        CONTEXT("When creating SparseMatrixCOO");
+
+        Index num_rows = graph.get_num_nodes_domain();
+        Index num_cols = graph.get_num_nodes_image();
+        Index num_nnze = graph.get_num_indices();
+
+        // create temporary vectors
+        LAFEM::DenseVector<Mem::Main, IT_, IT_> vrow_idx(num_nnze);
+        LAFEM::DenseVector<Mem::Main, IT_, IT_> vcol_idx(num_nnze);
+        LAFEM::DenseVector<Mem::Main, DT_, IT_> vdata(num_nnze, DT_(0));
+
+        const Index * dom_ptr(graph.get_domain_ptr());
+        const Index * img_idx(graph.get_image_idx());
+        IT_ * prow_idx(vrow_idx.elements());
+        IT_ * pcol_idx(vcol_idx.elements());
+
+        // build col-idx and row-idx
+        for (Index i(0); i < num_rows; ++i)
         {
-          CONTEXT("When creating SparseMatrixCOO");
-
-          Index num_rows = graph.get_num_nodes_domain();
-          Index num_cols = graph.get_num_nodes_image();
-          Index num_nnze = graph.get_num_indices();
-
-          // create temporary vectors
-          LAFEM::DenseVector<Mem::Main, IT_, IT_> vrow_idx(num_nnze);
-          LAFEM::DenseVector<Mem::Main, IT_, IT_> vcol_idx(num_nnze);
-          LAFEM::DenseVector<Mem::Main, DT_, IT_> vdata(num_nnze, DT_(0));
-
-          const Index * dom_ptr(graph.get_domain_ptr());
-          const Index * img_idx(graph.get_image_idx());
-          IT_ * prow_idx(vrow_idx.elements());
-          IT_ * pcol_idx(vcol_idx.elements());
-
-          // build col-idx and row-idx
-          for (Index i(0); i < num_rows; ++i)
+          for (Index j(dom_ptr[i]); j < dom_ptr[i+1]; ++j)
           {
-            for (Index j(dom_ptr[i]); j < dom_ptr[i+1]; ++j)
-            {
-              prow_idx[j] = IT_(i);
-              pcol_idx[j] = IT_(img_idx[j]);
-            }
+            prow_idx[j] = IT_(i);
+            pcol_idx[j] = IT_(img_idx[j]);
           }
-
-          // build the matrix
-          this->assign(SparseMatrixCOO<Mem::Main, DT_, IT_>(num_rows, num_cols, vrow_idx, vcol_idx, vdata));
         }
+
+        // build the matrix
+        this->assign(SparseMatrixCOO<Mem::Main, DT_, IT_>(num_rows, num_cols, vrow_idx, vcol_idx, vdata));
+      }
 
         /**
          * \brief Constructor
@@ -567,21 +567,21 @@ namespace FEAST
          */
         explicit SparseMatrixCOO(FileMode mode, String filename) :
           Container<Mem_, DT_, IT_>(0)
-        {
-          CONTEXT("When creating SparseMatrixCOO");
+      {
+        CONTEXT("When creating SparseMatrixCOO");
 
-          switch(mode)
-          {
-            case FileMode::fm_mtx:
-              _read_from_mtx(filename);
-              break;
-            case FileMode::fm_coo:
-              _read_from_coo(filename);
-              break;
-            default:
-              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-          }
+        switch(mode)
+        {
+          case FileMode::fm_mtx:
+            _read_from_mtx(filename);
+            break;
+          case FileMode::fm_coo:
+            _read_from_coo(filename);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
+      }
 
         /**
          * \brief Constructor
@@ -593,21 +593,21 @@ namespace FEAST
          */
         explicit SparseMatrixCOO(FileMode mode, std::istream& file) :
           Container<Mem_, DT_, IT_>(0)
-        {
-          CONTEXT("When creating SparseMatrixCOO");
+      {
+        CONTEXT("When creating SparseMatrixCOO");
 
-          switch(mode)
-          {
-            case FileMode::fm_mtx:
-              _read_from_mtx(file);
-              break;
-            case FileMode::fm_coo:
-              _read_from_coo(file);
-              break;
-            default:
-              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-          }
+        switch(mode)
+        {
+          case FileMode::fm_mtx:
+            _read_from_mtx(file);
+            break;
+          case FileMode::fm_coo:
+            _read_from_coo(file);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
+      }
 
         /**
          * \brief Move Constructor
@@ -618,9 +618,9 @@ namespace FEAST
          */
         SparseMatrixCOO(SparseMatrixCOO && other) :
           Container<Mem_, DT_, IT_>(std::forward<SparseMatrixCOO>(other))
-        {
-          CONTEXT("When moving SparseMatrixCOO");
-        }
+      {
+        CONTEXT("When moving SparseMatrixCOO");
+      }
 
         /**
          * \brief Move operator
@@ -904,18 +904,18 @@ namespace FEAST
             tcol_ind = new IT_[other.used_elements()];
           }
 
-          #ifdef START_OFFSET
-            #warning Overwriting definition of START_OFFSET
-            #undef START_OFFSET
-          #endif
+#ifdef START_OFFSET
+#warning Overwriting definition of START_OFFSET
+#undef START_OFFSET
+#endif
 
-          #ifdef END_OFFSET
-            #error Overwriting definition of END_OFFSET
-            #undef END_OFFSET
-          #endif
+#ifdef END_OFFSET
+#error Overwriting definition of END_OFFSET
+#undef END_OFFSET
+#endif
 
-          #define START_OFFSET(j) ((j == Index(-1)) ? crows : ((j == k) ? 0 : crows - coffsets[j] - 1))
-          #define END_OFFSET(j) ((j == Index(-1)) ? crows : ((j == cnum_of_offsets) ? 0 : ccolumns + crows - coffsets[j] - 1))
+#define START_OFFSET(j) ((j == Index(-1)) ? crows : ((j == k) ? 0 : crows - coffsets[j] - 1))
+#define END_OFFSET(j) ((j == Index(-1)) ? crows : ((j == cnum_of_offsets) ? 0 : ccolumns + crows - coffsets[j] - 1))
 
           const DT_ * cval(cother.val());
           const IT2_ * coffsets(cother.offsets());
@@ -954,8 +954,8 @@ namespace FEAST
               }
             }
           }
-          #undef START_OFFSET
-          #undef END_OFFSET
+#undef START_OFFSET
+#undef END_OFFSET
 
           if (! std::is_same<Mem_, Mem::Main>::value)
           {
@@ -990,7 +990,7 @@ namespace FEAST
               write_out_coo(filename);
               break;
             default:
-                throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -1075,7 +1075,7 @@ namespace FEAST
               write_out_coo(file);
               break;
             default:
-                throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -1521,9 +1521,9 @@ namespace FEAST
          */
         template <typename Algo_>
         void axpy(
-          const SparseMatrixCOO & x,
-          const SparseMatrixCOO & y,
-          const DT_ alpha = DT_(1))
+            const SparseMatrixCOO & x,
+            const SparseMatrixCOO & y,
+            const DT_ alpha = DT_(1))
         {
           if (x.rows() != y.rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
@@ -1663,7 +1663,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::ScaleRows<Mem_, Algo_>::coo(this->val(), x.val(), this->row_indices(), this->column_indices(),
-                                            s.elements(), this->rows(), this->columns(), this->used_elements());
+          s.elements(), this->rows(), this->columns(), this->used_elements());
         }
 
         /**
@@ -1685,7 +1685,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::ScaleCols<Mem_, Algo_>::coo(this->val(), x.val(), this->row_indices(), this->column_indices(),
-                                            s.elements(), this->rows(), this->columns(), this->used_elements());
+          s.elements(), this->rows(), this->columns(), this->used_elements());
         }
 
         /**
@@ -1705,7 +1705,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
           Arch::ProductMatVec<Mem_, Algo_>::coo(r.elements(), this->val(), this->row_indices(),
-            this->column_indices(), x.elements(), this->rows(), this->used_elements());
+          this->column_indices(), x.elements(), this->rows(), this->used_elements());
         }
 
         /**
@@ -1720,10 +1720,10 @@ namespace FEAST
          */
         template<typename Algo_>
         void apply(
-          DenseVector<Mem_,DT_, IT_>& r,
-          const DenseVector<Mem_, DT_, IT_>& x,
-          const DenseVector<Mem_, DT_, IT_>& y,
-          const DT_ alpha = DT_(1)) const
+            DenseVector<Mem_,DT_, IT_>& r,
+            const DenseVector<Mem_, DT_, IT_>& x,
+            const DenseVector<Mem_, DT_, IT_>& y,
+            const DT_ alpha = DT_(1)) const
         {
           if (r.size() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
@@ -1737,7 +1737,7 @@ namespace FEAST
           if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
           {
             Arch::Defect<Mem_, Algo_>::coo(r.elements(), y.elements(), this->val(),
-                this->row_indices(), this->column_indices(), x.elements(), this->rows(), this->used_elements());
+            this->row_indices(), this->column_indices(), x.elements(), this->rows(), this->used_elements());
           }
           // r <- y
           else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -1746,7 +1746,7 @@ namespace FEAST
           else
           {
             Arch::Axpy<Mem_, Algo_>::coo(r.elements(), alpha, x.elements(), y.elements(),
-              this->val(), this->row_indices(), this->column_indices(), this->rows(), this->used_elements());
+            this->val(), this->row_indices(), this->column_indices(), this->rows(), this->used_elements());
           }
         }
         ///@}
@@ -1787,7 +1787,7 @@ namespace FEAST
 
         /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
         void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
-                      const Index col_start, const Index stride = 1) const
+        const Index col_start, const Index stride = 1) const
         {
           const IT_ * prow(this->row_indices());
           const IT_ * pcol(this->column_indices());
@@ -1812,63 +1812,62 @@ namespace FEAST
           }
         }
         /// \endcond
+
+        /**
+         * \brief SparseMatrixCOO comparison operator
+         *
+         * \param[in] a A matrix to compare with.
+         * \param[in] b A matrix to compare with.
+         */
+        template <typename Mem2_> friend bool operator== (const SparseMatrixCOO & a, const SparseMatrixCOO<Mem2_, DT_, IT_> & b)
+        {
+          CONTEXT("When comparing SparseMatrixCOOs");
+          if (a.rows() != b.rows())
+            return false;
+          if (a.columns() != b.columns())
+            return false;
+          if (a.used_elements() != b.used_elements())
+            return false;
+          if (a.zero_element() != b.zero_element())
+            return false;
+
+          for (Index i(0) ; i < a.used_elements() ; ++i)
+          {
+            if (Util::MemoryPool<Mem_>::get_element(a.val(), i) != Util::MemoryPool<Mem2_>::get_element(b.val(), i))
+              return false;
+            if (Util::MemoryPool<Mem_>::get_element(a.row_indices(), i) != Util::MemoryPool<Mem2_>::get_element(b.row_indices(), i))
+              return false;
+            if (Util::MemoryPool<Mem_>::get_element(a.column_indices(), i) != Util::MemoryPool<Mem2_>::get_element(b.column_indices(), i))
+              return false;
+          }
+
+          return true;
+        }
+
+        /**
+         * \brief SparseMatrixCOO streaming operator
+         *
+         * \param[in] lhs The target stream.
+         * \param[in] b The matrix to be streamed.
+         */
+        friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixCOO & b)
+        {
+          lhs << "[" << std::endl;
+          for (Index i(0) ; i < b.rows() ; ++i)
+          {
+            lhs << "[";
+            for (Index j(0) ; j < b.columns() ; ++j)
+            {
+              lhs << "  " << b(i, j);
+            }
+            lhs << "]" << std::endl;
+          }
+          lhs << "]" << std::endl;
+
+          return lhs;
+        }
     };
 
-    /**
-     * \brief SparseMatrixCOO comparison operator
-     *
-     * \param[in] a A matrix to compare with.
-     * \param[in] b A matrix to compare with.
-     */
-    template <typename Mem_, typename Mem2_, typename DT_, typename IT_> bool operator== (const SparseMatrixCOO<Mem_, DT_, IT_> & a, const SparseMatrixCOO<Mem2_, DT_, IT_> & b)
-    {
-      CONTEXT("When comparing SparseMatrixCOOs");
-      if (a.rows() != b.rows())
-        return false;
-      if (a.columns() != b.columns())
-        return false;
-      if (a.used_elements() != b.used_elements())
-        return false;
-      if (a.zero_element() != b.zero_element())
-        return false;
-
-      for (Index i(0) ; i < a.used_elements() ; ++i)
-      {
-        if (Util::MemoryPool<Mem_>::get_element(a.val(), i) != Util::MemoryPool<Mem2_>::get_element(b.val(), i))
-            return false;
-        if (Util::MemoryPool<Mem_>::get_element(a.row_indices(), i) != Util::MemoryPool<Mem2_>::get_element(b.row_indices(), i))
-            return false;
-        if (Util::MemoryPool<Mem_>::get_element(a.column_indices(), i) != Util::MemoryPool<Mem2_>::get_element(b.column_indices(), i))
-            return false;
-      }
-
-      return true;
-    }
-
-    /**
-     * \brief SparseMatrixCOO streaming operator
-     *
-     * \param[in] lhs The target stream.
-     * \param[in] b The matrix to be streamed.
-     */
-    template <typename Mem_, typename DT_, typename IT_>
-    std::ostream &
-    operator<< (std::ostream & lhs, const SparseMatrixCOO<Mem_, DT_, IT_> & b)
-    {
-      lhs << "[" << std::endl;
-      for (Index i(0) ; i < b.rows() ; ++i)
-      {
-        lhs << "[";
-        for (Index j(0) ; j < b.columns() ; ++j)
-        {
-          lhs << "  " << b(i, j);
-        }
-        lhs << "]" << std::endl;
-      }
-      lhs << "]" << std::endl;
-
-      return lhs;
-    }
   } // namespace LAFEM
 } // namespace FEAST
 

@@ -1,5 +1,7 @@
-#include <kernel/lafem/umfpack.hpp>
+#include <kernel/base_header.hpp>
+
 #ifdef FEAST_HAVE_UMFPACK
+#include <kernel/lafem/umfpack.hpp>
 FEAST_DISABLE_WARNINGS
 #include <umfpack.h>
 FEAST_RESTORE_WARNINGS
