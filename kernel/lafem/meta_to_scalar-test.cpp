@@ -170,7 +170,7 @@ public:
   typedef TupleVector<PowerVec3, PowerVec2, PowerVec1, DenseVec> TupleVec;
 
   VecMetaToScalarTest()
-    : FullTaggedTest<Mem_, DT_, Algo_, IT_>("DenseVectorComponentInvertTest")
+    : FullTaggedTest<Mem_, DT_, Algo_, IT_>("vec_meta_to_scalar_test")
   {
   }
 

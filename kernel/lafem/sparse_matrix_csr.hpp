@@ -634,23 +634,20 @@ namespace FEAST
           }
 
           trow_ptr[0] = IT_(0);
-          const Index stride(cother.stride());
+
+          const Index cC(cother.C());
+          const DT_ * cval(cother.val());
+          const IT_ * ccol(cother.col_ind());
+          const IT_ * crl(cother.rl());
+          const IT_ * ccs(cother.cs());
+
           IT_ ue(0);
           for (Index row(0) ; row < cother.rows() ; ++row)
           {
-            const IT_ * tAj(cother.Aj());
-            const DT_ * tAx(cother.Ax());
-            tAj += row;
-            tAx += row;
-
-            const Index max(cother.Arl()[row]);
-            for(Index n(0); n < max ; n++)
+            for (Index i(0); i < crl[row]; ++i)
             {
-              tval[ue] = *tAx;
-              tcol_ind[ue] = *tAj;
-
-              tAj += stride;
-              tAx += stride;
+              tval[ue] = cval[ccs[row/cC] + row%cC + i*cC];
+              tcol_ind[ue] = ccol[ccs[row/cC] + row%cC + i*cC];
               ++ue;
             }
             trow_ptr[row + 1] = ue;

@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -257,18 +258,18 @@ namespace FEAST
       template<typename Algo_>
       void filter_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
-        const Index tstride(matrix.stride());
-        const Index * paj(matrix.Aj());
-        const Index * parl(matrix.Arl());
-        DT_* pax(matrix.Ax());
+        const Index tC(matrix.C());
+        const Index * pcs(matrix.cs());
+        const Index * pcol_ind(matrix.col_ind());
+        DT_* pval(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
           Index ix(_sv.indices()[i]);
           // replace by unit row
-          for(Index j(ix); j < ix + tstride * parl[ix]; j += tstride)
+          for(Index j(pcs[ix/tC] + ix%tC); j < pcs[ix/tC + 1]; j += tC)
           {
-            pax[j] = (paj[j] == ix) ? DT_(1) : DT_(0);
+            pval[j] = (pcol_ind[j] == ix) ? DT_(1) : DT_(0);
           }
         }
       }
@@ -276,17 +277,17 @@ namespace FEAST
       template<typename Algo_>
       void filter_offdiag_row_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
-        const Index tstride(matrix.stride());
-        const Index * parl(matrix.Arl());
-        DT_* pax(matrix.Ax());
+        const Index tC(matrix.C());
+        const Index * pcs(matrix.cs());
+        DT_* pval(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
           Index ix(_sv.indices()[i]);
           // replace by null row
-          for(Index j(ix); j < ix + tstride * parl[ix]; j += tstride)
+          for(Index j(pcs[ix/tC] + ix%tC); j < pcs[ix/tC + 1]; j += tC)
           {
-            pax[j] = DT_(0);
+            pval[j] = DT_(0);
           }
         }
       }

@@ -42,6 +42,8 @@
 #define FEAST_DISABLE_WARNINGS __pragma(warning(push, 0))
 #define FEAST_RESTORE_WARNINGS __pragma(warning(pop))
 
+#define FORCE_INLINE inline __forceinline
+
 // define the noinline specifier
 #define NOINLINE __declspec(noinline)
 

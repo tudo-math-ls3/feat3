@@ -165,55 +165,261 @@ void Axpy<Mem::Main, Algo::Generic>::csrb(DT_ * r, const DT_ * const a, const DT
   }
 }
 
-template <typename DT_, typename IT_>
-void Axpy<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const Index stride, const Index rows)
+
+namespace FEAST
 {
-  for (Index row(0) ; row < rows ; ++row)
+  namespace LAFEM
   {
-    const IT_ * tAj(Aj);
-    const DT_ * tAx(Ax);
-    DT_ sum(0);
-    tAj += row;
-    tAx += row;
-
-    const IT_ max(Arl[row]);
-    for(IT_ n(0); n < max ; n++)
+    namespace Arch
     {
-      const DT_ A_ij = *tAx;
+      namespace Intern
+      {
+        namespace AxpyELL
+        {
+          template <typename DT_>
+          FORCE_INLINE void single_entry_axpy(Index k, DT_ * const r, const DT_ * const b, const DT_ a, const DT_ * const y)
+          {
+            r[k] = b[k] * a + y[k];
+          }
 
-      const IT_ col = *tAj;
-      sum += A_ij * x[col];
+          template <typename DT_>
+          FORCE_INLINE void single_entry_axpy(Index k, DT_ * const r, const DT_ * const b, const DT_ * const a, const DT_ * const y)
+          {
+            r[k] = b[k] * a[k] + y[k];
+          }
 
-      tAj += stride;
-      tAx += stride;
-    }
-    r[row] = (sum * a) + y[row];
+          template <typename DT_, typename IT_, Index C_>
+          struct AxpySpezialisation
+          {
+            static void f(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y,
+                          const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const Index /*C*/, const Index rows)
+            {
+              DT_ tmp[C_];
+              const DT_ * const ctmp(static_cast<const DT_ * const>(tmp));
+
+              for (Index i(0) ; i < rows/C_ ; ++i)
+              {
+                Intern::LoopUnroller<0, C_>::step(Intern::ProductMatVecELL::zero_entry, tmp);
+
+                for (Index j(0) ; j < cl[i] ; ++j)
+                {
+                  Intern::LoopUnroller<0, C_>::step(Intern::ProductMatVecELL::single_matrix_entry, tmp, val + cs[i] + j*C_, x, col_ind + cs[i] + j*C_);
+                }
+
+                Intern::LoopUnroller<0, C_>::step(single_entry_axpy, r + i*C_, ctmp, a, y + i*C_);
+              }
+
+              Index i(rows/C_);
+              {
+                for (Index k(0) ; k < rows%C_ ; ++k)
+                {
+                  tmp[k] = DT_(0);
+
+                  for (Index j(0) ; j < cl[i] ; ++j)
+                  {
+                    tmp[k] += val[cs[i]+j*C_+k] * x[col_ind[cs[i]+j*C_+k]];
+                  }
+
+                  r[i*C_+k] = tmp[k] * a + y[i*C_+k];
+                }
+              }
+            }
+
+            static void f(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y,
+                          const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const Index /*C*/, const Index rows)
+            {
+              DT_ tmp[C_];
+              const DT_ * const ctmp(static_cast<const DT_ * const>(tmp));
+
+              for (Index i(0) ; i < rows/C_ ; ++i)
+              {
+                Intern::LoopUnroller<0, C_>::step(Intern::ProductMatVecELL::zero_entry, tmp);
+
+                for (Index j(0) ; j < cl[i] ; ++j)
+                {
+                  Intern::LoopUnroller<0, C_>::step(Intern::ProductMatVecELL::single_matrix_entry, tmp, val + cs[i] + j*C_, x, col_ind + cs[i] + j*C_);
+                }
+
+                Intern::LoopUnroller<0, C_>::step(single_entry_axpy, r + i*C_, ctmp, a + i*C_, y + i*C_);
+              }
+
+              Index i(rows/C_);
+              {
+                for (Index k(0) ; k < rows%C_ ; ++k)
+                {
+                  tmp[k] = DT_(0);
+
+                  for (Index j(0) ; j < cl[i] ; ++j)
+                  {
+                    tmp[k] += val[cs[i]+j*C_+k] * x[col_ind[cs[i]+j*C_+k]];
+                  }
+
+                  r[i*C_+k] = tmp[k] * a[i*C_+k] + y[i*C_+k];
+                }
+              }
+            }
+          };
+
+          template <typename DT_, typename IT_>
+          struct AxpyGeneric
+          {
+            static void f(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y,
+                          const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const Index C, const Index rows)
+            {
+              for (Index i(0) ; i < rows/C ; ++i)
+              {
+                for (Index k(0); k < C; ++k)
+                {
+                  r[i*C + k] = DT_(0);
+                }
+
+                for (Index j(0) ; j < cl[i] ; ++j)
+                {
+                  for (Index k(0); k < C; ++k)
+                  {
+                    r[i*C+k] += val[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+                  }
+                }
+
+                for (Index k(0); k < C; ++k)
+                {
+                  r[i*C+k] = r[i*C+k] * a + y[i*C+k];
+                }
+              }
+
+              Index i(rows/C);
+              {
+                for (Index k(0) ; k < rows%C ; ++k)
+                {
+                  r[i*C+k] = DT_(0);
+
+                  for (Index j(0) ; j < cl[i] ; ++j)
+                  {
+                    r[i*C+k] += val[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+                  }
+
+                  r[i*C+k] = r[i*C+k] * a + y[i*C+k];
+                }
+              }
+            }
+
+            static void f(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y,
+                          const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const Index C, const Index rows)
+            {
+              for (Index i(0) ; i < rows/C ; ++i)
+              {
+                for (Index k(0); k < C; ++k)
+                {
+                  r[i*C + k] = DT_(0);
+                }
+
+                for (Index j(0) ; j < cl[i] ; ++j)
+                {
+                  for (Index k(0); k < C; ++k)
+                  {
+                    r[i*C+k] += val[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+                  }
+                }
+
+                for (Index k(0); k < C; ++k)
+                {
+                  r[i*C+k] = r[i*C+k] * a[i*C+k] + y[i*C+k];
+                }
+              }
+
+              Index i(rows/C);
+              {
+                for (Index k(0) ; k < rows%C ; ++k)
+                {
+                  r[i*C+k] = DT_(0);
+
+                  for (Index j(0) ; j < cl[i] ; ++j)
+                  {
+                    r[i*C+k] += val[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+                  }
+
+                  r[i*C+k] = r[i*C+k] * a[i*C+k] + y[i*C+k];
+                }
+              }
+            }
+          };
+        } // namespace AxpyELL
+      } // namespace Intern
+    } // namespace Arch
+  } // namespace LAFEM
+} // namespace FEAST
+
+template <typename DT_, typename IT_>
+void Axpy<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+                                         const IT_ * const col_ind, const IT_ * const cs,
+                                         const IT_ * const cl,
+                                         const Index C, const Index rows)
+{
+  switch (C)
+  {
+  case 1:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 1>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 2:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 4:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 4>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 8:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 8>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 16:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_,16>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 32:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_,32>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  default:
+#ifdef DEBUG
+    /// \todo print warning in feast log file
+    std::cout << "Warning: Axpy not optimized for chunk size = " << C << "!" << std::endl;
+#endif
+    Intern::AxpyELL::AxpyGeneric<DT_, IT_>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
   }
 }
 
 template <typename DT_, typename IT_>
-void Axpy<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const Index stride, const Index rows)
+void Axpy<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+                                         const IT_ * const col_ind, const IT_ * const cs,
+                                         const IT_ * const cl,
+                                         const Index C, const Index rows)
 {
-  for (Index row(0) ; row < rows ; ++row)
+  switch (C)
   {
-    const IT_ * tAj(Aj);
-    const DT_ * tAx(Ax);
-    DT_ sum(0);
-    tAj += row;
-    tAx += row;
-
-    const Index max(Arl[row]);
-    for(Index n(0); n < max ; n++)
-    {
-      const DT_ A_ij = *tAx;
-
-      const Index col = *tAj;
-      sum += A_ij * x[col];
-
-      tAj += stride;
-      tAx += stride;
-    }
-    r[row] = (sum * a[row]) + y[row];
+  case 1:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 1>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 2:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 4:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 4>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 8:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 8>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 16:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_,16>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  case 32:
+    Intern::AxpyELL::AxpySpezialisation<DT_, IT_,32>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+    break;
+  default:
+#ifdef DEBUG
+    /// \todo print warning in feast log file
+    std::cout << "Warning: Axpy not optimized for chunk size = " << C << "!" << std::endl;
+#endif
+    Intern::AxpyELL::AxpyGeneric<DT_, IT_>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
   }
 }
 
@@ -277,8 +483,10 @@ namespace FEAST
               FEAST_IVDEP
                 for (Index l(start); l < end; ++l)
                 {
-                  r[l] = y[l] + alpha * Intern::ProductMatVecBanded::Single_Entry<DT_, IT_, i-j>::f(val + (j-1) * rows + l,
-                                                                                                    offsets + (j-1), x + l + 1 - rows, rows);
+                  DT_ tmp(0);
+                  Intern::LoopUnroller<0, i-j>::step(Intern::ProductMatVecBanded::single_matrix_entry, &tmp, val + (j-1) * rows + l,
+                                                     offsets + (j-1), x + l + 1 - rows, rows);
+                  r[l] = y[l] + alpha * tmp;
                 }
 
               Iteration_Left<DT_, IT_, noo, i, j-1>::f(r, y, alpha, val, offsets, x, rows, columns);
@@ -296,8 +504,10 @@ namespace FEAST
               FEAST_IVDEP
                 for (Index l(start); l < end; ++l)
                 {
-                  r[l] = y[l] + alpha[l] * Intern::ProductMatVecBanded::Single_Entry<DT_, IT_, i-j>::f(val + (j-1) * rows + l,
-                                                                                                       offsets + (j-1), x + l + 1 - rows, rows);
+                  DT_ tmp(0);
+                  Intern::LoopUnroller<0, i-j>::step(ProductMatVecBanded::single_matrix_entry, &tmp, val + (j-1) * rows + l,
+                                                     offsets + (j-1), x + l + 1 - rows, rows);
+                  r[l] = y[l] + alpha[l] * tmp;
                 }
 
               Iteration_Left<DT_, IT_, noo, i, j-1>::f(r, y, alpha, val, offsets, x, rows, columns);

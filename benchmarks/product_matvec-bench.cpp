@@ -41,9 +41,9 @@ void run()
   flops *= 2;
 
   double bytes(double(sys.used_elements()));
-  bytes *= 2;
-  bytes += size;
   bytes *= sizeof(DT_);
+  bytes += sys.used_elements() * sizeof(IT_);
+  bytes += size * sizeof(DT_);
 
   auto func = [&] () { sys.template apply<Algo_>(x, b); };
   run_bench<Mem_>(func, flops, bytes);

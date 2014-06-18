@@ -43,6 +43,8 @@
 // define the noinline specifier
 #define NOINLINE __attribute__((noinline))
 
+#define FORCE_INLINE inline __attribute__((always_inline))
+
 #endif // !defined(FEAST_COMPILER) && defined(__GNUC__)
 
 #endif // KERNEL_UTIL_COMPILER_GNU_HPP

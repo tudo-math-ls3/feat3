@@ -9,13 +9,19 @@ INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 # list of arch source files
 SET (kernel-lafem-arch-list
   axpy_generic.cpp
+  axpy_generic_ell.cpp
+  axpy_generic_banded.cpp
   component_invert_generic.cpp
   component_product_generic.cpp
   defect_generic.cpp
+  defect_generic_ell.cpp
+  defect_generic_banded.cpp
   difference_generic.cpp
   dot_product_generic.cpp
   norm_generic.cpp
   product_matvec_generic.cpp
+  product_matvec_generic_ell.cpp
+  product_matvec_generic_banded.cpp
   scale_generic.cpp
   scale_row_col_generic.cpp
   sum_generic.cpp

@@ -26,7 +26,7 @@ namespace FEAST
         static void csrb(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_>
-        static void ell(DT_ * r, const DT_ * const rhs, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows);
+        static void ell(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows);
 
         template <typename DT_, typename IT_>
         static void coo(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const row_ptr, const IT_ * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements);
@@ -40,10 +40,10 @@ namespace FEAST
       extern template void Defect<Mem::Main, Algo::Generic>::csr(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
       extern template void Defect<Mem::Main, Algo::Generic>::csr(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
 
-      extern template void Defect<Mem::Main, Algo::Generic>::ell(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
-      extern template void Defect<Mem::Main, Algo::Generic>::ell(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
-      extern template void Defect<Mem::Main, Algo::Generic>::ell(double *,const double * const,  const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
-      extern template void Defect<Mem::Main, Algo::Generic>::ell(double *,const double * const,  const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
+      extern template void Defect<Mem::Main, Algo::Generic>::ell(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
+      extern template void Defect<Mem::Main, Algo::Generic>::ell(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
+      extern template void Defect<Mem::Main, Algo::Generic>::ell(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
+      extern template void Defect<Mem::Main, Algo::Generic>::ell(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
 
       extern template void Defect<Mem::Main, Algo::Generic>::coo(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
       extern template void Defect<Mem::Main, Algo::Generic>::coo(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
@@ -73,7 +73,7 @@ namespace FEAST
         static void csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_>
-        static void ell(DT_ * r, const DT_ * const rhs, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows);
+        static void ell(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows);
 
         template <typename DT_, typename IT_>
         static void banded(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);

@@ -102,6 +102,11 @@ This macro can be used to instruct the compiler to ignore assumed vector depende
 immediately before - not in - a loop definition. The pragma takes effect for the scope of the loop that follows it.
 
 <hr>
+\subsection ppm_feast_force_inline FORCE_INLINE
+This macro can be used to force the compiler to compile a function inline. The semantics of FORCE_INLINE are exactly the
+same as those for the C++ inline keyword.
+
+<hr>
 \subsection ppm_feast_compiler_wrapper FEAST_USE_COMPILER_WRAPPER
 This macro indicates, if defined, that a compiler wrapper like ccache or distcc is used to compile FEAST.
 

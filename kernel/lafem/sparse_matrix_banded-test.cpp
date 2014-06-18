@@ -141,9 +141,17 @@ template<
 class SparseMatrixBandedApplyTest
   : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
+private:
+  const Index _opt;
 public:
   SparseMatrixBandedApplyTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedApplyTest")
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedApplyTest"), _opt(0)
+  {
+  }
+
+  SparseMatrixBandedApplyTest(const Index opt)
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedApplyTest: "
+                                            + stringify(opt) + " offsets"), _opt(opt)
   {
   }
 
@@ -162,7 +170,11 @@ public:
     const Index rows(tsize + random(Index(0), Index(20)));
     const Index columns(tsize + random(Index(0), Index(20)));
 
-    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+    Index num_of_offsets;
+    if (_opt == 0)
+      num_of_offsets = 5 + random(Index(0), Index(10));
+    else
+      num_of_offsets = _opt;
 
     DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
     DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows);
@@ -216,12 +228,17 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(y1(i), y2(i), 1e-5);
     }
 
+    for (Index i(0); i < y1.size(); ++i)
+    {
+      y1(i, y1(i) + Math::cos(DT_(i)));
+    }
+
     sys.template apply<Algo_>(y2, x, y1, DT_(-1.0));
 
     // check, if the result is correct
     for (Index i(0) ; i < y1.size() ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-5);
+      TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)), y2(i), 1e-5);
     }
 
     for (Index i(0); i < y2.size(); ++i)
@@ -234,7 +251,7 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < y1.size() ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-5);
+      TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)) * s, y2(i), 1e-5);
     }
 }
 };
@@ -243,6 +260,11 @@ SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_
 SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong;
 SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint;
 SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint;
+
+SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong_9(9);
+SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong_9(9);
+SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint_9(9);
+SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint_9(9);
 // #ifdef FEAST_BACKENDS_MKL
 // SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sparse_matrix_banded_apply_test_float_ulong;
 // SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sparse_matrix_banded_apply_test_double_ulong;

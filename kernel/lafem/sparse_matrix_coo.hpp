@@ -784,23 +784,19 @@ namespace FEAST
             tcolumn = new IT_[other.used_elements()];
           }
 
-          const Index stride(cother.stride());
-          for (Index row(0), ue(0); row < cother.rows() ; ++row)
+          const Index cC(cother.C());
+          const DT_ * cval(cother.val());
+          const IT_ * ccol(cother.col_ind());
+          const IT_ * crl(cother.rl());
+          const IT_ * ccs(cother.cs());
+
+          for (IT_ row(0), ue(0) ; row < cother.rows() ; ++row)
           {
-            const IT_ * tAj(cother.Aj());
-            const DT_ * tAx(cother.Ax());
-            tAj += row;
-            tAx += row;
-
-            const Index max(cother.Arl()[row]);
-            for(Index n(0); n < max ; n++)
+            for (Index i(0); i < crl[row]; ++i)
             {
-              tval[ue] = *tAx;
-              trow[ue] = IT_(row);
-              tcolumn[ue] = *tAj;
-
-              tAj += stride;
-              tAx += stride;
+              tval[ue] = cval[ccs[row/cC] + row%cC + i*cC];
+              tcolumn[ue] = ccol[ccs[row/cC] + row%cC + i*cC];
+              trow[ue] = row;
               ++ue;
             }
           }

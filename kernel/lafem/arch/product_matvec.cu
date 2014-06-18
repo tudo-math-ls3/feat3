@@ -6,6 +6,8 @@
 
 #include "cusparse_v2.h"
 
+#include <stdio.h>
+
 namespace FEAST
 {
   namespace Util
@@ -58,32 +60,25 @@ namespace FEAST
       }
 
       template <typename DT_, typename IT_>
-      __global__ void cuda_product_matvec_ell(DT_ * r, const DT_ * b, const DT_ * Ax, const IT_ * Aj,
-          const IT_ * Arl, const Index stride, const Index count)
+      __global__ void cuda_product_matvec_ell(DT_ * r, const DT_ * x, const DT_ * val, const IT_ * col_ind,
+          const IT_ * cs, const IT_ * cl, const Index rows, const Index C)
       {
-        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-        if (idx >= count)
+        const Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+        if (idx >= rows)
           return;
 
-        const Index row(idx);
-        const IT_ * tAj(Aj);
-        const DT_ * tAx(Ax);
+
         DT_ sum(0);
-        tAj += row;
-        tAx += row;
+        const Index chunk(idx / C);
+        const Index local_row(idx % C);
+        const Index chunk_end(cs[chunk+1]);
 
-        const Index max(Arl[row]);
-        for(Index n(0); n < max ; n++)
+        for (Index pcol(cs[chunk] + local_row) ; pcol < chunk_end ; pcol+=C)
         {
-          const DT_ A_ij = *tAx;
-
-          const IT_ col = *tAj;
-          sum += A_ij * b[col];
-
-          tAj += stride;
-          tAx += stride;
+          sum += val[pcol] * x[col_ind[pcol]];
         }
-        r[row] = sum;
+        r[idx] = sum;
+
       }
 
       template <typename DT_, typename IT_>
@@ -199,7 +194,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_>
 void ProductMatVec<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
 {
-  Index blocksize(128);
+  Index blocksize(256);
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -235,15 +230,15 @@ template void ProductMatVec<Mem::CUDA, Algo::CUDA>::csr(double *, const double *
 
 
 template <typename DT_, typename IT_>
-void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows)
+void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
 {
-  Index blocksize(128);
+  Index blocksize(256);
   dim3 grid;
   dim3 block;
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_product_matvec_ell<<<grid, block>>>(r, x, Ax, Aj, Arl, stride, rows);
+  FEAST::LAFEM::Intern::cuda_product_matvec_ell<<<grid, block>>>(r, x, val, col_ind, cs, cl, rows, C);
 #ifdef FEAST_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
@@ -251,15 +246,15 @@ void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const Ax, co
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
-template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
-template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
-template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
+template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
+template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
+template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
+template void ProductMatVec<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
 
 template <typename DT_, typename IT_>
 void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
 {
-  Index blocksize(128);
+  Index blocksize(256);
   dim3 grid;
   dim3 block;
   block.x = blocksize;

@@ -33,25 +33,33 @@ void ScaleRows<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, cons
 }
 
 template <typename DT_, typename IT_>
-void ScaleRows<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const Ax, const IT_ * const /*Aj*/, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows)
+void ScaleRows<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/,
+                                              const IT_ * const cs, const IT_ * const cl, const IT_ * const /*rl*/,
+                                              const DT_ * const x, const Index C, const Index rows)
 {
-  for (Index row(0) ; row < rows ; ++row)
+  for (Index i(0) ; i < rows/C ; ++i)
   {
-    const DT_ * tAx(Ax);
-    DT_ * tr(r);
-    tAx += row;
-    tr += row;
-
-    const IT_ max(Arl[row]);
-    for(IT_ n(0); n < max ; n++)
+    for (Index j(0) ; j < cl[i] ; ++j)
     {
-      *tr = *tAx * x[row];
+      for (Index k(0); k < C; ++k)
+      {
+        r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[i*C+k];
+      }
+    }
+  }
 
-      tAx += stride;
-      tr += stride;
+  Index i(rows/C);
+  {
+    for (Index k(0) ; k < rows%C ; ++k)
+    {
+      for (Index j(0) ; j < cl[i] ; ++j)
+      {
+        r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[i*C+k];
+      }
     }
   }
 }
+
 
 // ***********************************************
 
@@ -78,25 +86,29 @@ void ScaleCols<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, cons
 }
 
 template <typename DT_, typename IT_>
-void ScaleCols<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows)
+void ScaleCols<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind,
+                                              const IT_ * const cs, const IT_ * const cl, const IT_ * const /*rl*/,
+                                              const DT_ * const x, const Index C, const Index rows)
 {
-  for (Index row(0) ; row < rows ; ++row)
+  for (Index i(0) ; i < rows/C ; ++i)
   {
-    const IT_ * tAj(Aj);
-    const DT_ * tAx(Ax);
-    DT_ * tr(r);
-    tAj += row;
-    tAx += row;
-    tr += row;
-
-    const IT_ max(Arl[row]);
-    for(IT_ n(0); n < max ; n++)
+    for (Index j(0) ; j < cl[i] ; ++j)
     {
-      *tr = *tAx * x[*tAj];
+      for (Index k(0); k < C; ++k)
+      {
+        r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+      }
+    }
+  }
 
-      tAj += stride;
-      tAx += stride;
-      tr += stride;
+  Index i(rows/C);
+  {
+    for (Index k(0) ; k < rows%C ; ++k)
+    {
+      for (Index j(0) ; j < cl[i] ; ++j)
+      {
+        r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+      }
     }
   }
 }

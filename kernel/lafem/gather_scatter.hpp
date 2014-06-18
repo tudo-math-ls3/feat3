@@ -720,11 +720,11 @@ namespace FEAST
 #endif
       Index _num_rows;
       Index _num_cols;
-      Index _stride;
-      const IndexType_* _aj;
-      const IndexType_* _arl;
-      IndexType_* _col_ptr;
-      DataType_ *_data;
+      IndexType_ _C;
+      const IndexType_ * _cs;
+      const IndexType_ * _col_ind;
+      IndexType_ * _col_ptr;
+      DataType_ * _val;
 
     public:
       explicit ScatterAxpy(MatrixType& matrix) :
@@ -733,11 +733,11 @@ namespace FEAST
 #endif
         _num_rows(matrix.rows()),
         _num_cols(matrix.columns()),
-        _stride(matrix.stride()),
-        _aj(matrix.Aj()),
-        _arl(matrix.Arl()),
+        _C(IndexType_(matrix.C())),
+        _cs(matrix.cs()),
+        _col_ind(matrix.col_ind()),
         _col_ptr(nullptr),
-        _data(matrix.Ax())
+        _val(matrix.val())
       {
         // allocate column-pointer array
         _col_ptr = new IndexType_[matrix.columns()];
@@ -774,9 +774,9 @@ namespace FEAST
             IndexType_ ix = IndexType_(loc_mat.get_row_index(i, ic));
 
             // build column pointer for this row entry contribution
-            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += IndexType_(_stride))
+            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C + 1]; k += _C)
             {
-              _col_ptr[_aj[k]] = k;
+              _col_ptr[_col_ind[k]] = k;
             }
 
             // loop over all local column entries
@@ -797,7 +797,7 @@ namespace FEAST
 #endif
 
                 // incorporate data into global matrix
-                _data[_col_ptr[jx]] += iw * jw * loc_mat(i,j);
+                _val[_col_ptr[jx]] += iw * jw * loc_mat(i,j);
 
                 // continue with next column contribution
               }
@@ -806,9 +806,9 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += IndexType_(_stride))
+            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C + 1]; k += _C)
             {
-              _col_ptr[_aj[k]] = _deadcode;
+              _col_ptr[_col_ind[k]] = _deadcode;
             }
 #endif
             // continue with next row contribution
@@ -838,11 +838,11 @@ namespace FEAST
 #endif
       Index _num_rows;
       Index _num_cols;
-      Index _stride;
-      const IndexType_* _aj;
-      const IndexType_* _arl;
-      IndexType_* _col_ptr;
-      const DataType_ *_data;
+      IndexType_ _C;
+      const IndexType_ * _cs;
+      const IndexType_ * _col_ind;
+      IndexType_ * _col_ptr;
+      const DataType_ * _val;
 
     public:
       explicit GatherAxpy(const MatrixType& matrix) :
@@ -851,11 +851,11 @@ namespace FEAST
 #endif
         _num_rows(matrix.rows()),
         _num_cols(matrix.columns()),
-        _stride(matrix.stride()),
-        _aj(matrix.Aj()),
-        _arl(matrix.Arl()),
+        _C(IndexType_(matrix.C())),
+        _cs(matrix.cs()),
+        _col_ind(matrix.col_ind()),
         _col_ptr(nullptr),
-        _data(matrix.Ax())
+        _val(matrix.val())
       {
         // allocate column-pointer array
         _col_ptr = new IndexType_[matrix.columns()];
@@ -889,9 +889,9 @@ namespace FEAST
             IndexType_ ix = IndexType_(loc_mat.get_row_index(i, ic));
 
             // build column pointer for this row entry contribution
-            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += IndexType_(_stride))
+            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C + 1]; k += _C)
             {
-              _col_ptr[_aj[k]] = k;
+              _col_ptr[_col_ind[k]] = k;
             }
 
             // loop over all local column entries
@@ -912,7 +912,7 @@ namespace FEAST
 #endif
 
                 // update accumulator
-                dx += DataType_(loc_mat.get_col_weight(j, jc)) * _data[_col_ptr[jx]];
+                dx += DataType_(loc_mat.get_col_weight(j, jc)) * _val[_col_ptr[jx]];
 
                 // continue with next column contribution
               }
@@ -925,9 +925,9 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(IndexType_ k(ix); k < ix + _stride * _arl[ix]; k += IndexType_(_stride))
+            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C + 1]; k += _C)
             {
-              _col_ptr[_aj[k]] = _deadcode;
+              _col_ptr[_col_ind[k]] = _deadcode;
             }
 #endif
 

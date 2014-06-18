@@ -77,8 +77,9 @@ public:
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
     TEST_CHECK_EQUAL(z.columns(), a.columns());
-    TEST_CHECK_EQUAL(z.stride(), b.stride());
-    TEST_CHECK_EQUAL(z.num_cols_per_row(), b.num_cols_per_row());
+    TEST_CHECK_EQUAL(z.C(), b.C());
+    TEST_CHECK_EQUAL(z.num_of_chunks(), b.num_of_chunks());
+    TEST_CHECK_EQUAL(z.val_size(), b.val_size());
     TEST_CHECK_EQUAL(z(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(z(5, 5), a(5, 5));
     TEST_CHECK_EQUAL(z(1, 3), a(1, 3));
@@ -92,15 +93,17 @@ public:
     SparseMatrixELL<Mem_, DT_, IT_> c;
     c.clone(b);
     TEST_CHECK_EQUAL(c, b);
-    TEST_CHECK_NOT_EQUAL((void*)c.Ax(), (void*)b.Ax());
-    TEST_CHECK_EQUAL((void*)c.Aj(), (void*)b.Aj());
+    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
+    TEST_CHECK_EQUAL((void*)c.col_ind(), (void*)b.col_ind());
     c = b.clone(true);
     TEST_CHECK_EQUAL(c, b);
-    TEST_CHECK_NOT_EQUAL((void*)c.Ax(), (void*)b.Ax());
-    TEST_CHECK_NOT_EQUAL((void*)c.Aj(), (void*)b.Aj());
+    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
+    TEST_CHECK_NOT_EQUAL((void*)c.col_ind(), (void*)b.col_ind());
 
     decltype(b) y(b.layout());
-    TEST_CHECK_EQUAL((void*)y.Arl(), (void*)b.Arl());
+    TEST_CHECK_EQUAL((void*)y.cs(), (void*)b.cs());
+    TEST_CHECK_EQUAL((void*)y.cl(), (void*)b.cl());
+    TEST_CHECK_EQUAL((void*)y.rl(), (void*)b.rl());
 
 
     SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
@@ -418,12 +421,12 @@ SparseMatrixELLScaleRowColTest<Mem::Main, Algo::Generic, __float128, unsigned lo
 // SparseMatrixELLScaleRowColTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sm_ell_scale_row_col_test_float_ulong;
 // SparseMatrixELLScaleRowColTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sm_ell_scale_row_col_test_double_ulong;
 // #endif
-// #ifdef FEAST_BACKENDS_CUDA
-// SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_ell_scale_row_col_test_float_uint;
-// SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_ell_scale_row_col_test_double_uint;
-// SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_ell_scale_row_col_test_float_ulong;
-// SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_ell_scale_row_col_test_double_ulong;
-// #endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_ell_scale_row_col_test_float_uint;
+SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_ell_scale_row_col_test_double_uint;
+SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_ell_scale_row_col_test_float_ulong;
+SparseMatrixELLScaleRowColTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_ell_scale_row_col_test_double_ulong;
+#endif
 
 
 /**

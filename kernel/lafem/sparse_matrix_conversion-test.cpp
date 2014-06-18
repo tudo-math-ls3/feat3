@@ -73,7 +73,7 @@ public:
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
       SparseMatrixCSR<Mem_, DT_, IT_> csr_m1(coo_m1);
       SparseMatrixCOO<Mem_, DT_, IT_> coo_m3(csr_m1);
-      TEST_CHECK_EQUAL(coo_m2, coo_m1);
+      TEST_CHECK_EQUAL(coo_m3, coo_m1);
     }
 
     {
@@ -85,7 +85,6 @@ public:
       SparseMatrixELL<Mem_, DT_, IT_> ell_m3(csr_m1);
       TEST_CHECK_EQUAL(ell_m3, ell_m1);
     }
-
     {
       SparseMatrixCSR<Mem_, DT_, IT_> csr_m1(a);
       SparseMatrixCOO<Mem_, DT_, IT_> coo_m1(csr_m1);

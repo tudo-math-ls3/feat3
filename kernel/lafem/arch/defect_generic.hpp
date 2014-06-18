@@ -55,29 +55,141 @@ void Defect<Mem::Main, Algo::Generic>::csrb(DT_ * r, const DT_ * const rhs, cons
   }
 }
 
-template <typename DT_, typename IT_>
-void Defect<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows)
+namespace FEAST
 {
-  for (Index row(0) ; row < rows ; ++row)
+  namespace LAFEM
   {
-    const IT_ * tAj(Aj);
-    const DT_ * tAx(Ax);
-    DT_ sum(0);
-    tAj += row;
-    tAx += row;
-
-    const IT_ max(Arl[row]);
-    for(IT_ n(0); n < max ; n++)
+    namespace Arch
     {
-      const DT_ A_ij = *tAx;
+      namespace Intern
+      {
+        namespace DefectELL
+        {
+          template <typename DT_>
+          FORCE_INLINE void single_entry_defect(Index k, DT_ * const r, const DT_ * const b, const DT_ * const rhs)
+          {
+            r[k] = rhs[k] - b[k];
+          }
 
-      const IT_ col = *tAj;
-      sum += A_ij * x[col];
+          template <typename DT_, typename IT_, Index C_>
+          struct DefectSpezialisation
+          {
+            static void f(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const DT_ * const x, const Index /*C*/, const Index rows)
+            {
+              DT_ tmp[C_];
+              const DT_ * const ctmp(static_cast<const DT_ * const>(tmp));
 
-      tAj += stride;
-      tAx += stride;
-    }
-    r[row] = rhs[row] - sum;
+              for (Index i(0) ; i < rows/C_ ; ++i)
+              {
+                Intern::LoopUnroller<0, C_>::step(Intern::ProductMatVecELL::zero_entry, tmp);
+
+                for (Index j(0) ; j < cl[i] ; ++j)
+                {
+                  Intern::LoopUnroller<0, C_>::step(Intern::ProductMatVecELL::single_matrix_entry, tmp, val + cs[i] + j*C_, x, col_ind + cs[i] + j*C_);
+                }
+
+                Intern::LoopUnroller<0, C_>::step(single_entry_defect, r + i*C_, ctmp, rhs + i*C_);
+              }
+
+              Index i(rows/C_);
+              {
+                for (Index k(0) ; k < rows%C_ ; ++k)
+                {
+                  tmp[k] = DT_(0);
+
+                  for (Index j(0) ; j < cl[i] ; ++j)
+                  {
+                    tmp[k] += val[cs[i]+j*C_+k] * x[col_ind[cs[i]+j*C_+k]];
+                  }
+
+                  r[i*C_+k] = rhs[i*C_+k] - tmp[k];
+                }
+              }
+            }
+          };
+
+          template <typename DT_, typename IT_>
+          struct DefectGeneric
+          {
+            static void f(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
+            {
+              for (Index i(0) ; i < rows/C ; ++i)
+              {
+                for (Index k(0); k < C; ++k)
+                {
+                  r[i*C + k] = DT_(0);
+                }
+
+                for (Index j(0) ; j < cl[i] ; ++j)
+                {
+                  for (Index k(0); k < C; ++k)
+                  {
+                    r[i*C+k] += val[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+                  }
+                }
+
+                for (Index k(0); k < C; ++k)
+                {
+                  r[i*C + k] = rhs[i*C + k] - r[i*C + k];
+                }
+              }
+
+              Index i(rows/C);
+              {
+                for (Index k(0) ; k < rows%C ; ++k)
+                {
+                  r[i*C+k] = DT_(0);
+
+                  for (Index j(0) ; j < cl[i] ; ++j)
+                  {
+                    r[i*C+k] += val[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+                  }
+
+                  r[i*C+k] = rhs[i*C+k] - r[i*C+k];
+                }
+              }
+            }
+          };
+        } // namespace DefectELL
+      } // namespace Intern
+    } // namespace Arch
+  } // namespace LAFEM
+} // namespace FEAST
+
+template <typename DT_, typename IT_>
+void Defect<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const val,
+                                           const IT_ * const col_ind, const IT_ * const cs,
+                                           const IT_ * const cl, const DT_ * const x,
+                                           const Index C, const Index rows)
+{
+  switch (C)
+  {
+  case 1:
+    Intern::DefectELL::DefectSpezialisation<DT_, IT_, 1>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 2:
+    Intern::DefectELL::DefectSpezialisation<DT_, IT_, 2>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 4:
+    Intern::DefectELL::DefectSpezialisation<DT_, IT_, 4>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 8:
+    Intern::DefectELL::DefectSpezialisation<DT_, IT_, 8>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 16:
+    Intern::DefectELL::DefectSpezialisation<DT_, IT_,16>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 32:
+    Intern::DefectELL::DefectSpezialisation<DT_, IT_,32>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+    break;
+  default:
+#ifdef DEBUG
+    /// \todo print warning in feast log file
+    std::cout << "Warning: Defect not optimized for chunk size = " << C << "!" << std::endl;
+#endif
+    Intern::DefectELL::DefectGeneric<DT_, IT_>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
   }
 }
 
@@ -123,8 +235,10 @@ namespace FEAST
               FEAST_IVDEP
                 for (Index l(start); l < end; ++l)
                 {
-                  r[l] = y[l] - Intern::ProductMatVecBanded::Single_Entry<DT_, IT_, i-j>::f(val + (j-1) * rows + l,
-                                                                                            offsets + (j-1), x + l + 1 - rows, rows);
+                  DT_ tmp(0);
+                  Intern::LoopUnroller<0, i-j>::step(Intern::ProductMatVecBanded::single_matrix_entry, &tmp, val + (j-1) * rows + l,
+                                                     offsets + (j-1), x + l + 1 - rows, rows);
+                  r[l] = y[l] - tmp;
                 }
 
               Iteration_Left<DT_, IT_, noo, i, j-1>::f(r, y, val, offsets, x, rows, columns);

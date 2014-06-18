@@ -53,31 +53,168 @@ void ProductMatVec<Mem::Main, Algo::Generic>::csrb(DT_ * r, const DT_ * const va
   }
 }
 
-template <typename DT_, typename IT_>
-void ProductMatVec<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows)
+namespace FEAST
 {
-  for (Index row(0) ; row < rows ; ++row)
+  namespace LAFEM
   {
-    const IT_ * tAj(Aj);
-    const DT_ * tAx(Ax);
-    DT_ sum(0);
-    tAj += row;
-    tAx += row;
-
-    const IT_ max(Arl[row]);
-    for(IT_ n(0); n < max ; n++)
+    namespace Arch
     {
-      const DT_ A_ij = *tAx;
+      namespace Intern
+      {
+        template <Index Start, Index End, Index Step = 1>
+        struct LoopUnroller
+        {
+          template <typename ... Params>
+          static FORCE_INLINE void step(void f(Index, Params ...), Params... parameters)
+          {
+            f(Start, parameters ...);
+            LoopUnroller<Start+Step, End, Step>::step(f, parameters ...);
+          }
+        };
 
-      const IT_ col = *tAj;
-      sum += A_ij * x[col];
+        template <Index Start, Index Step>
+        struct LoopUnroller<Start, Start, Step>
+        {
+          template <typename ... Params>
+          static FORCE_INLINE void step(void (Index, Params ...), Params ...)
+          {
+          }
+        };
+      } // namespace Intern
+    } // namespace Arch
+  } // namespace LAFEM
+} // namespace FEAST
+namespace FEAST
+{
+  namespace LAFEM
+  {
+    namespace Arch
+    {
+      namespace Intern
+      {
+        namespace ProductMatVecELL
+        {
+          template <typename DT_>
+          FORCE_INLINE void zero_entry(Index k, DT_ * r)
+          {
+            r[k] = DT_(0);
+          }
 
-      tAj += stride;
-      tAx += stride;
-    }
-    r[row] = sum;
+          template <typename DT_, typename IT_>
+          FORCE_INLINE void single_matrix_entry(Index k, DT_ * const r, const DT_ * const val,
+                                                const DT_ * const x, const IT_ * const col_ind)
+          {
+            r[k] += val[k] * x[col_ind[k]];
+          }
+
+          template <typename DT_, typename IT_, Index C_>
+          struct ProductMatVecSpezialisation
+          {
+            static void f(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const DT_ * const x, const Index /*C*/, const Index rows)
+            {
+              for (Index i(0) ; i < rows/C_ ; ++i)
+              {
+                Intern::LoopUnroller<0, C_>::step(zero_entry, r + i*C_);
+
+                for (Index j(0) ; j < cl[i] ; ++j)
+                {
+                  Intern::LoopUnroller<0, C_>::step(single_matrix_entry, r + i*C_, val + cs[i] + j*C_, x, col_ind + cs[i] + j*C_);
+                }
+              }
+
+              Index i(rows/C_);
+              {
+                for (Index k(0) ; k < rows%C_ ; ++k)
+                {
+                  r[i*C_+k] = DT_(0);
+
+                  for (Index j(0) ; j < cl[i] ; ++j)
+                  {
+                    r[i*C_+k] += val[cs[i]+j*C_+k] * x[col_ind[cs[i]+j*C_+k]];
+                  }
+                }
+              }
+            }
+          };
+
+          template <typename DT_, typename IT_>
+          struct ProductMatVecGeneric
+          {
+            static void f(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
+            {
+              for (Index i(0) ; i < rows/C ; ++i)
+              {
+                for (Index k(0); k < C; ++k)
+                {
+                  r[i*C + k] = DT_(0);
+                }
+
+                for (Index j(0) ; j < cl[i] ; ++j)
+                {
+                  for (Index k(0); k < C; ++k)
+                  {
+                    r[i*C+k] += val[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+                  }
+                }
+              }
+
+              Index i(rows/C);
+              {
+                for (Index k(0) ; k < rows%C ; ++k)
+                {
+                  r[i*C+k] = DT_(0);
+
+                  for (Index j(0) ; j < cl[i] ; ++j)
+                  {
+                    r[i*C+k] += val[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+                  }
+                }
+              }
+            }
+          };
+        } // namespace ProductMatVecELL
+      } // namespace Intern
+    } // namespace Arch
+  } // namespace LAFEM
+} // namespace FEAST
+
+template <typename DT_, typename IT_>
+void ProductMatVec<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const val,
+                                                  const IT_ * const col_ind, const IT_ * const cs,
+                                                  const IT_ * const cl, const DT_ * const x,
+                                                  const Index C, const Index rows)
+{
+  switch (C)
+  {
+  case 1:
+    Intern::ProductMatVecELL::ProductMatVecSpezialisation<DT_, IT_, 1>::f(r, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 2:
+    Intern::ProductMatVecELL::ProductMatVecSpezialisation<DT_, IT_, 2>::f(r, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 4:
+    Intern::ProductMatVecELL::ProductMatVecSpezialisation<DT_, IT_, 4>::f(r, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 8:
+    Intern::ProductMatVecELL::ProductMatVecSpezialisation<DT_, IT_, 8>::f(r, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 16:
+    Intern::ProductMatVecELL::ProductMatVecSpezialisation<DT_, IT_,16>::f(r, val, col_ind, cs, cl, x, C, rows);
+    break;
+  case 32:
+    Intern::ProductMatVecELL::ProductMatVecSpezialisation<DT_, IT_,32>::f(r, val, col_ind, cs, cl, x, C, rows);
+    break;
+  default:
+#ifdef DEBUG
+    /// \todo print warning in feast log file
+    std::cout << "Warning: ProductMatVec not optimized for chunk size = " << C << "!" << std::endl;
+#endif
+    Intern::ProductMatVecELL::ProductMatVecGeneric<DT_, IT_>::f(r, val, col_ind, cs, cl, x, C, rows);
   }
 }
+
 
 template <typename DT_, typename IT_>
 void ProductMatVec<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const val, const IT_ * const row_ptr, const IT_ * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements)
@@ -106,187 +243,6 @@ namespace FEAST
       {
         namespace ProductMatVecBanded
         {
-          template <typename DT_, typename IT_, Index i>
-          struct Single_Entry
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return Single_Entry<DT_, IT_, i-9>::f(val + 9*rows, offsets + 9, x , rows) +
-                *val * x[*offsets] +
-                val[rows] * x[offsets[1]] +
-                val[2 * rows] * x[offsets[2]] +
-                val[3 * rows] * x[offsets[3]] +
-                val[4 * rows] * x[offsets[4]] +
-                val[5 * rows] * x[offsets[5]] +
-                val[6 * rows] * x[offsets[6]] +
-                val[7 * rows] * x[offsets[7]] +
-                val[8 * rows] * x[offsets[8]];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 25>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return *val * x[*offsets] +
-                val[rows] * x[offsets[1]] +
-                val[ 2 * rows] * x[offsets[ 2]] +
-                val[ 3 * rows] * x[offsets[ 3]] +
-                val[ 4 * rows] * x[offsets[ 4]] +
-                val[ 5 * rows] * x[offsets[ 5]] +
-                val[ 6 * rows] * x[offsets[ 6]] +
-                val[ 7 * rows] * x[offsets[ 7]] +
-                val[ 8 * rows] * x[offsets[ 8]] +
-                val[ 9 * rows] * x[offsets[ 9]] +
-                val[10 * rows] * x[offsets[10]] +
-                val[11 * rows] * x[offsets[11]] +
-                val[12 * rows] * x[offsets[12]] +
-                val[13 * rows] * x[offsets[13]] +
-                val[14 * rows] * x[offsets[14]] +
-                val[15 * rows] * x[offsets[15]] +
-                val[16 * rows] * x[offsets[16]] +
-                val[17 * rows] * x[offsets[17]] +
-                val[18 * rows] * x[offsets[18]] +
-                val[19 * rows] * x[offsets[19]] +
-                val[20 * rows] * x[offsets[20]] +
-                val[21 * rows] * x[offsets[21]] +
-                val[22 * rows] * x[offsets[22]] +
-                val[23 * rows] * x[offsets[23]] +
-                val[24 * rows] * x[offsets[24]];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 1>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index /*rows*/)
-            {
-              return *val * x[*offsets];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 2>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return *val * x[*offsets] +
-                val[rows] * x[offsets[1]];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 3>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return *val * x[*offsets] +
-                val[rows] * x[offsets[1]] +
-                val[2 * rows] * x[offsets[2]];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 4>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return *val * x[*offsets] +
-                val[rows] * x[offsets[1]] +
-                val[2 * rows] * x[offsets[2]] +
-                val[3 * rows] * x[offsets[3]];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 5>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return *val * x[*offsets] +
-                val[rows] * x[offsets[1]] +
-                val[2 * rows] * x[offsets[2]] +
-                val[3 * rows] * x[offsets[3]] +
-                val[4 * rows] * x[offsets[4]];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 6>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return *val * x[*offsets] +
-                val[rows] * x[offsets[1]] +
-                val[2 * rows] * x[offsets[2]] +
-                val[3 * rows] * x[offsets[3]] +
-                val[4 * rows] * x[offsets[4]] +
-                val[5 * rows] * x[offsets[5]];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 7>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return *val * x[*offsets] +
-                val[rows] * x[offsets[1]] +
-                val[2 * rows] * x[offsets[2]] +
-                val[3 * rows] * x[offsets[3]] +
-                val[4 * rows] * x[offsets[4]] +
-                val[5 * rows] * x[offsets[5]] +
-                val[6 * rows] * x[offsets[6]];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 8>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return *val * x[*offsets] +
-                val[rows] * x[offsets[1]] +
-                val[2 * rows] * x[offsets[2]] +
-                val[3 * rows] * x[offsets[3]] +
-                val[4 * rows] * x[offsets[4]] +
-                val[5 * rows] * x[offsets[5]] +
-                val[6 * rows] * x[offsets[6]] +
-                val[7 * rows] * x[offsets[7]];
-            }
-          };
-
-          template <typename DT_, typename IT_>
-          struct Single_Entry<DT_, IT_, 9>
-          {
-            static inline DT_ f(const DT_ * const val, const IT_ * const offsets,
-                                const DT_ * const x, const Index rows)
-            {
-              return *val * x[*offsets] +
-                val[rows] * x[offsets[1]] +
-                val[2 * rows] * x[offsets[2]] +
-                val[3 * rows] * x[offsets[3]] +
-                val[4 * rows] * x[offsets[4]] +
-                val[5 * rows] * x[offsets[5]] +
-                val[6 * rows] * x[offsets[6]] +
-                val[7 * rows] * x[offsets[7]] +
-                val[8 * rows] * x[offsets[8]];
-            }
-          };
-
-          /********************************************************************/
-
           template <typename IT_>
           inline Index start_offset(const Index i, const IT_ * const offsets,
                                     const Index rows, const Index columns, const Index noo)
@@ -325,6 +281,13 @@ namespace FEAST
 
           /********************************************************************/
 
+          template <typename DT_, typename IT_>
+          FORCE_INLINE void single_matrix_entry(Index k, DT_ * const res, const DT_ * const val,
+                                                const IT_ * const offsets, const DT_ * const x, Index rows)
+          {
+            *res += val[k * rows] * x[offsets[k]];
+          }
+
           template <typename DT_, typename IT_, Index noo, Index i, Index j>
           struct Iteration_Left
           {
@@ -339,8 +302,10 @@ namespace FEAST
               FEAST_IVDEP
               for (Index l(start); l < end; ++l)
               {
-                r[l] = Single_Entry<DT_, IT_, i-j>::f(val + (j-1) * rows + l,
-                                                      offsets + (j-1), x + l + 1 - rows, rows);
+                DT_ tmp(0);
+                Intern::LoopUnroller<0, i-j>::step(single_matrix_entry, &tmp, val + (j-1) * rows + l,
+                                                   offsets + (j-1), x + l + 1 - rows, rows);
+                r[l] = tmp;
               }
 
               Iteration_Left<DT_, IT_, noo, i, j-1>::f(r, val, offsets, x, rows, columns);

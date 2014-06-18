@@ -25,10 +25,12 @@
 
 #define FEAST_RESTORE_WARNINGS _Pragma("clang diagnostic pop")
 
-#  define FEAST_IVDEP _Pragma("omp simd")
+#define FEAST_IVDEP _Pragma("omp simd")
 
 // define the noinline specifier
 #define NOINLINE __attribute__((noinline))
+
+#define FORCE_INLINE inline __attribute__((always_inline))
 
 #endif // !defined(FEAST_COMPILER) && defined(__clang__)
 

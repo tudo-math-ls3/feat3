@@ -55,6 +55,8 @@
 
 #endif //  (__INTEL_COMPILER != 1400) && defined(FEAST_USE_COMPILER_WRAPPER)
 
+#define FORCE_INLINE inline __forceinline
+
 #endif // !defined(FEAST_COMPILER) && defined(__INTEL_COMPILER)
 
 #endif // KERNEL_UTIL_COMPILER_INTEL_HPP
