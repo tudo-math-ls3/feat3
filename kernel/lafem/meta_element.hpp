@@ -37,6 +37,7 @@ namespace FEAST
       }
     };
 
+    /// \cond internal
     template<typename First_, typename... Rest_>
     struct TupleElement<Index(0), First_, Rest_...>
     {
@@ -54,6 +55,7 @@ namespace FEAST
         return meta.first();
       }
     };
+    /// \endcond
 
     /**
      * \brief Power container element helper class template
@@ -79,6 +81,7 @@ namespace FEAST
       }
     };
 
+    /// \cond internal
     template<typename SubType_>
     struct PowerElement<Index(0), SubType_>
     {
@@ -94,6 +97,7 @@ namespace FEAST
         return meta.first();
       }
     };
+    /// \endcond
   } // namespace LAFEM
 } // namespace FEAST
 

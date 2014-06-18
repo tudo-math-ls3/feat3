@@ -9,14 +9,9 @@ namespace FEAST
 {
   namespace Geometry
   {
-    /**
-     * \brief Structured namespace
-     *
-     * This namespace encapsulates classes relates to the implementation of the structured mesh.
-     */
+    /// \cond internal
     namespace Intern
     {
-      /// \cond internal
       template<
         typename Shape_,
         typename VertexSet_>
@@ -280,9 +275,8 @@ namespace FEAST
           } //k-loop
         }
       }; // class StructuredVertexRefiner<Hypercube<3>,...>
-
-      /// \endcond
-    } // namespace Structured
+    } // namespace Intern
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 

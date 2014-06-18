@@ -9,6 +9,7 @@ namespace FEAST
 {
   namespace Geometry
   {
+    /// \cond internal
     namespace Intern
     {
       /**
@@ -51,7 +52,6 @@ namespace FEAST
       };
   #endif // DOXYGEN
 
-      /// \cond internal
       /**
        * \brief StandardRefinementTraits implementation for Vertex shape.
        *
@@ -409,9 +409,8 @@ namespace FEAST
           return "StandardRefinementTraits<" + ShapeType::name() + ",3>";
         }
       }; // struct StandardRefinementTraits<Simplex<3>,3>
-
-      /// \endcond
     } // namespace Intern
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 

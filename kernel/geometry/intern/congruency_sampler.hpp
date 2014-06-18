@@ -9,6 +9,7 @@ namespace FEAST
 {
   namespace Geometry
   {
+    /// \cond internal
     namespace Intern
     {
       /**
@@ -255,6 +256,7 @@ namespace FEAST
         }
       }; // class CongruencySampler<Hypercube<2>>
     } // namespace Intern
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 
