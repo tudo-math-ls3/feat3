@@ -51,7 +51,7 @@ void run()
   std::cout<<"control norm: "<<x.template norm2<Algo_>()<<std::endl;
 }
 
-int main(int argc, char ** argv)
+int main(int /*argc*/, char ** /*argv*/)
 {
 #ifdef FEAST_BACKENDS_CUDA
   run<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, Index> >();

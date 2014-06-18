@@ -34,7 +34,7 @@ void run()
   run_bench<Mem_>(func, flops, bytes);
 }
 
-int main(int argc, char ** argv)
+int main(int /*argc*/, char ** /*argv*/)
 {
 #ifdef FEAST_BACKENDS_CUDA
   run<Algo::CUDA, DenseVector<Mem::CUDA, double, Index> >();
