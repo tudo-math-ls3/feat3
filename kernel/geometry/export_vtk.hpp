@@ -258,12 +258,12 @@ namespace FEAST
         CONTEXT("ExportVTK::~ExportVTK()");
         while(!_vars_cell.empty())
         {
-          delete _vars_cell.back().second;
+          delete [] _vars_cell.back().second;
           _vars_cell.pop_back();
         }
         while(!_vars_vertex.empty())
         {
-          delete _vars_vertex.back().second;
+          delete [] _vars_vertex.back().second;
           _vars_vertex.pop_back();
         }
       }
