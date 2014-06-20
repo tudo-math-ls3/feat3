@@ -23,10 +23,10 @@ void run()
   DenseVector<Mem_, DT_, IT_> y(size, DT_(4711));
   DT_ s(23);
 
-  double flops(size);
+  double flops = double(size);
   flops *= 2;
 
-  double bytes(size);
+  double bytes = double(size);
   bytes *= 3;
   bytes *= sizeof(DT_);
 

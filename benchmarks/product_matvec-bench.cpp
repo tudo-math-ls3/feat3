@@ -37,10 +37,10 @@ void run()
     b(i, DT_(i%100) / DT_(100));
   DenseVector<Mem_, DT_, IT_> x(size, DT_(4711));
 
-  double flops(sys.used_elements());
+  double flops(double(sys.used_elements()));
   flops *= 2;
 
-  double bytes(sys.used_elements());
+  double bytes(double(sys.used_elements()));
   bytes *= 2;
   bytes += size;
   bytes *= sizeof(DT_);
