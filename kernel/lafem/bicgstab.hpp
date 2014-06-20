@@ -20,7 +20,7 @@ namespace FEAST
     struct BiCGStab
     {
       template <typename MT_, typename VT_>
-      static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<Algo_, MT_, VT_> & precon, Index max_iters, typename VT_::DataType eps_relative)
+      static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<Algo_, MT_, VT_> & precon, Index max_iters, typename VT_::DataType eps_relative, bool verbose = true)
       {
         typedef typename VT_::DataType DT_;
 
@@ -150,7 +150,8 @@ namespace FEAST
 
         Index used_iters = 0;
         used_iters = iter + 1;
-        std::cout<<"Initial defect norm: " << defnorm_00 << ", Final defect norm: " << defnorm << ", used iters: " << used_iters << std::endl;
+        if (verbose)
+          std::cout<<"Initial defect norm: " << defnorm_00 << ", Final defect norm: " << defnorm << ", used iters: " << used_iters << std::endl;
       }
     };
 
