@@ -17,6 +17,9 @@ if (FEAST_BACKENDS_CUDA)
   FIND_PACKAGE(CUDA)
   set (CUDA_VERBOSE_BUILD ON)
   set(CUDA_NVCC_FLAGS "-G -arch=sm_20;-O3;--restrict;--use_fast_math;--compiler-options;-Wall;-g")
+  if (FEAST_DEBUG_MODE)
+    set (CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-Xptxas=-v")
+  endif(FEAST_DEBUG_MODE)
   #TODO  use CUDA_HOST_COMPILER to get rid of hard wired gcc host compilation
   set (CUDA_PROPAGATE_HOST_FLAGS OFF)
 
