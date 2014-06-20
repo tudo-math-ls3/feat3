@@ -177,7 +177,7 @@ public:
     SparseMatrixBanded<Mem_, DT_, IT_> sys(rows, columns, vec_val, vec_offsets);
 
     auto x(sys.create_vector_r());
-    auto y1(sys.create_vector_l());
+    DenseVector<Mem_, DT_, IT_> y1(rows, DT_(0));
     auto y2(sys.create_vector_l());
 
     for (Index i(0); i < x.size(); ++i)
