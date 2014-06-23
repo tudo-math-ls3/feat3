@@ -34,14 +34,12 @@
 #    define FEAST_COMPILER "Intel C/C++ compiler"
 #  endif
 
-#  define FEAST_IVDEP _Pragma("ivdep")
-
 // Note: The ICC 14.0.x compilers have a bug which causes the compiler to choke
 // on _Pragma statements in preprocessed include files; see
 // https://software.intel.com/en-us/forums/topic/515154?language=en
-// Therefore, we skip implementing the FEAST_DISABLE/RESTORE_WARNINGS macros
-// for these versions.
-#if (__INTEL_COMPILER != 1400)
+// Therefore we skip any _Pragma definition for these versions, if any
+// Compiler wrapper is active, causing these errors.
+#if (__INTEL_COMPILER != 1400) && defined(FEAST_USE_COMPILER_WRAPPER)
 
 #define FEAST_DISABLE_WARNINGS _Pragma("warning(push,0)") \
   _Pragma("warning(disable:177)") \
@@ -49,7 +47,13 @@
 
 #define FEAST_RESTORE_WARNINGS _Pragma("warning(pop)")
 
-#endif //  (__INTEL_COMPILER != 1400)
+#  define FEAST_IVDEP _Pragma("ivdep")
+
+#else
+
+#  define FEAST_IVDEP
+
+#endif //  (__INTEL_COMPILER != 1400) && defined(FEAST_USE_COMPILER_WRAPPER)
 
 #endif // !defined(FEAST_COMPILER) && defined(__INTEL_COMPILER)
 

@@ -439,10 +439,10 @@ void ProductMatVec<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const 
     Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, val, offsets, x, rows, columns);
     break;
   case 9:
-    Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 9,10>::f(r, val, offsets, x, rows, columns);
+    Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, val, offsets, x, rows, columns);
     break;
   case 25:
-    Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_,25,26>::f(r, val, offsets, x, rows, columns);
+    Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, val, offsets, x, rows, columns);
     break;
   default:
 #if DEBUG

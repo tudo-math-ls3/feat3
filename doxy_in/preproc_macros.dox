@@ -101,6 +101,10 @@ be deduced at compile-time, therefore this macro is simply defined as 1.
 This macro can be used to instruct the compiler to ignore assumed vector dependencies. To use this loop pragma, place it
 immediately before - not in - a loop definition. The pragma takes effect for the scope of the loop that follows it.
 
+<hr>
+\subsection ppm_feast_compiler_wrapper FEAST_USE_COMPILER_WRAPPER
+This macro indicates, if defined, that a compiler wrapper like ccache or distcc is used to compile FEAST.
+
 <hr><hr>
 \section preproc_sec_backends Backend / Library Macros
 This section enlists macros defined by the build system, which specify what types of third-party libraries and backends

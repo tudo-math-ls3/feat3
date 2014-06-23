@@ -234,6 +234,7 @@ if "ccache" in buildid:
   remove_string(unused_tokens, "ccache")
   os.environ["CC"] = "ccache " + os.environ["CC"]
   os.environ["CXX"] = "ccache " + os.environ["CXX"]
+  cmake_flags += " -DFEAST_USE_COMPILER_WRAPPER:BOOL=ON"
 
 #additional backends
 if "cuda" in buildid:
