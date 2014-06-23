@@ -301,7 +301,7 @@ namespace FEAST
             }
             else
             {
-              return std::max(columns + Index(1), rows + columns - offsets[i]) - columns - Index(1);
+              return Math::max(columns + Index(1), rows + columns - offsets[i]) - columns - Index(1);
             }
           }
 
@@ -319,7 +319,7 @@ namespace FEAST
             }
             else
             {
-              return std::min(rows, columns + rows - offsets[i] - Index(1));
+              return Math::min(rows, columns + rows - offsets[i] - Index(1));
             }
           }
 
@@ -331,10 +331,10 @@ namespace FEAST
             static void f(DT_ * const r, const DT_ * const val, const IT_ * const offsets,
                           const DT_ * const x, const Index rows, const Index columns)
             {
-              Index start(std::max(start_offset(j-1, offsets, rows, columns, noo),
-                                   end_offset(i-1, offsets, rows, columns, noo)));
-              Index end  (std::min(start_offset(j-2, offsets, rows, columns, noo),
-                                   end_offset(i-2, offsets, rows, columns, noo)));
+              Index start(Math::max(start_offset(j-1, offsets, rows, columns, noo),
+                                    end_offset(i-1, offsets, rows, columns, noo)));
+              Index end  (Math::min(start_offset(j-2, offsets, rows, columns, noo),
+                                    end_offset(i-2, offsets, rows, columns, noo)));
 
               FEAST_IVDEP
               for (Index l(start); l < end; ++l)

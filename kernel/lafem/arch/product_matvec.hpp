@@ -5,7 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
-
+#include <kernel/util/math.hpp>
 namespace FEAST
 {
   namespace LAFEM
