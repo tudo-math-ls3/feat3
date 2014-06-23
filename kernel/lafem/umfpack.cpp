@@ -10,11 +10,11 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template<typename Idx_, int sidx = sizeof(Idx_)>
+    template<typename Idx_, int sidx = sizeof(Idx_), bool eq_ = (sizeof(int) == sizeof(SuiteSparse_long))>
     struct UmfpackWrapper;
 
-    template<typename Idx_>
-    struct UmfpackWrapper<Idx_, sizeof(int)>
+    template<typename Idx_, bool eq_>
+    struct UmfpackWrapper<Idx_, sizeof(int), eq_>
     {
       static void init_defaults(double* control)
       {
@@ -60,7 +60,7 @@ namespace FEAST
     };
 
     template<typename Idx_>
-    struct UmfpackWrapper<Idx_, sizeof(SuiteSparse_long)>
+    struct UmfpackWrapper<Idx_, sizeof(SuiteSparse_long), false>
     {
       static void init_defaults(double* control)
       {
