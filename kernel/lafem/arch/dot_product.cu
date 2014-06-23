@@ -27,6 +27,7 @@ namespace FEAST
         float result;
         if (CUBLAS_STATUS_SUCCESS != cublasSdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result))
           throw InternalError(__func__, __FILE__, __LINE__, "cublasSdot failed!");
+        cudaDeviceSynchronize();
         return result;
       }
 
@@ -35,6 +36,7 @@ namespace FEAST
         double result;
         if (CUBLAS_STATUS_SUCCESS != cublasDdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result))
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDdot failed!");
+        cudaDeviceSynchronize();
         return result;
       }
     }

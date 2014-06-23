@@ -26,6 +26,7 @@ namespace FEAST
         float result;
         if (CUBLAS_STATUS_SUCCESS != cublasSnrm2(Util::Intern::cublas_handle, size, x, 1, &result))
           throw InternalError(__func__, __FILE__, __LINE__, "cublasSnrm2 failed!");
+        cudaDeviceSynchronize();
         return result;
       }
 
@@ -34,6 +35,7 @@ namespace FEAST
         double result;
         if (CUBLAS_STATUS_SUCCESS != cublasDnrm2(Util::Intern::cublas_handle, size, x, 1, &result))
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDnrm2 failed!");
+        cudaDeviceSynchronize();
         return result;
       }
     }
