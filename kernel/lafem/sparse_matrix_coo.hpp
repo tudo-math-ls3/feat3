@@ -904,19 +904,6 @@ namespace FEAST
             tcol_ind = new IT_[other.used_elements()];
           }
 
-#ifdef START_OFFSET
-#warning Overwriting definition of START_OFFSET
-#undef START_OFFSET
-#endif
-
-#ifdef END_OFFSET
-#error Overwriting definition of END_OFFSET
-#undef END_OFFSET
-#endif
-
-#define START_OFFSET(j) ((j == Index(-1)) ? crows : ((j == k) ? 0 : crows - coffsets[j] - 1))
-#define END_OFFSET(j) ((j == Index(-1)) ? crows : ((j == cnum_of_offsets) ? 0 : ccolumns + crows - coffsets[j] - 1))
-
           const DT_ * cval(cother.val());
           const IT2_ * coffsets(cother.offsets());
           const Index cnum_of_offsets(cother.num_of_offsets());
@@ -942,7 +929,11 @@ namespace FEAST
               --j;
 
               // iteration over all rows which contain the offsets between offset i and offset j
-              for (Index l(std::max(START_OFFSET(i), END_OFFSET(j))); l < std::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
+              const Index start(Math::max(Arch::Intern::ProductMatVecBanded::start_offset(i, coffsets, crows, ccolumns, cnum_of_offsets),
+                                          Arch::Intern::ProductMatVecBanded::end_offset(j, coffsets, crows, ccolumns, cnum_of_offsets)));
+              const Index end  (Math::min(Arch::Intern::ProductMatVecBanded::start_offset(i-1, coffsets, crows, ccolumns, cnum_of_offsets),
+                                          Arch::Intern::ProductMatVecBanded::end_offset(j-1, coffsets, crows, ccolumns, cnum_of_offsets)));
+              for (Index l(start); l < end; ++l)
               {
                 for (Index a(i); a < j; ++a)
                 {
@@ -954,8 +945,6 @@ namespace FEAST
               }
             }
           }
-#undef START_OFFSET
-#undef END_OFFSET
 
           if (! std::is_same<Mem_, Mem::Main>::value)
           {

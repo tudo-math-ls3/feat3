@@ -790,19 +790,6 @@ namespace FEAST
           IT_ * tArl = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_rows());
           Util::MemoryPool<Mem::Main>::instance()->set_memory(tArl, IT_(0), _rows());
 
-          #ifdef START_OFFSET
-            #warning Overwriting definition of START_OFFSET
-            #undef START_OFFSET
-          #endif
-
-          #ifdef END_OFFSET
-            #error Overwriting definition of END_OFFSET
-            #undef END_OFFSET
-          #endif
-
-          #define START_OFFSET(j) ((j == Index(-1)) ? crows : ((j == k) ? 0 : crows - coffsets[j] - 1))
-          #define END_OFFSET(j) ((j == Index(-1)) ? crows : ((j == cnum_of_offsets) ? 0 : ccolumns + crows - coffsets[j] - 1))
-
           const DT_ * cval(cother.val());
           const IT_ * coffsets(cother.offsets());
           const Index cnum_of_offsets(cother.num_of_offsets());
@@ -816,7 +803,8 @@ namespace FEAST
             ++k;
           }
 
-          if (START_OFFSET(0) > END_OFFSET(cnum_of_offsets - 1))
+          if (Arch::Intern::ProductMatVecBanded::start_offset(0, coffsets, crows, ccolumns, cnum_of_offsets)
+              > Arch::Intern::ProductMatVecBanded::end_offset(cnum_of_offsets - 1, coffsets, crows, ccolumns, cnum_of_offsets))
           {
             _num_cols_per_row() = cnum_of_offsets;
           }
@@ -831,9 +819,12 @@ namespace FEAST
               {
                 --j;
 
+                const Index start(Math::max(Arch::Intern::ProductMatVecBanded::start_offset(i, coffsets, crows, ccolumns, cnum_of_offsets),
+                                            Arch::Intern::ProductMatVecBanded::end_offset(j, coffsets, crows, ccolumns, cnum_of_offsets)));
+                const Index end  (Math::min(Arch::Intern::ProductMatVecBanded::start_offset(i-1, coffsets, crows, ccolumns, cnum_of_offsets),
+                                            Arch::Intern::ProductMatVecBanded::end_offset(j-1, coffsets, crows, ccolumns, cnum_of_offsets)));
                 if (j - i > _num_cols_per_row() &&
-                    std::max(START_OFFSET(i), END_OFFSET(j))
-                    < std::min(START_OFFSET(i-1), END_OFFSET(j-1)))
+                    start < end)
                 {
                   _num_cols_per_row() = j - i;
                 }
@@ -859,7 +850,11 @@ namespace FEAST
               --j;
 
               // iteration over all rows which contain the offsets between offset i and offset j
-              for (Index l(std::max(START_OFFSET(i), END_OFFSET(j))); l < std::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
+              const Index start(Math::max(Arch::Intern::ProductMatVecBanded::start_offset(i, coffsets, crows, ccolumns, cnum_of_offsets),
+                                          Arch::Intern::ProductMatVecBanded::end_offset(j, coffsets, crows, ccolumns, cnum_of_offsets)));
+              const Index end  (Math::min(Arch::Intern::ProductMatVecBanded::start_offset(i-1, coffsets, crows, ccolumns, cnum_of_offsets),
+                                          Arch::Intern::ProductMatVecBanded::end_offset(j-1, coffsets, crows, ccolumns, cnum_of_offsets)));
+              for (Index l(start); l < end; ++l)
               {
                 tArl[l] = IT_(j - i);
                 for (Index a(i); a < j; ++a)
@@ -870,9 +865,6 @@ namespace FEAST
               }
             }
           }
-
-          #undef START_OFFSET
-          #undef END_OFFSET
 
           this->_elements_size.push_back(_num_cols_per_row() * _stride());
           this->_indices_size.push_back(_num_cols_per_row() * _stride());
