@@ -8,6 +8,7 @@
 
 #include <kernel/util/math.hpp>
 #include <kernel/util/tiny_algebra.hpp>
+#include <kernel/lafem/arch/product_matvec.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -96,56 +97,148 @@ void Defect<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const rhs, const
   }
 }
 
-template <typename DT_, typename IT_>
-void Defect<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const y, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
+
+namespace FEAST
 {
-#ifdef START_OFFSET
-#warning Overwriting definition of START_OFFSET
-#undef START_OFFSET
-#endif
-
-#ifdef END_OFFSET
-#error Overwriting definition of END_OFFSET
-#undef END_OFFSET
-#endif
-
-#define START_OFFSET(j) ((j == Index(-1)) ? rows : ((j == k) ? 0 : rows - offsets[j] - 1))
-#define END_OFFSET(j) ((j == Index(-1)) ? rows : ((j == num_of_offsets) ? 0 : columns + rows - offsets[j] - 1))
-
-  // Search first offset of the upper triangular matrix
-  Index k(0);
-  while (k < num_of_offsets && offsets[k] + 1 < rows)
+  namespace LAFEM
   {
-    ++k;
-  }
-
-  // iteration over all offsets of the lower triangular matrix
-  for (Index i(k + 1); i > 0;)
-  {
-    --i;
-
-    // iteration over all offsets of the upper triangular matrix
-    for (Index j(num_of_offsets + 1); j > 0;)
+    namespace Arch
     {
-      --j;
-
-      // iteration over all rows which contain the offsets between offset i and offset j
-      const Index start(Math::max(START_OFFSET(i), END_OFFSET(j)));
-      const Index stop(Math::min(START_OFFSET(i-1), END_OFFSET(j-1)));
-      for (Index l(start); l < stop; ++l)
+      namespace Intern
       {
-        DT_ s(0);
-        for (Index a(i); a < j; ++a)
+        namespace DefectBanded
         {
-          s += val[a * rows + l] * x[l + offsets[a] + 1 - rows];
-        }
-        r[l] = y[l] - s;
-      }
-    }
-  }
+          template <typename DT_, typename IT_, Index noo, Index i, Index j>
+          struct Iteration_Left
+          {
+            static void f(DT_ * const r, const DT_ * y,
+                          const DT_ * const val, const IT_ * const offsets,
+                          const DT_ * const x, const Index rows, const Index columns)
+            {
+              Index start(Math::max(Intern::ProductMatVecBanded::start_offset(j-1, offsets, rows, columns, noo),
+                                    Intern::ProductMatVecBanded::end_offset(i-1, offsets, rows, columns, noo)));
+              Index end  (Math::min(Intern::ProductMatVecBanded::start_offset(j-2, offsets, rows, columns, noo),
+                                    Intern::ProductMatVecBanded::end_offset(i-2, offsets, rows, columns, noo)));
 
-#undef START_OFFSET
-#undef END_OFFSET
+              FEAST_IVDEP
+                for (Index l(start); l < end; ++l)
+                {
+                  r[l] = y[l] - Intern::ProductMatVecBanded::Single_Entry<DT_, IT_, i-j>::f(val + (j-1) * rows + l,
+                                                                                            offsets + (j-1), x + l + 1 - rows, rows);
+                }
+
+              Iteration_Left<DT_, IT_, noo, i, j-1>::f(r, y, val, offsets, x, rows, columns);
+            }
+          };
+
+          template <typename DT_, typename IT_, Index noo, Index i>
+          struct Iteration_Left<DT_, IT_, noo, i, 0>
+          {
+            static void f(DT_ * const /*r*/, const DT_ * const /*y*/,
+                          const DT_ * const /*val*/, const IT_ * const /*offsets*/,
+                          const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
+            {
+            }
+          };
+
+          /********************************************************************/
+
+          template <typename DT_, typename IT_, Index noo, Index i>
+          struct Iteration_Right
+          {
+            static void f(DT_ * const r, const DT_ * const y,
+                          const DT_ * const val, const IT_ * const offsets,
+                          const DT_ * const x, const Index rows, const Index columns)
+            {
+              Iteration_Left<DT_, IT_, noo, i, i-1>::f(r, y, val, offsets, x, rows, columns);
+              Iteration_Right<DT_, IT_, noo, i-1>::f(r, y, val, offsets, x, rows, columns);
+            }
+          };
+
+          template <typename DT_, typename IT_, Index noo>
+          struct Iteration_Right<DT_, IT_, noo, 0>
+          {
+            static void f(DT_ * const /*r*/, const DT_ * const /*y*/,
+                          const DT_ * const /*val*/, const IT_ * const /*offsets*/,
+                          const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
+            {
+            }
+          };
+
+          /********************************************************************/
+
+          template <typename DT_, typename IT_>
+          void defect_banded_generic(DT_ * r, const DT_ * const y, const DT_ * const val,
+                                     const IT_ * const offsets, const DT_ * const x,
+                                     const Index num_of_offsets, const Index rows, const Index columns)
+          {
+            // Search first offset of the upper triangular matrix
+            Index k(0);
+            while (k < num_of_offsets && offsets[k] + 1 < rows)
+            {
+              ++k;
+            }
+
+            // iteration over all offsets of the lower triangular matrix
+            for (Index i(k + 1); i > 0;)
+            {
+              --i;
+
+              // iteration over all offsets of the upper triangular matrix
+              for (Index j(num_of_offsets + 1); j > 0;)
+              {
+                --j;
+
+                // iteration over all rows which contain the offsets between offset i and offset j
+                const Index start(Math::max(Intern::ProductMatVecBanded::start_offset(  i, offsets, rows, columns, num_of_offsets),
+                                            Intern::ProductMatVecBanded::end_offset  (  j, offsets, rows, columns, num_of_offsets)));
+                const Index stop (Math::min(Intern::ProductMatVecBanded::start_offset(i-1, offsets, rows, columns, num_of_offsets),
+                                            Intern::ProductMatVecBanded::end_offset  (j-1, offsets, rows, columns, num_of_offsets)));
+                for (Index l(start); l < stop; ++l)
+                {
+                  DT_ s(0);
+                  for (Index a(i); a < j; ++a)
+                  {
+                    s += val[a * rows + l] * x[l + offsets[a] + 1 - rows];
+                  }
+                  r[l] = y[l] - s;
+                }
+              }
+            }
+          }
+        } // namespace DefectBanded
+      } // namespace Intern
+    } // namespace Arch
+  } // namespace LAFEM
+} // namespace FEAST
+
+
+
+template <typename DT_, typename IT_>
+void Defect<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const y,
+                                              const DT_ * const val, const IT_ * const offsets, const DT_ * const x,
+                                              const Index num_of_offsets, const Index rows, const Index columns)
+{
+  switch (num_of_offsets)
+  {
+  case 3:
+    Intern::DefectBanded::Iteration_Right<DT_, IT_, 3, 4>::f(r, y, val, offsets, x, rows, columns);
+    break;
+  case 5:
+    Intern::DefectBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, y, val, offsets, x, rows, columns);
+    break;
+  case 9:
+    Intern::DefectBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, y, val, offsets, x, rows, columns);
+    break;
+  case 25:
+    Intern::DefectBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, y, val, offsets, x, rows, columns);
+    break;
+  default:
+#if DEBUG
+    std::cout << "Defect not optimized for " << num_of_offsets << " offsets!" << std::endl;
+#endif
+    Intern::DefectBanded::defect_banded_generic(r, y, val, offsets, x, num_of_offsets, rows, columns);
+  }
 }
 
 #endif // KERNEL_LAFEM_ARCH_DEFECT_GENERIC_HPP
