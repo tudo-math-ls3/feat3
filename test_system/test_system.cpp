@@ -1,5 +1,5 @@
 #include <test_system/test_system.hpp>
-#include <test_system/cuda.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 #include <cstring>
 
@@ -137,7 +137,8 @@ int main(int argc, char** argv)
 
 #ifdef FEAST_BACKENDS_CUDA
   if (cudadevicereset)
-    reset_device();
+    // we need to use the instance here, to ensure the device has been set up properly, if no cuda is used at all
+    FEAST::Util::MemoryPool<Mem::CUDA>::instance()->shutdown_device();
 #endif
 
   return result;

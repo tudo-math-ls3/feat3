@@ -167,6 +167,15 @@ namespace FEAST
         static void synchronize();
 
         static void reset_device();
+
+        /**
+         * Explicitly shut down cuda device
+         *
+         * This is necessary as the last user defined line of code, if cuda-memcheck is used with leak checking.
+         * This includes a call to cudaResetDevice().
+         *
+        **/
+        static void shutdown_device();
     };
   } // namespace Util
 } // namespace FEAST

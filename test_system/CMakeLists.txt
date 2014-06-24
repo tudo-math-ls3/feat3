@@ -8,19 +8,13 @@ INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 
 ADD_LIBRARY(test_system STATIC test_system.cpp)
 
-if (FEAST_BACKENDS_CUDA)
-  CUDA_ADD_LIBRARY(test_system-cuda STATIC
-    cuda.cu
-  )
-  ADD_DEPENDENCIES(test_system test_system-cuda)
-  TARGET_LINK_LIBRARIES(test_system test_system-cuda)
-endif(FEAST_BACKENDS_CUDA)
+TARGET_LINK_LIBRARIES(test_system)
 
 #list of test_system tests
-SET ( test_list test_system-test )
+SET ( test_list test_system-test)
 
 #create all tests
-FOREACH (test ${test_list} )
+FOREACH (test ${test_list})
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} feast test_system)
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
