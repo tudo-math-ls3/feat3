@@ -12,8 +12,6 @@
 #include <iostream>
 #include <fstream>
 
-using namespace FEAST;
-
 namespace FEAST
 {
   namespace Space
