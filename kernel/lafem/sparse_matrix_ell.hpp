@@ -794,7 +794,6 @@ namespace FEAST
           const IT_ * coffsets(cother.offsets());
           const Index cnum_of_offsets(cother.num_of_offsets());
           const Index crows(cother.rows());
-          const Index ccolumns(cother.columns());
 
           // Search first offset of the upper triangular matrix
           Index k(0);
@@ -803,8 +802,8 @@ namespace FEAST
             ++k;
           }
 
-          if (Arch::Intern::ProductMatVecBanded::start_offset(0, coffsets, crows, ccolumns, cnum_of_offsets)
-              > Arch::Intern::ProductMatVecBanded::end_offset(cnum_of_offsets - 1, coffsets, crows, ccolumns, cnum_of_offsets))
+          if (cother.start_offset(0)
+              <= cother.end_offset(cnum_of_offsets - 1))
           {
             _num_cols_per_row() = cnum_of_offsets;
           }
@@ -819,10 +818,10 @@ namespace FEAST
               {
                 --j;
 
-                const Index start(Math::max(Arch::Intern::ProductMatVecBanded::start_offset(i, coffsets, crows, ccolumns, cnum_of_offsets),
-                                            Arch::Intern::ProductMatVecBanded::end_offset(j, coffsets, crows, ccolumns, cnum_of_offsets)));
-                const Index end  (Math::min(Arch::Intern::ProductMatVecBanded::start_offset(i-1, coffsets, crows, ccolumns, cnum_of_offsets),
-                                            Arch::Intern::ProductMatVecBanded::end_offset(j-1, coffsets, crows, ccolumns, cnum_of_offsets)));
+                const Index start(Math::max(cother.start_offset(i),
+                                            cother.end_offset(j) + 1));
+                const Index end  (Math::min(cother.start_offset(i-1),
+                                            cother.end_offset(j-1) + 1));
                 if (j - i > _num_cols_per_row() &&
                     start < end)
                 {
@@ -850,10 +849,10 @@ namespace FEAST
               --j;
 
               // iteration over all rows which contain the offsets between offset i and offset j
-              const Index start(Math::max(Arch::Intern::ProductMatVecBanded::start_offset(i, coffsets, crows, ccolumns, cnum_of_offsets),
-                                          Arch::Intern::ProductMatVecBanded::end_offset(j, coffsets, crows, ccolumns, cnum_of_offsets)));
-              const Index end  (Math::min(Arch::Intern::ProductMatVecBanded::start_offset(i-1, coffsets, crows, ccolumns, cnum_of_offsets),
-                                          Arch::Intern::ProductMatVecBanded::end_offset(j-1, coffsets, crows, ccolumns, cnum_of_offsets)));
+              const Index start(Math::max(cother.start_offset(i),
+                                          cother.end_offset(j) + 1));
+              const Index end  (Math::min(cother.start_offset(i-1),
+                                          cother.end_offset(j-1) + 1));
               for (Index l(start); l < end; ++l)
               {
                 tArl[l] = IT_(j - i);

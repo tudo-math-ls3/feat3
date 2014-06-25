@@ -311,15 +311,15 @@ namespace FEAST
           {
             if (i == Index (-1))
             {
-              return rows;
+              return rows - 1;
             }
             else if (i == noo)
             {
-              return Index(0);
+              return Index(-1);
             }
             else
             {
-              return Math::min(rows, columns + rows - offsets[i] - Index(1));
+              return Math::min(rows, columns + rows - offsets[i] - 1) - 1;
             }
           }
 
@@ -332,9 +332,9 @@ namespace FEAST
                           const DT_ * const x, const Index rows, const Index columns)
             {
               Index start(Math::max(start_offset(j-1, offsets, rows, columns, noo),
-                                    end_offset(i-1, offsets, rows, columns, noo)));
+                                    end_offset(i-1, offsets, rows, columns, noo) + 1));
               Index end  (Math::min(start_offset(j-2, offsets, rows, columns, noo),
-                                    end_offset(i-2, offsets, rows, columns, noo)));
+                                    end_offset(i-2, offsets, rows, columns, noo) + 1));
 
               FEAST_IVDEP
               for (Index l(start); l < end; ++l)
@@ -404,9 +404,9 @@ namespace FEAST
 
                 // iteration over all rows which contain the offsets between offset i and offset j
                 const Index start(Math::max(start_offset(  i, offsets, rows, columns, num_of_offsets),
-                                            end_offset  (  j, offsets, rows, columns, num_of_offsets)));
+                                            end_offset  (  j, offsets, rows, columns, num_of_offsets) + 1));
                 const Index stop (Math::min(start_offset(i-1, offsets, rows, columns, num_of_offsets),
-                                            end_offset  (j-1, offsets, rows, columns, num_of_offsets)));
+                                            end_offset  (j-1, offsets, rows, columns, num_of_offsets) + 1));
                 for (Index l(start); l < stop; ++l)
                 {
                   DT_ s(0);

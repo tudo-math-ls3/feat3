@@ -545,6 +545,17 @@ namespace FEAST
         return VectorTypeR(this->columns());
       }
 
+      /// Returns first row-index of the diagonal matching to the offset i
+      Index start_offset(const Index i) const
+      {
+        return Arch::Intern::ProductMatVecBanded::start_offset(i, offsets(), rows(), columns(), num_of_offsets());
+      }
+
+      /// Returns last row-index of the diagonal matching to the offset i
+      Index end_offset(const Index i) const
+      {
+        return Arch::Intern::ProductMatVecBanded::end_offset(i, offsets(), rows(), columns(), num_of_offsets());
+      }
 
       /**
        * \brief SparseMatrixBanded comparison operator
