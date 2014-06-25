@@ -65,8 +65,8 @@ endif(DOXYGEN_FOUND)
 
 # directories to scan recursively
 ADD_SUBDIRECTORY( thirdparty )
-ADD_SUBDIRECTORY( test_system )
 ADD_SUBDIRECTORY( kernel )
+ADD_SUBDIRECTORY( test_system )
 ADD_SUBDIRECTORY( tools )
 ADD_SUBDIRECTORY( applications )
 ADD_SUBDIRECTORY( benchmarks )
