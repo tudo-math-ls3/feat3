@@ -446,7 +446,8 @@ void ProductMatVec<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const 
     break;
   default:
 #if DEBUG
-    std::cout << "ProductMatVec not optimized for " << num_of_offsets << " offsets!" << std::endl;
+    /// \todo print warning in feast log file
+    std::cout << "Warning: ProductMatVec not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
     Intern::ProductMatVecBanded::product_matvec_banded_generic(r, val, offsets, x, num_of_offsets, rows, columns);
   }

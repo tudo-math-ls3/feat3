@@ -235,7 +235,8 @@ void Defect<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const y,
     break;
   default:
 #if DEBUG
-    std::cout << "Defect not optimized for " << num_of_offsets << " offsets!" << std::endl;
+    /// \todo print warning in feast log file
+    std::cout << "Warning: Defect not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
     Intern::DefectBanded::defect_banded_generic(r, y, val, offsets, x, num_of_offsets, rows, columns);
   }
