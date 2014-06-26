@@ -20,7 +20,7 @@ if (FEAST_BACKENDS_CUDA)
     STATIC
   )
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-util-cuda)
-  TARGET_LINK_LIBRARIES(kernel-util kernel-util-cuda)
+  TARGET_LINK_LIBRARIES(kernel-util-cuda kernel-util)
 endif(FEAST_BACKENDS_CUDA)
 
 # list of util tests
