@@ -302,7 +302,7 @@ namespace FEAST
 
               Iteration_Left<DT_, IT_, noo, i, j-1>::f(r, y, alpha, val, offsets, x, rows, columns);
             }
-};
+          };
 
           template <typename DT_, typename IT_, Index noo, Index i>
           struct Iteration_Left<DT_, IT_, noo, i, 0>
@@ -318,7 +318,7 @@ namespace FEAST
                           const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
             {
             }
-};
+          };
 
           /********************************************************************/
 
@@ -340,7 +340,7 @@ namespace FEAST
               Iteration_Left<DT_, IT_, noo, i, i-1>::f(r, y, alpha, val, offsets, x, rows, columns);
               Iteration_Right<DT_, IT_, noo, i-1>::f(r, y, alpha, val, offsets, x, rows, columns);
             }
-};
+          };
 
           template <typename DT_, typename IT_, Index noo>
           struct Iteration_Right<DT_, IT_, noo, 0>
@@ -356,7 +356,7 @@ namespace FEAST
                           const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
             {
             }
-};
+          };
 
           /********************************************************************/
 
@@ -465,7 +465,7 @@ void Axpy<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const y, const 
     Intern::AxpyBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, y, alpha, val, offsets, x, rows, columns);
     break;
   default:
-#if DEBUG
+#ifdef DEBUG
     /// \todo print warning in feast log file
     std::cout << "Warning: Axpy not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
@@ -493,7 +493,7 @@ void Axpy<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const y, const 
     Intern::AxpyBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, y, alpha, val, offsets, x, rows, columns);
     break;
   default:
-#if DEBUG
+#ifdef DEBUG
     std::cout << "Axpy not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
     Intern::AxpyBanded::axpy_banded_generic(r, y, alpha, val, offsets, x, num_of_offsets, rows, columns);
