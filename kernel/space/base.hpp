@@ -160,7 +160,7 @@ namespace FEAST
     template<typename Cfg1_, typename Cfg2_>
     struct ConfigOr
     {
-      /** \copydoc Space::ConfigBasae::SpaceRequirements */
+      /** \copydoc Space::ConfigBase::SpaceRequirements */
       enum SpaceRequirements
       {
         /// specifies whether the space should supply basis function values

@@ -178,104 +178,319 @@ namespace FEAST
       /**
        * \brief Evaluates the function value.
        *
-       * \param[in] x,y,z
+       * \param[in] x
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The function value
        */
-      static DataType_ eval(DataType_ x, [DataType_ y, DataType_ z]);
+      static DataType_ eval(DataType_ x);
 
       /**
-       * \brief Evaluates the first order X-derivative.
+       * \brief Evaluates the function value.
+       *
+       * \param[in] x,y
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The function value
+       */
+      static DataType_ eval(DataType_ x, DataType_ y);
+
+      /**
+       * \brief Evaluates the function value.
        *
        * \param[in] x,y,z
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The function value
        */
-      static DataType_ der_x(DataType_ x, [DataType_ y, DataType_ z]);
+      static DataType_ eval(DataType_ x, DataType_ y, DataType_ z);
 
       /**
-       * \brief Evaluates the first order Y-derivative.
+       * \brief Evaluates the first order x-derivative.
+       *
+       * \param[in] x
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_x(DataType_ x);
+
+      /**
+       * \brief Evaluates the first order x-derivative.
+       *
+       * \param[in] x,y
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_x(DataType_ x, DataType_ y);
+
+      /**
+       * \brief Evaluates the first order x-derivative.
        *
        * \param[in] x,y,z
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
-      static DataType_ der_y(DataType_ x, DataType_ y, [DataType_ z]);
+      static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z);
 
       /**
-       * \brief Evaluates the first order Z-derivative.
+       * \brief Evaluates the first order y-derivative.
+       *
+       * \param[in] x
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_y(DataType_ x);
+
+      /**
+       * \brief Evaluates the first order y-derivative.
+       *
+       * \param[in] x,y
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_y(DataType_ x, DataType_ y);
+
+      /**
+       * \brief Evaluates the first order y-derivative.
        *
        * \param[in] x,y,z
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z);
+
+      /**
+       * \brief Evaluates the first order z-derivative.
+       *
+       * \param[in] x
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_z(DataType_ x);
+
+      /**
+       * \brief Evaluates the first order z-derivative.
+       *
+       * \param[in] x,y
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_z(DataType_ x, DataType_ y);
+
+      /**
+       * \brief Evaluates the first order z-derivative.
+       *
+       * \param[in] x,y,z
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
       static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z);
 
       /**
-       * \brief Evaluates the second order XX-derivative.
+       * \brief Evaluates the second order xx-derivative.
        *
-       * \param[in] x,y,z
+       * \param[in] x
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
-      static DataType_ der_xx(DataType_ x, [DataType_ y, DataType_ z]);
+      static DataType_ der_xx(DataType_ x);
 
       /**
-       * \brief Evaluates the second order YY-derivative.
+       * \brief Evaluates the second order xx-derivative.
        *
-       * \param[in] x,y,z
+       * \param[in] x,y
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
-      static DataType_ der_yy(DataType_ x, DataType_ y, [DataType_ z]);
+      static DataType_ der_xx(DataType_ x, DataType_ y);
 
       /**
-       * \brief Evaluates the second order ZZ-derivative.
+       * \brief Evaluates the second order xx-derivative.
        *
        * \param[in] x,y,z
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
       static DataType_ der_xx(DataType_ x, DataType_ y, DataType_ z);
 
       /**
-       * \brief Evaluates the second order XY-derivative.
+       * \brief Evaluates the second order yy-derivative.
        *
-       * \param[in] x,y,z
+       * \param[in] x
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
-      static DataType_ der_xy(DataType_ x, DataType_ y, [DataType_ z]);
+      static DataType_ der_yy(DataType_ x);
 
       /**
-       * \brief Evaluates the second order YX-derivative.
+       * \brief Evaluates the second order yy-derivative.
        *
-       * \param[in] x,y,z
+       * \param[in] x,y
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
-      static DataType_ der_yx(DataType_ x, DataType_ y, [DataType_ z]);
+      static DataType_ der_yy(DataType_ x, DataType_ y);
 
       /**
-       * \brief Evaluates the second order XZ-derivative.
+       * \brief Evaluates the second order yy-derivative.
        *
        * \param[in] x,y,z
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_yy(DataType_ x, DataType_ y, DataType_ z);
+
+      /**
+       * \brief Evaluates the second order zz-derivative.
+       *
+       * \param[in] x
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_zz(DataType_ x);
+
+      /**
+       * \brief Evaluates the second order zz-derivative.
+       *
+       * \param[in] x,y
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_zz(DataType_ x, DataType_ y);
+
+      /**
+       * \brief Evaluates the second order zz-derivative.
+       *
+       * \param[in] x,y,z
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_zz(DataType_ x, DataType_ y, DataType_ z);
+
+      /**
+       * \brief Evaluates the second order xy-derivative.
+       *
+       * \param[in] x,y
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_xy(DataType_ x, DataType_ y);
+
+      /**
+       * \brief Evaluates the second order xy-derivative.
+       *
+       * \param[in] x,y,z
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_xy(DataType_ x, DataType_ y, DataType_ z);
+
+      /**
+       * \brief Evaluates the second order yx-derivative.
+       *
+       * \param[in] x,y
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_yx(DataType_ x, DataType_ y);
+
+      /**
+       * \brief Evaluates the second order yx-derivative.
+       *
+       * \param[in] x,y,z
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
+       */
+      static DataType_ der_yx(DataType_ x, DataType_ y, DataType_ z);
+
+      /**
+       * \brief Evaluates the second order xz-derivative.
+       *
+       * \param[in] x,y,z
+       * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
       static DataType_ der_xz(DataType_ x, DataType_ y, DataType_ z);
 
       /**
-       * \brief Evaluates the second order ZX-derivative.
+       * \brief Evaluates the second order zx-derivative.
        *
        * \param[in] x,y,z
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
       static DataType_ der_zx(DataType_ x, DataType_ y, DataType_ z);
 
       /**
-       * \brief Evaluates the second order YZ-derivative.
+       * \brief Evaluates the second order yz-derivative.
        *
        * \param[in] x,y,z
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
       static DataType_ der_yz(DataType_ x, DataType_ y, DataType_ z);
 
       /**
-       * \brief Evaluates the second order ZY-derivative.
+       * \brief Evaluates the second order zy-derivative.
        *
        * \param[in] x,y,z
        * The coordinates of the evaluation point.
+       *
+       * \returns
+       * The value of the derivative
        */
       static DataType_ der_zy(DataType_ x, DataType_ y, DataType_ z);
 #endif // DOXYGEN
@@ -414,7 +629,7 @@ namespace FEAST
       public AnalyticFunction
     {
     public:
-      /** \copydoc AnalyticFunction::FunctorCapabilities */
+      /** \copydoc AnalyticFunction::FunctionCapabilities */
       enum
       {
         can_value = can_value_ ? 1 : 0,
@@ -468,6 +683,7 @@ namespace FEAST
         typedef typename EvalTraits_::HessianType HessianType;
 
       public:
+        /// Constructor
         explicit Evaluator(const StaticWrapperFunction&)
         {
         }

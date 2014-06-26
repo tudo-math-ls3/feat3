@@ -94,6 +94,9 @@ namespace FEAST
        *
        * This operator checks whether two trafo mapping objects are equal.
        *
+       * \param[in] other
+       * The other mapping object
+       *
        * \returns
        * \c true, if this \c this and \p other name the same object, otherwise \c false.
        */

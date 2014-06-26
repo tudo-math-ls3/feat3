@@ -103,7 +103,7 @@ namespace FEAST
     /**
     * \brief Constructor.
     *
-    * \param message
+    * \param message_in
     * A short error message.
     */
     InternalError(const String & message_in) :
@@ -117,7 +117,7 @@ namespace FEAST
     * \param function the current function name.
     * \param file the current file name.
     * \param line the current line number.
-    * \param message A short error message.
+    * \param message_in A short error message.
     */
     InternalError(
         const char* const function,

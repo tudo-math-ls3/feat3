@@ -441,7 +441,7 @@ namespace FEAST
      * \brief Returns x raised to the power of y.
      *
      * \param[in] x The base value. Must be positive.
-     * \patam[in] y The exponent value.
+     * \param[in] y The exponent value.
      *
      * \returns x^y
      */

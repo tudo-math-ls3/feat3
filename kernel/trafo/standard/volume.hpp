@@ -28,7 +28,8 @@ namespace FEAST
       template<typename ShapeType_>
       struct CellVolumeEvaluator
       {
-        template<
+        template
+        <
           /// Data type
           typename DataType_,
           /// Transformation type
@@ -36,36 +37,50 @@ namespace FEAST
           /// Type for index sets
           typename IndexSetType_,
           /// Type for vertex sets
-          typename VertexSetType_>
-          /*
-          * \brief The routine that does the actual work
-          *
-          * \param[in] trafo
-          * The underlying transformation, needed if the cell volume can only be computed by integration.
-          *
-          * \returns The volume of cell.
-          */
-          static DataType_ compute_vol(
-              const TrafoType_ trafo,
-              const IndexSetType_ idx,
-              const VertexSetType_ vtx,
-              const Index cell);
+          typename VertexSetType_
+        >
+        /**
+         * \brief The routine that does the actual work
+         *
+         * \param[in] trafo
+         * The underlying transformation, needed if the cell volume can only be computed by integration.
+         *
+         * \param[in] idx
+         * The index set of the underlying mesh of trafo
+         *
+         * \param[in] vtx
+         * The vertex set of the underlying mesh of trafo
+         *
+         * \param[in] cell
+         * Cell index
+         *
+         * \returns The volume of cell.
+         **/
+        static DataType_ compute_vol(
+          const TrafoType_ trafo,
+          const IndexSetType_ idx,
+          const VertexSetType_ vtx,
+          const Index cell);
       };
 
+      /// \copydoc CellVolumeEvaluator
       /// Specialisation for Hypercube<1> shape
       template<>
         struct CellVolumeEvaluator<Shape::Hypercube<1>>
         {
-          template<
+          template
+          <
             typename DataType_,
             typename TrafoType_,
             typename IndexSetType_,
-            typename VertexSetType_>
-            static DataType_ compute_vol(
-                const TrafoType_& DOXY(trafo),
-                const IndexSetType_& idx,
-                const VertexSetType_& vtx,
-                const Index cell)
+            typename VertexSetType_
+          >
+          /// \copydoc CellVolumeEvaluator::compute_vol()
+          static DataType_ compute_vol(
+            const TrafoType_& DOXY(trafo),
+            const IndexSetType_& idx,
+            const VertexSetType_& vtx,
+            const Index cell)
             {
               DataType_ v = DataType_(0.);
               for(Index d = 0; d < TrafoType_::MeshType::world_dim; d++)
@@ -77,25 +92,28 @@ namespace FEAST
         };
 
       /// Specialisation for Hypercubes of dimension 2 and 3
-      //
-      // As the Hypercube<2> could be immersed in 3D, the Gaussian formula for general polyhedra in 2D is not
-      // applicable, so integration is used.
-      //
-      // For Hypercube<3> shape based on the standard Q1 transformation, faces no longer need to be planar, so
-      // integration is necessary anyway.
+      ///
+      /// As the Hypercube<2> could be immersed in 3D, the Gaussian formula for general polyhedra in 2D is not
+      /// applicable, so integration is used.
+      ///
+      /// For Hypercube<3> shape based on the standard Q1 transformation, faces no longer need to be planar, so
+      /// integration is necessary anyway.
       template<int shape_dim_>
         struct CellVolumeEvaluator<Shape::Hypercube<shape_dim_>>
         {
-          template<
+          template
+          <
             typename DataType_,
             typename TrafoType_,
             typename IndexSetType_,
-            typename VertexSetType_>
-            static DataType_ compute_vol(
-                const TrafoType_& trafo,
-                const IndexSetType_& DOXY(idx),
-                const VertexSetType_& DOXY(vtx),
-                const Index cell)
+            typename VertexSetType_
+          >
+          /// \copydoc CellVolumeEvaluator::compute_vol()
+          static DataType_ compute_vol(
+            const TrafoType_& trafo,
+            const IndexSetType_& DOXY(idx),
+            const VertexSetType_& DOXY(vtx),
+            const Index cell)
             {
               typedef typename TrafoType_::template Evaluator<Shape::Hypercube<shape_dim_>, DataType_>::Type Evaluator;
               typedef typename Evaluator::DomainPointType DomainPointType;
@@ -141,6 +159,7 @@ namespace FEAST
       template<int shape_dim_>
         struct CellVolumeEvaluator<Shape::Simplex<shape_dim_>>
         {
+          /// \copydoc CellVolumeEvaluator::compute_vol()
           template<
             typename DataType_,
             typename TrafoType_,
@@ -152,9 +171,8 @@ namespace FEAST
                 const VertexSetType_& vtx,
                 const Index cell)
             {
-              /* A consist of all vectors of type [v_(d+1) - v_0, ..., v_1 - v_0], where v_0, ... , v_(d+1) are
-               * the world_dim_ vectors of the vertices comprising the shape_dim_ simplex.
-               */
+              // A consist of all vectors of type [v_(d+1) - v_0, ..., v_1 - v_0], where v_0, ... , v_(d+1) are
+              // the world_dim_ vectors of the vertices comprising the shape_dim_ simplex.
               FEAST::Tiny::Matrix< DataType_,
               TrafoType_::MeshType::world_dim, shape_dim_,
               TrafoType_::MeshType::world_dim, shape_dim_ > A(0.);

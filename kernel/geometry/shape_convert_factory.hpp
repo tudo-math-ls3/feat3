@@ -22,7 +22,7 @@ namespace FEAST
      * i.e. this factory will convert a Simplex<n> mesh into a Hypercube<n> mesh or vice versa by
      * conforming element subdivision.
      *
-     * \tparam[in] Mesh_
+     * \tparam Mesh_
      * The type that the input mesh is to be converted to.
      *
      * \author Peter Zajac

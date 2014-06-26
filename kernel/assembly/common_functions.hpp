@@ -223,6 +223,7 @@ namespace FEAST
         static_assert(k_ > 0, "parameter k_ must be a positive integer");
 
       public:
+        /// Returns k times pi
         static DataType_ kpi()
         {
           return DataType_(k_) * Math::pi<DataType_>();
@@ -402,7 +403,7 @@ namespace FEAST
         public AnalyticFunction
       {
       public:
-        /** \copydoc AnalyticFunction::FunctionCapabilites */
+        /** \copydoc AnalyticFunction::FunctionCapabilities */
         enum FunctionCapabilities
         {
           can_value = 1,
@@ -414,6 +415,7 @@ namespace FEAST
         template<typename Config_>
         struct ConfigTraits
         {
+          /// Transformation config
           typedef Trafo::ConfigBase TrafoConfig;
         };
 
@@ -437,9 +439,11 @@ namespace FEAST
           typedef typename EvalTraits_::HessianType HessianType;
 
         private:
+          /// Function that is being evaluated
           const ConstantFunction& _function;
 
         public:
+          /// Constructor
           explicit Evaluator(const ConstantFunction& function) :
             _function(function)
           {
@@ -462,9 +466,11 @@ namespace FEAST
         }; // class ConstantFunction::Evaluator<...>
 
       private:
+        /// Value of the constant function
         Real _value;
 
       public:
+        /// Constructor, value defaults to 0
         explicit ConstantFunction(Real value = Real(0)) :
           _value(value)
         {
@@ -493,7 +499,7 @@ namespace FEAST
         public AnalyticFunction
       {
       public:
-        /** \copydoc AnalyticFunction::FunctionCapabilites */
+        /** \copydoc AnalyticFunction::FunctionCapabilities */
         enum FunctionCapabilities
         {
           can_value = 1,
@@ -505,6 +511,11 @@ namespace FEAST
         template<typename Config_>
         struct ConfigTraits
         {
+          /**
+           * \brief Trafo configuration tag class
+           *
+           * \see Trafo::ConfigBase
+           */
           struct TrafoConfig :
             public Trafo::ConfigBase
           {
@@ -537,9 +548,11 @@ namespace FEAST
           typedef typename EvalTraits_::ImagePointType ImgPointType;
 
         private:
+          /// Function to evaluate
           const DistanceFunction& _function;
 
         public:
+          /// Constructor
           explicit Evaluator(const DistanceFunction& function) :
             _function(function)
           {
@@ -597,6 +610,7 @@ namespace FEAST
         }; // class DistanceFunction::Evaluator<...>
 
       public:
+        /// Point to calculate the distance from
         ImgPointType_ _point;
 
       public:
@@ -634,8 +648,9 @@ namespace FEAST
         public AnalyticFunction
       {
       public:
+        /// Datatype for the point coordinates
         typedef typename ImgPointType_::DataType DataType;
-        /** \copydoc AnalyticFunction::FunctionCapabilites */
+        /** \copydoc AnalyticFunction::FunctionCapabilities */
         enum FunctionCapabilities
         {
           can_value = 1,
@@ -647,6 +662,11 @@ namespace FEAST
         template<typename Config_>
         struct ConfigTraits
         {
+          /**
+           * \brief Trafo configuration tag class
+           *
+           * \see Trafo::ConfigBase
+           */
           struct TrafoConfig :
             public Trafo::ConfigBase
           {
@@ -679,9 +699,11 @@ namespace FEAST
           typedef typename EvalTraits_::ImagePointType ImgPointType;
 
         private:
+          /// Function to evaluate
           const DistanceFunctionSD& _function;
 
         public:
+          /// Constructor
           explicit Evaluator(const DistanceFunctionSD& function) :
             _function(function)
           {

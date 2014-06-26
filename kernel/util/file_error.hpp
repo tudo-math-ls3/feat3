@@ -17,7 +17,7 @@ namespace FEAST
   public:
     /**
      * \brief Constructor
-     * \param[in] message
+     * \param[in] message_in
      * The error message.
      */
     explicit FileError(const String& message_in) :

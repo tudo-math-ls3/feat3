@@ -17,6 +17,11 @@ namespace FEAST
     class ScalarErrorComputerL2
     {
     private:
+      /**
+       * \brief Trafo configuration tag class
+       *
+       * \see Trafo::ConfigBase
+       */
       struct TrafoConfig : public Trafo::ConfigBase
       {
         enum
@@ -26,6 +31,11 @@ namespace FEAST
         };
       };
 
+      /**
+       * \brief Space configuration tag class
+       *
+       * \see Space::ConfigBase
+       */
       struct SpaceConfig : public Space::ConfigBase
       {
         enum
@@ -194,6 +204,11 @@ namespace FEAST
     class ScalarErrorComputerH1
     {
     private:
+      /**
+       * \brief Trafo configuration tag class
+       *
+       * \see Trafo::ConfigBase
+       */
       struct TrafoConfig : public Trafo::ConfigBase
       {
         enum
@@ -203,6 +218,11 @@ namespace FEAST
         };
       };
 
+      /**
+       * \brief Space configuration tag class
+       *
+       * \see Space::ConfigBase
+       */
       struct SpaceConfig : public Space::ConfigBase
       {
         enum
@@ -367,6 +387,11 @@ namespace FEAST
      */
     class ScalarErrorComputerH2
     {
+      /**
+       * \brief Trafo configuration tag class
+       *
+       * \see Trafo::ConfigBase
+       */
       struct TrafoConfig : public Trafo::ConfigBase
       {
         enum
@@ -376,6 +401,11 @@ namespace FEAST
         };
       };
 
+      /**
+       * \brief Space configuration tag class
+       *
+       * \see Space::ConfigBase
+       */
       struct SpaceConfig : public Space::ConfigBase
       {
         enum
