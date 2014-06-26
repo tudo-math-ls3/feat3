@@ -494,7 +494,8 @@ void Axpy<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const y, const 
     break;
   default:
 #ifdef DEBUG
-    std::cout << "Axpy not optimized for " << num_of_offsets << " offsets!" << std::endl;
+    /// \todo print warning in feast log file
+    std::cout << "Warning: Axpy not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
     Intern::AxpyBanded::axpy_banded_generic(r, y, alpha, val, offsets, x, num_of_offsets, rows, columns);
   }
