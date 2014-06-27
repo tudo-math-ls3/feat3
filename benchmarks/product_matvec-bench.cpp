@@ -68,6 +68,7 @@ int main(int /*argc*/, char ** /*argv*/)
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> >();
 #ifdef FEAST_BACKENDS_CUDA
   run<Algo::CUDA, SparseMatrixBanded<Mem::CUDA, double, Index> >();
+  run<Algo::CUDA, SparseMatrixBanded<Mem::CUDA, double, unsigned int> >();
 #endif
   run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, unsigned int> >();

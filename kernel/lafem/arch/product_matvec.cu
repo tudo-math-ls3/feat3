@@ -262,7 +262,7 @@ void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const val
 
   FEAST::LAFEM::Intern::cuda_product_matvec_banded<<<grid, block, 3 * (block.x + 2) * sizeof(DT_)>>>(r, x, val, offsets, num_of_offsets, rows, columns);
 }
-//template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-//template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-//template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
