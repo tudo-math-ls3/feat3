@@ -138,9 +138,13 @@ def run_test(build_id, branch, myDB):
 
   if "ninja" in build_id:
     make_command = "ninja -v -k 999 all tests"
+    make_output = get_output_utf8(make_command)
   else:
-    make_command = "make -j 4 -O -k all tests"
-  make_output = get_output_utf8(make_command)
+    make_command = "make -j 4 -O -k all"
+    make_output = get_output_utf8(make_command)
+    make_command = "make -j 4 -O -k tests"
+    make_output += get_output_utf8(make_command)
+
   process_compiler_output("warning:", "warning", make_output)
   process_compiler_output("warning #", "warning", make_output)
   process_compiler_output("error:", "error", make_output)
