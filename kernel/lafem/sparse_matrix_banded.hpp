@@ -598,7 +598,7 @@ namespace FEAST
           val_a = new DT_[a.num_of_offsets() * a.rows()];
           Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
         }
-        if(std::is_same<Mem::Main, Mem_>::value)
+        if(std::is_same<Mem::Main, Mem2_>::value)
         {
           offsets_b = (IT_*)b.offsets();
           val_b = (DT_*)b.val();
@@ -606,9 +606,9 @@ namespace FEAST
         else
         {
           offsets_b = new IT_[b.num_of_offsets()];
-          Util::MemoryPool<Mem_>::instance()->template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
+          Util::MemoryPool<Mem2_>::instance()->template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
           val_b = new DT_[b.num_of_offsets() * b.rows()];
-          Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
+          Util::MemoryPool<Mem2_>::instance()->template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
         }
 
         bool ret(true);
