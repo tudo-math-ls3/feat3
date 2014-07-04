@@ -110,12 +110,12 @@ namespace FEAST
           ++end;
         }
 
-        DT_ gamma(DT_(0.0));
+        DT_ sum(DT_(0.0));
         for (Index diag(start); diag < end; ++diag)
         {
-          gamma += val[rows * diag + idx] * x[idx + offsets[diag] - rows + 1];
+          sum += val[rows * diag + idx] * x[idx + offsets[diag] - rows + 1];
         }
-        r[idx] = gamma;
+        r[idx] = sum;
       }
 
       template <typename DT_, typename IT_>
@@ -265,9 +265,9 @@ void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const val
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  if (num_of_offsets == 9)
-    FEAST::LAFEM::Intern::cuda_product_matvec_q1<<<grid, block, 3 * (block.x + 2) * sizeof(DT_)>>>(r, x, val, offsets, num_of_offsets, rows, columns);
-  else
+  //if (num_of_offsets == 9)
+  //  FEAST::LAFEM::Intern::cuda_product_matvec_q1<<<grid, block, 3 * (block.x + 2) * sizeof(DT_)>>>(r, x, val, offsets, num_of_offsets, rows, columns);
+  //else
     FEAST::LAFEM::Intern::cuda_product_matvec_banded<<<grid, block>>>(r, x, val, offsets, num_of_offsets, rows, columns);
 }
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);

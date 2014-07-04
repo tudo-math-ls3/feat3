@@ -237,14 +237,12 @@ SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_
 // SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sparse_matrix_banded_apply_test_float_ulong;
 // SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sparse_matrix_banded_apply_test_double_ulong;
 // #endif
-/*
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sparse_matrix_banded_apply_test_float_ulong;
 SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sparse_matrix_banded_apply_test_double_ulong;
 SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sparse_matrix_banded_apply_test_float_uint;
 SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sparse_matrix_banded_apply_test_double_uint;
 #endif
-*/
 
 
 template<

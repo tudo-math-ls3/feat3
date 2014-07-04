@@ -32,7 +32,7 @@ namespace FEAST
         static void coo(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const row_ptr, const IT_ * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements);
 
         template <typename DT_, typename IT_>
-        static void banded(DT_ * r, const DT_ * const y, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
+        static void banded(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
       };
 
       extern template void Defect<Mem::Main, Algo::Generic>::csr(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
@@ -74,6 +74,9 @@ namespace FEAST
 
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ * const rhs, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows);
+
+        template <typename DT_, typename IT_>
+        static void banded(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
       };
 
     } // namespace Arch

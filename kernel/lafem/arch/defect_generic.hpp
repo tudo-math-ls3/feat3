@@ -215,30 +215,30 @@ namespace FEAST
 
 
 template <typename DT_, typename IT_>
-void Defect<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const y,
+void Defect<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const rhs,
                                               const DT_ * const val, const IT_ * const offsets, const DT_ * const x,
                                               const Index num_of_offsets, const Index rows, const Index columns)
 {
   switch (num_of_offsets)
   {
   case 3:
-    Intern::DefectBanded::Iteration_Right<DT_, IT_, 3, 4>::f(r, y, val, offsets, x, rows, columns);
+    Intern::DefectBanded::Iteration_Right<DT_, IT_, 3, 4>::f(r, rhs, val, offsets, x, rows, columns);
     break;
   case 5:
-    Intern::DefectBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, y, val, offsets, x, rows, columns);
+    Intern::DefectBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, rhs, val, offsets, x, rows, columns);
     break;
   case 9:
-    Intern::DefectBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, y, val, offsets, x, rows, columns);
+    Intern::DefectBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, rhs, val, offsets, x, rows, columns);
     break;
   case 25:
-    Intern::DefectBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, y, val, offsets, x, rows, columns);
+    Intern::DefectBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, rhs, val, offsets, x, rows, columns);
     break;
   default:
 #ifdef DEBUG
     /// \todo print warning in feast log file
     std::cout << "Warning: Defect not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
-    Intern::DefectBanded::defect_banded_generic(r, y, val, offsets, x, num_of_offsets, rows, columns);
+    Intern::DefectBanded::defect_banded_generic(r, rhs, val, offsets, x, num_of_offsets, rows, columns);
   }
 }
 

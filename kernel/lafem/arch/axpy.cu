@@ -123,6 +123,70 @@ namespace FEAST
         }
         r[row] = (sum * a[idx]) + y[idx];
       }
+
+      template <typename DT_, typename IT_>
+      __global__ void cuda_axpy_banded(DT_ * r, const DT_ alpha, const DT_ * x, const DT_ * y, const DT_ * val, const IT_ * offsets, const Index num_of_offsets, const Index rows, const Index columns)
+      {
+        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+          if (idx >= rows)
+          return;
+
+        const Index k1(rows - 1);
+        const Index k2(rows + columns - 1);
+
+        Index start(0);
+
+        while (k1 > offsets[start] + idx)
+        {
+          ++start;
+        }
+
+        Index end(start);
+
+        while (end < num_of_offsets && idx + offsets[end] <= k2)
+        {
+          ++end;
+        }
+
+        DT_ sum(DT_(0.0));
+        for (Index diag(start); diag < end; ++diag)
+        {
+          sum += val[rows * diag + idx] * x[idx + offsets[diag] - rows + 1];
+        }
+        r[idx] = (sum*alpha) + y[idx];
+      }
+
+      template <typename DT_, typename IT_>
+      __global__ void cuda_axpy_banded(DT_ * r, const DT_ * alpha, const DT_ * x, const DT_ * y, const DT_ * val, const IT_ * offsets, const Index num_of_offsets, const Index rows, const Index columns)
+      {
+        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+          if (idx >= rows)
+          return;
+
+        const Index k1(rows - 1);
+        const Index k2(rows + columns - 1);
+
+        Index start(0);
+
+        while (k1 > offsets[start] + idx)
+        {
+          ++start;
+        }
+
+        Index end(start);
+
+        while (end < num_of_offsets && idx + offsets[end] <= k2)
+        {
+          ++end;
+        }
+
+        DT_ sum(DT_(0.0));
+        for (Index diag(start); diag < end; ++diag)
+        {
+          sum += val[rows * diag + idx] * x[idx + offsets[diag] - rows + 1];
+        }
+        r[idx] = (sum*alpha[idx]) + y[idx];
+      }
     }
   }
 }
@@ -278,3 +342,35 @@ template void Axpy<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, con
 template void Axpy<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
 template void Axpy<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
 template void Axpy<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
+
+template <typename DT_, typename IT_>
+void Axpy<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
+{
+  Index blocksize(128);
+  dim3 grid;
+  dim3 block;
+  block.x = blocksize;
+  grid.x = (unsigned)ceil((rows)/(double)(block.x));
+
+  FEAST::LAFEM::Intern::cuda_axpy_banded<<<grid, block>>>(r, alpha, x, y, val, offsets, num_of_offsets, rows, columns);
+}
+template void Axpy<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const float, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const double, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const float, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const double, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+
+template <typename DT_, typename IT_>
+void Axpy<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const y, const DT_ * const alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
+{
+  Index blocksize(128);
+  dim3 grid;
+  dim3 block;
+  block.x = blocksize;
+  grid.x = (unsigned)ceil((rows)/(double)(block.x));
+
+  FEAST::LAFEM::Intern::cuda_axpy_banded<<<grid, block>>>(r, alpha, x, y, val, offsets, num_of_offsets, rows, columns);
+}
+template void Axpy<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const float * const, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const double * const, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const float * const, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const double * const, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
