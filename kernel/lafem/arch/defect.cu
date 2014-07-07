@@ -77,7 +77,7 @@ namespace FEAST
 
         Index end(start);
 
-        while (end < num_of_offsets && idx + offsets[end] <= k2)
+        while (end < num_of_offsets && idx + offsets[end] < k2)
         {
           ++end;
         }
