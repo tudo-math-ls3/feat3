@@ -35,7 +35,7 @@ using namespace FEAST;
 
 
     // Mesh and trafo
-    Index level(6);
+    Index level(3);
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
     MeshType mesh(mesh_factory);
     TrafoType trafo(mesh);
@@ -43,8 +43,8 @@ using namespace FEAST;
     DataType pi(Math::pi<DataType>());
     DataType deltat(DataType(0.0125));
 
-    DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_det2 = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(1e-8));
-    FunctionalType my_functional(fac_norm, fac_det, fac_det2, fac_cof, fac_reg);
+    DataType fac_norm = DataType(1e0),fac_det = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     // The smoother in all its template glory
     Geometry::RumpfSmoother
@@ -67,14 +67,14 @@ using namespace FEAST;
     Geometry::TargetSet boundary_set = boundary.template get_target_set<0>();
 
     //Initial boundary deformation
-    for(Index i(0); i < boundary.get_num_entities(0); ++i)
-    {
-      Index j = boundary_set[i];
-      DataType tmp0 = rumpflpumpfl._coords[0](j);
-      DataType tmp1 = rumpflpumpfl._coords[1](j);
-      rumpflpumpfl._coords[0](j, tmp0 - ( Math::sin(DataType(2)*pi*tmp1) )/DataType(1 << (level+2)));
-      rumpflpumpfl._coords[1](j, tmp1 + ( Math::sin(DataType(2)*pi*tmp0) )/DataType(1 << (level+2)));
-    }
+    //for(Index i(0); i < boundary.get_num_entities(0); ++i)
+    //{
+    //  Index j = boundary_set[i];
+    //  DataType tmp0 = rumpflpumpfl._coords[0](j);
+    //  DataType tmp1 = rumpflpumpfl._coords[1](j);
+    //  rumpflpumpfl._coords[0](j, tmp0 - ( Math::sin(DataType(2)*pi*tmp1) )/DataType(1 << (level+2)));
+    //  rumpflpumpfl._coords[1](j, tmp1 + ( Math::sin(DataType(2)*pi*tmp0) )/DataType(1 << (level+2)));
+    //}
 
     DataType* func_norm(new DataType[mesh.get_num_entities(2)]);
     DataType* func_det(new DataType[mesh.get_num_entities(2)]);
@@ -115,7 +115,7 @@ using namespace FEAST;
     writer_post.write("post_initial.vtk");
 
 
-    std::string filename;
+    /*std::string filename;
 
     DataType time(0);
     Index n(0);
@@ -131,7 +131,7 @@ using namespace FEAST;
     deltat /= DataType(outputstep);
     std::cout << "deltat = " << scientify(deltat) << ", outputstep = " << outputstep << std::endl;
     std::cout << "fac_norm = " << scientify(fac_norm) << ", fac_det= " << scientify(fac_det)
-    << ", fac_det2 = " << scientify(fac_det2) << ", fac_reg = " << scientify(fac_reg) << std::endl;
+    << ", fac_reg = " << scientify(fac_reg) << std::endl;
 
     while(time < DataType(6))
     {
@@ -225,6 +225,7 @@ using namespace FEAST;
     delete func_det2;
 
     delete mesh_velocity;
+  */
   }
 
 int main()

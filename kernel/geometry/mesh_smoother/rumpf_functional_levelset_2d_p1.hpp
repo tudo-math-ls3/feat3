@@ -60,8 +60,7 @@ namespace FEAST
        * fac_det2 are now coupled.
        *
        * \f$ f(d) = d + \frac{c_s}{d^2 + \sqrt{ \mathrm{fac_reg}^2 + d^2}} \f$
-       * We want to have \f$ f'(d) = 0 \Leftrightarrow c_s = \frac{1}{d \sqrt{ \mathrm{fac_reg}^2 + d^2} +
-       * \mathrm{fac_reg}^2 + d^2) \f$ for \f$ d = 1 \f$.
+       * We want to have \f$ f'(d) = 0 \Leftrightarrow c_s = \frac{1}{d \sqrt{ \mathrm{fac_reg}^2 + d^2} + \mathrm{fac_reg}^2 + d^2)} \f$ for \f$ d = 1 \f$.
        **/
       RumpfFunctionalLevelset(
         const DataType_ fac_norm_,
@@ -112,8 +111,8 @@ namespace FEAST
         DataType_ lvlset_penalty = compute_levelset_penalty(lvlset_vals);
         lvlset_constraint += lvlset_penalty;
 
-        return this->_fac_norm*Math::sqr(DataType_(2) - Math::sqr(norm_A))
-          + this->_fac_det*Math::sqr(det_A)
+        return this->_fac_norm*norm_A
+          + this->_fac_det*det_A
           + this->_fac_det2*det2_A;
 
       }
@@ -146,8 +145,8 @@ namespace FEAST
         DataType_& func_lvlset,
         DataType_& lvlset_constraint)
         {
-          func_norm = this->_fac_norm*Math::sqr(DataType_(2) - Math::sqr(compute_norm_A(x,h)));
-          func_det = this->_fac_det*Math::sqr(compute_det_A(x,h));
+          func_norm = this->_fac_norm*compute_norm_A(x,h);
+          func_det = this->_fac_det*compute_det_A(x,h);
           func_det2 = this->_fac_det2*compute_det2_A(x,h);
           func_lvlset = compute_levelset_penalty(lvlset_vals);
 

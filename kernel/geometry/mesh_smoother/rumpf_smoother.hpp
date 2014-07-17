@@ -320,19 +320,39 @@ namespace FEAST
         virtual void compute_h()
         {
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
-          DataType vol(0);
+          DataType sum_det(0);
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          // Local cell dimensions for passing to other routines
+          FEAST::Tiny::Vector <DataType_, MeshType::world_dim> h;
+          for(Index d(0); d < this->_world_dim; ++d)
+            h(d) = DataType(1);
 
+          // Index set for local/global numbering
+          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+
+          DataType_ target_vol(0);
           for(Index cell(0); cell < ncells; ++cell)
-            vol += this->_trafo.template compute_vol<ShapeType,DataType>(cell);
+          {
+            for(Index d = 0; d < this->_world_dim; d++)
+            {
+              // Get local coordinates
+              for(Index j = 0; j < Shape::FaceTraits<ShapeType,0>::count; j++)
+                x(d,j) = this->_coords[d](idx(cell,j));
+            }
+            sum_det+=_functional.compute_det_A(x,h);
+          }
 
           DataType_ exponent = DataType_(1)/DataType_(this->_world_dim);
           for(Index cell(0); cell < ncells; ++cell)
           {
             for(Index d(0); d < this->_world_dim; ++d)
-              this->_h[d](cell,Math::pow(this->_lambda(cell)*vol,exponent));
+              this->_h[d](cell,Math::pow(this->_lambda(cell)*sum_det,exponent));
+
+            target_vol += DataType_(0.25)*Math::sqrt(DataType(3))*Math::sqr(_h[0](cell));
+
           }
+          std::cout << "compute_h target vol = " << scientify(target_vol) << std::endl;
         }
 
         /// Computes the weights _lambda.
@@ -469,11 +489,15 @@ namespace FEAST
             vol += this->_trafo.template compute_vol<ShapeType,DataType>(cell);
 
           DataType_ exponent = DataType_(1)/DataType_(this->_world_dim);
+          DataType_ target_vol(0);
           for(Index cell(0); cell < ncells; ++cell)
           {
             for(Index d(0); d < this->_world_dim; ++d)
               this->_h[d](cell,DataType(0.5)*Math::pow(this->_lambda(cell)*vol,exponent));
+
+            target_vol += DataType_(4) * this->_h[0](cell)*this->_h[1](cell);
           }
+          std::cout << "compute_h target_vol = " << scientify(target_vol) << std::endl;
         } // compute_h
 
     }; // class RumpfSmoother<Hypercube<2>>
@@ -663,13 +687,13 @@ namespace FEAST
         my_smoother->compute_gradient();
 
         // Copy to array for the gradient for passing to ALGLIB's optimiser
-        // DataType norm_grad(0);
+        DataType norm_grad(0);
         for(Index j(0); j < world_dim*num_vert; ++j)
         {
           grad[alglib::ae_int_t(j)] = my_smoother->_grad[j];
-          //norm_grad+=Math::sqr(my_smoother->_grad[j]);
+          norm_grad+=Math::sqr(my_smoother->_grad[j]);
         }
-        //norm_grad = Math::sqrt(norm_grad/DataType(world_dim*num_vert));
+        norm_grad = Math::sqrt(norm_grad/DataType(world_dim*num_vert));
         //std::cout << "|| grad ||_l2 = " << scientify(norm_grad) << std::endl;
 
       }
