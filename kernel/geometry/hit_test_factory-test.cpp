@@ -7,7 +7,6 @@
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
 #include <kernel/geometry/cell_sub_set.hpp>                // for CellSubSet
 #include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
-#include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -36,6 +35,7 @@ public:
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
     typedef Geometry::CellSubSet<ShapeType> BoundaryType;
     typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactoryType;
+    typedef Geometry::StandardRefinery<MeshType> RefineryType;
 
     // some parameters for this special test
     Index level(6);
@@ -44,32 +44,44 @@ public:
 
     // create a meshfactory
     MeshFactoryType mesh_factory(level);
+    // create a mesh and a refined mesh
     MeshType mesh(mesh_factory);
+    RefineryType refinery(mesh);
+    MeshType mesh_fine(refinery);
 
-    // create the hittest
+    // create a sphere hit function
     SphereHitTestFunction<double,Index(2)> hit_func(mid_point,radius);
+    // apply the hit test to the mesh and refined mesh
     HitTestFactory<SphereHitTestFunction<double,Index(2)>, MeshType> hit_test(hit_func, mesh);
     BoundaryType sphere(hit_test);
+    HitTestFactory<SphereHitTestFunction<double,Index(2)>, MeshType> hit_test_fine(hit_func, mesh_fine);
+    BoundaryType sphere_fine(hit_test_fine);
 
-    // helper vectors to visualize the hittest
-    std::vector<double> nodes(mesh.get_num_entities(0),0.0);
-    std::vector<double> quads(mesh.get_num_entities(2),0.0);
-    // loop over all nodes caught by the hittest
+    // number of nodes, edges, quads
+    Index nv(sphere.get_num_entities(0)), ne(sphere.get_num_entities(1)), nq(sphere.get_num_entities(2));
+    // check if the number of nodes fits
+    TEST_CHECK_EQUAL(nv + ne + nq, sphere_fine.get_num_entities(0));
+    // helper vector to compare the nodes caught by the hit test of the mesh and refined mesh
+    std::vector<Index> nodes(nv + ne + nq);
+
+    // compute the nodes that should be caught by the hit test of the refined mesh
     for (Index i(0); i < sphere.get_num_entities(0); ++i)
     {
-      nodes[sphere.get_target_set<0>()[i]] = 1;
+      nodes[i] = sphere.get_target_set<0>()[i];
     }
-    // loop over all quadrilaterals caught by the hittest
+    for (Index i(0); i < sphere.get_num_entities(1); ++i)
+    {
+      nodes[i + nv] = sphere.get_target_set<1>()[i] + mesh.get_num_entities(0);
+    }
     for (Index i(0); i < sphere.get_num_entities(2); ++i)
     {
-      quads[sphere.get_target_set<2>()[i]] = 1;
+      nodes[i + nv + ne] = sphere.get_target_set<2>()[i] + mesh.get_num_entities(0) + mesh.get_num_entities(1);
     }
-
-    // export the helper vectors (uncomment this to create the vtk file)
-    /*Geometry::ExportVTK<MeshType> exporter(mesh);
-    exporter.add_scalar_vertex("nodes", nodes.data());
-    exporter.add_scalar_cell("quads", quads.data());
-    exporter.write("hit_test.vtk");*/
+    // compare the node numbers
+    for (Index i(0); i < sphere_fine.get_num_entities(0); ++i)
+    {
+      TEST_CHECK_EQUAL(nodes[i], sphere_fine.get_target_set<0>()[i]);
+    }
   } // test_0
 
   virtual void run() const
