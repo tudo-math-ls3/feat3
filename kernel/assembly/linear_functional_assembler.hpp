@@ -117,12 +117,14 @@ namespace FEAST
             // compute test basis function data
             test_eval(test_data, trafo_data);
 
+            // prepare functional
+            func_eval.set_point(trafo_data);
+
             // test function loop
             for(Index i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functor and integrate
-              lvad(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
-                func_eval(trafo_data, test_data.phi[i]);
+              lvad(i) += trafo_data.jac_det * cubature_rule.get_weight(k) * func_eval(test_data.phi[i]);
               // continue with next trial function
             }
             // continue with next test function

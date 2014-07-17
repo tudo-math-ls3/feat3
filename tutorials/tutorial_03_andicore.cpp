@@ -221,7 +221,6 @@ namespace Tutorial03
       // Finally, we can provide the actual evaluation operator, which performs the actual work:
       // This operator returns a scalar value and its parameters are const references to...
       DataType operator()(
-        const TrafoData& /*tau*/,   // ...the trafo data object (unused)
         const TrialBasisData& phi,  // ...the trial basis data object
         const TestBasisData& psi    // ...the test basis data object
         ) const
@@ -337,31 +336,6 @@ namespace Tutorial03
       // As usual, a reference to our data object:
       const AndicoreData& _data;
 
-      // Now comes the interesting part:
-      // We want to evaluate the analytical solution, and for this, we need to get its corresponding
-      // evaluator, which is again a class template similar to the one that you are currently reading,
-      // see the 'PringlesFunction' from the 'tutorial_02_laplace' example.
-      // However, its template parameter is *not* our assembly traits type 'AsmTraits_', but another
-      // type called 'analytic evaluation traits', which can be queried from our assembly traits.
-      // For convenience, we'll make a typedef of this traits class:
-      typedef typename AsmTraits_::AnalyticEvalTraits AnalyticEvalTraits;
-
-      // With that type, we can now define the type of the solution function evaluator:
-      typedef typename SolFunction_::template Evaluator<AnalyticEvalTraits> SolEvaluator;
-
-      // Finally, declare one of those solution function evaluators:
-      SolEvaluator _sol_eval;
-
-    public:
-      // And a matching constructor, which receives a reference to the functional object as its
-      // only parameter. This constructor will first get a reference to our custom data object and
-      // will create the solution function evaluator using its mandatory constructor:
-      explicit Evaluator(const AndicoreFunctional& functional) :
-        _data(functional._data),
-        _sol_eval(functional._sol_func)
-      {
-      }
-
       // The 'AsmTraits_' class template, which is passed to this evaluator template by the
       // assembler, is the same as the one passed on for bilinear operators, so we can again
       // query our required types from it. As functionals do not operate on trial basis functions,
@@ -375,6 +349,35 @@ namespace Tutorial03
 
       // Finally, we also need the DataType typedef.
       typedef typename AsmTraits_::DataType DataType;
+
+      // Now comes the interesting part:
+      // We want to evaluate the analytical solution, and for this, we need to get its corresponding
+      // evaluator, which is again a class template similar to the one that you are currently reading,
+      // see the 'PringlesFunction' from the 'tutorial_02_laplace' example.
+      // However, its template parameter is *not* our assembly traits type 'AsmTraits_', but another
+      // type called 'analytic evaluation traits', which can be queried from our assembly traits.
+      // For convenience, we'll make a typedef of this traits class:
+      typedef typename AsmTraits_::AnalyticEvalTraits AnalyticEvalTraits;
+
+      // With that type, we can now define the type of the solution function evaluator:
+      typedef typename SolFunction_::template Evaluator<AnalyticEvalTraits> SolEvaluator;
+
+      // Now, declare one of those solution function evaluators:
+      SolEvaluator _sol_eval;
+
+      // Finally, declare a variable that will store the value of the force in the current cubature point:
+      DataType _force_value;
+
+    public:
+      // And a matching constructor, which receives a reference to the functional object as its
+      // only parameter. This constructor will first get a reference to our custom data object and
+      // will create the solution function evaluator using its mandatory constructor:
+      explicit Evaluator(const AndicoreFunctional& functional) :
+        _data(functional._data),
+        _sol_eval(functional._sol_func),
+        _force_value(DataType(0))
+      {
+      }
 
       // Each type of evaluator has a 'prepare' and a 'finish' member function which are called
       // for each cell of the mesh that the assembler iterates over.  Although uur functional
@@ -392,27 +395,37 @@ namespace Tutorial03
         _sol_eval.finish();
       }
 
-      // Once again, we implement our evaluation operator, which is quite similar to the one
-      // for bilinear operators, with the only difference being that there is no trial function.
-      // It takes const references to the trafo and the test-function data objects as parameters
-      // and returns the evaluation of the functional in the current cubature point:
-      DataType operator()(const TrafoData& tau, const TestBasisData& psi)
+      // Now we come to learn a new function, which is present in all bilinear operator and
+      // linear functional evaluator classes. The next function is called for each cubature point
+      // before the actual evaluation operator is called. At this point, we have the chance to
+      // pre-compute any data that depends on the current cubature point, but not on the test-function.
+      void set_point(const TrafoData& tau)
       {
-        // Now we can start combining our force functional.
         // In analogy to the bilinear operator, this functional is given by three additive terms:
         // 1. the diffusion  : -dot(A,hess(u)) * psi
         // 2. the convection :  dot(b,grad(u)) * psi
         // 3. the reaction   :      c *    u   * psi
 
-        // So, let's combine:
-        return psi.value * (
-          // First, the diffustion. This is the matrix-dot product of 'A' and the hessian of 'u':
+        // At this point, we can already combine these terms to pre-compute the value of our force
+        // functional, so that we just need to multiply by 'psi' lateron:
+        _force_value =
+          // First, the diffusion. This is the matrix-dot product of 'A' and the hessian of 'u':
           - dot(_data.a, _sol_eval.hessian(tau))
           // Next, the convection. This is the vector-dot-product of 'b' and the gradient of 'u':
           + dot(_data.b, _sol_eval.gradient(tau))
           // Finally, the reaction. This is a simple product:
-          + _data.c * _sol_eval.value(tau)
-          );
+          + _data.c * _sol_eval.value(tau);
+      }
+
+      // Once again, we implement our evaluation operator, which is quite similar to the one
+      // for bilinear operators, with the only difference being that there is no trial function.
+      // It takes a const reference to the test-function data object as a parameter
+      // and returns the evaluation of the functional in the current cubature point:
+      DataType operator()(const TestBasisData& psi) const
+      {
+        // As we have already computed the value of our force functional in the "set_point" function
+        // above, we just need to multiply by the function value of 'psi':
+        return _force_value * psi.value;
       }
     }; // class AndicoreFunctional<...>::Evaluator<...>
   }; // class AndicoreFunctional<...>

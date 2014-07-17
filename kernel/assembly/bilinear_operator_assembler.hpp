@@ -90,7 +90,7 @@ namespace FEAST
         typename AsmTraits::TrialDofMapping trial_dof_mapping(trial_space);
 
         // create a functor evaluator
-        typename OperatorType::template Evaluator<AsmTraits> func_eval(operat);
+        typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
 
         // create trafo evaluation data
         typename AsmTraits::TrafoEvalData trafo_data;
@@ -119,7 +119,7 @@ namespace FEAST
           trial_eval.prepare(trafo_eval);
 
           // prepare functor evaluator
-          func_eval.prepare(trafo_eval);
+          oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
           Index num_loc_test_dofs = test_eval.get_num_local_dofs();
@@ -138,6 +138,9 @@ namespace FEAST
             test_eval(test_data, trafo_data);
             trial_eval(trial_data, trafo_data);
 
+            // prepare bilinear operator
+            oper_eval.set_point(trafo_data);
+
             // test function loop
             for(Index i(0); i < num_loc_test_dofs; ++i)
             {
@@ -146,15 +149,16 @@ namespace FEAST
               {
                 // evaluate functor and integrate
                 lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
-                  func_eval(trafo_data, trial_data.phi[j], test_data.phi[i]);
+                  oper_eval(trial_data.phi[j], test_data.phi[i]);
+                // continue with next trial function
               }
-              // continue with next trial function
+              // continue with next test function
             }
-            // continue with next test function
+            // continue with next cubature point
           }
 
           // finish functor evaluator
-          func_eval.finish();
+          oper_eval.finish();
 
           // finish evaluators
           trial_eval.finish();
@@ -239,7 +243,7 @@ namespace FEAST
         typename AsmTraits::DofMapping dof_mapping(space);
 
         // create a functor evaluator
-        typename OperatorType::template Evaluator<AsmTraits> func_eval(operat);
+        typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
 
         // create trafo evaluation data
         typename AsmTraits::TrafoEvalData trafo_data;
@@ -266,7 +270,7 @@ namespace FEAST
           space_eval.prepare(trafo_eval);
 
           // prepare functor evaluator
-          func_eval.prepare(trafo_eval);
+          oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
           Index num_loc_dofs = space_eval.get_num_local_dofs();
@@ -283,6 +287,9 @@ namespace FEAST
             // compute basis function data
             space_eval(space_data, trafo_data);
 
+            // prepare bilinear operator
+            oper_eval.set_point(trafo_data);
+
             // test function loop
             for(Index i(0); i < num_loc_dofs; ++i)
             {
@@ -291,15 +298,16 @@ namespace FEAST
               {
                 // evaluate functor and integrate
                 lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
-                  func_eval(trafo_data, space_data.phi[j], space_data.phi[i]);
+                  oper_eval(space_data.phi[j], space_data.phi[i]);
+                // continue with next trial function
               }
-              // continue with next trial function
+              // continue with next test function
             }
-            // continue with next test function
+            // continue with next cubature point
           }
 
           // finish functor evaluator
-          func_eval.finish();
+          oper_eval.finish();
 
           // finish evaluators
           space_eval.finish();

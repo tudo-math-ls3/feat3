@@ -60,7 +60,7 @@ namespace FEAST
          */
         template<typename AsmTraits_>
         class Evaluator :
-            public BilinearOperator::Evaluator<AsmTraits_>
+          public BilinearOperator::Evaluator<AsmTraits_>
         {
         public:
           /// the data type to be used
@@ -84,7 +84,7 @@ namespace FEAST
           }
 
           /** \copydoc BilinearFunctorBase::Evaluator::operator() */
-          DataType operator()(const TrafoData& DOXY(tau), const TrialBasisData& phi, const TestBasisData& psi)
+          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return dot(phi.grad, psi.grad);
           }
@@ -140,7 +140,7 @@ namespace FEAST
          */
         template<typename AsmTraits_>
         class Evaluator :
-            public BilinearOperator::Evaluator<AsmTraits_>
+          public BilinearOperator::Evaluator<AsmTraits_>
         {
         public:
           /// the data type to be used
@@ -164,7 +164,7 @@ namespace FEAST
           }
 
           /** \copydoc BilinearFunctorBase::Evaluator::operator() */
-          DataType operator()(const TrafoData& DOXY(tau), const TrialBasisData& phi, const TestBasisData& psi)
+          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.value * psi.value;
           }
@@ -252,7 +252,7 @@ namespace FEAST
           }
 
           /** \copydoc BilinearFunctorBase::Evaluator::operator() */
-          DataType operator()(const TrafoData& DOXY(tau), const TrialBasisData& phi, const TestBasisData& psi)
+          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.value * psi.grad[derivative_];
           }

@@ -84,11 +84,14 @@ namespace FEAST
         protected:
           /// the function evaluator
           typename Function_::template Evaluator<typename AsmTraits_::AnalyticEvalTraits> _func_eval;
+          /// the function value in the current point
+          DataType _func_value;
 
         public:
           /// constructor
           explicit Evaluator(const ForceFunctional<Function_>& functional) :
-            _func_eval(functional._function)
+            _func_eval(functional._function),
+            _func_value(DataType(0))
           {
           }
 
@@ -105,10 +108,17 @@ namespace FEAST
             _func_eval.finish();
           }
 
-          /** \copydoc LinearFunctional::Evaluator::operator() */
-          DataType operator()(const TrafoData& tau, const TestBasisData& psi) const
+          /** \copydoc LinearFunctional::Evaluator::set_point() */
+          void set_point(const TrafoData& tau)
           {
-            return _func_eval.value(tau) * psi.value;
+            // evaluate function value
+            _func_value = _func_eval.value(tau);
+          }
+
+          /** \copydoc LinearFunctional::Evaluator::operator() */
+          DataType operator()(const TestBasisData& psi) const
+          {
+            return _func_value * psi.value;
           }
         }; // class ForceFunctional::Evaluator<...>
 

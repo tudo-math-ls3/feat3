@@ -70,15 +70,25 @@ namespace FEAST
           // do nothing
         }
 
+        /**
+         * \brief Point initialisation function
+         *
+         * This function is called to initialise the evaluator for a new evaluation point.
+         *
+         * \param[in] tau
+         * The transformation data in the current evaluation point. \see Trafo::EvalData
+         */
+        void set_point(const TrafoData& DOXY(tau))
+        {
+          // do nothing
+        }
+
 #ifdef DOXYGEN
         /**
          * \brief Evaluation operator
          *
          * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
          * a single point.
-         *
-         * \param[in] tau
-         * The transformation data in the current evaluation point. \see Trafo::EvalData
          *
          * \param[in] phi
          * The trial function data in the current evaluation point. \see Space::EvalData
@@ -89,7 +99,7 @@ namespace FEAST
          * \returns
          * The value of the bilinear functor.
          */
-        DataType operator()(const TrafoData& tau, const TrialBasisData& phi, const TestBasisData& psi) const;
+        DataType operator()(const TrialBasisData& phi, const TestBasisData& psi) const;
 #endif // DOXYGEN
       }; // class BilinearOperator::Evaluator<...>
     }; // class BilinearOperator
