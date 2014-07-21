@@ -3,9 +3,11 @@
 #include <kernel/util/math.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_smoother_levelset.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_levelset_2d_p1.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_levelset_2d_q1.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_smoother_lvlset.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_smoother_lvlset_q1hack.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_p1.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1hack.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/assembly/interpolator.hpp>
@@ -135,63 +137,41 @@ namespace FEAST
 } // namespace FEAST
 
 /**
- * @brief Runs mesh smoother stuff
- *
+ * \brief Wrapper struct as functions do not seem to agree with template template parameters
  **/
-  template<typename DataType_, typename ShapeType_ >
-  void run()
+template
+<
+  typename ShapeType_,
+  typename FunctionalShapeType_,
+  template<typename, typename, typename> class FunctionalType_,
+  template<typename ... > class RumpfSmootherType_,
+  typename DataType_,
+  typename MemType_
+> struct LevelsetApp
+{
+  /**
+   * @brief Runs mesh smoother stuff
+   *
+   **/
+  static void run()
   {
+    typedef MemType_ MemType;
     typedef DataType_ DataType;
-    typedef Mem::Main MemType;
-    typedef ShapeType_ ShapeType;
 
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    typedef ShapeType_ ShapeType;
+    typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension,ShapeType::dimension, DataType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+
+    typedef FunctionalShapeType_ FunctionalShapeType;
+
+    typedef FunctionalType_<MemType, DataType, FunctionalShapeType> FunctionalType;
+
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
     typedef Tiny::Vector<DataType,2,2> ImgPointType;
     typedef Assembly::Common::DistanceFunctionSD<ImgPointType> AnalyticFunctionType;
     typedef Assembly::Common::DistanceFunctionSD_grad<ImgPointType, 0> AnalyticFunctionGrad0Type;
     typedef Assembly::Common::DistanceFunctionSD_grad<ImgPointType, 1> AnalyticFunctionGrad1Type;
-    //    typedef typename Geometry::RumpfFunctionalLevelset<MemType, DataType, TrafoType> FunctionalType;
-    typedef typename Geometry::RumpfFunctionalLevelset<MemType, DataType, TrafoType> FunctionalType;
-
-    typedef LAFEM::DenseVector<MemType, DataType> VectorType;
-
-
-    // Mesh and trafo
-    Index level(4);
-    Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
-    MeshType mesh(mesh_factory);
-    TrafoType trafo(mesh);
-
-    // Levelset function stuff
-    ImgPointType x0(DataType(0));
-    x0.v[0] = DataType(0.5);
-    x0.v[1] = DataType(0.85);
-    // Levelset function is phi(x) = displacement + scaling * || x - x0 ||_2
-    DataType displacement(0.5);
-    DataType scaling(-4);
-    AnalyticFunctionType analytic_lvlset(x0, displacement, scaling);
-    AnalyticFunctionGrad0Type analytic_lvlset_grad0(x0, displacement, scaling);
-    AnalyticFunctionGrad1Type analytic_lvlset_grad1(x0, displacement, scaling);
-
-    SpaceType lvlsetspace(trafo);
-    VectorType lvlset_vec, lvlset_vec_out;
-    Assembly::Interpolator::project(lvlset_vec, analytic_lvlset, lvlsetspace);
-    FEAST::Assembly::DiscreteVertexProjector::project(lvlset_vec_out, lvlset_vec, lvlsetspace);
-
-    DataType pi(Math::pi<DataType>());
-
-    DataType deltat(DataType(0.0125));
-
-    DataType fac_norm = DataType(5e-1),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
-    bool from_original(false);
-    bool align_to_lvlset(false);
-    bool r_adaptivity(true);
-    FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
-
-    // The smoother in all its template glory
-    Geometry::RumpfSmootherLevelsetAnalytic
+    typedef RumpfSmootherType_
     <
       AnalyticFunctionType,
       AnalyticFunctionGrad0Type,
@@ -201,7 +181,44 @@ namespace FEAST
       TrafoType,
       DataType,
       MemType
-    > rumpflpumpfl(trafo, my_functional, align_to_lvlset, from_original, r_adaptivity, analytic_lvlset, analytic_lvlset_grad0, analytic_lvlset_grad1);
+    > RumpfSmootherType;
+
+    typedef LAFEM::DenseVector<MemType, DataType> VectorType;
+
+    // Mesh and trafo
+    Index level(5);
+    Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
+    MeshType mesh(mesh_factory);
+    TrafoType trafo(mesh);
+
+    // Levelset function stuff
+    ImgPointType x0(DataType(0));
+    x0.v[0] = DataType(0.75);
+    x0.v[1] = DataType(0.5);
+    // Levelset function is phi(x) = displacement + scaling * || x - x0 ||_2
+    DataType displacement(0.15);
+    DataType scaling(-1);
+    AnalyticFunctionType analytic_lvlset(x0, displacement, scaling);
+    AnalyticFunctionGrad0Type analytic_lvlset_grad0(x0, displacement, scaling);
+    AnalyticFunctionGrad1Type analytic_lvlset_grad1(x0, displacement, scaling);
+
+    SpaceType lvlsetspace(trafo);
+    VectorType lvlset_vec, lvlset_vec_out;
+    Assembly::Interpolator::project(lvlset_vec, analytic_lvlset, lvlsetspace);
+    FEAST::Assembly::DiscreteVertexProjector::project(lvlset_vec_out, lvlset_vec, lvlsetspace);
+
+    DataType deltat(DataType(0.025));
+
+    DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    bool from_original(true);
+    bool align_to_lvlset(true);
+    bool r_adaptivity(true);
+    FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
+
+    // The smoother in all its template glory
+    RumpfSmootherType rumpflpumpfl(trafo, my_functional, align_to_lvlset, from_original, r_adaptivity,
+    analytic_lvlset, analytic_lvlset_grad0, analytic_lvlset_grad1);
+
     rumpflpumpfl.init();
 
     DataType* func_norm(new DataType[mesh.get_num_entities(2)]);
@@ -221,32 +238,32 @@ namespace FEAST
     // Filename for vtk files
     std::string filename;
 
-    Geometry::ExportVTK<MeshType> writer_pre(mesh);
-    writer_pre.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-    writer_pre.add_scalar_cell("h", rumpflpumpfl._h[0].elements() );
-    writer_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-    writer_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
-    writer_pre.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-    writer_pre.add_scalar_vertex("lvlset_grad_0", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements());
-    writer_pre.add_scalar_vertex("lvlset_grad_1", rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
-    writer_pre.add_scalar_cell("levelset_constraint", func_lvlset );
-    writer_pre.write("pre_initial.vtk");
+    Geometry::ExportVTK<MeshType> writer_pre_initial(mesh);
+    writer_pre_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
+    writer_pre_initial.add_scalar_cell("h", rumpflpumpfl._h[0].elements() );
+    writer_pre_initial.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
+    writer_pre_initial.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
+    writer_pre_initial.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
+    writer_pre_initial.add_scalar_vertex("lvlset_grad_0", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements());
+    writer_pre_initial.add_scalar_vertex("lvlset_grad_1", rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+    writer_pre_initial.add_scalar_cell("levelset_constraint", func_lvlset );
+    writer_pre_initial.write("pre_initial.vtk");
 
     rumpflpumpfl.optimise();
 
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_det2, func_lvlset);
     std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
 
-    Geometry::ExportVTK<MeshType> writer_post(mesh);
-    writer_post.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-    writer_post.add_scalar_cell("h", rumpflpumpfl._h[0].elements() );
-    writer_post.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-    writer_post.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
-    writer_post.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-    writer_post.add_scalar_vertex("lvlset_grad_0", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements());
-    writer_post.add_scalar_vertex("lvlset_grad_1", rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
-    writer_post.add_scalar_cell("levelset_constraint", func_lvlset );
-    writer_post.write("post_initial.vtk");
+    Geometry::ExportVTK<MeshType> writer_post_initial(mesh);
+    writer_post_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
+    writer_post_initial.add_scalar_cell("h", rumpflpumpfl._h[0].elements() );
+    writer_post_initial.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
+    writer_post_initial.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
+    writer_post_initial.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
+    writer_post_initial.add_scalar_vertex("lvlset_grad_0", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements());
+    writer_post_initial.add_scalar_vertex("lvlset_grad_1", rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+    writer_post_initial.add_scalar_cell("levelset_constraint", func_lvlset );
+    writer_post_initial.write("post_initial.vtk");
 
     DataType time(0);
     Index n(0);
@@ -278,8 +295,10 @@ namespace FEAST
       }
 
       // update leveset function
-      x0.v[0] = DataType(0.5) + 0.35*Math::sin(DataType(2)*pi*time);
-      x0.v[1] = DataType(0.5) + 0.35*Math::cos(DataType(2)*pi*time);
+      //x0.v[0] = DataType(0.5) + DataType(0.35)*Math::sin(DataType(2)*pi*time);
+      //x0.v[1] = DataType(0.5) + DataType(0.35)*Math::cos(DataType(2)*pi*time);
+      x0.v[0] = DataType(0.25) *(DataType(2) + Math::cos(time));
+      x0.v[1] = DataType(0.25) *(DataType(2) + Math::sin(DataType(3)*time));
       analytic_lvlset.set_point(x0);
 
       if( n%outputstep || outputstep==1)
@@ -292,7 +311,8 @@ namespace FEAST
         Geometry::ExportVTK<MeshType> writer_pre(mesh);
 
         writer_pre.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-        writer_pre.add_scalar_cell("h", rumpflpumpfl._h[0].elements() );
+        writer_pre.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
+        writer_pre.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
         writer_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
         writer_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
         writer_pre.add_scalar_cell("norm", func_norm);
@@ -333,7 +353,8 @@ namespace FEAST
         Geometry::ExportVTK<MeshType> writer_post(mesh);
 
         writer_post.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-        writer_post.add_scalar_cell("h", rumpflpumpfl._h[0].elements() );
+        writer_post.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
+        writer_post.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
         writer_post.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
         writer_post.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
         writer_post.add_scalar_cell("norm", func_norm);
@@ -359,9 +380,17 @@ namespace FEAST
 
     delete mesh_velocity;
   }
+}; // struct LevelsetApp
 
+template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
+using MySmoother = Geometry::RumpfSmootherLevelsetAnalytic<A, B, C, D, E, F, G, H>;
+
+template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
+using MySmootherQ1Hack = Geometry::RumpfSmootherLevelsetAnalyticQ1Hack<A, B, C, D, E, F, G, H>;
 int main()
 {
-  run<double,Shape::Simplex<2>>();
+  typedef Mem::Main MemType;
+
+  LevelsetApp<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelset, MySmoother, double, MemType>::run();
   return 0;
 }

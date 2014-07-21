@@ -7,6 +7,7 @@
 FEAST_DISABLE_WARNINGS
 #include <thirdparty/alglib/cpp/src/optimization.h>
 FEAST_RESTORE_WARNINGS
+#include <kernel/geometry/mesh_smoother/h_evaluator.hpp>
 
 namespace FEAST
 {
@@ -19,7 +20,7 @@ namespace FEAST
     /**
      * \brief Baseclass for a family of variational mesh optimisation algorithms.
      *
-     * This abstract class is the baseclass for all mesh optimisation algorithms derived from Martin Rumpf's paper
+     * That is, mesh optimisation algorithms derived from Martin Rumpf's paper
      *
      * M. Rumpf: A variational approach to optimal meshes, Numerische Mathematik 72 (1996), pp. 523 - 540.
      *
@@ -35,11 +36,21 @@ namespace FEAST
      * \tparam MemType_
      * Memory architecture.
      *
+     * \tparam H_EvalType
+     * Local meshsize evaluator
+     *
      * \author Jordi Paul
      *
      */
-    template<typename FunctionalType_, typename TrafoType_, typename DataType_, typename MemType_>
-    class RumpfSmootherBase :
+    template
+    <
+      typename FunctionalType_,
+      typename TrafoType_,
+      typename DataType_,
+      typename MemType_,
+      typename H_EvalType_ = H_Evaluator<TrafoType_, DataType_>
+    >
+    class RumpfSmoother:
       public MeshSmoother<TrafoType_, DataType_, MemType_>
     {
       public :
@@ -59,6 +70,9 @@ namespace FEAST
         typedef MeshSmoother<TrafoType_, DataType_, MemType_> BaseClass;
         /// Vector types for element sizes etc.
         typedef LAFEM::DenseVector<MemType_, DataType_> VectorType;
+        /// Since the functional contains a ShapeType, these have to be the same
+        //static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
+        //"ShapeTypes of the transformation / functional have to agree" );
 
         /// Global gradient of the functional
         //
@@ -70,14 +84,12 @@ namespace FEAST
         /// Index vector for identifying boundary vertices and setting boundary conditions
         int* _bdry_id;
 
-      protected :
+        // This is public for debugging purposes
+      public:
         /// Functional value before mesh optimisation.
         DataType initial_functional_value;
         /// Weights for computing the functional value.
         VectorType _lambda;
-
-        // This is public for debugging purposes
-      public:
         /// Size parameters for the local reference element.
         VectorType _h[MeshType::world_dim];
 
@@ -92,17 +104,18 @@ namespace FEAST
          * Reference to the functional used
          *
          */
-        explicit RumpfSmootherBase(const TrafoType& trafo_, FunctionalType& functional_)
+        explicit RumpfSmoother(const TrafoType& trafo_, FunctionalType& functional_)
           : BaseClass(trafo_),
           _grad(new DataType_[this->_world_dim*this->_nk]),
           _functional(functional_),
-          _lambda(this->_mesh.get_num_entities(ShapeType::dimension)),
-          _bdry_id(new int[this->_mesh.get_num_entities(0)])
+          _bdry_id(new int[this->_mesh.get_num_entities(0)]),
+          _lambda(this->_mesh.get_num_entities(ShapeType::dimension))
       {
         /// Type for the boundary mesh
         typedef typename Geometry::CellSubSet<ShapeType> BoundaryType;
         /// Factory for the boundary mesh
         typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
+
         // Get the boundary set
         BoundaryFactoryType boundary_factory(this->_mesh);
         BoundaryType boundary(boundary_factory);
@@ -124,10 +137,11 @@ namespace FEAST
       }
 
 
-        virtual ~RumpfSmootherBase()
+        /// \brief Destructor
+        virtual ~RumpfSmoother()
         {
           delete[] _grad;
-          delete _bdry_id;
+          delete[] _bdry_id;
         };
 
         /// \brief Initialises member variables required for the first application of the smoother
@@ -224,6 +238,7 @@ namespace FEAST
                 x(d,j) = this->_coords[d](idx(cell,j));
             }
 
+            // Scale local functional value with lambda
             fval += this->_lambda(cell)*_functional.compute_local_functional(x,h, norm_A, det_A, det2_A);
 
             func_norm[cell] = this->_lambda(cell) * norm_A;
@@ -234,7 +249,8 @@ namespace FEAST
             func_det2_tot += func_det2[cell];
           }
 
-          std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) << ", func_det2 = " << scientify(func_det2_tot) << std::endl;
+          std::cout << "fval = " << scientify(fval) << " func_norm = " << scientify(func_norm_tot)
+          << ", func_det = " << scientify(func_det_tot) << ", func_det2 = " << scientify(func_det2_tot) << std::endl;
 
           return fval;
         } // compute_functional
@@ -296,7 +312,7 @@ namespace FEAST
         /// \copydoc MeshSmoother::optimise()
         virtual void optimise()
         {
-          ALGLIBWrapper<RumpfSmootherBase<FunctionalType_, TrafoType_, DataType_, MemType_>>::minimise_functional_cg(*this);
+          ALGLIBWrapper<RumpfSmoother<FunctionalType_, TrafoType_, DataType_, MemType_, H_EvalType_>>::minimise_functional_cg(*this);
           // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
           this->set_coords();
         }
@@ -316,47 +332,20 @@ namespace FEAST
         /**
          * \brief Computes the volume of the optimal reference for each cell and saves it to _h.
          *
-         */
+         **/
         virtual void compute_h()
         {
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
-          DataType sum_det(0);
-          // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
-          // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <DataType_, MeshType::world_dim> h;
-          for(Index d(0); d < this->_world_dim; ++d)
-            h(d) = DataType(1);
-
-          // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
-
-          DataType_ target_vol(0);
-          for(Index cell(0); cell < ncells; ++cell)
-          {
-            for(Index d = 0; d < this->_world_dim; d++)
-            {
-              // Get local coordinates
-              for(Index j = 0; j < Shape::FaceTraits<ShapeType,0>::count; j++)
-                x(d,j) = this->_coords[d](idx(cell,j));
-            }
-            sum_det+=_functional.compute_det_A(x,h);
-          }
-
-          DataType_ exponent = DataType_(1)/DataType_(this->_world_dim);
-          for(Index cell(0); cell < ncells; ++cell)
-          {
-            for(Index d(0); d < this->_world_dim; ++d)
-              this->_h[d](cell,Math::pow(this->_lambda(cell)*sum_det,exponent));
-
-            target_vol += DataType_(0.25)*Math::sqrt(DataType(3))*Math::sqr(_h[0](cell));
-
-          }
-          std::cout << "compute_h target vol = " << scientify(target_vol) << std::endl;
+          H_EvalType_::compute_h(_h, this->_coords, _lambda, this->_trafo);
         }
 
-        /// Computes the weights _lambda.
+        /// \brief Computes the weights _lambda.
         virtual void compute_lambda()
+        {
+          compute_lambda_uniform();
+        }
+
+        /// \brief Computes the uniformly distributed weights _lambda.
+        virtual void compute_lambda_uniform()
         {
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -380,199 +369,7 @@ namespace FEAST
 
         }
 
-    }; // class RumpfSmootherBase
-
-    /**
-     * \brief Generic template for specialisations of RumpfSmoothers
-     *
-     * \tparam FunctionalType_
-     * Functional used for determining mesh quality.
-     *
-     * \tparam TrafoType_
-     * Our transformation.
-     *
-     * \tparam DataType_
-     * Our datatype.
-     *
-     * \tparam MemType_
-     * Memory architecture.
-     *
-     * \author Jordi Paul
-     *
-     **/
-    template< typename FunctionalType_, typename TrafoType_, typename DataType_, typename MemType_ >
-    class RumpfSmoother;
-
-    /**
-     * \brief Specialisation of RumpfSmoother for Q1 transformations on Hypercube<2> meshes in 2d
-     *
-     * For each element, there is an optimal reference cell \f[ K^* = [-h_1, h_1] \times [-h_2, h_2] \f]
-     *
-     * \tparam FunctionalType_
-     * Functional used for determining mesh quality.
-     *
-     * \tparam DataType_
-     * Our datatype.
-     *
-     * \tparam MemType_
-     * Memory architecture.
-     *
-     * \author Jordi Paul
-     *
-     */
-    template<typename FunctionalType_, typename DataType_, typename MemType_ >
-    class RumpfSmoother
-    <
-      FunctionalType_,
-      Trafo::Standard::Mapping
-      <
-        Geometry::ConformalMesh
-        <
-          Shape::Hypercube<2>,
-          Shape::Hypercube<2>::dimension,
-          Shape::Hypercube<2>::dimension,
-          DataType_
-        >
-      >,
-      DataType_,
-      MemType_
-    > : public RumpfSmootherBase
-    <
-      FunctionalType_,
-      Trafo::Standard::Mapping<Geometry::ConformalMesh
-      <
-        Shape::Hypercube<2>,
-        Shape::Hypercube<2>::dimension,
-        Shape::Hypercube<2>::dimension,
-        DataType_ >
-      >,
-      DataType_,
-      MemType_
-    >
-    {
-      public:
-        /// Our functional type
-        typedef FunctionalType_ FunctionalType;
-        /// Our datatype
-        typedef DataType_ DataType;
-        /// Memory architecture
-        typedef MemType_ MemType;
-        /// ShapeType
-        typedef Shape::Hypercube<2> ShapeType;
-        /// Mesh of said ShapeType
-        typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
-        /// Type for the transformation
-        typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-        /// Who's my daddy?
-        typedef RumpfSmootherBase< FunctionalType_, TrafoType, DataType_, MemType_ > BaseClass;
-
-        /// \copydoc RumpfSmootherBase()
-        explicit RumpfSmoother( const TrafoType& trafo_, FunctionalType& functional_)
-          : BaseClass(trafo_, functional_)
-        {
-        }
-
-      protected:
-        /**
-         * \copydoc RumpfSmootherBase::compute_h
-         *
-         * TODO: The components of _h are supposed to reflect the aspect ratio of the real element
-         */
-        virtual void compute_h()
-        {
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
-          DataType vol(0);
-          // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
-
-          for(Index cell(0); cell < ncells; ++cell)
-            vol += this->_trafo.template compute_vol<ShapeType,DataType>(cell);
-
-          DataType_ exponent = DataType_(1)/DataType_(this->_world_dim);
-          DataType_ target_vol(0);
-          for(Index cell(0); cell < ncells; ++cell)
-          {
-            for(Index d(0); d < this->_world_dim; ++d)
-              this->_h[d](cell,DataType(0.5)*Math::pow(this->_lambda(cell)*vol,exponent));
-
-            target_vol += DataType_(4) * this->_h[0](cell)*this->_h[1](cell);
-          }
-          std::cout << "compute_h target_vol = " << scientify(target_vol) << std::endl;
-        } // compute_h
-
-    }; // class RumpfSmoother<Hypercube<2>>
-
-    /**
-     * \brief Specialisation of RumpfSmoother for P1 transformations on Simplex<2> meshes in 2d
-     *
-     * For each element, there is an optimal reference cell \f[ K^* = h \cdot \hat{K} \f], with \f$ \hat{K} \f$
-     * the simplex defined by the vertices \f$ (0,0), (0,1) \left( \frac{1}{2}, \frac{\sqrt{3}}{2} \right) \f$
-     *
-     * \tparam FunctionalType_
-     * Functional used for determining mesh quality.
-     *
-     * \tparam DataType_
-     * Our datatype.
-     *
-     * \tparam MemType_
-     * Memory architecture.
-     *
-     * \author Jordi Paul
-     *
-     */
-    template<typename FunctionalType_, typename DataType_, typename MemType_>
-    class RumpfSmoother
-    <
-      FunctionalType_,
-      Trafo::Standard::Mapping
-      <
-        Geometry::ConformalMesh
-        <
-          Shape::Simplex<2>,
-          Shape::Simplex<2>::dimension,
-          Shape::Simplex<2>::dimension,
-          DataType_
-        >
-      >, DataType_, MemType_ >:
-      public RumpfSmootherBase
-      <
-        FunctionalType_,
-        Trafo::Standard::Mapping
-        <
-          Geometry::ConformalMesh
-          <
-            Shape::Simplex<2>,
-            Shape::Simplex<2>::dimension,
-            Shape::Simplex<2>::dimension,
-            DataType_
-          >
-        >,
-        DataType_,
-        MemType_
-      >
-    {
-      public:
-        /// Our functional type
-          typedef FunctionalType_ FunctionalType;
-          /// Our datatype
-          typedef DataType_ DataType;
-          /// Memory architecture
-          typedef MemType_ MemType;
-          /// ShapeType
-          typedef Shape::Simplex<2> ShapeType;
-          /// Mesh of said ShapeType
-          typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
-          /// Type for the transformation
-          typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-          /// Who's my daddy?
-          typedef RumpfSmootherBase< FunctionalType_, TrafoType, DataType_, MemType_ > BaseClass;
-
-          /// \copydoc RumpfSmootherBase()
-          explicit RumpfSmoother( const TrafoType& trafo_, FunctionalType& functional_)
-            : BaseClass(trafo_, functional_)
-          {
-          }
-      }; // class RumpfSmoother<Simplex<2>>
+    }; // class RumpfSmoother
 
     /**
      * \brief Wrapper struct for calling and passing data to ALGLIB.

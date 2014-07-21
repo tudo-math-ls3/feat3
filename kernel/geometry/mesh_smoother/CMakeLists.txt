@@ -12,7 +12,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 # list of mesh smoother tests
 if (FEAST_HAVE_ALGLIB)
   SET (test_list
-    mesh_smoother-test
+    rumpf_smoother-test
   )
 endif (FEAST_HAVE_ALGLIB)
 

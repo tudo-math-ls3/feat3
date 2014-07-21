@@ -4,38 +4,47 @@
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_smoother.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_smoother_q1hack.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_2d_p1.hpp>
-//#include <kernel/geometry/mesh_smoother/rumpf_functional_levelset_2d_p1.hpp>
-//#include <kernel/geometry/mesh_smoother/rumpf_functional_levelset_2d_q1.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1hack.hpp>
 #include <kernel/geometry/export_vtk.hpp>
-#include <kernel/space/lagrange1/element.hpp>
-#include <kernel/assembly/interpolator.hpp>
-#include <kernel/assembly/common_functions.hpp>
-#include <kernel/assembly/discrete_projector.hpp>
 
 using namespace FEAST;
-
+/**
+ * \brief Wrapper struct as functions do not seem to agree with template template parameters
+ **/
+template
+<
+  typename ShapeType_,
+  typename FunctionalShapeType_,
+  template<typename, typename, typename> class FunctionalType_,
+  template<typename ... > class RumpfSmootherType_,
+  typename DataType_,
+  typename MemType_
+> struct BdryDeformApp
+{
   /**
    * @brief Runs mesh smoother stuff
    *
    **/
-  template<typename DataType_, typename ShapeType_ >
-  void run()
+  static void run()
   {
+    typedef MemType_ MemType;
     typedef DataType_ DataType;
-    typedef Mem::Main MemType;
+
     typedef ShapeType_ ShapeType;
-
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension,ShapeType::dimension, DataType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    typedef typename Geometry::RumpfFunctional<MemType, DataType, TrafoType> FunctionalType;
 
-    typedef LAFEM::DenseVector<MemType, DataType> VectorType;
+    typedef FunctionalShapeType_ FunctionalShapeType;
 
+    typedef FunctionalType_<MemType, DataType, FunctionalShapeType> FunctionalType;
+    typedef RumpfSmootherType_<FunctionalType, TrafoType, DataType_, MemType> RumpfSmootherType;
+    typedef DataType_ DataType;
 
     // Mesh and trafo
-    Index level(3);
+    Index level(5);
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
     MeshType mesh(mesh_factory);
     TrafoType trafo(mesh);
@@ -47,13 +56,7 @@ using namespace FEAST;
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     // The smoother in all its template glory
-    Geometry::RumpfSmoother
-    <
-      FunctionalType,
-      TrafoType,
-      DataType,
-      MemType
-    > rumpflpumpfl(trafo, my_functional);
+    RumpfSmootherType rumpflpumpfl(trafo, my_functional);
 
     // Call init before tinkering with the boundary coordinates
     rumpflpumpfl.init();
@@ -67,14 +70,14 @@ using namespace FEAST;
     Geometry::TargetSet boundary_set = boundary.template get_target_set<0>();
 
     //Initial boundary deformation
-    //for(Index i(0); i < boundary.get_num_entities(0); ++i)
-    //{
-    //  Index j = boundary_set[i];
-    //  DataType tmp0 = rumpflpumpfl._coords[0](j);
-    //  DataType tmp1 = rumpflpumpfl._coords[1](j);
-    //  rumpflpumpfl._coords[0](j, tmp0 - ( Math::sin(DataType(2)*pi*tmp1) )/DataType(1 << (level+2)));
-    //  rumpflpumpfl._coords[1](j, tmp1 + ( Math::sin(DataType(2)*pi*tmp0) )/DataType(1 << (level+2)));
-    //}
+    for(Index i(0); i < boundary.get_num_entities(0); ++i)
+    {
+      Index j = boundary_set[i];
+      DataType tmp0 = rumpflpumpfl._coords[0](j);
+      DataType tmp1 = rumpflpumpfl._coords[1](j);
+      rumpflpumpfl._coords[0](j, tmp0 - ( Math::sin(DataType(2)*pi*tmp1) )/DataType(1 << (level+2)));
+      rumpflpumpfl._coords[1](j, tmp1 + ( Math::sin(DataType(2)*pi*tmp0) )/DataType(1 << (level+2)));
+    }
 
     DataType* func_norm(new DataType[mesh.get_num_entities(2)]);
     DataType* func_det(new DataType[mesh.get_num_entities(2)]);
@@ -89,14 +92,15 @@ using namespace FEAST;
     // Compute initial functional gradient
     rumpflpumpfl.compute_gradient();
 
-    Geometry::ExportVTK<MeshType> writer_pre(mesh);
-    writer_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-    writer_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
-    writer_pre.add_scalar_cell("norm_A", func_norm);
-    writer_pre.add_scalar_cell("det_A", func_det);
-    writer_pre.add_scalar_cell("det2_A", func_det2);
-    writer_pre.add_scalar_cell("h", rumpflpumpfl._h[0].elements() );
-    writer_pre.write("pre_initial.vtk");
+    Geometry::ExportVTK<MeshType> writer_initial_pre(mesh);
+    writer_initial_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
+    writer_initial_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
+    writer_initial_pre.add_scalar_cell("norm_A", func_norm);
+    writer_initial_pre.add_scalar_cell("det_A", func_det);
+    writer_initial_pre.add_scalar_cell("det2_A", func_det2);
+    writer_initial_pre.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
+    writer_initial_pre.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
+    writer_initial_pre.write("pre_initial.vtk");
 
     rumpflpumpfl.optimise();
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_det2);
@@ -105,17 +109,17 @@ using namespace FEAST;
     rumpflpumpfl.prepare();
     rumpflpumpfl.compute_gradient();
 
-    Geometry::ExportVTK<MeshType> writer_post(mesh);
-    writer_post.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-    writer_post.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
-    writer_post.add_scalar_cell("norm_A", func_norm);
-    writer_post.add_scalar_cell("det_A", func_det);
-    writer_post.add_scalar_cell("det2_A", func_det2);
-    writer_post.add_scalar_cell("h", rumpflpumpfl._h[0].elements() );
-    writer_post.write("post_initial.vtk");
+    Geometry::ExportVTK<MeshType> writer_initial_post(mesh);
+    writer_initial_post.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
+    writer_initial_post.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
+    writer_initial_post.add_scalar_cell("norm_A", func_norm);
+    writer_initial_post.add_scalar_cell("det_A", func_det);
+    writer_initial_post.add_scalar_cell("det2_A", func_det2);
+    writer_initial_post.add_scalar_cell("h", rumpflpumpfl._h[0].elements() );
+    writer_initial_post.write("post_initial.vtk");
 
 
-    /*std::string filename;
+    std::string filename;
 
     DataType time(0);
     Index n(0);
@@ -225,11 +229,18 @@ using namespace FEAST;
     delete func_det2;
 
     delete mesh_velocity;
-  */
   }
+}; // struct BdryDeformApp
 
+template<typename A, typename B, typename C, typename D>
+using MySmoother = Geometry::RumpfSmoother<A, B, C, D>;
+
+template<typename A, typename B, typename C, typename D>
+using MySmootherQ1Hack = Geometry::RumpfSmootherQ1Hack<A, B, C, D>;
 int main()
 {
-  run<double,Shape::Hypercube<2>>();
+  typedef Mem::Main MemType;
+
+  BdryDeformApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother, double, MemType>::run();
   return 0;
 }
