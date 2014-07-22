@@ -82,7 +82,7 @@ namespace FEAST
 
       virtual Index get_num_entities(int dim)
       {
-        return Index(_target_data[dim].size());
+        return Index(_target_data[Index(dim)].size());
       }
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
@@ -138,7 +138,7 @@ namespace FEAST
           int num_vertex(Shape::FaceTraits<Shape_,0>::count);
           Tiny::Vector<DataType, VertexSet_::num_coords> mid_point;
           mid_point.format();
-          for(Index i(0); i < num_vertex; ++i)
+          for(int i(0); i < num_vertex; ++i)
           {
             for(Index j(0); j < VertexSet_::num_coords; ++j)
             {
@@ -164,7 +164,7 @@ namespace FEAST
         {
           const Index num_cells(mesh.get_num_entities(0));
           trg[0].reserve(num_cells);
-          for(int i(0); i < num_cells; ++i)
+          for(Index i(0); i < num_cells; ++i)
           {
             if (hit_test(get_midpoint(mesh.get_vertex_set(), i)))
             {
@@ -182,9 +182,9 @@ namespace FEAST
           typedef typename VertexSet_::CoordType DataType;
           Tiny::Vector<DataType, VertexSet_::num_coords> mid_point;
           mid_point.format();
-          for(int j(0); j < VertexSet_::num_coords; ++j)
+          for(Index j(0); j < VertexSet_::num_coords; ++j)
           {
-            mid_point[j] += vertex_set[vertex][j];
+            mid_point[j] += vertex_set[Index(vertex)][j];
           }
           return mid_point;
         }
