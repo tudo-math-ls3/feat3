@@ -1,7 +1,7 @@
 import platform
 from cmake_modules.feast_util import get_output
 
-def configure_icc(cpu, buildid):
+def configure_icc(cpu, buildid, system_host_compiler):
   version = get_output("icpc -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__INTEL_COMPILER"][0:2])
@@ -14,6 +14,8 @@ def configure_icc(cpu, buildid):
     sys.exit(1)
 
   cxxflags = "-std=c++11 -g"
+  if system_host_compiler:
+    cxxflags += " -gcc-name=" + system_host_compiler
 
   # do not use stone old clang libc++ from apple with icc14, hopefully any gcc headers are present
   if platform.system() == "Darwin" and major == 14:

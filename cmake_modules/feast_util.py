@@ -15,6 +15,12 @@ def remove_string(array, string):
     array.remove(string)
   return array
 
+def remove_substring(array, sub):
+  for s in array:
+    if sub in s:
+      array.remove(s)
+  return array
+
 def get_output(command):
   pipe = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT)
   pipe.stdin.close()

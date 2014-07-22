@@ -15,6 +15,7 @@ from cmake_modules.configure_icc import configure_icc
 from cmake_modules.configure_clang import configure_clang
 from cmake_modules.configure_msc import configure_msc
 from cmake_modules.feast_util import remove_string
+from cmake_modules.feast_util import remove_substring
 from cmake_modules.feast_util import is_found
 from cmake_modules.thirdparty_package import *
 #TODO help, ? und guess nicht in sys.argv[0] suchen
@@ -71,6 +72,12 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("Note that the source code for third party libraries is automatically downloaded if it is not")
   print ("provided in the first place.")
   print ("The target cpu is detected automatically manual override options are not implemented yet.")
+  print ("")
+  print ("============== ADDITIONAL OPTIONS ==============")
+  print ("system-host-compiler=/usr/bin/gcc")
+  print ("  Selects the system compiler (and header files) used by icc.")
+  print ("cuda-host-compiler=/usr/bin/gcc")
+  print ("  Selects the system compiler (and header files) used by nvcc.")
   sys.exit()
 
 #get path to feast source trunk
@@ -186,8 +193,33 @@ else:
 cputype = detect_cpu()
 cmake_flags += " -DFEAST_CPU_TYPE:STRING=" + cputype
 
+#configure user defined host compilers
+system_host_compiler = ""
+system_host_compilers = [s for s in buildid if "system_host_compiler=" in s]
+if len(system_host_compilers) == 1:
+  system_host_compiler = system_host_compilers[0].split("=")[1]
+  remove_substring(unused_tokens, "system_host_compiler=")
+  #cmake_flags += " -DFEAST_SYSTEM_HOST_COMPILER=" + system_host_compiler
+elif len(system_host_compilers) > 1:
+  print ("Error: buildid contains more than one system_host_compiler statements:")
+  print (os.linesep.join(system_host_compilers))
+  print (buildid_string)
+  sys.exit(1)
+
+cuda_host_compilers = [s for s in buildid if "cuda_host_compiler=" in s]
+if len(cuda_host_compilers) == 1:
+  cuda_host_compiler = cuda_host_compilers[0].split("=")[1]
+  remove_substring(unused_tokens, "cuda_host_compiler=")
+  cmake_flags += " -DFEAST_CUDA_HOST_COMPILER=" + cuda_host_compiler
+elif len(cuda_host_compilers) > 1:
+  print ("Error: buildid contains more than one cuda_host_compiler statements:")
+  print (os.linesep.join(cuda_host_compilers))
+  print (buildid_string)
+  sys.exit(1)
+
+
 #compiler selection
-if "gcc" in buildid or "gnu" in buildid:
+if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
   if not is_found("g++"):
     print ("Error: Chosen compiler binary 'g++' not found!")
     sys.exit(1)
@@ -196,7 +228,7 @@ if "gcc" in buildid or "gnu" in buildid:
   os.environ["CC"] = "gcc"
   os.environ["CXX"] = "g++"
   cxxflags += " " + configure_gcc (cputype, buildid)
-elif "icc" in buildid or "intel" in buildid:
+elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   if not is_found("icpc"):
     print ("Error: Chosen compiler binary 'icpc' not found!")
     sys.exit(1)
@@ -204,7 +236,7 @@ elif "icc" in buildid or "intel" in buildid:
   remove_string(unused_tokens, "intel")
   os.environ["CC"] = "icc"
   os.environ["CXX"] = "icpc"
-  cxxflags += " " + configure_icc (cputype, buildid)
+  cxxflags += " " + configure_icc (cputype, buildid, system_host_compiler)
 elif "clang" in buildid or "llvm" in buildid:
   if not is_found("clang++"):
     print ("Error: Chosen compiler binary 'clang++' not found!")
