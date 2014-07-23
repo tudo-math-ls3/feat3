@@ -265,7 +265,7 @@ if "ccache" in buildid:
   if not is_found("ccache"):
     print ("Error: Choosen compiler frontend binary ccache not found!")
     sys.exit(1)
-  print("ccache version: " + get_output("ccache --version")[0])
+  print("ccache version: " + get_output("ccache -V")[0])
   remove_string(unused_tokens, "ccache")
   os.environ["CC"] = "ccache " + os.environ["CC"]
   os.environ["CXX"] = "ccache " + os.environ["CXX"]
