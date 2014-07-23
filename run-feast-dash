@@ -25,7 +25,9 @@ def run_test(build_id, branch, myDB):
   hostname = socket.gethostname()
 
   if dump_filename != "":
-    dump_filename_full = dump_filename+"-"+hostname+"-"+branch+"-"+build_id
+    build_id_writeable = build_id.replace("=", "_")
+    build_id_writeable = build_id_writeable.replace("/", "_")
+    dump_filename_full = dump_filename+"-"+hostname+"-"+branch+"-"+build_id_writeable
     dump_file = open(dump_filename_full, "w")
   else:
     dump_filename_full = "not set"
@@ -301,13 +303,14 @@ get_output("git fetch -v -p")
 raw_branches = get_output("git branch -a")
 raw_branches[:] = [s.strip("* ") for s in raw_branches]
 
-addition = ""
+addition = "-system_host_compiler=/usr/bin/gcc"
 if is_found ("ninja"):
   addition += "-ninja"
 else:
   addition += "-unixmake"
 if is_found ("nvcc"):
   addition = addition + "-cuda"
+  addition = addition + "-cuda_host_compiler=/usr/bin/gcc"
 if is_found ("ccache"):
   addition = addition + "-ccache"
 
