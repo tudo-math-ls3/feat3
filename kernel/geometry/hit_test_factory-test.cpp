@@ -1,12 +1,9 @@
-#include <kernel/geometry/hit_test_factory.hpp>
 #include <test_system/test_system.hpp>
-#include <sstream>
-#include <kernel/util/string.hpp>                          // for String
-
-// FEAST-Geometry includes
+#include <kernel/geometry/hit_test_factory.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
 #include <kernel/geometry/cell_sub_set.hpp>                // for CellSubSet
 #include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
+#include <kernel/util/string.hpp>                          // for String
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;

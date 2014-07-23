@@ -39,7 +39,7 @@ namespace FEAST
      * \tparam Mesh_
      * The type of the mesh for which the cell sub-set is to be computed.
      *
-     * \authors Peter Zajac
+     * \author Peter Zajac, Stefan Wahlers
      */
     template<
       typename HitFunc_,
@@ -59,6 +59,7 @@ namespace FEAST
       const HitFunc_& _hit_func;
       /// reference to the input mesh
       const Mesh_& _mesh;
+      /// internal data storing the indices
       std::vector<std::vector<Index>> _target_data;
 
     public:
@@ -82,7 +83,7 @@ namespace FEAST
 
       virtual Index get_num_entities(int dim)
       {
-        return Index(_target_data[Index(dim)].size());
+        return Index(_target_data.at(std::size_t(dim)).size());
       }
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
@@ -177,14 +178,13 @@ namespace FEAST
         static Tiny::Vector<
           typename VertexSet_::CoordType,
           VertexSet_::num_coords>
-        get_midpoint(const VertexSet_& vertex_set, const int vertex)
+        get_midpoint(const VertexSet_& vertex_set, const Index vertex)
         {
           typedef typename VertexSet_::CoordType DataType;
           Tiny::Vector<DataType, VertexSet_::num_coords> mid_point;
-          mid_point.format();
           for(Index j(0); j < VertexSet_::num_coords; ++j)
           {
-            mid_point[j] += vertex_set[Index(vertex)][j];
+            mid_point[j] = vertex_set[vertex][j];
           }
           return mid_point;
         }
@@ -300,7 +300,7 @@ namespace FEAST
        */
       bool operator()(PointType point) const
       {
-        return (point -= _midpoint).norm_euclid() <= _radius;
+        return (point - _midpoint).norm_euclid() <= _radius;
       }
     }; // class SphereHitTestFunction<...>
   } // namespace Geometry
