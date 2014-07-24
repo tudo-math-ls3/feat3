@@ -336,6 +336,10 @@ if (not nothirdparty):
   addition = addition + "-alglib"
   addition = addition + "-umfpack"
 
+quadmath_add = ""
+if "lido-" not in socket.gethostname():
+  quadmath_add = "-quadmath"
+
 #iterate over all branches, that are queued for testing
 branches = BranchQueue.select()
 for branch in branches:
@@ -360,21 +364,21 @@ for branch in branches:
     continue
 
   if is_found ("valgrind") and is_found ("nvcc") and is_found("g++"):
-      run_test("serial-gcc-debug-coverage-mkl-quadmath-valgrind-cudamemcheck" + addition, branch, myDB)
+      run_test("serial-gcc-debug-coverage-mklvalgrind-cudamemcheck" + addition + quadmath_add, branch, myDB)
   elif is_found ("valgrind") and is_found("g++"):
-      run_test("serial-gcc-debug-coverage-mkl-quadmath-valgrind" + addition, branch, myDB)
+      run_test("serial-gcc-debug-coverage-mklvalgrind" + addition + quadmath_add, branch, myDB)
   elif is_found ("nvcc") and is_found("g++"):
-      run_test("serial-gcc-debug-coverage-mkl-quadmath-cudamemcheck" + addition, branch, myDB)
+      run_test("serial-gcc-debug-coverage-mklcudamemcheck" + addition + quadmath_add, branch, myDB)
   '''
   if is_found ("valgrind") and is_found ("nvcc") and is_found("icpc"):
-      run_test("serial-icc-debug-coverage-mkl-quadmath-valgrind-cudamemcheck" + addition, branch, myDB)
+      run_test("serial-icc-debug-coverage-mklvalgrind-cudamemcheck" + addition + quadmath_add, branch, myDB)
   elif is_found ("valgrind") and is_found("icpc"):
-      run_test("serial-icc-debug-coverage-mkl-quadmath-valgrind" + addition, branch, myDB)
+      run_test("serial-icc-debug-coverage-mklvalgrind" + addition + quadmath_add, branch, myDB)
   elif is_found ("nvcc") and is_found("icpc"):
-      run_test("serial-icc-debug-coverage-mkl-quadmath-cudamemcheck" + addition, branch, myDB)
+      run_test("serial-icc-debug-coverage-mklcudamemcheck" + addition + quadmath_add, branch, myDB)
 
   if is_found ("valgrind") and is_found ("nvcc") and is_found("clang++"):
-      run_test("serial-clang-debug-coverage-mkl-valgrind-cudamemcheck" + addition, branch, myDB)
+      run_test("serial-clang-debug-coverage-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB)
   elif is_found ("valgrind") and is_found("clang++"):
       run_test("serial-clang-debug-coverage-mkl-valgrind" + addition, branch, myDB)
   elif is_found ("nvcc") and is_found("clang++"):
@@ -382,21 +386,21 @@ for branch in branches:
   '''
   if is_found("mpic++"):
     if is_found("g++"):
-      run_test("mpi-gcc-debug-coverage-quadmath-mkl" + addition, branch, myDB)
-      run_test("mpi-gcc-opt-coverage-quadmath-mkl" + addition, branch, myDB)
+      run_test("mpi-gcc-debug-coveragemkl" + addition + quadmath_add, branch, myDB)
+      run_test("mpi-gcc-opt-coveragemkl" + addition + quadmath_add, branch, myDB)
     if is_found("clang++"):
       run_test("mpi-clang-debug-mkl" + addition, branch, myDB)
       run_test("mpi-clang-opt-mkl" + addition, branch, myDB)
     if is_found("icpc"):
-      run_test("mpi-icc-debug-quadmath-mkl" + addition, branch, myDB)
-      run_test("mpi-icc-opt-quadmath-mkl" + addition, branch, myDB)
+      run_test("mpi-icc-debugmkl" + addition + quadmath_add, branch, myDB)
+      run_test("mpi-icc-optmkl" + addition + quadmath_add, branch, myDB)
 
   if is_found("g++"):
-    run_test("serial-gcc-debug-coverage-quadmath-mkl" + addition, branch, myDB)
-    run_test("serial-gcc-opt-coverage-quadmath-mkl" + addition, branch, myDB)
+    run_test("serial-gcc-debug-coveragemkl" + addition + quadmath_add, branch, myDB)
+    run_test("serial-gcc-opt-coveragemkl" + addition + quadmath_add, branch, myDB)
   if is_found("clang++"):
     run_test("serial-clang-debug-mkl" + addition, branch, myDB)
     run_test("serial-clang-opt-mkl" + addition, branch, myDB)
   if is_found("icpc"):
-    run_test("serial-icc-debug-quadmath-mkl" + addition, branch, myDB)
-    run_test("serial-icc-opt-quadmath-mkl" + addition, branch, myDB)
+    run_test("serial-icc-debugmkl" + addition + quadmath_add, branch, myDB)
+    run_test("serial-icc-optmkl" + addition + quadmath_add, branch, myDB)
