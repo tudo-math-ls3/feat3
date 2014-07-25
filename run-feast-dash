@@ -337,7 +337,12 @@ if (not nothirdparty):
   addition = addition + "-umfpack"
 
 quadmath_add = ""
-if "lido-" not in socket.gethostname():
+gcc_version = get_output("/usr/bin/g++ -dM -E -")
+gcc_version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in gcc_version]))
+major = int(gcc_version["__GNUC__"])
+minor = int(gcc_version["__GNUC_MINOR__"])
+minor2 = int(gcc_version["__GNUC_PATCHLEVEL__"])
+if major > 4 or (major == 4 and minor > 5):
   quadmath_add = "-quadmath"
 
 #iterate over all branches, that are queued for testing
