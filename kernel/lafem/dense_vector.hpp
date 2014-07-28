@@ -896,7 +896,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow this \cdot x\f$
+         * \brief Calculate \f$result \leftarrow this \cdot this\f$
          *
          * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
          *
