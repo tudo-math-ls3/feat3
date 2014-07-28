@@ -44,10 +44,6 @@ public:
     ioss << "  shape quad" << endl;
     ioss << "  coords 2" << endl;
 
-
-    //ioss << "  coord_file /home/doncamillo/swahlers/Desktop/MeshReader_Beispieldateien/coorddatei.txt" << endl;
-    //ioss << "  adj_file /home/doncamillo/swahlers/Desktop/MeshReader_Beispieldateien/adjacencydatei.txt" << endl;
-
     ioss << " </header>" << endl;
     ioss << " <info>" << endl;
     ioss << "test" << endl;
@@ -144,19 +140,17 @@ public:
     writer.parse_mesh_file(ioss);
 
     // temporary MeshNodes to test the _insert_sub_mesh function
-    MeshStreamer::MeshDataContainer tempMDC1;
+    MeshStreamer::MeshNode* tempMN1 = new MeshStreamer::MeshNode();
+    MeshStreamer::MeshDataContainer& tempMDC1 = tempMN1->mesh_data;
     tempMDC1.name = "tempSubmesh1";
     tempMDC1.parent = "root";
     tempMDC1.info = "super info1";
-    MeshStreamer::MeshNode* tempMN1 = new MeshStreamer::MeshNode();
-    tempMN1->mesh_data = tempMDC1;
 
-    MeshStreamer::MeshDataContainer tempMDC2;
+    MeshStreamer::MeshNode* tempMN2 = new MeshStreamer::MeshNode();
+    MeshStreamer::MeshDataContainer& tempMDC2 = tempMN2->mesh_data;
     tempMDC2.name = "tempSubmesh2";
     tempMDC2.parent = "tempSubmesh1";
     tempMDC2.info = "super info2";
-    MeshStreamer::MeshNode* tempMN2 = new MeshStreamer::MeshNode();
-    tempMN2->mesh_data = tempMDC2;
 
     // insert the temporary MeshNodes
     writer._insert_sub_mesh(tempMN1);
@@ -177,7 +171,6 @@ public:
     // drop the data into an auxiliary file
     stringstream ioss2;
     writer.write_mesh_file(ioss2);
-    // writer.write_into("../mytest.txt");
 
     // parse the data with the other mesh reader
     reader.parse_mesh_file(ioss2);
@@ -491,9 +484,6 @@ public:
     TEST_CHECK_EQUAL((root_mesh.parent_indices[3]).empty(), true);
 
     // ok, everything is right
-
-    // delete the created file
-    // TEST_CHECK_EQUAL(remove("../mytest.txt"),0);
   } // test_0
 
   void test_1() const
@@ -678,7 +668,6 @@ public:
     // drop the data into an auxiliary file
     stringstream ioss2;
     writer.write_mesh_file(ioss2);
-    //writer.write_mesh_file("../mytest.txt");
 
     // parse the data with the other mesh reader
     reader.parse_mesh_file(ioss2);
@@ -767,12 +756,7 @@ public:
     TEST_CHECK_EQUAL((root_mesh.parent_indices[2]).empty(), true);
     TEST_CHECK_EQUAL((root_mesh.parent_indices[3]).empty(), true);
 
-
-
     // ok, everything is right
-
-    // delete the created file
-    // TEST_CHECK_EQUAL(remove("../mytest.txt"),0);
   } // test_2
 
 
