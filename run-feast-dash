@@ -147,6 +147,8 @@ def run_test(build_id, branch, myDB):
     make_command = "make -j 4 -O -k tests"
     make_output += get_output_utf8(make_command)
 
+  process_compiler_output("remark:", "warning", make_output)
+  process_compiler_output("remark #", "warning", make_output)
   process_compiler_output("warning:", "warning", make_output)
   process_compiler_output("warning #", "warning", make_output)
   process_compiler_output("error:", "error", make_output)
