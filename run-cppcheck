@@ -1,0 +1,183 @@
+#!/usr/bin/env python
+# vim: set filetype=python sw=2 sts=2 et nofoldenable :
+# This is a python script.
+# If you encounter problemes when executing it on its own, start it with a python interpreter
+from __future__ import print_function
+import sys
+import platform
+import os
+import re
+import subprocess
+import socket
+import shutil
+import time
+import datetime
+import random
+import peewee as pw
+from cmake_modules.feast_util import is_found
+from cmake_modules.feast_util import get_output
+from cmake_modules.feast_util import get_output_utf8
+
+sys.dont_write_bytecode = True
+
+def run_test(branch, myDB):
+  failed = False
+  hostname = socket.gethostname()
+
+  if dump_filename != "":
+    build_id_writeable = build_id.replace("=", "_")
+    build_id_writeable = build_id_writeable.replace("/", "_")
+    dump_filename_full = dump_filename+"-"+"cppcheck-"+hostname+"-"+branch
+    dump_file = open(dump_filename_full, "w")
+  else:
+    dump_filename_full = "not set"
+
+
+  #create test run in database
+  r = Run.create(branch=branch, hostname=hostname, build="cppcheck", starttime=time.time())
+  if note != "":
+    r.notes = note
+  r.save()
+
+  #git pull
+  os.chdir(src_dirname)
+  git_output = get_output("git gc --auto")
+  git_output += get_output("git checkout -f --no-track -B test123" + hostname + " origin/" + branch)
+  git_output.append("git HEAD:")
+  git_output += get_output("git log HEAD -n1")
+  m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="git output", body="\n".join(git_output))
+  m.save()
+  if dump_filename != "":
+    dump_file.write("\n" + "\n".join(git_output))
+
+#workaround for network base file system to prevent rebuilding everything in ctest phase
+  if is_found("sync"):
+    get_output("sync")
+
+######### CONFIGURE #########
+  cppcheck_command = "cppcheck --force -q kernel"
+  cppcheck_output = get_output_utf8(cppcheck_command)
+  cppcheck_output = "\n".join(cppcheck_output)
+  if "(error)" in cppcheck_output:
+    m = Message.create(runid=r, stage="configure", status="error", timestamp=time.time(), title="output", body=cppcheck_output)
+    m.save()
+    r.endtime = time.time()
+    r.save()
+    return
+  elif "(warning)" in cppcheck_output:
+    m = Message.create(runid=r, stage="configure", status="warning", timestamp=time.time(), title="output", body=cppcheck_output)
+    m.save()
+  else:
+    m = Message.create(runid=r, stage="configure", status="ok", timestamp=time.time(), title="cppcheck_output", body=cppcheck_output)
+    m.save()
+
+  if dump_filename != "":
+    dump_file.write("\n" + src_dirname + os.sep + "cppcheck-feast "+"\n")
+    dump_file.write("\n" + cppcheck_output)
+
+  r.endtime = time.time()
+  r.save()
+
+
+
+################## MAIN ######################
+
+#TODO help, ? und nicht in sys.argv[0] suchen
+# output help screen
+if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.argv)):
+  print ("This python scripts starts static analysis tests and submits them to a cdash server")
+  print ("Options:")
+  print ("dump=absolute_path")
+  print ("  dump complete make/ctest output into file given with absolute path, the filename is extended by run specific identifiers.")
+  print ("sqlhost=hostname")
+  print ("  set hostname as server that runs the sql daemon.")
+  print ("sqlport=port")
+  print ("  setup port of sql server.")
+  print ("note=text")
+  print ("  set note for all runs.")
+  sys.exit();
+
+dump_filename = ""
+sqlhost = "augias"
+sqlport = 3306
+note = ""
+
+for i in range(1, len(sys.argv)):
+  if sys.argv[i].startswith("dump="):
+    dump_filename = sys.argv[i].replace("dump=", "", 1)
+  if sys.argv[i].startswith("sqlhost="):
+    sqlhost = sys.argv[i].replace("sqlhost=", "", 1)
+  if sys.argv[i].startswith("sqlport="):
+    sqlport = int(sys.argv[i].replace("sqlport=", "", 1))
+  if sys.argv[i].startswith("note="):
+    note = sys.argv[i].replace("note=", "", 1)
+
+src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
+myDB = pw.MySQLDatabase("feastdash", host=sqlhost, port=sqlport, user="feastdash", passwd="feastdash", threadlocals=True)
+myDB.connect()
+
+class MySQLModel(pw.Model):
+  """A base model that will use our MySQL database"""
+  class Meta:
+    database = myDB
+
+class User(MySQLModel):
+  username = pw.CharField()
+
+class BranchQueue(MySQLModel):
+  branch = pw.CharField()
+
+class Run(MySQLModel):
+  branch = pw.CharField()
+  hostname = pw.CharField()
+  build = pw.CharField()
+  starttime = pw.IntegerField()
+  endtime = pw.IntegerField()
+  notes = pw.TextField()
+
+class Message(MySQLModel):
+  runid = pw.ForeignKeyField(Run, related_name="messages", db_column="runid")
+  stage = pw.CharField()
+  status = pw.CharField()
+  timestamp = pw.IntegerField()
+  title = pw.CharField()
+  body = pw.TextField()
+
+class Attachment(MySQLModel):
+  messageid = pw.ForeignKeyField(Message, related_name="attachments", db_column="messageid")
+  name = pw.CharField()
+  mimetype = pw.CharField()
+  data = pw.BlobField()
+
+
+if not is_found("cppcheck"):
+  print ("cppcheck not found! aborting...")
+  sys.exit(1)
+if not is_found("git"):
+  print ("git not found! aborting...")
+  sys.exit(1)
+
+src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
+os.chdir(src_dirname)
+# fetch remote branches and create a list of fetched branches
+#TODO insert output into database
+get_output("git fetch -v -p")
+raw_branches = get_output("git branch -a")
+raw_branches[:] = [s.strip("* ") for s in raw_branches]
+
+
+#iterate over all branches, that are queued for testing
+branches = BranchQueue.select()
+for branch in branches:
+  #check if branch is present in repository
+  branch = branch.branch
+  found_branch = False
+  for s in raw_branches[:]:
+    if "remotes/origin/"+branch in s:
+      found_branch = True
+      break
+
+  if found_branch == False:
+    continue
+
+  run_test(branch, myDB)
