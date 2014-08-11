@@ -229,6 +229,8 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  set note for all runs.")
   print ("nothirdparty")
   print ("  do not use thirdparty libraries at all.")
+  print ("nomemcheck")
+  print ("  do not use memory checking tools at all.")
   print ("system_host_compiler=binary")
   print ("  use binary as host compiler for e.g. intel icc.")
   print ("cuda_host_compiler=binary")
@@ -241,6 +243,7 @@ sqlhost = "augias"
 sqlport = 3306
 note = ""
 nothirdparty = False
+nomemcheck = False
 system_host_compiler = ""
 cuda_host_compiler = ""
 
@@ -257,6 +260,8 @@ for i in range(1, len(sys.argv)):
     note = sys.argv[i].replace("note=", "", 1)
   if sys.argv[i].startswith("nothirdparty"):
     nothirdparty = True
+  if sys.argv[i].startswith("nomemcheck"):
+    nomemcheck = True
   if sys.argv[i].startswith("system_host_compiler="):
     system_host_compiler = sys.argv[i].replace("system_host_compiler=", "", 1)
   if sys.argv[i].startswith("cuda_host_compiler="):
@@ -385,27 +390,29 @@ for branch in branches:
     run_test("serial-gcc-opt-coverage" + addition, branch, myDB)
     continue
 
-  if is_found ("valgrind") and is_found ("nvcc") and is_found("g++"):
-      run_test("serial-gcc-debug-coverage-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB)
-  elif is_found ("valgrind") and is_found("g++"):
-      run_test("serial-gcc-debug-coverage-mkl-valgrind" + addition + quadmath_add, branch, myDB)
-  elif is_found ("nvcc") and is_found("g++"):
-      run_test("serial-gcc-debug-coverage-mkl-cudamemcheck" + addition + quadmath_add, branch, myDB)
-  '''
-  if is_found ("valgrind") and is_found ("nvcc") and is_found("icpc"):
-      run_test("serial-icc-debug-coverage-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB)
-  elif is_found ("valgrind") and is_found("icpc"):
-      run_test("serial-icc-debug-coverage-mkl-valgrind" + addition + quadmath_add, branch, myDB)
-  elif is_found ("nvcc") and is_found("icpc"):
-      run_test("serial-icc-debug-coverage-mkl-cudamemcheck" + addition + quadmath_add, branch, myDB)
+  if (not nomemcheck):
+    if is_found ("valgrind") and is_found ("nvcc") and is_found("g++"):
+        run_test("serial-gcc-debug-coverage-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB)
+    elif is_found ("valgrind") and is_found("g++"):
+        run_test("serial-gcc-debug-coverage-mkl-valgrind" + addition + quadmath_add, branch, myDB)
+    elif is_found ("nvcc") and is_found("g++"):
+        run_test("serial-gcc-debug-coverage-mkl-cudamemcheck" + addition + quadmath_add, branch, myDB)
+    '''
+    if is_found ("valgrind") and is_found ("nvcc") and is_found("icpc"):
+        run_test("serial-icc-debug-coverage-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB)
+    elif is_found ("valgrind") and is_found("icpc"):
+        run_test("serial-icc-debug-coverage-mkl-valgrind" + addition + quadmath_add, branch, myDB)
+    elif is_found ("nvcc") and is_found("icpc"):
+        run_test("serial-icc-debug-coverage-mkl-cudamemcheck" + addition + quadmath_add, branch, myDB)
 
-  if is_found ("valgrind") and is_found ("nvcc") and is_found("clang++"):
-      run_test("serial-clang-debug-coverage-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB)
-  elif is_found ("valgrind") and is_found("clang++"):
-      run_test("serial-clang-debug-coverage-mkl-valgrind" + addition, branch, myDB)
-  elif is_found ("nvcc") and is_found("clang++"):
-      run_test("serial-clang-debug-coverage-mkl-cudamemcheck" + addition, branch, myDB)
-  '''
+    if is_found ("valgrind") and is_found ("nvcc") and is_found("clang++"):
+        run_test("serial-clang-debug-coverage-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB)
+    elif is_found ("valgrind") and is_found("clang++"):
+        run_test("serial-clang-debug-coverage-mkl-valgrind" + addition, branch, myDB)
+    elif is_found ("nvcc") and is_found("clang++"):
+        run_test("serial-clang-debug-coverage-mkl-cudamemcheck" + addition, branch, myDB)
+    '''
+
   if is_found("mpic++"):
     if is_found("g++"):
       run_test("mpi-gcc-debug-coverage-mkl" + addition + quadmath_add, branch, myDB)

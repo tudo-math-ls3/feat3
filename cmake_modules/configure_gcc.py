@@ -37,7 +37,7 @@ def configure_gcc(cpu, buildid):
     if major >= 4 and minor >= 9:
       cxxflags += " -fsanitize=undefined"
   elif "opt" in buildid:
-    cxxflags += " -O3"
+    cxxflags += " -O3 -funsafe-loop-optimizations"
     if cpu == "unknown":
       cxxflags += " -mtune=generic"
       print ("Warning: cpu type not detected, using -mtune=generic instead.")
