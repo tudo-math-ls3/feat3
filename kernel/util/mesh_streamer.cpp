@@ -91,7 +91,7 @@ namespace FEAST
       }
       else
       {
-        throw exc;
+        throw;
       }
     }
   } // MeshStreamer::parse_mesh_file(String filename)
@@ -1210,7 +1210,7 @@ namespace FEAST
       }
       else
       {
-        throw exc;
+        throw;
       }
     }
   } // MeshStreamer::MeshDataContainer::parse_coord_file(String filename, MeshStreamer::MeshDataContainer *mesh)
@@ -1356,7 +1356,7 @@ namespace FEAST
       }
       else
       {
-        throw exc;
+        throw;
       }
     }
   } // MeshStreamer::MeshDataContainer::parse_adjacency_file(String filename)

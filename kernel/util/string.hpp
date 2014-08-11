@@ -674,7 +674,6 @@ namespace FEAST
 #else
       // reference implementation
       std::locale loc;
-      int k;
       size_type n1 = size();
       size_type n2 = other.size();
       size_type n = std::min(n1, n2);
@@ -682,7 +681,7 @@ namespace FEAST
       // loop over all characters and compare them
       for(size_type i = 0; i < n; ++i)
       {
-        k = int(std::tolower<char>((*this)[i], loc)) - int(std::tolower<char>(other[i], loc));
+        int k = int(std::tolower<char>((*this)[i], loc)) - int(std::tolower<char>(other[i], loc));
         if(k < 0)
         {
           return -1;

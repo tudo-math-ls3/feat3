@@ -210,7 +210,7 @@ namespace FEAST
       }
       else
       {
-        throw exc;
+        throw;
       }
     }
   }
