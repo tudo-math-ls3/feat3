@@ -78,9 +78,9 @@ def run_test(build_id, branch, myDB):
   elif "Warning" in configure_output:
     m = Message.create(runid=r, stage="configure", status="warning", timestamp=time.time(), title="output", body=configure_output)
     m.save()
-
-  m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="configure_output", body=configure_output)
-  m.save()
+  else:
+    m = Message.create(runid=r, stage="configure", status="ok", timestamp=time.time(), title="output", body=configure_output)
+    m.save()
 
   if dump_filename != "":
     dump_file.write("\n" + src_dirname + os.sep + "configure-feast " + build_id + "\n")
