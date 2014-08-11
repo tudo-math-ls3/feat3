@@ -76,9 +76,9 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("The target cpu is detected automatically manual override options are not implemented yet.")
   print ("")
   print ("============== ADDITIONAL OPTIONS ==============")
-  print ("system-host-compiler=/usr/bin/gcc")
+  print ("system_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by icc.")
-  print ("cuda-host-compiler=/usr/bin/gcc")
+  print ("cuda_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by nvcc.")
   sys.exit()
 
