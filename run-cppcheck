@@ -25,8 +25,6 @@ def run_test(branch, myDB):
   hostname = socket.gethostname()
 
   if dump_filename != "":
-    build_id_writeable = build_id.replace("=", "_")
-    build_id_writeable = build_id_writeable.replace("/", "_")
     dump_filename_full = dump_filename+"-"+"cppcheck-"+hostname+"-"+branch
     dump_file = open(dump_filename_full, "w")
   else:
@@ -55,7 +53,7 @@ def run_test(branch, myDB):
     get_output("sync")
 
 ######### CONFIGURE #########
-  cppcheck_command = "cppcheck --force -q kernel"
+  cppcheck_command = "cppcheck -j 2 -f -q kernel"
   cppcheck_output = get_output_utf8(cppcheck_command)
   cppcheck_output = "\n".join(cppcheck_output)
   if "(error)" in cppcheck_output:
@@ -74,6 +72,7 @@ def run_test(branch, myDB):
   if dump_filename != "":
     dump_file.write("\n" + src_dirname + os.sep + "cppcheck-feast "+"\n")
     dump_file.write("\n" + cppcheck_output)
+    dump_file.close()
 
   r.endtime = time.time()
   r.save()
