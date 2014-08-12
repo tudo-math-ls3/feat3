@@ -53,7 +53,7 @@ def run_test(branch, myDB):
     get_output("sync")
 
 ######### CONFIGURE #########
-  cppcheck_command = "cppcheck -j 2 -f -q kernel"
+  cppcheck_command = "cppcheck -j 2 -f -q -v test_system kernel applications benchmarks tools tutorials"
   cppcheck_output = get_output_utf8(cppcheck_command)
   cppcheck_output = "\n".join(cppcheck_output)
   if "(error)" in cppcheck_output:
