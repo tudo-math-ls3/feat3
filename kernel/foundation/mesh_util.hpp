@@ -37,41 +37,39 @@ namespace FEAST
 
           typename AT_::data_type_ e0_x(x.at(v_fi.at(1)) - x.at(v_fi.at(0)));
           typename AT_::data_type_ e0_y(y.at(v_fi.at(1)) - y.at(v_fi.at(0)));
-          typename AT_::data_type_ e1_x(x.at(v_fi.at(3)) - x.at(v_fi.at(2)));
-          typename AT_::data_type_ e1_y(y.at(v_fi.at(3)) - y.at(v_fi.at(2)));
           typename AT_::data_type_ ez_x(x.at(v_fi.at(2)) - x.at(v_fi.at(1)));
           typename AT_::data_type_ ez_y(y.at(v_fi.at(2)) - y.at(v_fi.at(1)));
 
           ///check sanity of vertex-based iz-curve (cross-edges)
-          if(e0_x > 0. && e1_x > 0.)
+          if(e0_x > 0. && e0_y > 0)
           {
-            if(!(ez_y > 0. && ez_x < 0.))
+            if(!(ez_x < 0.))
             {
-              std::cout << "WARNING: malformed cross-edge in iz-curve! e0_x > 0 AND e1_x > 0 => ez_x < 0 AND ez_y > 0, but ez_x is " << ez_x << " and ez_y is " << ez_y << "!" << std::endl;
+              std::cout << "WARNING: malformed cross-edge in iz-curve! e0_x > 0 AND e0_y > 0 => ez_x < 0, but ez_x is " << ez_x <<  "!" << std::endl;
               return false;
             }
           }
-          else if(e0_y > 0. && e1_y > 0.)
+          else if(e0_x > 0. && e0_y <= 0)
           {
-            if(!(ez_y < 0. && ez_x < 0.))
+            if(!(ez_y > 0.))
             {
-              std::cout << "WARNING: malformed cross-edge in iz-curve! e0_y > 0 AND e1_y > 0 => ez_x < 0 AND ez_y < 0, but ez_x is " << ez_x << " and ez_y is " << ez_y << "!" << std::endl;
+              std::cout << "WARNING: malformed cross-edge in iz-curve! e0_x > 0 AND e0_y <= 0 => ez_y > 0, but ez_y is " << ez_y << "!" << std::endl;
               return false;
             }
           }
-          else if(e0_x < 0. && e1_x < 0.)
+          else if(e0_x <= 0. && e0_y > 0.)
           {
-            if(!(ez_y < 0. && ez_x > 0.))
+            if(!(ez_y < 0.))
             {
-              std::cout << "WARNING: malformed cross-edge in iz-curve! e0_x < 0 AND e1_x < 0 => ez_x > 0 AND ez_y < 0, but ez_x is " << ez_x << " and ez_y is " << ez_y << "!" << std::endl;
+              std::cout << "WARNING: malformed cross-edge in iz-curve! e0_x <= 0 AND e0_y > 0 => ez_y < 0, but ez_y is " << ez_y << "!" << std::endl;
               return false;
             }
           }
-          else if(e0_y < 0. && e1_y < 0.)
+          else if(e0_x <= 0. && e0_y <= 0)
           {
-            if(!(ez_y > 0. && ez_x > 0.))
+            if(!(ez_x > 0.))
             {
-              std::cout << "WARNING: malformed cross-edge in iz-curve! e0_y < 0 AND e1_y < 0 => ez_x > 0 AND ez_y > 0, but ez_x is " << ez_x << " and ez_y is " << ez_y << "!" << std::endl;
+              std::cout << "WARNING: malformed cross-edge in iz-curve! e0_x <= 0 AND e0_y <= 0 => ez_x > 0, but ez_x is " << ez_x << "!" << std::endl;
               return false;
             }
           }
