@@ -17,6 +17,7 @@ namespace FEAST
 {
   namespace Util
   {
+    /// \cond internal
     namespace Intern
     {
       struct MemoryInfo
@@ -25,6 +26,7 @@ namespace FEAST
         Index size;
       };
     }
+    /// \endcond
 
     template <typename Mem_>
     class MemoryPool

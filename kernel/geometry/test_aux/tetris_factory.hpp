@@ -8,6 +8,7 @@ namespace FEAST
 {
   namespace Geometry
   {
+    /// \cond internal
     namespace TestAux
     {
       template<typename Mesh_>
@@ -142,6 +143,7 @@ namespace FEAST
         }
       };
     } // namespace TestAux
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 

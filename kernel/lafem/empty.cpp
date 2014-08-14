@@ -1,3 +1,5 @@
+#ifndef DOXYGEN
+
 // dummy class instance to silence ipo linker optimization warnings about empty liblafem
 class ipo_foobar
 {
@@ -8,3 +10,5 @@ class ipo_foobar
     (void)i;
   }
 } ipo_barfoo;
+
+#endif // DOXYGEN

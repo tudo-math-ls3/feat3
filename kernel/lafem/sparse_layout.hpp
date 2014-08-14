@@ -22,6 +22,7 @@ namespace FEAST
       lt_ell
     };
 
+    /// \cond internal
     namespace Intern
     {
       template <SparseLayoutId LT_>
@@ -47,7 +48,8 @@ namespace FEAST
         template<typename Mem_, typename DT_, typename IT_>
         using MatrixType = SparseMatrixCOO<Mem_, DT_, IT_>;
       };
-    }
+    } // namespace Intern
+    /// \endcond
 
     /**
      * \brief Layout scheme for sparse matrix containers.

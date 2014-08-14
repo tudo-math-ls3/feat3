@@ -20,6 +20,7 @@ namespace FEAST
    */
   namespace LAFEM
   {
+    /// \cond internal
     namespace Intern
     {
       struct AssignStruct
@@ -55,6 +56,7 @@ namespace FEAST
         }
       };
     } //namespace Intern
+    /// \endcond
 
     /**
      * Supported File modes.
