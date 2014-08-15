@@ -1,4 +1,4 @@
-#include <kernel/util/param_section.hpp>
+#include <kernel/util/property_map.hpp>
 #include <test_system/test_system.hpp>
 #include <sstream>
 
@@ -6,18 +6,19 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 /**
- * \brief Test class for the ParamSection class.
+ * \brief Test class for the PropertyMap class.
  *
- * \test Tests the ParamSection class.
+ * \test Tests the PropertyMap class.
  *
  * \author Peter Zajac
+ * \author Constantin Christof
  */
-class ParamSectionTest
+class PropertyMapTest
   : public TaggedTest<Archs::None, Archs::None>
 {
 public:
-  ParamSectionTest() :
-    TaggedTest<Archs::None, Archs::None>("param_section_test")
+  PropertyMapTest() :
+    TaggedTest<Archs::None, Archs::None>("PropertyMapTest")
   {
   }
 
@@ -52,7 +53,7 @@ public:
     ioss << "       line continuation." << endl;
 
     // parse the stream
-    ParamSection parsec;
+    PropertyMap parsec;
     parsec.parse(ioss);
 
     // test the root section entries
@@ -63,16 +64,16 @@ public:
     TEST_CHECK_EQUAL(parsec.get_entry("key2").first, "...but then it was overwritten");
 
     // okay, we survived the root section, so let's go for YourSection
-    ParamSection* yoursec = parsec.get_section("YourSection");
+    PropertyMap* yoursec = parsec.get_section("YourSection");
     TEST_CHECK(yoursec != nullptr);
 
     // let's go for pi
-    ParamSection* consec = yoursec->get_section("CONSTANTS");
+    PropertyMap* consec = yoursec->get_section("CONSTANTS");
     TEST_CHECK(consec != nullptr);
     TEST_CHECK_EQUAL(consec->get_entry("pI").first, "3.141592653589793238462643383279...");
 
     // we're back in the root section; try MySection now
-    ParamSection* mysec = parsec.get_section("MySeCtIoN");
+    PropertyMap* mysec = parsec.get_section("MySeCtIoN");
     TEST_CHECK(mysec != nullptr);
     TEST_CHECK_EQUAL(mysec->get_entry("Key3").first, "This entry makes use of line continuation.");
 
@@ -100,7 +101,7 @@ public:
     ioss << "# The closing brace is missing here" << endl;
 
     // does parsing fail?
-    ParamSection parsec;
+    PropertyMap parsec;
     TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_1
 
@@ -120,7 +121,7 @@ public:
     ioss << "} # End of [YourSection]" << endl;
 
     // does parsing fail?
-    ParamSection parsec;
+    PropertyMap parsec;
     TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_2
 
@@ -133,7 +134,7 @@ public:
     ioss << "6214125()/1321&%/(%????" << endl;
 
     // does parsing fail?
-    ParamSection parsec;
+    PropertyMap parsec;
     TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_3
 
@@ -146,7 +147,7 @@ public:
     ioss << " = 4" << endl;
 
     // does parsing fail?
-    ParamSection parsec;
+    PropertyMap parsec;
     TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_4
 
@@ -163,7 +164,7 @@ public:
     ioss << "  { # this brace is misplaced" << endl;
 
     // does parsing fail?
-    ParamSection parsec;
+    PropertyMap parsec;
     TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_5
 
@@ -173,8 +174,8 @@ public:
     stringstream ioss1;
     stringstream ioss2;
 
-    ParamSection parsec1;
-    ParamSection parsec2;
+    PropertyMap parsec1;
+    PropertyMap parsec2;
 
     // let's write an INI file into the first stream
     ioss1 << "# This is a comment" << endl;
@@ -239,25 +240,25 @@ public:
     TEST_CHECK_EQUAL(parsec1.get_entry("KEY42").first, "23");
 
     // okay, we survived the root section, so let's go for Section1
-    ParamSection* sec1 = parsec1.get_section("Section1");
+    PropertyMap* sec1 = parsec1.get_section("Section1");
     TEST_CHECK(sec1 != nullptr);
 
     // let's go for pi in the first subsection
-    ParamSection* subsec1 = sec1->get_section("Subsection1");
+    PropertyMap* subsec1 = sec1->get_section("Subsection1");
     TEST_CHECK(subsec1 != nullptr);
     TEST_CHECK_EQUAL(subsec1->get_entry("pI").first, "3.141592653589793238462643383279...");
 
     // an now for the other one
-    ParamSection* subsec2 = sec1->get_section("Subsection2");
+    PropertyMap* subsec2 = sec1->get_section("Subsection2");
     TEST_CHECK(subsec2 != nullptr);
     TEST_CHECK_EQUAL(subsec2->get_entry("pi").first, "circa 3");
 
     // let's check if the Section 2 and 3 are there
-    ParamSection* sec2 = parsec1.get_section("SECTION2");
+    PropertyMap* sec2 = parsec1.get_section("SECTION2");
     TEST_CHECK(sec2 != nullptr);
     TEST_CHECK_EQUAL(sec2->get_entry("Key3").first, "something else");
 
-    ParamSection* sec3 = parsec1.get_section("SECTION3");
+    PropertyMap* sec3 = parsec1.get_section("SECTION3");
     TEST_CHECK(sec3 != nullptr);
     TEST_CHECK_EQUAL(sec3->get_entry("Key3").first, "no idea");
 
@@ -288,4 +289,4 @@ public:
     test_6();
 
   }
-} param_section_test;
+} property_map_test;

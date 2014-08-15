@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_UTIL_PARAM_SECTION_HPP
-#define KERNEL_UTIL_PARAM_SECTION_HPP 1
+#ifndef KERNEL_UTIL_PROPERTY_MAP_HPP
+#define KERNEL_UTIL_PROPERTY_MAP_HPP 1
 
 // includes, FEAST
 #include <kernel/util/file_error.hpp>
@@ -19,13 +19,13 @@ namespace FEAST
    * \author Constantin Christof
    * \author Peter Zajac
    */
-  class ParamSection
+  class PropertyMap
   {
   public:
     /// entry-map type
     typedef std::map<String, String, String::NoCaseLess> EntryMap;
     /// section-map type
-    typedef std::map<String, ParamSection*, String::NoCaseLess> SectionMap;
+    typedef std::map<String, PropertyMap*, String::NoCaseLess> SectionMap;
 
     /// entry iterator type
     typedef EntryMap::iterator EntryIterator;
@@ -45,13 +45,13 @@ namespace FEAST
 
   public:
     /// Default Constructor
-    ParamSection();
+    PropertyMap();
 
     /// Virtual Destructor
-    virtual ~ParamSection();
+    virtual ~PropertyMap();
 
     /**
-     * \brief Adds a new key-value pair to this section.
+     * \brief Adds a new key-value pair to this map.
      *
      * This function adds a new key-value pair to this section or, if desired, overwrites an existing one.
      *
@@ -74,7 +74,7 @@ namespace FEAST
     bool add_entry(String key, String value, bool replace = true);
 
     /**
-     * \brief Adds a new sub-section to this section.
+     * \brief Adds a new sub-section to this map.
      *
      * This function adds a new sub-section and returns a pointer to it. If a sub-section with the corresponding
      * name already exists, a pointer to that section is returned instead of allocating a new one.
@@ -83,9 +83,9 @@ namespace FEAST
      * The name of the section to be added.
      *
      * \return
-     * A pointer to a the \c ParamSection associated to the name.
+     * A pointer to a the \c PropertyMap associated to the name.
      */
-    ParamSection* add_section(String name);
+    PropertyMap* add_section(String name);
 
     /**
      * \brief Erases a key-value pair.
@@ -158,12 +158,12 @@ namespace FEAST
      * The name of the sub-section which is to be returned.
      *
      * \returns
-     * A pointer to the ParamSection associated with \p name or \c nullptr if no section with that name exists.
+     * A pointer to the PropertyMap associated with \p name or \c nullptr if no section with that name exists.
      */
-    ParamSection* get_section(String name);
+    PropertyMap* get_section(String name);
 
     /** \copydoc get_section() */
-    const ParamSection* get_section(String name) const;
+    const PropertyMap* get_section(String name) const;
 
     /**
      * \brief Returns a reference to the entry map.
@@ -172,70 +172,70 @@ namespace FEAST
      */
     EntryMap& get_entry_map()
     {
-      CONTEXT("ParamSection::get_entry_map()");
+      CONTEXT("PropertyMap::get_entry_map()");
       return _values;
     }
 
     /** \copydoc get_entry_map() */
     const EntryMap& get_entry_map() const
     {
-      CONTEXT("ParamSection::get_entry_map() [const]");
+      CONTEXT("PropertyMap::get_entry_map() [const]");
       return _values;
     }
 
     /// Returns the first entry iterator.
     EntryIterator begin_entry()
     {
-      CONTEXT("ParamSection::begin_entry()");
+      CONTEXT("PropertyMap::begin_entry()");
       return _values.begin();
     }
 
     /** \copydoc begin_entry() */
     ConstEntryIterator begin_entry() const
     {
-      CONTEXT("ParamSection::begin_entry() [const]");
+      CONTEXT("PropertyMap::begin_entry() [const]");
       return _values.begin();
     }
 
     /// Returns the last entry iterator.
     EntryIterator end_entry()
     {
-      CONTEXT("ParamSection::end_entry()");
+      CONTEXT("PropertyMap::end_entry()");
       return _values.end();
     }
 
     /** \copydoc end_entry() */
     ConstEntryIterator end_entry() const
     {
-      CONTEXT("ParamSection::end_entry() const");
+      CONTEXT("PropertyMap::end_entry() const");
       return _values.end();
     }
 
     /// Returns the first section iterator.
     SectionIterator begin_section()
     {
-      CONTEXT("ParamSection::begin_section()");
+      CONTEXT("PropertyMap::begin_section()");
       return _sections.begin();
     }
 
     /** \copydoc begin_section() */
     ConstSectionIterator begin_section() const
     {
-      CONTEXT("ParamSection::begin_section() [const]");
+      CONTEXT("PropertyMap::begin_section() [const]");
       return _sections.begin();
     }
 
     /// Returns the last section iterator
     SectionIterator end_section()
     {
-      CONTEXT("ParamSection::end_section()");
+      CONTEXT("PropertyMap::end_section()");
       return _sections.end();
     }
 
     /** \copydoc end_section() */
     ConstSectionIterator end_section() const
     {
-      CONTEXT("ParamSection::end_section() [const]");
+      CONTEXT("PropertyMap::end_section() [const]");
       return _sections.end();
     }
 
@@ -250,7 +250,7 @@ namespace FEAST
      *  - If \p replace = \c true, then the old value of the entry is replaced by the new \p value
      *  - If \p replace = \c false, then the old value of the entry is kept.
      *
-     * \see ParamSection::parse(std::istream&)
+     * \see PropertyMap::parse(std::istream&)
      */
     void parse(String filename, bool replace = true);
 
@@ -268,7 +268,7 @@ namespace FEAST
     void parse(std::istream& ifs, bool replace = true);
 
     /**
-     * \brief Merges another ParamSection into \c this.
+     * \brief Merges another PropertyMap into \c this.
      *
      * \param[in] section
      * The section to be merged into \c this.
@@ -276,7 +276,7 @@ namespace FEAST
      * \param[in] replace
      * Specifies the behaviour when conflicting key-value pairs are encountered. See add_entry() for more details.
      */
-    void merge(const ParamSection& section, bool replace = true);
+    void merge(const PropertyMap& section, bool replace = true);
 
     /**
      * \brief Dumps the section tree into a file.
@@ -286,7 +286,7 @@ namespace FEAST
      * \param[in] filename
      * The name of the file into which to dump to.
      *
-     * \see ParamSection::dump(std::ostream&, String::size_type) const
+     * \see PropertyMap::dump(std::ostream&, String::size_type) const
      */
     void dump(String filename) const;
 
@@ -307,7 +307,7 @@ namespace FEAST
      * caller.
      */
     void dump(std::ostream& os, String::size_type indent = 0) const;
-  }; // class ParamSection
+  }; // class PropertyMap
 } // namespace FEAST
 
-#endif // KERNEL_UTIL_PARAM_SECTION_HPP
+#endif // KERNEL_UTIL_PROPERTY_MAP_HPP

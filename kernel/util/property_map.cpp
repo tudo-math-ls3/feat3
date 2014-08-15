@@ -1,18 +1,18 @@
-#include <kernel/util/param_section.hpp>
+#include <kernel/util/property_map.hpp>
 
 #include <fstream>
 #include <stack>
 
 namespace FEAST
 {
-  ParamSection::ParamSection()
+  PropertyMap::PropertyMap()
   {
-    CONTEXT("ParamSection::ParamSection()");
+    CONTEXT("PropertyMap::PropertyMap()");
   }
 
-  ParamSection::~ParamSection()
+  PropertyMap::~PropertyMap()
   {
-    CONTEXT("ParamSection::~ParamSection()");
+    CONTEXT("PropertyMap::~PropertyMap()");
     // delete all sub-sections
     SectionMap::iterator it(_sections.begin());
     SectionMap::iterator jt(_sections.end());
@@ -25,9 +25,9 @@ namespace FEAST
     }
   }
 
-  bool ParamSection::add_entry(String key, String value, bool replace)
+  bool PropertyMap::add_entry(String key, String value, bool replace)
   {
-    CONTEXT("ParamSection::add_entry()");
+    CONTEXT("PropertyMap::add_entry()");
 
     // try to insert the key-value-pair
     std::pair<EntryMap::iterator, bool> rtn(_values.insert(std::make_pair(key,value)));
@@ -46,9 +46,9 @@ namespace FEAST
     return true;
   }
 
-  ParamSection* ParamSection::add_section(String name)
+  PropertyMap* PropertyMap::add_section(String name)
   {
-    CONTEXT("ParamSection::add_section()");
+    CONTEXT("PropertyMap::add_section()");
 
     // try to find the entry
     SectionMap::iterator it(_sections.find(name));
@@ -60,14 +60,14 @@ namespace FEAST
     }
 
     // if it was found, create a new section
-    ParamSection* sub_section = new ParamSection();
+    PropertyMap* sub_section = new PropertyMap();
     _sections.insert(std::make_pair(name, sub_section));
     return sub_section;
   }
 
-  bool ParamSection::erase_entry(String key)
+  bool PropertyMap::erase_entry(String key)
   {
-    CONTEXT("ParamSection::erase_entry()");
+    CONTEXT("PropertyMap::erase_entry()");
 
     EntryMap::iterator it(_values.find(key));
     if(it != _values.end())
@@ -78,9 +78,9 @@ namespace FEAST
     return false;
   }
 
-  bool ParamSection::erase_section(String name)
+  bool PropertyMap::erase_section(String name)
   {
-    CONTEXT("ParamSection::erase_section()");
+    CONTEXT("PropertyMap::erase_section()");
 
     SectionMap::iterator it(_sections.find(name));
     if(it != _sections.end())
@@ -91,14 +91,14 @@ namespace FEAST
     return false;
   }
 
-  std::pair<String, bool> ParamSection::query(String key_path) const
+  std::pair<String, bool> PropertyMap::query(String key_path) const
   {
     // try to find a dot within the path
     size_t off = key_path.find('.');
     if(off != key_path.npos)
     {
       // separate the first substring and interpret it as a section name
-      const ParamSection* sec(get_section(key_path.substr(0, off)));
+      const PropertyMap* sec(get_section(key_path.substr(0, off)));
       if(sec != nullptr)
       {
         // search subsection
@@ -115,16 +115,16 @@ namespace FEAST
     return std::make_pair("", false);
   }
 
-  String ParamSection::query(String key_path, String default_value) const
+  String PropertyMap::query(String key_path, String default_value) const
   {
-    CONTEXT("ParamSection::query()");
+    CONTEXT("PropertyMap::query()");
 
     // try to find a dot within the path
     size_t off = key_path.find('.');
     if(off != key_path.npos)
     {
       // separate the first substring and interpret it as a section name
-      const ParamSection* sec(get_section(key_path.substr(0, off)));
+      const PropertyMap* sec(get_section(key_path.substr(0, off)));
       if(sec != nullptr)
       {
         // search subsection
@@ -146,9 +146,9 @@ namespace FEAST
     return default_value;
   }
 
-  std::pair<String, bool> ParamSection::get_entry(String key) const
+  std::pair<String, bool> PropertyMap::get_entry(String key) const
   {
-    CONTEXT("ParamSection::get_entry()");
+    CONTEXT("PropertyMap::get_entry()");
 
     EntryMap::const_iterator iter(_values.find(key));
     if(iter == _values.end())
@@ -158,9 +158,9 @@ namespace FEAST
     return std::make_pair(iter->second, true);
   }
 
-  const ParamSection* ParamSection::get_section(String name) const
+  const PropertyMap* PropertyMap::get_section(String name) const
   {
-    CONTEXT("ParamSection::get_section() [const]");
+    CONTEXT("PropertyMap::get_section() [const]");
     SectionMap::const_iterator iter(_sections.find(name));
     if(iter == _sections.end())
     {
@@ -169,9 +169,9 @@ namespace FEAST
     return iter->second;
   }
 
-  ParamSection* ParamSection::get_section(String name)
+  PropertyMap* PropertyMap::get_section(String name)
   {
-    CONTEXT("ParamSection::get_section()");
+    CONTEXT("PropertyMap::get_section()");
     SectionMap::iterator iter(_sections.find(name));
     if(iter == _sections.end())
     {
@@ -180,9 +180,9 @@ namespace FEAST
     return iter->second;
   }
 
-  void ParamSection::parse(String filename, bool replace)
+  void PropertyMap::parse(String filename, bool replace)
   {
-    CONTEXT("ParamSection::parse(String)");
+    CONTEXT("PropertyMap::parse(String)");
 
     // try to open the file
     std::ifstream ifs(filename.c_str(), std::ios::in);
@@ -215,15 +215,15 @@ namespace FEAST
     }
   }
 
-  void ParamSection::parse(std::istream& ifs, bool replace)
+  void PropertyMap::parse(std::istream& ifs, bool replace)
   {
-    CONTEXT("ParamSection::parse(std::ifstream&)");
+    CONTEXT("PropertyMap::parse(std::ifstream&)");
 
     // a stack to keep track of all currently open sections
-    std::stack<ParamSection*> stack;
+    std::stack<PropertyMap*> stack;
 
     // a pointer to the currently used section; pushed onto the bottom of the stack
-    ParamSection* current = this;
+    PropertyMap* current = this;
     stack.push(current);
 
     // the string containing the current line
@@ -437,9 +437,9 @@ namespace FEAST
     }
   }
 
-  void ParamSection::merge(const ParamSection& section, bool replace)
+  void PropertyMap::merge(const PropertyMap& section, bool replace)
   {
-    CONTEXT("ParamSection::merge()");
+    CONTEXT("PropertyMap::merge()");
 
     EntryMap::const_iterator valiter(section._values.begin());
     EntryMap::const_iterator valend(section._values.end());
@@ -453,17 +453,17 @@ namespace FEAST
     SectionMap::const_iterator seciter(section._sections.begin());
     SectionMap::const_iterator secend(section._sections.end());
 
-    // merging _sections of the two ParamSections
+    // merging _sections of the two PropertyMaps
     for(; seciter != secend; ++seciter)
     {
-      // get ParamSection pointer to the section corresponding to iter and merge again
+      // get PropertyMap pointer to the section corresponding to iter and merge again
       add_section(seciter->first)->merge(*seciter->second, replace);
     }
   }
 
-  void ParamSection::dump(String filename) const
+  void PropertyMap::dump(String filename) const
   {
-    CONTEXT("ParamSection::dump(String)");
+    CONTEXT("PropertyMap::dump(String)");
 
     // open stream
     std::ofstream ofs(filename.c_str(), std::ios_base::out | std::ios_base::trunc);
@@ -479,9 +479,9 @@ namespace FEAST
     ofs.close();
   }
 
-  void ParamSection::dump(std::ostream& os, String::size_type indent) const
+  void PropertyMap::dump(std::ostream& os, String::size_type indent) const
   {
-    CONTEXT("ParamSection::dump(std::ostream&)");
+    CONTEXT("PropertyMap::dump(std::ostream&)");
     // prefix string: 2*indent spaces
     String prefix(2*indent, ' ');
 

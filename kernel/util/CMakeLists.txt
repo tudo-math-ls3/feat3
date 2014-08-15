@@ -11,7 +11,7 @@ ADD_LIBRARY(kernel-util STATIC
   exception.cpp
   memory_pool.cpp
   mesh_streamer.cpp
-  param_section.cpp
+  property_map.cpp
 )
 
 if (FEAST_BACKENDS_CUDA)
@@ -31,7 +31,7 @@ SET (test_list
   math-test
   mesh_streamer-test
   meta_math-test
-  param_section-test
+  property_map-test
   string-test
   tiny_algebra-test
 )
