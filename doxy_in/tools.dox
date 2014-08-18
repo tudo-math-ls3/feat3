@@ -1,0 +1,24 @@
+/** \page tools Tool overview
+
+This page describes small utility programms, located in the tools subfolder
+
+\section tools_sec_io File conversion
+- csr2ell
+- csr2mtx
+- csr2mtx
+- dv2exp
+- ell2csr
+- ell2mtx
+- exp2dv
+- mtx2csr
+- mtx2ell
+
+General syntax:
+\code{.cpp}
+./binary <input-file> <output-file>
+\endcode
+Convert a matrix file from one format into another.
+
+\section tools_fem FEM tools
+\todo add documentation
+**/
