@@ -55,6 +55,7 @@ SET (test_list
   sparse_matrix_ell-test
   sparse_vector-test
   umfpack-test
+  unit_filter-test
 )
 
 # create all tests
