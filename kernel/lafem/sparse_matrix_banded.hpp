@@ -462,7 +462,7 @@ namespace FEAST
       template <typename Algo_>
       DT_ norm_frobenius() const
       {
-        return Arch::Norm2<Mem_, Algo_>::value(this->val(), this->used_elements());
+        return Arch::Norm2<Mem_, Algo_>::value(this->val(), this->rows() * this->num_of_offsets());
       }
 
       /**
