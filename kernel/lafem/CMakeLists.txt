@@ -56,6 +56,7 @@ SET (test_list
   sparse_vector-test
   umfpack-test
   unit_filter-test
+  vector_mirror-test
 )
 
 # create all tests
