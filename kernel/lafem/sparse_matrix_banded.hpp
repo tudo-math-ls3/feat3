@@ -17,6 +17,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
+#include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 
 #include <fstream>
@@ -386,8 +387,8 @@ namespace FEAST
       /**
        * \brief Calculate \f$this \leftarrow y + \alpha x\f$
        *
-         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-         *
+       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+       *
        * \param[in] x The first summand matrix to be scaled.
        * \param[in] y The second summand matrix
        * \param[in] alpha A scalar to multiply x with.
@@ -433,8 +434,8 @@ namespace FEAST
       /**
        * \brief Calculate \f$this \leftarrow \alpha x \f$
        *
-         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-         *
+       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+       *
        * \param[in] x The matrix to be scaled.
        * \param[in] alpha A scalar to scale x with.
        */
@@ -454,10 +455,21 @@ namespace FEAST
       }
 
       /**
+       * \brief Calculates the Frobenius norm of this matrix.
+       *
+       * \returns The Frobenius norm of this matrix.
+       */
+      template <typename Algo_>
+      DT_ norm_frobenius() const
+      {
+        return Arch::Norm2<Mem_, Algo_>::value(this->val(), this->used_elements());
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-         *
+       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
@@ -481,8 +493,8 @@ namespace FEAST
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
        *
-         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-         *
+       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.

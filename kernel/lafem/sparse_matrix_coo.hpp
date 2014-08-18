@@ -19,6 +19,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
+#include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 
 #include <map>
@@ -1560,6 +1561,17 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
           Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), alpha, this->used_elements());
+        }
+
+        /**
+         * \brief Calculates the Frobenius norm of this matrix.
+         *
+         * \returns The Frobenius norm of this matrix.
+         */
+        template <typename Algo_>
+        DT_ norm_frobenius() const
+        {
+          return Arch::Norm2<Mem_, Algo_>::value(this->val(), this->used_elements());
         }
 
         /**

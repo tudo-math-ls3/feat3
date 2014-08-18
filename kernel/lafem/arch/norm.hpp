@@ -36,7 +36,7 @@ namespace FEAST
       struct Norm2<Mem::CUDA, Algo::CUDA>
       {
         template <typename DT_>
-          static DT_ value(const DT_ * const x, const Index size);
+        static DT_ value(const DT_ * const x, const Index size);
       };
 
     } // namespace Arch
