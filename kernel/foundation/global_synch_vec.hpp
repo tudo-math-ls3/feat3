@@ -85,8 +85,8 @@ namespace FEAST
                           );
             }
 
-            int recvflags[recvrequests.size()];
-            int taskflags[recvrequests.size()];
+            int* recvflags = new int[recvrequests.size()];
+            int* taskflags = new int[recvrequests.size()];
             for(Index i(0) ; i < recvrequests.size() ; ++i)
             {
               recvflags[i] = 0;
@@ -119,6 +119,9 @@ namespace FEAST
               Status ws;
               Comm::wait(sendrequests.at(i), ws);
             }
+
+            delete[] recvflags;
+            delete[] taskflags;
           }
 #else
           template<typename VectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
@@ -207,8 +210,8 @@ namespace FEAST
                           );
             }
 
-            int recvflags[recvrequests.size()];
-            int taskflags[recvrequests.size()];
+            int* recvflags = new int[recvrequests.size()];
+            int* taskflags = new int[recvrequests.size()];
             for(Index i(0) ; i < recvrequests.size() ; ++i)
             {
               recvflags[i] = 0;
@@ -252,6 +255,9 @@ namespace FEAST
               Status ws;
               Comm::wait(sendrequests.at(i), ws);
             }
+
+            delete[] recvflags;
+            delete[] taskflags;
           }
 #else
           template<typename VectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>

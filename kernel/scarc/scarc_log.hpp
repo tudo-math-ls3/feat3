@@ -32,7 +32,7 @@ namespace FEAST
         msg = std::string(stream.str());
         Index len_sb;
         len_sb = msg.size() + 1;
-        Index len_rb[Comm::size(c)];
+        Index* len_rb = new Index[Comm::size(c)];
 
         Comm::allgather(&len_sb,
                         1,
@@ -79,8 +79,8 @@ namespace FEAST
                       c);
         }
 
-        int recvflags[recv_req.size()];
-        int taskflags[recv_req.size()];
+        int* recvflags = new int[recv_req.size()];
+        int* taskflags = new int[recv_req.size()];
         for(Index i(0) ; i < recv_req.size() ; ++i)
         {
           recvflags[i] = 0;
@@ -112,6 +112,9 @@ namespace FEAST
         }
         delete[] recvbufs;
         delete[] sendbuf;
+        delete[] recvflags;
+        delete[] taskflags;
+        delete[] len_rb;
 
         msg = res.str();
         return msg;
