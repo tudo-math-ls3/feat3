@@ -41,6 +41,7 @@ namespace FEAST
       {
         SparseMatrixCSR<Mem_, DT_, IT_> result;
         result.clone(origin);
+#ifndef SERIAL
         ST_<DenseVector<Mem_, DT_, IT_>, std::allocator<DenseVector<Mem_, DT_, IT_> > > val_sendbufs;
         ST_<DenseVector<Mem_, DT_, IT_>, std::allocator<DenseVector<Mem_, DT_, IT_> > > val_recvbufs;
         ST_<DenseVector<Mem_, IT_, IT_>, std::allocator<DenseVector<Mem_, IT_, IT_> > > colind_sendbufs;
@@ -126,7 +127,7 @@ namespace FEAST
           buf_mat.axpy<Algo::Generic>(buf_mat, other_buf_mat);
           mat_mirror.scatter_op(result, buf_mat);
         }
-
+#endif
         return result;
       }
     };
