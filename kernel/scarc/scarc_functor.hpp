@@ -695,8 +695,8 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data),
-          _temp0(this->_data->sol().size()),
-          _temp1(this->_data->sol().size())
+          _temp0(data.sol().size()),
+          _temp1(data.sol().size())
         {
           this->_precon = std::shared_ptr<ScaRCFunctorBase<DataType_,
                                                            MemTag_,
@@ -749,8 +749,8 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data, precon),
-          _temp0(this->_data->sol().size()),
-          _temp1(this->_data->sol().size())
+          _temp0(data.sol().size()),
+          _temp1(data.sol().size())
         {
         }
 
@@ -766,8 +766,8 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(other),
-          _temp0(this->_data->sol().size()),
-          _temp1(this->_data->sol().size())
+          _temp0(other._data.sol().size()),
+          _temp1(other._data.sol().size())
         {
         }
 
@@ -1039,8 +1039,8 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data),
-          _temp0(this->_data->sol().size()),
-          _temp1(this->_data->sol().size())
+          _temp0(data.sol().size()),
+          _temp1(data.sol().size())
         {
           this->_precon = std::shared_ptr<ScaRCFunctorBase<DataType_,
                                                            MemTag_,
@@ -1093,8 +1093,8 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data, precon),
-          _temp0(this->_data->sol().size()),
-          _temp1(this->_data->sol().size())
+          _temp0(data.sol().size()),
+          _temp1(data.sol().size())
         {
         }
 
@@ -1110,8 +1110,8 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(other),
-          _temp0(this->_data->sol().size()),
-          _temp1(this->_data->sol().size())
+          _temp0(other.data.sol().size()),
+          _temp1(other.data.sol().size())
         {
         }
 
@@ -1237,9 +1237,9 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data),
-          _temp0(this->_data->sol().size()),
-          _temp1(this->_data->sol().size()),
-          _temp2(this->_data->sol().size())
+          _temp0(data.sol().size()),
+          _temp1(data.sol().size()),
+          _temp2(data.sol().size())
         {
           this->_precon = std::shared_ptr<ScaRCFunctorBase<DataType_,
                                                            MemTag_,
@@ -1292,9 +1292,9 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data, precon),
-          _temp0(this->_data->sol().size()),
-          _temp1(this->_data->sol().size()),
-          _temp2(this->_data->sol().size())
+          _temp0(data.sol().size()),
+          _temp1(data.sol().size()),
+          _temp2(data.sol().size())
         {
         }
 
@@ -1310,9 +1310,9 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(other),
-          _temp0(this->_data->sol().size()),
-          _temp1(this->_data->sol().size()),
-          _temp2(this->_data->sol().size())
+          _temp0(other.data.sol().size()),
+          _temp1(other.data.sol().size()),
+          _temp2(other.data.sol().size())
         {
         }
 
@@ -1584,10 +1584,10 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data),
-          _p(this->_data->sol().size()),
-          _r(this->_data->sol().size()),
-          _v(this->_data->sol().size()),
-          _z(this->_data->sol().size()),
+          _p(data.sol().size()),
+          _r(data.sol().size()),
+          _v(data.sol().size()),
+          _z(data.sol().size()),
           _alpha(0),
           _alpha_new(0),
           _lambda(0)
@@ -1643,10 +1643,10 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data, precon),
-          _p(this->_data->sol().size()),
-          _r(this->_data->sol().size()),
-          _v(this->_data->sol().size()),
-          _z(this->_data->sol().size()),
+          _p(data.sol().size()),
+          _r(data.sol().size()),
+          _v(data.sol().size()),
+          _z(data.sol().size()),
           _alpha(0),
           _alpha_new(0),
           _lambda(0)
@@ -1665,10 +1665,10 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(other),
-          _p(this->_data->sol().size()),
-          _r(this->_data->sol().size()),
-          _v(this->_data->sol().size()),
-          _z(this->_data->sol().size()),
+          _p(other._data.sol().size()),
+          _r(other._data.sol().size()),
+          _v(other._data.sol().size()),
+          _z(other._data.sol().size()),
           _alpha(0),
           _alpha_new(0),
           _lambda(0)
@@ -1860,10 +1860,10 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data),
-          _p(this->_data->sol().size()),
-          _r(this->_data->sol().size()),
-          _v(this->_data->sol().size()),
-          _z(this->_data->sol().size()),
+          _p(data.sol().size()),
+          _r(data.sol().size()),
+          _v(data.sol().size()),
+          _z(data.sol().size()),
           _alpha(0),
           _alpha_new(0),
           _lambda(0)
@@ -1919,10 +1919,10 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(data, precon),
-          _p(this->_data->sol().size()),
-          _r(this->_data->sol().size()),
-          _v(this->_data->sol().size()),
-          _z(this->_data->sol().size()),
+          _p(data.sol().size()),
+          _r(data.sol().size()),
+          _v(data.sol().size()),
+          _z(data.sol().size()),
           _alpha(0),
           _alpha_new(0),
           _lambda(0)
@@ -1941,10 +1941,10 @@ namespace FEAST
                            StorageType_,
                            IT_,
                            Algo_>(other),
-          _p(this->_data->sol().size()),
-          _r(this->_data->sol().size()),
-          _v(this->_data->sol().size()),
-          _z(this->_data->sol().size()),
+          _p(other._data.sol().size()),
+          _r(other._data.sol().size()),
+          _v(other._data.sol().size()),
+          _z(other._data.sol().size()),
           _alpha(0),
           _alpha_new(0),
           _lambda(0)
