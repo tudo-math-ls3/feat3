@@ -323,6 +323,8 @@ namespace FEAST
                             communicator.mpi_comm());
             }
 
+/// \todo Enable this command once MS does its homework.
+#ifndef MSMPI_VER
           template<typename DataType1_>
             static inline void iallreduce(DataType1_ * sendbuf,
                                           Index num_elements_to_send_and_receive,
@@ -339,6 +341,7 @@ namespace FEAST
                             communicator.mpi_comm(),
                             &(r.mpi_request()));
             }
+#endif // MSMPI_VER
 
           static inline Index rank(Communicator c = Communicator(MPI_COMM_WORLD))
           {
