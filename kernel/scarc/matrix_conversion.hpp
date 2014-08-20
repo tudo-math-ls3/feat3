@@ -30,6 +30,7 @@ namespace FEAST
     {
     };
 
+#ifndef SERIAL
     template<
              typename Mem_,
              typename DT_,
@@ -41,7 +42,6 @@ namespace FEAST
       {
         SparseMatrixCSR<Mem_, DT_, IT_> result;
         result.clone(origin);
-#ifndef SERIAL
         ST_<DenseVector<Mem_, DT_, IT_>, std::allocator<DenseVector<Mem_, DT_, IT_> > > val_sendbufs;
         ST_<DenseVector<Mem_, DT_, IT_>, std::allocator<DenseVector<Mem_, DT_, IT_> > > val_recvbufs;
         ST_<DenseVector<Mem_, IT_, IT_>, std::allocator<DenseVector<Mem_, IT_, IT_> > > colind_sendbufs;
@@ -127,9 +127,24 @@ namespace FEAST
           buf_mat.axpy<Algo::Generic>(buf_mat, other_buf_mat);
           mat_mirror.scatter_op(result, buf_mat);
         }
-#endif
         return result;
       }
+#else
+    template<
+             typename Mem_,
+             typename DT_,
+             typename IT_>
+    struct MatrixConversion<Mem_, DT_, IT_, SparseMatrixCSR>
+    {
+      template<template<typename, typename> class ST_, typename VMT_>
+      static SparseMatrixCSR<Mem_, DT_, IT_> value(const SparseMatrixCSR<Mem_, DT_, IT_>& origin, const ST_<VMT_, std::allocator<VMT_> >&, const ST_<IT_, std::allocator<IT_> >&)
+      {
+        SparseMatrixCSR<Mem_, DT_, IT_> result;
+        result.clone(origin);
+        return result;
+      }
+
+#endif
     };
   }
 }
