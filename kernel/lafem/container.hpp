@@ -11,6 +11,10 @@
 #include <limits>
 #include <cmath>
 #include <typeinfo>
+#include <string>
+#include <type_traits>
+#include <cstdlib>
+#include <stdint.h>
 
 
 namespace FEAST
@@ -68,7 +72,10 @@ namespace FEAST
       fm_mtx, /**< Matrix market ascii */
       fm_ell, /**< Binary ell data */
       fm_csr, /**< Binary csr data */
-      fm_coo /**< Binary coo data */
+      fm_coo, /**< Binary coo data */
+      fm_bm, /**< Binary banded data */
+      fm_dm,  /**< Binary dense matrix data */
+      fm_sv  /**< Binary sparse vector data */
       };
 
     /**
@@ -87,6 +94,9 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_>
     class Container
     {
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      friend class Container;
+
       private:
         /**
          * \brief Constructor
@@ -95,7 +105,7 @@ namespace FEAST
          *
          * \note Internal use only
          */
-        Container() {}
+        Container();
 
       protected:
         /// List of pointers to all datatype dependent arrays.
@@ -304,6 +314,195 @@ namespace FEAST
                 delete[] pother;
             }
           }
+        }
+
+        /**
+         * \brief Serialization of complete container entity.
+         *
+         * \param[in] mode FileMode enum, describing the actual container specialisation.
+         * \param[out] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         *
+         * Serialize a complete container entity into a single binary array.
+         *
+         * \warning The allocated array must be freed by the user!
+         *
+         * Array data layout:
+         * \code
+         * magic number (uint64_t)
+         * _elements.size() (uint64_t)
+         * _indices.size() (uint64_t)
+         * _elements_size.size() (uint64_t)
+         * _indices_size.size() (uint64_t)
+         * _scalar_index.size() (uint64_t)
+         * _scalar_dt.size() (uint64_t)
+         *
+         * _elements_size array (uint64_t)
+         * _indices_size array (uint64_t)
+         * _scalar_index array (uint64_t)
+         * _scalar_dt array (DT2_)
+         * _elements arrays (DT2_)
+         * _indices arrays (IT2_)
+         * \endcode
+         */
+        template <typename DT2_ = DT_, typename IT2_ = IT_>
+        std::pair<Index, char *> _serialize(FileMode mode)
+        {
+          Container<Mem::Main, DT2_, IT2_> tc(0);
+          tc.assign(*this);
+
+          uint64_t gsize(sizeof(uint64_t)); //magic number
+          gsize += 6 * sizeof(uint64_t); // size of all six stl containers
+          gsize += tc._elements_size.size() * sizeof(uint64_t); // _elements_size contents
+          gsize += tc._indices_size.size() * sizeof(uint64_t); // _indices_size contents
+          gsize += tc._scalar_index.size() * sizeof(uint64_t); // _scalar_index contents
+          gsize += tc._scalar_dt.size() * sizeof(DT2_); // _scalar_dt contents
+
+          for (Index i(0) ; i < tc._elements_size.size() ; ++i)
+          {
+            gsize += tc._elements_size.at(i) * sizeof(DT2_); // actual array sizes
+          }
+          for (Index i(0) ; i < tc._indices_size.size() ; ++i)
+          {
+            gsize += tc._indices_size.at(i) * sizeof(IT2_); // actual array sizes
+          }
+          gsize +=16; //padding for datatype alignment missmatch
+
+          char * array(new char[gsize]);
+          uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
+          DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
+          IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
+
+          // clang seems to use older libc++ without std::underlying_type
+#ifdef FEAST_COMPILER_CLANG
+          uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
+#else
+          uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
+#endif
+          uiarray[0] = magic;
+          uiarray[1] = tc._elements.size();
+          uiarray[2] = tc._indices.size();
+          uiarray[3] = tc._elements_size.size();
+          uiarray[4] = tc._indices_size.size();
+          uiarray[5] = tc._scalar_index.size();
+          uiarray[6] = tc._scalar_dt.size();
+
+          Index global_i(7); // count how many elements of uint64_t have been inserted so far
+
+          for (Index i(0) ; i < tc._elements_size.size() ; ++i)
+          {
+            uiarray[i + global_i] = tc._elements_size.at(i);
+          }
+          global_i += Index(tc._elements_size.size());
+
+          for (Index i(0) ; i < tc._indices_size.size() ; ++i)
+          {
+            uiarray[i + global_i] = tc._indices_size.at(i);
+          }
+          global_i += Index(tc._indices.size());
+
+          for (Index i(0) ; i < tc._scalar_index.size() ; ++i)
+          {
+            uiarray[i + global_i] = tc._scalar_index.at(i);
+          }
+          global_i += Index(tc._scalar_index.size());
+
+          global_i = (Index)std::ceil(((float)global_i * (float)sizeof(uint64_t)) / (float)sizeof(DT2_)); // now counting how many DT2 have been inserted so far
+
+          for (Index i(0) ; i < tc._scalar_dt.size() ; ++i)
+          {
+            dtarray[i + global_i] = tc._scalar_dt.at(i);
+          }
+          global_i += Index(tc._scalar_dt.size());
+
+          for (Index i(0) ; i < tc._elements.size() ; ++i)
+          {
+            std::memcpy(&dtarray[global_i], tc._elements.at(i), tc._elements_size.at(i) * sizeof(DT2_));
+            global_i += tc._elements_size.at(i);
+          }
+
+          global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_)); // now counting IT2_ elements
+          for (Index i(0) ; i < tc._indices.size() ; ++i)
+          {
+            std::memcpy(&itarray[global_i], tc._indices.at(i), tc._indices_size.at(i) * sizeof(IT2_));
+            global_i += tc._indices_size.at(i);
+          }
+
+          std::pair<Index, char*> result(gsize, array);
+          return result;
+        }
+
+        /**
+         * \brief Deserialization of complete container entity.
+         *
+         * \param[in] mode FileMode enum, describing the actual container specialisation.
+         * \param[in] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         *
+         * Recreate a complete container entity by a single binary array.
+         */
+        template <typename DT2_ = DT_, typename IT2_ = IT_>
+        void _deserialize(FileMode mode, std::pair<Index, char *> & input)
+        {
+          this->clear();
+          Container<Mem::Main, DT2_, IT2_> tc(0);
+          tc.clear();
+
+          char * array(input.second);
+          uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
+          DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
+          IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
+
+          // clang seems to use older libc++ without std::underlying_type
+#ifdef FEAST_COMPILER_CLANG
+          uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
+#else
+          uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
+#endif
+          if (magic != uiarray[0])
+            throw InternalError(__func__, __FILE__, __LINE__, "_deserialize: given FileMode incompatible with given array!");
+
+
+          Index global_i(7);
+          for (uint64_t i(0) ; i < uiarray[3] ; ++i)
+          {
+            tc._elements_size.push_back(Index(uiarray[i + global_i]));
+          }
+          global_i += Index(uiarray[3]);
+
+          for (uint64_t i(0) ; i < uiarray[4] ; ++i)
+          {
+            tc._indices_size.push_back(Index(uiarray[i + global_i]));
+          }
+          global_i += Index(uiarray[4]);
+
+          for (uint64_t i(0) ; i < uiarray[5] ; ++i)
+          {
+            tc._scalar_index.push_back(Index(uiarray[i + global_i]));
+          }
+          global_i += Index(uiarray[5]);
+
+          global_i = (Index)std::ceil(((float)global_i * (float)sizeof(uint64_t)) / (float)sizeof(DT2_));
+          for (uint64_t i(0) ; i < uiarray[6] ; ++i)
+          {
+            tc._scalar_dt.push_back(dtarray[i + global_i]);
+          }
+          global_i += Index(uiarray[6]);
+
+          for (uint64_t i(0) ; i < uiarray[1] ; ++i)
+          {
+            tc._elements.push_back(Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT2_>(tc._elements_size.at(i)));
+            Util::MemoryPool<Mem::Main>::template upload<DT2_>(tc._elements.at(i), &dtarray[global_i], tc._elements_size.at(i));
+            global_i += tc._elements_size.at(i);
+          }
+
+          global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_));
+          for (uint64_t i(0) ; i < uiarray[2] ; ++i)
+          {
+            tc._indices.push_back(Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT2_>(tc._indices_size.at(i)));
+            Util::MemoryPool<Mem::Main>::template upload<IT2_>(tc._indices.at(i), &itarray[global_i], tc._indices_size.at(i));
+            global_i += tc._indices_size.at(i);
+          }
+
+          this->assign(tc);
         }
 
       public:

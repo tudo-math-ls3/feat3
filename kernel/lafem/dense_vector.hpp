@@ -404,6 +404,21 @@ namespace FEAST
         }
 
         /**
+         * \brief Constructor
+         *
+         * \param[in] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         *
+         * Creates a vector from the given byte array.
+         */
+        template <typename DT2_ = DT_, typename IT2_ = IT_>
+        explicit DenseVector(std::pair<Index, char *> input) :
+          Container<Mem_, DT_, IT_>(0)
+        {
+          CONTEXT("When creating DenseVector");
+          deserialize<DT2_, IT2_>(input);
+        }
+
+        /**
          * \brief Move Constructor
          *
          * \param[in] other The source vector.
@@ -501,6 +516,37 @@ namespace FEAST
           CONTEXT("When converting DenseVector");
 
           this->template _convert<VT_>(a);
+        }
+
+        /**
+         * \brief Deserialization of complete container entity.
+         *
+         * \param[in] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         *
+         * Recreate a complete container entity by a single binary array.
+         */
+        template <typename DT2_ = DT_, typename IT2_ = IT_>
+        void deserialize(std::pair<Index, char *> input)
+        {
+          this->template _deserialize<DT2_, IT2_>(FileMode::fm_dv, input);
+        }
+
+        /**
+         * \brief Serialization of complete container entity.
+         *
+         * \param[in] mode FileMode enum, describing the actual container specialisation.
+         * \param[out] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         *
+         * Serialize a complete container entity into a single binary array.
+         *
+         * \warning The allocated array must be freed by the user!
+         *
+         * See \ref FEAST::LAFEM::Container::_serialize for details.
+         */
+        template <typename DT2_ = DT_, typename IT2_ = IT_>
+        std::pair<Index, char *> serialize()
+        {
+          return this->template _serialize<DT2_, IT2_>(FileMode::fm_dv);
         }
 
         /**

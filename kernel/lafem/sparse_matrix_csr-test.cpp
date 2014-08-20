@@ -130,6 +130,11 @@ public:
     f.write_out(FileMode::fm_mtx, ts);
     SparseMatrixCSR<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
+
+    auto kp = f.serialize();
+    SparseMatrixCSR<Mem_, DT_, IT_> k(kp);
+    delete[] kp.second;
+    TEST_CHECK_EQUAL(k, f);
   }
 };
 

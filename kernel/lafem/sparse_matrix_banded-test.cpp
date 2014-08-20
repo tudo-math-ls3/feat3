@@ -108,6 +108,10 @@ public:
     e.copy(c);
     TEST_CHECK_EQUAL(e, c);
 
+    auto kp = c.serialize();
+    SparseMatrixBanded<Mem_, DT_, IT_> k(kp);
+    delete[] kp.second;
+    TEST_CHECK_EQUAL(k, c);
   }
 };
 

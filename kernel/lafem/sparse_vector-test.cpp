@@ -22,23 +22,25 @@ using namespace FEAST::TestSystem;
 */
 template<
   typename Mem_,
-  typename DT_>
+  typename Algo_,
+  typename DT_,
+  typename IT_>
 class SparseVectorTest
-  : public TaggedTest<Mem_, DT_>
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
 public:
   SparseVectorTest()
-    : TaggedTest<Mem_, DT_>("SparseVectorTest")
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseVectorTest")
   {
   }
 
   virtual void run() const
   {
-    SparseVector<Mem_, DT_> zero1;
-    SparseVector<Mem::Main, DT_> zero2;
+    SparseVector<Mem_, DT_, IT_> zero1;
+    SparseVector<Mem::Main, DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
 
-    SparseVector<Mem_, DT_> a(10);
+    SparseVector<Mem_, DT_, IT_> a(10);
     a(3, DT_(7));
     a(3, DT_(3));
     a(6, DT_(1));
@@ -52,10 +54,10 @@ public:
 
     std::stringstream ts;
     a.write_out(FileMode::fm_mtx, ts);
-    SparseVector<Mem::Main, DT_> j(FileMode::fm_mtx, ts);
+    SparseVector<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, a);
 
-    SparseVector<Mem_, DT_> b;
+    SparseVector<Mem_, DT_, IT_> b;
     b.convert(a);
     TEST_CHECK_EQUAL(a, b);
     b(6, DT_(1));
@@ -83,13 +85,19 @@ public:
     TEST_CHECK_EQUAL(a.used_elements(), Index(3));
     TEST_CHECK_EQUAL(a(2), DT_(0));
     TEST_CHECK_EQUAL(a(3), DT_(0));
+
+    auto op = b.serialize();
+    SparseVector<Mem_, DT_, IT_> o(op);
+    delete[] op.second;
+    for (Index i(0) ; i < b.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), b(i), 1e-5);
   }
 };
-SparseVectorTest<Mem::Main, float> cpu_sparse_vector_test_float;
-SparseVectorTest<Mem::Main, double> cpu_sparse_vector_test_double;
+SparseVectorTest<Mem::Main, NotSet, float, Index> cpu_sparse_vector_test_float;
+SparseVectorTest<Mem::Main, NotSet, double, Index> cpu_sparse_vector_test_double;
 //SparseVectorTest<Mem::Main, Index> cpu_sparse_vector_test_index;
 #ifdef FEAST_BACKENDS_CUDA
-SparseVectorTest<Mem::CUDA, float> cuda_sparse_vector_test_float;
-SparseVectorTest<Mem::CUDA, double> cuda_sparse_vector_test_double;
+SparseVectorTest<Mem::CUDA, NotSet, float, Index> cuda_sparse_vector_test_float;
+SparseVectorTest<Mem::CUDA, NotSet, double, Index> cuda_sparse_vector_test_double;
 //SparseVectorTest<Mem::CUDA, Index> cuda_sparse_vector_test_index;
 #endif

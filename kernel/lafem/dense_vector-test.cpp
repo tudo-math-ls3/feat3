@@ -115,6 +115,12 @@ public:
     DenseVector<Mem_, DT_, IT_> n(FileMode::fm_dv, bs);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), 1e-5);
+
+    auto op = k.serialize();
+    DenseVector<Mem_, DT_, IT_> o(op);
+    delete[] op.second;
+    for (Index i(0) ; i < k.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), 1e-5);
   }
 };
 DenseVectorTest<Mem::Main, NotSet, float, unsigned int> cpu_dense_vector_test_float_uint;
