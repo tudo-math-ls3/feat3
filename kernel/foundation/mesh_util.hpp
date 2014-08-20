@@ -152,13 +152,26 @@ namespace FEAST
         {
           auto y_sum_e0(y.at(V_e0.at(0)) + y.at(V_e0.at(1)));
           auto y_sum_e1(y.at(V_e1.at(0)) + y.at(V_e1.at(1)));
-          auto ez0(y_sum_e0 < y_sum_e1 ? e0 : e1);
+          auto ez0(e0);
+          auto V_ez0(V_e0);
+          auto ez1(e1);
+          auto V_ez1(V_e1);
+          if(y_sum_e0 > y_sum_e1)
+          {
+            ez0=e1;
+            V_ez0=V_e1;
+            ez1=e0;
+            V_ez1=V_e0;
+          }
           edges_processed.push_back(ez0);
           edge_types.push_back(et_iz_x);
 
-          auto ez1(y_sum_e0 < y_sum_e1 ? e1 : e0);
+          //auto ez1(x_sum_e0 < x_sum_e1 ? e1 : e0);
           edges_processed.push_back(ez1);
           edge_types.push_back(et_iz_x);
+
+          x_diff_ez0 = x.at(V_ez0.at(1)) - x.at(V_ez0.at(0));
+          x_diff_ez1 = x.at(V_ez1.at(1)) - x.at(V_ez1.at(0));
 
           if(x_diff_ez0 < 0)
           {
@@ -213,8 +226,8 @@ namespace FEAST
           }
 
           ///set iz-curve
-          auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
-          auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
+          //auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
+          //auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
 
           m.get_topologies().at(ipi_face_vertex).at(0).at(0) = V_ez0.at(0);
           m.get_topologies().at(ipi_face_vertex).at(0).at(1) = V_ez0.at(1);
@@ -225,13 +238,26 @@ namespace FEAST
         {
           auto x_sum_e0(x.at(V_e0.at(0)) + x.at(V_e0.at(1)));
           auto x_sum_e1(x.at(V_e1.at(0)) + x.at(V_e1.at(1)));
-          auto ez0(x_sum_e0 > x_sum_e1 ? e0 : e1);
+          auto ez0(e0);
+          auto V_ez0(V_e0);
+          auto ez1(e1);
+          auto V_ez1(V_e1);
+          if(x_sum_e0 > x_sum_e1)
+          {
+            ez0=e1;
+            V_ez0=V_e1;
+            ez1=e0;
+            V_ez1=V_e0;
+          }
           edges_processed.push_back(ez0);
-          edge_types.push_back(et_iz_y);
+          edge_types.push_back(et_iz_x);
 
-          auto ez1(x_sum_e0 > x_sum_e1 ? e1 : e0);
+          //auto ez1(x_sum_e0 < x_sum_e1 ? e1 : e0);
           edges_processed.push_back(ez1);
-          edge_types.push_back(et_iz_y);
+          edge_types.push_back(et_iz_x);
+
+          y_diff_ez0 = y.at(V_ez0.at(1)) - y.at(V_ez0.at(0));
+          y_diff_ez1 = y.at(V_ez1.at(1)) - y.at(V_ez1.at(0));
 
           if(y_diff_ez0 < 0)
           {
@@ -284,8 +310,8 @@ namespace FEAST
             }
           }
           ///set iz-curve
-          auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
-          auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
+          //auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
+          //auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
 
           m.get_topologies().at(ipi_face_vertex).at(0).at(0) = V_ez0.at(0);
           m.get_topologies().at(ipi_face_vertex).at(0).at(1) = V_ez0.at(1);
