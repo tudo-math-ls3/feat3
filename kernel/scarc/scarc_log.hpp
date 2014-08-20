@@ -44,7 +44,7 @@ namespace FEAST
         ST_<Request, std::allocator<Request> >send_req;
         ST_<Status, std::allocator<Status> >recv_stat;
         ST_<Status, std::allocator<Status> >send_stat;
-        char** recvbufs(new char*[Comm::size(c)]);
+        char** recvbufs = new char*[Comm::size(c)];
         char* sendbuf(new char[len_sb]);
 
         for(Index i(0) ; i < Comm::size(c) ; ++i)
