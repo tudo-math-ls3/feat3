@@ -323,7 +323,7 @@ namespace FEAST
       {
         for(Index i(0) ; i < m.num_polytopes(pl_face) ; ++i)
         {
-          auto v_fi(m.get_adjacent_polytopes(pl_face, pl_vertex, i));std::cout << v_fi.at(0) << " " << v_fi.at(1) << " " << v_fi.at(2) << " " << v_fi.at(3) << " "<<std::endl;auto bla(m.get_adjacent_polytopes(pl_face, pl_edge, i));std::cout << bla.at(0) << " " << bla.at(1) << " " << bla.at(2) << " " << bla.at(3) << " "<<std::endl;
+          auto v_fi(m.get_adjacent_polytopes(pl_face, pl_vertex, i));
 
           if(v_fi.size() != 4)
           {
@@ -381,7 +381,7 @@ namespace FEAST
           bool found_c1(false);
           for(auto e_fi_j : e_fi)
           {
-            auto v_e_fi_j(m.get_adjacent_polytopes(pl_edge, pl_vertex, e_fi_j));std::cout <<v_e_fi_j.at(0)<< " " << v_e_fi_j.at(1) << std::endl;
+            auto v_e_fi_j(m.get_adjacent_polytopes(pl_edge, pl_vertex, e_fi_j));
             found_e0 = v_e_fi_j.at(0) == v_fi.at(0) && v_e_fi_j.at(1) == v_fi.at(1) ? true : found_e0;
             found_e1 = v_e_fi_j.at(0) == v_fi.at(2) && v_e_fi_j.at(1) == v_fi.at(3) ? true : found_e1;
             found_c0 = v_e_fi_j.at(0) == v_fi.at(0) && v_e_fi_j.at(1) == v_fi.at(2) ? true : found_c0;
@@ -418,7 +418,7 @@ namespace FEAST
         OuterStorageType_<EdgeTypes, std::allocator<EdgeTypes> > edge_types;
 
         ///start with face 0
-        auto E_f0(m.get_adjacent_polytopes(pl_face, pl_edge, 0));//std::cout << E_f0.at(0) << " " << E_f0.at(1) << " " << E_f0.at(2) << " " << E_f0.at(3) << " " << std::endl;
+        auto E_f0(m.get_adjacent_polytopes(pl_face, pl_edge, 0));
         ///pick edge 0 and find e1 = E_f0 - E_V_e0
         auto e0 = E_f0.at(0);
         std::sort(E_f0.begin(), E_f0.end());
@@ -445,29 +445,39 @@ namespace FEAST
         auto x_diff_ez1(x.at(V_e1.at(1)) - x.at(V_e1.at(0)));
         auto y_diff_ez0(y.at(V_e0.at(1)) - y.at(V_e0.at(0)));
         auto y_diff_ez1(y.at(V_e1.at(1)) - y.at(V_e1.at(0)));
-        auto z_diff_ez0(z.at(V_e0.at(1)) - z.at(V_e0.at(0)));
-        auto z_diff_ez1(z.at(V_e1.at(1)) - z.at(V_e1.at(0)));
-        if(x_diff_ez0 != 0 ) //x pos mode
-        {std::cout<<"x pos mode"<<std::endl;
+        if(x_diff_ez0 != 0 && y_diff_ez0 != y_diff_ez1) //x pos mode
+        {
           auto y_sum_e0(y.at(V_e0.at(0)) + y.at(V_e0.at(1)));
           auto y_sum_e1(y.at(V_e1.at(0)) + y.at(V_e1.at(1)));
-//          auto z_sum_e0(z.at(V_e0.at(0)) + z.at(V_e0.at(1)));
-//          auto z_sum_e1(z.at(V_e1.at(0)) + z.at(V_e1.at(1)));
-          auto ez0(y_sum_e0 < y_sum_e1 ? e0 : e1);
+
+          auto ez0(e0);
+          auto V_ez0(V_e0);
+          auto ez1(e1);
+          auto V_ez1(V_e1);
+          if(y_sum_e0 > y_sum_e1)
+          {
+            ez0=e1;
+            V_ez0=V_e1;
+            ez1=e0;
+            V_ez1=V_e0;
+          }
           edges_processed.push_back(ez0);
           edge_types.push_back(et_iz_x);
 
-          auto ez1(y_sum_e0 < y_sum_e1 ? e1 : e0);
+          //auto ez1(x_sum_e0 < x_sum_e1 ? e1 : e0);
           edges_processed.push_back(ez1);
           edge_types.push_back(et_iz_x);
 
-          if(x_diff_ez0 < 0)//hier ggf. z diff
+          x_diff_ez0 = x.at(V_ez0.at(1)) - x.at(V_ez0.at(0));
+          x_diff_ez1 = x.at(V_ez1.at(1)) - x.at(V_ez1.at(0));
+
+          if(x_diff_ez0 < 0)
           {
             m.get_topologies().at(ipi_edge_vertex).at(ez0).at(0) = V_e0.at(1);
             m.get_topologies().at(ipi_edge_vertex).at(ez0).at(1) = V_e0.at(0);
           }
 
-          if(x_diff_ez1 < 0)//hier ggf. z diff
+          if(x_diff_ez1 < 0)
           {
             m.get_topologies().at(ipi_edge_vertex).at(ez1).at(0) = V_e1.at(1);
             m.get_topologies().at(ipi_edge_vertex).at(ez1).at(1) = V_e1.at(0);
@@ -492,7 +502,7 @@ namespace FEAST
             if(iter00 != V_E_f0_j.end() && iter01 != V_E_f0_j.end())
             {
               if(x.at(V_E_f0_j.at(0)) < x.at(V_E_f0_j.at(1)))//hier ggf. z
-              {std::cout <<"bla3";
+              {
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(0) = V_E_f0_j.at(1);
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(1) = V_E_f0_j.at(0);
               }
@@ -504,7 +514,7 @@ namespace FEAST
             if(iter10 != V_E_f0_j.end() && iter11 != V_E_f0_j.end())
             {
               if(x.at(V_E_f0_j.at(0)) < x.at(V_E_f0_j.at(1)))//hier ggf. z
-              {std::cout <<"bla4";
+              {
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(0) = V_E_f0_j.at(1);
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(1) = V_E_f0_j.at(0);
               }
@@ -514,8 +524,8 @@ namespace FEAST
           }
 
           ///set iz-curve
-          auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
-          auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
+          //auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
+          //auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
 
           m.get_topologies().at(ipi_face_vertex).at(0).at(0) = V_ez0.at(0);
           m.get_topologies().at(ipi_face_vertex).at(0).at(1) = V_ez0.at(1);
@@ -523,24 +533,39 @@ namespace FEAST
           m.get_topologies().at(ipi_face_vertex).at(0).at(3) = V_ez1.at(1);
         }
         else if(y_diff_ez0 != 0 )//y pos mode
-        {std::cout << "y pos mode" <<std::endl;
+        {
           auto x_sum_e0(x.at(V_e0.at(0)) + x.at(V_e0.at(1)));
           auto x_sum_e1(x.at(V_e1.at(0)) + x.at(V_e1.at(1)));
-          auto ez0(x_sum_e0 > x_sum_e1 ? e0 : e1);
+          //auto ez0(x_sum_e0 < x_sum_e1 ? e0 : e1);
+
+          auto ez0(e0);
+          auto V_ez0(V_e0);
+          auto ez1(e1);
+          auto V_ez1(V_e1);
+          if(x_sum_e0 > x_sum_e1)
+          {
+            ez0=e1;
+            V_ez0=V_e1;
+            ez1=e0;
+            V_ez1=V_e0;
+          }
           edges_processed.push_back(ez0);
           edge_types.push_back(et_iz_y);
 
-          auto ez1(x_sum_e0 > x_sum_e1 ? e1 : e0);
+          //auto ez1(x_sum_e0 < x_sum_e1 ? e1 : e0);
           edges_processed.push_back(ez1);
           edge_types.push_back(et_iz_y);
 
-          if(y_diff_ez0 < 0)
+          y_diff_ez0 = y.at(V_ez0.at(1)) - y.at(V_ez0.at(0));
+          y_diff_ez1 = y.at(V_ez1.at(1)) - y.at(V_ez1.at(0));
+
+          if(y_diff_ez0 > 0)
           {
             m.get_topologies().at(ipi_edge_vertex).at(ez0).at(0) = V_e0.at(1);
             m.get_topologies().at(ipi_edge_vertex).at(ez0).at(1) = V_e0.at(0);
           }
 
-          if(y_diff_ez1 < 0)
+          if(y_diff_ez1 > 0)
           {
             m.get_topologies().at(ipi_edge_vertex).at(ez1).at(0) = V_e1.at(1);
             m.get_topologies().at(ipi_edge_vertex).at(ez1).at(1) = V_e1.at(0);
@@ -564,7 +589,7 @@ namespace FEAST
 
             if(iter00 != V_E_f0_j.end() && iter01 != V_E_f0_j.end())
             {
-              if(y.at(V_E_f0_j.at(0)) < y.at(V_E_f0_j.at(1)))
+              if(y.at(V_E_f0_j.at(0)) > y.at(V_E_f0_j.at(1)))
               {
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(0) = V_E_f0_j.at(1);
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(1) = V_E_f0_j.at(0);
@@ -575,7 +600,7 @@ namespace FEAST
 
             if(iter10 != V_E_f0_j.end() && iter11 != V_E_f0_j.end())
             {
-              if(y.at(V_E_f0_j.at(0)) < y.at(V_E_f0_j.at(1)))
+              if(y.at(V_E_f0_j.at(0)) > y.at(V_E_f0_j.at(1)))
               {
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(0) = V_E_f0_j.at(1);
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(1) = V_E_f0_j.at(0);
@@ -585,8 +610,8 @@ namespace FEAST
             }
           }
           ///set iz-curve
-          auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
-          auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
+          //auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
+          //auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
 
           m.get_topologies().at(ipi_face_vertex).at(0).at(0) = V_ez0.at(0);
           m.get_topologies().at(ipi_face_vertex).at(0).at(1) = V_ez0.at(1);
@@ -595,26 +620,37 @@ namespace FEAST
         }
         else // z-pos mode
         {
-          std::cout << "z-pos mode"<<std::endl;
           auto y_sum_e0(y.at(V_e0.at(0)) + y.at(V_e0.at(1)));
           auto y_sum_e1(y.at(V_e1.at(0)) + y.at(V_e1.at(1)));
-//          auto z_sum_e0(z.at(V_e0.at(0)) + z.at(V_e0.at(1)));
-//          auto z_sum_e1(z.at(V_e1.at(0)) + z.at(V_e1.at(1)));
-          auto ez0(y_sum_e0 < y_sum_e1 ? e0 : e1);
+
+          auto ez0(e0);
+          auto V_ez0(V_e0);
+          auto ez1(e1);
+          auto V_ez1(V_e1);
+          if(y_sum_e0 > y_sum_e1)
+          {
+            ez0=e1;
+            V_ez0=V_e1;
+            ez1=e0;
+            V_ez1=V_e0;
+          }
           edges_processed.push_back(ez0);
           edge_types.push_back(et_iz_x);
 
-          auto ez1(y_sum_e0 < y_sum_e1 ? e1 : e0);
+          //auto ez1(x_sum_e0 < x_sum_e1 ? e1 : e0);
           edges_processed.push_back(ez1);
           edge_types.push_back(et_iz_x);
 
-          if(x_diff_ez0 < 0)//hier ggf. z diff
+          x_diff_ez0 = x.at(V_ez0.at(1)) - x.at(V_ez0.at(0));
+          x_diff_ez1 = x.at(V_ez1.at(1)) - x.at(V_ez1.at(0));
+
+          if(x_diff_ez0 < 0)
           {
             m.get_topologies().at(ipi_edge_vertex).at(ez0).at(0) = V_e0.at(1);
             m.get_topologies().at(ipi_edge_vertex).at(ez0).at(1) = V_e0.at(0);
           }
 
-          if(x_diff_ez1 < 0)//hier ggf. z diff
+          if(x_diff_ez1 < 0)
           {
             m.get_topologies().at(ipi_edge_vertex).at(ez1).at(0) = V_e1.at(1);
             m.get_topologies().at(ipi_edge_vertex).at(ez1).at(1) = V_e1.at(0);
@@ -639,7 +675,7 @@ namespace FEAST
             if(iter00 != V_E_f0_j.end() && iter01 != V_E_f0_j.end())
             {
               if(x.at(V_E_f0_j.at(0)) < x.at(V_E_f0_j.at(1)))//hier ggf. z
-              {std::cout <<"bla3";
+              {
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(0) = V_E_f0_j.at(1);
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(1) = V_E_f0_j.at(0);
               }
@@ -651,7 +687,7 @@ namespace FEAST
             if(iter10 != V_E_f0_j.end() && iter11 != V_E_f0_j.end())
             {
               if(x.at(V_E_f0_j.at(0)) < x.at(V_E_f0_j.at(1)))//hier ggf. z
-              {std::cout <<"bla4";
+              {
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(0) = V_E_f0_j.at(1);
                 m.get_topologies().at(ipi_edge_vertex).at(E_f0_j).at(1) = V_E_f0_j.at(0);
               }
@@ -661,8 +697,8 @@ namespace FEAST
           }
 
           ///set iz-curve
-          auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
-          auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
+          //auto V_ez0(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez0));
+          //auto V_ez1(m.get_adjacent_polytopes(pl_edge, pl_vertex, ez1));
 
           m.get_topologies().at(ipi_face_vertex).at(0).at(0) = V_ez0.at(0);
           m.get_topologies().at(ipi_face_vertex).at(0).at(1) = V_ez0.at(1);
@@ -687,7 +723,7 @@ namespace FEAST
         }
 
         for(auto F_E_fi_j : F_E_fi)
-          _establish_iz_property(m, x, y, z, faces_processed, edges_processed, edge_types, 0, F_E_fi_j);auto test(m.get_adjacent_polytopes(pl_face,pl_vertex,0)); std::cout << test.at(0) << " " << test.at(1) << " " << test.at(2) << " " << test.at(3) << " " << std::endl;auto test2(m.get_adjacent_polytopes(pl_face,pl_edge,0)); std::cout << test2.at(0) << " " << test2.at(1) << " " << test2.at(2) << " " << test2.at(3) << " " << std::endl;
+          _establish_iz_property(m, x, y, z, faces_processed, edges_processed, edge_types, 0, F_E_fi_j);auto test(m.get_adjacent_polytopes(pl_face,pl_vertex,0));
       }
 
 
