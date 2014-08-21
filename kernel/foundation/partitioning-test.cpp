@@ -71,6 +71,8 @@ class PartitioningTest1D:
                                                                                                           num_procs, rank,
                                                                                                           attrs
                                                                                                           ));
+      TEST_CHECK_EQUAL(p0.levels_refined, 3);
+
       //inspect p0 for (1)submesh data, (2)comm_halos, (3)boundaries, (4)attributes
       //(1)submesh data on process 0
       TEST_CHECK_EQUAL(p0.submesh->get_topologies().at(ipi_edge_vertex).size(), 2ul);
@@ -215,6 +217,7 @@ class PartitioningTest2D:
                                                                                                           attrs
                                                                                                           ));
 
+      TEST_CHECK_EQUAL(p0.levels_refined, 1);
       //inspect p0 for (1)submesh data, (2)comm_halos, (3)boundaries, (4)attributes
       //(1)submesh data on process 0
       TEST_CHECK_EQUAL(p0.submesh->get_topologies().at(ipi_face_vertex).size(), 2ul);
@@ -572,6 +575,7 @@ class PartitioningTest3D:
                                                                                                           attrs
                                                                                                           ));
 
+      TEST_CHECK_EQUAL(p0.levels_refined, 1);
       //inspect p0 for (1)submesh data, (2)comm_halos, (3)boundaries, (4)attributes
       //(1)submesh data on process 0
       TEST_CHECK_EQUAL(p0.submesh->get_topologies().at(ipi_polyhedron_vertex).size(), 3ul);

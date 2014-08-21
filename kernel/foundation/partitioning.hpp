@@ -128,6 +128,8 @@ namespace FEAST
             Refinement<Tag_, Arch_, mrt_, hrt_refine>::execute(result.basemesh,
                                                                &boundaries_copy,
                                                                origin_coords);
+
+            ++result.levels_refined;
           }
 
           boundaries.clear();

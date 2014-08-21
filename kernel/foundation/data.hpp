@@ -28,6 +28,7 @@ namespace FEAST
         basemesh_boundaries(),
         boundaries(),
         attrs(),
+        levels_refined(0),
         comm_cost(0),
         comp_cost(0)
       {
@@ -40,6 +41,7 @@ namespace FEAST
         basemesh_boundaries(other.basemesh_boundaries),
         boundaries(other.boundaries),
         attrs(other.attrs),
+        levels_refined(other.levels_refined),
         comm_cost(other.comm_cost),
         comp_cost(other.comp_cost)
       {
@@ -53,6 +55,7 @@ namespace FEAST
         this->basemesh_boundaries = other.basemesh_boundaries;
         this->boundaries = other.boundaries;
         this->attrs = other.attrs;
+        this->levels_refined = other.levels_refined;
         this->comm_cost = other.comm_cost;
         this->comp_cost = other.comp_cost;
       }
@@ -63,6 +66,7 @@ namespace FEAST
       os_<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>, std::allocator<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_> > > basemesh_boundaries;
       os_<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>, std::allocator<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_> > > boundaries;
       os_<std::shared_ptr<AttributeBase<os_> >, std::allocator<std::shared_ptr<AttributeBase<os_> > > > attrs;
+      typename t_::index_type_ levels_refined;
       DT_ comm_cost;
       DT_ comp_cost;
     };
