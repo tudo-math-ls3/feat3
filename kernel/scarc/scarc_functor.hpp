@@ -439,8 +439,9 @@ namespace FEAST
         {
         }
 
-        virtual void apply(VectorType_&, VectorType_&, VectorType_&)
+        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_&)
         {
+          store_to.convert(apply_to);
         }
 
         ///returns a string that describes the functor
