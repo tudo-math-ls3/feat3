@@ -84,7 +84,8 @@ namespace FEAST
                                                  data.vector_mirrors(),
                                                  data.dest_ranks(),
                                                  data.vector_mirror_sendbufs(),
-                                                 data.vector_mirror_recvbufs()
+                                                 data.vector_mirror_recvbufs(),
+                                                 data.tags()
                                                 );
       }
     };
@@ -108,7 +109,8 @@ namespace FEAST
                                                  data.halo_frequencies(),
                                                  data.dest_ranks(),
                                                  data.vector_mirror_sendbufs(),
-                                                 data.vector_mirror_recvbufs()
+                                                 data.vector_mirror_recvbufs(),
+                                                 data.tags()
                                                 );
       }
     };
@@ -133,7 +135,8 @@ namespace FEAST
                                                  data.vector_mirrors(),
                                                  data.dest_ranks(),
                                                  data.vector_mirror_sendbufs(),
-                                                 data.vector_mirror_recvbufs()
+                                                 data.vector_mirror_recvbufs(),
+                                                 data.tags()
                                                 );
       }
     };

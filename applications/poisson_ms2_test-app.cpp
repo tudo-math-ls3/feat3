@@ -206,11 +206,13 @@ int main()
 
   //synching for type-0 -> type-1
   auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks));
+  auto tags(HaloTags::value(p_i.comm_halos));
   GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(vec_rhs,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
-                                                  recvbufs);
+                                                  recvbufs,
+                                                  tags);
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -237,6 +239,7 @@ int main()
   data.vector_mirror_sendbufs() = std::move(sendbufs);
   data.vector_mirror_recvbufs() = std::move(recvbufs);
   data.dest_ranks() = std::move(other_ranks);
+  data.tags() = std::move(tags);
 
 #ifndef SERIAL
   Communicator c(MPI_COMM_WORLD);

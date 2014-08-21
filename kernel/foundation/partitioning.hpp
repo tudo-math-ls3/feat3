@@ -187,64 +187,113 @@ namespace FEAST
         typename t_::storage_type_ comm_halo_originating_from_process_sub;
         typename t_::storage_type_ comm_halo_originating_from_process_sub_sub;
 
+        std::vector<std::pair<Index, Index> > pairs_processed;
+
+        Index global_id(0);
+
         for(Index i(0) ; i < elements_for_process.size() ; ++i)
-          for(Index j(0) ; j < elements_for_process.at(i).size() ; ++j)
-            for(Index k(0) ; k < elements_for_process.size() ; ++k)
-              for(Index l(0) ; l < elements_for_process.at(k).size() ; ++l)
+          for(Index k(0) ; k < elements_for_process.size() ; ++k)
+          {
+            if(i != k)
+            {
+              auto iter(std::find(pairs_processed.begin(), pairs_processed.end(), std::pair<Index, Index>(i, k)));
+
+              if(!(iter != pairs_processed.end()))
               {
-                if(i != k)
-                {
-                  typename t_::storage_type_ tmp(result.basemesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
-                                                                            Dim_::ElementPolytopeType_::SubElementPolytopeType_::tag_value,
-                                                                            elements_for_process.at(i).at(j),
-                                                                            elements_for_process.at(k).at(l)));
-                  typename t_::storage_type_ tmp_sub(result.basemesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
-                                                                                Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value,
-                                                                                elements_for_process.at(i).at(j),
-                                                                                elements_for_process.at(k).at(l)));
-                  typename t_::storage_type_ tmp_sub_sub(result.basemesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
-                                                                                    Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value,
-                                                                                    elements_for_process.at(i).at(j),
-                                                                                    elements_for_process.at(k).at(l)));
-                  if(tmp.size() > 0)
-                  {
-                    comm_halos_globalview.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, k));
-                    comm_halo_originating_from_element.push_back(elements_for_process.at(i).at(j));
-                    comm_halo_originating_from_process.push_back(i);
+                pairs_processed.push_back(std::pair<Index, Index>(i, k));
+                pairs_processed.push_back(std::pair<Index, Index>(k, i));
 
-                    for(Index m(0) ; m < tmp.size() ; ++m)
-                      comm_halos_globalview.at(comm_halos_globalview.size() - 1).push_back(tmp.at(m));
-                  }
-
-                  //sublevel 1
-                  if(tmp.size() == 0)
+                for(Index j(0) ; j < elements_for_process.at(i).size() ; ++j)
+                  for(Index l(0) ; l < elements_for_process.at(k).size() ; ++l)
                   {
-                    if(tmp_sub.size() > 0)
+
+                    typename t_::storage_type_ tmp(result.basemesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
+                          Dim_::ElementPolytopeType_::SubElementPolytopeType_::tag_value,
+                          elements_for_process.at(i).at(j),
+                          elements_for_process.at(k).at(l)));
+                    typename t_::storage_type_ tmp_sub(result.basemesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
+                          Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value,
+                          elements_for_process.at(i).at(j),
+                          elements_for_process.at(k).at(l)));
+                    typename t_::storage_type_ tmp_sub_sub(result.basemesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
+                          Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value,
+                          elements_for_process.at(i).at(j),
+                          elements_for_process.at(k).at(l)));
+
+                    if(tmp.size() > 0)
                     {
-                      comm_halos_globalview_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, k));
-                      comm_halo_originating_from_element_sub.push_back(elements_for_process.at(i).at(j));
-                      comm_halo_originating_from_process_sub.push_back(i);
+                      comm_halos_globalview.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, k));
+                      comm_halo_originating_from_element.push_back(elements_for_process.at(i).at(j));
+                      comm_halo_originating_from_process.push_back(i);
+                      comm_halos_globalview.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, i));
+                      comm_halo_originating_from_element.push_back(elements_for_process.at(k).at(l));
+                      comm_halo_originating_from_process.push_back(k);
 
-                      for(Index m(0) ; m < tmp_sub.size() ; ++m)
-                        comm_halos_globalview_sub.at(comm_halos_globalview_sub.size() - 1).push_back(tmp_sub.at(m));
+                      for(Index m(0) ; m < tmp.size() ; ++m)
+                      {
+                        comm_halos_globalview.at(comm_halos_globalview.size() - 2).push_back(tmp.at(m));
+                        comm_halos_globalview.at(comm_halos_globalview.size() - 1).push_back(tmp.at(m));
+                      }
+
+                      //same global id for both procs
+                      comm_halos_globalview.at(comm_halos_globalview.size() - 2).set_id(global_id);
+                      comm_halos_globalview.at(comm_halos_globalview.size() - 1).set_id(global_id);
+                      ++global_id;
+                    }
+
+                    //sublevel 1
+                    if(tmp.size() == 0)
+                    {
+                      if(tmp_sub.size() > 0)
+                      {
+                        comm_halos_globalview_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, k));
+                        comm_halo_originating_from_element_sub.push_back(elements_for_process.at(i).at(j));
+                        comm_halo_originating_from_process_sub.push_back(i);
+                        comm_halos_globalview_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, i));
+                        comm_halo_originating_from_element_sub.push_back(elements_for_process.at(k).at(l));
+                        comm_halo_originating_from_process_sub.push_back(k);
+
+                        for(Index m(0) ; m < tmp_sub.size() ; ++m)
+                        {
+                          comm_halos_globalview_sub.at(comm_halos_globalview_sub.size() - 2).push_back(tmp_sub.at(m));
+                          comm_halos_globalview_sub.at(comm_halos_globalview_sub.size() - 1).push_back(tmp_sub.at(m));
+                        }
+
+                        //same global id for both procs
+                        comm_halos_globalview_sub.at(comm_halos_globalview_sub.size() - 2).set_id(global_id);
+                        comm_halos_globalview_sub.at(comm_halos_globalview_sub.size() - 1).set_id(global_id);
+                        ++global_id;
+                      }
+                    }
+
+                    //sublevel 2
+                    if(tmp_sub.size() == 0 && tmp.size() == 0)
+                    {
+                      if(tmp_sub_sub.size() > 0)
+                      {
+                        comm_halos_globalview_sub_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, k));
+                        comm_halo_originating_from_element_sub_sub.push_back(elements_for_process.at(i).at(j));
+                        comm_halo_originating_from_process_sub_sub.push_back(i);
+                        comm_halos_globalview_sub_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, i));
+                        comm_halo_originating_from_element_sub_sub.push_back(elements_for_process.at(k).at(l));
+                        comm_halo_originating_from_process_sub_sub.push_back(k);
+
+                        for(Index m(0) ; m < tmp_sub_sub.size() ; ++m)
+                        {
+                          comm_halos_globalview_sub_sub.at(comm_halos_globalview_sub_sub.size() - 2).push_back(tmp_sub_sub.at(m));
+                          comm_halos_globalview_sub_sub.at(comm_halos_globalview_sub_sub.size() - 1).push_back(tmp_sub_sub.at(m));
+                        }
+
+                        //same global id for both procs
+                        comm_halos_globalview_sub_sub.at(comm_halos_globalview_sub_sub.size() - 2).set_id(global_id);
+                        comm_halos_globalview_sub_sub.at(comm_halos_globalview_sub_sub.size() - 1).set_id(global_id);
+                        ++global_id;
+                      }
                     }
                   }
-
-                  //sublevel 2
-                  if(tmp_sub.size() == 0 && tmp.size() == 0)
-                  {
-                    if(tmp_sub_sub.size() > 0)
-                    {
-                      comm_halos_globalview_sub_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, k));
-                      comm_halo_originating_from_element_sub_sub.push_back(elements_for_process.at(i).at(j));
-                      comm_halo_originating_from_process_sub_sub.push_back(i);
-
-                      for(Index m(0) ; m < tmp_sub_sub.size() ; ++m)
-                        comm_halos_globalview_sub_sub.at(comm_halos_globalview_sub_sub.size() - 1).push_back(tmp_sub_sub.at(m));
-                    }
-                  }
-                }
               }
+            }
+          }
 
         ///-->Each process for its patch
         ///submesh and halo generation; here not delta_ may be used but rather delta=0, delta_ applies later for the micro-mesh

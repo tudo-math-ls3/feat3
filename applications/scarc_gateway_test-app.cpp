@@ -449,6 +449,8 @@ void check_nrm2sqr_gateway_1D(Index rank)
                                        SparseMatrixCSR<Mem::Main, double> > pdata(std::move(mat_sys), std::move(mat_sys), std::move(a), std::move(b));
 
   pdata.halo_frequencies() = std::move(frequencies);
+  auto tags(HaloTags::value(p0.comm_halos));
+  pdata.tags() = std::move(tags);
 
   auto nrm2sqr_gate(GatewayCreation<got_nrm2sqr, Algo::Generic>::value(pdata));
 
@@ -583,6 +585,8 @@ void check_synch0_gateway_1D(Index rank)
   pdata.dest_ranks().push_back(rank == 0 ? 1 : 0);
 
   pdata.halo_frequencies() = std::move(frequencies);
+  auto tags(HaloTags::value(p0.comm_halos));
+  pdata.tags() = std::move(tags);
 
   auto synch0_gate(GatewayCreation<got_synch_vec0, Algo::Generic>::value(pdata));
 
@@ -721,6 +725,8 @@ void check_synch1_gateway_1D(Index rank)
   pdata.dest_ranks().push_back(rank == 0 ? 1 : 0);
 
   pdata.halo_frequencies() = std::move(frequencies);
+  auto tags(HaloTags::value(p0.comm_halos));
+  pdata.tags() = std::move(tags);
 
   auto synch1_gate(GatewayCreation<got_synch_vec1, Algo::Generic>::value(pdata));
 
@@ -860,6 +866,8 @@ void check_prodmat0vec1_gateway_1D(Index rank)
   pdata.dest_ranks().push_back(rank == 0 ? 1 : 0);
 
   pdata.halo_frequencies() = std::move(frequencies);
+  auto tags(HaloTags::value(p0.comm_halos));
+  pdata.tags() = std::move(tags);
 
   auto prod_gate(GatewayCreation<got_product_mat0_vec1, Algo::Generic>::value(pdata));
 

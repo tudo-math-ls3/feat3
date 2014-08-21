@@ -4,6 +4,7 @@
 
 #include<kernel/base_header.hpp>
 #include<kernel/foundation/communication.hpp>
+#include<kernel/foundation/environment.hpp>
 
 using namespace FEAST;
 using namespace FEAST::Foundation;
@@ -19,8 +20,8 @@ namespace FEAST
       std::ostringstream stream;
       std::string msg;
 
-      ScaRCLog(Index bt = 100000) :
-        basetag(bt),
+      ScaRCLog() :
+        basetag(Environment::reserve_tag()),
         stream(),
         msg()
       {

@@ -6,6 +6,7 @@
 #include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/global_product_mat_vec.hpp>
 #include<kernel/lafem/arch/difference.hpp>
+#include<kernel/foundation/environment.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -31,7 +32,7 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> >& other_ranks,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                           Index tag = 0,
+                           const StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                            )
           {
@@ -46,7 +47,7 @@ namespace FEAST
                                                                   other_ranks,
                                                                   sendbufs,
                                                                   recvbufs,
-                                                                  tag,
+                                                                  tags,
                                                                   communicator);
 
             Difference<Mem_, Algo_>::value(target.elements(), b.elements(), target.elements(), target.size());
@@ -62,7 +63,7 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> >&,
                            StorageT_<VectorT_, std::allocator<VectorT_> >&,
                            StorageT_<VectorT_, std::allocator<VectorT_> >&,
-                           Index = 0,
+                           const StorageT_<Index, std::allocator<Index> >&,
                            Communicator = Communicator(0)
                            )
           {

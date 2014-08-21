@@ -566,7 +566,7 @@ namespace FEAST
                                                this->_data->dest_ranks(),
                                                this->_data->vector_mirror_sendbufs(),
                                                this->_data->vector_mirror_recvbufs(),
-                                               this->_data->base_tag(),             ///tag handling
+                                               this->_data->tags(),
                                                this->_data->communicators().at(0)); ///TODO ScarcLayer selection
 
             if(this->_conv_check)
@@ -629,7 +629,7 @@ namespace FEAST
                                                this->_data->dest_ranks(),
                                                this->_data->vector_mirror_sendbufs(),
                                                this->_data->vector_mirror_recvbufs(),
-                                               this->_data->base_tag(),             ///tag handling
+                                               this->_data->tags(),
                                                this->_data->communicators().at(0)); ///TODO ScarcLayer selection
 
             if(this->_conv_check)
@@ -1156,7 +1156,7 @@ namespace FEAST
                                              this->_data->dest_ranks(),
                                              this->_data->vector_mirror_sendbufs(),
                                              this->_data->vector_mirror_recvbufs(),
-                                             this->_data->base_tag(),             ///tag handling
+                                             this->_data->tags(),
                                              this->_data->communicators().at(0)); ///TODO ScarcLayer selection
 
           _temp0.format();
@@ -1170,7 +1170,7 @@ namespace FEAST
                                                  this->_data->dest_ranks(),
                                                  this->_data->vector_mirror_sendbufs(),
                                                  this->_data->vector_mirror_recvbufs(),
-                                                 this->_data->base_tag(),
+                                                 this->_data->tags(),
                                                  this->_data->communicators().at(0)
                                                 );
 
@@ -1189,7 +1189,7 @@ namespace FEAST
                                              this->_data->dest_ranks(),
                                              this->_data->vector_mirror_sendbufs(),
                                              this->_data->vector_mirror_recvbufs(),
-                                             this->_data->base_tag(),             ///tag handling
+                                             this->_data->tags(),
                                              this->_data->communicators().at(0)); ///TODO ScarcLayer selection
 
           //local solver, temp0 is now our rhs
@@ -1204,7 +1204,7 @@ namespace FEAST
                                                  this->_data->dest_ranks(),
                                                  this->_data->vector_mirror_sendbufs(),
                                                  this->_data->vector_mirror_recvbufs(),
-                                                 this->_data->base_tag(),
+                                                 this->_data->tags(),
                                                  this->_data->communicators().at(0)
                                                 );
 
@@ -1357,7 +1357,7 @@ namespace FEAST
                                              this->_data->dest_ranks(),
                                              this->_data->vector_mirror_sendbufs(),
                                              this->_data->vector_mirror_recvbufs(),
-                                             this->_data->base_tag(),             ///tag handling
+                                             this->_data->tags(),
                                              this->_data->communicators().at(0)); ///TODO ScarcLayer selection
 
           this->_precon->apply(_p, _r, this->_data->rhs());
@@ -1390,7 +1390,7 @@ namespace FEAST
                                                         this->_data->dest_ranks(),
                                                         this->_data->vector_mirror_sendbufs(),
                                                         this->_data->vector_mirror_recvbufs(),
-                                                        this->_data->base_tag(),
+                                                        this->_data->tags(),
                                                         this->_data->communicators().at(0)
                                                        );
 
@@ -1463,7 +1463,7 @@ namespace FEAST
                                              this->_data->dest_ranks(),
                                              this->_data->vector_mirror_sendbufs(),
                                              this->_data->vector_mirror_recvbufs(),
-                                             this->_data->base_tag(),             ///tag handling
+                                             this->_data->tags(),
                                              this->_data->communicators().at(0)); ///TODO ScarcLayer selection
 
           this->_precon->apply(_p, _r, this->_data->rhs());
@@ -1496,7 +1496,7 @@ namespace FEAST
                                                         this->_data->dest_ranks(),
                                                         this->_data->vector_mirror_sendbufs(),
                                                         this->_data->vector_mirror_recvbufs(),
-                                                        this->_data->base_tag(),
+                                                        this->_data->tags(),
                                                         this->_data->communicators().at(0)
                                                        );
 

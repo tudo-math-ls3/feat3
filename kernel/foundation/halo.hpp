@@ -33,14 +33,32 @@ namespace FEAST
             CommLink() :
               _rank(typename MeshType_::index_type_(0)),
               _weight(WT_(0.5)),
-              _complete(false)
+              _complete(false),
+              _global_id(0)
             {
             }
 
             CommLink(typename MeshType_::index_type_ rank, WeightType_ w) :
               _rank(rank),
               _weight(w),
-              _complete(true)
+              _complete(false),
+              _global_id(0)
+            {
+            }
+
+            CommLink(typename MeshType_::index_type_ rank, WeightType_ w, typename MeshType_::index_type_ id) :
+              _rank(rank),
+              _weight(w),
+              _complete(true),
+              _global_id(id)
+            {
+            }
+
+            CommLink(const CommLink& other) :
+              _rank(other._rank),
+              _weight(other._weight),
+              _complete(other._complete),
+              _global_id(other._global_id)
             {
             }
 
@@ -69,10 +87,26 @@ namespace FEAST
               return _complete;
             }
 
+            void set_complete()
+            {
+              _complete = true;
+            }
+
+            typename MeshType_::index_type_ get_global_id() const
+            {
+              return _global_id;
+            }
+
+            typename MeshType_::index_type_& get_global_id()
+            {
+              return _global_id;
+            }
+
           private:
             typename MeshType_::index_type_ _rank;
             WeightType_ _weight;
             bool _complete;
+            typename MeshType_::index_type_ _global_id;
         };
 
         ///type exports:
@@ -188,6 +222,17 @@ namespace FEAST
         virtual void set_elements(compound_storage_type_&& data)
         {
           _halo_elements = data;
+        }
+
+        virtual Index get_global_id()
+        {
+          return _cl.get_global_id();
+        }
+
+        virtual void set_id(typename MeshType_::index_type_ id)
+        {
+          _cl.get_global_id() = id;
+          _cl.set_complete();
         }
 
         ///implementation of Bufferable interface
@@ -368,6 +413,21 @@ namespace FEAST
         unsigned _overlap;
 
         PolytopeLevels _level;
+    };
+
+    struct HaloTags
+    {
+      template<typename MeshType_,
+               typename WT_ = double,
+               template<typename, typename> class ST_ = std::vector>
+      static ST_<Index, std::allocator<Index> > value(ST_<std::shared_ptr<HaloBase<MeshType_, WT_, ST_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_, WT_, ST_> > > >& halos)
+      {
+        ST_<Index, std::allocator<Index> > res;
+        for(auto& h_i : halos)
+          res.push_back(h_i->get_global_id());
+
+        return res;
+      }
     };
 
 

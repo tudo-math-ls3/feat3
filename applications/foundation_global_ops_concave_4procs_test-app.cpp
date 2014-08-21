@@ -2031,11 +2031,13 @@ void check_global_synchvec0_3D_concave(Index rank)
   other_ranks.push_back(p0.comm_halos.at(1)->get_other());
   other_ranks.push_back(p0.comm_halos.at(2)->get_other());
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(a,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
-                                                  recvbufs);
+                                                  recvbufs,
+                                                  tags);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;
@@ -2477,12 +2479,14 @@ void check_global_synchvec1_3D_concave(Index rank)
 
   auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1<Mem::Main, Algo::Generic>::exec(a,
                                                   mirrors,
                                                   frequencies,
                                                   other_ranks,
                                                   sendbufs,
-                                                  recvbufs);
+                                                  recvbufs,
+                                                  tags);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;
@@ -3300,11 +3304,13 @@ void check_global_synchvec0_3D_gateway_concave(Index rank)
   other_ranks.push_back(p0.comm_halos.at(1)->get_other());
   other_ranks.push_back(p0.comm_halos.at(2)->get_other());
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec0Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
-                                                                                                                          recvbufs);
+                                                                                                                          recvbufs,
+                                                                                                                          tags);
   a.synch0(&gate);
 
 
@@ -3748,12 +3754,14 @@ void check_global_synchvec1_3D_gateway_concave(Index rank)
 
   auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           frequencies,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
-                                                                                                                          recvbufs);
+                                                                                                                          recvbufs,
+                                                                                                                          tags);
   a.synch1(&gate);
 
   TestResult<double, double, double> res0;

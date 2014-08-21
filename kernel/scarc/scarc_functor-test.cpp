@@ -249,13 +249,15 @@ class ScaRCFunctorTest:
       UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
       dirichlet.assemble(filter);
 
+      auto tags(HaloTags::value(p_i.comm_halos));
       //synching for type-0 -> type-1
       auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks));
       GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(vec_rhs,
           mirrors,
           other_ranks,
           sendbufs,
-          recvbufs);
+          recvbufs,
+          tags);
 
       SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
       for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -287,6 +289,7 @@ class ScaRCFunctorTest:
       data.localsys() = std::move(mat_localsys);
 
       data.halo_frequencies() = std::move(frequencies);
+      data.tags() = std::move(tags);
       ///layer 0 (local layer)
       std::shared_ptr<ScaRCFunctorBase<double,
         Mem::Main,

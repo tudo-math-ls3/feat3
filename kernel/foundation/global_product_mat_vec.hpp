@@ -5,6 +5,7 @@
 #include<kernel/foundation/comm_base.hpp>
 #include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/global_synch_vec.hpp>
+#include<kernel/foundation/environment.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -30,7 +31,7 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> >& other_ranks,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                           Index tag = 0,
+                           const StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                            )
           {
@@ -44,7 +45,7 @@ namespace FEAST
                                                other_ranks,
                                                sendbufs,
                                                recvbufs,
-                                               tag,
+                                               tags,
                                                communicator);
           }
 #else
@@ -57,7 +58,7 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> >&,
                            StorageT_<VectorT_, std::allocator<VectorT_> >&,
                            StorageT_<VectorT_, std::allocator<VectorT_> >&,
-                           Index = 0,
+                           const StorageT_<Index, std::allocator<Index> >&,
                            Communicator = Communicator(0)
                            )
           {

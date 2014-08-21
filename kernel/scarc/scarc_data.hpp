@@ -440,10 +440,16 @@ namespace FEAST
           return _halo_frequencies;
         }
 
-        virtual IT_ base_tag() const
+        virtual index_storage_type_& tags()
         {
-          return _base_tag;
+          return _tags;
         }
+
+        virtual const index_storage_type_& tags() const
+        {
+          return _tags;
+        }
+
 
         virtual StorageType_<Communicator, std::allocator<Communicator> >& communicators()
         {
@@ -468,6 +474,7 @@ namespace FEAST
           _stored_vector_mirror_recvbufs(),
           _stored_dest_ranks(),
           _stored_source_ranks(),
+          _tags(),
           _communicators()
         {
         }
@@ -480,6 +487,7 @@ namespace FEAST
           this->_stored_dest_ranks = std::move(other._stored_dest_ranks);
           this->_stored_source_ranks = std::move(other._stored_source_ranks);
           this->_halo_frequencies = std::move(other._halo_frequencies);
+          this->_tags = std::move(other._tags);
           this->_communicators = std::move(other._communicators);
         }
 
@@ -491,20 +499,11 @@ namespace FEAST
 
         vector_type_ _halo_frequencies;
 
-        static IT_ _base_tag;
+        index_storage_type_ _tags;
 
         ///communicators associated with scarc layers of the same index
         StorageType_<Communicator, std::allocator<Communicator> > _communicators;
     };
-    ///generic definition of static base tag
-    template<typename DataType_,
-             typename MemTag_,
-             typename VectorType_,
-             typename VectorMirrorType_,
-             template<typename, typename> class StorageType_,
-             typename IT_>
-    IT_ SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_, IT_>::_base_tag = 0;
-
 
     /**
      * \brief Simple data container with synchronisation data
@@ -590,6 +589,9 @@ namespace FEAST
         this->_stored_dest_ranks = std::move(other._stored_dest_ranks);
         this->_stored_source_ranks = std::move(other._stored_source_ranks);
         this->_halo_frequencies = std::move(other._halo_frequencies);
+
+        this->_tags = std::move(other._tags);
+        this->_communicators = std::move(other._communicators);
 
         return *this;
       }
@@ -686,6 +688,8 @@ namespace FEAST
         this->_stored_source_ranks = std::move(other._stored_source_ranks);
         this->_halo_frequencies = std::move(other._halo_frequencies);
 
+        this->_tags = std::move(other._tags);
+        this->_communicators = std::move(other._communicators);
         return *this;
       }
     };
@@ -843,6 +847,8 @@ namespace FEAST
         this->_stored_source_ranks = std::move(other._stored_source_ranks);
         this->_halo_frequencies = std::move(other._halo_frequencies);
 
+        this->_tags = std::move(other._tags);
+        this->_communicators = std::move(other._communicators);
         this->_stored_filter = std::move(other._stored_filter);
 
         return *this;

@@ -96,13 +96,13 @@ namespace FEAST
                                StorageT_<Index, std::allocator<Index> >& other_ranks,
                                StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                                StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                               Index tag = 0,
+                               StorageT_<Index, std::allocator<Index> >& tags,
                                Communicator communicator = Communicator(MPI_COMM_WORLD)) :
           _mirrors(mirrors),
           _other_ranks(other_ranks),
           _sendbufs(sendbufs),
           _recvbufs(recvbufs),
-          _tag(tag),
+          _tags(tags),
           _communicator(communicator)
         {
         }
@@ -112,13 +112,13 @@ namespace FEAST
                                StorageT_<Index, std::allocator<Index> >& other_ranks,
                                StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                                StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                               Index tag = 0,
+                               StorageT_<Index, std::allocator<Index> >& tags,
                                Communicator communicator = Communicator(0)) :
           _mirrors(mirrors),
           _other_ranks(other_ranks),
           _sendbufs(sendbufs),
           _recvbufs(recvbufs),
-          _tag(tag),
+          _tags(tags),
           _communicator(communicator)
         {
         }
@@ -132,7 +132,7 @@ namespace FEAST
                                               _other_ranks,
                                               _sendbufs,
                                               _recvbufs,
-                                              _tag,
+                                              _tags,
                                               _communicator);
           return x;
         }
@@ -142,7 +142,7 @@ namespace FEAST
         StorageT_<Index, std::allocator<Index> >& _other_ranks;
         StorageT_<VectorT_, std::allocator<VectorT_> >& _sendbufs;
         StorageT_<VectorT_, std::allocator<VectorT_> >& _recvbufs;
-        Index _tag;
+        StorageT_<Index, std::allocator<Index> >& _tags;
         Communicator _communicator;
     };
 
@@ -161,14 +161,14 @@ namespace FEAST
                                StorageT_<Index, std::allocator<Index> >& other_ranks,
                                StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                                StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                               Index tag = 0,
+                               StorageT_<Index, std::allocator<Index> >& tags,
                                Communicator communicator = Communicator(MPI_COMM_WORLD)) :
           _mirrors(mirrors),
           _frequencies(frequencies),
           _other_ranks(other_ranks),
           _sendbufs(sendbufs),
           _recvbufs(recvbufs),
-          _tag(tag),
+          _tags(tags),
           _communicator(communicator)
         {
         }
@@ -179,14 +179,14 @@ namespace FEAST
                                StorageT_<Index, std::allocator<Index> >& other_ranks,
                                StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                                StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                               Index tag = 0,
+                               StorageT_<Index, std::allocator<Index> >& tags,
                                Communicator communicator = Communicator(0)) :
           _mirrors(mirrors),
           _frequencies(frequencies),
           _other_ranks(other_ranks),
           _sendbufs(sendbufs),
           _recvbufs(recvbufs),
-          _tag(tag),
+          _tags(tags),
           _communicator(communicator)
         {
         }
@@ -201,7 +201,7 @@ namespace FEAST
                                               _other_ranks,
                                               _sendbufs,
                                               _recvbufs,
-                                              _tag,
+                                              _tags,
                                               _communicator);
           return x;
         }
@@ -212,7 +212,7 @@ namespace FEAST
         StorageT_<Index, std::allocator<Index> >& _other_ranks;
         StorageT_<VectorT_, std::allocator<VectorT_> >& _sendbufs;
         StorageT_<VectorT_, std::allocator<VectorT_> >& _recvbufs;
-        Index _tag;
+        StorageT_<Index, std::allocator<Index> >& _tags;
         Communicator _communicator;
     };
 
@@ -231,14 +231,14 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> >& other_ranks,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                           Index tag = 0,
+                           StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                                ) :
           _mirrors(mirrors),
           _other_ranks(other_ranks),
           _sendbufs(sendbufs),
           _recvbufs(recvbufs),
-          _tag(tag),
+          _tags(tags),
           _communicator(communicator)
         {
         }
@@ -248,14 +248,14 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> >& other_ranks,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                           Index tag = 0,
+                           StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(0)
                                ) :
           _mirrors(mirrors),
           _other_ranks(other_ranks),
           _sendbufs(sendbufs),
           _recvbufs(recvbufs),
-          _tag(tag),
+          _tags(tags),
           _communicator(communicator)
         {
         }
@@ -271,7 +271,7 @@ namespace FEAST
                                                    _other_ranks,
                                                    _sendbufs,
                                                    _recvbufs,
-                                                   _tag,
+                                                   _tags,
                                                    _communicator
                                                    );
           return r;
@@ -282,7 +282,7 @@ namespace FEAST
         StorageT_<Index, std::allocator<Index> >& _other_ranks;
         StorageT_<VectorT_, std::allocator<VectorT_> >& _sendbufs;
         StorageT_<VectorT_, std::allocator<VectorT_> >& _recvbufs;
-        Index _tag;
+        StorageT_<Index, std::allocator<Index> >& _tags;
         Communicator _communicator;
     };
   }

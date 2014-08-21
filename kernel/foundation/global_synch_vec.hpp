@@ -4,6 +4,7 @@
 
 #include<kernel/foundation/comm_base.hpp>
 #include<kernel/foundation/communication.hpp>
+#include<kernel/foundation/environment.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -33,7 +34,7 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> >& other_ranks,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                           Index tag = 0,
+                           const StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                            )
           {
@@ -57,7 +58,7 @@ namespace FEAST
                           recvbufs.at(i).size(),
                           other_ranks.at(i),
                           recvrequests.at(i),
-                          tag + Comm::rank(communicator),
+                          tags.at(i),
                           communicator
                          );
 
@@ -80,7 +81,7 @@ namespace FEAST
                           sendbufs.at(i).size(),
                           other_ranks.at(i),
                           sendrequests.at(i),
-                          tag + other_ranks.at(i),
+                          tags.at(i),
                           communicator
                           );
             }
@@ -131,7 +132,7 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> >&,
                            StorageT_<VectorT_, std::allocator<VectorT_> >&,
                            StorageT_<VectorT_, std::allocator<VectorT_> >&,
-                           Index = 0,
+                           const StorageT_<Index, std::allocator<Index> >&,
                            Communicator = Communicator(0)
                            )
           {
@@ -159,7 +160,7 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> > other_ranks,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                            StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                           Index tag = 0,
+                           const StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                            )
           {
@@ -183,7 +184,7 @@ namespace FEAST
                           recvbufs.at(i).size(),
                           other_ranks.at(i),
                           recvrequests.at(i),
-                          tag + Comm::rank(communicator),
+                          tags.at(i),
                           communicator
                          );
             }
@@ -205,7 +206,7 @@ namespace FEAST
                           sendbufs.at(i).size(),
                           other_ranks.at(i),
                           sendrequests.at(i),
-                          tag + other_ranks.at(i),
+                          tags.at(i),
                           communicator
                           );
             }
@@ -268,7 +269,7 @@ namespace FEAST
                            StorageT_<Index, std::allocator<Index> >&,
                            StorageT_<VectorT_, std::allocator<VectorT_> >&,
                            StorageT_<VectorT_, std::allocator<VectorT_> >&,
-                           Index = 0,
+                           const StorageT_<Index, std::allocator<Index> >&,
                            Communicator = Communicator(0)
                            )
           {

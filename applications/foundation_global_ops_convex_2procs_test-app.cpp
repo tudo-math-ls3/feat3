@@ -639,11 +639,13 @@ void check_global_synchvec0_1D(Index rank)
   std::vector<Index> other_ranks;
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(a,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
-                                                  recvbufs);
+                                                  recvbufs,
+                                                  tags);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;
@@ -767,11 +769,13 @@ void check_global_synchvec0_2D(Index rank)
   std::vector<Index> other_ranks;
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(a,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
-                                                  recvbufs);
+                                                  recvbufs,
+                                                  tags);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;
@@ -1047,11 +1051,13 @@ void check_global_synchvec0_3D(Index rank)
   std::vector<Index> other_ranks;
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(a,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
-                                                  recvbufs);
+                                                  recvbufs,
+                                                  tags);
 
   TestResult<double, double, double> res[18];
   const double ref[18][2] =
@@ -1190,12 +1196,14 @@ void check_global_synchvec1_1D(Index rank)
 
   auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1<Mem::Main, Algo::Generic>::exec(a,
                                                   mirrors,
                                                   frequencies,
                                                   other_ranks,
                                                   sendbufs,
-                                                  recvbufs);
+                                                  recvbufs,
+                                                  tags);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;
@@ -1329,12 +1337,14 @@ void check_global_synchvec1_2D(Index rank)
 
   auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1<Mem::Main, Algo::Generic>::exec(a,
                                                   mirrors,
                                                   frequencies,
                                                   other_ranks,
                                                   sendbufs,
-                                                  recvbufs);
+                                                  recvbufs,
+                                                  tags);
 
   TestResult<double, double, double> res0, res1, res2, res3, res4, res5;
   res0 = test_check_equal_within_eps(a(0), 1., std::numeric_limits<double>::epsilon());
@@ -1612,12 +1622,14 @@ void check_global_synchvec1_3D(Index rank)
 
   auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1<Mem::Main, Algo::Generic>::exec(a,
                                                   mirrors,
                                                   frequencies,
                                                   other_ranks,
                                                   sendbufs,
-                                                  recvbufs);
+                                                  recvbufs,
+                                                  tags);
 
   TestResult<double, double, double> res[18];
 
@@ -1744,6 +1756,7 @@ void check_global_product_mat_vec_1D(Index rank)
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> result(a.size(), double(0));
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalProductMat0Vec1<Mem::Main, Algo::Generic>::exec(
                                                         result,
                                                         mat_sys,
@@ -1751,7 +1764,8 @@ void check_global_product_mat_vec_1D(Index rank)
                                                         mirrors,
                                                         other_ranks,
                                                         sendbufs,
-                                                        recvbufs);
+                                                        recvbufs,
+                                                        tags);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;
@@ -1874,6 +1888,7 @@ void check_global_defect_1D(Index rank)
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> result(a.size(), double(0));
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalDefect<Mem::Main, Algo::Generic>::exec(
                                                result,
                                                b,
@@ -1882,7 +1897,8 @@ void check_global_defect_1D(Index rank)
                                                mirrors,
                                                other_ranks,
                                                sendbufs,
-                                               recvbufs);
+                                               recvbufs,
+                                               tags);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;
@@ -3940,11 +3956,13 @@ void check_global_synchvec0_1D_gateway(Index rank)
   std::vector<Index> other_ranks;
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec0Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
-                                                                                                                          recvbufs);
+                                                                                                                          recvbufs,
+                                                                                                                          tags);
   a.synch0(&gate);
 
   TestResult<double, double, double> res0;
@@ -4070,11 +4088,13 @@ void check_global_synchvec0_2D_gateway(Index rank)
   std::vector<Index> other_ranks;
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec0Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
-                                                                                                                          recvbufs);
+                                                                                                                          recvbufs,
+                                                                                                                          tags);
   a.synch0(&gate);
 
   TestResult<double, double, double> res0;
@@ -4348,11 +4368,13 @@ void check_global_synchvec0_3D_gateway(Index rank)
   std::vector<Index> other_ranks;
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec0Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
-                                                                                                                          recvbufs);
+                                                                                                                          recvbufs,
+                                                                                                                          tags);
   a.synch0(&gate);
 
   TestResult<double, double, double> res[18];
@@ -4492,12 +4514,14 @@ void check_global_synchvec1_1D_gateway(Index rank)
 
   auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           frequencies,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
-                                                                                                                          recvbufs);
+                                                                                                                          recvbufs,
+                                                                                                                          tags);
   a.synch1(&gate);
 
   TestResult<double, double, double> res0;
@@ -4633,12 +4657,14 @@ void check_global_synchvec1_2D_gateway(Index rank)
 
   auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           frequencies,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
-                                                                                                                          recvbufs);
+                                                                                                                          recvbufs,
+                                                                                                                          tags);
   a.synch1(&gate);
 
   TestResult<double, double, double> res0, res1, res2, res3, res4, res5;
@@ -4919,12 +4945,14 @@ void check_global_synchvec1_3D_gateway(Index rank)
 
   auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
 
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           frequencies,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
-                                                                                                                          recvbufs);
+                                                                                                                          recvbufs,
+                                                                                                                          tags);
   a.synch1(&gate);
 
   TestResult<double, double, double> res[18];
@@ -5052,6 +5080,7 @@ void check_global_product_mat_vec_1D_gateway(Index rank)
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> result(a.size(), double(0));
+  auto tags(HaloTags::value(p0.comm_halos));
   GlobalProductMat0Vec1Gateway<Mem::Main,
                                Algo::Generic,
                                DenseVector<Mem::Main, double>,
@@ -5061,7 +5090,8 @@ void check_global_product_mat_vec_1D_gateway(Index rank)
                                       mirrors,
                                       other_ranks,
                                       sendbufs,
-                                      recvbufs);
+                                      recvbufs,
+                                      tags);
 
   mat_sys.apply(result, a, &gate);
 

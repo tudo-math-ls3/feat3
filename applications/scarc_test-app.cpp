@@ -226,6 +226,8 @@ void check_scarc_rich_rich_1D(Index rank)
 #else
   Communicator c(0);
 #endif
+  auto tags(HaloTags::value(p0.comm_halos));
+  data.tags() = std::move(tags);
   data.communicators().push_back(std::move(c));
 
   //data.source_ranks() = std::move(sourceranks);
@@ -489,6 +491,8 @@ void check_scarc_pcg_rich_1D(Index rank)
 #else
   Communicator c(0);
 #endif
+  auto tags(HaloTags::value(p0.comm_halos));
+  data.tags() = std::move(tags);
   data.communicators().push_back(std::move(c));
 
   //data.source_ranks() = std::move(sourceranks);
@@ -753,6 +757,8 @@ void check_scarc_rich_pcg_1D(Index rank)
 #else
   Communicator c(0);
 #endif
+  auto tags(HaloTags::value(p0.comm_halos));
+  data.tags() = std::move(tags);
   data.communicators().push_back(std::move(c));
 
   //data.source_ranks() = std::move(sourceranks);
@@ -1015,6 +1021,8 @@ void check_scarc_pcg_pcg_1D(Index rank)
 #else
   Communicator c(0);
 #endif
+  auto tags(HaloTags::value(p0.comm_halos));
+  data.tags() = std::move(tags);
   data.communicators().push_back(std::move(c));
 
   //data.source_ranks() = std::move(sourceranks);
