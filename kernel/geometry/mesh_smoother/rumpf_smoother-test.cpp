@@ -1,13 +1,16 @@
 #include <test_system/test_system.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/util/math.hpp>
+#ifdef FEAST_HAVE_ALGLIB
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/reference_cell_factory.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_smoother.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_smoother_q1hack.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1_d2.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_2d_p1.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1_d2.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_p1.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1hack.hpp>
 
@@ -149,13 +152,19 @@ typedef Mem::Main MemType;
 
 RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother, float, MemType> test_hc_f_1;
 RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset, MySmoother, float, MemType>test_hc_f_2;
+RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional_D2, MySmoother, float, MemType> test_hc_f_3;
+RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset_D2, MySmoother, float, MemType> test_hc_f_4;
 RumpfSmootherTest_2d<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctional, MySmoother, float, MemType>test_s_f_1;
 RumpfSmootherTest_2d<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelset, MySmoother, float, MemType>test_s_f_2;
 
 RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother, double, MemType>test_hc_d_1;
 RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset, MySmoother, double, MemType>test_hc_d_2;
+RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional_D2, MySmoother, double, MemType>test_hc_d_3;
+RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset_D2, MySmoother, double, MemType>test_hc_d_4;
 RumpfSmootherTest_2d<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctional, MySmoother, double, MemType> test_s_d_1;
 RumpfSmootherTest_2d<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelset, MySmoother, double, MemType>test_s_d_2;
 
 RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelsetQ1Hack, MySmootherQ1Hack, float, MemType>test_q1hack_f;
 RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelsetQ1Hack, MySmootherQ1Hack, double, MemType>test_q1hack_d;
+
+#endif

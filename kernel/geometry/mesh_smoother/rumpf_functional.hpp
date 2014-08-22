@@ -397,6 +397,9 @@ namespace FEAST
 
     template<typename MemoryType_, typename DataType_, typename ShapeType_>
     class RumpfFunctional_D2;
+
+    template<typename MemoryType_, typename DataType_, typename ShapeType_>
+    class RumpfFunctionalLevelset_D2;
     }
   }
 

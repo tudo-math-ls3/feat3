@@ -16,6 +16,7 @@ SET (app_list
   foundation_global_ops_concave_4procs_test-app
   foundation_global_ops_synch_scal_test-app
   foundation_partitioning_4procs_test-app
+  laplace_smoother_bdry_deform-app
   scarc_test-app
   scarc_1proc_test-app
   scarc_gateway_test-app
@@ -32,9 +33,9 @@ SET (app_list
 if (FEAST_HAVE_ALGLIB)
   SET (app_list
     ${app_list}
-    mesh_smoother_bdry_deform-app
-    mesh_smoother_lvlset-app
-    mesh_smoother_resize-app
+    rumpf_smoother_bdry_deform-app
+    rumpf_smoother_lvlset-app
+    rumpf_smoother_resize-app
   )
 endif (FEAST_HAVE_ALGLIB)
 

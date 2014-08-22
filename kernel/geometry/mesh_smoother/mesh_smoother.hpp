@@ -43,9 +43,11 @@ namespace FEAST
         typedef typename TrafoType::MeshType MeshType;
         /// ShapeType of said mesh
         typedef typename MeshType::ShapeType ShapeType;
+        /// Type for the vectors to hold coordinates etc.
+        typedef LAFEM::DenseVector<MemType, DataType> VectorType;
 
         /// Coordinates of the vertices, as they get changed in the optimisation process
-        LAFEM::DenseVector<MemType_, DataType_> _coords[MeshType::world_dim];
+        VectorType _coords[MeshType::world_dim];
 
       protected:
         /// The underlying transformation
@@ -66,7 +68,7 @@ namespace FEAST
           _nk (_mesh.get_num_entities(0))
       {
         for(Index d = 0; d < _world_dim; ++d)
-          _coords[d]= std::move(LAFEM::DenseVector<MemType, DataType>(_nk));
+          _coords[d]= std::move(VectorType(_nk));
 
       }
 
@@ -118,6 +120,9 @@ namespace FEAST
 
         /// \brief Optimises the mesh according to the criteria implemented in the mesh smoother.
         virtual void optimise() = 0;
+
+        /// \brief Prepares the mesh optimiser for application
+        virtual void prepare() = 0;
 
     }; // class MeshSmoother
 

@@ -41,8 +41,8 @@ namespace FEAST
           BaseClass( fac_norm_,
           fac_det_,
           fac_cof_,
-          fac_reg_,
-          fac_lvlset(DataType_(1)))
+          fac_reg_),
+          fac_lvlset(DataType_(1))
           {
           }
 

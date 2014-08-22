@@ -6,6 +6,7 @@
 #include <kernel/geometry/mesh_smoother/rumpf_smoother.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_smoother_q1hack.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1_d2.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_2d_p1.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1hack.hpp>
 #include <kernel/geometry/export_vtk.hpp>
@@ -44,15 +45,15 @@ template
     typedef DataType_ DataType;
 
     // Mesh and trafo
-    Index level(5);
-    Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
+    Index level(3);
+    Geometry::RefineFactory<MeshType,Geometry::UnitStarCubeFactory> mesh_factory(level);
     MeshType mesh(mesh_factory);
     TrafoType trafo(mesh);
 
     DataType pi(Math::pi<DataType>());
-    DataType deltat(DataType(0.0125));
+    DataType deltat(DataType(1e-3));
 
-    DataType fac_norm = DataType(1e0),fac_det = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    DataType fac_norm = DataType(1e-2),fac_det = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(1e-4));
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     // The smoother in all its template glory
@@ -75,18 +76,25 @@ template
       Index j = boundary_set[i];
       DataType tmp0 = rumpflpumpfl._coords[0](j);
       DataType tmp1 = rumpflpumpfl._coords[1](j);
-      rumpflpumpfl._coords[0](j, tmp0 - ( Math::sin(DataType(2)*pi*tmp1) )/DataType(1 << (level+2)));
-      rumpflpumpfl._coords[1](j, tmp1 + ( Math::sin(DataType(2)*pi*tmp0) )/DataType(1 << (level+2)));
+      DataType norm = Math::sqrt(DataType(0.5)) / Math::sqrt( Math::sqr(tmp0 - DataType(0.5)) + Math::sqr(tmp1 - DataType(0.5)) );
+      rumpflpumpfl._coords[0](j, (tmp0 - DataType(0.5)) * norm + (DataType(0.5)) );
+      rumpflpumpfl._coords[1](j, (tmp1 - DataType(0.5)) * norm + (DataType(0.5)));
     }
+      for(Index i(0); i < mesh.get_num_entities(0); ++i)
+      {
+        rumpflpumpfl._coords[0](i, rumpflpumpfl._coords[0](i) - DataType(0.5));
+        rumpflpumpfl._coords[1](i, rumpflpumpfl._coords[1](i) - DataType(0.5));
+      }
+    // Set coords since we used the boundary deformation
+    rumpflpumpfl.set_coords();
 
     DataType* func_norm(new DataType[mesh.get_num_entities(2)]);
     DataType* func_det(new DataType[mesh.get_num_entities(2)]);
     DataType* func_det2(new DataType[mesh.get_num_entities(2)]);
 
-    // Set coords since we used the boundary deformation
-    rumpflpumpfl.set_coords();
     // Compute initial functional value
     DataType fval(0);
+
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_det2);
     std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
     // Compute initial functional gradient
@@ -131,13 +139,13 @@ template
       coords_old[d]= std::move(LAFEM::DenseVector<MemType, DataType>(mesh.get_num_entities(0)));
 
 
-    Index outputstep(4);
+    Index outputstep(1);
     deltat /= DataType(outputstep);
     std::cout << "deltat = " << scientify(deltat) << ", outputstep = " << outputstep << std::endl;
     std::cout << "fac_norm = " << scientify(fac_norm) << ", fac_det= " << scientify(fac_det)
     << ", fac_reg = " << scientify(fac_reg) << std::endl;
 
-    while(time < DataType(6))
+    while(time < DataType(2e-1))
     {
 
       std::cout << "timestep " << n << std::endl;
@@ -162,9 +170,9 @@ template
         //rumpflpumpfl._coords[1](j, tmp1 - deltat*tmp0*norm );
         rumpflpumpfl._coords[0](j, tmp0 + deltat*DataType(0.25)*((DataType(4)*tmp0 - DataType(2)) + Math::pow((DataType(4)*tmp1 - DataType(2)),DataType(3) ) )) ;
         rumpflpumpfl._coords[1](j, tmp1 - deltat*DataType(0.25)*((DataType(4)*tmp1 - DataType(2)) + Math::pow((DataType(4)*tmp0 - DataType(2)),DataType(3) ) )) ;
-        rumpflpumpfl.set_coords();
 
       }
+      rumpflpumpfl.set_coords();
 
       if( n%outputstep || outputstep==1)
       {
@@ -241,6 +249,6 @@ int main()
 {
   typedef Mem::Main MemType;
 
-  BdryDeformApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother, double, MemType>::run();
+  BdryDeformApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional_D2, MySmoother, double, MemType>::run();
   return 0;
 }

@@ -7,6 +7,7 @@
 #include <kernel/geometry/mesh_smoother/rumpf_smoother_lvlset_q1hack.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_p1.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1_d2.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1hack.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/space/lagrange1/element.hpp>
@@ -209,9 +210,9 @@ template
 
     DataType deltat(DataType(0.025));
 
-    DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
-    bool from_original(true);
-    bool align_to_lvlset(true);
+    DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-4));
+    bool from_original(false);
+    bool align_to_lvlset(false);
     bool r_adaptivity(true);
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
@@ -379,7 +380,9 @@ template
     delete func_lvlset;
 
     delete mesh_velocity;
+
   }
+
 }; // struct LevelsetApp
 
 template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
@@ -391,6 +394,6 @@ int main()
 {
   typedef Mem::Main MemType;
 
-  LevelsetApp<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelset, MySmoother, double, MemType>::run();
+  LevelsetApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset_D2, MySmoother, double, MemType>::run();
   return 0;
 }
