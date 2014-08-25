@@ -41,10 +41,14 @@ public:
     SparseVector<Mem_, DT_> a(10);
     a(3, DT_(7));
     a(3, DT_(3));
+    a(6, DT_(1));
     a(5, DT_(6));
-    TEST_CHECK_EQUAL(a.used_elements(), Index(2));
+    a(6, DT_(8));
+    TEST_CHECK_EQUAL(a.used_elements(), Index(3));
     TEST_CHECK_EQUAL(a(3), DT_(3));
     TEST_CHECK_EQUAL(a(2), DT_(0));
+    TEST_CHECK_EQUAL(a(5), DT_(6));
+    TEST_CHECK_EQUAL(a(6), DT_(8));
 
     std::stringstream ts;
     a.write_out(FileMode::fm_mtx, ts);
@@ -76,7 +80,8 @@ public:
     TEST_CHECK_NOT_EQUAL(c, e);
 
     a.format();
-    TEST_CHECK_EQUAL(a.used_elements(), Index(2));
+    TEST_CHECK_EQUAL(a.used_elements(), Index(3));
+    TEST_CHECK_EQUAL(a(2), DT_(0));
     TEST_CHECK_EQUAL(a(3), DT_(0));
   }
 };
