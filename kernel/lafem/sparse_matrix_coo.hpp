@@ -1199,16 +1199,16 @@ namespace FEAST
           {
             _allocated_elements() += alloc_increment();
 
-            DT_ * elements_new(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(allocated_elements()));
-            Util::MemoryPool<Mem_>::instance()->template set_memory<DT_>(elements_new, DT_(4711), allocated_elements());
-            IT_ * rows_new(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(allocated_elements()));
-            Util::MemoryPool<Mem_>::instance()->template set_memory<IT_>(rows_new, IT_(4711), allocated_elements());
-            IT_ * cols_new(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(allocated_elements()));
-            Util::MemoryPool<Mem_>::instance()->template set_memory<IT_>(cols_new, IT_(4711), allocated_elements());
+            DT_ * elements_new(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_allocated_elements()));
+            Util::MemoryPool<Mem_>::instance()->template set_memory<DT_>(elements_new, DT_(4711), _allocated_elements());
+            IT_ * rows_new(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_allocated_elements()));
+            Util::MemoryPool<Mem_>::instance()->template set_memory<IT_>(rows_new, IT_(4711), _allocated_elements());
+            IT_ * cols_new(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_allocated_elements()));
+            Util::MemoryPool<Mem_>::instance()->template set_memory<IT_>(cols_new, IT_(4711), _allocated_elements());
 
-            Util::MemoryPool<Mem_>::copy(elements_new, this->_elements.at(0), used_elements());
-            Util::MemoryPool<Mem_>::copy(rows_new, this->_indices.at(0), used_elements());
-            Util::MemoryPool<Mem_>::copy(cols_new, this->_indices.at(1), used_elements());
+            Util::MemoryPool<Mem_>::copy(elements_new, this->_elements.at(0), _used_elements());
+            Util::MemoryPool<Mem_>::copy(rows_new, this->_indices.at(0), _used_elements());
+            Util::MemoryPool<Mem_>::copy(cols_new, this->_indices.at(1), _used_elements());
 
             Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(0));
             Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(0));
@@ -1218,14 +1218,14 @@ namespace FEAST
             this->_indices.at(0) = rows_new;
             this->_indices.at(1) = cols_new;
 
-            Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0) + used_elements(), value);
-            Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + used_elements(), IT_(row));
-            Util::MemoryPool<Mem_>::set_memory(this->_indices.at(1) + used_elements(), IT_(col));
+            Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0) + _used_elements(), value);
+            Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(row));
+            Util::MemoryPool<Mem_>::set_memory(this->_indices.at(1) + _used_elements(), IT_(col));
 
             ++_used_elements();
-            this->_elements_size.at(0) = allocated_elements();
-            this->_indices_size.at(0) = allocated_elements();
-            this->_indices_size.at(1) = allocated_elements();
+            this->_elements_size.at(0) = _allocated_elements();
+            this->_indices_size.at(0) = _allocated_elements();
+            this->_indices_size.at(1) = _allocated_elements();
           }
         }
 
@@ -1237,36 +1237,36 @@ namespace FEAST
             _sorted() = 1;
 
             // check if there is anything to be sorted
-            if(used_elements() <= Index(0))
+            if(_used_elements() <= Index(0))
               return;
 
             // sort elements by row index
-            _insertion_sort(row_indices(), val(), column_indices(), used_elements());
+            _insertion_sort(this->_indices.at(0), val(), this->_indices.at(1), _used_elements());
 
             Index row_start(0);
             for (IT_ rowi(0) ; rowi < IT_(rows()) ; ++rowi)
             {
               Index offset(0);
               // explore range of elements in given row
-              for ( ; row_start + offset < used_elements() && Util::MemoryPool<Mem_>::get_element(row_indices(), row_start + offset) == rowi ; ++offset) ;
+              for ( ; row_start + offset < _used_elements() && Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), row_start + offset) == rowi ; ++offset) ;
               // sort range of elements in given row by column index
-              _insertion_sort(column_indices() + row_start, val() + row_start, row_indices() + row_start, offset);
+              _insertion_sort(this->_indices.at(1) + row_start, val() + row_start, this->_indices.at(0) + row_start, offset);
               // find and mark duplicate entries
               for (Index i(row_start + 1) ; i < row_start + offset ; ++i)
               {
-                if (Util::MemoryPool<Mem_>::get_element(column_indices(), i - 1) == Util::MemoryPool<Mem_>::get_element(column_indices(), i))
+                if (Util::MemoryPool<Mem_>::get_element(this->_indices.at(1), i - 1) == Util::MemoryPool<Mem_>::get_element(this->_indices.at(1), i))
                 {
-                  Util::MemoryPool<Mem_>::set_memory(row_indices() + i - 1, std::numeric_limits<IT_>::max());
+                  Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + i - 1, std::numeric_limits<IT_>::max());
                 }
               }
               row_start += offset;
             }
 
             // sort out marked duplicated elements
-            _insertion_sort(row_indices(), val(), column_indices(), used_elements());
+            _insertion_sort(this->_indices.at(0), val(), this->_indices.at(1), _used_elements());
             Index junk(0);
-            while (Util::MemoryPool<Mem_>::get_element(row_indices(), used_elements() - 1 - junk) == std::numeric_limits<IT_>::max()
-                && junk < used_elements())
+            while (Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), _used_elements() - 1 - junk) == std::numeric_limits<IT_>::max()
+                && junk < _used_elements())
               ++junk;
             _used_elements() -= junk;
           }

@@ -47,17 +47,21 @@ public:
     a(5,5,5);
     a(1,2,7);
     a(5,5,2);
-    TEST_CHECK_EQUAL(a.used_elements(), 2ul);
-    TEST_CHECK_EQUAL(a(1, 2), 7.);
+    a(3,3,1);
+    a(1,2,8);
+    TEST_CHECK_EQUAL(a.used_elements(), 3ul);
+    TEST_CHECK_EQUAL(a(1, 2), 8.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);
+    TEST_CHECK_EQUAL(a(3, 3), 1.);
+    TEST_CHECK_EQUAL(a(1, 3), 0.);
 
     a.format();
-    TEST_CHECK_EQUAL(a.used_elements(), Index(2));
+    TEST_CHECK_EQUAL(a.used_elements(), Index(3));
     TEST_CHECK_EQUAL(a(5, 5), DT_(0));
     a(1,2,7);
     a(5,5,8);
     a(5,5,2);
-    TEST_CHECK_EQUAL(a.used_elements(), 2ul);
+    TEST_CHECK_EQUAL(a.used_elements(), 3ul);
     TEST_CHECK_EQUAL(a(1, 2), 7.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);
 
@@ -65,7 +69,7 @@ public:
     a(1,2,8);
     a(5,5,2);
     a(1,2,7);
-    TEST_CHECK_EQUAL(a.used_elements(), 2ul);
+    TEST_CHECK_EQUAL(a.used_elements(), 3ul);
     TEST_CHECK_EQUAL(a(1, 2), 7.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);
 
