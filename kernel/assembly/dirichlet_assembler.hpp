@@ -87,9 +87,9 @@ namespace FEAST
       }
 
       /**
-       * \brief Builds a homogene unit-filter.
+       * \brief Builds a homogeneous unit-filter.
        *
-       * This function assembles a unit-filter implementing the homogene Dirichlet boundary conditions.
+       * This function assembles a unit-filter implementing the homogeneous Dirichlet boundary conditions.
        *
        * \param[in,out] filter
        * A reference to the unit-filter where the entries are to be added.
@@ -112,7 +112,38 @@ namespace FEAST
       }
 
       /**
-       * \brief Builds an (inhomogene) unit-filter.
+       * \brief Builds an inhomogeneous unit-filter.
+       *
+       * This function assembles a unit-filter implementing the inhomogeneous Dirichlet boundary conditions given by
+       * the vector vector_
+       *
+       * \param[in,out] filter
+       * A reference to the unit-filter where the entries are to be added.
+       *
+       * \param[in] vector_
+       * A LAFEM::DenseVector containing (among other stuff) the entries to be added.
+       *
+       */
+      template<typename MemType_, typename DataType_, typename IndexType_>
+      void assemble(LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter,
+      const LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vector_) const
+      {
+        // build index set
+        std::set<Index> idx_set;
+        Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
+
+        // loop over all dof-indices
+        typename std::set<Index>::const_iterator it(idx_set.begin());
+        typename std::set<Index>::const_iterator jt(idx_set.end());
+        for(Index i(0); it != jt; ++it, ++i)
+        {
+          // store the dof-index
+          filter.add(IndexType_(*it), vector_(IndexType_(*it)));
+        }
+      }
+
+      /**
+       * \brief Builds an (inhomogeneous) unit-filter.
        *
        * This function assembles a unit-filter implementing Dirichlet boundary conditions based on
        * a functor.
@@ -168,7 +199,7 @@ namespace FEAST
           }
         }
 
-        /// homogene assembly
+        /// homogeneous assembly
         template<typename Space_>
         static void assemble(std::set<Index>& idx, const Space_& space, const std::set<Index>& cells)
         {
