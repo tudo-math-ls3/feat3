@@ -336,19 +336,25 @@ namespace FEAST
 
     };
 
-
-
     /**
-     * \brief Refined Unit-Cube mesh factory
+     * \brief Refine mesh factory
+     *
+     * \tparam Mesh_
+     * Mesh type
+     *
+     * \tparam Factory_
+     * Factory type to create the initial mesh
+     *
+     * This uses a factory to create a mesh and then refines that mesh.
      *
      * \author Peter Zajac
      */
-    template<typename Mesh_>
-    class RefinedUnitCubeFactory DOXY({});
+    template<typename Mesh_, template<typename> class Factory_>
+    class RefineFactory DOXY({});
 
     /// \cond internal
-    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
-    class RefinedUnitCubeFactory< ConformalMesh<Shape_, num_coords_, stride_, Coord_> > :
+    template<typename Shape_, int num_coords_, int stride_, typename Coord_, template<typename> class Factory_>
+    class RefineFactory< ConformalMesh<Shape_, num_coords_, stride_, Coord_>, Factory_ > :
     public Factory< ConformalMesh<Shape_, num_coords_, stride_, Coord_> >
     {
       public:
@@ -358,29 +364,30 @@ namespace FEAST
 
       private:
         typedef Factory<MeshType> MeshFactory;
-        typedef UnitCubeFactory<MeshType> CubeFactory;
-        typedef StandardRefinery<MeshType> RefineFactory;
+        typedef Factory_<MeshType> MyFactoryType;
+        typedef StandardRefinery<MeshType> Refinery;
 
         MeshType* _coarse_mesh;
         MeshFactory* _factory;
 
       public:
-        explicit RefinedUnitCubeFactory(Index num_refines) :
+        template<typename... Arguments>
+        explicit RefineFactory(Index num_refines, Arguments... args) :
           _coarse_mesh(nullptr),
           _factory(nullptr)
       {
         if(num_refines <= 0)
         {
-          _factory = new CubeFactory();
+          _factory = new MyFactoryType(args...);
           return;
         }
 
         // create coarse mesh
-        CubeFactory cube_factory;
-        _coarse_mesh = new MeshType(cube_factory);
+        MyFactoryType my_factory;
+        _coarse_mesh = new MeshType(my_factory);
 
         // create refinery
-        _factory = new RefineFactory(*_coarse_mesh);
+        _factory = new Refinery(*_coarse_mesh);
 
         // refine n-1 times;
         for(Index i(1); i < num_refines; ++i)
@@ -394,11 +401,11 @@ namespace FEAST
           // delete old coarse mesh
           delete mesh_old;
           // create new factory
-          _factory = new RefineFactory(*_coarse_mesh);
+          _factory = new Refinery(*_coarse_mesh);
         }
       }
 
-        virtual ~RefinedUnitCubeFactory()
+        virtual ~RefineFactory()
         {
           if(_factory != nullptr)
           {
@@ -425,7 +432,277 @@ namespace FEAST
           _factory->fill_index_sets(index_set_holder);
         }
     };
+
+    template<typename MeshType_>
+    using RefinedUnitCubeFactory = RefineFactory<MeshType_, Geometry::UnitCubeFactory >;
+
+    /*
+     * \brief Unit cube factory with star shaped mesh topology
+     *
+     * 2-------------------------------1------------------------------3
+     * |.\                                                          /.|
+     * |  .\                                                      /.  |
+     * |    .\                                                  /.    |
+     * |      .\                                              /.      |
+     * |        11                     2                    10        |
+     * |          .\                                      /.          |
+     * |            .\                                  /.            |
+     * |              .\                              /.              |
+     * |               6---------------5--------------7               |
+     * |               |                              |               |
+     * |               |                              |               |
+     * |               |                              |               |
+     * |               |                              |               |
+     * |               |                              |               |
+     * |               |                              |               |
+     * 2       3       6               4              7       1       3
+     * |               |                              |               |
+     * |               |                              |               |
+     * |               |                              |               |
+     * |               |                              |               |
+     * |               |                              |               |
+     * |               4---------------4--------------5               |
+     * |               /.                             .\              |
+     * |             /.                                 .\            |
+     * |           /.                                     .\          |
+     * |         8                                           9        |
+     * |       /.                      0                      .\      |
+     * |     /.                                                 .\    |
+     * |   /.                                                     .\  |
+     * | /.                                                         .\|
+     * 0-------------------------------0------------------------------1
+     *
+     * \author Jordi Paul
+     *
+     **/
+    template<typename Mesh_>
+    class UnitStarCubeFactory DOXY({});
+
+    /// \cond internal
+    /*
+     * \brief Specialisation for Hypercube<2> meshes
+     **/
+    template<int stride_, typename Coord_>
+    class UnitStarCubeFactory< ConformalMesh<Shape::Hypercube<2>, 2, stride_, Coord_> > :
+    public Factory< ConformalMesh<Shape::Hypercube<2>, 2, stride_, Coord_> >
+    {
+      public:
+        /// shape type
+        typedef Shape::Hypercube<2> ShapeType;
+        /// mesh type
+        typedef ConformalMesh<Shape::Hypercube<2>, 2, stride_, Coord_> MeshType;
+        /// vertex set type
+        typedef typename MeshType::VertexSetType VertexSetType;
+        /// index holder type
+        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+
+      public:
+        UnitStarCubeFactory()
+        {
+        }
+
+        virtual Index get_num_entities(int dim)
+        {
+          switch(dim)
+          {
+            case 0:
+              return 8u;
+            case 1:
+              return 12u;
+            case 2:
+              return 5u;
+            default:
+              return 0u;
+          }
+        }
+
+        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        {
+          vertex_set[0][0] = Coord_(0);
+          vertex_set[0][1] = Coord_(0);
+
+          vertex_set[1][0] = Coord_(1);
+          vertex_set[1][1] = Coord_(0);
+
+          vertex_set[2][0] = Coord_(0);
+          vertex_set[2][1] = Coord_(1);
+
+          vertex_set[3][0] = Coord_(1);
+          vertex_set[3][1] = Coord_(1);
+
+          vertex_set[4][0] = Coord_(0.25);
+          vertex_set[4][1] = Coord_(0.25);
+
+          vertex_set[5][0] = Coord_(0.75);
+          vertex_set[5][1] = Coord_(0.25);
+
+          vertex_set[6][0] = Coord_(0.25);
+          vertex_set[6][1] = Coord_(0.75);
+
+          vertex_set[7][0] = Coord_(0.75);
+          vertex_set[7][1] = Coord_(0.75);
+
+        }
+
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        {
+          IndexSet<4>& v_q = index_set_holder.template get_index_set<2,0>();
+
+          v_q(0,0) = Index(0);
+          v_q(0,1) = Index(1);
+          v_q(0,2) = Index(4);
+          v_q(0,3) = Index(5);
+
+          v_q(1,0) = Index(5);
+          v_q(1,1) = Index(1);
+          v_q(1,2) = Index(7);
+          v_q(1,3) = Index(3);
+
+          v_q(2,0) = Index(6);
+          v_q(2,1) = Index(7);
+          v_q(2,2) = Index(2);
+          v_q(2,3) = Index(3);
+
+          v_q(3,0) = Index(0);
+          v_q(3,1) = Index(4);
+          v_q(3,2) = Index(2);
+          v_q(3,3) = Index(6);
+
+          v_q(4,0) = Index(4);
+          v_q(4,1) = Index(5);
+          v_q(4,2) = Index(6);
+          v_q(4,3) = Index(7);
+
+          IndexSet<4>& e_q = index_set_holder.template get_index_set<2,1>();
+
+          e_q(0,0) = Index(0);
+          e_q(0,1) = Index(4);
+          e_q(0,2) = Index(8);
+          e_q(0,3) = Index(9);
+
+          e_q(1,0) = Index(9);
+          e_q(1,1) = Index(10);
+          e_q(1,2) = Index(7);
+          e_q(1,3) = Index(3);
+
+          e_q(2,0) = Index(5);
+          e_q(2,1) = Index(1);
+          e_q(2,2) = Index(11);
+          e_q(2,3) = Index(10);
+
+          e_q(3,0) = Index(8);
+          e_q(3,1) = Index(11);
+          e_q(3,2) = Index(2);
+          e_q(3,3) = Index(6);
+
+          e_q(4,0) = Index(4);
+          e_q(4,1) = Index(5);
+          e_q(4,2) = Index(6);
+          e_q(4,3) = Index(7);
+
+          IndexSet<2>& v_e = index_set_holder.template get_index_set<1,0>();
+
+          v_e(0,0) = Index(0);
+          v_e(0,1) = Index(1);
+
+          v_e(1,0) = Index(2);
+          v_e(1,1) = Index(3);
+
+          v_e(2,0) = Index(0);
+          v_e(2,1) = Index(2);
+
+          v_e(3,0) = Index(1);
+          v_e(3,1) = Index(3);
+
+          v_e(4,0) = Index(4);
+          v_e(4,1) = Index(5);
+
+          v_e(5,0) = Index(6);
+          v_e(5,1) = Index(7);
+
+          v_e(6,0) = Index(4);
+          v_e(6,1) = Index(6);
+
+          v_e(7,0) = Index(5);
+          v_e(7,1) = Index(7);
+
+          v_e(8,0) = Index(0);
+          v_e(8,1) = Index(4);
+
+          v_e(9,0) = Index(1);
+          v_e(9,1) = Index(5);
+
+          v_e(10,0) = Index(7);
+          v_e(10,1) = Index(3);
+
+          v_e(11,0) = Index(6);
+          v_e(11,1) = Index(2);
+        }
+
+    };
+
+    /*
+     * \brief Specialisation for simplical meshes
+     *
+     * This uses the UnitStarCubeFactory for Hypercubes and then the ShapeConvertFactory.
+     *
+     **/
+    template<int stride_, typename Coord_, int dim_>
+    class UnitStarCubeFactory< ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> > :
+    public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> >
+    {
+      public:
+        /// shape type
+        typedef Shape::Simplex<dim_> ShapeType;
+        /// mesh type
+        typedef ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> MeshType;
+        /// vertex set type
+        typedef typename MeshType::VertexSetType VertexSetType;
+        /// index holder type
+        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+        /// shape convert factory type
+        typedef ShapeConvertFactory<MeshType> FactoryType;
+        /// mesh type to convert from
+        typedef ConformalMesh<Shape::Hypercube<dim_>, dim_, stride_, Coord_> GeneratorMeshType;
+
+      private:
+        GeneratorMeshType* _generator_mesh;
+        FactoryType* _factory;
+
+      public:
+        UnitStarCubeFactory() :
+          _generator_mesh(nullptr),
+          _factory(nullptr)
+        {
+          UnitStarCubeFactory<GeneratorMeshType> cube_factory;
+          _generator_mesh = new GeneratorMeshType(cube_factory);
+          _factory = new FactoryType(*_generator_mesh);
+        }
+
+        virtual ~UnitStarCubeFactory()
+        {
+          delete _generator_mesh;
+          delete _factory;
+        }
+
+        virtual Index get_num_entities(int dim)
+        {
+          return _factory->get_num_entities(dim);
+        }
+
+        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        {
+          _factory->fill_vertex_set(vertex_set);
+        }
+
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        {
+          _factory->fill_index_sets(index_set_holder);
+        }
+
+    };
     /// \endcond
+
   } // namespace Geometry
 } // namespace FEAST
 
