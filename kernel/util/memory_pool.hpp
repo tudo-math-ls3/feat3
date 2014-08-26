@@ -11,6 +11,7 @@
 #include <map>
 #include <cstring>
 #include <typeinfo>
+#include <cstdio>
 
 
 namespace FEAST
@@ -50,23 +51,72 @@ namespace FEAST
         std::map<void*, Intern::MemoryInfo> _pool;
 
         /// default CTOR
-        MemoryPool();
+        MemoryPool()
+        {
+        }
+
 
       public:
-        ~MemoryPool();
+        ~MemoryPool()
+        {
+          if (_pool.size() > 0)
+          {
+            std::cout << stderr << " Error: MemoryPool<CPU> still contains memory chunks on deconstructor call" << std::endl;
+            std::exit(1);
+          }
+        }
 
         /// pointer to MemoryPool singleton
         friend MemoryPool* InstantiationPolicy<MemoryPool<Mem::Main>, Singleton>::instance();
 
         /// allocate new memory
         template <typename DT_>
-        DT_ * allocate_memory(const Index count);
+        DT_ * allocate_memory(const Index count)
+        {
+          DT_ * memory(NULL);
+          memory = (DT_*)::malloc(count * sizeof(DT_));
+          if (memory == NULL)
+            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
+
+          Intern::MemoryInfo mi;
+          mi.counter = 1;
+          mi.size = count * sizeof(DT_);
+          _pool.insert(std::pair<void*, Intern::MemoryInfo>(memory, mi));
+
+          return memory;
+        }
 
         /// increase memory counter
-        void increase_memory(void * address);
+        void increase_memory(void * address)
+        {
+          std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
+          if (it == _pool.end())
+            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::increase_memory: Memory address not found!");
+          else
+          {
+            it->second.counter = it->second.counter + 1;
+          }
+        }
 
         /// release memory or decrease reference counter
-        void release_memory(void * address);
+        void release_memory(void * address)
+        {
+          std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
+          if (it == _pool.end())
+            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::release_memory: Memory address not found!");
+          else
+          {
+            if(it->second.counter == 1)
+            {
+              ::free(address);
+              _pool.erase(it);
+            }
+            else
+            {
+              it->second.counter = it->second.counter - 1;
+            }
+          }
+        }
 
         /// download memory chunk to host memory
         template <typename DT_>
@@ -119,6 +169,30 @@ namespace FEAST
         {
         }
     };
+
+    extern template float * MemoryPool<Mem::Main>::allocate_memory<float>(const Index);
+    extern template double * MemoryPool<Mem::Main>::allocate_memory<double>(const Index);
+    extern template unsigned int * MemoryPool<Mem::Main>::allocate_memory<unsigned int>(const Index);
+    extern template unsigned long * MemoryPool<Mem::Main>::allocate_memory<unsigned long>(const Index);
+    #ifdef FEAST_HAVE_QUADMATH
+    extern template __float128 * MemoryPool<Mem::Main>::allocate_memory<__float128>(const Index);
+    #endif
+
+    extern template void MemoryPool<Mem::Main>::download<float>(float *, const float * const, const Index);
+    extern template void MemoryPool<Mem::Main>::download<double>(double *, const double * const, const Index);
+    extern template void MemoryPool<Mem::Main>::download<unsigned int>(unsigned int *, const unsigned int * const, const Index);
+    extern template void MemoryPool<Mem::Main>::download<unsigned long>(unsigned long *, const unsigned long * const, const Index);
+    #ifdef FEAST_HAVE_QUADMATH
+    extern template void MemoryPool<Mem::Main>::download<__float128>(__float128 *, const __float128 * const, const Index);
+    #endif
+
+    extern template void MemoryPool<Mem::Main>::upload<float>(float *, const float * const, const Index);
+    extern template void MemoryPool<Mem::Main>::upload<double>(double *, const double * const, const Index);
+    extern template void MemoryPool<Mem::Main>::upload<unsigned int>(unsigned int *, const unsigned int * const, const Index);
+    extern template void MemoryPool<Mem::Main>::upload<unsigned long>(unsigned long *, const unsigned long * const, const Index);
+    #ifdef FEAST_HAVE_QUADMATH
+    extern template void MemoryPool<Mem::Main>::upload<__float128>(__float128 *, const __float128 * const, const Index);
+    #endif
 
     template <>
     class MemoryPool<Mem::CUDA>
