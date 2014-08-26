@@ -202,56 +202,7 @@ namespace FEAST
 
         void _read_from_csr(std::istream& file)
         {
-          uint64_t rows64;
-          uint64_t columns64;
-          uint64_t elements64;
-          file.read((char *)&rows64, sizeof(uint64_t));
-          file.read((char *)&columns64, sizeof(uint64_t));
-          file.read((char *)&elements64, sizeof(uint64_t));
-          Index trows = (Index)rows64;
-          Index tcolumns = (Index)columns64;
-          Index elements = (Index)elements64;
-
-          _size() = Index(trows * tcolumns);
-          this->_scalar_index.push_back(Index(trows));
-          this->_scalar_index.push_back(Index(tcolumns));
-          this->_scalar_index.push_back(elements);
-          this->_scalar_dt.push_back(DT_(0));
-
-          uint64_t * ccol_ind = new uint64_t[elements];
-          file.read((char *)ccol_ind, (long)(elements * sizeof(uint64_t)));
-          IT_ * tcol_ind = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(elements);
-          for (Index i(0) ; i < elements ; ++i)
-            tcol_ind[i] = IT_(ccol_ind[i]);
-          delete[] ccol_ind;
-
-          uint64_t * crow_ptr = new uint64_t[std::size_t(trows + 1)];
-          file.read((char *)crow_ptr, (long)((trows + 1) * sizeof(uint64_t)));
-          IT_ * trow_ptr = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(trows + 1);
-          for (Index i(0) ; i < trows + 1 ; ++i)
-            trow_ptr[i] = IT_(crow_ptr[i]);
-          delete[] crow_ptr;
-
-          double * cval = new double[elements];
-          file.read((char *)cval, (long)(elements * sizeof(double)));
-          DT_ * tval = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(elements);
-          for (Index i(0) ; i < elements ; ++i)
-            tval[i] = DT_(cval[i]);
-          delete[] cval;
-
-          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(elements));
-          this->_elements_size.push_back(elements);
-          this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(elements));
-          this->_indices_size.push_back(elements);
-          this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_rows() + 1));
-          this->_indices_size.push_back(_rows() + 1);
-
-          Util::MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, elements);
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tcol_ind, elements);
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), trow_ptr, _rows()  + 1);
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(tval);
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
+          this->template _deserialize<double, uint64_t>(FileMode::fm_csr, file);
         }
 
         Index & _size()
@@ -1083,40 +1034,7 @@ namespace FEAST
           if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an csr matrix with less than double precission!"<<std::endl;
 
-          IT_ * tcol_ind = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(this->_indices_size.at(0));
-          Util::MemoryPool<Mem_>::template download<IT_>(tcol_ind, this->_indices.at(0), this->_indices_size.at(0));
-          uint64_t * ccol_ind = new uint64_t[this->_indices_size.at(0)];
-          for (Index i(0) ; i < this->_indices_size.at(0) ; ++i)
-            ccol_ind[i] = tcol_ind[i];
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
-
-          IT_ * trow_ptr = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(this->_indices_size.at(1));
-          Util::MemoryPool<Mem_>::template download<IT_>(trow_ptr, this->_indices.at(1), this->_indices_size.at(1));
-          uint64_t * crow_ptr = new uint64_t[this->_indices_size.at(1)];
-          for (Index i(0) ; i < this->_indices_size.at(1) ; ++i)
-            crow_ptr[i] = trow_ptr[i];
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
-
-          DT_ * tval = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(this->_elements_size.at(0));
-          Util::MemoryPool<Mem_>::template download<DT_>(tval, this->_elements.at(0), this->_elements_size.at(0));
-          double * cval = new double[this->_elements_size.at(0)];
-          for (Index i(0) ; i < this->_elements_size.at(0) ; ++i)
-            cval[i] = (double)tval[i];
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(tval);
-
-          uint64_t trows(rows());
-          uint64_t tcolumns(columns());
-          uint64_t elements(this->_indices_size.at(0));
-          file.write((const char *)&trows, sizeof(uint64_t));
-          file.write((const char *)&tcolumns, sizeof(uint64_t));
-          file.write((const char *)&elements, sizeof(uint64_t));
-          file.write((const char *)ccol_ind, (long)(elements * sizeof(uint64_t)));
-          file.write((const char *)crow_ptr, (long)((trows + 1) * sizeof(uint64_t)));
-          file.write((const char *)cval, (long)(elements * sizeof(double)));
-
-          delete[] ccol_ind;
-          delete[] crow_ptr;
-          delete[] cval;
+          this->template _serialize<double, uint64_t>(FileMode::fm_csr, file);
         }
 
         /**

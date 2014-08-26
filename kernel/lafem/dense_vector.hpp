@@ -174,23 +174,7 @@ namespace FEAST
 
         void _read_from_dv(std::istream& file)
         {
-          uint64_t tsize;
-          file.read((char *)&tsize, (long)(sizeof(uint64_t)));
-          _size() = (Index)tsize;
-          this->_elements_size.push_back(_size());
-
-          double * ctemp = new double[std::size_t(tsize)];
-          file.read((char *)ctemp, (long)(tsize * sizeof(double)));
-
-          DT_ * temp = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((_size()));
-          for (Index i(0) ; i < tsize ; ++i)
-          {
-            temp[i] = (DT_)ctemp[i];
-          }
-          delete[] ctemp;
-          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_size()));
-          Util::MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), temp, _size());
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(temp);
+          this->template _deserialize<double, uint64_t>(FileMode::fm_dv, file);
         }
 
         Index & _size()
@@ -720,21 +704,7 @@ namespace FEAST
           if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an dense vector with less than double precission!"<<std::endl;
 
-          const Index csize(this->size());
-          DT_ * temp = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(csize);
-          Util::MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), csize);
-          double * ctemp = new double[csize];
-          for (Index i(0) ; i < csize ; ++i)
-          {
-            ctemp[i] = (double)temp[i];
-          }
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(temp);
-
-          uint64_t tsize(csize);
-          file.write((const char *)&tsize, sizeof(uint64_t));
-          file.write((const char *)ctemp, (long)(tsize * sizeof(double)));
-
-          delete[] ctemp;
+          this->template _serialize<double, uint64_t>(FileMode::fm_dv, file);
         }
 
         /**

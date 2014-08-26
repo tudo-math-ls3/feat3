@@ -221,72 +221,7 @@ namespace FEAST
 
         void _read_from_ell(std::istream& file)
         {
-          uint64_t dim;
-          uint64_t trows;
-          uint64_t tcolumns;
-          uint64_t tstride;
-          uint64_t tnum_cols_per_row;
-          file.read((char *)&dim, sizeof(uint64_t));
-          file.read((char *)&trows, sizeof(uint64_t));
-          file.read((char *)&tcolumns, sizeof(uint64_t));
-          file.read((char *)&tstride, sizeof(uint64_t));
-          file.read((char *)&tnum_cols_per_row, sizeof(uint64_t));
-
-          _size() = Index(trows * tcolumns);
-          this->_scalar_index.push_back((Index)trows);
-          this->_scalar_index.push_back((Index)tcolumns);
-          this->_scalar_index.push_back((Index)tstride);
-          this->_scalar_index.push_back((Index)tnum_cols_per_row);
-          this->_scalar_index.push_back(0);
-          this->_scalar_dt.push_back(DT_(0));
-
-          uint64_t * cAj = new uint64_t[std::size_t(dim)];
-          file.read((char *)cAj, (long)(dim * sizeof(uint64_t)));
-          IT_* tAj = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(IT_(dim));
-          for (Index i(0) ; i < dim ; ++i)
-            tAj[i] = IT_(cAj[i]);
-          delete[] cAj;
-
-          double * cAx = new double[std::size_t(dim)];
-          file.read((char *)cAx, (long)(dim * sizeof(double)));
-
-          DT_* tAx = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(Index(dim));
-          for (Index i(0) ; i < dim ; ++i)
-            tAx[i] = DT_(cAx[i]);
-          delete[] cAx;
-
-          IT_* tArl = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_rows());
-          //compute row length vector
-          _used_elements() = 0;
-          for (Index row(0) ; row < _rows() ; ++row)
-          {
-            IT_ count(0);
-            for (Index i(row) ; i < Index(dim) ; i += Index(tstride))
-            {
-                if (tAx[i] == DT_(0))
-                {
-                  i = Index(dim);
-                  break;
-                }
-                ++count;
-                ++_used_elements();
-            }
-            tArl[row] = count;
-          }
-
-          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(dim)));
-          this->_elements_size.push_back(Index(dim));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_num_cols_per_row() * _stride()));
-          this->_indices_size.push_back(Index(dim));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_rows()));
-          this->_indices_size.push_back(_rows());
-
-          Util::MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tAx, Index(dim));
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tAj, Index(dim));
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), tArl, _rows());
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(tAx);
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(tAj);
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(tArl);
+          this->template _deserialize<double, uint64_t>(FileMode::fm_ell, file);
         }
 
         Index & _size()
@@ -1096,36 +1031,7 @@ namespace FEAST
           if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an ell matrix with less than double precission!"<<std::endl;
 
-          const Index dim(num_cols_per_row() * stride());
-          IT_ * tAj = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(dim);
-          Util::MemoryPool<Mem_>::template download<IT_>(tAj, this->_indices.at(0), dim);
-          uint64_t * cAj = new uint64_t[dim];
-          for (Index i(0) ; i < dim ; ++i)
-            cAj[i] = tAj[i];
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(tAj);
-
-          DT_ * tAx = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(dim);
-          Util::MemoryPool<Mem_>::template download<DT_>(tAx, this->_elements.at(0), dim);
-          double * cAx = new double[dim];
-          for (Index i(0) ; i < dim ; ++i)
-            cAx[i] = (double)tAx[i];
-          Util::MemoryPool<Mem::Main>::instance()->release_memory(tAx);
-
-          uint64_t tdim(dim);
-          uint64_t trows(rows());
-          uint64_t tcolumns(columns());
-          uint64_t tstride(stride());
-          uint64_t tnum_cols_per_row(num_cols_per_row());
-          file.write((const char *)&tdim, sizeof(uint64_t));
-          file.write((const char *)&trows, sizeof(uint64_t));
-          file.write((const char *)&tcolumns, sizeof(uint64_t));
-          file.write((const char *)&tstride, sizeof(uint64_t));
-          file.write((const char *)&tnum_cols_per_row, sizeof(uint64_t));
-          file.write((const char *)cAj, (long)(tdim * sizeof(uint64_t)));
-          file.write((const char *)cAx, (long)(tdim * sizeof(double)));
-
-          delete[] cAj;
-          delete[] cAx;
+          this->template _serialize<double, uint64_t>(FileMode::fm_ell, file);
         }
 
         /**
