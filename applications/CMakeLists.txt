@@ -342,7 +342,7 @@ if (FEAST_MPI)
     --build-target poisson_ms2_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 16 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_ms2_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_ms2_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_ms2_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_ms2_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
