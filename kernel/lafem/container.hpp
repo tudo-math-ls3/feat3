@@ -368,7 +368,7 @@ namespace FEAST
           }
           gsize +=16; //padding for datatype alignment missmatch
 
-          char * array(new char[gsize]);
+          char * array(new char[size_t(gsize)]);
           uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
           DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
           IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
@@ -505,7 +505,7 @@ namespace FEAST
           }
           global_i += Index(uiarray[7]);
 
-          for (uint64_t i(0) ; i < uiarray[2] ; ++i)
+          for (Index i(0) ; i < Index(uiarray[2]) ; ++i)
           {
             tc._elements.push_back(Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT2_>(tc._elements_size.at(i)));
             Util::MemoryPool<Mem::Main>::template upload<DT2_>(tc._elements.at(i), &dtarray[global_i], tc._elements_size.at(i));
@@ -513,7 +513,7 @@ namespace FEAST
           }
 
           global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_));
-          for (uint64_t i(0) ; i < uiarray[3] ; ++i)
+          for (Index i(0) ; i < Index(uiarray[3]) ; ++i)
           {
             tc._indices.push_back(Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT2_>(tc._indices_size.at(i)));
             Util::MemoryPool<Mem::Main>::template upload<IT2_>(tc._indices.at(i), &itarray[global_i], tc._indices_size.at(i));
