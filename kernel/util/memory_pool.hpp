@@ -174,25 +174,31 @@ namespace FEAST
     extern template double * MemoryPool<Mem::Main>::allocate_memory<double>(const Index);
     extern template unsigned int * MemoryPool<Mem::Main>::allocate_memory<unsigned int>(const Index);
     extern template unsigned long * MemoryPool<Mem::Main>::allocate_memory<unsigned long>(const Index);
+#ifndef __CUDACC__
     #ifdef FEAST_HAVE_QUADMATH
     extern template __float128 * MemoryPool<Mem::Main>::allocate_memory<__float128>(const Index);
     #endif
+#endif
 
     extern template void MemoryPool<Mem::Main>::download<float>(float *, const float * const, const Index);
     extern template void MemoryPool<Mem::Main>::download<double>(double *, const double * const, const Index);
     extern template void MemoryPool<Mem::Main>::download<unsigned int>(unsigned int *, const unsigned int * const, const Index);
     extern template void MemoryPool<Mem::Main>::download<unsigned long>(unsigned long *, const unsigned long * const, const Index);
+#ifndef __CUDACC__
     #ifdef FEAST_HAVE_QUADMATH
     extern template void MemoryPool<Mem::Main>::download<__float128>(__float128 *, const __float128 * const, const Index);
     #endif
+#endif
 
     extern template void MemoryPool<Mem::Main>::upload<float>(float *, const float * const, const Index);
     extern template void MemoryPool<Mem::Main>::upload<double>(double *, const double * const, const Index);
     extern template void MemoryPool<Mem::Main>::upload<unsigned int>(unsigned int *, const unsigned int * const, const Index);
     extern template void MemoryPool<Mem::Main>::upload<unsigned long>(unsigned long *, const unsigned long * const, const Index);
+#ifndef __CUDACC__
     #ifdef FEAST_HAVE_QUADMATH
     extern template void MemoryPool<Mem::Main>::upload<__float128>(__float128 *, const __float128 * const, const Index);
     #endif
+#endif
 
     template <>
     class MemoryPool<Mem::CUDA>
