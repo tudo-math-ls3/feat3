@@ -20,6 +20,7 @@ namespace FEAST
 {
   namespace ScaRC
   {
+#ifndef SERIAL
     ///type-0 to type-1 matrix conversion
     template<
              typename Mem_,
@@ -28,105 +29,122 @@ namespace FEAST
              template<typename, typename, typename> class MT_>
     struct MatrixConversion
     {
-    };
-
-#ifndef SERIAL
-    template<
-             typename Mem_,
-             typename DT_,
-             typename IT_>
-    struct MatrixConversion<Mem_, DT_, IT_, SparseMatrixCSR>
-    {
       template<template<typename, typename> class ST_, typename VMT_>
-      static SparseMatrixCSR<Mem_, DT_, IT_> value(const SparseMatrixCSR<Mem_, DT_, IT_>& origin, const ST_<VMT_, std::allocator<VMT_> >& vec_mirrors, const ST_<IT_, std::allocator<IT_> >& other_ranks)
+      static MT_<Mem_, DT_, IT_> value(const MT_<Mem_, DT_, IT_>& origin,
+                                       const ST_<VMT_, std::allocator<VMT_> >& vec_mirrors,
+                                       const ST_<IT_, std::allocator<IT_> >& other_ranks,
+                                       ST_<IT_, std::allocator<IT_> >& tags,
+                                       Communicator communicator = Communicator(MPI_COMM_WORLD) )
       {
-        SparseMatrixCSR<Mem_, DT_, IT_> result;
+        MT_<Mem_, DT_, IT_> result;
         result.clone(origin);
-        ST_<DenseVector<Mem_, DT_, IT_>, std::allocator<DenseVector<Mem_, DT_, IT_> > > val_sendbufs;
-        ST_<DenseVector<Mem_, DT_, IT_>, std::allocator<DenseVector<Mem_, DT_, IT_> > > val_recvbufs;
-        ST_<DenseVector<Mem_, IT_, IT_>, std::allocator<DenseVector<Mem_, IT_, IT_> > > colind_sendbufs;
-        ST_<DenseVector<Mem_, IT_, IT_>, std::allocator<DenseVector<Mem_, IT_, IT_> > > colind_recvbufs;
-        ST_<DenseVector<Mem_, IT_, IT_>, std::allocator<DenseVector<Mem_, IT_, IT_> > > rp_sendbufs;
-        ST_<DenseVector<Mem_, IT_, IT_>, std::allocator<DenseVector<Mem_, IT_, IT_> > > rp_recvbufs;
-        for(Index i(0) ; i < vec_mirrors.size() ; ++i)
-        {
-          MatrixMirror<Mem::Main, double> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
-          SparseMatrixCSR<Mem::Main, double> buf_mat;
-          Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, result);
-          mat_mirror.gather_op(buf_mat, result);
 
-          double* val(buf_mat.val());
-          Index* row_ptr(buf_mat.row_ptr());
-          Index* col_ind(buf_mat.col_ind());
+        ST_<std::pair<Index, char*>, std::allocator<std::pair<Index, char*> > > recv_buf;
+        ST_<std::pair<Index, char*>, std::allocator<std::pair<Index, char*> > > send_buf;
 
-          DenseVector<Mem::Main, double> val_sendbuf(buf_mat.used_elements());
-          DenseVector<Mem::Main, double> val_recvbuf(buf_mat.used_elements());
-          DenseVector<Mem::Main, Index> colind_sendbuf(buf_mat.used_elements());
-          DenseVector<Mem::Main, Index> colind_recvbuf(buf_mat.used_elements());
-          DenseVector<Mem::Main, Index> rp_sendbuf(buf_mat.rows() + 1);
-          DenseVector<Mem::Main, Index> rp_recvbuf(buf_mat.rows() + 1);
+        ST_<Request, std::allocator<Request> > recvrequests;
+        ST_<Request, std::allocator<Request> > sendrequests;
 
-          for(Index j(0) ; j < buf_mat.used_elements() ; ++j)
-          {
-            val_sendbuf(j, val[j]);
-            colind_sendbuf(j, col_ind[j]);
-          }
-          for(Index j(0) ; j < buf_mat.rows() + 1 ; ++j)
-          {
-            rp_sendbuf(j, row_ptr[j]);
-          }
-
-          Status s1;
-          Comm::send_recv(val_sendbuf.elements(),
-              val_sendbuf.size(),
-              other_ranks.at(i),
-              val_recvbuf.elements(),
-              val_recvbuf.size(),
-              other_ranks.at(i),
-              s1);
-          Status s2;
-          Comm::send_recv(colind_sendbuf.elements(),
-              colind_sendbuf.size(),
-              other_ranks.at(i),
-              colind_recvbuf.elements(),
-              colind_recvbuf.size(),
-              other_ranks.at(i),
-              s2);
-          Status s3;
-          Comm::send_recv(rp_sendbuf.elements(),
-              rp_sendbuf.size(),
-              other_ranks.at(i),
-              rp_recvbuf.elements(),
-              rp_recvbuf.size(),
-              other_ranks.at(i),
-              s3);
-
-          val_sendbufs.push_back(std::move(val_sendbuf));
-          val_recvbufs.push_back(std::move(val_recvbuf));
-          colind_sendbufs.push_back(std::move(colind_sendbuf));
-          colind_recvbufs.push_back(std::move(colind_recvbuf));
-          rp_sendbufs.push_back(std::move(rp_sendbuf));
-          rp_recvbufs.push_back(std::move(rp_recvbuf));
-        }
-        Comm::barrier();
+        ST_<Status, std::allocator<Status> > recvstatus;
+        ST_<Status, std::allocator<Status> > sendstatus;
 
         for(Index i(0) ; i < vec_mirrors.size() ; ++i)
         {
-          MatrixMirror<Mem::Main, double> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
-          SparseMatrixCSR<Mem::Main, double> buf_mat;
-          Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, result);
+          MatrixMirror<Mem_, DT_> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
+          MT_<Mem_, DT_, IT_> sendbuf_mat;
+          Assembly::MirrorAssembler::assemble_buffer_matrix(sendbuf_mat, mat_mirror, result);
+          mat_mirror.gather_op(sendbuf_mat, result);
 
-          mat_mirror.gather_op(buf_mat, result);
-
-          SparseMatrixCSR<Mem::Main, double> other_buf_mat(buf_mat.rows(),
-              buf_mat.columns(),
-              colind_recvbufs.at(i),
-              val_recvbufs.at(i),
-              rp_recvbufs.at(i));
-
-          buf_mat.axpy<Algo::Generic>(buf_mat, other_buf_mat);
-          mat_mirror.scatter_op(result, buf_mat);
+          send_buf.push_back(sendbuf_mat.serialize());
         }
+
+        for(Index i(0) ; i < vec_mirrors.size() ; ++i)
+        {
+
+          Request rr;
+          Status rs;
+
+          recvrequests.push_back(rr);
+          recvstatus.push_back(rs);
+
+          char* recv_buf_p(new char[send_buf.at(i).first]);
+          recv_buf.push_back(std::pair<Index, char*>(send_buf.at(i).first, recv_buf_p));
+
+          Comm::irecv(recv_buf.at(i).second,
+                      recv_buf.at(i).first,
+                      other_ranks.at(i),
+                      recvrequests.at(i),
+                      tags.at(i),
+                      communicator
+              );
+
+        }
+
+        for(Index i(0) ; i < vec_mirrors.size() ; ++i)
+        {
+          Request sr;
+          Status ss;
+
+          sendrequests.push_back(sr);
+          sendstatus.push_back(ss);
+
+          Comm::isend(send_buf.at(i).second,
+                      send_buf.at(i).first,
+                      other_ranks.at(i),
+                      sendrequests.at(i),
+                      tags.at(i),
+                      communicator
+              );
+        }
+
+        int* recvflags = new int[recvrequests.size()];
+        int* taskflags = new int[recvrequests.size()];
+        for(Index i(0) ; i < recvrequests.size() ; ++i)
+        {
+          recvflags[i] = 0;
+          taskflags[i] = 0;
+        }
+
+        Index count(0);
+        while(count != recvrequests.size())
+        {
+          //go through all requests round robin
+          for(Index i(0) ; i < recvrequests.size() ; ++i)
+          {
+            if(taskflags[i] == 0)
+            {
+              Comm::test(recvrequests.at(i), recvflags[i], recvstatus.at(i));
+              if(recvflags[i] != 0)
+              {
+                MT_<Mem_, DT_, IT_> other_mat(recv_buf.at(i));
+                MatrixMirror<Mem::Main, double> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
+                SparseMatrixCSR<Mem::Main, double> buf_mat;
+                Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, result);
+
+                mat_mirror.gather_op(buf_mat, result);
+
+                buf_mat.axpy<Algo::Generic>(buf_mat, other_mat);
+                mat_mirror.scatter_op(result, buf_mat);
+                ++count;
+                taskflags[i] = 1;
+              }
+            }
+          }
+        }
+
+        for(Index i(0) ; i < sendrequests.size() ; ++i)
+        {
+          Status ws;
+          Comm::wait(sendrequests.at(i), ws);
+        }
+
+        delete[] recvflags;
+        delete[] taskflags;
+        for(auto recv_buf_p_i : recv_buf)
+          delete[] recv_buf_p_i.second;
+        for(auto send_buf_p_i : send_buf)
+          delete[] send_buf_p_i.second;
+
         return result;
       }
 #else

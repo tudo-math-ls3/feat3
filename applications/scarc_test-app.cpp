@@ -193,7 +193,8 @@ void check_scarc_rich_rich_1D(Index rank)
   UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
   dirichlet.assemble(filter);
 
-  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks));
+  auto tags(HaloTags::value(p0.comm_halos));
+  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -226,7 +227,6 @@ void check_scarc_rich_rich_1D(Index rank)
 #else
   Communicator c(0);
 #endif
-  auto tags(HaloTags::value(p0.comm_halos));
   data.tags() = std::move(tags);
   data.communicators().push_back(std::move(c));
 
@@ -458,7 +458,8 @@ void check_scarc_pcg_rich_1D(Index rank)
   UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
   dirichlet.assemble(filter);
 
-  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks));
+  auto tags(HaloTags::value(p0.comm_halos));
+  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -491,7 +492,6 @@ void check_scarc_pcg_rich_1D(Index rank)
 #else
   Communicator c(0);
 #endif
-  auto tags(HaloTags::value(p0.comm_halos));
   data.tags() = std::move(tags);
   data.communicators().push_back(std::move(c));
 
@@ -724,7 +724,8 @@ void check_scarc_rich_pcg_1D(Index rank)
   UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
   dirichlet.assemble(filter);
 
-  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks));
+  auto tags(HaloTags::value(p0.comm_halos));
+  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -757,7 +758,6 @@ void check_scarc_rich_pcg_1D(Index rank)
 #else
   Communicator c(0);
 #endif
-  auto tags(HaloTags::value(p0.comm_halos));
   data.tags() = std::move(tags);
   data.communicators().push_back(std::move(c));
 
@@ -988,7 +988,8 @@ void check_scarc_pcg_pcg_1D(Index rank)
   UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
   dirichlet.assemble(filter);
 
-  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks));
+  auto tags(HaloTags::value(p0.comm_halos));
+  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -1021,7 +1022,6 @@ void check_scarc_pcg_pcg_1D(Index rank)
 #else
   Communicator c(0);
 #endif
-  auto tags(HaloTags::value(p0.comm_halos));
   data.tags() = std::move(tags);
   data.communicators().push_back(std::move(c));
 
