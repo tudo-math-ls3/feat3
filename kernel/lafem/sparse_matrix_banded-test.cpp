@@ -159,6 +159,8 @@ public:
 
   virtual void run() const
   {
+    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.7)));
+
     Random::SeedType seed(Random::SeedType(time(NULL)));
     Random random(seed);
     std::cout << "seed: " << seed << std::endl;
@@ -199,59 +201,63 @@ public:
     SparseMatrixBanded<Mem_, DT_, IT_> sys(rows, columns, vec_val, vec_offsets);
 
     auto x(sys.create_vector_r());
-    DenseVector<Mem_, DT_, IT_> y1(rows, DT_(0));
-    auto y2(sys.create_vector_l());
+    DenseVector<Mem_, DT_, IT_> r(rows, DT_(0));
+    auto ref1(sys.create_vector_l());
+    auto ref2(sys.create_vector_l());
 
     for (Index i(0); i < x.size(); ++i)
     {
       x(i, random(DT_(-1), DT_(1)));
     }
 
-    for (Index i(0); i < y2.size(); ++i)
+    for (Index i(0); i < ref1.size(); ++i)
     {
-      y2(i, 0);
+      ref1(i, 0);
     }
 
-    sys.template apply<Algo_>(y1, x);
+    sys.template apply<Algo_>(r, x);
 
     for(Index i(0); i < sys.rows(); ++i)
     {
       for(Index j(0); j < sys.columns(); ++j)
       {
-        y2(i, y2(i) + sys(i, j) * x(j));
+        ref1(i, ref1(i) + sys(i, j) * x(j));
       }
     }
 
     // check, if the result is correct
-    for (Index i(0) ; i < y1.size() ; ++i)
+    for (Index i(0) ; i < r.size() ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(y1(i), y2(i), 1e-5);
+      if (fabs(ref1(i)) > eps)
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref1(i), eps);
     }
 
-    for (Index i(0); i < y1.size(); ++i)
+    for (Index i(0); i < r.size(); ++i)
     {
-      y1(i, y1(i) + Math::cos(DT_(i)));
+      ref2(i, ref1(i) + Math::cos(DT_(i)));
     }
 
-    sys.template apply<Algo_>(y2, x, y1, DT_(-1.0));
+    sys.template apply<Algo_>(r, x, ref2, DT_(-1.0));
 
     // check, if the result is correct
-    for (Index i(0) ; i < y1.size() ; ++i)
+    for (Index i(0) ; i < r.size() ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)), y2(i), 1e-5);
+      if (fabs(ref1(i)) > eps)
+        TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)), r(i), eps);
     }
 
-    for (Index i(0); i < y2.size(); ++i)
+    for (Index i(0); i < r.size(); ++i)
     {
-      y1(i, y1(i) * s);
+      ref2(i, ref2(i) * s);
     }
 
-    sys.template apply<Algo_>(y2, x, y1, -s);
+    sys.template apply<Algo_>(r, x, ref2, -s);
 
     // check, if the result is correct
-    for (Index i(0) ; i < y1.size() ; ++i)
+    for (Index i(0) ; i < r.size() ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)) * s, y2(i), 1e-5);
+      if (fabs(ref1(i)) > eps)
+        TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)) * s, r(i), eps);
     }
 }
 };
