@@ -76,6 +76,20 @@ namespace FEAST
     class SparseMatrixBanded : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
     private:
+      void _read_from_bm(String filename)
+      {
+        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        _read_from_bm(file);
+        file.close();
+      }
+
+      void _read_from_bm(std::istream& file)
+      {
+        this->template _deserialize<double, uint64_t>(FileMode::fm_bm, file);
+      }
+
       Index & _size()
       {
         return this->_scalar_index.at(0);
@@ -185,6 +199,29 @@ namespace FEAST
       /**
        * \brief Constructor
        *
+       * \param[in] mode The used file format.
+       * \param[in] file The source filestream.
+       *
+       * Creates a banded matrix based on the source filestream.
+       */
+      explicit SparseMatrixBanded(FileMode mode, std::istream& file) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        CONTEXT("When creating SparseMatrixBanded");
+
+        switch(mode)
+        {
+          case FileMode::fm_bm:
+            _read_from_bm(file);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Constructor
+       *
        * \param[in] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
        *
        * Creates a matrix from the given byte array.
@@ -256,6 +293,73 @@ namespace FEAST
       {
         CONTEXT("When converting SparseMatrixBanded");
         this->assign(other);
+      }
+
+      /**
+       * \brief Write out matrix to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file where the matrix shall be stored.
+       */
+      void write_out(FileMode mode, String filename) const
+      {
+        CONTEXT("When writing out SparseMatrixBanded");
+
+        switch(mode)
+        {
+          case FileMode::fm_bm:
+            write_out_bm(filename);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Write out matrix to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that shall be written to.
+       */
+      void write_out(FileMode mode, std::ostream& file) const
+      {
+        CONTEXT("When writing out SparseMatrixBanded");
+
+        switch(mode)
+        {
+          case FileMode::fm_bm:
+            write_out_bm(file);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Write out matrix to banded binary file.
+       *
+       * \param[in] filename The file where the matrix shall be stored.
+       */
+      void write_out_bm(String filename) const
+      {
+        std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        write_out_bm(file);
+        file.close();
+      }
+
+      /**
+       * \brief Write out matrix to banded binary file.
+       *
+       * \param[in] file The stream that shall be written to.
+       */
+      void write_out_bm(std::ostream& file) const
+      {
+        if (! std::is_same<DT_, double>::value)
+          std::cout<<"Warning: You are writing out an banded matrix with less than double precission!"<<std::endl;
+
+        this->template _serialize<double, uint64_t>(FileMode::fm_bm, file);
       }
 
       /**

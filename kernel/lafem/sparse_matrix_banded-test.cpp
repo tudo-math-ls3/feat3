@@ -108,6 +108,12 @@ public:
     e.copy(c);
     TEST_CHECK_EQUAL(e, c);
 
+    BinaryStream bs;
+    c.write_out(FileMode::fm_bm, bs);
+    bs.seekg(0);
+    SparseMatrixBanded<Mem_, DT_, IT_> f(FileMode::fm_bm, bs);
+    TEST_CHECK_EQUAL(f, c);
+
     auto kp = c.serialize();
     SparseMatrixBanded<Mem_, DT_, IT_> k(kp);
     delete[] kp.second;
