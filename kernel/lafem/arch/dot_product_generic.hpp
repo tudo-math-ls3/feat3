@@ -6,53 +6,60 @@
   #error "Do not include this implementation-only header file directly!"
 #endif
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
-
-template <typename DT_>
-DT_ DotProduct<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ * const y, const Index size)
+namespace FEAST
 {
-  DT_ r(0);
-
-  if(x == y)
+  namespace LAFEM
   {
-    for (Index i(0) ; i < size ; ++i)
+    namespace Arch
     {
-      r += x[i] * x[i];
-    }
-  }
-  else
-  {
-    for (Index i(0) ; i < size ; ++i)
-    {
-      r += x[i] * y[i];
-    }
-  }
 
-  return r;
-}
+      template <typename DT_>
+      DT_ DotProduct<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ * const y, const Index size)
+      {
+        DT_ r(0);
 
-template <typename DT_>
-DT_ TripleDotProduct<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
-{
-  DT_ r(0);
+        if(x == y)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            r += x[i] * x[i];
+          }
+        }
+        else
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            r += x[i] * y[i];
+          }
+        }
 
-  for (Index i(0) ; i < size ; ++i)
-    r += x[i] * y[i] * z[i];
+        return r;
+      }
 
-  return r;
-}
+      template <typename DT_>
+      DT_ TripleDotProduct<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
+      {
+        DT_ r(0);
 
-template <typename DT_>
-DT_ TripleDotProductI<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
-{
-  DT_ r(0);
+        for (Index i(0) ; i < size ; ++i)
+          r += x[i] * y[i] * z[i];
 
-  for (Index i(0) ; i < size ; ++i)
-    r += y[i] * z[i] / x[i];
+        return r;
+      }
 
-  return r;
-}
+      template <typename DT_>
+      DT_ TripleDotProductI<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
+      {
+        DT_ r(0);
+
+        for (Index i(0) ; i < size ; ++i)
+          r += y[i] * z[i] / x[i];
+
+        return r;
+      }
+
+    } // namespace Arch
+  } // namespace LAFEM
+} // namespace FEAST
 
 #endif // KERNEL_LAFEM_ARCH_DOT_PRODUCT_GENERIC_HPP

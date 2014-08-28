@@ -6,111 +6,118 @@
   #error "Do not include this implementation-only header file directly!"
 #endif
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
-
-template <typename DT_, typename IT_>
-void ScaleRows<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
+namespace FEAST
 {
-  for (Index row(0) ; row < rows ; ++row)
+  namespace LAFEM
   {
-    const IT_ end(row_ptr[row + 1]);
-    for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+    namespace Arch
     {
-      r[i] = a[i] * x[row];
-    }
-  }
-}
 
-template <typename DT_, typename IT_>
-void ScaleRows<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const IT_ * const row_idx, const IT_ * const /*col_idx*/, const DT_ * const x, const Index, const Index, const Index used_elements)
-{
-  for (Index i(0) ; i < used_elements ; ++i)
-  {
-      r[i] = a[i] * x[row_idx[i]];
-  }
-}
-
-template <typename DT_, typename IT_>
-void ScaleRows<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/,
-                                              const IT_ * const cs, const IT_ * const cl, const IT_ * const /*rl*/,
-                                              const DT_ * const x, const Index C, const Index rows)
-{
-  for (Index i(0) ; i < rows/C ; ++i)
-  {
-    for (Index j(0) ; j < cl[i] ; ++j)
-    {
-      for (Index k(0); k < C; ++k)
+      template <typename DT_, typename IT_>
+      void ScaleRows<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
       {
-        r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[i*C+k];
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          const IT_ end(row_ptr[row + 1]);
+          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          {
+            r[i] = a[i] * x[row];
+          }
+        }
       }
-    }
-  }
 
-  Index i(rows/C);
-  {
-    for (Index k(0) ; k < rows%C ; ++k)
-    {
-      for (Index j(0) ; j < cl[i] ; ++j)
+      template <typename DT_, typename IT_>
+      void ScaleRows<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const IT_ * const row_idx, const IT_ * const /*col_idx*/, const DT_ * const x, const Index, const Index, const Index used_elements)
       {
-        r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[i*C+k];
+        for (Index i(0) ; i < used_elements ; ++i)
+        {
+          r[i] = a[i] * x[row_idx[i]];
+        }
       }
-    }
-  }
-}
 
-
-// ***********************************************
-
-template <typename DT_, typename IT_>
-void ScaleCols<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
-{
-  for (Index row(0) ; row < rows ; ++row)
-  {
-    const IT_ end(row_ptr[row + 1]);
-    for (IT_ i(row_ptr[row]) ; i < end ; ++i)
-    {
-      r[i] = a[i] * x[col_ind[i]];
-    }
-  }
-}
-
-template <typename DT_, typename IT_>
-void ScaleCols<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const IT_ * const /*row_idx*/, const IT_ * const col_idx, const DT_ * const x, const Index, const Index, const Index used_elements)
-{
-  for (Index i(0) ; i < used_elements ; ++i)
-  {
-    r[i] = a[i] * x[col_idx[i]];
-  }
-}
-
-template <typename DT_, typename IT_>
-void ScaleCols<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind,
-                                              const IT_ * const cs, const IT_ * const cl, const IT_ * const /*rl*/,
-                                              const DT_ * const x, const Index C, const Index rows)
-{
-  for (Index i(0) ; i < rows/C ; ++i)
-  {
-    for (Index j(0) ; j < cl[i] ; ++j)
-    {
-      for (Index k(0); k < C; ++k)
+      template <typename DT_, typename IT_>
+      void ScaleRows<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/,
+      const IT_ * const cs, const IT_ * const cl, const IT_ * const /*rl*/,
+      const DT_ * const x, const Index C, const Index rows)
       {
-        r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
-      }
-    }
-  }
+        for (Index i(0) ; i < rows/C ; ++i)
+        {
+          for (Index j(0) ; j < cl[i] ; ++j)
+          {
+            for (Index k(0); k < C; ++k)
+            {
+              r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[i*C+k];
+            }
+          }
+        }
 
-  Index i(rows/C);
-  {
-    for (Index k(0) ; k < rows%C ; ++k)
-    {
-      for (Index j(0) ; j < cl[i] ; ++j)
-      {
-        r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+        Index i(rows/C);
+        {
+          for (Index k(0) ; k < rows%C ; ++k)
+          {
+            for (Index j(0) ; j < cl[i] ; ++j)
+            {
+              r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[i*C+k];
+            }
+          }
+        }
       }
-    }
-  }
-}
+
+
+      // ***********************************************
+
+      template <typename DT_, typename IT_>
+      void ScaleCols<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
+      {
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          const IT_ end(row_ptr[row + 1]);
+          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          {
+            r[i] = a[i] * x[col_ind[i]];
+          }
+        }
+      }
+
+      template <typename DT_, typename IT_>
+      void ScaleCols<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const IT_ * const /*row_idx*/, const IT_ * const col_idx, const DT_ * const x, const Index, const Index, const Index used_elements)
+      {
+        for (Index i(0) ; i < used_elements ; ++i)
+        {
+          r[i] = a[i] * x[col_idx[i]];
+        }
+      }
+
+      template <typename DT_, typename IT_>
+      void ScaleCols<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind,
+      const IT_ * const cs, const IT_ * const cl, const IT_ * const /*rl*/,
+      const DT_ * const x, const Index C, const Index rows)
+      {
+        for (Index i(0) ; i < rows/C ; ++i)
+        {
+          for (Index j(0) ; j < cl[i] ; ++j)
+          {
+            for (Index k(0); k < C; ++k)
+            {
+              r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+            }
+          }
+        }
+
+        Index i(rows/C);
+        {
+          for (Index k(0) ; k < rows%C ; ++k)
+          {
+            for (Index j(0) ; j < cl[i] ; ++j)
+            {
+              r[cs[i]+j*C+k] = a[cs[i]+j*C+k] * x[col_ind[cs[i]+j*C+k]];
+            }
+          }
+        }
+      }
+
+    } // namespace Arch
+  } // namespace LAFEM
+} // namespace FEAST
 
 #endif // KERNEL_LAFEM_ARCH_SCALE_ROW_COL_GENERIC_HPP

@@ -10,57 +10,54 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
-
-template <typename DT_, typename IT_>
-void Defect<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
-{
-  for (Index row(0) ; row < rows ; ++row)
-  {
-    DT_ sum(0);
-    const IT_ end(row_ptr[row + 1]);
-    for (IT_ i(row_ptr[row]) ; i < end ; ++i)
-    {
-      sum += val[i] * x[col_ind[i]];
-    }
-    r[row] = rhs[row] - sum;
-  }
-}
-
-template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
-void Defect<Mem::Main, Algo::Generic>::csrb(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
-{
-  Tiny::Vector<DT_, BlockHeight_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockHeight_> *>(r));
-  const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const bval(reinterpret_cast<const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const>(val));
-  const Tiny::Vector<DT_, BlockWidth_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, BlockWidth_> * const>(x));
-  const Tiny::Vector<DT_, BlockHeight_> * const brhs(reinterpret_cast<const Tiny::Vector<DT_, BlockHeight_> * const>(rhs));
-
-  for (Index row(0) ; row < rows ; ++row)
-  {
-    Tiny::Vector<DT_, BlockHeight_> bsum(0);
-    const IT_ end(row_ptr[row + 1]);
-    for (IT_ i(row_ptr[row]) ; i < end ; ++i)
-    {
-      for (Index h(0) ; h < BlockHeight_ ; ++h)
-      {
-        for (Index w(0) ; w < BlockWidth_ ; ++w)
-        {
-          bsum[h] += bval[i][h][w] * bx[col_ind[i]][w];
-        }
-      }
-    }
-    br[row] = brhs[row] - bsum;
-  }
-}
-
 namespace FEAST
 {
   namespace LAFEM
   {
     namespace Arch
     {
+
+      template <typename DT_, typename IT_>
+      void Defect<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
+      {
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          DT_ sum(0);
+          const IT_ end(row_ptr[row + 1]);
+          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          {
+            sum += val[i] * x[col_ind[i]];
+          }
+          r[row] = rhs[row] - sum;
+        }
+      }
+
+      template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+      void Defect<Mem::Main, Algo::Generic>::csrb(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
+      {
+        Tiny::Vector<DT_, BlockHeight_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockHeight_> *>(r));
+        const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const bval(reinterpret_cast<const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const>(val));
+        const Tiny::Vector<DT_, BlockWidth_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, BlockWidth_> * const>(x));
+        const Tiny::Vector<DT_, BlockHeight_> * const brhs(reinterpret_cast<const Tiny::Vector<DT_, BlockHeight_> * const>(rhs));
+
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          Tiny::Vector<DT_, BlockHeight_> bsum(0);
+          const IT_ end(row_ptr[row + 1]);
+          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          {
+            for (Index h(0) ; h < BlockHeight_ ; ++h)
+            {
+              for (Index w(0) ; w < BlockWidth_ ; ++w)
+              {
+                bsum[h] += bval[i][h][w] * bx[col_ind[i]][w];
+              }
+            }
+          }
+          br[row] = brhs[row] - bsum;
+        }
+      }
+
       namespace Intern
       {
         namespace DefectELL
@@ -75,7 +72,7 @@ namespace FEAST
           struct DefectSpezialisation
           {
             static void f(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
-                          const IT_ * const cl, const DT_ * const x, const Index /*C*/, const Index rows)
+            const IT_ * const cl, const DT_ * const x, const Index /*C*/, const Index rows)
             {
               DT_ tmp[C_];
               const DT_ * const ctmp(static_cast<const DT_ * const>(tmp));
@@ -113,7 +110,7 @@ namespace FEAST
           struct DefectGeneric
           {
             static void f(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
-                          const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
+            const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
             {
               for (Index i(0) ; i < rows/C ; ++i)
               {
@@ -154,68 +151,59 @@ namespace FEAST
           };
         } // namespace DefectELL
       } // namespace Intern
-    } // namespace Arch
-  } // namespace LAFEM
-} // namespace FEAST
 
-template <typename DT_, typename IT_>
-void Defect<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const val,
-                                           const IT_ * const col_ind, const IT_ * const cs,
-                                           const IT_ * const cl, const DT_ * const x,
-                                           const Index C, const Index rows)
-{
-  switch (C)
-  {
-  case 1:
-    Intern::DefectELL::DefectSpezialisation<DT_, IT_, 1>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
-    break;
-  case 2:
-    Intern::DefectELL::DefectSpezialisation<DT_, IT_, 2>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
-    break;
-  case 4:
-    Intern::DefectELL::DefectSpezialisation<DT_, IT_, 4>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
-    break;
-  case 8:
-    Intern::DefectELL::DefectSpezialisation<DT_, IT_, 8>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
-    break;
-  case 16:
-    Intern::DefectELL::DefectSpezialisation<DT_, IT_,16>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
-    break;
-  case 32:
-    Intern::DefectELL::DefectSpezialisation<DT_, IT_,32>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
-    break;
-  default:
+      template <typename DT_, typename IT_>
+      void Defect<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const val,
+      const IT_ * const col_ind, const IT_ * const cs,
+      const IT_ * const cl, const DT_ * const x,
+      const Index C, const Index rows)
+      {
+        switch (C)
+        {
+          case 1:
+            Intern::DefectELL::DefectSpezialisation<DT_, IT_, 1>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            break;
+          case 2:
+            Intern::DefectELL::DefectSpezialisation<DT_, IT_, 2>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            break;
+          case 4:
+            Intern::DefectELL::DefectSpezialisation<DT_, IT_, 4>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            break;
+          case 8:
+            Intern::DefectELL::DefectSpezialisation<DT_, IT_, 8>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            break;
+          case 16:
+            Intern::DefectELL::DefectSpezialisation<DT_, IT_,16>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            break;
+          case 32:
+            Intern::DefectELL::DefectSpezialisation<DT_, IT_,32>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            break;
+          default:
 #ifdef DEBUG
-    /// \todo print warning in feast log file
-    std::cout << "Warning: Defect not optimized for chunk size = " << C << "!" << std::endl;
+            /// \todo print warning in feast log file
+            std::cout << "Warning: Defect not optimized for chunk size = " << C << "!" << std::endl;
 #endif
-    Intern::DefectELL::DefectGeneric<DT_, IT_>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
-  }
-}
+            Intern::DefectELL::DefectGeneric<DT_, IT_>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+        }
+      }
 
-template <typename DT_, typename IT_>
-void Defect<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const row_ptr, const IT_ * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements)
-{
-  Index iter(0);
-  for (IT_ row(0); row < IT_(rows); ++row)
-  {
-    DT_ sum(DT_(0));
-    while (iter < used_elements && row_ptr[iter] == row)
-    {
-      sum += val[iter] * x[col_ptr[iter]];
-      ++iter;
-    }
-    r[row] = rhs[row] - sum;
-  }
-}
+      template <typename DT_, typename IT_>
+      void Defect<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const row_ptr, const IT_ * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements)
+      {
+        Index iter(0);
+        for (IT_ row(0); row < IT_(rows); ++row)
+        {
+          DT_ sum(DT_(0));
+          while (iter < used_elements && row_ptr[iter] == row)
+          {
+            sum += val[iter] * x[col_ptr[iter]];
+            ++iter;
+          }
+          r[row] = rhs[row] - sum;
+        }
+      }
 
 
-namespace FEAST
-{
-  namespace LAFEM
-  {
-    namespace Arch
-    {
       namespace Intern
       {
         namespace DefectBanded
@@ -224,20 +212,20 @@ namespace FEAST
           struct Iteration_Left
           {
             static void f(DT_ * const r, const DT_ * y,
-                          const DT_ * const val, const IT_ * const offsets,
-                          const DT_ * const x, const Index rows, const Index columns)
+            const DT_ * const val, const IT_ * const offsets,
+            const DT_ * const x, const Index rows, const Index columns)
             {
               Index start(Math::max(Intern::ProductMatVecBanded::start_offset(j-1, offsets, rows, columns, noo),
-                                    Intern::ProductMatVecBanded::end_offset(i-1, offsets, rows, columns, noo) + 1));
+              Intern::ProductMatVecBanded::end_offset(i-1, offsets, rows, columns, noo) + 1));
               Index end  (Math::min(Intern::ProductMatVecBanded::start_offset(j-2, offsets, rows, columns, noo),
-                                    Intern::ProductMatVecBanded::end_offset(i-2, offsets, rows, columns, noo) + 1));
+              Intern::ProductMatVecBanded::end_offset(i-2, offsets, rows, columns, noo) + 1));
 
               FEAST_IVDEP
                 for (Index l(start); l < end; ++l)
                 {
                   DT_ tmp(0);
                   Intern::LoopUnroller<0, i-j>::step(Intern::ProductMatVecBanded::single_matrix_entry, &tmp, val + (j-1) * rows + l,
-                                                     offsets + (j-1), x + l + 1 - rows, rows);
+                  offsets + (j-1), x + l + 1 - rows, rows);
                   r[l] = y[l] - tmp;
                 }
 
@@ -249,8 +237,8 @@ namespace FEAST
           struct Iteration_Left<DT_, IT_, noo, i, 0>
           {
             static void f(DT_ * const /*r*/, const DT_ * const /*y*/,
-                          const DT_ * const /*val*/, const IT_ * const /*offsets*/,
-                          const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
+            const DT_ * const /*val*/, const IT_ * const /*offsets*/,
+            const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
             {
             }
           };
@@ -261,8 +249,8 @@ namespace FEAST
           struct Iteration_Right
           {
             static void f(DT_ * const r, const DT_ * const y,
-                          const DT_ * const val, const IT_ * const offsets,
-                          const DT_ * const x, const Index rows, const Index columns)
+            const DT_ * const val, const IT_ * const offsets,
+            const DT_ * const x, const Index rows, const Index columns)
             {
               Iteration_Left<DT_, IT_, noo, i, i-1>::f(r, y, val, offsets, x, rows, columns);
               Iteration_Right<DT_, IT_, noo, i-1>::f(r, y, val, offsets, x, rows, columns);
@@ -273,8 +261,8 @@ namespace FEAST
           struct Iteration_Right<DT_, IT_, noo, 0>
           {
             static void f(DT_ * const /*r*/, const DT_ * const /*y*/,
-                          const DT_ * const /*val*/, const IT_ * const /*offsets*/,
-                          const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
+            const DT_ * const /*val*/, const IT_ * const /*offsets*/,
+            const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
             {
             }
           };
@@ -283,8 +271,8 @@ namespace FEAST
 
           template <typename DT_, typename IT_>
           void defect_banded_generic(DT_ * r, const DT_ * const y, const DT_ * const val,
-                                     const IT_ * const offsets, const DT_ * const x,
-                                     const Index num_of_offsets, const Index rows, const Index columns)
+          const IT_ * const offsets, const DT_ * const x,
+          const Index num_of_offsets, const Index rows, const Index columns)
           {
             // Search first offset of the upper triangular matrix
             Index k(0);
@@ -305,9 +293,9 @@ namespace FEAST
 
                 // iteration over all rows which contain the offsets between offset i and offset j
                 const Index start(Math::max(Intern::ProductMatVecBanded::start_offset(  i, offsets, rows, columns, num_of_offsets),
-                                            Intern::ProductMatVecBanded::end_offset  (  j, offsets, rows, columns, num_of_offsets) + 1));
+                Intern::ProductMatVecBanded::end_offset  (  j, offsets, rows, columns, num_of_offsets) + 1));
                 const Index stop (Math::min(Intern::ProductMatVecBanded::start_offset(i-1, offsets, rows, columns, num_of_offsets),
-                                            Intern::ProductMatVecBanded::end_offset  (j-1, offsets, rows, columns, num_of_offsets) + 1));
+                Intern::ProductMatVecBanded::end_offset  (j-1, offsets, rows, columns, num_of_offsets) + 1));
                 for (Index l(start); l < stop; ++l)
                 {
                   DT_ s(0);
@@ -322,38 +310,39 @@ namespace FEAST
           }
         } // namespace DefectBanded
       } // namespace Intern
+
+
+
+      template <typename DT_, typename IT_>
+      void Defect<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const rhs,
+      const DT_ * const val, const IT_ * const offsets, const DT_ * const x,
+      const Index num_of_offsets, const Index rows, const Index columns)
+      {
+        switch (num_of_offsets)
+        {
+          case 3:
+            Intern::DefectBanded::Iteration_Right<DT_, IT_, 3, 4>::f(r, rhs, val, offsets, x, rows, columns);
+            break;
+          case 5:
+            Intern::DefectBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, rhs, val, offsets, x, rows, columns);
+            break;
+          case 9:
+            Intern::DefectBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, rhs, val, offsets, x, rows, columns);
+            break;
+          case 25:
+            Intern::DefectBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, rhs, val, offsets, x, rows, columns);
+            break;
+          default:
+#ifdef DEBUG
+            /// \todo print warning in feast log file
+            std::cout << "Warning: Defect not optimized for " << num_of_offsets << " offsets!" << std::endl;
+#endif
+            Intern::DefectBanded::defect_banded_generic(r, rhs, val, offsets, x, num_of_offsets, rows, columns);
+        }
+
+      }
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST
-
-
-
-template <typename DT_, typename IT_>
-void Defect<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const rhs,
-                                              const DT_ * const val, const IT_ * const offsets, const DT_ * const x,
-                                              const Index num_of_offsets, const Index rows, const Index columns)
-{
-  switch (num_of_offsets)
-  {
-  case 3:
-    Intern::DefectBanded::Iteration_Right<DT_, IT_, 3, 4>::f(r, rhs, val, offsets, x, rows, columns);
-    break;
-  case 5:
-    Intern::DefectBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, rhs, val, offsets, x, rows, columns);
-    break;
-  case 9:
-    Intern::DefectBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, rhs, val, offsets, x, rows, columns);
-    break;
-  case 25:
-    Intern::DefectBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, rhs, val, offsets, x, rows, columns);
-    break;
-  default:
-#ifdef DEBUG
-    /// \todo print warning in feast log file
-    std::cout << "Warning: Defect not optimized for " << num_of_offsets << " offsets!" << std::endl;
-#endif
-    Intern::DefectBanded::defect_banded_generic(r, rhs, val, offsets, x, num_of_offsets, rows, columns);
-  }
-}
 
 #endif // KERNEL_LAFEM_ARCH_DEFECT_GENERIC_HPP

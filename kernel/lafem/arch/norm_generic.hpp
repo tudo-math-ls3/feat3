@@ -9,20 +9,27 @@
 #include <kernel/util/math.hpp>
 #include <cmath>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
-
-template <typename DT_>
-DT_ Norm2<Mem::Main, Algo::Generic>::value(const DT_ * const x, const Index size)
+namespace FEAST
 {
-  DT_ r(0);
-  for (Index i(0) ; i < size ; ++i)
+  namespace LAFEM
   {
-    r += x[i] * x[i];
-  }
+    namespace Arch
+    {
 
-  return (DT_)Math::sqrt(r);
-}
+      template <typename DT_>
+      DT_ Norm2<Mem::Main, Algo::Generic>::value(const DT_ * const x, const Index size)
+      {
+        DT_ r(0);
+        for (Index i(0) ; i < size ; ++i)
+        {
+          r += x[i] * x[i];
+        }
+
+        return (DT_)Math::sqrt(r);
+      }
+
+    } // namespace Arch
+  } // namespace LAFEM
+} // namespace FEAST
 
 #endif // KERNEL_LAFEM_ARCH_NORM_GENERIC_HPP
