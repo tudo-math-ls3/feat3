@@ -65,7 +65,6 @@ public:
 
     auto kp = b.serialise();
     DenseMatrix<Mem_, DT_, IT_> k(kp);
-    delete[] kp.second;
     TEST_CHECK_EQUAL(k, b);
   }
 };

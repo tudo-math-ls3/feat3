@@ -39,8 +39,8 @@ namespace FEAST
         MT_<Mem_, DT_, IT_> result;
         result.clone(origin);
 
-        ST_<std::pair<Index, char*>, std::allocator<std::pair<Index, char*> > > recv_buf;
-        ST_<std::pair<Index, char*>, std::allocator<std::pair<Index, char*> > > send_buf;
+        ST_<std::vector<char>, std::allocator<std::vector<char> > > recv_buf;
+        ST_<std::vector<char>, std::allocator<std::vector<char> > > send_buf;
 
         ST_<Request, std::allocator<Request> > recvrequests;
         ST_<Request, std::allocator<Request> > sendrequests;
@@ -67,11 +67,10 @@ namespace FEAST
           recvrequests.push_back(rr);
           recvstatus.push_back(rs);
 
-          char* recv_buf_p(new char[send_buf.at(i).first]);
-          recv_buf.push_back(std::pair<Index, char*>(send_buf.at(i).first, recv_buf_p));
+          recv_buf.push_back(std::vector<char>(send_buf.at(i).size()));
 
-          Comm::irecv(recv_buf.at(i).second,
-                      recv_buf.at(i).first,
+          Comm::irecv(recv_buf.at(i).data(),
+                      recv_buf.at(i).size(),
                       other_ranks.at(i),
                       recvrequests.at(i),
                       tags.at(i),
@@ -88,8 +87,8 @@ namespace FEAST
           sendrequests.push_back(sr);
           sendstatus.push_back(ss);
 
-          Comm::isend(send_buf.at(i).second,
-                      send_buf.at(i).first,
+          Comm::isend(send_buf.at(i).data(),
+                      send_buf.at(i).size(),
                       other_ranks.at(i),
                       sendrequests.at(i),
                       tags.at(i),
@@ -140,10 +139,6 @@ namespace FEAST
 
         delete[] recvflags;
         delete[] taskflags;
-        for(auto recv_buf_p_i : recv_buf)
-          delete[] recv_buf_p_i.second;
-        for(auto send_buf_p_i : send_buf)
-          delete[] send_buf_p_i.second;
 
         return result;
       }

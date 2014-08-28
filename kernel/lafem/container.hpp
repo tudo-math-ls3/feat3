@@ -317,14 +317,12 @@ namespace FEAST
         }
 
         /**
-         * \brief Serialisation of complete container entity.
+         * \brief Serialization of complete container entity.
          *
          * \param[in] mode FileMode enum, describing the actual container specialisation.
-         * \param[out] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         * \param[out] std::vector<char> A std::vector, containing the byte array.
          *
-         * Serialise a complete container entity into a single binary array.
-         *
-         * \warning The allocated array must be freed by the user!
+         * Serialize a complete container entity into a single binary array.
          *
          * Array data layout:
          * \code
@@ -346,7 +344,7 @@ namespace FEAST
          * \endcode
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        std::pair<Index, char *> _serialise(FileMode mode) const
+        std::vector<char> _serialize(FileMode mode) const
         {
           Container<Mem::Main, DT2_, IT2_> tc(0);
           tc.assign(*this);
@@ -368,7 +366,8 @@ namespace FEAST
           }
           gsize +=16; //padding for datatype alignment missmatch
 
-          char * array(new char[size_t(gsize)]);
+          std::vector<char> result(gsize);
+          char * array(result.data());
           uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
           DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
           IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
@@ -408,8 +407,7 @@ namespace FEAST
           }
           global_i += Index(tc._scalar_index.size());
 
-          //global_i = (Index)std::ceil(((float)global_i * (float)sizeof(uint64_t)) / (float)sizeof(DT2_)); // now counting how many DT2 have been inserted so far
-          global_i = (global_i * Index(sizeof(uint64_t)) + Index(sizeof(DT2_) - 1)) / Index(sizeof(DT2_));
+          global_i = (Index)std::ceil(((float)global_i * (float)sizeof(uint64_t)) / (float)sizeof(DT2_)); // now counting how many DT2 have been inserted so far
 
           for (Index i(0) ; i < tc._scalar_dt.size() ; ++i)
           {
@@ -423,50 +421,47 @@ namespace FEAST
             global_i += tc._elements_size.at(i);
           }
 
-          //global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_)); // now counting IT2_ elements
-          global_i = (global_i * Index(sizeof(DT2_)) + Index(sizeof(IT2_) - 1)) / Index(sizeof(IT2_));
+          global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_)); // now counting IT2_ elements
           for (Index i(0) ; i < tc._indices.size() ; ++i)
           {
             std::memcpy(&itarray[global_i], tc._indices.at(i), tc._indices_size.at(i) * sizeof(IT2_));
             global_i += tc._indices_size.at(i);
           }
 
-          std::pair<Index, char*> result(Index(gsize), array);
           return result;
         }
 
         /**
-         * \brief Serialisation of complete container entity.
+         * \brief Serialization of complete container entity.
          *
          * \param[in] mode FileMode enum, describing the actual container specialisation.
          * \param[in] file The output stream to write data into.
          *
-         * Serialise a complete container entity into a single binary file.
+         * Serialize a complete container entity into a single binary file.
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        void _serialise(FileMode mode, std::ostream & file) const
+        void _serialize(FileMode mode, std::ostream & file) const
         {
-          auto temp(this->template _serialise<DT2_, IT2_>(mode));
-          file.write((const char *)temp.second, (long)(temp.first));
-          delete[] temp.second;
+          auto temp(this->template _serialize<DT2_, IT2_>(mode));
+          file.write(temp.data(), long(temp.size()));
         }
 
         /**
-         * \brief Deserialisation of complete container entity.
+         * \brief Deserialization of complete container entity.
          *
          * \param[in] mode FileMode enum, describing the actual container specialisation.
-         * \param[in] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         * \param[in] std::vector<char> A std::vector containing the byte array.
          *
          * Recreate a complete container entity by a single binary array.
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        void _deserialise(FileMode mode, std::pair<Index, char *> & input)
+        void _deserialize(FileMode mode, std::vector<char> & input)
         {
           this->clear();
           Container<Mem::Main, DT2_, IT2_> tc(0);
           tc.clear();
 
-          char * array(input.second);
+          char * array(input.data());
           uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
           DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
           IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
@@ -478,7 +473,7 @@ namespace FEAST
           uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
 #endif
           if (magic != uiarray[1])
-            throw InternalError(__func__, __FILE__, __LINE__, "_deserialise: given FileMode incompatible with given array!");
+            throw InternalError(__func__, __FILE__, __LINE__, "_deserialize: given FileMode incompatible with given array!");
 
 
           Index global_i(8);
@@ -500,9 +495,7 @@ namespace FEAST
           }
           global_i += Index(uiarray[6]);
 
-          //global_i = (Index)std::ceil(((float)global_i * (float)sizeof(uint64_t)) / (float)sizeof(DT2_));
-          global_i = (global_i * Index(sizeof(uint64_t)) + Index(sizeof(DT2_) - 1)) / Index(sizeof(DT2_));
-
+          global_i = (Index)std::ceil(((float)global_i * (float)sizeof(uint64_t)) / (float)sizeof(DT2_));
           for (uint64_t i(0) ; i < uiarray[7] ; ++i)
           {
             tc._scalar_dt.push_back(dtarray[i + global_i]);
@@ -516,8 +509,7 @@ namespace FEAST
             global_i += tc._elements_size.at(i);
           }
 
-          //global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_));
-          global_i = (global_i * Index(sizeof(DT2_)) + Index(sizeof(IT2_) - 1)) / Index(sizeof(IT2_));
+          global_i = (Index)std::ceil(((float)global_i * (float)sizeof(DT2_)) / (float)sizeof(IT2_));
           for (Index i(0) ; i < Index(uiarray[3]) ; ++i)
           {
             tc._indices.push_back(Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT2_>(tc._indices_size.at(i)));
@@ -529,7 +521,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Deserialisation of complete container entity.
+         * \brief Deserialization of complete container entity.
          *
          * \param[in] mode FileMode enum, describing the actual container specialisation.
          * \param[in] file std::istream, pointing to the input data.
@@ -537,16 +529,14 @@ namespace FEAST
          * Recreate a complete container entity by a single binary file.
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        void _deserialise(FileMode mode, std::istream & file)
+        void _deserialize(FileMode mode, std::istream & file)
         {
           uint64_t tsize;
           file.read((char *)&tsize, (long)(sizeof(uint64_t)));
-          char * temp(new char[size_t(tsize)]);
+          std::vector<char> temp(tsize);
           file.seekg(0, file.beg);
-          file.read(temp, (long)(tsize * sizeof(uint64_t)));
-          std::pair<Index, char*> tp(Index(tsize), temp);
-          this->template _deserialise<DT2_, IT2_>(mode, tp);
-          delete[] temp;
+          file.read(temp.data(), (long)(tsize * sizeof(uint64_t)));
+          this->template _deserialize<DT2_, IT2_>(mode, temp);
         }
 
       public:

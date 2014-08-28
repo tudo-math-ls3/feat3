@@ -118,16 +118,16 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         * \param[in] std::vector<char> A std::vector, containing the byte array.
          *
          * Creates a matrix from the given byte array.
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        explicit DenseMatrix(std::pair<Index, char *> input) :
+        explicit DenseMatrix(std::vector<char> input) :
           Container<Mem_, DT_, IT_>(0)
         {
           CONTEXT("When creating DenseMatrix");
-          deserialise<DT2_, IT2_>(input);
+          deserialize<DT2_, IT2_>(input);
         }
 
         /**
@@ -238,34 +238,32 @@ namespace FEAST
         }
 
         /**
-         * \brief Deserialisation of complete container entity.
+         * \brief Deserialization of complete container entity.
          *
-         * \param[in] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         * \param[in] std::vector<char> A std::vector, containing the byte array.
          *
          * Recreate a complete container entity by a single binary array.
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        void deserialise(std::pair<Index, char *> input)
+        void deserialize(std::vector<char> input)
         {
-          this->template _deserialise<DT2_, IT2_>(FileMode::fm_dm, input);
+          this->template _deserialize<DT2_, IT2_>(FileMode::fm_dm, input);
         }
 
         /**
-         * \brief Serialisation of complete container entity.
+         * \brief Serialization of complete container entity.
          *
          * \param[in] mode FileMode enum, describing the actual container specialisation.
-         * \param[out] std::pair<Index, char *> A std::pair, containing byte array size and byte array pointer.
+         * \param[out] std::vector<char> A std::vector, containing the byte array.
          *
-         * Serialise a complete container entity into a single binary array.
+         * Serialize a complete container entity into a single binary array.
          *
-         * \warning The allocated array must be freed by the user!
-         *
-         * See \ref FEAST::LAFEM::Container::_serialise for details.
+         * See \ref FEAST::LAFEM::Container::_serialize for details.
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        std::pair<Index, char *> serialise()
+        std::vector<char> serialize()
         {
-          return this->template _serialise<DT2_, IT2_>(FileMode::fm_dm);
+          return this->template _serialize<DT2_, IT2_>(FileMode::fm_dm);
         }
 
         /**

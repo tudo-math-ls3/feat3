@@ -133,7 +133,6 @@ public:
 
     auto kp = f.serialise();
     SparseMatrixCSR<Mem_, DT_, IT_> k(kp);
-    delete[] kp.second;
     TEST_CHECK_EQUAL(k, f);
   }
 };

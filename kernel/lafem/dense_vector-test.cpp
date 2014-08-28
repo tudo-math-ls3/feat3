@@ -118,7 +118,6 @@ public:
 
     auto op = k.serialise();
     DenseVector<Mem_, DT_, IT_> o(op);
-    delete[] op.second;
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), 1e-5);
   }

@@ -116,7 +116,6 @@ public:
 
     auto kp = c.serialise();
     SparseMatrixBanded<Mem_, DT_, IT_> k(kp);
-    delete[] kp.second;
     TEST_CHECK_EQUAL(k, c);
   }
 };
