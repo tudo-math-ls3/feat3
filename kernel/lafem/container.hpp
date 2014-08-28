@@ -373,8 +373,8 @@ namespace FEAST
           DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
           IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
 
-          // clang seems to use older libc++ without std::underlying_type
-#ifdef FEAST_COMPILER_CLANG
+          // clang/icc seems to use older libc++ without std::underlying_type
+#if defined(FEAST_COMPILER_CLANG) || defined(FEAST_COMPILER_INTEL)
           uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
 #else
           uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
@@ -469,8 +469,8 @@ namespace FEAST
           DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
           IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
 
-          // clang seems to use older libc++ without std::underlying_type
-#ifdef FEAST_COMPILER_CLANG
+          // clang/icc seems to use older libc++ without std::underlying_type
+#if defined(FEAST_COMPILER_CLANG) || defined(FEAST_COMPILER_INTEL)
           uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
 #else
           uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
