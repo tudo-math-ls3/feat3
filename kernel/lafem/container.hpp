@@ -536,7 +536,7 @@ namespace FEAST
         {
           uint64_t tsize;
           file.read((char *)&tsize, (long)(sizeof(uint64_t)));
-          char * temp(new char[tsize]);
+          char * temp(new char[size_t(tsize)]);
           file.seekg(0, file.beg);
           file.read(temp, (long)(tsize * sizeof(uint64_t)));
           std::pair<Index, char*> tp(Index(tsize), temp);
