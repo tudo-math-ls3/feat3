@@ -4,7 +4,6 @@
 
 #include<kernel/base_header.hpp>
 #include <kernel/foundation/attribute.hpp>
-#include <kernel/foundation/mesh.hpp>
 #include <kernel/foundation/sub_mesh.hpp>
 #include <kernel/foundation/halo.hpp>
 
@@ -60,7 +59,7 @@ namespace FEAST
         this->comp_cost = other.comp_cost;
       }
 
-      Mesh<Dim_, t_, os_> basemesh;
+      MeshType_<Dim_, t_, os_> basemesh;
       std::shared_ptr<SubMesh<Dim_, t_, os_> > submesh;
       os_<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DT_, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DT_, os_> > > > comm_halos;
       os_<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>, std::allocator<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_> > > basemesh_boundaries;
