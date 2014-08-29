@@ -33,7 +33,7 @@ namespace FEAST
       static MT_<Mem_, DT_, IT_> value(const MT_<Mem_, DT_, IT_>& origin,
                                        const ST_<VMT_, std::allocator<VMT_> >& vec_mirrors,
                                        const ST_<IT_, std::allocator<IT_> >& other_ranks,
-                                       ST_<IT_, std::allocator<IT_> >& tags,
+                                       const ST_<IT_, std::allocator<IT_> >& tags,
                                        Communicator communicator = Communicator(MPI_COMM_WORLD) )
       {
         MT_<Mem_, DT_, IT_> result;
@@ -151,13 +151,19 @@ namespace FEAST
     template<
              typename Mem_,
              typename DT_,
-             typename IT_>
-    struct MatrixConversion<Mem_, DT_, IT_, SparseMatrixCSR>
+             typename IT_,
+             template<typename, typename, typename> class MT_>
+    struct MatrixConversion
     {
       template<template<typename, typename> class ST_, typename VMT_>
-      static SparseMatrixCSR<Mem_, DT_, IT_> value(const SparseMatrixCSR<Mem_, DT_, IT_>& origin, const ST_<VMT_, std::allocator<VMT_> >&, const ST_<IT_, std::allocator<IT_> >&)
+      static MT_<Mem_, DT_, IT_> value(const MT_<Mem_, DT_, IT_>& origin,
+                                       const ST_<VMT_, std::allocator<VMT_> >&,
+                                       const ST_<IT_, std::allocator<IT_> >&,
+                                       const ST_<IT_, std::allocator<IT_> >&,
+                                       Communicator = Communicator(0)
+                                       )
       {
-        SparseMatrixCSR<Mem_, DT_, IT_> result;
+        MT_<Mem_, DT_, IT_> result;
         result.clone(origin);
         return result;
       }
