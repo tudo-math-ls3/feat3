@@ -77,7 +77,7 @@ public:
     TEST_CHECK_EQUAL(prol_matrix.used_elements(), 36u);
 
     // fetch matrix arrays of matrix in CSR-format
-    SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_prol_matrix;
+    LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_prol_matrix;
     tmp_prol_matrix.convert(prol_matrix);
     const IndexType_ * row_ptr = tmp_prol_matrix.row_ptr();
     const IndexType_ * col_idx = tmp_prol_matrix.col_ind();
@@ -156,7 +156,7 @@ public:
     TEST_CHECK_EQUAL(prol_matrix.used_elements(), 48u);
 
     // fetch matrix arrays of matrix in CSR-format
-    SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_prol_matrix;
+    LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> tmp_prol_matrix;
     tmp_prol_matrix.convert(prol_matrix);
     const IndexType_ * row_ptr = tmp_prol_matrix.row_ptr();
     const IndexType_ * col_idx = tmp_prol_matrix.col_ind();
@@ -215,28 +215,28 @@ public:
   }
 };
 
-GridTransferTest<SparseMatrixCSR<Mem::Main, float, unsigned int> > grid_transfer_test_csr_float_uint;
-GridTransferTest<SparseMatrixCSR<Mem::Main, float, unsigned long> > grid_transfer_test_csr_float_ulong;
-GridTransferTest<SparseMatrixCSR<Mem::Main, double, unsigned int> > grid_transfer_test_csr_double_uint;
-GridTransferTest<SparseMatrixCSR<Mem::Main, double, unsigned long> > grid_transfer_test_csr_double_ulong;
+GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, float, unsigned int> > grid_transfer_test_csr_float_uint;
+GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, float, unsigned long> > grid_transfer_test_csr_float_ulong;
+GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, double, unsigned int> > grid_transfer_test_csr_double_uint;
+GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, double, unsigned long> > grid_transfer_test_csr_double_ulong;
 
-GridTransferTest<SparseMatrixCOO<Mem::Main, float, unsigned int> > grid_transfer_test_coo_float_uint;
-GridTransferTest<SparseMatrixCOO<Mem::Main, float, unsigned long> > grid_transfer_test_coo_float_ulong;
-GridTransferTest<SparseMatrixCOO<Mem::Main, double, unsigned int> > grid_transfer_test_coo_double_uint;
-GridTransferTest<SparseMatrixCOO<Mem::Main, double, unsigned long> > grid_transfer_test_coo_double_ulong;
+GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, float, unsigned int> > grid_transfer_test_coo_float_uint;
+GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, float, unsigned long> > grid_transfer_test_coo_float_ulong;
+GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, double, unsigned int> > grid_transfer_test_coo_double_uint;
+GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, double, unsigned long> > grid_transfer_test_coo_double_ulong;
 
-GridTransferTest<SparseMatrixELL<Mem::Main, float, unsigned int> > grid_transfer_test_ell_float_uint;
-GridTransferTest<SparseMatrixELL<Mem::Main, float, unsigned long> > grid_transfer_test_ell_float_ulong;
-GridTransferTest<SparseMatrixELL<Mem::Main, double, unsigned int> > grid_transfer_test_ell_double_uint;
-GridTransferTest<SparseMatrixELL<Mem::Main, double, unsigned long> > grid_transfer_test_ell_double_ulong;
+GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, float, unsigned int> > grid_transfer_test_ell_float_uint;
+GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, float, unsigned long> > grid_transfer_test_ell_float_ulong;
+GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned int> > grid_transfer_test_ell_double_uint;
+GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned long> > grid_transfer_test_ell_double_ulong;
 
 #ifdef FEAST_HAVE_QUADMATH
-GridTransferTest<SparseMatrixCSR<Mem::Main, __float128, unsigned int> > grid_transfer_test_csr_float128_uint;
-GridTransferTest<SparseMatrixCSR<Mem::Main, __float128, unsigned long> > grid_transfer_test_csr_float128_ulong;
+GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned int> > grid_transfer_test_csr_float128_uint;
+GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned long> > grid_transfer_test_csr_float128_ulong;
 
-GridTransferTest<SparseMatrixCOO<Mem::Main, __float128, unsigned int> > grid_transfer_test_coo_float128_uint;
-GridTransferTest<SparseMatrixCOO<Mem::Main, __float128, unsigned long> > grid_transfer_test_coo_float128_ulong;
+GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, __float128, unsigned int> > grid_transfer_test_coo_float128_uint;
+GridTransferTest<LAFEM::SparseMatrixCOO<Mem::Main, __float128, unsigned long> > grid_transfer_test_coo_float128_ulong;
 
-GridTransferTest<SparseMatrixELL<Mem::Main, __float128, unsigned int> > grid_transfer_test_ell_float128_uint;
-GridTransferTest<SparseMatrixELL<Mem::Main, __float128, unsigned long> > grid_transfer_test_ell_float128_ulong;
+GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, __float128, unsigned int> > grid_transfer_test_ell_float128_uint;
+GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, __float128, unsigned long> > grid_transfer_test_ell_float128_ulong;
 #endif
