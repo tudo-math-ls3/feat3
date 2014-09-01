@@ -86,7 +86,7 @@ public:
     TEST_CHECK_EQUAL(a(2), DT_(0));
     TEST_CHECK_EQUAL(a(3), DT_(0));
 
-    auto op = b.serialize();
+    auto op = b.serialise();
     SparseVector<Mem_, DT_, IT_> o(op);
     delete[] op.second;
     for (Index i(0) ; i < b.size() ; ++i)

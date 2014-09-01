@@ -127,7 +127,7 @@ public:
     SparseMatrixELL<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
 
-    auto kp = f.serialize();
+    auto kp = f.serialise();
     SparseMatrixELL<Mem_, DT_, IT_> k(kp);
     delete[] kp.second;
     TEST_CHECK_EQUAL(k, f);

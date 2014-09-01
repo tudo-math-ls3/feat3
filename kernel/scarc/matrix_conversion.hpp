@@ -55,7 +55,7 @@ namespace FEAST
           Assembly::MirrorAssembler::assemble_buffer_matrix(sendbuf_mat, mat_mirror, result);
           mat_mirror.gather_op(sendbuf_mat, result);
 
-          send_buf.push_back(sendbuf_mat.serialize());
+          send_buf.push_back(sendbuf_mat.serialise());
         }
 
         for(Index i(0) ; i < vec_mirrors.size() ; ++i)

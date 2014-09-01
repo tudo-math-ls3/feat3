@@ -114,7 +114,7 @@ public:
     SparseMatrixBanded<Mem_, DT_, IT_> f(FileMode::fm_bm, bs);
     TEST_CHECK_EQUAL(f, c);
 
-    auto kp = c.serialize();
+    auto kp = c.serialise();
     SparseMatrixBanded<Mem_, DT_, IT_> k(kp);
     delete[] kp.second;
     TEST_CHECK_EQUAL(k, c);
