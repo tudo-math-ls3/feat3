@@ -108,7 +108,8 @@ static void run()
   MeshType mesh(mesh_factory);
   TrafoType trafo(mesh);
 
-  DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(0e0));
+  DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(0e0));
+
   FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
   // The smoother in all its template glory
@@ -118,6 +119,7 @@ static void run()
   for(Index i(0); i < mesh.get_num_entities(0); ++i)
     rumpflpumpfl._bdry_id[i] = 0;
 
+  // Set initial coordinates by scaling the original Rumpf reference cell by ...
   DataType scaling(5);
   helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, scaling);
 
@@ -125,7 +127,7 @@ static void run()
   rumpflpumpfl.set_coords();
   rumpflpumpfl.init();
 
-  // Set scaling after init, as compute_h() is called there
+  // Set target edge lengths
   rumpflpumpfl._h[0](0, DataType(4));
   rumpflpumpfl._h[1](0, DataType(4));
   //rumpflpumpfl._h[0](0, DataType(4)/Math::sqrt(DataType(3)));
@@ -193,8 +195,8 @@ int main()
   //ResizeApp<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctional, MySmoother, float, MemType>::run();
   //ResizeApp<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelset, MySmoother, float, MemType>::run();
 
-  ResizeApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother, double, MemType>::run();
-  //ResizeApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional_D2, MySmoother, double, MemType>::run();
+  //ResizeApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother, double, MemType>::run();
+  ResizeApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional_D2, MySmoother, double, MemType>::run();
   //ResizeApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset, MySmoother, double, MemType>::run();
   //ResizeApp<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctional, MySmoother, double, MemType>::run();
   //ResizeApp<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelset, MySmoother, double, MemType>::run();

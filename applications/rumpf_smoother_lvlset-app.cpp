@@ -187,7 +187,7 @@ template
     typedef LAFEM::DenseVector<MemType, DataType> VectorType;
 
     // Mesh and trafo
-    Index level(5);
+    Index level(6);
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
     MeshType mesh(mesh_factory);
     TrafoType trafo(mesh);
@@ -210,15 +210,25 @@ template
 
     DataType deltat(DataType(0.025));
 
-    DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-4));
+    DataType fac_norm = DataType(1e-3),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-4));
     bool from_original(false);
     bool align_to_lvlset(false);
     bool r_adaptivity(true);
+    DataType r_adapt_reg = DataType(1e-3), r_adapt_pow = DataType(1);
+
+    std::cout << "deltat = " << scientify(deltat) << std::endl;
+    std::cout << "fac_norm = " << scientify(fac_norm) << ", fac_det= " << scientify(fac_det)
+    << ", fac_reg = " << scientify(fac_reg) << std::endl;
+    if(r_adaptivity)
+      std::cout << "r_adapt_reg = " << scientify(r_adapt_reg)
+      << ", r_adapt_pow = " << scientify(r_adapt_pow) << std::endl;
+
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     // The smoother in all its template glory
     RumpfSmootherType rumpflpumpfl(trafo, my_functional, align_to_lvlset, from_original, r_adaptivity,
     analytic_lvlset, analytic_lvlset_grad0, analytic_lvlset_grad1);
+    rumpflpumpfl.set_r_adapt_params(r_adapt_reg,r_adapt_pow);
 
     rumpflpumpfl.init();
 
@@ -276,13 +286,8 @@ template
     for(Index d = 0; d < MeshType::world_dim; ++d)
       coords_old[d]= std::move(LAFEM::DenseVector<MemType, DataType>(mesh.get_num_entities(0)));
 
-    Index outputstep(1);
-    deltat /= DataType(outputstep);
-    std::cout << "deltat = " << scientify(deltat) << ", outputstep = " << outputstep << std::endl;
-    std::cout << "fac_norm = " << scientify(fac_norm) << ", fac_det= " << scientify(fac_det)
-    << ", fac_reg = " << scientify(fac_reg) << std::endl;
 
-    while(time < DataType(6))
+    while(time < DataType(1))
     {
 
       std::cout << "timestep " << n << std::endl;
@@ -302,30 +307,27 @@ template
       x0.v[1] = DataType(0.25) *(DataType(2) + Math::sin(DataType(3)*time));
       analytic_lvlset.set_point(x0);
 
-      if( n%outputstep || outputstep==1)
-      {
-        fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_det2, func_lvlset);
-        rumpflpumpfl.compute_gradient();
-        std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
+      fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_det2, func_lvlset);
+      rumpflpumpfl.compute_gradient();
+      std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
 
-        filename = "pre_" + stringify(n) + ".vtk";
-        Geometry::ExportVTK<MeshType> writer_pre(mesh);
+      filename = "pre_" + stringify(n) + ".vtk";
+      Geometry::ExportVTK<MeshType> writer_pre(mesh);
 
-        writer_pre.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-        writer_pre.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
-        writer_pre.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
-        writer_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-        writer_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
-        writer_pre.add_scalar_cell("norm", func_norm);
-        writer_pre.add_scalar_cell("det", func_det);
-        writer_pre.add_scalar_cell("det2", func_det2);
-        writer_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-        writer_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
-        writer_pre.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-        writer_pre.add_scalar_cell("levelset_constraint", func_lvlset );
-        //std::cout << "Writing " << filename << std::endl;
-        writer_pre.write(filename);
-      }
+      writer_pre.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
+      writer_pre.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
+      writer_pre.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
+      writer_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
+      writer_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
+      writer_pre.add_scalar_cell("norm", func_norm);
+      writer_pre.add_scalar_cell("det", func_det);
+      writer_pre.add_scalar_cell("det2", func_det2);
+      writer_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
+      writer_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
+      writer_pre.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
+      writer_pre.add_scalar_cell("levelset_constraint", func_lvlset );
+      //std::cout << "Writing " << filename << std::endl;
+      writer_pre.write(filename);
 
       rumpflpumpfl.optimise();
 
@@ -344,32 +346,28 @@ template
       }
       std::cout << "max mesh velocity = " << scientify(max_mesh_velocity) << std::endl;
 
-      if( n%outputstep || outputstep==1)
-      {
-        fval = rumpflpumpfl.compute_functional(func_norm,func_det,func_det2,func_lvlset);
-        rumpflpumpfl.compute_gradient();
-        std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
+      fval = rumpflpumpfl.compute_functional(func_norm,func_det,func_det2,func_lvlset);
+      rumpflpumpfl.compute_gradient();
+      std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
 
-        filename = "post_" + stringify(n) + ".vtk";
-        Geometry::ExportVTK<MeshType> writer_post(mesh);
+      filename = "post_" + stringify(n) + ".vtk";
+      Geometry::ExportVTK<MeshType> writer_post(mesh);
 
-        writer_post.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-        writer_post.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
-        writer_post.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
-        writer_post.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-        writer_post.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
-        writer_post.add_scalar_cell("norm", func_norm);
-        writer_post.add_scalar_cell("det", func_det);
-        writer_post.add_scalar_cell("det2", func_det2);
-        writer_post.add_scalar_vertex("lvlset_grad_0", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements());
-        writer_post.add_scalar_vertex("lvlset_grad_1", rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
-        writer_post.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-        writer_post.add_scalar_vertex("mesh_velocity", mesh_velocity);
-        writer_post.add_scalar_cell("levelset_constraint", func_lvlset );
-        //std::cout << "Writing " << filename << std::endl;
-        writer_post.write(filename);
-
-      }
+      writer_post.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
+      writer_post.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
+      writer_post.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
+      writer_post.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
+      writer_post.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
+      writer_post.add_scalar_cell("norm", func_norm);
+      writer_post.add_scalar_cell("det", func_det);
+      writer_post.add_scalar_cell("det2", func_det2);
+      writer_post.add_scalar_vertex("lvlset_grad_0", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements());
+      writer_post.add_scalar_vertex("lvlset_grad_1", rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+      writer_post.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
+      writer_post.add_scalar_vertex("mesh_velocity", mesh_velocity);
+      writer_post.add_scalar_cell("levelset_constraint", func_lvlset );
+      //std::cout << "Writing " << filename << std::endl;
+      writer_post.write(filename);
 
       n++;
     }
@@ -394,6 +392,6 @@ int main()
 {
   typedef Mem::Main MemType;
 
-  LevelsetApp<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset_D2, MySmoother, double, MemType>::run();
+  LevelsetApp<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelset, MySmoother, double, MemType>::run();
   return 0;
 }

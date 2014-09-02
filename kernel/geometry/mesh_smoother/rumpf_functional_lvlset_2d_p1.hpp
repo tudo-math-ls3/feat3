@@ -28,7 +28,8 @@ namespace FEAST
         /// Factor for the levelset penalty term
         DataType_ fac_lvlset;
         /// Factor for making the regularised Heaviside function steeper
-        static constexpr DataType_ heaviside_reg_fac = DataType_(50);
+        static DataType_ heaviside_reg_fac(){ return DataType_(10); };
+        //static constexpr DataType_ heaviside_reg_fac = DataType_(1);
 
       public:
         /**
@@ -43,7 +44,7 @@ namespace FEAST
           fac_det_,
           fac_cof_,
           fac_reg_),
-          fac_lvlset(1)
+          fac_lvlset(DataType_(10))
           {
           }
 
@@ -57,7 +58,7 @@ namespace FEAST
           for(Index i(0); i < Index(3); ++i)
           {
             for(Index j(0); j < i; ++j)
-              penalty += FEAST::Assembly::Common::template HeavisideRegStatic<DataType_>::eval(-heaviside_reg_fac*lvlset_vals(i)*lvlset_vals(j));
+              penalty += FEAST::Assembly::Common::template HeavisideRegStatic<DataType_>::eval(-heaviside_reg_fac()*lvlset_vals(i)*lvlset_vals(j));
           }
 
           return penalty;
@@ -74,11 +75,12 @@ namespace FEAST
           {
             for(Index j(0); j < i; ++j)
             {
-              auto lvlset_prod = -heaviside_reg_fac*lvlset_vals(i)*lvlset_vals(j);
+              auto lvlset_prod = -heaviside_reg_fac()*lvlset_vals(i)*lvlset_vals(j);
               // Derivative of the heaviside function
               auto heaviside_der = FEAST::Assembly::Common::template HeavisideRegStatic<DataType_>::der_x(lvlset_prod);
               for(Index d(0); d < Index(2); ++d)
-                grad(d,i) -= heaviside_reg_fac*fac_lvlset*Math::sqr(lvlset_constraint_last) * (heaviside_der * lvlset_grad_vals(d,i) * lvlset_vals(j));
+                grad(d,i) -= heaviside_reg_fac() * fac_lvlset * lvlset_constraint_last * heaviside_der *
+                  (lvlset_grad_vals(d,i) * lvlset_vals(j));
             }
           }
 

@@ -28,8 +28,6 @@ namespace FEAST
         typedef RumpfFunctionalBase<MemoryType_, DataType_> BaseClass;
         /// Factor for the levelset penalty term
         DataType_ fac_lvlset;
-        /// Factor for making the regularised Heaviside function steeper
-        static constexpr DataType_ heaviside_reg_fac = DataType_(50);
 
       public:
         /**

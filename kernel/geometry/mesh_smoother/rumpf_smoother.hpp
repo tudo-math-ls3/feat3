@@ -89,6 +89,8 @@ namespace FEAST
         /// Functional value before mesh optimisation.
         DataType initial_functional_value;
         /// Weights for computing the functional value.
+        VectorType _mu;
+        /// Weights for local mesh size
         VectorType _lambda;
         /// Size parameters for the local reference element.
         VectorType _h[MeshType::world_dim];
@@ -106,10 +108,11 @@ namespace FEAST
          */
         explicit RumpfSmoother(const TrafoType& trafo_, FunctionalType& functional_)
           : BaseClass(trafo_),
-          _grad(new DataType_[this->_world_dim*this->_nk]),
+          _grad(new DataType_[MeshType::world_dim*trafo_.get_mesh().get_num_entities(0)]),
           _functional(functional_),
-          _bdry_id(new int[this->_mesh.get_num_entities(0)]),
-          _lambda(this->_mesh.get_num_entities(ShapeType::dimension))
+          _bdry_id(new int[trafo_.get_mesh().get_num_entities(0)]),
+          _mu(trafo_.get_mesh().get_num_entities(ShapeType::dimension),DataType(1)/DataType(trafo_.get_mesh().get_num_entities(ShapeType::dimension))),
+          _lambda(trafo_.get_mesh().get_num_entities(ShapeType::dimension))
       {
         /// Type for the boundary mesh
         typedef typename Geometry::CellSubSet<ShapeType> BoundaryType;
@@ -129,7 +132,7 @@ namespace FEAST
         for(Index i(0); i < boundary.get_num_entities(0); ++i)
           _bdry_id[boundary_set[i]] = -1;
 
-        for(Index d = 0; d < this->_world_dim; ++d)
+        for(Index d(0); d < this->_world_dim; ++d)
           _h[d]= std::move(VectorType(this->_mesh.get_num_entities(ShapeType::dimension)));
 
         //for(Index d = 0; d < this->_world_dim; ++d)
@@ -150,6 +153,7 @@ namespace FEAST
           BaseClass::init();
           compute_lambda();
           compute_h();
+          compute_mu();
           initial_functional_value = compute_functional();
         }
 
@@ -185,7 +189,7 @@ namespace FEAST
                 x(d,j) = this->_coords[d](idx(cell,j));
               }
             }
-            fval += this->_lambda(cell)*_functional.compute_local_functional(x,h);
+            fval += this->_mu(cell)*_functional.compute_local_functional(x,h);
           }
 
           return fval;
@@ -239,11 +243,11 @@ namespace FEAST
             }
 
             // Scale local functional value with lambda
-            fval += this->_lambda(cell)*_functional.compute_local_functional(x,h, norm_A, det_A, det2_A);
+            fval += this->_mu(cell)*_functional.compute_local_functional(x,h, norm_A, det_A, det2_A);
 
-            func_norm[cell] = this->_lambda(cell) * norm_A;
-            func_det[cell] = this->_lambda(cell) * det_A;
-            func_det2[cell] = this->_lambda(cell) * det2_A;
+            func_norm[cell] = this->_mu(cell) * norm_A;
+            func_det[cell] = this->_mu(cell) * det_A;
+            func_det2[cell] = this->_mu(cell) * det2_A;
             func_norm_tot += func_norm[cell];
             func_det_tot += func_det[cell];
             func_det2_tot += func_det2[cell];
@@ -292,7 +296,7 @@ namespace FEAST
             {
               // Add local contributions to global gradient vector
               for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                this->_grad[d*this->_nk + idx(cell,j)] += this->_lambda(cell)*grad_loc(d,j);
+                this->_grad[d*this->_nk + idx(cell,j)] += this->_mu(cell)*grad_loc(d,j);
             }
           }
 
@@ -369,6 +373,13 @@ namespace FEAST
 
         }
 
+        virtual void compute_mu()
+        {
+          DataType fac = DataType(1)/DataType(this->_mesh.get_num_entities(ShapeType::dimension));
+          for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); cell++)
+            this->_mu(cell,fac);
+        }
+
     }; // class RumpfSmoother
 
     /**
@@ -431,16 +442,72 @@ namespace FEAST
         alglib::mincgoptimize(state, ALGLIBWrapper::functional_grad, nullptr, &my_smoother);
         alglib::mincgresults(state, x, rep);
 
-        // Copy back the vertex coordinates
+        std::cout << "mincg: terminationtype " << rep.terminationtype << ", " << rep.iterationscount << " its, " << rep.nfev << " grad evals, " << std::endl;
+
+        //double epsg = 1.e-10;
+        //double epsf = 0.;
+        //double epsx = 0;
+        //alglib::ae_int_t maxits = 10000; // 1000
+        //alglib::mincgstate state;
+        //alglib::mincgreport rep;
+
+        //alglib::mincgcreatef(x, 1e-6, state);
+        //alglib::mincgsetcgtype(state, -1);
+        //alglib::mincgsetcond(state, epsg, epsf, epsx, maxits);
+        //// mincgsuggeststep(state, 1.e-4);
+        //alglib::mincgoptimize(state, ALGLIBWrapper::functional, nullptr, &my_smoother);
+        //alglib::mincgresults(state, x, rep);
+
+        //// Copy back the vertex coordinates
+        //for(Index d(0); d < world_dim; ++d)
+        //{
+        //  for(Index j(0); j < num_vert; ++j)
+        //    // Warning: Index/ae_int_t conversion
+        //    my_smoother._coords[d](j,DataType(x[alglib::ae_int_t(d*num_vert + j)]));
+        //}
+
+      }
+
+      /**
+       * \brief Computes the functional value
+       *
+       * The actual work is done by the mesh smoother's routines. The mesh smoother is passed as ptr and then casted
+       *
+       * \param[in] x
+       * Vertex coordinates for the mesh in its current state in the optimisation process.
+       *
+       * \param[out] func
+       * Functional value.
+       *
+       * \param[out] grad
+       * Gradient of the functional.
+       *
+       * \param[in] ptr
+       * The mesh smoother.
+       *
+       */
+      static void functional(const alglib::real_1d_array& x, double& func, void* ptr)
+      {
+        // Evil downcast, but we know what we are doing, right?
+        RumpfSmootherType_* my_smoother = reinterpret_cast<RumpfSmootherType_*> (ptr);
+
+        const Index world_dim(my_smoother->get_world_dim());
+        const Index num_vert(my_smoother->get_num_vert());
+
+        // Copy back the vertex coordinates, needed for computing the gradient on the modified mesh
         for(Index d(0); d < world_dim; ++d)
         {
           for(Index j(0); j < num_vert; ++j)
             // Warning: Index/ae_int_t conversion
-            my_smoother._coords[d](j,DataType(x[alglib::ae_int_t(d*num_vert + j)]));
+            my_smoother->_coords[d](j,DataType(x[alglib::ae_int_t(d*num_vert + j)]));
         }
 
+        // Let the functional initialise stuff if it needs to, like evaluating the levelset function on the current
+        // mesh
+        my_smoother->prepare();
+        // Compute functional value
+        func = double(my_smoother->compute_functional());
       }
-
       /**
        * \brief Computes the functional value and its gradient
        *

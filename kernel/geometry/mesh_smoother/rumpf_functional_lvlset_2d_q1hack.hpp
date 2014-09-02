@@ -28,7 +28,8 @@ namespace FEAST
         /// Factor for the levelset penalty term
         DataType_ fac_lvlset;
         /// Factor for making the regularised Heaviside function steeper
-        static constexpr DataType_ heaviside_reg_fac = DataType_(50);
+        static DataType_ heaviside_reg_fac(){ return DataType_(10); }
+        //static constexpr DataType_ heaviside_reg_fac = DataType_(10);
 
         /**
          * \brief Constructor
@@ -58,7 +59,8 @@ namespace FEAST
           for(Index i(0); i < Index(4); ++i)
           {
             Index j =other[i];
-            penalty += FEAST::Assembly::Common::template HeavisideRegStatic<DataType_>::eval(-heaviside_reg_fac*lvlset_vals(i)*lvlset_vals(j));
+            penalty += FEAST::Assembly::Common::template HeavisideRegStatic<DataType_>::eval(-heaviside_reg_fac()
+                * lvlset_vals(i) * lvlset_vals(j));
           }
           // This is the version for penalising the diagonal cuts as well
           /*
@@ -89,11 +91,12 @@ namespace FEAST
             for(Index i(0); i < Index(4); ++i)
             {
               Index j = other[i];
-              auto lvlset_prod = -heaviside_reg_fac*lvlset_vals(i)*lvlset_vals(j);
+              auto lvlset_prod = -heaviside_reg_fac() * lvlset_vals(i) * lvlset_vals(j);
               // Derivative of the heaviside function
               auto heaviside_der = FEAST::Assembly::Common::template HeavisideRegStatic<DataType_>::der_x(lvlset_prod);
               for(Index d(0); d < 2; ++d)
-                grad(d,i) -= heaviside_reg_fac*fac_lvlset*Math::sqr(lvlset_constraint_last) * (heaviside_der * lvlset_grad_vals(d,i) * lvlset_vals(j));
+                grad(d,i) -= heaviside_reg_fac() * fac_lvlset * lvlset_constraint_last *
+                  (heaviside_der * lvlset_grad_vals(d,i) * lvlset_vals(j));
             }
 
             // This is the version for penalising the diagonal cuts as well
@@ -118,4 +121,4 @@ namespace FEAST
   } // namespace Geometry
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_LVLSET_2D_P1_HPP
+#endif // KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_LVLSET_2D_Q1HACK_HPP

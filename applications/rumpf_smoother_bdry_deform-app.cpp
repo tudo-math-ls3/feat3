@@ -45,12 +45,11 @@ template
     typedef DataType_ DataType;
 
     // Mesh and trafo
-    Index level(3);
+    Index level(4);
     Geometry::RefineFactory<MeshType,Geometry::UnitStarCubeFactory> mesh_factory(level);
     MeshType mesh(mesh_factory);
     TrafoType trafo(mesh);
 
-    DataType pi(Math::pi<DataType>());
     DataType deltat(DataType(1e-3));
 
     DataType fac_norm = DataType(1e-2),fac_det = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(1e-4));
