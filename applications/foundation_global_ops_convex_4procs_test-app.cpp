@@ -227,15 +227,9 @@ void check_global_dot_2D(Index rank)
   mirror_buffers.push_back(std::move(mbuf1));
   mirror_buffers.push_back(std::move(mbuf2));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
-  DenseVector<Mem::Main, double> fbuf0(a.size());
-  DenseVector<Mem::Main, double> fbuf1(a.size());
-  DenseVector<Mem::Main, double> fbuf2(a.size());
-  freq_buffers.push_back(std::move(fbuf0));
-  freq_buffers.push_back(std::move(fbuf1));
-  freq_buffers.push_back(std::move(fbuf2));
+  DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
   GlobalDot<Mem::Main, Algo::Generic>::value(result, a, b, frequencies);
@@ -404,15 +398,9 @@ void check_global_dot_2D_gateway(Index rank)
   mirror_buffers.push_back(std::move(mbuf1));
   mirror_buffers.push_back(std::move(mbuf2));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
-  DenseVector<Mem::Main, double> fbuf0(a.size());
-  DenseVector<Mem::Main, double> fbuf1(a.size());
-  DenseVector<Mem::Main, double> fbuf2(a.size());
-  freq_buffers.push_back(std::move(fbuf0));
-  freq_buffers.push_back(std::move(fbuf1));
-  freq_buffers.push_back(std::move(fbuf2));
+  DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   GlobalDotGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(a.dot(b, &gate));
@@ -581,15 +569,9 @@ void check_global_nrm2_2D(Index rank)
   mirror_buffers.push_back(std::move(mbuf1));
   mirror_buffers.push_back(std::move(mbuf2));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
-  DenseVector<Mem::Main, double> fbuf0(a.size());
-  DenseVector<Mem::Main, double> fbuf1(a.size());
-  DenseVector<Mem::Main, double> fbuf2(a.size());
-  freq_buffers.push_back(std::move(fbuf0));
-  freq_buffers.push_back(std::move(fbuf1));
-  freq_buffers.push_back(std::move(fbuf2));
+  DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
   GlobalNorm2<Mem::Main, Algo::Generic>::value(result, b, frequencies);
@@ -758,15 +740,9 @@ void check_global_nrm2_2D_gateway(Index rank)
   mirror_buffers.push_back(std::move(mbuf1));
   mirror_buffers.push_back(std::move(mbuf2));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
-  DenseVector<Mem::Main, double> fbuf0(a.size());
-  DenseVector<Mem::Main, double> fbuf1(a.size());
-  DenseVector<Mem::Main, double> fbuf2(a.size());
-  freq_buffers.push_back(std::move(fbuf0));
-  freq_buffers.push_back(std::move(fbuf1));
-  freq_buffers.push_back(std::move(fbuf2));
+  DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   GlobalNorm2Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2(&gate));
@@ -1154,15 +1130,9 @@ void check_global_synchvec1_2D(Index rank)
   mirror_buffers.push_back(std::move(mbuf1));
   mirror_buffers.push_back(std::move(mbuf2));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
-  DenseVector<Mem::Main, double> fbuf0(a.size());
-  DenseVector<Mem::Main, double> fbuf1(a.size());
-  DenseVector<Mem::Main, double> fbuf2(a.size());
-  freq_buffers.push_back(std::move(fbuf0));
-  freq_buffers.push_back(std::move(fbuf1));
-  freq_buffers.push_back(std::move(fbuf2));
+  DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1<Mem::Main, Algo::Generic>::exec(a,
@@ -1571,15 +1541,9 @@ void check_global_synchvec1_2D_gateway(Index rank)
   mirror_buffers.push_back(std::move(mbuf1));
   mirror_buffers.push_back(std::move(mbuf2));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
-  DenseVector<Mem::Main, double> fbuf0(a.size());
-  DenseVector<Mem::Main, double> fbuf1(a.size());
-  DenseVector<Mem::Main, double> fbuf2(a.size());
-  freq_buffers.push_back(std::move(fbuf0));
-  freq_buffers.push_back(std::move(fbuf1));
-  freq_buffers.push_back(std::move(fbuf2));
+  DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
   GlobalSynchVec1Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
@@ -1769,15 +1733,9 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
   mirror_buffers.push_back(std::move(mbuf1));
   mirror_buffers.push_back(std::move(mbuf2));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
-  DenseVector<Mem::Main, double> fbuf0(a.size());
-  DenseVector<Mem::Main, double> fbuf1(a.size());
-  DenseVector<Mem::Main, double> fbuf2(a.size());
-  freq_buffers.push_back(std::move(fbuf0));
-  freq_buffers.push_back(std::move(fbuf1));
-  freq_buffers.push_back(std::move(fbuf2));
+  DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   GlobalNorm2SquaredGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2sqr(&gate));

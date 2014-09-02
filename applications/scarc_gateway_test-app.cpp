@@ -170,11 +170,9 @@ void check_dot_gateway_1D(Index rank)
   DenseVector<Mem::Main, double> mbuf(mirrors.at(0).size());
   mirror_buffers.push_back(std::move(mbuf));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(a.size());
-  freq_buffers.push_back(std::move(fbuf));
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -299,11 +297,9 @@ void check_nrm2_gateway_1D(Index rank)
   DenseVector<Mem::Main, double> mbuf(mirrors.at(0).size());
   mirror_buffers.push_back(std::move(mbuf));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(a.size());
-  freq_buffers.push_back(std::move(fbuf));
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -428,11 +424,9 @@ void check_nrm2sqr_gateway_1D(Index rank)
   DenseVector<Mem::Main, double> mbuf(mirrors.at(0).size());
   mirror_buffers.push_back(std::move(mbuf));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(a.size());
-  freq_buffers.push_back(std::move(fbuf));
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -559,11 +553,9 @@ void check_synch0_gateway_1D(Index rank)
   DenseVector<Mem::Main, double> mbuf(mirrors.at(0).size());
   mirror_buffers.push_back(std::move(mbuf));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(a.size());
-  freq_buffers.push_back(std::move(fbuf));
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -699,11 +691,9 @@ void check_synch1_gateway_1D(Index rank)
   DenseVector<Mem::Main, double> mbuf(mirrors.at(0).size());
   mirror_buffers.push_back(std::move(mbuf));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(a.size());
-  freq_buffers.push_back(std::move(fbuf));
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -840,11 +830,9 @@ void check_prodmat0vec1_gateway_1D(Index rank)
   DenseVector<Mem::Main, double> mbuf(mirrors.at(0).size());
   mirror_buffers.push_back(std::move(mbuf));
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(a.size());
-  freq_buffers.push_back(std::move(fbuf));
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);

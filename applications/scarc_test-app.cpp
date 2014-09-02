@@ -174,10 +174,8 @@ void check_scarc_rich_rich_1D(Index rank)
   Assembly::Common::LaplaceOperator laplace;
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
-  freq_buffers.push_back(std::move(fbuf));
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
@@ -439,10 +437,8 @@ void check_scarc_pcg_rich_1D(Index rank)
   Assembly::Common::LaplaceOperator laplace;
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
-  freq_buffers.push_back(std::move(fbuf));
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
@@ -705,10 +701,8 @@ void check_scarc_rich_pcg_1D(Index rank)
   Assembly::Common::LaplaceOperator laplace;
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
-  freq_buffers.push_back(std::move(fbuf));
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
@@ -969,10 +963,8 @@ void check_scarc_pcg_pcg_1D(Index rank)
   Assembly::Common::LaplaceOperator laplace;
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
-  std::vector<DenseVector<Mem::Main, double> > freq_buffers;
   DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
-  freq_buffers.push_back(std::move(fbuf));
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, freq_buffers));
+  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
