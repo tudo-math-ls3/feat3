@@ -66,6 +66,21 @@ namespace FEAST
         return DataType(1) + DataType(7) / DataType(i+1);
       }
 
+      static DataType fz00(Index i)
+      {
+        return Math::sqr(DataType(i+1));
+      }
+
+      static DataType fz01(Index i)
+      {
+        return -DataType(5) - Math::sqrt(DataType(i+1));
+      }
+
+      static DataType fz1(Index i)
+      {
+        return - DataType(7) / DataType(i+1);
+      }
+
       // generate test-vector x
       static MetaVector gen_vector_x(Index n00, Index n01, Index n1)
       {
@@ -108,6 +123,28 @@ namespace FEAST
         y.template at<Index(0)>().template at<Index(1)>().convert(r01);
         y.template at<Index(1)>().convert(r1);
         return std::move(y);
+      }
+
+      // Generate test-vector z. It is crucial that z_i != 0
+      static MetaVector gen_vector_z(Index n00, Index n01, Index n1)
+      {
+        // Mem::Main vectors
+        DenseVector<Mem::Main, DataType, IndexType> r00(n00), r01(n01), r1(n1);
+
+        // fill vectors
+        for(Index i(0); i < n00; ++i)
+          r00(i, fz00(i));
+        for(Index i(0); i < n01; ++i)
+          r01(i, fz01(i));
+        for(Index i(0); i < n1; ++i)
+          r1(i, fz1(i));
+
+        // construct data vector
+        MetaVector z;
+        z.template at<Index(0)>().template at<Index(0)>().convert(r00);
+        z.template at<Index(0)>().template at<Index(1)>().convert(r01);
+        z.template at<Index(1)>().convert(r1);
+        return std::move(z);
       }
 
       // generate null vector

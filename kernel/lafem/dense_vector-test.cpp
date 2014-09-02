@@ -281,6 +281,100 @@ DenseVectorDotTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_dot_pro
 #endif
 
 
+/**
+ * \brief DenseVector triple_dot and triple_dot_i test class
+ *
+ * \test The triple_dot and triple_dot_i routines
+ *
+ * \author Jordi Paul
+ *
+ **/
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_,
+  typename IT_>
+class DenseVectorTripleDotTest
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+{
+public:
+  DenseVectorTripleDotTest()
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorTripleDotTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      DenseVector<Mem::Main, DT_, IT_> b_local(size);
+      DenseVector<Mem::Main, DT_, IT_> c_local(size);
+
+      const DT_ den( DT_(1) / Math::sqrt(DT_(size)) );
+
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(i+1) * den);    // a[i] = (i+1) / n
+        b_local(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
+        c_local(i, den);
+      }
+
+      DenseVector<Mem_, DT_, IT_> a;
+      a.convert(a_local);
+
+      DenseVector<Mem_, DT_, IT_> b;
+      b.convert(b_local);
+
+      DenseVector<Mem_, DT_, IT_> c;
+      c.convert(c_local);
+
+      // a^T diag(c) b = 1
+      DT_ ref(DT_(1));
+
+      DT_ res  = a.template triple_dot<Algo_>(b,c);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      res  = a.template triple_dot<Algo_>(c,b);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+
+      res = b.template triple_dot<Algo_>(a,c);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      res = b.template triple_dot<Algo_>(c,a);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+
+      res = c.template triple_dot<Algo_>(a,b);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      res = c.template triple_dot<Algo_>(b,a);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+
+      // a^T diag(1/c_ii) b = n
+      ref = DT_(size);
+      res = c.template triple_dot_i<Algo_>(a,b);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      res = c.template triple_dot_i<Algo_>(b,a);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+
+    }
+  }
+};
+DenseVectorTripleDotTest<Mem::Main, Algo::Generic, float, unsigned int> dv_triple_dot_product_test_float_uint;
+DenseVectorTripleDotTest<Mem::Main, Algo::Generic, double, unsigned int> dv_triple_dot_product_test_double_uint;
+DenseVectorTripleDotTest<Mem::Main, Algo::Generic, float, unsigned long> dv_triple_dot_product_test_float_ulong;
+DenseVectorTripleDotTest<Mem::Main, Algo::Generic, double, unsigned long> dv_triple_dot_product_test_double_ulong;
+#ifdef FEAST_HAVE_QUADMATH
+DenseVectorTripleDotTest<Mem::Main, Algo::Generic, __float128, unsigned int> dv_triple_dot_product_test_float128_uint;
+DenseVectorTripleDotTest<Mem::Main, Algo::Generic, __float128, unsigned long> dv_triple_dot_product_test_float128_ulong;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+// TODO Add MKL tests as soon as the triple_dot routines are implemented for that backend
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+// TODO Add CUDA tests as soon as the triple_dot routines are implemented for that backend
+#endif
+
+
 template<
   typename Mem_,
   typename Algo_,

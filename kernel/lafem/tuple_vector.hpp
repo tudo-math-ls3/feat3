@@ -253,6 +253,26 @@ namespace FEAST
         return first().template dot<Algo_>(x.first()) + rest().template dot<Algo_>(x.rest());
       }
 
+      /**
+       * \copydoc LAFEM::DenseVector::triple_dot()
+       **/
+      template<typename Algo_>
+      DataType triple_dot(const TupleVector& x, const TupleVector& y) const
+      {
+        return first().template triple_dot<Algo_>(x.first(), y.first())
+          + rest().template triple_dot<Algo_>(x.rest(), y.rest());
+      }
+
+      /**
+       * \copydoc LAFEM::DenseVector::triple_dot_i()
+       **/
+      template<typename Algo_>
+      DataType triple_dot_i(const TupleVector& x, const TupleVector& y) const
+      {
+        return first().template triple_dot_i<Algo_>(x.first(), y.first())
+          + rest().template triple_dot_i<Algo_>(x.rest(), y.rest());
+      }
+
       template<typename Algo_>
       DataType norm2sqr() const
       {
@@ -487,6 +507,18 @@ namespace FEAST
       DataType dot(const TupleVector& x) const
       {
         return first().template dot<Algo_>(x.first());
+      }
+
+      template<typename Algo_>
+      DataType triple_dot(const TupleVector& x, const TupleVector& y) const
+      {
+        return first().template triple_dot<Algo_>(x.first(), y.first());
+      }
+
+      template<typename Algo_>
+      DataType triple_dot_i(const TupleVector& x, const TupleVector& y) const
+      {
+        return first().template triple_dot_i<Algo_>(x.first(), y.first());
       }
 
       template<typename Algo_>

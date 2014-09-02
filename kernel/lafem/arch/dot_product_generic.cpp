@@ -9,3 +9,9 @@ using namespace FEAST::LAFEM::Arch;
 
 template float DotProduct<Mem::Main, Algo::Generic>::value(const float * const, const float * const, const Index);
 template double DotProduct<Mem::Main, Algo::Generic>::value(const double * const, const double * const, const Index);
+
+template float TripleDotProduct<Mem::Main, Algo::Generic>::value(const float * const, const float * const, const float * const, const Index);
+template double TripleDotProduct<Mem::Main, Algo::Generic>::value(const double * const, const double * const, const double * const, const Index);
+
+template float TripleDotProductI<Mem::Main, Algo::Generic>::value(const float * const, const float * const, const float * const, const Index);
+template double TripleDotProductI<Mem::Main, Algo::Generic>::value(const double * const, const double * const, const double * const, const Index);

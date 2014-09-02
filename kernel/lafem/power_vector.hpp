@@ -319,6 +319,26 @@ namespace FEAST
       }
 
       /**
+       * \copydoc LAFEM::DenseVector::triple_dot()
+       **/
+      template<typename Algo_>
+      DataType triple_dot(const PowerVector& x, const PowerVector& y) const
+      {
+        return first().template triple_dot<Algo_>(x.first(), y.first())
+          + rest().template triple_dot<Algo_>(x.rest(), y.rest());
+      }
+
+      /**
+       * \copydoc LAFEM::DenseVector::triple_dot_i()
+       **/
+      template<typename Algo_>
+      DataType triple_dot_i(const PowerVector& x, const PowerVector& y) const
+      {
+        return first().template triple_dot_i<Algo_>(x.first(), y.first())
+          + rest().template triple_dot_i<Algo_>(x.rest(), y.rest());
+      }
+
+      /**
        * \brief Returns the squared euclid norm of this vector.
        */
       template<typename Algo_>
@@ -580,6 +600,18 @@ namespace FEAST
       DataType dot(const PowerVector& x) const
       {
         return first().template dot<Algo_>(x.first());
+      }
+
+      template<typename Algo_>
+      DataType triple_dot(const PowerVector& x, const PowerVector& y) const
+      {
+        return first().template triple_dot<Algo_>(x.first(), y.first());
+      }
+
+      template<typename Algo_>
+      DataType triple_dot_i(const PowerVector& x, const PowerVector& y) const
+      {
+        return first().template triple_dot_i<Algo_>(x.first(), y.first());
       }
 
       template<typename Algo_>

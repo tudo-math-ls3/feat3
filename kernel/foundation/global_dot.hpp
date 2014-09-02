@@ -36,16 +36,9 @@ namespace FEAST
             if(frequencies.size() == 0)
               return a.template dot<Algo::Generic>(b);
 
-            ///assumes type-1 vector (full entries at inner boundaries)
-
-            const typename VectorT_::DataType* a_data(a.elements());
-            const typename VectorT_::DataType* b_data(b.elements());
-            const typename VectorT_::DataType* f_data(frequencies.elements());
-            typename VectorT_::DataType sum(0);
-            for(Index i(0) ; i < a.size() ; ++i)
-            {
-              sum += a_data[i] * b_data[i] * typename VectorT_::DataType(1.)/f_data[i];
-            }
+            // assumes that a and b are type-1 vectors (full entries at inner boundaries)
+            // Compute a^T diag(1/frequencies) b
+            typename VectorT_::DataType sum = frequencies.template triple_dot_i<Algo::Generic>(a, b);
 
             typename VectorT_::DataType sendbuf(sum), recvbuf;
 
