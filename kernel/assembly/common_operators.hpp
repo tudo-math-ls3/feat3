@@ -268,7 +268,10 @@ namespace FEAST
        *
        * This functor can be used with the BilinearOperator assembly class template to assemble one
        * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the number
-       * of space dimensions
+       * of space dimensions.
+       *
+       * Note that \f[ \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \varpsi + \nabla \varphi : \left( \nabla \psi \right)^T \right) \f],
+       * so the \f$ (k,l) \f$-block consists of entries corresponding to \f$ \partial_k \varphi \partial_l \psi \f$.
        *
        * \tparam ir
        * The row index of the block
@@ -282,7 +285,7 @@ namespace FEAST
       class DuDvOperator :
         public BilinearOperator
       {
-        static_assert< ir != ic, "This part is only for the off-diagonal blocks." >;
+        static_assert( ir != ic, "This part is only for the off-diagonal blocks." );
       public:
         /// test space configuration
         struct TestConfig :
