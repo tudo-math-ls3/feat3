@@ -16,12 +16,22 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    /**
+     * \brief BiCGStab solver implementation
+     *
+     * This is just a temporary affair until there are some real(TM) solvers
+     *
+     **/
     template <typename Algo_>
     struct BiCGStab
     {
+      /**
+       * \brief Applies the solver to a given system of linear equations.
+       **/
       template <typename MT_, typename VT_>
       static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<Algo_, MT_, VT_> & precon, Index max_iters, typename VT_::DataType eps_relative, bool verbose = true)
       {
+        // Each *_tilde vector is a correction, all others are defects.
         typedef typename VT_::DataType DT_;
 
         DT_ defnorm, defnorm_0, defnorm_00(DT_(1e14));
@@ -157,11 +167,14 @@ namespace FEAST
       /**
        * \brief Variant with filter
        *
+       * Copy-pasted from the original above
+       *
        * \author Jordi Paul
        **/
       template <typename MT_, typename VT_, typename FT_>
       static void value(VT_ & x, const MT_ & A, const VT_ & b, const FT_ & filter, Preconditioner<Algo_, MT_, VT_> & precon, Index max_iters, typename VT_::DataType eps_relative, bool verbose = true)
       {
+        // Each *_tilde vector is a correction, all others are defects.
         typedef typename VT_::DataType DT_;
 
         DT_ defnorm, defnorm_0, defnorm_00(DT_(1e14));

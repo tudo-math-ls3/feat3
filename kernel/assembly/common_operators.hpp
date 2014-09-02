@@ -83,7 +83,7 @@ namespace FEAST
           {
           }
 
-          /** \copydoc BilinearFunctorBase::Evaluator::operator() */
+          /** \copydoc BilinearOperator::Evaluator::operator() */
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return dot(phi.grad, psi.grad);
@@ -163,7 +163,7 @@ namespace FEAST
           {
           }
 
-          /** \copydoc BilinearFunctorBase::Evaluator::operator() */
+          /** \copydoc BilinearOperator::Evaluator::operator() */
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.value * psi.value;
@@ -251,7 +251,7 @@ namespace FEAST
           {
           }
 
-          /** \copydoc BilinearFunctorBase::Evaluator::operator() */
+          /** \copydoc BilinearOperator::Evaluator::operator() */
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.value * psi.grad[derivative_];
@@ -270,7 +270,7 @@ namespace FEAST
        * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the number
        * of space dimensions.
        *
-       * Note that \f[ \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \varpsi + \nabla \varphi : \left( \nabla \psi \right)^T \right) \f],
+       * Note that \f[ \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \psi + \nabla \varphi : \left( \nabla \psi \right)^T \right) \f],
        * so the \f$ (k,l) \f$-block consists of entries corresponding to \f$ \partial_k \varphi \partial_l \psi \f$.
        *
        * \tparam ir
@@ -344,7 +344,7 @@ namespace FEAST
           {
           }
 
-          /** \copydoc BilinearFunctorBase::Evaluator::operator() */
+          /** \copydoc BilinearOperator::Evaluator::operator() */
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.grad[ir] * psi.grad[ic];

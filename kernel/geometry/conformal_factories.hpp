@@ -271,6 +271,8 @@ namespace FEAST
           }
       };
 
+    /// \cond internal
+
     /**
      * \brief Unit-Cube mesh factory specialisation for simplical meshes
      *
@@ -280,8 +282,6 @@ namespace FEAST
      *
      * \author Jordi Paul
      */
-
-    /// \cond internal
     template<int stride_, typename Coord_, int dim_>
     class UnitCubeFactory< ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> > :
     public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, stride_, Coord_> >
@@ -335,6 +335,7 @@ namespace FEAST
         FactoryType* _factory;
 
     };
+    /// \endcond
 
     /**
      * \brief Refine mesh factory
@@ -432,6 +433,7 @@ namespace FEAST
           _factory->fill_index_sets(index_set_holder);
         }
     };
+    /// \endcond
 
     template<typename MeshType_>
     using RefinedUnitCubeFactory = RefineFactory<MeshType_, Geometry::UnitCubeFactory >;
@@ -640,7 +642,9 @@ namespace FEAST
         }
 
     };
+    /// \endcond
 
+    /// \cond internal
     /*
      * \brief Specialisation for simplical meshes
      *
