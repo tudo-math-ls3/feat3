@@ -230,14 +230,9 @@ class ScaRCFunctorTest:
       Assembly::Common::LaplaceOperator laplace;
       Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
-      std::vector<DenseVector<Mem::Main, double> > freq_buffers;
-      for(Index i(0) ; i < mbufs.size() ; ++i)
-      {
-        DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
-        freq_buffers.push_back(std::move(fbuf));
-      }
+      DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
 
-      auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mbufs, freq_buffers));
+      auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mbufs, fbuf));
 
       DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
       Assembly::Common::ConstantFunction rhs_func(1.0);
