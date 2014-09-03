@@ -317,7 +317,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Serialization of complete container entity.
+         * \brief Serialisation of complete container entity.
          *
          * \param[in] mode FileMode enum, describing the actual container specialisation.
          * \param[out] std::vector<char> A std::vector, containing the byte array.
@@ -344,7 +344,7 @@ namespace FEAST
          * \endcode
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        std::vector<char> _serialize(FileMode mode) const
+        std::vector<char> _serialise(FileMode mode) const
         {
           Container<Mem::Main, DT2_, IT2_> tc(0);
           tc.assign(*this);
@@ -432,7 +432,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Serialization of complete container entity.
+         * \brief Serialisation of complete container entity.
          *
          * \param[in] mode FileMode enum, describing the actual container specialisation.
          * \param[in] file The output stream to write data into.
@@ -440,14 +440,14 @@ namespace FEAST
          * Serialize a complete container entity into a single binary file.
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        void _serialize(FileMode mode, std::ostream & file) const
+        void _serialise(FileMode mode, std::ostream & file) const
         {
-          auto temp(this->template _serialize<DT2_, IT2_>(mode));
+          auto temp(this->template _serialise<DT2_, IT2_>(mode));
           file.write(temp.data(), long(temp.size()));
         }
 
         /**
-         * \brief Deserialization of complete container entity.
+         * \brief Deserialisation of complete container entity.
          *
          * \param[in] mode FileMode enum, describing the actual container specialisation.
          * \param[in] std::vector<char> A std::vector containing the byte array.
@@ -455,7 +455,7 @@ namespace FEAST
          * Recreate a complete container entity by a single binary array.
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        void _deserialize(FileMode mode, std::vector<char> & input)
+        void _deserialise(FileMode mode, std::vector<char> & input)
         {
           this->clear();
           Container<Mem::Main, DT2_, IT2_> tc(0);
@@ -473,7 +473,7 @@ namespace FEAST
           uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
 #endif
           if (magic != uiarray[1])
-            throw InternalError(__func__, __FILE__, __LINE__, "_deserialize: given FileMode incompatible with given array!");
+            throw InternalError(__func__, __FILE__, __LINE__, "_deserialise: given FileMode incompatible with given array!");
 
 
           Index global_i(8);
@@ -521,7 +521,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Deserialization of complete container entity.
+         * \brief Deserialisation of complete container entity.
          *
          * \param[in] mode FileMode enum, describing the actual container specialisation.
          * \param[in] file std::istream, pointing to the input data.
@@ -529,14 +529,14 @@ namespace FEAST
          * Recreate a complete container entity by a single binary file.
          */
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        void _deserialize(FileMode mode, std::istream & file)
+        void _deserialise(FileMode mode, std::istream & file)
         {
           uint64_t tsize;
           file.read((char *)&tsize, (long)(sizeof(uint64_t)));
           std::vector<char> temp(tsize);
           file.seekg(0, file.beg);
           file.read(temp.data(), (long)(tsize * sizeof(uint64_t)));
-          this->template _deserialize<DT2_, IT2_>(mode, temp);
+          this->template _deserialise<DT2_, IT2_>(mode, temp);
         }
 
       public:

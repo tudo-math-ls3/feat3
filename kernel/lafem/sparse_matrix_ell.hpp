@@ -214,7 +214,7 @@ namespace FEAST
 
       void _read_from_ell(std::istream& file)
       {
-        this->template _deserialize<double, uint64_t>(FileMode::fm_ell, file);
+        this->template _deserialise<double, uint64_t>(FileMode::fm_ell, file);
       }
 
       Index & _size()
@@ -515,7 +515,7 @@ namespace FEAST
         Container<Mem_, DT_, IT_>(0)
       {
         CONTEXT("When creating SparseMatrixELL");
-        deserialize<DT2_, IT2_>(input);
+        deserialise<DT2_, IT2_>(input);
       }
 
       /**
@@ -1047,32 +1047,32 @@ namespace FEAST
       }
 
       /**
-       * \brief Deserialization of complete container entity.
+       * \brief Deserialisation of complete container entity.
        *
        * \param[in] std::vector<char> A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      void deserialize(std::vector<char> input)
+      void deserialise(std::vector<char> input)
       {
-        this->template _deserialize<DT2_, IT2_>(FileMode::fm_ell, input);
+        this->template _deserialise<DT2_, IT2_>(FileMode::fm_ell, input);
       }
 
       /**
-       * \brief Serialization of complete container entity.
+       * \brief Serialisation of complete container entity.
        *
        * \param[in] mode FileMode enum, describing the actual container specialisation.
        * \param[out] std::vector<char> A std::vector, containing the byte array.
        *
        * Serialize a complete container entity into a single binary array.
        *
-       * See \ref FEAST::LAFEM::Container::_serialize for details.
+       * See \ref FEAST::LAFEM::Container::_serialise for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> serialize()
+      std::vector<char> serialise()
       {
-        return this->template _serialize<DT2_, IT2_>(FileMode::fm_ell);
+        return this->template _serialise<DT2_, IT2_>(FileMode::fm_ell);
       }
 
       /**
@@ -1145,7 +1145,7 @@ namespace FEAST
         if (! std::is_same<DT_, double>::value)
           std::cout<<"Warning: You are writing out an ell matrix with less than double precission!"<<std::endl;
 
-        this->template _serialize<double, uint64_t>(FileMode::fm_ell, file);
+        this->template _serialise<double, uint64_t>(FileMode::fm_ell, file);
       }
 
       /**
