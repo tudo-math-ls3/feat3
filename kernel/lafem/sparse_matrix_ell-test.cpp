@@ -353,7 +353,7 @@ public:
 
   virtual void run() const
   {
-    for (Index size(2) ; size < 3e2 ; size*=3)
+    for (Index size(2) ; size < 2e2 ; size*=3)
     {
       const DT_ pi(Math::pi<DT_>());
       const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
@@ -380,11 +380,13 @@ public:
         s1(i, pi * (i % 3 + 1) - DT_(5.21) + DT_(i));
       }
       b.template scale_rows<Algo_>(b, s1);
+
+      SparseMatrixELL<Mem::Main, DT_, IT_> b_local(b.clone());
       for (Index row(0) ; row < a.rows() ; ++row)
       {
         for (Index col(0) ; col < a.columns() ; ++col)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(b(row, col), a(row, col) * s1(row), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(b_local(row, col), a_local(row, col) * s1(row), eps);
         }
       }
 
@@ -395,11 +397,13 @@ public:
         s2(i, pi * (i % 3 + 1) - DT_(5.21) + DT_(i));
       }
       b.template scale_cols<Algo_>(a, s2);
+
+      b_local.convert(b);
       for (Index row(0) ; row < a.rows() ; ++row)
       {
         for (Index col(0) ; col < a.columns() ; ++col)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(b(row, col), a(row, col) * s2(col), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(b_local(row, col), a_local(row, col) * s2(col), eps);
         }
       }
     }
