@@ -20,20 +20,20 @@ namespace FEAST
       {
       };
 
-      template <>
-      struct GlobalSynchVec0<Mem::Main, Algo::Generic>
+      template <typename Algo_>
+      struct GlobalSynchVec0<Mem::Main, Algo_>
       {
         public:
 
 #ifndef SERIAL
           ///TODO implement version with active queue of requests
-          template<typename VectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
+          template<typename TargetVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
           static void exec(
-                           VectorT_& target,
+                           TargetVectorT_& target,
                            const StorageT_<VectorMirrorT_, std::allocator<VectorMirrorT_> >& mirrors,
                            StorageT_<Index, std::allocator<Index> >& other_ranks,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& sendbufs,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& recvbufs,
                            const StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                            )
@@ -69,7 +69,7 @@ namespace FEAST
             StorageT_<Status, std::allocator<Status> > sendstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
-              mirrors.at(i).gather_dual(sendbufs.at(i), target);
+              mirrors.at(i).template gather_dual<Algo_>(sendbufs.at(i), target);
 
               Request sr;
               Status ss;
@@ -105,9 +105,7 @@ namespace FEAST
                   Comm::test(recvrequests.at(i), recvflags[i], recvstatus.at(i));
                   if(recvflags[i] != 0)
                   {
-                    VectorT_ temp(target.size(), typename VectorT_::DataType(0));
-                    mirrors.at(i).scatter_dual(temp, recvbufs.at(i));
-                    target.template axpy<Algo::Generic>(target, temp);
+                    mirrors.at(i).template scatter_axpy_dual<Algo_>(target, recvbufs.at(i));
                     ++count;
                     taskflags[i] = 1;
                   }
@@ -125,13 +123,13 @@ namespace FEAST
             delete[] taskflags;
           }
 #else
-          template<typename VectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
+          template<typename TargetVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
           static void exec(
-                           VectorT_&,
+                           TargetVectorT_&,
                            const StorageT_<VectorMirrorT_, std::allocator<VectorMirrorT_> >&,
                            StorageT_<Index, std::allocator<Index> >&,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >&,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >&,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
                            const StorageT_<Index, std::allocator<Index> >&,
                            Communicator = Communicator(0)
                            )
@@ -145,21 +143,21 @@ namespace FEAST
       {
       };
 
-      template <>
-      struct GlobalSynchVec1<Mem::Main, Algo::Generic>
+      template <typename Algo_>
+      struct GlobalSynchVec1<Mem::Main, Algo_>
       {
         public:
 
 #ifndef SERIAL
           ///TODO start all recvs in one sweep first
-          template<typename VectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
+          template<typename TargetVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
           static void exec(
-                           VectorT_& target,
+                           TargetVectorT_& target,
                            const StorageT_<VectorMirrorT_, std::allocator<VectorMirrorT_> >& mirrors,
-                           const VectorT_& frequencies,
+                           const TargetVectorT_& frequencies,
                            StorageT_<Index, std::allocator<Index> > other_ranks,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& sendbufs,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& recvbufs,
                            const StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                            )
@@ -194,7 +192,7 @@ namespace FEAST
             StorageT_<Status, std::allocator<Status> > sendstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
-              mirrors.at(i).gather_dual(sendbufs.at(i), target);
+              mirrors.at(i).template gather_dual<Algo_>(sendbufs.at(i), target);
 
               Request sr;
               Status ss;
@@ -223,7 +221,6 @@ namespace FEAST
             Index count(0);
 
             ///handle receives
-            VectorT_ sum(target.size(), typename VectorT_::DataType(0));
             while(count != recvrequests.size())
             {
               //go through all requests round robin
@@ -234,22 +231,18 @@ namespace FEAST
                   Comm::test(recvrequests.at(i), recvflags[i], recvstatus.at(i));
                   if(recvflags[i] != 0)
                   {
-                    VectorT_ temp(target.size(), typename VectorT_::DataType(0));
-                    mirrors.at(i).scatter_dual(temp, recvbufs.at(i));
-                    sum.template axpy<Algo::Generic>(sum, temp);
+                    mirrors.at(i).template scatter_axpy_dual<Algo_>(target, recvbufs.at(i));
                     ++count;
                     taskflags[i] = 1;
                   }
                 }
               }
             }
-            target.template axpy<Algo::Generic>(target, sum);
 
-            typename VectorT_::DataType* target_d(target.elements());
-            const typename VectorT_::DataType* freq_d(frequencies.elements());
-            for(Index i(0) ; i < sum.size() ; ++i)
+            typename TargetVectorT_::DataType* target_d(target.elements());
+            const typename TargetVectorT_::DataType* freq_d(frequencies.elements());
+            for(Index i(0) ; i < target.size() ; ++i)
               target_d[i] /= freq_d[i];
-
 
             for(Index i(0) ; i < sendrequests.size() ; ++i)
             {
@@ -261,14 +254,14 @@ namespace FEAST
             delete[] taskflags;
           }
 #else
-          template<typename VectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
+          template<typename TargetVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
           static void exec(
-                           VectorT_&,
+                           TargetVectorT_&,
                            const StorageT_<VectorMirrorT_, std::allocator<VectorMirrorT_> >&,
-                           const VectorT_&,
+                           const TargetVectorT_&,
                            StorageT_<Index, std::allocator<Index> >&,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >&,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >&,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
                            const StorageT_<Index, std::allocator<Index> >&,
                            Communicator = Communicator(0)
                            )

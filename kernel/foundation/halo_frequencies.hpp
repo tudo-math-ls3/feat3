@@ -20,11 +20,6 @@ namespace FEAST
       template <typename Mem_, typename Algo_>
       struct HaloFrequencies
       {
-      };
-
-      template <>
-      struct HaloFrequencies<Mem::Main, Algo::Generic>
-      {
         public:
 
           template<typename SystemVectorT_,
@@ -38,18 +33,15 @@ namespace FEAST
             if(mirrors.empty())
               return SystemVectorT_();
 
-            SystemVectorT_ result(frequency_buffer.clone());
-            result.format(typename SystemVectorT_::DataType(1));
+            frequency_buffer.format(typename SystemVectorT_::DataType(1));
 
             for(Index i(0); i < Index(mirrors.size()); ++i)
             {
               mirror_buffers.at(i).format(typename BufferVectorT_::DataType(1));
-              frequency_buffer.format();
-              mirrors.at(i).scatter_dual(frequency_buffer, mirror_buffers.at(i));
-              result.template axpy<Algo::Generic>(frequency_buffer, result);
+              mirrors.at(i).template scatter_axpy_dual<Algo_>(frequency_buffer, mirror_buffers.at(i));
             }
 
-            return result;
+            return frequency_buffer.clone();
           }
       };
   }

@@ -23,6 +23,7 @@ namespace FEAST
 #ifndef SERIAL
     ///type-0 to type-1 matrix conversion
     template<
+             typename Algo_,
              typename Mem_,
              typename DT_,
              typename IT_,
@@ -50,10 +51,10 @@ namespace FEAST
 
         for(Index i(0) ; i < vec_mirrors.size() ; ++i)
         {
-          MatrixMirror<Mem_, DT_> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
+          MatrixMirror<VMT_> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
           MT_<Mem_, DT_, IT_> sendbuf_mat;
           Assembly::MirrorAssembler::assemble_buffer_matrix(sendbuf_mat, mat_mirror, result);
-          mat_mirror.gather_op(sendbuf_mat, result);
+          mat_mirror.template gather<Algo_>(sendbuf_mat, result);
 
           send_buf.push_back(sendbuf_mat.serialise());
         }
@@ -116,14 +117,13 @@ namespace FEAST
               if(recvflags[i] != 0)
               {
                 MT_<Mem_, DT_, IT_> other_mat(recv_buf.at(i));
-                MatrixMirror<Mem::Main, double> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
-                SparseMatrixCSR<Mem::Main, double> buf_mat;
+                MatrixMirror<VMT_> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
+                SparseMatrixCSR<Mem_, DT_, IT_> buf_mat;
                 Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, result);
 
-                mat_mirror.gather_op(buf_mat, result);
-
-                buf_mat.axpy<Algo::Generic>(buf_mat, other_mat);
-                mat_mirror.scatter_op(result, buf_mat);
+                mat_mirror.template gather<Algo_>(buf_mat, result);
+                buf_mat.template axpy<Algo_>(buf_mat, other_mat);
+                mat_mirror.template scatter<Algo_>(result, buf_mat);
                 ++count;
                 taskflags[i] = 1;
               }
@@ -144,6 +144,7 @@ namespace FEAST
       }
 #else
     template<
+             typename Algo_,
              typename Mem_,
              typename DT_,
              typename IT_,

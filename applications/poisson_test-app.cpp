@@ -502,10 +502,10 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
     //gather data, exchange
-    MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
+    MatrixMirror<VectorMirror<Mem::Main, double>> mat_mirror(mirrors.at(i), mirrors.at(i));
     SparseMatrixCSR<Mem::Main, double> buf_mat;
     Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, mat_localsys);
-    mat_mirror.gather_op(buf_mat, mat_localsys);
+    mat_mirror.gather<Algo::Generic>(buf_mat, mat_localsys);
 
     double* val(buf_mat.val());
     Index* row_ptr(buf_mat.row_ptr());
@@ -568,11 +568,11 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
 
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
-    MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
+    MatrixMirror<VectorMirror<Mem::Main, double>> mat_mirror(mirrors.at(i), mirrors.at(i));
     SparseMatrixCSR<Mem::Main, double> buf_mat;
     Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, mat_localsys);
 
-    mat_mirror.gather_op(buf_mat, mat_localsys);
+    mat_mirror.gather<Algo::Generic>(buf_mat, mat_localsys);
 
     SparseMatrixCSR<Mem::Main, double> other_buf_mat(buf_mat.rows(),
         buf_mat.columns(),
@@ -584,7 +584,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     std::cout << "proc " << rank << "A0_omega_j " << other_buf_mat;
     buf_mat.axpy<Algo::Generic>(buf_mat, other_buf_mat);
     std::cout << "proc " << rank << "A1_omega_i " << buf_mat;
-    mat_mirror.scatter_op(mat_localsys, buf_mat);
+    mat_mirror.scatter<Algo::Generic>(mat_localsys, buf_mat);
   }
 
   ///bring up a local preconditioning matrix TODO use a product wrapper and DV

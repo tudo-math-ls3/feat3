@@ -31,7 +31,7 @@ namespace FEAST
                                  Index dest_rank,
                                  Index source_rank)
       {
-        mirror.gather_dual(sendbuf, target);
+        mirror.template gather_dual<Tag_>(sendbuf, target);
 
         Status s;
         Comm::send_recv(sendbuf.elements(),
@@ -42,7 +42,7 @@ namespace FEAST
                         source_rank,
                         s);
 
-        mirror.scatter_dual(target, recvbuf);
+        mirror.template scatter_dual<Tag_>(target, recvbuf);
       }
 
       //single target, multiple mirrors (stemming from multiple halos)
@@ -78,7 +78,7 @@ namespace FEAST
                                  Index dest_rank,
                                  Index source_rank)
       {
-        mirror.gather_dual(sendbuf, target);
+        mirror.template gather_dual<Tag_>(sendbuf, target);
 
         Status s;
         Comm::send_recv(sendbuf.elements(),
@@ -91,7 +91,7 @@ namespace FEAST
 
         recvbuf.template axpy<Tag_>(sendbuf, recvbuf);
 
-        mirror.scatter_dual(target, recvbuf);
+        mirror.template scatter_dual<Tag_>(target, recvbuf);
       }
 
       //single target, multiple mirrors (stemming from multiple halos)
@@ -110,7 +110,7 @@ namespace FEAST
       {
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
-          mirrors.at(i).gather_dual(sendbufs.at(i), target);
+          mirrors.at(i).template gather_dual<Tag_>(sendbufs.at(i), target);
 
           Status s;
           Comm::send_recv(sendbufs.at(i).elements(),
@@ -126,11 +126,11 @@ namespace FEAST
 
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
-          mirrors.at(i).gather_dual(sendbufs.at(i), target); //we dont need the sendbuf any more
+          mirrors.at(i).template gather_dual<Tag_>(sendbufs.at(i), target); //we dont need the sendbuf any more
 
           recvbufs.at(i).template axpy<Tag_>(sendbufs.at(i), recvbufs.at(i));
 
-          mirrors.at(i).scatter_dual(target, recvbufs.at(i));
+          mirrors.at(i).template scatter_dual<Tag_>(target, recvbufs.at(i));
         }
       }
     };
@@ -147,7 +147,7 @@ namespace FEAST
                                  Index dest_rank,
                                  Index source_rank)
       {
-        mirror.gather_dual(sendbuf, target);
+        mirror.template gather_dual<Tag_>(sendbuf, target);
 
         Comm::send_recv(sendbuf.elements(),
                                sendbuf.size(),
@@ -159,7 +159,7 @@ namespace FEAST
         recvbuf.template axpy<Tag_>(sendbuf, recvbuf);
         recvbuf.template scale<Tag_>(recvbuf, typename VectorT_::DataType(0.5));
 
-        mirror.scatter_dual(target, recvbuf);
+        mirror.template scatter_dual<Tag_>(target, recvbuf);
       }
 
       //single target, multiple mirrors (stemming from multiple halos)
@@ -178,9 +178,9 @@ namespace FEAST
           //average by two along non-vertex halos only (implies divide by four along vertex halos) TODO: generalize will in most cases not work
           if(mirrors.at(i).size() != 1)
           {
-            mirrors.at(i).gather_dual(sendbufs.at(i), target);
+            mirrors.at(i).template gather_dual<Tag_>(sendbufs.at(i), target);
             sendbufs.at(i).template scale<Tag_>(sendbufs.at(i), typename VectorT_::DataType(0.5));
-            mirrors.at(i).scatter_dual(target, sendbufs.at(i));
+            mirrors.at(i).template scatter_dual<Tag_>(target, sendbufs.at(i));
           }
         }
       }

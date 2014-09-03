@@ -11,24 +11,48 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    /// \cond internal
+    namespace Intern
+    {
+      struct SetOp
+      {
+        template<typename Tx_>
+        Tx_ operator()(Tx_, Tx_ y) const
+        {
+          return y;
+        }
+      };
+
+      template<typename Ta_>
+      struct AxpyOp
+      {
+        Ta_ alpha;
+        explicit AxpyOp(Ta_ a) : alpha(a) {}
+        Ta_ operator()(Ta_ x, Ta_ y) const
+        {
+          return x + alpha*y;
+        }
+      };
+    } // namespace Intern
+    /// \endcond
+
     /**
      * \brief Matrix-Mirror class template.
      *
      * \author Peter Zajac
      */
-    template<
-      typename Mem_,
-      typename DataType_>
+    template<typename VectorMirror_>
     class MatrixMirror
     {
     public:
+      /// vector mirror type
+      typedef VectorMirror_ VectorMirrorType;
       /// arch typedef
-      typedef Mem_ MemType;
+      typedef typename VectorMirrorType::MemType MemType;
       /// data-type typedef
-      typedef DataType_ DataType;
-
-      /// corresponding vector-mirror type
-      typedef VectorMirror<MemType, DataType> VectorMirrorType;
+      typedef typename VectorMirrorType::DataType DataType;
+      /// index-type typedef
+      typedef typename VectorMirrorType::IndexType IndexType;
 
     protected:
       /// row-mirror reference
@@ -120,33 +144,124 @@ namespace FEAST
        * A reference to the operator matrix whose entries are to be gathered.
        */
       template<
+        typename Algo_,
         typename Tx_,
-        typename Ty_>
-      void gather_op(
-        LAFEM::SparseMatrixCSR<Mem::Main, Tx_>& buffer,
-        const LAFEM::SparseMatrixCSR<Mem::Main, Ty_>& matrix) const
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void gather(
+        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix) const
+      {
+        Intern::SetOp set_op;
+        this->_gather(set_op, buffer, matrix);
+      }
+
+      /**
+       * \brief Performs a gather-axpy-operation on an operator matrix.
+       *
+       * \param[in,out] buffer
+       * A reference to the buffer matrix.
+       *
+       * \param[in] matrix
+       * A reference to the operator matrix whose entries are to be gathered.
+       *
+       * \param[in] alpha
+       * The scaling factor for the operation.
+       */
+      template<
+        typename Algo_,
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void gather_axpy(
+        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix,
+        const Tx_ alpha = Tx_(1)) const
+      {
+        Intern::AxpyOp<Tx_> axpy_op(alpha);
+        this->_gather(axpy_op, buffer, matrix);
+      }
+
+      /**
+       * \brief Performs a scatter-operation on an operator matrix.
+       *
+       * \param[in,out] matrix
+       * A reference to the operator matrix.
+       *
+       * \param[in]
+       * A reference to the buffer matrix whose entries are to be scattered.
+       */
+      template<
+        typename Algo_,
+        typename Ty_,
+        typename Iy_,
+        typename Tx_,
+        typename Ix_>
+      void scatter(
+        LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
+      {
+        Intern::SetOp set_op;
+        this->_scatter(set_op, matrix, buffer);
+      }
+
+      /**
+       * \brief Performs a scatter-axpy-operation on an operator matrix.
+       *
+       * \param[in,out] matrix
+       * A reference to the operator matrix.
+       *
+       * \param[in]
+       * A reference to the buffer matrix whose entries are to be scattered.
+       *
+       * \param[in]
+       * The scaling factor for the operation.
+       */
+      template<
+        typename Algo_,
+        typename Ty_,
+        typename Iy_,
+        typename Tx_,
+        typename Ix_>
+      void scatter_axpy(
+        LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+        const Ty_ alpha = Ty_(1)) const
+      {
+        Intern::AxpyOp<Ty_> axpy_op(alpha);
+        this->_scatter(axpy_op, matrix, buffer);
+      }
+
+    private:
+      template<typename Op_, typename Tx_, typename Ix_, typename Ty_, typename Iy_>
+      void _gather(
+        const Op_& op,
+        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
 
         // fetch row mirror arrays
-        const Index* row_ptr_a(row_mir_mat.row_ptr());
-        const Index* col_idx_a(row_mir_mat.col_ind());
+        const IndexType* row_ptr_a(row_mir_mat.row_ptr());
+        const IndexType* col_idx_a(row_mir_mat.col_ind());
         const DataType* av(row_mir_mat.val());
 
         // fetch col mirror arrays
-        const Index* row_ptr_b(col_mir_mat.row_ptr());
-        const Index* col_idx_b(col_mir_mat.col_ind());
+        const IndexType* row_ptr_b(col_mir_mat.row_ptr());
+        const IndexType* col_idx_b(col_mir_mat.col_ind());
         const DataType* bv(col_mir_mat.val());
 
         // fetch system matrix arrays
-        const Index* row_ptr_y(matrix.row_ptr());
-        const Index* col_idx_y(matrix.col_ind());
+        const Iy_* row_ptr_y(matrix.row_ptr());
+        const Iy_* col_idx_y(matrix.col_ind());
         const Ty_* yv(matrix.val());
 
         // fetch buffer arrays
-        const Index* row_ptr_x(buffer.row_ptr());
-        const Index* col_idx_x(buffer.col_ind());
+        const Ix_* row_ptr_x(buffer.row_ptr());
+        const Ix_* col_idx_x(buffer.col_ind());
         Tx_* xv(buffer.val());
 
         // In the following, we have to compute:
@@ -164,32 +279,32 @@ namespace FEAST
           Index irow_a(irow_x); // row of a := row of x
 
           // loop over all non-zeroes in the buffer row (X_i.)
-          for(Index ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
+          for(Ix_ ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
           {
             // init result
-            Tx_ x_ij(0);
+            Tx_ x_ij(Tx_(0));
 
             // fetch the column index
-            Index irow_b(col_idx_x[ix]); // row of b := col of x
+            Ix_ irow_b(col_idx_x[ix]); // row of b := col of x
 
             // loop over all non-zeroes of the col-mirror (B_j.)
-            for(Index ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
+            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
             {
               // and densify the sparse row B_j.
               _work[col_idx_b[ib]] = bv[ib];
             }
 
             // loop over all non-zeroes of the row-mirror (A_i.)
-            for(Index ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
+            for(IndexType ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
             {
               // fetch the column index
-              Index irow_y(col_idx_a[ia]); // row of y := col of a
+              Iy_ irow_y(col_idx_a[ia]); // row of y := col of a
 
               // temporary entry: Z_kj := Y_k. * B_j.
-              Tx_ z_kj(0);
+              Tx_ z_kj(Tx_(0));
 
               // loop over all non-zeroes of the system matrix (Y_k.)
-              for(Index iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
+              for(Iy_ iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
               {
                 z_kj += Tx_(yv[iy]) * Tx_(_work[col_idx_y[iy]]);
               }
@@ -199,10 +314,10 @@ namespace FEAST
             }
 
             // store X_ij
-            xv[ix] = x_ij;
+            xv[ix] = op(xv[ix], x_ij);
 
             // reset temporary data
-            for(Index ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
+            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
             {
               _work[col_idx_b[ib]] = DataType(0);
             }
@@ -210,43 +325,33 @@ namespace FEAST
         }
       }
 
-      /**
-       * \brief Performs a scatter-operation on an operator matrix.
-       *
-       * \param[in,out] matrix
-       * A reference to the operator matrix.
-       *
-       * \param[in]
-       * A reference to the buffer matrix whose entries are to be scattered.
-       */
-      template<
-        typename Ty_,
-        typename Tx_>
-      void scatter_op(
-        LAFEM::SparseMatrixCSR<Mem::Main, Ty_>& matrix,
-        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_>& buffer) const
+      template<typename Op_, typename Ty_, typename Iy_, typename Tx_, typename Ix_>
+      void _scatter(
+        const Op_& op,
+        LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
 
         // fetch row-mirror arrays
-        const Index* row_ptr_a(row_mir_mat.row_ptr());
-        const Index* col_idx_a(row_mir_mat.col_ind());
+        const IndexType* row_ptr_a(row_mir_mat.row_ptr());
+        const IndexType* col_idx_a(row_mir_mat.col_ind());
         const DataType* av(row_mir_mat.val());
 
         // fetch col-mirror arrays
-        const Index* row_ptr_b(col_mir_mat.row_ptr());
-        const Index* col_idx_b(col_mir_mat.col_ind());
+        const IndexType* row_ptr_b(col_mir_mat.row_ptr());
+        const IndexType* col_idx_b(col_mir_mat.col_ind());
         const DataType* bv(col_mir_mat.val());
 
         // fetch system matrix arrays
-        const Index* row_ptr_y(matrix.row_ptr());
-        const Index* col_idx_y(matrix.col_ind());
+        const Iy_* row_ptr_y(matrix.row_ptr());
+        const Iy_* col_idx_y(matrix.col_ind());
         Ty_* yv(matrix.val());
 
         // fetch buffer arrays
-        const Index* row_ptr_x(buffer.row_ptr());
-        const Index* col_idx_x(buffer.col_ind());
+        const Ix_* row_ptr_x(buffer.row_ptr());
+        const Ix_* col_idx_x(buffer.col_ind());
         const Tx_* xv(buffer.val());
 
         // In the following, we have to compute:
@@ -268,36 +373,36 @@ namespace FEAST
             continue;
 
           // loop over all non-zeroes in the system row (Y_i.)
-          for(Index iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
+          for(Iy_ iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
           {
             // init result
-            Ty_ y_ij(0);
+            Ty_ y_ij(Ty_(0));
 
             // fetch the column index
-            Index irow_b(col_idx_y[iy]); // row of b := col of y
+            IndexType irow_b(col_idx_y[iy]); // row of b := col of y
 
             // skip if the row of b is empty
             if(row_ptr_b[irow_b] >= row_ptr_b[irow_b + 1])
               continue;
 
             // loop over all non-zeroes of the col-mirror (B_j.)
-            for(Index ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
+            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
             {
               // and densify the sparse row B_j.
               _work[col_idx_b[ib]] = bv[ib];
             }
 
             // loop over all non-zeroes of the row-mirror (A_i.)
-            for(Index ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
+            for(IndexType ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
             {
               // fetch the column index
-              Index irow_x(col_idx_a[ia]); // row of x := col of a
+              IndexType irow_x(col_idx_a[ia]); // row of x := col of a
 
               // temporary entry: Z_kj := X_k. * B_j.
-              Ty_ z_kj(0);
+              Ty_ z_kj(Ty_(0));
 
               // loop over all non-zeroes of the buffer matrix (X_k.)
-              for(Index ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
+              for(Ix_ ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
               {
                 z_kj += Ty_(xv[ix]) * Ty_(_work[col_idx_x[ix]]);
               }
@@ -307,10 +412,10 @@ namespace FEAST
             }
 
             // store Y_ij
-            yv[iy] = y_ij;
+            yv[iy] = op(yv[iy], y_ij);
 
             // reset temporary data
-            for(Index ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
+            for(IndexType ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
             {
               _work[col_idx_b[ib]] = DataType(0);
             }

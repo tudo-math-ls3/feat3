@@ -192,7 +192,7 @@ void check_scarc_rich_rich_1D(Index rank)
   dirichlet.assemble(filter);
 
   auto tags(HaloTags::value(p0.comm_halos));
-  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
+  auto mat_localsys(MatrixConversion<Algo::Generic, Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -455,7 +455,7 @@ void check_scarc_pcg_rich_1D(Index rank)
   dirichlet.assemble(filter);
 
   auto tags(HaloTags::value(p0.comm_halos));
-  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
+  auto mat_localsys(MatrixConversion<Algo::Generic, Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -719,7 +719,7 @@ void check_scarc_rich_pcg_1D(Index rank)
   dirichlet.assemble(filter);
 
   auto tags(HaloTags::value(p0.comm_halos));
-  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
+  auto mat_localsys(MatrixConversion<Algo::Generic, Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -981,7 +981,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
   dirichlet.assemble(filter);
 
   auto tags(HaloTags::value(p0.comm_halos));
-  auto mat_localsys(MatrixConversion<Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
+  auto mat_localsys(MatrixConversion<Algo::Generic, Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)

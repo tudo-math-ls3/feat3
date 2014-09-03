@@ -525,16 +525,16 @@ namespace FEAST
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename> class VectorMirrorType_ = VectorMirror,
+             template<typename, typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronizationDataContainer
     {
       public:
         typedef VectorType_<MemTag_, DataType_, IT_> vector_type_;
-        typedef VectorMirrorType_<MemTag_, DataType_> vector_mirror_type_;
+        typedef VectorMirrorType_<MemTag_, DataType_, IT_> vector_mirror_type_;
         typedef StorageType_<VectorType_<MemTag_, DataType_, IT_>, std::allocator<VectorType_<MemTag_, DataType_, IT_> > > vector_storage_type_;
-        typedef StorageType_<VectorMirrorType_<MemTag_, DataType_>, std::allocator<VectorMirrorType_<MemTag_, DataType_> > > vector_mirror_storage_type_;
+        typedef StorageType_<VectorMirrorType_<MemTag_, DataType_, IT_>, std::allocator<VectorMirrorType_<MemTag_, DataType_, IT_> > > vector_mirror_storage_type_;
         typedef StorageType_<IT_, std::allocator<IT_> > index_storage_type_;
 
         virtual vector_mirror_storage_type_& vector_mirrors()
@@ -642,7 +642,7 @@ namespace FEAST
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename> class VectorMirrorType_ = VectorMirror,
+             template<typename, typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
@@ -653,7 +653,7 @@ namespace FEAST
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::matrix_type_ matrix_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_type_ vector_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_storage_type_ vector_storage_type_;
-      typedef StorageType_<VectorMirrorType_<MemTag_, DataType_>, std::allocator<VectorMirrorType_<MemTag_, DataType_> > > vector_mirror_storage_type_;
+      typedef StorageType_<VectorMirrorType_<MemTag_, DataType_, IT_>, std::allocator<VectorMirrorType_<MemTag_, DataType_, IT_> > > vector_mirror_storage_type_;
       typedef StorageType_<IT_, std::allocator<IT_> > index_storage_type_;
 
       ///fulfill pure virtual
@@ -742,7 +742,7 @@ namespace FEAST
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename> class VectorMirrorType_ = VectorMirror,
+             template<typename, typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
              template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector,
@@ -906,7 +906,7 @@ namespace FEAST
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename> class VectorMirrorType_ = VectorMirror,
+             template<typename, typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
              template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
              template<typename, typename, typename> class FilterType_ = UnitFilter,

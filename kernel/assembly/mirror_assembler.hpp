@@ -234,10 +234,10 @@ namespace FEAST
        * A reference to the matrix that is to be mirrored.
        */
       template<
-        typename DataTypeA_,
+        typename VectorMirror_,
         typename DataTypeB_>
       static Adjacency::Graph assemble_buffer_graph(
-        const LAFEM::MatrixMirror<Mem::Main, DataTypeA_>& matrix_mirror,
+        const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
         const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeB_>& template_matrix)
       {
         Adjacency::Graph tmp(Adjacency::rt_injectify, matrix_mirror.get_row_mirror().get_gather_dual(), template_matrix);
@@ -258,11 +258,11 @@ namespace FEAST
        */
       template<
         typename DataTypeA_,
-        typename DataTypeB_,
+        typename VectorMirror_,
         typename DataTypeC_>
       static void assemble_buffer_matrix(
         LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_>& buffer_matrix,
-        const LAFEM::MatrixMirror<Mem::Main, DataTypeB_>& matrix_mirror,
+        const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
         const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeC_>& template_matrix)
       {
         SymbolicMatrixAssemblerBase::assemble(buffer_matrix, assemble_buffer_graph(matrix_mirror, template_matrix));
