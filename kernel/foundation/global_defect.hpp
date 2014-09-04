@@ -22,16 +22,16 @@ namespace FEAST
       {
         public:
 #ifndef SERIAL
-          template<typename MatrixT_, typename VectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
+          template<typename MatrixT_, typename SystemVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
           static void exec(
-                           VectorT_& target,
-                           const VectorT_& b,
+                           SystemVectorT_& target,
+                           const SystemVectorT_& b,
                            const MatrixT_& A,
-                           const VectorT_& x,
+                           const SystemVectorT_& x,
                            const StorageT_<VectorMirrorT_, std::allocator<VectorMirrorT_> >& mirrors,
                            StorageT_<Index, std::allocator<Index> >& other_ranks,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& sendbufs,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& recvbufs,
                            const StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                            )
@@ -53,16 +53,16 @@ namespace FEAST
             Difference<Mem_, Algo_>::value(target.elements(), b.elements(), target.elements(), target.size());
           }
 #else
-          template<typename MatrixT_, typename VectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
+          template<typename MatrixT_, typename SystemVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
           static void exec(
-                           VectorT_& target,
-                           const VectorT_& b,
+                           SystemVectorT_& target,
+                           const SystemVectorT_& b,
                            const MatrixT_& A,
-                           const VectorT_& x,
+                           const SystemVectorT_& x,
                            const StorageT_<VectorMirrorT_, std::allocator<VectorMirrorT_> >&,
                            StorageT_<Index, std::allocator<Index> >&,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >&,
-                           StorageT_<VectorT_, std::allocator<VectorT_> >&,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
+                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
                            const StorageT_<Index, std::allocator<Index> >&,
                            Communicator = Communicator(0)
                            )

@@ -6,6 +6,9 @@
 
 namespace FEAST
 {
+  /**
+   * \brief Foundation namespace
+   */
   namespace Foundation
   {
     ///polytope level identifiers

@@ -41,6 +41,9 @@ namespace FEAST
               mirrors.at(i).template scatter_axpy_dual<Algo_>(frequency_buffer, mirror_buffers.at(i));
             }
 
+            // invert frequencies
+            frequency_buffer.template component_invert<Algo_>(frequency_buffer);
+
             return frequency_buffer.clone();
           }
       };

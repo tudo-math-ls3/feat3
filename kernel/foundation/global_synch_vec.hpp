@@ -239,10 +239,8 @@ namespace FEAST
               }
             }
 
-            typename TargetVectorT_::DataType* target_d(target.elements());
-            const typename TargetVectorT_::DataType* freq_d(frequencies.elements());
-            for(Index i(0) ; i < target.size() ; ++i)
-              target_d[i] /= freq_d[i];
+            // scale target vector by frequencies
+            target.template component_product<Algo_>(target, frequencies);
 
             for(Index i(0) ; i < sendrequests.size() ; ++i)
             {
