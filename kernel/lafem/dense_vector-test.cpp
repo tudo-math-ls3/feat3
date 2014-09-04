@@ -304,7 +304,7 @@ public:
 
   virtual void run() const
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
