@@ -158,7 +158,7 @@ public:
 
   virtual void run() const
   {
-    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.7)));
+    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.5)));
 
     Random::SeedType seed(Random::SeedType(time(NULL)));
     Random random(seed);
