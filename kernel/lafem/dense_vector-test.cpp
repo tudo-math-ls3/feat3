@@ -281,9 +281,9 @@ DenseVectorDotTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_dot_pro
 
 
 /**
- * \brief DenseVector triple_dot and triple_dot_i test class
+ * \brief DenseVector triple_dot test class
  *
- * \test The triple_dot and triple_dot_i routines
+ * \test The triple_dot routines
  *
  * \author Jordi Paul
  *
@@ -346,13 +346,6 @@ public:
       res = c.template triple_dot<Algo_>(a,b);
       TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
       res = c.template triple_dot<Algo_>(b,a);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
-
-      // a^T diag(1/c_ii) b = n
-      ref = DT_(size);
-      res = c.template triple_dot_i<Algo_>(a,b);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
-      res = c.template triple_dot_i<Algo_>(b,a);
       TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
 
     }

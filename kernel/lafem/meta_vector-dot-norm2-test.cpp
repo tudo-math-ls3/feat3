@@ -131,23 +131,19 @@ public:
 
     // compute x^T diag(z) y and x^T diag(1/z_ii) y
     DataType tdot(DataType(0));
-    DataType tdot_i(DataType(0));
 
     // compute reference results
     for(Index i(0); i < n00; ++i)
     {
       tdot += fx00(i) * fy00(i) * fz00(i);
-      tdot_i += fx00(i) * fy00(i) / fz00(i);
     }
     for(Index i(0); i < n01; ++i)
     {
       tdot += fx01(i) * fy01(i) * fz01(i);
-      tdot_i += fx01(i) * fy01(i) / fz01(i);
     }
     for(Index i(0); i < n1; ++i)
     {
       tdot += fx1(i) * fy1(i) * fz1(i);
-      tdot_i += fx1(i) * fy1(i) / fz1(i);
     }
 
     // test y^T diag(x) z
@@ -161,11 +157,6 @@ public:
     // test x^T diag(z) y
     TEST_CHECK_EQUAL_WITHIN_EPS(z.template triple_dot<AlgoType>(x, y), tdot, tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(z.template triple_dot<AlgoType>(y, x), tdot, tol);
-
-    // test x^T diag(1/z_ii) y
-    TEST_CHECK_EQUAL_WITHIN_EPS(z.template triple_dot_i<AlgoType>(x, y), tdot_i, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(z.template triple_dot_i<AlgoType>(y, x), tdot_i, tol);
-
   }
 };
 

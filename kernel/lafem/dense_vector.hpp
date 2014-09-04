@@ -931,26 +931,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$result \leftarrow x^T \mathrm{diag}(1/this_{ii}) y \f$
-         *
-         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-         *
-         * \param[in] x The first vector.
-         *
-         * \param[in] x The second vector.
-         *
-         * \return The computed triple dot product.
-         */
-        template <typename Algo_>
-        DataType triple_dot_i(const DenseVector & x, const DenseVector & y) const
-        {
-          if (x.size() != this->size() || y.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector sizes does not match!");
-
-          return Arch::TripleDotProductI<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
-        }
-
-        /**
          * \brief Calculate \f$result \leftarrow this \cdot this\f$
          *
          * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.

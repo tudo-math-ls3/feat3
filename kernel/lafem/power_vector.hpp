@@ -329,16 +329,6 @@ namespace FEAST
       }
 
       /**
-       * \copydoc LAFEM::DenseVector::triple_dot_i()
-       **/
-      template<typename Algo_>
-      DataType triple_dot_i(const PowerVector& x, const PowerVector& y) const
-      {
-        return first().template triple_dot_i<Algo_>(x.first(), y.first())
-          + rest().template triple_dot_i<Algo_>(x.rest(), y.rest());
-      }
-
-      /**
        * \brief Returns the squared euclid norm of this vector.
        */
       template<typename Algo_>

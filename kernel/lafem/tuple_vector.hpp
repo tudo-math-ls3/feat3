@@ -263,16 +263,6 @@ namespace FEAST
           + rest().template triple_dot<Algo_>(x.rest(), y.rest());
       }
 
-      /**
-       * \copydoc LAFEM::DenseVector::triple_dot_i()
-       **/
-      template<typename Algo_>
-      DataType triple_dot_i(const TupleVector& x, const TupleVector& y) const
-      {
-        return first().template triple_dot_i<Algo_>(x.first(), y.first())
-          + rest().template triple_dot_i<Algo_>(x.rest(), y.rest());
-      }
-
       template<typename Algo_>
       DataType norm2sqr() const
       {

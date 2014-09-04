@@ -47,17 +47,6 @@ namespace FEAST
         return r;
       }
 
-      template <typename DT_>
-      DT_ TripleDotProductI<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
-      {
-        DT_ r(0);
-
-        for (Index i(0) ; i < size ; ++i)
-          r += y[i] * z[i] / x[i];
-
-        return r;
-      }
-
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST
