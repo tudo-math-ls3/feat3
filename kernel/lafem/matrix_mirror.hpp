@@ -228,10 +228,76 @@ namespace FEAST
       void scatter_axpy(
         LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix,
         const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
-        const Ty_ alpha = Ty_(1)) const
+        const Tx_ alpha = Tx_(1)) const
       {
-        Intern::AxpyOp<Ty_> axpy_op(alpha);
+        Intern::AxpyOp<Tx_> axpy_op(alpha);
         this->_scatter(axpy_op, matrix, buffer);
+      }
+
+      template<
+        typename Algo_,
+        typename Tx_,
+        typename Ix_,
+        typename MatrixT_>
+      void gather(
+        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+        const MatrixT_& matrix) const
+      {
+        // convert to SparseMatrixCSR
+        LAFEM::SparseMatrixCSR<Mem::Main, typename MatrixT_::DataType, typename MatrixT_::IndexType> mat;
+        mat.convert(matrix);
+        this->gather(buffer, mat);
+      }
+
+      template<
+        typename Algo_,
+        typename Tx_,
+        typename Ix_,
+        typename MatrixT_>
+      void gather_axpy(
+        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+        const MatrixT_& matrix,
+        const Tx_ alpha = Tx_(1)) const
+      {
+        // convert to SparseMatrixCSR
+        LAFEM::SparseMatrixCSR<Mem::Main, typename MatrixT_::DataType, typename MatrixT_::IndexType> mat;
+        mat.convert(matrix);
+        this->gather_axpy(buffer, mat, alpha);
+      }
+
+      template<
+        typename Algo_,
+        typename Tx_,
+        typename Ix_,
+        typename MatrixT_>
+      void scatter(
+        MatrixT_& matrix,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
+      {
+        // convert to SparseMatrixCSR
+        LAFEM::SparseMatrixCSR<Mem::Main, typename MatrixT_::DataType, typename MatrixT_::IndexType> mat;
+        mat.convert(matrix);
+        this->scatter(mat, buffer);
+        // convert back to original type
+        matrix.convert(mat);
+      }
+
+      template<
+        typename Algo_,
+        typename Tx_,
+        typename Ix_,
+        typename MatrixT_>
+      void scatter_axpy(
+        MatrixT_& matrix,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+        const Tx_ alpha = Tx_(1)) const
+      {
+        // convert to SparseMatrixCSR
+        LAFEM::SparseMatrixCSR<Mem::Main, typename MatrixT_::DataType, typename MatrixT_::IndexType> mat;
+        mat.convert(matrix);
+        this->scatter_axpy(mat, buffer, typename MatrixT_::DataType(alpha));
+        // convert back to original type
+        matrix.convert(mat);
       }
 
     private:
