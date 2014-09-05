@@ -136,7 +136,7 @@ namespace FEAST
         _matrix_d(matrix_d)
       {
         ASSERT(_matrix_a.rows() == _matrix_b.rows(), "row count mismatch: A.rows != B.rows");
-        ASSERT(_matrix_a.colums() == _matrix_d.colums(), "row count mismatch: A.cols != D.cols");
+        ASSERT(_matrix_a.columns() == _matrix_d.columns(), "row count mismatch: A.cols != D.cols");
       }
 
       /// move ctor
