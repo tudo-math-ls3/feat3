@@ -366,7 +366,7 @@ namespace FEAST
           }
           gsize +=16; //padding for datatype alignment missmatch
 
-          std::vector<char> result(size_t(gsize));
+          std::vector<char> result((size_t(gsize)));
           char * array(result.data());
           uint64_t * uiarray(reinterpret_cast<uint64_t *>(array));
           DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
@@ -533,7 +533,7 @@ namespace FEAST
         {
           uint64_t tsize;
           file.read((char *)&tsize, (long)(sizeof(uint64_t)));
-          std::vector<char> temp(size_t(tsize));
+          std::vector<char> temp((size_t(tsize)));
           file.seekg(0, file.beg);
           file.read(temp.data(), (long)(tsize * sizeof(uint64_t)));
           this->template _deserialise<DT2_, IT2_>(mode, temp);
