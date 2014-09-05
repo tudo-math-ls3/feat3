@@ -413,7 +413,7 @@ namespace FEAST
         const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template gather_axpy_dual<Algo_>(buffer, vector.first(), buffer_offset);
+        _first.template gather_axpy_dual<Algo_>(buffer, vector.first(), alpha, buffer_offset);
       }
 
       template<typename Algo_, typename Tx_, typename Ix_, typename... Tv_>
@@ -434,7 +434,7 @@ namespace FEAST
         const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template scatter_axpy_dual<Algo_>(vector.first(), buffer, buffer_offset);
+        _first.template scatter_axpy_dual<Algo_>(vector.first(), buffer, alpha, buffer_offset);
       }
 #else // all other compilers
       template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
