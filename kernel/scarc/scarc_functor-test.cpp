@@ -246,7 +246,7 @@ class ScaRCFunctorTest:
 
       auto tags(HaloTags::value(p_i.comm_halos));
       //synching for type-0 -> type-1
-      auto mat_localsys(MatrixConversion<Algo::Generic, Mem::Main, double, Index, SparseMatrixCSR>::value(mat_sys, mirrors, other_ranks, tags));
+      auto mat_localsys(MatrixConversion<Mem::Main, Algo::Generic>::value(mat_sys, mirrors, other_ranks, tags));
       GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(vec_rhs,
           mirrors,
           other_ranks,

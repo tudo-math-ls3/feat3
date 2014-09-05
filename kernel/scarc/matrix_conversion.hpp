@@ -22,15 +22,14 @@ namespace FEAST
   {
 #ifndef SERIAL
     ///type-0 to type-1 matrix conversion
-    template<
-             typename Algo_,
-             typename Mem_,
-             typename DT_,
-             typename IT_,
-             template<typename, typename, typename> class MT_>
+    template<typename Mem_,
+             typename Algo_>
     struct MatrixConversion
     {
-      template<template<typename, typename> class ST_, typename VMT_>
+      template<typename DT_,
+               typename IT_,
+               template<typename, typename, typename> class MT_,
+               template<typename, typename> class ST_, typename VMT_>
       static MT_<Mem_, DT_, IT_> value(const MT_<Mem_, DT_, IT_>& origin,
                                        const ST_<VMT_, std::allocator<VMT_> >& vec_mirrors,
                                        const ST_<IT_, std::allocator<IT_> >& other_ranks,
@@ -143,21 +142,19 @@ namespace FEAST
         return result;
       }
 #else
-    template<
-             typename Algo_,
-             typename Mem_,
-             typename DT_,
-             typename IT_,
-             template<typename, typename, typename> class MT_>
+    template<typename Mem_,
+             typename Algo_>
     struct MatrixConversion
     {
-      template<template<typename, typename> class ST_, typename VMT_>
+      template<typename DT_,
+               typename IT_,
+               template<typename, typename, typename> class MT_,
+               template<typename, typename> class ST_, typename VMT_>
       static MT_<Mem_, DT_, IT_> value(const MT_<Mem_, DT_, IT_>& origin,
                                        const ST_<VMT_, std::allocator<VMT_> >&,
                                        const ST_<IT_, std::allocator<IT_> >&,
                                        const ST_<IT_, std::allocator<IT_> >&,
-                                       Communicator = Communicator(0)
-                                       )
+                                       Communicator = Communicator(0))
       {
         MT_<Mem_, DT_, IT_> result;
         result.clone(origin);
