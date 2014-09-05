@@ -154,8 +154,8 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_prim<Algo_>(buffer, vector.first(), alpha, buffer_offset);
-        _rest.template gather_prim<Algo_>(buffer, vector.rest(), alpha, buffer_offset + _first.size());
+        _first.template gather_axpy_prim<Algo_>(buffer, vector.first(), alpha, buffer_offset);
+        _rest.template gather_axpy_prim<Algo_>(buffer, vector.rest(), alpha, buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::scatter_prim() */
@@ -177,8 +177,8 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_prim<Algo_>(vector.first(), buffer, alpha, buffer_offset);
-        _rest.template scatter_prim<Algo_>(vector.rest(), buffer, alpha, buffer_offset + _first.size());
+        _first.template scatter_axpy_prim<Algo_>(vector.first(), buffer, alpha, buffer_offset);
+        _rest.template scatter_axpy_prim<Algo_>(vector.rest(), buffer, alpha, buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::gather_dual() */
@@ -200,8 +200,8 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_dual<Algo_>(buffer, vector.first(), alpha, buffer_offset);
-        _rest.template gather_dual<Algo_>(buffer, vector.rest(), alpha, buffer_offset + _first.size());
+        _first.template gather_axpy_dual<Algo_>(buffer, vector.first(), alpha, buffer_offset);
+        _rest.template gather_axpy_dual<Algo_>(buffer, vector.rest(), alpha, buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::scatter_dual() */
@@ -223,8 +223,8 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_dual<Algo_>(vector.first(), buffer, alpha, buffer_offset);
-        _rest.template scatter_dual<Algo_>(vector.rest(), buffer, alpha, buffer_offset + _first.size());
+        _first.template scatter_axpy_dual<Algo_>(vector.first(), buffer, alpha, buffer_offset);
+        _rest.template scatter_axpy_dual<Algo_>(vector.rest(), buffer, alpha, buffer_offset + _first.size());
       }
     }; // class TupleMirror<...>
 
@@ -410,7 +410,7 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_prim<Algo_>(buffer, vector.first(), alpha, buffer_offset);
+        _first.template gather_axpy_prim<Algo_>(buffer, vector.first(), alpha, buffer_offset);
       }
 
       template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
@@ -429,7 +429,7 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_prim<Algo_>(vector.first(), buffer, alpha, buffer_offset);
+        _first.template scatter_axpy_prim<Algo_>(vector.first(), buffer, alpha, buffer_offset);
       }
 
       template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
@@ -448,7 +448,7 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_dual<Algo_>(buffer, vector.first(), alpha, buffer_offset);
+        _first.template gather_axpy_dual<Algo_>(buffer, vector.first(), alpha, buffer_offset);
       }
 
       template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
@@ -467,7 +467,7 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_dual<Algo_>(vector.first(), buffer, alpha, buffer_offset);
+        _first.template scatter_axpy_dual<Algo_>(vector.first(), buffer, alpha, buffer_offset);
       }
 #endif // FEAST_COMPILER_MICROSOFT
     };
