@@ -131,9 +131,9 @@ namespace FEAST
         MatrixTypeA&& matrix_a,
         MatrixTypeB&& matrix_b,
         MatrixTypeD&& matrix_d) :
-        _matrix_a(matrix_a),
-        _matrix_b(matrix_b),
-        _matrix_d(matrix_d)
+        _matrix_a(std::move(matrix_a)),
+        _matrix_b(std::move(matrix_b)),
+        _matrix_d(std::move(matrix_d))
       {
         ASSERT(_matrix_a.rows() == _matrix_b.rows(), "row count mismatch: A.rows != B.rows");
         ASSERT(_matrix_a.columns() == _matrix_d.columns(), "row count mismatch: A.cols != D.cols");
