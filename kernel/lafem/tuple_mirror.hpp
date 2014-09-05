@@ -95,6 +95,29 @@ namespace FEAST
         return *this;
       }
 
+      /**
+       * \brief Clone operation
+       *
+       * \returns A deep copy of this tuple mirror.
+       */
+      TupleMirror clone() const
+      {
+        return TupleMirror(_first.clone(), _rest.clone());
+      }
+
+      /**
+       * \brief Conversion method
+       *
+       * \param[in] other
+       * The source mirror.
+       */
+      template<typename... SubMirror2_>
+      void convert(const TupleMirror<SubMirror2_...>& other)
+      {
+        this->_first.convert(other._first);
+        this->_rest.convert(other._rest);
+      }
+
       /// \cond internal
       First_& first()
       {
@@ -273,6 +296,26 @@ namespace FEAST
         }
         return *this;
       }
+
+      TupleMirror clone() const
+      {
+        return TupleMirror(_first.clone());
+      }
+
+#ifdef FEAST_COMPILER_MICROSOFT
+      template<typename... SubMirror2_>
+      void convert(const TupleMirror<SubMirror2_...>& other)
+      {
+        static_assert(sizeof...(SubMirror2_) == std::size_t(1), "invalid TupleVector size");
+        this->_first.convert(other._first);
+      }
+#else
+      template<typename SubMirror2_>
+      void convert(const TupleMirror<SubMirror2_>& other)
+      {
+        this->_first.convert(other._first);
+      }
+#endif
 
       /// \cond internal
       First_& first()

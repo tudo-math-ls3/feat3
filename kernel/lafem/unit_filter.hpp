@@ -101,6 +101,12 @@ namespace FEAST
         _sv.clone(other._sv);
       }
 
+      template<typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const UnitFilter<Mem2_, DT2_, IT2_>& other)
+      {
+        _sv.convert(other._sv);
+      }
+
       void clear()
       {
         _sv.clear();

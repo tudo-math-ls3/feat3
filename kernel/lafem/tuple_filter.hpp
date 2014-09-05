@@ -98,6 +98,13 @@ namespace FEAST
         return TupleFilter(_first.clone(), _rest.clone());
       }
 
+      template<typename... SubFilter2_>
+      void convert(const TupleFilter<SubFilter2_...>& other)
+      {
+        _first.convert(other._first);
+        _rest.convert(other._rest);
+      }
+
       /// \cond internal
       First_& first()
       {
@@ -222,6 +229,21 @@ namespace FEAST
       {
         return TupleFilter(_first.clone());
       }
+
+#ifdef FEAST_COMPILER_MICROSOFT
+      template<typename... SubFilter2_>
+      void convert(const TupleFilter<SubFilter2_...>& other)
+      {
+        static_assert(sizeof...(SubFilter2_) == std::size_t(1), "invalid TupleFilter size");
+        _first.convert(other._first);
+      }
+#else
+      template<typename SubFilter2_>
+      void convert(const TupleFilter<SubFilter2_>& other)
+      {
+        _first.convert(other._first);
+      }
+#endif
 
       /// \cond internal
       First_& first()

@@ -70,6 +70,29 @@ namespace FEAST
         return *this;
       }
 
+      /**
+       * \brief Clone operation
+       *
+       * \returns A deep copy of this vector mirror.
+       */
+      VectorMirror clone() const
+      {
+        return VectorMirror(_mirror_gather.clone(), _mirror_scatter.clone());
+      }
+
+      /**
+       * \brief Conversion method
+       *
+       * \param[in] other
+       * The source mirror.
+       */
+      template<typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const VectorMirror<Mem2_, DT2_, IT2_>& other)
+      {
+        this->_mirror_gather.convert(other._mirror_gather);
+        this->_mirror_scatter.convert(other._mirror_scatter);
+      }
+
       /// \cond internal
       const MirrorMatrixType& get_gather_prim() const
       {

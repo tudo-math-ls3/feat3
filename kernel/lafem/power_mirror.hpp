@@ -183,6 +183,28 @@ namespace FEAST
         return *this;
       }
 
+      /**
+       * \brief Clone operation
+       *
+       * \returns A deep copy of this power mirror.
+       */
+      PowerMirror clone() const
+      {
+        return PowerMirror(_sub_mirror.clone());
+      }
+
+      /**
+       * \brief Conversion method
+       *
+       * \param[in] other
+       * The source mirror.
+       */
+      template<typename SubMirror2_>
+      void convert(const PowerMirror<SubMirror2_, count_>& other)
+      {
+        this->_sub_mirror.convert(other._sub_mirror);
+      }
+
       /// Returns the total size of the mirror.
       Index size() const
       {

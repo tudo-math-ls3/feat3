@@ -95,6 +95,14 @@ namespace FEAST
         return PowerFilter(first().clone(), rest().clone());
       }
 
+      /// Conversion method
+      template<typename SubFilter2_>
+      void convert(const PowerFilter<SubFilter2_, count_>& other)
+      {
+        _first.convert(other._first);
+        _rest.convert(other._rest);
+      }
+
       /// \cond internal
       SubFilterType& first()
       {
@@ -210,6 +218,12 @@ namespace FEAST
       PowerFilter clone() const
       {
         return PowerFilter(first().clone());
+      }
+
+      template<typename SubFilter2_>
+      void convert(const PowerFilter<SubFilter2_, 1>& other)
+      {
+        _first.convert(other._first);
       }
 
       SubFilterType& first()
