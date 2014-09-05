@@ -69,8 +69,8 @@ namespace FEAST
 
       /// base-class constructor; this one is protected for a reason
       explicit PowerColMatrix(SubMatrixType&& the_first, RestClass&& the_rest) :
-        _first(the_first),
-        _rest(the_rest)
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest))
       {
       }
 
@@ -359,7 +359,7 @@ namespace FEAST
 
       /// base-class constructor; this one is protected for a reason
       explicit PowerColMatrix(SubMatrixType&& the_first) :
-        _first(the_first)
+        _first(std::move(the_first))
       {
       }
 

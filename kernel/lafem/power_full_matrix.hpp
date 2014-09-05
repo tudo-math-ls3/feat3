@@ -70,7 +70,7 @@ namespace FEAST
     protected:
       /// base-class emplacement constructor
       explicit PowerFullMatrix(ContClass&& cont) :
-        _container(cont)
+        _container(std::move(cont))
       {
       }
 

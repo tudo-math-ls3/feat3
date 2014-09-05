@@ -60,8 +60,8 @@ namespace FEAST
 
       /// base-class ctor; for internal use only
       explicit PowerFilter(SubFilterType&& the_first, RestClass&& the_rest) :
-        _first(the_first),
-        _rest(the_rest)
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest))
       {
       }
 
@@ -191,7 +191,7 @@ namespace FEAST
       SubFilterType _first;
 
       explicit PowerFilter(SubFilterType&& the_first) :
-        _first(the_first)
+        _first(std::move(the_first))
       {
       }
 
