@@ -9,6 +9,7 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
+#include <kernel/lafem/arch/unit_filter.hpp>
 
 namespace FEAST
 {
@@ -313,11 +314,7 @@ namespace FEAST
       template<typename Algo_>
       void filter_rhs(DenseVector<Mem_, DT_, IT_> & vector) const
       {
-        DT_* v(vector.elements());
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          v[_sv.indices()[i]] = _sv.elements()[i];
-        }
+        Arch::UnitFilter<Mem_, Algo_>::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
       }
 
       /**
@@ -342,11 +339,7 @@ namespace FEAST
       template<typename Algo_>
       void filter_def(DenseVector<Mem_, DT_, IT_> & vector) const
       {
-        DT_* v(vector.elements());
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          v[_sv.indices()[i]] = DT_(0);
-        }
+        Arch::UnitFilter<Mem_, Algo_>::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
       }
 
       /**

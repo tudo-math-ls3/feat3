@@ -18,19 +18,19 @@ template<
   typename Algo_,
   typename DT_,
   typename IT_>
-class UnitFilterTest
+class UnitFilterVectorTest
   : public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
 {
   typedef DenseVector<typename Algo_::MemType, DT_, IT_> VectorType;
   typedef DenseVector<typename Algo_::MemType, IT_, IT_> IVectorType;
   typedef UnitFilter<typename Algo_::MemType, DT_, IT_> FilterType;
 public:
-  UnitFilterTest()
-    : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("UnitFilterTest")
+  UnitFilterVectorTest()
+    : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("UnitFilterVectorTest")
   {
   }
 
-  void test_vector() const
+  virtual void run() const override
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
@@ -74,8 +74,35 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(b1.template norm2<Algo_>(), DT_(0), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(b2.template norm2<Algo_>(), DT_(0), tol);
   }
+};
 
-  void test_sparse_matrix_csr() const
+UnitFilterVectorTest<Algo::Generic, float, Index> unit_filter_vector_test_generic_fi;
+UnitFilterVectorTest<Algo::Generic, double, Index> unit_filter_vector_test_generic_di;
+UnitFilterVectorTest<Algo::CUDA, float, Index> unit_filter_vector_test_cuda_fi;
+UnitFilterVectorTest<Algo::CUDA, double, Index> unit_filter_vector_test_cuda_di;
+
+/**
+ * \brief Test class for UnitFilter class template
+ *
+ * \author Peter Zajac
+ */
+template<
+  typename Algo_,
+  typename DT_,
+  typename IT_>
+class UnitFilterMatrixTest
+  : public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
+{
+  typedef DenseVector<typename Algo_::MemType, DT_, IT_> VectorType;
+  typedef DenseVector<typename Algo_::MemType, IT_, IT_> IVectorType;
+  typedef UnitFilter<typename Algo_::MemType, DT_, IT_> FilterType;
+public:
+  UnitFilterMatrixTest()
+    : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("UnitFilterMatrixTest")
+  {
+  }
+
+  virtual void run() const override
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
@@ -140,12 +167,7 @@ public:
     // check difference
     TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a.template norm_frobenius<Algo_>(), DT_(0), tol);
   }
-
-  virtual void run() const override
-  {
-    test_vector();
-    test_sparse_matrix_csr();
-  }
 };
 
-UnitFilterTest<Algo::Generic, double, Index> unit_filter_test_generic_di;
+UnitFilterMatrixTest<Algo::Generic, float, Index> unit_filter_matrix_test_generic_fi;
+UnitFilterMatrixTest<Algo::Generic, double, Index> unit_filter_matrix_test_generic_di;

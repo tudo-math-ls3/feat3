@@ -25,6 +25,7 @@ SET (kernel-lafem-arch-list
   scale_generic.cpp
   scale_row_col_generic.cpp
   sum_generic.cpp
+  unit_filter_generic.cpp
   )
 
 if (FEAST_BACKENDS_MKL)
@@ -64,6 +65,7 @@ if (FEAST_BACKENDS_CUDA)
     scale.cu
     scale_row_col.cu
     sum.cu
+    unit_filter.cu
     STATIC
   )
   ADD_DEPENDENCIES(kernel-lafem-arch kernel-lafem-arch-cuda)
