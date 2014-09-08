@@ -14,7 +14,7 @@ In its simplest shape, building FEAST is just as easy as
 make all
 This will automagically detect a proper tool/setting setup and build all FEAST components.
 
-'./configure-feast help' reveals a lot more configuration possiblitys.
+'./configure-feast help' reveals a lot more configuration possiblities.
 
 === TEST RUN ===
 To check if your system created a correct FEAST binary, you can run a set of unittests with the additional commands
