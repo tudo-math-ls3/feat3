@@ -324,72 +324,9 @@ public:
     }
   }
 
-  void run2() const
-  {
-    for (Index size(1) ; size < 1e3 ; size*=2)
-    {
-      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
-      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> b_local(size);
-      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> c_local(size);
-      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> ref(size);
-      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> result_local(size);
-      for (Index i(0) ; i < size ; ++i)
-      {
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j] = DT_(i%100+j);
-        a_local(i, tv1);
-        Tiny::Vector<DT_, BS_> tv2;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv2.v[j] = DT_(2*i + j);
-        b_local(i, tv2);
-        Tiny::Vector<DT_, BS_> tv3;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv3.v[j] = DT_((2*i+j) % 100);
-        c_local(i, tv3);
-        ref(i, c_local(i) * a_local(i) + b_local(i));
-      }
-
-      DenseVectorBlocked<Mem_, DT_, IT_, BS_> a(size);
-      a.copy(a_local);
-      DenseVectorBlocked<Mem_, DT_, IT_, BS_> b(size);
-      b.copy(b_local);
-      DenseVectorBlocked<Mem_, DT_, IT_, BS_> c(size);
-      c.copy(c_local);
-
-      DenseVectorBlocked<Mem_, DT_, IT_, BS_> d(size);
-      d.template component_product<Algo_>(c, a, b);
-      result_local.copy(d);
-      for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], 1e-2);
-
-      a.template component_product<Algo_>(c, a, b);
-      result_local.copy(a);
-      for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], 1e-2);
-
-      a.copy(a_local);
-      b.template component_product<Algo_>(c, a, b);
-      result_local.copy(b);
-      for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], 1e-2);
-
-      b.copy(b_local);
-      c.template component_product<Algo_>(c, a, b);
-      result_local.copy(c);
-      for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], 1e-2);
-    }
-  }
-
   virtual void run() const
   {
     run1();
-    run2();
   }
 };
 DenseVectorBlockedComponentProductTest<Mem::Main, Algo::Generic, float, Index, 2> dv_component_product_test_float;

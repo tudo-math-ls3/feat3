@@ -387,29 +387,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this_i \leftarrow x_i \cdot y_i + z_i\f$
-         *
-         * \param[in] x The first factor.
-         * \param[in] y The second factor.
-         * \param[in] z The second summand.
-         */
-        template <typename Algo_>
-        void component_product(
-          const DenseVectorBlocked & x,
-          const DenseVectorBlocked & y,
-          const DenseVectorBlocked & z)
-        {
-          if (this->size() != x.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->size() != y.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->size() != z.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-
-          Arch::Axpy<Mem_, Algo_>::dv(raw_elements(), x.raw_elements(), y.raw_elements(), z.raw_elements(), this->raw_size());
-        }
-
-        /**
          * \brief Calculate \f$this \leftarrow \alpha x \f$
          *
          * \param[in] x The vector to be scaled.
