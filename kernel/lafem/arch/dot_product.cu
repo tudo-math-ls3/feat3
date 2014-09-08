@@ -2,6 +2,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
+#include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/util/exception.hpp>
 
 // includes, CUDA
@@ -56,3 +57,17 @@ DT_ DotProduct<Mem::CUDA, Algo::CUDA>::value(const DT_ * const x, const DT_ * co
 
 template float DotProduct<Mem::CUDA, Algo::CUDA>::value(const float * const, const float * const, const Index);
 template double DotProduct<Mem::CUDA, Algo::CUDA>::value(const double * const, const double * const, const Index);
+
+template <typename DT_>
+DT_ TripleDotProduct<Mem::CUDA, Algo::CUDA>::value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
+{
+  DT_ * temp;
+  cudaMalloc((void **) &temp, size * sizeof(DT_));
+  ComponentProduct<Mem::CUDA, Algo::CUDA>::value(temp, y, z, size);
+  DT_ result = Intern::cuda_dot_product(x, temp, size);
+  cudaFree(temp);
+  return result;
+}
+
+template float TripleDotProduct<Mem::CUDA, Algo::CUDA>::value(const float * const x, const float * const y, const float * const z, const Index size);
+template double TripleDotProduct<Mem::CUDA, Algo::CUDA>::value(const double * const x, const double * const y, const double * const z, const Index size);

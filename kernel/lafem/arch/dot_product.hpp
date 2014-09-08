@@ -52,9 +52,6 @@ namespace FEAST
       {
         template <typename DT_>
         static DT_ value(const DT_ * const x, const DT_ * const y, const Index size);
-
-        template <typename DT_>
-        static DT_ value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size);
       };
 
       // Triple dot product
@@ -64,9 +61,6 @@ namespace FEAST
       template <>
       struct TripleDotProduct<Mem::Main, Algo::Generic>
       {
-        template <typename DT_>
-        static DT_ value(const DT_ * const x, const DT_ * const y, const Index size);
-
         template <typename DT_>
         static DT_ value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size);
       };
@@ -84,9 +78,6 @@ namespace FEAST
       template <>
       struct TripleDotProduct<Mem::CUDA, Algo::CUDA>
       {
-        template <typename DT_>
-        static DT_ value(const DT_ * const x, const DT_ * const y, const Index size);
-
         template <typename DT_>
         static DT_ value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size);
       };

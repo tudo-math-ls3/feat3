@@ -360,10 +360,16 @@ DenseVectorTripleDotTest<Mem::Main, Algo::Generic, __float128, unsigned int> dv_
 DenseVectorTripleDotTest<Mem::Main, Algo::Generic, __float128, unsigned long> dv_triple_dot_product_test_float128_ulong;
 #endif
 #ifdef FEAST_BACKENDS_MKL
-// TODO Add MKL tests as soon as the triple_dot routines are implemented for that backend
+DenseVectorTripleDotTest<Mem::Main, Algo::MKL, float, unsigned int> mkl_dv_triple_dot_product_test_float_uint;
+DenseVectorTripleDotTest<Mem::Main, Algo::MKL, double, unsigned int> mkl_dv_triple_dot_product_test_double_uint;
+DenseVectorTripleDotTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_dv_triple_dot_product_test_float_ulong;
+DenseVectorTripleDotTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_dv_triple_dot_product_test_double_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-// TODO Add CUDA tests as soon as the triple_dot routines are implemented for that backend
+DenseVectorTripleDotTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_dv_triple_dot_product_test_float_uint;
+DenseVectorTripleDotTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_dv_triple_dot_product_test_double_uint;
+DenseVectorTripleDotTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_dv_triple_dot_product_test_float_ulong;
+DenseVectorTripleDotTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_triple_dot_product_test_double_ulong;
 #endif
 
 
