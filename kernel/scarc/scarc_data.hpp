@@ -20,10 +20,6 @@
 #include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/gateway.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::Foundation;
-
 namespace FEAST
 {
   namespace ScaRC
@@ -53,8 +49,8 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename VectorType_ = DenseVector<MemTag_, DataType_>,
-             typename MatrixType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             typename VectorType_ = LAFEM::DenseVector<MemTag_, DataType_>,
+             typename MatrixType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct ScaRCDataBase
@@ -159,8 +155,8 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename VectorType_ = DenseVector<MemTag_, DataType_>,
-             typename MatrixType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             typename VectorType_ = LAFEM::DenseVector<MemTag_, DataType_>,
+             typename MatrixType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct ScaRCData : public ScaRCDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>
@@ -235,7 +231,7 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             typename PreconContType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
              typename IT_ = Index>
     struct PreconditionerDataContainer
     {
@@ -297,9 +293,9 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename VectorType_ = DenseVector<MemTag_, DataType_>,
-             typename MatrixType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             typename VectorType_ = LAFEM::DenseVector<MemTag_, DataType_>,
+             typename MatrixType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
+             typename PreconContType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct PreconditionedScaRCData :
@@ -372,8 +368,8 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename VectorType_ = DenseVector<MemTag_, DataType_>,
-             typename VectorMirrorType_ = VectorMirror<MemTag_, DataType_>,
+             typename VectorType_ = LAFEM::DenseVector<MemTag_, DataType_>,
+             typename VectorMirrorType_ = LAFEM::VectorMirror<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronizationDataContainer
@@ -451,12 +447,12 @@ namespace FEAST
         }
 
 
-        virtual StorageType_<Communicator, std::allocator<Communicator> >& communicators()
+        virtual StorageType_<Foundation::Communicator, std::allocator<Foundation::Communicator> >& communicators()
         {
           return _communicators;
         }
 
-        virtual const StorageType_<Communicator, std::allocator<Communicator> >& communicators() const
+        virtual const StorageType_<Foundation::Communicator, std::allocator<Foundation::Communicator> >& communicators() const
         {
           return _communicators;
         }
@@ -502,7 +498,7 @@ namespace FEAST
         index_storage_type_ _tags;
 
         ///communicators associated with scarc layers of the same index
-        StorageType_<Communicator, std::allocator<Communicator> > _communicators;
+        StorageType_<Foundation::Communicator, std::allocator<Foundation::Communicator> > _communicators;
     };
 
     /**
@@ -533,9 +529,9 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename VectorType_ = DenseVector<MemTag_, DataType_>,
-             typename VectorMirrorType_ = VectorMirror<MemTag_, DataType_>,
-             typename MatrixType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             typename VectorType_ = LAFEM::DenseVector<MemTag_, DataType_>,
+             typename VectorMirrorType_ = LAFEM::VectorMirror<MemTag_, DataType_>,
+             typename MatrixType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronisedScaRCData :
@@ -627,10 +623,10 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename VectorType_ = DenseVector<MemTag_, DataType_>,
-             typename VectorMirrorType_ = VectorMirror<MemTag_, DataType_>,
-             typename MatrixType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             typename VectorType_ = LAFEM::DenseVector<MemTag_, DataType_>,
+             typename VectorMirrorType_ = LAFEM::VectorMirror<MemTag_, DataType_>,
+             typename MatrixType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
+             typename PreconContType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronisedPreconditionedScaRCData :
@@ -713,7 +709,7 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename FilterType_ = UnitFilter<MemTag_, DataType_>,
+             typename FilterType_ = LAFEM::UnitFilter<MemTag_, DataType_>,
              typename IT_ = Index>
     struct FilterDataContainer
     {
@@ -782,11 +778,11 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename VectorType_ = DenseVector<MemTag_, DataType_>,
-             typename VectorMirrorType_ = VectorMirror<MemTag_, DataType_>,
-             typename MatrixType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             typename FilterType_ = UnitFilter<MemTag_, DataType_>,
+             typename VectorType_ = LAFEM::DenseVector<MemTag_, DataType_>,
+             typename VectorMirrorType_ = LAFEM::VectorMirror<MemTag_, DataType_>,
+             typename MatrixType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
+             typename PreconContType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
+             typename FilterType_ = LAFEM::UnitFilter<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronisedPreconditionedFilteredScaRCData :
@@ -857,10 +853,10 @@ namespace FEAST
 
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             typename VectorType_ = DenseVector<MemTag_, DataType_>,
-             typename MatrixType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             typename TransferContType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             typename VectorType_ = LAFEM::DenseVector<MemTag_, DataType_>,
+             typename MatrixType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
+             typename TransferContType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
+             typename PreconContType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct MultiLevelScaRCData : public ScaRCData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>

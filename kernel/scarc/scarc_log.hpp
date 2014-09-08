@@ -6,9 +6,6 @@
 #include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/environment.hpp>
 
-using namespace FEAST;
-using namespace FEAST::Foundation;
-
 namespace FEAST
 {
   namespace ScaRC
@@ -21,42 +18,42 @@ namespace FEAST
       std::string msg;
 
       ScaRCLog() :
-        basetag(Environment::reserve_tag()),
+        basetag(Foundation::Environment::reserve_tag()),
         stream(),
         msg()
       {
       }
 
 #ifndef SERIAL
-      std::string synch(Communicator c = Communicator(MPI_COMM_WORLD))
+      std::string synch(Foundation::Communicator c = Foundation::Communicator(MPI_COMM_WORLD))
       {
         msg = std::string(stream.str());
         Index len_sb;
         len_sb = msg.size() + 1;
-        Index* len_rb = new Index[Comm::size(c)];
+        Index* len_rb = new Index[Foundation::Comm::size(c)];
 
-        Comm::allgather(&len_sb,
+        Foundation::Comm::allgather(&len_sb,
                         1,
                         &len_rb[0],
                         1,
                         c);
 
-        ST_<Request, std::allocator<Request> >recv_req;
-        ST_<Request, std::allocator<Request> >send_req;
-        ST_<Status, std::allocator<Status> >recv_stat;
-        ST_<Status, std::allocator<Status> >send_stat;
-        char** recvbufs = new char*[Comm::size(c)];
+        ST_<Foundation::Request, std::allocator<Foundation::Request> >recv_req;
+        ST_<Foundation::Request, std::allocator<Foundation::Request> >send_req;
+        ST_<Foundation::Status, std::allocator<Foundation::Status> >recv_stat;
+        ST_<Foundation::Status, std::allocator<Foundation::Status> >send_stat;
+        char** recvbufs = new char*[Foundation::Comm::size(c)];
         char* sendbuf(new char[len_sb]);
 
-        for(Index i(0) ; i < Comm::size(c) ; ++i)
+        for(Index i(0) ; i < Foundation::Comm::size(c) ; ++i)
         {
-          Status rs;
+          Foundation::Status rs;
           recv_stat.push_back(std::move(rs));
-          Request rr;
+          Foundation::Request rr;
           recv_req.push_back(std::move(rr));
           recvbufs[i] = new char[len_rb[i]];
 
-          Comm::irecv(recvbufs[i],
+          Foundation::Comm::irecv(recvbufs[i],
                       len_rb[i],
                       i,
                       recv_req.at(i),
@@ -64,19 +61,19 @@ namespace FEAST
                       c);
         }
 
-        for(Index i(0) ; i < Comm::size(c) ; ++i)
+        for(Index i(0) ; i < Foundation::Comm::size(c) ; ++i)
         {
-          Status ss;
+          Foundation::Status ss;
           send_stat.push_back(std::move(ss));
-          Request sr;
+          Foundation::Request sr;
           send_req.push_back(std::move(sr));
           std::copy(msg.c_str(), msg.c_str() + len_sb, sendbuf);
 
-          Comm::isend(sendbuf,
+          Foundation::Comm::isend(sendbuf,
                       len_sb,
                       i,
                       send_req.at(i),
-                      basetag + Comm::rank(c),
+                      basetag + Foundation::Comm::rank(c),
                       c);
         }
 
@@ -96,7 +93,7 @@ namespace FEAST
           {
             if(taskflags[i] == 0)
             {
-              Comm::test(recv_req.at(i), recvflags[i], recv_stat.at(i));
+              Foundation::Comm::test(recv_req.at(i), recvflags[i], recv_stat.at(i));
               if(recvflags[i] != 0)
               {
                 res << recvbufs[i] << std::endl;
@@ -107,7 +104,7 @@ namespace FEAST
           }
         }
 
-        for(Index i(0) ; i < Comm::size(c) ; ++i)
+        for(Index i(0) ; i < Foundation::Comm::size(c) ; ++i)
         {
           delete[] recvbufs[i];
         }
@@ -121,7 +118,7 @@ namespace FEAST
         return msg;
       }
 #else
-      std::string synch(Communicator c = Communicator(0))
+      std::string synch(Foundation::Communicator c = Foundation::Communicator(0))
       {
         msg = std::string(stream.str());
         return msg;
@@ -131,7 +128,7 @@ namespace FEAST
       template<typename...DT_>
       int checkin_line(DT_&...data)
       {
-        stream << Comm::rank() << "| " ;
+        stream << Foundation::Comm::rank() << "| " ;
         int r0[sizeof...(data)] = {(stream << data, 0)...};
 
         stream << std::endl;

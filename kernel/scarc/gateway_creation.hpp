@@ -14,9 +14,6 @@
 
 #include<kernel/foundation/gateway.hpp>
 
-using namespace FEAST;
-using namespace FEAST::Foundation;
-
 namespace FEAST
 {
   namespace ScaRC
@@ -40,9 +37,9 @@ namespace FEAST
     struct GatewayCreation<got_dot, Algo_>
     {
       template<typename SynchedScaRCDataT_>
-      static GlobalDotGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
+      static Foundation::GlobalDotGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
       {
-        return GlobalDotGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
+        return Foundation::GlobalDotGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
       }
     };
 
@@ -50,9 +47,9 @@ namespace FEAST
     struct GatewayCreation<got_nrm2, Algo_>
     {
       template<typename SynchedScaRCDataT_>
-      static GlobalNorm2Gateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
+      static Foundation::GlobalNorm2Gateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
       {
-        return GlobalNorm2Gateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
+        return Foundation::GlobalNorm2Gateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
       }
     };
 
@@ -60,9 +57,9 @@ namespace FEAST
     struct GatewayCreation<got_nrm2sqr, Algo_>
     {
       template<typename SynchedScaRCDataT_>
-      static GlobalNorm2SquaredGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
+      static Foundation::GlobalNorm2SquaredGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
       {
-        return GlobalNorm2SquaredGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
+        return Foundation::GlobalNorm2SquaredGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
       }
     };
 
@@ -70,13 +67,13 @@ namespace FEAST
     struct GatewayCreation<got_synch_vec0, Algo_, StorageT_>
     {
       template<typename SynchedScaRCDataT_>
-      static GlobalSynchVec0Gateway<typename SynchedScaRCDataT_::mem_,
+      static Foundation::GlobalSynchVec0Gateway<typename SynchedScaRCDataT_::mem_,
                                     Algo_,
                                     typename SynchedScaRCDataT_::vector_type_,
                                     typename SynchedScaRCDataT_::vector_mirror_type_,
                                     StorageT_> value(SynchedScaRCDataT_& data)
       {
-        return GlobalSynchVec0Gateway<typename SynchedScaRCDataT_::mem_,
+        return Foundation::GlobalSynchVec0Gateway<typename SynchedScaRCDataT_::mem_,
                                       Algo_,
                                       typename SynchedScaRCDataT_::vector_type_,
                                       typename SynchedScaRCDataT_::vector_mirror_type_,
@@ -94,13 +91,13 @@ namespace FEAST
     struct GatewayCreation<got_synch_vec1, Algo_, StorageT_>
     {
       template<typename SynchedScaRCDataT_>
-      static GlobalSynchVec1Gateway<typename SynchedScaRCDataT_::mem_,
+      static Foundation::GlobalSynchVec1Gateway<typename SynchedScaRCDataT_::mem_,
                                     Algo_,
                                     typename SynchedScaRCDataT_::vector_type_,
                                     typename SynchedScaRCDataT_::vector_mirror_type_,
                                     StorageT_> value(SynchedScaRCDataT_& data)
       {
-        return GlobalSynchVec1Gateway<typename SynchedScaRCDataT_::mem_,
+        return Foundation::GlobalSynchVec1Gateway<typename SynchedScaRCDataT_::mem_,
                                       Algo_,
                                       typename SynchedScaRCDataT_::vector_type_,
                                       typename SynchedScaRCDataT_::vector_mirror_type_,
@@ -119,14 +116,14 @@ namespace FEAST
     struct GatewayCreation<got_product_mat0_vec1, Algo_, StorageT_>
     {
       template<typename SynchedScaRCDataT_>
-      static GlobalProductMat0Vec1Gateway<typename SynchedScaRCDataT_::mem_,
+      static Foundation::GlobalProductMat0Vec1Gateway<typename SynchedScaRCDataT_::mem_,
                                     Algo_,
                                     typename SynchedScaRCDataT_::vector_type_,
                                     typename SynchedScaRCDataT_::matrix_type_,
                                     typename SynchedScaRCDataT_::vector_mirror_type_,
                                     StorageT_> value(SynchedScaRCDataT_& data)
       {
-        return GlobalProductMat0Vec1Gateway<typename SynchedScaRCDataT_::mem_,
+        return Foundation::GlobalProductMat0Vec1Gateway<typename SynchedScaRCDataT_::mem_,
                                       Algo_,
                                       typename SynchedScaRCDataT_::vector_type_,
                                       typename SynchedScaRCDataT_::matrix_type_,

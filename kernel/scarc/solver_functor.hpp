@@ -16,9 +16,6 @@
 #include<kernel/scarc/scarc_error.hpp>
 #include<kernel/foundation/synch.hpp>
 
-using namespace FEAST::Foundation;
-using namespace FEAST;
-
 namespace FEAST
 {
   namespace ScaRC
@@ -1618,7 +1615,7 @@ namespace FEAST
     template<typename Algo_,
              typename VT_,
              typename VMT_,
-             Tier2CommModes cm_,
+             Foundation::Tier2CommModes cm_,
              template<typename, typename> class StoreT_ = std::vector>
     class SynchVecFunctor : public SolverFunctorBase<VT_>
     {
@@ -1646,7 +1643,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          SynchVec<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          Foundation::SynchVec<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
         }
 
         SynchVecFunctor& operator=(const SynchVecFunctor& rhs)
@@ -1690,7 +1687,7 @@ namespace FEAST
     template<typename Algo_,
              typename VT_,
              typename VMT_,
-             Tier2CommModes cm_,
+             Foundation::Tier2CommModes cm_,
              template<typename, typename> class StoreT_ = std::vector>
     class SynchVecFunctorProxy : public SolverFunctorBase<VT_>
     {
@@ -1721,7 +1718,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SynchVecFunctor can not be executed!");
 
-          SynchVec<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          Foundation::SynchVec<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
         }
 
         SynchVecFunctorProxy& operator=(const SynchVecFunctorProxy& rhs)
@@ -1767,7 +1764,7 @@ namespace FEAST
     template<typename Algo_,
              typename VT_,
              typename DT_,
-             Tier2CommModes cm_>
+             Foundation::Tier2CommModes cm_>
     class SynchScalFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -1788,7 +1785,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          SynchScal<cm_>::execute(_l, _sendbuf, _recvbuf);
+          Foundation::SynchScal<cm_>::execute(_l, _sendbuf, _recvbuf);
         }
 
         SynchScalFunctor& operator=(const SynchScalFunctor& rhs)

@@ -754,7 +754,7 @@ void check_halobased_dv_transfer(Index rank)
 {
   if(rank < 2)
   {
-    DenseVector<Mem::Main, double> attr(100000);
+    LAFEM::DenseVector<Mem::Main, double> attr(100000);
     for(Index i(0) ; i < 100000 ; ++i)
     {
       attr(i, (double(rank + i)));

@@ -12,9 +12,6 @@
 #endif
 
 
-using namespace FEAST;
-using namespace Archs;
-
 namespace FEAST
 {
   namespace Foundation

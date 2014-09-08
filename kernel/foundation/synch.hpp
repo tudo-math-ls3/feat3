@@ -6,9 +6,6 @@
 
 #include<kernel/foundation/communication.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-
 ///TODO add communicators
 namespace FEAST
 {

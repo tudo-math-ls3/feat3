@@ -26,6 +26,7 @@
 
 using namespace FEAST;
 using namespace Foundation;
+using namespace LAFEM;
 
 template<typename DT_>
 struct TestResult

@@ -19,10 +19,6 @@
 
 #include<kernel/foundation/communication.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::Foundation;
-
 namespace FEAST
 {
   namespace ScaRC
@@ -53,8 +49,8 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class VectorType_ = LAFEM::DenseVector,
+             template<typename, typename, typename> class MatrixType_ = LAFEM::SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SolverDataBase
@@ -248,8 +244,8 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class VectorType_ = LAFEM::DenseVector,
+             template<typename, typename, typename> class MatrixType_ = LAFEM::SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SolverData : public SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>
@@ -376,7 +372,7 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class PreconContType_ = LAFEM::SparseMatrixCSR,
              typename IT_ = Index>
     struct PreconditionerDataContainer
     {
@@ -438,9 +434,9 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class VectorType_ = LAFEM::DenseVector,
+             template<typename, typename, typename> class MatrixType_ = LAFEM::SparseMatrixCSR,
+             template<typename, typename, typename> class PreconContType_ = LAFEM::SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct PreconditionedSolverData :
@@ -524,8 +520,8 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename, typename> class VectorMirrorType_ = VectorMirror,
+             template<typename, typename, typename> class VectorType_ = LAFEM::DenseVector,
+             template<typename, typename, typename> class VectorMirrorType_ = LAFEM::VectorMirror,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronizationDataContainer
@@ -641,9 +637,9 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename, typename> class VectorMirrorType_ = VectorMirror,
-             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class VectorType_ = LAFEM::DenseVector,
+             template<typename, typename, typename> class VectorMirrorType_ = LAFEM::VectorMirror,
+             template<typename, typename, typename> class MatrixType_ = LAFEM::SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronisedSolverData :
@@ -741,10 +737,10 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename, typename> class VectorMirrorType_ = VectorMirror,
-             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class VectorType_ = LAFEM::DenseVector,
+             template<typename, typename, typename> class VectorMirrorType_ = LAFEM::VectorMirror,
+             template<typename, typename, typename> class MatrixType_ = LAFEM::SparseMatrixCSR,
+             template<typename, typename, typename> class PreconContType_ = LAFEM::SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronisedPreconditionedSolverData :
@@ -836,7 +832,7 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename,typename> class FilterType_ = UnitFilter,
+             template<typename, typename,typename> class FilterType_ = LAFEM::UnitFilter,
              typename IT_ = Index>
     struct FilterDataContainer
     {
@@ -905,11 +901,11 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename, typename> class VectorMirrorType_ = VectorMirror,
-             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
-             template<typename, typename, typename> class FilterType_ = UnitFilter,
+             template<typename, typename, typename> class VectorType_ = LAFEM::DenseVector,
+             template<typename, typename, typename> class VectorMirrorType_ = LAFEM::VectorMirror,
+             template<typename, typename, typename> class MatrixType_ = LAFEM::SparseMatrixCSR,
+             template<typename, typename, typename> class PreconContType_ = LAFEM::SparseMatrixCSR,
+             template<typename, typename, typename> class FilterType_ = LAFEM::UnitFilter,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronisedPreconditionedFilteredSolverData :
@@ -989,10 +985,10 @@ namespace FEAST
 
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
-             typename TransferContType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             template<typename, typename, typename> class VectorType_ = LAFEM::DenseVector,
+             template<typename, typename, typename> class MatrixType_ = LAFEM::SparseMatrixCSR,
+             typename TransferContType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
+             typename PreconContType_ = LAFEM::SparseMatrixCSR<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct MultiLevelSolverData : public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>

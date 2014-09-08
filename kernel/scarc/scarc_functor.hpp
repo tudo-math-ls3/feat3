@@ -17,9 +17,6 @@
 #include<kernel/scarc/scarc_data.hpp>
 #include<kernel/foundation/global_defect.hpp>
 
-using namespace FEAST;
-using namespace FEAST::Foundation;
-
 namespace FEAST
 {
   namespace ScaRC
@@ -558,30 +555,30 @@ namespace FEAST
           while(true)
           {
             ///temp0 <- b - SYNCH(Ax)
-            GlobalDefect<MemTag_, Algo_>::exec(_temp0,
-                                               this->_data->rhs(),
-                                               this->_data->sys(),
-                                               _temp0,
-                                               this->_data->vector_mirrors(),
-                                               this->_data->dest_ranks(),
-                                               this->_data->vector_mirror_sendbufs(),
-                                               this->_data->vector_mirror_recvbufs(),
-                                               this->_data->tags(),
-                                               this->_data->communicators().at(0)); ///TODO ScarcLayer selection
+            Foundation::GlobalDefect<MemTag_, Algo_>::exec(_temp0,
+                                                           this->_data->rhs(),
+                                                           this->_data->sys(),
+                                                           _temp0,
+                                                           this->_data->vector_mirrors(),
+                                                           this->_data->dest_ranks(),
+                                                           this->_data->vector_mirror_sendbufs(),
+                                                           this->_data->vector_mirror_recvbufs(),
+                                                           this->_data->tags(),
+                                                           this->_data->communicators().at(0)); ///TODO ScarcLayer selection
 
             if(this->_conv_check)
             {
               if(this->_used_iters == 0)
               {
-                GlobalNorm2<MemTag_, Algo_>::value(
-                    this->_norm_0,
-                    _temp0,
-                    this->_data->halo_frequencies()
+                Foundation::GlobalNorm2<MemTag_, Algo_>::value(
+                                                               this->_norm_0,
+                                                               _temp0,
+                                                               this->_data->halo_frequencies()
                     );
               }
               else
               {
-                GlobalNorm2<MemTag_, Algo_>::value(
+                Foundation::GlobalNorm2<MemTag_, Algo_>::value(
                     this->_norm,
                     _temp0,
                     this->_data->halo_frequencies()
@@ -621,7 +618,7 @@ namespace FEAST
           while(true)
           {
             ///temp0 <- b - SYNCH(Ax)
-            GlobalDefect<MemTag_, Algo_>::exec(_temp0,
+            Foundation::GlobalDefect<MemTag_, Algo_>::exec(_temp0,
                                                apply_rhs,
                                                this->_data->sys(),
                                                _temp0,
@@ -636,7 +633,7 @@ namespace FEAST
             {
               if(this->_used_iters == 0)
               {
-                GlobalNorm2<MemTag_, Algo_>::value(
+                Foundation::GlobalNorm2<MemTag_, Algo_>::value(
                     this->_norm_0,
                     _temp0,
                     this->_data->halo_frequencies()
@@ -644,7 +641,7 @@ namespace FEAST
               }
               else
               {
-                GlobalNorm2<MemTag_, Algo_>::value(
+                Foundation::GlobalNorm2<MemTag_, Algo_>::value(
                     this->_norm,
                     _temp0,
                     this->_data->halo_frequencies()
@@ -1148,7 +1145,7 @@ namespace FEAST
         virtual void execute()
         {
           //global defect
-          GlobalDefect<MemTag_, Algo_>::exec(this->_data->def(),
+          Foundation::GlobalDefect<MemTag_, Algo_>::exec(this->_data->def(),
                                              this->_data->rhs(),
                                              this->_data->sys(),
                                              this->_data->sol(),
@@ -1163,7 +1160,7 @@ namespace FEAST
           this->_precon->apply(_temp1, _temp0, this->_data->def());
 
           //synchronisation
-          GlobalSynchVec1<MemTag_, Algo_>::exec(
+          Foundation::GlobalSynchVec1<MemTag_, Algo_>::exec(
                                                  _temp1,
                                                  this->_data->vector_mirrors(),
                                                  this->_data->halo_frequencies(),
@@ -1181,7 +1178,7 @@ namespace FEAST
 
         virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
         {
-          GlobalDefect<MemTag_, Algo_>::exec(_temp0,
+          Foundation::GlobalDefect<MemTag_, Algo_>::exec(_temp0,
                                              apply_rhs,
                                              this->_data->sys(),
                                              apply_to,
@@ -1197,7 +1194,7 @@ namespace FEAST
           this->_precon->apply(_temp2, _temp1, _temp0);
 
           //synchronisation
-          GlobalSynchVec1<MemTag_, Algo_>::exec(
+          Foundation::GlobalSynchVec1<MemTag_, Algo_>::exec(
                                                  _temp2,
                                                  this->_data->vector_mirrors(),
                                                  this->_data->halo_frequencies(),
@@ -1349,7 +1346,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          GlobalDefect<MemTag_, Algo_>::exec(_r,
+          Foundation::GlobalDefect<MemTag_, Algo_>::exec(_r,
                                              this->_data->rhs(),
                                              this->_data->sys(),
                                              this->_data->sol(),
@@ -1364,14 +1361,14 @@ namespace FEAST
 
           if(this->_conv_check)
           {
-            GlobalNorm2<MemTag_, Algo_>::value(
+            Foundation::GlobalNorm2<MemTag_, Algo_>::value(
                 this->_norm_0,
                 _r,
                 this->_data->halo_frequencies()
                 );
           }
 
-          GlobalDot<MemTag_, Algo_>::value(
+          Foundation::GlobalDot<MemTag_, Algo_>::value(
                                            _alpha_new,
                                            _r,
                                            _p,
@@ -1382,7 +1379,7 @@ namespace FEAST
           ///TODO: config objs!
           while(this->_used_iters < this->_max_iters)
           {
-            GlobalProductMat0Vec1<MemTag_, Algo_>::exec(
+            Foundation::GlobalProductMat0Vec1<MemTag_, Algo_>::exec(
                                                         _v,
                                                         this->_data->sys(),
                                                         _p,
@@ -1394,7 +1391,7 @@ namespace FEAST
                                                         this->_data->communicators().at(0)
                                                        );
 
-            GlobalDot<MemTag_, Algo_>::value(
+            Foundation::GlobalDot<MemTag_, Algo_>::value(
                                              temp,
                                              _v,
                                              _p,
@@ -1412,7 +1409,7 @@ namespace FEAST
 
             if(this->_conv_check)
             {
-              GlobalNorm2<MemTag_, Algo_>::value(
+              Foundation::GlobalNorm2<MemTag_, Algo_>::value(
                   this->_norm,
                   _r,
                   this->_data->halo_frequencies()
@@ -1436,7 +1433,7 @@ namespace FEAST
 
             _alpha = _alpha_new;
 
-            GlobalDot<MemTag_, Algo_>::value(
+            Foundation::GlobalDot<MemTag_, Algo_>::value(
                                              _alpha_new,
                                              _r,
                                              _z,
@@ -1455,7 +1452,7 @@ namespace FEAST
 
         virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
         {
-          GlobalDefect<MemTag_, Algo_>::exec(_r,
+          Foundation::GlobalDefect<MemTag_, Algo_>::exec(_r,
                                              apply_rhs,
                                              this->_data->sys(),
                                              apply_to,
@@ -1470,14 +1467,14 @@ namespace FEAST
 
           if(this->_conv_check)
           {
-            GlobalNorm2<MemTag_, Algo_>::value(
+            Foundation::GlobalNorm2<MemTag_, Algo_>::value(
                 this->_norm_0,
                 _r,
                 this->_data->halo_frequencies()
                 );
           }
 
-          GlobalDot<MemTag_, Algo_>::value(
+          Foundation::GlobalDot<MemTag_, Algo_>::value(
                                            _alpha_new,
                                            _r,
                                            _p,
@@ -1488,7 +1485,7 @@ namespace FEAST
           store_to.copy(apply_to);
           while(this->_used_iters < this->_max_iters)
           {
-            GlobalProductMat0Vec1<MemTag_, Algo_>::exec(
+            Foundation::GlobalProductMat0Vec1<MemTag_, Algo_>::exec(
                                                         _v,
                                                         this->_data->sys(),
                                                         _p,
@@ -1500,7 +1497,7 @@ namespace FEAST
                                                         this->_data->communicators().at(0)
                                                        );
 
-            GlobalDot<MemTag_, Algo_>::value(
+            Foundation::GlobalDot<MemTag_, Algo_>::value(
                                              temp,
                                              _v,
                                              _p,
@@ -1518,7 +1515,7 @@ namespace FEAST
 
             if(this->_conv_check)
             {
-              GlobalNorm2<MemTag_, Algo_>::value(
+              Foundation::GlobalNorm2<MemTag_, Algo_>::value(
                   this->_norm,
                   _r,
                   this->_data->halo_frequencies()
@@ -1542,7 +1539,7 @@ namespace FEAST
 
             _alpha = _alpha_new;
 
-            GlobalDot<MemTag_, Algo_>::value(
+            Foundation::GlobalDot<MemTag_, Algo_>::value(
                                              _alpha_new,
                                              _r,
                                              _z,

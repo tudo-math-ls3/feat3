@@ -7,10 +7,6 @@
 #include<kernel/foundation/global_synch_vec.hpp>
 #include<kernel/foundation/environment.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
-
 ///TODO add communicators
 namespace FEAST
 {

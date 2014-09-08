@@ -8,8 +8,6 @@
 #include<kernel/foundation/communication.hpp>
 #include<kernel/archs.hpp>
 
-using namespace FEAST::Archs;
-
 namespace FEAST
 {
   namespace Foundation

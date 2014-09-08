@@ -8,10 +8,6 @@
 #include<kernel/lafem/arch/difference.hpp>
 #include<kernel/foundation/environment.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
-
 ///TODO add communicators
 namespace FEAST
 {
@@ -50,7 +46,7 @@ namespace FEAST
                                                                   tags,
                                                                   communicator);
 
-            Difference<Mem_, Algo_>::value(target.elements(), b.elements(), target.elements(), target.size());
+            LAFEM::Arch::Difference<Mem_, Algo_>::value(target.elements(), b.elements(), target.elements(), target.size());
           }
 #else
           template<typename MatrixT_, typename SystemVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
@@ -68,7 +64,7 @@ namespace FEAST
                            )
           {
             A.template apply<Algo_>(target, x);
-            Difference<Mem_, Algo_>::value(target.elements(), b.elements(), target.elements(), target.size());
+            LAFEM::Arch::Difference<Mem_, Algo_>::value(target.elements(), b.elements(), target.elements(), target.size());
           }
 #endif
       };

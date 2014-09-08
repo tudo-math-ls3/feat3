@@ -7,8 +7,6 @@
 #include<kernel/foundation/sub_mesh.hpp>
 #include<algorithm>
 
-using namespace FEAST;
-
 namespace FEAST
 {
   namespace Foundation

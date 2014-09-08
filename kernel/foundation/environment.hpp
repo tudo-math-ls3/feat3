@@ -9,9 +9,6 @@
 #include<mpi.h>
 #endif
 
-using namespace FEAST;
-using namespace FEAST::Foundation;
-
 namespace FEAST
 {
   namespace Foundation

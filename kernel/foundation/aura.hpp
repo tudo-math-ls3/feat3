@@ -6,8 +6,6 @@
 #include<kernel/archs.hpp>
 #include<kernel/foundation/halo.hpp>
 
-using namespace FEAST::Archs;
-
 namespace FEAST
 {
   namespace Foundation

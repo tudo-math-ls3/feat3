@@ -6,8 +6,6 @@
 #include<kernel/foundation/halo.hpp>
 #include<kernel/foundation/mesh_util.hpp>
 
-using namespace FEAST;
-
 namespace FEAST
 {
   namespace Foundation

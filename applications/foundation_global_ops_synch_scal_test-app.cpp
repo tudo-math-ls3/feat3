@@ -8,6 +8,7 @@
 
 using namespace FEAST;
 using namespace Foundation;
+using namespace LAFEM;
 
 template<typename DT1_, typename DT2_, typename DT3_>
 struct TestResult

@@ -49,7 +49,9 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::LAFEM;
+using namespace FEAST::Foundation;
 using namespace FEAST::ScaRC;
+using namespace FEAST::Geometry;
 
 void testmesh_hypercube_2D(Mesh<Dim2D>& target_mesh, std::vector<Attribute<double> >& attrs, std::vector<Halo<0, PLEdge, Mesh<Dim2D> > >& boundaries)
 {

@@ -7,8 +7,6 @@
 #include<kernel/foundation/buffer.hpp>
 #include<kernel/archs.hpp>
 
-using namespace FEAST::Archs;
-
 namespace FEAST
 {
   namespace Foundation

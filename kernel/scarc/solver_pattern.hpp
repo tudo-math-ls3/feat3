@@ -15,9 +15,6 @@
 #include<kernel/scarc/solver_functor.hpp>
 #include<kernel/scarc/solver_data.hpp>
 
-using namespace FEAST::Foundation;
-using namespace FEAST;
-
 namespace FEAST
 {
   namespace ScaRC
@@ -117,7 +114,7 @@ namespace FEAST
         cf.add_functor(new SynchVecFunctor<Algo_,
                                            VT_<Tag_, DataType_, IT_>,
                                            VMT_<Tag_, DataType_, IT_>,
-                                           com_accumulate,
+                                           Foundation::com_accumulate,
                                            StoreT_>(data.def(),
                                                     data.vector_mirrors(),
                                                     data.vector_mirror_sendbufs(),
@@ -132,7 +129,7 @@ namespace FEAST
         ///initial norm of defect with global comm
         cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.def()));
 
-        cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, com_allreduce_sqrtsum>(data.norm_0(),
+        cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm_0(),
                                                                                                            data.scalars().at(0),
                                                                                                            data.scalars().at(1)));
 
@@ -147,7 +144,7 @@ namespace FEAST
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
                                                   VT_<Tag_, DataType_, IT_>,
                                                   VMT_<Tag_, DataType_, IT_>,
-                                                  com_average,
+                                                  Foundation::com_average,
                                                   StoreT_>(data.def(),
                                                            data.vector_mirrors(),
                                                            data.vector_mirror_sendbufs(),
@@ -161,7 +158,7 @@ namespace FEAST
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
                                            VT_<Tag_, DataType_, IT_>,
                                            VMT_<Tag_, DataType_, IT_>,
-                                           com_accumulate,
+                                           Foundation::com_accumulate,
                                            StoreT_>(data.def(),
                                                     data.vector_mirrors(),
                                                     data.vector_mirror_sendbufs(),
@@ -173,7 +170,7 @@ namespace FEAST
         cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
 
         cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.def()));
-        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
+        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm(),
                                                                                                            data.scalars().at(0),
                                                                                                            data.scalars().at(1)));
 
@@ -282,7 +279,7 @@ namespace FEAST
         cf.add_functor(new SynchVecFunctor<Algo_,
                                            VT_<Tag_, DataType_, IT_>,
                                            VMT_<Tag_, DataType_, IT_>,
-                                           com_exchange,
+                                           Foundation::com_exchange,
                                            StoreT_>(data.temp().at(0),
                                                     data.vector_mirrors(),
                                                     data.vector_mirror_sendbufs(),
@@ -292,7 +289,7 @@ namespace FEAST
 
         //norm2(norm_0, t)
         cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.temp().at(0)));
-        cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, com_allreduce_sqrtsum>(data.norm_0(),
+        cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm_0(),
                                                                                                 data.scalars().at(1),
                                                                                                 data.scalars().at(2)));
 
@@ -308,7 +305,7 @@ namespace FEAST
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
                                                   VT_<Tag_, DataType_, IT_>,
                                                   VMT_<Tag_, DataType_, IT_>,
-                                                  com_exchange,
+                                                  Foundation::com_exchange,
                                                   StoreT_>(data.temp().at(0),
                                                            data.vector_mirrors(),
                                                            data.vector_mirror_sendbufs(),
@@ -317,7 +314,7 @@ namespace FEAST
                                                            data.source_ranks()));
 
         cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.temp().at(0)));
-        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
+        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm(),
                                                                                                        data.scalars().at(1),
                                                                                                        data.scalars().at(2)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_, IT_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));

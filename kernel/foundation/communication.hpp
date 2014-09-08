@@ -13,10 +13,6 @@
 
 #include <vector>
 
-using namespace FEAST::Archs;
-using namespace FEAST::LAFEM;
-
-
 namespace FEAST
 {
   namespace Foundation
@@ -170,12 +166,12 @@ namespace FEAST
                    template<typename, typename> class>
            class HaloType_,
            typename DT_ = double>
-         static void execute(const HaloType_<delta_, a_, b_, DT_, c_>& interface, DenseVector<ContainerBackend_, DT_>& fct)
+         static void execute(const HaloType_<delta_, a_, b_, DT_, c_>& interface, LAFEM::DenseVector<ContainerBackend_, DT_>& fct)
          {
            ///TODO: does assume, attribute for level a_ is stored in fct
            //acquire buffers
-           DenseVector<ContainerBackend_, DT_> sendbuf(interface.size());
-           DenseVector<ContainerBackend_, DT_> recvbuf(interface.size());
+           LAFEM::DenseVector<ContainerBackend_, DT_> sendbuf(interface.size());
+           LAFEM::DenseVector<ContainerBackend_, DT_> recvbuf(interface.size());
 
            //collect data
            for(Index i(0) ; i < interface.size() ; ++i)

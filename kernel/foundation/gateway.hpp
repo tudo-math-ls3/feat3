@@ -7,16 +7,13 @@
 #include<kernel/foundation/global_synch_vec.hpp>
 #include<kernel/foundation/global_product_mat_vec.hpp>
 
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
-
 namespace FEAST
 {
   namespace Foundation
   {
 
     template<typename Mem_, typename Algo_, typename VectorT_>
-    class GlobalDotGateway : public DotGatewayBase<Mem_, Algo_, VectorT_>
+    class GlobalDotGateway : public LAFEM::Arch::DotGatewayBase<Mem_, Algo_, VectorT_>
     {
       public:
         GlobalDotGateway(VectorT_& frequencies) :
@@ -39,7 +36,7 @@ namespace FEAST
     };
 
     template<typename Mem_, typename Algo_, typename VectorT_>
-    class GlobalNorm2Gateway : public Norm2GatewayBase<Mem_, Algo_, VectorT_>
+    class GlobalNorm2Gateway : public LAFEM::Arch::Norm2GatewayBase<Mem_, Algo_, VectorT_>
     {
       public:
         GlobalNorm2Gateway(VectorT_& frequencies) :
@@ -61,7 +58,7 @@ namespace FEAST
     };
 
     template<typename Mem_, typename Algo_, typename VectorT_>
-    class GlobalNorm2SquaredGateway : public Norm2SquaredGatewayBase<Mem_, Algo_, VectorT_>
+    class GlobalNorm2SquaredGateway : public LAFEM::Arch::Norm2SquaredGatewayBase<Mem_, Algo_, VectorT_>
     {
       public:
         GlobalNorm2SquaredGateway(VectorT_& frequencies) :
@@ -87,7 +84,7 @@ namespace FEAST
              typename VectorT_,
              typename VectorMirrorT_,
              template<typename, typename> class StorageT_ = std::vector>
-    class GlobalSynchVec0Gateway : public SynchVec0GatewayBase<Mem_, Algo_, VectorT_>
+    class GlobalSynchVec0Gateway : public LAFEM::Arch::SynchVec0GatewayBase<Mem_, Algo_, VectorT_>
     {
       public:
 #ifndef SERIAL
@@ -151,7 +148,7 @@ namespace FEAST
              typename VectorT_,
              typename VectorMirrorT_,
              template<typename, typename> class StorageT_ = std::vector>
-    class GlobalSynchVec1Gateway : public SynchVec1GatewayBase<Mem_, Algo_, VectorT_>
+    class GlobalSynchVec1Gateway : public LAFEM::Arch::SynchVec1GatewayBase<Mem_, Algo_, VectorT_>
     {
       public:
 #ifndef SERIAL
@@ -222,7 +219,7 @@ namespace FEAST
              typename MatrixT_,
              typename VectorMirrorT_,
              template<typename, typename> class StorageT_ = std::vector>
-    class GlobalProductMat0Vec1Gateway : public ProductMat0Vec1GatewayBase<Mem_, Algo_, VectorT_, MatrixT_>
+    class GlobalProductMat0Vec1Gateway : public LAFEM::Arch::ProductMat0Vec1GatewayBase<Mem_, Algo_, VectorT_, MatrixT_>
     {
       public:
 #ifndef SERIAL

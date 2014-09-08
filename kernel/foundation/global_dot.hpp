@@ -8,10 +8,6 @@
 #include<kernel/lafem/arch/component_product.hpp>
 #include<kernel/lafem/arch/dot_product.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
-
 ///TODO add communicators
 namespace FEAST
 {
