@@ -53,7 +53,8 @@ namespace FEAST
       for (auto & time : times)
         mean += time;
       mean /= double(times.size());
-      std::cout<<"TOE: "<<std::fixed<<mean<<std::endl;
+      std::cout<<"TOE: "<<std::fixed<<mean<<"; duration of "<< iters << " function calls, average over " << 10 << " runs."<<std::endl;
+      std::cout<<"TOE per function call: "<<std::fixed<<mean/double(iters)<<std::endl;
       flops *= iters;
       flops /= mean;
       flops /= 1000; // kilo
