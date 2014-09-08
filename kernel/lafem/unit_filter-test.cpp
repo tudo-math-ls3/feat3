@@ -78,8 +78,10 @@ public:
 
 UnitFilterVectorTest<Algo::Generic, float, Index> unit_filter_vector_test_generic_fi;
 UnitFilterVectorTest<Algo::Generic, double, Index> unit_filter_vector_test_generic_di;
+#ifdef FEAST_BACKENDS_CUDA
 UnitFilterVectorTest<Algo::CUDA, float, Index> unit_filter_vector_test_cuda_fi;
 UnitFilterVectorTest<Algo::CUDA, double, Index> unit_filter_vector_test_cuda_di;
+#endif
 
 /**
  * \brief Test class for UnitFilter class template
