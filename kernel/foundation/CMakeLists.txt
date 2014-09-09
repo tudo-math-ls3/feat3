@@ -11,6 +11,7 @@ endif()
 INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 
 ADD_LIBRARY(kernel-foundation STATIC
+  environment.cpp
   attribute_error.cpp
   functor_error.cpp
   communication_error.cpp
