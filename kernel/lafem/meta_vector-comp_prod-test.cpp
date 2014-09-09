@@ -75,17 +75,6 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), fx01(i) * fy01(i), tol);
     for(Index i(0); i < n1; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), fx1(i) * fy1(i), tol);
-
-    // test: z <- 1; z <- x * y + z
-    // purpose: general test
-    z.format(DataType(1));
-    z.template component_product<AlgoType>(x, y, z);
-    for(Index i(0); i < n00; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i) * fy00(i) + DataType(1), tol);
-    for(Index i(0); i < n01; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), fx01(i) * fy01(i) + DataType(1), tol);
-    for(Index i(0); i < n1; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), fx1(i) * fy1(i) + DataType(1), tol);
   }
 };
 

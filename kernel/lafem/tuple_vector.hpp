@@ -226,13 +226,6 @@ namespace FEAST
         rest().template component_product<Algo_>(x.rest(), y.rest());
       }
 
-      template <typename Algo_>
-      void component_product(const TupleVector & x, const TupleVector & y, const TupleVector& z)
-      {
-        first().template component_product<Algo_>(x.first(), y.first(), z.first());
-        rest().template component_product<Algo_>(x.rest(), y.rest(), z.rest());
-      }
-
       template<typename Algo_>
       void component_invert(const TupleVector& x, DataType alpha = DataType(1))
       {
@@ -473,12 +466,6 @@ namespace FEAST
       void component_product(const TupleVector & x, const TupleVector & y)
       {
         first().template component_product<Algo_>(x.first(), y.first());
-      }
-
-      template <typename Algo_>
-      void component_product(const TupleVector & x, const TupleVector & y, const TupleVector& z)
-      {
-        first().template component_product<Algo_>(x.first(), y.first(), z.first());
       }
 
       template<typename Algo_>

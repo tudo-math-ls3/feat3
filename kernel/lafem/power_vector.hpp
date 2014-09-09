@@ -261,20 +261,6 @@ namespace FEAST
       }
 
       /**
-       * \brief Performs \f$this_i \leftarrow x_i \cdot y_i + z_i\f$
-       *
-       * \param[in] x The first factor.
-       * \param[in] y The second factor.
-       * \param[in] z The second summand.
-       */
-      template <typename Algo_>
-      void component_product(const PowerVector & x, const PowerVector & y, const PowerVector& z)
-      {
-        first().template component_product<Algo_>(x.first(), y.first(), z.first());
-        rest().template component_product<Algo_>(x.rest(), y.rest(), z.rest());
-      }
-
-      /**
        * \brief Performs \f$ this_i \leftarrow \alpha / x_i \f$
        *
        * \param[in] x
@@ -566,12 +552,6 @@ namespace FEAST
       void component_product(const PowerVector & x, const PowerVector & y)
       {
         first().template component_product<Algo_>(x.first(), y.first());
-      }
-
-      template <typename Algo_>
-      void component_product(const PowerVector & x, const PowerVector & y, const PowerVector& z)
-      {
-        first().template component_product<Algo_>(x.first(), y.first(), z.first());
       }
 
       template<typename Algo_>

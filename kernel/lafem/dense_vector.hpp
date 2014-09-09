@@ -849,31 +849,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this_i \leftarrow x_i \cdot y_i + z_i\f$
-         *
-         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-         *
-         * \param[in] x The first factor.
-         * \param[in] y The second factor.
-         * \param[in] z The second summand.
-         */
-        template <typename Algo_>
-        void component_product(
-          const DenseVector & x,
-          const DenseVector & y,
-          const DenseVector & z)
-        {
-          if (this->size() != x.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->size() != y.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->size() != z.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-
-          Arch::Axpy<Mem_, Algo_>::dv(this->elements(), x.elements(), y.elements(), z.elements(), this->size());
-        }
-
-        /**
          * \brief Performs \f$ this_i \leftarrow \alpha / x_i \f$
          *
          * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.

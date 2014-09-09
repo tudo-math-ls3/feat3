@@ -430,58 +430,9 @@ public:
     }
   }
 
-  void run2() const
-  {
-    for (Index size(1) ; size < 1e3 ; size*=2)
-    {
-      DenseVector<Mem::Main, DT_, IT_> a_local(size);
-      DenseVector<Mem::Main, DT_, IT_> b_local(size);
-      DenseVector<Mem::Main, DT_, IT_> c_local(size);
-      DenseVector<Mem::Main, DT_, IT_> ref(size);
-      DenseVector<Mem::Main, DT_, IT_> result_local(size);
-      for (Index i(0) ; i < size ; ++i)
-      {
-        a_local(i, DT_(i % 100 * DT_(1.234)));
-        b_local(i, DT_(2 - DT_(i % 42)));
-        c_local(i, DT_(1 - DT_(i % 23)));
-        ref(i, c_local(i) * a_local(i) + b_local(i));
-      }
-      DenseVector<Mem_, DT_, IT_> a(size);
-      a.copy(a_local);
-      DenseVector<Mem_, DT_, IT_> b(size);
-      b.copy(b_local);
-      DenseVector<Mem_, DT_, IT_> c(size);
-      c.copy(c_local);
-
-      DenseVector<Mem_, DT_, IT_> d(size);
-      d.template component_product<Algo_>(c, a, b);
-      result_local.copy(d);
-      for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
-
-      a.template component_product<Algo_>(c, a, b);
-      result_local.copy(a);
-      for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
-
-      a.copy(a_local);
-      b.template component_product<Algo_>(c, a, b);
-      result_local.copy(b);
-      for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
-
-      b.copy(b_local);
-      c.template component_product<Algo_>(c, a, b);
-      result_local.copy(c);
-      for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
-    }
-  }
-
   virtual void run() const
   {
     run1();
-    run2();
   }
 };
 DenseVectorComponentProductTest<Mem::Main, Algo::Generic, float, unsigned int> dv_component_product_test_float_uint;
