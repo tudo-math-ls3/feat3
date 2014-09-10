@@ -21,6 +21,7 @@
 #include <kernel/adjacency/graph.hpp>
 
 #include <fstream>
+#include <set>
 
 
 namespace FEAST
@@ -194,6 +195,51 @@ namespace FEAST
           Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
           Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] graph The graph to create the matrix from
+       *
+       * Creates a matrix based on a given adjacency graph, representing the sparsity pattern.
+       */
+      explicit SparseMatrixBanded(const Adjacency::Graph & graph) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        CONTEXT("When creating SparseMatrixBanded");
+
+        Index num_rows = graph.get_num_nodes_domain();
+        Index num_cols = graph.get_num_nodes_image();
+
+        const Index * dom_ptr(graph.get_domain_ptr());
+        const Index * img_idx(graph.get_image_idx());
+
+        std::set<IT_> moffsets;
+
+        for(Index row(0); row < num_rows; ++row)
+        {
+          for(Index j(dom_ptr[row]); j < dom_ptr[row+1]; ++j)
+          {
+            moffsets.insert((unsigned int)(num_rows - 1 + img_idx[j] - row));
+          }
+        }
+
+        DenseVector<Mem::Main, IT_, IT_> toffsets(moffsets.size());
+        auto * ptoffsets = toffsets.elements();
+
+        IT_ idx(0);
+        for (auto off : moffsets)
+        {
+          ptoffsets[idx] = off;
+          ++idx;
+        }
+
+        DenseVector<Mem_, IT_, IT_> toffsets_mem;
+        toffsets_mem.convert(toffsets);
+        DenseVector<Mem_, DT_, IT_> tval_mem(moffsets.size() * num_rows, DT_(0));
+
+        this->assign(SparseMatrixBanded(num_rows, num_cols, tval_mem, toffsets_mem));
       }
 
       /**
