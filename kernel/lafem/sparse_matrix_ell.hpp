@@ -200,6 +200,8 @@ namespace FEAST
           ++row_idx;
         }
 
+        _init_padded_elements<Mem::Main, Mem::Main>(ptval, ptcol_ind, ptcs, trows, tnum_of_chunks, tC);
+
         this->assign(SparseMatrixELL<Mem::Main, DT_, IT_>(trows, tcols, ue, tval, tcol_ind, tcs, tcl, trl, tC));
       }
 
@@ -244,6 +246,21 @@ namespace FEAST
       Index & _used_elements()
       {
         return this->_scalar_index.at(6);
+      }
+
+      /// initialise padded elements of val- and col_ind-array if rows modulo C != 0
+      template <typename Mem2_, typename Mem3_>
+      void _init_padded_elements(DT_ * const pval, IT_ * const pcol_ind, const IT_ * const pcs,
+                                 const Index trows, const Index tnum_of_chunks, const Index tC)
+      {
+        if (trows % tC != 0)
+        {
+          for (Index i(pcs[tnum_of_chunks-1] + trows - (tnum_of_chunks-1) * tC); i < pcs[tnum_of_chunks]; i+=tC)
+          {
+            Util::MemoryPool<Mem2_>::instance()->set_memory(pval     + i, DT_(0), tnum_of_chunks * tC - trows);
+            Util::MemoryPool<Mem3_>::instance()->set_memory(pcol_ind + i, IT_(0), tnum_of_chunks * tC - trows);
+          }
+        }
       }
 
     public:
@@ -428,7 +445,6 @@ namespace FEAST
 
         LAFEM::DenseVector<Mem::Main, IT_, IT_> tcol_ind(val_size_in);
         IT_ * ptcol_ind(tcol_ind.elements());
-        LAFEM::DenseVector<Mem::Main, DT_, IT_> tval(val_size_in);
 
         for (Index i(0); i < num_rows; ++i)
         {
@@ -442,9 +458,23 @@ namespace FEAST
           }
         }
 
+        LAFEM::DenseVector<Mem_, DT_, IT_> tval_mem(val_size_in);
+        auto * ptval_mem(tval_mem.elements());
+
+        _init_padded_elements<Mem_, Mem::Main>(ptval_mem, ptcol_ind, ptcs, num_rows, num_of_chunks_in, C_in);
+
+        LAFEM::DenseVector<Mem_, IT_, IT_> tcol_ind_mem;
+        tcol_ind_mem.convert(tcol_ind);
+        LAFEM::DenseVector<Mem_, IT_, IT_> tcs_mem;
+        tcs_mem.convert(tcs);
+        LAFEM::DenseVector<Mem_, IT_, IT_> tcl_mem;
+        tcl_mem.convert(tcl);
+        LAFEM::DenseVector<Mem_, IT_, IT_> trl_mem;
+        trl_mem.convert(trl);
+
         // build the matrix
-        this->assign(SparseMatrixELL<Mem::Main, DT_, IT_>(num_rows, num_cols, num_nnze,
-                                                          tval, tcol_ind, tcs, tcl, trl, C_in));
+        this->assign(SparseMatrixELL<Mem_, DT_, IT_>(num_rows, num_cols, num_nnze,
+                                                     tval_mem, tcol_ind_mem, tcs_mem, tcl_mem, trl_mem, C_in));
       }
 
       /**
@@ -694,6 +724,8 @@ namespace FEAST
           }
         }
 
+        _init_padded_elements<Mem::Main, Mem::Main>(tval, tcol_ind, tcs, _rows(), _num_of_chunks(), tC);
+
         this->_elements_size.push_back(_val_size());
         this->_indices_size.push_back(_val_size());
         this->_indices_size.push_back(_num_of_chunks() + 1);
@@ -796,6 +828,8 @@ namespace FEAST
             tval    [tcs[i/_C()] + i%_C() + k*_C()] = DT_(0);
           }
         }
+
+        _init_padded_elements<Mem::Main, Mem::Main>(tval, tcol_ind, tcs, _rows(), _num_of_chunks(), tC);
 
         this->_elements_size.push_back(_val_size());
         this->_indices_size.push_back(_val_size());
@@ -911,6 +945,8 @@ namespace FEAST
           }
         }
 
+        _init_padded_elements<Mem::Main, Mem::Main>(tval, tcol_ind, tcs, _rows(), _num_of_chunks(), tC);
+
         this->_elements_size.push_back(_val_size());
         this->_indices_size.push_back(_val_size());
         this->_indices_size.push_back(_num_of_chunks() + 1);
@@ -1005,6 +1041,8 @@ namespace FEAST
           }
         }
 
+        _init_padded_elements<Mem::Main, Mem::Main>(pval, pcol_ind, pcs, arows, anum_of_chunks, aC);
+
         SparseMatrixELL<Mem::Main, DT_, IT_> ta_ell(arows, acolumns, aused_elements, aval, acol_ind, acs, acl, arl, aC);
         this->assign(ta_ell);
       }
@@ -1091,8 +1129,8 @@ namespace FEAST
             write_out_ell(filename);
             break;
           case FileMode::fm_mtx:
-           write_out_mtx(filename);
-           break;
+            write_out_mtx(filename);
+            break;
           default:
             throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
