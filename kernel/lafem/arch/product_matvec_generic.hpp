@@ -174,9 +174,6 @@ namespace FEAST
       {
         switch (C)
         {
-          case 1:
-            Intern::ProductMatVecELL::ProductMatVecSpezialisation<DT_, IT_, 1>::f(r, val, col_ind, cs, cl, x, C, rows);
-            break;
           case 2:
             Intern::ProductMatVecELL::ProductMatVecSpezialisation<DT_, IT_, 2>::f(r, val, col_ind, cs, cl, x, C, rows);
             break;

@@ -160,9 +160,6 @@ namespace FEAST
       {
         switch (C)
         {
-          case 1:
-            Intern::DefectELL::DefectSpezialisation<DT_, IT_, 1>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
-            break;
           case 2:
             Intern::DefectELL::DefectSpezialisation<DT_, IT_, 2>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
             break;

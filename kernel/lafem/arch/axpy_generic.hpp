@@ -355,9 +355,6 @@ namespace FEAST
       {
         switch (C)
         {
-          case 1:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 1>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
-            break;
           case 2:
             Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
@@ -390,9 +387,6 @@ namespace FEAST
       {
         switch (C)
         {
-          case 1:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 1>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
-            break;
           case 2:
             Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
