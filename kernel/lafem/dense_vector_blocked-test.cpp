@@ -297,8 +297,8 @@ public:
         for (Index j(0) ; j < BS_ ; ++j)
           tv2.v[j] = DT_(size*2*BS_ - i + 2*j);
         b_local(i, tv2);
-        ref(i, a_local(i) * b_local(i));
-        ref2(i, a_local(i) * a_local(i));
+        ref(i, component_product(a_local(i), b_local(i)) );
+        ref2(i, component_product(a_local(i), a_local(i)) );
       }
 
       DenseVectorBlocked<Mem_, DT_, IT_, BS_> a(size);

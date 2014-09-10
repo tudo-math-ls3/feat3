@@ -30,7 +30,7 @@ namespace FEAST
     {
     public:
       /// data type
-      typedef typename LocalVector_::DataType DataType;
+      typedef typename LocalVector_::FieldType DataType;
 
     protected:
       /// dof-mapping reference
@@ -130,7 +130,7 @@ namespace FEAST
     {
     public:
       /// data type
-      typedef typename LocalMatrix_::DataType DataType;
+      typedef typename LocalMatrix_::FieldType DataType;
 
     protected:
       /// row dof-mapping reference
