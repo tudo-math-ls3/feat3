@@ -79,13 +79,6 @@ namespace FEAST
       /// all remaining sub-vectors
       RestClass _rest;
 
-      /// rest-class emplacement ctor; this one is protected for a reason
-      explicit TupleVector(First_&& the_first, RestClass&& the_rest) :
-        _first(std::move(the_first)),
-        _rest(std::move(the_rest))
-      {
-      }
-
       /// Returns a list of all sub-vector type names
       static String sub_name_list()
       {
@@ -95,6 +88,13 @@ namespace FEAST
     public:
       /// default CTOR
       TupleVector()
+      {
+      }
+
+      /// rest-class emplacement ctor; for internal use only
+      explicit TupleVector(First_&& the_first, RestClass&& the_rest) :
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest))
       {
       }
 
