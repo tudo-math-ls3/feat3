@@ -186,7 +186,7 @@ namespace FEAST
           }
 
           template <typename DT_, typename IT_, Index C_>
-          struct AxpySpezialisation
+          struct AxpySpecialisation
           {
             static void f(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y,
             const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
@@ -356,19 +356,19 @@ namespace FEAST
         switch (C)
         {
           case 2:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           case 4:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 4>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 4>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           case 8:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 8>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 8>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           case 16:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_,16>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_,16>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           case 32:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_,32>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_,32>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           default:
 #ifdef DEBUG
@@ -388,19 +388,19 @@ namespace FEAST
         switch (C)
         {
           case 2:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           case 4:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 4>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 4>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           case 8:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_, 8>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 8>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           case 16:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_,16>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_,16>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           case 32:
-            Intern::AxpyELL::AxpySpezialisation<DT_, IT_,32>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+            Intern::AxpyELL::AxpySpecialisation<DT_, IT_,32>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
             break;
           default:
 #ifdef DEBUG

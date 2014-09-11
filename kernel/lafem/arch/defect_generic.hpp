@@ -69,7 +69,7 @@ namespace FEAST
           }
 
           template <typename DT_, typename IT_, Index C_>
-          struct DefectSpezialisation
+          struct DefectSpecialisation
           {
             static void f(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
             const IT_ * const cl, const DT_ * const x, const Index /*C*/, const Index rows)
@@ -161,19 +161,19 @@ namespace FEAST
         switch (C)
         {
           case 2:
-            Intern::DefectELL::DefectSpezialisation<DT_, IT_, 2>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            Intern::DefectELL::DefectSpecialisation<DT_, IT_, 2>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
             break;
           case 4:
-            Intern::DefectELL::DefectSpezialisation<DT_, IT_, 4>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            Intern::DefectELL::DefectSpecialisation<DT_, IT_, 4>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
             break;
           case 8:
-            Intern::DefectELL::DefectSpezialisation<DT_, IT_, 8>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            Intern::DefectELL::DefectSpecialisation<DT_, IT_, 8>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
             break;
           case 16:
-            Intern::DefectELL::DefectSpezialisation<DT_, IT_,16>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            Intern::DefectELL::DefectSpecialisation<DT_, IT_,16>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
             break;
           case 32:
-            Intern::DefectELL::DefectSpezialisation<DT_, IT_,32>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
+            Intern::DefectELL::DefectSpecialisation<DT_, IT_,32>::f(r, rhs, val, col_ind, cs, cl, x, C, rows);
             break;
           default:
 #ifdef DEBUG
