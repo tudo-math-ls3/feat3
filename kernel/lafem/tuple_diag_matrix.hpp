@@ -60,9 +60,9 @@ namespace FEAST
       using ContainerType = ContHelper<Mem2_, DT2_, IT2_>;
 #else
       /// Compatible L-vector type
-      typedef TupleVector<typename First_::VectorTypeL, (typename Rest_::VectorTypeL)...> VectorTypeL;
+      typedef TupleVector<typename First_::VectorTypeL, typename Rest_::VectorTypeL...> VectorTypeL;
       /// Compatible R-vector type
-      typedef TupleVector<typename First_::VectorTypeR, (typename Rest_::VectorTypeR)...> VectorTypeR;
+      typedef TupleVector<typename First_::VectorTypeR, typename Rest_::VectorTypeR...> VectorTypeR;
 
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
@@ -87,6 +87,12 @@ namespace FEAST
         _first(std::move(the_first)),
         _rest(std::move(the_rest))
       {
+      }
+
+      /// Returns a list of all sub-matrix type names
+      static String sub_name_list()
+      {
+        return First_::name() + "," + RestClass::sub_name_list();
       }
 
     public:
@@ -379,6 +385,11 @@ namespace FEAST
 
     protected:
       First_ _first;
+
+      static String sub_name_list()
+      {
+        return First_::name();
+      }
 
     public:
       /// default ctor
