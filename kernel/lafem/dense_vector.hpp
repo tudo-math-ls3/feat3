@@ -198,7 +198,7 @@ namespace FEAST
           typename VT_::template ContainerType<Mem_, DT_, IT_> ta;
           ta.convert(a);
 
-          this->convert(a);
+          this->convert(ta);
         }
 
         template <typename VT_, typename Mem2_, typename IT2_>
