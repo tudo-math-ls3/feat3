@@ -327,6 +327,164 @@ namespace FEAST
 
         // okay, that's it
       }
+
+      /**
+       * \brief Assembles a vector valued bilinear operator into a block matrix.
+       *
+       * This function is the version for identical test- and trial-spaces.
+       *
+       * \param[in,out] matrix
+       * The matrix that is to be assembled. This has to be compatible with the operator's block structure, i.e. to be
+       * of some *Matrix*Blocked type with appropriate block size.
+       *
+       * \param[in] operat
+       * A reference to the operator implementing the BilinearOperator interface to be assembled.
+       *
+       * \param[in] space
+       * A reference to the finite-element to be used as the test- and trial-space.
+       *
+       * \param[in] cubature_factory
+       * A reference to the cubature factory to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the bilinear operator.
+       */
+      template<
+        typename Matrix_,
+        typename Operator_,
+        typename Space_,
+        typename CubatureFactory_>
+      static void assemble_block_matrix1(
+        Matrix_& matrix,
+        Operator_& operat,
+        const Space_& space,
+        const CubatureFactory_& cubature_factory,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
+      {
+        // matrix type
+        typedef Matrix_ MatrixType;
+        // Block height
+        static constexpr int BlockHeight = MatrixType::BlockHeight;
+        // Block width
+        static constexpr int BlockWidth = MatrixType::BlockWidth;
+
+        // functor type
+        typedef Operator_ OperatorType;
+        // space type
+        typedef Space_ SpaceType;
+
+        // assembly traits
+        typedef AsmTraits1Blocked
+        <
+          typename MatrixType::DataType,
+          SpaceType,
+          BlockHeight,
+          BlockWidth,
+          typename OperatorType::TrafoConfig,
+          Space::ConfigOr
+          <
+            typename OperatorType::TestConfig,
+            typename OperatorType::TrialConfig
+          >
+        > AsmTraits;
+
+        // fetch the trafo
+        const typename AsmTraits::TrafoType& trafo = space.get_trafo();
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create a space evaluator and evaluation data
+        typename AsmTraits::SpaceEvaluator space_eval(space);
+
+        // create a dof-mapping
+        typename AsmTraits::DofMapping dof_mapping(space);
+
+        // create a functor evaluator
+        typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+
+        // create space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+
+        // create local matrix data
+        typename AsmTraits::LocalMatrixDataType lmd(dof_mapping, dof_mapping);
+
+        // create cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // create matrix scatter-axpy
+        LAFEM::ScatterAxpy<MatrixType> scatter_axpy(matrix);
+
+        // loop over all cells of the mesh
+        for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
+        {
+          // prepare trafo evaluator
+          trafo_eval.prepare(cell);
+
+          // prepare space evaluator
+          space_eval.prepare(trafo_eval);
+
+          // prepare functor evaluator
+          oper_eval.prepare(trafo_eval);
+
+          // fetch number of local dofs
+          Index num_loc_dofs = space_eval.get_num_local_dofs();
+
+          // format local matrix
+          lmd.format();
+
+          // loop over all quadrature points and integrate
+          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          {
+            // compute trafo data
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
+
+            // compute basis function data
+            space_eval(space_data, trafo_data);
+
+            // prepare bilinear operator
+            oper_eval.set_point(trafo_data);
+
+            // test function loop
+            for(Index i(0); i < num_loc_dofs; ++i)
+            {
+              // trial function loop
+              for(Index j(0); j < num_loc_dofs; ++j)
+              {
+                // evaluate functor and integrate
+                lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
+                  oper_eval(space_data.phi[j], space_data.phi[i]);
+                // continue with next trial function
+              }
+              // continue with next test function
+            }
+            // continue with next cubature point
+          }
+
+          // finish functor evaluator
+          oper_eval.finish();
+
+          // finish evaluators
+          space_eval.finish();
+          trafo_eval.finish();
+
+          // initialise dof-mapping
+          dof_mapping.prepare(cell);
+
+          // incorporate local matrix
+          scatter_axpy(lmd, alpha);
+
+          // finish dof-mapping
+          dof_mapping.finish();
+
+          // continue with next cell
+        }
+
+        // okay, that's it
+      }
     }; // class BilinearOperatorAssembler<...>
   } // namespace Assembly
 } // namespace FEAST

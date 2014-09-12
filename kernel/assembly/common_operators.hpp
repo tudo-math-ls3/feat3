@@ -285,30 +285,21 @@ namespace FEAST
       class DuDvOperator :
         public BilinearOperator
       {
-        static_assert( ir != ic, "This part is only for the off-diagonal blocks." );
       public:
         /// test space configuration
         struct TestConfig :
           public Space::ConfigBase
         {
-          /// test-space requirement enumeration
-          enum
-          {
-            /// this functor requires test-function gradients
-            need_grad = 1
-          };
+          /// this functor requires test-function gradients
+          static constexpr int need_grad = 1
         };
 
         /// trial space configuration
         struct TrialConfig :
           public Space::ConfigBase
         {
-          /// trial-space requirement enumeration
-          enum
-          {
-            /// this functor requires trial-function gradients
-            need_grad= 1
-          };
+          /// this functor requires trial-function gradients
+          static constexpr int need_grad = 1
         };
 
         /**
@@ -347,10 +338,99 @@ namespace FEAST
           /** \copydoc BilinearOperator::Evaluator::operator() */
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
-            return phi.grad[ir] * psi.grad[ic];
+            return DataType(ir==ic)*dot(phi.grad,psi.grad) + phi.grad[ir] * psi.grad[ic];
           }
-        }; // class TestDerivativeOperator::Evaluator<...>
-      }; // class TestDerivativeOperator
+        }; // class DuDvOperator::Evaluator<...>
+      }; // class DuDVOperator
+
+      /**
+       * \brief Du:Dv operator implementation
+       *
+       * This functor implements the weak formulation of the bilinear Du : Dv operator, i.e.
+       *   \f[ \mathbf{D} \varphi : \mathbf{D} \psi \f] with the operator
+       *   \f[ \mathbf{D} \varphi = \frac{1}{2} \left( \nabla \varphi + \left( \nabla \varphi \right)^T \right) \f]
+       *
+       * This functor can be used with the BilinearOperator assembly class template to assemble one
+       * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the number
+       * of space dimensions.
+       *
+       * Note that \f[ \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \psi + \nabla \varphi : \left( \nabla \psi \right)^T \right) \f],
+       * so the \f$ (k,l) \f$-block consists of entries corresponding to \f$ \partial_k \varphi \partial_l \psi \f$.
+       *
+       * \author Jordi Paul
+       */
+      class DuDvOperatorBlocked :
+        public BilinearOperator
+      {
+      public:
+        /// test space configuration
+        struct TestConfig :
+          public Space::ConfigBase
+        {
+          /// this functor requires test-function gradients
+          static constexpr int need_grad = 1
+        };
+
+        /// trial space configuration
+        struct TrialConfig :
+          public Space::ConfigBase
+        {
+          /// this functor requires trial-function gradients
+          static constexpr int need_grad = 1
+        };
+
+        /**
+         * \brief Du : Dv evaluator class template
+         *
+         * \tparam AsmTraits_
+         * The assembly traits class.
+         *
+         * \author Jordi Paul
+         */
+        template<typename AsmTraits_>
+        class Evaluator :
+            public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the data type for the block system
+          typedef typename AsmTraits_::DataTypeBlocked DataTypeBlocked;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] operat
+           * A reference to the Du : Dv operator object.
+           */
+          explicit Evaluator(const DuDvOperatorBlocked& DOXY(operat))
+          {
+          }
+
+          /** \copydoc BilinearOperator::Evaluator::operator() */
+          DataTypeBlocked operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            DataTypeBlocked r(DataType(0));
+            for(Index i(0); i < DataTypeBlocked::m; ++i)
+            {
+              r(i,i) = dot(phi.grad, psi.grad) + phi.grad[i]*phi.grad[i];
+              for(Index j(0); j < i; ++j)
+              {
+                r(i,j) = phi.grad[i] * psi.grad[j];
+                r(j,i) = phi.grad[j] * psi.grad[i];
+              }
+            }
+            return r;
+          }
+        }; // class DuDvOperatorBlocked::Evaluator<...>
+      }; // class DuDVOperatorBlocked
     } // namespace Common
   } // namespace Assembly
 } // namespace FEAST

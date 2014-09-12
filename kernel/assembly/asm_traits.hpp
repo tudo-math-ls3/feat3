@@ -356,6 +356,170 @@ namespace FEAST
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
     }; // class AsmTraits2
+
+    /**
+      * \brief Common single-space block matrix assembly traits class template
+      *
+      * This class template takes care of defining the necessary classes for the assembly with a vector valued operator
+      * with one single scalar finite element space. An example for this is the Du : Dv operator.
+      *
+      * This class can e.g. be used as a base class for
+      * - assembly of a linear functional, e.g. a right-hand-side vector
+      * - assembly of a bilinear operator with identical test- and trial-spaces
+      * - assembly of a trilinear operator with identical test-, trial- and multiplier-spaces
+      * - post-processing of a primal vector, e.g. L2- or H1-error calculation
+      *
+      * \tparam DataType_
+      * The data type that is used to be for the assembly.
+      *
+      * \tparam Space_
+      * The finite element space that is to be used as a (test- and trial-) space.
+      *
+      * \tparam BlockHeight_
+      * Height of the blocks, i.e. the dimension of the space the operator maps to.
+      *
+      * \tparam BlockWidth_
+      * Width of the blocks, i.e. the dimension of the space the operator maps from.
+      *
+      * \tparam TrafoConfig_
+      * A trafo config class defining additional trafo requirements, e.g. from a (bi)linear functor.
+      *
+      * \tparam SpaceConfig_
+      * A space config class defining additional space requirements, e.g. from a (bi)linear functor.
+      *
+      * \author Jordi Paul
+      */
+    template<
+      typename DataType_,
+      typename Space_,
+      int BlockHeight_,
+      int BlockWidth_,
+      typename TrafoConfig_ = Trafo::ConfigBase,
+      typename SpaceConfig_ = Space::ConfigBase>
+    class AsmTraits1Blocked :
+      public Intern::EvalPolicyFetcher<Space_, DataType_>::EvalPolicy
+    {
+    public:
+      static constexpr int BlockHeight = BlockHeight_;
+      static constexpr int BlockWidth = BlockWidth_;
+      /// data type
+      typedef DataType_ DataType;
+      /// Blocks of DataTypes
+      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> DataTypeBlocked;
+      /// space type
+      typedef Space_ SpaceType;
+      /// test-space type
+      typedef SpaceType TestSpaceType;
+      /// trial-space type
+      typedef SpaceType TrialSpaceType;
+      /// multiplier space type
+      typedef SpaceType MultSpaceType;
+
+      /// trafo type
+      typedef typename SpaceType::TrafoType TrafoType;
+      /// shape type
+      typedef typename TrafoType::ShapeType ShapeType;
+      /// mesh type
+      typedef typename TrafoType::MeshType MeshType;
+
+      /// trafo evaluator type
+      typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
+
+      /// trafo cell iterator type
+      typedef typename TrafoEvaluator::CellIterator CellIterator;
+
+      /// space evaluator types
+      typedef typename SpaceType::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+      typedef SpaceEvaluator TestEvaluator;
+      typedef SpaceEvaluator TrialEvaluator;
+      typedef SpaceEvaluator MultEvaluator;
+
+      /// space evaluator traits
+      typedef typename SpaceEvaluator::SpaceEvalTraits SpaceEvalTraits;
+      typedef SpaceEvalTraits TestEvalTraits;
+      typedef SpaceEvalTraits TrialEvalTraits;
+      typedef SpaceEvalTraits MultEvalTraits;
+
+      // define test- and trial-space configs
+      typedef SpaceConfig_ SpaceConfig;
+      typedef SpaceConfig TestConfig;
+      typedef SpaceConfig TrialConfig;
+      typedef SpaceConfig MultConfig;
+
+      // now fetch the trafo config from the space
+      typedef typename SpaceEvaluator::template ConfigTraits<SpaceConfig>::TrafoConfig SpaceTrafoConfig;
+      typedef SpaceTrafoConfig TestTrafoConfig;
+      typedef SpaceTrafoConfig TrialTrafoConfig;
+      typedef SpaceTrafoConfig MultTrafoConfig;
+
+      /// assembly trafo config: derive from user-defined trafo config
+      struct AsmTrafoConfig :
+        public TrafoConfig_
+      {
+        /// we need jacobian determinants for integration
+        static constexpr int need_jac_det = 1
+      };
+
+      /// trafo config: combine space and assembly trafo configs
+      typedef Trafo::ConfigOr<AsmTrafoConfig, SpaceTrafoConfig> TrafoConfig;
+
+      /// trafo evaluation data type
+      typedef typename TrafoEvaluator::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+      typedef TrafoEvalData TrafoData;
+
+      /// space evaluation data types
+      typedef typename SpaceEvaluator::template ConfigTraits<SpaceConfig>::EvalDataType SpaceEvalData;
+      typedef SpaceEvalData TestEvalData;
+      typedef SpaceEvalData TrialEvalData;
+      typedef SpaceEvalData MultEvalData;
+
+      /// basis function data types
+      typedef typename SpaceEvalData::BasisDataType SpaceBasisData;
+      typedef SpaceBasisData BasisData;
+      typedef SpaceBasisData TestBasisData;
+      typedef SpaceBasisData TrialBasisData;
+      typedef SpaceBasisData MultBasisData;
+
+      /// dof-mapping types
+      typedef typename SpaceType::DofMappingType DofMapping;
+      typedef DofMapping TestDofMapping;
+      typedef DofMapping TrialDofMapping;
+      typedef DofMapping MultDofMapping;
+
+      /// trafo domain dimension
+      static constexpr int domain_dim = TrafoEvaluator::domain_dim;
+      /// trafo image dimension
+      static constexpr int image_dim = TrafoEvaluator::image_dim;
+
+      /// analytic function evaluator traits
+      typedef Trafo::AnalyticEvalTraits<TrafoEvaluator, TrafoEvalData> AnalyticEvalTraits;
+
+      /// value type
+      typedef typename AnalyticEvalTraits::ValueType ValueType;
+      /// gradient type
+      typedef typename AnalyticEvalTraits::GradientType GradientType;
+      /// hessian type
+      typedef typename AnalyticEvalTraits::HessianType HessianType;
+
+      /// local vector type
+      typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> LocalVectorType;
+      typedef Tiny::Vector<LocalVectorType, BlockHeight_> LocalTestVectorType;
+      typedef Tiny::Vector<LocalVectorType, BlockWidth_>  LocalTrialVectorType;
+      typedef Tiny::Vector<LocalVectorType, BlockWidth_> LocalMultVectorType;
+
+      /// local vector data type
+      typedef LocalVectorData<LocalVectorType, DofMapping> LocalVectorDataType;
+
+      /// local matrix type
+      typedef Tiny::Matrix<DataTypeBlocked, SpaceEvaluator::max_local_dofs, SpaceEvaluator::max_local_dofs>
+        LocalMatrixType;
+
+      /// local matrix data type
+      typedef LocalMatrixData<LocalMatrixType, DofMapping, DofMapping> LocalMatrixDataType;
+
+      /// cubature rule type
+      typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
+    }; // class AsmTraits1Blocked
   } // namespace Assembly
 } // namespace FEAST
 
