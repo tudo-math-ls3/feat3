@@ -7,6 +7,7 @@
 
 namespace FEAST
 {
+  /// \cond internal
   // read next line from stream
   String read_next_line(std::istream& ifs, Index& cur_line)
   {
@@ -19,6 +20,7 @@ namespace FEAST
     ++cur_line;
     return line.trim();
   }
+  /// \endcond
 
   // default constructor
   MeshStreamer::MeshStreamer() :

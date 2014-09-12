@@ -6,11 +6,11 @@
 #include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/global_dot.hpp>
 
-///TODO add communicators
 namespace FEAST
 {
   namespace Foundation
   {
+      /// \todo add communicators
       template <typename Mem_, typename Algo_>
       struct GlobalNorm2
       {

@@ -6,11 +6,11 @@
 
 #include<kernel/foundation/communication.hpp>
 
-///TODO add communicators
 namespace FEAST
 {
   namespace Foundation
   {
+    /// \todo add communicators
     template<typename Tag_, Tier2CommModes cm_>
     struct SynchVec
     {

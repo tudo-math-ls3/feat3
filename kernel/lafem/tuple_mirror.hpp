@@ -317,7 +317,6 @@ namespace FEAST
       }
 #endif
 
-      /// \cond internal
       First_& first()
       {
         return _first;
@@ -327,7 +326,6 @@ namespace FEAST
       {
         return _first;
       }
-      /// \endcond
 
       Index size() const
       {

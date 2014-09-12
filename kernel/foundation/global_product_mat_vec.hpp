@@ -7,11 +7,11 @@
 #include<kernel/foundation/global_synch_vec.hpp>
 #include<kernel/foundation/environment.hpp>
 
-///TODO add communicators
 namespace FEAST
 {
   namespace Foundation
   {
+      /// \todo add communicators
       template <typename Mem_, typename Algo_>
       struct GlobalProductMat0Vec1
       {

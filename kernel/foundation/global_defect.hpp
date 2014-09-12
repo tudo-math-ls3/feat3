@@ -8,11 +8,11 @@
 #include<kernel/lafem/arch/difference.hpp>
 #include<kernel/foundation/environment.hpp>
 
-///TODO add communicators
 namespace FEAST
 {
   namespace Foundation
   {
+      /// \todo add communicators
       template <typename Mem_, typename Algo_>
       struct GlobalDefect
       {

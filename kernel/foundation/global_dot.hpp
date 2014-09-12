@@ -8,11 +8,11 @@
 #include<kernel/lafem/arch/component_product.hpp>
 #include<kernel/lafem/arch/dot_product.hpp>
 
-///TODO add communicators
 namespace FEAST
 {
   namespace Foundation
   {
+      /// \todo add communicators
       template <typename Mem_, typename Algo_>
       struct GlobalDot
       {

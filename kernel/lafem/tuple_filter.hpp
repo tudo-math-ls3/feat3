@@ -245,7 +245,6 @@ namespace FEAST
       }
 #endif
 
-      /// \cond internal
       First_& first()
       {
         return _first;
@@ -255,7 +254,6 @@ namespace FEAST
       {
         return _first;
       }
-      /// \endcond
 
       template<Index i_>
       typename TupleElement<i_, First_>::Type& at()

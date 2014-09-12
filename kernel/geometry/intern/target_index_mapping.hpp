@@ -28,7 +28,6 @@ namespace FEAST
         static_assert(face_dim_ >= 0, "invalid face dimension");
 
       protected:
-        /// \cond internal
         template<
           typename Inner_,
           typename Outer_>
@@ -53,7 +52,6 @@ namespace FEAST
             return _outer[_inner[i]];
           }
         }; // class CompIndexMap
-        /// \endcond
 
         /// cell orientation code
         int _cell_orient;

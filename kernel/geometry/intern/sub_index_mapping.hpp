@@ -31,7 +31,6 @@ namespace FEAST
         static_assert(face_dim_ >= 0, "invalid face dimension");
 
       protected:
-        /// \cond internal
         typedef typename Shape::FaceTraits<Shape_, cell_dim_>::ShapeType CellType;
 
         template<typename Outer_>
@@ -57,7 +56,6 @@ namespace FEAST
             return _outer[LimType::map(_idx,i)];
           }
         }; // class CompIndexMap
-        /// \endcond
 
         /// dummy enum
         enum
