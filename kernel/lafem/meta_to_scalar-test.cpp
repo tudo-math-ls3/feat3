@@ -228,7 +228,15 @@ public:
     {
       TEST_CHECK_EQUAL_WITHIN_EPS(tv_main(i), tv(i), eps);
     }
-  }
+
+    DenseVector<Mem::Main, DT_, IT_> tv_scalar_main;
+    tv_scalar_main.convert(tv);
+
+    for (Index i(0); i < glob_size; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(tv_scalar_main(i), tv(i), eps);
+    }
+}
 };
 VecMetaToScalarTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_vec_meta_to_scalar_test_generic_float_uint;
 VecMetaToScalarTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_vec_meta_to_scalar_test_generic_float_ulong;
