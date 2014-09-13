@@ -7,6 +7,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/sparse_matrix_banded.hpp>
 
 namespace FEAST
 {
@@ -937,6 +938,254 @@ namespace FEAST
         }
       }
     }; // class GatherAxpy<LAFEM::SparseMatrixELL<Mem::Main,...>>
+
+    /**
+     * \brief Scatter-Axpy specialisation for SparseMatrixBanded
+     *
+     * \author Christoph Lohmann
+     */
+    template<typename DataType_, typename IndexType_>
+    class ScatterAxpy< LAFEM::SparseMatrixBanded<Mem::Main, DataType_, IndexType_> >
+    {
+    public:
+      typedef LAFEM::SparseMatrixBanded<Mem::Main, DataType_, IndexType_> MatrixType;
+      typedef Mem::Main MemType;
+      typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
+
+    private:
+#ifdef DEBUG
+      IndexType_ _deadcode;
+#endif
+      Index _num_rows;
+      Index _num_cols;
+      Index _num_of_offsets;
+      IndexType_* _offsets;
+      IndexType_* _col_ptr;
+      DataType_ *_data;
+
+    public:
+      explicit ScatterAxpy(MatrixType& matrix) :
+#ifdef DEBUG
+        _deadcode(~IndexType_(0)),
+#endif
+        _num_rows(matrix.rows()),
+        _num_cols(matrix.columns()),
+        _num_of_offsets(matrix.num_of_offsets()),
+        _offsets(matrix.offsets()),
+        _col_ptr(nullptr),
+        _data(matrix.val())
+      {
+        // allocate column-pointer array
+        _col_ptr = new IndexType_[matrix.columns()];
+#ifdef DEBUG
+        for(Index i(0); i < _num_cols; ++i)
+        {
+          _col_ptr[i] = _deadcode;
+        }
+#endif
+      }
+
+      virtual ~ScatterAxpy()
+      {
+        if(_col_ptr != nullptr)
+        {
+          delete [] _col_ptr;
+        }
+      }
+
+      template<typename LocalData_>
+      void operator()(
+                      const LocalData_& loc_mat,
+                      DataType_ alpha = DataType_(1))
+      {
+        // loop over all local row entries
+        for(Index i(0); i < loc_mat.get_num_rows(); ++i)
+        {
+          // loop over all row entry contributations
+          for(Index ic(0); ic < loc_mat.get_num_row_contribs(i); ++ic)
+          {
+            // fetch row entry weight and pre-multiply by alpha
+            DataType_ iw = alpha * DataType_(loc_mat.get_row_weight(i, ic));
+
+            // fetch row index
+            Index ix = loc_mat.get_row_index(i, ic);
+
+            // build column pointer for this row entry contribution
+            for(IndexType_ k(0); k < _num_of_offsets; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
+              {
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IndexType_(k * _num_rows + ix);
+              }
+            }
+
+            // loop over all local column entries
+            for(Index j(0); j < loc_mat.get_num_cols(); ++j)
+            {
+              // loop over all column entry contributions
+              for(Index jc(0); jc < loc_mat.get_num_col_contribs(j); ++jc)
+              {
+                // fetch trial function dof weight
+                DataType_ jw = DataType_(loc_mat.get_col_weight(j, jc));
+
+                // fetch column index
+                Index jx = loc_mat.get_col_index(j, jc);
+
+#ifdef DEBUG
+                // ensure that the column pointer is valid for this index
+                ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
+#endif
+
+                // incorporate data into global matrix
+                _data[_col_ptr[jx]] += iw * jw * loc_mat(i,j);
+
+                // continue with next column contribution
+              }
+              // continue with next column entry
+            }
+
+#ifdef DEBUG
+            // reformat column-pointer array
+            for(IndexType_ k(0); k < _num_of_offsets; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
+              {
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
+              }
+            }
+#endif
+            // continue with next row contribution
+          }
+          // continue with next row entry
+        }
+      }
+    }; // class ScatterAxpy<LAFEM::SparseMatrixBanded<Mem::Main,...>>
+
+    /**
+     * \brief Gather-Axpy specialisation for SparseMatrixBanded
+     *
+     * \author Peter Zajac
+     */
+    template<typename DataType_, typename IndexType_>
+    class GatherAxpy< LAFEM::SparseMatrixBanded<Mem::Main, DataType_, IndexType_> >
+    {
+    public:
+      typedef LAFEM::SparseMatrixBanded<Mem::Main, DataType_, IndexType_> MatrixType;
+      typedef Mem::Main MemType;
+      typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
+
+    private:
+#ifdef DEBUG
+      IndexType_ _deadcode;
+#endif
+      Index _num_rows;
+      Index _num_cols;
+      Index _num_of_offsets;
+      const IndexType_* _offsets;
+      IndexType_* _col_ptr;
+      const DataType_ *_data;
+
+    public:
+      explicit GatherAxpy(const MatrixType& matrix) :
+#ifdef DEBUG
+        _deadcode(~IndexType_(0)),
+#endif
+        _num_rows(matrix.rows()),
+        _num_cols(matrix.columns()),
+        _num_of_offsets(matrix.num_of_offsets()),
+        _offsets(matrix.offsets()),
+        _col_ptr(nullptr),
+        _data(matrix.val())
+      {
+        // allocate column-pointer array
+        _col_ptr = new IndexType_[matrix.columns()];
+#ifdef DEBUG
+        for(Index i(0); i < _num_cols; ++i)
+        {
+          _col_ptr[i] = _deadcode;
+        }
+#endif
+      }
+
+      virtual ~GatherAxpy()
+      {
+        if(_col_ptr != nullptr)
+        {
+          delete [] _col_ptr;
+        }
+      }
+
+      template<typename LocalData_>
+      void operator()(
+                      LocalData_& loc_mat,
+                      DataType_ alpha = DataType_(1))
+      {
+        // loop over all local row entries
+        for(Index i(0); i < loc_mat.get_num_rows(); ++i)
+        {
+          // loop over all row entry contributations
+          for(Index ic(0); ic < loc_mat.get_num_row_contribs(i); ++ic)
+          {
+            // fetch row index
+            Index ix = loc_mat.get_row_index(i, ic);
+
+            // build column pointer for this row entry contribution
+            for(IndexType_ k(0); k < _num_of_offsets; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
+              {
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IndexType_(k * _num_rows + ix);
+              }
+            }
+
+            // loop over all local column entries
+            for(Index j(0); j < loc_mat.get_num_cols(); ++j)
+            {
+              // clear  accumulation entry
+              DataType_ dx(DataType_(0));
+
+              // loop over all column entry contributions
+              for(Index jc(0); jc < loc_mat.get_num_col_contribs(j); ++jc)
+              {
+                // fetch column index
+                Index jx = loc_mat.get_col_index(j, jc);
+
+#ifdef DEBUG
+                // ensure that the column pointer is valid for this index
+                ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
+#endif
+
+                // update accumulator
+                dx += DataType_(loc_mat.get_col_weight(j, jc)) * _data[_col_ptr[jx]];
+
+                // continue with next column contribution
+              }
+
+              // update local matrix data
+              loc_mat(i,j) += alpha * DataType_(loc_mat.get_row_weight(i, ic)) * dx;
+
+              // continue with next column entry
+            }
+
+#ifdef DEBUG
+            // reformat column-pointer array
+            for(IndexType_ k(0); k < _num_of_offsets; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
+              {
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
+              }
+            }
+#endif
+
+            // continue with next row contribution
+          }
+          // continue with next row entry
+        }
+      }
+    }; // class GatherAxpy<LAFEM::SparseMatrixBanded<Mem::Main,...>>
   } // namespace LAFEM
 } // namespace FEAST
 
