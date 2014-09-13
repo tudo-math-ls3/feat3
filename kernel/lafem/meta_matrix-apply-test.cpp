@@ -55,7 +55,22 @@ public:
     mat_sys.template apply<AlgoType>(vec_tmp, vec_sol);
     vec_tmp.template axpy<AlgoType>(vec_rhs, vec_tmp, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
-  }
+
+    // generate densevectors
+    DenseVector<typename AlgoType::MemType, DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
+    vec_sol_dense.convert(vec_sol);
+    vec_rhs_dense.convert(vec_rhs);
+    DenseVector<typename AlgoType::MemType, DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
+
+    // test t <- b - A*x with densevectors
+    mat_sys.template apply<AlgoType>(vec_tmp_dense, vec_sol_dense, vec_rhs_dense, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.template norm2<AlgoType>(), DataType_(0), tol);
+
+    // test t <- A*x; t <- t - b with densevectors
+    mat_sys.template apply<AlgoType>(vec_tmp_dense, vec_sol_dense);
+    vec_tmp_dense.template axpy<AlgoType>(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.template norm2<AlgoType>(), DataType_(0), tol);
+}
 
   void test_full() const
   {
@@ -75,6 +90,21 @@ public:
     mat_sys.template apply<AlgoType>(vec_tmp, vec_sol);
     vec_tmp.template axpy<AlgoType>(vec_rhs, vec_tmp, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
+
+    // generate densevectors
+    DenseVector<typename AlgoType::MemType, DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
+    vec_sol_dense.convert(vec_sol);
+    vec_rhs_dense.convert(vec_rhs);
+    DenseVector<typename AlgoType::MemType, DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
+
+    // test t <- b - A*x with densevectors
+    mat_sys.template apply<AlgoType>(vec_tmp_dense, vec_sol_dense, vec_rhs_dense, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.template norm2<AlgoType>(), DataType_(0), tol);
+
+    // test t <- A*x; t <- t - b with densevectors
+    mat_sys.template apply<AlgoType>(vec_tmp_dense, vec_sol_dense);
+    vec_tmp_dense.template axpy<AlgoType>(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.template norm2<AlgoType>(), DataType_(0), tol);
   }
 };
 

@@ -280,6 +280,25 @@ namespace FEAST
         block_d().template apply<Algo_>(r.template at<1>(), x.template at<0>());
       }
 
+      template<typename Algo_>
+      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+        DenseVector<MemType, DataType, IndexType> r_first(r, block_a().rows(), 0);
+        DenseVector<MemType, DataType, IndexType> r_rest(r, block_d().rows(), block_a().rows());
+
+        DenseVector<MemType, DataType, IndexType> x_first(x, block_a().columns(), 0);
+        DenseVector<MemType, DataType, IndexType> x_rest(x, block_b().columns(), block_a().columns());
+
+        block_a().template apply<Algo_>(r_first, x_first);
+        block_b().template apply<Algo_>(r_first, x_rest, r_first, DataType(1));
+        block_d().template apply<Algo_>(r_rest, x_first);
+      }
+
       /**
        * \brief Applies this matrix onto a vector.
        *
@@ -302,6 +321,31 @@ namespace FEAST
         block_a().template apply<Algo_>(r.template at<0>(), x.template at<0>(), y.template at<0>(), alpha);
         block_b().template apply<Algo_>(r.template at<0>(), x.template at<1>(), r.template at<0>(), alpha);
         block_d().template apply<Algo_>(r.template at<1>(), x.template at<0>(), y.template at<1>(), alpha);
+      }
+
+      template<typename Algo_>
+      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
+                 const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        if (y.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+        DenseVector<MemType, DataType, IndexType> r_first(r, block_a().rows(), 0);
+        DenseVector<MemType, DataType, IndexType> r_rest(r, block_d().rows(), block_a().rows());
+
+        DenseVector<MemType, DataType, IndexType> x_first(x, block_a().columns(), 0);
+        DenseVector<MemType, DataType, IndexType> x_rest(x, block_b().columns(), block_a().columns());
+
+        DenseVector<MemType, DataType, IndexType> y_first(y, block_a().rows(), 0);
+        DenseVector<MemType, DataType, IndexType> y_rest(y, block_d().rows(), block_a().rows());
+
+        block_a().template apply<Algo_>(r_first, x_first, y_first, alpha);
+        block_b().template apply<Algo_>(r_first, x_rest, r_first, alpha);
+        block_d().template apply<Algo_>(r_rest, x_first, y_rest, alpha);
       }
 
       /// Returns a new compatible L-Vector.

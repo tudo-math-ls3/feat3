@@ -239,6 +239,21 @@ namespace FEAST
         rest().template apply<Algo_>(r, x.rest(), r, DataType(1));
       }
 
+      template<typename Algo_>
+      void apply(DenseVector<MemType, DataType , IndexType>& r, const DenseVector<MemType, DataType , IndexType>& x) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+        DenseVector<MemType, DataType, IndexType> x_first(x, first().columns(), 0);
+        DenseVector<MemType, DataType, IndexType> x_rest(x, rest().columns(), first().columns());
+
+        first().template apply<Algo_>(r, x_first);
+        rest().template apply<Algo_>(r, x_rest, r, DataType(1));
+      }
+
       /**
        * \brief Applies this matrix onto a vector.
        *
@@ -260,6 +275,24 @@ namespace FEAST
       {
         first().template apply<Algo_>(r, x.first(), y, alpha);
         rest().template apply<Algo_>(r, x.rest(), r, alpha);
+      }
+
+      template<typename Algo_>
+      void apply(DenseVector<MemType, DataType , IndexType>& r, const DenseVector<MemType, DataType , IndexType>& x,
+                 const DenseVector<MemType, DataType , IndexType>& y, DataType alpha = DataType(1)) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        if (y.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+        DenseVector<MemType, DataType, IndexType> x_first(x, first().columns(), 0);
+        DenseVector<MemType, DataType, IndexType> x_rest(x, rest().columns(), first().columns());
+
+        first().template apply<Algo_>(r, x_first, y, alpha);
+        rest().template apply<Algo_>(r, x_rest, r, alpha);
       }
 
       /// Returns a new compatible L-Vector.
@@ -454,10 +487,24 @@ namespace FEAST
       }
 
       template<typename Algo_>
+      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
+      {
+        first().template apply<Algo_>(r, x);
+      }
+
+      template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
         first().template apply<Algo_>(r, x.first(), y, alpha);
       }
+
+      template<typename Algo_>
+      void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
+                 const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      {
+        first().template apply<Algo_>(r, x, y, alpha);
+      }
+
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
