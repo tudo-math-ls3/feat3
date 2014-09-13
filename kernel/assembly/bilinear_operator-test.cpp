@@ -212,6 +212,11 @@ BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, float, unsigned long> > b
 BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned int> > bilinear_operator_test_ell_double_uint;
 BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned long> > bilinear_operator_test_ell_double_ulong;
 
+BilinearOperatorTest<LAFEM::SparseMatrixBanded<Mem::Main, float, unsigned int> > bilinear_operator_test_banded_float_uint;
+BilinearOperatorTest<LAFEM::SparseMatrixBanded<Mem::Main, float, unsigned long> > bilinear_operator_test_banded_float_ulong;
+BilinearOperatorTest<LAFEM::SparseMatrixBanded<Mem::Main, double, unsigned int> > bilinear_operator_test_banded_double_uint;
+BilinearOperatorTest<LAFEM::SparseMatrixBanded<Mem::Main, double, unsigned long> > bilinear_operator_test_banded_double_ulong;
+
 #ifdef FEAST_HAVE_QUADMATH
 BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned int> > bilinear_operator_test_csr_float128_uint;
 BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned long> > bilinear_operator_test_csr_float128_ulong;
@@ -221,4 +226,7 @@ BilinearOperatorTest<LAFEM::SparseMatrixCOO<Mem::Main, __float128, unsigned long
 
 BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, __float128, unsigned int> > bilinear_operator_test_ell_float128_uint;
 BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, __float128, unsigned long> > bilinear_operator_test_ell_float128_ulong;
+
+BilinearOperatorTest<LAFEM::SparseMatrixBanded<Mem::Main, __float128, unsigned int> > bilinear_operator_test_banded_float128_uint;
+BilinearOperatorTest<LAFEM::SparseMatrixBanded<Mem::Main, __float128, unsigned long> > bilinear_operator_test_banded_float128_ulong;
 #endif
