@@ -1189,7 +1189,7 @@ namespace FEAST
             _sorted() = 1;
 
             // check if there is anything to be sorted
-            if(_used_elements() <= Index(0))
+            if(_used_elements() == Index(0))
               return;
 
             // sort elements by row index

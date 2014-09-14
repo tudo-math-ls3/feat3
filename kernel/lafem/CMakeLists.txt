@@ -54,6 +54,7 @@ SET (test_list
   sparse_matrix_csr_blocked-test
   sparse_matrix_ell-test
   sparse_vector-test
+  sparse_vector_blocked-test
   umfpack-test
   unit_filter-test
   vector_mirror-test

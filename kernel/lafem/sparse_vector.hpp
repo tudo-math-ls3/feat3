@@ -448,7 +448,7 @@ namespace FEAST
          *
          * \returns Specific vector element.
          */
-        DT_ operator()(Index index) const
+        const DT_ operator()(Index index) const
         {
           CONTEXT("When retrieving SparseVector element");
 
@@ -551,7 +551,7 @@ namespace FEAST
             _sorted() = 1;
 
             // check if there is anything to be sorted
-            if(_used_elements() <= Index(0))
+            if(_used_elements() == Index(0))
               return;
 
             _insertion_sort(this->_indices.at(0), this->_elements.at(0), _used_elements());

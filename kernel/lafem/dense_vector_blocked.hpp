@@ -39,7 +39,7 @@ namespace FEAST
      * \tparam BlockSize_ The size of the represented blocks
      *
      * This class represents a vector of continuous data in memory.\n
-     * Logical, the data are organized in small blocks of Blocksize_ length.\n\n
+     * Logical, the data are organized in small blocks of BlockSize_ length.\n\n
      * Data survey: \n
      * _elements[0]: raw number values \n
      * _scalar_index[0]: container size - aka block count
