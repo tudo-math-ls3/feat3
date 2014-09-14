@@ -66,6 +66,9 @@ public:
     TEST_CHECK_EQUAL(e.size(), d.size());
     TEST_CHECK_EQUAL(e(7), d(7));
     TEST_CHECK_EQUAL(e, d);
+    e.clone(a);
+    for (Index i(0) ; i < a.size() ; ++i)
+      TEST_CHECK_EQUAL(e(i), a(i));
 
     b.clone(a);
     TEST_CHECK_NOT_EQUAL((void*)b.elements(), (void*)a.elements());

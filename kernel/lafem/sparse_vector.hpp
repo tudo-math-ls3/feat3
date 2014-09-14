@@ -25,7 +25,7 @@ namespace FEAST
      * Data survey: \n
      * _elements[0]: raw number values \n
      * _indices[0]: non zero indices \n
-     * _scalar_index[0]: container size
+     * _scalar_index[0]: container size \n
      * _scalar_index[1]: non zero element count (used elements) \n
      * _scalar_index[2]: allocated elements \n
      * _scalar_index[3]: allocation size increment \n
@@ -790,4 +790,4 @@ namespace FEAST
   } // namespace LAFEM
 } // namespace FEAST
 
-#endif // KERNEL_LAFEM_DENSE_VECTOR_HPP
+#endif // KERNEL_LAFEM_SPARSE_VECTOR_HPP

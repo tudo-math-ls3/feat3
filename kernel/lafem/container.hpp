@@ -97,16 +97,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       friend class Container;
 
-      private:
-        /**
-         * \brief Constructor
-         *
-         * Creates an empty container.
-         *
-         * \note Internal use only
-         */
-        Container();
-
       protected:
         /// List of pointers to all datatype dependent arrays.
         std::vector<DT_*> _elements;
@@ -653,11 +643,11 @@ namespace FEAST
             Util::MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
           }
 
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+          this->_indices.clear();
           if (clone_indices)
           {
-            for (Index i(0) ; i < this->_indices.size() ; ++i)
-              Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
-            this->_indices.clear();
             for (Index i(0) ; i < other._indices.size() ; ++i)
             {
               this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
@@ -684,7 +674,7 @@ namespace FEAST
         void clone(const Container<Mem2_, DT2_, IT2_> & other, bool clone_indices = false)
         {
           CONTEXT("When cloning Container");
-          Container t;
+          Container t(other.size());
           t.assign(other);
           clone(t, clone_indices);
         }

@@ -64,7 +64,7 @@ namespace FEAST
         typedef IT_ IndexType;
         /// Our memory architecture type
         typedef Mem_ MemType;
-        /// Our size of single blocks
+        /// Our size of a single block
         static constexpr Index BlockSize = BlockSize_;
 
         /**

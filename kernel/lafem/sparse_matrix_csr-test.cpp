@@ -106,6 +106,9 @@ public:
     TEST_CHECK_EQUAL(e, c);
     e.copy(c);
     TEST_CHECK_EQUAL(e, c);
+    e.clone(c);
+    b.clone(e);
+    TEST_CHECK_EQUAL(b, c);
 
     SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
     for (Index row(0) ; row < fcoo.rows() ; ++row)
