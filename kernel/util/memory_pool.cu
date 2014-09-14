@@ -80,6 +80,9 @@ void MemoryPool<Mem::CUDA>::increase_memory(void * address)
 
 void MemoryPool<Mem::CUDA>::release_memory(void * address)
 {
+  if (address == nullptr)
+    return;
+
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::relase_memory: Memory address not found!");

@@ -12,6 +12,7 @@
 #include <cstring>
 #include <typeinfo>
 #include <cstdio>
+#include <cstddef>
 
 
 namespace FEAST
@@ -101,6 +102,9 @@ namespace FEAST
         /// release memory or decrease reference counter
         void release_memory(void * address)
         {
+          if (address == nullptr)
+            return;
+
           std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
           if (it == _pool.end())
             throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::release_memory: Memory address not found!");

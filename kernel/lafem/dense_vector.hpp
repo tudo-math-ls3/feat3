@@ -43,6 +43,7 @@ namespace FEAST
      * Data survey: \n
      * _elements[0]: raw number values \n
      * _scalar_index[0]: container size
+     * _scalar_index[1]: boolean flag, signaling DenseVectorRange usage
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -254,6 +255,7 @@ namespace FEAST
           Container<Mem_, DT_, IT_> (0)
         {
           CONTEXT("When creating DenseVector");
+          this->_scalar_index.push_back(0);
         }
 
         /**
@@ -268,6 +270,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
+          this->_scalar_index.push_back(0);
           this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size_in));
           this->_elements_size.push_back(size_in);
         }
@@ -285,6 +288,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
+          this->_scalar_index.push_back(0);
           this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size_in));
           this->_elements_size.push_back(size_in);
 
@@ -304,6 +308,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
+          this->_scalar_index.push_back(0);
           this->_elements.push_back(data);
           this->_elements_size.push_back(size_in);
 
@@ -311,6 +316,28 @@ namespace FEAST
             Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] dv_ind The source DenseVector
+         * \param[in] size_in The size of the created vector range.
+         * \param[in] offset The starting element of the created vector range in relation to the source vector.
+         *
+         * Creates a vector range from a given DenseVector
+         *
+         * \note The created DenseVector has no own memory management nor own allocated memory and should be used carefully!
+         */
+        explicit DenseVector(const DenseVector & dv_in, Index size_in, Index offset_in) :
+          Container<Mem_, DT_, IT_>(size_in)
+        {
+          CONTEXT("When creating DenseVector");
+
+          this->_scalar_index.push_back(1);
+          DT_ * te(const_cast<DT_*>(dv_in.elements()));
+          this->_elements.push_back(te + offset_in);
+          this->_elements_size.push_back(size_in);
         }
 
         /**
@@ -326,6 +353,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
+          this->_scalar_index.push_back(0);
           convert(other);
         }
 
@@ -342,6 +370,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
+          this->_scalar_index.push_back(0);
           switch(mode)
           {
             case FileMode::fm_mtx:
@@ -371,6 +400,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
+          this->_scalar_index.push_back(0);
           switch(mode)
           {
             case FileMode::fm_mtx:
@@ -413,6 +443,25 @@ namespace FEAST
           Container<Mem_, DT_, IT_>(std::forward<DenseVector>(other))
         {
           CONTEXT("When moving DenseVector");
+        }
+
+        /**
+         * \brief Destructor
+         *
+         * Destroys the DenseVector and releases all of its used arrays if its not marked a range vector.
+         */
+        virtual ~DenseVector()
+        {
+          CONTEXT("When destroying DenseVector");
+
+          // avoid releasing memory by base class destructore, because we do not own the referenced memory
+          if (this->_scalar_index.size() > 0 && this->_scalar_index.at(1) == 1)
+          {
+            for (Index i(0) ; i < this->_elements.size() ; ++i)
+              this->_elements.at(i) = nullptr;
+            for (Index i(0) ; i < this->_indices.size() ; ++i)
+              this->_indices.at(i) = nullptr;
+          }
         }
 
         /**
@@ -478,6 +527,7 @@ namespace FEAST
           this->clear();
 
           this->_scalar_index.push_back(other.raw_size());
+          this->_scalar_index.push_back(0);
           this->_elements.push_back(other.get_elements().at(0));
           this->_elements_size.push_back(this->size());
 
