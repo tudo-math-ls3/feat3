@@ -391,21 +391,22 @@ namespace FEAST
       */
     template<
       typename DataType_,
+      typename OperatorValueType_,
       typename Space_,
-      int BlockHeight_,
-      int BlockWidth_,
       typename TrafoConfig_ = Trafo::ConfigBase,
       typename SpaceConfig_ = Space::ConfigBase>
     class AsmTraits1Blocked :
       public Intern::EvalPolicyFetcher<Space_, DataType_>::EvalPolicy
     {
     public:
-      static constexpr int BlockHeight = BlockHeight_;
-      static constexpr int BlockWidth = BlockWidth_;
       /// data type
       typedef DataType_ DataType;
-      /// Blocks of DataTypes
-      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> DataTypeBlocked;
+      /// type an operator returns
+      typedef OperatorValueType_ OperatorValueType;
+      static constexpr int BlockHeight = OperatorValueType::m;
+      static constexpr int BlockWidth = OperatorValueType::n;
+      /// type a functional returns
+      typedef FEAST::Tiny::Vector<DataType,BlockWidth> FunctionalDataType;
       /// space type
       typedef Space_ SpaceType;
       /// test-space type
@@ -457,7 +458,7 @@ namespace FEAST
         public TrafoConfig_
       {
         /// we need jacobian determinants for integration
-        static constexpr int need_jac_det = 1
+        static constexpr int need_jac_det = 1;
       };
 
       /// trafo config: combine space and assembly trafo configs
@@ -502,16 +503,17 @@ namespace FEAST
       typedef typename AnalyticEvalTraits::HessianType HessianType;
 
       /// local vector type
-      typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> LocalVectorType;
-      typedef Tiny::Vector<LocalVectorType, BlockHeight_> LocalTestVectorType;
-      typedef Tiny::Vector<LocalVectorType, BlockWidth_>  LocalTrialVectorType;
-      typedef Tiny::Vector<LocalVectorType, BlockWidth_> LocalMultVectorType;
+      typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> FunctionalValueType;
+      typedef Tiny::Vector<FunctionalValueType, SpaceEvaluator::max_local_dofs> LocalVectorType;
+      typedef Tiny::Vector<FunctionalValueType, BlockHeight> LocalTestVectorType;
+      typedef Tiny::Vector<FunctionalValueType, BlockWidth>  LocalTrialVectorType;
+      typedef Tiny::Vector<FunctionalValueType, BlockWidth> LocalMultVectorType;
 
       /// local vector data type
       typedef LocalVectorData<LocalVectorType, DofMapping> LocalVectorDataType;
 
       /// local matrix type
-      typedef Tiny::Matrix<DataTypeBlocked, SpaceEvaluator::max_local_dofs, SpaceEvaluator::max_local_dofs>
+      typedef Tiny::Matrix<OperatorValueType, SpaceEvaluator::max_local_dofs, SpaceEvaluator::max_local_dofs>
         LocalMatrixType;
 
       /// local matrix data type

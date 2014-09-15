@@ -14,10 +14,11 @@ namespace FEAST
     /**
      * \brief Tiny Vector class template
      *
-     * This class template implements a vector whose datatype and size is given at compile-time.
+     * This class template implements a vector whose value type and size is given at compile-time. The value type can
+     * be a primitive type, or some other object like (again) a Vector.
      *
      * \tparam T_
-     * The datatype that the vector shall contain.
+     * The valuetype that the vector shall contain.
      *
      * \tparam n_
      * The length of the vector. Must be > 0.
@@ -36,7 +37,8 @@ namespace FEAST
     /**
      * \brief Tiny Matrix class template
      *
-     * This class template implements a matrix whose datatype and sizes are given at compile-time.
+     * This class template implements a matrix whose value type and size is given at compile-time. The value type can
+     * be a primitive type, or some other object like a Vector.
      *
      * \tparam T_
      * The datatype that the vector shall contain.
@@ -64,6 +66,9 @@ namespace FEAST
      * \brief Tiny Tensor3 class template
      *
      * This class template implements a 3rd-order tensor whose datatype and sizes are given at compile-time.
+     * This class template implements a 3rd order tensor whose value type and size is given at compile-time. The value
+     * type can be a primitive type, or some other object like a Vector.
+     *
      * Technically, the Tensor3 class template realises a l-tuple of m-by-n matrices.
      *
      * \tparam T_
@@ -97,19 +102,19 @@ namespace FEAST
     namespace Intern
     {
       /**
-       * \brief Helper class that extracts the basic data type from a vector
+       * \brief Helper class that extracts the basic data type from another type
        *
        * \tparam T_
        * The yype
        *
-       * This is the end of the recursion where the type is something other than vector.
+       * This is the end of the recursion where the type is something other than a FEAST::Tiny::... object.
        *
        **/
       template<typename T_>
-      struct FieldType
+      struct DataTypeExtractor
       {
         /// The basic data type
-        typedef T_ MyFieldType;
+        typedef T_ MyDataType;
         /// Level of recursion, see below
         static constexpr int level = 0;
       };
@@ -129,29 +134,32 @@ namespace FEAST
        * This goes on as long as the underlying type is still some kind of Vector.
        **/
       template<typename T_, int n_, int s_>
-      struct FieldType<Vector<T_, n_, s_>>
+      struct DataTypeExtractor<Vector<T_, n_, s_>>
       {
         /// Recursive typedef
-        typedef typename FieldType<T_>::MyFieldType MyFieldType;
-        /// The number of times the DataType is some kind of Vector. A Vector is a tensor of order 1+level.
-        static constexpr int level = FieldType<T_>::level+1;
+        typedef typename DataTypeExtractor<T_>::MyDataType MyDataType;
+        /// The number of times the ValueType is some kind of Vector. A Vector is a tensor of order 1+level.
+        static constexpr int level = DataTypeExtractor<T_>::level+1;
       };
       template<typename T_, int m_, int n_, int sm_, int sn_>
-      struct FieldType<Matrix<T_, m_, n_, sm_, sn_>>
+
+      // Same for Matrix
+      struct DataTypeExtractor<Matrix<T_, m_, n_, sm_, sn_>>
       {
         /// Recursive typedef
-        typedef typename FieldType<T_>::MyFieldType MyFieldType;
-        /// The number of times the DataType is some kind of Vector. A Vector is a tensor of order 1+level.
-        static constexpr int level = FieldType<T_>::level+1;
+        typedef typename DataTypeExtractor<T_>::MyDataType MyDataType;
+        /// The number of times the ValueType is some kind of Vector. A Vector is a tensor of order 1+level.
+        static constexpr int level = DataTypeExtractor<T_>::level+1;
       };
 
+      // Same for Tensor3
       template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
-      struct FieldType<Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>>
+      struct DataTypeExtractor<Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>>
       {
         /// Recursive typedef
-        typedef typename FieldType<T_>::MyFieldType MyFieldType;
-        /// The number of times the DataType is some kind of Vector. A Vector is a tensor of order 1+level.
-        static constexpr int level = FieldType<T_>::level+1;
+        typedef typename DataTypeExtractor<T_>::MyDataType MyDataType;
+        /// The number of times the ValueType is some kind of Vector. A Vector is a tensor of order 1+level.
+        static constexpr int level = DataTypeExtractor<T_>::level+1;
       };
 
       // forward declarations
@@ -188,10 +196,10 @@ namespace FEAST
         s = s_
       };
 
-      /// the data type of the vector
-      typedef T_ DataType;
+      /// the value type of the vector
+      typedef T_ ValueType;
       /// The basic data type buried in the lowest level of the vector
-      typedef typename Intern::FieldType<DataType>::MyFieldType FieldType;
+      typedef typename Intern::DataTypeExtractor<ValueType>::MyDataType DataType;
 
       /// actual vector data
       T_ v[s_];
@@ -202,7 +210,7 @@ namespace FEAST
       }
 
       /// \brief value-assignment constructor
-      explicit Vector(FieldType value)
+      explicit Vector(DataType value)
       {
         for(Index i(0); i < Index(n_); ++i)
         {
@@ -221,7 +229,7 @@ namespace FEAST
       }
 
       /// value-assignment operator
-      Vector& operator=(FieldType value)
+      Vector& operator=(DataType value)
       {
         for(Index i(0); i < Index(n_); ++i)
         {
@@ -351,7 +359,7 @@ namespace FEAST
        * \param[in] alpha
        * The value that the vector is to be set to.
        */
-      void format(FieldType alpha = FieldType(0))
+      void format(DataType alpha = DataType(0))
       {
         for(Index i(0); i < Index(n_); ++i)
         {
@@ -415,9 +423,9 @@ namespace FEAST
        * \returns
        * The euclid norm of the vector.
        */
-      DataType norm_euclid() const
+      ValueType norm_euclid() const
       {
-        FieldType r(FieldType(0));
+        DataType r(DataType(0));
         for(Index i(0); i < Index(n_); ++i)
           r += Math::sqr(v[i]);
         return Math::sqrt(r);
@@ -470,14 +478,14 @@ namespace FEAST
 
     /// scalar-left-multiplication operator
     template<typename T_, int n_, int s_>
-    inline Vector<T_, n_> operator*(typename Vector<T_, n_>::FieldType alpha, const Vector<T_, n_, s_>& x)
+    inline Vector<T_, n_> operator*(typename Vector<T_, n_>::DataType alpha, const Vector<T_, n_, s_>& x)
     {
       return Vector<T_, n_>(x) *= alpha;
     }
 
     /// scalar-right-multiplication operator
     template<typename T_, int n_, int s_>
-    inline Vector<T_, n_> operator*(const Vector<T_, n_, s_>& x, typename Vector<T_, n_>::FieldType alpha)
+    inline Vector<T_, n_> operator*(const Vector<T_, n_, s_>& x, typename Vector<T_, n_>::DataType alpha)
     {
       return Vector<T_, n_>(x) *= alpha;
     }
@@ -532,9 +540,9 @@ namespace FEAST
       };
 
       /// the data type of the matrix
-      typedef T_ DataType;
+      typedef T_ ValueType;
       /// The basic data type buried in the lowest level of the vector
-      typedef typename Intern::FieldType<DataType>::MyFieldType FieldType;
+      typedef typename Intern::DataTypeExtractor<ValueType>::MyDataType DataType;
 
 
       /// actual matrix data; that's an array of vectors
@@ -547,7 +555,7 @@ namespace FEAST
       }
 
       /// value-assignment constructor
-      explicit Matrix(FieldType value)
+      explicit Matrix(DataType value)
       {
         for(Index i(0); i < Index(m_); ++i)
         {
@@ -566,7 +574,7 @@ namespace FEAST
       }
 
       /// value-assignment operator
-      Matrix& operator=(FieldType value)
+      Matrix& operator=(DataType value)
       {
         for(Index i(0); i < Index(m_); ++i)
         {
@@ -661,7 +669,7 @@ namespace FEAST
       }
 
       /// scalar-right-multiply-by operator
-      Matrix& operator*=(FieldType alpha)
+      Matrix& operator*=(DataType alpha)
       {
         for(Index i(0); i < Index(m_); ++i)
         {
@@ -698,7 +706,7 @@ namespace FEAST
        * \param[in] alpha
        * The value that the matrix is to be set to.
        */
-      void format(FieldType alpha = FieldType(0))
+      void format(DataType alpha = DataType(0))
       {
         for(Index i(0); i < Index(m_); ++i)
         {
@@ -717,9 +725,9 @@ namespace FEAST
        *
        * \returns The Hessian norm square of the matrix.
        */
-      FieldType hessian_sqr_norm() const
+      DataType hessian_sqr_norm() const
       {
-        FieldType r(0);
+        DataType r(0);
         for(Index i(0); i < Index(m_); ++i)
         {
           r += Math::sqr(v[i][i]);
@@ -728,7 +736,7 @@ namespace FEAST
             r += Math::sqr(v[i][j]);
           }
         }
-        return r / FieldType(2);
+        return r / DataType(2);
       }
 
       /**
@@ -738,12 +746,12 @@ namespace FEAST
        *
        * \returns The determinant of the matrix.
        */
-      FieldType det() const
+      DataType det() const
       {
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
-        typedef FieldType Tv[sm_][sn_];
-        return Intern::DetHelper<m_, n_>::template compute<FieldType, sm_, sn_>(*reinterpret_cast<const Tv*>(this));
+        typedef DataType Tv[sm_][sn_];
+        return Intern::DetHelper<m_, n_>::template compute<DataType, sm_, sn_>(*reinterpret_cast<const Tv*>(this));
       }
 
       /**
@@ -757,12 +765,12 @@ namespace FEAST
        *
        * \returns The volume of the matrix.
        */
-      FieldType vol() const
+      DataType vol() const
       {
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
-        typedef FieldType Tv[sm_][sn_];
-        return Intern::VolHelper<m_, n_>::template compute<FieldType, sm_, sn_>(*reinterpret_cast<const Tv*>(this));
+        typedef DataType Tv[sm_][sn_];
+        return Intern::VolHelper<m_, n_>::template compute<DataType, sm_, sn_>(*reinterpret_cast<const Tv*>(this));
       }
 
       /**
@@ -780,9 +788,9 @@ namespace FEAST
       {
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
-        typedef FieldType Tv[sm_][sn_];
-        typedef FieldType Ta[sma_][sna_];
-        Intern::InverseHelper<m_,n_>::template compute<FieldType, sm_, sn_, sma_, sna_>(
+        typedef DataType Tv[sm_][sn_];
+        typedef DataType Ta[sma_][sna_];
+        Intern::InverseHelper<m_,n_>::template compute<DataType, sm_, sn_, sma_, sna_>(
           *reinterpret_cast<Tv*>(this), *reinterpret_cast<const Ta*>(&a));
         return *this;
       }
@@ -824,9 +832,9 @@ namespace FEAST
        * The scalar product of \p x and \p y with this matrix.
        */
       template<int snx_, int sny_>
-      FieldType scalar_product(const Vector<T_, m_, snx_>& x, const Vector<T_, n_, sny_>& y) const
+      DataType scalar_product(const Vector<T_, m_, snx_>& x, const Vector<T_, n_, sny_>& y) const
       {
-        FieldType r(FieldType(0));
+        DataType r(DataType(0));
         for(Index i(0); i < Index(m_); ++i)
         {
           r += x[i] * dot(v[i], y);
@@ -852,13 +860,13 @@ namespace FEAST
       Matrix& add_mat_mat_mult(
         const Matrix<T_, m_, l_, sma_, sna_>& a,
         const Matrix<T_, l_, n_, smb_, snb_>& b,
-        FieldType alpha = FieldType(1))
+        DataType alpha = DataType(1))
       {
         for(Index i(0); i < Index(m_); ++i)
         {
           for(Index j(0); j < Index(n_); ++j)
           {
-            FieldType r(0);
+            DataType r(0);
             for(Index k(0); k < Index(l_); ++k)
             {
               r += a.v[i][k] * b.v[k][j];
@@ -914,16 +922,16 @@ namespace FEAST
         const Matrix<T_, k_, l_, sma_, sna_>& a,
         const Matrix<T_, k_, m_, smb_, snb_>& b,
         const Matrix<T_, l_, n_, smd_, snd_>& d,
-        FieldType alpha = FieldType(1))
+        DataType alpha = DataType(1))
       {
         for(Index i(0); i < Index(m_); ++i)
         {
           for(Index j(0); j < Index(n_); ++j)
           {
-            FieldType r(0);
+            DataType r(0);
             for(Index p(0); p < Index(k_); ++p)
             {
-              FieldType t(0);
+              DataType t(0);
               for(Index q(0); q < Index(l_); ++q)
               {
                 t += a(p,q) * d(q,j);
@@ -971,13 +979,13 @@ namespace FEAST
       Matrix& add_vec_tensor_mult(
         const Vector<T_, l_, snv_>& x,
         const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
-        FieldType alpha = FieldType(1))
+        DataType alpha = DataType(1))
       {
         for(Index i(0); i < Index(m_); ++i)
         {
           for(Index j(0); j < Index(n_); ++j)
           {
-            FieldType r(0);
+            DataType r(0);
             for(Index k(0); k < Index(l_); ++k)
             {
               r += x(k) * t(k,i,j);
@@ -992,7 +1000,7 @@ namespace FEAST
       Matrix& set_vec_tensor_mult(
         const Vector<T_, l_, snv_>& x,
         const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
-        FieldType alpha = FieldType(1))
+        DataType alpha = DataType(1))
       {
         format();
         return add_vec_tensor_mult(x, t, alpha);
@@ -1015,14 +1023,14 @@ namespace FEAST
 
     /// scalar-left-multiply operator
     template<typename T_, int m_, int n_, int sm_, int sn_>
-    inline Matrix<T_, m_, n_> operator*(typename Matrix<T_, m_, n_>::FieldType alpha, const Matrix<T_, m_, n_, sm_, sn_>& a)
+    inline Matrix<T_, m_, n_> operator*(typename Matrix<T_, m_, n_>::DataType alpha, const Matrix<T_, m_, n_, sm_, sn_>& a)
     {
       return Matrix<T_, m_, n_>(a) *= alpha;
     }
 
     /// scalar-right-multiply operator
     template<typename T_, int m_, int n_, int sm_, int sn_>
-    inline Matrix<T_, m_, n_, sm_, sn_> operator*(const Matrix<T_, m_, n_, sm_, sn_>& a, typename Matrix<T_, m_, n_>::FieldType alpha)
+    inline Matrix<T_, m_, n_, sm_, sn_> operator*(const Matrix<T_, m_, n_, sm_, sn_>& a, typename Matrix<T_, m_, n_>::DataType alpha)
     {
       return Matrix<T_, m_, n_>(a) *= alpha;
     }
@@ -1082,9 +1090,9 @@ namespace FEAST
       };
 
       /// the data type of the tensor
-      typedef T_ DataType;
+      typedef T_ ValueType;
       /// The basic data type buried in the lowest level of the vector
-      typedef typename Intern::FieldType<DataType>::MyFieldType FieldType;
+      typedef typename Intern::DataTypeExtractor<ValueType>::MyDataType DataType;
 
       /// tensor data; that's an array of matrices
       typedef Matrix<T_, m_, n_, sm_, sn_> PlaneType;
@@ -1096,7 +1104,7 @@ namespace FEAST
       }
 
       /// value-assignment constructor
-      explicit Tensor3(FieldType value)
+      explicit Tensor3(DataType value)
       {
         for(Index i(0); i < Index(l_); ++i)
           v[i] = value;
@@ -1111,7 +1119,7 @@ namespace FEAST
       }
 
       /// value-assignment operator
-      Tensor3& operator=(FieldType value)
+      Tensor3& operator=(DataType value)
       {
         for(Index i(0); i < Index(l_); ++i)
           v[i] = value;
@@ -1207,7 +1215,7 @@ namespace FEAST
       }
 
       /// scalar right-multiply-by operator
-      Tensor3& operator*=(FieldType alpha)
+      Tensor3& operator*=(DataType alpha)
       {
         for(Index i(0); i < Index(l_); ++i)
           v[i] *= alpha;
@@ -1233,7 +1241,7 @@ namespace FEAST
       }
 
       /// formats the tensor
-      void format(FieldType alpha = FieldType(0))
+      void format(DataType alpha = DataType(0))
       {
         (*this) = alpha;
       }
@@ -1262,7 +1270,7 @@ namespace FEAST
       Tensor3& add_mat_tensor_mult(
         const Matrix<T_, l_, k_, sma_, sna_>& a,
         const Tensor3<T_, k_, m_, n_, slt_, smt_, snt_>& t,
-        FieldType alpha = FieldType(1))
+        DataType alpha = DataType(1))
       {
         for(Index h(0); h < Index(l_); ++h)
         {
@@ -1270,7 +1278,7 @@ namespace FEAST
           {
             for(Index j(0); j < Index(n_); ++j)
             {
-              FieldType r(0);
+              DataType r(0);
               for(Index p(0); p < Index(k_); ++p)
               {
                 r += a(h,p) * t(p,i,j);
@@ -1314,7 +1322,7 @@ namespace FEAST
         const Tensor3<T_, lt_, mt_, nt_, slt_, smt_, snt_>& t,
         const Matrix<T_, nt_, n_, smb_, snb_>& b,
         const Matrix<T_, mt_, m_, smd_, snd_>& d,
-        FieldType alpha = FieldType(1))
+        DataType alpha = DataType(1))
       {
         for(Index h(0); h < Index(l_); ++h)
         {
@@ -1322,7 +1330,7 @@ namespace FEAST
           {
             for(Index j(0); j < Index(n_); ++j)
             {
-              FieldType r(0);
+              DataType r(0);
               for(Index p(0); p < Index(mt_); ++p)
               {
                 for(Index q(0); q < Index(nt_); ++q)
@@ -1341,7 +1349,7 @@ namespace FEAST
     /// scalar left-multiply operator
     template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
     inline Tensor3<T_, l_, m_, n_, sl_, sm_, sn_> operator*(
-      typename Tensor3<T_, l_, m_, n_>::FieldType alpha, const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& a)
+      typename Tensor3<T_, l_, m_, n_>::DataType alpha, const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& a)
     {
       return Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>(a) *= alpha;
     }
@@ -1349,7 +1357,7 @@ namespace FEAST
     /// scalar right-multiply operator
     template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
     inline Tensor3<T_, l_, m_, n_, sl_, sm_, sn_> operator*(
-      const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& a, typename Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>::FieldType alpha)
+      const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& a, typename Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>::DataType alpha)
     {
       return Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>(a) *= alpha;
     }

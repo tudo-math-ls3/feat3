@@ -361,12 +361,17 @@ namespace FEAST
         const CubatureFactory_& cubature_factory,
         typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
+        // Make sure matrix and operator match
+        static_assert(Operator_::BlockHeight == Matrix_::BlockHeight, "Operator/Matrix BlockHeight mismatch.");
+        static_assert(Operator_::BlockWidth == Matrix_::BlockWidth, "Operator/Matrix BlockHeight mismatch.");
         // matrix type
         typedef Matrix_ MatrixType;
         // Block height
-        static constexpr int BlockHeight = MatrixType::BlockHeight;
+        static constexpr int BlockHeight = Operator_::BlockHeight;
         // Block width
-        static constexpr int BlockWidth = MatrixType::BlockWidth;
+        static constexpr int BlockWidth = Operator_::BlockWidth;
+        // Type returned by the operator
+        typedef Tiny::Matrix<typename MatrixType::DataType, BlockHeight, BlockWidth> OperatorValueType;
 
         // functor type
         typedef Operator_ OperatorType;
@@ -377,9 +382,8 @@ namespace FEAST
         typedef AsmTraits1Blocked
         <
           typename MatrixType::DataType,
+          OperatorValueType,
           SpaceType,
-          BlockHeight,
-          BlockWidth,
           typename OperatorType::TrafoConfig,
           Space::ConfigOr
           <

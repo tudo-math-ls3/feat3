@@ -291,7 +291,7 @@ namespace FEAST
           public Space::ConfigBase
         {
           /// this functor requires test-function gradients
-          static constexpr int need_grad = 1
+          static constexpr int need_grad = 1;
         };
 
         /// trial space configuration
@@ -299,7 +299,7 @@ namespace FEAST
           public Space::ConfigBase
         {
           /// this functor requires trial-function gradients
-          static constexpr int need_grad = 1
+          static constexpr int need_grad = 1;
         };
 
         /**
@@ -359,16 +359,19 @@ namespace FEAST
        *
        * \author Jordi Paul
        */
+      template<Index dimension_>
       class DuDvOperatorBlocked :
         public BilinearOperator
       {
       public:
+        static constexpr int BlockHeight = dimension_;
+        static constexpr int BlockWidth = dimension_;
         /// test space configuration
         struct TestConfig :
           public Space::ConfigBase
         {
           /// this functor requires test-function gradients
-          static constexpr int need_grad = 1
+          static constexpr int need_grad = 1;
         };
 
         /// trial space configuration
@@ -376,7 +379,7 @@ namespace FEAST
           public Space::ConfigBase
         {
           /// this functor requires trial-function gradients
-          static constexpr int need_grad = 1
+          static constexpr int need_grad = 1;
         };
 
         /**
@@ -395,7 +398,7 @@ namespace FEAST
           /// the data type to be used
           typedef typename AsmTraits_::DataType DataType;
           /// the data type for the block system
-          typedef typename AsmTraits_::DataTypeBlocked DataTypeBlocked;
+          typedef typename AsmTraits_::OperatorValueType OperatorValueType;
           /// the assembler's trafo data type
           typedef typename AsmTraits_::TrafoData TrafoData;
           /// the assembler's test-function data type
@@ -415,10 +418,10 @@ namespace FEAST
           }
 
           /** \copydoc BilinearOperator::Evaluator::operator() */
-          DataTypeBlocked operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
-            DataTypeBlocked r(DataType(0));
-            for(Index i(0); i < DataTypeBlocked::m; ++i)
+            OperatorValueType r(DataType(0));
+            for(Index i(0); i < OperatorValueType::m; ++i)
             {
               r(i,i) = dot(phi.grad, psi.grad) + phi.grad[i]*phi.grad[i];
               for(Index j(0); j < i; ++j)
