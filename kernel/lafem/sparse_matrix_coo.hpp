@@ -21,6 +21,7 @@
 #include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
+#include <kernel/util/math.hpp>
 
 #include <map>
 #include <algorithm>
@@ -341,7 +342,7 @@ namespace FEAST
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(1000);
+        this->_scalar_index.push_back(Math::min<Index>(0, 1000));
         this->_scalar_index.push_back(1);
         this->_scalar_dt.push_back(DT_(0));
       }
@@ -361,7 +362,7 @@ namespace FEAST
         this->_scalar_index.push_back(dimensions);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(1000);
+        this->_scalar_index.push_back(Math::min<Index>(dimensions*dimensions, 1000));
         this->_scalar_index.push_back(1);
         this->_scalar_dt.push_back(DT_(0));
       }
@@ -382,7 +383,7 @@ namespace FEAST
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(1000);
+        this->_scalar_index.push_back(Math::min<Index>(rows_in * columns_in, 1000));
         this->_scalar_index.push_back(1);
         this->_scalar_dt.push_back(DT_(0));
       }
@@ -446,7 +447,7 @@ namespace FEAST
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(val_in.size());
         this->_scalar_index.push_back(val_in.size());
-        this->_scalar_index.push_back(1000);
+        this->_scalar_index.push_back(Math::min<Index>(rows_in * columns_in, 1000));
         this->_scalar_index.push_back(0);
         this->_scalar_dt.push_back(DT_(0));
 
@@ -682,7 +683,7 @@ namespace FEAST
           this->_scalar_index.push_back(other.columns());
           this->_scalar_index.push_back(other.used_elements());
           this->_scalar_index.push_back(other.used_elements());
-          this->_scalar_index.push_back(1000);
+          this->_scalar_index.push_back(other.alloc_increment());
           this->_scalar_index.push_back(1);
           this->_scalar_dt.push_back(DT_(0));
 

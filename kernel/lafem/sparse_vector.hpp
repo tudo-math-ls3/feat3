@@ -9,6 +9,7 @@
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/vector_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/util/math.hpp>
 
 namespace FEAST
 {
@@ -189,7 +190,7 @@ namespace FEAST
           CONTEXT("When creating SparseVector");
           this->_scalar_index.push_back(0);
           this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(1000);
+          this->_scalar_index.push_back(Math::min<Index>(0, 1000));
           this->_scalar_index.push_back(1);
           this->_scalar_dt.push_back(DT_(0));
         }
@@ -207,7 +208,7 @@ namespace FEAST
           CONTEXT("When creating SparseVector");
           this->_scalar_index.push_back(0);
           this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(1000);
+          this->_scalar_index.push_back(Math::min<Index>(size_in, 1000));
           this->_scalar_index.push_back(1);
           this->_scalar_dt.push_back(DT_(0));
         }
@@ -233,7 +234,7 @@ namespace FEAST
 
           this->_scalar_index.push_back(elements_in.size());
           this->_scalar_index.push_back(elements_in.size());
-          this->_scalar_index.push_back(1000);
+          this->_scalar_index.push_back(Math::min<Index>(size_in, 1000));
           this->_scalar_index.push_back(Index(is_sorted));
           this->_scalar_dt.push_back(DT_(0));
 
