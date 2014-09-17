@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/lafem/tuple_vector.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 
 // includes, system
 #include <type_traits>
@@ -272,8 +273,13 @@ namespace FEAST
        * \param[in] x
        * The multiplicant vector.
        */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template<typename Algo_, typename VectorL_, typename VectorR_>
+      void apply(VectorL_& r, const VectorR_& x) const
+#else
       template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x) const
+#endif
       {
         block_a().template apply<Algo_>(r.template at<0>(), x.template at<0>());
         block_b().template apply<Algo_>(r.template at<0>(), x.template at<1>(), r.template at<0>(), DataType(1));
@@ -315,8 +321,13 @@ namespace FEAST
        * The summand vector
        * \param[in] alpha A scalar to scale the product with.
        */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template<typename Algo_, typename VectorL_, typename VectorR_>
+      void apply(VectorL_& r, const VectorR_& x, const VectorL_& y, DataType alpha = DataType(1)) const
+#else
       template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
+#endif
       {
         block_a().template apply<Algo_>(r.template at<0>(), x.template at<0>(), y.template at<0>(), alpha);
         block_b().template apply<Algo_>(r.template at<0>(), x.template at<1>(), r.template at<0>(), alpha);
