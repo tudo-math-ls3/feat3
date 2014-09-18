@@ -20,8 +20,7 @@ from cmake_modules.feast_util import get_output_utf8
 
 sys.dont_write_bytecode = True
 
-def branch_tested_before(hostname, branch, build_id, myDB):
-
+def branch_tested_before(hostname, branch, build_id):
   branch_sha = "".join(get_output("git show-ref --hash " + branch))
 
   runs = Run.select().where(Run.hostname == hostname).where(Run.branch == branch).where(Run.build == build_id)
@@ -34,10 +33,9 @@ def branch_tested_before(hostname, branch, build_id, myDB):
   return False
 
 def run_test(build_id, branch, myDB):
-  failed = False
   hostname = socket.gethostname()
 
-  if branch != "master" and branch != "develop" and branch_tested_before(hostname, branch, build_id, myDB):
+  if onlynew and branch != "master" and branch != "develop" and branch_tested_before(hostname, branch, build_id):
     return
 
   if dump_filename != "":
