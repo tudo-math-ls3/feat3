@@ -54,15 +54,17 @@ namespace FEAST
      * diagonal. For faster access on the matrix-elements each diagonal get the virtual
      * length of the row-count of the matrix. They are enlarged to the left and right
      * side of the matrix as shown in the following layout.
-     *       +--                  --+
-     *  \    | \           \      \ |
-     *   \   |\ \           \      \|
-     *    \  | \ \           \      |
-     *     \ |  \ \           \     |\
-     *      \|   \ \           \    | \
-     *       |    \ \           \   |  \
-     *       |\    \ \           \  |   \
-     *       +--                  --+
+       \verbatim
+            +--                  --+
+       \    | \           \      \ |
+        \   |\ \           \      \|
+         \  | \ \           \      |
+          \ |  \ \           \     |\
+           \|   \ \           \    | \
+            |    \ \           \   |  \
+            |\    \ \           \  |   \
+            +--                  --+
+       \endverbatim
      * To get the position of the diagonals in the matrix, the matching offsets are
      * saved from left to right in the offsets-array.
      * - The first diagonal is the one at the bottom-left and gets the offset = 1,
@@ -225,7 +227,7 @@ namespace FEAST
           }
         }
 
-        DenseVector<Mem::Main, IT_, IT_> toffsets(moffsets.size());
+        DenseVector<Mem::Main, IT_, IT_> toffsets(Index(moffsets.size()));
         auto * ptoffsets = toffsets.elements();
 
         IT_ idx(0);
@@ -237,7 +239,7 @@ namespace FEAST
 
         DenseVector<Mem_, IT_, IT_> toffsets_mem;
         toffsets_mem.convert(toffsets);
-        DenseVector<Mem_, DT_, IT_> tval_mem(moffsets.size() * num_rows, DT_(0));
+        DenseVector<Mem_, DT_, IT_> tval_mem(Index(moffsets.size()) * num_rows, DT_(0));
 
         this->assign(SparseMatrixBanded(num_rows, num_cols, tval_mem, toffsets_mem));
       }
