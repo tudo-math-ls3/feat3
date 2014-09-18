@@ -21,7 +21,7 @@ from cmake_modules.feast_util import get_output_utf8
 sys.dont_write_bytecode = True
 
 def branch_tested_before(hostname, branch, build_id):
-  branch_sha = "".join(get_output("git show-ref --hash " + branch))
+  branch_sha = "".join(get_output("git show-ref --hash origin/" + branch))
 
   runs = Run.select().where(Run.hostname == hostname).where(Run.branch == branch).where(Run.build == build_id)
   for run in runs:
