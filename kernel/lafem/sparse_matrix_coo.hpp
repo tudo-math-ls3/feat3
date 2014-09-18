@@ -216,11 +216,11 @@ namespace FEAST
             String sval(line, 0, end);
             DT_ tval((DT_)atof(sval.c_str()));
 
-            entries[(unsigned int)row].insert(std::pair<IT_, DT_>(col, tval));
+            entries[IT_(row)].insert(std::pair<IT_, DT_>(col, tval));
             ++ue;
             if (symmetric == true && row != col)
             {
-              entries[(unsigned int)col].insert(std::pair<IT_, DT_>(row, tval));
+              entries[IT_(col)].insert(std::pair<IT_, DT_>(row, tval));
               ++ue;
             }
           }

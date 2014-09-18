@@ -253,7 +253,7 @@ namespace FEAST
         {
           for(Index j(dom_ptr[row]); j < dom_ptr[row+1]; ++j)
           {
-            moffsets.insert((unsigned int)(num_rows - 1 + img_idx[j] - row));
+            moffsets.insert(IT_(num_rows - 1 + img_idx[j] - row));
           }
         }
 
