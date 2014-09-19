@@ -33,6 +33,7 @@ def branch_tested_before(hostname, branch, build_id):
   return False
 
 def run_test(build_id, branch, myDB):
+  os.chdir(src_dirname)
   hostname = socket.gethostname()
 
   if onlynew and branch != "master" and branch != "develop" and branch_tested_before(hostname, branch, build_id):
