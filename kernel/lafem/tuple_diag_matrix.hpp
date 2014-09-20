@@ -56,7 +56,7 @@ namespace FEAST
         ContHelper<Mem2_, DT2_, IT2_, RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_>>;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = ContHelper<Mem2_, DT2_, IT2_>;
 #else
       /// Compatible L-vector type
@@ -65,7 +65,7 @@ namespace FEAST
       typedef TupleVector<typename First_::VectorTypeR, typename Rest_::VectorTypeR...> VectorTypeR;
 
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = TupleDiagMatrix<
         typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
         typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
@@ -433,7 +433,7 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_, typename... Dummy_>
       using ContainerType = class TupleDiagMatrix<typename First_::template ContainerType<Mem2_, DT2_, IT2_>, Dummy_...>;
 #else
-      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class TupleDiagMatrix<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
 #endif
 

@@ -326,7 +326,7 @@ namespace FEAST
         /// Our used layout type
         static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_coo;
         /// Our 'base' class type
-        template <typename Mem2_, typename DT2_, typename IT2_ = IT_>
+        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
         using ContainerType = class SparseMatrixCOO<Mem2_, DT2_, IT2_>;
 
         /**

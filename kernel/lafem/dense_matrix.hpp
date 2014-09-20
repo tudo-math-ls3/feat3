@@ -55,7 +55,7 @@ namespace FEAST
         /// Our memory architecture type
         typedef Mem_ MemType;
         /// Our 'base' class type
-        template <typename Mem2_, typename DT2_, typename IT2_ = IT_>
+        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
         using ContainerType = class DenseMatrix<Mem2_, DT2_, IT2_>;
 
         /**

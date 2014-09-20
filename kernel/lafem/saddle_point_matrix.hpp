@@ -94,7 +94,7 @@ namespace FEAST
       /// Compatible R-vector type
       typedef TupleVector<typename MatrixTypeA::VectorTypeR, typename MatrixTypeB::VectorTypeR> VectorTypeR;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class SaddlePointMatrix<typename MatrixA_::template ContainerType<Mem2_, DT2_, IT2_>,
                                                     typename MatrixB_::template ContainerType<Mem2_, DT2_, IT2_>,
                                                     typename MatrixD_::template ContainerType<Mem2_, DT2_, IT2_> >;

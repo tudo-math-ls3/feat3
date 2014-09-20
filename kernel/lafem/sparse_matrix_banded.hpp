@@ -134,7 +134,7 @@ namespace FEAST
       /// ImageIterator typedef for Adjactor interface implementation
       typedef const IT_* ImageIterator;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_, typename IT2_ = IT_>
+      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = class SparseMatrixBanded<Mem2_, DT2_, IT2_>;
 
       /**

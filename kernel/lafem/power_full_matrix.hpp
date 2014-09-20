@@ -54,7 +54,7 @@ namespace FEAST
       /// Compatible R-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeR, width_> VectorTypeR;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerFullMatrix<
         typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, width_, height_>;
 

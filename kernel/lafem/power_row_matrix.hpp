@@ -53,7 +53,7 @@ namespace FEAST
       /// Compatible R-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeR, blocks_> VectorTypeR;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerRowMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
 
         /// number of row blocks (vertical size)
@@ -366,7 +366,7 @@ namespace FEAST
       /// Compatible R-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeR, 1> VectorTypeR;
       /// Our 'base' class type
-      template <typename Mem2_, typename DT2_, typename IT2_ = IndexType>
+      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerRowMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
 
       static constexpr Index num_row_blocks = 1;
