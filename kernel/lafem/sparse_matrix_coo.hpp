@@ -648,6 +648,19 @@ namespace FEAST
           Container<Mem_, DT_, IT_>::clone(t, clone_indices);
         }
 
+        /** \brief Shallow copy operation
+         *
+         * Create a shallow copy of itself.
+         *
+         */
+        SparseMatrixCOO shared() const
+        {
+          CONTEXT("When sharing SparseMatrixCOO");
+          SparseMatrixCOO r;
+          r.assign(*this);
+          return r;
+        }
+
         /**
          * \brief Conversion method
          *

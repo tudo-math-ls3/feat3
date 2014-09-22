@@ -29,7 +29,7 @@ namespace FEAST
     {
       struct AssignStruct
       {
-        template <typename MT_, typename T1_, typename T2_>
+        template <typename MT_, typename T1_>
         static void assign(std::vector<T1_ *> & own, const std::vector<T1_ *> & other)
         {
           own.assign(other.begin(), other.end());
@@ -217,7 +217,7 @@ namespace FEAST
 
           if (std::is_same<Mem_, Mem2_>::value && std::is_same<DT_, DT2_>::value)
           {
-            Intern::AssignStruct::template assign<Mem_, DT_, DT2_>(this->_elements, other.get_elements());
+            Intern::AssignStruct::template assign<Mem_, DT_>(this->_elements, other.get_elements());
           }
           else
           {
@@ -261,7 +261,7 @@ namespace FEAST
 
           if (std::is_same<Mem_, Mem2_>::value && std::is_same<IT_, IT2_>::value)
           {
-            Intern::AssignStruct::template assign<Mem_, IT_, IT2_>(this->_indices, other.get_indices());
+            Intern::AssignStruct::template assign<Mem_, IT_>(this->_indices, other.get_indices());
           }
           else
           {

@@ -78,6 +78,9 @@ public:
     c.convert(a);
     TEST_CHECK_EQUAL((void*)c.elements(), (void*)a.elements());
     TEST_CHECK_EQUAL(b, c);
+    auto cs(c.shared());
+    TEST_CHECK_EQUAL((void*)cs.elements(), (void*)c.elements());
+    TEST_CHECK_EQUAL(cs, c);
     a(3, DT_(23));
     TEST_CHECK_EQUAL(a, c);
     TEST_CHECK_NOT_EQUAL(a, b);

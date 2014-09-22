@@ -329,6 +329,19 @@ namespace FEAST
 
       using Container<Mem_, DT_, IT_>::clone;
 
+      /** \brief Shallow copy operation
+       *
+       * Create a shallow copy of itself.
+       *
+       */
+      SparseMatrixBanded shared() const
+      {
+        CONTEXT("When sharing SparseMatrixBanded");
+        SparseMatrixBanded r;
+        r.assign(*this);
+        return r;
+      }
+
       /**
        * \brief Convertion method
        *

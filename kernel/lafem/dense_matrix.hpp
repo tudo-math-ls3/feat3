@@ -175,6 +175,20 @@ namespace FEAST
 
         using Container<Mem_, DT_, IT_>::clone;
 
+        /** \brief Shallow copy operation
+         *
+         * Create a shallow copy of itself.
+         *
+         */
+        DenseMatrix shared() const
+        {
+          CONTEXT("When sharing DenseMatrix");
+          DenseMatrix r;
+          r.assign(*this);
+          return r;
+        }
+
+
         /**
          * \brief Conversion method
          *

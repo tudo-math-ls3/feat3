@@ -62,6 +62,10 @@ public:
     TEST_CHECK_EQUAL(e, c);
     TEST_CHECK_NOT_EQUAL((void*)e.raw_val(), (void*)c.raw_val());
     TEST_CHECK_NOT_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
+    e = c.shared();
+    TEST_CHECK_EQUAL(e, c);
+    TEST_CHECK_EQUAL((void*)e.raw_val(), (void*)c.raw_val());
+    TEST_CHECK_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
 
     SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> f(c.layout());
     TEST_CHECK_EQUAL(f.rows(), c.rows());

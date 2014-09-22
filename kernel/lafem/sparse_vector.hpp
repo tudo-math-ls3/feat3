@@ -386,6 +386,18 @@ namespace FEAST
           Container<Mem_, DT_, IT_>::clone(t, clone_indices);
         }
 
+        /** \brief Shallow copy operation
+         *
+         * Create a shallow copy of itself.
+         *
+         */
+        SparseVector shared() const
+        {
+          CONTEXT("When sharing SparseVector");
+          SparseVector r;
+          r.assign(*this);
+          return r;
+        }
 
         /**
          * \brief Conversion method

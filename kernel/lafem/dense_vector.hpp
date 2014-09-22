@@ -498,6 +498,19 @@ namespace FEAST
 
         using Container<Mem_, DT_, IT_>::clone;
 
+        /** \brief Shallow copy operation
+         *
+         * Create a shallow copy of itself.
+         *
+         */
+        DenseVector shared() const
+        {
+          CONTEXT("When sharing DenseVector");
+          DenseVector r;
+          r.assign(*this);
+          return r;
+        }
+
         /**
          * \brief Conversion method
          *
