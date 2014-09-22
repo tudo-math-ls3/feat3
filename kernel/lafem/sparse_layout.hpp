@@ -75,6 +75,13 @@ namespace FEAST
       template<typename DT_>
       using MatrixType = typename Intern::LayoutId<Layout_>::template MatrixType<Mem_, DT_, IT_>;
 
+      SparseLayout() :
+        _indices(),
+        _indices_size(),
+        _scalar_index()
+      {
+      }
+
       SparseLayout(const std::vector<IT_ *> & indices, const std::vector<Index> & indices_size, const std::vector<Index> & scalar_index) :
         _indices(indices),
         _indices_size(indices_size),
