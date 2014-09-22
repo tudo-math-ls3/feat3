@@ -291,7 +291,7 @@ public:
     //MatrixType matrix(LAFEM::PointstarStructureFE<Algo::Generic>::template value<DataType_,IndexType_>(Index(0), nsi));
     Index neq = space.get_num_dofs();
     LAFEM::DenseVector<MemType_,DataType_, IndexType_> vv(neq, DataType_(0));
-    LAFEM::DenseVector<MemType_, IndexType_, IndexType_> vi(Index(1), neq - Index(1));
+    LAFEM::DenseVector<MemType_, IndexType_, IndexType_> vi(Index(1), IndexType_(neq) - IndexType_(1));
     MatrixType matrix(neq, neq, vv, vi);
 
     // create a cubature factory
@@ -334,15 +334,15 @@ public:
     Index nze = Index(9)*neq;
     LAFEM::DenseVector<MemType_,DataType_, IndexType_> vv(nze, DataType_(0));
     LAFEM::DenseVector<MemType_, IndexType_, IndexType_> vi(Index(9));
-    vi(Index(0), IndexType_(neq) - nsl - IndexType_(2));
-    vi(Index(1), IndexType_(neq) - nsl - IndexType_(1));
-    vi(Index(2), IndexType_(neq) - nsl - IndexType_(0));
-    vi(Index(3), IndexType_(neq) - IndexType_(2));
-    vi(Index(4), IndexType_(neq) - IndexType_(1));
-    vi(Index(5), IndexType_(neq) - IndexType_(0));
-    vi(Index(6), IndexType_(neq) + nsl - IndexType_(2));
-    vi(Index(7), IndexType_(neq) + nsl - IndexType_(1));
-    vi(Index(8), IndexType_(neq) + nsl - IndexType_(0));
+    vi(Index(0), IndexType_(neq - nsl) - IndexType_(2));
+    vi(Index(1), IndexType_(neq - nsl) - IndexType_(1));
+    vi(Index(2), IndexType_(neq - nsl) - IndexType_(0));
+    vi(Index(3), IndexType_(neq      ) - IndexType_(2));
+    vi(Index(4), IndexType_(neq      ) - IndexType_(1));
+    vi(Index(5), IndexType_(neq      ) - IndexType_(0));
+    vi(Index(6), IndexType_(neq + nsl) - IndexType_(2));
+    vi(Index(7), IndexType_(neq + nsl) - IndexType_(1));
+    vi(Index(8), IndexType_(neq + nsl) - IndexType_(0));
     MatrixType matrix_1(neq, neq, vv, vi);
 
     MatrixType matrix_2(matrix_1.clone());
