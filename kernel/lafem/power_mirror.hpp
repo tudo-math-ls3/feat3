@@ -178,7 +178,7 @@ namespace FEAST
       {
         if(this != &other)
         {
-          _sub_mirror(std::move(other._sub_mirror));
+          _sub_mirror = std::move(other._sub_mirror);
         }
         return *this;
       }
