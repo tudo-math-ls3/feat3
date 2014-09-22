@@ -8,6 +8,7 @@
 // includes, FEAST-LAFEM
 #include <kernel/lafem/matrix_mirror.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
+#include <kernel/lafem/power_mirror.hpp>
 
 namespace FEAST
 {
@@ -222,6 +223,21 @@ namespace FEAST
         const Space_& space, const CellSet_& cell_set)
       {
         assemble_mirror(vec_mirror, assemble_mirror_graph(space, cell_set));
+      }
+
+      template<
+        typename MemType_,
+        typename DataType_,
+        typename IndexType_,
+        Index count_,
+        typename Space_,
+        typename CellSet_>
+      static void assemble_mirror(LAFEM::PowerMirror<LAFEM::VectorMirror<MemType_, DataType_, IndexType_>, count_>& vec_mirror,
+        const Space_& space, const CellSet_& cell_set)
+      {
+        LAFEM::VectorMirror<MemType_, DataType_, IndexType_> submirror;
+        assemble_mirror(submirror, assemble_mirror_graph(space, cell_set));
+        vec_mirror = LAFEM::PowerMirror<LAFEM::VectorMirror<MemType_, DataType_, IndexType_>, count_>(std::move(submirror));
       }
 
       /**
