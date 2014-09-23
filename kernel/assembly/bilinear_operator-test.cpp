@@ -123,7 +123,7 @@ public:
     Index num_verts = mesh.get_num_entities(0);
     Index num_quads = mesh.get_num_entities(2);
 
-    const Geometry::IndexSet<4>& vatq(mesh.get_index_set<2,0>());
+    const Geometry::IndexSet<4>& vatq(mesh.template get_index_set<2,0>());
 
     // create a temporary array to count the number of quads adjacent to a vertex
     LAFEM::DenseVector<Mem::Main, Index> qatv(num_verts, Index(0));
@@ -362,7 +362,7 @@ public:
     Index num_verts = mesh.get_num_entities(0);
     Index num_quads = mesh.get_num_entities(2);
 
-    const auto& vatq(mesh.get_index_set<2,0>());
+    const auto& vatq(mesh.template get_index_set<2,0>());
 
     // create a temporary array to count the number of quads adjacent to a vertex
     LAFEM::DenseVector<Mem::Main, Index> qatv(num_verts, Index(0));
