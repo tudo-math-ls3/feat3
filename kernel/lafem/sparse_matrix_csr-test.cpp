@@ -76,6 +76,7 @@ public:
     typedef decltype(b.layout()) LayoutId;
     typename LayoutId::template MatrixType<DT_> y(b.layout());
     TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
+    TEST_CHECK_NOT_EQUAL((void*)x.val(), (void*)b.val());
 
 
     SparseMatrixCSR<Mem_, DT_, IT_> z;

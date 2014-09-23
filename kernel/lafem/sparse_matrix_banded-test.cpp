@@ -85,6 +85,27 @@ public:
     TEST_CHECK_EQUAL(a.rows(), rows);
     TEST_CHECK_EQUAL(a.columns(), columns);
 
+    auto b = a.clone();
+    SparseMatrixBanded<Mem_, DT_, IT_> bl(b.layout());
+    TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
+    TEST_CHECK_EQUAL(bl.size(), b.size());
+    TEST_CHECK_EQUAL(bl.rows(), b.rows());
+    TEST_CHECK_EQUAL(bl.columns(), b.columns());
+
+    bl = b.layout();
+    TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
+    TEST_CHECK_EQUAL(bl.size(), b.size());
+    TEST_CHECK_EQUAL(bl.rows(), b.rows());
+    TEST_CHECK_EQUAL(bl.columns(), b.columns());
+
+    typename SparseLayout<Mem_, IT_, SparseLayoutId::lt_banded>::template MatrixType<DT_> x(b.layout());
+    // icc 14.0.2 does not understand the following line, so we need a typedef hier
+    //typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
+    typedef decltype(b.layout()) LayoutId;
+    typename LayoutId::template MatrixType<DT_> y(b.layout());
+    TEST_CHECK_EQUAL((void*)x.offsets(), (void*)b.offsets());
+    TEST_CHECK_NOT_EQUAL((void*)x.val(), (void*)b.val());
+
     SparseMatrixBanded<Mem_, DT_, IT_> z;
     z.convert(a);
     TEST_CHECK_EQUAL(a, z);

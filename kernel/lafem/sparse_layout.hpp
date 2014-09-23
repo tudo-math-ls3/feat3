@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/memory_pool.hpp>
+#include <kernel/lafem/forward.hpp>
 
 #include <vector>
 
@@ -18,8 +19,9 @@ namespace FEAST
     enum class SparseLayoutId
     {
       lt_csr = 0,
-      lt_coo = 1,
-      lt_ell
+      lt_coo,
+      lt_ell,
+      lt_banded
     };
 
     /// \cond internal
@@ -36,6 +38,13 @@ namespace FEAST
       };
 
       template <>
+      struct LayoutId<SparseLayoutId::lt_coo>
+      {
+        template<typename Mem_, typename DT_, typename IT_>
+        using MatrixType = SparseMatrixCOO<Mem_, DT_, IT_>;
+      };
+
+      template <>
       struct LayoutId<SparseLayoutId::lt_ell>
       {
         template<typename Mem_, typename DT_, typename IT_>
@@ -43,11 +52,12 @@ namespace FEAST
       };
 
       template <>
-      struct LayoutId<SparseLayoutId::lt_coo>
+      struct LayoutId<SparseLayoutId::lt_banded>
       {
         template<typename Mem_, typename DT_, typename IT_>
-        using MatrixType = SparseMatrixCOO<Mem_, DT_, IT_>;
+        using MatrixType = SparseMatrixBanded<Mem_, DT_, IT_>;
       };
+
     } // namespace Intern
     /// \endcond
 

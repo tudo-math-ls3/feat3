@@ -129,6 +129,13 @@ namespace FEAST
       typedef DenseVector<MemType, DataType, IT_> VectorTypeL;
       /// Compatible R-vector type
       typedef DenseVector<MemType, DataType, IT_> VectorTypeR;
+      /// Our used layout type
+      static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_banded;
+      /// ImageIterator typedef for Adjactor interface implementation
+      typedef const IT_* ImageIterator;
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_, typename IT2_ = IT_>
+      using ContainerType = class SparseMatrixBanded<Mem2_, DT2_, IT2_>;
 
       /**
        * \brief Constructor
@@ -144,6 +151,29 @@ namespace FEAST
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_dt.push_back(DT_(0));
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] layout The layout to be used.
+       *
+       * Creates an empty matrix with given layout.
+       */
+      explicit SparseMatrixBanded(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
+        Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
+      {
+        CONTEXT("When creating SparseMatrixBanded");
+        this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
+        this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
+        this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
+        this->_scalar_dt.push_back(DT_(0));
+
+        for (auto i : this->_indices)
+          Util::MemoryPool<Mem_>::instance()->increase_memory(i);
+
+        this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(rows() * num_of_offsets()));
+        this->_elements_size.push_back(rows() * num_of_offsets());
       }
 
       /**
@@ -357,6 +387,44 @@ namespace FEAST
       }
 
       /**
+       * \brief Assignment operator
+       *
+       * \param[in] layout A sparse matrix layout.
+       *
+       * Assigns a new matrix layout, discarding all old data
+       */
+      SparseMatrixBanded & operator= (const SparseLayout<Mem_, IT_, layout_id> & layout_in)
+      {
+        CONTEXT("When assigning SparseMatrixBanded");
+
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+
+        this->_elements.clear();
+        this->_indices.clear();
+        this->_elements_size.clear();
+        this->_indices_size.clear();
+        this->_scalar_index.clear();
+        this->_scalar_dt.clear();
+
+        this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
+        this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
+        this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
+        this->_scalar_dt.push_back(DT_(0));
+
+        for (auto i : this->_indices)
+          Util::MemoryPool<Mem_>::instance()->increase_memory(i);
+
+        this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(rows() * num_of_offsets()));
+        this->_elements_size.push_back(rows() * num_of_offsets());
+
+        return *this;
+      }
+
+
+      /**
        * \brief Write out matrix to file.
        *
        * \param[in] mode The used file format.
@@ -449,6 +517,16 @@ namespace FEAST
           }
         }
         return zero_element();
+      }
+
+      /**
+       * \brief Retrieve convenient sparse matrix layout object.
+       *
+       * \return An object containing the sparse matrix layout.
+       */
+      SparseLayout<Mem_, IT_, layout_id> layout() const
+      {
+        return SparseLayout<Mem_, IT_, layout_id>(this->_indices, this->_indices_size, this->_scalar_index);
       }
 
       /**
@@ -724,6 +802,7 @@ namespace FEAST
         }
       }
       ///@}
+
       /**
        * \brief Deserialisation of complete container entity.
        *
