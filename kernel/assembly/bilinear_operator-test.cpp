@@ -24,7 +24,7 @@ class BilinearOperatorTest :
   typedef typename MatrixType_::IndexType IndexType_;
   typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
 
-  typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
+  typedef Geometry::ConformalMesh<Shape::Quadrilateral, 2, 2, DataType_> QuadMesh;
 
   typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
@@ -233,7 +233,7 @@ class BandedBilinearOperatorTest :
   typedef LAFEM::SparseMatrixBanded<Mem::Main, DataType_, IndexType_> MatrixType;
   typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
 
-  typedef Geometry::StructuredMesh<2> QuadMesh;
+  typedef Geometry::StructuredMesh<2, 2, 2, DataType_> QuadMesh;
 
   typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
@@ -242,7 +242,7 @@ class BandedBilinearOperatorTest :
 
 public:
   BandedBilinearOperatorTest() :
-    TestSystem::FullTaggedTest<MemType_, Archs::None, DataType_, IndexType_>("BandedBilinearOperatorTest<" + MatrixType::name() + ">")
+    TestSystem::FullTaggedTest<MemType_, Archs::None, DataType_, IndexType_>("BandedBilinearOperatorTest")
   {
   }
 
