@@ -1186,6 +1186,127 @@ namespace FEAST
         }
       }
     }; // class GatherAxpy<LAFEM::SparseMatrixBanded<Mem::Main,...>>
+
+    /**
+     * \brief Scatter-Axpy specialisation for SparseMatrixCSRBlocked
+     *
+     * Apart from the MatrixType and usage of DataTypeBlocked c&p from SparseMatrixCSR.
+     *
+     * \author Jordi Paul
+     */
+    template<typename DataType_, typename IndexType_, Index BlockHeight_, Index BlockWidth_>
+    class ScatterAxpy< LAFEM::SparseMatrixCSRBlocked<Mem::Main, DataType_, IndexType_, BlockHeight_, BlockWidth_> >
+    {
+    public:
+      typedef LAFEM::SparseMatrixCSRBlocked<Mem::Main, DataType_, IndexType_, BlockHeight_, BlockWidth_> MatrixType;
+      typedef Mem::Main MemType;
+      typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
+      typedef Tiny::Matrix<DataType_, BlockHeight_, BlockWidth_>DataTypeBlocked;
+
+    private:
+#ifdef DEBUG
+      IndexType_ _deadcode;
+#endif
+      Index _num_rows;
+      Index _num_cols;
+      IndexType_* _row_ptr;
+      IndexType_* _col_idx;
+      IndexType_* _col_ptr;
+      DataTypeBlocked *_data;
+
+    public:
+      explicit ScatterAxpy(MatrixType& matrix) :
+#ifdef DEBUG
+        _deadcode(~IndexType_(0)),
+#endif
+        _num_rows(matrix.rows()),
+        _num_cols(matrix.columns()),
+        _row_ptr(matrix.row_ptr()),
+        _col_idx(matrix.col_ind()),
+        _col_ptr(nullptr),
+        _data(matrix.val())
+      {
+        // allocate column-pointer array
+        _col_ptr = new IndexType_[matrix.columns()];
+#ifdef DEBUG
+        for(Index i(0); i < _num_cols; ++i)
+        {
+          _col_ptr[i] = _deadcode;
+        }
+#endif
+      }
+
+      virtual ~ScatterAxpy()
+      {
+        if(_col_ptr != nullptr)
+        {
+          delete [] _col_ptr;
+        }
+      }
+
+      template<typename LocalData_>
+      void operator()(
+        const LocalData_& loc_mat,
+        DataType_ alpha = DataType_(1))
+      {
+        // loop over all local row entries
+        for(Index i(0); i < loc_mat.get_num_rows(); ++i)
+        {
+          // loop over all row entry contributations
+          for(Index ic(0); ic < loc_mat.get_num_row_contribs(i); ++ic)
+          {
+            // fetch row entry weight and pre-multiply by alpha
+            DataType_ iw = alpha * DataType_(loc_mat.get_row_weight(i, ic));
+
+            // fetch row index
+            Index ix = loc_mat.get_row_index(i, ic);
+
+            // build column pointer for this row entry contribution
+            for(IndexType_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+            {
+              _col_ptr[_col_idx[k]] = k;
+            }
+
+            // loop over all local column entries
+            for(Index j(0); j < loc_mat.get_num_cols(); ++j)
+            {
+              // loop over all column entry contributions
+              for(Index jc(0); jc < loc_mat.get_num_col_contribs(j); ++jc)
+              {
+                // fetch trial function dof weight
+                DataType_ jw = DataType_(loc_mat.get_col_weight(j, jc));
+
+                // fetch column index
+                Index jx = loc_mat.get_col_index(j, jc);
+
+#ifdef DEBUG
+                // ensure that the column pointer is valid for this index
+                ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
+#endif
+
+                // incorporate data into global matrix
+                _data[_col_ptr[jx]] += iw * jw * loc_mat(i,j);
+
+                // continue with next column contribution
+              }
+              // continue with next column entry
+            }
+
+#ifdef DEBUG
+            // reformat column-pointer array
+            for(IndexType_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+            {
+              _col_ptr[_col_idx[k]] = _deadcode;
+            }
+#endif
+            // continue with next row contribution
+          }
+          // continue with next row entry
+        }
+      }
+    }; // class ScatterAxpy<LAFEM::SparseMatrixCSRBlocked<Mem::Main,...>>
+
   } // namespace LAFEM
 } // namespace FEAST
 
