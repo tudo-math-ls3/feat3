@@ -91,7 +91,12 @@ namespace FEAST
         static constexpr Index BlockWidth = BlockWidth_;
         /// Our used layout type
         static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_csr;
-
+        /// Value type, meaning the type of each block
+        typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
+        /// Compatible L-vector type
+        typedef DenseVectorBlocked<Mem_, DT_, IT_, BlockHeight> VectorTypeL;
+        /// Compatible R-vector type
+        typedef DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth> VectorTypeR;
 
         /**
          * \brief Constructor
@@ -941,6 +946,22 @@ namespace FEAST
 
           return lhs;
         }
+
+        /// \cond internal
+        /// Returns a new compatible L-Vector.
+        VectorTypeL create_vector_l() const
+        {
+          return VectorTypeL(this->rows());
+        }
+
+        /// Returns a new compatible R-Vector.
+        VectorTypeR create_vector_r() const
+        {
+          return VectorTypeR(this->columns());
+        }
+
+        /// \endcond
+
     };
 
   } // namespace LAFEM
