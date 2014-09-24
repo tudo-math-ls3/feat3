@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/assembly/base.hpp>
 #include <kernel/lafem/unit_filter.hpp>
+#include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 
 // includes, system
@@ -115,7 +116,7 @@ namespace FEAST
        * \brief Builds an inhomogeneous unit-filter.
        *
        * This function assembles a unit-filter implementing the inhomogeneous Dirichlet boundary conditions given by
-       * the vector vector_
+       * the vector vector_. In general, this vector will be a representation of an FE function.
        *
        * \param[in,out] filter
        * A reference to the unit-filter where the entries are to be added.
@@ -175,6 +176,63 @@ namespace FEAST
           filter.add(IndexType_(it->first), it->second);
         }
       }
+      /**
+       * \brief Builds a homogeneous blocked unit filter.
+       *
+       * This function assembles a blocked unit filter implementing the homogeneous Dirichlet boundary conditions.
+       *
+       * \param[in,out] filter
+       * A reference to the blocked unit filter where the entries are to be added.
+       */
+      template<typename MemType_, typename DataType_, typename IndexType_, Index BlockSize_>
+      void assemble(LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>& filter) const
+      {
+        // build index set
+        std::set<Index> idx_set;
+        Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
+
+        // loop over all dof-indices
+        typename std::set<Index>::const_iterator it(idx_set.begin());
+        typename std::set<Index>::const_iterator jt(idx_set.end());
+        typename LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>::ValueType tmp(DataType_(0));
+        for(Index i(0); it != jt; ++it, ++i)
+        {
+          // store the dof-index
+          filter.add(IndexType_(*it), tmp);
+        }
+      }
+
+      /**
+       * \brief Builds an inhomogeneous blocked unit filter.
+       *
+       * This function assembles a blocked unit filter implementing the inhomogeneous Dirichlet boundary conditions
+       * given by the vector vector_. In general, this vector will be a representation of an FE function.
+       *
+       * \param[in,out] filter
+       * A reference to the unit-filter where the entries are to be added.
+       *
+       * \param[in] vector_
+       * A LAFEM::DenseVector containing (among other stuff) the entries to be added.
+       *
+       */
+      template<typename MemType_, typename DataType_, typename IndexType_, Index BlockSize_>
+      void assemble(LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>& filter,
+      const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, BlockSize_>& vector_) const
+      {
+        // build index set
+        std::set<Index> idx_set;
+        Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
+
+        // loop over all dof-indices
+        typename std::set<Index>::const_iterator it(idx_set.begin());
+        typename std::set<Index>::const_iterator jt(idx_set.end());
+        for(Index i(0); it != jt; ++it, ++i)
+        {
+          // store the dof-index
+          filter.add(IndexType_(*it), vector_(IndexType_(*it)));
+        }
+      }
+
     }; // class DirichletAssembler
 
     /// \cond internal
