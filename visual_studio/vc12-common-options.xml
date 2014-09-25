@@ -107,7 +107,7 @@
   <!-- ************************************************************************************************************* -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 5.5.targets"
-      Condition="'$(CUDA_PATH)'!='' And '$(BackendCUDA)'=='true'"/>
+    <!--<Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 5.5.targets"
+      Condition="'$(CUDA_PATH)'!='' And '$(BackendCUDA)'=='true'"/>-->
   </ImportGroup>
 </Project>
