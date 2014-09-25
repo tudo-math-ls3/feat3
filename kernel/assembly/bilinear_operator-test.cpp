@@ -285,14 +285,11 @@ public:
     QuadSpaceQ0 space(trafo);
 
     // create a matrix
-    //std::vector<IndexType_> nsi;
-    //nsi.push_back(mesh.get_num_slices(0));
-    //nsi.push_back(mesh.get_num_slices(1));
-    //MatrixType matrix(LAFEM::PointstarStructureFE<Algo::Generic>::template value<DataType_,IndexType_>(Index(0), nsi));
-    Index neq = space.get_num_dofs();
-    LAFEM::DenseVector<MemType_,DataType_, IndexType_> vv(neq, DataType_(0));
-    LAFEM::DenseVector<MemType_, IndexType_, IndexType_> vi(Index(1), IndexType_(neq) - IndexType_(1));
-    MatrixType matrix(neq, neq, vv, vi);
+    std::vector<IndexType_> nsi;
+    nsi.push_back(IndexType_(mesh.get_num_slices(0)));
+    nsi.push_back(IndexType_(mesh.get_num_slices(1)));
+    MatrixType matrix(LAFEM::PointstarStructureFE<Algo::Generic>::template value<DataType_,IndexType_>(Index(0), nsi));
+    matrix.format();
 
     // create a cubature factory
     Cubature::DynamicFactory cubature_factory("barycentre");
@@ -325,29 +322,13 @@ public:
     QuadSpaceQ1 space(trafo);
 
     // create two matrices
-    //std::vector<IndexType_> nsi;
-    //nsi.push_back(mesh.get_num_slices(0));
-    //nsi.push_back(mesh.get_num_slices(1));
-    //MatrixType matrix_1(LAFEM::PointstarStructureFE<Algo::Generic>::template value<DataType_,IndexType_>(Index(1), nsi));
-    Index nsl = mesh.get_num_slices(0) + Index(1);
-    Index neq = space.get_num_dofs();
-    Index nze = Index(9)*neq;
-    LAFEM::DenseVector<MemType_,DataType_, IndexType_> vv(nze, DataType_(0));
-    LAFEM::DenseVector<MemType_, IndexType_, IndexType_> vi(Index(9));
-    vi(Index(0), IndexType_(neq - nsl) - IndexType_(2));
-    vi(Index(1), IndexType_(neq - nsl) - IndexType_(1));
-    vi(Index(2), IndexType_(neq - nsl) - IndexType_(0));
-    vi(Index(3), IndexType_(neq      ) - IndexType_(2));
-    vi(Index(4), IndexType_(neq      ) - IndexType_(1));
-    vi(Index(5), IndexType_(neq      ) - IndexType_(0));
-    vi(Index(6), IndexType_(neq + nsl) - IndexType_(2));
-    vi(Index(7), IndexType_(neq + nsl) - IndexType_(1));
-    vi(Index(8), IndexType_(neq + nsl) - IndexType_(0));
-    MatrixType matrix_1(neq, neq, vv, vi);
+    std::vector<IndexType_> nsi;
+    nsi.push_back(IndexType_(mesh.get_num_slices(0)));
+    nsi.push_back(IndexType_(mesh.get_num_slices(1)));
+    MatrixType matrix_1(LAFEM::PointstarStructureFE<Algo::Generic>::template value<DataType_,IndexType_>(Index(1), nsi));
 
-    MatrixType matrix_2(matrix_1.clone());
     matrix_1.format();
-    matrix_2.format();
+    MatrixType matrix_2(matrix_1.clone());
 
     // create a cubature factory
     Cubature::DynamicFactory cubature_factory_trz("trapezoidal");
