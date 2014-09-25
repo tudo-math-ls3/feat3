@@ -58,10 +58,20 @@ namespace FEAST
         // calculate size of matrix and number of offsets
         IndexType_ size(1);
         Index noo(1);
-        for (Index i(0); i < d; ++i)
+        if (fe_order > Index(0))
         {
-          size *= pnos[i] * IndexType_(fe_order) - 1;
-          noo *=  2 * fe_order + 1;
+          for (Index i(0); i < d; ++i)
+          {
+            size *= pnos[i] * IndexType_(fe_order) + 1;
+            noo *=  2 * fe_order + 1;
+          }
+        }
+        else
+        {
+          for (Index i(0); i < d; ++i)
+          {
+            size *= pnos[i];
+          }
         }
 
         // allocate memory for vectors of matrix
@@ -75,7 +85,7 @@ namespace FEAST
         // save position of main-diagonal
         poffsets[h_off] = IndexType_(size - 1);
 
-        for (Index i(0), k(1), m(1); i < d; ++i, k *= 2 * fe_order + 1, m *= pnos[i - 1] * fe_order - 1)
+        for (Index i(0), k(1), m(1); i < d; ++i, k *= 2 * fe_order + 1, m *= pnos[i - 1] * fe_order + 1)
         {
           Index k1((k - 1) / 2);
 
