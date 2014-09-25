@@ -1524,7 +1524,7 @@ namespace FEAST
        *
        * \return The transposed matrix
        */
-      SparseMatrixELL transpose()
+      SparseMatrixELL transpose() const
       {
         SparseMatrixELL x_t;
         x_t.transpose(*this);

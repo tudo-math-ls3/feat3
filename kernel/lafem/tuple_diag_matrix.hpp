@@ -145,6 +145,14 @@ namespace FEAST
       }
 
       /**
+       * \brief Creates and returns the transpose of this matrix.
+       */
+      TupleDiagMatrix transpose() const
+      {
+        return TupleDiagMatrix(_first.transpose(), _rest.transpose());
+      }
+
+      /**
        * \brief Returns a sub-matrix block.
        *
        * \tparam i_
@@ -335,6 +343,13 @@ namespace FEAST
         return VectorTypeR(first().create_vector_r(), rest().create_vector_r());
       }
 
+      template<typename Algo_>
+      void scale_rows(const TupleDiagMatrix& a, const VectorTypeL& w)
+      {
+        first().template scale_rows<Algo_>(a.first(), w.first());
+        rest().template scale_rows<Algo_>(a.rest(), w.rest());
+      }
+
       /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
@@ -475,6 +490,11 @@ namespace FEAST
         return TupleDiagMatrix(_first.clone());
       }
 
+      TupleDiagMatrix transpose() const
+      {
+        return TupleDiagMatrix(_first.transpose());
+      }
+
       template<Index i, Index j>
       typename TupleElement<i, First_>::Type& at()
       {
@@ -553,6 +573,12 @@ namespace FEAST
       VectorTypeR create_vector_r() const
       {
         return VectorTypeR(first().create_vector_r());
+      }
+
+      template<typename Algo_>
+      void scale_rows(const TupleDiagMatrix& a, const VectorTypeL& w)
+      {
+        first().template scale_rows<Algo_>(a.first(), w.first());
       }
 
       /// Returns the number of NNZ-elements of the selected row

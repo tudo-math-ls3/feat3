@@ -1545,7 +1545,7 @@ namespace FEAST
          *
          * \return The transposed matrix
          */
-        SparseMatrixCOO transpose()
+        SparseMatrixCOO transpose() const
         {
           SparseMatrixCOO x_t;
           x_t.transpose(*this);

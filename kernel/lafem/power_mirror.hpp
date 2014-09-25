@@ -211,6 +211,20 @@ namespace FEAST
         return count_ * _sub_mirror.size();
       }
 
+      template<Index i_>
+      SubMirrorType& at()
+      {
+        static_assert(i_ < count_, "invalid sub-mirror index");
+        return _sub_mirror;
+      }
+
+      template<Index i_>
+      const SubMirrorType& at() const
+      {
+        static_assert(i_ < count_, "invalid sub-mirror index");
+        return _sub_mirror;
+      }
+
       /** \copydoc VectorMirror::template gather_prim() */
       template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
       void gather_prim(

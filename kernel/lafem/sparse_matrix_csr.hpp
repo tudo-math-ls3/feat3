@@ -1315,7 +1315,7 @@ namespace FEAST
          *
          * \return The transposed matrix
          */
-        SparseMatrixCSR transpose()
+        SparseMatrixCSR transpose() const
         {
           SparseMatrixCSR x_t;
           x_t.transpose(*this);
