@@ -57,6 +57,7 @@ SET (test_list
   sparse_vector_blocked-test
   umfpack-test
   unit_filter-test
+  unit_filter_blocked-test
   vector_mirror-test
 )
 

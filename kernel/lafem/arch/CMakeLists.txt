@@ -26,6 +26,7 @@ SET (kernel-lafem-arch-list
   scale_row_col_generic.cpp
   sum_generic.cpp
   unit_filter_generic.cpp
+  unit_filter_blocked_generic.cpp
   )
 
 if (FEAST_BACKENDS_MKL)
