@@ -109,7 +109,7 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] size The size of the created vector.
+         * \param[in] size_in The size of the created vector.
          *
          * Creates a vector with a given size.
          */
@@ -230,6 +230,8 @@ namespace FEAST
           return this->_elements.at(0);
         }
 
+        /// \copydoc elements()
+        /// const version.
         Tiny::Vector<DT_, BlockSize_> const * elements() const
         {
           if (sorted() == 0)
@@ -249,6 +251,8 @@ namespace FEAST
           return this->_elements.at(0);
         }
 
+        /// \copydoc raw_elements()
+        /// const version.
         DT_ const * raw_elements() const
         {
           if (sorted() == 0)
@@ -268,6 +272,8 @@ namespace FEAST
           return this->_indices.at(0);
         }
 
+        /// \copydoc indices()
+        /// const version.
         IT_ const * indices() const
         {
           if (sorted() == 0)
@@ -386,6 +392,7 @@ namespace FEAST
           }
         }
 
+        /// \brief Sorts the vector
         void sort()
         {
           if (sorted() == 0)

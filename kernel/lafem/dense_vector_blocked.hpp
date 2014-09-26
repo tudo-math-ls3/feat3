@@ -51,12 +51,6 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_, Index BlockSize_>
     class DenseVectorBlocked : public Container<Mem_, DT_, IT_>, public VectorBase
     {
-      private:
-        Index & _size()
-        {
-          return this->_scalar_index.at(0);
-        }
-
       public:
         /// Our datatype
         typedef DT_ DataType;
@@ -81,7 +75,8 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] size The size of the created vector. aka block count
+         * \param[in] size_in
+         * The size of the created vector. aka block count
          *
          * Creates a vector with a given block count.
          */
@@ -97,8 +92,11 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] size The size of the created vector.
-         * \param[in] value The value, each element will be set to.
+         * \param[in] size_in
+         * The size of the created vector.
+         *
+         * \param[in] value
+         * The value, each element will be set to.
          *
          * Creates a vector with given size and value.
          */
@@ -116,7 +114,7 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] size The block count of the created vector.
+         * \param[in] size_in The block count of the created vector.
          * \param[in] data An array containing the value data.
          *
          * Creates a vector with given size and given data.
@@ -168,6 +166,8 @@ namespace FEAST
          * \param[in] other The source vector.
          *
          * Moves another vector to the target vector.
+         *
+         * \returns The vector moved to.
          */
         DenseVectorBlocked & operator= (DenseVectorBlocked && other)
         {
@@ -178,12 +178,12 @@ namespace FEAST
           return *this;
         }
 
-
-        /** \brief Clone operation
+        /**
+         * \brief Clone operation
          *
          * Create a deep copy of itself.
          *
-         * \return A deep copy of itself.
+         * \returns A deep copy of itself.
          *
          */
         DenseVectorBlocked clone() const
@@ -195,7 +195,8 @@ namespace FEAST
 
         using Container<Mem_, DT_, IT_>::clone;
 
-        /** \brief Shallow copy operation
+        /**
+         * \brief Shallow copy operation
          *
          * Create a shallow copy of itself.
          *
@@ -259,6 +260,8 @@ namespace FEAST
           return (Tiny::Vector<DT_, BlockSize_>*)this->_elements.at(0);
         }
 
+        /// \copydoc elements()
+        /// const version.
         Tiny::Vector<DT_, BlockSize_> const * elements() const
         {
           return (Tiny::Vector<DT_, BlockSize_>*)this->_elements.at(0);
@@ -274,6 +277,8 @@ namespace FEAST
           return this->_elements.at(0);
         }
 
+        /// \copydoc raw_elements()
+        /// const version.
         DT_ const * raw_elements() const
         {
           return this->_elements.at(0);
@@ -312,7 +317,7 @@ namespace FEAST
         {
           CONTEXT("When setting DenseVectorBlocked element");
 
-          ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector blocked size " + stringify(this->_size()) + " !");
+          ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector blocked size " + stringify(this->size()) + " !");
           Util::MemoryPool<Mem_>::upload(this->_elements.at(0) + index * BlockSize_, value.v, BlockSize_);
         }
 

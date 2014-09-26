@@ -128,11 +128,19 @@ namespace FEAST
         _sv.convert(other._sv);
       }
 
+      /// \brief Clears the underlying data (namely the SparseVector)
       void clear()
       {
         _sv.clear();
       }
 
+      /**
+       * \brief Adds one element to the filter
+       *
+       * \param[in] idx Index where to add
+       * \param[in] val Value to add
+       *
+       **/
       void add(IndexType idx, ValueType val)
       {
         _sv(idx, val);
@@ -207,6 +215,22 @@ namespace FEAST
         }
       }
 
+      /**
+       * \brief Filter the non-diagonal row entries
+       *
+       * \tparam Algo_
+       * Backend
+       *
+       * \tparam BlockWidth_
+       * The input matrix' block width
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       *
+       * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
+       * blocksize.
+       *
+       */
       template<typename Algo_, Index BlockWidth_>
       void filter_offdiag_row_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
@@ -224,6 +248,22 @@ namespace FEAST
         }
       }
 
+      /**
+       * \brief Filter the non-diagonal column entries
+       *
+       * \tparam Algo_
+       * Backend
+       *
+       * \tparam BlockWidth_
+       * The input matrix' block width
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       *
+       * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
+       * blocksize.
+       *
+       */
       template<typename Algo_, Index BlockWidth_>
       void filter_offdiag_col_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> &) const
       {

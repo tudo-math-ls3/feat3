@@ -117,7 +117,7 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] layout The layout to be used.
+         * \param[in] layout_in The layout to be used.
          *
          * Creates an empty matrix with given layout.
          */
@@ -140,11 +140,11 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] rows The row count of the created matrix.
-         * \param[in] columns The column count of the created matrix.
-         * \param[in] col_ind Vector with column indices.
-         * \param[in] val Vector with non zero elements.
-         * \param[in] row_ptr Vector with start indices of all rows into the val/col_ind arrays.
+         * \param[in] rows_in The row count of the created matrix.
+         * \param[in] columns_in The column count of the created matrix.
+         * \param[in] col_ind_in Vector with column indices.
+         * \param[in] val_in Vector with non zero elements.
+         * \param[in] row_ptr_in Vector with start indices of all rows into the val/col_ind arrays.
          * Note that this vector must also contain the end index of the last row and thus has a size of row_count + 1.
          *
          * Creates a matrix with given dimensions and content.
@@ -252,7 +252,7 @@ namespace FEAST
         /**
          * \brief Assignment operator
          *
-         * \param[in] layout A sparse matrix layout.
+         * \param[in] layout_in A sparse matrix layout.
          *
          * Assigns a new matrix layout, discarding all old data
          */
@@ -393,6 +393,8 @@ namespace FEAST
           return this->_indices.at(0);
         }
 
+        /// \copydoc col_ind()
+        /// const version.
         IT_ const * col_ind() const
         {
           return this->_indices.at(0);
@@ -408,6 +410,8 @@ namespace FEAST
           return (Tiny::Matrix<DT_, BlockHeight_, BlockWidth_>*)this->_elements.at(0);
         }
 
+        /// \copydoc val()
+        /// const version.
         Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> const * val() const
         {
           return (Tiny::Matrix<DT_, BlockHeight_, BlockWidth_>*)this->_elements.at(0);
@@ -423,6 +427,8 @@ namespace FEAST
           return this->_elements.at(0);
         }
 
+        /// \copydoc raw_val()
+        /// const version.
         DT_ const * raw_val() const
         {
           return this->_elements.at(0);
@@ -438,6 +444,8 @@ namespace FEAST
           return this->_indices.at(1);
         }
 
+        /// \copydoc row_ptr()
+        /// const version.
         IT_ const * row_ptr() const
         {
           return this->_indices.at(1);
@@ -948,13 +956,13 @@ namespace FEAST
         }
 
         /// \cond internal
-        /// Returns a new compatible L-Vector.
+        // Returns a new compatible L-Vector.
         VectorTypeL create_vector_l() const
         {
           return VectorTypeL(this->rows());
         }
 
-        /// Returns a new compatible R-Vector.
+        // Returns a new compatible R-Vector.
         VectorTypeR create_vector_r() const
         {
           return VectorTypeR(this->columns());
