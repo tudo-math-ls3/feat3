@@ -152,7 +152,7 @@ namespace FEAST
         }
 
         const IT_ tC(IT_(this->_C()));
-        const Index tnum_of_chunks(Index(ceil(trows / float(tC))));
+        const Index tnum_of_chunks((trows + tC - Index(1)) / tC);
 
         LAFEM::DenseVector<Mem::Main, IT_, IT_> tcl(tnum_of_chunks, IT_(0));
         IT_ * ptcl(tcl.elements());
@@ -372,7 +372,7 @@ namespace FEAST
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(C_in);
-        this->_scalar_index.push_back(Index(ceil(rows_in / float(C_in))));
+        this->_scalar_index.push_back((rows_in + C_in - Index(1)) / C_in);
         this->_scalar_index.push_back(val_in.size());
         this->_scalar_index.push_back(used_elements_in);
         this->_scalar_dt.push_back(DT_(0));
@@ -415,7 +415,7 @@ namespace FEAST
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
         Index num_nnze = graph.get_num_indices();
-        Index num_of_chunks_in(Index(ceil(num_rows / float(C_in))));
+        Index num_of_chunks_in = (num_rows + C_in - Index(1)) / C_in;
 
         const Index * dom_ptr(graph.get_domain_ptr());
         const Index * img_idx(graph.get_image_idx());
@@ -642,7 +642,7 @@ namespace FEAST
         this->_scalar_index.push_back(other.rows());
         this->_scalar_index.push_back(other.columns());
         this->_scalar_index.push_back(tC);
-        this->_scalar_index.push_back(Index(ceil(_rows() / float(_C()))));
+        this->_scalar_index.push_back((_rows() + _C() - Index(1)) / _C());
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(other.used_elements());
         this->_scalar_dt.push_back(other.zero_element());
@@ -792,7 +792,7 @@ namespace FEAST
         this->_scalar_index.push_back(other.rows());
         this->_scalar_index.push_back(other.columns());
         this->_scalar_index.push_back(tC);
-        this->_scalar_index.push_back(Index(ceil(_rows() / float(_C()))));
+        this->_scalar_index.push_back((_rows() + _C() - Index(1)) / _C());
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(other.used_elements());
         this->_scalar_dt.push_back(other.zero_element());
@@ -897,7 +897,7 @@ namespace FEAST
         this->_scalar_index.push_back(other.rows());
         this->_scalar_index.push_back(other.columns());
         this->_scalar_index.push_back(tC);
-        this->_scalar_index.push_back(Index(ceil(_rows() / float(_C()))));
+        this->_scalar_index.push_back((_rows() + _C() - Index(1)) / _C());
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(other.used_elements());
         this->_scalar_dt.push_back(other.zero_element());
@@ -1013,7 +1013,7 @@ namespace FEAST
         const Index arows(ta.rows());
         const Index acolumns(ta.columns());
         const Index aused_elements(ta.used_elements());
-        const Index anum_of_chunks(Index(ceil(arows / float(aC))));
+        const Index anum_of_chunks((arows + aC - Index(1)) / aC);
 
         DenseVector<Mem::Main, IT_, IT_> arl(arows);
         IT_ * prl(arl.elements());
@@ -1552,7 +1552,7 @@ namespace FEAST
         const IT_ * ptxrl(tx.rl());
 
         const Index tC(this->C());
-        const Index tnum_of_chunks(Index(ceil(txcolumns / float(tC))));
+        const Index tnum_of_chunks((txcolumns + tC - Index(1)) / tC);
 
         DenseVector<Mem::Main, IT_, IT_> trl(txcolumns, IT_(0));
         IT_ * ptrl(trl.elements());
