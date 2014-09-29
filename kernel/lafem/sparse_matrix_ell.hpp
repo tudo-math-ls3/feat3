@@ -276,6 +276,41 @@ namespace FEAST
       typedef DenseVector<Mem_, DT_, IT_> VectorTypeR;
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_ell;
+      /// ImageIterator class for Adjactor interface implementation
+      class ImageIterator
+      {
+      private:
+        const IT_* _ai;
+        IT_ _c;
+
+      public:
+        ImageIterator() : _ai(nullptr), _c(IT_(0)) {}
+
+        ImageIterator(const IT_* ai, IT_ c) : _ai(ai), _c(c) {}
+
+        ImageIterator& operator=(const ImageIterator& other)
+        {
+          _ai = other._ai;
+          _c = other._c;
+          return *this;
+        }
+
+        bool operator!=(const ImageIterator& other) const
+        {
+          return this->_ai != other._ai;
+        }
+
+        ImageIterator& operator++()
+        {
+          _ai += _c;
+          return *this;
+        }
+
+        Index operator*() const
+        {
+          return Index(*_ai);
+        }
+      };
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = class SparseMatrixELL<Mem2_, DT2_, IT2_>;
@@ -1776,6 +1811,38 @@ namespace FEAST
         }
       }
       /// \endcond
+
+      /* ******************************************************************* */
+      /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
+      /* ******************************************************************* */
+    public:
+      /** \copydoc Adjactor::get_num_nodes_domain() */
+      const inline Index & get_num_nodes_domain() const
+      {
+        return rows();
+      }
+
+      /** \copydoc Adjactor::get_num_nodes_image() */
+      const inline Index & get_num_nodes_image() const
+      {
+        return columns();
+      }
+
+      /** \copydoc Adjactor::image_begin() */
+      inline ImageIterator image_begin(Index domain_node) const
+      {
+        ASSERT(domain_node < rows(), "Domain node index out of range");
+        return ImageIterator(&col_ind()[cs()[domain_node/C()] + domain_node%C()], C());
+      }
+
+      /** \copydoc Adjactor::image_end() */
+      inline ImageIterator image_end(Index domain_node) const
+      {
+        CONTEXT("Graph::image_end()");
+        ASSERT(domain_node < rows(), "Domain node index out of range");
+        return ImageIterator(&col_ind()[cs()[domain_node/C()] + domain_node%C() + rl()[domain_node] * C()], C());
+      }
+
 
       /**
        * \brief SparseMatrixELL comparison operator
