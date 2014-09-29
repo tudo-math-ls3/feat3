@@ -14,6 +14,14 @@ namespace FEAST
 {
   namespace Space
   {
+    /**
+     * \brief Argyris Element namespace
+     *
+     * This namespace encapsulates all classes related to the implementation of the sixth-order
+     * H2-conforming triangular Finite Element space known as the "Argyris" element.
+     *
+     * \see P.G. Ciarlet: The Finite Element Method for Elliptic Problems; pp. 71-73
+     */
     namespace Argyris
     {
       /**
