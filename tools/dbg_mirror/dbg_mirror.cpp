@@ -24,6 +24,7 @@ typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
 
 typedef LAFEM::DenseVector<Mem::Main, double> MyVectorType;
 typedef LAFEM::SparseMatrixCSR<Mem::Main, double> MyMatrixType;
+typedef LAFEM::SparseMatrixCSR<Mem::Main, double> BufMatrixType;
 
 typedef LAFEM::VectorMirror<Mem::Main, double> VectorMirrorType;
 typedef LAFEM::MatrixMirror<VectorMirrorType> MatrixMirrorType;
@@ -40,7 +41,7 @@ void sync_add(MyVectorType& a, MyVectorType& b)
     av[i] = bv[i] = av[i] + bv[i];
 }
 
-void sync_add(MyMatrixType& a, MyMatrixType& b)
+void sync_add(BufMatrixType& a, BufMatrixType& b)
 {
   double * av(a.val());
   double * bv(b.val());
@@ -107,8 +108,8 @@ void test_mirror(
   Assembly::MirrorAssembler::assemble_buffer_vector(buf_vec_1, vec_mir_1, loc_vec_1);
 
   // allocate buffer matrices
-  MyMatrixType buf_mat_0;
-  MyMatrixType buf_mat_1;
+  BufMatrixType buf_mat_0;
+  BufMatrixType buf_mat_1;
   Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat_0, mat_mir_0, loc_mat_0);
   Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat_1, mat_mir_1, loc_mat_1);
 

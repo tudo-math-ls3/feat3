@@ -9,6 +9,9 @@
 #include <kernel/lafem/matrix_mirror.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/lafem/power_mirror.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 
 namespace FEAST
 {
@@ -191,8 +194,8 @@ namespace FEAST
        * \param[in] graph
        * The mirror adjacency graph.
        */
-      template<typename MemType_, typename DataType_>
-      static void assemble_mirror(LAFEM::VectorMirror<MemType_, DataType_>& vec_mirror, const Adjacency::Graph& graph)
+      template<typename MemType_, typename DataType_, typename IndexType_>
+      static void assemble_mirror(LAFEM::VectorMirror<MemType_, DataType_, IndexType_>& vec_mirror, const Adjacency::Graph& graph)
       {
         SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_gather_prim(), graph);
         SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_scatter_prim(),
@@ -251,10 +254,23 @@ namespace FEAST
        */
       template<
         typename VectorMirror_,
-        typename DataTypeB_>
+        typename DataTypeB_,
+        typename IndexTypeB_>
       static Adjacency::Graph assemble_buffer_graph(
         const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
-        const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeB_>& template_matrix)
+        const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeB_, IndexTypeB_>& template_matrix)
+      {
+        Adjacency::Graph tmp(Adjacency::rt_injectify, matrix_mirror.get_row_mirror().get_gather_dual(), template_matrix);
+        return Adjacency::Graph(Adjacency::rt_injectify, tmp, matrix_mirror.get_col_mirror().get_scatter_dual());
+      }
+
+      template<
+        typename VectorMirror_,
+        typename DataTypeB_,
+        typename IndexTypeB_>
+      static Adjacency::Graph assemble_buffer_graph(
+        const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
+        const LAFEM::SparseMatrixELL<Mem::Main, DataTypeB_, IndexTypeB_>& template_matrix)
       {
         Adjacency::Graph tmp(Adjacency::rt_injectify, matrix_mirror.get_row_mirror().get_gather_dual(), template_matrix);
         return Adjacency::Graph(Adjacency::rt_injectify, tmp, matrix_mirror.get_col_mirror().get_scatter_dual());
@@ -274,12 +290,28 @@ namespace FEAST
        */
       template<
         typename DataTypeA_,
+        typename IndexTypeA_,
         typename VectorMirror_,
-        typename DataTypeC_>
+        typename DataTypeC_,
+        typename IndexTypeC_>
       static void assemble_buffer_matrix(
-        LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_>& buffer_matrix,
+        LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_, IndexTypeA_>& buffer_matrix,
         const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
-        const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeC_>& template_matrix)
+        const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeC_, IndexTypeC_>& template_matrix)
+      {
+        SymbolicMatrixAssemblerBase::assemble(buffer_matrix, assemble_buffer_graph(matrix_mirror, template_matrix));
+      }
+
+      template<
+        typename DataTypeA_,
+        typename IndexTypeA_,
+        typename VectorMirror_,
+        typename DataTypeC_,
+        typename IndexTypeC_>
+      static void assemble_buffer_matrix(
+        LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_, IndexTypeA_>& buffer_matrix,
+        const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
+        const LAFEM::SparseMatrixELL<Mem::Main, DataTypeC_, IndexTypeC_>& template_matrix)
       {
         SymbolicMatrixAssemblerBase::assemble(buffer_matrix, assemble_buffer_graph(matrix_mirror, template_matrix));
       }
@@ -298,14 +330,17 @@ namespace FEAST
        */
       template<
         typename DataTypeA_,
+        typename IndexTypeA_,
         typename DataTypeB_,
-        typename DataTypeC_>
+        typename IndexTypeB_,
+        typename DataTypeC_,
+        typename IndexTypeC_>
       static void assemble_buffer_vector(
-        LAFEM::DenseVector<Mem::Main, DataTypeA_>& buffer_vector,
-        const LAFEM::VectorMirror<Mem::Main, DataTypeB_>& vector_mirror,
-        const LAFEM::DenseVector<Mem::Main, DataTypeC_>& DOXY(template_vector))
+        LAFEM::DenseVector<Mem::Main, DataTypeA_, IndexTypeA_>& buffer_vector,
+        const LAFEM::VectorMirror<Mem::Main, DataTypeB_, IndexTypeB_>& vector_mirror,
+        const LAFEM::DenseVector<Mem::Main, DataTypeC_, IndexTypeC_>& DOXY(template_vector))
       {
-        buffer_vector = std::move(LAFEM::DenseVector<Mem::Main, DataTypeA_>(vector_mirror.size()));
+        buffer_vector = std::move(LAFEM::DenseVector<Mem::Main, DataTypeA_, IndexTypeA_>(vector_mirror.size()));
       }
     }; // class DofMirror
   } // namespace Assembly
