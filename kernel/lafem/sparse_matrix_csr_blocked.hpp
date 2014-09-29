@@ -140,6 +140,46 @@ namespace FEAST
         /**
          * \brief Constructor
          *
+         * \param[in] graph The.graph to create the matrix from
+         *
+         * Creates a CSR blocked matrix based on a given adjacency graph representing the sparsity pattern.
+         */
+        explicit SparseMatrixCSRBlocked(const Adjacency::Graph & graph) :
+          Container<Mem_, DT_, IT_>(0)
+        {
+          CONTEXT("When creating SparseMatrixCSR");
+
+          Index num_rows = graph.get_num_nodes_domain();
+          Index num_cols = graph.get_num_nodes_image();
+          Index num_nnze = graph.get_num_indices();
+
+          // Create temporary vectors. Row and column pointer are block wise
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> vrow_ptr(num_rows+1);
+          LAFEM::DenseVector<Mem::Main, IT_, IT_> vcol_idx(num_nnze);
+          // The data array has to account for the block size
+          LAFEM::DenseVector<Mem::Main, DT_, IT_> vdata(num_nnze*BlockHeight_*BlockWidth_, DT_(0));
+
+          const Index * dom_ptr(graph.get_domain_ptr());
+          const Index * img_idx(graph.get_image_idx());
+          IT_ * prow_ptr(vrow_ptr.elements());
+          IT_ * pcol_idx(vcol_idx.elements());
+
+          // build row-end
+          prow_ptr[0] = IT_(dom_ptr[0]);
+          for(Index i(0); i < num_rows; ++i)
+            prow_ptr[i+1] = IT_(dom_ptr[i+1]);
+
+          // build col-idx
+          for(Index i(0); i < num_nnze; ++i)
+            pcol_idx[i] = IT_(img_idx[i]);
+
+          // build the matrix
+          this->assign(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
+        }
+
+        /**
+         * \brief Constructor
+         *
          * \param[in] rows_in The row count of the created matrix.
          * \param[in] columns_in The column count of the created matrix.
          * \param[in] col_ind_in Vector with column indices.
