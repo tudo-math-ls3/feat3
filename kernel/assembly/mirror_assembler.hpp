@@ -12,6 +12,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/sparse_matrix_banded.hpp>
 
 namespace FEAST
 {
@@ -254,23 +255,10 @@ namespace FEAST
        */
       template<
         typename VectorMirror_,
-        typename DataTypeB_,
-        typename IndexTypeB_>
+        typename MT_>
       static Adjacency::Graph assemble_buffer_graph(
         const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
-        const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeB_, IndexTypeB_>& template_matrix)
-      {
-        Adjacency::Graph tmp(Adjacency::rt_injectify, matrix_mirror.get_row_mirror().get_gather_dual(), template_matrix);
-        return Adjacency::Graph(Adjacency::rt_injectify, tmp, matrix_mirror.get_col_mirror().get_scatter_dual());
-      }
-
-      template<
-        typename VectorMirror_,
-        typename DataTypeB_,
-        typename IndexTypeB_>
-      static Adjacency::Graph assemble_buffer_graph(
-        const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
-        const LAFEM::SparseMatrixELL<Mem::Main, DataTypeB_, IndexTypeB_>& template_matrix)
+        const MT_& template_matrix)
       {
         Adjacency::Graph tmp(Adjacency::rt_injectify, matrix_mirror.get_row_mirror().get_gather_dual(), template_matrix);
         return Adjacency::Graph(Adjacency::rt_injectify, tmp, matrix_mirror.get_col_mirror().get_scatter_dual());
@@ -292,26 +280,11 @@ namespace FEAST
         typename DataTypeA_,
         typename IndexTypeA_,
         typename VectorMirror_,
-        typename DataTypeC_,
-        typename IndexTypeC_>
+        typename MT_>
       static void assemble_buffer_matrix(
         LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_, IndexTypeA_>& buffer_matrix,
         const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
-        const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeC_, IndexTypeC_>& template_matrix)
-      {
-        SymbolicMatrixAssemblerBase::assemble(buffer_matrix, assemble_buffer_graph(matrix_mirror, template_matrix));
-      }
-
-      template<
-        typename DataTypeA_,
-        typename IndexTypeA_,
-        typename VectorMirror_,
-        typename DataTypeC_,
-        typename IndexTypeC_>
-      static void assemble_buffer_matrix(
-        LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_, IndexTypeA_>& buffer_matrix,
-        const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
-        const LAFEM::SparseMatrixELL<Mem::Main, DataTypeC_, IndexTypeC_>& template_matrix)
+        const MT_& template_matrix)
       {
         SymbolicMatrixAssemblerBase::assemble(buffer_matrix, assemble_buffer_graph(matrix_mirror, template_matrix));
       }
