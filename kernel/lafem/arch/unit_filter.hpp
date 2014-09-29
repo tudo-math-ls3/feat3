@@ -6,7 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-
+/// \cond internal
 namespace FEAST
 {
   namespace LAFEM
@@ -49,6 +49,7 @@ namespace FEAST
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST
+/// \endcond
 
 #ifndef  __CUDACC__
 #include <kernel/lafem/arch/unit_filter_generic.hpp>

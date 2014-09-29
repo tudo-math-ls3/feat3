@@ -6,7 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-
+/// \cond internal
 namespace FEAST
 {
   namespace LAFEM
@@ -26,8 +26,8 @@ namespace FEAST
         static void filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue);
       };
 
-    // Do not instantiate the following templates as this is done in unit_filter_blocked_generic.cpp and then linked
-    // into the shared library
+      // Do not instantiate the following templates as this is done in unit_filter_blocked_generic.cpp and then linked
+      // into the shared library
       extern template void UnitFilterBlocked<Mem::Main, Algo::Generic>::filter_rhs<float, unsigned long, 2>(float * v, const float * const sv_elements, const unsigned long * const sv_indices, const Index ue);
       extern template void UnitFilterBlocked<Mem::Main, Algo::Generic>::filter_rhs<double, unsigned long, 2>(double * v, const double * const sv_elements, const unsigned long * const sv_indices, const Index ue);
       extern template void UnitFilterBlocked<Mem::Main, Algo::Generic>::filter_rhs<float, unsigned int, 2>(float * v, const float * const sv_elements, const unsigned int * const sv_indices, const Index ue);
@@ -62,6 +62,7 @@ namespace FEAST
   } // namespace LAFEM
 } // namespace FEAST
 
+/// \endcond
 #ifndef  __CUDACC__
 #include <kernel/lafem/arch/unit_filter_blocked_generic.hpp>
 #endif

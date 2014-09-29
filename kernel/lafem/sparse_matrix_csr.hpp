@@ -399,7 +399,7 @@ namespace FEAST
          * \param[in] col_ind Vector with column indices.
          * \param[in] val Vector with non zero elements.
          * \param[in] row_ptr Vector with start indices of all rows into the val/col_ind arrays.
-         * Note, that this vector must also contain the end index of the last row and thus has a size of row_count + 1.
+         * Note that this vector must also contain the end index of the last row and thus has a size of row_count + 1.
          *
          * Creates a matrix with given dimensions and content.
          */

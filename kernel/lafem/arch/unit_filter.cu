@@ -4,6 +4,7 @@
 #include <kernel/lafem/arch/unit_filter.hpp>
 #include <kernel/util/exception.hpp>
 
+/// \cond internal
 namespace FEAST
 {
   namespace LAFEM
@@ -81,3 +82,5 @@ template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(float *, const unsig
 template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(double *,  const unsigned long * const, const Index);
 template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(float *,  const unsigned int * const, const Index);
 template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(double *,  const unsigned int * const, const Index);
+
+/// \endcond

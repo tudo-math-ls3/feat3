@@ -51,7 +51,7 @@ namespace FEAST
       /// Value type
       typedef Tiny::Vector<DataType, BlockSize> ValueType;
 
-      static_assert(BlockSize > 1, "BlockSize has to be >= 2 in UnitFilterBlocked!" );
+      static_assert(BlockSize > 1, "BlockSize has to be >= 2 in UnitFilterBlocked!");
 
     private:
       /// SparseVector, containing all entries of the unit filter
@@ -110,6 +110,7 @@ namespace FEAST
       {
       }
 
+      /// \returns A deep copy of itself
       UnitFilterBlocked clone() const
       {
         UnitFilterBlocked other;
@@ -117,11 +118,13 @@ namespace FEAST
         return std::move(other);
       }
 
+      /// \brief Clones data from another UnitFilter
       void clone(const UnitFilterBlocked & other)
       {
         _sv.clone(other._sv);
       }
 
+      /// \brief Converts data from another UnitFilter
       template<typename Mem2_, typename DT2_, typename IT2_, Index BS_>
       void convert(const UnitFilterBlocked<Mem2_, DT2_, IT2_, BS_>& other)
       {
@@ -176,6 +179,10 @@ namespace FEAST
         return _sv.elements();
       }
 
+#ifdef DOXYGEN
+      // The following documentation block is visible to Doxygen only. The actual implementation is matrix type
+      // specific and provided below.
+
       /**
        * \brief Applies the filter onto a system matrix.
        *
@@ -192,6 +199,55 @@ namespace FEAST
        * blocksize.
        *
        */
+      template<typename Algo_>
+      void filter_mat(MatrixType & matrix) const
+      {
+      }
+
+      /**
+       * \brief Filter the non-diagonal row entries
+       *
+       * \tparam Algo_
+       * Backend
+       *
+       * \tparam BlockWidth_
+       * The input matrix' block width
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       *
+       * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
+       * blocksize.
+       *
+       */
+      template<typename Algo_>
+      void filter_offdiag_row_mat(MatrixType & matrix) const
+      {
+      }
+
+      /**
+       * \brief Filter the non-diagonal column entries
+       *
+       * \tparam Algo_
+       * Backend
+       *
+       * \tparam BlockWidth_
+       * The input matrix' block width
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       *
+       * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
+       * blocksize.
+       *
+       */
+      template<typename Algo_>
+      void filter_offdiag_col_mat(MatrixType & matrix) const
+      {
+      }
+
+#endif
+      /// \cond internal
       template<typename Algo_, Index BlockWidth_>
       void filter_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
@@ -215,22 +271,6 @@ namespace FEAST
         }
       }
 
-      /**
-       * \brief Filter the non-diagonal row entries
-       *
-       * \tparam Algo_
-       * Backend
-       *
-       * \tparam BlockWidth_
-       * The input matrix' block width
-       *
-       * \param[in,out] matrix
-       * A reference to the matrix to be filtered.
-       *
-       * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
-       * blocksize.
-       *
-       */
       template<typename Algo_, Index BlockWidth_>
       void filter_offdiag_row_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
@@ -248,27 +288,12 @@ namespace FEAST
         }
       }
 
-      /**
-       * \brief Filter the non-diagonal column entries
-       *
-       * \tparam Algo_
-       * Backend
-       *
-       * \tparam BlockWidth_
-       * The input matrix' block width
-       *
-       * \param[in,out] matrix
-       * A reference to the matrix to be filtered.
-       *
-       * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
-       * blocksize.
-       *
-       */
       template<typename Algo_, Index BlockWidth_>
       void filter_offdiag_col_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> &) const
       {
         // nothing to do here
       }
+      /// \endcond
 
       /**
        * \brief Applies the filter onto the right-hand-side vector.

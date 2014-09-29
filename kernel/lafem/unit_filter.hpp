@@ -90,6 +90,7 @@ namespace FEAST
       {
       }
 
+      /// \returns A deep copy of itself
       UnitFilter clone() const
       {
         UnitFilter other;
@@ -97,22 +98,32 @@ namespace FEAST
         return std::move(other);
       }
 
+      /// \brief Clones data from another UnitFilter
       void clone(const UnitFilter & other)
       {
         _sv.clone(other._sv);
       }
 
+      /// \brief Converts data from another UnitFilter
       template<typename Mem2_, typename DT2_, typename IT2_>
       void convert(const UnitFilter<Mem2_, DT2_, IT2_>& other)
       {
         _sv.convert(other._sv);
       }
 
+      /// \brief Clears the underlying data (namely the SparseVector)
       void clear()
       {
         _sv.clear();
       }
 
+      /**
+       * \brief Adds one element to the filter
+       *
+       * \param[in] idx Index where to add
+       * \param[in] val Value to add
+       *
+       **/
       void add(IndexType idx, DataType val)
       {
         _sv(idx, val);
@@ -148,12 +159,57 @@ namespace FEAST
         return _sv.elements();
       }
 
+#ifdef DOXYGEN
+      // The following documentation block is visible to Doxygen only. The actual implementation is matrix type
+      // specific and provided below.
+
       /**
        * \brief Applies the filter onto a system matrix.
        *
+       * \tparam Algo_
+       * Backend
+       *
        * \param[in,out] matrix
        * A reference to the matrix to be filtered.
+       *
        */
+      template<typename Algo_>
+      void filter_mat(MatrixType & matrix) const
+      {
+      }
+
+      /**
+       * \brief Filter the non-diagonal entries, row wise
+       *
+       * \tparam Algo_
+       * Backend
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       *
+       */
+      template<typename Algo_>
+      void filter_offdiag_row_mat(MatrixType & matrix) const
+      {
+      }
+
+      /**
+       * \brief Filter the non-diagonal entries, column wise
+       *
+       * \tparam Algo_
+       * Backend
+       *
+       * \param[in,out] matrix
+       * A reference to the matrix to be filtered.
+       *
+       */
+      template<typename Algo_>
+      void filter_offdiag_col_mat(MatrixType & matrix) const
+      {
+      }
+
+#endif
+      ///\cond internal
       template<typename Algo_>
       void filter_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
       {
@@ -195,12 +251,6 @@ namespace FEAST
         // nothing to do here
       }
 
-      /**
-       * \brief Applies the filter onto a system matrix.
-       *
-       * \param[in,out] matrix
-       * A reference to the matrix to be filtered.
-       */
       template<typename Algo_>
       void filter_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
       {
@@ -256,12 +306,6 @@ namespace FEAST
         // nothing to do here
       }
 
-      /**
-       * \brief Applies the filter onto a system matrix.
-       *
-       * \param[in,out] matrix
-       * A reference to the matrix to be filtered.
-       */
       template<typename Algo_>
       void filter_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
@@ -304,6 +348,7 @@ namespace FEAST
       {
         // nothing to do here
       }
+      /// \endcond
 
       /**
        * \brief Applies the filter onto the right-hand-side vector.

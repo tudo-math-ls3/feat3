@@ -6,6 +6,7 @@
   #error "Do not include this implementation-only header file directly!"
 #endif
 
+/// \cond internal
 namespace FEAST
 {
   namespace LAFEM
@@ -33,5 +34,6 @@ namespace FEAST
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST
+/// \endcond
 
 #endif // KERNEL_LAFEM_ARCH_UNIT_FILTER_GENERIC_HPP

@@ -3,6 +3,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/unit_filter.hpp>
 
+/// \cond internal
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
@@ -16,3 +17,4 @@ template void UnitFilter<Mem::Main, Algo::Generic>::filter_def(float * v, const 
 template void UnitFilter<Mem::Main, Algo::Generic>::filter_def(double * v, const unsigned long * const sv_indices, const Index ue);
 template void UnitFilter<Mem::Main, Algo::Generic>::filter_def(float * v, const unsigned int * const sv_indices, const Index ue);
 template void UnitFilter<Mem::Main, Algo::Generic>::filter_def(double * v, const unsigned int * const sv_indices, const Index ue);
+/// \endcond
