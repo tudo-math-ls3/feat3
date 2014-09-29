@@ -723,6 +723,7 @@ namespace FEAST
       Index _num_cols;
       IndexType_ _C;
       const IndexType_ * _cs;
+      const IndexType_ * _rl;
       const IndexType_ * _col_ind;
       IndexType_ * _col_ptr;
       DataType_ * _val;
@@ -736,6 +737,7 @@ namespace FEAST
         _num_cols(matrix.columns()),
         _C(IndexType_(matrix.C())),
         _cs(matrix.cs()),
+        _rl(matrix.rl()),
         _col_ind(matrix.col_ind()),
         _col_ptr(nullptr),
         _val(matrix.val())
@@ -775,7 +777,7 @@ namespace FEAST
             IndexType_ ix = IndexType_(loc_mat.get_row_index(i, ic));
 
             // build column pointer for this row entry contribution
-            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C + 1]; k += _C)
+            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C] + ix%_C + _rl[ix]*_C; k += _C)
             {
               _col_ptr[_col_ind[k]] = k;
             }
@@ -807,7 +809,7 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C + 1]; k += _C)
+            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C] + ix%_C + _rl[ix]*_C; k += _C)
             {
               _col_ptr[_col_ind[k]] = _deadcode;
             }
@@ -841,6 +843,7 @@ namespace FEAST
       Index _num_cols;
       IndexType_ _C;
       const IndexType_ * _cs;
+      const IndexType_ * _rl;
       const IndexType_ * _col_ind;
       IndexType_ * _col_ptr;
       const DataType_ * _val;
@@ -854,6 +857,7 @@ namespace FEAST
         _num_cols(matrix.columns()),
         _C(IndexType_(matrix.C())),
         _cs(matrix.cs()),
+        _rl(matrix.rl()),
         _col_ind(matrix.col_ind()),
         _col_ptr(nullptr),
         _val(matrix.val())
@@ -890,7 +894,7 @@ namespace FEAST
             IndexType_ ix = IndexType_(loc_mat.get_row_index(i, ic));
 
             // build column pointer for this row entry contribution
-            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C + 1]; k += _C)
+            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C] + ix%_C + _rl[ix]*_C; k += _C)
             {
               _col_ptr[_col_ind[k]] = k;
             }
@@ -926,7 +930,7 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C + 1]; k += _C)
+            for(IndexType_ k(_cs[ix/_C] + ix%_C); k < _cs[ix/_C] + ix%_C + _rl[ix]*_C; k += _C)
             {
               _col_ptr[_col_ind[k]] = _deadcode;
             }
