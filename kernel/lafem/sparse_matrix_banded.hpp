@@ -131,8 +131,43 @@ namespace FEAST
       typedef DenseVector<MemType, DataType, IT_> VectorTypeR;
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_banded;
-      /// ImageIterator typedef for Adjactor interface implementation
-      typedef const IT_* ImageIterator;
+      /// ImageIterator class for Adjactor interface implementation
+      class ImageIterator
+      {
+      private:
+        IT_ _k;
+        const IT_ _s;
+        const IT_ * const _offsets;
+
+      public:
+        ImageIterator() : _k(IT_(0)), _s(IT_(0)), _offsets(nullptr) {}
+
+        ImageIterator(IT_ k, IT_ s, const IT_ * offsets) : _k(k), _s(s), _offsets(offsets) {}
+
+        ImageIterator& operator=(const ImageIterator& other)
+        {
+          _k       = other._k;
+          _s       = other._s;
+          _offsets = other._offsets;
+          return *this;
+        }
+
+        bool operator!=(const ImageIterator& other) const
+        {
+          return this->_k != other._k;
+        }
+
+        ImageIterator& operator++()
+        {
+          ++_k;
+          return *this;
+        }
+
+        Index operator*() const
+        {
+          return Index(_s + _offsets[_k]);
+        }
+      };
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = class SparseMatrixBanded<Mem2_, DT2_, IT2_>;
@@ -855,6 +890,59 @@ namespace FEAST
       {
         return Arch::Intern::ProductMatVecBanded::end_offset(i, offsets(), rows(), columns(), num_of_offsets());
       }
+
+      /* ******************************************************************* */
+      /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
+      /* ******************************************************************* */
+    public:
+      /** \copydoc Adjactor::get_num_nodes_domain() */
+      const inline Index & get_num_nodes_domain() const
+      {
+        return rows();
+      }
+
+      /** \copydoc Adjactor::get_num_nodes_image() */
+      const inline Index & get_num_nodes_image() const
+      {
+        return columns();
+      }
+
+      /** \copydoc Adjactor::image_begin() */
+      inline ImageIterator image_begin(Index domain_node) const
+      {
+        ASSERT(domain_node < rows(), "Domain node index out of range");
+
+        const IT_ * toffsets(offsets());
+        const IT_ tnum_of_offsets(num_of_offsets());
+        const Index trows(rows());
+
+        for(IT_ k(0); k < tnum_of_offsets; ++k)
+        {
+          if(toffsets[k] + domain_node + 1 >= trows)
+            return ImageIterator(k, domain_node + 1 - trows, toffsets);
+        }
+      }
+
+      /** \copydoc Adjactor::image_end() */
+      inline ImageIterator image_end(Index domain_node) const
+      {
+        CONTEXT("Graph::image_end()");
+        ASSERT(domain_node < rows(), "Domain node index out of range");
+
+        const IT_ * toffsets(offsets());
+        const IT_ tnum_of_offsets(num_of_offsets());
+        const Index trows(rows());
+
+        for(IT_ k(0); k < tnum_of_offsets; ++k)
+        {
+          if(toffsets[k] + domain_node + 1 >= 2 * trows)
+          {
+            return ImageIterator(k, domain_node + 1 - trows, toffsets);
+          }
+        }
+        return ImageIterator(tnum_of_offsets, domain_node + 1 - trows, toffsets);
+      }
+
 
       /**
        * \brief SparseMatrixBanded comparison operator
