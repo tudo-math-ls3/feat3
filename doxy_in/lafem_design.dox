@@ -52,7 +52,7 @@ void foo()
 \section lafem_sec_data_handling Data handling
 All containers provide at least three different member functions for proper conversion and data movement.
 
-- \ref FEAST::LAFEM::Container::clone() "clone": creates a deep copy from scratch
+- \ref FEAST::LAFEM::Container::clone() "clone": creates a copy of a container with user defined depth. See \ref FEAST::LAFEM::CloneMode for details.
 
 - convert: try to reuse existing arrays for shallow copy, convert and transfer where nessesary.
 

@@ -58,7 +58,7 @@ public:
     TEST_CHECK_EQUAL(e, c);
     TEST_CHECK_NOT_EQUAL((void*)e.raw_val(), (void*)c.raw_val());
     TEST_CHECK_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
-    e = c.clone(true);
+    e = c.clone(CloneMode::Deep);
     TEST_CHECK_EQUAL(e, c);
     TEST_CHECK_NOT_EQUAL((void*)e.raw_val(), (void*)c.raw_val());
     TEST_CHECK_NOT_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());

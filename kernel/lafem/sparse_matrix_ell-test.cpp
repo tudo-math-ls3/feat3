@@ -95,7 +95,7 @@ public:
     TEST_CHECK_EQUAL(c, b);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
     TEST_CHECK_EQUAL((void*)c.col_ind(), (void*)b.col_ind());
-    c = b.clone(true);
+    c = b.clone(CloneMode::Deep);
     TEST_CHECK_EQUAL(c, b);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
     TEST_CHECK_NOT_EQUAL((void*)c.col_ind(), (void*)b.col_ind());

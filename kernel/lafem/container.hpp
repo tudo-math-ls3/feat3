@@ -16,6 +16,52 @@
 #include <cstdlib>
 #include <stdint.h>
 
+#define InsertWeakClone( TContainer ) \
+  /** \brief Clone operation\
+   *\
+   * Create a weak clone of this container.\
+   *\
+   * \param[in] clone_mode The actual cloning procedure.\
+   *\
+   */\
+TContainer clone(CloneMode clone_mode = CloneMode::Weak) const\
+{\
+  CONTEXT("When cloning TContainer");\
+  TContainer t;\
+  t.clone(*this, clone_mode);\
+  return t;\
+}\
+using Container<Mem_, DT_, IT_>::clone;
+
+#define InsertDeepClone( TContainer ) \
+  /** \brief Clone operation\
+   *\
+   * Create a deep clone of this container.\
+   *\
+   * \param[in] clone_mode The actual cloning procedure.\
+   *\
+   */\
+TContainer clone(CloneMode clone_mode = CloneMode::Deep) const\
+{\
+  CONTEXT("When cloning TContainer");\
+  TContainer t;\
+  t.clone(*this, clone_mode);\
+  return t;\
+}\
+  /** \brief Clone operation\
+   *\
+   * Create a deep clone of this container.\
+   *\
+   * \param[in] other The source container to create the clone from.\
+   * \param[in] clone_mode The actual cloning procedure.\
+   *\
+   */\
+template<typename Mem2_, typename DT2_, typename IT2_> \
+void clone(const TContainer<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Deep) \
+{\
+  Container<Mem_, DT_, IT_>::clone(other, clone_mode);\
+}\
+
 
 namespace FEAST
 {
@@ -76,7 +122,18 @@ namespace FEAST
       fm_bm, /**< Binary banded data */
       fm_dm,  /**< Binary dense matrix data */
       fm_sv  /**< Binary sparse vector data */
-      };
+    };
+
+    /**
+     * Supported clone modes.
+     */
+    enum class CloneMode
+    {
+      Shallow = 0, /**< Share index and data arrays */
+      Layout, /**< Share index arrays, allocate new data array */
+      Weak, /**< Share index arrays, allocate new data array and copy content */
+      Deep /**< Allocate new index and data arrays and copy content */
+    };
 
     /**
      * \brief Container base class.
@@ -619,40 +676,39 @@ namespace FEAST
 
         /** \brief Clone operation
          *
-         * Become a deep copy of a given container.
+         * Become a copy of a given container.
          *
          * \param[in] other The source container.
-         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
+         * \param[in] clone_mode The actual cloning procedure
          *
          */
-        void clone(const Container & other, bool clone_indices = false)
+        void clone(const Container & other, CloneMode clone_mode = CloneMode::Weak)
         {
           CONTEXT("When cloning Container");
+
+          this->clear();
 
           this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
           this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
           this->_elements_size.assign(other._elements_size.begin(), other._elements_size.end());
           this->_indices_size.assign(other._indices_size.begin(), other._indices_size.end());
 
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          this->_elements.clear();
-          for (Index i(0) ; i < other._elements.size() ; ++i)
-          {
-            this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
-            Util::MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
-          }
 
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
-          this->_indices.clear();
-          if (clone_indices)
+          if (clone_mode == CloneMode::Deep)
           {
             for (Index i(0) ; i < other._indices.size() ; ++i)
             {
               this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
               Util::MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
             }
+
+            for (Index i(0) ; i < other._elements.size() ; ++i)
+            {
+              this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
+              Util::MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
+            }
+
+            return;
           }
           else
           {
@@ -660,23 +716,44 @@ namespace FEAST
             for (Index i(0) ; i < this->_indices.size() ; ++i)
               Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
           }
+
+          if(clone_mode == CloneMode::Shallow)
+          {
+            this->_elements.assign(other._elements.begin(), other._elements.end());
+            for (Index i(0) ; i < this->_elements.size() ; ++i)
+              Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+
+            return;
+          }
+          else if(clone_mode == CloneMode::Layout)
+          {
+            for (Index i(0) ; i < other._elements.size() ; ++i)
+            {
+              this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
+            }
+
+            return;
+          }
+          else if(clone_mode == CloneMode::Weak)
+          {
+            for (Index i(0) ; i < other._elements.size() ; ++i)
+            {
+              this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
+              Util::MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
+            }
+
+            return;
+          }
         }
 
-        /** \brief Clone operation
-         *
-         * Become a deep copy of a given container.
-         *
-         * \param[in] other The source container.
-         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
-         *
-         */
+        /// \copydoc clone(const Container&,CloneMode)
         template <typename Mem2_, typename DT2_, typename IT2_>
-        void clone(const Container<Mem2_, DT2_, IT2_> & other, bool clone_indices = false)
+        void clone(const Container<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)
         {
           CONTEXT("When cloning Container");
           Container t(other.size());
           t.assign(other);
-          clone(t, clone_indices);
+          clone(t, clone_mode);
         }
 
         /** \brief Assignment move operation

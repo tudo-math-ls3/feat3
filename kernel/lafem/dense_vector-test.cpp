@@ -129,6 +129,27 @@ public:
     DenseVector<Mem_, DT_, IT_> o(op);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), 1e-5);
+
+    // new clone testing
+    auto clone1 = a.clone(CloneMode::Deep);
+    TEST_CHECK_EQUAL(clone1, a);
+    clone1(7, DT_(132));
+    TEST_CHECK_NOT_EQUAL(clone1, a);
+    TEST_CHECK_NOT_EQUAL((void*)clone1.elements(), (void*)a.elements());
+    DenseVector<Mem_, DT_, IT_> clone2 = clone1.clone(CloneMode::Layout);
+    Util::MemoryPool<Mem_>::instance()->set_memory(clone2.elements(), DT_(4713), clone2.size());
+    TEST_CHECK_NOT_EQUAL(clone2(7), clone1(7));
+    TEST_CHECK_NOT_EQUAL((void*)clone2.elements(), (void*)clone1.elements());
+    DenseVector<Mem_, DT_, IT_> clone3 = clone1.clone(CloneMode::Weak);
+    TEST_CHECK_EQUAL(clone3, clone1);
+    clone3(7, DT_(133));
+    TEST_CHECK_NOT_EQUAL(clone3, clone1);
+    TEST_CHECK_NOT_EQUAL((void*)clone3.elements(), (void*)clone1.elements());
+    DenseVector<Mem_, DT_, IT_> clone4 = clone1.clone(CloneMode::Shallow);
+    TEST_CHECK_EQUAL(clone4, clone1);
+    clone4(7, DT_(134));
+    TEST_CHECK_EQUAL(clone4, clone1);
+    TEST_CHECK_EQUAL((void*)clone4.elements(), (void*)clone1.elements());
   }
 };
 DenseVectorTest<Mem::Main, NotSet, float, unsigned int> cpu_dense_vector_test_float_uint;

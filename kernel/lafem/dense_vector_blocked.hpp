@@ -178,22 +178,7 @@ namespace FEAST
           return *this;
         }
 
-        /**
-         * \brief Clone operation
-         *
-         * Create a deep copy of itself.
-         *
-         * \returns A deep copy of itself.
-         *
-         */
-        DenseVectorBlocked clone() const
-        {
-          DenseVectorBlocked t;
-          t.clone(*this);
-          return t;
-        }
-
-        using Container<Mem_, DT_, IT_>::clone;
+        InsertWeakClone( DenseVectorBlocked );
 
         /**
          * \brief Shallow copy operation

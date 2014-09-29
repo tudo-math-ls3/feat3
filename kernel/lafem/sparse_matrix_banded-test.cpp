@@ -114,7 +114,7 @@ public:
     c.clone(a);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)a.val());
     TEST_CHECK_EQUAL((void*)c.offsets(), (void*)a.offsets());
-    c = z.clone(true);
+    c = z.clone(CloneMode::Deep);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)z.val());
     TEST_CHECK_NOT_EQUAL((void*)c.offsets(), (void*)z.offsets());
     c = z.shared();

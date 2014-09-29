@@ -470,24 +470,7 @@ namespace FEAST
           return *this;
         }
 
-        /** \brief Clone operation
-         *
-         * Create a deep copy of itself.
-         *
-         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
-         *
-         * \return A deep copy of itself.
-         *
-         */
-        SparseMatrixCSR clone(bool clone_indices = false) const
-        {
-          CONTEXT("When cloning SparseMatrixiCSR");
-          SparseMatrixCSR t;
-          t.clone(*this, clone_indices);
-          return t;
-        }
-
-        using Container<Mem_, DT_, IT_>::clone;
+        InsertWeakClone( SparseMatrixCSR );
 
         /** \brief Shallow copy operation
          *

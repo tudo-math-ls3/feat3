@@ -339,52 +339,7 @@ namespace FEAST
           return *this;
         }
 
-        /** \brief Clone operation
-         *
-         * Create a deep copy of itself.
-         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
-         *
-         * \return A deep copy of itself.
-         *
-         */
-        SparseVector clone(bool clone_indices = true) const
-        {
-          CONTEXT("When cloning SparseVector");
-          SparseVector t;
-          t.clone(*this, clone_indices);
-          return t;
-        }
-
-        /** \brief Clone operation
-         *
-         * Become a deep copy of a given vector.
-         *
-         * \param[in] other The source container.
-         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
-         *
-         */
-        void clone(const SparseVector & other, bool clone_indices = true)
-        {
-          CONTEXT("When cloning SparseVector");
-          Container<Mem_, DT_, IT_>::clone(other, clone_indices);
-        }
-
-        /** \brief Clone operation
-         *
-         * Become a deep copy of a given vector.
-         *
-         * \param[in] other The source container.
-         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
-         *
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        void clone(const SparseVector<Mem2_, DT2_, IT2_> & other, bool clone_indices = true)
-        {
-          CONTEXT("When cloning SparseVector");
-          SparseVector t;
-          t.assign(other);
-          Container<Mem_, DT_, IT_>::clone(t, clone_indices);
-        }
+        InsertDeepClone( SparseVector );
 
         /** \brief Shallow copy operation
          *

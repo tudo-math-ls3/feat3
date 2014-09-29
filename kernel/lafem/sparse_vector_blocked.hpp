@@ -155,51 +155,32 @@ namespace FEAST
 
         /** \brief Clone operation
          *
-         * Create a deep copy of itself.
-         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
+         * Create a deep clone of this container.
          *
-         * \return A deep copy of itself.
+         * \param[in] clone_mode The actual cloning procedure.
          *
          */
-        SparseVectorBlocked clone(bool clone_indices = true) const
+        SparseVectorBlocked clone(CloneMode clone_mode = CloneMode::Deep) const
         {
-          CONTEXT("When cloning SparseVectorBlocked");
+          CONTEXT("When cloning TContainer");
           SparseVectorBlocked t;
-          t.clone(*this, clone_indices);
+          t.clone(*this, clone_mode);
           return t;
         }
 
         /** \brief Clone operation
          *
-         * Become a deep copy of a given vector.
+         * Create a deep clone of this container.
          *
-         * \param[in] other The source container.
-         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
-         *
-         */
-        void clone(const SparseVectorBlocked & other, bool clone_indices = true)
-        {
-          CONTEXT("When cloning SparseVectorBlocked");
-          Container<Mem_, DT_, IT_>::clone(other, clone_indices);
-        }
-
-        /** \brief Clone operation
-         *
-         * Become a deep copy of a given vector.
-         *
-         * \param[in] other The source container.
-         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
+         * \param[in] other The source container to create the clone from.
+         * \param[in] clone_mode The actual cloning procedure.
          *
          */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        void clone(const SparseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other, bool clone_indices = true)
+        template<typename Mem2_, typename DT2_, typename IT2_>
+        void clone(const SparseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other, CloneMode clone_mode = CloneMode::Deep)
         {
-          CONTEXT("When cloning SparseVectorBlocked");
-          SparseVectorBlocked<Mem_, DT_, IT_, BlockSize_> t;
-          t.assign(other);
-          Container<Mem_, DT_, IT_>::clone(t, clone_indices);
+          Container<Mem_, DT_, IT_>::clone(other, clone_mode);
         }
-
 
         /**
          * \brief Conversion method
