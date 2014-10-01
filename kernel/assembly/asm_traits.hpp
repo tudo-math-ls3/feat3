@@ -353,6 +353,10 @@ namespace FEAST
       /// local matrix data type
       typedef LocalMatrixData<LocalMatrixType, TestDofMapping, TrialDofMapping> LocalMatrixDataType;
 
+      /// local vector data types
+      typedef LocalVectorData<LocalTestVectorType, TestDofMapping> LocalTestVectorDataType;
+      typedef LocalVectorData<LocalTrialVectorType, TrialDofMapping> LocalTrialVectorDataType;
+
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
     }; // class AsmTraits2

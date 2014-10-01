@@ -7,13 +7,23 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/pointstar_structure.hpp>
-#include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/argyris/element.hpp>
+#include <kernel/space/bogner_fox_schmit/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
+#include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/math.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
+
+template<typename Trafo_>
+using MyRT = Space::RannacherTurek::Element<Trafo_, Space::RannacherTurek::Variant::StdNonPar>;
+
+template<typename Trafo_>
+using MyP0 = Space::Discontinuous::Element<Trafo_, Space::Discontinuous::Variant::StdPolyP<0>>;
+
 
 template<typename MatrixType_>
 class BilinearOperatorTest :
@@ -40,7 +50,125 @@ public:
   virtual void run() const
   {
     test_unit_2d();
+
+    // Argyris has polynomial degree 6, so the integration for the indentity operator has only to be exact to
+    // degree 6 + 6 = 12
+    test_apply1<Space::Argyris::Element, Shape::Simplex<2>, Assembly::Common::IdentityOperator, Index(2)>(2,12);
+    // degree 1 + 1 - 2 = 0
+    test_apply1<Space::Lagrange1::Element, Shape::Hypercube<3>, Assembly::Common::LaplaceOperator, Index(3)>(2, 0);
+
+    // RT has degree 1, BFC has degree 3, so the integration for the Laplace operator has only to be exact to
+    // degree 1 + 3 - 2 = 2
+    test_apply2<MyRT, Space::BognerFoxSchmit::Element, Shape::Hypercube<2>, Assembly::Common::LaplaceOperator, Index(2)>(3, 2);
+    // degree 0 + 1 = 1
+    test_apply2<MyP0, Space::Lagrange1::Element, Shape::Simplex<3>, Assembly::Common::IdentityOperator, Index(3)>(1, 1);
   }
+
+  template<template<typename> class SpaceType_, typename ShapeType_, typename OperatorType_, Index dim_>
+  void test_apply1(const Index level, const Index cubature_degree) const
+  {
+    typedef Geometry::ConformalMesh<ShapeType_, dim_, dim_, DataType_> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef SpaceType_<TrafoType> SpaceType;
+
+    Geometry::RefinedUnitCubeFactory<MeshType> unit_factory(level);
+    MeshType my_mesh(unit_factory);
+    TrafoType my_trafo(my_mesh);
+    SpaceType my_space(my_trafo);
+
+    // create a matrix
+    MatrixType_ matrix;
+    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, my_space);
+    matrix.format();
+
+    // create a cubature factory
+    Cubature::DynamicFactory cubature_factory("auto-degree:"+stringify(cubature_degree));
+
+    // Our bilinear operator
+    OperatorType_ my_operator;
+
+    // Generate bogus coefficient vector for the FE function
+    VectorType x(my_space.get_num_dofs(), DataType_(0));
+    // This factor is there so that the l2-norm of x does not get too big
+    DataType_ fac(DataType_(1)/DataType_(my_space.get_num_dofs()));
+    for(Index i(0); i < x.size(); ++i)
+      x(i, fac*(DataType_(2)*i - Math::sqrt(DataType_(i))));
+
+    // Compute reference solution by assembling the matrix and multiplying x to it
+    Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, my_operator, my_space, cubature_factory);
+    VectorType ref(my_space.get_num_dofs(), DataType_(0));
+    matrix.template apply<Algo::Generic>(ref, x);
+
+    // Compute the result given by the apply1() routine
+    VectorType res(my_space.get_num_dofs(), DataType_(0));
+    Assembly::BilinearOperatorAssembler::apply1(res, x, my_operator, my_space, cubature_factory);
+
+    // Compute || ref - res ||_l2
+    res.template axpy<Algo::Generic>(res, ref, DataType_(-1));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    TEST_CHECK_EQUAL_WITHIN_EPS(res.template norm2<Algo::Generic>(), DataType_(0), eps);
+
+  }
+
+  template
+  <
+    template<typename> class TestSpaceType_,
+    template<typename> class TrialSpaceType_,
+    typename ShapeType_,
+    typename OperatorType_,
+    Index dim_
+  >
+  void test_apply2(const Index level, const Index cubature_degree) const
+  {
+    typedef Geometry::ConformalMesh<ShapeType_, dim_, dim_, DataType_> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef TestSpaceType_<TrafoType> TestSpaceType;
+    typedef TrialSpaceType_<TrafoType> TrialSpaceType;
+
+    Geometry::RefinedUnitCubeFactory<MeshType> unit_factory(level);
+    MeshType my_mesh(unit_factory);
+    TrafoType my_trafo(my_mesh);
+    TestSpaceType my_test_space(my_trafo);
+    TrialSpaceType my_trial_space(my_trafo);
+
+    // create a matrix
+    MatrixType_ matrix;
+    Assembly::SymbolicMatrixAssembler<>::assemble2(matrix, my_test_space, my_trial_space);
+    matrix.format();
+
+    // create a cubature factory
+    Cubature::DynamicFactory cubature_factory("auto-degree:"+stringify(cubature_degree));
+
+    // Create bogus coefficient vector for the FE function
+    VectorType x(my_trial_space.get_num_dofs(), DataType_(0));
+    // This factor is there so that the l2-norm of x does not get too big
+    DataType_ fac(DataType_(1)/DataType_(my_trial_space.get_num_dofs()));
+    for(Index i(0); i < x.size(); ++i)
+      x(i, fac*(DataType_(2)*i - Math::sqrt(DataType_(i))));
+
+    // Our bilinear operator
+    OperatorType_ my_operator;
+
+    // Compute reference solution by assembling the matrix and multiplying x to it
+    Assembly::BilinearOperatorAssembler::assemble_matrix2
+      (matrix, my_operator, my_test_space, my_trial_space, cubature_factory);
+
+    VectorType ref(my_test_space.get_num_dofs(), DataType_(0));
+    matrix.template apply<Algo::Generic>(ref, x);
+
+    // Compute the result given by the apply2() routine
+    VectorType res(my_test_space.get_num_dofs(), DataType_(0));
+    Assembly::BilinearOperatorAssembler::apply2
+      (res, x, my_operator, my_test_space, my_trial_space, cubature_factory);
+
+    // Compute || ref - res ||_l2
+    res.template axpy<Algo::Generic>(res, ref, DataType_(-1));
+
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    TEST_CHECK_EQUAL_WITHIN_EPS(res.template norm2<Algo::Generic>(), DataType_(0), eps);
+
+  }
+
 
   void test_unit_2d() const
   {
@@ -253,7 +381,7 @@ public:
 
   void test_unit_2d() const
   {
-    // create an 4x4 structured mesh
+    // create a 4x4 structured mesh
     const Index num_slices[2] = {Index(4), Index(4)};
     QuadMesh mesh(num_slices);
 
