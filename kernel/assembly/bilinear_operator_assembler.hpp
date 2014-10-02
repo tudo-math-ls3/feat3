@@ -533,8 +533,8 @@ namespace FEAST
         const CubatureFactory_& cubature_factory,
         typename Vector_::DataType alpha = typename Vector_::DataType(1))
         {
-          ASSERT(ret.size()==space.get_num_dofs(), "Error: Return vector size does not match FE space dimension: " + stringify((ret.size()) + " != " + stringify(space.get_num_dofs() )) );
-          ASSERT(coeff_vector.size()==space.get_num_dofs(), "Error: Coefficient vector size does not match FE space dimension: " + stringify((coeff_vector.size()) + " != " + stringify(space.get_num_dofs() )) );
+          ASSERT(ret.size()==space.get_num_dofs(), "Error: Return vector size does not match FE space dimension: " + stringify(ret.size()) + " != " + stringify(space.get_num_dofs() )) ;
+          ASSERT(coeff_vector.size()==space.get_num_dofs(), "Error: Coefficient vector size does not match FE space dimension: " + stringify(coeff_vector.size()) + " != " + stringify(space.get_num_dofs() ));
           ret.format();
 
           // Coefficient vector type
@@ -702,8 +702,8 @@ namespace FEAST
         const CubatureFactory_& cubature_factory,
         typename Vector_::DataType alpha = typename Vector_::DataType(1))
         {
-          ASSERT(ret.size()==test_space.get_num_dofs(), "Error: Return vector size does not match FE space dimension: " + stringify((ret.size()) + " != " + stringify(test_space.get_num_dofs() )) );
-          ASSERT(coeff_vector.size()==trial_space.get_num_dofs(), "Error: Coefficient vector size does not match FE space dimension: " + stringify((coeff_vector.size()) + " != " + stringify(trial_space.get_num_dofs() )) );
+          ASSERT(ret.size()==test_space.get_num_dofs(), "Error: Return vector size does not match FE space dimension: " + stringify(ret.size()) + " != " + stringify(test_space.get_num_dofs() ));
+          ASSERT(coeff_vector.size()==trial_space.get_num_dofs(), "Error: Coefficient vector size does not match FE space dimension: " + stringify(coeff_vector.size()) + " != " + stringify(trial_space.get_num_dofs() ));
           ret.format();
 
           // Coefficient vector type

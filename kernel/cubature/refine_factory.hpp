@@ -642,7 +642,7 @@ namespace FEAST
                 vol = Weight_(1)/Weight_(16);
               }
 
-              rule.get_weight(i*n + j) = rule_in.get_weight(j)*std::fabs(vol);
+              rule.get_weight(i*n + j) = rule_in.get_weight(j)*Math::abs(vol);
             }
           }
         }
