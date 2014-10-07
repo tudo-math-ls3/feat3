@@ -199,7 +199,7 @@ namespace FEAST
 
       static Index min_num_temp_vectors()
       {
-        return 1;
+        return 2;
       }
 
       template<typename Tag_,
@@ -234,8 +234,8 @@ namespace FEAST
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
-        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.sol(), data.temp().at(0), data.sol()));
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(1), data.precon(), data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.sol(), data.temp().at(1), data.sol()));
 
         cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
         cfiterate.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.temp().at(0)));
@@ -298,8 +298,8 @@ namespace FEAST
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
-        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.sol(), data.temp().at(0), data.sol()));
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(1), data.precon(), data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.sol(), data.temp().at(1), data.sol()));
 
         cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
