@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries;
   testmesh_hypercube_2D(mesh, attrs, boundaries);
 
-  if(!MeshUtil::iz_property(mesh, attrs.at(0), attrs.at(1)))
+  if(!MeshUtil::iz_property_quad(mesh, attrs.at(0), attrs.at(1)))
     std::cout << "WARNING: rank " << rank << " " << " base mesh does not fulfill IZ-property!" << std::endl;
 
   ///provide memory for halos
@@ -114,10 +114,10 @@ int main(int argc, char* argv[])
   //MeshUtil::establish_iz_property(p_i.basemesh, attrs.at(0), attrs.at(1));
   //MeshUtil::establish_iz_property(*((Mesh<Dim2D>*)(p_i.submesh.get())), *( (Attribute<double>*)(p_i.attrs.at(0).get()) ), *( (Attribute<double>*)(p_i.attrs.at(1).get()) ));
 
-  if(!MeshUtil::iz_property(*((Mesh<Dim2D>*)(p_i.submesh.get())), *( (Attribute<double>*)(p_i.attrs.at(0).get()) ), *( (Attribute<double>*)(p_i.attrs.at(1).get() ))))
+  if(!MeshUtil::iz_property_quad(*((Mesh<Dim2D>*)(p_i.submesh.get())), *( (Attribute<double>*)(p_i.attrs.at(0).get()) ), *( (Attribute<double>*)(p_i.attrs.at(1).get() ))))
     std::cout << "WARNING: rank " << rank << " " << " local mesh does not fulfill IZ-property!" << std::endl;
 
-  if(!MeshUtil::iz_property(p_i.basemesh, attrs.at(0), attrs.at(1)))
+  if(!MeshUtil::iz_property_quad(p_i.basemesh, attrs.at(0), attrs.at(1)))
     std::cout << "WARNING: rank " << rank << " " << " global mesh (refined basemesh) does not fulfill IZ-property!" << std::endl;
 
   auto adjv_base(p_i.basemesh.get_adjacent_polytopes(pl_face, pl_vertex, p_i.submesh->get_map().at(0)));

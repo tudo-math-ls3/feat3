@@ -817,7 +817,7 @@ namespace FEAST
           origin_coords.at(0).push_back(c_x);
           origin_coords.at(1).push_back(c_y);
         }
-        MeshUtil::establish_iz_property(origin, origin_coords.at(0), origin_coords.at(1));
+        MeshUtil::establish_iz_property_quad(origin, origin_coords.at(0), origin_coords.at(1));
       }
 
       ///3D

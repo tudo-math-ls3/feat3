@@ -102,10 +102,10 @@ int main()
                                            Index(nprocs), Index(rank),
                                            attrs
                                            ));
-  if(!MeshUtil::iz_property(p_i.basemesh, attrs.at(0), attrs.at(1)))
+  if(!MeshUtil::iz_property_quad(p_i.basemesh, attrs.at(0), attrs.at(1)))
     log.checkin_line(" ...iz prop hurt at basemesh!");
 
-  if(!MeshUtil::iz_property(*((Mesh<Dim2D>*)(p_i.submesh.get())), *( (Attribute<double>*)(p_i.attrs.at(0).get()) ), *( (Attribute<double>*)(p_i.attrs.at(1).get()) )))
+  if(!MeshUtil::iz_property_quad(*((Mesh<Dim2D>*)(p_i.submesh.get())), *( (Attribute<double>*)(p_i.attrs.at(0).get()) ), *( (Attribute<double>*)(p_i.attrs.at(1).get()) )))
     log.checkin_line(" ...iz prop hurt at submesh!");
 
 
