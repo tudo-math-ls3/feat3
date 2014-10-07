@@ -65,7 +65,7 @@ namespace FEAST
           recv_buf.push_back(std::vector<char>(send_buf.at(i).size()));
 
           Foundation::Comm::irecv(recv_buf.at(i).data(),
-                      recv_buf.at(i).size(),
+                      Index(recv_buf.at(i).size()),
                       other_ranks.at(i),
                       recvrequests.at(i),
                       tags.at(i),
@@ -83,7 +83,7 @@ namespace FEAST
           sendstatus.push_back(ss);
 
           Foundation::Comm::isend(send_buf.at(i).data(),
-                      send_buf.at(i).size(),
+                      Index(send_buf.at(i).size()),
                       other_ranks.at(i),
                       sendrequests.at(i),
                       tags.at(i),
