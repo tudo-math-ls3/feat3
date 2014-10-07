@@ -45,6 +45,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <FloatingPointModel>Strict</FloatingPointModel>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <OmitFramePointers>false</OmitFramePointers>
       <SmallerTypeCheck>true</SmallerTypeCheck>
@@ -60,6 +61,7 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FloatingPointModel>Precise</FloatingPointModel>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
