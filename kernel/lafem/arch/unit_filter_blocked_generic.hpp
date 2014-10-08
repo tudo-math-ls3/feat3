@@ -18,8 +18,8 @@ namespace FEAST
       {
         for(Index i(0); i < ue; ++i)
         {
-          for(Index j(0); j < BlockSize_; ++j)
-            v[BlockSize_* sv_indices[i] + j] = sv_elements[BlockSize_*i+j];
+          for(Index j(0) ; j < BlockSize_ ; ++j)
+            v[BlockSize_ * sv_indices[i] + j] = sv_elements[BlockSize_ * i + j];
         }
       }
 
@@ -28,8 +28,8 @@ namespace FEAST
       {
         for(Index i(0); i < ue; ++i)
         {
-          for(Index j(0); j < BlockSize_; ++j)
-            v[BlockSize_*sv_indices[i] + j] = DT_(0);
+          for(Index j(0) ; j < BlockSize_ ; ++j)
+            v[BlockSize_ * sv_indices[i] + j] = DT_(0);
         }
       }
 

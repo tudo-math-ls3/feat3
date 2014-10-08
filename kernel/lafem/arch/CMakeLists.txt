@@ -67,6 +67,7 @@ if (FEAST_BACKENDS_CUDA)
     scale_row_col.cu
     sum.cu
     unit_filter.cu
+    unit_filter_blocked.cu
     STATIC
   )
   ADD_DEPENDENCIES(kernel-lafem-arch kernel-lafem-arch-cuda)

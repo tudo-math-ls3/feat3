@@ -104,12 +104,12 @@ UnitFilterBlockedVectorTest<Algo::Generic, double, Index, 3> unit_filter_vector_
 UnitFilterBlockedVectorTest<Algo::Generic, float, Index, 4> unit_filter_vector_test_generic_fi_4;
 UnitFilterBlockedVectorTest<Algo::Generic, double, Index, 4> unit_filter_vector_test_generic_di_4;
 #ifdef FEAST_BACKENDS_CUDA
-//UnitFilterBlockedVectorTest<Algo::CUDA, float, Index, 2> unit_filter_vector_test_cuda_fi;
-//UnitFilterBlockedVectorTest<Algo::CUDA, float, Index, 3> unit_filter_vector_test_cuda_fi;
-//UnitFilterBlockedVectorTest<Algo::CUDA, float, Index, 4> unit_filter_vector_test_cuda_fi;
-//UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 2> unit_filter_vector_test_cuda_di;
-//UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 3> unit_filter_vector_test_cuda_di;
-//UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 4> unit_filter_vector_test_cuda_di;
+UnitFilterBlockedVectorTest<Algo::CUDA, float, Index, 2> unit_filter_vector_test_cuda_fi_2;
+UnitFilterBlockedVectorTest<Algo::CUDA, float, Index, 3> unit_filter_vector_test_cuda_fi_3;
+UnitFilterBlockedVectorTest<Algo::CUDA, float, Index, 4> unit_filter_vector_test_cuda_fi_4;
+UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 2> unit_filter_vector_test_cuda_di_2;
+UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 3> unit_filter_vector_test_cuda_di_3;
+UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 4> unit_filter_vector_test_cuda_di_4;
 #endif
 
 /**
