@@ -1289,6 +1289,94 @@ namespace FEAST
 
       }
 
+      ///for tetra 3D meshes
+      template<typename TopologyType_,
+               template <typename, typename> class OuterStorageType_>
+      static bool property_tetra(const Mesh<Dim3D, TopologyType_, OuterStorageType_>& m)
+      {
+        for(Index i(0); i < m.num_polytopes(pl_polyhedron); i++)
+        {
+          auto v_pi(m.get_adjacent_polytopes(pl_polyhedron, pl_vertex, i));
+
+          if(v_pi.size() != 4)
+          {
+            std::cout << "WARNING: not a pure tetra mesh!" << std::endl;
+            return false;
+          }
+        }
+        //check property for all edges
+        auto num_edges(m.get_topologies().at(ipi_edge_vertex).size());
+        for(Index i(0) ; i < num_edges; ++i)
+        {
+          auto V_e_i(m.get_adjacent_polytopes(pl_edge, pl_vertex, i));
+          if(V_e_i.at(0) > V_e_i.at(1))
+          {
+            std::cout << "WARNING: edge " << i << " is directed incorretly" << std::endl;
+            return false;
+          }
+        }
+
+        //check property for all faces
+        auto num_faces(m.get_topologies().at(ipi_face_vertex).size());
+        for(Index i(0); i < num_faces; ++i)
+        {
+          auto v_fi(m.get_adjacent_polytopes(pl_face, pl_vertex, i));
+
+          if(v_fi.size() != 3)
+          {
+            std::cout << "WARNING: not a pure tetra mesh!"<< "Face " << i << " has not 3 vertices!" << std::endl;
+            return false;
+          }
+
+          if(v_fi.at(0) > v_fi.at(1))
+          {
+            std::cout << "WARNING: face " << i << " is directed incorretly" << std::endl;
+            return false;
+          }
+          else if(v_fi.at(1) > v_fi.at(2))
+          {
+            std::cout << "WARNING: face " << i << " is directed incorretly" << std::endl;
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      template<typename TopologyType_,
+               template <typename, typename> class OuterStorageType_>
+      static void establish_property_tetra(Mesh<Dim3D, TopologyType_, OuterStorageType_>& m)
+      {
+        if(property_tetra(m))
+          return;
+
+        //direct all edges
+        auto num_edges(m.get_topologies().at(ipi_edge_vertex).size());
+        for(Index i(0); i < num_edges; i++)
+        {
+          auto V_ei(m.get_adjacent_polytopes(pl_edge, pl_vertex, i));
+          if(V_ei.at(0) > V_ei.at(1))
+          {
+            m.get_topologies().at(ipi_edge_vertex).at(i).at(0) = V_ei.at(1);
+            m.get_topologies().at(ipi_edge_vertex).at(i).at(1) = V_ei.at(0);
+          }
+        }
+
+        //direct all faces
+        auto num_faces(m.get_topologies().at(ipi_face_vertex).size());
+        for(Index i(0); i < num_faces; i++)
+        {
+          auto V_fi(m.get_adjacent_polytopes(pl_face, pl_vertex, i));
+          if(V_fi.at(0) > V_fi.at(1) || V_fi.at(1) > V_fi.at(2))
+          {
+            std::sort(V_fi.begin(), V_fi.end());
+            m.get_topologies().at(ipi_face_vertex).at(i).at(0) = V_fi.at(0);
+            m.get_topologies().at(ipi_face_vertex).at(i).at(1) = V_fi.at(1);
+            m.get_topologies().at(ipi_face_vertex).at(i).at(2) = V_fi.at(2);
+          }
+        }
+      }
+
 
       private:
         template<typename TopologyType_,

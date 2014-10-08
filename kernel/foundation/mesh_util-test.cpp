@@ -1001,3 +1001,503 @@ MeshUtilTest3D_hexa<Mem::Main, Index, Algo::Generic, std::vector, std::vector<In
 /*MeshUtilTest3D_hexa<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mu_test_cpu_v_d_3d_hexa("std::vector, std::deque");
 MeshUtilTest3D_hexa<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mu_test_cpu_d_v_3d_hexa("std::deque, std::vector");
 MeshUtilTest3D_hexa<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mu_test_cpu_d_d_3d_hexa("std::deque, std::deque");*/
+
+
+
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+class MeshUtilTest3D_tetra:
+  public TaggedTest<Tag_, IndexType_, Algo_>
+{
+  public:
+    MeshUtilTest3D_tetra(const std::string & tag) :
+      TaggedTest<Tag_, Index, Algo_>("MeshUtilTest3D_tetra<" + tag + ">")
+    {
+    }
+
+    virtual void run() const
+    {
+      /*
+       * (0,1,1)  (1,1,1)
+       *      *----*
+       *     /    /|
+       *(0,1,0)(1,1,0)
+       *   *----*  *(1,0,1)
+       *   | /  | /
+       *   |/   |/
+       *   *----*
+       *(0,0,0) (1,0,0)
+       */
+
+      //create attributes for vertex coords
+      OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > attrs;
+      attrs.push_back(Attribute<double, OT_>()); //vertex x-coords
+      attrs.push_back(Attribute<double, OT_>()); //vertex y-coords
+      attrs.push_back(Attribute<double, OT_>()); //vertex z-coords
+
+      attrs.at(0).get_data().push_back(double(0));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(0));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(-sqrt(3)));
+
+      attrs.at(0).get_data().push_back(double(2));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(0));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(2*sqrt(2/3)));
+      attrs.at(2).get_data().push_back(double(-sqrt(3)/3));
+
+      attrs.at(0).get_data().push_back(double(0.5));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(-sqrt(3)/2));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(1));
+
+      attrs.at(0).get_data().push_back(double(0.5));
+      attrs.at(1).get_data().push_back(double(sqrt(2/3)));
+      attrs.at(2).get_data().push_back(double(-sqrt(3)/6));
+
+      attrs.at(0).get_data().push_back(double(1.5));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(-sqrt(3)/2));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(sqrt(2/3)));
+      attrs.at(2).get_data().push_back(double(-sqrt(3)/3*2));
+
+      attrs.at(0).get_data().push_back(double(1.5));
+      attrs.at(1).get_data().push_back(double(sqrt(2/3)));
+      attrs.at(2).get_data().push_back(double(-sqrt(3)/6));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(sqrt(2/3)));
+      attrs.at(2).get_data().push_back(double(-sqrt(3)/3));
+
+      /*  2    3
+       *  *-1--*
+       *  2    |
+       *  |    3
+       *  *--0-*
+       *  0    1
+       */
+
+      //creating foundation mesh
+      Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m(0);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+
+      m.add_polytope(pl_face);
+      m.add_polytope(pl_face);
+      m.add_polytope(pl_face);
+      m.add_polytope(pl_face);
+
+      m.add_polytope(pl_polyhedron);
+
+      m.add_adjacency(pl_vertex, pl_edge, 1, 0);
+      m.add_adjacency(pl_vertex, pl_edge, 1, 3);
+      m.add_adjacency(pl_vertex, pl_edge, 1, 4);
+
+      m.add_adjacency(pl_vertex, pl_face, 1, 0);
+      m.add_adjacency(pl_vertex, pl_face, 1, 2);
+      m.add_adjacency(pl_vertex, pl_face, 1, 3);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 1, 0);
+
+      m.add_adjacency(pl_vertex, pl_edge, 0, 0);
+      m.add_adjacency(pl_vertex, pl_edge, 0, 1);
+      m.add_adjacency(pl_vertex, pl_edge, 0, 2);
+
+      m.add_adjacency(pl_vertex, pl_face, 0, 3);
+      m.add_adjacency(pl_vertex, pl_face, 0, 1);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 0, 0);
+
+      m.add_adjacency(pl_vertex, pl_edge, 2, 1);
+      m.add_adjacency(pl_vertex, pl_edge, 2, 3);
+      m.add_adjacency(pl_vertex, pl_edge, 2, 5);
+
+      m.add_adjacency(pl_vertex, pl_face, 2, 0);
+      m.add_adjacency(pl_vertex, pl_face, 2, 1);
+      m.add_adjacency(pl_vertex, pl_face, 2, 3);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 2, 0);
+
+      m.add_adjacency(pl_vertex, pl_edge, 3, 2);
+      m.add_adjacency(pl_vertex, pl_edge, 3, 4);
+      m.add_adjacency(pl_vertex, pl_edge, 3, 5);
+
+      m.add_adjacency(pl_vertex, pl_face, 3, 0);
+      m.add_adjacency(pl_vertex, pl_face, 3, 1);
+      m.add_adjacency(pl_vertex, pl_face, 3, 2);
+
+      m.add_adjacency(pl_vertex, pl_face, 0, 2);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 3, 0);
+
+      TEST_CHECK(!MeshUtil::property_tetra(m));
+      MeshUtil::establish_property_tetra(m);
+      TEST_CHECK(MeshUtil::property_tetra(m));
+
+      //creating foundation mesh
+      Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m_fine(0);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+      m_fine.add_polytope(pl_vertex);
+
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+      m_fine.add_polytope(pl_edge);
+
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+      m_fine.add_polytope(pl_face);
+
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+      m_fine.add_polytope(pl_polyhedron);
+
+      //vertex 0
+      m_fine.add_adjacency(pl_vertex, pl_edge, 0, 0);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 0, 2);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 0, 4);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 0, 4);
+      m_fine.add_adjacency(pl_vertex, pl_face, 0, 8);
+      m_fine.add_adjacency(pl_vertex, pl_face, 0, 12);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 0, 0);
+
+      //vertex 1
+      m_fine.add_adjacency(pl_vertex, pl_edge, 1, 1);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 1, 6);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 1, 8);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 1, 0);
+      m_fine.add_adjacency(pl_vertex, pl_face, 1, 9);
+      m_fine.add_adjacency(pl_vertex, pl_face, 1, 13);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 1, 2);
+
+      //vertex 2
+      m_fine.add_adjacency(pl_vertex, pl_edge, 2, 3);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 2, 7);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 2, 10);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 2, 1);
+      m_fine.add_adjacency(pl_vertex, pl_face, 2, 5);
+      m_fine.add_adjacency(pl_vertex, pl_face, 2, 14);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 2, 4);
+
+      //vertex 3
+      m_fine.add_adjacency(pl_vertex, pl_edge, 3, 5);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 3, 9);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 3, 11);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 3, 2);
+      m_fine.add_adjacency(pl_vertex, pl_face, 3, 6);
+      m_fine.add_adjacency(pl_vertex, pl_face, 3, 10);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 3, 6);
+
+      //vertex 4
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 15);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 11);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 13);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 9);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 23);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 22);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 17);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 8);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 12);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 16);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 21);
+      m_fine.add_adjacency(pl_vertex, pl_face, 4, 20);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 4, 0);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 4, 1);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 4, 2);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 4, 3);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 4, 10);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 4, 11);
+
+
+      //vertex 5
+      m_fine.add_adjacency(pl_vertex, pl_edge, 5, 2);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 5, 15);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 5, 21);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 5, 25);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 5, 23);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 5, 16);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 5, 3);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 15);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 7);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 14);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 5);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 18);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 26);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 12);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 4);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 24);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 20);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 25);
+      m_fine.add_adjacency(pl_vertex, pl_face, 5, 16);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 5, 0);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 5, 1);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 5, 4);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 5, 5);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 5, 9);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 5, 11);
+
+      //vertex 6
+      m_fine.add_adjacency(pl_vertex, pl_edge, 6, 4);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 6, 15);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 6, 18);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 6, 26);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 6, 5);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 6, 17);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 6, 20);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 11);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 7);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 28);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 27);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 6);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 19);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 10);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 8);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 4);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 24);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 21);
+      m_fine.add_adjacency(pl_vertex, pl_face, 6, 16);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 6, 0);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 6, 1);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 6, 6);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 6, 7);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 6, 9);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 6, 10);
+
+      //vertex 7
+      m_fine.add_adjacency(pl_vertex, pl_edge, 7, 22);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 7, 12);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 7, 27);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 7, 6);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 7, 23);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 7, 13);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 7, 7);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 15);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 3);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 14);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 1);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 25);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 30);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 18);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 13);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 0);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 29);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 22);
+      m_fine.add_adjacency(pl_vertex, pl_face, 7, 17);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 7, 2);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 7, 3);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 7, 4);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 7, 5);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 7, 8);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 7, 11);
+
+      //vertex 8
+      m_fine.add_adjacency(pl_vertex, pl_edge, 8, 8);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 8, 9);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 8, 12);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 8, 14);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 8, 19);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 8, 20);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 8, 28);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 11);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 27);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 31);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 3);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 19);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 10);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 2);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 9);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 0);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 29);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 23);
+      m_fine.add_adjacency(pl_vertex, pl_face, 8, 17);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 8, 2);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 8, 3);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 8, 6);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 8, 8);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 8, 7);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 8, 10);
+
+      //vertex 10
+      m_fine.add_adjacency(pl_vertex, pl_edge, 10, 24);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 10, 25);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 10, 26);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 10, 27);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 10, 28);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 10, 29);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 30);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 29);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 31);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 28);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 26);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 24);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 21);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 27);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 23);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 25);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 22);
+      m_fine.add_adjacency(pl_vertex, pl_face, 10, 20);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 10, 1);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 10, 3);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 10, 5);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 10, 7);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 10, 8);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 10, 9);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 10, 10);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 10, 11);
+
+      //vertex 9
+      m_fine.add_adjacency(pl_vertex, pl_edge, 9, 10);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 9, 11);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 9, 13);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 9, 14);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 9, 16);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 9, 17);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 9, 29);
+
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 7);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 28);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 31);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 3);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 19);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 6);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 2);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 5);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 1);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 30);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 26);
+      m_fine.add_adjacency(pl_vertex, pl_face, 9, 18);
+
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 9, 4);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 9, 5);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 9, 6);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 9, 7);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 9, 8);
+      m_fine.add_adjacency(pl_vertex, pl_polyhedron, 9, 9);
+
+      m_fine.add_adjacency(pl_vertex, pl_edge, 4, 0);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 4, 21);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 4, 18);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 4, 24);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 4, 19);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 4, 22);
+      m_fine.add_adjacency(pl_vertex, pl_edge, 4, 1);
+
+      TEST_CHECK(!MeshUtil::property_tetra(m_fine));
+      MeshUtil::establish_property_tetra(m_fine);
+      TEST_CHECK(MeshUtil::property_tetra(m_fine));
+    }
+};
+MeshUtilTest3D_tetra<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mu_test_cpu_v_v_3d_tetra("std::vector, std::vector");
+/*MeshUtilTest3D_tetra<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mu_test_cpu_v_d_3d_tetra("std::vector, std::deque");
+MeshUtilTest3D_tetra<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mu_test_cpu_d_v_3d_tetra("std::deque, std::vector");
+MeshUtilTest3D_tetra<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mu_test_cpu_d_d_3d_tetra("std::deque, std::deque");*/
