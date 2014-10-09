@@ -331,6 +331,13 @@ namespace FEAST
         rest().template scale_rows<Algo_>(a.rest(), w.rest());
       }
 
+      template<typename Algo_>
+      void scale_cols(const PowerDiagMatrix& a, const VectorTypeL& w)
+      {
+        first().template scale_cols<Algo_>(a.first(), w.first());
+        rest().template scale_cols<Algo_>(a.rest(), w.rest());
+      }
+
       /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
@@ -566,6 +573,12 @@ namespace FEAST
       void scale_rows(const PowerDiagMatrix& a, const VectorTypeL& w)
       {
         first().template scale_rows<Algo_>(a.first(), w.first());
+      }
+
+      template<typename Algo_>
+      void scale_cols(const PowerDiagMatrix& a, const VectorTypeL& w)
+      {
+        first().template scale_cols<Algo_>(a.first(), w.first());
       }
 
       /// Returns the number of NNZ-elements of the selected row
