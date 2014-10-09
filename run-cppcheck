@@ -20,9 +20,25 @@ from cmake_modules.feast_util import get_output_utf8
 
 sys.dont_write_bytecode = True
 
+def branch_tested_before(hostname, branch, build_id):
+  branch_sha = "".join(get_output("git show-ref --hash origin/" + branch))
+
+  runs = Run.select().where(Run.hostname == hostname).where(Run.branch == branch).where(Run.build == build_id)
+  for run in runs:
+    git_output = Message.select().where(Message.runid == run.id, Message.title == "git output")
+    for message in git_output:
+      if branch_sha in message.body:
+        return True
+
+  return False
+
 def run_test(branch, myDB):
+  os.chdir(src_dirname)
   failed = False
   hostname = socket.gethostname()
+
+  if onlynew and branch != "master" and branch != "develop" and branch_tested_before(hostname, branch, build_id):
+    return
 
   if dump_filename != "":
     dump_filename_full = dump_filename+"-"+"cppcheck-"+hostname+"-"+branch
@@ -94,12 +110,15 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  setup port of sql server.")
   print ("note=text")
   print ("  set note for all runs.")
+  print ("onlynew")
+  print ("  execute runs only if it was not tested before - develop and master will always be tested."
   sys.exit();
 
 dump_filename = ""
 sqlhost = "augias"
 sqlport = 3306
 note = ""
+onlynew = False
 
 for i in range(1, len(sys.argv)):
   if sys.argv[i].startswith("dump="):
@@ -110,6 +129,8 @@ for i in range(1, len(sys.argv)):
     sqlport = int(sys.argv[i].replace("sqlport=", "", 1))
   if sys.argv[i].startswith("note="):
     note = sys.argv[i].replace("note=", "", 1)
+  if (sys.argv[i].startswith("onlynew"):
+    onlynew = True
 
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 myDB = pw.MySQLDatabase("feastdash", host=sqlhost, port=sqlport, user="feastdash", passwd="feastdash", threadlocals=True)
