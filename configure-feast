@@ -80,6 +80,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Selects the system compiler (and header files) used by icc.")
   print ("cuda_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by nvcc.")
+  print ("export_compile_commands")
+  print ("  Let CMake export the used compile commands to compile_commands.json")
   sys.exit()
 
 #get path to feast source trunk
@@ -299,6 +301,11 @@ for package in available_packages(trunk_dirname+os.sep+"cmake_modules",trunk_dir
     package.add()
     cmake_flags += package.cmake_flags
     remove_string(unused_tokens, package.name)
+
+# shall we output the generated compile commands?
+if "export_compile_commands" in buildid:
+  cmake_flags += " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+  remove_string(unused_tokens, "export_compile_commands")
 
 # clean up previous configurations
 clean = [ "CMakeCache.txt", trunk_dirname+os.sep+"CMakeCache.txt" ]
