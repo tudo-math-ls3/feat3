@@ -1028,7 +1028,7 @@ namespace FEAST
         {
           CONTEXT("When writing out SparseMatrixCOO");
 
-          if (_sorted() == 0)
+          if (sorted() == 0)
             const_cast<SparseMatrixCOO *>(this)->sort();
 
           switch(mode)
@@ -1054,6 +1054,9 @@ namespace FEAST
         void write_out(FileMode mode, std::ostream& file) const
         {
           CONTEXT("When writing out SparseMatrixCOO");
+
+          if (sorted() == 0)
+            const_cast<SparseMatrixCOO *>(this)->sort();
 
           switch(mode)
           {
