@@ -1096,6 +1096,20 @@ namespace FEAST
         }
 
         /**
+         * \brief Write out matrix to MatrixMarktet mtx file.
+         *
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out_mtx(String filename) const
+        {
+          std::ofstream file(filename.c_str(), std::ofstream::out);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          write_out_mtx(file);
+          file.close();
+        }
+
+        /**
          * \brief Write out matrix to matrix market mtx file.
          *
          * \param[in] file The stream that shall be written to.
