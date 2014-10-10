@@ -111,7 +111,7 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("note=text")
   print ("  set note for all runs.")
   print ("onlynew")
-  print ("  execute runs only if it was not tested before - develop and master will always be tested."
+  print ("  execute runs only if it was not tested before - develop and master will always be tested.")
   sys.exit();
 
 dump_filename = ""
