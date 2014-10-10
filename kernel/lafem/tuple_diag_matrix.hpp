@@ -398,13 +398,8 @@ namespace FEAST
        *
        * Use source matrix content as content of current matrix
        */
-#ifdef FEAST_COMPILER_MICROSOFT
       template <typename First2_, typename... Rest2_>
       void convert(const TupleDiagMatrix<First2_, Rest2_...>& other)
-#else
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
-#endif
       {
         CONTEXT("When converting TupleDiagMatrix");
 
@@ -618,10 +613,10 @@ namespace FEAST
       template <typename First2_, typename... Rest2_>
       void convert(const TupleDiagMatrix<First2_, Rest2_...>& other)
       {
-        static_assert(sizeof...(Rest2_) == std::size_t(0), "invalud TupleVector size");
+        static_assert(sizeof...(Rest2_) == std::size_t(0), "invalid TupleDiagMatrix size");
 #else
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+      template <typename First2_>
+      void convert(const TupleDiagMatrix<First2_>& other)
       {
 #endif
         CONTEXT("When converting TupleDiagMatrix");
