@@ -148,6 +148,57 @@ namespace FEAST
       {
       }
 
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The source file.
+       *
+       * Creates a saddle-point-matrix based on the source file.
+       */
+      explicit SaddlePointMatrix(FileMode mode, String filename)
+      {
+        CONTEXT("When creating SaddlePointMatrix");
+
+        String directory;
+        auto found = filename.rfind("/");
+        if (found != std::string::npos)
+        {
+          directory = filename.substr(0, found + 1);
+        }
+
+        std::ifstream file(filename.c_str(), std::ifstream::in);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+
+        String line;
+        std::getline(file, line);
+        if (line.find("%%MatrixMarket saddlepointmatrix coordinate real general") == String::npos)
+          throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a complatible file");
+
+        do {
+          if (file.eof())
+            throw InternalError(__func__, __FILE__, __LINE__, "Wrong Input-file");
+          std::getline(file, line);
+          line.trim_me();
+        } while (line.find("%%") == 0 || line == "");
+
+        MatrixA_ tmp_a(mode, directory + line);
+        _matrix_a = std::move(tmp_a);
+
+        std::getline(file, line);
+        line.trim_me();
+        MatrixB_ tmp_b(mode, directory + line);
+        _matrix_b = std::move(tmp_b);
+
+        std::getline(file, line);
+        line.trim_me();
+        MatrixD_ tmp_d(mode, directory + line);
+        _matrix_d = std::move(tmp_d);
+
+        file.close();
+      }
+
       /// move-assign operator
       SaddlePointMatrix& operator=(SaddlePointMatrix&& other)
       {
@@ -162,6 +213,46 @@ namespace FEAST
       /// virtual destructor
       virtual ~SaddlePointMatrix()
       {
+      }
+
+      /**
+       * \brief Write out matrix to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file where the matrix shall be stored.
+       */
+      void write_out(FileMode mode, String filename) const
+      {
+        CONTEXT("When writing out SaddlePointMatrix");
+
+        std::ofstream file(filename.c_str(), std::ofstream::out);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+
+        String suffix, directory;
+        auto found = filename.rfind(".");
+        if (found != std::string::npos)
+        {
+          suffix = filename.substr(found);
+          filename.erase(found);
+        }
+        found = filename.rfind("/");
+        if (found != std::string::npos)
+        {
+          directory = filename.substr(0, found + 1);
+          filename.erase(0, found + 1);
+        }
+
+        file << "%%MatrixMarket saddlepointmatrix coordinate real general" << std::endl;
+        file << filename << "_a" << suffix << std::endl;
+        file << filename << "_b" << suffix << std::endl;
+        file << filename << "_d" << suffix << std::endl;
+
+        file.close();
+
+        _matrix_a.write_out(mode, directory + filename + "_a" + suffix);
+        _matrix_b.write_out(mode, directory + filename + "_b" + suffix);
+        _matrix_d.write_out(mode, directory + filename + "_d" + suffix);
       }
 
       /**

@@ -94,6 +94,67 @@ namespace FEAST
       {
       }
 
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The source file.
+       *
+       * Creates a power-diag-point-matrix based on the source file.
+       */
+      explicit PowerDiagMatrix(FileMode mode, String filename)
+      {
+        String directory;
+        auto found = filename.rfind("/");
+        if (found != std::string::npos)
+        {
+          directory = filename.substr(0, found + 1);
+        }
+
+        std::ifstream file(filename.c_str(), std::ifstream::in);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+
+        String line;
+        std::getline(file, line);
+        if (line.find("%%MatrixMarket powerdiagmatrix coordinate real general") == String::npos)
+          throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a complatible file");
+
+        PowerDiagMatrix other(mode, file, directory);
+
+        _first = std::move(other._first);
+        _rest = std::move(other._rest);
+
+        file.close();
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The source filestream.
+       *
+       * Creates a power-diag-matrix based on the source filestream.
+       */
+      explicit PowerDiagMatrix(FileMode mode, std::istream& file, String directory = "")
+      {
+        CONTEXT("When creating PowerDiagMatrix");
+
+        String line;
+        do {
+          if (file.eof())
+            throw InternalError(__func__, __FILE__, __LINE__, "Wrong Input-file");
+          std::getline(file, line);
+          line.trim_me();
+        } while (line.find("%%") == 0 || line == "");
+
+        SubMatrixType tmp_first(mode, directory + line);
+        _first = std::move(tmp_first);
+
+        RestClass tmp_rest(mode, file, directory);
+        _rest = std::move(tmp_rest);
+      }
+
       /// move-assign operator
       PowerDiagMatrix& operator=(PowerDiagMatrix&& other)
       {
@@ -113,6 +174,59 @@ namespace FEAST
       /// virtual destructor
       virtual ~PowerDiagMatrix()
       {
+      }
+
+      /**
+       * \brief Write out matrix to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file where the matrix shall be stored.
+       */
+      void write_out(FileMode mode, String filename) const
+      {
+        CONTEXT("When writing out PowerDiagMatrix");
+
+        std::ofstream file(filename.c_str(), std::ofstream::out);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+
+        String suffix, directory;
+        auto found = filename.rfind(".");
+        if (found != std::string::npos)
+        {
+          suffix = filename.substr(found);
+          filename.erase(found);
+        }
+        found = filename.rfind("/");
+        if (found != std::string::npos)
+        {
+          directory = filename.substr(0, found + 1);
+          filename.erase(0, found + 1);
+        }
+
+        file << "%%MatrixMarket powerdiagmatrix coordinate real general" << std::endl;
+        for (Index i(1); i <= blocks_; ++i)
+        {
+          file << filename << "_pd" << i << suffix << std::endl;
+        }
+
+        file.close();
+
+        this->write_out_submatrices(mode, directory, filename, suffix);
+      }
+
+      /**
+       * \brief Write out submatrices to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] directory The directory of the matrix-files.
+       * \param[in] prefix The prefix of the matrix-files.
+       * \param[in] suffix The suffix of the matrix-files.
+       */
+      void write_out_submatrices(FileMode mode, String directory, String prefix, String suffix, Index length = blocks_) const
+      {
+        _first.write_out(mode, directory + prefix + "_pd" + stringify(length + 1 - blocks_) + suffix);
+        _rest.write_out_submatrices(mode, directory, prefix, suffix, length);
       }
 
       /**
@@ -475,6 +589,44 @@ namespace FEAST
         return *this;
       }
 
+      /// file-input ctor
+      explicit PowerDiagMatrix(FileMode mode, String filename)
+      {
+        String directory;
+        auto found = filename.rfind("/");
+        if (found != std::string::npos)
+        {
+          directory = filename.substr(0, found + 1);
+        }
+
+        std::ifstream file(filename.c_str(), std::ifstream::in);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+
+        PowerDiagMatrix other(mode, file, directory);
+
+        _first = std::move(other._first);
+
+        file.close();
+      }
+
+      /// filestream-input ctor
+      explicit PowerDiagMatrix(FileMode mode, std::istream& file, String directory = "")
+      {
+        CONTEXT("When creating PowerDiagMatrix");
+
+        String line;
+        do {
+          if (file.eof())
+            throw InternalError(__func__, __FILE__, __LINE__, "Wrong Input-file");
+          std::getline(file, line);
+          line.trim_me();
+        } while (line.find("%%") == 0 || line == "");
+
+        SubMatrixType tmp_first(mode, directory + line);
+        _first = std::move(tmp_first);
+      }
+
       /// deleted copy-ctor
       PowerDiagMatrix(const PowerDiagMatrix&) = delete;
       /// deleted copy-assign operator
@@ -483,6 +635,41 @@ namespace FEAST
       /// virtual destructor
       virtual ~PowerDiagMatrix()
       {
+      }
+
+      void write_out(FileMode mode, String filename) const
+      {
+        CONTEXT("When writing out PowerDiagMatrix");
+
+        std::ofstream file(filename.c_str(), std::ofstream::out);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+
+        String suffix, directory;
+        auto found = filename.rfind(".");
+        if (found != std::string::npos)
+        {
+          suffix = filename.substr(found);
+          filename.erase(found);
+        }
+        found = filename.rfind("/");
+        if (found != std::string::npos)
+        {
+          directory = filename.substr(0, found + 1);
+          filename.erase(0, found + 1);
+        }
+
+        file << "%%MatrixMarket powerdiagmatrix coordinate real general" << std::endl;
+        file << filename << "_pd" << 1 << suffix << std::endl;
+
+        file.close();
+
+        this->write_out_submatrices(mode, directory, filename, suffix);
+      }
+
+      void write_out_submatrices(FileMode mode, String directory, String prefix, String suffix, Index length = 1) const
+      {
+        _first.write_out(mode, directory + prefix + "_pd" + stringify(length) + suffix);
       }
 
       PowerDiagMatrix clone() const

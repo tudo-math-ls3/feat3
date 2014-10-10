@@ -92,6 +92,38 @@ namespace FEAST
       {
       }
 
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The source file.
+       *
+       * Creates a power-full-point-matrix based on the source file.
+       */
+      explicit PowerFullMatrix(FileMode mode, String filename)
+      {
+        CONTEXT("When creating PowerFullMatrix");
+
+        ContClass other(mode, filename);
+        _container = std::move(other);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The source filestream.
+       *
+       * Creates a power-full-matrix based on the source filestream.
+       */
+      explicit PowerFullMatrix(FileMode mode, std::istream& file, String directory = "")
+      {
+        CONTEXT("When creating PowerFullMatrix");
+
+        ContClass other(mode, file, directory);
+        _container = std::move(other);
+      }
+
       /// move-assign operator
       PowerFullMatrix& operator=(PowerFullMatrix&& other)
       {
@@ -110,6 +142,19 @@ namespace FEAST
       /// virtual destructor
       virtual ~PowerFullMatrix()
       {
+      }
+
+      /**
+       * \brief Write out matrix to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file where the matrix shall be stored.
+       */
+      void write_out(FileMode mode, String filename) const
+      {
+        CONTEXT("When writing out PowerFullMatrix");
+
+        _container.write_out(mode, filename);
       }
 
       /**

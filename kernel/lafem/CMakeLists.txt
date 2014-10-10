@@ -39,6 +39,7 @@ SET (test_list
   dense_vector_blocked-test
   meta_filter-test
   meta_matrix-apply-test
+  meta_matrix-io-test
   meta_mirror-test
   meta_vector-axpy-test
   meta_vector-comp_prod-test
