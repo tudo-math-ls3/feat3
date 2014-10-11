@@ -333,7 +333,7 @@ namespace FEAST
        * Use source matrix content as content of current matrix
        */
 #ifdef FEAST_COMPILER_MICROSOFT
-      template< typename SubType_>
+      template <typename SubType_>
       void convert(const PowerRowMatrix<SubType_, blocks_>& other)
 #else
       template <typename Mem2_, typename DT2_, typename IT2_>
@@ -344,6 +344,25 @@ namespace FEAST
 
         this->first().convert(other.first());
         this->rest().convert(other.rest());
+      }
+
+      /**
+       * \brief PowerRowMatrix comparison operator
+       *
+       * \param[in] a A matrix to compare with.
+       * \param[in] b A matrix to compare with.
+       */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template <typename SubType_>
+      friend bool operator== (const PowerRowMatrix & a, const PowerRowMatrix<SubType_, blocks_> & b)
+#else
+      template <typename Mem2_>
+      friend bool operator== (const PowerRowMatrix & a, const ContainerType<Mem2_> & b)
+#endif
+      {
+        CONTEXT("When comparing PowerRowMatrices");
+
+        return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
       }
     };
 
@@ -543,7 +562,7 @@ namespace FEAST
        * Use source matrix content as content of current matrix
        */
 #ifdef FEAST_COMPILER_MICROSOFT
-      template< typename SubType_>
+      template <typename SubType_>
       void convert(const PowerRowMatrix<SubType_, Index(1)>& other)
 #else
       template <typename Mem2_, typename DT2_, typename IT2_>
@@ -553,6 +572,25 @@ namespace FEAST
         CONTEXT("When converting PowerRowMatrix");
 
         this->first().convert(other.first());
+      }
+
+      /**
+       * \brief PowerRowMatrix comparison operator
+       *
+       * \param[in] a A matrix to compare with.
+       * \param[in] b A matrix to compare with.
+       */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template <typename SubType_>
+      friend bool operator== (const PowerRowMatrix & a, const PowerRowMatrix<SubType_, Index(1)> & b)
+#else
+      template <typename Mem2_>
+      friend bool operator== (const PowerRowMatrix & a, const ContainerType<Mem2_> & b)
+#endif
+      {
+        CONTEXT("When comparing PowerRowMatrices");
+
+        return (a.name() == b.name()) && (a.first() == b.first());
       }
     };
     /// \endcond

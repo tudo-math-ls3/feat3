@@ -406,6 +406,25 @@ namespace FEAST
         this->first().convert(other.first());
         this->rest().convert(other.rest());
       }
+
+      /**
+       * \brief TupleDiagMatrix comparison operator
+       *
+       * \param[in] a A matrix to compare with.
+       * \param[in] b A matrix to compare with.
+       */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template <typename First2_, typename... Rest2__>
+      friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix<First2_, Rest2_...> & b)
+#else
+      template <typename Mem2_>
+      friend bool operator== (const TupleDiagMatrix & a, const ContainerType<Mem2_> & b)
+#endif
+      {
+        CONTEXT("When comparing TupleDiagMatrices");
+
+        return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
+      }
     };
 
     /// \cond internal
@@ -622,6 +641,25 @@ namespace FEAST
         CONTEXT("When converting TupleDiagMatrix");
 
         this->first().convert(other.first());
+      }
+
+      /**
+       * \brief TupleDiagMatrix comparison operator
+       *
+       * \param[in] a A matrix to compare with.
+       * \param[in] b A matrix to compare with.
+       */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template <typename First2_, typename... Rest2__>
+      friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix<First2_, Rest2_...> & b)
+#else
+      template <typename Mem2_>
+      friend bool operator== (const TupleDiagMatrix & a, const ContainerType<Mem2_> & b)
+#endif
+      {
+        CONTEXT("When comparing TupleDiagMatrices");
+
+        return (a.name() == b.name()) && (a.first() == b.first());
       }
     };
     /// \endcond

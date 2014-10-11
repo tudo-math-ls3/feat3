@@ -248,6 +248,25 @@ namespace FEAST
         CONTEXT("When converting PowerFullMatrix");
         _container.convert(other._container);
       }
+
+      /**
+       * \brief PowerFullMatrix comparison operator
+       *
+       * \param[in] a A matrix to compare with.
+       * \param[in] b A matrix to compare with.
+       */
+#ifdef FEAST_COMPILER_MICROSOFT
+      template< typename SubType_>
+      friend bool operator== (const PowerFullMatrix & a, const PowerFullMatrix<SubType_, width_, height_> & b)
+#else
+      template <typename Mem2_>
+      friend bool operator== (const PowerFullMatrix & a, const ContainerType<Mem2_> & b)
+#endif
+      {
+        CONTEXT("When comparing PowerFullMatrices");
+
+        return a._container == b._container;
+      }
     }; // class PowerFullMatrix
   } // namespace LAFEM
 } // namespace FEAST

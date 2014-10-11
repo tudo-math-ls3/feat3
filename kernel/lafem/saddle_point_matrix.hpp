@@ -423,6 +423,21 @@ namespace FEAST
         this->block_b().convert(other.block_b());
         this->block_d().convert(other.block_d());
       }
+
+      /**
+       * \brief SaddlePointMatrix comparison operator
+       *
+       * \param[in] a A matrix to compare with.
+       * \param[in] b A matrix to compare with.
+       */
+      template <typename Mem2_>
+      friend bool operator== (const SaddlePointMatrix & a, const ContainerType<Mem2_> & b)
+      {
+        CONTEXT("When comparing SaddlePointMatrices");
+
+        return (a.name() == b.name()) && (a.block_a() == b.block_a())
+          && (a.block_b() == b.block_b()) && (a.block_d() == b.block_d());
+      }
     }; // class SaddlePointMatrix<...>
 
     /// \cond internal
