@@ -475,6 +475,11 @@ namespace FEAST
         return first().used_elements();
       }
 
+      static String name()
+      {
+        return String("PowerRowMatrix<") + SubMatrixType::name() + "," + stringify(1) + ">";
+      }
+
       void format(DataType value = DataType(0))
       {
         first().format(value);
