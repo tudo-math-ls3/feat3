@@ -129,7 +129,7 @@ for i in range(1, len(sys.argv)):
     sqlport = int(sys.argv[i].replace("sqlport=", "", 1))
   if sys.argv[i].startswith("note="):
     note = sys.argv[i].replace("note=", "", 1)
-  if (sys.argv[i].startswith("onlynew"):
+  if sys.argv[i].startswith("onlynew"):
     onlynew = True
 
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
