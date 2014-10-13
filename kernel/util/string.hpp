@@ -254,7 +254,7 @@ namespace FEAST
      * \returns
      * The front-trimmed string.
      */
-    String trim_front(const String charset) const
+    String trim_front(const String & charset) const
     {
       // find first character not to be trimmed
       size_type pos = find_first_not_of(charset);
@@ -286,7 +286,7 @@ namespace FEAST
      * \returns
      * The back-trimmed string.
      */
-    String trim_back(const String charset) const
+    String trim_back(const String & charset) const
     {
       // find last character not to be trimmed
       size_type pos = find_last_not_of(charset);
@@ -320,7 +320,7 @@ namespace FEAST
      * \returns
      * The trimmed string.
      */
-    String trim(const String charset) const
+    String trim(const String & charset) const
     {
       // trim front and back
       return trim_front(charset).trim_back(charset);
@@ -351,7 +351,7 @@ namespace FEAST
      *
      * \returns \p *this
      */
-    String& trim_me(const String charset)
+    String& trim_me(const String & charset)
     {
       return (*this = trim(charset));
     }
@@ -445,7 +445,7 @@ namespace FEAST
     template<typename Container_>
     size_type split_by_charset(
       Container_& words,
-      const String charset) const
+      const String & charset) const
     {
       words.clear();
       if(empty() || charset.empty())
@@ -526,7 +526,7 @@ namespace FEAST
     template<typename Container_>
     size_type split_by_string(
       Container_& words,
-      const String delimiter) const
+      const String & delimiter) const
     {
       words.clear();
       if(empty() || delimiter.empty())
@@ -585,7 +585,7 @@ namespace FEAST
      * \returns
      * The total number of replacements made.
      */
-    size_type replace_all(const String find_string, const String replace_string)
+    size_type replace_all(const String & find_string, const String & replace_string)
     {
       size_type flen(find_string.size());
       size_type rlen(replace_string.size());

@@ -5,7 +5,8 @@ class ipo_foobar
 {
   public:
   int i;
-  ipo_foobar()
+  ipo_foobar() :
+    i(0)
   {
     (void)i;
   }

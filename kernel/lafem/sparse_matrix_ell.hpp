@@ -413,9 +413,9 @@ namespace FEAST
         this->_scalar_dt.push_back(DT_(0));
 
         ASSERT(val_in.size() == col_ind_in.size(), "Error: val- and col-arrays must have the same size!");
-        ASSERT(cs_in.size() == _num_of_chunks() + 1, "Error: cs-array-size must match to row-count and chunk size!");
-        ASSERT(cl_in.size() == _num_of_chunks(), "Error: cl-array-size must match to row-count and chunk size!");
-        ASSERT(rl_in.size() == _rows(), "Error: rl-array-size must match to row-count!");
+        ASSERT(cs_in.size() == num_of_chunks() + 1, "Error: cs-array-size must match to row-count and chunk size!");
+        ASSERT(cl_in.size() == num_of_chunks(), "Error: cl-array-size must match to row-count and chunk size!");
+        ASSERT(rl_in.size() == rows(), "Error: rl-array-size must match to row-count!");
 
         this->_elements.push_back(val_in.elements());
         this->_elements_size.push_back(val_in.size());

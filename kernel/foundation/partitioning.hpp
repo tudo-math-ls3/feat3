@@ -47,7 +47,7 @@ namespace FEAST
           //add neighbours found
           bool found(false);
           for(Index k(0) ; k < target.size() ; ++k)
-            if(std::find(target.at(k).begin() , target.at(k).end(), nb.at(j)) < target.at(k).end())
+            if(std::find(target.at(k).begin() , target.at(k).end(), nb.at(j)) != target.at(k).end())
             {
               found = true;
               break;

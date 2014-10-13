@@ -223,7 +223,7 @@ void check_isend_and_irecv_and_test(Index rank)
 
   Request r;
   Status s;
-  int flag(false);
+  int flag(0);
   if(rank == 0)
   {
     Comm::isend(f,
@@ -233,7 +233,7 @@ void check_isend_and_irecv_and_test(Index rank)
                99,
                Communicator(MPI_COMM_WORLD));
 
-    while(flag != true)
+    while(flag != 1)
       Comm::test(r, flag, s);
 
     std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: isend and irecv and test)" << std::endl;
@@ -247,7 +247,7 @@ void check_isend_and_irecv_and_test(Index rank)
                99,
                Communicator(MPI_COMM_WORLD));
 
-    while(flag != true)
+    while(flag != 1)
       Comm::test(r, flag, s);
 
     TestResult<float, float, float>* res = new TestResult<float, float, float>[100000];
