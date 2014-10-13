@@ -50,9 +50,6 @@ configure_file (${FEAST_SOURCE_DIR}/feast_config.hpp.in ${FEAST_BINARY_DIR}/feas
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 
-# our custom target to wipe out all cmake generated files
-INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/target_distclean.cmake )
-
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
