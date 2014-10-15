@@ -38,7 +38,7 @@ namespace FEAST
          * \brief Maps a local index based on an orientation code.
          *
          * \param[in] orient
-         * An orientation code as returned by the Sampler<Shape_>::compare() function.
+         * An orientation code as returned by the CongruencySampler<Shape_>::compare() function.
          *
          * \param[in] idx
          * The local face index that is to be mapped.
