@@ -121,23 +121,20 @@ int main(int /*argc*/, char** /*argv*/)
   // test coarse
   test_bcasm(space, cell);
 
-  if(true)
-  {
-    // refine meshes
-    Geometry::StandardRefinery<QuadMesh> mesh_refinery(mesh);
-    QuadMesh mesh_f(mesh_refinery);
-    // refine cell sets
-    Geometry::StandardRefinery<QuadCellSet, QuadMesh> cell_refinery(cell, mesh);
-    QuadCellSet cell_f(cell_refinery);
-    // create trafo
-    QuadTrafo trafo_f(mesh_f);
+  // refine meshes
+  Geometry::StandardRefinery<QuadMesh> mesh_refinery(mesh);
+  QuadMesh mesh_f(mesh_refinery);
+  // refine cell sets
+  Geometry::StandardRefinery<QuadCellSet, QuadMesh> cell_refinery(cell, mesh);
+  QuadCellSet cell_f(cell_refinery);
+  // create trafo
+  QuadTrafo trafo_f(mesh_f);
 
-    // create space
-    QuadSpace space_f(trafo_f);
+  // create space
+  QuadSpace space_f(trafo_f);
 
-    // test refined
-    test_bcasm(space_f, cell_f);
-  }
+  // test refined
+  test_bcasm(space_f, cell_f);
 }
 
 
