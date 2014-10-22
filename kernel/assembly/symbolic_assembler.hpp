@@ -121,6 +121,98 @@ namespace FEAST
       }
     }; // class SymbolicGraphAssembler<Stencil::Standard>
 
+    template<>
+    class SymbolicGraphAssembler<Stencil::ExtendedFacet>
+    {
+    public:
+      /**
+       * \brief Assembles the extended-facet Dof-Adjacency graph for different test- and trial-spaces.
+       *
+       * \param[in] test_space, trial_space
+       * The test- and trial-spaces to be used for the assembly. Must be defined on the same mesh.
+       *
+       * \returns
+       * The extended-facet Dof-Adjacency graph of the test- and trial-space combination.
+       */
+      template<
+        typename TestSpace_,
+        typename TrialSpace_>
+      static Adjacency::Graph assemble_graph(const TestSpace_& test_space, const TrialSpace_& trial_space)
+      {
+        // render dof-graphs
+        Adjacency::Graph test_dof_graph(Space::DofMappingRenderer::render(test_space));
+        Adjacency::Graph trial_dof_graph(Space::DofMappingRenderer::render(trial_space));
+
+        // get the shape dimension
+        typedef typename TestSpace_::ShapeType ShapeType;
+        static constexpr Index shape_dim = Index(ShapeType::dimension);
+
+        // get the facet index set
+        const auto& facet_at_shape = test_space.get_trafo().get_mesh().template get_index_set<shape_dim, shape_dim-1>();
+
+        // transpose to get the facet support
+        Adjacency::Graph shape_at_facet(Adjacency::rt_transpose, facet_at_shape);
+
+        // render transposed test-dof-mapping
+        Adjacency::Graph test_dof_support(Adjacency::rt_transpose, test_dof_graph);
+
+        // render extended test-dof-support
+        Adjacency::Graph test_dof_ext_sup(Adjacency::rt_injectify, test_dof_support, facet_at_shape);
+
+        // render extended trial-dof-mapping
+        Adjacency::Graph trial_dof_ext_graph(Adjacency::rt_injectify, shape_at_facet, trial_dof_graph);
+
+        // render composite test-dof-mapping/trial-dof-support graph
+        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, test_dof_ext_sup, trial_dof_ext_graph);
+
+        // sort the dof-adjactor graph
+        dof_adjactor.sort_indices();
+
+        // return the graph
+        return std::move(dof_adjactor);
+      }
+
+      /**
+       * \brief Assembles the standard Dof-Adjacency graph for identical test- and trial-spaces.
+       *
+       * \param[in] space
+       * The space representing the test- and trial spaces to be used for the assembly.
+       *
+       * \returns
+       * The standard Dof-Adjacency graph of the space.
+       */
+      template<typename Space_>
+      static Adjacency::Graph assemble_graph(const Space_& space)
+      {
+        // create dof-mapping
+        Adjacency::Graph dof_graph(Space::DofMappingRenderer::render(space));
+
+        // get the shape dimension
+        typedef typename Space_::ShapeType ShapeType;
+        static constexpr Index shape_dim = Index(ShapeType::dimension);
+
+        // get the facet index set
+        const auto& facet_at_shape = space.get_trafo().get_mesh().template get_index_set<shape_dim, shape_dim-1>();
+
+        // transpose to get the facet support
+        Adjacency::Graph shape_at_facet(Adjacency::rt_transpose, facet_at_shape);
+
+        // render extended dof-mapping
+        Adjacency::Graph dof_ext_graph(Adjacency::rt_injectify, shape_at_facet, dof_graph);
+
+        // render transposed extended dof-mapping
+        Adjacency::Graph dof_ext_sup(Adjacency::rt_transpose, dof_ext_graph);
+
+        // render composite dof-mapping/dof-support graph
+        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, dof_ext_sup, dof_ext_graph);
+
+        // sort the sof-adjactor graph
+        dof_adjactor.sort_indices();
+
+        // return the graph
+        return std::move(dof_adjactor);
+      }
+    }; // class SymbolicGraphAssembler<Stencil::ExtendedFacet>
 
     /**
      * \brief Standard-Refinement Dof-Adjacency assembler class
