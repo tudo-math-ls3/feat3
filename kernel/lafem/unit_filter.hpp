@@ -359,7 +359,8 @@ namespace FEAST
       template<typename Algo_>
       void filter_rhs(DenseVector<Mem_, DT_, IT_> & vector) const
       {
-        Arch::UnitFilter<Mem_, Algo_>::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
+        if(_sv.used_elements() > Index(0))
+          Arch::UnitFilter<Mem_, Algo_>::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
       }
 
       /**
@@ -384,7 +385,8 @@ namespace FEAST
       template<typename Algo_>
       void filter_def(DenseVector<Mem_, DT_, IT_> & vector) const
       {
-        Arch::UnitFilter<Mem_, Algo_>::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
+        if(_sv.used_elements() > Index(0))
+          Arch::UnitFilter<Mem_, Algo_>::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
       }
 
       /**
