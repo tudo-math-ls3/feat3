@@ -106,6 +106,7 @@ namespace FEAST
         }
       };
     } // namespace Intern
+    /// \endcond
 
     /**
      * \brief Uniform Dof-Assignment class template.

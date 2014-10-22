@@ -70,7 +70,7 @@ namespace FEAST
         }
       };
     } // namespace Intern
-    /// \endcon
+    /// \endcond
 
     /**
      * \brief Extended VTK writer class template
