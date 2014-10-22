@@ -8,6 +8,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/lafem/matrix_mirror.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 
@@ -46,7 +47,7 @@ namespace FEAST
         for(Index i(0) ; i < vec_mirrors.size() ; ++i)
         {
           LAFEM::MatrixMirror<VMT_> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
-          MT_<Mem_, DT_, IT_> sendbuf_mat;
+          LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> sendbuf_mat;
           Assembly::MirrorAssembler::assemble_buffer_matrix(sendbuf_mat, mat_mirror, result);
           mat_mirror.template gather<Algo_>(sendbuf_mat, result);
 
@@ -110,14 +111,9 @@ namespace FEAST
               Foundation::Comm::test(recvrequests.at(i), recvflags[i], recvstatus.at(i));
               if(recvflags[i] != 0)
               {
-                MT_<Mem_, DT_, IT_> other_mat(recv_buf.at(i));
+                LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> other_mat(recv_buf.at(i));
                 LAFEM::MatrixMirror<VMT_> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
-                LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> buf_mat;
-                Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, result);
-
-                mat_mirror.template gather<Algo_>(buf_mat, result);
-                buf_mat.template axpy<Algo_>(buf_mat, other_mat);
-                mat_mirror.template scatter<Algo_>(result, buf_mat);
+                mat_mirror.template scatter_axpy<Algo_>(result, other_mat);
                 ++count;
                 taskflags[i] = 1;
               }
