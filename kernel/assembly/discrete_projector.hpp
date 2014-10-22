@@ -108,7 +108,7 @@ namespace FEAST
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
+        typename AsmTraits::LocalVectorType lvad;
 
         // create a vector gather-axpy
         LAFEM::GatherAxpy<VectorIn_> gather_axpy(coeff);
@@ -123,7 +123,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // fetch local vector
-          gather_axpy(lvad);
+          gather_axpy(lvad, dof_mapping);
 
           // finish dof-mapping
           dof_mapping.finish();
@@ -285,7 +285,7 @@ namespace FEAST
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
+        typename AsmTraits::LocalVectorType lvad;
 
         // create a vector gather-axpy
         LAFEM::GatherAxpy<VectorIn_> gather_axpy(coeff);
@@ -300,7 +300,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // fetch local vector
-          gather_axpy(lvad);
+          gather_axpy(lvad, dof_mapping);
 
           // finish dof-mapping
           dof_mapping.finish();

@@ -262,12 +262,10 @@ public:
     }
 
     // create a dof-mapping
-    typedef typename QuadSpaceQ1::DofMappingType DofMapping;
     typename QuadSpaceQ1::DofMappingType dof_mapping(space);
 
     // create local matrix data
-    Assembly::LocalMatrixData<Tiny::Matrix<DataType_,4,4>, DofMapping, DofMapping>
-      lmd1(dof_mapping,dof_mapping), lmd2(dof_mapping,dof_mapping);
+    Tiny::Matrix<DataType_,4,4> lmd1, lmd2;
     LAFEM::GatherAxpy<MatrixType_> gather1(matrix_1), gather2(matrix_2);
 
     // some constants
@@ -284,8 +282,8 @@ public:
       dof_mapping.prepare(cell);
       lmd1.format();
       lmd2.format();
-      gather1(lmd1);
-      gather2(lmd2);
+      gather1(lmd1, dof_mapping, dof_mapping);
+      gather2(lmd2, dof_mapping, dof_mapping);
 
       // loop over all 4x4 entries
       for(Index i(0); i < 4; ++i)
@@ -482,12 +480,10 @@ public:
     }
 
     // create a dof-mapping
-    typedef typename QuadSpaceQ1::DofMappingType DofMapping;
     typename QuadSpaceQ1::DofMappingType dof_mapping(space);
 
     // create local matrix data
-    Assembly::LocalMatrixData<Tiny::Matrix<DataType_,4,4>, DofMapping, DofMapping>
-      lmd1(dof_mapping,dof_mapping), lmd2(dof_mapping,dof_mapping);
+    Tiny::Matrix<DataType_,4,4> lmd1, lmd2;
     LAFEM::GatherAxpy<MatrixType> gather1(matrix_1), gather2(matrix_2);
 
     // some constants
@@ -504,8 +500,8 @@ public:
       dof_mapping.prepare(cell);
       lmd1.format();
       lmd2.format();
-      gather1(lmd1);
-      gather2(lmd2);
+      gather1(lmd1, dof_mapping, dof_mapping);
+      gather2(lmd2, dof_mapping, dof_mapping);
 
       // loop over all 4x4 entries
       for(Index i(0); i < 4; ++i)

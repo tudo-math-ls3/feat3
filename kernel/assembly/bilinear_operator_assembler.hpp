@@ -4,7 +4,6 @@
 
 // includes, FEAST
 #include <kernel/assembly/asm_traits.hpp>
-#include <kernel/assembly/local_system_data.hpp>
 
 namespace FEAST
 {
@@ -100,7 +99,7 @@ namespace FEAST
         typename AsmTraits::TrialEvalData trial_data;
 
         // create local matrix data
-        typename AsmTraits::LocalMatrixDataType lmd(test_dof_mapping, trial_dof_mapping);
+        typename AsmTraits::LocalMatrixType lmd;
 
         // create cubature rule
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -170,7 +169,7 @@ namespace FEAST
           trial_dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lmd, alpha);
+          scatter_axpy(lmd, test_dof_mapping, trial_dof_mapping, alpha);
 
           // finish dof mapping
           trial_dof_mapping.finish();
@@ -252,7 +251,7 @@ namespace FEAST
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local matrix data
-        typename AsmTraits::LocalMatrixDataType lmd(dof_mapping, dof_mapping);
+        typename AsmTraits::LocalMatrixType lmd;
 
         // create cubature rule
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -317,7 +316,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lmd, alpha);
+          scatter_axpy(lmd, dof_mapping, dof_mapping, alpha);
 
           // finish dof mapping
           dof_mapping.finish();
@@ -415,7 +414,7 @@ namespace FEAST
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local matrix data
-        typename AsmTraits::LocalMatrixDataType lmd(dof_mapping, dof_mapping);
+        typename AsmTraits::LocalMatrixType lmd;
 
         // create cubature rule
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -480,7 +479,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lmd, alpha);
+          scatter_axpy(lmd, dof_mapping, dof_mapping, alpha);
 
           // finish dof mapping
           dof_mapping.finish();
@@ -575,8 +574,8 @@ namespace FEAST
           typename AsmTraits::SpaceEvalData space_data;
 
           // create local vector data
-          typename AsmTraits::LocalVectorDataType coeff_loc(dof_mapping);
-          typename AsmTraits::LocalVectorDataType ret_loc(dof_mapping);
+          typename AsmTraits::LocalVectorType coeff_loc;
+          typename AsmTraits::LocalVectorType ret_loc;
 
           // create cubature rule
           typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -600,7 +599,7 @@ namespace FEAST
             trafo_eval.prepare(cell);
 
             // incorporate local vector
-            gather_axpy(coeff_loc);
+            gather_axpy(coeff_loc, dof_mapping);
 
             // prepare space evaluator
             space_eval.prepare(trafo_eval);
@@ -647,7 +646,7 @@ namespace FEAST
             trafo_eval.finish();
 
             // incorporate local vector
-            scatter_axpy(ret_loc, alpha);
+            scatter_axpy(ret_loc, dof_mapping, alpha);
 
             // finish dof mapping
             dof_mapping.finish();
@@ -751,8 +750,8 @@ namespace FEAST
           typename AsmTraits::TrialEvalData trial_data;
 
           // create local vector data
-          typename AsmTraits::LocalTrialVectorDataType coeff_loc(trial_dof_mapping);
-          typename AsmTraits::LocalTestVectorDataType ret_loc(test_dof_mapping);
+          typename AsmTraits::LocalTrialVectorType coeff_loc;
+          typename AsmTraits::LocalTestVectorType ret_loc;
 
           // create cubature rule
           typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -780,7 +779,7 @@ namespace FEAST
             trial_eval.prepare(trafo_eval);
 
             // incorporate local vector
-            gather_axpy(coeff_loc);
+            gather_axpy(coeff_loc, trial_dof_mapping);
 
             // prepare functor evaluator
             oper_eval.prepare(trafo_eval);
@@ -827,7 +826,7 @@ namespace FEAST
             trafo_eval.finish();
 
             // incorporate local vector
-            scatter_axpy(ret_loc, alpha);
+            scatter_axpy(ret_loc, test_dof_mapping, alpha);
 
             // finish dof mappings
             test_dof_mapping.finish();

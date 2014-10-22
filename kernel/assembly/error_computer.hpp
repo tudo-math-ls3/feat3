@@ -119,7 +119,7 @@ namespace FEAST
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
+        typename AsmTraits::LocalVectorType lvad;
 
         // create matrix scatter-axpy
         LAFEM::GatherAxpy<VectorType> gather_axpy(vector);
@@ -137,7 +137,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          gather_axpy(lvad);
+          gather_axpy(lvad, dof_mapping);
 
           // finish dof-mapping
           dof_mapping.finish();
@@ -304,7 +304,7 @@ namespace FEAST
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
+        typename AsmTraits::LocalVectorType lvad;
 
         // create matrix scatter-axpy
         LAFEM::GatherAxpy<VectorType> gather_axpy(vector);
@@ -322,7 +322,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          gather_axpy(lvad);
+          gather_axpy(lvad, dof_mapping);
 
           // finish dof-mapping
           dof_mapping.finish();
@@ -489,7 +489,7 @@ namespace FEAST
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
+        typename AsmTraits::LocalVectorType lvad;
 
         // create matrix scatter-axpy
         LAFEM::GatherAxpy<VectorType> gather_axpy(vector);
@@ -507,7 +507,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          gather_axpy(lvad);
+          gather_axpy(lvad, dof_mapping);
 
           // finish dof-mapping
           dof_mapping.finish();

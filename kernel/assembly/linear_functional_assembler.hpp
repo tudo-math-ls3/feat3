@@ -82,7 +82,7 @@ namespace FEAST
         typename AsmTraits::TestEvalData test_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
+        typename AsmTraits::LocalVectorType lvad;
 
         // create cubature rule
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -141,7 +141,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lvad, alpha);
+          scatter_axpy(lvad, dof_mapping, alpha);
 
           // finish dof-mapping
           dof_mapping.finish();

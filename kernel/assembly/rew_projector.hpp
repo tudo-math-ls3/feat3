@@ -126,10 +126,10 @@ namespace FEAST
         Index pivot[mass.n];
 
         // create local vector data
-        typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
+        typename AsmTraits::LocalVectorType lvad;
 
         // create local weight data
-        typename AsmTraits::LocalVectorDataType lwad(dof_mapping);
+        typename AsmTraits::LocalVectorType lwad;
 
         // fetch the dof count
         const Index num_dofs(space.get_num_dofs());
@@ -228,8 +228,8 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local vector and weights
-          scatter_axpy(lvad);
-          weight_scatter_axpy(lwad);
+          scatter_axpy(lvad, dof_mapping);
+          weight_scatter_axpy(lwad, dof_mapping);
 
           // finish dof-mapping
           dof_mapping.finish();

@@ -144,20 +144,22 @@ namespace FEAST
         Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, FineSpaceEvaluator::max_local_dofs> mass;
 
         // allocate local matrix data for interlevel-mesh mass matrix
-        LocalMatrixData<
+        /*LocalMatrixData<
           Tiny::Matrix<
             DataType,
             FineSpaceEvaluator::max_local_dofs,
             CoarseSpaceEvaluator::max_local_dofs>,
           FineDofMapping,
-          CoarseDofMapping> lmd(fine_dof_mapping, coarse_dof_mapping);
+          CoarseDofMapping> lmd(fine_dof_mapping, coarse_dof_mapping);*/
+        Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, CoarseSpaceEvaluator::max_local_dofs> lmd;
 
         // allocate local vector data for weight vector
-        LocalVectorData<
+        /*LocalVectorData<
           Tiny::Vector<
             DataType,
             FineSpaceEvaluator::max_local_dofs>,
-          FineDofMapping> lvd(fine_dof_mapping);
+          FineDofMapping> lvd(fine_dof_mapping);*/
+        Tiny::Vector<DataType, FineSpaceEvaluator::max_local_dofs> lvd;
 
         // pivaot array for factorisation
         Index pivot[FineSpaceEvaluator::max_local_dofs];
@@ -255,11 +257,11 @@ namespace FEAST
             fine_dof_mapping.prepare(fcell);
 
             // incorporate local matrix
-            scatter_maxpy(lmd);
+            scatter_maxpy(lmd, fine_dof_mapping, coarse_dof_mapping);
 
             // update weights
             lvd.format(DataType(1));
-            scatter_vaxpy(lvd);
+            scatter_vaxpy(lvd, fine_dof_mapping);
 
             // finish fine mesh dof-mapping
             fine_dof_mapping.finish();
