@@ -381,10 +381,10 @@ namespace FEAST
       template<int m_, int sma_, int sna_, int sx_>
       Vector& set_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x)
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(Index i(0); i < Index(n_); ++i)
         {
           v[i] = T_(0);
-          for(Index j(0); j < Index(n_); ++j)
+          for(Index j(0); j < Index(m_); ++j)
           {
             v[i] += a.v[i][j] * x.v[j];
           }
