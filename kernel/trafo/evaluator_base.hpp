@@ -247,7 +247,7 @@ namespace FEAST
        */
       Index get_num_cells() const
       {
-        return _trafo.get_mesh().get_num_entities(ShapeType::dimension);
+        return _trafo.get_mesh().get_num_entities(domain_dim);
       }
 
       /**
