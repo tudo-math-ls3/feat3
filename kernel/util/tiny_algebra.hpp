@@ -8,7 +8,12 @@
 
 namespace FEAST
 {
-  /// Tiny namespace
+  /**
+   * \brief Tiny namespace
+   *
+   * This namespace encapsulates Vector, Matrix and third-order Tensor classes, whose dimensions are given at
+   * compile-time. These classes are commonly used by various other kernel components, most notably by the assembly.
+   */
   namespace Tiny
   {
     /**
@@ -18,7 +23,7 @@ namespace FEAST
      * be a primitive type, or some other object like (again) a Vector.
      *
      * \tparam T_
-     * The valuetype that the vector shall contain.
+     * The value-type that the vector shall contain.
      *
      * \tparam n_
      * The length of the vector. Must be > 0.
@@ -105,10 +110,9 @@ namespace FEAST
        * \brief Helper class that extracts the basic data type from another type
        *
        * \tparam T_
-       * The yype
+       * The type
        *
        * This is the end of the recursion where the type is something other than a FEAST::Tiny::... object.
-       *
        **/
       template<typename T_>
       struct DataTypeExtractor
@@ -370,6 +374,10 @@ namespace FEAST
       /**
        * \brief Sets this vector to the result of a matrix-vector product.
        *
+       * Let \e y denote \c this vector, and let \e A denote the input matrix and \e x in the input vector, then
+       * this function computes:
+       * \f[ y \leftarrow A\cdot x \f]
+       *
        * \param[in] a
        * The matrix for the product.
        *
@@ -394,6 +402,10 @@ namespace FEAST
 
       /**
        * \brief Sets this vector to the result of a vector-matrix product.
+       *
+       * Let \e y denote \c this vector, and let \e x in the input vector and \e A denote the input matrix, then
+       * this function computes:
+       * \f[ y\top \leftarrow x^\top \cdot A \Longleftrightarrow y \leftarrow A^\top\cdot x \f]
        *
        * \param[in] x
        * The (left) multiplicant vector for the product.
@@ -434,6 +446,9 @@ namespace FEAST
 
     /**
      * \brief Computes the dot-product of two vectors.
+     *
+     * This function returns the dot-product of \e a and \e b:
+     * \f[\sum_{k=0}^{n-1} a_k\cdot b_k\f]
      *
      * \param[in] a,b
      * The vectors whose dot-product is to be computed.
@@ -544,9 +559,9 @@ namespace FEAST
       /// The basic data type buried in the lowest level of the vector
       typedef typename Intern::DataTypeExtractor<ValueType>::MyDataType DataType;
 
-
-      /// actual matrix data; that's an array of vectors
+      /// the type of a single matrix row
       typedef Vector<T_, n_, sn_> RowType;
+      /// actual matrix data; that's an array of vectors
       RowType v[sm_];
 
       /// default constructor
@@ -625,7 +640,7 @@ namespace FEAST
        * The index of the row that is to be returned.
        *
        * \returns
-       * A (const) pointer to the <c>i</c>-th row of the matrix.S
+       * A (const) reference to the <c>i</c>-th row of the matrix.S
        */
       RowType& operator[](Index i)
       {
@@ -718,7 +733,7 @@ namespace FEAST
        * \brief Returns the Hessian norm square.
        *
        * This function computes and returns
-       * \f[ \sum_{i=1}^m\sum_{j=1}^n K_{ij}\cdot (A_{ij})^2 \f]
+       * \f[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} K_{ij}\cdot (A_{ij})^2 \f]
        * where K_ij is 1 for i=j and 1/2 otherwise.
        *
        * \note This function is used for the computation of the H^2 semi-norm of a function.
@@ -820,7 +835,7 @@ namespace FEAST
        * \brief Computes the scalar product of two vectors with this matrix.
        *
        * This function returns
-       * \f[ x^\top\cdot A\cdot y \f]
+       * \f[ x^\top\cdot A\cdot y = \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} x_i\cdot A_{ij}\cdot y_j\f]
        *
        * \param[in] x
        * The left muliplicant vector of size \p m_.
@@ -844,6 +859,10 @@ namespace FEAST
 
       /**
        * \brief Adds the algebraic matrix-product of two other matrices onto this matrix.
+       *
+       * Let \e C denote \c this matrix, and let \e A denote the left m-by-l matrix and \e B the right l-by-n matrix,
+       * then this function computes:
+       * \f[ C\leftarrow C + \alpha A\cdot B \f]
        *
        * \param[in] a
        * The left m-by-l multiplicant matrix.
@@ -880,6 +899,10 @@ namespace FEAST
       /**
        * \brief Sets this matrix to the algebraic matrix-product of two other matrices.
        *
+       * Let \e C denote \c this matrix, and let \e A denote the left m-by-l matrix and \e B the right l-by-n matrix,
+       * then this function computes:
+       * \f[ C\leftarrow A\cdot B \f]
+       *
        * \param[in] a
        * The left m-by-l multiplicant matrix.
        *
@@ -895,13 +918,12 @@ namespace FEAST
         return add_mat_mat_mult(a, b);
       }
 
-
       /**
        * \brief Adds the algebraic matrix double-product of three other matrices onto this matrix.
        *
-       * Let C denote this m-by-n matrix, B the left k-by-m input matrix, D the right l-by-n input matrix
-       * and A the inner k-by-l input matrix, then this operation computes:
-       *   \f[ C += \alpha B^\top\cdot A\cdot D\f]
+       * Let \e C denote \c this m-by-n matrix, \e B the left k-by-m input matrix, \e D the right l-by-n input matrix
+       * and \e A the inner k-by-l input matrix, then this operation computes:
+       *   \f[ C \leftarrow C + \alpha B^\top\cdot A\cdot D\f]
        *
        * \param[in] a
        * The inner k-by-l multiplicant matrix.
@@ -944,6 +966,27 @@ namespace FEAST
         return *this;
       }
 
+      /**
+       * \brief Sets this matrix to the algebraic matrix double-product of three other matrices.
+       *
+       * Let \e C denote \c this m-by-n matrix, \e B the left k-by-m input matrix, \e D the right l-by-n input matrix
+       * and \e A the inner k-by-l input matrix, then this operation computes:
+       *   \f[ C \leftarrow B^\top\cdot A\cdot D\f]
+       *
+       * \param[in] a
+       * The inner k-by-l multiplicant matrix.
+       *
+       * \param[in] b
+       * The left k-by-m multiplicant matrix.
+       *
+       * \param[in] d
+       * The right l-by-n multiplicant matrix.
+       *
+       * \param[in] alpha
+       * A scaling factor for the product.
+       *
+       * \returns \p *this
+       */
       template<int k_, int l_, int sma_, int sna_, int smb_, int snb_, int smd_, int snd_>
       Matrix& set_double_mat_mult(
         const Matrix<T_, k_, l_, sma_, sna_>& a,
@@ -958,9 +1001,9 @@ namespace FEAST
       /**
        * \brief Adds the result of a vector-tensor left-product onto this matrix.
        *
-       * Let A denote this m-by-n matrix, v the l-size input vector and T the l-by-m-by-b input tensor,
+       * Let \e A denote \c this m-by-n matrix, \e v the l-size input vector and \e T the l-by-m-by-b input tensor,
        * then this operation computes:
-       * \f[ \forall i\in\{1,...,m\},j\in\{1,...,n\}:~ A_{ij} += \alpha \sum_{k=1}^l v_k\cdot T_{kij}\f]
+       * \f[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow A_{ij} + \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\f]
        *
        * \note This function is used for the computation of second-order derivatives by the chain rule.
        *
@@ -996,6 +1039,26 @@ namespace FEAST
         return *this;
       }
 
+      /**
+       * \brief Sets this matrix to the result of a vector-tensor left-product.
+       *
+       * Let \e A denote \c this m-by-n matrix, \e v the l-size input vector and \e T the l-by-m-by-b input tensor,
+       * then this operation computes:
+       * \f[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\f]
+       *
+       * \note This function is used for the computation of second-order derivatives by the chain rule.
+       *
+       * \param[in] x
+       * The l-size vector that serves as a left multiplicant.
+       *
+       * \param[in] t
+       * The l-by-m-by-n tensor that serves as a right multiplicant.
+       *
+       * \param[in] alpha
+       * A scaling factor for the product.
+       *
+       * \returns \p *this
+       */
       template<int l_, int snv_, int slt_, int smt_, int snt_>
       Matrix& set_vec_tensor_mult(
         const Vector<T_, l_, snv_>& x,
@@ -1042,7 +1105,17 @@ namespace FEAST
       return Matrix<T_, m_, n_>().set_mat_mat_mult(a, b);
     }
 
-    /// matrix-matrix dot-product operator
+    /**
+     * \brief Computes the dot-product of two matrices.
+     *
+     * This function returns the dot-product of \e A and \e B:
+     * \f[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1} a_{ij} \cdot b_{ij}\f]
+     *
+     * \param[in] a,b
+     * The matrices whose dot-product is to be computed.
+     *
+     * \returns The dot-product of \p a and \p b.
+     */
     template<typename T_, int m_, int n_, int sma_, int sna_, int smb_, int snb_>
     inline T_ dot(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
     {
@@ -1249,9 +1322,9 @@ namespace FEAST
       /**
        * \brief Adds the result of a matrix-tensor product onto this tensor.
        *
-       * Let K denote this tensor, A the input matrix and T the input tensor, then this operation computes:
-       * \f[ \forall h\in\{1,...,l\}, i\in\{1,...,m\},j\in\{1,...,n\}:~ K_{hij} +=
-       *     \alpha \sum_{p=1}^k A_{hp}\cdot T_{pij}\f]
+       * Let \e K denote this tensor, \e A the input matrix and \e T the input tensor, then this operation computes:
+       * \f[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
+       *     \alpha \sum_{p=0}^{k-1} A_{hp}\cdot T_{pij}\f]
        *
        * \note This function is used for the computation of second-order derivatives by the chain rule.
        *
@@ -1293,10 +1366,10 @@ namespace FEAST
       /**
        * \brief Adds the result of a matrix-tensor-matrix double-product onto this tensor.
        *
-       * Let K denote this l-by-m-by-n tensor, T the l-by-m'-by-n' input tensor,
-       * B the m'-by-m and D the n'-by-n input matrices, then this operation computes:
-       * \f[ \forall h\in\{1,...,l\}, i\in\{1,...,m\}, j\in\{1,...,n\}:~ K_{hij} +=
-       *     \alpha \sum_{p=1}^{m'}\sum_{q=1}^{n'} T_{hpq}\cdot B_{pi}\cdot D_{qj} \f]
+       * Let \e K denote this l-by-m-by-n tensor, \e T the l-by-m'-by-n' input tensor,
+       * \e B the m'-by-m and \e D the n'-by-n input matrices, then this operation computes:
+       * \f[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\}, j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
+       *     \alpha \sum_{p=0}^{m'-1}\sum_{q=0}^{n'-1} T_{hpq}\cdot B_{pi}\cdot D_{qj} \f]
        *
        * \note This function is used for the computation of second-order derivatives by the chain rule.
        *
