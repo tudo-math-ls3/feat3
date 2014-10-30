@@ -80,6 +80,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Selects the system compiler (and header files) used by icc.")
   print ("cuda_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by nvcc.")
+  print ("cuda_arch=sm_20")
+  print ("  Selects the cuda architecture target (defaults to sm_20 if not set).")
   print ("export_compile_commands")
   print ("  Let CMake export the used compile commands to compile_commands.json")
   print ("============== NOTES ===========================")
@@ -287,13 +289,29 @@ if "cuda" in buildid:
     sys.exit(1)
   remove_string(unused_tokens, "cuda")
   cmake_flags += " -DFEAST_BACKENDS_CUDA:BOOL=ON"
+
+  cuda_archs = [s for s in buildid if "cuda_arch=" in s]
+  if len(cuda_archs) == 0:
+    cuda_arch = "sm_20"
+    cmake_flags += " -DFEAST_CUDA_ARCH=" + cuda_arch
+  elif len(cuda_archs) == 1:
+    cuda_arch = cuda_archs[0].split("=")[1]
+    remove_substring(unused_tokens, "cuda_arch=")
+    cmake_flags += " -DFEAST_CUDA_ARCH=" + cuda_arch
+  elif len(cuda_host_compilers) > 1:
+    print ("Error: buildid contains more than one cuda_arch statements:")
+    print (os.linesep.join(cuda_archs))
+    print (buildid_string)
+    sys.exit(1)
   if "cudamemcheck" in buildid:
     remove_string(unused_tokens, "cudamemcheck")
     cmake_flags += " -DFEAST_CUDAMEMCHECK:BOOL=ON"
+
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")
   cmake_flags += " -DFEAST_BACKENDS_MKL:BOOL=ON"
   cxxflags += " -DMKL_ILP64"
+
 if "valgrind" in buildid:
   if not is_found("valgrind"):
     print ("Error: Choosen debugger valgrind not found!")
