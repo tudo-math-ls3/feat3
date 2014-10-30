@@ -82,6 +82,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Selects the system compiler (and header files) used by nvcc.")
   print ("export_compile_commands")
   print ("  Let CMake export the used compile commands to compile_commands.json")
+  print ("============== NOTES ===========================")
+  print ("You can escape hyphens with a single slash, e.g. '/-'")
   sys.exit()
 
 #get path to feast source trunk
@@ -122,8 +124,11 @@ else:
     buildid_string += sys.argv[i] + "-"
 
 buildid_string = buildid_string.strip("-")
+#mask escaped hyphen with "|"
+buildid_string = buildid_string.replace("/-", "|")
 #generate handy build id array of tokens
 buildid = buildid_string.split("-")
+buildid_string = buildid_string.replace("|", "-")
 #list of buildid tokens, remove token when used, results in list of unused tokens
 unused_tokens = copy.deepcopy(buildid)
 
@@ -202,6 +207,7 @@ system_host_compiler = ""
 system_host_compilers = [s for s in buildid if "system_host_compiler=" in s]
 if len(system_host_compilers) == 1:
   system_host_compiler = system_host_compilers[0].split("=")[1]
+  system_host_compiler = system_host_compiler.replace("|", "-")
   remove_substring(unused_tokens, "system_host_compiler=")
   #cmake_flags += " -DFEAST_SYSTEM_HOST_COMPILER=" + system_host_compiler
 elif len(system_host_compilers) > 1:
@@ -213,6 +219,7 @@ elif len(system_host_compilers) > 1:
 cuda_host_compilers = [s for s in buildid if "cuda_host_compiler=" in s]
 if len(cuda_host_compilers) == 1:
   cuda_host_compiler = cuda_host_compilers[0].split("=")[1]
+  cuda_host_compiler = cuda_host_compiler.replace("|", "-")
   remove_substring(unused_tokens, "cuda_host_compiler=")
   cmake_flags += " -DFEAST_CUDA_HOST_COMPILER=" + cuda_host_compiler
 elif len(cuda_host_compilers) > 1:
