@@ -182,6 +182,7 @@ else:
   sys.exit(1)
 if "coverage" in buildid:
   remove_string(unused_tokens, "coverage")
+  ldflags += " -fprofile-arcs -ftest-coverage"
 if "quadmath" in buildid:
   remove_string(unused_tokens, "quadmath")
   cmake_flags += " -DFEAST_HAVE_QUADMATH:BOOL=ON"
