@@ -114,6 +114,9 @@ public:
     test_mat_inv_lehmer<4>();
     test_mat_inv_lehmer<5>();
     test_mat_inv_lehmer<6>();
+    test_mat_inv_lehmer<7>();
+    test_mat_inv_lehmer<8>();
+    test_mat_inv_lehmer<9>();
 
     // test matrix determinant calculaation
     test_mat_det_lehmer<1>();

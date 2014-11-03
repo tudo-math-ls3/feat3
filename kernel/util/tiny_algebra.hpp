@@ -1691,23 +1691,6 @@ namespace FEAST
         }
       };
 
-      // generic square matrix inversion:
-      // currently disabled to avoid dependency on linear_algebra.hpp
-      /*template<int n_>
-      struct InverseHelper<n_, n_>
-      {
-        template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
-        {
-          T_ lu[n_][n_];
-          int p[n_];
-          LinAlg::mat_copy<false>(n_, n_, n_, &lu[0][0], sna_, &a[0][0]);
-          LinAlg::mat_identity(n_, snb_, &b[0][0]);
-          LinAlg::mat_factorise(n_, n_, n_, &lu[0][0], p);
-          LinAlg::mat_solve_mat<false>(n_, n_, snb_, &b[0][0], n_, &lu[0][0], p);
-        }
-      };*/
-
       template<>
       struct InverseHelper<1,1>
       {
@@ -2089,6 +2072,125 @@ namespace FEAST
           b[3][5] = d*( a[4][0]*w[12]-a[4][1]*w[8]+a[4][2]*w[5]-a[4][4]*w[2]+a[4][5]*w[1]);
           b[4][5] = d*(-a[4][0]*w[11]+a[4][1]*w[7]-a[4][2]*w[4]+a[4][3]*w[2]-a[4][5]*w[0]);
           b[5][5] = d*( a[4][0]*w[10]-a[4][1]*w[6]+a[4][2]*w[3]-a[4][3]*w[1]+a[4][4]*w[0]);
+        }
+      };
+
+      // generic square matrix inversion:
+      // \author Christoph Lohmann
+      template<int n_>
+      struct InverseHelper<n_, n_>
+      {
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        {
+          // copy matrix a to b
+          for (Index i(0); i < n_; ++i)
+          {
+            for (Index j(0); j < n_; ++j)
+            {
+              b[i][j] = a[i][j];
+            }
+          }
+
+          // routine for Gauss-Jordan elimination with full pivoting
+          // -------------------------------------------------------
+          // "Numerical Recipes in C - The Art of Scientific Computing (Second Ed.)"
+          // written by William H. Press, Saul A. Teukolsky, William T. Vetterling, Brian P. Flannery
+          // (chapter 2.1 Gauss-Jordan Elimination; page 39)
+          // -------------------------------------------------------
+          // The integer arrays ipiv, indxr, and indxc are used for bookkeeping on the pivoting.
+          Index indxc[n_];
+          Index indxr[n_];
+          Index ipiv [n_];
+          for (Index j(0); j < n_; ++j)
+            ipiv[j] = 0;
+          // This is the main loop over the columns to be reduced.
+          for (Index i(0), icol, irow; i < n_; ++i)
+          {
+            T_ big(T_(0.0));
+            // This is the outer loop of the search for a pivot element.
+            for (Index j(0); j < n_; ++j)
+            {
+              if (ipiv[j] != 1)
+              {
+                for (Index k(0); k < n_; ++k)
+                {
+                  if (ipiv[k] == 0)
+                  {
+                    if (Math::abs(b[j][k]) >= big)
+                    {
+                      big = Math::abs(b[j][k]);
+                      irow = j;
+                      icol = k;
+                    }
+                  }
+                }
+              }
+            }
+            ++(ipiv[icol]);
+            // We now have the pivot element, so we interchange rows, if needed,
+            // to put the pivot element on the diagonal. The columns are not
+            // physically interchanged, only relabeled: indxc[i], the column of
+            // the ith pivot element, is the ith column that is reduced, while
+            // indxr[i] is the row in which that pivot element was originally
+            // located. If indxr[i] ?= indxc[i] there is an implied column
+            // interchange. With this form of bookkeeping, the solution b's will
+            // end up in the correct order, and the inverse matrix will be
+            // scrambled by columns.
+            if (irow != icol) {
+              for (Index j(0); j < n_; ++j)
+              {
+                _swap(b[irow][j], b[icol][j]);
+              }
+            }
+            // We are now ready to divide the pivot row by the pivot element, located at irow and icol.
+            indxr[i] = irow;
+            indxc[i] = icol;
+            T_ pivinv(T_(1.0) / b[icol][icol]);
+            b[icol][icol] = T_(1.0);
+            for (Index j(0); j < n_; ++j)
+            {
+              b[icol][j] *= pivinv;
+            }
+            // Next, we reduce the rows except for the pivot one, of course.
+            for (Index j(0); j < n_; ++j)
+            {
+              if (j != icol)
+              {
+                T_ dum(b[j][icol]);
+                b[j][icol] = T_(0.0);
+                for (Index k(0); k < n_; ++k)
+                {
+                  b[j][k] -= b[icol][k]*dum;
+                }
+              }
+            }
+          }
+          // This is the end of the main loop over columns of the reduction. It
+          // only remains to unscram- ble the solution in view of the column
+          // interchanges. We do this by interchanging pairs of columns in the
+          // reverse order that the permutation was built up.
+          for (Index j(n_); j > 0;)
+          {
+            --j;
+            if (indxr[j] != indxc[j])
+            {
+              for (Index k(0); k < n_; ++k)
+              {
+                _swap(b[k][indxr[j]], b[k][indxc[j]]);
+              }
+            }
+          }
+          // And we are done.
+        }
+
+      private:
+        template<typename T_>
+        static void FORCE_INLINE _swap(T_ & a, T_ & b)
+        {
+          T_ tmp(a);
+          a = b;
+          b = tmp;
         }
       };
     } // namespace Intern
