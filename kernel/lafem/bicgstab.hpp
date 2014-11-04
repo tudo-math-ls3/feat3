@@ -224,6 +224,7 @@ namespace FEAST
             A.template apply<Algo_>(v, p_tilde);
             filter.template filter_def<Algo_>(v);
             precon.apply(v_tilde, v);
+            filter.template filter_cor<Algo_>(v_tilde);
 
             gamma_tilde = v_tilde.template dot<Algo_>(r_tilde_0);
 
