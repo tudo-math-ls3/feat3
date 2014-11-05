@@ -65,6 +65,9 @@ namespace FEAST
           have_node_func = 0
         };
 
+        /** \copydoc ElementBase::local_degree */
+        static constexpr int local_degree = 3;
+
         /** \copydoc ElementBase::Evaluator */
         template<
           typename TrafoEvaluator_,

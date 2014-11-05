@@ -74,6 +74,17 @@ namespace FEAST
       };
 
       /**
+       * \brief Local Polynomial degree count
+       *
+       * This constant describes the maximum local polynomial degree of the element.
+       * This may be used, e.g. for automated determination of appropriate cubature rules.
+       *
+       * Please note that for Simplex elements, 'degree' refers to the P_k spaces, whereas for
+       * Hypercube elements, 'degree' refers to the Q_k spaces.
+       */
+      static constexpr int local_degree = ...;
+
+      /**
        * \brief Dof-Mapping class.
        */
       typedef ... DofMappingType;
