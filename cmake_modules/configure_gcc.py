@@ -139,7 +139,7 @@ def configure_gcc(cpu, buildid):
 
     #ARM
     elif cpu == "cortexa15":
-      cxxflags += " -mtune=cortex-a15 -funsafe-math-optimizations -mfpu=neon"
+      cxxflags += " -funsafe-math-optimizations -mcpu=cortex-a15 -mfpu=neon-vfpv4  -mfloat-abi=hard -mthumb"
 
     else:
       cxxflags += " -march=native"
