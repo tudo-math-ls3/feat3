@@ -5,7 +5,6 @@
 // includes, FEAST
 #include <kernel/space/evaluator_base.hpp>
 #include <kernel/geometry/intern/sub_index_mapping.hpp>
-#include <kernel/util/linear_algebra.hpp>
 
 namespace FEAST
 {
@@ -271,11 +270,8 @@ namespace FEAST
             }
           }
 
-          // invert nodal matrix
-          Index pivot[21];
-          LinAlg::mat_factorise((Index)21, (Index)21, (Index)21, &node_mat.v[0][0], pivot);
-          LinAlg::mat_identity((Index)21, (Index)21, &_coeff.v[0][0]);
-          LinAlg::mat_solve_mat<false>((Index)21, (Index)21, (Index)21, &_coeff.v[0][0], (Index)21, &node_mat.v[0][0], pivot);
+          // invert nodal matrix to get the coefficient matrix
+          _coeff.set_inverse(node_mat);
         }
 
         template<typename SpaceCfg_, typename TrafoCfg_>
