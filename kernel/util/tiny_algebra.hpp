@@ -2105,7 +2105,7 @@ namespace FEAST
           for (Index j(0); j < n_; ++j)
             ipiv[j] = 0;
           // This is the main loop over the columns to be reduced.
-          for (Index i(0), icol, irow; i < n_; ++i)
+          for (Index i(0), icol(0), irow(0); i < n_; ++i)
           {
             T_ big(T_(0.0));
             // This is the outer loop of the search for a pivot element.
@@ -2137,7 +2137,8 @@ namespace FEAST
             // interchange. With this form of bookkeeping, the solution b's will
             // end up in the correct order, and the inverse matrix will be
             // scrambled by columns.
-            if (irow != icol) {
+            if (irow != icol)
+            {
               for (Index j(0); j < n_; ++j)
               {
                 _swap(b[irow][j], b[icol][j]);
