@@ -4,6 +4,41 @@ from cmake_modules.feast_util import get_output
 def detect_cpu():
   cputype = "unknown"
 
+# detect arm architecture
+  if "arm" in platform.machine():
+    if platform.system() == "Linux":
+      d = {}
+      f = open("/proc/cpuinfo")
+      input = f.read()
+      lines = input.split("\n")
+
+      for line in lines:
+        values = line.split("\t: ")
+        if len(values) == 2:
+          d[values[0].strip()] = values[1].strip()
+        else:
+          values = line.split(":")
+          if len(values) == 2:
+            d[values[0].strip()] = values[1].strip()
+
+      cpu_architecture = d["CPU architecture"]
+      cpu_implementer = d["CPU implementer"]
+      cpu_part = d["CPU part"]
+
+      # ARM
+      if cpu_implementer == "0x41":
+        if cpu_part == "0xc07":
+          cputype = "cortexa7"
+        elif cpu_part == "0xc0f":
+          cputype = "cortexa15"
+
+    else:
+      print ("detect_cpu: operating system not supported")
+      return cputype
+
+    return cputype
+
+#no special arch detected, assume x86 from now
 # read int cpu information
   if platform.system() == "Linux":
     d = {}

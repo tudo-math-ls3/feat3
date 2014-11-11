@@ -137,6 +137,10 @@ def configure_gcc(cpu, buildid):
     elif cpu == "magnycours":
       cxxflags += " -m64 -march=barcelona"
 
+    #ARM
+    elif cpu == "cortexa15":
+      cxxflags += " -mtune=cortex-a15 -funsafe-math-optimizations -mfpu=neon"
+
     else:
       cxxflags += " -march=native"
       print ("Warning: Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
