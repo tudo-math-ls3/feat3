@@ -25,6 +25,10 @@ namespace FEAST
     void run_bench(std::function<void (void)> func, double flops, double bytes)
     {
       Index iters(1);
+      //warup
+      func();
+      Util::MemoryPool<Mem_>::synchronize();
+
       TimeStamp at, bt;
       at.stamp();
       func();
