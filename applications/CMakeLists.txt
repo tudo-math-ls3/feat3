@@ -53,7 +53,7 @@ if (FEAST_MPI)
     --build-target foundation_comm_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_comm_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_comm_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_comm_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_comm_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -77,7 +77,7 @@ if (FEAST_MPI)
     --build-target foundation_system_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_system_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_system_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_system_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_system_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -101,7 +101,7 @@ if (FEAST_MPI)
     --build-target scarc_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/scarc_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/scarc_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST scarc_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST scarc_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -125,7 +125,7 @@ if (FEAST_MPI)
     --build-target scarc_1proc_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 1 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/scarc_1proc_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 1 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/scarc_1proc_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST scarc_1proc_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST scarc_1proc_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -149,7 +149,7 @@ if (FEAST_MPI)
     --build-target foundation_synch_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_synch_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_synch_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_synch_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_synch_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -173,7 +173,7 @@ if (FEAST_MPI)
     --build-target poisson_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -197,7 +197,7 @@ if (FEAST_MPI)
     --build-target foundation_global_ops_convex_2procs_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_convex_2procs_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_convex_2procs_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_global_ops_convex_2procs_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_global_ops_convex_2procs_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -221,7 +221,7 @@ if (FEAST_MPI)
     --build-target foundation_global_ops_convex_4procs_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_convex_4procs_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_convex_4procs_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_global_ops_convex_4procs_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_global_ops_convex_4procs_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -245,7 +245,7 @@ if (FEAST_MPI)
     --build-target foundation_global_ops_concave_3procs_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_concave_3procs_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_concave_3procs_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_global_ops_concave_3procs_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_global_ops_concave_3procs_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -269,7 +269,7 @@ if (FEAST_MPI)
     --build-target foundation_partitioning_4procs_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_partitioning_4procs_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_partitioning_4procs_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_partitioning_4procs_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_partitioning_4procs_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -294,7 +294,7 @@ if (FEAST_MPI)
     --build-target scarc_gateway_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/scarc_gateway_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/scarc_gateway_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST scarc_gateway_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST scarc_gateway_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -318,7 +318,7 @@ if (FEAST_MPI)
     --build-target foundation_global_ops_concave_4procs_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_concave_4procs_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_concave_4procs_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_global_ops_concave_4procs_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_global_ops_concave_4procs_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -342,7 +342,7 @@ if (FEAST_MPI)
     --build-target poisson_ms2_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_ms2_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_ms2_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_ms2_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_ms2_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -366,7 +366,7 @@ if (FEAST_MPI)
     --build-target foundation_global_ops_synch_scal_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_synch_scal_test-app ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} -bynode ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_global_ops_synch_scal_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_global_ops_synch_scal_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_global_ops_synch_scal_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
