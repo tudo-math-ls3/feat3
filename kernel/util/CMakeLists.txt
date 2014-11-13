@@ -21,6 +21,7 @@ if (FEAST_BACKENDS_CUDA)
   )
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-util-cuda)
   TARGET_LINK_LIBRARIES(kernel-util-cuda kernel-util)
+  target_link_libraries(kernel-util-cuda ${CUDA_cusparse_LIBRARY})
 endif(FEAST_BACKENDS_CUDA)
 
 # list of util tests
