@@ -47,6 +47,7 @@ SET (test_list
   meta_vector-dot-norm2-test
   meta_vector-scale-test
   pointstar_factory-test
+  proto_solver-test
   richardson-test
   sparse_matrix_conversion-test
   sparse_matrix_banded-test
