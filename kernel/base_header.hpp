@@ -55,6 +55,16 @@
 #define NOINLINE
 #endif
 
+// If the compiler does not support a 'force-inline' specifier, we'll define it as a simple inline.
+#ifndef FORCE_INLINE
+#define FORCE_INLINE inline
+#endif
+
+// If the compiler does not support a loop vectorisation specifier, we'll define it as an empty macro.
+#ifndef FEAST_IVDEP
+#define FEAST_IVDEP
+#endif
+
 // If the compiler does not support disabling/restoring warnings, we'll define the corresponding
 // macros as empty.
 #ifndef FEAST_DISABLE_WARNINGS

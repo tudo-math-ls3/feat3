@@ -27,8 +27,6 @@
 #    define FEAST_COMPILER "Open64 C/C++ compiler (unknown version)"
 #  endif
 
-#  define FEAST_IVDEP
-
 #endif // !defined(FEAST_COMPILER) && defined(__OPEN64__)
 
 #endif // KERNEL_UTIL_COMPILER_OPEN64_HPP
