@@ -792,13 +792,13 @@ namespace FEAST
             Index lp1(l == vertex_at_polygon.size() - 1 ? 0 : l + 1);
             area += origin_coords.at(0).at(vertex_at_polygon.at(l)) * origin_coords.at(1).at(vertex_at_polygon.at(lp1)) - origin_coords.at(0).at(vertex_at_polygon.at(lp1)) * origin_coords.at(1).at(vertex_at_polygon.at(l));
           }
-          area =  DataType_(1./2.) * fabs(area);
+          area =  DataType_(1./2.) * area;
 
           //area multiplier
           area = DataType_(1) / (DataType_(6) * area);
 
           //coords
-          for(Index l(0); l < vertex_at_polygon.size() - 1 ; ++l)
+          for(Index l(0); l < vertex_at_polygon.size() ; ++l)
           {
             Index lp1(l == vertex_at_polygon.size() - 1 ? 0 : l + 1);
             c_x += (origin_coords.at(0).at(vertex_at_polygon.at(l)) + origin_coords.at(0).at(vertex_at_polygon.at(lp1)))
@@ -806,7 +806,7 @@ namespace FEAST
           }
           c_x *= area;
 
-          for(Index l(0); l < vertex_at_polygon.size() - 1 ; ++l)
+          for(Index l(0); l < vertex_at_polygon.size() ; ++l)
           {
             Index lp1(l == vertex_at_polygon.size() - 1 ? 0 : l + 1);
             c_y += (origin_coords.at(1).at(vertex_at_polygon.at(l)) + origin_coords.at(1).at(vertex_at_polygon.at(lp1)))
