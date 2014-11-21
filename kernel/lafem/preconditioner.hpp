@@ -396,28 +396,26 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
+        const DT_ * pin(in.elements());
         const DT_ * pval(_A.val());
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * prow_ptr(_A.row_ptr());
         const IT_ n(IT_(_A.rows()));
 
-        IT_ col;
-
         // __forward-insertion__
         // iteration over all rows
-        for (IT_ i(0); i < n; ++i)
+        for (IT_ i(0), col; i < n; ++i)
         {
-          // iteration over all elements on the left side of the main-diagonal
-          col = prow_ptr[i];
+          DT_ d(0);
 
-          while (pcol_ind[col] < i)
+          // iteration over all elements on the left side of the main-diagonal
+          for (col = prow_ptr[i]; pcol_ind[col] < i; ++col)
           {
-            pout[i] -= pval[col] * pout[pcol_ind[col]];
-            ++col;
+            d += pval[col] * pout[pcol_ind[col]];
           }
 
           // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] = (pin[i] - d) / pval[col];
         }
 
         // damping of solution
@@ -501,36 +499,30 @@ namespace FEAST
       virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
                          const DenseVector<Mem_, DT_, IT_> & in) override
       {
-        // copy in-vector to out-vector
-        out.copy(in);
-
         // create pointers
         DT_ * pout(out.elements());
+        const DT_ * pin(in.elements());
         const DT_ * pval(_A.val());
         const IT_ * pcol(_A.column_indices());
         const IT_ * prow(_A.row_indices());
         const IT_ n(IT_(_A.rows()));
 
-        IT_ col(0);
-
         // __forward-insertion__
         // iteration over all rows
-        for (IT_ i(0); i < n; ++i)
+        for (IT_ i(0), col(0); i < n; ++i)
         {
-          // iteration over all elements on the left side of the main-diagonal
-          while (prow[col] < i)
-          {
-            ++col;
-          }
+          DT_ d(0);
 
-          while (pcol[col] < i)
+          // iteration over all elements on the left side of the main-diagonal
+          for (; prow[col] < i; ++col);
+
+          for (; pcol[col] < i; ++col)
           {
-            pout[i] -= pval[col] * pout[pcol[col]];
-            ++col;
+            d += pval[col] * pout[pcol[col]];
           }
 
           // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] = (pin[i] - d) / pval[col];
         }
 
         // damping of solution
@@ -619,6 +611,7 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
+        const DT_ * pin(in.elements());
         const DT_ * pval(_A.val());
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * pcs(_A.cs());
@@ -626,23 +619,20 @@ namespace FEAST
         const IT_ n(IT_(_A.rows()));
 
 
-        IT_ col;
-
         // __forward-insertion__
         // iteration over all rows
-        for (IT_ i(0); i < n; ++i)
+        for (IT_ i(0), col; i < n; ++i)
         {
-          // iteration over all elements on the left side of the main-diagonal
-          col = pcs[i/C] + i%C;
+          DT_ d(0);
 
-          while (pcol_ind[col] < i)
+          // iteration over all elements on the left side of the main-diagonal
+          for (col = pcs[i/C] + i%C; pcol_ind[col] < i; col += C)
           {
-            pout[i] -= pval[col] * pout[pcol_ind[col]];
-            col += C;
+            d += pval[col] * pout[pcol_ind[col]];
           }
 
           // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] = (pin[i] - d) / pval[col];
         }
 
         // damping of solution
@@ -1720,31 +1710,24 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
+        const DT_ * pin(in.elements());
         const DT_ * pval(_A.val());
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * prow_ptr(_A.row_ptr());
         const Index n(_A.rows());
 
-        Index col;
-
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < n; ++i)
+        for (Index i(0), col; i < n; ++i)
         {
+          DT_ d(0);
           // iteration over all elements on the left side of the main-diagonal
-          col = prow_ptr[i];
-
-          while (pcol_ind[col] < i)
+          for (col = prow_ptr[i]; pcol_ind[col] < i; ++col)
           {
-            pout[i] -= _omega * pval[col] * pout[pcol_ind[col]];
-            ++col;
+            d += pval[col] * pout[pcol_ind[col]];
           }
-
-          // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] = _omega * (pin[i] - d) / pval[col];
         }
-
-        out.template scale<Algo::Generic>(out, DT_(1.0) / _omega);
       }
     };
 
@@ -1829,34 +1812,29 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
+        const DT_ * pin(in.elements());
         const DT_ * pval(_A.val());
         const IT_ * pcol(_A.column_indices());
         const IT_ * prow(_A.row_indices());
         const Index n(_A.rows());
 
-        Index col(0);
-
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < n; ++i)
+        for (Index i(0), col(0); i < n; ++i)
         {
           // iteration over all elements on the left side of the main-diagonal
           while (prow[col] < i)
           {
             ++col;
           }
-
+          DT_ d(0);
           while (pcol[col] < i)
           {
-            pout[i] -= _omega * pval[col] * pout[pcol[col]];
+            d += pval[col] * pout[pcol[col]];
             ++col;
           }
-
-          // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] = _omega * (pin[i] - d) / pval[col];
         }
-
-        out.template scale<Algo::Generic>(out, DT_(1.0) / _omega);
       }
     };
 
@@ -1941,6 +1919,7 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
+        const DT_ * pin(in.elements());
         const DT_ * pval(_A.val());
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * pcs(_A.cs());
@@ -1948,26 +1927,18 @@ namespace FEAST
         const Index n(_A.rows());
 
 
-        Index col;
-
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < n; ++i)
+        for (Index i(0), col; i < n; ++i)
         {
+          DT_ d(0);
           // iteration over all elements on the left side of the main-diagonal
-          col = pcs[i/C] + i%C;
-
-          while (pcol_ind[col] < i)
+          for (col = pcs[i/C] + i%C; pcol_ind[col] < i; col += C)
           {
-            pout[i] -= _omega * pval[col] * pout[pcol_ind[col]];
-            col += C;
+            d += pval[col] * pout[pcol_ind[col]];
           }
-
-          // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] = _omega * (pin[i] - d) / pval[col];
         }
-
-        out.template scale<Algo::Generic>(out, DT_(1.0) / _omega);
       }
     };
 
@@ -2001,7 +1972,6 @@ namespace FEAST
     private:
       const SparseMatrixCSR<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
-      DenseVector<Mem_, DT_, IT_> _diag;
 
     public:
       /// Our algotype
@@ -2033,8 +2003,7 @@ namespace FEAST
        */
       SSORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1.3)) :
         _A(A),
-        _omega(omega),
-        _diag(A.rows())
+        _omega(omega)
       {
         if (_A.columns() != _A.rows())
         {
@@ -2044,13 +2013,6 @@ namespace FEAST
         if (Math::abs(_omega - DT_(2.0)) < 1e-10)
         {
           throw InternalError(__func__, __FILE__, __LINE__, "omega too close to 2!");
-        }
-
-        const Index n(_A.rows());
-
-        for (Index i(0) ; i < n ; ++i)
-        {
-          _diag(i, _A(i, i));
         }
       }
 
@@ -2073,57 +2035,42 @@ namespace FEAST
       virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
                          const DenseVector<Mem_, DT_, IT_> & in) override
       {
-        // copy in-vector to out-vector
-        out.copy(in);
-
         // create pointers
         DT_ * pout(out.elements());
+        const DT_ * pin (in.elements());
         const DT_ * pval(_A.val());
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * prow_ptr(_A.row_ptr());
         const Index n(_A.rows());
 
-        Index col;
-
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < n; ++i)
+        for (Index i(0), col; i < n; ++i)
         {
+          DT_ d(0);
           // iteration over all elements on the left side of the main-diagonal
-          col = prow_ptr[i];
-
-          while (pcol_ind[col] < i)
+          for (col = prow_ptr[i]; pcol_ind[col] < i; ++col)
           {
-            pout[i] -= _omega * pval[col] * pout[pcol_ind[col]];
-            ++col;
+            d += pval[col] * pout[pcol_ind[col]];
           }
-
-          // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] = (pin[i] - _omega * d) / pval[col];
         }
-
-        out.template component_product<Algo::Generic>(_diag, in);
 
         // __backward-insertion__
         // iteration over all rows
-        for (Index i(n); i > 0;)
+        for (Index i(n), col; i > 0;)
         {
           --i;
-
+          DT_ d(0);
           // iteration over all elements on the right side of the main-diagonal
-          col = prow_ptr[i+1]-1;
-
-          while (pcol_ind[col] > i)
+          for (col = prow_ptr[i+1]-1; pcol_ind[col] > i; --col)
           {
-            pout[i] -= _omega * pval[col] * pout[pcol_ind[col]];
-            --col;
+            d += pval[col] * pout[pcol_ind[col]];
           }
-
-          // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] -= _omega * d / pval[col];
         }
 
-        out.template scale<Algo::Generic>(out, DT_(1.0) / (_omega * (DT_(2.0) - _omega)));
+        out.template scale<Algo::Generic>(out, _omega * (DT_(2.0) - _omega));
       } // function apply
     };
 
@@ -2144,7 +2091,6 @@ namespace FEAST
     private:
       const SparseMatrixCOO<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
-      DenseVector<Mem_, DT_, IT_> _diag;
 
     public:
       /// Our algotype
@@ -2176,8 +2122,7 @@ namespace FEAST
        */
       SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1.3)) :
         _A(A),
-        _omega(omega),
-        _diag(A.rows())
+        _omega(omega)
       {
         if (_A.columns() != _A.rows())
         {
@@ -2187,13 +2132,6 @@ namespace FEAST
         if (Math::abs(_omega - DT_(2.0)) < 1e-10)
         {
           throw InternalError(__func__, __FILE__, __LINE__, "omega too close to 2!");
-        }
-
-        const Index n(_A.rows());
-
-        for (Index i(0) ; i < n ; ++i)
-        {
-          _diag(i, _A(i, i));
         }
       }
 
@@ -2216,44 +2154,35 @@ namespace FEAST
       virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
                          const DenseVector<Mem_, DT_, IT_> & in) override
       {
-        // copy in-vector to out-vector
-        out.copy(in);
-
         // create pointers
         DT_ * pout(out.elements());
+        const DT_ * pin (in.elements());
         const DT_ * pval(_A.val());
         const IT_ * pcol(_A.column_indices());
         const IT_ * prow(_A.row_indices());
         const Index n(_A.rows());
 
-        Index col(0);
-
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < n; ++i)
+        for (Index i(0), col(0); i < n; ++i)
         {
           // iteration over all elements on the left side of the main-diagonal
           while (prow[col] < i)
           {
             ++col;
           }
-
+          DT_ d(0);
           while (pcol[col] < i)
           {
-            pout[i] -= _omega * pval[col] * pout[pcol[col]];
+            d += pval[col] * pout[pcol[col]];
             ++col;
           }
-
-          // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] = (pin[i] - _omega * d) / pval[col];
         }
-
-        out.template component_product<Algo::Generic>(_diag, in);
 
         // __backward-insertion__
         // iteration over all rows
-        col = _A.used_elements() - 1;
-        for (Index i(n); i > 0;)
+        for (Index i(n), col(_A.used_elements() - 1); i > 0;)
         {
           --i;
 
@@ -2262,18 +2191,16 @@ namespace FEAST
           {
             --col;
           }
-
+          DT_ d(0);
           while (pcol[col] > i)
           {
-            pout[i] -= _omega * pval[col] * pout[pcol[col]];
+            d += pval[col] * pout[pcol[col]];
             --col;
           }
-
-          // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] -= _omega * d / pval[col];
         }
 
-        out.template scale<Algo::Generic>(out, DT_(1.0) / (_omega * (DT_(2.0) - _omega)));
+        out.template scale<Algo::Generic>(out, _omega * (DT_(2.0) - _omega));
       } // function apply
     };
 
@@ -2294,7 +2221,6 @@ namespace FEAST
     private:
       const SparseMatrixELL<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
-      DenseVector<Mem_, DT_, IT_> _diag;
 
     public:
       /// Our algotype
@@ -2326,8 +2252,7 @@ namespace FEAST
        */
       SSORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1.3)) :
         _A(A),
-        _omega(omega),
-        _diag(A.rows())
+        _omega(omega)
       {
         if (_A.columns() != _A.rows())
         {
@@ -2337,13 +2262,6 @@ namespace FEAST
         if (Math::abs(_omega - DT_(2.0)) < 1e-10)
         {
           throw InternalError(__func__, __FILE__, __LINE__, "omega too close to 2!");
-        }
-
-        const Index n(_A.rows());
-
-        for (Index i(0) ; i < n ; ++i)
-        {
-          _diag(i, _A(i, i));
         }
       }
 
@@ -2366,11 +2284,9 @@ namespace FEAST
       virtual void apply(DenseVector<Mem_, DT_, IT_> & out,
                          const DenseVector<Mem_, DT_, IT_> & in) override
       {
-        // copy in-vector to out-vector
-        out.copy(in);
-
         // create pointers
         DT_ * pout(out.elements());
+        const DT_ * pin (in.elements());
         const DT_ * pval(_A.val());
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * pcs(_A.cs());
@@ -2378,48 +2294,35 @@ namespace FEAST
         const Index C(_A.C());
         const Index n(_A.rows());
 
-
-        Index col;
-
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < n; ++i)
+        for (Index i(0), col; i < n; ++i)
         {
+          DT_ d(0);
           // iteration over all elements on the left side of the main-diagonal
-          col = pcs[i/C] + i%C;
-
-          while (pcol_ind[col] < i)
+          for (col = pcs[i/C] + i%C; pcol_ind[col] < i; col += C)
           {
-            pout[i] -= _omega * pval[col] * pout[pcol_ind[col]];
-            col += C;
+            d += pval[col] * pout[pcol_ind[col]];
           }
-
-          // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] = (pin[i] - _omega * d) / pval[col];
         }
-
-        out.template component_product<Algo::Generic>(_diag, in);
 
         // __backward-insertion__
         // iteration over all rows
-        for (Index i(n); i > 0;)
+        for (Index i(n), col; i > 0;)
         {
           --i;
 
+          DT_ d(0);
           // iteration over all elements on the right side of the main-diagonal
-          col = pcs[i/C] + i%C + C * (prl[i] - 1);
-
-          while (pcol_ind[col] > i)
+          for (col = pcs[i/C] + i%C + C * (prl[i] - 1); pcol_ind[col] > i; col -= C)
           {
-            pout[i] -= _omega * pval[col] * pout[pcol_ind[col]];
-            col -= C;
+            d += pval[col] * pout[pcol_ind[col]];
           }
-
-          // divide by the element on the main-diagonal
-          pout[i] /= pval[col];
+          pout[i] -= _omega * d / pval[col];
         }
 
-        out.template scale<Algo::Generic>(out, DT_(1.0) / (_omega * (DT_(2.0) - _omega)));
+        out.template scale<Algo::Generic>(out, _omega * (DT_(2.0) - _omega));
       } // function apply
     };
 
