@@ -71,6 +71,14 @@ namespace FEAST
        * The total number of local degrees of freedom for the currently active cell.
        */
       Index get_num_local_dofs() const;
+
+      /**
+       * \brief Return the number of global dofs.
+       *
+       * \returns
+       * The total number of global degress of freedom for the finite element space.
+       */
+      Index get_num_global_dofs() const;
 #endif // DOXYGEN
 
       /**

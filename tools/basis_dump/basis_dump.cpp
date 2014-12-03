@@ -6,6 +6,7 @@
 #include <kernel/space/crouzeix_raviart/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/bogner_fox_schmit/element.hpp>
 #include <kernel/space/hermite3/element.hpp>
@@ -30,6 +31,8 @@ int main(int, char**)
     dump_basis< Space::Discontinuous::Element<TrafoType> >("1d_line_discontinuous-0.vtk");
     // Lagrange-1
     dump_basis< Space::Lagrange1::Element<TrafoType> >("1d_line_lagrange-1.vtk");
+    // Lagrange-2
+    dump_basis< Space::Lagrange2::Element<TrafoType> >("1d_line_lagrange-2.vtk");
     // Bogner-Fox-Schmit
     dump_basis< Space::BognerFoxSchmit::Element<TrafoType> >("1d_line_bogner_fox_schmit.vtk");
   }
@@ -43,6 +46,8 @@ int main(int, char**)
     dump_basis< Space::Discontinuous::Element<TrafoType> >("2d_tria_discontinuous-0.vtk");
     // Lagrange-1
     dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_tria_lagrange-1.vtk");
+    // Lagrange-2
+    dump_basis< Space::Lagrange2::Element<TrafoType> >("2d_tria_lagrange-2.vtk");
     // Crouzeix-Raviart
     dump_basis< Space::CrouzeixRaviart::Element<TrafoType> >("2d_tria_crouzeix_raviart.vtk");
     // Hermite-3
@@ -60,6 +65,8 @@ int main(int, char**)
     dump_basis< Space::Discontinuous::Element<TrafoType> >("3d_tetra_discontinuous-0.vtk", 1);
     // Lagrange-1
     dump_basis< Space::Lagrange1::Element<TrafoType> >("3d_tetra_lagrange-1.vtk", 2);
+    // Lagrange-2
+    dump_basis< Space::Lagrange2::Element<TrafoType> >("3d_tetra_lagrange-2.vtk", 2);
   }
 
   // 2D Quad Elements
@@ -71,6 +78,8 @@ int main(int, char**)
     dump_basis< Space::Discontinuous::Element<TrafoType> >("2d_quad_discontinuous-0.vtk");
     // Lagrange-1
     dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_quad_lagrange-1.vtk");
+    // Lagrange-2
+    dump_basis< Space::Lagrange2::Element<TrafoType> >("2d_quad_lagrange-2.vtk");
     // Rannacher-Turek
     dump_basis< Space::RannacherTurek::Element<TrafoType> >("2d_quad_rannacher_turek.vtk");
     // Bogner-Fox-Schmit
@@ -88,6 +97,8 @@ int main(int, char**)
     dump_basis< Space::Discontinuous::Element<TrafoType> >("3d_hexa_discontinuous-0.vtk", 1);
     // Lagrange-1
     dump_basis< Space::Lagrange1::Element<TrafoType> >("3d_hexa_lagrange-1.vtk", 3);
+    // Lagrange-2
+    dump_basis< Space::Lagrange2::Element<TrafoType> >("3d_hexa_lagrange-2.vtk", 3);
   }
 }
 

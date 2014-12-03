@@ -43,6 +43,12 @@ namespace FEAST
         return Index(dofs_per_cell_);
       }
 
+      /** \copydoc DofMappingBase::get_num_global_dofs() */
+      Index get_num_global_dofs() const
+      {
+        return this->_space.get_trafo().get_mesh().get_num_entities(Space_::shape_dim) * Index(dofs_per_cell_);
+      }
+
       /** \copydoc DofMappingBase::get_index() */
       Index get_index(Index local_dof_idx, Index /*contrib_idx*/ = 0) const
       {
@@ -116,6 +122,12 @@ namespace FEAST
       Index get_num_local_dofs() const
       {
         return Index(IndexSetType::num_indices) * Index(dofs_per_cell_);
+      }
+
+      /** \copydoc DofMappingBase::get_num_global_dofs() */
+      Index get_num_global_dofs() const
+      {
+        return this->_space.get_trafo().get_mesh().get_num_entities(dof_dim) * Index(dofs_per_cell_);
       }
 
       /** \copydoc DofMappingBase::get_index() */
@@ -220,6 +232,12 @@ namespace FEAST
         return Index(dof_count);
       }
 
+      /** \copydoc DofMappingBase::get_num_global_dofs() */
+      Index get_num_global_dofs() const
+      {
+        return Intern::UniformDofMappingHelper<ShapeType, DofTraits_, DofTag_>::global_count(this->_space.get_mesh());
+      }
+
       /** \copydoc DofMappingBase::get_index() */
       Index get_index(Index local_dof_idx, Index /*contrib_idx*/ = 0) const
       {
@@ -262,6 +280,13 @@ namespace FEAST
           }
           return offs + Index(dofs_per_cell) * mesh.get_num_entities(cell_dim_);
         }
+
+        template<typename MeshType_>
+        static Index global_count(const MeshType_& mesh)
+        {
+          return UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::global_count(mesh) +
+            Index(Traits_<Tag_, cell_dim_>::count) * mesh.get_num_entities(cell_dim_);
+        }
       };
 
       // specialisation for cell_dim_ = shape_dim_
@@ -288,6 +313,13 @@ namespace FEAST
             dof_idx[k] = offs + cell * dofs_per_cell + Index(j);
           }
           return offs + Index(dofs_per_cell) * mesh.get_num_entities(cell_dim_);
+        }
+
+        template<typename MeshType_>
+        static Index global_count(const MeshType_& mesh)
+        {
+          return UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::global_count(mesh) +
+            Index(Traits_<Tag_, cell_dim_>::count) * mesh.get_num_entities(cell_dim_);
         }
       };
 
@@ -322,6 +354,11 @@ namespace FEAST
           return Index(dofs_per_cell) * mesh.get_num_entities(0);
         }
 
+        template<typename MeshType_>
+        static Index global_count(const MeshType_& mesh)
+        {
+          return Index(Traits_<Tag_, 0>::count) * mesh.get_num_entities(0);
+        }
       };
     } // namespace Intern
     /// \endcond

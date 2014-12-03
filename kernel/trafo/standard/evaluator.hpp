@@ -1163,7 +1163,7 @@ namespace FEAST
 
           // calculate transformation coefficients
           // j = _coeff[i][j] for all j = 0....7
-          // v = 1*x + 2*y + 3*z + x*y*4 + x*z*5 + y*z*6 + x*y*z*7 + 0
+          // v = 0 + 1*x + 2*y + 3*z + x*y*4 + x*z*5 + y*z*6 + x*y*z*7
           for(Index i(0); i < image_dim; ++i)
           {
             _coeff[i][0] = DataType(0.125) * DataType( + v0[i] + v1[i] + v2[i] + v3[i] + v4[i] + v5[i] + v6[i] + v7[i]);
@@ -1190,16 +1190,11 @@ namespace FEAST
         {
           for(Index i(0); i < image_dim; ++i)
           {
-            img_point[i] = _coeff[i][0] +
-            // x *
-              (_coeff[i][1] +
-               _coeff[i][4] * dom_point[1] +
-               _coeff[i][5] * dom_point[2] +
-               _coeff[i][7] * dom_point[1] * dom_point[2]) * dom_point[0] +
-            // y *
-              (_coeff[i][2] + _coeff[i][6] * dom_point[2]) * dom_point[1] +
-            // z *
-              _coeff[i][3] *dom_point[2];
+            img_point[i] = _coeff[i][0]
+              + dom_point[0] * (_coeff[i][1])
+              + dom_point[1] * (_coeff[i][2] + dom_point[0]*_coeff[i][4])
+              + dom_point[2] * (_coeff[i][3] + dom_point[0]*_coeff[i][5]
+                + dom_point[1]*(_coeff[i][6] + dom_point[0]*_coeff[i][7]));
           }
         }
 
@@ -1216,12 +1211,9 @@ namespace FEAST
         {
           for(Index i(0); i < image_dim; ++i)
           {
-            jac_mat(i,0) = _coeff[i][1] + dom_point[1] * _coeff[i][4] + dom_point[2] * _coeff[i][5] +
-                           dom_point[1] * dom_point[2] * _coeff[i][7];
-            jac_mat(i,1) = _coeff[i][2] + dom_point[0] * _coeff[i][4] + dom_point[2] * _coeff[i][6] +
-                           dom_point[0] * dom_point[2] * _coeff[i][7];
-            jac_mat(i,2) = _coeff[i][3] + dom_point[0] * _coeff[i][5] + dom_point[1] * _coeff[i][6] +
-                           dom_point[0] * dom_point[1] * _coeff[i][7];
+            jac_mat(i,0) = _coeff[i][1] + dom_point[1] * _coeff[i][4] + dom_point[2] * (_coeff[i][5] + dom_point[1] * _coeff[i][7]);
+            jac_mat(i,1) = _coeff[i][2] + dom_point[0] * _coeff[i][4] + dom_point[2] * (_coeff[i][6] + dom_point[0] * _coeff[i][7]);
+            jac_mat(i,2) = _coeff[i][3] + dom_point[0] * _coeff[i][5] + dom_point[1] * (_coeff[i][6] + dom_point[0] * _coeff[i][7]);
           }
         }
 
