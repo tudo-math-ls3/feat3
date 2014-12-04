@@ -855,6 +855,8 @@ namespace FEAST
         typename t_::storage_type_ vertex_at_polygon;
         typename t_::storage_type_ vf_0; //new vertices for new face with old index i ; need to find them in adj-list updates later
 
+        Index pos_before_refine_faces(origin.num_polytopes(pl_vertex));//needed later
+
         // refine all faces
         const Index num_faces(origin.num_polytopes(pl_face));
         for(Index i(0) ; i < num_faces; i++)
@@ -1561,11 +1563,27 @@ namespace FEAST
           }
 
           DataType_ vol(0), c_x(0), c_y(0), c_z(0);
-          Index num_faces1((Index)coarse.get_adjacent_polytopes(pl_polyhedron, pl_face, i).size());
+          typename t_::storage_type_ faces_at_polyhedron(coarse.get_adjacent_polytopes(pl_polyhedron, pl_face, i));
+          Index num_faces1(faces_at_polyhedron.size());
+          Attribute<double, os_> approx_centroid;
+
+          approx_centroid.push_back(double(0));
+          approx_centroid.push_back(double(0));
+          approx_centroid.push_back(double(0));
+          for(Index j(0) ; j < num_faces1; j++)
+          {
+            approx_centroid.at(0) += origin_coords.at(0).at(pos_before_refine_faces + faces_at_polyhedron.at(j));
+            approx_centroid.at(1) += origin_coords.at(1).at(pos_before_refine_faces + faces_at_polyhedron.at(j));
+            approx_centroid.at(2) += origin_coords.at(2).at(pos_before_refine_faces + faces_at_polyhedron.at(j));
+          }
+          approx_centroid.at(0) /= num_faces1;
+          approx_centroid.at(1) /= num_faces1;
+          approx_centroid.at(2) /= num_faces1;
+
           for(Index j(0) ; j < num_faces1; j++)
           {
             //sorting
-            vertex_at_polygon = coarse.get_adjacent_polytopes(pl_face, pl_vertex, j);
+            vertex_at_polygon = coarse.get_adjacent_polytopes(pl_face, pl_vertex, faces_at_polyhedron.at(j));
             Index v_current(*vertex_at_polygon.begin());
             Index v_start(*vertex_at_polygon.begin());
             typename t_::storage_type_ e_way;
@@ -1602,52 +1620,59 @@ namespace FEAST
             vertex_at_polygon = v_way;
 
             // Calculating centroid of polyhedron
-            Index num_vertices((Index)coarse.get_adjacent_polytopes(pl_face, pl_vertex, j).size());
+            Index num_vertices((Index)coarse.get_adjacent_polytopes(pl_face, pl_vertex, faces_at_polyhedron.at(j)).size());
+            Index center_of_face_j(pos_before_refine_faces + faces_at_polyhedron.at(j));
+
+            DataType_ n[3];
+            n[0] =
+              ((origin_coords.at(1).at(vertex_at_polygon.at(1)) - origin_coords.at(1).at(vertex_at_polygon.at(0))) * (origin_coords.at(2).at(center_of_face_j) - origin_coords.at(2).at(vertex_at_polygon.at(0)))) - ((origin_coords.at(2).at(vertex_at_polygon.at(1)) - origin_coords.at(2).at(vertex_at_polygon.at(0))) * (origin_coords.at(1).at(center_of_face_j) - origin_coords.at(1).at(vertex_at_polygon.at(0))));
+            n[1] =
+              ((origin_coords.at(2).at(vertex_at_polygon.at(1)) - origin_coords.at(2).at(vertex_at_polygon.at(0))) * (origin_coords.at(0).at(center_of_face_j) - origin_coords.at(0).at(vertex_at_polygon.at(0)))) - ((origin_coords.at(0).at(vertex_at_polygon.at(1)) - origin_coords.at(0).at(vertex_at_polygon.at(0))) * (origin_coords.at(2).at(center_of_face_j) - origin_coords.at(2).at(vertex_at_polygon.at(0))));
+            n[2] =
+              ((origin_coords.at(0).at(vertex_at_polygon.at(1)) - origin_coords.at(0).at(vertex_at_polygon.at(0))) * (origin_coords.at(1).at(center_of_face_j) - origin_coords.at(1).at(vertex_at_polygon.at(0)))) - ((origin_coords.at(1).at(vertex_at_polygon.at(1)) - origin_coords.at(1).at(vertex_at_polygon.at(0))) * (origin_coords.at(0).at(center_of_face_j) - origin_coords.at(0).at(vertex_at_polygon.at(0))));
+
+            DataType_ test_outer_normal((origin_coords.at(0).at(center_of_face_j) - approx_centroid.at(0)) * n[0] +
+                                        (origin_coords.at(1).at(center_of_face_j) - approx_centroid.at(1)) * n[1] +
+                                        (origin_coords.at(2).at(center_of_face_j) - approx_centroid.at(2)) * n[2]);
+            if (test_outer_normal < 0)
+              for(Index m(0); m < 3 ;m++) n[m] *= DataType_(-1);
+
             for(Index k(0) ; k < num_vertices ; k++)
             {
-              double n[3];
+              Index kp1((k + 1) % num_vertices);
               DataType_ areak(0);
-              n[0] = (origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(1).at(vertex_at_polygon.at(k)))
-                   * (origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices))) - (origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                   * (origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(2).at(vertex_at_polygon.at(k)));
-              n[1] = (origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(2).at(vertex_at_polygon.at(k)))
-                   * (origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices))) - (origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                   * (origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(0).at(vertex_at_polygon.at(k)));
-              n[2] = (origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(0).at(vertex_at_polygon.at(k)))
-                   * (origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices))) - (origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                   * (origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(1).at(vertex_at_polygon.at(k)));
 
-              areak= origin_coords.at(0).at(vertex_at_polygon.at(k)) * n[0] + origin_coords.at(1).at(vertex_at_polygon.at(k)) * n[1] + origin_coords.at(2).at(vertex_at_polygon.at(k)) * n[2];
-              if (areak < 0) //outer normal
-                for(Index m(0); m < 3 ;m++) n[m] *= DataType_(-1);
-              vol += fabs(areak);
+              areak = origin_coords.at(0).at(vertex_at_polygon.at(k)) * n[0] + origin_coords.at(1).at(vertex_at_polygon.at(k)) * n[1] + origin_coords.at(2).at(vertex_at_polygon.at(k)) * n[2];
 
-              c_x += n[0] * (((origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                            * (origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                            * (origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))
-                            * (origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))) );
+              vol += areak;
 
-              c_y += n[1] * (((origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                            * (origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                            * (origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))
-                            * (origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))) );
+              c_x += n[0] * (((origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(vertex_at_polygon.at(kp1)))
+                            * (origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(vertex_at_polygon.at(kp1))))
+                           + ((origin_coords.at(0).at(center_of_face_j) + origin_coords.at(0).at(vertex_at_polygon.at(kp1)))
+                            * (origin_coords.at(0).at(center_of_face_j) + origin_coords.at(0).at(vertex_at_polygon.at(kp1))))
+                           + ((origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(center_of_face_j))
+                            * (origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(center_of_face_j))) );
 
-              c_z += n[2] * (((origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                            * (origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                            * (origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(2).at(vertex_at_polygon.at(( k + 1) % num_vertices))))
-                           + ((origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))
-                            * (origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))) );
+              c_y += n[1] * (((origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(vertex_at_polygon.at(kp1)))
+                            * (origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(vertex_at_polygon.at(kp1))))
+                           + ((origin_coords.at(1).at(center_of_face_j) + origin_coords.at(1).at(vertex_at_polygon.at(kp1)))
+                            * (origin_coords.at(1).at(center_of_face_j) + origin_coords.at(1).at(vertex_at_polygon.at(kp1))))
+                           + ((origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(center_of_face_j))
+                            * (origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(center_of_face_j))) );
+
+              c_z += n[2] * (((origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(vertex_at_polygon.at(kp1)))
+                            * (origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(vertex_at_polygon.at(kp1))))
+                           + ((origin_coords.at(2).at(center_of_face_j) + origin_coords.at(2).at(vertex_at_polygon.at(kp1)))
+                            * (origin_coords.at(2).at(center_of_face_j) + origin_coords.at(2).at(vertex_at_polygon.at(kp1))))
+                           + ((origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(center_of_face_j))
+                            * (origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(center_of_face_j))) );
              }
 
            }
            origin_coords.at(0).push_back(c_x / (DataType_(8) * vol));
            origin_coords.at(1).push_back(c_y / (DataType_(8) * vol));
            origin_coords.at(2).push_back(c_z / (DataType_(8) * vol));
+
         }
       }
     };
