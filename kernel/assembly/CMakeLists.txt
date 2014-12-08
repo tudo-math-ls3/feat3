@@ -13,6 +13,7 @@ INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 SET (test_list
   bilinear_operator-test
   grid_transfer-test
+  grid_transfer-mass-test
   interpolator-test
   linear_functional-test
   rew_projector-test
