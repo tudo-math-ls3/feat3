@@ -1564,7 +1564,7 @@ namespace FEAST
 
           DataType_ vol(0), c_x(0), c_y(0), c_z(0);
           typename t_::storage_type_ faces_at_polyhedron(coarse.get_adjacent_polytopes(pl_polyhedron, pl_face, i));
-          Index num_faces1(faces_at_polyhedron.size());
+          Index num_faces1(Index(faces_at_polyhedron.size()));
           Attribute<double, os_> approx_centroid;
 
           approx_centroid.push_back(double(0));
