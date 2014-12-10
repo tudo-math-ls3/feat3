@@ -1,6 +1,7 @@
 #include <kernel/geometry/mesh_streamer_factory.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
@@ -18,6 +19,7 @@ typedef StandardRefinery<QuadMesh> QuadRefinery;
 typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
 typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
+typedef Space::Lagrange2::Element<QuadTrafo> QuadSpaceQ2;
 typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
 
 
@@ -73,6 +75,7 @@ int main(int argc, char* argv[])
     std::cout << std::endl << "  USAGE: dbg-fe-asm-2 [-q1|-q1t] [-sm|-mm] [-r:<count>] <mesh-name>" << std::endl << std::endl;
     std::cout << "-r:<n>            Refine mesh <n> times" << std::endl;
     std::cout << "-q1               Use Q1 element" << std::endl;
+    std::cout << "-q2               Use Q2 element" << std::endl;
     std::cout << "-q1t              Use Q1~ element" << std::endl;
     std::cout << "-sm               Assemble stiffness matrix" << std::endl;
     std::cout << "-mm               Assemble mass matrix" << std::endl;
@@ -86,8 +89,10 @@ int main(int argc, char* argv[])
     String arg(argv[i]);
     if(arg.compare("-q1") == 0)
       space = 0;
-    else if(arg.compare("-q1t") == 0)
+    else if(arg.compare("-q2") == 0)
       space = 1;
+    else if(arg.compare("-q1t") == 0)
+      space = 2;
     else if(arg.compare("-sm") == 0)
       imat = 0;
     else if(arg.compare("-mm") == 0)
@@ -145,6 +150,13 @@ int main(int argc, char* argv[])
     break;
 
   case 1:
+    {
+      std::cout << "Creating Q2 space..." << std::endl;
+      QuadSpaceQ2 space_q2(*trafo);
+      test_asm(space_q2, "gauss-legendre:3", imat);
+    }
+
+  case 2:
     {
       std::cout << "Creating Q1~ space..." << std::endl;
       QuadSpaceQ1T space_q1t(*trafo);

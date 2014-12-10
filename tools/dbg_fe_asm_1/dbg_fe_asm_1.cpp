@@ -1,6 +1,7 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
@@ -17,6 +18,7 @@ typedef StandardRefinery<QuadMesh> QuadRefinery;
 typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
 typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
+typedef Space::Lagrange2::Element<QuadTrafo> QuadSpaceQ2;
 typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
 
 int nrefs = -1;
@@ -313,6 +315,7 @@ int main(int argc, char* argv[])
     std::cout << "-vs        verify matrix structure" << std::endl;
     std::cout << "-v         verify both matrix structure and data" << std::endl;
     std::cout << "-q1        use Q1 element" << std::endl;
+    std::cout << "-q2        use Q2 element" << std::endl;
     std::cout << "-q1t       use Q1T element" << std::endl;
     std::cout << "-sm        assemble stiffness matrix" << std::endl;
     std::cout << "-mm        assemble mass matrix" << std::endl;
@@ -335,8 +338,10 @@ int main(int argc, char* argv[])
       verify_s = true;
     else if(arg.compare("-q1") == 0)
       space = 0;
-    else if(arg.compare("-q1t") == 0)
+    else if(arg.compare("-q2") == 0)
       space = 1;
+    else if(arg.compare("-q1t") == 0)
+      space = 2;
     else if(arg.compare("-sm") == 0)
       imat = 0;
     else if(arg.compare("-mm") == 0)
@@ -372,6 +377,19 @@ int main(int argc, char* argv[])
     break;
 
   case 1:
+    // Q2 element
+    switch(imat)
+    {
+    case 0:
+      sprintf(matx_name, "data/%s_laplace_q2_g3.bin", base_name);
+      break;
+    case 1:
+      sprintf(matx_name, "data/%s_mass_q2_g3.bin", base_name);
+      break;
+    }
+    break;
+
+  case 2:
     // Q1~ element
     switch(imat)
     {
@@ -419,6 +437,14 @@ int main(int argc, char* argv[])
     break;
 
   case 1:
+    {
+      std::cout << "Creating Q2 space..." << std::endl;
+      QuadSpaceQ2 space_q2(*trafo);
+      test_asm(space_q2, "gauss-legendre:3", matx_name);
+    }
+    break;
+
+  case 2:
     {
       std::cout << "Creating Q1~ space..." << std::endl;
       QuadSpaceQ1T space_q1t(*trafo);
