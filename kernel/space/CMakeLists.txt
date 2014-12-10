@@ -13,6 +13,7 @@ INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 SET (test_list
   bogner_fox_schmit-test
   discontinuous-test
+  element-regression-test
   lagrange1-test
   rannacher_turek-test
 )
