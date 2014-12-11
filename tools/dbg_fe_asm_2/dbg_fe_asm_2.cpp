@@ -155,6 +155,7 @@ int main(int argc, char* argv[])
       QuadSpaceQ2 space_q2(*trafo);
       test_asm(space_q2, "gauss-legendre:3", imat);
     }
+    break;
 
   case 2:
     {
