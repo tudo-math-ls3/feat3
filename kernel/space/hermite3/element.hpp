@@ -142,6 +142,12 @@ namespace FEAST
             // number of cell dofs
             Index(num_cell_dofs) * this->get_mesh().get_num_entities(ShapeType::dimension);
         }
+
+        /** \copydoc ElementBase::name() */
+        static String name()
+        {
+          return "Hermite3";
+        }
       }; // class Element<...>
     } // namespace Hermite3
   } // namespace Space

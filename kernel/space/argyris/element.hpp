@@ -139,6 +139,12 @@ namespace FEAST
             // number of edge dofs
             Index(num_edge_dofs) * this->get_mesh().get_num_entities(1);
         }
+
+        /** \copydoc ElementBase::name() */
+        static String name()
+        {
+          return "Argyris";
+        }
       }; // class Element<...>
     } // namespace Argyris
   } // namespace Space

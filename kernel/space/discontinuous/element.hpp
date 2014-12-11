@@ -131,6 +131,13 @@ namespace FEAST
           // number of DOFs = number of cells in the mesh
           return this->get_mesh().get_num_entities(ShapeType::dimension);
         }
+
+        /** \copydoc ElementBase::name() */
+        static String name()
+        {
+          return String("Discontinuous<") + Variant_::name() + ">";
+        }
+
       }; // class Element
     } // namespace Discontinuous
   } // namespace Space

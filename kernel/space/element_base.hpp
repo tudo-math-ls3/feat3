@@ -139,6 +139,11 @@ namespace FEAST
        * The total number of global degrees of freedom for the patch.
        */
       Index get_num_dofs() const;
+
+      /**
+       * \brief Returns the name of the element.
+       */
+      String name() const;
 #endif // DOXYGEN
 
     private:

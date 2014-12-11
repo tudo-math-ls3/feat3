@@ -143,6 +143,12 @@ namespace FEAST
           // number of DOFs = (number of vertices in the mesh) * (2^dimension)
           return this->get_mesh().get_num_entities(0) * Index(1 << ShapeType::dimension);
         }
+
+        /** \copydoc ElementBase::name() */
+        static String name()
+        {
+          return "BognerFoxSchmit";
+        }
       }; // class Element<...>
     } // namespace BognerFoxSchmit
   } // namespace Space

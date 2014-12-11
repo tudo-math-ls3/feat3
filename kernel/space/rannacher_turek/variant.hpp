@@ -26,6 +26,11 @@ namespace FEAST
             non_par = 1,
             bubble = 0
           };
+
+          static String name()
+          {
+            return "StdNonPar";
+          }
         };
       } // namespace Variant
     } // namespace RannacherTurek

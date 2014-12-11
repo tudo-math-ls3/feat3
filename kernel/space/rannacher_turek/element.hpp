@@ -147,6 +147,12 @@ namespace FEAST
           // number of DOFs = number of facets in the mesh
           return this->get_mesh().get_num_entities(ShapeType::dimension - 1);
         }
+
+        /** \copydoc ElementBase::name() */
+        static String name()
+        {
+          return String("RannacherTurek<") + Variant_::name() + ">";
+        }
       }; // class Element
     } // namespace RannacherTurek
   } // namespace Space

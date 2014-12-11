@@ -128,6 +128,12 @@ namespace FEAST
           // number of DOFs = number of vertices in the mesh
           return this->get_mesh().get_num_entities(0);
         }
+
+        /** \copydoc ElementBase::name() */
+        static String name()
+        {
+          return "Lagrange1";
+        }
       }; // class Element
     } // namespace Lagrange1
   } // namespace Space

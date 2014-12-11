@@ -129,6 +129,12 @@ namespace FEAST
           DofMappingType dof_map(*this);
           return dof_map.get_num_global_dofs();
         }
+
+        /** \copydoc ElementBase::name() */
+        static String name()
+        {
+          return "Lagrange2";
+        }
       }; // class Element
     } // namespace Lagrange2
   } // namespace Space
