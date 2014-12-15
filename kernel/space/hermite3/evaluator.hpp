@@ -219,7 +219,7 @@ namespace FEAST
           trafo_eval(coeff_data, dom_point);
 
           // store coefficient
-          _coeff = coeff_data.jac_det(0,0);
+          _coeff = coeff_data.jac_mat(0,0);
         }
 
         /**

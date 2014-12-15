@@ -12,6 +12,7 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/argyris/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
+#include <kernel/space/hermite3/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
@@ -578,6 +579,15 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
+  // Hermite-3 element
+
+  // L2-Projection Hypercube<1>
+  ElementRegressionL2<Shape::Hypercube<1>, Space::Hermite3::Element, true, true, true>
+    l2_hy1_hermite3_lvl5("L2:Hermite3:Hypercube<1>:5", 5, 6.183857974105e-008, 1.250686784444e-005, 2.633222452923e-003);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
   // Argyris element
 
   // L2-Projection Simplex<2>
@@ -608,7 +618,7 @@ namespace ElementRegression
 
   // H1-Projection Simplex<3>
   ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange1::Element, true, true, false>
-    h1_sx3_lagrange1_lvh1("H1:Lagrange1:Simplex<3>:2", 2, 2.472424266085e-002, 4.803811239931e-001);
+    h1_sx3_lagrange1_lvl1("H1:Lagrange1:Simplex<3>:2", 2, 2.472424266085e-002, 4.803811239931e-001);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -625,7 +635,7 @@ namespace ElementRegression
 
   // H1-Projection Hypercube<3>
   ElementRegressionH1<Shape::Hypercube<3>, Space::Lagrange2::Element, true, true, true>
-    h1_hy3_lagrange2_lvh1("H1:Lagrange2:Hypercube<3>:2", 2, 1.675103396311e-003, 4.471054331889e-002, 1.379478609799e+000);
+    h1_hy3_lagrange2_lvl1("H1:Lagrange2:Hypercube<3>:2", 2, 1.675103396311e-003, 4.471054331889e-002, 1.379478609799e+000);
 
   // H1-Projection Simplex<2>
   ElementRegressionH1<Shape::Simplex<2>, Space::Lagrange2::Element, true, true, true>
@@ -633,7 +643,7 @@ namespace ElementRegression
 
   // H1-Projection Simplex<3>
   ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange2::Element, true, true, true>
-    h1_sx3_lagrange2_lvh1("H1:Lagrange2:Simplex<3>:2", 2, 1.008388594508e-003, 5.001897374726e-002, 1.934606569160e+000);
+    h1_sx3_lagrange2_lvl1("H1:Lagrange2:Simplex<3>:2", 2, 1.008388594508e-003, 5.001897374726e-002, 1.934606569160e+000);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -652,5 +662,14 @@ namespace ElementRegression
   // H1-Projection Simplex<2>
   ElementRegressionH1<Shape::Simplex<2>, Space::CrouzeixRaviart::Element, true, true, false>
     h1_sx2_crouzeix_raviart_lvl4("H1:CrouzeixRaviart:Simplex<2>:4", 4, 2.028469318821e-003, 1.463272513514e-001);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Hermite-3 element
+
+  // L2-Projection Hypercube<1>
+  ElementRegressionH1<Shape::Hypercube<1>, Space::Hermite3::Element, true, true, true>
+    h1_hy1_hermite3_lvl5("H1:Hermite3:Hypercube<1>:5", 5, 6.199872813170e-008, 1.243908289727e-005, 2.594740745804e-003);
 
 } // namespace ElementRegression
