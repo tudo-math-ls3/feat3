@@ -387,7 +387,7 @@ if len(unused_tokens) == 0:
 else:
   print ("Warning: Unused Build-ID tokens: " + "-".join(unused_tokens))
 print
-print ("Extra Options: " + ", ".join(extra_options))
+print ("Extra Options: " + " ".join(extra_options))
 print
 print ("CPU Type: " + cputype)
 print
