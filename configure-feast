@@ -103,6 +103,10 @@ os.environ["MPICH_CXX"] = ""
 os.environ["MPICH_CC"] = ""
 
 extra_options = []
+#separate extra options from build id
+for i in range(1, len(sys.argv)):
+  if len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--":
+    extra_options.append(sys.argv[i])
 
 # guess a fitting configuration and search for available compilers
 if len(sys.argv) == 1 or "guess" in sys.argv:
@@ -118,18 +122,16 @@ if len(sys.argv) == 1 or "guess" in sys.argv:
   elif is_found("clang++"):
     buildid_string += "-clang"
 
-  if is_found("nvcc") and os.path.isfile("/usr/bin/g++"):
+  if is_found("nvcc"):
     buildid_string += "-cuda"
 #TODO suchen nach mkl
 
 # use provided build id
 else:
+  #add every parameter to the build id that is no extra_option
   buildid_string = ""
   for i in range(1, len(sys.argv)):
-    #separate extra options from build id
-    if len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--":
-      extra_options.append(sys.argv[i])
-    else:
+    if not (len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--"):
       buildid_string += sys.argv[i] + "-"
 
 buildid_string = buildid_string.strip("-")
