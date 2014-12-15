@@ -1,8 +1,10 @@
 import platform
 from cmake_modules.feast_util import get_output
 
-def configure_icc(cpu, buildid, system_host_compiler):
-  version = get_output("icpc -dM -E - ")
+def configure_icc(cpu, buildid, compiler, system_host_compiler):
+  if not compiler:
+    compiler = "icpc"
+  version = get_output(compiler + " -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__INTEL_COMPILER"][0:2])
   minor = int(version["__INTEL_COMPILER"][-2:])

@@ -345,9 +345,9 @@ raw_branches[:] = [s.strip("* ") for s in raw_branches]
 addition = ""
 
 if system_host_compiler:
-  addition += "-system_host_compiler=" + system_host_compiler
+  addition += " --system_host_compiler=" + system_host_compiler + " "
 if cuda_host_compiler:
-  addition += "-cuda_host_compiler=" + cuda_host_compiler
+  addition += " --cuda_host_compiler=" + cuda_host_compiler + " "
 
 if is_found ("ninja"):
   addition += "-ninja"
@@ -355,7 +355,7 @@ else:
   addition += "-unixmake"
 if is_found ("nvcc"):
   addition = addition + "-cuda"
-if is_found ("ccache") and not is_found("nvcc"): # ccache is borken in conjunction with cmake 2.8.12 and cuda
+if is_found ("ccache") and not is_found("nvcc"): # ccache is broken in conjunction with cmake 2.8.12 and cuda
   addition = addition + "-ccache"
 
 #unconditionally add umfpack/alglib and delete it before the first test run to trigger package downloads

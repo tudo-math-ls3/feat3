@@ -1,8 +1,10 @@
 import platform
 from cmake_modules.feast_util import get_output
 
-def configure_clang(cpu, buildid):
-  version = get_output("clang++ -dM -E - ")
+def configure_clang(cpu, buildid, compiler):
+  if not compiler:
+    compiler = "clang++"
+  version = get_output(compiler + " -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__clang_major__"])
   minor = int(version["__clang_minor__"])

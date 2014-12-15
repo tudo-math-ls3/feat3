@@ -76,16 +76,18 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("The target cpu is detected automatically manual override options are not implemented yet.")
   print ("")
   print ("============== ADDITIONAL OPTIONS ==============")
-  print ("system_host_compiler=/usr/bin/gcc")
+  print ("--system_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by icc.")
-  print ("cuda_host_compiler=/usr/bin/gcc")
+  print ("--cuda_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by nvcc.")
-  print ("cuda_arch=sm_20")
+  print ("--cuda_arch=sm_20")
   print ("  Selects the cuda architecture target (defaults to sm_20 if not set).")
-  print ("export_compile_commands")
-  print ("  Let CMake export the used compile commands to compile_commands.json")
-  print ("============== NOTES ===========================")
-  print ("You can escape hyphens with a single slash, e.g. '/-'")
+  print ("--export_compile_commands")
+  print ("  Let CMake export the used compile commands to compile_commands.json.")
+  print ("--cpu=cputype")
+  print ("  Override cpu auto detection with provided string (see cmake_modules/detect_cpu.py for a list).")
+  print ("--compiler=path/to/binary")
+  print ("  Override default c++ compiler binary by absolute path to binary.")
   sys.exit()
 
 #get path to feast source trunk
@@ -100,6 +102,7 @@ os.environ["OMP_CC"] = ""
 os.environ["MPICH_CXX"] = ""
 os.environ["MPICH_CC"] = ""
 
+extra_options = []
 
 # guess a fitting configuration and search for available compilers
 if len(sys.argv) == 1 or "guess" in sys.argv:
@@ -123,14 +126,15 @@ if len(sys.argv) == 1 or "guess" in sys.argv:
 else:
   buildid_string = ""
   for i in range(1, len(sys.argv)):
-    buildid_string += sys.argv[i] + "-"
+    #separate extra options from build id
+    if len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--":
+      extra_options.append(sys.argv[i])
+    else:
+      buildid_string += sys.argv[i] + "-"
 
 buildid_string = buildid_string.strip("-")
-#mask escaped hyphen with "|"
-buildid_string = buildid_string.replace("/-", "|")
 #generate handy build id array of tokens
 buildid = buildid_string.split("-")
-buildid_string = buildid_string.replace("|", "-")
 #list of buildid tokens, remove token when used, results in list of unused tokens
 unused_tokens = copy.deepcopy(buildid)
 
@@ -201,36 +205,52 @@ else:
   print (buildid_string)
   sys.exit(1)
 
-#cpu detection
-cputype = detect_cpu()
-cmake_flags += " -DFEAST_CPU_TYPE:STRING=" + cputype
-
-#configure user defined host compilers
+#evaluate extra options
+cputype = ""
 system_host_compiler = ""
-system_host_compilers = [s for s in buildid if "system_host_compiler=" in s]
-if len(system_host_compilers) == 1:
-  system_host_compiler = system_host_compilers[0].split("=")[1]
-  system_host_compiler = system_host_compiler.replace("|", "-")
-  remove_substring(unused_tokens, "system_host_compiler=")
-  #cmake_flags += " -DFEAST_SYSTEM_HOST_COMPILER=" + system_host_compiler
-elif len(system_host_compilers) > 1:
-  print ("Error: buildid contains more than one system_host_compiler statements:")
-  print (os.linesep.join(system_host_compilers))
-  print (buildid_string)
-  sys.exit(1)
+cuda_host_compiler = ""
+compiler = ""
+cuda_arch = ""
+for option in extra_options:
+  if option.startswith("--cpu="):
+    if cputype:
+      print ("Error: multiple cpu parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    cputype = option.replace("--cpu=", "", 1)
 
-cuda_host_compilers = [s for s in buildid if "cuda_host_compiler=" in s]
-if len(cuda_host_compilers) == 1:
-  cuda_host_compiler = cuda_host_compilers[0].split("=")[1]
-  cuda_host_compiler = cuda_host_compiler.replace("|", "-")
-  remove_substring(unused_tokens, "cuda_host_compiler=")
-  cmake_flags += " -DFEAST_CUDA_HOST_COMPILER=" + cuda_host_compiler
-elif len(cuda_host_compilers) > 1:
-  print ("Error: buildid contains more than one cuda_host_compiler statements:")
-  print (os.linesep.join(cuda_host_compilers))
-  print (buildid_string)
-  sys.exit(1)
+  if option.startswith("--system_host_compiler="):
+    if system_host_compiler:
+      print ("Error: multiple system_host_compiler parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    system_host_compiler = option.replace("--system_host_compiler=", "", 1)
 
+  if option.startswith("--cuda_host_compiler="):
+    if cuda_host_compiler:
+      print ("Error: multiple cuda_host_compiler parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    cuda_host_compiler = option.replace("--cuda_host_compiler=", "", 1)
+    cmake_flags += " -DFEAST_CUDA_HOST_COMPILER=" + cuda_host_compiler
+
+  if option.startswith("--compiler="):
+    if compiler:
+      print ("Error: multiple compiler parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    compiler = option.replace("--compiler=", "", 1)
+
+  if option.startswith("--cuda_arch="):
+    if cuda_arch:
+      print ("Error: multiple cuda_arch parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    cuda_arch = option.replace("--cuda_arch=", "", 1)
+
+  if option.startswith("--export_compile_commands"):
+    cmake_flags += " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+
+if not cputype:
+  cputype = detect_cpu()
+cmake_flags += " -DFEAST_CPU_TYPE:STRING=" + cputype
+if not cuda_arch:
+  cuda_arch = "sm_20"
 
 #compiler selection
 if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
@@ -240,8 +260,11 @@ if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
   remove_string(unused_tokens, "gcc")
   remove_string(unused_tokens, "gnu")
   os.environ["CC"] = "gcc"
-  os.environ["CXX"] = "g++"
-  cxxflags += " " + configure_gcc (cputype, buildid)
+  if compiler:
+    os.environ["CXX"] = compiler
+  else:
+    os.environ["CXX"] = "g++"
+  cxxflags += " " + configure_gcc (cputype, buildid, compiler)
 elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   if not is_found("icpc"):
     print ("Error: Chosen compiler binary 'icpc' not found!")
@@ -249,8 +272,11 @@ elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   remove_string(unused_tokens, "icc")
   remove_string(unused_tokens, "intel")
   os.environ["CC"] = "icc"
-  os.environ["CXX"] = "icpc"
-  cxxflags += " " + configure_icc (cputype, buildid, system_host_compiler)
+  if compiler:
+    os.environ["CXX"] = compiler
+  else:
+    os.environ["CXX"] = "icpc"
+  cxxflags += " " + configure_icc (cputype, buildid, compiler, system_host_compiler)
 elif "clang" in buildid or "llvm" in buildid:
   if not is_found("clang++"):
     print ("Error: Chosen compiler binary 'clang++' not found!")
@@ -258,15 +284,21 @@ elif "clang" in buildid or "llvm" in buildid:
   remove_string(unused_tokens, "clang")
   remove_string(unused_tokens, "llvm")
   os.environ["CC"] = "clang"
-  os.environ["CXX"] = "clang++"
-  cxxflags += " " + configure_clang (cputype, buildid)
+  if compiler:
+    os.environ["CXX"] = compiler
+  else:
+    os.environ["CXX"] = "clang++"
+  cxxflags += " " + configure_clang (cputype, buildid, compiler)
 elif "msc" in buildid:
   if not is_found("cl"):
     print ("Error: Chosen compiler binary 'cl' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "msc")
   os.environ["CC"] = "cl"
-  os.environ["CXX"] = "cl"
+  if compiler:
+    os.environ["CXX"] = compiler
+  else:
+    os.environ["CXX"] = "cl"
   cxxflags += " " + configure_msc (cputype, buildid)
 else:
   print ("Error: No supported compiler found in build id:")
@@ -290,20 +322,8 @@ if "cuda" in buildid:
     sys.exit(1)
   remove_string(unused_tokens, "cuda")
   cmake_flags += " -DFEAST_BACKENDS_CUDA:BOOL=ON"
+  cmake_flags += " -DFEAST_CUDA_ARCH=" + cuda_arch
 
-  cuda_archs = [s for s in buildid if "cuda_arch=" in s]
-  if len(cuda_archs) == 0:
-    cuda_arch = "sm_20"
-    cmake_flags += " -DFEAST_CUDA_ARCH=" + cuda_arch
-  elif len(cuda_archs) == 1:
-    cuda_arch = cuda_archs[0].split("=")[1]
-    remove_substring(unused_tokens, "cuda_arch=")
-    cmake_flags += " -DFEAST_CUDA_ARCH=" + cuda_arch
-  elif len(cuda_host_compilers) > 1:
-    print ("Error: buildid contains more than one cuda_arch statements:")
-    print (os.linesep.join(cuda_archs))
-    print (buildid_string)
-    sys.exit(1)
   if "cudamemcheck" in buildid:
     remove_string(unused_tokens, "cudamemcheck")
     cmake_flags += " -DFEAST_CUDAMEMCHECK:BOOL=ON"
@@ -327,11 +347,6 @@ for package in available_packages(trunk_dirname+os.sep+"cmake_modules",trunk_dir
     package.add()
     cmake_flags += package.cmake_flags
     remove_string(unused_tokens, package.name)
-
-# shall we output the generated compile commands?
-if "export_compile_commands" in buildid:
-  cmake_flags += " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
-  remove_string(unused_tokens, "export_compile_commands")
 
 # clean up previous configurations
 clean = [ "CMakeCache.txt", trunk_dirname+os.sep+"CMakeCache.txt" ]
@@ -369,7 +384,10 @@ if len(unused_tokens) == 0:
   pass
 else:
   print ("Warning: Unused Build-ID tokens: " + "-".join(unused_tokens))
-print ("Detected CPU Type: " + cputype)
+print
+print ("Extra Options: " + ", ".join(extra_options))
+print
+print ("CPU Type: " + cputype)
 print
 print ("cxx: " + os.environ["CXX"])
 print
