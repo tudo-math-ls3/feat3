@@ -119,7 +119,7 @@ if len(sys.argv) == 1 or "guess" in sys.argv:
     buildid_string += "-clang"
 
   if is_found("nvcc") and os.path.isfile("/usr/bin/g++"):
-    buildid_string += "-cuda-cuda_host_compiler=/usr/bin/g++"
+    buildid_string += "-cuda"
 #TODO suchen nach mkl
 
 # use provided build id
