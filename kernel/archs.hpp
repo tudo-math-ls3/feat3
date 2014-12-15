@@ -86,7 +86,7 @@ namespace FEAST
       enum TagValue
       {
         tv_main,
-        tv_cuda,
+        tv_cuda
       };
 
       /**
@@ -130,7 +130,7 @@ namespace FEAST
       {
         tv_generic,
         tv_mkl,
-        tv_cuda,
+        tv_cuda
       };
 
       /**
