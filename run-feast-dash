@@ -254,6 +254,8 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  use binary as host compiler for nvcc.")
   print ("onlynew")
   print ("  execute runs only if it was not tested before - develop and master will always be tested.")
+  print ("cuda_arch=sm_20")
+  print ("  use user defined cuda arch.")
   sys.exit();
 
 dump_filename = ""
@@ -266,6 +268,7 @@ nomemcheck = False
 system_host_compiler = ""
 cuda_host_compiler = ""
 onlynew = False
+cuda_arch = "sm_20"
 
 for i in range(1, len(sys.argv)):
   if sys.argv[i].startswith("dump="):
@@ -288,6 +291,8 @@ for i in range(1, len(sys.argv)):
     cuda_host_compiler = sys.argv[i].replace("cuda_host_compiler=", "", 1)
   if sys.argv[i].startswith("onlynew"):
     onlynew = True
+  if sys.argv[i].startswith("cuda_arch="):
+    cuda_arch = sys.argv[i].replace("cuda_arch=", "", 1)
 
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 myDB = pw.MySQLDatabase("feastdash", host=sqlhost, port=sqlport, user="feastdash", passwd="feastdash", threadlocals=True)
@@ -347,6 +352,8 @@ if system_host_compiler:
   extra_opts += " --system_host_compiler=" + system_host_compiler + " "
 if cuda_host_compiler:
   extra_opts += " --cuda_host_compiler=" + cuda_host_compiler + " "
+if is_found ("nvcc"):
+  extra_opts += " --cuda_arch=" + cuda_arch + " "
 
 addition = ""
 if is_found ("ninja"):
