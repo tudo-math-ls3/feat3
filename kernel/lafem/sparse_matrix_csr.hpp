@@ -58,153 +58,6 @@ namespace FEAST
     class SparseMatrixCSR : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
       private:
-        void _read_from_mtx(String filename)
-        {
-          std::ifstream file(filename.c_str(), std::ifstream::in);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-          _read_from_mtx(file);
-          file.close();
-        }
-
-        void _read_from_mtx(std::istream& file)
-        {
-          std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-          this->_scalar_dt.push_back(DT_(0));
-
-          Index ue(0);
-          String line;
-          std::getline(file, line);
-          const bool general((line.find("%%MatrixMarket matrix coordinate real general") != String::npos) ? true : false);
-          const bool symmetric((line.find("%%MatrixMarket matrix coordinate real symmetric") != String::npos) ? true : false);
-
-          if (symmetric == false && general == false)
-          {
-            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
-          }
-
-          while(!file.eof())
-          {
-            std::getline(file,line);
-            if (file.eof())
-              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
-
-            String::size_type begin(line.find_first_not_of(" "));
-            if (line.at(begin) != '%')
-              break;
-          }
-          {
-            String::size_type begin(line.find_first_not_of(" "));
-            line.erase(0, begin);
-            String::size_type end(line.find_first_of(" "));
-            String srow(line, 0, end);
-            Index row((Index)atol(srow.c_str()));
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String scol(line, 0, end);
-            Index col((Index)atol(scol.c_str()));
-            line.erase(0, end);
-            _rows() = row;
-            _columns() = col;
-            _size() = this->rows() * this->columns();
-          }
-
-          while(!file.eof())
-          {
-            std::getline(file, line);
-            if (file.eof())
-              break;
-
-            String::size_type begin(line.find_first_not_of(" "));
-            line.erase(0, begin);
-            String::size_type end(line.find_first_of(" "));
-            String srow(line, 0, end);
-            IT_ row((IT_)atol(srow.c_str()));
-            --row;
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String scol(line, 0, end);
-            IT_ col((IT_)atol(scol.c_str()));
-            --col;
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String sval(line, 0, end);
-            DT_ tval((DT_)atof(sval.c_str()));
-
-            entries[IT_(row)].insert(std::pair<IT_, DT_>(col, tval));
-            ++ue;
-            if (symmetric == true && row != col)
-            {
-              entries[IT_(col)].insert(std::pair<IT_, DT_>(row, tval));
-              ++ue;
-            }
-          }
-          _size() = this->rows() * this->columns();
-          _used_elements() = ue;
-
-          DT_ * tval = new DT_[ue];
-          IT_ * tcol_ind = new IT_[ue];
-          IT_ * trow_ptr = new IT_[rows() + 1];
-
-          IT_ idx(0);
-          Index row_idx(0);
-          for (auto row : entries)
-          {
-            trow_ptr[row_idx] = idx;
-            for (auto col : row.second )
-            {
-              tcol_ind[idx] = col.first;
-              tval[idx] = col.second;
-              ++idx;
-            }
-            row.second.clear();
-            ++row_idx;
-          }
-          trow_ptr[rows()] = IT_(ue);
-          entries.clear();
-
-          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
-          this->_elements_size.push_back(_used_elements());
-          this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
-          this->_indices_size.push_back(_used_elements());
-          this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(rows() + 1));
-          this->_indices_size.push_back(rows() + 1);
-
-          Util::MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, rows() + 1);
-
-          delete[] tval;
-          delete[] tcol_ind;
-          delete[] trow_ptr;
-        }
-
-        void _read_from_csr(String filename)
-        {
-          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-          _read_from_csr(file);
-          file.close();
-        }
-
-        void _read_from_csr(std::istream& file)
-        {
-          this->template _deserialise<double, uint64_t>(FileMode::fm_csr, file);
-        }
-
         Index & _size()
         {
           return this->_scalar_index.at(0);
@@ -352,17 +205,7 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          switch(mode)
-          {
-            case FileMode::fm_mtx:
-              _read_from_mtx(filename);
-              break;
-            case FileMode::fm_csr:
-              _read_from_csr(filename);
-              break;
-            default:
-              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-          }
+          read_from(mode, filename);
         }
 
         /**
@@ -378,17 +221,7 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          switch(mode)
-          {
-            case FileMode::fm_mtx:
-              _read_from_mtx(file);
-              break;
-            case FileMode::fm_csr:
-              _read_from_csr(file);
-              break;
-            default:
-              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-          }
+          read_from(mode, file);
         }
 
         /**
@@ -955,6 +788,223 @@ namespace FEAST
         {
           return this->template _serialise<DT2_, IT2_>(FileMode::fm_csr);
         }
+
+        /**
+         * \brief Read in matrix from file.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] filename The file that shall be read in.
+         */
+        void read_from(FileMode mode, String filename)
+        {
+          CONTEXT("When reading in SparseMatrixCSR");
+
+          switch(mode)
+          {
+            case FileMode::fm_mtx:
+              read_from_mtx(filename);
+              break;
+            case FileMode::fm_csr:
+              read_from_csr(filename);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Read in matrix from stream.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] file The stream that shall be read in.
+         */
+        void read_from(FileMode mode, std::istream& file)
+        {
+          CONTEXT("When reading in SparseMatrixCSR");
+
+          switch(mode)
+          {
+            case FileMode::fm_mtx:
+              read_from_mtx(file);
+              break;
+            case FileMode::fm_csr:
+              read_from_csr(file);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Read in matrix from MatrixMarket mtx file.
+         *
+         * \param[in] filename The file that shall be read in.
+         */
+        void read_from_mtx(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          read_from_mtx(file);
+          file.close();
+        }
+
+        /**
+         * \brief Read in matrix from MatrixMarket mtx stream.
+         *
+         * \param[in] file The stream that shall be read in.
+         */
+        void read_from_mtx(std::istream& file)
+        {
+          this->clear();
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_dt.push_back(DT_(0));
+
+          std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
+
+          Index ue(0);
+          String line;
+          std::getline(file, line);
+          const bool general((line.find("%%MatrixMarket matrix coordinate real general") != String::npos) ? true : false);
+          const bool symmetric((line.find("%%MatrixMarket matrix coordinate real symmetric") != String::npos) ? true : false);
+
+          if (symmetric == false && general == false)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
+          }
+
+          while(!file.eof())
+          {
+            std::getline(file,line);
+            if (file.eof())
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+
+            String::size_type begin(line.find_first_not_of(" "));
+            if (line.at(begin) != '%')
+              break;
+          }
+          {
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row((Index)atol(srow.c_str()));
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col((Index)atol(scol.c_str()));
+            line.erase(0, end);
+            _rows() = row;
+            _columns() = col;
+            _size() = this->rows() * this->columns();
+          }
+
+          while(!file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              break;
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            IT_ row((IT_)atol(srow.c_str()));
+            --row;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            IT_ col((IT_)atol(scol.c_str()));
+            --col;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ tval((DT_)atof(sval.c_str()));
+
+            entries[IT_(row)].insert(std::pair<IT_, DT_>(col, tval));
+            ++ue;
+            if (symmetric == true && row != col)
+            {
+              entries[IT_(col)].insert(std::pair<IT_, DT_>(row, tval));
+              ++ue;
+            }
+          }
+          _size() = this->rows() * this->columns();
+          _used_elements() = ue;
+
+          DT_ * tval = new DT_[ue];
+          IT_ * tcol_ind = new IT_[ue];
+          IT_ * trow_ptr = new IT_[rows() + 1];
+
+          IT_ idx(0);
+          Index row_idx(0);
+          for (auto row : entries)
+          {
+            trow_ptr[row_idx] = idx;
+            for (auto col : row.second )
+            {
+              tcol_ind[idx] = col.first;
+              tval[idx] = col.second;
+              ++idx;
+            }
+            row.second.clear();
+            ++row_idx;
+          }
+          trow_ptr[rows()] = IT_(ue);
+          entries.clear();
+
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
+          this->_elements_size.push_back(_used_elements());
+          this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
+          this->_indices_size.push_back(_used_elements());
+          this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(rows() + 1));
+          this->_indices_size.push_back(rows() + 1);
+
+          Util::MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
+          Util::MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
+          Util::MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, rows() + 1);
+
+          delete[] tval;
+          delete[] tcol_ind;
+          delete[] trow_ptr;
+        }
+
+        /**
+         * \brief Read in matrix from binary file.
+         *
+         * \param[in] filename The file that shall be read in.
+         */
+        void read_from_csr(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          read_from_csr(file);
+          file.close();
+        }
+
+        /**
+         * \brief Read in matrix from binary stream.
+         *
+         * \param[in] file The stream that shall be read in.
+         */
+        void read_from_csr(std::istream& file)
+        {
+          this->template _deserialise<double, uint64_t>(FileMode::fm_csr, file);
+        }
+
 
         /**
          * \brief Write out matrix to file.
