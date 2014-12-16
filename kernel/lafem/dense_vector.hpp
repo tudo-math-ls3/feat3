@@ -53,131 +53,6 @@ namespace FEAST
     class DenseVector : public Container<Mem_, DT_, IT_>, public VectorBase
     {
       private:
-        void _read_from_mtx(String filename)
-        {
-          std::ifstream file(filename.c_str(), std::ifstream::in);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-          _read_from_mtx(file);
-          file.close();
-        }
-
-        void _read_from_mtx(std::istream& file)
-        {
-          Index rows;
-          String line;
-          std::getline(file, line);
-          if (line.find("%%MatrixMarket matrix array real general") == String::npos)
-          {
-            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-vector-file");
-          }
-          while(!file.eof())
-          {
-            std::getline(file,line);
-            if (file.eof())
-              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
-
-            String::size_type begin(line.find_first_not_of(" "));
-            if (line.at(begin) != '%')
-              break;
-          }
-          {
-            String::size_type begin(line.find_first_not_of(" "));
-            line.erase(0, begin);
-            String::size_type end(line.find_first_of(" "));
-            String srows(line, 0, end);
-            rows = (Index)atol(srows.c_str());
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String scols(line, 0, end);
-            Index cols((Index)atol(scols.c_str()));
-            line.erase(0, end);
-            if (cols != 1)
-              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no dense-vector-file");
-          }
-
-          DenseVector<Mem::Main, DT_, IT_> tmp(rows);
-          DT_ * pval(tmp.elements());
-
-          while(!file.eof())
-          {
-            std::getline(file, line);
-            if (file.eof())
-              break;
-
-            String::size_type begin(line.find_first_not_of(" "));
-            line.erase(0, begin);
-            String::size_type end(line.find_first_of(" "));
-            String sval(line, 0, end);
-            DT_ tval((DT_)atof(sval.c_str()));
-
-            *pval = tval;
-            ++pval;
-          }
-          this->assign(tmp);
-        }
-
-        void _read_from_exp(String filename)
-        {
-          std::ifstream file(filename.c_str(), std::ifstream::in);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-          _read_from_exp(file);
-          file.close();
-        }
-
-        void _read_from_exp(std::istream& file)
-        {
-          std::vector<DT_> data;
-
-          while(!file.eof())
-          {
-            std::string line;
-            std::getline(file, line);
-            if(line.find("#", 0) < line.npos)
-              continue;
-            if(file.eof())
-              break;
-
-            std::string n_z_s;
-
-            std::string::size_type first_digit(line.find_first_not_of(" "));
-            line.erase(0, first_digit);
-            std::string::size_type eol(line.length());
-            for(unsigned long i(0) ; i < eol ; ++i)
-            {
-              n_z_s.append(1, line[i]);
-            }
-
-            DT_ n_z((DT_)atof(n_z_s.c_str()));
-
-            data.push_back(n_z);
-
-          }
-
-          _size() = Index(data.size());
-          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(data.size())));
-          this->_elements_size.push_back(Index(data.size()));
-          Util::MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
-        }
-
-        void _read_from_dv(String filename)
-        {
-          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-          _read_from_dv(file);
-          file.close();
-        }
-
-        void _read_from_dv(std::istream& file)
-        {
-          this->template _deserialise<double, uint64_t>(FileMode::fm_dv, file);
-        }
-
         Index & _size()
         {
           return this->_scalar_index.at(0);
@@ -370,21 +245,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          this->_scalar_index.push_back(0);
-          switch(mode)
-          {
-            case FileMode::fm_mtx:
-              _read_from_mtx(filename);
-              break;
-            case FileMode::fm_exp:
-              _read_from_exp(filename);
-              break;
-            case FileMode::fm_dv:
-              _read_from_dv(filename);
-              break;
-            default:
-              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-          }
+          read_from(mode, filename);
         }
 
         /**
@@ -400,21 +261,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          this->_scalar_index.push_back(0);
-          switch(mode)
-          {
-            case FileMode::fm_mtx:
-              _read_from_mtx(file);
-              break;
-            case FileMode::fm_exp:
-              _read_from_exp(file);
-              break;
-            case FileMode::fm_dv:
-              _read_from_dv(file);
-              break;
-            default:
-              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-          }
+          read_from(mode, file);
         }
 
         /**
@@ -607,6 +454,227 @@ namespace FEAST
           this->template _copy_inv<VT_>(a);
         }
 
+
+        /**
+         * \brief Read in vector from file.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] filename The file that shall be read in.
+         */
+        void read_from(FileMode mode, String filename)
+        {
+          CONTEXT("When reading in DenseVector");
+
+          switch(mode)
+          {
+            case FileMode::fm_mtx:
+              read_from_mtx(filename);
+              break;
+            case FileMode::fm_exp:
+              read_from_exp(filename);
+              break;
+            case FileMode::fm_dv:
+              read_from_dv(filename);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Read in vector from stream.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] file The stream that shall be read in.
+         */
+        void read_from(FileMode mode, std::istream& file)
+        {
+          CONTEXT("When reading in DenseVector");
+
+          switch(mode)
+          {
+            case FileMode::fm_mtx:
+              read_from_mtx(file);
+              break;
+            case FileMode::fm_exp:
+              read_from_exp(file);
+              break;
+            case FileMode::fm_dv:
+              read_from_dv(file);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Read in vector from MatrixMarket mtx file.
+         *
+         * \param[in] filename The file that shall be read in.
+         */
+        void read_from_mtx(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          read_from_mtx(file);
+          file.close();
+        }
+
+        /**
+         * \brief Read in vector from MatrixMarket mtx stream.
+         *
+         * \param[in] file The stream that shall be read in.
+         */
+        void read_from_mtx(std::istream& file)
+        {
+          this->clear();
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+
+          Index rows;
+          String line;
+          std::getline(file, line);
+          if (line.find("%%MatrixMarket matrix array real general") == String::npos)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-vector-file");
+          }
+          while(!file.eof())
+          {
+            std::getline(file,line);
+            if (file.eof())
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+
+            String::size_type begin(line.find_first_not_of(" "));
+            if (line.at(begin) != '%')
+              break;
+          }
+          {
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srows(line, 0, end);
+            rows = (Index)atol(srows.c_str());
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scols(line, 0, end);
+            Index cols((Index)atol(scols.c_str()));
+            line.erase(0, end);
+            if (cols != 1)
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no dense-vector-file");
+          }
+
+          DenseVector<Mem::Main, DT_, IT_> tmp(rows);
+          DT_ * pval(tmp.elements());
+
+          while(!file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              break;
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String sval(line, 0, end);
+            DT_ tval((DT_)atof(sval.c_str()));
+
+            *pval = tval;
+            ++pval;
+          }
+          this->assign(tmp);
+        }
+
+        /**
+         * \brief Read in vector from ASCII file.
+         *
+         * \param[in] filename The file that shall be read in.
+         */
+        void read_from_exp(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          read_from_exp(file);
+          file.close();
+        }
+
+        /**
+         * \brief Read in vector from ASCII stream.
+         *
+         * \param[in] file The stream that shall be read in.
+         */
+        void read_from_exp(std::istream& file)
+        {
+          this->clear();
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+
+          std::vector<DT_> data;
+
+          while(!file.eof())
+          {
+            std::string line;
+            std::getline(file, line);
+            if(line.find("#", 0) < line.npos)
+              continue;
+            if(file.eof())
+              break;
+
+            std::string n_z_s;
+
+            std::string::size_type first_digit(line.find_first_not_of(" "));
+            line.erase(0, first_digit);
+            std::string::size_type eol(line.length());
+            for(unsigned long i(0) ; i < eol ; ++i)
+            {
+              n_z_s.append(1, line[i]);
+            }
+
+            DT_ n_z((DT_)atof(n_z_s.c_str()));
+
+            data.push_back(n_z);
+
+          }
+
+          _size() = Index(data.size());
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(data.size())));
+          this->_elements_size.push_back(Index(data.size()));
+          Util::MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
+        }
+
+        /**
+         * \brief Read in vector from binary file.
+         *
+         * \param[in] filename The file that shall be read in.
+         */
+        void read_from_dv(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          read_from_dv(file);
+          file.close();
+        }
+
+        /**
+         * \brief Read in vector from binary stream.
+         *
+         * \param[in] file The stream that shall be read in.
+         */
+        void read_from_dv(std::istream& file)
+        {
+          this->clear();
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+
+          this->template _deserialise<double, uint64_t>(FileMode::fm_dv, file);
+        }
+
+
         /**
          * \brief Write out vector to file.
          *
@@ -660,7 +728,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Write out matrix to MatrixMarktet mtx file.
+         * \brief Write out vector to MatrixMarket mtx file.
          *
          * \param[in] filename The file where the vector shall be stored.
          */
@@ -674,7 +742,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Write out matrix to MatrixMarktet mtx file.
+         * \brief Write out vector to MatrixMarket mtx file.
          *
          * \param[in] file The stream that shall be written to.
          */
