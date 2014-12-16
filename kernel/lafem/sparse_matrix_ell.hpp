@@ -64,161 +64,6 @@ namespace FEAST
     class SparseMatrixELL : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
     private:
-      void _read_from_mtx(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        _read_from_mtx(file);
-        file.close();
-      }
-
-      void _read_from_mtx(std::istream& file)
-      {
-        std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
-
-        Index trows, tcols, ue(0);
-        String line;
-        std::getline(file, line);
-        const bool general((line.find("%%MatrixMarket matrix coordinate real general") != String::npos) ? true : false);
-        const bool symmetric((line.find("%%MatrixMarket matrix coordinate real symmetric") != String::npos) ? true : false);
-
-        if (symmetric == false && general == false)
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
-        }
-
-        while(!file.eof())
-        {
-          std::getline(file,line);
-          if (file.eof())
-            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
-
-          String::size_type begin(line.find_first_not_of(" "));
-          if (line.at(begin) != '%')
-            break;
-        }
-        {
-          String::size_type begin(line.find_first_not_of(" "));
-          line.erase(0, begin);
-          String::size_type end(line.find_first_of(" "));
-          String srow(line, 0, end);
-          trows = Index(atol(srow.c_str()));
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String scol(line, 0, end);
-          tcols = Index(atol(scol.c_str()));
-          line.erase(0, end);
-        }
-
-        while(!file.eof())
-        {
-          std::getline(file, line);
-          if (file.eof())
-            break;
-
-          String::size_type begin(line.find_first_not_of(" "));
-          line.erase(0, begin);
-          String::size_type end(line.find_first_of(" "));
-          String srow(line, 0, end);
-          IT_ row((IT_)atol(srow.c_str()));
-          --row;
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String scol(line, 0, end);
-          IT_ col((IT_)atol(scol.c_str()));
-          --col;
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String sval(line, 0, end);
-          DT_ tval((DT_)atof(sval.c_str()));
-
-          entries[IT_(row)].insert(std::pair<IT_, DT_>(col, tval));
-          ++ue;
-          if (symmetric == true && row != col)
-          {
-            entries[IT_(col)].insert(std::pair<IT_, DT_>(row, tval));
-            ++ue;
-          }
-        }
-
-        const IT_ tC(IT_(this->_C()));
-        const Index tnum_of_chunks((trows + tC - Index(1)) / tC);
-
-        LAFEM::DenseVector<Mem::Main, IT_, IT_> tcl(tnum_of_chunks, IT_(0));
-        IT_ * ptcl(tcl.elements());
-        LAFEM::DenseVector<Mem::Main, IT_, IT_> tcs(tnum_of_chunks + 1);
-        IT_ * ptcs(tcs.elements());
-        LAFEM::DenseVector<Mem::Main, IT_, IT_> trl(trows);
-        IT_ * ptrl(trl.elements());
-
-        for (IT_ i(0); i < trows; ++i)
-        {
-          ptrl[i] = IT_(entries[i].size());
-          if (ptrl[i] > ptcl[i/tC])
-            ptcl[i/tC] = IT_(ptrl[i]);
-        }
-
-        ptcs[0] = IT_(0);
-        for (Index i(0); i < tnum_of_chunks; ++i)
-        {
-          ptcs[i+1] = ptcs[i] + IT_(tC) * ptcl[i];
-        }
-
-        Index tval_size = Index(ptcs[tnum_of_chunks]);
-
-        LAFEM::DenseVector<Mem::Main, IT_, IT_> tcol_ind(tval_size);
-        IT_ * ptcol_ind(tcol_ind.elements());
-        LAFEM::DenseVector<Mem::Main, DT_, IT_> tval(tval_size);
-        DT_ * ptval(tval.elements());
-
-        IT_ row_idx(0);
-        for (auto row : entries)
-        {
-          IT_ idx(ptcs[row_idx/tC] + row_idx%tC);
-
-          for (auto col : row.second)
-          {
-            ptcol_ind[idx] = col.first;
-            ptval    [idx] = col.second;
-            idx += tC;
-          }
-          for (; idx < ptcs[row_idx/tC + 1]; idx += tC)
-          {
-            ptcol_ind[idx] = IT_(0);
-            ptval    [idx] = DT_(0);
-          }
-          ++row_idx;
-        }
-
-        _init_padded_elements<Mem::Main, Mem::Main>(ptval, ptcol_ind, ptcs, trows, tnum_of_chunks, tC);
-
-        this->assign(SparseMatrixELL<Mem::Main, DT_, IT_>(trows, tcols, ue, tval, tcol_ind, tcs, tcl, trl, tC));
-      }
-
-      void _read_from_ell(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        _read_from_ell(file);
-        file.close();
-      }
-
-      void _read_from_ell(std::istream& file)
-      {
-        this->template _deserialise<double, uint64_t>(FileMode::fm_ell, file);
-      }
-
       Index & _size()
       {
         return this->_scalar_index.at(0);
@@ -526,18 +371,8 @@ namespace FEAST
       {
         CONTEXT("When creating SparseMatrixELL");
 
-        switch(mode)
-        {
-          case FileMode::fm_mtx:
-            this->assign(SparseMatrixELL(C_in));
-            _read_from_mtx(filename);
-            break;
-          case FileMode::fm_ell:
-            _read_from_ell(filename);
-            break;
-          default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        this->assign(SparseMatrixELL(C_in));
+        read_from(mode, filename);
       }
 
       /**
@@ -554,18 +389,8 @@ namespace FEAST
       {
         CONTEXT("When creating SparseMatrixELL");
 
-        switch(mode)
-        {
-          case FileMode::fm_mtx:
-            this->assign(SparseMatrixELL(C_in));
-            _read_from_mtx(file);
-            break;
-          case FileMode::fm_ell:
-            _read_from_ell(file);
-            break;
-          default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode nggot supported!");
-        }
+        this->assign(SparseMatrixELL(C_in));
+        read_from(mode, file);
       }
 
       /**
@@ -1143,6 +968,238 @@ namespace FEAST
       std::vector<char> serialise()
       {
         return this->template _serialise<DT2_, IT2_>(FileMode::fm_ell);
+      }
+
+      /**
+       * \brief Read in matrix from file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from(FileMode mode, String filename)
+      {
+        CONTEXT("When reading in SparseMatrixELL");
+
+        switch(mode)
+        {
+          case FileMode::fm_mtx:
+            read_from_mtx(filename);
+            break;
+          case FileMode::fm_ell:
+            read_from_ell(filename);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Read in matrix from stream.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from(FileMode mode, std::istream& file)
+      {
+        CONTEXT("When reading in SparseMatrixELL");
+
+        switch(mode)
+        {
+          case FileMode::fm_mtx:
+            read_from_mtx(file);
+            break;
+          case FileMode::fm_ell:
+            read_from_ell(file);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Read in matrix from MatrixMarket mtx file.
+       *
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from_mtx(String filename)
+      {
+        IT_ ttC(this->C());
+        this->clear();
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(ttC);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+        this->_scalar_dt.push_back(DT_(0));
+
+        std::ifstream file(filename.c_str(), std::ifstream::in);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        read_from_mtx(file);
+        file.close();
+      }
+
+      /**
+       * \brief Read in matrix from MatrixMarket mtx stream.
+       *
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from_mtx(std::istream& file)
+      {
+        std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
+
+        Index trows, tcols, ue(0);
+        String line;
+        std::getline(file, line);
+        const bool general((line.find("%%MatrixMarket matrix coordinate real general") != String::npos) ? true : false);
+        const bool symmetric((line.find("%%MatrixMarket matrix coordinate real symmetric") != String::npos) ? true : false);
+
+        if (symmetric == false && general == false)
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
+        }
+
+        while(!file.eof())
+        {
+          std::getline(file,line);
+          if (file.eof())
+            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+
+          String::size_type begin(line.find_first_not_of(" "));
+          if (line.at(begin) != '%')
+            break;
+        }
+        {
+          String::size_type begin(line.find_first_not_of(" "));
+          line.erase(0, begin);
+          String::size_type end(line.find_first_of(" "));
+          String srow(line, 0, end);
+          trows = Index(atol(srow.c_str()));
+          line.erase(0, end);
+
+          begin = line.find_first_not_of(" ");
+          line.erase(0, begin);
+          end = line.find_first_of(" ");
+          String scol(line, 0, end);
+          tcols = Index(atol(scol.c_str()));
+          line.erase(0, end);
+        }
+
+        while(!file.eof())
+        {
+          std::getline(file, line);
+          if (file.eof())
+            break;
+
+          String::size_type begin(line.find_first_not_of(" "));
+          line.erase(0, begin);
+          String::size_type end(line.find_first_of(" "));
+          String srow(line, 0, end);
+          IT_ row((IT_)atol(srow.c_str()));
+          --row;
+          line.erase(0, end);
+
+          begin = line.find_first_not_of(" ");
+          line.erase(0, begin);
+          end = line.find_first_of(" ");
+          String scol(line, 0, end);
+          IT_ col((IT_)atol(scol.c_str()));
+          --col;
+          line.erase(0, end);
+
+          begin = line.find_first_not_of(" ");
+          line.erase(0, begin);
+          end = line.find_first_of(" ");
+          String sval(line, 0, end);
+          DT_ tval((DT_)atof(sval.c_str()));
+
+          entries[IT_(row)].insert(std::pair<IT_, DT_>(col, tval));
+          ++ue;
+          if (symmetric == true && row != col)
+          {
+            entries[IT_(col)].insert(std::pair<IT_, DT_>(row, tval));
+            ++ue;
+          }
+        }
+
+        const IT_ tC(IT_(this->_C()));
+        const Index tnum_of_chunks((trows + tC - Index(1)) / tC);
+
+        LAFEM::DenseVector<Mem::Main, IT_, IT_> tcl(tnum_of_chunks, IT_(0));
+        IT_ * ptcl(tcl.elements());
+        LAFEM::DenseVector<Mem::Main, IT_, IT_> tcs(tnum_of_chunks + 1);
+        IT_ * ptcs(tcs.elements());
+        LAFEM::DenseVector<Mem::Main, IT_, IT_> trl(trows);
+        IT_ * ptrl(trl.elements());
+
+        for (IT_ i(0); i < trows; ++i)
+        {
+          ptrl[i] = IT_(entries[i].size());
+          if (ptrl[i] > ptcl[i/tC])
+            ptcl[i/tC] = IT_(ptrl[i]);
+        }
+
+        ptcs[0] = IT_(0);
+        for (Index i(0); i < tnum_of_chunks; ++i)
+        {
+          ptcs[i+1] = ptcs[i] + IT_(tC) * ptcl[i];
+        }
+
+        Index tval_size = Index(ptcs[tnum_of_chunks]);
+
+        LAFEM::DenseVector<Mem::Main, IT_, IT_> tcol_ind(tval_size);
+        IT_ * ptcol_ind(tcol_ind.elements());
+        LAFEM::DenseVector<Mem::Main, DT_, IT_> tval(tval_size);
+        DT_ * ptval(tval.elements());
+
+        IT_ row_idx(0);
+        for (auto row : entries)
+        {
+          IT_ idx(ptcs[row_idx/tC] + row_idx%tC);
+
+          for (auto col : row.second)
+          {
+            ptcol_ind[idx] = col.first;
+            ptval    [idx] = col.second;
+            idx += tC;
+          }
+          for (; idx < ptcs[row_idx/tC + 1]; idx += tC)
+          {
+            ptcol_ind[idx] = IT_(0);
+            ptval    [idx] = DT_(0);
+          }
+          ++row_idx;
+        }
+
+        _init_padded_elements<Mem::Main, Mem::Main>(ptval, ptcol_ind, ptcs, trows, tnum_of_chunks, tC);
+
+        this->assign(SparseMatrixELL<Mem::Main, DT_, IT_>(trows, tcols, ue, tval, tcol_ind, tcs, tcl, trl, tC));
+      }
+
+      /**
+       * \brief Read in matrix from binary file.
+       *
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from_ell(String filename)
+      {
+        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        read_from_ell(file);
+        file.close();
+      }
+
+      /**
+       * \brief Read in matrix from binary stream.
+       *
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from_ell(std::istream& file)
+      {
+        this->template _deserialise<double, uint64_t>(FileMode::fm_ell, file);
       }
 
       /**
