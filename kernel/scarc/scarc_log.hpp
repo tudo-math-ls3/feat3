@@ -38,8 +38,8 @@ namespace FEAST
                         1,
                         c);
 
-        ST_<Foundation::Request, std::allocator<Foundation::Request> >recv_req;
-        ST_<Foundation::Request, std::allocator<Foundation::Request> >send_req;
+        ST_<Foundation::Request, std::allocator<Foundation::Request> >recv_req(Foundation::Comm::size(c));
+        ST_<Foundation::Request, std::allocator<Foundation::Request> >send_req(Foundation::Comm::size(c));
         ST_<Foundation::Status, std::allocator<Foundation::Status> >recv_stat;
         ST_<Foundation::Status, std::allocator<Foundation::Status> >send_stat;
         char** recvbufs = new char*[Foundation::Comm::size(c)];
@@ -49,8 +49,6 @@ namespace FEAST
         {
           Foundation::Status rs;
           recv_stat.push_back(std::move(rs));
-          Foundation::Request rr;
-          recv_req.push_back(std::move(rr));
           recvbufs[i] = new char[len_rb[i]];
 
           Foundation::Comm::irecv(recvbufs[i],
@@ -65,8 +63,6 @@ namespace FEAST
         {
           Foundation::Status ss;
           send_stat.push_back(std::move(ss));
-          Foundation::Request sr;
-          send_req.push_back(std::move(sr));
           std::copy(msg.c_str(), msg.c_str() + len_sb, sendbuf);
 
           Foundation::Comm::isend(sendbuf,
@@ -108,6 +104,13 @@ namespace FEAST
         {
           delete[] recvbufs[i];
         }
+
+        for(Index i(0) ; i < send_req.size() ; ++i)
+        {
+          Foundation::Status ws;
+          Foundation::Comm::wait(send_req.at(i), ws);
+        }
+
         delete[] recvbufs;
         delete[] sendbuf;
         delete[] recvflags;

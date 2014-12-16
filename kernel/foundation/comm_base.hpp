@@ -121,6 +121,14 @@ namespace FEAST
           return _r;
         }
 
+        virtual ~Request()
+        {
+          if(_r != MPI_REQUEST_NULL)
+          {
+            MPI_Request_free(&_r);
+          }
+        }
+
       private:
         MPI_Request _r;
     };

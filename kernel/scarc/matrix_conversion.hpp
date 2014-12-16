@@ -38,8 +38,8 @@ namespace FEAST
         ST_<std::vector<char>, std::allocator<std::vector<char> > > recv_buf;
         ST_<std::vector<char>, std::allocator<std::vector<char> > > send_buf;
 
-        ST_<Foundation::Request, std::allocator<Foundation::Request> > recvrequests;
-        ST_<Foundation::Request, std::allocator<Foundation::Request> > sendrequests;
+        ST_<Foundation::Request, std::allocator<Foundation::Request> > recvrequests(vec_mirrors.size());
+        ST_<Foundation::Request, std::allocator<Foundation::Request> > sendrequests(vec_mirrors.size());
 
         ST_<Foundation::Status, std::allocator<Foundation::Status> > recvstatus;
         ST_<Foundation::Status, std::allocator<Foundation::Status> > sendstatus;
@@ -57,10 +57,8 @@ namespace FEAST
         for(Index i(0) ; i < vec_mirrors.size() ; ++i)
         {
 
-          Foundation::Request rr;
           Foundation::Status rs;
 
-          recvrequests.push_back(rr);
           recvstatus.push_back(rs);
 
           recv_buf.push_back(std::vector<char>(send_buf.at(i).size()));
@@ -77,10 +75,8 @@ namespace FEAST
 
         for(Index i(0) ; i < vec_mirrors.size() ; ++i)
         {
-          Foundation::Request sr;
           Foundation::Status ss;
 
-          sendrequests.push_back(sr);
           sendstatus.push_back(ss);
 
           Foundation::Comm::isend(send_buf.at(i).data(),

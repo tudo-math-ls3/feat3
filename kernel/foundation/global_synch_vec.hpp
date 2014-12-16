@@ -40,14 +40,12 @@ namespace FEAST
             ///assumes type-0 vector (entry fractions at inner boundaries)
 
             ///start recv
-            StorageT_<Request, std::allocator<Request> > recvrequests;
+            StorageT_<Request, std::allocator<Request> > recvrequests(mirrors.size());
             StorageT_<Status, std::allocator<Status> > recvstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
-              Request rr;
               Status rs;
 
-              recvrequests.push_back(std::move(rr));
               recvstatus.push_back(std::move(rs));
 
               Comm::irecv(recvbufs.at(i).elements(),
@@ -61,16 +59,14 @@ namespace FEAST
             }
 
             ///gather and start send
-            StorageT_<Request, std::allocator<Request> > sendrequests;
+            StorageT_<Request, std::allocator<Request> > sendrequests(mirrors.size());
             StorageT_<Status, std::allocator<Status> > sendstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
               mirrors.at(i).template gather_dual<Algo_>(sendbufs.at(i), target);
 
-              Request sr;
               Status ss;
 
-              sendrequests.push_back(std::move(sr));
               sendstatus.push_back(std::move(ss));
 
               Comm::isend(sendbufs.at(i).elements(),
@@ -164,14 +160,12 @@ namespace FEAST
             ///assumes type-1 vector (full entries at inner boundaries)
 
             ///start recv
-            StorageT_<Request, std::allocator<Request> > recvrequests;
+            StorageT_<Request, std::allocator<Request> > recvrequests(mirrors.size());
             StorageT_<Status, std::allocator<Status> > recvstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
-              Request rr;
               Status rs;
 
-              recvrequests.push_back(std::move(rr));
               recvstatus.push_back(std::move(rs));
 
               Comm::irecv(recvbufs.at(i).elements(),
@@ -184,16 +178,14 @@ namespace FEAST
             }
 
             ///gather and start send
-            StorageT_<Request, std::allocator<Request> > sendrequests;
+            StorageT_<Request, std::allocator<Request> > sendrequests(mirrors.size());
             StorageT_<Status, std::allocator<Status> > sendstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
               mirrors.at(i).template gather_dual<Algo_>(sendbufs.at(i), target);
 
-              Request sr;
               Status ss;
 
-              sendrequests.push_back(std::move(sr));
               sendstatus.push_back(std::move(ss));
 
               Comm::isend(sendbufs.at(i).elements(),
