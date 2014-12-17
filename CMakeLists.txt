@@ -61,7 +61,6 @@ if(DOXYGEN_FOUND)
     )
 endif(DOXYGEN_FOUND)
 
-
 # directories to scan recursively
 ADD_SUBDIRECTORY( thirdparty )
 ADD_SUBDIRECTORY( kernel )
