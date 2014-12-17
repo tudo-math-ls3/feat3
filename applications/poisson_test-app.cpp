@@ -680,10 +680,11 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   ///now we must send the mirror to rank 0 -> VM must implement foundation's sendable/bufferable interfaces -> TODO
   ///alternatively, we can create all needed subsets again on rank 0 and only communicate sol
   ///TODO send data.sol to rank 0
-  if(rank == 0)
+
+  ///TODO receive sol and mirror, scatter into global solution
+  /*if(rank == 0)
   {
-    ///TODO receive sol and mirror, scatter into global solution
-  }
+  }*/
 
   delete macro_basemesh;
 }
