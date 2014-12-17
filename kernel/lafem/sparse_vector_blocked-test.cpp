@@ -59,6 +59,13 @@ public:
     TEST_CHECK_EQUAL(a, b);
     a(2, tv2);
     TEST_CHECK_NOT_EQUAL(a, b);
+
+    //increase vector size above alloc_increment
+    SparseVectorBlocked<Mem_, DT_, IT_, 2> c(a.alloc_increment() * 3 + 1);
+    for (Index i(1) ; i <= c.size() ; ++i)
+    {
+      c(c.size() - i, tv1);
+    }
   }
 };
 SparseVectorBlockedTest<Mem::Main, NotSet, float, Index> cpu_sparse_vector_blocked_test_float;

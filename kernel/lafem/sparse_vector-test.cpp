@@ -93,6 +93,13 @@ public:
     SparseVector<Mem_, DT_, IT_> o(op);
     for (Index i(0) ; i < b.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(o(i), b(i), 1e-5);
+
+    //increase vector size above alloc_increment
+    SparseVector<Mem_, DT_, IT_> p(3 * a.alloc_increment() + 1);
+    for (Index i(1) ; i <= p.size() ; ++i)
+    {
+      p(p.size() - i, DT_(i));
+    }
   }
 };
 SparseVectorTest<Mem::Main, NotSet, float, Index> cpu_sparse_vector_test_float;
