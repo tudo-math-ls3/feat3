@@ -45,6 +45,10 @@ public:
     dv3(1, IT_(1));
     dv3(2, IT_(2));
     SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
+
+    TEST_CHECK_EQUAL(c(1,0)(0,0), DT_(0));
+    TEST_CHECK_EQUAL(c(1,1)(1,1), DT_(11));
+
     SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> d;
     d.convert(c);
     TEST_CHECK_EQUAL(d.rows(), c.rows());
