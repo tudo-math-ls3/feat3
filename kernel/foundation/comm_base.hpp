@@ -133,6 +133,33 @@ namespace FEAST
         MPI_Request _r;
     };
 
+    template<template<typename, typename> class ST_>
+    class RequestSeq
+    {
+      public:
+        RequestSeq(Index size) :
+          _data(ST_<MPI_Request, std::allocator<MPI_Request> >(size))
+        {
+        }
+
+        MPI_Request* mpi_requests()
+        {
+          return _data.data();
+        }
+
+        virtual ~RequestSeq()
+        {
+          for(auto& r : _data)
+            if(r != MPI_REQUEST_NULL)
+            {
+              MPI_Request_free(&r);
+            }
+        }
+
+      private:
+        ST_<MPI_Request, std::allocator<MPI_Request> > _data;
+    };
+
     class Status
     {
       public:
@@ -148,6 +175,24 @@ namespace FEAST
 
       private:
         MPI_Status _s;
+    };
+
+    template<template<typename, typename> class ST_>
+    class StatusSeq
+    {
+      public:
+        StatusSeq(Index size) :
+          _data(ST_<MPI_Status, std::allocator<MPI_Status> >(size))
+        {
+        }
+
+        MPI_Status* mpi_statuses()
+        {
+          return _data.data();
+        }
+
+      private:
+        ST_<MPI_Status, std::allocator<MPI_Status> > _data;
     };
 
       class Comm
@@ -248,6 +293,12 @@ namespace FEAST
           static inline void wait(Request& r, Status& s)
           {
             MPI_Wait(&(r.mpi_request()), &(s.mpi_status()));
+          }
+
+          template<template<typename, typename> class ST_>
+          static inline void waitall(RequestSeq<ST_>& r, StatusSeq<ST_>& s)
+          {
+            MPI_Waitall(r.size(), r.mpi_requests(), s.mpi_statuses());
           }
 
           static inline void test(Request& r, int& flag, Status& s)
