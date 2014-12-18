@@ -79,20 +79,6 @@ namespace FEAST
     class SparseMatrixBanded : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
     private:
-      void _read_from_bm(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        _read_from_bm(file);
-        file.close();
-      }
-
-      void _read_from_bm(std::istream& file)
-      {
-        this->template _deserialise<double, uint64_t>(FileMode::fm_bm, file);
-      }
-
       Index & _size()
       {
         return this->_scalar_index.at(0);
@@ -313,6 +299,22 @@ namespace FEAST
        * \brief Constructor
        *
        * \param[in] mode The used file format.
+       * \param[in] filename The source file.
+       *
+       * Creates a banded matrix based on the source filestream.
+       */
+      explicit SparseMatrixBanded(FileMode mode, String filename) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        CONTEXT("When creating SparseMatrixBanded");
+
+        read_from(mode, filename);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
        * \param[in] file The source filestream.
        *
        * Creates a banded matrix based on the source filestream.
@@ -322,14 +324,7 @@ namespace FEAST
       {
         CONTEXT("When creating SparseMatrixBanded");
 
-        switch(mode)
-        {
-          case FileMode::fm_bm:
-            _read_from_bm(file);
-            break;
-          default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-        }
+        read_from(mode, file);
       }
 
       /**
@@ -849,6 +844,70 @@ namespace FEAST
       std::vector<char> serialise()
       {
         return this->template _serialise<DT2_, IT2_>(FileMode::fm_bm);
+      }
+
+      /**
+       * \brief Read in matrix from file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from(FileMode mode, String filename)
+      {
+        CONTEXT("When reading in SparseMatrixELL");
+
+        switch(mode)
+        {
+        case FileMode::fm_bm:
+          read_from_bm(filename);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Read in matrix from stream.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from(FileMode mode, std::istream& file)
+      {
+        CONTEXT("When reading in SparseMatrixELL");
+
+        switch(mode)
+        {
+        case FileMode::fm_bm:
+          read_from_bm(file);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Read in matrix from binary file.
+       *
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from_bm(String filename)
+      {
+        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+        read_from_bm(file);
+        file.close();
+      }
+
+      /**
+       * \brief Read in matrix from binary stream.
+       *
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from_bm(std::istream& file)
+      {
+        this->template _deserialise<double, uint64_t>(FileMode::fm_bm, file);
       }
 
       /// Returns a new compatible L-Vector.
