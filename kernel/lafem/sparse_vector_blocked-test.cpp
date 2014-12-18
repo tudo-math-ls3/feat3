@@ -61,7 +61,7 @@ public:
     TEST_CHECK_NOT_EQUAL(a, b);
 
     //increase vector size above alloc_increment
-    SparseVectorBlocked<Mem_, DT_, IT_, 2> c(a.alloc_increment() * 3 + 1);
+    SparseVectorBlocked<Mem_, DT_, IT_, 2> c(1001);
     for (Index i(1) ; i <= c.size() ; ++i)
     {
       c(c.size() - i, tv1);
