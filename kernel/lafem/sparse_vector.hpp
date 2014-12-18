@@ -41,100 +41,6 @@ namespace FEAST
     class SparseVector : public Container<Mem_, DT_, IT_>, public VectorBase
     {
       private:
-        void _read_from_mtx(String filename)
-        {
-          std::ifstream file(filename.c_str(), std::ifstream::in);
-          if (! file.is_open())
-            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
-          _read_from_mtx(file);
-          file.close();
-        }
-
-        void _read_from_mtx(std::istream& file)
-        {
-          Index rows;
-          Index nnz;
-          String line;
-          std::getline(file, line);
-          if (line.find("%%MatrixMarket matrix coordinate real general") == String::npos)
-          {
-            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
-          }
-          while(!file.eof())
-          {
-            std::getline(file,line);
-            if (file.eof())
-              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
-
-            String::size_type begin(line.find_first_not_of(" "));
-            if (line.at(begin) != '%')
-              break;
-          }
-          {
-            String::size_type begin(line.find_first_not_of(" "));
-            line.erase(0, begin);
-            String::size_type end(line.find_first_of(" "));
-            String srows(line, 0, end);
-            rows = (Index)atol(srows.c_str());
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String scols(line, 0, end);
-            Index cols((Index)atol(scols.c_str()));
-            line.erase(0, end);
-            if (cols != 1)
-              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no sparse-vector-file");
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String snnz(line, 0, end);
-            nnz = (Index)atol(snnz.c_str());
-            line.erase(0, end);
-          }
-
-          DenseVector<Mem::Main, IT_, IT_> ind(nnz);
-          DenseVector<Mem::Main, DT_, IT_> val(nnz);
-
-          IT_ * pind(ind.elements());
-          DT_ * pval(val.elements());
-
-          while(!file.eof())
-          {
-            std::getline(file, line);
-            if (file.eof())
-              break;
-
-            String::size_type begin(line.find_first_not_of(" "));
-            line.erase(0, begin);
-            String::size_type end(line.find_first_of(" "));
-            String srow(line, 0, end);
-            IT_ row((IT_)atol(srow.c_str()));
-            --row;
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String sval(line, 0, end);
-            DT_ tval((DT_)atof(sval.c_str()));
-
-            *pval = tval;
-            *pind = row;
-            ++pval;
-            ++pind;
-          }
-          SparseVector<Mem::Main, DT_, IT_> tmp(rows, val, ind, false);
-          this->assign(tmp);
-        }
-
         template <typename T1_, typename T2_>
         static void _insertion_sort(T1_ * key, T2_ * val1, Index size)
         {
@@ -290,14 +196,7 @@ namespace FEAST
         {
           CONTEXT("When creating SparseVector");
 
-          switch(mode)
-          {
-            case FileMode::fm_mtx:
-              _read_from_mtx(filename);
-              break;
-            default:
-              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-          }
+          read_from(mode, filename);
         }
 
         /**
@@ -313,14 +212,7 @@ namespace FEAST
         {
           CONTEXT("When creating SparseVector");
 
-          switch(mode)
-          {
-            case FileMode::fm_mtx:
-              _read_from_mtx(file);
-              break;
-            default:
-              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
-          }
+          read_from(mode, file);
         }
 
         /**
@@ -570,6 +462,147 @@ namespace FEAST
         std::vector<char> serialise()
         {
           return this->template _serialise<DT2_, IT2_>(FileMode::fm_sv);
+        }
+
+      /**
+       * \brief Read in vector from file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from(FileMode mode, String filename)
+      {
+        CONTEXT("When reading in SparseVector");
+
+        switch(mode)
+        {
+          case FileMode::fm_mtx:
+            read_from_mtx(filename);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Read in vector from stream.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from(FileMode mode, std::istream& file)
+      {
+        CONTEXT("When reading in SparseVector");
+
+        switch(mode)
+        {
+          case FileMode::fm_mtx:
+            read_from_mtx(file);
+            break;
+          default:
+            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+        void read_from_mtx(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+          read_from_mtx(file);
+          file.close();
+        }
+
+        void read_from_mtx(std::istream& file)
+        {
+          this->clear();
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(Math::min<Index>(0, 1000));
+          this->_scalar_index.push_back(1);
+          this->_scalar_dt.push_back(DT_(0));
+
+          Index rows;
+          Index nnz;
+          String line;
+          std::getline(file, line);
+          if (line.find("%%MatrixMarket matrix coordinate real general") == String::npos)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-file");
+          }
+          while(!file.eof())
+          {
+            std::getline(file,line);
+            if (file.eof())
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+
+            String::size_type begin(line.find_first_not_of(" "));
+            if (line.at(begin) != '%')
+              break;
+          }
+          {
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srows(line, 0, end);
+            rows = (Index)atol(srows.c_str());
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scols(line, 0, end);
+            Index cols((Index)atol(scols.c_str()));
+            line.erase(0, end);
+            if (cols != 1)
+              throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no sparse-vector-file");
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String snnz(line, 0, end);
+            nnz = (Index)atol(snnz.c_str());
+            line.erase(0, end);
+          }
+
+          DenseVector<Mem::Main, IT_, IT_> ind(nnz);
+          DenseVector<Mem::Main, DT_, IT_> val(nnz);
+
+          IT_ * pind(ind.elements());
+          DT_ * pval(val.elements());
+
+          while(!file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              break;
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            IT_ row((IT_)atol(srow.c_str()));
+            --row;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ tval((DT_)atof(sval.c_str()));
+
+            *pval = tval;
+            *pind = row;
+            ++pval;
+            ++pind;
+          }
+          SparseVector<Mem::Main, DT_, IT_> tmp(rows, val, ind, false);
+          this->assign(tmp);
         }
 
         /**
