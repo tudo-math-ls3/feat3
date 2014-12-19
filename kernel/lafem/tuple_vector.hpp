@@ -36,10 +36,10 @@ namespace FEAST
     public:
       /// dummy enum
       enum
-      {
-        /// number of vector blocks
-        num_blocks = TupleVector<Rest_...>::num_blocks + 1
-      };
+        {
+          /// number of vector blocks
+          num_blocks = TupleVector<Rest_...>::num_blocks + 1
+        };
 
 
       /// sub-vector mem-type
@@ -67,11 +67,11 @@ namespace FEAST
 
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
-        "sub-vectors have different mem-types");
+                    "sub-vectors have different mem-types");
       static_assert(std::is_same<DataType, typename RestClass::DataType>::value,
-        "sub-vectors have different data-types");
+                    "sub-vectors have different data-types");
       static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value,
-        "sub-vectors have different index-types");
+                    "sub-vectors have different index-types");
 
     protected:
       /// the first sub-vector
@@ -340,9 +340,9 @@ namespace FEAST
 
     public:
       enum
-      {
-        num_blocks = 1
-      };
+        {
+          num_blocks = 1
+        };
       typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;

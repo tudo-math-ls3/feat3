@@ -54,9 +54,9 @@ namespace FEAST
 
       /// number of vector blocks
       enum
-      {
-        num_blocks = count_
-      };
+        {
+          num_blocks = count_
+        };
 
     protected:
       /// the first sub-vector
@@ -437,9 +437,9 @@ namespace FEAST
       using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, Index(1)>;
 
       enum
-      {
-        num_blocks = 1
-      };
+        {
+          num_blocks = 1
+        };
 
     protected:
       SubVectorType _first;

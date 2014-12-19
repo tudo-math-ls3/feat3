@@ -17,23 +17,23 @@ namespace FEAST
       template <typename Mem_, typename Algo_, typename VectorT_>
       class SynchVec0GatewayBase
       {
-        public:
-          virtual VectorT_& value(VectorT_& x) const = 0;
+      public:
+        virtual VectorT_& value(VectorT_& x) const = 0;
 
-          virtual ~SynchVec0GatewayBase()
-          {
-          }
+        virtual ~SynchVec0GatewayBase()
+        {
+        }
       };
 
       template <typename Mem_, typename Algo_, typename VectorT_>
       class SynchVec1GatewayBase
       {
-        public:
-          virtual VectorT_& value(VectorT_& x) const = 0;
+      public:
+        virtual VectorT_& value(VectorT_& x) const = 0;
 
-          virtual ~SynchVec1GatewayBase()
-          {
-          }
+        virtual ~SynchVec1GatewayBase()
+        {
+        }
       };
     } // namespace Arch
   } // namespace LAFEM

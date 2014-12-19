@@ -54,7 +54,7 @@ namespace FEAST
       extern template void Defect<Mem::Main, Algo::Generic>::banded(double *, const double * const, const double * const, const Index * const, const double * const, const Index, const Index, const Index);
 
       template <>
-        struct Defect<Mem::Main, Algo::MKL>
+      struct Defect<Mem::Main, Algo::MKL>
       {
         static void csr(float * r, const float * const rhs, const float * const val, const Index * const col_ind, const Index * const row_ptr, const float * const x, const Index rows, const Index, const Index);
         static void csr(double * r, const double * const rhs, const double * const val, const Index * const col_ind, const Index * const row_ptr, const double * const x, const Index rows, const Index, const Index);

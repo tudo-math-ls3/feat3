@@ -33,9 +33,9 @@ namespace FEAST
      *
      * This class template implements a meta container for saddle-point matrices:
      * \verbatim
-       / A B \
-       \ D 0 /
-       \endverbatim
+     / A B \
+     \ D 0 /
+     \endverbatim
      * where
      *  - \e A is an n-by-n (meta) matrix
      *  - \e B is an n-by-m (meta) matrix
@@ -68,19 +68,19 @@ namespace FEAST
 
       // ensure that all matrices have the same mem- and data-types
       static_assert(std::is_same<typename MatrixA_::MemType, typename MatrixB_::MemType>::value,
-        "A and B have different mem-types");
+                    "A and B have different mem-types");
       static_assert(std::is_same<typename MatrixA_::MemType, typename MatrixD_::MemType>::value,
-        "A and D have different mem-types");
+                    "A and D have different mem-types");
       static_assert(std::is_same<typename MatrixA_::DataType, typename MatrixB_::DataType>::value,
-        "A and B have different data-types");
+                    "A and B have different data-types");
       static_assert(std::is_same<typename MatrixA_::DataType, typename MatrixD_::DataType>::value,
-        "A and D have different data-types");
+                    "A and D have different data-types");
 
       // ensure that the compatible vector types are the same
       static_assert(std::is_same<typename MatrixA_::VectorTypeL, typename MatrixB_::VectorTypeL>::value,
-        "A and B have different compatible L-vectors");
+                    "A and B have different compatible L-vectors");
       static_assert(std::is_same<typename MatrixA_::VectorTypeR, typename MatrixD_::VectorTypeR>::value,
-        "A and D have different compatible R-vectors");
+                    "A and D have different compatible R-vectors");
 
       /// memory type
       typedef typename MatrixTypeA::MemType MemType;
@@ -101,12 +101,12 @@ namespace FEAST
 
       /// dummy enum
       enum
-      {
-        /// number of row blocks (vertical size)
-        num_row_blocks = 2,
-        /// number of column blocks (horizontal size)
-        num_col_blocks = 2
-      };
+        {
+          /// number of row blocks (vertical size)
+          num_row_blocks = 2,
+          /// number of column blocks (horizontal size)
+          num_col_blocks = 2
+        };
 
     protected:
       /// sub-matrix A
@@ -129,9 +129,9 @@ namespace FEAST
        * The three sub-matrices which are to be inserted.
        */
       explicit SaddlePointMatrix(
-        MatrixTypeA&& matrix_a,
-        MatrixTypeB&& matrix_b,
-        MatrixTypeD&& matrix_d) :
+                                 MatrixTypeA&& matrix_a,
+                                 MatrixTypeB&& matrix_b,
+                                 MatrixTypeD&& matrix_d) :
         _matrix_a(std::move(matrix_a)),
         _matrix_b(std::move(matrix_b)),
         _matrix_d(std::move(matrix_d))

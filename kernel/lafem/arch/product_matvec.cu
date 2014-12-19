@@ -24,7 +24,7 @@ namespace FEAST
     {
       template <typename DT_>
       __global__ void cuda_product_matvec_csr(DT_ * r, const DT_ * b, const DT_ * val, const unsigned long * col_ind,
-          const unsigned long * row_ptr, const Index count)
+                                              const unsigned long * row_ptr, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
@@ -40,28 +40,28 @@ namespace FEAST
       }
 
       void cusparse_product_matvec_csr(cusparseOperation_t trans,
-          int m, int n, int nnz,
-          const float * alpha, const cusparseMatDescr_t descrA,
-          const float * csrVal, const int * csrRowPtr, const int *csrColInd,
-          const float * x, const float * beta, float * y)
+                                       int m, int n, int nnz,
+                                       const float * alpha, const cusparseMatDescr_t descrA,
+                                       const float * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       const float * x, const float * beta, float * y)
       {
         cusparseScsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
-            csrColInd, x, beta, y);
+                       csrColInd, x, beta, y);
       }
 
       void cusparse_product_matvec_csr(cusparseOperation_t trans,
-          int m, int n, int nnz,
-          const double * alpha, const cusparseMatDescr_t descrA,
-          const double * csrVal, const int * csrRowPtr, const int *csrColInd,
-          const double * x, const double * beta, double * y)
+                                       int m, int n, int nnz,
+                                       const double * alpha, const cusparseMatDescr_t descrA,
+                                       const double * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       const double * x, const double * beta, double * y)
       {
         cusparseDcsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
-            csrColInd, x, beta, y);
+                       csrColInd, x, beta, y);
       }
 
       template <typename DT_, typename IT_>
       __global__ void cuda_product_matvec_ell(DT_ * r, const DT_ * x, const DT_ * val, const IT_ * col_ind,
-          const IT_ * cs, const IT_ * cl, const Index rows, const Index C)
+                                              const IT_ * cs, const IT_ * cl, const Index rows, const Index C)
       {
         const Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= rows)
@@ -85,7 +85,7 @@ namespace FEAST
       __global__ void cuda_product_matvec_banded(DT_ * r, const DT_ * x, const DT_ * val, const IT_ * offsets, const Index num_of_offsets, const Index rows, const Index columns)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-          if (idx >= rows)
+        if (idx >= rows)
           return;
 
         const Index k1(rows - 1);
@@ -263,7 +263,7 @@ void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const val
   //if (num_of_offsets == 9)
   //  FEAST::LAFEM::Intern::cuda_product_matvec_q1<<<grid, block, 3 * (block.x + 2) * sizeof(DT_)>>>(r, x, val, offsets, num_of_offsets, rows, columns);
   //else
-    FEAST::LAFEM::Intern::cuda_product_matvec_banded<<<grid, block>>>(r, x, val, offsets, num_of_offsets, rows, columns);
+  FEAST::LAFEM::Intern::cuda_product_matvec_banded<<<grid, block>>>(r, x, val, offsets, num_of_offsets, rows, columns);
 }
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
 template void ProductMatVec<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);

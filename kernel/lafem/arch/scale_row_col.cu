@@ -12,7 +12,7 @@ namespace FEAST
     {
       template <typename DT_, typename IT_>
       __global__ void cuda_scale_rows_csr(DT_ * r, const DT_ * b, const DT_ * val, const IT_ * col_ind,
-          const IT_ * row_ptr, const Index count)
+                                          const IT_ * row_ptr, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
@@ -27,7 +27,7 @@ namespace FEAST
 
       template <typename DT_, typename IT_>
       __global__ void cuda_scale_cols_csr(DT_ * r, const DT_ * b, const DT_ * val, const IT_ * col_ind,
-          const IT_ * row_ptr, const Index count)
+                                          const IT_ * row_ptr, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)

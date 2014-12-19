@@ -74,14 +74,14 @@ namespace FEAST
      * The matrix, which is generated, has the following structure:
      *
      * \verbatim
-       S = / A  B \
-           \ D  0 /
+     S = / A  B \
+     \ D  0 /
 
-       A = / A1  0 \  B = / B1 \
-           \ 0  A2 /      \ B2 /
+     A = / A1  0 \  B = / B1 \
+     \ 0  A2 /      \ B2 /
 
-       D = ( D1 D2 )
-       \endverbatim
+     D = ( D1 D2 )
+     \endverbatim
      * where:
      *  - A1, A2 are of type SparseMatrixCSR
      *  - B1, B2 are of type SparseMatrixELL
@@ -93,11 +93,11 @@ namespace FEAST
      *
      * Putting all this together leads to
      * \verbatim
-       SaddlePointMatrix<
-         PowerDiagMatrix< SparseMatrixCSR<...> >,
-         PowerColMatrix< SparseMatrixELL<...> >,
-         PowerRowMatrix< SpaceMatrixCOO<...> >
-         >
+     SaddlePointMatrix<
+     PowerDiagMatrix< SparseMatrixCSR<...> >,
+     PowerColMatrix< SparseMatrixELL<...> >,
+     PowerRowMatrix< SpaceMatrixCOO<...> >
+     >
      * \endverbatim
      *
      * \author Peter Zajac

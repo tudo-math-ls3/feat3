@@ -8,12 +8,12 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief Test class for the sparse matrix csr blocked class.
-*
-* \test test description missing
-*
-* \author Dirk Ribbrock
-*/
+ * \brief Test class for the sparse matrix csr blocked class.
+ *
+ * \test test description missing
+ *
+ * \author Dirk Ribbrock
+ */
 template<
   typename Mem_,
   typename Algo_,
@@ -91,12 +91,12 @@ SparseMatrixCSRBlockedTest<Mem::CUDA, NotSet, double, unsigned int> cuda_sparse_
 #endif
 
 /**
-* \brief Test class for the sparse matrix csr blocked apply method.
-*
-* \test test description missing
-*
-* \author Dirk Ribbrock
-*/
+ * \brief Test class for the sparse matrix csr blocked apply method.
+ *
+ * \test test description missing
+ *
+ * \author Dirk Ribbrock
+ */
 template<
   typename Mem_,
   typename Algo_,

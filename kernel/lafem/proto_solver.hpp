@@ -22,18 +22,18 @@ namespace FEAST
       /// undefined status
       undefined = 0,
       /// continue iteration (internal use only)
-      progress,
+        progress,
       /// solving successful (convergence criterion fulfilled)
-      success,
+        success,
       /// premature abort (solver aborted due to internal errors or preconditioner failure)
-      aborted,
+        aborted,
       /// solver diverged (divergence criterion fulfilled)
-      diverged,
+        diverged,
       /// solver reached maximum iterations
-      max_iter,
+        max_iter,
       /// solver stagnated (stagnation criterion fulfilled)
-      stagnated
-    };
+        stagnated
+        };
 
     /**
      * \brief Status success check function
@@ -261,8 +261,8 @@ namespace FEAST
       explicit UmfpackSolver(const MatrixType& matrix) :
         _matrix(matrix),
         _umfpack()
-      {
-      }
+        {
+        }
 
       virtual bool init_symbolic() override
       {
@@ -447,7 +447,7 @@ namespace FEAST
         // plot?
         if(this->_plot)
           std::cout << this->_name << ": " << stringify(0).pad_front(_iter_digits)
-            << " : " << scientify(this->_def_init) << std::endl;
+                    << " : " << scientify(this->_def_init) << std::endl;
 
         // continue iterating
         return SolverStatus::progress;
@@ -482,7 +482,7 @@ namespace FEAST
         // plot?
         if(this->_plot)
           std::cout << this->_name << ": " << stringify(this->_num_iter).pad_front(_iter_digits)
-            << " : " << scientify(this->_def_cur) << std::endl;
+                    << " : " << scientify(this->_def_cur) << std::endl;
 
         // is diverged?
         if(is_diverged())
@@ -525,7 +525,7 @@ namespace FEAST
         // plot?
         if(this->_plot)
           std::cout << this->_name << "* " << stringify(this->_num_iter).pad_front(_iter_digits)
-            << " : " << scientify(this->_def_cur) << std::endl;
+                    << " : " << scientify(this->_def_cur) << std::endl;
       }
     }; // class IterativeSolver
 
@@ -1144,8 +1144,8 @@ namespace FEAST
       explicit SSORPrecond(const MatrixType& matrix, DataType_ relax = DataType_(1)) :
         _matrix(matrix),
         _relax(relax)
-      {
-      }
+        {
+        }
 
       void set_relax(DataType_ relax)
       {

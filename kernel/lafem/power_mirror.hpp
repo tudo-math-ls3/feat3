@@ -146,10 +146,10 @@ namespace FEAST
 
       /// dummy enum
       enum
-      {
-        /// total number of sub-mirror blocks
-        num_blocks = count_
-      };
+        {
+          /// total number of sub-mirror blocks
+          num_blocks = count_
+        };
 
     protected:
       /// the one and only sub-mirror object
@@ -228,9 +228,9 @@ namespace FEAST
       /** \copydoc VectorMirror::template gather_prim() */
       template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
       void gather_prim(
-        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
-        const LAFEM::PowerVector<Tv_, count_>& vector,
-        const Index buffer_offset = Index(0)) const
+                       LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                       const LAFEM::PowerVector<Tv_, count_>& vector,
+                       const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::template gather_prim<Algo_>(_sub_mirror, buffer, vector, buffer_offset);
       }
@@ -238,10 +238,10 @@ namespace FEAST
       /** \copydoc VectorMirror::template gather_axpy_prim() */
       template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
       void gather_axpy_prim(
-        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
-        const LAFEM::PowerVector<Tv_, count_>& vector,
-        const Tx_ alpha = Tx_(1),
-        const Index buffer_offset = Index(0)) const
+                            LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                            const LAFEM::PowerVector<Tv_, count_>& vector,
+                            const Tx_ alpha = Tx_(1),
+                            const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::template gather_axpy_prim<Algo_>(_sub_mirror, buffer, vector, alpha, buffer_offset);
       }
@@ -249,9 +249,9 @@ namespace FEAST
       /** \copydoc VectorMirror::template scatter_prim() */
       template<typename Algo_, typename Tv_, typename Tx_, typename Ix_>
       void scatter_prim(
-        LAFEM::PowerVector<Tv_, count_>& vector,
-        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
-        const Index buffer_offset = Index(0)) const
+                        LAFEM::PowerVector<Tv_, count_>& vector,
+                        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                        const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::template scatter_prim<Algo_>(_sub_mirror, vector, buffer, buffer_offset);
       }
@@ -259,10 +259,10 @@ namespace FEAST
       /** \copydoc VectorMirror::template scatter_axpy_prim() */
       template<typename Algo_, typename Tv_, typename Tx_, typename Ix_>
       void scatter_axpy_prim(
-        LAFEM::PowerVector<Tv_, count_>& vector,
-        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
-        const Tx_ alpha = Tx_(1),
-        const Index buffer_offset = Index(0)) const
+                             LAFEM::PowerVector<Tv_, count_>& vector,
+                             const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                             const Tx_ alpha = Tx_(1),
+                             const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::template scatter_axpy_prim<Algo_>(_sub_mirror, vector, buffer, alpha, buffer_offset);
       }
@@ -270,9 +270,9 @@ namespace FEAST
       /** \copydoc VectorMirror::template gather_dual() */
       template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
       void gather_dual(
-        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
-        const LAFEM::PowerVector<Tv_, count_>& vector,
-        const Index buffer_offset = Index(0)) const
+                       LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                       const LAFEM::PowerVector<Tv_, count_>& vector,
+                       const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::template gather_dual<Algo_>(_sub_mirror, buffer, vector, buffer_offset);
       }
@@ -280,10 +280,10 @@ namespace FEAST
       /** \copydoc VectorMirror::template gather_axpy_dual() */
       template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
       void gather_axpy_dual(
-        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
-        const LAFEM::PowerVector<Tv_, count_>& vector,
-        const Tx_ alpha = Tx_(1),
-        const Index buffer_offset = Index(0)) const
+                            LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                            const LAFEM::PowerVector<Tv_, count_>& vector,
+                            const Tx_ alpha = Tx_(1),
+                            const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::template gather_axpy_dual<Algo_>(_sub_mirror, buffer, vector, alpha, buffer_offset);
       }
@@ -291,9 +291,9 @@ namespace FEAST
       /** \copydoc VectorMirror::template scatter_dual() */
       template<typename Algo_, typename Tv_, typename Tx_, typename Ix_>
       void scatter_dual(
-        LAFEM::PowerVector<Tv_, count_>& vector,
-        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
-        const Index buffer_offset = Index(0)) const
+                        LAFEM::PowerVector<Tv_, count_>& vector,
+                        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                        const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::template scatter_dual<Algo_>(_sub_mirror, vector, buffer, buffer_offset);
       }
@@ -301,10 +301,10 @@ namespace FEAST
       /** \copydoc VectorMirror::template scatter_axpy_dual() */
       template<typename Algo_, typename Tv_, typename Tx_, typename Ix_>
       void scatter_axpy_dual(
-        LAFEM::PowerVector<Tv_, count_>& vector,
-        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
-        const Tx_ alpha = Tx_(1),
-        const Index buffer_offset = Index(0)) const
+                             LAFEM::PowerVector<Tv_, count_>& vector,
+                             const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                             const Tx_ alpha = Tx_(1),
+                             const Index buffer_offset = Index(0)) const
       {
         Intern::PowerMirrorHelper<count_>::template scatter_axpy_dual<Algo_>(_sub_mirror, vector, buffer, alpha, buffer_offset);
       }

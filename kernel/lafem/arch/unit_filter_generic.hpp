@@ -3,7 +3,7 @@
 #define KERNEL_LAFEM_ARCH_UNIT_FILTER_GENERIC_HPP 1
 
 #ifndef KERNEL_LAFEM_ARCH_UNIT_FILTER_HPP
-  #error "Do not include this implementation-only header file directly!"
+#error "Do not include this implementation-only header file directly!"
 #endif
 
 /// \cond internal
@@ -30,7 +30,6 @@ namespace FEAST
           v[sv_indices[i]] = DT_(0);
         }
       }
-
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST

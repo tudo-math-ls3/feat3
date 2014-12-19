@@ -22,21 +22,21 @@ namespace FEAST
       }
 
       static int init_symbolic(Idx_ nrows, Idx_ ncols, const Idx_* row_ptr, const Idx_* col_idx,
-        const double* data, void** symb, const double* ctrl, double* info)
+                               const double* data, void** symb, const double* ctrl, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(int), "invalid index size");
         return int(::umfpack_di_symbolic(static_cast<int>(nrows), static_cast<int>(ncols),
-          reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
-          data, symb, ctrl, info));
+                                         reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
+                                         data, symb, ctrl, info));
       }
 
       static int init_numeric(const Idx_* row_ptr, const Idx_* col_idx,
-        const double* data, void* symb, void** nume, const double* ctrl, double* info)
+                              const double* data, void* symb, void** nume, const double* ctrl, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(int), "invalid index size");
         return int(::umfpack_di_numeric(
-          reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
-          data, symb, nume, ctrl, info));
+                                        reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
+                                        data, symb, nume, ctrl, info));
       }
 
       static void free_symbolic(void** symb)
@@ -50,12 +50,12 @@ namespace FEAST
       }
 
       static int solve(int sys, const Idx_* row_ptr, const Idx_* col_idx, const double* data,
-        double* x, const double* b, void* nume, const double* control, double* info)
+                       double* x, const double* b, void* nume, const double* control, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(int), "invalid index size");
         return int(::umfpack_di_solve(static_cast<int>(sys),
-          reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
-          data, x, b, nume, control, info));
+                                      reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
+                                      data, x, b, nume, control, info));
       }
     };
 
@@ -68,21 +68,21 @@ namespace FEAST
       }
 
       static int init_symbolic(Idx_ nrows, Idx_ ncols, const Idx_* row_ptr, const Idx_* col_idx,
-        const double* data, void** symb, const double* ctrl, double* info)
+                               const double* data, void** symb, const double* ctrl, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
         return int(::umfpack_dl_symbolic(static_cast<SuiteSparse_long>(nrows), static_cast<SuiteSparse_long>(ncols),
-          reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
-          data, symb, ctrl, info));
+                                         reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
+                                         data, symb, ctrl, info));
       }
 
       static int init_numeric(const Idx_* row_ptr, const Idx_* col_idx,
-        const double* data, void* symb, void** nume, const double* ctrl, double* info)
+                              const double* data, void* symb, void** nume, const double* ctrl, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
         return int(::umfpack_dl_numeric(
-          reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
-          data, symb, nume, ctrl, info));
+                                        reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
+                                        data, symb, nume, ctrl, info));
       }
 
       static void free_symbolic(void** symb)
@@ -96,12 +96,12 @@ namespace FEAST
       }
 
       static int solve(int sys, const Idx_* row_ptr, const Idx_* col_idx, const double* data,
-        double* x, const double* b, void* nume, const double* control, double* info)
+                       double* x, const double* b, void* nume, const double* control, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
         return int(::umfpack_dl_solve(static_cast<SuiteSparse_long>(sys),
-          reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
-          data, x, b, nume, control, info));
+                                      reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
+                                      data, x, b, nume, control, info));
       }
     };
 
@@ -158,15 +158,15 @@ namespace FEAST
 
       // try to perform symbolic factorisation
       int status = UmfpackWrapper<Index>::init_symbolic(
-        _system_matrix->rows(),
-        _system_matrix->columns(),
-        _system_matrix->row_ptr(),
-        _system_matrix->col_ind(),
-        ignore_data ? nullptr : _system_matrix->val(),
-        &_umf_symbolic,
-        _umf_control,
-        info
-      );
+                                                        _system_matrix->rows(),
+                                                        _system_matrix->columns(),
+                                                        _system_matrix->row_ptr(),
+                                                        _system_matrix->col_ind(),
+                                                        ignore_data ? nullptr : _system_matrix->val(),
+                                                        &_umf_symbolic,
+                                                        _umf_control,
+                                                        info
+                                                        );
 
       // check status code
       switch(status)
@@ -198,14 +198,14 @@ namespace FEAST
 
       // try to perform symbolic factorisation
       int status = UmfpackWrapper<Index>::init_numeric(
-        _system_matrix->row_ptr(),
-        _system_matrix->col_ind(),
-        _system_matrix->val(),
-        _umf_symbolic,
-        &_umf_numeric,
-        _umf_control,
-        info
-      );
+                                                       _system_matrix->row_ptr(),
+                                                       _system_matrix->col_ind(),
+                                                       _system_matrix->val(),
+                                                       _umf_symbolic,
+                                                       &_umf_numeric,
+                                                       _umf_control,
+                                                       info
+                                                       );
 
       // check status code
       switch(status)
@@ -271,15 +271,15 @@ namespace FEAST
 
       // solve
       int status = UmfpackWrapper<Index>::solve(
-        UMFPACK_At,
-        _system_matrix->row_ptr(),
-        _system_matrix->col_ind(),
-        _system_matrix->val(),
-        x.elements(),
-        b.elements(),
-        _umf_numeric,
-        _umf_control,
-        info);
+                                                UMFPACK_At,
+                                                _system_matrix->row_ptr(),
+                                                _system_matrix->col_ind(),
+                                                _system_matrix->val(),
+                                                x.elements(),
+                                                b.elements(),
+                                                _umf_numeric,
+                                                _umf_control,
+                                                info);
 
       // check status code
       switch(status)

@@ -14,7 +14,7 @@ namespace FEAST
     {
       template <typename DT_>
       __global__ void cuda_defect_csr(DT_ * r, const DT_ * rhs, const DT_ * b, const DT_ * val, const unsigned long * col_ind,
-          const unsigned long * row_ptr, const Index count)
+                                      const unsigned long * row_ptr, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
@@ -55,7 +55,7 @@ namespace FEAST
       __global__ void cuda_defect_banded(DT_ * r, const DT_ * rhs, const DT_ * x, const DT_ * val, const IT_ * offsets, const Index num_of_offsets, const Index rows, const Index columns)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-          if (idx >= rows)
+        if (idx >= rows)
           return;
 
         const Index k1(rows - 1);

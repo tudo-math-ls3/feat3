@@ -3,7 +3,7 @@
 #define KERNEL_LAFEM_ARCH_SUM_GENERIC_HPP 1
 
 #ifndef KERNEL_LAFEM_ARCH_SUM_HPP
-  #error "Do not include this implementation-only header file directly!"
+#error "Do not include this implementation-only header file directly!"
 #endif
 
 namespace FEAST
@@ -42,7 +42,6 @@ namespace FEAST
           }
         }
       }
-
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST

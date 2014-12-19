@@ -82,7 +82,7 @@ namespace FEAST
        * \param[in] indices DenseVector containing element indices
        */
       explicit UnitFilterBlocked(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & values,
-      DenseVectorBlocked<Mem_, IT_, IT_, BlockSize_> & indices) :
+                                 DenseVectorBlocked<Mem_, IT_, IT_, BlockSize_> & indices) :
         _sv(values.size(), values, indices)
       {
         if (values.size() != indices.size())

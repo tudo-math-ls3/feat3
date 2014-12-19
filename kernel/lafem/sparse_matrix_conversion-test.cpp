@@ -16,24 +16,24 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief Test class for sparse matrix conversions.
-*
-* \test test description missing
-*
-* \tparam Mem_
-* description missing
-*
-* \tparam Algo_
-* description missing
-*
-* \tparam DT_
-* description missing
-*
-* \tparam IT_
-* description missing
-*
-* \author Dirk Ribbrock
-*/
+ * \brief Test class for sparse matrix conversions.
+ *
+ * \test test description missing
+ *
+ * \tparam Mem_
+ * description missing
+ *
+ * \tparam Algo_
+ * description missing
+ *
+ * \tparam DT_
+ * description missing
+ *
+ * \tparam IT_
+ * description missing
+ *
+ * \author Dirk Ribbrock
+ */
 template<
   typename Mem_,
   typename Algo_,
@@ -104,18 +104,18 @@ SparseMatrixConversionTest<Mem::Main, NotSet, double, unsigned long> sparse_matr
 
 
 /**
-* \brief Test class for sparse matrix conversions.
-*
-* \test test description missing
-*
-* \tparam Mem_
-* description missing
-*
-* \tparam DT_
-* description missing
-*
-* \author Dirk Ribbrock
-*/
+ * \brief Test class for sparse matrix conversions.
+ *
+ * \test test description missing
+ *
+ * \tparam Mem_
+ * description missing
+ *
+ * \tparam DT_
+ * description missing
+ *
+ * \author Dirk Ribbrock
+ */
 template<
   typename Mem_,
   typename DT_>

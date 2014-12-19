@@ -282,7 +282,7 @@ public:
       if (fabs(ref1(i)) > eps)
         TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)) * s, r(i), eps);
     }
-}
+  }
 };
 
 SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong;

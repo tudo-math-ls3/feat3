@@ -3,7 +3,7 @@
 #define KERNEL_LAFEM_ARCH_AXPY_GENERIC_HPP 1
 
 #ifndef KERNEL_LAFEM_ARCH_AXPY_HPP
-  #error "Do not include this implementation-only header file directly!"
+#error "Do not include this implementation-only header file directly!"
 #endif
 
 #include <kernel/util/math.hpp>
@@ -46,7 +46,7 @@ namespace FEAST
 
       template <typename DT_, typename IT_>
       void Axpy<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-      const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
+                                               const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
       {
         for (Index row(0) ; row < rows ; ++row)
         {
@@ -62,7 +62,7 @@ namespace FEAST
 
       template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
       void Axpy<Mem::Main, Algo::Generic>::csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-      const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
+                                                const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
       {
         Tiny::Vector<DT_, BlockHeight_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockHeight_> *>(r));
         const Tiny::Vector<DT_, BlockHeight_> * const by(reinterpret_cast<const Tiny::Vector<DT_, BlockHeight_> * const>(y));
@@ -101,8 +101,8 @@ namespace FEAST
           struct AxpySpecialisation
           {
             static void f(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y,
-            const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
-            const IT_ * const cl, const Index /*C*/, const Index rows)
+                          const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const Index /*C*/, const Index rows)
             {
               DT_ tmp[C_];
               const DT_ * const ctmp(static_cast<const DT_ * const>(tmp));
@@ -140,8 +140,8 @@ namespace FEAST
           struct AxpyGeneric
           {
             static void f(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y,
-            const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
-            const IT_ * const cl, const Index C, const Index rows)
+                          const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
+                          const IT_ * const cl, const Index C, const Index rows)
             {
               for (Index i(0) ; i < rows/C ; ++i)
               {
@@ -185,39 +185,39 @@ namespace FEAST
 
       template <typename DT_, typename IT_>
       void Axpy<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-      const IT_ * const col_ind, const IT_ * const cs,
-      const IT_ * const cl,
-      const Index C, const Index rows)
+                                               const IT_ * const col_ind, const IT_ * const cs,
+                                               const IT_ * const cl,
+                                               const Index C, const Index rows)
       {
         switch (C)
         {
-          case 2:
-            Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
-            break;
-          case 4:
-            Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 4>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
-            break;
-          case 8:
-            Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 8>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
-            break;
-          case 16:
-            Intern::AxpyELL::AxpySpecialisation<DT_, IT_,16>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
-            break;
-          case 32:
-            Intern::AxpyELL::AxpySpecialisation<DT_, IT_,32>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
-            break;
-          default:
+        case 2:
+          Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 2>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+          break;
+        case 4:
+          Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 4>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+          break;
+        case 8:
+          Intern::AxpyELL::AxpySpecialisation<DT_, IT_, 8>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+          break;
+        case 16:
+          Intern::AxpyELL::AxpySpecialisation<DT_, IT_,16>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+          break;
+        case 32:
+          Intern::AxpyELL::AxpySpecialisation<DT_, IT_,32>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+          break;
+        default:
 #ifdef DEBUG
-            /// \todo print warning in feast log file
-            std::cout << "Warning: Axpy not optimized for chunk size = " << C << "!" << std::endl;
+          /// \todo print warning in feast log file
+          std::cout << "Warning: Axpy not optimized for chunk size = " << C << "!" << std::endl;
 #endif
-            Intern::AxpyELL::AxpyGeneric<DT_, IT_>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
+          Intern::AxpyELL::AxpyGeneric<DT_, IT_>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
         }
       }
 
       template <typename DT_, typename IT_>
       void Axpy<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-      const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index used_elements)
+                                               const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index used_elements)
       {
         Index iter(0);
         for (IT_ row(0); row < IT_(rows); ++row)
@@ -240,20 +240,20 @@ namespace FEAST
           struct Iteration_Left
           {
             static void f(DT_ * const r, const DT_ * y, const DT_ alpha,
-            const DT_ * const val, const IT_ * const offsets,
-            const DT_ * const x, const Index rows, const Index columns)
+                          const DT_ * const val, const IT_ * const offsets,
+                          const DT_ * const x, const Index rows, const Index columns)
             {
               Index start(Math::max(Intern::ProductMatVecBanded::start_offset(j-1, offsets, rows, columns, noo),
-              Intern::ProductMatVecBanded::end_offset(i-1, offsets, rows, columns, noo) + 1));
+                                    Intern::ProductMatVecBanded::end_offset(i-1, offsets, rows, columns, noo) + 1));
               Index end  (Math::min(Intern::ProductMatVecBanded::start_offset(j-2, offsets, rows, columns, noo),
-              Intern::ProductMatVecBanded::end_offset(i-2, offsets, rows, columns, noo) + 1));
+                                    Intern::ProductMatVecBanded::end_offset(i-2, offsets, rows, columns, noo) + 1));
 
               FEAST_IVDEP
                 for (Index l(start); l < end; ++l)
                 {
                   DT_ tmp(0);
                   Intern::LoopUnroller<0, i-j>::step(Intern::ProductMatVecBanded::single_matrix_entry, &tmp, val + (j-1) * rows + l,
-                  offsets + (j-1), x + l + 1 - rows, rows);
+                                                     offsets + (j-1), x + l + 1 - rows, rows);
                   r[l] = y[l] + alpha * tmp;
                 }
 
@@ -265,8 +265,8 @@ namespace FEAST
           struct Iteration_Left<DT_, IT_, noo, i, 0>
           {
             static void f(DT_ * const /*r*/, const DT_ * const /*y*/, const DT_ /*alpha*/,
-            const DT_ * const /*val*/, const IT_ * const /*offsets*/,
-            const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
+                          const DT_ * const /*val*/, const IT_ * const /*offsets*/,
+                          const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
             {
             }
           };
@@ -277,8 +277,8 @@ namespace FEAST
           struct Iteration_Right
           {
             static void f(DT_ * const r, const DT_ * const y, const DT_ alpha,
-            const DT_ * const val, const IT_ * const offsets,
-            const DT_ * const x, const Index rows, const Index columns)
+                          const DT_ * const val, const IT_ * const offsets,
+                          const DT_ * const x, const Index rows, const Index columns)
             {
               Iteration_Left<DT_, IT_, noo, i, i-1>::f(r, y, alpha, val, offsets, x, rows, columns);
               Iteration_Right<DT_, IT_, noo, i-1>::f(r, y, alpha, val, offsets, x, rows, columns);
@@ -289,8 +289,8 @@ namespace FEAST
           struct Iteration_Right<DT_, IT_, noo, 0>
           {
             static void f(DT_ * const /*r*/, const DT_ * const /*y*/, const DT_ /*alpha*/,
-            const DT_ * const /*val*/, const IT_ * const /*offsets*/,
-            const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
+                          const DT_ * const /*val*/, const IT_ * const /*offsets*/,
+                          const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
             {
             }
           };
@@ -299,8 +299,8 @@ namespace FEAST
 
           template <typename DT_, typename IT_>
           void axpy_banded_generic(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val,
-          const IT_ * const offsets, const DT_ * const x,
-          const Index num_of_offsets, const Index rows, const Index columns)
+                                   const IT_ * const offsets, const DT_ * const x,
+                                   const Index num_of_offsets, const Index rows, const Index columns)
           {
             // Search first offset of the upper triangular matrix
             Index k(0);
@@ -321,9 +321,9 @@ namespace FEAST
 
                 // iteration over all rows which contain the offsets between offset i and offset j
                 const Index start(Math::max(Intern::ProductMatVecBanded::start_offset(  i, offsets, rows, columns, num_of_offsets),
-                Intern::ProductMatVecBanded::end_offset  (  j, offsets, rows, columns, num_of_offsets) + 1));
+                                            Intern::ProductMatVecBanded::end_offset  (  j, offsets, rows, columns, num_of_offsets) + 1));
                 const Index stop (Math::min(Intern::ProductMatVecBanded::start_offset(i-1, offsets, rows, columns, num_of_offsets),
-                Intern::ProductMatVecBanded::end_offset  (j-1, offsets, rows, columns, num_of_offsets) + 1));
+                                            Intern::ProductMatVecBanded::end_offset  (j-1, offsets, rows, columns, num_of_offsets) + 1));
                 for (Index l(start); l < stop; ++l)
                 {
                   DT_ s(0);
@@ -341,29 +341,29 @@ namespace FEAST
 
       template <typename DT_, typename IT_>
       void Axpy<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const y, const DT_ alpha,
-      const DT_ * const val, const IT_ * const offsets, const DT_ * const x,
-      const Index num_of_offsets, const Index rows, const Index columns)
+                                                  const DT_ * const val, const IT_ * const offsets, const DT_ * const x,
+                                                  const Index num_of_offsets, const Index rows, const Index columns)
       {
         switch (num_of_offsets)
         {
-          case 3:
-            Intern::AxpyBanded::Iteration_Right<DT_, IT_, 3, 4>::f(r, y, alpha, val, offsets, x, rows, columns);
-            break;
-          case 5:
-            Intern::AxpyBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, y, alpha, val, offsets, x, rows, columns);
-            break;
-          case 9:
-            Intern::AxpyBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, y, alpha, val, offsets, x, rows, columns);
-            break;
-          case 25:
-            Intern::AxpyBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, y, alpha, val, offsets, x, rows, columns);
-            break;
-          default:
+        case 3:
+          Intern::AxpyBanded::Iteration_Right<DT_, IT_, 3, 4>::f(r, y, alpha, val, offsets, x, rows, columns);
+          break;
+        case 5:
+          Intern::AxpyBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, y, alpha, val, offsets, x, rows, columns);
+          break;
+        case 9:
+          Intern::AxpyBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, y, alpha, val, offsets, x, rows, columns);
+          break;
+        case 25:
+          Intern::AxpyBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, y, alpha, val, offsets, x, rows, columns);
+          break;
+        default:
 #ifdef DEBUG
-            /// \todo print warning in feast log file
-            std::cout << "Warning: Axpy not optimized for " << num_of_offsets << " offsets!" << std::endl;
+          /// \todo print warning in feast log file
+          std::cout << "Warning: Axpy not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
-            Intern::AxpyBanded::axpy_banded_generic(r, y, alpha, val, offsets, x, num_of_offsets, rows, columns);
+          Intern::AxpyBanded::axpy_banded_generic(r, y, alpha, val, offsets, x, num_of_offsets, rows, columns);
         }
       }
     } // namespace Arch

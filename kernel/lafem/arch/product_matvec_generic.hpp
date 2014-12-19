@@ -3,7 +3,7 @@
 #define KERNEL_LAFEM_ARCH_PRODUCT_MATVEC_GENERIC_HPP 1
 
 #ifndef KERNEL_LAFEM_ARCH_PRODUCT_MATVEC_HPP
-  #error "Do not include this implementation-only header file directly!"
+#error "Do not include this implementation-only header file directly!"
 #endif
 
 #include <kernel/util/math.hpp>
@@ -15,7 +15,6 @@ namespace FEAST
   {
     namespace Arch
     {
-
       template <typename DT_, typename IT_>
       void ProductMatVec<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
       {
@@ -91,7 +90,7 @@ namespace FEAST
 
           template <typename DT_, typename IT_>
           FORCE_INLINE void single_matrix_entry(Index k, DT_ * const r, const DT_ * const val,
-          const DT_ * const x, const IT_ * const col_ind)
+                                                const DT_ * const x, const IT_ * const col_ind)
           {
             r[k] += val[k] * x[col_ind[k]];
           }
@@ -100,7 +99,7 @@ namespace FEAST
           struct ProductMatVecSpecialisation
           {
             static void f(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
-            const IT_ * const cl, const DT_ * const x, const Index /*C*/, const Index rows)
+                          const IT_ * const cl, const DT_ * const x, const Index /*C*/, const Index rows)
             {
               for (Index i(0) ; i < rows/C_ ; ++i)
               {
@@ -131,7 +130,7 @@ namespace FEAST
           struct ProductMatVecGeneric
           {
             static void f(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
-            const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
+                          const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
             {
               for (Index i(0) ; i < rows/C ; ++i)
               {
@@ -168,33 +167,33 @@ namespace FEAST
 
       template <typename DT_, typename IT_>
       void ProductMatVec<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const val,
-      const IT_ * const col_ind, const IT_ * const cs,
-      const IT_ * const cl, const DT_ * const x,
-      const Index C, const Index rows)
+                                                        const IT_ * const col_ind, const IT_ * const cs,
+                                                        const IT_ * const cl, const DT_ * const x,
+                                                        const Index C, const Index rows)
       {
         switch (C)
         {
-          case 2:
-            Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_, 2>::f(r, val, col_ind, cs, cl, x, C, rows);
-            break;
-          case 4:
-            Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_, 4>::f(r, val, col_ind, cs, cl, x, C, rows);
-            break;
-          case 8:
-            Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_, 8>::f(r, val, col_ind, cs, cl, x, C, rows);
-            break;
-          case 16:
-            Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_,16>::f(r, val, col_ind, cs, cl, x, C, rows);
-            break;
-          case 32:
-            Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_,32>::f(r, val, col_ind, cs, cl, x, C, rows);
-            break;
-          default:
+        case 2:
+          Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_, 2>::f(r, val, col_ind, cs, cl, x, C, rows);
+          break;
+        case 4:
+          Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_, 4>::f(r, val, col_ind, cs, cl, x, C, rows);
+          break;
+        case 8:
+          Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_, 8>::f(r, val, col_ind, cs, cl, x, C, rows);
+          break;
+        case 16:
+          Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_,16>::f(r, val, col_ind, cs, cl, x, C, rows);
+          break;
+        case 32:
+          Intern::ProductMatVecELL::ProductMatVecSpecialisation<DT_, IT_,32>::f(r, val, col_ind, cs, cl, x, C, rows);
+          break;
+        default:
 #ifdef DEBUG
-            /// \todo print warning in feast log file
-            std::cout << "Warning: ProductMatVec not optimized for chunk size = " << C << "!" << std::endl;
+          /// \todo print warning in feast log file
+          std::cout << "Warning: ProductMatVec not optimized for chunk size = " << C << "!" << std::endl;
 #endif
-            Intern::ProductMatVecELL::ProductMatVecGeneric<DT_, IT_>::f(r, val, col_ind, cs, cl, x, C, rows);
+          Intern::ProductMatVecELL::ProductMatVecGeneric<DT_, IT_>::f(r, val, col_ind, cs, cl, x, C, rows);
         }
       }
 
@@ -222,7 +221,7 @@ namespace FEAST
         {
           template <typename IT_>
           inline Index start_offset(const Index i, const IT_ * const offsets,
-          const Index rows, const Index columns, const Index noo)
+                                    const Index rows, const Index columns, const Index noo)
           {
             if (i == Index(-1))
             {
@@ -240,7 +239,7 @@ namespace FEAST
 
           template <typename IT_>
           inline Index end_offset(const Index i, const IT_ * const offsets,
-          const Index rows, const Index columns, const Index noo)
+                                  const Index rows, const Index columns, const Index noo)
           {
             if (i == Index (-1))
             {
@@ -260,7 +259,7 @@ namespace FEAST
 
           template <typename DT_, typename IT_>
           FORCE_INLINE void single_matrix_entry(Index k, DT_ * const res, const DT_ * const val,
-          const IT_ * const offsets, const DT_ * const x, Index rows)
+                                                const IT_ * const offsets, const DT_ * const x, Index rows)
           {
             *res += val[k * rows] * x[offsets[k]];
           }
@@ -269,19 +268,19 @@ namespace FEAST
           struct Iteration_Left
           {
             static void f(DT_ * const r, const DT_ * const val, const IT_ * const offsets,
-            const DT_ * const x, const Index rows, const Index columns)
+                          const DT_ * const x, const Index rows, const Index columns)
             {
               Index start(Math::max(start_offset(j-1, offsets, rows, columns, noo),
-              end_offset(i-1, offsets, rows, columns, noo) + 1));
+                                    end_offset(i-1, offsets, rows, columns, noo) + 1));
               Index end  (Math::min(start_offset(j-2, offsets, rows, columns, noo),
-              end_offset(i-2, offsets, rows, columns, noo) + 1));
+                                    end_offset(i-2, offsets, rows, columns, noo) + 1));
 
               FEAST_IVDEP
                 for (Index l(start); l < end; ++l)
                 {
                   DT_ tmp(0);
                   Intern::LoopUnroller<0, i-j>::step(single_matrix_entry, &tmp, val + (j-1) * rows + l,
-                  offsets + (j-1), x + l + 1 - rows, rows);
+                                                     offsets + (j-1), x + l + 1 - rows, rows);
                   r[l] = tmp;
                 }
 
@@ -293,7 +292,7 @@ namespace FEAST
           struct Iteration_Left<DT_, IT_, noo, i, 0>
           {
             static void f(DT_ * const /*r*/, const DT_ * const /*val*/, const IT_ * const /*offsets*/,
-            const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
+                          const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
             {
             }
           };
@@ -304,7 +303,7 @@ namespace FEAST
           struct Iteration_Right
           {
             static void f(DT_ * const r, const DT_ * const val, const IT_ * const offsets,
-            const DT_ * const x, const Index rows, const Index columns)
+                          const DT_ * const x, const Index rows, const Index columns)
             {
               Iteration_Left<DT_, IT_, noo, i, i-1>::f(r, val, offsets, x, rows, columns);
               Iteration_Right<DT_, IT_, noo, i-1>::f(r, val, offsets, x, rows, columns);
@@ -315,7 +314,7 @@ namespace FEAST
           struct Iteration_Right<DT_, IT_, noo, 0>
           {
             static void f(DT_ * const /*r*/, const DT_ * const /*val*/, const IT_ * const /*offsets*/,
-            const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
+                          const DT_ * const /*x*/, const Index /*rows*/, const Index /*columns*/)
             {
             }
           };
@@ -324,8 +323,8 @@ namespace FEAST
 
           template <typename DT_, typename IT_>
           void product_matvec_banded_generic(DT_ * r, const DT_ * const val,
-          const IT_ * const offsets, const DT_ * const x,
-          const Index num_of_offsets, const Index rows, const Index columns)
+                                             const IT_ * const offsets, const DT_ * const x,
+                                             const Index num_of_offsets, const Index rows, const Index columns)
           {
             // Search first offset of the upper triangular matrix
             Index k(0);
@@ -346,9 +345,9 @@ namespace FEAST
 
                 // iteration over all rows which contain the offsets between offset i and offset j
                 const Index start(Math::max(start_offset(  i, offsets, rows, columns, num_of_offsets),
-                end_offset  (  j, offsets, rows, columns, num_of_offsets) + 1));
+                                            end_offset  (  j, offsets, rows, columns, num_of_offsets) + 1));
                 const Index stop (Math::min(start_offset(i-1, offsets, rows, columns, num_of_offsets),
-                end_offset  (j-1, offsets, rows, columns, num_of_offsets) + 1));
+                                            end_offset  (j-1, offsets, rows, columns, num_of_offsets) + 1));
                 for (Index l(start); l < stop; ++l)
                 {
                   DT_ s(0);
@@ -366,32 +365,31 @@ namespace FEAST
 
       template <typename DT_, typename IT_>
       void ProductMatVec<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const val,
-      const IT_ * const offsets, const DT_ * const x,
-      const Index num_of_offsets, const Index rows, const Index columns)
+                                                           const IT_ * const offsets, const DT_ * const x,
+                                                           const Index num_of_offsets, const Index rows, const Index columns)
       {
         switch (num_of_offsets)
         {
-          case 3:
-            Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 3, 4>::f(r, val, offsets, x, rows, columns);
-            break;
-          case 5:
-            Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, val, offsets, x, rows, columns);
-            break;
-          case 9:
-            Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, val, offsets, x, rows, columns);
-            break;
-          case 25:
-            Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, val, offsets, x, rows, columns);
-            break;
-          default:
+        case 3:
+          Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 3, 4>::f(r, val, offsets, x, rows, columns);
+          break;
+        case 5:
+          Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 5, 6>::f(r, val, offsets, x, rows, columns);
+          break;
+        case 9:
+          Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 9, 10>::f(r, val, offsets, x, rows, columns);
+          break;
+        case 25:
+          Intern::ProductMatVecBanded::Iteration_Right<DT_, IT_, 25, 26>::f(r, val, offsets, x, rows, columns);
+          break;
+        default:
 #ifdef DEBUG
-            /// \todo print warning in feast log file
-            std::cout << "Warning: ProductMatVec not optimized for " << num_of_offsets << " offsets!" << std::endl;
+          /// \todo print warning in feast log file
+          std::cout << "Warning: ProductMatVec not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
-            Intern::ProductMatVecBanded::product_matvec_banded_generic(r, val, offsets, x, num_of_offsets, rows, columns);
+          Intern::ProductMatVecBanded::product_matvec_banded_generic(r, val, offsets, x, num_of_offsets, rows, columns);
         }
       }
-
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST

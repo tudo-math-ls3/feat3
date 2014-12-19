@@ -21,20 +21,20 @@ template
   typename DT_,
   typename IT_,
   Index BlockSize_
->
+  >
 class UnitFilterBlockedVectorTest
-: public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
+  : public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
 {
   typedef Tiny::Vector<DT_, BlockSize_> ValueType;
   typedef DenseVectorBlocked<typename Algo_::MemType, DT_, IT_, BlockSize_> VectorType;
   typedef DenseVectorBlocked<typename Algo_::MemType, IT_, IT_, BlockSize_> IVectorType;
   typedef UnitFilterBlocked<typename Algo_::MemType, DT_, IT_, BlockSize_> FilterType;
 
-  public:
+public:
   UnitFilterBlockedVectorTest()
     : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("UnitFilterBlockedVectorTest")
-    {
-    }
+  {
+  }
 
   virtual void run() const override
   {
@@ -124,9 +124,9 @@ template
   typename IT_,
   Index BlockHeight_,
   Index BlockWidth_
->
+  >
 class UnitFilterBlockedMatrixTest
-: public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
+  : public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
 {
   typedef SparseMatrixCSRBlocked<typename Algo_::MemType, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
   typedef typename MatrixType::VectorTypeL VectorTypeR;
@@ -138,11 +138,11 @@ class UnitFilterBlockedMatrixTest
   static constexpr Index BlockHeight = BlockHeight_;
   static constexpr Index BlockWidth = BlockWidth_;
 
-  public:
+public:
   UnitFilterBlockedMatrixTest()
     : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("UnitFilterBlockedMatrixTest")
-    {
-    }
+  {
+  }
 
   virtual void run() const override
   {
@@ -192,11 +192,11 @@ class UnitFilterBlockedMatrixTest
     // Set off-diagonals to 0
     // Row 1
     matrix_b.val()[1] = b_tmp;
-   // Row 3
+    // Row 3
     matrix_b.val()[4] = b_tmp;
     matrix_b.val()[6] = b_tmp;
 
-   // Row 6
+    // Row 6
     matrix_b.val()[15] = b_tmp;
     matrix_b.val()[16] = b_tmp;
 

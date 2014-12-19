@@ -33,10 +33,10 @@ namespace FEAST
     public:
       /// dummy enum
       enum
-      {
-        /// number of vector blocks
-        num_blocks = TupleFilter<Rest_...>::num_blocks + 1
-      };
+        {
+          /// number of vector blocks
+          num_blocks = TupleFilter<Rest_...>::num_blocks + 1
+        };
 
       /// sub-filter mem-type
       typedef typename First_::MemType MemType;
@@ -45,9 +45,9 @@ namespace FEAST
 
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
-        "sub-filters have different mem-types");
+                    "sub-filters have different mem-types");
       static_assert(std::is_same<DataType, typename RestClass::DataType>::value,
-        "sub-filters have different data-types");
+                    "sub-filters have different data-types");
 
     protected:
       /// the first sub-filter
@@ -184,9 +184,9 @@ namespace FEAST
 
     public:
       enum
-      {
-        num_blocks = 1
-      };
+        {
+          num_blocks = 1
+        };
 
       /// sub-filter mem-type
       typedef typename First_::MemType MemType;

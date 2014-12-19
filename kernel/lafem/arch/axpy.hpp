@@ -23,18 +23,18 @@ namespace FEAST
 
         template <typename DT_, typename IT_>
         static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-            const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
+                        const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
         static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-            const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
+                         const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
 
         template <typename DT_, typename IT_>
         static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-            const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index used_elements);
+                        const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index used_elements);
 
         template <typename DT_, typename IT_>
         static void banded(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);

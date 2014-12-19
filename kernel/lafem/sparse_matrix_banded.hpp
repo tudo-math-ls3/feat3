@@ -54,17 +54,17 @@ namespace FEAST
      * diagonal. For faster access on the matrix-elements each diagonal get the virtual
      * length of the row-count of the matrix. They are enlarged to the left and right
      * side of the matrix as shown in the following layout.
-       \verbatim
-            +--                  --+
-       \    | \           \      \ |
-        \   |\ \           \      \|
-         \  | \ \           \      |
-          \ |  \ \           \     |\
-           \|   \ \           \    | \
-            |    \ \           \   |  \
-            |\    \ \           \  |   \
-            +--                  --+
-       \endverbatim
+     \verbatim
+     +--                  --+
+     \    | \           \      \ |
+     \   |\ \           \      \|
+     \  | \ \           \      |
+     \ |  \ \           \     |\
+     \|   \ \           \    | \
+     |    \ \           \   |  \
+     |\    \ \           \  |   \
+     +--                  --+
+     \endverbatim
      * To get the position of the diagonals in the matrix, the matching offsets are
      * saved from left to right in the offsets-array.
      * - The first diagonal is the one at the bottom-left and gets the offset = 1,
@@ -450,11 +450,11 @@ namespace FEAST
 
         switch(mode)
         {
-          case FileMode::fm_bm:
-            write_out_bm(filename);
-            break;
-          default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        case FileMode::fm_bm:
+          write_out_bm(filename);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
 
@@ -470,11 +470,11 @@ namespace FEAST
 
         switch(mode)
         {
-          case FileMode::fm_bm:
-            write_out_bm(file);
-            break;
-          default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        case FileMode::fm_bm:
+          write_out_bm(file);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
 

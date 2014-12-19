@@ -3,7 +3,7 @@
 #define KERNEL_LAFEM_ARCH_COMPONENT_INVERT_GENERIC_HPP 1
 
 #ifndef KERNEL_LAFEM_ARCH_COMPONENT_INVERT_HPP
-  #error "Do not include this implementation-only header file directly!"
+#error "Do not include this implementation-only header file directly!"
 #endif
 
 namespace FEAST
@@ -12,7 +12,6 @@ namespace FEAST
   {
     namespace Arch
     {
-
       template<typename DT_>
       void ComponentInvert<Mem::Main, Algo::Generic>::value(DT_* r, const DT_* const x, const DT_ s, const Index size)
       {

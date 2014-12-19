@@ -36,376 +36,376 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_ = Index>
     class DenseMatrix : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
-      private:
-        Index & _rows()
-        {
-          return _rows();
-        }
+    private:
+      Index & _rows()
+      {
+        return _rows();
+      }
 
-        Index & _columns()
-        {
-          return _columns();
-        }
+      Index & _columns()
+      {
+        return _columns();
+      }
 
-      public:
-        /// Our datatype
-        typedef DT_ DataType;
-        /// Our indextype
-        typedef IT_ IndexType;
-        /// Our memory architecture type
-        typedef Mem_ MemType;
-        /// Our 'base' class type
-        template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
-        using ContainerType = class DenseMatrix<Mem2_, DT2_, IT2_>;
+    public:
+      /// Our datatype
+      typedef DT_ DataType;
+      /// Our indextype
+      typedef IT_ IndexType;
+      /// Our memory architecture type
+      typedef Mem_ MemType;
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = class DenseMatrix<Mem2_, DT2_, IT2_>;
 
-        /**
-         * \brief Constructor
-         *
-         * Creates an empty non dimensional matrix.
-         */
-        explicit DenseMatrix() :
-          Container<Mem_, DT_, IT_> (0)
-        {
-          CONTEXT("When creating DenseMatrix");
+      /**
+       * \brief Constructor
+       *
+       * Creates an empty non dimensional matrix.
+       */
+      explicit DenseMatrix() :
+        Container<Mem_, DT_, IT_> (0)
+      {
+        CONTEXT("When creating DenseMatrix");
 
-          this->_scalar_index.push_back(0);
-          this->_scalar_index.push_back(0);
-        }
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+      }
 
-        /**
-         * \brief Constructor
-         *
-         * \param[in] rows The row count of the created matrix.
-         * \param[in] columns The column count of the created matrix.
-         *
-         * Creates a matrix with given dimensions.
-         */
-        explicit DenseMatrix(Index rows_in, Index columns_in) :
-          Container<Mem_, DT_, IT_>(rows_in * columns_in)
-        {
-          CONTEXT("When creating DenseMatrix");
+      /**
+       * \brief Constructor
+       *
+       * \param[in] rows The row count of the created matrix.
+       * \param[in] columns The column count of the created matrix.
+       *
+       * Creates a matrix with given dimensions.
+       */
+      explicit DenseMatrix(Index rows_in, Index columns_in) :
+        Container<Mem_, DT_, IT_>(rows_in * columns_in)
+      {
+        CONTEXT("When creating DenseMatrix");
 
-          this->_scalar_index.at(0) = rows_in * columns_in;
-          this->_scalar_index.push_back(rows_in);
-          this->_scalar_index.push_back(columns_in);
+        this->_scalar_index.at(0) = rows_in * columns_in;
+        this->_scalar_index.push_back(rows_in);
+        this->_scalar_index.push_back(columns_in);
 
-          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
-          this->_elements_size.push_back(this->_scalar_index.at(0));
-        }
+        this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
+        this->_elements_size.push_back(this->_scalar_index.at(0));
+      }
 
-        /**
-         * \brief Constructor
-         *
-         * \param[in] rows The row count of the created matrix.
-         * \param[in] columns The column count of the created matrix.
-         * \param[in] value The value, each element will be set to.
-         *
-         * Creates a matrix with given dimensions and value.
-         */
-        explicit DenseMatrix(Index rows_in, Index columns_in, DT_ value) :
-          Container<Mem_, DT_, IT_>(rows_in * columns_in)
-        {
-          CONTEXT("When creating DenseMatrix");
+      /**
+       * \brief Constructor
+       *
+       * \param[in] rows The row count of the created matrix.
+       * \param[in] columns The column count of the created matrix.
+       * \param[in] value The value, each element will be set to.
+       *
+       * Creates a matrix with given dimensions and value.
+       */
+      explicit DenseMatrix(Index rows_in, Index columns_in, DT_ value) :
+        Container<Mem_, DT_, IT_>(rows_in * columns_in)
+      {
+        CONTEXT("When creating DenseMatrix");
 
-          this->_scalar_index.at(0) = rows_in * columns_in;
-          this->_scalar_index.push_back(rows_in);
-          this->_scalar_index.push_back(columns_in);
-          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
-          this->_elements_size.push_back(this->_scalar_index.at(0));
-          Util::MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));
-        }
+        this->_scalar_index.at(0) = rows_in * columns_in;
+        this->_scalar_index.push_back(rows_in);
+        this->_scalar_index.push_back(columns_in);
+        this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
+        this->_elements_size.push_back(this->_scalar_index.at(0));
+        Util::MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));
+      }
 
-        /**
-         * \brief Constructor
-         *
-         * \param[in] std::vector<char> A std::vector, containing the byte array.
-         *
-         * Creates a matrix from the given byte array.
-         */
-        template <typename DT2_ = DT_, typename IT2_ = IT_>
-        explicit DenseMatrix(std::vector<char> input) :
-          Container<Mem_, DT_, IT_>(0)
-        {
-          CONTEXT("When creating DenseMatrix");
-          deserialise<DT2_, IT2_>(input);
-        }
+      /**
+       * \brief Constructor
+       *
+       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       *
+       * Creates a matrix from the given byte array.
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      explicit DenseMatrix(std::vector<char> input) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        CONTEXT("When creating DenseMatrix");
+        deserialise<DT2_, IT2_>(input);
+      }
 
-        /**
-         * \brief Move Constructor
-         *
-         * \param[in] other The source matrix.
-         *
-         * Moves a given matrix to this matrix.
-         */
-        DenseMatrix(DenseMatrix && other) :
-          Container<Mem_, DT_, IT_>(std::forward<DenseMatrix>(other))
-        {
-          CONTEXT("When moving DenseMatrix");
-        }
+      /**
+       * \brief Move Constructor
+       *
+       * \param[in] other The source matrix.
+       *
+       * Moves a given matrix to this matrix.
+       */
+      DenseMatrix(DenseMatrix && other) :
+        Container<Mem_, DT_, IT_>(std::forward<DenseMatrix>(other))
+      {
+        CONTEXT("When moving DenseMatrix");
+      }
 
-        /**
-         * \brief Move operator
-         *
-         * \param[in] other The source matrix.
-         *
-         * Moves another matrix to the target matrix.
-         */
-        DenseMatrix & operator= (DenseMatrix && other)
-        {
-          CONTEXT("When moving DenseMatrix");
+      /**
+       * \brief Move operator
+       *
+       * \param[in] other The source matrix.
+       *
+       * Moves another matrix to the target matrix.
+       */
+      DenseMatrix & operator= (DenseMatrix && other)
+      {
+        CONTEXT("When moving DenseMatrix");
 
-          this->move(std::forward<DenseMatrix>(other));
+        this->move(std::forward<DenseMatrix>(other));
 
-          return *this;
-        }
+        return *this;
+      }
 
-        InsertWeakClone ( DenseMatrix );
+      InsertWeakClone ( DenseMatrix );
 
-        /** \brief Shallow copy operation
-         *
-         * Create a shallow copy of itself.
-         *
-         */
-        DenseMatrix shared() const
-        {
-          CONTEXT("When sharing DenseMatrix");
-          DenseMatrix r;
-          r.assign(*this);
-          return r;
-        }
+      /** \brief Shallow copy operation
+       *
+       * Create a shallow copy of itself.
+       *
+       */
+      DenseMatrix shared() const
+      {
+        CONTEXT("When sharing DenseMatrix");
+        DenseMatrix r;
+        r.assign(*this);
+        return r;
+      }
 
 
-        /**
-         * \brief Conversion method
-         *
-         * \param[in] other The source matrix.
-         *
-         * Use source matrix content as content of current matrix
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        void convert(const DenseMatrix<Mem2_, DT2_, IT2_> & other)
-        {
-          CONTEXT("When converting DenseMatrix");
-          this->assign(other);
-        }
+      /**
+       * \brief Conversion method
+       *
+       * \param[in] other The source matrix.
+       *
+       * Use source matrix content as content of current matrix
+       */
+      template <typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const DenseMatrix<Mem2_, DT2_, IT2_> & other)
+      {
+        CONTEXT("When converting DenseMatrix");
+        this->assign(other);
+      }
 
-        /**
-         * \brief Get a pointer to the data array.
-         *
-         * \returns Pointer to the data array.
-         */
-        DT_ * elements()
-        {
-          return this->_elements.at(0);
-        }
+      /**
+       * \brief Get a pointer to the data array.
+       *
+       * \returns Pointer to the data array.
+       */
+      DT_ * elements()
+      {
+        return this->_elements.at(0);
+      }
 
-        DT_ const * elements() const
-        {
-          return this->_elements.at(0);
-        }
+      DT_ const * elements() const
+      {
+        return this->_elements.at(0);
+      }
 
-        /**
-         * \brief Retrieve specific matrix element.
-         *
-         * \param[in] row The row of the matrix element.
-         * \param[in] col The column of the matrix element.
-         *
-         * \returns Specific matrix element.
-         */
-        const DT_ operator()(Index row, Index col) const
-        {
-          CONTEXT("When retrieving DenseMatrix element");
+      /**
+       * \brief Retrieve specific matrix element.
+       *
+       * \param[in] row The row of the matrix element.
+       * \param[in] col The column of the matrix element.
+       *
+       * \returns Specific matrix element.
+       */
+      const DT_ operator()(Index row, Index col) const
+      {
+        CONTEXT("When retrieving DenseMatrix element");
 
-          ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
-          ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
-          return Util::MemoryPool<Mem_>::get_element(this->_elements.at(0), row * this->columns() + col);
-        }
+        ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
+        ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
+        return Util::MemoryPool<Mem_>::get_element(this->_elements.at(0), row * this->columns() + col);
+      }
 
-        /**
-         * \brief Set specific matrix element.
-         *
-         * \param[in] row The row of the matrix element.
-         * \param[in] col The column of the matrix element.
-         * \param[in] value The value to be set.
-         */
-        void operator()(Index row, Index col, DT_ value)
-        {
-          CONTEXT("When setting DenseMatrix element");
+      /**
+       * \brief Set specific matrix element.
+       *
+       * \param[in] row The row of the matrix element.
+       * \param[in] col The column of the matrix element.
+       * \param[in] value The value to be set.
+       */
+      void operator()(Index row, Index col, DT_ value)
+      {
+        CONTEXT("When setting DenseMatrix element");
 
-          ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
-          ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
-          Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
-        }
+        ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
+        ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
+        Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
+      }
 
-        /**
-         * \brief Deserialisation of complete container entity.
-         *
-         * \param[in] std::vector<char> A std::vector, containing the byte array.
-         *
-         * Recreate a complete container entity by a single binary array.
-         */
-        template <typename DT2_ = DT_, typename IT2_ = IT_>
-        void deserialise(std::vector<char> input)
-        {
-          this->template _deserialise<DT2_, IT2_>(FileMode::fm_dm, input);
-        }
+      /**
+       * \brief Deserialisation of complete container entity.
+       *
+       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       *
+       * Recreate a complete container entity by a single binary array.
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      void deserialise(std::vector<char> input)
+      {
+        this->template _deserialise<DT2_, IT2_>(FileMode::fm_dm, input);
+      }
 
-        /**
-         * \brief Serialisation of complete container entity.
-         *
-         * \param[in] mode FileMode enum, describing the actual container specialisation.
-         * \param[out] std::vector<char> A std::vector, containing the byte array.
-         *
-         * Serialize a complete container entity into a single binary array.
-         *
-         * See \ref FEAST::LAFEM::Container::_serialise for details.
-         */
-        template <typename DT2_ = DT_, typename IT2_ = IT_>
-        std::vector<char> serialise()
-        {
-          return this->template _serialise<DT2_, IT2_>(FileMode::fm_dm);
-        }
+      /**
+       * \brief Serialisation of complete container entity.
+       *
+       * \param[in] mode FileMode enum, describing the actual container specialisation.
+       * \param[out] std::vector<char> A std::vector, containing the byte array.
+       *
+       * Serialize a complete container entity into a single binary array.
+       *
+       * See \ref FEAST::LAFEM::Container::_serialise for details.
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      std::vector<char> serialise()
+      {
+        return this->template _serialise<DT2_, IT2_>(FileMode::fm_dm);
+      }
 
-        /**
-         * \brief Retrieve matrix row count.
-         *
-         * \returns Matrix row count.
-         */
-        const Index & rows() const
-        {
-          return this->_scalar_index.at(1);
-        }
+      /**
+       * \brief Retrieve matrix row count.
+       *
+       * \returns Matrix row count.
+       */
+      const Index & rows() const
+      {
+        return this->_scalar_index.at(1);
+      }
 
-        /**
-         * \brief Retrieve matrix column count.
-         *
-         * \returns Matrix column count.
-         */
-        const Index & columns() const
-        {
-          return this->_scalar_index.at(2);
-        }
+      /**
+       * \brief Retrieve matrix column count.
+       *
+       * \returns Matrix column count.
+       */
+      const Index & columns() const
+      {
+        return this->_scalar_index.at(2);
+      }
 
-        /**
-         * \brief Returns a descriptive string.
-         *
-         * \returns A string describing the container.
-         */
-        static String name()
-        {
-          return "DenseMatrix";
-        }
+      /**
+       * \brief Returns a descriptive string.
+       *
+       * \returns A string describing the container.
+       */
+      static String name()
+      {
+        return "DenseMatrix";
+      }
 
-        /**
-         * \brief Performs \f$this \leftarrow x\f$.
-         *
-         * \param[in] x The Matrix to be copied.
-         */
-        void copy(const DenseMatrix & x)
-        {
-          this->_copy_content(x);
-        }
+      /**
+       * \brief Performs \f$this \leftarrow x\f$.
+       *
+       * \param[in] x The Matrix to be copied.
+       */
+      void copy(const DenseMatrix & x)
+      {
+        this->_copy_content(x);
+      }
 
-        /**
-         * \brief Performs \f$this \leftarrow x\f$.
-         *
-         * \param[in] x The Matrix to be copied.
-         */
-        template <typename Mem2_>
-        void copy(const DenseMatrix<Mem2_, DT_, IT_> & x)
-        {
-          this->_copy_content(x);
-        }
+      /**
+       * \brief Performs \f$this \leftarrow x\f$.
+       *
+       * \param[in] x The Matrix to be copied.
+       */
+      template <typename Mem2_>
+      void copy(const DenseMatrix<Mem2_, DT_, IT_> & x)
+      {
+        this->_copy_content(x);
+      }
 
-        Index get_length_of_line(const Index /*row*/) const
-        {
-          return this->columns();
-        }
+      Index get_length_of_line(const Index /*row*/) const
+      {
+        return this->columns();
+      }
       ///@}
 
-        /**
-         * \brief DenseMatrix comparison operator
-         *
-         * \param[in] a A matrix to compare with.
-         * \param[in] b A matrix to compare with.
-         */
-        template <typename Mem2_> friend bool operator== (const DenseMatrix & a, const DenseMatrix<Mem2_, DT_, IT_> & b)
+      /**
+       * \brief DenseMatrix comparison operator
+       *
+       * \param[in] a A matrix to compare with.
+       * \param[in] b A matrix to compare with.
+       */
+      template <typename Mem2_> friend bool operator== (const DenseMatrix & a, const DenseMatrix<Mem2_, DT_, IT_> & b)
+      {
+        CONTEXT("When comparing DenseMatrices");
+
+        if (a.size() != b.size())
+          return false;
+        if (a.get_elements().size() != b.get_elements().size())
+          return false;
+        if (a.get_indices().size() != b.get_indices().size())
+          return false;
+        if (a.rows() != b.rows())
+          return false;
+        if (a.columns() != b.columns())
+          return false;
+
+        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
+          return true;
+
+        bool ret(true);
+
+        DT_ * ta;
+        DT_ * tb;
+
+        if(std::is_same<Mem::Main, Mem_>::value)
+          ta = (DT_*)a.elements();
+        else
         {
-          CONTEXT("When comparing DenseMatrices");
-
-          if (a.size() != b.size())
-            return false;
-          if (a.get_elements().size() != b.get_elements().size())
-            return false;
-          if (a.get_indices().size() != b.get_indices().size())
-            return false;
-          if (a.rows() != b.rows())
-            return false;
-          if (a.columns() != b.columns())
-            return false;
-
-          if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
-            return true;
-
-          bool ret(true);
-
-          DT_ * ta;
-          DT_ * tb;
-
-          if(std::is_same<Mem::Main, Mem_>::value)
-            ta = (DT_*)a.elements();
-          else
-          {
-            ta = new DT_[a.size()];
-            Util::MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.elements(), a.size());
-          }
-          if(std::is_same<Mem::Main, Mem2_>::value)
-            tb = (DT_*)b.elements();
-          else
-          {
-            tb = new DT_[b.size()];
-            Util::MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.elements(), b.size());
-          }
-
-          for (Index i(0) ; i < a.size() ; ++i)
-            if (ta[i] != tb[i])
-            {
-              ret = false;
-              break;
-            }
-
-          if(! std::is_same<Mem::Main, Mem_>::value)
-            delete[] ta;
-          if(! std::is_same<Mem::Main, Mem2_>::value)
-            delete[] tb;
-
-          return ret;
+          ta = new DT_[a.size()];
+          Util::MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.elements(), a.size());
+        }
+        if(std::is_same<Mem::Main, Mem2_>::value)
+          tb = (DT_*)b.elements();
+        else
+        {
+          tb = new DT_[b.size()];
+          Util::MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.elements(), b.size());
         }
 
-        /**
-         * \brief DenseMatrix streaming operator
-         *
-         * \param[in] lhs The target stream.
-         * \param[in] b The matrix to be streamed.
-         */
-        friend std::ostream & operator<< (std::ostream & lhs, const DenseMatrix & b)
-        {
-          lhs << "[" << std::endl;
-          for (Index i(0) ; i < b.rows() ; ++i)
+        for (Index i(0) ; i < a.size() ; ++i)
+          if (ta[i] != tb[i])
           {
-            lhs << "[";
-            for (Index j(0) ; j < b.columns() ; ++j)
-            {
-              lhs << "  " << b(i, j);
-            }
-            lhs << "]" << std::endl;
+            ret = false;
+            break;
+          }
+
+        if(! std::is_same<Mem::Main, Mem_>::value)
+          delete[] ta;
+        if(! std::is_same<Mem::Main, Mem2_>::value)
+          delete[] tb;
+
+        return ret;
+      }
+
+      /**
+       * \brief DenseMatrix streaming operator
+       *
+       * \param[in] lhs The target stream.
+       * \param[in] b The matrix to be streamed.
+       */
+      friend std::ostream & operator<< (std::ostream & lhs, const DenseMatrix & b)
+      {
+        lhs << "[" << std::endl;
+        for (Index i(0) ; i < b.rows() ; ++i)
+        {
+          lhs << "[";
+          for (Index j(0) ; j < b.columns() ; ++j)
+          {
+            lhs << "  " << b(i, j);
           }
           lhs << "]" << std::endl;
-
-          return lhs;
         }
-  };
-} // namespace LAFEM
+        lhs << "]" << std::endl;
+
+        return lhs;
+      }
+    };
+  } // namespace LAFEM
 } // namespace FEAST
 
 #endif // KERNEL_LAFEM_DENSE_MATRIX_HPP

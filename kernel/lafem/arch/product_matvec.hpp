@@ -15,12 +15,12 @@ namespace FEAST
       template <typename Mem_, typename Algo_, typename VectorT_, typename MatrixT_>
       class ProductMat0Vec1GatewayBase
       {
-        public:
-          virtual VectorT_& value(VectorT_& r, const MatrixT_& A, const VectorT_& x) = 0;
+      public:
+        virtual VectorT_& value(VectorT_& r, const MatrixT_& A, const VectorT_& x) = 0;
 
-          virtual ~ProductMat0Vec1GatewayBase()
-          {
-          }
+        virtual ~ProductMat0Vec1GatewayBase()
+        {
+        }
       };
 
       template <typename Mem_, typename Algo_>

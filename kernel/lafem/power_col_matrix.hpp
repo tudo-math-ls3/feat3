@@ -56,9 +56,9 @@ namespace FEAST
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerColMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
 
-        /// number of row blocks (vertical size)
+      /// number of row blocks (vertical size)
       static constexpr Index num_row_blocks = blocks_;
-        /// number of column blocks (horizontal size)
+      /// number of column blocks (horizontal size)
       static constexpr Index num_col_blocks = 1;
 
     protected:

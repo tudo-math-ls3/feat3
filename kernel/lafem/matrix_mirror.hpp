@@ -83,8 +83,8 @@ namespace FEAST
         _work(nullptr)
       {
         Index n = std::max(
-          col_mirror.get_gather_dual().columns(),
-          col_mirror.get_scatter_dual().columns());
+                           col_mirror.get_gather_dual().columns(),
+                           col_mirror.get_scatter_dual().columns());
         _work = new DataType[n];
         for(Index i(0); i < n; ++i)
         {
@@ -152,8 +152,8 @@ namespace FEAST
         typename Ix_,
         typename MT_>
       void gather(
-        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
-        const MT_& matrix) const
+                  LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+                  const MT_& matrix) const
       {
         Intern::SetOp set_op;
         this->_gather(set_op, buffer, matrix);
@@ -177,9 +177,9 @@ namespace FEAST
         typename Ix_,
         typename MT_>
       void gather_axpy(
-        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
-        const MT_& matrix,
-        const Tx_ alpha = Tx_(1)) const
+                       LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+                       const MT_& matrix,
+                       const Tx_ alpha = Tx_(1)) const
       {
         Intern::AxpyOp<Tx_> axpy_op(alpha);
         this->_gather(axpy_op, buffer, matrix);
@@ -200,8 +200,8 @@ namespace FEAST
         typename Tx_,
         typename Ix_>
       void scatter(
-        MT_& matrix,
-        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
+                   MT_& matrix,
+                   const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
       {
         Intern::SetOp set_op;
         this->_scatter(set_op, matrix, buffer);
@@ -225,9 +225,9 @@ namespace FEAST
         typename Tx_,
         typename Ix_>
       void scatter_axpy(
-        MT_& matrix,
-        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
-        const Tx_ alpha = Tx_(1)) const
+                        MT_& matrix,
+                        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+                        const Tx_ alpha = Tx_(1)) const
       {
         Intern::AxpyOp<Tx_> axpy_op(alpha);
         this->_scatter(axpy_op, matrix, buffer);
@@ -236,9 +236,9 @@ namespace FEAST
     private:
       template<typename Op_, typename Tx_, typename Ix_, typename Ty_, typename Iy_>
       void _gather(
-        const Op_& op,
-        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
-        const LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix) const
+                   const Op_& op,
+                   LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+                   const LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
@@ -326,9 +326,9 @@ namespace FEAST
 
       template<typename Op_, typename Ty_, typename Iy_, typename Tx_, typename Ix_>
       void _scatter(
-        const Op_& op,
-        LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix,
-        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
+                    const Op_& op,
+                    LAFEM::SparseMatrixCSR<Mem::Main, Ty_, Iy_>& matrix,
+                    const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
@@ -424,9 +424,9 @@ namespace FEAST
 
       template<typename Op_, typename Tx_, typename Ix_, typename Ty_, typename Iy_>
       void _gather(
-        const Op_& op,
-        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
-        const LAFEM::SparseMatrixELL<Mem::Main, Ty_, Iy_>& matrix) const
+                   const Op_& op,
+                   LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+                   const LAFEM::SparseMatrixELL<Mem::Main, Ty_, Iy_>& matrix) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
@@ -516,9 +516,9 @@ namespace FEAST
 
       template<typename Op_, typename Ty_, typename Iy_, typename Tx_, typename Ix_>
       void _scatter(
-        const Op_& op,
-        LAFEM::SparseMatrixELL<Mem::Main, Ty_, Iy_>& matrix,
-        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
+                    const Op_& op,
+                    LAFEM::SparseMatrixELL<Mem::Main, Ty_, Iy_>& matrix,
+                    const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());
@@ -616,9 +616,9 @@ namespace FEAST
 
       template<typename Op_, typename Tx_, typename Ix_, typename Ty_, typename Iy_>
       void _gather(
-        const Op_& op,
-        LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
-        const LAFEM::SparseMatrixBanded<Mem::Main, Ty_, Iy_>& matrix) const
+                   const Op_& op,
+                   LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer,
+                   const LAFEM::SparseMatrixBanded<Mem::Main, Ty_, Iy_>& matrix) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
@@ -710,9 +710,9 @@ namespace FEAST
 
       template<typename Op_, typename Ty_, typename Iy_, typename Tx_, typename Ix_>
       void _scatter(
-        const Op_& op,
-        LAFEM::SparseMatrixBanded<Mem::Main, Ty_, Iy_>& matrix,
-        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
+                    const Op_& op,
+                    LAFEM::SparseMatrixBanded<Mem::Main, Ty_, Iy_>& matrix,
+                    const LAFEM::SparseMatrixCSR<Mem::Main, Tx_, Ix_>& buffer) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());

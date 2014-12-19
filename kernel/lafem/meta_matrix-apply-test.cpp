@@ -70,7 +70,7 @@ public:
     mat_sys.template apply<AlgoType>(vec_tmp_dense, vec_sol_dense);
     vec_tmp_dense.template axpy<AlgoType>(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.template norm2<AlgoType>(), DataType_(0), tol);
-}
+  }
 
   void test_full() const
   {

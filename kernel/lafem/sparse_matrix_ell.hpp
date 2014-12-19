@@ -982,14 +982,14 @@ namespace FEAST
 
         switch(mode)
         {
-          case FileMode::fm_mtx:
-            read_from_mtx(filename);
-            break;
-          case FileMode::fm_ell:
-            read_from_ell(filename);
-            break;
-          default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        case FileMode::fm_mtx:
+          read_from_mtx(filename);
+          break;
+        case FileMode::fm_ell:
+          read_from_ell(filename);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
 
@@ -1005,14 +1005,14 @@ namespace FEAST
 
         switch(mode)
         {
-          case FileMode::fm_mtx:
-            read_from_mtx(file);
-            break;
-          case FileMode::fm_ell:
-            read_from_ell(file);
-            break;
-          default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        case FileMode::fm_mtx:
+          read_from_mtx(file);
+          break;
+        case FileMode::fm_ell:
+          read_from_ell(file);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
 
@@ -1214,14 +1214,14 @@ namespace FEAST
 
         switch(mode)
         {
-          case FileMode::fm_ell:
-            write_out_ell(filename);
-            break;
-          case FileMode::fm_mtx:
-            write_out_mtx(filename);
-            break;
-          default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        case FileMode::fm_ell:
+          write_out_ell(filename);
+          break;
+        case FileMode::fm_mtx:
+          write_out_mtx(filename);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
 
@@ -1237,14 +1237,14 @@ namespace FEAST
 
         switch(mode)
         {
-          case FileMode::fm_ell:
-            write_out_ell(file);
-            break;
-          case FileMode::fm_mtx:
-           write_out_mtx(file);
-           break;
-          default:
-            throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        case FileMode::fm_ell:
+          write_out_ell(file);
+          break;
+        case FileMode::fm_mtx:
+          write_out_mtx(file);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
       }
 
@@ -1762,8 +1762,8 @@ namespace FEAST
        */
       template<typename Algo_>
       void apply(DenseVector<Mem_,DT_, IT_>& r,
-        const DenseVector<Mem_, DT_, IT_>& x,
-        Arch::ProductMat0Vec1GatewayBase<Mem_, Algo_, DenseVector<Mem_, DT_, IT_>, SparseMatrixELL<Mem_, DT_, IT_> >* gate)
+                 const DenseVector<Mem_, DT_, IT_>& x,
+                 Arch::ProductMat0Vec1GatewayBase<Mem_, Algo_, DenseVector<Mem_, DT_, IT_>, SparseMatrixELL<Mem_, DT_, IT_> >* gate)
       {
         if (r.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");

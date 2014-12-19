@@ -27,7 +27,7 @@ namespace FEAST
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const cs,
                         const IT_ * const cl, const IT_ * const /*rl*/, const DT_ * const x, const Index C, const Index rows);
-};
+      };
 
       extern template void ScaleRows<Mem::Main, Algo::Generic>::csr(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
       extern template void ScaleRows<Mem::Main, Algo::Generic>::csr(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
@@ -73,7 +73,7 @@ namespace FEAST
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const cs,
                         const IT_ * const cl, const IT_ * const /*rl*/, const DT_ * const x, const Index C, const Index rows);
-};
+      };
 
       extern template void ScaleCols<Mem::Main, Algo::Generic>::csr(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
       extern template void ScaleCols<Mem::Main, Algo::Generic>::csr(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
@@ -99,8 +99,7 @@ namespace FEAST
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const cs,
                         const IT_ * const cl, const IT_ * const /*rl*/, const DT_ * const x, const Index C, const Index rows);
-};
-
+      };
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST

@@ -8,18 +8,18 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief Test class for the dense matrix class.
-*
-* \test test description missing
-*
-* \tparam Mem_
-* description missing
-*
-* \tparam DT_
-* description missing
-*
-* \author Dirk Ribbrock
-*/
+ * \brief Test class for the dense matrix class.
+ *
+ * \test test description missing
+ *
+ * \tparam Mem_
+ * description missing
+ *
+ * \tparam DT_
+ * description missing
+ *
+ * \author Dirk Ribbrock
+ */
 template<
   typename Mem_,
   typename Algo_,

@@ -3,7 +3,7 @@
 #define KERNEL_LAFEM_ARCH_COMPONENT_PRODUCT_GENERIC_HPP 1
 
 #ifndef KERNEL_LAFEM_ARCH_COMPONENT_PRODUCT_HPP
-  #error "Do not include this implementation-only header file directly!"
+#error "Do not include this implementation-only header file directly!"
 #endif
 
 namespace FEAST

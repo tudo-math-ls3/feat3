@@ -489,7 +489,7 @@ namespace FEAST
       /// \cond internal
       /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
       void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
-                     const Index col_start, const Index stride = 1) const
+                    const Index col_start, const Index stride = 1) const
       {
         const Index brows(this->first().rows());
         const Index bcolumns(this->first().columns());

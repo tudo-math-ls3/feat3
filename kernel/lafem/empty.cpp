@@ -3,7 +3,7 @@
 // dummy class instance to silence ipo linker optimization warnings about empty liblafem
 class ipo_foobar
 {
-  public:
+public:
   int i;
   ipo_foobar() :
     i(0)

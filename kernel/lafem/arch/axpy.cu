@@ -25,7 +25,7 @@ namespace FEAST
 
       template <typename DT_>
       __global__ void cuda_axpy_mv_csr(DT_ * r, const DT_ a, const DT_ * x, const DT_ * y, const DT_ * val, const Index * col_ind,
-          const Index * row_ptr, const Index count)
+                                       const Index * row_ptr, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
@@ -66,7 +66,7 @@ namespace FEAST
       __global__ void cuda_axpy_banded(DT_ * r, const DT_ alpha, const DT_ * x, const DT_ * y, const DT_ * val, const IT_ * offsets, const Index num_of_offsets, const Index rows, const Index columns)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-          if (idx >= rows)
+        if (idx >= rows)
           return;
 
         const Index k1(rows - 1);

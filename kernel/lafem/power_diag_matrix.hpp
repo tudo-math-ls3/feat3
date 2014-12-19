@@ -56,9 +56,9 @@ namespace FEAST
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerDiagMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
 
-        /// number of row blocks (vertical size)
+      /// number of row blocks (vertical size)
       static constexpr Index num_row_blocks = blocks_;
-        /// number of column blocks (horizontal size)
+      /// number of column blocks (horizontal size)
       static constexpr Index num_col_blocks = blocks_;
 
     protected:
@@ -470,7 +470,7 @@ namespace FEAST
       /// \cond internal
       /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
       void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
-                     const Index col_start, const Index stride = 1) const
+                    const Index col_start, const Index stride = 1) const
       {
         const Index brows(this->first().rows());
         const Index bcolumns(this->first().columns());

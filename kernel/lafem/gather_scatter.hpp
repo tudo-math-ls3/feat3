@@ -56,9 +56,9 @@ namespace FEAST
        */
       template<typename LocalVector_, typename Mapping_>
       void operator()(
-        const LocalVector_& local_vector,
-        const Mapping_& mapping,
-        DataType alpha = DataType_(1));
+                      const LocalVector_& local_vector,
+                      const Mapping_& mapping,
+                      DataType alpha = DataType_(1));
 
       /**
        * \brief Matrix Scatter-Axpy operator
@@ -86,10 +86,10 @@ namespace FEAST
        */
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        const LocalMatrix_& local_matrix,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType alpha = DataType_(1));
+                      const LocalMatrix_& local_matrix,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType alpha = DataType_(1));
     };
 #endif // DOXYGEN
 
@@ -136,9 +136,9 @@ namespace FEAST
        */
       template<typename LocalData_, typename Mapping_>
       void operator()(
-        LocalData_& local_data,
-        const Mapping_& mapping,
-        DataType alpha = DataType_(1));
+                      LocalData_& local_data,
+                      const Mapping_& mapping,
+                      DataType alpha = DataType_(1));
 
       /**
        * \brief Matrix Gather-Axpy operator
@@ -166,10 +166,10 @@ namespace FEAST
        */
       template<typename LocalData_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        LocalMatrix_& local_matrix,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType alpha = DataType_(1));
+                      LocalMatrix_& local_matrix,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType alpha = DataType_(1));
     };
 #endif // DOXYGEN
 
@@ -204,9 +204,9 @@ namespace FEAST
 
       template<typename LocalVector_, typename Mapping_>
       void operator()(
-        const LocalVector_& loc_vec,
-        const Mapping_& mapping,
-        DataType_ alpha = DataType_(1))
+                      const LocalVector_& loc_vec,
+                      const Mapping_& mapping,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local entries
         for(Index i(0); i < mapping.get_num_local_dofs(); ++i)
@@ -255,9 +255,9 @@ namespace FEAST
 
       template<typename LocalVector_, typename Mapping_>
       void operator()(
-        LocalVector_& loc_vec,
-        const Mapping_& mapping,
-        DataType_ alpha = DataType_(1))
+                      LocalVector_& loc_vec,
+                      const Mapping_& mapping,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local entries
         for(Index i(0); i < mapping.get_num_local_dofs(); ++i)
@@ -335,10 +335,10 @@ namespace FEAST
 
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        const LocalMatrix_& loc_mat,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType_ alpha = DataType_(1))
+                      const LocalMatrix_& loc_mat,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
         for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
@@ -454,10 +454,10 @@ namespace FEAST
 
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        LocalMatrix_& loc_mat,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType_ alpha = DataType_(1))
+                      LocalMatrix_& loc_mat,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
         for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
@@ -577,10 +577,10 @@ namespace FEAST
 
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        const LocalMatrix_& loc_mat,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType_ alpha = DataType_(1))
+                      const LocalMatrix_& loc_mat,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
         for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
@@ -710,10 +710,10 @@ namespace FEAST
 
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        LocalMatrix_& loc_mat,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType_ alpha = DataType_(1))
+                      LocalMatrix_& loc_mat,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
         for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
@@ -847,10 +847,10 @@ namespace FEAST
 
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        const LocalMatrix_& loc_mat,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType_ alpha = DataType_(1))
+                      const LocalMatrix_& loc_mat,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
         for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
@@ -970,10 +970,10 @@ namespace FEAST
 
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        LocalMatrix_& loc_mat,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType_ alpha = DataType_(1))
+                      LocalMatrix_& loc_mat,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
         for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
@@ -1091,10 +1091,10 @@ namespace FEAST
 
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        const LocalMatrix_& loc_mat,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType_ alpha = DataType_(1))
+                      const LocalMatrix_& loc_mat,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
         for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
@@ -1216,10 +1216,10 @@ namespace FEAST
 
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        LocalMatrix_& loc_mat,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType_ alpha = DataType_(1))
+                      LocalMatrix_& loc_mat,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
         for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
@@ -1346,10 +1346,10 @@ namespace FEAST
 
       template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
       void operator()(
-        const LocalMatrix_& loc_mat,
-        const RowMapping_& row_map,
-        const ColMapping_& col_map,
-        DataType_ alpha = DataType_(1))
+                      const LocalMatrix_& loc_mat,
+                      const RowMapping_& row_map,
+                      const ColMapping_& col_map,
+                      DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
         for(Index i(0); i < row_map.get_num_local_dofs(); ++i)

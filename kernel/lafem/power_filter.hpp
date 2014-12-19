@@ -47,10 +47,10 @@ namespace FEAST
 
       /// dummy enum
       enum
-      {
-        /// number of filter blocks
-        num_blocks = count_
-      };
+        {
+          /// number of filter blocks
+          num_blocks = count_
+        };
 
     protected:
       /// the first sub-filter
@@ -183,9 +183,9 @@ namespace FEAST
       typedef SubFilter_ SubFilterType;
 
       enum
-      {
-        num_blocks = 1
-      };
+        {
+          num_blocks = 1
+        };
 
     protected:
       SubFilterType _first;

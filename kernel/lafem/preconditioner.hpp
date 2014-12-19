@@ -21,15 +21,15 @@ namespace FEAST
     enum class SparsePreconType
     {
       pt_none = 0,
-      pt_file,
-      pt_jacobi,
-      pt_gauss_seidel,
-      pt_polynomial,
-      pt_ilu,
-      pt_sor,
-      pt_ssor,
-      pt_spai
-    };
+        pt_file,
+        pt_jacobi,
+        pt_gauss_seidel,
+        pt_polynomial,
+        pt_ilu,
+        pt_sor,
+        pt_ssor,
+        pt_spai
+        };
 
     /**
      * \brief Preconditioner base class

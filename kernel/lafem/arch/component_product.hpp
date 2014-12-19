@@ -27,7 +27,7 @@ namespace FEAST
       extern template void ComponentProduct<Mem::Main, Algo::Generic>::value(double *, const double * const, const double * const, const Index);
 
       template <>
-        struct ComponentProduct<Mem::Main, Algo::MKL>
+      struct ComponentProduct<Mem::Main, Algo::MKL>
       {
         static void value(float * r, const float * const x, const float * const y, const Index size);
         static void value(double * r, const double * const x, const double * const y, const Index size);
