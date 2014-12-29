@@ -4,6 +4,8 @@
 
 #ifndef SERIAL
 #include<mpi.h>
+#include<memory>
+#include<kernel/foundation/base.hpp>
 
 namespace FEAST
 {
