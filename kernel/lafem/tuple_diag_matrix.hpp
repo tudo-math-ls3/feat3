@@ -528,7 +528,7 @@ namespace FEAST
        * \param[in] b A matrix to compare with.
        */
 #ifdef FEAST_COMPILER_MICROSOFT
-      template <typename First2_, typename... Rest2__>
+      template <typename First2_, typename... Rest2_>
       friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix<First2_, Rest2_...> & b)
 #else
       template <typename Mem2_>
@@ -837,7 +837,7 @@ namespace FEAST
        * \param[in] b A matrix to compare with.
        */
 #ifdef FEAST_COMPILER_MICROSOFT
-      template <typename First2_, typename... Rest2__>
+      template <typename First2_, typename... Rest2_>
       friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix<First2_, Rest2_...> & b)
 #else
       template <typename Mem2_>
