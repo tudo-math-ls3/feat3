@@ -58,7 +58,7 @@ namespace FEAST
           return count;
         }
 
-        static Index fill(Index* ptr, Index idx[], Index offset, const Space_& space, const CellSet_& cell_set)
+        static Index fill(Index*& ptr, Index idx[], Index offset, const Space_& space, const CellSet_& cell_set)
         {
           // fetch the target set for this dimension
           const typename CellSet_::template TargetSet<shape_dim_>::Type&
@@ -107,7 +107,7 @@ namespace FEAST
             DofMirrorHelper<Space_, CellSet_, shape_dim_>::count(contribs, space, cell_set);
         }
 
-        static Index fill(Index* ptr, Index idx[], const Space_& space, const CellSet_& cell_set)
+        static Index fill(Index*& ptr, Index idx[], const Space_& space, const CellSet_& cell_set)
         {
           Index offset =  DofMirrorHelpWrapper<Space_, CellSet_, shape_dim_ - 1>::fill(ptr, idx, space, cell_set);
           return DofMirrorHelper<Space_, CellSet_, shape_dim_>::fill(ptr, idx, offset, space, cell_set);
@@ -124,7 +124,7 @@ namespace FEAST
           return DofMirrorHelper<Space_, CellSet_, 0>::count(contribs, space, cell_set);
         }
 
-        static Index fill(Index* ptr, Index idx[], const Space_& space, const CellSet_& cell_set)
+        static Index fill(Index*& ptr, Index idx[], const Space_& space, const CellSet_& cell_set)
         {
           return DofMirrorHelper<Space_, CellSet_, 0>::fill(ptr, idx, 0, space, cell_set);
         }
