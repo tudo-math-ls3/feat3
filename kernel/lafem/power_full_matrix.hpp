@@ -124,6 +124,20 @@ namespace FEAST
         _container = std::move(other);
       }
 
+      /**
+       * \brief Read in matrix from file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from(FileMode mode, String filename)
+      {
+        CONTEXT("When reading in PowerFullMatrix");
+
+        ContClass other(mode, filename);
+        _container = std::move(other);
+      }
+
       /// move-assign operator
       PowerFullMatrix& operator=(PowerFullMatrix&& other)
       {
