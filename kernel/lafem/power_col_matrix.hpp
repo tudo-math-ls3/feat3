@@ -104,6 +104,50 @@ namespace FEAST
        */
       explicit PowerColMatrix(FileMode mode, String filename)
       {
+        CONTEXT("When creating PowerColMatrix");
+
+        read_from(mode, filename);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The source filestream.
+       *
+       * \note This constructor is used internally when reading a file
+       *
+       * Creates a power-col-matrix based on the source filestream.
+       */
+      explicit PowerColMatrix(FileMode mode, std::istream& file, String directory = "")
+      {
+        CONTEXT("When creating PowerColMatrix");
+
+        String line;
+        do {
+          if (file.eof())
+            throw InternalError(__func__, __FILE__, __LINE__, "Wrong Input-file");
+          std::getline(file, line);
+          line.trim_me();
+        } while (line.find("%%") == 0 || line == "");
+
+        SubMatrixType tmp_first(mode, directory + line);
+        _first = std::move(tmp_first);
+
+        RestClass tmp_rest(mode, file, directory);
+        _rest = std::move(tmp_rest);
+      }
+
+      /**
+       * \brief Read in matrix from file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from(FileMode mode, String filename)
+      {
+        CONTEXT("When reading in PowerColMatrix");
+
         String directory;
         auto found = filename.rfind("/");
         if (found != std::string::npos)
@@ -126,33 +170,6 @@ namespace FEAST
         _rest = std::move(other._rest);
 
         file.close();
-      }
-
-      /**
-       * \brief Constructor
-       *
-       * \param[in] mode The used file format.
-       * \param[in] file The source filestream.
-       *
-       * Creates a power-col-matrix based on the source filestream.
-       */
-      explicit PowerColMatrix(FileMode mode, std::istream& file, String directory = "")
-      {
-        CONTEXT("When creating PowerColMatrix");
-
-        String line;
-        do {
-          if (file.eof())
-            throw InternalError(__func__, __FILE__, __LINE__, "Wrong Input-file");
-          std::getline(file, line);
-          line.trim_me();
-        } while (line.find("%%") == 0 || line == "");
-
-        SubMatrixType tmp_first(mode, directory + line);
-        _first = std::move(tmp_first);
-
-        RestClass tmp_rest(mode, file, directory);
-        _rest = std::move(tmp_rest);
       }
 
       /// move-assign operator
@@ -553,22 +570,9 @@ namespace FEAST
       /// file-input ctor
       explicit PowerColMatrix(FileMode mode, String filename)
       {
-        String directory;
-        auto found = filename.rfind("/");
-        if (found != std::string::npos)
-        {
-          directory = filename.substr(0, found + 1);
-        }
+        CONTEXT("When creating PowerColMatrix");
 
-        std::ifstream file(filename.c_str(), std::ifstream::in);
-        if (! file.is_open())
-          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-
-        PowerColMatrix other(mode, file, directory);
-
-        _first = std::move(other._first);
-
-        file.close();
+        read_from(mode, filename);
       }
 
       /// filestream-input ctor
@@ -586,6 +590,28 @@ namespace FEAST
 
         SubMatrixType tmp_first(mode, directory + line);
         _first = std::move(tmp_first);
+      }
+
+      void read_from(FileMode mode, String filename)
+      {
+        CONTEXT("When reading in PowerColMatrix");
+
+        String directory;
+        auto found = filename.rfind("/");
+        if (found != std::string::npos)
+        {
+          directory = filename.substr(0, found + 1);
+        }
+
+        std::ifstream file(filename.c_str(), std::ifstream::in);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+
+        PowerColMatrix other(mode, file, directory);
+
+        _first = std::move(other._first);
+
+        file.close();
       }
 
       /// move-assign operator
