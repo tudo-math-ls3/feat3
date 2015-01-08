@@ -160,6 +160,19 @@ namespace FEAST
       {
         CONTEXT("When creating SaddlePointMatrix");
 
+        read_from(mode, filename);
+      }
+
+      /**
+       * \brief Read in matrix from file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from(FileMode mode, String filename)
+      {
+        CONTEXT("When reading in SaddlePointMatrix");
+
         String directory;
         auto found = filename.rfind("/");
         if (found != std::string::npos)
