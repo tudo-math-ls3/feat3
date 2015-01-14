@@ -1,7 +1,7 @@
 This file keeps track of the third-party library versions that have been
 tested with FEAST.
 
-ALGLIB                  3.8.2
+ALGLIB                  3.8.2, 3.9.0
 AMD                     2.3.1, 2.4.0
 SuiteSparse_config      4.2.1, 4.3.1
 UMFPACK                 5.6.2, 5.7.0
