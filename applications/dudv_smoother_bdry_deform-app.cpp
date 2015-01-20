@@ -12,9 +12,9 @@ using namespace FEAST;
  **/
 template
 <
-  typename ShapeType_,
   typename DataType_,
-  typename MemType_
+  typename MemType_,
+  typename ShapeType_
 > struct BdryDeformApp
 {
   /**
@@ -23,8 +23,8 @@ template
    **/
   static void run()
   {
-    typedef MemType_ MemType;
     typedef DataType_ DataType;
+    typedef MemType_ MemType;
     typedef ShapeType_ ShapeType;
 
     typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
@@ -43,7 +43,7 @@ template
     DataType deltat(DataType(1e-3));
 
     // The smoother in all its template glory
-    Geometry::DuDvSmoother<TrafoType, DataType, MemType> mr_dudv(trafo);
+    Geometry::DuDvSmoother<DataType, MemType, TrafoType> mr_dudv(trafo);
     //SmootherType mr_dudv(trafo);
 
     // Call init before tinkering with the boundary coordinates
@@ -177,6 +177,6 @@ int main()
 {
   typedef Mem::Main MemType;
 
-  BdryDeformApp<Shape::Hypercube<2>, double, MemType>::run();
+  BdryDeformApp<double, MemType, Shape::Hypercube<2>>::run();
   return 0;
 }

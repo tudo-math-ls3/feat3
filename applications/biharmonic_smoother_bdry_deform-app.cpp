@@ -43,7 +43,7 @@ template
     DataType deltat(DataType(1e-3));
 
     // The smoother in all its template glory
-    Geometry::BiharmonicSmoother<TrafoType, DataType, MemType> mr_biha(trafo);
+    Geometry::BiharmonicSmoother<DataType, MemType, TrafoType> mr_biha(trafo);
     //SmootherType mr_biha(trafo);
 
     // Call init before tinkering with the boundary coordinates

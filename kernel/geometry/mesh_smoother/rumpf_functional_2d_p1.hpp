@@ -15,28 +15,30 @@ namespace FEAST
     /**
      * @brief Class template for Rumpf functionals, 2d P1
      **/
-    template<typename MemoryType_, typename DataType_>
-    class RumpfFunctional<MemoryType_, DataType_, Shape::Simplex<2> > :
-    public RumpfFunctionalBase<MemoryType_, DataType_>
+    template<typename DataType_>
+    class RumpfFunctional<DataType_, Shape::Simplex<2> > :
+    public RumpfFunctionalBase<DataType_>
     {
 
       public:
+        /// Our data type
+        typedef DataType_ DataType;
         /// Shape type of the underlying transformation
         typedef Shape::Simplex<2> ShapeType;
         /// Our baseclass
-        typedef RumpfFunctionalBase<MemoryType_, DataType_> BaseClass;
+        typedef RumpfFunctionalBase<DataType> BaseClass;
 
         /**
          * \brief Constructor
          **/
         RumpfFunctional(
-          const DataType_ fac_norm_,
-          const DataType_ fac_det_,
-          const DataType_ fac_cof_,
-          const DataType_ fac_reg_) :
+          const DataType fac_norm_,
+          const DataType fac_det_,
+          const DataType fac_cof_,
+          const DataType fac_reg_) :
           BaseClass( fac_norm_,
-          fac_det_/( Math::sqrt( Math::sqr(fac_reg_) + DataType_(1) ) + Math::sqr(fac_reg_) + DataType_(1)),
           fac_det_,
+          fac_det_*( Math::sqrt( Math::sqr(fac_reg_) + DataType(1) ) + Math::sqr(fac_reg_) + DataType(1)),
           fac_cof_,
           fac_reg_)
           {
@@ -46,15 +48,15 @@ namespace FEAST
          * \brief Computes value the Rumpf functional on one element.
          **/
         template<typename Tx_, typename Th_>
-        DataType_ compute_local_functional(const Tx_& x, const Th_& h)
+        DataType compute_local_functional(const Tx_& x, const Th_& h)
         {
-          DataType_ norm_A = compute_norm_A(x,h);
-          DataType_ det_A = compute_det_A(x,h);
-          DataType_ det2_A = compute_det2_A(x,h);
+          DataType norm_A = compute_norm_A(x,h);
+          DataType det_A = compute_det_A(x,h);
+          DataType rec_det_A = compute_rec_det_A(x,h);
 
           return this->_fac_norm*norm_A
             + this->_fac_det*det_A
-            + this->_fac_det2*det2_A;
+            + this->_fac_rec_det*rec_det_A;
 
         }
 
@@ -62,16 +64,16 @@ namespace FEAST
          * \copydoc compute_local_functional()
          **/
         template<typename Tx_, typename Th_>
-        DataType_ compute_local_functional(const Tx_& x, const Th_& h,
-        DataType_& func_norm,
-        DataType_& func_det,
-        DataType_& func_det2)
+        DataType compute_local_functional(const Tx_& x, const Th_& h,
+        DataType& func_norm,
+        DataType& func_det,
+        DataType& func_rec_det)
         {
           func_norm = this->_fac_norm*compute_norm_A(x,h);
           func_det = this->_fac_det*compute_det_A(x,h);
-          func_det2 = this->_fac_det2*compute_det2_A(x,h);
+          func_rec_det = this->_fac_rec_det*compute_rec_det_A(x,h);
 
-          return func_norm + func_det + func_det2;
+          return func_norm + func_det + func_rec_det;
 
         }
 
@@ -79,29 +81,33 @@ namespace FEAST
          * \brief Computes the det term on one element
          **/
         template<typename Tx_, typename Th_ >
-        DataType_ compute_det_A( const Tx_& x, const Th_& h)
+        DataType compute_det_A( const Tx_& x, const Th_& h)
         {
-          return DataType_(0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.2e1));
+          DataType det_;
+          det_ = DataType( DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.2e1)));
+          return det_;
         }
 
         /**
          * \brief Computes the 1/det term on one element
          **/
         template<typename Tx_, typename Th_ >
-        DataType_ compute_det2_A( const Tx_& x, const Th_& h)
+        DataType compute_rec_det_A( const Tx_& x, const Th_& h)
         {
-          return DataType_(0.1e1 / (0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.2e1) + sqrt((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1)) / 0.3e1));
+          DataType rec_det_;
+          rec_det_ = DataType( DataType(0.1e1) / (DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.2e1)) + Math::sqrt(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1))) / DataType(0.3e1)));
+          return rec_det_;
         }
 
         /**
          * \brief Computes the Frobenius norm term for one cell
          **/
         template<typename Tx_, typename Th_ >
-        DataType_ compute_norm_A(const Tx_& x, const Th_& h)
+        DataType compute_norm_A(const Tx_& x, const Th_& h)
         {
-
-          return DataType_(pow(pow(h(0), -0.2e1) * pow(-x(0,0) + x(0,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1), 0.2e1) + pow(h(0), -0.2e1) * pow(-x(1,0) + x(1,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1), 0.2e1) - 0.2e1, 0.2e1));
-
+          DataType norm_;
+          norm_ = DataType( DataType(0.4e1) / DataType(0.9e1) * Math::pow(-DataType(0.2e1) * Math::pow(x(0,0), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,1) - DataType(0.2e1) * Math::pow(x(0,1), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,2) + DataType(0.2e1) * x(0,1) * x(0,2) - DataType(0.2e1) * Math::pow(x(0,2), DataType(0.2e1)) - DataType(0.2e1) * Math::pow(x(1,0), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,1) - DataType(0.2e1) * Math::pow(x(1,1), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,2) + DataType(0.2e1) * x(1,1) * x(1,2) - DataType(0.2e1) * Math::pow(x(1,2), DataType(0.2e1)) + DataType(0.3e1) * Math::pow(h(0), DataType(0.2e1)), DataType(0.2e1)) * Math::pow(h(0), -DataType(0.4e1)));
+          return norm_;
         }
 
         /**
@@ -110,12 +116,12 @@ namespace FEAST
         template<typename Tx_, typename Th_, typename Tgrad_>
         void compute_local_grad( const Tx_& x, const Th_& h, Tgrad_& grad)
         {
-          grad(0,0) = DataType_(0.2e1 * this->_fac_norm * (pow(h(0), -0.2e1) * pow(-x(0,0) + x(0,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1), 0.2e1) + pow(h(0), -0.2e1) * pow(-x(1,0) + x(1,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1), 0.2e1) - 0.2e1) * (-0.2e1 * pow(h(0), -0.2e1) * (-x(0,0) + x(0,1)) - 0.2e1 / 0.3e1 * pow(h(0), -0.2e1) * (-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1)) * sqrt(0.3e1)) + 0.2e1 / 0.3e1 * this->_fac_det * sqrt(0.3e1) * (x(1,1) - x(1,2)) * pow(h(1), -0.2e1) - 0.1e1 * this->_fac_det2 * pow(0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.2e1) + sqrt((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1)) / 0.3e1, -0.2e1) * (0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(1,1) - x(1,2)) * pow(h(1), -0.2e1) + 0.4e1 * pow((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1), -0.1e1 / 0.2e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.4e1) * (x(1,1) - x(1,2))));
-          grad(0,1) = DataType_(0.2e1 * this->_fac_norm * (pow(h(0), -0.2e1) * pow(-x(0,0) + x(0,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1), 0.2e1) + pow(h(0), -0.2e1) * pow(-x(1,0) + x(1,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1), 0.2e1) - 0.2e1) * (0.2e1 * pow(h(0), -0.2e1) * (-x(0,0) + x(0,1)) - 0.2e1 / 0.3e1 * pow(h(0), -0.2e1) * (-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1)) * sqrt(0.3e1)) + 0.2e1 / 0.3e1 * this->_fac_det * sqrt(0.3e1) * (-x(1,0) + x(1,2)) * pow(h(1), -0.2e1) - 0.1e1 * this->_fac_det2 * pow(0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.2e1) + sqrt((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1)) / 0.3e1, -0.2e1) * (0.2e1 / 0.3e1 * sqrt(0.3e1) * (-x(1,0) + x(1,2)) * pow(h(1), -0.2e1) + 0.4e1 * pow((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1), -0.1e1 / 0.2e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.4e1) * (-x(1,0) + x(1,2))));
-          grad(1,0) = DataType_(0.2e1 * this->_fac_norm * (pow(h(0), -0.2e1) * pow(-x(0,0) + x(0,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1), 0.2e1) + pow(h(0), -0.2e1) * pow(-x(1,0) + x(1,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1), 0.2e1) - 0.2e1) * (-0.2e1 * pow(h(0), -0.2e1) * (-x(1,0) + x(1,1)) - 0.2e1 / 0.3e1 * pow(h(0), -0.2e1) * (-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1)) * sqrt(0.3e1)) + 0.2e1 / 0.3e1 * this->_fac_det * sqrt(0.3e1) * (-x(0,1) + x(0,2)) * pow(h(1), -0.2e1) - 0.1e1 * this->_fac_det2 * pow(0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.2e1) + sqrt((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1)) / 0.3e1, -0.2e1) * (0.2e1 / 0.3e1 * sqrt(0.3e1) * (-x(0,1) + x(0,2)) * pow(h(1), -0.2e1) + 0.4e1 * pow((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1), -0.1e1 / 0.2e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.4e1) * (-x(0,1) + x(0,2))));
-          grad(1,1) = DataType_(0.2e1 * this->_fac_norm * (pow(h(0), -0.2e1) * pow(-x(0,0) + x(0,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1), 0.2e1) + pow(h(0), -0.2e1) * pow(-x(1,0) + x(1,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1), 0.2e1) - 0.2e1) * (0.2e1 * pow(h(0), -0.2e1) * (-x(1,0) + x(1,1)) - 0.2e1 / 0.3e1 * pow(h(0), -0.2e1) * (-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1)) * sqrt(0.3e1)) + 0.2e1 / 0.3e1 * this->_fac_det * sqrt(0.3e1) * (x(0,0) - x(0,2)) * pow(h(1), -0.2e1) - 0.1e1 * this->_fac_det2 * pow(0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.2e1) + sqrt((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1)) / 0.3e1, -0.2e1) * (0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) - x(0,2)) * pow(h(1), -0.2e1) + 0.4e1 * pow((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1), -0.1e1 / 0.2e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.4e1) * (x(0,0) - x(0,2))));
-          grad(0,2) = DataType_(0.8e1 / 0.3e1 * this->_fac_norm * (pow(h(0), -0.2e1) * pow(-x(0,0) + x(0,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1), 0.2e1) + pow(h(0), -0.2e1) * pow(-x(1,0) + x(1,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1), 0.2e1) - 0.2e1) * pow(h(0), -0.2e1) * (-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1)) * sqrt(0.3e1) + 0.2e1 / 0.3e1 * this->_fac_det * sqrt(0.3e1) * (x(1,0) - x(1,1)) * pow(h(1), -0.2e1) - 0.1e1 * this->_fac_det2 * pow(0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.2e1) + sqrt((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1)) / 0.3e1, -0.2e1) * (0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(1,0) - x(1,1)) * pow(h(1), -0.2e1) + 0.4e1 * pow((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1), -0.1e1 / 0.2e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.4e1) * (x(1,0) - x(1,1))));
-          grad(1,2) = DataType_(0.8e1 / 0.3e1 * this->_fac_norm * (pow(h(0), -0.2e1) * pow(-x(0,0) + x(0,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(0,0) + x(0,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(0,0) + x(0,2)) * sqrt(0.3e1), 0.2e1) + pow(h(0), -0.2e1) * pow(-x(1,0) + x(1,1), 0.2e1) + pow(h(0), -0.2e1) * pow(-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1), 0.2e1) - 0.2e1) * pow(h(0), -0.2e1) * (-(-x(1,0) + x(1,1)) * sqrt(0.3e1) / 0.3e1 + 0.2e1 / 0.3e1 * (-x(1,0) + x(1,2)) * sqrt(0.3e1)) * sqrt(0.3e1) + 0.2e1 / 0.3e1 * this->_fac_det * sqrt(0.3e1) * (-x(0,0) + x(0,1)) * pow(h(1), -0.2e1) - 0.1e1 * this->_fac_det2 * pow(0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.2e1) + sqrt((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1)) / 0.3e1, -0.2e1) * (0.2e1 / 0.3e1 * sqrt(0.3e1) * (-x(0,0) + x(0,1)) * pow(h(1), -0.2e1) + 0.4e1 * pow((double) (9 * this->_fac_reg * this->_fac_reg) + 0.12e2 * pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), 0.2e1) * pow(h(1), -0.4e1), -0.1e1 / 0.2e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * pow(h(1), -0.4e1) * (-x(0,0) + x(0,1))));
+          grad(0,0) = DataType( DataType(0.8e1) / DataType(0.9e1) * this->_fac_norm * (-DataType(0.2e1) * Math::pow(x(0,0), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,1) - DataType(0.2e1) * Math::pow(x(0,1), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,2) + DataType(0.2e1) * x(0,1) * x(0,2) - DataType(0.2e1) * Math::pow(x(0,2), DataType(0.2e1)) - DataType(0.2e1) * Math::pow(x(1,0), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,1) - DataType(0.2e1) * Math::pow(x(1,1), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,2) + DataType(0.2e1) * x(1,1) * x(1,2) - DataType(0.2e1) * Math::pow(x(1,2), DataType(0.2e1)) + DataType(0.3e1) * Math::pow(h(0), DataType(0.2e1))) * Math::pow(h(0), -DataType(0.4e1)) * (-DataType(0.4e1) * x(0,0) + DataType(0.2e1) * x(0,1) + DataType(0.2e1) * x(0,2)) + DataType(0.2e1) / DataType(0.3e1) * this->_fac_det * Math::sqrt(DataType(0.3e1)) * (x(1,1) - x(1,2)) * Math::pow(h(1), -DataType(0.2e1)) - this->_fac_rec_det * Math::pow(DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.2e1)) + Math::sqrt(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1))) / DataType(0.3e1), -DataType(0.2e1)) * (DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(1,1) - x(1,2)) * Math::pow(h(1), -DataType(0.2e1)) + DataType(0.4e1) * Math::pow(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1)), -DataType(0.1e1) / DataType(0.2e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.4e1)) * (x(1,1) - x(1,2))));
+          grad(0,1) = DataType( DataType(0.8e1) / DataType(0.9e1) * this->_fac_norm * (-DataType(0.2e1) * Math::pow(x(0,0), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,1) - DataType(0.2e1) * Math::pow(x(0,1), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,2) + DataType(0.2e1) * x(0,1) * x(0,2) - DataType(0.2e1) * Math::pow(x(0,2), DataType(0.2e1)) - DataType(0.2e1) * Math::pow(x(1,0), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,1) - DataType(0.2e1) * Math::pow(x(1,1), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,2) + DataType(0.2e1) * x(1,1) * x(1,2) - DataType(0.2e1) * Math::pow(x(1,2), DataType(0.2e1)) + DataType(0.3e1) * Math::pow(h(0), DataType(0.2e1))) * Math::pow(h(0), -DataType(0.4e1)) * (DataType(0.2e1) * x(0,0) - DataType(0.4e1) * x(0,1) + DataType(0.2e1) * x(0,2)) + DataType(0.2e1) / DataType(0.3e1) * this->_fac_det * Math::sqrt(DataType(0.3e1)) * (-x(1,0) + x(1,2)) * Math::pow(h(1), -DataType(0.2e1)) - this->_fac_rec_det * Math::pow(DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.2e1)) + Math::sqrt(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1))) / DataType(0.3e1), -DataType(0.2e1)) * (DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (-x(1,0) + x(1,2)) * Math::pow(h(1), -DataType(0.2e1)) + DataType(0.4e1) * Math::pow(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1)), -DataType(0.1e1) / DataType(0.2e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.4e1)) * (-x(1,0) + x(1,2))));
+          grad(1,0) = DataType( DataType(0.8e1) / DataType(0.9e1) * this->_fac_norm * (-DataType(0.2e1) * Math::pow(x(0,0), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,1) - DataType(0.2e1) * Math::pow(x(0,1), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,2) + DataType(0.2e1) * x(0,1) * x(0,2) - DataType(0.2e1) * Math::pow(x(0,2), DataType(0.2e1)) - DataType(0.2e1) * Math::pow(x(1,0), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,1) - DataType(0.2e1) * Math::pow(x(1,1), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,2) + DataType(0.2e1) * x(1,1) * x(1,2) - DataType(0.2e1) * Math::pow(x(1,2), DataType(0.2e1)) + DataType(0.3e1) * Math::pow(h(0), DataType(0.2e1))) * Math::pow(h(0), -DataType(0.4e1)) * (-DataType(0.4e1) * x(1,0) + DataType(0.2e1) * x(1,1) + DataType(0.2e1) * x(1,2)) + DataType(0.2e1) / DataType(0.3e1) * this->_fac_det * Math::sqrt(DataType(0.3e1)) * (-x(0,1) + x(0,2)) * Math::pow(h(1), -DataType(0.2e1)) - this->_fac_rec_det * Math::pow(DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.2e1)) + Math::sqrt(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1))) / DataType(0.3e1), -DataType(0.2e1)) * (DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (-x(0,1) + x(0,2)) * Math::pow(h(1), -DataType(0.2e1)) + DataType(0.4e1) * Math::pow(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1)), -DataType(0.1e1) / DataType(0.2e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.4e1)) * (-x(0,1) + x(0,2))));
+          grad(1,1) = DataType( DataType(0.8e1) / DataType(0.9e1) * this->_fac_norm * (-DataType(0.2e1) * Math::pow(x(0,0), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,1) - DataType(0.2e1) * Math::pow(x(0,1), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,2) + DataType(0.2e1) * x(0,1) * x(0,2) - DataType(0.2e1) * Math::pow(x(0,2), DataType(0.2e1)) - DataType(0.2e1) * Math::pow(x(1,0), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,1) - DataType(0.2e1) * Math::pow(x(1,1), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,2) + DataType(0.2e1) * x(1,1) * x(1,2) - DataType(0.2e1) * Math::pow(x(1,2), DataType(0.2e1)) + DataType(0.3e1) * Math::pow(h(0), DataType(0.2e1))) * Math::pow(h(0), -DataType(0.4e1)) * (DataType(0.2e1) * x(1,0) - DataType(0.4e1) * x(1,1) + DataType(0.2e1) * x(1,2)) + DataType(0.2e1) / DataType(0.3e1) * this->_fac_det * Math::sqrt(DataType(0.3e1)) * (x(0,0) - x(0,2)) * Math::pow(h(1), -DataType(0.2e1)) - this->_fac_rec_det * Math::pow(DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.2e1)) + Math::sqrt(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1))) / DataType(0.3e1), -DataType(0.2e1)) * (DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(0,0) - x(0,2)) * Math::pow(h(1), -DataType(0.2e1)) + DataType(0.4e1) * Math::pow(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1)), -DataType(0.1e1) / DataType(0.2e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.4e1)) * (x(0,0) - x(0,2))));
+          grad(0,2) = DataType( DataType(0.8e1) / DataType(0.9e1) * this->_fac_norm * (-DataType(0.2e1) * Math::pow(x(0,0), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,1) - DataType(0.2e1) * Math::pow(x(0,1), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,2) + DataType(0.2e1) * x(0,1) * x(0,2) - DataType(0.2e1) * Math::pow(x(0,2), DataType(0.2e1)) - DataType(0.2e1) * Math::pow(x(1,0), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,1) - DataType(0.2e1) * Math::pow(x(1,1), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,2) + DataType(0.2e1) * x(1,1) * x(1,2) - DataType(0.2e1) * Math::pow(x(1,2), DataType(0.2e1)) + DataType(0.3e1) * Math::pow(h(0), DataType(0.2e1))) * Math::pow(h(0), -DataType(0.4e1)) * (DataType(0.2e1) * x(0,0) + DataType(0.2e1) * x(0,1) - DataType(0.4e1) * x(0,2)) + DataType(0.2e1) / DataType(0.3e1) * this->_fac_det * Math::sqrt(DataType(0.3e1)) * (x(1,0) - x(1,1)) * Math::pow(h(1), -DataType(0.2e1)) - this->_fac_rec_det * Math::pow(DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.2e1)) + Math::sqrt(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1))) / DataType(0.3e1), -DataType(0.2e1)) * (DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(1,0) - x(1,1)) * Math::pow(h(1), -DataType(0.2e1)) + DataType(0.4e1) * Math::pow(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1)), -DataType(0.1e1) / DataType(0.2e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.4e1)) * (x(1,0) - x(1,1))));
+          grad(1,2) = DataType( DataType(0.8e1) / DataType(0.9e1) * this->_fac_norm * (-DataType(0.2e1) * Math::pow(x(0,0), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,1) - DataType(0.2e1) * Math::pow(x(0,1), DataType(0.2e1)) + DataType(0.2e1) * x(0,0) * x(0,2) + DataType(0.2e1) * x(0,1) * x(0,2) - DataType(0.2e1) * Math::pow(x(0,2), DataType(0.2e1)) - DataType(0.2e1) * Math::pow(x(1,0), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,1) - DataType(0.2e1) * Math::pow(x(1,1), DataType(0.2e1)) + DataType(0.2e1) * x(1,0) * x(1,2) + DataType(0.2e1) * x(1,1) * x(1,2) - DataType(0.2e1) * Math::pow(x(1,2), DataType(0.2e1)) + DataType(0.3e1) * Math::pow(h(0), DataType(0.2e1))) * Math::pow(h(0), -DataType(0.4e1)) * (DataType(0.2e1) * x(1,0) + DataType(0.2e1) * x(1,1) - DataType(0.4e1) * x(1,2)) + DataType(0.2e1) / DataType(0.3e1) * this->_fac_det * Math::sqrt(DataType(0.3e1)) * (-x(0,0) + x(0,1)) * Math::pow(h(1), -DataType(0.2e1)) - this->_fac_rec_det * Math::pow(DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.2e1)) + Math::sqrt(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1))) / DataType(0.3e1), -DataType(0.2e1)) * (DataType(0.2e1) / DataType(0.3e1) * Math::sqrt(DataType(0.3e1)) * (-x(0,0) + x(0,1)) * Math::pow(h(1), -DataType(0.2e1)) + DataType(0.4e1) * Math::pow(DataType(0.9e1) * this->_fac_reg * this->_fac_reg + DataType(0.12e2) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1), DataType(0.2e1)) * Math::pow(h(1), -DataType(0.4e1)), -DataType(0.1e1) / DataType(0.2e1)) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) * Math::pow(h(1), -DataType(0.4e1)) * (-x(0,0) + x(0,1))));
 
           return;
         }

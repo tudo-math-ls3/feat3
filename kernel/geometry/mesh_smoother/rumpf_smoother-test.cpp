@@ -8,11 +8,9 @@
 #include <kernel/geometry/mesh_smoother/rumpf_smoother_q1hack.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1_d2.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1hack.hpp>
 #include <kernel/geometry/mesh_smoother/rumpf_functional_2d_p1.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1_d2.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_p1.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_2d_q1hack.hpp>
+#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_p1_d2.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -72,12 +70,11 @@ struct helperclass< FEAST::Shape::Simplex<2> >
  **/
 template
 <
-  typename ShapeType_,
-  typename FunctionalShapeType_,
-  template<typename, typename, typename> class FunctionalType_,
-  template<typename ... > class RumpfSmootherType_,
   typename DataType_,
-  typename MemType_
+  typename MemType_,
+  typename ShapeType_,
+  template<typename, typename> class FunctionalType_,
+  template<typename ... > class RumpfSmootherType_
 >
 class RumpfSmootherTest_2d
 : public TestSystem::TaggedTest<Archs::None, DataType_>
@@ -90,10 +87,8 @@ class RumpfSmootherTest_2d
     typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension,ShapeType::dimension, DataType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
-    typedef FunctionalShapeType_ FunctionalShapeType;
-
-    typedef FunctionalType_<MemType, DataType, FunctionalShapeType> FunctionalType;
-    typedef RumpfSmootherType_<FunctionalType, TrafoType, DataType_, MemType> RumpfSmootherType;
+    typedef FunctionalType_<DataType, ShapeType> FunctionalType;
+    typedef RumpfSmootherType_<DataType, MemType, TrafoType, FunctionalType> RumpfSmootherType;
 
     RumpfSmootherTest_2d() :
       TestSystem::TaggedTest<Archs::None, DataType_>("rumpf_smoother_test")
@@ -150,21 +145,25 @@ using MySmootherQ1Hack = Geometry::RumpfSmootherQ1Hack<A, B, C, D>;
 
 typedef Mem::Main MemType;
 
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother, float, MemType> test_hc_f_1;
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset, MySmoother, float, MemType>test_hc_f_2;
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional_D2, MySmoother, float, MemType> test_hc_f_3;
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset_D2, MySmoother, float, MemType> test_hc_f_4;
-RumpfSmootherTest_2d<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctional, MySmoother, float, MemType>test_s_f_1;
-RumpfSmootherTest_2d<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelset, MySmoother, float, MemType>test_s_f_2;
+RumpfSmootherTest_2d<float, MemType, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother> test_hc_f_1;
+RumpfSmootherTest_2d<float, MemType, Shape::Hypercube<2>, Geometry::RumpfFunctional_D2, MySmoother> test_hc_f_2;
+RumpfSmootherTest_2d<float, MemType, Shape::Simplex<2>, Geometry::RumpfFunctional, MySmoother> test_s_f_1;
+RumpfSmootherTest_2d<float, MemType, Shape::Simplex<2>, Geometry::RumpfFunctional_D2, MySmoother> test_s_f_2;
 
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother, double, MemType>test_hc_d_1;
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset, MySmoother, double, MemType>test_hc_d_2;
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctional_D2, MySmoother, double, MemType>test_hc_d_3;
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Hypercube<2>, Geometry::RumpfFunctionalLevelset_D2, MySmoother, double, MemType>test_hc_d_4;
-RumpfSmootherTest_2d<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctional, MySmoother, double, MemType> test_s_d_1;
-RumpfSmootherTest_2d<Shape::Simplex<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelset, MySmoother, double, MemType>test_s_d_2;
+RumpfSmootherTest_2d<double, MemType, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother> test_hc_d_1;
+RumpfSmootherTest_2d<double, MemType, Shape::Hypercube<2>, Geometry::RumpfFunctional_D2, MySmoother> test_hc_d_2;
+RumpfSmootherTest_2d<double, MemType, Shape::Simplex<2>, Geometry::RumpfFunctional, MySmoother> test_s_d_1;
+RumpfSmootherTest_2d<double, MemType, Shape::Simplex<2>, Geometry::RumpfFunctional_D2, MySmoother> test_s_d_2;
 
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelsetQ1Hack, MySmootherQ1Hack, float, MemType>test_q1hack_f;
-RumpfSmootherTest_2d<Shape::Hypercube<2>, Shape::Simplex<2>, Geometry::RumpfFunctionalLevelsetQ1Hack, MySmootherQ1Hack, double, MemType>test_q1hack_d;
+template<typename A, typename B>
+using MyFunctionalQ1Hack = Geometry::RumpfFunctionalQ1Hack<A, B, Geometry::RumpfFunctional>;
+
+template<typename A, typename B>
+using MyFunctionalQ1Hack_D2 = Geometry::RumpfFunctionalQ1Hack<A, B, Geometry::RumpfFunctional_D2>;
+
+RumpfSmootherTest_2d<float, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack> test_q1hack_f_1;
+RumpfSmootherTest_2d<float, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack_D2, MySmootherQ1Hack> test_q1hack_f_2;
+RumpfSmootherTest_2d<double, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack> test_q1hack_d_1;
+RumpfSmootherTest_2d<double, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack_D2, MySmootherQ1Hack> test_q1hack_d_2;
 
 #endif

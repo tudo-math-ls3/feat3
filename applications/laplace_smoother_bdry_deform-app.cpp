@@ -43,7 +43,7 @@ template
     DataType deltat(DataType(1e-3));
 
     // The smoother in all its template glory
-    Geometry::LaplaceSmoother<TrafoType, DataType, MemType> mr_laplace(trafo);
+    Geometry::LaplaceSmoother<DataType, MemType, TrafoType> mr_laplace(trafo);
     //SmootherType mr_laplace(trafo);
 
     // Call init before tinkering with the boundary coordinates

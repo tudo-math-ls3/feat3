@@ -27,20 +27,20 @@ namespace FEAST
      * S. Basting and M. Weismann: A hybrid level set-front tracking finite element approach for fluid-structure
      * interaction and two-phase flow applications, Journal of Computational Physics 255(2013), 228 - 244.
      *
-     * \tparam SpaceType_
-     * Finite element space for the levelset function
-     *
-     * \tparam FunctionalType_
-     * Functional used for defining mesh quality.
-     *
-     * \tparam TrafoType_
-     * Type of the underlying transformation.
-     *
      * \tparam DataType_
      * Our datatype.
      *
      * \tparam MemType_
      * Memory architecture.
+     *
+     * \tparam TrafoType_
+     * Type of the underlying transformation.
+     *
+     * \tparam FunctionalType_
+     * Functional used for defining mesh quality.
+     *
+     * \tparam SpaceType_
+     * Finite element space for the levelset function
      *
      * \tparam H_EvalType
      * Local meshsize evaluator
@@ -50,32 +50,36 @@ namespace FEAST
      */
     template
     <
-      typename SpaceType_,
-      typename FunctionalType_,
-      typename TrafoType_,
       typename DataType_,
       typename MemType_,
+      typename TrafoType_,
+      typename FunctionalType_,
+      typename LevelsetFunctionalType_,
+      typename SpaceType_,
       typename H_EvalType_ = H_Evaluator<TrafoType_, DataType_>
     >
     class RumpfSmootherLevelset :
-      public RumpfSmoother
+      public RumpfSmootherBase
       <
-        FunctionalType_,
-        TrafoType_,
         DataType_,
         MemType_,
+        TrafoType_,
+        FunctionalType_,
         H_EvalType_
       >
     {
       public :
-        /// Type for the functional
-        typedef FunctionalType_ FunctionalType;
-        /// Type for the transformation
-        typedef TrafoType_ TrafoType;
         /// Our datatype
         typedef DataType_ DataType;
         /// Memory architecture
         typedef MemType_ MemType;
+        /// Type for the transformation
+        typedef TrafoType_ TrafoType;
+        /// Type for the functional
+        typedef FunctionalType_ FunctionalType;
+        /// Type for the levelset part of the functional
+        typedef LevelsetFunctionalType_ LevelsetFunctionalType;
+
         /// The mesh the transformation is defined on
         typedef typename TrafoType::MeshType MeshType;
         /// ShapeType of said mesh
@@ -85,16 +89,17 @@ namespace FEAST
         /// Factory for the boundary mesh
         typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
         /// Who's my daddy?
-        typedef RumpfSmoother<FunctionalType_,TrafoType_,DataType_, MemType_,H_EvalType_> BaseClass;
+        typedef RumpfSmootherBase<DataType_, MemType_, TrafoType_, FunctionalType_, H_EvalType_> BaseClass;
         /// Vector types for element sizes etc.
         typedef LAFEM::DenseVector<MemType_, DataType_> VectorType;
         /// Since the functional contains a ShapeType, these have to be the same
-        //static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
-        //"ShapeTypes of the transformation / functional have to agree" );
+        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value, "ShapeTypes of the transformation / functional have to agree" );
 
         /// Vector with the original coordinates
         VectorType _coords_org[TrafoType_::MeshType::world_dim];
 
+        /// Functional for levelset part
+        LevelsetFunctionalType _lvlset_functional;
         /// FE space for the levelset function
         SpaceType_ _lvlset_space;
         /// DoF vector for the levelset function
@@ -105,13 +110,19 @@ namespace FEAST
         VectorType _lvlset_grad_vec[TrafoType_::MeshType::world_dim];
         /// DoF vector the the gradient of the levelset function
         VectorType _lvlset_grad_vtx_vec[TrafoType_::MeshType::world_dim];
+
         /// Align vertices/edges/faces with 0 levelset?
         bool _align_to_lvlset;
         /// Start mesh optimisation from original grid?
         bool _from_original;
         /// Use levelset-based r_adaptivity?
         bool _r_adaptivity;
+        /// Recompute h in each iteration? By default, this is disabled due to poor numerical stability.
+        bool _update_h;
+        /// Regularisation parameter for levelset based optimal scales
         DataType _r_adapt_reg;
+        /// Exponent for levelset based optimal scales.
+        /// The function is vol = vol(dist) = (_r_adapt_reg + dist)^_r_adapt_pow
         DataType _r_adapt_pow;
 
       public:
@@ -134,13 +145,15 @@ namespace FEAST
          * Use levelset-based r_adaptivity?
          *
          **/
-        explicit RumpfSmootherLevelset( TrafoType& trafo_, FunctionalType& functional_, bool align_to_lvlset_, bool from_original_, bool r_adaptivity_)
+        explicit RumpfSmootherLevelset( TrafoType& trafo_, FunctionalType& functional_, LevelsetFunctionalType& lvlset_functional, bool align_to_lvlset_, bool from_original_, bool r_adaptivity_)
           : BaseClass(trafo_, functional_),
+          _lvlset_functional(lvlset_functional),
           _lvlset_space(trafo_),
           _lvlset_vec(_lvlset_space.get_num_dofs()),
           _lvlset_vtx_vec(trafo_.get_mesh().get_num_entities(0)),
           _align_to_lvlset(align_to_lvlset_),
           _from_original(from_original_),
+          _update_h(false),
           _r_adaptivity(r_adaptivity_),
           _r_adapt_reg(Math::pow( Math::eps<DataType_>(),DataType(0.25)) ),
           _r_adapt_pow(DataType(0.5)),
@@ -149,7 +162,7 @@ namespace FEAST
           lvlset_constraint_last(0)
           {
             // This sets the levelset penalty term to 0 if we do not align
-            this->_functional.fac_lvlset *= DataType(_align_to_lvlset);
+            this->_lvlset_functional.fac_lvlset *= DataType(_align_to_lvlset);
 
             for(Index d = 0; d < this->_world_dim; ++d)
             {
@@ -167,6 +180,27 @@ namespace FEAST
         virtual ~RumpfSmootherLevelset()
         {
         };
+
+        /// \copydoc RumpfSmoother::print()
+        virtual void print() override
+        {
+          std::cout << "RumpfSmootherLevelset characteristics: " << std::endl;
+
+          std::cout << "Align to levelset:   " << _align_to_lvlset;
+          if(_align_to_lvlset)
+            std::cout << ", levelset constraint tolerance: " << scientify(lvlset_constraint_tol);
+          std::cout << std::endl;
+
+          std::cout << "Start from original: " << _from_original<< std::endl;
+
+          std::cout << "Use r-adaptivity:    " << _r_adaptivity;
+          if(_r_adaptivity)
+            std::cout << ", update h in each iteration: " << _update_h;
+            std::cout << ", r_adapt_reg = " << scientify(_r_adapt_reg)
+            << ", r_adapt_pow = " << scientify(_r_adapt_pow);
+          std::cout << std::endl;
+          this->_functional.print();
+        }
 
         /// \brief Initialises member variables required for the first application of the smoother
         virtual void init() override
@@ -226,11 +260,11 @@ namespace FEAST
 
             fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h);
             // Add local penalty term to global levelset constraint
-            this->lvlset_constraint_last += this->_functional.compute_lvlset_penalty(lvlset_vals);
+            this->lvlset_constraint_last += this->_lvlset_functional.compute_lvlset_penalty(lvlset_vals);
           }
 
           // Scale levelset constraint correctly and add it to the functional value
-          fval += this->_functional.fac_lvlset/DataType(2)*Math::sqr(lvlset_constraint_last);
+          fval += this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(lvlset_constraint_last);
           return fval;
         } // compute_functional()
 
@@ -248,7 +282,7 @@ namespace FEAST
          * \param[in] func_det
          * The contribution of the det term for each cell
          *
-         * \param[in] func_det2
+         * \param[in] func_rec_det
          * The contribution of the 1/det term for each cell
          *
          * \param[in] func_lvlset
@@ -256,7 +290,7 @@ namespace FEAST
          *
          * Debug variant that saves the different contributions for each cell.
          **/
-        virtual DataType compute_functional( DataType_* func_norm, DataType_* func_det, DataType_* func_det2, DataType* func_lvlset )
+        virtual DataType compute_functional( DataType_* func_norm, DataType_* func_det, DataType_* func_rec_det, DataType* func_lvlset )
         {
           DataType_ fval(0);
           // Total number of cells in the mesh
@@ -272,11 +306,11 @@ namespace FEAST
           // This will hold the levelset values at the mesh vertices for one element
           FEAST::Tiny::Vector <DataType_, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
 
-          DataType_ norm_A(0), det_A(0), det2_A(0), lvlset_penalty(0);
+          DataType_ norm_A(0), det_A(0), rec_det_A(0), lvlset_penalty(0);
 
           DataType_ func_norm_tot(0);
           DataType_ func_det_tot(0);
-          DataType_ func_det2_tot(0);
+          DataType_ func_rec_det_tot(0);
 
           // Reset last levelset constraint
           this->lvlset_constraint_last = DataType(0);
@@ -296,33 +330,33 @@ namespace FEAST
               }
             }
 
-            fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, det2_A);
+            fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
 
-            lvlset_penalty = this->_functional.compute_lvlset_penalty(lvlset_vals);
+            lvlset_penalty = this->_lvlset_functional.compute_lvlset_penalty(lvlset_vals);
             // Add local penalty term to global levelset constraint
             this->lvlset_constraint_last += lvlset_penalty;
 
             func_norm[cell] = this->_mu(cell) * norm_A;
             func_det[cell] = this->_mu(cell) * det_A;
-            func_det2[cell] = this->_mu(cell) * det2_A;
+            func_rec_det[cell] = this->_mu(cell) * rec_det_A;
             func_lvlset[cell] =  lvlset_penalty;
             func_norm_tot += func_norm[cell];
             func_det_tot += func_det[cell];
-            func_det2_tot += func_det2[cell];
+            func_rec_det_tot += func_rec_det[cell];
           }
 
           // Scale levelset constraint correctly and add it to the functional value
-          fval += this->_functional.fac_lvlset/DataType(2)*Math::sqr(lvlset_constraint_last);
+          fval += this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(lvlset_constraint_last);
 
           std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) <<
-            ", func_det2 = " << scientify(func_det2_tot) << ", func_lvlset = " <<
-            scientify(this->_functional.fac_lvlset/DataType(2)*Math::sqr(lvlset_constraint_last)) << std::endl;
+            ", func_rec_det = " << scientify(func_rec_det_tot) << ", func_lvlset = " <<
+            scientify(this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(lvlset_constraint_last)) << std::endl;
 
           return fval;
-        } // compute_functional(func_norm, func_det, func_det2, func_lvlset)
+        } // compute_functional(func_norm, func_det, func_rec_det, func_lvlset)
 
         /// \copydoc RumpfSmoother::compute_gradient()
-        virtual void compute_gradient()
+        virtual void compute_gradient() override
         {
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
@@ -367,7 +401,7 @@ namespace FEAST
             // This does not contain the weighting yet
             grad_loc *= this->_mu(cell);
             // Add levelset penalty term, which is not weighted with lambda
-            this->_functional.add_lvlset_penalty_grad(lvlset_vals, lvlset_grad_vals, grad_loc, lvlset_constraint_last);
+            this->_lvlset_functional.add_lvlset_penalty_grad(lvlset_vals, lvlset_grad_vals, grad_loc, lvlset_constraint_last);
 
             for(Index d(0); d < this->_world_dim; ++d)
             {
@@ -404,6 +438,8 @@ namespace FEAST
           }
 
           this->prepare();
+          this->compute_lambda();
+          this->compute_h();
 
           //int* bdry_id_org;
           // Quadratic penalty method for solving the constraint minimization problem as a sequence of unconstrained
@@ -418,37 +454,43 @@ namespace FEAST
             // Value of the levelset constraint from the previous iteration
             DataType lvlset_constraint_previous = this->lvlset_constraint_last;
 
-            DataType fac_lvlset_org(this->_functional.fac_lvlset);
-            while(this->lvlset_constraint_last > this->lvlset_constraint_tol && this->_functional.fac_lvlset < Math::sqrt(Math::Limits<DataType>::max()))
+            // Save old levelset penalty factor for restoring later
+            DataType fac_lvlset_org(this->_lvlset_functional.fac_lvlset);
+
+            // The Penalty Iteration(TM)
+            while(this->lvlset_constraint_last > this->lvlset_constraint_tol && this->_lvlset_functional.fac_lvlset < Math::sqrt(Math::Limits<DataType>::max()))
             {
               penalty_iterations++;
+              // Update penalty factor
+              this->_lvlset_functional.fac_lvlset *= big_factor_inc;
 
               lvlset_constraint_previous = this->lvlset_constraint_last;
 
-              ALGLIBWrapper<RumpfSmootherLevelset<SpaceType_, FunctionalType_, TrafoType_, DataType_, MemType_, H_EvalType_>>::minimise_functional_cg(*this);
+              ALGLIBWrapper<RumpfSmootherLevelset<DataType_, MemType_, TrafoType_, FunctionalType_, LevelsetFunctionalType_, SpaceType_, H_EvalType_>>::minimise_functional_cg(*this);
 
               // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
               this->set_coords();
 
               // DEBUG
-              //std::cout << "Rumpf Smoother penalty iteration: " << penalty_iterations << ", last constraint: " << this->lvlset_constraint_last << ", penalty factor: " << this->_functional.fac_lvlset << ", fval = " << scientify(this->compute_functional()) << std::endl;
+              //std::cout << "Rumpf Smoother penalty iteration: " << penalty_iterations << ", last constraint: "
+              //<< this->lvlset_constraint_last << ", penalty factor: " << this->_lvlset_functional.fac_lvlset
+              //<< ", fval = " << scientify(this->compute_functional()) << std::endl;
 
               // Increment for the penalty factor
               // Increase penalty parameter by at least factor 5, very arbitrary
-              big_factor_inc = DataType(5)*this->_functional.fac_lvlset*
+              big_factor_inc = DataType(5)*this->_lvlset_functional.fac_lvlset*
                 Math::max<DataType>(Math::sqr(lvlset_constraint_previous/this->lvlset_constraint_last), DataType(1));
 
-              this->_functional.fac_lvlset *= big_factor_inc;
             }
 
             std::cout << "Rumpf Smoother penalty iterations: " << penalty_iterations <<
               ", last constraint: " << this->lvlset_constraint_last <<
-              ", penalty factor: " << this->_functional.fac_lvlset <<
+              ", penalty factor: " << this->_lvlset_functional.fac_lvlset <<
               ", fval = " << scientify(this->compute_functional())
               << std::endl;
 
             // Restore original values
-            this->_functional.fac_lvlset = fac_lvlset_org;
+            this->_lvlset_functional.fac_lvlset = fac_lvlset_org;
 
             //bdry_id_org = new int[this->_mesh.get_num_entities(0)];
             //const DataType eps = DataType(1e-4);//Math::sqrt(Math::eps<DataType>());
@@ -463,7 +505,7 @@ namespace FEAST
           else
           {
             // Standard method
-            ALGLIBWrapper<RumpfSmootherLevelset<SpaceType_, FunctionalType_, TrafoType_, DataType_, MemType_, H_EvalType_>>::minimise_functional_cg(*this);
+            ALGLIBWrapper<RumpfSmootherLevelset<DataType_, MemType_, TrafoType_, FunctionalType_, LevelsetFunctionalType_, SpaceType_, H_EvalType_>>::minimise_functional_cg(*this);
             // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
             this->set_coords();
           }
@@ -485,7 +527,7 @@ namespace FEAST
          * vertices.
          *
          **/
-        virtual void prepare()
+        virtual void prepare() override
         {
           // Project the levelset function to a grid vector on the new grid and...
           FEAST::Assembly::DiscreteVertexProjector::project(_lvlset_vtx_vec, _lvlset_vec, _lvlset_space);
@@ -495,7 +537,7 @@ namespace FEAST
           FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_grad_vtx_vec[1],this->_lvlset_grad_vec[1], this->_lvlset_space);
 
           // As the levelset might be used for r-adaptivity and it's vertex vector might have changed, re-compute
-          if(this->_r_adaptivity)
+          if(this->_update_h && this->_r_adaptivity)
           {
             this->compute_lambda();
 
@@ -508,7 +550,7 @@ namespace FEAST
         }
 
         /// \copydoc RumpfSmoother::compute_lambda()
-        virtual void compute_lambda()
+        virtual void compute_lambda() override
         {
           if(this->_r_adaptivity)
           {
@@ -542,16 +584,36 @@ namespace FEAST
             DataType tmp(0);
 
             for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-              tmp += Math::sqr(this->_lvlset_vtx_vec(idx(cell,j)));
+              tmp += this->_lvlset_vtx_vec(idx(cell,j));
 
-            this->_lambda(cell, this->_r_adapt_reg + Math::pow(tmp,this->_r_adapt_pow));
+            tmp = tmp/DataType(Shape::FaceTraits<ShapeType,0>::count);
+            tmp = Math::pow(this->_r_adapt_reg + Math::abs(tmp),this->_r_adapt_pow);
+
+            this->_lambda(cell, tmp);
             sum_lambda+=this->_lambda(cell);
           }
 
           // Scale so that sum(lambda) = 1
           sum_lambda = DataType(1)/sum_lambda;
           for(Index cell(0); cell < ncells; ++cell)
+          {
             this->_lambda(cell,sum_lambda*this->_lambda(cell));
+            // DEBUG: Set mu to lambda
+            //this->_mu(cell,this->_lambda(cell));
+          }
+
+          // DEBUG: Set mu to 1/lambda and scale such that sum(mu) = 1
+          //DataType sum_mu(0);
+          //for(Index cell(0); cell < ncells; ++cell)
+          //{
+          //  this->_mu(cell,DataType(1)/this->_lambda(cell));
+          //  sum_mu+=this->_mu(cell);
+          //}
+
+          //// Scale so that sum(mu) = 1
+          //sum_mu= DataType(1)/sum_mu;
+          //for(Index cell(0); cell < ncells; ++cell)
+          //  this->_mu(cell,sum_mu*this->_mu(cell));
 
         }
 
@@ -602,21 +664,23 @@ namespace FEAST
       typename AnalyticFunctionType_,
       typename AnalyticFunctionGrad0Type_,
       typename AnalyticFunctionGrad1Type_,
-      typename SpaceType_,
-      typename FunctionalType_,
-      typename TrafoType_,
       typename DataType_,
       typename MemType_,
+      typename TrafoType_,
+      typename FunctionalType_,
+      typename LevelsetFunctionalType_,
+      typename SpaceType_,
       typename H_EvalType_ = H_Evaluator<TrafoType_, DataType_>
     >
     class RumpfSmootherLevelsetAnalytic :
       public RumpfSmootherLevelset
       <
-        SpaceType_,
-        FunctionalType_,
-        TrafoType_,
         DataType_,
         MemType_,
+        TrafoType_,
+        FunctionalType_,
+        LevelsetFunctionalType_,
+        SpaceType_,
         H_EvalType_
       >
     {
@@ -626,11 +690,12 @@ namespace FEAST
         /// Baseclass
         typedef RumpfSmootherLevelset
         <
-          SpaceType_,
-          FunctionalType_,
-          TrafoType_,
           DataType_,
           MemType_,
+          TrafoType_,
+          FunctionalType_,
+          LevelsetFunctionalType_,
+          SpaceType_,
           H_EvalType_
         > BaseClass;
 
@@ -666,13 +731,14 @@ namespace FEAST
         explicit RumpfSmootherLevelsetAnalytic(
           TrafoType& trafo_,
           FunctionalType_& functional_,
+          LevelsetFunctionalType_& lvlset_functional_,
           bool align_to_lvlset_,
           bool from_original_,
           bool r_adaptivity_,
           AnalyticFunctionType_& analytic_function_,
           AnalyticFunctionGrad0Type_& analytic_function_grad0_,
           AnalyticFunctionGrad1Type_& analytic_function_grad1_)
-          : BaseClass(trafo_, functional_, align_to_lvlset_, from_original_, r_adaptivity_),
+          : BaseClass(trafo_, functional_, lvlset_functional_, align_to_lvlset_, from_original_, r_adaptivity_),
           _analytic_lvlset(analytic_function_),
           _analytic_lvlset_grad0(analytic_function_grad0_),
           _analytic_lvlset_grad1(analytic_function_grad1_)

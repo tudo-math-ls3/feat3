@@ -24,11 +24,12 @@ namespace FEAST
       typename AnalyticFunctionType_,
       typename AnalyticFunctionGrad0Type_,
       typename AnalyticFunctionGrad1Type_,
-      typename SpaceType_,
-      typename FunctionalType_,
-      typename TrafoType_,
       typename DataType_,
       typename MemType_,
+      typename TrafoType_,
+      typename FunctionalType_,
+      typename LevelsetFunctionalType_,
+      typename SpaceType_,
       typename H_EvalType_ = H_EvaluatorQ1Hack<TrafoType_, DataType_>
     >
     class RumpfSmootherLevelsetAnalyticQ1Hack :
@@ -37,23 +38,26 @@ namespace FEAST
         AnalyticFunctionType_,
         AnalyticFunctionGrad0Type_,
         AnalyticFunctionGrad1Type_,
-        SpaceType_,
-        FunctionalType_,
-        TrafoType_,
         DataType_,
         MemType_,
+        TrafoType_,
+        FunctionalType_,
+        LevelsetFunctionalType_,
+        SpaceType_,
         H_EvalType_
       >
     {
       public:
-        /// Our functional type
-        typedef FunctionalType_ FunctionalType;
-        /// Transformation type
-        typedef TrafoType_ TrafoType;
         /// Our datatype
         typedef DataType_ DataType;
         /// Memory architecture
         typedef MemType_ MemType;
+        /// Transformation type
+        typedef TrafoType_ TrafoType;
+        /// Our functional type
+        typedef FunctionalType_ FunctionalType;
+        /// Our levelset functional type
+        typedef LevelsetFunctionalType_ LevelsetFunctionalType;
         /// ShapeType
         typedef typename TrafoType::ShapeType ShapeType;
         /// Mesh of said ShapeType
@@ -69,18 +73,20 @@ namespace FEAST
           AnalyticFunctionType_,
           AnalyticFunctionGrad0Type_,
           AnalyticFunctionGrad1Type_,
-          SpaceType_,
-          FunctionalType_,
-          TrafoType_,
           DataType_,
           MemType_,
+          TrafoType_,
+          FunctionalType_,
+          LevelsetFunctionalType_,
+          SpaceType_,
           H_EvalType_
         > BaseClass;
 
         /// \copydoc BaseClass::RumpfSmootherLevelsetAnalytic()
         explicit RumpfSmootherLevelsetAnalyticQ1Hack(
           TrafoType& trafo_,
-          FunctionalType_& functional_,
+          FunctionalType& functional_,
+          LevelsetFunctionalType& lvlset_functional_,
           bool align_to_lvlset_,
           bool from_original_,
           bool r_adaptivity_,
@@ -90,6 +96,7 @@ namespace FEAST
           : BaseClass(
             trafo_,
             functional_,
+            lvlset_functional_,
             align_to_lvlset_,
             from_original_,
             r_adaptivity_ ,
@@ -148,12 +155,12 @@ namespace FEAST
             for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
               lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
 
-            lvlset_penalty = this->_functional.compute_lvlset_penalty(lvlset_vals);
+            lvlset_penalty = this->_lvlset_functional.compute_lvlset_penalty(lvlset_vals);
             // Add local penalty term to global levelset constraint
             this->lvlset_constraint_last += lvlset_penalty;
           } // cell
 
-          fval += this->_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last);
+          fval += this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last);
 
           return fval;
         } // compute_functional
@@ -162,7 +169,7 @@ namespace FEAST
          * This makes the baseclass' compute_functional available, as one might want to compute the functional value
          * without the levelset contribution and now the compiler no longer complains about overloaded virtual
          */
-        using BaseClass::compute_functional;
+        //using BaseClass::compute_functional;
         /**
          * \copydoc RumpfSmootherLevelset::compute_functional()
          *
@@ -172,7 +179,7 @@ namespace FEAST
          * \param[in] func_det
          * The contribution of the det term for each cell
          *
-         * \param[in] func_det2
+         * \param[in] func_rec_det
          * The contribution of the 1/det term for each cell
          *
          * \param[in] func_lvlset
@@ -181,7 +188,7 @@ namespace FEAST
          * Debug variant that saves the different contributions for each cell.
          **/
         virtual DataType compute_functional(DataType_* func_norm, DataType_* func_det,
-        DataType_* func_det2, DataType* func_lvlset) override
+        DataType_* func_rec_det, DataType* func_lvlset) override
         {
           DataType_ fval(0);
           // Total number of cells in the mesh
@@ -206,11 +213,11 @@ namespace FEAST
           // This will hold the levelset values at the mesh vertices for one element
           FEAST::Tiny::Vector <DataType_, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
 
-          DataType_ norm_A(0), det_A(0), det2_A(0), lvlset_penalty(0);
+          DataType_ norm_A(0), det_A(0), rec_det_A(0), lvlset_penalty(0);
 
           DataType_ func_norm_tot(0);
           DataType_ func_det_tot(0);
-          DataType_ func_det2_tot(0);
+          DataType_ func_rec_det_tot(0);
 
           // Reset last levelset constraint
           this->lvlset_constraint_last = DataType(0);
@@ -220,7 +227,7 @@ namespace FEAST
           {
             func_norm[cell] = DataType(0);
             func_det[cell] = DataType(0);
-            func_det2[cell] = DataType(0);
+            func_rec_det[cell] = DataType(0);
 
             //std::cout << "cell " << cell << std::endl;
             for(Index p(0); p < n_perms; ++p)
@@ -237,32 +244,32 @@ namespace FEAST
                 //std::cout << std::endl;
               }
 
-              fval += this->_lambda(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, det2_A);
+              fval += this->_lambda(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
 
               func_norm[cell] += this->_lambda(cell) * norm_A;
               func_det[cell] += this->_lambda(cell) * det_A;
-              func_det2[cell] += this->_lambda(cell) * det2_A;
+              func_rec_det[cell] += this->_lambda(cell) * rec_det_A;
               func_norm_tot += func_norm[cell];
               func_det_tot += func_det[cell];
-              func_det2_tot += func_det2[cell];
+              func_rec_det_tot += func_rec_det[cell];
             }
 
             // The levelset penalty has to be computed for the hypercube case
             for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
               lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
 
-            lvlset_penalty = this->_functional.compute_lvlset_penalty(lvlset_vals);
+            lvlset_penalty = this->_lvlset_functional.compute_lvlset_penalty(lvlset_vals);
             // Add local penalty term to global levelset constraint
             this->lvlset_constraint_last += lvlset_penalty;
             func_lvlset[cell] +=  lvlset_penalty;
           }
 
           // Scale levelset constraint correctly and add it to the functional value
-          fval += this->_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last);
+          fval += this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last);
 
           std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) <<
-            ", func_det2 = " << scientify(func_det2_tot) << ", func_lvlset = " <<
-            scientify(this->_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last)) << std::endl;
+            ", func_rec_det = " << scientify(func_rec_det_tot) << ", func_lvlset = " <<
+            scientify(this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last)) << std::endl;
 
           return fval;
         } // compute_functional
@@ -338,7 +345,7 @@ namespace FEAST
 
             }
             // Add levelset penalty term, which is not weighted with lambda
-            this->_functional.add_lvlset_penalty_grad(lvlset_vals, lvlset_grad_vals, grad_loc, this->lvlset_constraint_last);
+            this->_lvlset_functional.add_lvlset_penalty_grad(lvlset_vals, lvlset_grad_vals, grad_loc, this->lvlset_constraint_last);
             for(Index d(0); d < this->_world_dim; ++d)
             {
               // Add local contributions to global gradient vector

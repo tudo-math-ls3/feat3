@@ -38,9 +38,9 @@ namespace FEAST
      * \author Jordi Paul
      *
      */
-    template<typename TrafoType_, typename DataType_, typename MemType_>
+    template<typename DataType_, typename MemType_, typename TrafoType_>
     class DuDvSmoother :
-      public MeshSmoother<TrafoType_, DataType_, MemType_>
+      public MeshSmoother<DataType_, MemType_, TrafoType_>
     {
       public:
         /// Type for the transformation
@@ -51,7 +51,7 @@ namespace FEAST
         typedef MemType_ MemType;
 
         /// Our base class
-        typedef MeshSmoother<TrafoType, DataType, MemType> BaseClass;
+        typedef MeshSmoother<DataType, MemType, TrafoType> BaseClass;
 
         /// The mesh the transformation is defined on
         typedef typename TrafoType::MeshType MeshType;

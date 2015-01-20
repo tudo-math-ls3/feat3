@@ -20,30 +20,30 @@ namespace FEAST
      **/
     template
     <
-      typename FunctionalType_,
-      typename TrafoType_,
       typename DataType_,
-      typename MemType_
+      typename MemType_,
+      typename TrafoType_,
+      typename FunctionalType_
     >
     class RumpfSmootherQ1Hack :
-      public RumpfSmoother
+      public RumpfSmootherBase
       <
-        FunctionalType_,
-        TrafoType_,
         DataType_,
         MemType_,
+        TrafoType_,
+        FunctionalType_,
         H_EvaluatorQ1Hack<TrafoType_, DataType_>
       >
     {
       public:
-        /// Our functional type
-        typedef FunctionalType_ FunctionalType;
-        /// Transformation type
-        typedef TrafoType_ TrafoType;
         /// Our datatype
         typedef DataType_ DataType;
         /// Memory architecture
         typedef MemType_ MemType;
+        /// Transformation type
+        typedef TrafoType_ TrafoType;
+        /// Our functional type
+        typedef FunctionalType_ FunctionalType;
         /// Meshsize evaluator
         typedef H_EvaluatorQ1Hack<TrafoType_, DataType_> H_EvalType;
         /// ShapeType
@@ -51,10 +51,10 @@ namespace FEAST
         /// Mesh of said ShapeType
         typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
         /// Who's my daddy?
-        typedef RumpfSmoother< FunctionalType_, TrafoType, DataType_, MemType_, H_EvalType > BaseClass;
+        typedef RumpfSmootherBase<DataType_, MemType_, TrafoType, FunctionalType_, H_EvalType > BaseClass;
         // The functional has to use Simplex<shape_dim> and the trafo Hypercube<shape_dim>
-        static_assert( std::is_same<ShapeType, Shape::Hypercube<ShapeType::dimension> >::value &&
-        std::is_same<typename FunctionalType::ShapeType, Shape::Simplex<ShapeType::dimension> >::value, "ShapeTypes of the transformation / functional have to be Hypercube<d>/Simplex<d> for RumpfSmootherQ1Hack" );
+        //static_assert( std::is_same<ShapeType, Shape::Hypercube<ShapeType::dimension> >::value &&
+        //std::is_same<typename FunctionalType::ShapeType, Shape::Simplex<ShapeType::dimension> >::value, "ShapeTypes of the transformation / functional have to be Hypercube<d>/Simplex<d> for RumpfSmootherQ1Hack" );
 
         /// \copydoc RumpfSmoother()
         explicit RumpfSmootherQ1Hack( const TrafoType& trafo_, FunctionalType& functional_)
@@ -63,7 +63,7 @@ namespace FEAST
           }
 
         /// \copydoc BaseClass::compute_functional()
-        virtual DataType compute_functional() override
+        virtual DataType compute_functional()
         {
           DataType_ fval(0);
           // Total number of cells in the mesh
@@ -106,7 +106,7 @@ namespace FEAST
         } // compute_functional
 
         /// \copydoc BaseClass::compute_functional(DataType_*, DataType_*, DataType_*)
-        virtual DataType compute_functional( DataType_* func_norm, DataType_* func_det, DataType_* func_det2 ) override
+        virtual DataType compute_functional( DataType_* func_norm, DataType_* func_det, DataType_* func_rec_det )
         {
           DataType_ fval(0);
           // Total number of cells in the mesh
@@ -129,18 +129,18 @@ namespace FEAST
           // Local cell dimensions for passing to other routines
           FEAST::Tiny::Vector<DataType_, MeshType::world_dim> h;
 
-          DataType_ norm_A(0), det_A(0), det2_A(0);
+          DataType_ norm_A(0), det_A(0), rec_det_A(0);
 
           DataType_ func_norm_tot(0);
           DataType_ func_det_tot(0);
-          DataType_ func_det2_tot(0);
+          DataType_ func_rec_det_tot(0);
 
           // Compute the functional value for each cell...
           for(Index cell(0); cell < ncells; ++cell)
           {
             func_norm[cell] = DataType(0);
             func_det[cell] = DataType(0);
-            func_det2[cell] = DataType(0);
+            func_rec_det[cell] = DataType(0);
 
             //std::cout << "cell " << cell << std::endl;
             // ... and for each simplex in all permutations
@@ -157,26 +157,26 @@ namespace FEAST
                 }
                 //std::cout << std::endl;
               }
-              fval += this->_lambda(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, det2_A);
+              fval += this->_lambda(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
 
               func_norm[cell] += this->_lambda(cell) * norm_A;
               func_det[cell] += this->_lambda(cell) * det_A;
-              func_det2[cell] += this->_lambda(cell) * det2_A;
+              func_rec_det[cell] += this->_lambda(cell) * rec_det_A;
             }
             func_norm_tot += func_norm[cell];
             func_det_tot += func_det[cell];
-            func_det2_tot += func_det2[cell];
+            func_rec_det_tot += func_rec_det[cell];
           }
 
           std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) <<
-            ", func_det2 = " << scientify(func_det2_tot) << std::endl;
+            ", func_rec_det = " << scientify(func_rec_det_tot) << std::endl;
 
           return fval;
         } // compute_functional
 
         /// \brief Computes the gradient of the functional with regard to the nodal coordinates.
         /// \copydoc BaseClass::compute_gradient()
-        virtual void compute_gradient() override
+        virtual void compute_gradient()
         {
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
@@ -241,6 +241,14 @@ namespace FEAST
           }
 
         } // compute_gradient
+
+        /// \copydoc MeshSmoother::optimise()
+        virtual void optimise()
+        {
+          ALGLIBWrapper<RumpfSmootherQ1Hack<DataType_, MemType_, TrafoType_, FunctionalType_>>::minimise_functional_cg(*this);
+          // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
+          this->set_coords();
+        }
 
     }; // class RumpfSmootherQ1Hack
 

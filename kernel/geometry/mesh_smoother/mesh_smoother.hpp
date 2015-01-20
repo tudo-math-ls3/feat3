@@ -17,28 +17,28 @@ namespace FEAST
      * This abstract class is the baseclass for all mesh optimisation algorithms, which can be direct, variational
      * or something entirely different.
      *
-     * \tparam TrafoType_
-     * Type of the underlying transformation.
-     *
      * \tparam DataType_
      * Our datatype.
      *
      * \tparam MemType_
      * Memory architecture.
      *
+     * \tparam TrafoType_
+     * Type of the underlying transformation.
+     *
      * \author Jordi Paul
      *
      */
-    template<typename TrafoType_, typename DataType_, typename MemType_>
+    template<typename DataType_, typename MemType_, typename TrafoType_>
     class MeshSmoother
     {
       public:
-        /// Type for the transformation
-        typedef TrafoType_ TrafoType;
         /// Our datatype
         typedef DataType_ DataType;
         /// Memory architecture
         typedef MemType_ MemType;
+        /// Type for the transformation
+        typedef TrafoType_ TrafoType;
         /// The mesh the transformation is defined on
         typedef typename TrafoType::MeshType MeshType;
         /// ShapeType of said mesh
@@ -49,7 +49,7 @@ namespace FEAST
         /// Coordinates of the vertices, as they get changed in the optimisation process
         VectorType _coords[MeshType::world_dim];
 
-      protected:
+      public:
         /// The underlying transformation
         const TrafoType& _trafo;
         /// The mesh for the underlying transformation
