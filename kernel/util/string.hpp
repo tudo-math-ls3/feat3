@@ -784,7 +784,7 @@ namespace FEAST
     String& join(
       Iterator_ first,
       Iterator_ last,
-      const String delimiter = "")
+      const String & delimiter = "")
     {
       Iterator_ it(first);
       while(it != last)
@@ -816,7 +816,7 @@ namespace FEAST
     template<typename Container_>
     String& join(
       const Container_& container,
-      const String delimiter = "")
+      const String & delimiter = "")
     {
       return join(container.cbegin(), container.cend(), delimiter);
     }
