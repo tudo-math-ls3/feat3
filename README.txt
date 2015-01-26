@@ -17,6 +17,5 @@ This will automagically detect a proper tool/setting setup and build all FEAST c
 './configure-feast help' reveals a lot more configuration possiblities.
 
 === TEST RUN ===
-To check if your system created a correct FEAST binary, you can run a set of unittests with the additional commands
-make tests
+To check if your system created a correct FEAST binary, you can run a set of unittests with the additional command
 ctest
