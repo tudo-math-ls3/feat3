@@ -7,6 +7,8 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 PROJECT( FEAST )
 
+site_name( FEAST_HOSTNAME )
+
 include (CTest)
 ENABLE_TESTING()
 configure_file (${FEAST_SOURCE_DIR}/CTestCustom.cmake.in ${FEAST_BINARY_DIR}/CTestCustom.cmake COPONLY)
@@ -43,10 +45,6 @@ if (FEAST_VALGRIND)
 endif (FEAST_VALGRIND)
 
 
-# store all variables describing the build in a custom header file
-# to use later on in the real code
-configure_file (${FEAST_SOURCE_DIR}/feast_config.hpp.in ${FEAST_BINARY_DIR}/feast_config.hpp)
-
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 
@@ -61,6 +59,11 @@ if(DOXYGEN_FOUND)
     )
 endif(DOXYGEN_FOUND)
 
+if (CMAKE_CXX_COMPILER_ARG1)
+  string(STRIP ${CMAKE_CXX_COMPILER_ARG1} CMAKE_CXX_COMPILER_ARG1_STRIPED)
+  find_path(CMAKE_CXX_COMPILER_ARG1_PATH ${CMAKE_CXX_COMPILER_ARG1_STRIPED})
+endif (CMAKE_CXX_COMPILER_ARG1)
+
 # directories to scan recursively
 ADD_SUBDIRECTORY( thirdparty )
 ADD_SUBDIRECTORY( kernel )
@@ -69,3 +72,7 @@ ADD_SUBDIRECTORY( tools )
 ADD_SUBDIRECTORY( applications )
 ADD_SUBDIRECTORY( benchmarks )
 ADD_SUBDIRECTORY( tutorials )
+
+# store all variables describing the build in a custom header file
+# to use later on in the real code
+configure_file (${FEAST_SOURCE_DIR}/feast_config.hpp.in ${FEAST_BINARY_DIR}/feast_config.hpp)

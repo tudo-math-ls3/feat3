@@ -39,6 +39,67 @@ This macro contains a string literal specifying the user provided build id strin
 \subsection ppm_feast_cpu_type FEAST_CPU_TYPE
 This macro contains a string literal describing the detected target cpu type.
 
+<hr>
+\subsection ppm_feast_system_host_compiler FEAST_SYSTEM_HOST_COMPILER
+The system compiler the actual host compiler will rely on, e.g. using its header files etc.
+
+<hr>
+\subsection ppm_feast_cuda_host_compiler FEAST_CUDA_HOST_COMPILER
+The host compiler that will be used by nvcc for host code compilation.
+
+<hr>
+\subsection ppm_cmake_cxx_compiler_id CMAKE_CXX_COMPILER_ID
+Descriptive compiler name, as detected by cmake.
+
+<hr>
+\subsecion ppm_cmake_cxx_compiler_version CMAKE_CXX_COMPILER_VERSION
+Compiler version, as detected by cmake.
+
+<hr>
+\subsection ppm_cmake_cxx_compiler CMAKE_CXX_COMPILER
+Path to the used host compiler.
+
+<hr>
+\subsection ppm_feast_compiler_wrapper FEAST_USE_COMPILER_WRAPPER
+This macro indicates, if defined, that a compiler wrapper like ccache or distcc is used to compile FEAST.
+
+<hr>
+\subsection ppm_cmake_cxx_compiler_arg1 CMAKE_CXX_COMPILER_ARG1
+Contains the 'real' compiler, if we use a COMPILER_WRAPPER.
+Is empty, if we don't.
+
+<hr>
+\subsection ppm_cmake_cxx_compiler_arg1_path CMAKE_CXX_COMPILER_ARG1_PATH
+Path to CMAKE_CXX_COMPILER_ARG1, if any.
+
+<hr>
+\subsection ppm_cmake_cxx_flags CMAKE_CXX_FLAGS
+The CXXFLAGS of the host compiler.
+
+<hr>
+\subsection ppm_cuda_nvcc_executable CUDA_NVCC_EXECUTABLE
+Path to the used nvcc compiler.
+
+<hr>
+\subsection ppm_cuda_nvcc_flags CUDA_NVCC_FLAGS
+The CXXFLAGS of the nvcc compiler.
+
+<hr>
+\subsection ppm_cuda_arch FEAST_CUDA_ARCH
+Compile for this CUDA device architecture
+
+<hr>
+\subsection ppm_feast_hostname FEAST_HOSTNAME
+Hostname of the computer in use.
+
+<hr>
+\subsection ppm_cmake_command CMAKE_COMMAND
+Full path of the cmake binary.
+
+<hr>
+\subsecion ppm_cmake_generator CMAKE_GENERATOR
+The 'makefile' generator used by cmake.
+
 <hr><hr>
 \section preproc_sec_comp_detect Compiler-Detection Macros
 This section enlists the macros defined by the compiler detection headers to provide information about the compiler
@@ -105,10 +166,6 @@ immediately before - not in - a loop definition. The pragma takes effect for the
 \subsection ppm_feast_force_inline FORCE_INLINE
 This macro can be used to force the compiler to compile a function inline. The semantics of FORCE_INLINE are exactly the
 same as those for the C++ inline keyword.
-
-<hr>
-\subsection ppm_feast_compiler_wrapper FEAST_USE_COMPILER_WRAPPER
-This macro indicates, if defined, that a compiler wrapper like ccache or distcc is used to compile FEAST.
 
 <hr><hr>
 \section preproc_sec_backends Backend / Library Macros

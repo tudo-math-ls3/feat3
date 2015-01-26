@@ -222,6 +222,7 @@ for option in extra_options:
       print ("Error: multiple system_host_compiler parameters in\n" + "\n".join(extra_options))
       exit(1)
     system_host_compiler = option.replace("--system_host_compiler=", "", 1)
+    cmake_flags += " -DFEAST_SYSTEM_HOST_COMPILER=" + system_host_compiler
 
   if option.startswith("--cuda_host_compiler="):
     if cuda_host_compiler:

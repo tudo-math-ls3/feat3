@@ -4,6 +4,9 @@
 /// Header guard
 #define FEAST_CONFIG_HPP 1
 
+/// Version of CMAKE used to configure this project
+#define CMAKE_VERSION "${CMAKE_VERSION}"
+
 /// Should the build include DEBUG support?
 #cmakedefine FEAST_DEBUG_MODE
 
@@ -42,5 +45,51 @@
 
 /// Do we use a compiler wrapper, e.g. ccache or distcc
 #cmakedefine FEAST_USE_COMPILER_WRAPPER
+
+/// Descriptive compiler name, as detected by cmake
+#define CMAKE_CXX_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}"
+
+/// Compiler version, as detected by cmake
+#define CMAKE_CXX_COMPILER_VERSION "${CMAKE_CXX_COMPILER_VERSION}"
+
+/// Path to the used host compiler
+#define CMAKE_CXX_COMPILER "${CMAKE_CXX_COMPILER}"
+
+/// Contains the 'real' compiler, if we use a COMPILER_WRAPPER and is empty, if we don't
+#define CMAKE_CXX_COMPILER_ARG1 "${CMAKE_CXX_COMPILER_ARG1}"
+
+/// Path to CMAKE_CXX_COMPILER_ARG1, if any.
+#define CMAKE_CXX_COMPILER_ARG1_PATH "${CMAKE_CXX_COMPILER_ARG1_PATH}"
+
+/// Host CXX Compiler Flags
+#define CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"
+
+/// The system compiler the actual host compiler will rely on, e.g. using its header files etc.
+#define FEAST_SYSTEM_HOST_COMPILER "${FEAST_SYSTEM_HOST_COMPILER}"
+
+/// The host compiler that will be used by nvcc for host code compilation.
+#define FEAST_CUDA_HOST_COMPILER "${FEAST_CUDA_HOST_COMPILER}"
+
+#ifdef FEAST_BACKENDS_CUDA
+/// Path to CUDA Compiler
+#define CUDA_NVCC_EXECUTABLE "${CUDA_NVCC_EXECUTABLE}"
+/// CUDA CXX Compiler Flags
+#define CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}"
+/// compile for this CUDA device architecture
+#define FEAST_CUDA_ARCH "${FEAST_CUDA_ARCH}"
+#endif
+
+#ifdef FEAST_MPI
+#define MPI_CXX_COMPILER "${MPI_CXX_COMPILER}"
+#endif
+
+/// Hostname of the computer in use
+#define FEAST_HOSTNAME "${FEAST_HOSTNAME}"
+
+/// full path of the cmake binary
+#define CMAKE_COMMAND "${CMAKE_COMMAND}"
+
+/// cmake 'makefile' generator
+#define CMAKE_GENERATOR "${CMAKE_GENERATOR}"
 
 #endif // FEAST_CONFIG_HPP
