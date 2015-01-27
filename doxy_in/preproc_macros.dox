@@ -52,7 +52,7 @@ The host compiler that will be used by nvcc for host code compilation.
 Descriptive compiler name, as detected by cmake.
 
 <hr>
-\subsecion ppm_cmake_cxx_compiler_version CMAKE_CXX_COMPILER_VERSION
+\subsection ppm_cmake_cxx_compiler_version CMAKE_CXX_COMPILER_VERSION
 Compiler version, as detected by cmake.
 
 <hr>
@@ -97,7 +97,7 @@ Hostname of the computer in use.
 Full path of the cmake binary.
 
 <hr>
-\subsecion ppm_cmake_generator CMAKE_GENERATOR
+\subsection ppm_cmake_generator CMAKE_GENERATOR
 The 'makefile' generator used by cmake.
 
 <hr><hr>
