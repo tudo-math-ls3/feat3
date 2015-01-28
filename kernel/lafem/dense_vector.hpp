@@ -177,6 +177,8 @@ namespace FEAST
        * \param[in] data An array containing the value data.
        *
        * Creates a vector with given size and given data.
+       *
+       * \note The array must be allocated by FEAST's own memory pool
        */
       explicit DenseVector(Index size_in, DT_ * data) :
         Container<Mem_, DT_, IT_>(size_in)
