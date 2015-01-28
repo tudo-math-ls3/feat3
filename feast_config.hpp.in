@@ -75,12 +75,19 @@
 #define CUDA_NVCC_EXECUTABLE "${CUDA_NVCC_EXECUTABLE}"
 /// CUDA CXX Compiler Flags
 #define CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}"
+/// CUDA SDK Version
+#define CUDA_VERSION "${CUDA_VERSION}"
 /// compile for this CUDA device architecture
 #define FEAST_CUDA_ARCH "${FEAST_CUDA_ARCH}"
 #endif
 
 #ifdef FEAST_MPI
+/// absolute path to mpi compiler wrapper
 #define MPI_CXX_COMPILER "${MPI_CXX_COMPILER}"
+/// absolute path to mpi execution wrapper
+#define MPIEXEC "${MPIEXEC}"
+/// mpi version
+#define MPI_VERSION "${MPI_VERSION}"
 #endif
 
 /// Hostname of the computer in use

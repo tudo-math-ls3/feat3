@@ -35,6 +35,12 @@ endif(FEAST_BACKENDS_CUDA)
 
 if (FEAST_MPI)
   find_package(MPI REQUIRED)
+  execute_process(COMMAND "${MPIEXEC}" --version
+    WORKING_DIRECTORY ${FEAST_SOURCE_DIR}
+    OUTPUT_VARIABLE MPI_VERSION
+    ERROR_QUIET)
+  # TODO fix regex to catch only the first line
+  # string(REGEX MATCH "^.*[\r\n\t ]?" MPI_VERSION ${MPI_VERSION})
 endif (FEAST_MPI)
 
 if (FEAST_VALGRIND)

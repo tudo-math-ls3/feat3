@@ -85,8 +85,24 @@ Path to the used nvcc compiler.
 The CXXFLAGS of the nvcc compiler.
 
 <hr>
+\sebusectoin ppm_cuda_version CUDA_VERSION
+Version of the cuda SDK.
+
+<hr>
 \subsection ppm_cuda_arch FEAST_CUDA_ARCH
 Compile for this CUDA device architecture
+
+<hr>
+\subsection ppm_mpi_cxx_compiler MPI_CXX_COMPILER
+Absolute path to mpi compiler wrapper.
+
+<hr>
+\subsection ppm_mpiexec MPIEXEC
+Absolute path to mpi execution wrapper.
+
+<hr>
+\subsection ppm_mpi_version MPI_VERSION
+MPI Library version.
 
 <hr>
 \subsection ppm_feast_hostname FEAST_HOSTNAME
