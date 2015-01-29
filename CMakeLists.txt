@@ -39,8 +39,7 @@ if (FEAST_MPI)
     WORKING_DIRECTORY ${FEAST_SOURCE_DIR}
     OUTPUT_VARIABLE MPI_VERSION
     ERROR_QUIET)
-  # TODO fix regex to catch only the first line
-  # string(REGEX MATCH "^.*[\r\n\t ]?" MPI_VERSION ${MPI_VERSION})
+  string(REPLACE "\n" " " MPI_VERSION ${MPI_VERSION})
 endif (FEAST_MPI)
 
 if (FEAST_VALGRIND)
