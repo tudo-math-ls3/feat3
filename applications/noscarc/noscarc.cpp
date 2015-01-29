@@ -1,5 +1,7 @@
 #include <kernel/base_header.hpp>
 
+#ifdef FEAST_MPI
+
 #include <mpi.h>
 
 
@@ -12,3 +14,5 @@ int main(int argc, char* argv[])
   MPI_Finalize();
   return 0;
 }
+
+#endif // FEAST_MPI

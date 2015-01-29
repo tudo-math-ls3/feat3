@@ -12,14 +12,15 @@ endif()
 #top lvl include dir
 INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 
-ADD_EXECUTABLE(noscarc noscarc.cpp)
-
-TARGET_LINK_LIBRARIES(noscarc feast ${MPI_CXX_LIBRARIES})
-if(MPI_CXX_COMPILE_FLAGS)
-  set_target_properties(noscarc PROPERTIES
-    COMPILE_FLAGS "${MPI_CXX_COMPILE_FLAGS}")
-endif()
-if(MPI_CXX_LINK_FLAGS)
-  set_target_properties(noscarc PROPERTIES
-    LINK_FLAGS "${MPI_CXX_LINK_FLAGS}")
-endif()
+if (FEAST_MPI)
+  ADD_EXECUTABLE(noscarc noscarc.cpp)
+  TARGET_LINK_LIBRARIES(noscarc feast ${MPI_CXX_LIBRARIES})
+  if(MPI_CXX_COMPILE_FLAGS)
+    set_target_properties(noscarc PROPERTIES
+      COMPILE_FLAGS "${MPI_CXX_COMPILE_FLAGS}")
+  endif()
+  if(MPI_CXX_LINK_FLAGS)
+    set_target_properties(noscarc PROPERTIES
+      LINK_FLAGS "${MPI_CXX_LINK_FLAGS}")
+  endif()
+endif (FEAST_MPI)
