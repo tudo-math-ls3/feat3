@@ -101,7 +101,7 @@ Absolute path to mpi compiler wrapper.
 Absolute path to mpi execution wrapper.
 
 <hr>
-\subsection ppm_mpi_version MPI_VERSION
+\subsection ppm_cmake_mpi_version CMAKE_MPI_VERSION
 MPI Library version.
 
 <hr>
