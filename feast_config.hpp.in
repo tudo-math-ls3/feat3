@@ -87,7 +87,8 @@
 /// absolute path to mpi execution wrapper
 #define MPIEXEC "${MPIEXEC}"
 /// mpi version
-#define MPI_VERSION "${MPI_VERSION}"
+///todo fix regex in CMakeList.txt to use only first line of output
+//#define MPI_VERSION "DOLLAR{MPI_VERSION}"
 #endif
 
 /// Hostname of the computer in use
