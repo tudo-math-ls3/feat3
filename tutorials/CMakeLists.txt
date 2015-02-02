@@ -18,9 +18,13 @@ TARGET_LINK_LIBRARIES(tutorial-02-laplace feast)
 ADD_EXECUTABLE(tutorial-03-andicore tutorial_03_andicore.cpp)
 TARGET_LINK_LIBRARIES(tutorial-03-andicore feast)
 
+ADD_EXECUTABLE(tutorial-x1-andicore-mg tutorial_x1_andicore_mg.cpp)
+TARGET_LINK_LIBRARIES(tutorial-x1-andicore-mg feast)
+
 # tutorials target
 ADD_CUSTOM_TARGET(tutorials DEPENDS
   tutorial-01-poisson
   tutorial-02-laplace
   tutorial-03-andicore
+  tutorial-x1-andicore-mg
 )
