@@ -387,5 +387,3 @@ ADD_CUSTOM_TARGET(applications_tests DEPENDS scarc_test-app foundation_system_te
 
 # build all tests through top lvl target tests
 ADD_DEPENDENCIES(tests applications_tests)
-
-ADD_SUBDIRECTORY( noscarc )
