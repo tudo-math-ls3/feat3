@@ -53,9 +53,7 @@ thirdparty/*.gz
 thirdparty/*.tgz
 thirdparty/*.zip
 thirdparty/alglib/*
-thirdparty/AMD/*
-thirdparty/SuiteSparse_config/*
-thirdparty/UMFPACK/*
+thirdparty/SuiteSparse/*
 
 # Ignore Visual Studio user/filter files
 *.vcxproj.user

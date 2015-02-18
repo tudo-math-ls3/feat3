@@ -12,7 +12,7 @@ goto build
 :errcall
 echo.
 echo ERROR: Do not execute this script directly.
-echo        Execute 'make_alglib_win32.cmd' or 'make_alglib_win64.cmd' instead
+echo        Execute 'make_win32.cmd' or 'make_win64.cmd' instead
 echo.
 goto end
 

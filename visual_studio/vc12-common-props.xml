@@ -101,10 +101,10 @@
       Include="$(MSMPI_INC)" />
     <FeastIncDir Condition="'$(BackendMKL)'=='true'"
       Include="$(MKL_PATH)\include" />
-    <FeastIncDir Condition="'$(FeastHaveUmfpack)'=='true'"
-      Include="$(FeastRootPath)\thirdparty\AMD\Include;$(FeastRootPath)\thirdparty\SuiteSparse_config;$(FeastRootPath)\thirdparty\UMFPACK\Include" />
     <FeastIncDir Condition="'$(FeastHaveAlgLib)'=='true'"
       Include="$(FeastRootPath)\thirdparty\ALGLIB\src;" />
+    <FeastIncDir Condition="'$(FeastHaveUmfpack)'=='true'"
+      Include="$(FeastRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeastRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeastRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
   </ItemGroup>
 
   <!-- FEAST additional library search path list -->

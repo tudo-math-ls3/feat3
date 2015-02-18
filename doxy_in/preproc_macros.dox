@@ -204,11 +204,12 @@ the MKL as a work-horse.
 
 <hr>
 \subsection ppm_feast_have_umfpack FEAST_HAVE_UMFPACK
-This macro is defined by the build system if the FEAST kernel is linked agains the UMFPACK library.
+This macro is defined by the build system if the FEAST kernel is linked agains the UMFPACK library, which is part of
+the SuiteSparse library package.
 
 If defined, the LAFEM subsystem of the FEAST kernel will implement the "LAFEM::Umfpack" solver class.
 
-\note The Visual Studio build system detects whether an umfpack library suitable for the current build-id
+\note The Visual Studio build system detects whether an UMFPACK library suitable for the current build-id
 has been compiled and linked. If so, it will define the FEAST_HAVE_UMFPACK macro automatically.
 
 <hr>

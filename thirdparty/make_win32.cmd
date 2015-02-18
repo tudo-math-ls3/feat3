@@ -23,11 +23,11 @@ if exist "./ALGLIB" (
 
 rem ===========================================================================
 echo **************************************************************************
-if exist "./UMFPACK" (
-  call ./vc12_internal/make_umfpack_internal.cmd dbg x86
-  call ./vc12_internal/make_umfpack_internal.cmd opt x86
+if exist "./SuiteSparse" (
+  call ./vc12_internal/make_suite_sparse_internal.cmd dbg x86
+  call ./vc12_internal/make_suite_sparse_internal.cmd opt x86
 ) else (
-  echo UMFPACK not found; skipping...
+  echo SuiteSparse not found; skipping...
   echo.
 )
 
