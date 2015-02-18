@@ -6,6 +6,10 @@
 #include <kernel/assembly/analytic_function.hpp>
 #include <kernel/util/math.hpp>
 
+// includes, system
+#include <initializer_list>
+#include <vector>
+
 namespace FEAST
 {
   namespace Assembly
@@ -1010,6 +1014,156 @@ namespace FEAST
        * \author Jordi Paul
        */
       typedef StaticWrapperFunction<HeavisideRegStatic, true, true, true> HeavisideRegFunction;
+
+      /**
+       * \brief 1D Polynomial function class template
+       *
+       * This class template implements a scalar polynomial implementing the Assembly::AnalyticFunction
+       * interface.
+       *
+       * \tparam DataType_
+       * The datatype of the polynomial coefficients. Must be a floating point type.
+       *
+       * \author Peter Zajac
+       */
+      template<typename DataType_>
+      class PolynomialFunction1D :
+        public Assembly::AnalyticFunction
+      {
+      public:
+        /// dummy enum
+        enum
+        {
+          /// we provide function values
+          can_value = 1,
+          /// we provide function gradients
+          can_grad = 1,
+          /// we provide function hessians
+          can_hess = 1
+        };
+
+        template<typename Config_>
+        struct ConfigTraits
+        {
+          struct TrafoConfig :
+            public Trafo::ConfigBase
+          {
+            enum
+            {
+              need_img_point = 1
+            };
+          };
+        };
+
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Assembly::AnalyticFunction::Evaluator<EvalTraits_>
+        {
+        public:
+          typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
+          typedef typename EvalTraits_::TrafoData TrafoData;
+          //typedef typename EvalTraits_::DataType DataType;
+          typedef typename EvalTraits_::ValueType ValueType;
+          typedef typename EvalTraits_::GradientType GradientType;
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          const PolynomialFunction1D& _function;
+
+        public:
+          explicit Evaluator(const PolynomialFunction1D& function) :
+            _function(function)
+          {
+          }
+
+          ValueType value(const TrafoData& tau) const
+          {
+            // evaluate polynomial via horner scheme
+            DataType_ x = DataType_(tau.img_point[0]);
+            DataType_ y = DataType_(0);
+            for(std::size_t k(_function._coeff.size()); k > std::size_t(0); )
+              y = x * y + _function._coeff[--k];
+            return ValueType(y);
+          }
+
+          GradientType gradient(const TrafoData& tau) const
+          {
+            std::size_t k = _function._coeff.size();
+            if(k <= std::size_t(0))
+              return GradientType(DataType_(0));
+
+            // evaluate polynomial via horner scheme
+            DataType_ x = DataType_(tau.img_point[0]);
+            DataType_ y = DataType_(0);
+            for( ; (--k) > std::size_t(0); )
+              y = x * y + (_function._coeff[k] * DataType_(k));
+
+            return GradientType(y);
+          }
+
+          HessianType hessian(const TrafoData& tau) const
+          {
+            std::size_t k = _function._coeff.size();
+            if(k <= std::size_t(1))
+              return HessianType(DataType_(0));
+
+            // evaluate polynomial via horner scheme
+            DataType_ x = DataType_(tau.img_point[0]);
+            DataType_ y = DataType_(0);
+            for( ; (--k) > std::size_t(1); )
+              y = x * y + (_function._coeff[k] * DataType_(k*(k-1)));
+
+            return HessianType(y);
+          }
+        }; // class PolynomialFunction1D::Evaluator
+
+      private:
+        // the polynomial coefficient vector
+        std::vector<DataType_> _coeff;
+
+      public:
+        /// default constructor
+        PolynomialFunction1D() :
+          _coeff()
+        {
+        }
+
+        /**
+         * \brief Polynomial coefficient constructor
+         *
+         * \param[in] coeff
+         * An initializer list containing the coefficients of the polynomial in ascending monomial degrees.
+         */
+        explicit PolynomialFunction1D(std::initializer_list<DataType_> coeff) :
+          _coeff(coeff)
+        {
+        }
+
+        /**
+         * \brief Sets a monomial coefficient.
+         *
+         * \param[in] degree
+         * The degree of the monomial whose coefficient is to be set.
+         *
+         * \param[in] coeff
+         * The coefficient of the monomial to be set.
+         *
+         * \returns
+         * The degree of the polynomial + 1.
+         */
+        Index set_coeff(Index degree, DataType_ coeff)
+        {
+          // check degree
+          if(Index(_coeff.size()) <= degree)
+            _coeff.resize(std::size_t(degree+1), DataType_(0));
+
+          // set coefficient
+          _coeff.at(std::size_t(degree)) = coeff;
+
+          // return degree+1
+          return Index(_coeff.size());
+        }
+      }; // class PolynomialFunction1D
     } // namespace Common
   } // namespace Assembly
 } // namespace FEAST
