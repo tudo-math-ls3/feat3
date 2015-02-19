@@ -129,7 +129,7 @@ public:
       test_solver("FGMRES(16)-ILU(0)", solver, vec_sol, vec_ref, vec_rhs);
     }
 
-    // test fix-point-ilu
+    // test Fix-Point-ILU
     {
       // create a SOR preconditioner
       PreconWrapper<AlgoType, MatrixType, SORPreconditioner> precon(matrix, DataType(1.7));

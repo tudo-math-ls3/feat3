@@ -22,18 +22,18 @@ namespace FEAST
       /// undefined status
       undefined = 0,
       /// continue iteration (internal use only)
-        progress,
+      progress,
       /// solving successful (convergence criterion fulfilled)
-        success,
+      success,
       /// premature abort (solver aborted due to internal errors or preconditioner failure)
-        aborted,
+      aborted,
       /// solver diverged (divergence criterion fulfilled)
-        diverged,
+      diverged,
       /// solver reached maximum iterations
-        max_iter,
+      max_iter,
       /// solver stagnated (stagnation criterion fulfilled)
-        stagnated
-        };
+      stagnated
+    };
 
     /**
      * \brief Status success check function
@@ -161,7 +161,7 @@ namespace FEAST
        * \brief Solver application method
        *
        * This method applies the solver represented by this object onto a given right-hand-side vector
-       * and returnes the corresponding solution vector.
+       * and returns the corresponding solution vector.
        *
        * \param[in,out] vec_sol
        * The vector that shall receive the solution of the linear system. It is assumed to be allocated, but
@@ -194,7 +194,7 @@ namespace FEAST
      * <b>Example</b>:\n
      * To use the ILUPreconditioner class for CSR-matrices, one would have to use the following class template
      * combination:
-     * <c>PreconWrapper<Algo::Generic, SparseMatrixCSR<Mem::Main,double>,ILUPreconditioner></c>.
+     * <c>PreconWrapper<Algo::Generic, SparseMatrixCSR<Mem::Main,double>, ILUPreconditioner></c>.
      *
      * \author Peter Zajac
      */
@@ -207,7 +207,7 @@ namespace FEAST
     {
     public:
       typedef Matrix_ MatrixType;
-      typedef typename MatrixType::VectorTypeR VectorType;;
+      typedef typename MatrixType::VectorTypeR VectorType;
 
     protected:
       /// the actual preconditioner object
@@ -319,7 +319,7 @@ namespace FEAST
      * \brief Abstract base-class for iterative solvers.
      *
      * This class template acts as an abstract base class for iterative solvers.
-     * It implements various auxiliary features for convergence control.
+     * It also implements various auxiliary features for convergence control.
      *
      * \tparam AlgoType_
      * The algorithm tag to be used by the solver.
@@ -618,7 +618,7 @@ namespace FEAST
        *
        * \note
        * If no preconditioner is present, this function will simply copy the input vector's
-       * contents into the output vector, therefore emulating and "identity preconditioner".
+       * contents into the output vector, therefore emulating an "identity preconditioner".
        *
        * \param[in,out] vec_out
        * A reference to the vector that shall receive the preconditioned defect.
