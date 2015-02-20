@@ -1,6 +1,6 @@
 import platform
 import sys
-from cmake_modules.feast_util import get_output
+from build_system.feast_util import get_output
 
 def configure_gcc(cpu, buildid, compiler):
   if not compiler:

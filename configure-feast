@@ -9,16 +9,16 @@ import shutil
 import copy
 
 sys.dont_write_bytecode = True
-from cmake_modules.detect_cpu import detect_cpu
-from cmake_modules.configure_gcc import configure_gcc
-from cmake_modules.configure_icc import configure_icc
-from cmake_modules.configure_clang import configure_clang
-from cmake_modules.configure_msc import configure_msc
-from cmake_modules.feast_util import remove_string
-from cmake_modules.feast_util import remove_substring
-from cmake_modules.feast_util import is_found
-from cmake_modules.feast_util import get_output
-from cmake_modules.thirdparty_package import *
+from build_system.detect_cpu import detect_cpu
+from build_system.configure_gcc import configure_gcc
+from build_system.configure_icc import configure_icc
+from build_system.configure_clang import configure_clang
+from build_system.configure_msc import configure_msc
+from build_system.feast_util import remove_string
+from build_system.feast_util import remove_substring
+from build_system.feast_util import is_found
+from build_system.feast_util import get_output
+from build_system.thirdparty_package import *
 
 #TODO help, ? und guess nicht in sys.argv[0] suchen
 #TODO scalasca
@@ -85,7 +85,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("--export_compile_commands")
   print ("  Let CMake export the used compile commands to compile_commands.json.")
   print ("--cpu=cputype")
-  print ("  Override cpu auto detection with provided string (see cmake_modules/detect_cpu.py for a list).")
+  print ("  Override cpu auto detection with provided string (see build_system/detect_cpu.py for a list).")
   print ("--compiler=path/to/binary")
   print ("  Override default c++ compiler binary by absolute path to binary.")
   sys.exit()
@@ -345,7 +345,7 @@ if "valgrind" in buildid:
   cmake_flags += " -DFEAST_VALGRIND:BOOL=ON"
 
 # optional third party libraries
-for package in available_packages(trunk_dirname+os.sep+"cmake_modules",trunk_dirname+os.sep+"thirdparty"):
+for package in available_packages(trunk_dirname+os.sep+"build_system",trunk_dirname+os.sep+"thirdparty"):
   if package.name in buildid:
     package.add()
     cmake_flags += package.cmake_flags

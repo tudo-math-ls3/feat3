@@ -1,5 +1,5 @@
 import platform
-from cmake_modules.feast_util import get_output
+from build_system.feast_util import get_output
 
 def configure_icc(cpu, buildid, compiler, system_host_compiler):
   if not compiler:

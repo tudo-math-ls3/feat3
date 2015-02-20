@@ -1,5 +1,5 @@
 import platform
-from cmake_modules.feast_util import get_output
+from build_system.feast_util import get_output
 
 def detect_cpu():
   cputype = "unknown"

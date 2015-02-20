@@ -11,8 +11,6 @@ site_name( FEAST_HOSTNAME )
 
 include (CTest)
 ENABLE_TESTING()
-configure_file (${FEAST_SOURCE_DIR}/CTestCustom.cmake.in ${FEAST_BINARY_DIR}/CTestCustom.cmake COPONLY)
-configure_file (${FEAST_SOURCE_DIR}/CTestCustom.cmake.in ${FEAST_BINARY_DIR}/CTestCustom.ctest COPONLY)
 
 if (FEAST_BACKENDS_CUDA)
   set (CUDA_VERBOSE_BUILD ON)

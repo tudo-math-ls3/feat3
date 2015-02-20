@@ -1,7 +1,7 @@
 # vim: set filetype=python sw=2 sts=2 et nofoldenable :
 __author__ = "Jordi Paul, Peter Zajac"
 __date__   = "April 2014"
-from cmake_modules.thirdparty_package import ThirdpartyPackage
+from build_system.thirdparty_package import ThirdpartyPackage
 import os
 
 class SuiteSparse(ThirdpartyPackage):

@@ -80,7 +80,7 @@ def download(url,filename):
         shutil.copyfileobj(response, out_file)
   return
 
-# Find available third party packages by parsing all .py files in the cmake_modules folder
+# Find available third party packages by parsing all .py files in the build_system folder
 def available_packages(files_path,target_path,name=''):
   available_files = glob.glob(files_path+os.sep+'*.py')
   available_packages = []
