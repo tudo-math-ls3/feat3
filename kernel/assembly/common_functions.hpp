@@ -788,6 +788,126 @@ namespace FEAST
       }; // class DistanceFunctionSD
 
       /**
+       * \brief Scaled and displaced analytic distance from i-th coordinate axis/plane function
+       *
+       * This class implements the AnalyticFunction interface representing the scaled and displaced distance function
+       * \f$ f(x) = b | (x - x_0)_i | \f$
+       *
+       * This class supports function values and gradients for all dimensions.
+       *
+       * \tparam component
+       * Index of the coordinate axis/plane.
+       *
+       * \tparam ImgPointType_
+       * The type of \f$ x_0 \f$.
+       *
+       * \author Jordi Paul
+       */
+      template<int component, typename ImgPointType_>
+      class PlaneDistanceFunctionSD :
+        public AnalyticFunction
+      {
+      public:
+        /// Datatype for the point coordinates
+        typedef typename ImgPointType_::DataType DataType;
+        /** \copydoc AnalyticFunction::FunctionCapabilities */
+        enum FunctionCapabilities
+        {
+          can_value = 1,
+          can_grad = 1,
+        };
+
+        /** \copydoc AnalyticFunction::ConfigTraits */
+        template<typename Config_>
+        struct ConfigTraits
+        {
+          /**
+           * \brief Trafo configuration tag class
+           *
+           * \see Trafo::ConfigBase
+           */
+          struct TrafoConfig :
+            public Trafo::ConfigBase
+          {
+            enum
+            {
+              need_img_point = 1
+            };
+          };
+        };
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public AnalyticFunction::Evaluator<EvalTraits_>
+        {
+        public:
+          /// trafo evaluator data
+          typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
+          /// trafo data type
+          typedef typename EvalTraits_::TrafoData TrafoData;
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+          /// type for the points the analytic function is evaluated at
+          typedef typename EvalTraits_::ImagePointType ImgPointType;
+
+        private:
+          /// Function to evaluate
+          const PlaneDistanceFunctionSD& _function;
+
+        public:
+          /// Constructor
+          explicit Evaluator(const PlaneDistanceFunctionSD& function) :
+            _function(function)
+          {
+          }
+
+          ValueType value(const TrafoData& tau) const
+          {
+            ImgPointType tmp (tau.img_point - _function._point);
+            return  _function._b*tmp(component);
+          }
+
+          GradientType gradient(const TrafoData& tau) const
+          {
+            GradientType grad(DataType(0));
+            DataType norm(value(tau));
+
+            if(norm > Math::eps<DataType>())
+              grad(component,_function._b);
+
+            return grad;
+          }
+        }; // class PlaneDistanceFunctionSD::Evaluator<...>
+
+      private:
+        /// The point to which the distance to is calculated
+        ImgPointType_ _point;
+        /// Scaling factor
+        DataType _b;
+
+      public:
+        /// Constructor
+        explicit PlaneDistanceFunctionSD(const ImgPointType_ x0_, const DataType b_) :
+          _point(x0_),
+          _b(b_)
+        {
+        }
+
+        /// Sets _point to x0_
+        void set_point(const ImgPointType_ x0_)
+        {
+          _point = x0_;
+        }
+      }; // class PlaneDistanceFunctionSD
+
+      /**
        * \brief Heaviside static function
        *
        * This class implements the StaticFunction interface representing the function
