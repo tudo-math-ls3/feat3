@@ -21,6 +21,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/lafem/arch/synch.hpp>
+#include <kernel/adjacency/permutation.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -1131,6 +1132,15 @@ namespace FEAST
         return gate->value(*this);
       }
       ///@}
+
+      /// Permutate vector according to the given Permutation
+      void permutate(Adjacency::Permutation & perm)
+      {
+        DenseVector<Mem::Main, DT_, IT_> local;
+        local.convert(*this);
+        perm(local.elements());
+        this->assign(local);
+      }
 
       /// Writes the vector-entries in an allocated array
       void set_vec(DT_ * const pval_set) const
