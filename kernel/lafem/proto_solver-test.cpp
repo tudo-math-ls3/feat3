@@ -141,6 +141,15 @@ public:
 
     // test UMFPACK
     test_umfpack(matrix, vec_sol, vec_ref, vec_rhs);
+
+    // test BiCGStab-SSOR
+    {
+      // create a SSOR preconditioner
+      SSORPrecond<MatrixType> precon(matrix);
+      // create a BiCGStab solver
+      BiCGStabSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, &precon);
+      test_solver("BiCGStab-SSOR", solver, vec_sol, vec_ref, vec_rhs);
+    }
   }
 };
 

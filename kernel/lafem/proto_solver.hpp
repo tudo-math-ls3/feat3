@@ -1187,6 +1187,246 @@ namespace FEAST
         return SolverStatus::success;
       }
     };
+
+    /**
+     * \brief (Preconditioned) Biconjugate gradient stabilized solver implementation
+     *
+     * This class implements a simple BiCGStab solver.
+     *
+     * \tparam AlgoType_
+     * The algorithm tag to be used by the solver.
+     *
+     * \tparam Matrix_
+     * The matrix class to be used by the solver.
+     *
+     * \tparam Filter_
+     * The filter class to be used by the solver.
+     *
+     * \author Christoph Lohmann
+     */
+    template<
+      typename AlgoType_,
+      typename Matrix_,
+      typename Filter_>
+    class BiCGStabSolver :
+      public PreconditionedIterativeSolver<AlgoType_, typename Matrix_::VectorTypeR>
+    {
+    public:
+      typedef AlgoType_ AlgoType;
+      typedef Matrix_ MatrixType;
+      typedef Filter_ FilterType;
+      typedef typename MatrixType::VectorTypeR VectorType;
+      typedef typename MatrixType::DataType DataType;
+      typedef PreconditionedIterativeSolver<AlgoType, VectorType> BaseClass;
+
+      typedef SolverInterface<VectorType> PrecondType;
+
+    protected:
+      /// the system matrix
+      const MatrixType& _system_matrix;
+      /// the system filter
+      const FilterType& _system_filter;
+
+      /// temporary vectors
+      VectorType _vec_r;
+      VectorType _vec_r_tilde;
+      VectorType _vec_r_tilde_0;
+      VectorType _vec_p_tilde;
+      VectorType _vec_v;
+      VectorType _vec_v_tilde;
+      VectorType _vec_s;
+      VectorType _vec_s_tilde;
+      VectorType _vec_t;
+      VectorType _vec_t_tilde;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] matrix
+       * A reference to the system matrix.
+       *
+       * \param[in] filter
+       * A reference to the system filter.
+       *
+       * \param[in] precond
+       * A pointer to the preconditioner. May be \c nullptr.
+       */
+      explicit BiCGStabSolver(const MatrixType& matrix, const FilterType& filter, PrecondType* precond = nullptr) :
+        BaseClass("BiCGStab", precond),
+        _system_matrix(matrix),
+        _system_filter(filter)
+      {
+      }
+
+      virtual bool init_symbolic() override
+      {
+        if(!BaseClass::init_symbolic())
+          return false;
+        // create all temporary vectors
+        // Each *_tilde vector is a correction, all others are defects.
+        _vec_r         = this->_system_matrix.create_vector_r();
+        _vec_r_tilde   = this->_system_matrix.create_vector_r();
+        _vec_r_tilde_0 = this->_system_matrix.create_vector_r();
+        _vec_p_tilde   = this->_system_matrix.create_vector_r();
+        _vec_v         = this->_system_matrix.create_vector_r();
+        _vec_v_tilde   = this->_system_matrix.create_vector_r();
+        _vec_s         = this->_system_matrix.create_vector_r();
+        _vec_s_tilde   = this->_system_matrix.create_vector_r();
+        _vec_t         = this->_system_matrix.create_vector_r();
+        _vec_t_tilde   = this->_system_matrix.create_vector_r();
+        return true;
+      }
+
+      virtual void done_symbolic() override
+      {
+        this->_vec_r.clear();
+        this->_vec_r_tilde.clear();
+        this->_vec_r_tilde_0.clear();
+        this->_vec_p_tilde.clear();
+        this->_vec_v.clear();
+        this->_vec_v_tilde.clear();
+        this->_vec_s.clear();
+        this->_vec_s_tilde.clear();
+        this->_vec_t.clear();
+        this->_vec_t_tilde.clear();
+      }
+
+      virtual SolverStatus apply(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        VectorType& vec_r        (this->_vec_r);
+        VectorType& vec_r_tilde  (this->_vec_r_tilde);
+        VectorType& vec_r_tilde_0(this->_vec_r_tilde_0);
+        VectorType& vec_p_tilde  (this->_vec_p_tilde);
+        VectorType& vec_v        (this->_vec_v);
+        VectorType& vec_v_tilde  (this->_vec_v_tilde);
+        VectorType& vec_s        (this->_vec_s);
+        VectorType& vec_s_tilde  (this->_vec_s_tilde);
+        VectorType& vec_t        (this->_vec_t);
+        VectorType& vec_t_tilde  (this->_vec_t_tilde);
+        const MatrixType& mat_sys(this->_system_matrix);
+        const FilterType& fil_sys(this->_system_filter);
+        SolverStatus status(SolverStatus::progress);
+
+        DataType rho_tilde, rho_tilde_old, alpha_tilde, omega_tilde, beta_tilde, gamma_tilde;
+        //bool early_exit = 0;
+        bool restarted = false;
+
+
+        while(status == SolverStatus::progress)
+        {
+          mat_sys.template apply<AlgoType_>(vec_r, vec_sol, vec_rhs, -DataType(1));
+          fil_sys.template filter_def<AlgoType_>(vec_r);
+
+          if (restarted == false)
+          {
+            status = this->_set_initial_defect(vec_r);
+          }
+
+          // apply preconditioner
+          if(!this->_apply_precond(vec_r_tilde_0, vec_r))
+            return SolverStatus::aborted;
+          fil_sys.template filter_cor<AlgoType_>(vec_r_tilde_0);
+
+          vec_r_tilde.copy(vec_r_tilde_0);
+          vec_p_tilde.copy(vec_r_tilde_0);
+
+          rho_tilde = vec_r_tilde_0.template dot<AlgoType_>(vec_r_tilde_0);
+
+          // main BiCGStab loop
+          while(status == SolverStatus::progress)
+          {
+            mat_sys.template apply<AlgoType_>(vec_v, vec_p_tilde);
+            fil_sys.template filter_def<AlgoType_>(vec_v);
+            // apply preconditioner
+            if(!this->_apply_precond(vec_v_tilde, vec_v))
+              return SolverStatus::aborted;
+            fil_sys.template filter_cor<AlgoType_>(vec_v_tilde);
+
+            gamma_tilde = vec_v_tilde.template dot<AlgoType_>(vec_r_tilde_0);
+
+            if (Math::abs(gamma_tilde) < Math::abs(rho_tilde)*1e-14)
+            {
+              restarted = true;
+              //std::cout << "Breakpoint 1" << std::endl;
+              break;
+            }
+
+            alpha_tilde = rho_tilde / gamma_tilde;
+
+            if ((Math::abs(alpha_tilde) * vec_v_tilde.template norm2<AlgoType_>()) / this->_def_cur < 1e-5)
+            {
+              restarted = true;;
+              //std::cout << "Breakpoint 2" << std::endl;
+              // \TODO warum ist das break hier nicht aktiv?
+              //break;
+            }
+
+            DataType malpha_tilde(-alpha_tilde);
+            vec_s.template axpy<AlgoType_>(vec_v, vec_r, malpha_tilde);
+
+            // compute new defect norm
+            status = this->_set_new_defect(vec_s);
+            if (status == SolverStatus::success)
+            {
+              vec_sol.template axpy<AlgoType_>(vec_p_tilde, vec_sol, alpha_tilde);
+
+              //early_exit = 1;
+              //std::cout << "Breakpoint 3 (converged)" << std::endl;
+              return status;
+            }
+            vec_s_tilde.template axpy<AlgoType_>(vec_v_tilde, vec_r_tilde, malpha_tilde);
+
+            mat_sys.template apply<AlgoType_>(vec_t, vec_s_tilde);
+            fil_sys.template filter_def<AlgoType_>(vec_t);
+
+            // apply preconditioner
+            if(!this->_apply_precond(vec_t_tilde, vec_t))
+              return SolverStatus::aborted;
+            fil_sys.template filter_cor<AlgoType_>(vec_t_tilde);
+
+            gamma_tilde = vec_t_tilde.template dot<AlgoType_>(vec_t_tilde);
+            omega_tilde = vec_t_tilde.template dot<AlgoType_>(vec_s_tilde);
+
+            if (Math::abs(gamma_tilde) < Math::abs(omega_tilde) * 1e-14)
+            {
+              restarted = true;
+              //std::cout << "Breakpoint 4" << std::endl;
+              break;
+            }
+            omega_tilde = omega_tilde / gamma_tilde;
+
+            vec_sol.template axpy<AlgoType_>(vec_s_tilde, vec_sol, omega_tilde);
+            vec_sol.template axpy<AlgoType_>(vec_p_tilde, vec_sol, alpha_tilde);
+
+            DataType momega_tilde(-omega_tilde);
+            vec_r.template axpy<AlgoType_>(vec_t, vec_s, momega_tilde);
+
+            // compute new defect norm
+            status = this->_set_new_defect(vec_r);
+            if (status == SolverStatus::success)
+            {
+              //std::cout << "Breakpoint 5 (converged)" << std::endl;
+              return status;
+            }
+
+            vec_r_tilde.template axpy<AlgoType_>(vec_t_tilde, vec_s_tilde, momega_tilde);
+
+            rho_tilde_old = rho_tilde;
+            rho_tilde = vec_r_tilde.template dot<AlgoType_>(vec_r_tilde_0);
+
+            beta_tilde = (alpha_tilde / omega_tilde) * (rho_tilde / rho_tilde_old);
+
+            vec_p_tilde.template axpy<AlgoType_>(vec_v_tilde, vec_p_tilde, momega_tilde);
+            vec_p_tilde.template scale<AlgoType_>(vec_p_tilde, beta_tilde);
+            vec_p_tilde.template axpy<AlgoType_>(vec_p_tilde, vec_r_tilde);
+          }
+        }
+
+        // finished
+        return status;
+      }
+    }; // class BiCGStabSolver<...>
   } // namespace LAFEM
 } // namespace FEAST
 
