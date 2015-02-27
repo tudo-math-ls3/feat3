@@ -281,7 +281,7 @@ namespace FEAST
         return v[i];
       }
 
-      /** \copydoc operator()() */
+      /** \copydoc operator[]() */
       const T_& operator[](Index i) const
       {
         ASSERT(i < Index(n_), "index i out-of-bounds");
@@ -1167,8 +1167,9 @@ namespace FEAST
       /// The basic data type buried in the lowest level of the vector
       typedef typename Intern::DataTypeExtractor<ValueType>::MyDataType DataType;
 
-      /// tensor data; that's an array of matrices
+      /// Type of tensor data; that's an array of matrices
       typedef Matrix<T_, m_, n_, sm_, sn_> PlaneType;
+      /// Actual tensor data
       PlaneType v[sl_];
 
       /// default constructor

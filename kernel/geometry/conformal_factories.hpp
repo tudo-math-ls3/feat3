@@ -228,6 +228,7 @@ namespace FEAST
     };
     /// \endcond
 
+    /// \cond internal
     template<>
       class UnitCubeFactory< CellSubSet<Shape::Hypercube<2> > > :
       public Factory< CellSubSet<Shape::Hypercube<2> > >
@@ -269,9 +270,9 @@ namespace FEAST
             ei[2] = 2;
             ei[3] = 3;
           }
-      };
+      }; //UnitCubeFactory< CellSubSet<Shape::Hypercube<2> > >
 
-    /// \cond internal
+    /// \endcond
 
     /**
      * \brief Unit-Cube mesh factory specialisation for simplical meshes
@@ -438,7 +439,7 @@ namespace FEAST
     template<typename MeshType_>
     using RefinedUnitCubeFactory = RefineFactory<MeshType_, Geometry::UnitCubeFactory >;
 
-    /*
+    /**
      * \brief Unit cube factory with star shaped mesh topology
      *
      * 2-------------------------------1------------------------------3
