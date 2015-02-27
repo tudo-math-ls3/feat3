@@ -25,17 +25,18 @@ def branch_tested_before(hostname, branch, build_id):
 
   #check every run with matching branch, hostname and build_id
   runs = Run.select().where(Run.hostname == hostname).where(Run.branch == branch).where(Run.build == build_id)
-  for run in runs:
-    #check if git sha matches with current commit sha
-    git_output = Message.select().where(Message.runid == run.id, Message.title == "git output")
-    for message in git_output:
-      if branch_sha in message.body:
-        #check if older runs did not fail
-        statuses = Message.select().where(Message.runid == run.id,\
-            ((Message.status == "failed") | (Message.status == "warning") | (Message.status == "error")))
-        if statuses.count() == 0:
-        #if no failure occured in last run, return true
-          return True
+  #select run with newest date
+  run = runs.order_by(Run.endtime.desc()).get()
+  #check if git sha matches with current commit sha
+  git_output = Message.select().where(Message.runid == run.id, Message.title == "git output")
+  for message in git_output:
+    if branch_sha in message.body:
+      #check if older runs did not fail
+      statuses = Message.select().where(Message.runid == run.id,\
+          ((Message.status == "failed") | (Message.status == "warning") | (Message.status == "error")))
+      if statuses.count() == 0:
+      #if no failure occured in last run, return true
+        return True
 
   return False
 
