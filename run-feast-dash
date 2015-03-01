@@ -25,6 +25,8 @@ def branch_tested_before(hostname, branch, build_id):
 
   #check every run with matching branch, hostname and build_id
   runs = Run.select().where(Run.hostname == hostname).where(Run.branch == branch).where(Run.build == build_id)
+  if runs.count() == 0:
+    return False
   #select run with newest date
   run = runs.order_by(Run.endtime.desc()).get()
   #check if git sha matches with current commit sha
