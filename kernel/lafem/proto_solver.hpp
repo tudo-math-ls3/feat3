@@ -1356,7 +1356,7 @@ namespace FEAST
 
             if ((Math::abs(alpha_tilde) * vec_v_tilde.template norm2<AlgoType_>()) / this->_def_cur < 1e-5)
             {
-              restarted = true;;
+              restarted = true;
               //std::cout << "Breakpoint 2" << std::endl;
               // \TODO warum ist das break hier nicht aktiv?
               //break;
@@ -1366,7 +1366,7 @@ namespace FEAST
             vec_s.template axpy<AlgoType_>(vec_v, vec_r, malpha_tilde);
 
             // compute new defect norm
-            status = this->_set_new_defect(vec_s);
+            /*status = this->_set_new_defect(vec_s);
             if (status == SolverStatus::success)
             {
               vec_sol.template axpy<AlgoType_>(vec_p_tilde, vec_sol, alpha_tilde);
@@ -1374,7 +1374,7 @@ namespace FEAST
               //early_exit = 1;
               //std::cout << "Breakpoint 3 (converged)" << std::endl;
               return status;
-            }
+            }*/
             vec_s_tilde.template axpy<AlgoType_>(vec_v_tilde, vec_r_tilde, malpha_tilde);
 
             mat_sys.template apply<AlgoType_>(vec_t, vec_s_tilde);
