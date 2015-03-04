@@ -193,7 +193,7 @@ mail_body = "\n" + failed_report + "\n" + passed_report + "\n" + detailed_report
 
 mail_subject = "Subject: [FEAST-DASH] Summary Mail - "
 if len(failed_runs) == 0:
-  mail_subject += "All runs passed"
+  mail_subject += "All " + str(runs.count()) + " runs passed"
 else:
   mail_subject += str(len(failed_runs))+ "/" + str(len(failed_runs) + len(passed_runs)) + " runs failed: M:"+str(master_failures)+"("+ str(yesterday_master_failures)+")" +" D:"+str(develop_failures)+"("+str(yesterday_develop_failures)+")"+" R:"+str(rest_failures)+"("+str(yesterday_rest_failures)+")"
 mail_from = "dirk.ribbrock@math.tu-dortmund.de"
