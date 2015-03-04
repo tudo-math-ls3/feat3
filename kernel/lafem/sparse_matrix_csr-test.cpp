@@ -566,12 +566,12 @@ template<
   typename Algo_,
   typename DT_,
   typename IT_>
-class SparseMatrixCSRPermutateTest
+class SparseMatrixCSRPermuteTest
   : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRPermutateTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixCSRPermutateTest")
+  SparseMatrixCSRPermuteTest()
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixCSRPermuteTest")
   {
   }
 
@@ -621,8 +621,8 @@ public:
 
       Adjacency::Permutation perm = Adjacency::CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_desc);
 
-      a.permutate(perm, perm);
-      x.permutate(perm);
+      a.permute(perm, perm);
+      x.permute(perm);
 
       a.template apply<Algo_>(r, x);
       DT_ norm = r.template norm2<Algo_>();
@@ -632,21 +632,21 @@ public:
   }
 };
 
-SparseMatrixCSRPermutateTest<Mem::Main, Algo::Generic, float, unsigned long> sm_csr_permutate_test_float_ulong;
-SparseMatrixCSRPermutateTest<Mem::Main, Algo::Generic, double, unsigned long> sm_csr_permutate_test_double_ulong;
-SparseMatrixCSRPermutateTest<Mem::Main, Algo::Generic, float, unsigned int> sm_csr_permutate_test_float_uint;
-SparseMatrixCSRPermutateTest<Mem::Main, Algo::Generic, double, unsigned int> sm_csr_permutate_test_double_uint;
+SparseMatrixCSRPermuteTest<Mem::Main, Algo::Generic, float, unsigned long> sm_csr_permute_test_float_ulong;
+SparseMatrixCSRPermuteTest<Mem::Main, Algo::Generic, double, unsigned long> sm_csr_permute_test_double_ulong;
+SparseMatrixCSRPermuteTest<Mem::Main, Algo::Generic, float, unsigned int> sm_csr_permute_test_float_uint;
+SparseMatrixCSRPermuteTest<Mem::Main, Algo::Generic, double, unsigned int> sm_csr_permute_test_double_uint;
 #ifdef FEAST_HAVE_QUADMATH
-SparseMatrixCSRPermutateTest<Mem::Main, Algo::Generic, __float128, unsigned long> sm_csr_permutate_test_float128_ulong;
-SparseMatrixCSRPermutateTest<Mem::Main, Algo::Generic, __float128, unsigned int> sm_csr_permutate_test_float128_uint;
+SparseMatrixCSRPermuteTest<Mem::Main, Algo::Generic, __float128, unsigned long> sm_csr_permute_test_float128_ulong;
+SparseMatrixCSRPermuteTest<Mem::Main, Algo::Generic, __float128, unsigned int> sm_csr_permute_test_float128_uint;
 #endif
 #ifdef FEAST_BACKENDS_MKL
-SparseMatrixCSRPermutateTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sm_csr_permutate_test_float_ulong;
-SparseMatrixCSRPermutateTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sm_csr_permutate_test_double_ulong;
+SparseMatrixCSRPermuteTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sm_csr_permute_test_float_ulong;
+SparseMatrixCSRPermuteTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sm_csr_permute_test_double_ulong;
 #endif
 /*#ifdef FEAST_BACKENDS_CUDA
-SparseMatrixCSRPermutateTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_csr_permutate_test_float_ulong;
-SparseMatrixCSRPermutateTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_csr_permutate_test_double_ulong;
-SparseMatrixCSRPermutateTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_csr_permutate_test_float_uint;
-SparseMatrixCSRPermutateTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_csr_permutate_test_double_uint;
+SparseMatrixCSRPermuteTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_csr_permute_test_float_ulong;
+SparseMatrixCSRPermuteTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_csr_permute_test_double_ulong;
+SparseMatrixCSRPermuteTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_csr_permute_test_float_uint;
+SparseMatrixCSRPermuteTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_csr_permute_test_double_uint;
 #endif*/

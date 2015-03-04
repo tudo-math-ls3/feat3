@@ -1134,7 +1134,7 @@ namespace FEAST
       ///@}
 
       /// Permutate vector according to the given Permutation
-      void permutate(Adjacency::Permutation & perm)
+      void permute(Adjacency::Permutation & perm)
       {
         DenseVector<Mem::Main, DT_, IT_> local;
         local.convert(*this);

@@ -1553,7 +1553,7 @@ namespace FEAST
       ///@}
 
       /// Permutate matrix rows and columns according to the given Permutations
-      void permutate(Adjacency::Permutation & perm_row, Adjacency::Permutation & perm_col)
+      void permute(Adjacency::Permutation & perm_row, Adjacency::Permutation & perm_col)
       {
         // http://de.mathworks.com/help/matlab/math/sparse-matrix-operations.html#f6-13070
         SparseMatrixCSR<Mem::Main, DT_, IT_> local;
@@ -1565,7 +1565,7 @@ namespace FEAST
         Index * perm_pos;
         perm_pos = perm_row.get_perm_pos();
 
-        //permutate rows from local to temp_*
+        //permute rows from local to temp_*
         Index new_start(0);
         temp_row_ptr[0] = 0;
         for (Index row(0) ; row < local.rows() ; ++row)
@@ -1587,7 +1587,7 @@ namespace FEAST
         Adjacency::Permutation perm_col_inv = perm_col.inverse();
         perm_pos = perm_col_inv.get_perm_pos();
 
-        //permutate columns from temp_* to local
+        //permute columns from temp_* to local
         ::memcpy(local.row_ptr(), temp_row_ptr, (rows() + 1) * sizeof(IT_));
         ::memcpy(local.val(), temp_val, used_elements() * sizeof(DT_));
         for (Index i(0) ; i < used_elements() ; ++i)
