@@ -101,7 +101,9 @@ public:
 
 #define N 10
     // create a random permutation
+    Permutation prm_rnd0(N, rng);
     Permutation prm_rnd(N, rng);
+    prm_rnd = std::move(prm_rnd0);
 
     // create two identity arrays
     Index vp[N], vs[N];
