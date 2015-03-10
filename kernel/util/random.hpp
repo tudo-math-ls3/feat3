@@ -25,7 +25,7 @@ namespace FEAST
   /**
    * \brief Pseudo-Random Number Generator
    *
-   * This class implements a 32-bit XOR-Shift pseudo-random number generator with a 128-bit cycle.
+   * This class implements a 64-bit XOR-Shift* pseudo-random number generator with a 64-bit cycle.
    *
    * The intention of this class is to provide a pseudo-random number generator which generates (warning:
    * paradoxon ahead) a reproducible random number stream independent of the platform and the compiler in use.
@@ -33,12 +33,15 @@ namespace FEAST
    * \warning This class is (intentionally) not thread-safe -- in a multi-threaded application each thread should
    * use its own random number generator.
    *
+   * \see <b>S. Vigna:</b> <em>An experimental exploration of Marsaglia's xorshift generators, scrambled</em>;
+   *      Cornell University Library, arXiv:1402.6246\n
+   *      http://arxiv.org/abs/1402.6246
    * \see <b>G. Marsaglia:</b> <em>Xorshift RNGs</em>; Journal of Statistical Software, Vol. 8 (Issue 14), 2003\n
    *      http://www.jstatsoft.org/v08/i14
    * \see http://en.wikipedia.org/wiki/Xorshift
    *
-   * \note The implementation in this class corresponds (with the exception of the default seed value) to the
-   * <c>xor128()</c> example in Section 4 of the <em>Xorshift RNGs</em> article mentioned above.
+   * \note The implementation in this class corresponds to the <c>xorshift64*</c> example in Figure 19 of the
+   * first article by Vigna mentioned above.
    *
    * \author Peter Zajac
    */
@@ -46,24 +49,14 @@ namespace FEAST
   {
   public:
     /// seed type
-    typedef uint32_t SeedType;
+    typedef uint64_t SeedType;
 
-    /// default seed enumeration
-    enum
-    {
-      /// default s-seed value
-      def_seed_s = 428147976,
-      /// default x-seed value
-      def_seed_x = 362436069,
-      /// default y-seed value
-      def_seed_y = 521288629,
-      /// default z-seed value
-      def_seed_z = 88675123
-    };
+    /// default seed value
+    static constexpr uint64_t def_seed = 28054777172512ull;
 
   private:
     /// the rng's working values
-    uint32_t _s, _x, _y, _z;
+    uint64_t _x;
 
   public:
     /**
@@ -72,11 +65,8 @@ namespace FEAST
      * \param[in] seed
      * The seed for the random number generator.
      */
-    explicit Random(SeedType seed = SeedType(def_seed_s)) :
-      _s(seed),
-      _x(uint32_t(def_seed_x)),
-      _y(uint32_t(def_seed_y)),
-      _z(uint32_t(def_seed_z))
+    explicit Random(SeedType seed = SeedType(def_seed)) :
+      _x(seed != 0ull ? seed : def_seed)
     {
     }
 
@@ -86,13 +76,12 @@ namespace FEAST
      * This function returns the next unsigned 32-bit integer in the random number stream and advances the
      * stream.
      */
-    uint32_t next()
+    uint64_t next()
     {
-      uint32_t t = _s ^ (_s << 11);
-      _s = _x;
-      _x = _y;
-      _y = _z;
-      return _z = _z ^ (_z >> 19) ^ t ^ (t >> 8);
+      _x ^= _x >> 12;
+      _x ^= _x << 25;
+      _x ^= _x >> 27;
+      return _x * uint64_t(2685821657736338717ull);
     }
 
     /**
@@ -181,7 +170,7 @@ namespace FEAST
     public:
       static T_ gen(Random& rng)
       {
-        return (T_)(rng.next());
+        return (T_)(rng.next() & 0xFFFFFFFFu);
       }
     };
 
@@ -192,16 +181,7 @@ namespace FEAST
     public:
       static T_ gen(Random& rng)
       {
-        // the rng works with 32-bit ints, so we need to generate a pair of those
-        // and concatenate them to obtain a random 64-bit integer...
-        union
-        {
-          uint32_t t[2];
-          uint64_t tq;
-        } x;
-        x.t[0] = rng.next();
-        x.t[1] = rng.next();
-        return (T_)x.tq;;
+        return (T_)(rng.next());
       }
     };
 
@@ -229,9 +209,9 @@ namespace FEAST
     public:
       static T_ gen(Random& rng)
       {
-        // the rng generates numbers in range [0,2^32-1], so divide by that maximum range
-        static const double d = 1.0 / double(0xFFFFFFFFu);
-        return T_(double(rng.next()) * d);
+        static constexpr uint64_t mask = 0xFFFFFFFFull;
+        static constexpr double d = 1.0 / double(mask);
+        return T_(double(rng.next() & mask) * d);
       }
 
       static T_ gen_ranged(Random& rng, T_ a, T_ b)
