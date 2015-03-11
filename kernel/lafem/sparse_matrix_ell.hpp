@@ -10,7 +10,6 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/lafem/arch/sum.hpp>
@@ -61,7 +60,7 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>
-    class SparseMatrixELL : public Container<Mem_, DT_, IT_>, public MatrixBase
+    class SparseMatrixELL : public Container<Mem_, DT_, IT_>
     {
     private:
       Index & _size()

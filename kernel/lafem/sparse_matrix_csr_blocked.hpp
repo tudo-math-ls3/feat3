@@ -10,7 +10,6 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
-#include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/sum.hpp>
 #include <kernel/lafem/arch/difference.hpp>
@@ -55,7 +54,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
-    class SparseMatrixCSRBlocked : public Container<Mem_, DT_, IT_>, public MatrixBase
+    class SparseMatrixCSRBlocked : public Container<Mem_, DT_, IT_>
     {
     private:
       Index & _size()

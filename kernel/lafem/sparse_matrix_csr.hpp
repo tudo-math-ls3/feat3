@@ -12,7 +12,6 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
 #include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
-#include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/lafem/arch/sum.hpp>
@@ -56,7 +55,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>
-    class SparseMatrixCSR : public Container<Mem_, DT_, IT_>, public MatrixBase
+    class SparseMatrixCSR : public Container<Mem_, DT_, IT_>
     {
     private:
       Index & _size()

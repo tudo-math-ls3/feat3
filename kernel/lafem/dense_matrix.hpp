@@ -7,7 +7,6 @@
 #include <kernel/lafem/forward.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/lafem/matrix_base.hpp>
 
 
 namespace FEAST
@@ -34,7 +33,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>
-    class DenseMatrix : public Container<Mem_, DT_, IT_>, public MatrixBase
+    class DenseMatrix : public Container<Mem_, DT_, IT_>
     {
     private:
       Index & _rows()

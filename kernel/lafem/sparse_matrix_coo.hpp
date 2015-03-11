@@ -8,7 +8,6 @@
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
@@ -61,7 +60,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>
-    class SparseMatrixCOO : public Container<Mem_, DT_, IT_>, public MatrixBase
+    class SparseMatrixCOO : public Container<Mem_, DT_, IT_>
     {
     private:
       template <typename T1_, typename T2_, typename T3_>
