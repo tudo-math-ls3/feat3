@@ -33,6 +33,7 @@ SET (test_list
   mesh_streamer-test
   meta_math-test
   property_map-test
+  random-test
   string-test
   tiny_algebra-test
 )

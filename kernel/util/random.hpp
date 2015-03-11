@@ -7,8 +7,8 @@
 
 // includes, system
 #include <algorithm>
-#include <stdint.h>
 #include <limits>
+#include <cstdint>
 
 namespace FEAST
 {
@@ -49,14 +49,17 @@ namespace FEAST
   {
   public:
     /// seed type
-    typedef uint64_t SeedType;
+    typedef std::uint64_t SeedType;
 
     /// default seed value
-    static constexpr uint64_t def_seed = 28054777172512ull;
+    static constexpr SeedType def_seed = SeedType(28054777172512ull);
+
+    /// internal multiplier
+    static constexpr SeedType xor_mult = SeedType(2685821657736338717ull);
 
   private:
     /// the rng's working values
-    uint64_t _x;
+    std::uint64_t _x;
 
   public:
     /**
@@ -66,7 +69,8 @@ namespace FEAST
      * The seed for the random number generator.
      */
     explicit Random(SeedType seed = SeedType(def_seed)) :
-      _x(seed != 0ull ? seed : def_seed)
+      // The seed must be non-zero.
+      _x(seed != SeedType(0) ? seed : def_seed)
     {
     }
 
@@ -81,7 +85,7 @@ namespace FEAST
       _x ^= _x >> 12;
       _x ^= _x << 25;
       _x ^= _x >> 27;
-      return _x * uint64_t(2685821657736338717ull);
+      return _x * xor_mult;
     }
 
     /**
@@ -141,6 +145,28 @@ namespace FEAST
     template<typename T_, size_t num_bytes_ = sizeof(T_)>
     class RandomInteger;
 
+    // Helper class: return non-negative integer
+    template<typename T_, bool signed_ = (Type::Traits<T_>::is_signed != 0)>
+    class NonNegInt
+    {
+    public:
+      static T_ make(T_ x)
+      {
+        return x;
+      }
+    };
+
+    // specialisation for signed integer types
+    template<typename T_>
+    class NonNegInt<T_, true>
+    {
+    public:
+      static T_ make(T_ x)
+      {
+        return (x < T_(0) ? T_(-(x + T_(1))) : x);
+      }
+    };
+
     // specialisation for 8-bit integers
     template<typename T_>
     class RandomInteger<T_, 1>
@@ -194,9 +220,13 @@ namespace FEAST
       static T_ gen_ranged(Random& rng, T_ a, T_ b)
       {
         // call gen() prior to the if-clause to advance the rng in any case
-        T_ x(RandomInteger<T_>::gen(rng));
+        // also, ensure that the value is non-negative
+        T_ x = NonNegInt<T_>::make(RandomInteger<T_>::gen(rng));
         if(a < b)
-          return a + x % (b - a + 1);
+          // Note: The following casting orgy is necessary on some compilers if the type 'T_' is
+          // actually shorter than 'int', as the arithmetic operations return values of type 'int'
+          // in this case.
+          return T_(a + T_(x % T_(T_(b - a) + T_(1))));
         else
           return a;
       }
@@ -209,8 +239,8 @@ namespace FEAST
     public:
       static T_ gen(Random& rng)
       {
-        static constexpr uint64_t mask = 0xFFFFFFFFull;
-        static constexpr double d = 1.0 / double(mask);
+        static constexpr std::uint64_t mask = std::uint64_t(0xFFFFFFFFull);
+        const double d = 1.0 / double(mask);
         return T_(double(rng.next() & mask) * d);
       }
 
@@ -227,7 +257,30 @@ namespace FEAST
           return a;
       }
     };
-  } // namespacce Intern
+
+    // specialisation for bool
+    template<typename T_>
+    class RandomNumber<T_, Type::BooleanClass>
+    {
+    public:
+      static T_ gen(Random& rng)
+      {
+        return T_(int(rng.next() & 0x8ull) != 0);
+      }
+
+      static T_ gen_ranged(Random& rng, T_ a, T_ b)
+      {
+        // call gen() prior to the if-clause to advance the rng in any case
+        T_ x(gen(rng));
+        // The following case may look pointless for bool, but if a and b are equal
+        // we want to return that value here - otherwise its either true or false.
+        if(a != b)
+          return x;
+        else
+          return a;
+      }
+    };
+  } // namespace Intern
   /// \endcond
 } // namespace FEAST
 
