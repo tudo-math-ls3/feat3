@@ -3,8 +3,8 @@ cmake_minimum_required (VERSION 2.8)
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-if (MPI_INCLUDE_PATH)
-  include_directories(${MPI_INCLUDE_PATH})
+if (MPI_CXX_INCLUDE_PATH)
+  include_directories(${MPI_CXX_INCLUDE_PATH})
 endif()
 
 # top lvl include dir
