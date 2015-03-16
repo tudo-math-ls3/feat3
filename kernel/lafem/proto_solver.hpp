@@ -225,8 +225,8 @@ namespace FEAST
        * see the documentation of the corresponding preconditioner class template.
        */
       template<typename... Args_>
-      explicit PreconWrapper(const Matrix_& matrix, Args_... args) :
-        _precond(matrix, args...)
+      explicit PreconWrapper(const Matrix_& matrix, Args_&&... args) :
+        _precond(matrix, std::forward<Args_>(args)...)
       {
       }
 

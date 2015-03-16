@@ -122,14 +122,14 @@ public:
 
     // test FGMRES-ILU
     {
-      // create an ILU preconditioner
-      PreconWrapper<AlgoType, MatrixType, ILUPreconditioner> precon(matrix, Index(0));
+      // create an SPAI preconditioner
+      PreconWrapper<AlgoType, MatrixType, SPAIPreconditioner> precon(matrix, matrix.layout());
       // create a fix-point solver
       FGMRESSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, 16, &precon);
-      test_solver("FGMRES(16)-ILU(0)", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("FGMRES(16)-SPAI", solver, vec_sol, vec_ref, vec_rhs);
     }
 
-    // test Fix-Point-ILU
+    // test Fix-Point-SOR
     {
       // create a SOR preconditioner
       PreconWrapper<AlgoType, MatrixType, SORPreconditioner> precon(matrix, DataType(1.7));
