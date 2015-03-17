@@ -3323,6 +3323,12 @@ namespace FEAST
         }
       }
 
+      /// Returns the actual spai matrix.
+      const MT_ & get_M() const
+      {
+        return _M;
+      }
+
     private:
       void _create_M()
       {
