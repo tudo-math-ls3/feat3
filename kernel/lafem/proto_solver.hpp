@@ -6,6 +6,7 @@
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/umfpack.hpp>
 #include <memory>
+#include <utility>
 
 namespace FEAST
 {
