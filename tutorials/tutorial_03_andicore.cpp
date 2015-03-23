@@ -74,7 +74,7 @@
 
 // FEAST-LAFEM provisional solver includes
 #include <kernel/lafem/preconditioner.hpp>                 // for NonePreconditioner
-#include <kernel/lafem/bicgstab.hpp>                       // for BiCGStab
+#include <kernel/lafem/proto_solver.hpp>                   // for BiCGStabSolver
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -590,13 +590,25 @@ namespace Tutorial03
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Solver set-up
 
-    // Create a dummy preconditioner
-    LAFEM::NonePreconditioner<AlgoType, MatrixType, VectorType> precond;
-
     std::cout << "Solving linear system..." << std::endl;
 
-    // Fire up the BiCGStab solver
-    LAFEM::BiCGStab<AlgoType>::value(vec_sol, matrix, vec_rhs, precond, 100, 1E-8);
+    // Create a SPAI preconditioner
+    LAFEM::PreconWrapper<AlgoType, MatrixType, LAFEM::SPAIPreconditioner> precond(matrix, matrix.layout());
+
+    // Create a preconditioned BiCGStab solver
+    LAFEM::BiCGStabSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, &precond);
+
+    // Enable convergence plot
+    solver.set_plot(true);
+
+    // Initialise the solver
+    solver.init();
+
+    // Correct our initial solution vector
+    solver.correct(vec_sol, vec_rhs);
+
+    // And release the solver
+    solver.done();
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Computing L2/H1-Errors

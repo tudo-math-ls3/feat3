@@ -75,7 +75,7 @@ namespace FEAST
      * This class template defines the interface for any solver implementation.
      *
      * \tparam IOVector_
-     * The class of the vector that is passed to the solver in the \c apply method.
+     * The class of the vector that is passed to the solver in the \c solve() method.
      *
      * \author Peter Zajac
      */
@@ -164,6 +164,9 @@ namespace FEAST
        * This method applies the solver represented by this object onto a given right-hand-side vector
        * and returns the corresponding solution vector.
        *
+       * \note Solvers which derive from the IterativeSolver base class also provide a \c correct() method
+       * which corrects an initial solution instead of starting with the null vector.
+       *
        * \param[in,out] vec_sol
        * The vector that shall receive the solution of the linear system. It is assumed to be allocated, but
        * its numerical contents may be undefined upon calling this method.
@@ -174,7 +177,7 @@ namespace FEAST
        * \returns
        * A SolverStatus code that represents the status of the solution step.
        */
-      virtual SolverStatus apply(IOVector_& vec_sol, const IOVector_& vec_rhs) = 0;
+      virtual SolverStatus solve(IOVector_& vec_sol, const IOVector_& vec_rhs) = 0;
     }; // class SolverInterface<...>
 
     /**
@@ -232,7 +235,7 @@ namespace FEAST
       }
 
       /// Applies the preconditioner.
-      virtual SolverStatus apply(VectorType& vec_sol, const VectorType& vec_rhs) override
+      virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         _precond.apply(vec_sol, vec_rhs);
         return SolverStatus::success;
@@ -301,7 +304,7 @@ namespace FEAST
         _umfpack.free_symbolic();
       }
 
-      virtual SolverStatus apply(VectorType& vec_sol, const VectorType& vec_rhs) override
+      virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         try
         {
@@ -325,22 +328,31 @@ namespace FEAST
      * \tparam AlgoType_
      * The algorithm tag to be used by the solver.
      *
-     * \tparam Vector_
-     * The vector class used by the solver.
+     * \tparam Matrix_
+     * The matrix class to be used by the solver.
+     *
+     * \tparam Filter_
+     * The filter class to be used by the solver.
      *
      * \author Peter Zajac
      */
-    template<typename AlgoType_, typename Vector_>
+    template<typename AlgoType_, typename Matrix_, typename Filter_>
     class IterativeSolver :
-      public SolverInterface<Vector_>
+      public SolverInterface<typename Matrix_::VectorTypeR>
     {
     public:
       typedef AlgoType_ AlgoType;
-      typedef Vector_ VectorType;
-      typedef typename VectorType::DataType DataType;
+      typedef Matrix_ MatrixType;
+      typedef Filter_ FilterType;
+      typedef typename Matrix_::VectorTypeR VectorType;
+      typedef typename MatrixType::DataType DataType;
       typedef SolverInterface<VectorType> BaseClass;
 
     protected:
+      /// the matrix for the solver
+      const MatrixType& _system_matrix;
+      /// the filter for the solver
+      const FilterType& _system_filter;
       /// name of the solver
       String _name;
       /// relative tolerance parameter
@@ -363,20 +375,29 @@ namespace FEAST
       /**
        * \brief Protected constructor
        *
-       * \param[in] name
-       * Specifies the name of the iterative solver. This is used as a prefix for the convergence plot.
-       *
        * This constructor initialises the following values:
        *
-       * - relative tolerance: 1E-8
+       * - relative tolerance: sqrt(eps) (~1E-8 for double)
        * - minimum iterations: 0
        * - maximum iterations: 100
        * - convergence plot: false
+       *
+       * \param[in] name
+       * Specifies the name of the iterative solver. This is used as a prefix for the convergence plot.
+       *
+       * \param[in] matrix
+       * A reference to the system matrix.
+       *
+       * \param[in] filter
+       * A reference to the system filter.
        */
-      explicit IterativeSolver(String name) :
+      explicit IterativeSolver(String name, const MatrixType& matrix, const FilterType& filter) :
         BaseClass(),
+        _system_matrix(matrix),
+        _system_filter(filter),
         _name(name),
-        _tol_rel(1E-8),
+        //_tol_rel(1E-8),
+        _tol_rel(Math::sqrt(Math::eps<DataType>())),
         _min_iter(0),
         _max_iter(100),
         _num_iter(0),
@@ -427,6 +448,58 @@ namespace FEAST
       bool is_diverged() const
       {
         return _def_cur > DataType(1E+99);
+      }
+
+      /**
+       * \brief Solver correction method
+       *
+       * This method applies the solver represented by this object onto a given right-hand-side vector
+       * and updates the corresponding solution vector.
+       *
+       * In contrast to the solve() method of the SolverInterface base class, this method uses the
+       * vector \p vec_sol as the initial solution vector for the iterative solution process instead of
+       * ignoring its contents upon entry and strating with the null vector.
+       *
+       * \note The default implementation creates a temporary vector, computes the defect, applies
+       * the solve() method to obtain a correction vector and update the solution vector with it.
+       *
+       * \param[in,out] vec_sol
+       * The vector that shall contains the initial solution upon entry and receives the solution
+       * of the linear system upon exit.
+       *
+       * \param[in] vec_rhs
+       * The vector that represents the right-hand-side of the linear system to be solved.
+       *
+       * \returns
+       * A SolverStatus code that represents the status of the solution step.
+       */
+      virtual SolverStatus correct(VectorType& vec_sol, const VectorType& vec_rhs)
+      {
+        // create a defect and a correction vector
+        auto vec_def = vec_rhs.clone(LAFEM::CloneMode::Layout);
+        auto vec_cor = vec_sol.clone(LAFEM::CloneMode::Layout);
+
+        // compute defect
+        this->_system_matrix.template apply<AlgoType>(vec_def, vec_sol, vec_rhs, -DataType(1));
+
+        // apply defect filter
+        this->_system_filter.template filter_def<AlgoType>(vec_def);
+
+        // apply solver
+        SolverStatus status = this->solve(vec_cor, vec_def);
+
+        // apply correction if successful
+        if(status_success(status))
+        {
+          // apply correction filter
+          this->_system_filter.template filter_cor<AlgoType>(vec_cor);
+
+          // update solution vector
+          vec_sol.template axpy<AlgoType>(vec_cor, vec_sol);
+        }
+
+        // return status
+        return status;
       }
 
     protected:
@@ -540,20 +613,25 @@ namespace FEAST
      * \tparam AlgoType_
      * The algorithm tag to be used by the solver.
      *
-     * \tparam Vector_
-     * The vector class used by the solver.
+     * \tparam Matrix_
+     * The matrix class to be used by the solver.
+     *
+     * \tparam Filter_
+     * The filter class to be used by the solver.
      *
      * \authro Peter Zajac
      */
-    template<typename AlgoType_, typename Vector_>
+    template<typename AlgoType_, typename Matrix_, typename Filter_>
     class PreconditionedIterativeSolver :
-      public IterativeSolver<AlgoType_, Vector_>
+      public IterativeSolver<AlgoType_, Matrix_, Filter_>
     {
     public:
       typedef AlgoType_ AlgoType;
-      typedef Vector_ VectorType;
-      typedef typename VectorType::DataType DataType;
-      typedef IterativeSolver<AlgoType_, VectorType> BaseClass;
+      typedef Matrix_ MatrixType;
+      typedef Filter_ FilterType;
+      typedef typename MatrixType::VectorTypeR VectorType;
+      typedef typename MatrixType::DataType DataType;
+      typedef IterativeSolver<AlgoType_, MatrixType, FilterType> BaseClass;
 
       /// the interface for the preconditioner
       typedef SolverInterface<VectorType> PrecondType;
@@ -568,14 +646,20 @@ namespace FEAST
        * \param[in] name
        * The name of the solver.
        *
+       * \param[in] matrix
+       * A reference to the system matrix.
+       *
+       * \param[in] filter
+       * A reference to the system filter.
+       *
        * \param[in] precond
        * A pointer to the preconditioner. May be nullptr.
        *
        * \attention
        * This class does \b not delete the preconditioner object upon destruction!
        */
-      explicit PreconditionedIterativeSolver(String name, PrecondType* precond = nullptr) :
-        BaseClass(name),
+      explicit PreconditionedIterativeSolver(String name, const MatrixType& matrix, const FilterType& filter, PrecondType* precond = nullptr) :
+        BaseClass(name, matrix, filter),
         _precond(precond)
       {
       }
@@ -634,7 +718,7 @@ namespace FEAST
       {
         if(this->_precond)
         {
-          return status_success(this->_precond->apply(vec_out, vec_in));
+          return status_success(this->_precond->solve(vec_out, vec_in));
         }
         else
         {
@@ -662,7 +746,7 @@ namespace FEAST
      */
     template<typename AlgoType_, typename Matrix_, typename Filter_>
     class FixPointSolver :
-      public PreconditionedIterativeSolver<AlgoType_, typename Matrix_::VectorTypeR>
+      public PreconditionedIterativeSolver<AlgoType_, Matrix_, Filter_>
     {
     public:
       typedef AlgoType_ AlgoType;
@@ -670,15 +754,11 @@ namespace FEAST
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeR VectorType;
       typedef typename MatrixType::DataType DataType;
-      typedef PreconditionedIterativeSolver<AlgoType, VectorType> BaseClass;
+      typedef PreconditionedIterativeSolver<AlgoType, MatrixType, FilterType> BaseClass;
 
       typedef SolverInterface<VectorType> PrecondType;
 
     protected:
-      /// the system matrix
-      const MatrixType& _system_matrix;
-      /// the system filter
-      const FilterType& _system_filter;
       /// defect vector
       VectorType _vec_def;
       /// correction vector
@@ -698,9 +778,7 @@ namespace FEAST
        * A pointer to the preconditioner. May be \c nullptr.
        */
       explicit FixPointSolver(const MatrixType& matrix, const FilterType& filter, PrecondType* precond = nullptr) :
-        BaseClass("FixPoint", precond),
-        _system_matrix(matrix),
-        _system_filter(filter)
+        BaseClass("FixPoint", matrix, filter, precond)
       {
       }
 
@@ -720,20 +798,37 @@ namespace FEAST
         this->_vec_def.clear();
       }
 
-      virtual SolverStatus apply(VectorType& vec_sol, const VectorType& vec_rhs) override
+      virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        // save defect
+        this->_vec_def.copy(vec_rhs);
+        this->_system_filter.template filter_def<AlgoType>(this->_vec_def);
+
+        // clear solution vector
+        vec_sol.format();
+
+        // apply
+        return _apply_intern(vec_sol, vec_rhs);
+      }
+
+      virtual SolverStatus correct(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        // compute defect
+        this->_system_matrix.template apply<AlgoType>(this->_vec_def, vec_sol, vec_rhs, -DataType(1));
+        this->_system_filter.template filter_def<AlgoType>(this->_vec_def);
+
+        // apply
+        return _apply_intern(vec_sol, vec_rhs);
+      }
+
+    protected:
+      virtual SolverStatus _apply_intern(VectorType& vec_sol, const VectorType& vec_rhs)
       {
         VectorType& vec_def(this->_vec_def);
         VectorType& vec_cor(this->_vec_cor);
         const MatrixType& mat_sys(this->_system_matrix);
         const FilterType& fil_sys(this->_system_filter);
         SolverStatus status(SolverStatus::progress);
-
-        // save defect
-        vec_def.copy(vec_rhs);
-        fil_sys.template filter_def<AlgoType>(vec_def);
-
-        // clear solution vector
-        vec_sol.format();
 
         // compute initial defect
         status = this->_set_initial_defect(vec_def);
@@ -785,7 +880,7 @@ namespace FEAST
       typename Matrix_,
       typename Filter_>
     class PCGSolver :
-      public PreconditionedIterativeSolver<AlgoType_, typename Matrix_::VectorTypeR>
+      public PreconditionedIterativeSolver<AlgoType_, Matrix_, Filter_>
     {
     public:
       typedef AlgoType_ AlgoType;
@@ -793,15 +888,11 @@ namespace FEAST
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeR VectorType;
       typedef typename MatrixType::DataType DataType;
-      typedef PreconditionedIterativeSolver<AlgoType, VectorType> BaseClass;
+      typedef PreconditionedIterativeSolver<AlgoType, MatrixType, FilterType> BaseClass;
 
       typedef SolverInterface<VectorType> PrecondType;
 
     protected:
-      /// the system matrix
-      const MatrixType& _system_matrix;
-      /// the system filter
-      const FilterType& _system_filter;
       /// defect vector
       VectorType _vec_def;
       /// descend direction vector
@@ -823,9 +914,7 @@ namespace FEAST
        * A pointer to the preconditioner. May be \c nullptr.
        */
       explicit PCGSolver(const MatrixType& matrix, const FilterType& filter, PrecondType* precond = nullptr) :
-        BaseClass("PCG", precond),
-        _system_matrix(matrix),
-        _system_filter(filter)
+        BaseClass("PCG", matrix, filter, precond)
       {
       }
 
@@ -847,7 +936,31 @@ namespace FEAST
         this->_vec_def.clear();
       }
 
-      virtual SolverStatus apply(VectorType& vec_sol, const VectorType& vec_rhs) override
+      virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        // save defect
+        this->_vec_def.copy(vec_rhs);
+        this->_system_filter.template filter_def<AlgoType>(this->_vec_def);
+
+        // clear solution vector
+        vec_sol.format();
+
+        // apply
+        return _apply_intern(vec_sol, vec_rhs);
+      }
+
+      virtual SolverStatus correct(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        // compute defect
+        this->_system_matrix.template apply<AlgoType>(this->_vec_def, vec_sol, vec_rhs, -DataType(1));
+        this->_system_filter.template filter_def<AlgoType>(this->_vec_def);
+
+        // apply
+        return _apply_intern(vec_sol, vec_rhs);
+      }
+
+    protected:
+      virtual SolverStatus _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
         VectorType& vec_def(this->_vec_def);
         VectorType& vec_dir(this->_vec_dir);
@@ -855,13 +968,6 @@ namespace FEAST
         const MatrixType& mat_sys(this->_system_matrix);
         const FilterType& fil_sys(this->_system_filter);
         SolverStatus status(SolverStatus::progress);
-
-        // save defect
-        vec_def.copy(vec_rhs);
-        fil_sys.template filter_def<AlgoType>(vec_def);
-
-        // clear solution vector
-        vec_sol.format();
 
         // compute initial defect
         status = this->_set_initial_defect(vec_def);
@@ -939,7 +1045,7 @@ namespace FEAST
       typename Matrix_,
       typename Filter_>
     class FGMRESSolver :
-      public PreconditionedIterativeSolver<AlgoType_, typename Matrix_::VectorTypeR>
+      public PreconditionedIterativeSolver<AlgoType_, Matrix_, Filter_>
     {
     public:
       typedef AlgoType_ AlgoType;
@@ -947,15 +1053,11 @@ namespace FEAST
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeR VectorType;
       typedef typename MatrixType::DataType DataType;
-      typedef PreconditionedIterativeSolver<AlgoType, VectorType> BaseClass;
+      typedef PreconditionedIterativeSolver<AlgoType, MatrixType, FilterType> BaseClass;
 
       typedef SolverInterface<VectorType> PrecondType;
 
     protected:
-      /// the system matrix
-      const MatrixType& _system_matrix;
-      /// the system filter
-      const FilterType& _system_filter;
       /// krylov dimension
       Index _krylov_dim;
       /// right-hand-side vector
@@ -984,9 +1086,7 @@ namespace FEAST
        * A pointer to the preconditioner. May be \c nullptr.
        */
       explicit FGMRESSolver(const MatrixType& matrix, const FilterType& filter, Index krylov_dim, PrecondType* precond = nullptr) :
-        BaseClass("FGMRES(" + stringify(krylov_dim) + ")", precond),
-        _system_matrix(matrix),
-        _system_filter(filter),
+        BaseClass("FGMRES(" + stringify(krylov_dim) + ")", matrix, filter, precond),
         _krylov_dim(krylov_dim)
       {
         _c.reserve(krylov_dim);
@@ -1017,16 +1117,36 @@ namespace FEAST
         _vec_z.clear();
       }
 
-      virtual SolverStatus apply(VectorType& vec_sol, const VectorType& vec_rhs) override
+      virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
-        // save input defect vector
+        // save input rhs vector
         this->_vec_b.copy(vec_rhs);
-        this->_system_filter.template filter_def<AlgoType>(this->_vec_b);
         this->_vec_v.at(0).copy(this->_vec_b);
+        this->_system_filter.template filter_def<AlgoType>(this->_vec_v.at(0));
 
         // clear solution vector
         vec_sol.format();
 
+        // apply
+        return _apply_intern(vec_sol, vec_rhs);
+      }
+
+      virtual SolverStatus correct(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        // save input rhs vector
+        this->_vec_b.copy(vec_rhs);
+
+        // compute defect
+        this->_system_matrix.template apply<AlgoType>(this->_vec_v.at(0), vec_sol, vec_rhs, -DataType(1));
+        this->_system_filter.template filter_def<AlgoType>(this->_vec_v.at(0));
+
+        // apply
+        return _apply_intern(vec_sol, vec_rhs);
+      }
+
+    protected:
+      virtual SolverStatus _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
+      {
         // compute initial defect
         SolverStatus status = this->_set_initial_defect(this->_vec_b);
 
@@ -1120,75 +1240,6 @@ namespace FEAST
       }
     }; // class FGMRESSolver<...>
 
-    /// a simple SSOR-preconditioner
-    template<typename Matrix_>
-    class SSORPrecond;
-
-    /// SSOR-specialisation for CSR matrices stored in Main memory
-    template<
-      typename DataType_,
-      typename IndexType_>
-    class SSORPrecond<LAFEM::SparseMatrixCSR<Mem::Main, DataType_, IndexType_>>
-      : public SolverInterface<LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>>
-    {
-    public:
-      typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_, IndexType_> MatrixType;
-      typedef LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> VectorType;
-      typedef SolverInterface<LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>> BaseClass;
-      typedef Algo::Generic AlgoType;
-
-    protected:
-      const MatrixType& _matrix;
-      DataType_ _relax;
-
-    public:
-      explicit SSORPrecond(const MatrixType& matrix, DataType_ relax = DataType_(1)) :
-        _matrix(matrix),
-        _relax(relax)
-        {
-        }
-
-      void set_relax(DataType_ relax)
-      {
-        _relax = relax;
-      }
-
-      virtual SolverStatus apply(VectorType& vec_sol, const VectorType& vec_rhs) override
-      {
-        const IndexType_* row_ptr(this->_matrix.row_ptr());
-        const IndexType_* col_idx(this->_matrix.col_ind());
-        const DataType_* data(this->_matrix.val());
-        DataType_* x(vec_sol.elements());
-        const DataType_* y(vec_rhs.elements());
-
-        const Index n = this->_matrix.rows();
-
-        // forward loop
-        for(Index i(0); i < n; ++i)
-        {
-          DataType_ d(0);
-          Index j(0);
-          for(j = row_ptr[i]; col_idx[j] < i; ++j)
-            d += data[j] * x[col_idx[j]];
-          x[i] = (y[i] - _relax * d) / data[j];
-        }
-
-        // backward loop
-        for(Index i(n); i > 0; )
-        {
-          --i;
-          DataType_ d(0);
-          Index j(0);
-          for(j = row_ptr[i+1]-1; col_idx[j] > i; --j)
-            d += data[j] * x[col_idx[j]];
-          x[i] -= _relax * d / data[j];
-        }
-
-        // okay
-        return SolverStatus::success;
-      }
-    };
-
     /**
      * \brief (Preconditioned) Biconjugate gradient stabilized solver implementation
      *
@@ -1210,7 +1261,7 @@ namespace FEAST
       typename Matrix_,
       typename Filter_>
     class BiCGStabSolver :
-      public PreconditionedIterativeSolver<AlgoType_, typename Matrix_::VectorTypeR>
+      public PreconditionedIterativeSolver<AlgoType_, Matrix_, Filter_>
     {
     public:
       typedef AlgoType_ AlgoType;
@@ -1218,16 +1269,11 @@ namespace FEAST
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeR VectorType;
       typedef typename MatrixType::DataType DataType;
-      typedef PreconditionedIterativeSolver<AlgoType, VectorType> BaseClass;
+      typedef PreconditionedIterativeSolver<AlgoType, MatrixType, FilterType> BaseClass;
 
       typedef SolverInterface<VectorType> PrecondType;
 
     protected:
-      /// the system matrix
-      const MatrixType& _system_matrix;
-      /// the system filter
-      const FilterType& _system_filter;
-
       /// temporary vectors
       VectorType _vec_r;
       VectorType _vec_r_tilde;
@@ -1254,9 +1300,7 @@ namespace FEAST
        * A pointer to the preconditioner. May be \c nullptr.
        */
       explicit BiCGStabSolver(const MatrixType& matrix, const FilterType& filter, PrecondType* precond = nullptr) :
-        BaseClass("BiCGStab", precond),
-        _system_matrix(matrix),
-        _system_filter(filter)
+        BaseClass("BiCGStab", matrix, filter, precond)
       {
       }
 
@@ -1293,7 +1337,7 @@ namespace FEAST
         this->_vec_t_tilde.clear();
       }
 
-      virtual SolverStatus apply(VectorType& vec_sol, const VectorType& vec_rhs) override
+      virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         VectorType& vec_r        (this->_vec_r);
         VectorType& vec_r_tilde  (this->_vec_r_tilde);

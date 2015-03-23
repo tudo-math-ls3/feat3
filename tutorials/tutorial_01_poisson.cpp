@@ -60,6 +60,7 @@
 
 // FEAST-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
+//#include <kernel/space/lagrange1/element.hpp>            // the Lagrange-2 Element (aka "Q2")
 //#include <kernel/space/rannacher_turek/element.hpp>      // the Rannacher-Turek Element (aka "Q1~")
 
 // FEAST-Cubature includes
@@ -82,8 +83,8 @@
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
 // FEAST-LAFEM provisional solver includes
-#include <kernel/lafem/preconditioner.hpp>                 // for NonePreconditioner
-#include <kernel/lafem/bicgstab.hpp>                       // for BiCGStab
+#include <kernel/lafem/preconditioner.hpp>                 // for SSORPreconditioner
+#include <kernel/lafem/proto_solver.hpp>                   // for PCGSolver
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -194,6 +195,9 @@ namespace Tutorial01
 
     // Use the Lagrange-1 element (aka "Q1"):
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+
+    // Use the Lagrange-2 element (aka "Q2"):
+    //typedef Space::Lagrange2::Element<TrafoType> SpaceType;
 
     // Use the Rannacher-Turek element (aka "Q1~"):
     //typedef Space::RannacherTurek::Element<TrafoType> SpaceType;
@@ -373,24 +377,27 @@ namespace Tutorial01
     // Solver set-up
 
     // Now we should configure our fancy ScaRC2 solver, but unfortunately, we're not that far...
-    // So we stick to a provisional BiCGStab solver for now...
-
-    // Create a dummy preconditioner
-    LAFEM::NonePreconditioner<AlgoType, MatrixType, VectorType> precond;
+    // So we stick to a provisional PCG-SSOR solver for now...
 
     std::cout << "Solving linear system..." << std::endl;
 
-    // Fire up the BiCGStab solver
-    LAFEM::BiCGStab<AlgoType>::value(
-      vec_sol,    // the initial solution vector
-      matrix,     // the system matrix
-      vec_rhs,    // the right-hand-side vector
-      precond,    // the dummy preconditioner
-      100,        // maximum number of iterations
-      1E-8        // relative tolerance to achieve
-      );
+    // Create a SSOR preconditioner
+    LAFEM::PreconWrapper<AlgoType, MatrixType, LAFEM::SSORPreconditioner> precond(matrix);
 
-    // Unless the BiCGStab died, we should now have our discrete solution.
+    // Create a PCG solver
+    LAFEM::PCGSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, &precond);
+
+    // Enable convergence plot
+    solver.set_plot(true);
+
+    // Initialise the solver
+    solver.init();
+
+    // Correct our initial solution vector
+    solver.correct(vec_sol, vec_rhs);
+
+    // Release the solver
+    solver.done();
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Computing L2/H1-Errors

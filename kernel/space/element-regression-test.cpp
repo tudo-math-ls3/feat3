@@ -22,6 +22,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/lafem/unit_filter.hpp>
+#include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/proto_solver.hpp>
 #include <kernel/util/time_stamp.hpp>
 
@@ -296,12 +297,8 @@ namespace ElementRegression
 
     virtual void solve_system(const MatrixType& matrix, const FilterType& filter, VectorType& vec_sol, const VectorType& vec_rhs) const
     {
-      // create two empty vector
-      VectorType vec_def(vec_sol.clone(LAFEM::CloneMode::Layout));
-      VectorType vec_cor(vec_sol.clone(LAFEM::CloneMode::Layout));
-
       // create a SSOR preconditioner
-      LAFEM::SSORPrecond<MatrixType> precon(matrix);
+      LAFEM::PreconWrapper<AlgoType, MatrixType, LAFEM::SSORPreconditioner> precon(matrix, DataType(1));
 
       // create a PCG solver
       LAFEM::PCGSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, &precon);
@@ -314,17 +311,9 @@ namespace ElementRegression
       // initialise solver
       TEST_CHECK_MSG(solver.init(), "Failed to initialise CG solver!");
 
-      // compute defect
-      matrix.template apply<AlgoType>(vec_def, vec_sol, vec_rhs, -DataType(1));
-      filter.template filter_def<AlgoType>(vec_def);
-
-      // apply solver on defect
-      LAFEM::SolverStatus status = solver.apply(vec_cor, vec_def);
+      // apply solver
+      LAFEM::SolverStatus status = solver.correct(vec_sol, vec_rhs);
       TEST_CHECK_MSG(LAFEM::status_success(status), "Failed to solve linear system!");
-
-      // update solution
-      filter.template filter_cor<AlgoType>(vec_cor);
-      vec_sol.template axpy<AlgoType>(vec_cor, vec_sol);
 
       // release solver
       solver.done();

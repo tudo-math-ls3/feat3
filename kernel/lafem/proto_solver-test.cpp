@@ -41,13 +41,15 @@ public:
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
+    // initialise solver
     bool okay = solver.init();
     TEST_CHECK_MSG(okay, (String("Failed to initialise solver: '") + name + ("'")));
 
     // solve
-    SolverStatus status = solver.apply(vec_sol, vec_rhs);
+    SolverStatus status = solver.solve(vec_sol, vec_rhs);
     TEST_CHECK_MSG(status_success(status), (String("Failed to solve: '") + name + ("'")));
 
+    // release solver
     solver.done();
 
     // check against reference solution
@@ -114,7 +116,7 @@ public:
     // test PCG-SSOR
     {
       // create a SSOR preconditioner
-      SSORPrecond<MatrixType> precon(matrix);
+      PreconWrapper<AlgoType, MatrixType, LAFEM::SSORPreconditioner> precon(matrix);
       // create a CG solver
       PCGSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, &precon);
       test_solver("PCG-SSOR", solver, vec_sol, vec_ref, vec_rhs);
@@ -139,17 +141,17 @@ public:
       test_solver("FixPoint-SOR(1.7)", solver, vec_sol, vec_ref, vec_rhs);
     }
 
-    // test UMFPACK
-    test_umfpack(matrix, vec_sol, vec_ref, vec_rhs);
-
-    // test BiCGStab-SSOR
+    // test BiCGStab-ILU(0)
     {
-      // create a SSOR preconditioner
-      SSORPrecond<MatrixType> precon(matrix);
+      // create a ILU(0) preconditioner
+      PreconWrapper<AlgoType, MatrixType, ILUPreconditioner> precon(matrix, Index(0));
       // create a BiCGStab solver
       BiCGStabSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, &precon);
-      test_solver("BiCGStab-SSOR", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("BiCGStab-ILU(0)", solver, vec_sol, vec_ref, vec_rhs);
     }
+
+    // test UMFPACK
+    test_umfpack(matrix, vec_sol, vec_ref, vec_rhs);
   }
 };
 
