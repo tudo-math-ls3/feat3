@@ -1671,12 +1671,12 @@ namespace FEAST
        *
        * param[in] A system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 0.7)
+       * param[in] omega A parameter of the preconditioner (default omega = 1)
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
       SORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A,
-                        const DT_ omega = DT_(0.7)) :
+                        const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -1773,12 +1773,12 @@ namespace FEAST
        *
        * param[in] A system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 0.7)
+       * param[in] omega A parameter of the preconditioner (default omega = 1)
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
       SORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A,
-                        const DT_ omega = DT_(0.7)) :
+                        const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -1880,12 +1880,12 @@ namespace FEAST
        *
        * param[in] A system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 0.7)
+       * param[in] omega A parameter of the preconditioner (default omega = 1)
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
       SORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A,
-                        const DT_ omega = DT_(0.7)) :
+                        const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -1997,11 +1997,11 @@ namespace FEAST
        *
        * param[in] A The system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 1.3)
+       * param[in] omega A parameter of the preconditioner (default omega = 1)
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1.3)) :
+      SSORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -2116,11 +2116,11 @@ namespace FEAST
        *
        * param[in] A The system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 1.3)
+       * param[in] omega A parameter of the preconditioner (default omega = 1)
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1.3)) :
+      SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -2246,11 +2246,11 @@ namespace FEAST
        *
        * param[in] A The system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 1.3)
+       * param[in] omega A parameter of the preconditioner (default omega = 1)
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1.3)) :
+      SSORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
