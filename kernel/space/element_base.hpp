@@ -28,26 +28,16 @@ namespace FEAST
       /// shape type
       typedef typename TrafoType::ShapeType ShapeType;
 
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = ShapeType::dimension
-      };
+      /// shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
 
-      /**
-       * \brief Element capabilities enumeration
+      /*
+       * \brief Specifies whether the element has node functionals
+       *
+       * If this value is 1, the element implements node functionals, i.e. the Type member of the
+       * nested NodeFunctional class template is defined.
        */
-      enum ElementCapabilities
-      {
-        /**
-         * \brief Specifies whether the element has node functionals
-         *
-         * If this value is 1, the element implements node functionals, i.e. the Type member of the
-         * nested NodeFunctional class template is defined.
-         */
-        have_node_func = 0
-      };
+      static constexpr bool have_node_func = false;
 
       // Note:
       // The following block serves as an element interface documentation and is therefore only

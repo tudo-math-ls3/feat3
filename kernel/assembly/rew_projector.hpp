@@ -26,19 +26,13 @@ namespace FEAST
       struct AsmSpaceConfig :
         public Space::ConfigBase
       {
-        enum
-        {
-          need_value = 1
-        };
+        static constexpr bool need_value = true;
       };
       struct AsmTrafoConfig :
         public Trafo::ConfigBase
       {
-        enum
-        {
-          need_img_point = 1,
-          need_jac_det = 1
-        };
+        static constexpr bool need_img_point = true;
+        static constexpr bool need_jac_det = true;
       };
       /// \endcond
 
@@ -89,7 +83,7 @@ namespace FEAST
         typedef Space_ SpaceType;
         typedef typename SpaceType::TrafoType TrafoType;
 
-        static_assert(Function_::can_value != 0, "analytic function can't compute function values");
+        static_assert(Function_::can_value, "analytic function can't compute function values");
 
         // define assembly traits
         typedef AsmTraits1<typename Vector_::DataType, SpaceType, AsmTrafoConfig, AsmSpaceConfig> AsmTraits;

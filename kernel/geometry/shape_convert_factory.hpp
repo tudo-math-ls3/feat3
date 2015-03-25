@@ -74,12 +74,8 @@ namespace FEAST
       /// index holder type
       typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = ShapeType::dimension
-      };
+      /// shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
 
     protected:
       const OtherMeshType& _other_mesh;
@@ -149,12 +145,8 @@ namespace FEAST
       /// target set holder type
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = ShapeType::dimension
-      };
+      /// shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
 
     protected:
       const OtherMeshType& _other_mesh;

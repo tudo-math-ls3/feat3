@@ -48,12 +48,9 @@ namespace FEAST
         struct FunctionConfig :
           public Trafo::AnalyticConfigBase
         {
-          enum
-          {
-            need_value = 1,
-            need_grad = 0,
-            need_hess = 0
-          };
+          static constexpr bool need_value = true;
+          static constexpr bool need_grad = false;
+          static constexpr bool need_hess = false;
         };
 
         typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;

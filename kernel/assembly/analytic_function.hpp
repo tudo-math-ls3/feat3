@@ -22,34 +22,28 @@ namespace FEAST
     {
     public:
       /**
-       * \brief Function capabilities enumeration
+       * \brief Function Value capability
+       *
+       * This entry specifies whether the functor is capable of computing function values.\n
+       * If this value is non-zero, the Evaluator class template offers the value() function.
        */
-      enum FunctionCapabilities
-      {
-        /**
-         * \brief Function Value capability
-         *
-         * This entry specifies whether the functor is capable of computing function values.\n
-         * If this value is non-zero, the Evaluator class template offers the value() function.
-         */
-        can_value = 0,
+      static constexpr bool can_value = false;
 
-        /**
-         * \brief Gradient capability
-         *
-         * This entry specifies whether the functor is capable of computing gradients.\n
-         * If this value is non-zero, the Evaluator class template offers the gradient() function.
-         */
-        can_grad = 0,
+      /**
+       * \brief Gradient capability
+       *
+       * This entry specifies whether the functor is capable of computing gradients.\n
+       * If this value is non-zero, the Evaluator class template offers the gradient() function.
+       */
+      static constexpr bool can_grad = false;
 
-        /**
-         * \brief Hessian capability
-         *
-         * This entry specifies whether the functor is capable of computing hessians.\n
-         * If this value is non-zero, the Evaluator class template offers the hessian() function.
-         */
-        can_hess = 0
-      };
+      /**
+       * \brief Hessian capability
+       *
+       * This entry specifies whether the functor is capable of computing hessians.\n
+       * If this value is non-zero, the Evaluator class template offers the hessian() function.
+       */
+      static constexpr bool can_hess = false;
 
       /**
        * \brief Configuration Traits
@@ -68,12 +62,8 @@ namespace FEAST
         struct TrafoConfig :
           public Trafo::ConfigBase
         {
-          /// dummy enumeration
-          enum
-          {
-            /// Let's assume that the function needs image point coordinates
-            need_img_point = 1
-          };
+          /// Let's assume that the function needs image point coordinates
+          static constexpr bool need_img_point = true;
         };
       };
 
@@ -629,22 +619,18 @@ namespace FEAST
       public AnalyticFunction
     {
     public:
-      /** \copydoc AnalyticFunction::FunctionCapabilities */
-      enum
-      {
-        can_value = can_value_ ? 1 : 0,
-        can_grad = can_grad_ ? 1 : 0,
-        can_hess = can_hess_ ? 1 : 0
-      };
+      static constexpr bool can_value = can_value_;
+      static constexpr bool can_grad = can_grad_;
+      static constexpr bool can_hess = can_hess_;
 
       /** \copydoc AnalyticFunction::ConfigTraits */
       template<typename Config_>
       struct ConfigTraits
       {
         // ensure that we have everything available
-        static_assert(can_value_ || (Config_::need_value == 0), "static function can't compute function values");
-        static_assert(can_grad_ || (Config_::need_grad == 0), "static function can't compute function gradients");
-        static_assert(can_hess_ || (Config_::need_hess == 0), "static function can't compute function hessians");
+        static_assert(can_value_ || (!Config_::need_value), "static function can't compute function values");
+        static_assert(can_grad_  || (!Config_::need_grad),  "static function can't compute function gradients");
+        static_assert(can_hess_  || (!Config_::need_hess),  "static function can't compute function hessians");
 
         /**
          * \brief Trafo configuration tag class
@@ -654,12 +640,8 @@ namespace FEAST
         struct TrafoConfig :
           public Trafo::ConfigBase
         {
-          /// dummy enumeration
-          enum
-          {
-            /// Let's assume that the function needs image point coordinates
-            need_img_point = 1
-          };
+          /// Let's assume that the function needs image point coordinates
+          static constexpr bool need_img_point = true;
         };
       };
 

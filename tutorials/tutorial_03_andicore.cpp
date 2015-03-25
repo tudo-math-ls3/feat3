@@ -150,18 +150,15 @@ namespace Tutorial03
     struct TestConfig :
       public Space::ConfigBase
     {
-      // This enum is just a trick to define compile-time constant values...
-      enum
-      {
-        // We can now express our wishes.
+      // We can now express our wishes.
 
-        // Our bilinear operator requires test function values for the convection and rection terms:
-        need_value = 1,
+      // Our bilinear operator requires test function values for the convection and rection terms:
+      static constexpr bool need_value = true;
 
-        // Moreover, we require the test function gradients for the diffusion term:
-        need_grad = 1
-      };
-      // And that's it, all the other possibilities in 'kernel/trafo/base.hpp' are defaulted to zero.
+      // Moreover, we require the test function gradients for the diffusion term:
+      static constexpr bool need_grad = true;
+
+      // And that's it, all the other possibilities in 'kernel/trafo/base.hpp' are defaulted to false.
     };
 
     // Now we should do the same for the trial-space configuration 'TrialConfig'. However, as it
@@ -297,16 +294,12 @@ namespace Tutorial03
     struct AnalyticConfig :
       public Trafo::AnalyticConfigBase
     {
-      // Yet another dummy enum
-      enum
-      {
-        // We need solution function values for the reaction term
-        need_value = 1,
-        // We need solution gradients for the convection term
-        need_grad = 1,
-        // We need solution hessians for the diffusion term
-        need_hess = 1
-      };
+      // We need solution function values for the reaction term
+      static constexpr bool need_value = true;
+      // We need solution gradients for the convection term
+      static constexpr bool need_grad = true;
+      // We need solution hessians for the diffusion term
+      static constexpr bool need_hess = true;
     };
 
     // The trafo requirements of this functional are identical to the ones requested by the
@@ -318,12 +311,8 @@ namespace Tutorial03
     struct TestConfig :
       public Space::ConfigBase
     {
-      // You guess: another dummy enum
-      enum
-      {
-        // Give us test function values
-        need_value = 1
-      };
+      // Give us test function values
+      static constexpr bool need_value = true;
     };
 
     // In analogy to operators, functionals are evaluated using 'evaluator' class templates as well,

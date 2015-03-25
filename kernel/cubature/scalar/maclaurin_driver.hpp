@@ -23,15 +23,12 @@ namespace FEAST
         public DriverBase
       {
       public:
-        enum
-        {
-          /// this rule is variadic
-          variadic = 1,
-          /// this rule has at least 1 points
-          min_points = 1,
-          /// this rule has at most 5 points
-          max_points = 5
-        };
+        /// this rule is variadic
+        static constexpr bool variadic = true;
+        /// this rule has at least 1 points
+        static constexpr int min_points = 1;
+        /// this rule has at most 5 points
+        static constexpr int max_points = 5;
 
         /// Returns the name of the cubature rule.
         static String name()

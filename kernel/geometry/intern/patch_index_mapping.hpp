@@ -78,10 +78,7 @@ namespace FEAST
       template<typename Shape_>
       struct PatchIndexMapping
       {
-        enum
-        {
-          shape_dim = Shape_::dimension
-        };
+        static constexpr int shape_dim = Shape_::dimension;
         typedef typename Shape::FaceTraits<Shape_, shape_dim - 1>::ShapeType FaceType;
 
         static void apply(

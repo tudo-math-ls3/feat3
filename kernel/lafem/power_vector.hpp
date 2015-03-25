@@ -53,10 +53,7 @@ namespace FEAST
       using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, count_>;
 
       /// number of vector blocks
-      enum
-        {
-          num_blocks = count_
-        };
+      static constexpr Index num_blocks = count_;
 
     protected:
       /// the first sub-vector
@@ -213,7 +210,7 @@ namespace FEAST
       /// Returns a descriptive string for this container.
       static String name()
       {
-        return String("PowerVector<") + SubVectorType::name() + "," + stringify(num_blocks) + ">";
+        return String("PowerVector<") + SubVectorType::name() + "," + stringify(count_) + ">";
       }
 
       /**
@@ -436,10 +433,7 @@ namespace FEAST
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, Index(1)>;
 
-      enum
-        {
-          num_blocks = 1
-        };
+      static constexpr Index num_blocks = 1;
 
     protected:
       SubVectorType _first;

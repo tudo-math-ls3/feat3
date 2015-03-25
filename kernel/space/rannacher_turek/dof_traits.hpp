@@ -24,11 +24,8 @@ namespace FEAST
       template<typename Tag_, int dim_>
       struct DofTraits
       {
-        enum
-        {
-          /// no dofs for any shape dimension > 0
-          count = 0
-        };
+        /// no dofs for any shape dimension > 0
+        static constexpr int count = 0;
 
         static Index derive_order(Index)
         {
@@ -39,10 +36,7 @@ namespace FEAST
       template<>
       struct DofTraits<DofTag<Shape::Hypercube<2>, Variant::StdNonPar>, 1>
       {
-        enum
-        {
-          count = 1
-        };
+        static constexpr int count = 1;
 
         static Index derive_order(Index)
         {
@@ -53,10 +47,7 @@ namespace FEAST
       template<>
       struct DofTraits<DofTag<Shape::Hypercube<3>, Variant::StdNonPar>, 2>
       {
-        enum
-        {
-          count = 1
-        };
+        static constexpr int count = 1;
 
         static Index derive_order(Index)
         {

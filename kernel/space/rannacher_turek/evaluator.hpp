@@ -82,15 +82,11 @@ namespace FEAST
         /// jacobian inverse matrix type
         typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
 
-        /** \copydoc EvaluatorBase::EvaluatorCapabilities */
-        enum EvaluatorCapabilities
-        {
-          /// can compute function values
-          can_value = 1,
+        /// can compute function values
+        static constexpr bool can_value = true;
 
-          /// can compute gradients
-          can_grad = 1
-        };
+        /// can compute gradients
+        static constexpr bool can_grad = true;
 
         template<typename Cfg_>
         struct ConfigTraits
@@ -102,11 +98,8 @@ namespace FEAST
           struct TrafoConfig :
             public Trafo::ConfigBase
           {
-            enum
-            {
-              /// we always need image point coordinates
-              need_img_point = 1
-            };
+            /// we always need image point coordinates
+            static constexpr bool need_img_point = true;
           };
 
           /// evaluation data typedef
@@ -118,12 +111,9 @@ namespace FEAST
         struct InvLinTrafoConfig :
           public Trafo::ConfigBase
         {
-          enum
-          {
-            need_dom_point = 1,
-            need_img_point = 1,
-            need_jac_inv = 1
-          };
+          static constexpr bool need_dom_point = true;
+          static constexpr bool need_img_point = true;
+          static constexpr bool need_jac_inv = true;
         };
 
         /// inverse linearised trafo data
@@ -138,11 +128,8 @@ namespace FEAST
         struct FacetTrafoConfig :
           public Trafo::ConfigBase
         {
-          enum
-          {
-            need_img_point = 1,
-            need_jac_det = 1
-          };
+          static constexpr bool need_img_point = true;
+          static constexpr bool need_jac_det = true;
         };
 
         /// facet trafo data

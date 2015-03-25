@@ -57,12 +57,8 @@ namespace FEAST
           }
         }; // class CompIndexMap
 
-        /// dummy enum
-        enum
-        {
-          /// number of cells
-          num_cells = Shape::FaceTraits<Shape_, cell_dim_>::count
-        };
+        /// number of cells
+        static constexpr int num_cells = Shape::FaceTraits<Shape_, cell_dim_>::count;
 
         /// cell orientation codes
         int _cell_orient[num_cells];

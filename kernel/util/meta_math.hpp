@@ -31,12 +31,8 @@ namespace FEAST
       // Ensure that n_ >= m_. The case m_ = n_ is handled by partial specialisation below.
       static_assert(n_ > m_, "parameter m_ must not be greater than parameter n_");
 
-      /// dummy enumeration
-      enum
-      {
-        /// value of the factorial
-        value = n_ * Factorial<n_ - 1, m_>::value
-      };
+      /// value of the factorial
+      static constexpr int value = n_ * Factorial<n_ - 1, m_>::value;
     }; // struct Factorial<n_,m_>
 
     /// \cond internal
@@ -45,20 +41,14 @@ namespace FEAST
     struct Factorial<n_, n_>
     {
       static_assert(n_ >= 0, "parameters n_ = m_ must be non-negative");
-      enum
-      {
-        value = n_
-      };
+      static constexpr int value = n_;
     }; // struct Factorial<n_,n_>
 
     // explicit specialisation for n_ = m_ = 0; the partial specialisation above for n_ = m_ would return 0
     template<>
     struct Factorial<0, 0>
     {
-      enum
-      {
-        value = 1
-      };
+      static constexpr int value = 1;
     }; // struct Factorial<0,0>
     /// \endcond
 
@@ -78,12 +68,8 @@ namespace FEAST
       static_assert(k_ > 0, "parameter k_ must be non-negative");
       static_assert(n_ > k_, "parameter k_ must not be greater than parameter n_");
 
-      /// dummy enumeration
-      enum
-      {
-        // (n,k) = (n-1,k-1) + (n-1, k)
-        value = Binomial<n_-1,k_-1>::value + Binomial<n_-1,k_>::value
-      };
+      // (n,k) = (n-1,k-1) + (n-1, k)
+      static constexpr int value = Binomial<n_-1,k_-1>::value + Binomial<n_-1,k_>::value;
     }; // struct Binomial<n_,k_>
 
     /// \cond internal
@@ -92,10 +78,7 @@ namespace FEAST
     struct Binomial<n_,n_>
     {
       static_assert(n_ > 0, "parameter n_ must be non-negative");
-      enum
-      {
-        value = 1
-      };
+      static constexpr int value = 1;
     };
 
     // partial specialisation for k_ = 0
@@ -103,20 +86,14 @@ namespace FEAST
     struct Binomial<n_, 0>
     {
       static_assert(n_ > 0, "parameter n_ must be non-negative");
-      enum
-      {
-        value = 1
-      };
+      static constexpr int value = 1;
     };
 
     // explicit specialisation for k_ = n_ = 0; this is only needed for disambiguation
     template<>
     struct Binomial<0, 0>
     {
-      enum
-      {
-        value = 1
-      };
+      static constexpr int value = 1;
     };
     /// \endcond
   } // namespace MetaMath

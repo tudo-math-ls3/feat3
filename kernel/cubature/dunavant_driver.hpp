@@ -31,13 +31,10 @@ namespace FEAST
       public SymmetricSimplexDriver<Shape::Simplex<2> >
     {
     public:
-      enum
-      {
-        /// this rule is variadic
-        variadic = 1,
-        min_points = 2,
-        max_points = 20
-      };
+      /// this rule is variadic
+      static constexpr bool variadic = true;
+      static constexpr int min_points = 2;
+      static constexpr int max_points = 20;
 
       /// Returns the name of the cubature rule.
       static String name()

@@ -224,7 +224,7 @@ namespace FEAST
     template<
       typename ScalarDriver_,
       typename Shape_,
-      bool variadic_ = (ScalarDriver_::variadic != 0)>
+      bool variadic_ = ScalarDriver_::variadic>
     class TensorProductFactory DOXY({});
 
     template<
@@ -237,11 +237,8 @@ namespace FEAST
       typedef TensorProductFactoryBase<ScalarDriver_, Shape_> BaseClass;
       typedef Shape_ ShapeType;
       typedef Scalar::DriverFactory<ScalarDriver_> ScalarFactoryType;
-      enum
-      {
-        variadic = 0,
-        num_points = ScalarFactoryType::num_points
-      };
+      static constexpr bool variadic = false;
+      static constexpr int num_points = ScalarFactoryType::num_points;
 
     public:
       TensorProductFactory()
@@ -272,12 +269,9 @@ namespace FEAST
       typedef TensorProductFactoryBase<ScalarDriver_, Shape_> BaseClass;
       typedef Shape_ ShapeType;
       typedef Scalar::DriverFactory<ScalarDriver_> ScalarFactoryType;
-      enum
-      {
-        variadic = 1,
-        min_points = ScalarFactoryType::min_points,
-        max_points = ScalarFactoryType::max_points
-      };
+      static constexpr bool variadic = true;
+      static constexpr int min_points = ScalarFactoryType::min_points;
+      static constexpr int max_points = ScalarFactoryType::max_points;
 
     protected:
       Index _num_points;

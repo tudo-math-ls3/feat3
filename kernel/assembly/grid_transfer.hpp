@@ -24,18 +24,12 @@ namespace FEAST
       struct AsmSpaceConfig :
         public Space::ConfigBase
       {
-        enum
-        {
-          need_value = 1
-        };
+        static constexpr bool need_value = true;
       };
       struct AsmTrafoConfig :
         public Trafo::ConfigBase
       {
-        enum
-        {
-          need_jac_det = 1
-        };
+        static constexpr bool need_jac_det = true;
       };
       /// \endcond
 
@@ -144,21 +138,9 @@ namespace FEAST
         Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, FineSpaceEvaluator::max_local_dofs> mass;
 
         // allocate local matrix data for interlevel-mesh mass matrix
-        /*LocalMatrixData<
-          Tiny::Matrix<
-            DataType,
-            FineSpaceEvaluator::max_local_dofs,
-            CoarseSpaceEvaluator::max_local_dofs>,
-          FineDofMapping,
-          CoarseDofMapping> lmd(fine_dof_mapping, coarse_dof_mapping);*/
         Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, CoarseSpaceEvaluator::max_local_dofs> lmd;
 
         // allocate local vector data for weight vector
-        /*LocalVectorData<
-          Tiny::Vector<
-            DataType,
-            FineSpaceEvaluator::max_local_dofs>,
-          FineDofMapping> lvd(fine_dof_mapping);*/
         Tiny::Vector<DataType, FineSpaceEvaluator::max_local_dofs> lvd;
 
         // pivaot array for factorisation

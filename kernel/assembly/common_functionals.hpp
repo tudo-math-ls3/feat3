@@ -36,12 +36,8 @@ namespace FEAST
         struct FunctionConfig :
           public Trafo::AnalyticConfigBase
         {
-          /// dummy enum
-          enum
-          {
-            /// we need function values
-            need_value = 1
-          };
+          /// we need function values
+          static constexpr bool need_value = true;
         };
 
         /// trafo config tag
@@ -51,12 +47,8 @@ namespace FEAST
         struct TestConfig :
           public Space::ConfigBase
         {
-          /// dummy enum
-          enum
-          {
-            /// we need basis function values
-            need_value = 1
-          };
+          /// we need basis function values
+          static constexpr bool need_value = true;
         };
 
         /**

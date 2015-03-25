@@ -46,12 +46,12 @@ namespace FEAST
       template<
         typename ScalarDriver_,
         typename Shape_,
-        bool tensorise_ = (ScalarDriver_::tensorise != 0)>
+        bool tensorise_ = ScalarDriver_::tensorise>
       class TensorProductFunctorHelper;
 
       template<
         typename ScalarDriver_,
-        bool tensorise_ = (ScalarDriver_::tensorise != 0)>
+        bool tensorise_ = ScalarDriver_::tensorise>
       class SimplexScalarFunctorHelper;
     } // namespace Intern
     /// \endcond

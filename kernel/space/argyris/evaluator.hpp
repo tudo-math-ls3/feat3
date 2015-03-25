@@ -71,18 +71,14 @@ namespace FEAST
         /// data type
         typedef typename SpaceEvalTraits::DataType DataType;
 
-        /** \copydoc EvaluatorBase::EvaluatorCapabilities */
-        enum EvaluatorCapabilities
-        {
-          /// can compute function values
-          can_value = 1,
+        /// can compute function values
+        static constexpr bool can_value = true;
 
-          /// can compute gradients
-          can_grad = 1,
+        /// can compute gradients
+        static constexpr bool can_grad = true;
 
-          /// can compute hessians
-          can_hess = 1
-        };
+        /// can compute hessians
+        static constexpr bool can_hess = true;
 
         template<typename Cfg_>
         struct ConfigTraits
@@ -94,11 +90,8 @@ namespace FEAST
           struct TrafoConfig :
             public Trafo::ConfigBase
           {
-            enum
-            {
-              /// we always need image point coordinates
-              need_img_point = 1
-            };
+            /// we always need image point coordinates
+            static constexpr bool need_img_point = true;
           };
 
           /// evaluation data typedef
@@ -115,10 +108,7 @@ namespace FEAST
         struct CoeffTrafoConfig :
           public Trafo::ConfigBase
         {
-          enum
-          {
-            need_img_point = 1
-          };
+          static constexpr bool need_img_point = true;
         };
 
       public:

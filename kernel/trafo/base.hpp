@@ -40,14 +40,10 @@ namespace FEAST
       /// shape type
       typedef Shape_ ShapeType;
 
-      /// dummy enumeration
-      enum
-      {
-        /// domain dimension
-        domain_dim = Shape_::dimension > 0 ? Shape_::dimension : 1,
-        /// image dimension
-        image_dim = image_dim_
-      };
+      /// domain dimension
+      static constexpr int domain_dim = Shape_::dimension > 0 ? Shape_::dimension : 1;
+      /// image dimension
+      static constexpr int image_dim = image_dim_;
 
       /* *************************************************************************************** */
 
@@ -80,18 +76,12 @@ namespace FEAST
      */
     struct AnalyticConfigBase
     {
-      /**
-       * \brief Analytic function requirements enumeration
-       */
-      enum AnalyticRequirements
-      {
-        /// specifies whether function values are required
-        need_value = 0,
-        /// specifies whether function gradients are required
-        need_grad = 0,
-        /// specifies whether function hessians are required
-        need_hess = 0
-      };
+      /// specifies whether function values are required
+      static constexpr bool need_value = false;
+      /// specifies whether function gradients are required
+      static constexpr bool need_grad = false;
+      /// specifies whether function hessians are required
+      static constexpr bool need_hess = false;
     };
 
     /**
@@ -122,14 +112,10 @@ namespace FEAST
       typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
       /// data type
       typedef typename TrafoEvalTraits::DataType DataType;
-      /// dummy enum
-      enum
-      {
-        /// trafo domain dimension
-        domain_dim = TrafoEvaluator::domain_dim,
-        /// trafo image dimension
-        image_dim = TrafoEvaluator::image_dim
-      };
+      /// trafo domain dimension
+      static constexpr int domain_dim = TrafoEvaluator::domain_dim;
+      /// trafo image dimension
+      static constexpr int image_dim = TrafoEvaluator::image_dim;
       /// function value type
       typedef DataType ValueType;
       /// gradient type
@@ -145,26 +131,20 @@ namespace FEAST
      */
     struct ConfigBase
     {
-      /**
-       * \brief Trafo requirements enumeration
-       */
-      enum TrafoRequirements
-      {
-        /// specifies whether the trafo should supply domain point coordinates
-        need_dom_point = 0,
-        /// specifies whether the trafo should supply image point coordinates
-        need_img_point = 0,
-        /// specifies whether the trafo should supply jacobian matrices
-        need_jac_mat = 0,
-        /// specifies whether the trafo should supply inverse jacobian matrices
-        need_jac_inv = 0,
-        /// specifies whether the trafo should supply jacobian determinants
-        need_jac_det = 0,
-        /// specifies whether the trafo should supply hessian tensors
-        need_hess_ten = 0,
-        /// specifies whether the trafo should supply inverse hessian tensors
-        need_hess_inv = 0
-      };
+      /// specifies whether the trafo should supply domain point coordinates
+      static constexpr bool need_dom_point = false;
+      /// specifies whether the trafo should supply image point coordinates
+      static constexpr bool need_img_point = false;
+      /// specifies whether the trafo should supply jacobian matrices
+      static constexpr bool need_jac_mat   = false;
+      /// specifies whether the trafo should supply inverse jacobian matrices
+      static constexpr bool need_jac_inv   = false;
+      /// specifies whether the trafo should supply jacobian determinants
+      static constexpr bool need_jac_det   = false;
+      /// specifies whether the trafo should supply hessian tensors
+      static constexpr bool need_hess_ten  = false;
+      /// specifies whether the trafo should supply inverse hessian tensors
+      static constexpr bool need_hess_inv  = false;
     }; // struct ConfigBase
 
     /**
@@ -180,24 +160,20 @@ namespace FEAST
     template<typename Cfg1_, typename Cfg2_>
     struct ConfigOr
     {
-      /** \copydoc Trafo::ConfigBase::TrafoRequirements */
-      enum TrafoRequirements
-      {
-        /// specifies whether the trafo should supply domain point coordinates
-        need_dom_point = (Cfg1_::need_dom_point != 0) || (Cfg2_::need_dom_point != 0) ? 1 : 0,
-        /// specifies whether the trafo should supply image point coordinates
-        need_img_point = (Cfg1_::need_img_point != 0) | (Cfg2_::need_img_point != 0) ? 1 : 0,
-        /// specifies whether the trafo should supply jacobian matrices
-        need_jac_mat = (Cfg1_::need_jac_mat != 0) | (Cfg2_::need_jac_mat != 0) ? 1 : 0,
-        /// specifies whether the trafo should supply inverse jacobian matrices
-        need_jac_inv = (Cfg1_::need_jac_inv != 0) | (Cfg2_::need_jac_inv != 0) ? 1 : 0,
-        /// specifies whether the trafo should supply jacobian determinants
-        need_jac_det = (Cfg1_::need_jac_det != 0) | (Cfg2_::need_jac_det != 0) ? 1 : 0,
-        /// specifies whether the trafo should supply hessian tensors
-        need_hess_ten = (Cfg1_::need_hess_ten != 0) | (Cfg2_::need_hess_ten != 0) ? 1 : 0,
-        /// specifies whether the trafo should supply inverse hessian tensors
-        need_hess_inv = (Cfg1_::need_hess_inv != 0) | (Cfg2_::need_hess_inv != 0) ? 1 : 0
-      };
+      /// specifies whether the trafo should supply domain point coordinates
+      static constexpr bool need_dom_point = Cfg1_::need_dom_point || Cfg2_::need_dom_point;
+      /// specifies whether the trafo should supply image point coordinates
+      static constexpr bool need_img_point = Cfg1_::need_img_point || Cfg2_::need_img_point;
+      /// specifies whether the trafo should supply jacobian matrices
+      static constexpr bool need_jac_mat   = Cfg1_::need_jac_mat   || Cfg2_::need_jac_mat;
+      /// specifies whether the trafo should supply inverse jacobian matrices
+      static constexpr bool need_jac_inv   = Cfg1_::need_jac_inv   || Cfg2_::need_jac_inv;
+      /// specifies whether the trafo should supply jacobian determinants
+      static constexpr bool need_jac_det   = Cfg1_::need_jac_det   || Cfg2_::need_jac_det;
+      /// specifies whether the trafo should supply hessian tensors
+      static constexpr bool need_hess_ten  = Cfg1_::need_hess_ten  || Cfg2_::need_hess_ten;
+      /// specifies whether the trafo should supply inverse hessian tensors
+      static constexpr bool need_hess_inv  = Cfg1_::need_hess_inv  || Cfg2_::need_hess_inv;
     }; // struct ConfigOr<...>
   } // namespace Trafo
 } // namespace FEAST

@@ -19,10 +19,7 @@ namespace FEAST
       template<typename Shape_, int dim_>
       struct DofTraits
       {
-        enum
-        {
-          count = 0
-        };
+        static constexpr int count = 0;
 
         static Index derive_order(Index)
         {
@@ -33,11 +30,8 @@ namespace FEAST
       template<int shape_dim_>
       struct DofTraits<Shape::Simplex<shape_dim_>, 0>
       {
-        enum
-        {
-          /// n+1 dofs per vertex
-          count = shape_dim_ + 1
-        };
+        /// n+1 dofs per vertex
+        static constexpr int count = shape_dim_ + 1;
 
         static Index derive_order(Index assign_idx)
         {
@@ -48,11 +42,8 @@ namespace FEAST
       template<int shape_dim_>
       struct DofTraits<Shape::Simplex<shape_dim_>, shape_dim_>
       {
-        enum
-        {
-          /// (n+3 over 3) - (n+1)^2 dofs per cell
-          count = MetaMath::Binomial<shape_dim_ + 3, 3>::value - (shape_dim_ + 1)*(shape_dim_ + 1)
-        };
+        /// (n+3 over 3) - (n+1)^2 dofs per cell
+        static constexpr int count = MetaMath::Binomial<shape_dim_ + 3, 3>::value - (shape_dim_ + 1)*(shape_dim_ + 1);
 
         static Index derive_order(Index)
         {
@@ -63,11 +54,8 @@ namespace FEAST
       template<int shape_dim_>
       struct DofTraits<Shape::Hypercube<shape_dim_>, 0>
       {
-        enum
-        {
-          /// n+1 dofs per vertex
-          count = shape_dim_ + 1
-        };
+        /// n+1 dofs per vertex
+        static constexpr int count = shape_dim_ + 1;
 
         static Index derive_order(Index assign_idx)
         {
@@ -78,11 +66,8 @@ namespace FEAST
       template<int shape_dim_>
       struct DofTraits<Shape::Hypercube<shape_dim_>, shape_dim_>
       {
-        enum
-        {
-          /// (2^n - (n+1))*2^n dofs per cell
-          count = ((1 << shape_dim_) - (shape_dim_ + 1)) * (1 << shape_dim_)
-        };
+        /// (2^n - (n+1))*2^n dofs per cell
+        static constexpr int count = ((1 << shape_dim_) - (shape_dim_ + 1)) * (1 << shape_dim_);
 
         static Index derive_order(Index)
         {

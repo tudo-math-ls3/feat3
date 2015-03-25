@@ -20,12 +20,8 @@ namespace FEAST
      */
     struct Vertex
     {
-      /// dummy enumeration
-      enum
-      {
-        /// Vertex dimension
-        dimension = 0
-      };
+      /// Vertex dimension
+      static constexpr int dimension = 0;
 
       /// Returns the name of the class as a String.
       static String name()
@@ -44,12 +40,8 @@ namespace FEAST
     {
       static_assert(dimension_ > 0, "parameter dimension_ must be greater than 0");
 
-      /// dummy enumeration
-      enum
-      {
-        /// Simplex dimension
-        dimension = dimension_
-      };
+      /// Simplex dimension
+      static constexpr int dimension = dimension_;
 
       /// Returns the name of the class as a String.
       static String name()
@@ -68,12 +60,8 @@ namespace FEAST
     {
       static_assert(dimension_ > 0, "parameter dimension_ must be greater than 0");
 
-      /// dummy enumeration
-      enum
-      {
-        /// Hypercube dimension
-        dimension = dimension_
-      };
+      /// Hypercube dimension
+      static constexpr int dimension = dimension_;
 
       /// Returns the name of the class as a String.
       static String name()
@@ -115,12 +103,8 @@ namespace FEAST
       /// Shape type of the face
       typedef ... ShapeType;
 
-      /// dummy enum
-      enum
-      {
-        /// Number of faces of dimension \p face_dim_
-        count = ...
-      };
+      /// Number of faces of dimension \p face_dim_
+      static constexpr int count = ...
     };
 #endif // DOXYGEN
 
@@ -134,12 +118,8 @@ namespace FEAST
       /// Shape type of face
       typedef Vertex ShapeType;
 
-      /// dummy enumeration
-      enum
-      {
-        /// Number of faces per cell
-        count = 1
-      };
+      /// Number of faces per cell
+      static constexpr int count = 1;
     }; // struct FaceTraits<Vertex,0>
 
     /**
@@ -158,17 +138,13 @@ namespace FEAST
       /// Shape type of face
       typedef Simplex<face_dim_> ShapeType;
 
-      /// dummy enumeration
-      enum
-      {
-        /**
-         * \brief Number of faces per cell
-         *
-         * For an <em>n</em>-Simplex, the number of <em>m</em>-faces is given by
-         * \f[ {n+1\choose m+1} \f]
-         */
-        count = MetaMath::Binomial<cell_dim_ + 1, face_dim_ + 1>::value
-      };
+      /**
+       * \brief Number of faces per cell
+       *
+       * For an <em>n</em>-Simplex, the number of <em>m</em>-faces is given by
+       * \f[ {n+1\choose m+1} \f]
+       */
+      static constexpr int count = MetaMath::Binomial<cell_dim_ + 1, face_dim_ + 1>::value;
     }; // struct FaceTraits<Simplex<...>, ...>
 
     /**
@@ -184,12 +160,8 @@ namespace FEAST
       /// Shape type of vertex
       typedef Vertex ShapeType;
 
-      /// dummy enumeration
-      enum
-      {
-        /** \brief Number of vertices per cell */
-        count = cell_dim_ + 1
-      };
+      /// \brief Number of vertices per cell
+      static constexpr int count = cell_dim_ + 1;
     }; // struct FaceTraits<Simplex<...>, 0>
 
     /**
@@ -208,17 +180,13 @@ namespace FEAST
       ///  Shape type of face
       typedef Hypercube<face_dim_> ShapeType;
 
-      /// dummy enumeration
-      enum
-      {
-        /**
-         * \brief Number of faces per cell
-         *
-         * For an <em>n</em>-Hypercube, the number of <em>m</em>-faces is given by
-         * \f[ 2^{(n-m)}\cdot {n\choose m} \f]
-         */
-        count = (1 << (cell_dim_ - face_dim_)) * MetaMath::Binomial<cell_dim_, face_dim_>::value
-      };
+      /**
+       * \brief Number of faces per cell
+       *
+       * For an <em>n</em>-Hypercube, the number of <em>m</em>-faces is given by
+       * \f[ 2^{(n-m)}\cdot {n\choose m} \f]
+       */
+      static constexpr int count = (1 << (cell_dim_ - face_dim_)) * MetaMath::Binomial<cell_dim_, face_dim_>::value;
     }; // struct FaceTraits<Hypercube<...>, ...>
 
     /**
@@ -234,12 +202,8 @@ namespace FEAST
       /// Shape type of vertex
       typedef Vertex ShapeType;
 
-      /// dummy enumeration
-      enum
-      {
-        /** \brief Number of vertices per cell */
-        count = (1 << cell_dim_)
-      };
+      /// Number of vertices per cell
+      static constexpr int count = (1 << cell_dim_);
     }; // struct FaceTraits<HyperCube<...>, 0>
     /// \endcond
 

@@ -38,11 +38,7 @@ namespace FEAST
 
           // technical typedef mumbo-jumbo
           typedef typename Shape::FaceTraits<Shape_, shape_dim_-1>::ShapeType FacetType;
-          enum
-          {
-            facets_per_cell = Shape::FaceTraits<Shape_, shape_dim_-1>::count,
-            faces_per_facet = Shape::FaceTraits<FacetType, cell_dim_-1>::count
-          };
+          static constexpr int faces_per_facet = Shape::FaceTraits<FacetType, cell_dim_-1>::count;
           typedef IndexSet<faces_per_facet> FaceIndexSet;
 
           const FaceIndexSet& face_index_set = index_set_holder.template get_index_set<shape_dim_-1, cell_dim_-1>();
@@ -120,10 +116,7 @@ namespace FEAST
           // If the number of cells is exactly 1, the facet is a boundary facet.
 
           // technical typedef mumbo-jumbo
-          enum
-          {
-            facets_per_cell = Shape::FaceTraits<Shape_, shape_dim_-1>::count
-          };
+          static constexpr int facets_per_cell = Shape::FaceTraits<Shape_, shape_dim_-1>::count;
           typedef IndexSet<facets_per_cell> FacetIndexSet;
 
           const FacetIndexSet& face_index_set = index_set_holder.template get_index_set<shape_dim_, shape_dim_-1>();

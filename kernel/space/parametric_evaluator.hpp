@@ -60,40 +60,32 @@ namespace FEAST
       /// trafo evaluator traits
       typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
 
-      /** \copydoc EvaluatorBase::EvaluatorCapabilities */
-      enum EvaluatorCapabilities
-      {
-        /// can compute function values if the trafo can compute domain points
-        can_value =
-          (ReferenceCapabilities_::can_ref_value != 0) &&
-          (TrafoEvaluator_::can_dom_point != 0) ? 1 : 0,
+      /// can compute function values if the trafo can compute domain points
+      static constexpr bool can_value =
+        ReferenceCapabilities_::can_ref_value &&
+        TrafoEvaluator_::can_dom_point;
 
-        /// can compute gradients if the trafo can compute jacobian matrices and domain points
-        can_grad =
-          (ReferenceCapabilities_::can_ref_grad != 0) &&
-          (TrafoEvaluator_::can_dom_point != 0) &&
-          (TrafoEvaluator_::can_jac_inv != 0) ? 1 : 0,
+      /// can compute gradients if the trafo can compute jacobian matrices and domain points
+      static constexpr bool can_grad =
+        ReferenceCapabilities_::can_ref_grad &&
+        TrafoEvaluator_::can_dom_point &&
+        TrafoEvaluator_::can_jac_inv;
 
-        /// can compute hessians if the trafo can compute inverse hessian tensors,
-        /// inverse jacobian matrices and domain points
-        can_hess =
-          (ReferenceCapabilities_::can_ref_grad != 0) &&
-          (ReferenceCapabilities_::can_ref_hess != 0) &&
-          (TrafoEvaluator_::can_dom_point != 0) &&
-          (TrafoEvaluator_::can_hess_inv != 0) &&
-          (TrafoEvaluator_::can_jac_inv != 0) ? 1 : 0
-      };
+      /// can compute hessians if the trafo can compute inverse hessian tensors,
+      /// inverse jacobian matrices and domain points
+      static constexpr bool can_hess =
+        ReferenceCapabilities_::can_ref_grad &&
+        ReferenceCapabilities_::can_ref_hess &&
+        TrafoEvaluator_::can_dom_point &&
+        TrafoEvaluator_::can_hess_inv &&
+        TrafoEvaluator_::can_jac_inv;
 
-      /// dummy enumeration
-      enum
-      {
-        /// domain dimension
-        domain_dim = SpaceEvalTraits::domain_dim,
-        /// image dimension
-        image_dim = SpaceEvalTraits::image_dim,
-        /// maximum number of local dofs
-        max_local_dofs = SpaceEvalTraits::max_local_dofs
-      };
+      /// domain dimension
+      static constexpr int domain_dim = SpaceEvalTraits::domain_dim;
+      /// image dimension
+      static constexpr int image_dim = SpaceEvalTraits::image_dim;
+      /// maximum number of local dofs
+      static constexpr int max_local_dofs = SpaceEvalTraits::max_local_dofs;
 
       /**
        * \brief Space configuration traits class template.
@@ -105,38 +97,30 @@ namespace FEAST
         struct EvalDataConfig :
           public Space::ConfigBase
         {
-          /** \copydoc Space::ConfigBase::SpaceRequirements */
-          enum
-          {
-            /// need hessians if they are desired
-            need_hess = (Cfg_::need_hess != 0) ? 1 : 0,
-            /// need gradients if they are desired
-            need_grad = (Cfg_::need_grad != 0) ? 1 : 0,
-            /// need values if they are desired
-            need_value = (Cfg_::need_value != 0) ? 1 : 0,
-            /// need reference hessians for hessians
-            need_ref_hess = (Cfg_::need_ref_hess != 0) || (need_hess != 0) ? 1 : 0,
-            /// need reference gradients for gradients and hessians
-            need_ref_grad = (Cfg_::need_ref_grad != 0) || (need_grad != 0) || (need_hess != 0) ? 1 : 0,
-            /// need reference values for values
-            need_ref_value = (Cfg_::need_ref_value != 0) || (need_value != 0) ? 1 : 0
-          };
+          /// need hessians if they are desired
+          static constexpr bool need_hess = Cfg_::need_hess;
+          /// need gradients if they are desired
+          static constexpr bool need_grad = Cfg_::need_grad;
+          /// need values if they are desired
+          static constexpr bool need_value = Cfg_::need_value;
+          /// need reference hessians for hessians
+          static constexpr bool need_ref_hess = Cfg_::need_ref_hess || need_hess;
+          /// need reference gradients for gradients and hessians
+          static constexpr bool need_ref_grad = Cfg_::need_ref_grad || need_grad || need_hess;
+          /// need reference values for values
+          static constexpr bool need_ref_value = Cfg_::need_ref_value || need_value;
         };
 
         /// trafo configuration
         struct TrafoConfig :
           public Trafo::ConfigBase
         {
-          /** \copydoc Trafo::ConfigBase::TrafoRequirements */
-          enum
-          {
-            /// we always need domain point coordinates
-            need_dom_point = 1,
-            /// we need inverse jacobians for basis gradients and hessians
-            need_jac_inv = (EvalDataConfig::need_grad != 0) ? 1 : 0,
-            /// we need inverse hessians for basis hessians
-            need_hess_inv = (EvalDataConfig::need_hess != 0) ? 1 : 0
-          };
+          /// we always need domain point coordinates
+          static constexpr bool need_dom_point = true;
+          /// we need inverse jacobians for basis gradients and hessians
+          static constexpr bool need_jac_inv = EvalDataConfig::need_grad;
+          /// we need inverse hessians for basis hessians
+          static constexpr bool need_hess_inv = EvalDataConfig::need_hess;
         };
 
         /// evaluation data typedef
@@ -176,11 +160,11 @@ namespace FEAST
         const typename SpaceEvalTraits::DomainPointType& dom_point) const
       {
         // compute reference basis values
-        Intern::ParamBasisEvalHelper<SpaceCfg_::need_ref_value != 0>::eval_ref_values(space_ref_data, cast(), dom_point);
+        Intern::ParamBasisEvalHelper<SpaceCfg_::need_ref_value>::eval_ref_values(space_ref_data, cast(), dom_point);
         // compute reference basis values
-        Intern::ParamBasisEvalHelper<SpaceCfg_::need_ref_grad != 0>::eval_ref_gradients(space_ref_data, cast(), dom_point);
+        Intern::ParamBasisEvalHelper<SpaceCfg_::need_ref_grad>::eval_ref_gradients(space_ref_data, cast(), dom_point);
         // compute reference basis values
-        Intern::ParamBasisEvalHelper<SpaceCfg_::need_ref_hess != 0>::eval_ref_hessians(space_ref_data, cast(), dom_point);
+        Intern::ParamBasisEvalHelper<SpaceCfg_::need_ref_hess>::eval_ref_hessians(space_ref_data, cast(), dom_point);
       }
 
       /** \copydoc EvaluatorBase::operator()() */
@@ -193,11 +177,11 @@ namespace FEAST
         cast().reference_eval(space_data, trafo_data.dom_point);
 
         // transform basis values
-        Intern::ParamBasisEvalHelper<SpaceCfg_::need_value != 0>::trans_values(space_data, trafo_data);
+        Intern::ParamBasisEvalHelper<SpaceCfg_::need_value>::trans_values(space_data, trafo_data);
         // transform basis gradients
-        Intern::ParamBasisEvalHelper<SpaceCfg_::need_grad != 0>::trans_gradients(space_data, trafo_data);
+        Intern::ParamBasisEvalHelper<SpaceCfg_::need_grad>::trans_gradients(space_data, trafo_data);
         // transform basis hessians
-        Intern::ParamBasisEvalHelper<SpaceCfg_::need_hess != 0>::trans_hessians(space_data, trafo_data);
+        Intern::ParamBasisEvalHelper<SpaceCfg_::need_hess>::trans_hessians(space_data, trafo_data);
       }
     }; // class EvaluatorParametric<...>
 

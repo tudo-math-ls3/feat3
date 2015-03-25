@@ -121,7 +121,7 @@ namespace FEAST
 
     template<
       typename ScalarDriver_,
-      bool variadic_ = (ScalarDriver_::variadic != 0)>
+      bool variadic_ = ScalarDriver_::variadic>
     class SimplexScalarFactory DOXY({});
 
     template<typename ScalarDriver_>
@@ -132,11 +132,8 @@ namespace FEAST
       typedef Shape::Simplex<1> ShapeType;
       typedef SimplexScalarFactoryBase<ScalarDriver_> BaseClass;
       typedef Scalar::DriverFactory<ScalarDriver_> ScalarFactoryType;
-      enum
-      {
-        variadic = 0,
-        num_points = ScalarFactoryType::num_points
-      };
+      static constexpr bool variadic = false;
+      static constexpr int num_points = ScalarFactoryType::num_points;
 
     public:
       SimplexScalarFactory()
@@ -165,12 +162,9 @@ namespace FEAST
       typedef Shape::Simplex<1> ShapeType;
       typedef SimplexScalarFactoryBase<ScalarDriver_> BaseClass;
       typedef Scalar::DriverFactory<ScalarDriver_> ScalarFactoryType;
-      enum
-      {
-        variadic = 1,
-        min_points = ScalarFactoryType::min_points,
-        max_points = ScalarFactoryType::max_points
-      };
+      static constexpr bool variadic = true;
+      static constexpr int min_points = ScalarFactoryType::min_points;
+      static constexpr int max_points = ScalarFactoryType::max_points;
 
     protected:
       Index _num_points;

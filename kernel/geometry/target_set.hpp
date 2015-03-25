@@ -131,10 +131,7 @@ namespace FEAST
     {
     public:
       typedef Shape_ ShapeType;
-      enum
-      {
-        shape_dim = ShapeType::dimension
-      };
+      static constexpr int shape_dim = ShapeType::dimension;
 
     protected:
       typedef TargetSetHolder<typename Shape::FaceTraits<ShapeType, shape_dim - 1>::ShapeType> BaseClass;
@@ -202,10 +199,7 @@ namespace FEAST
     {
     public:
       typedef Shape::Vertex ShapeType;
-      enum
-      {
-        shape_dim = ShapeType::dimension
-      };
+      static constexpr int shape_dim = ShapeType::dimension;
 
     protected:
       TargetSet _target_set;

@@ -86,14 +86,10 @@ namespace FEAST
       /// shape type
       typedef typename SpaceType::ShapeType ShapeType;
 
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = ShapeType::dimension,
-        /// dof dimension
-        dof_dim = shape_dim - codim_
-      };
+      /// shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
+      /// dof dimension
+      static constexpr int dof_dim = shape_dim - codim_;
 
       // make sure the dof-dimension is less than the shape dimension
       static_assert((codim_ >= 0) && (codim_ <= shape_dim), "invalid co-dimension");
@@ -200,11 +196,8 @@ namespace FEAST
       /// shape typedef
       typedef typename SpaceType::ShapeType ShapeType;
 
-      enum
-      {
-        // total number of local dofs
-        dof_count = Intern::UniformDofMappingHelper<ShapeType, DofTraits_, DofTag_>::dof_count
-      };
+      // total number of local dofs
+      static constexpr int dof_count = Intern::UniformDofMappingHelper<ShapeType, DofTraits_, DofTag_>::dof_count;
 
     private:
       /// dof index vector
@@ -254,16 +247,13 @@ namespace FEAST
       {
         static_assert(cell_dim_ < shape_dim_, "invalid cell dimension");
 
-        enum
-        {
-          cell_count = Shape::FaceTraits<Shape_, cell_dim_>::count,
-          // number of dofs per cell
-          dofs_per_cell = Traits_<Tag_, cell_dim_>::count,
-          // number of dofs for all cells of this dimension
-          dof_cell_count = cell_count * dofs_per_cell,
-          // total dof count
-          dof_count = UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::dof_count + dof_cell_count
-        };
+        static constexpr int cell_count = Shape::FaceTraits<Shape_, cell_dim_>::count;
+        // number of dofs per cell
+        static constexpr int dofs_per_cell = Traits_<Tag_, cell_dim_>::count;
+        // number of dofs for all cells of this dimension
+        static constexpr int dof_cell_count = cell_count * dofs_per_cell;
+        // total dof count
+        static constexpr int dof_count = UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::dof_count + dof_cell_count;
 
         template<typename MeshType_>
         static Index assemble(Index dof_idx[], const MeshType_& mesh, Index cell, Index& k)
@@ -293,15 +283,12 @@ namespace FEAST
       template<typename Shape_, template<typename, int> class Traits_, typename Tag_, int cell_dim_>
       struct UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_, cell_dim_>
       {
-        enum
-        {
-          // number of dofs per cell
-          dofs_per_cell = Traits_<Tag_, cell_dim_>::count,
-          // number of dofs for all cells of this dimension
-          dof_cell_count = dofs_per_cell,
-          // total dof count
-          dof_count = UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::dof_count + dof_cell_count
-        };
+        // number of dofs per cell
+        static constexpr int dofs_per_cell = Traits_<Tag_, cell_dim_>::count;
+        // number of dofs for all cells of this dimension
+        static constexpr int dof_cell_count = dofs_per_cell;
+        // total dof count
+        static constexpr int dof_count = UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::dof_count + dof_cell_count;
 
         template<typename MeshType_>
         static Index assemble(Index dof_idx[], const MeshType_& mesh, Index cell, Index& k)
@@ -327,16 +314,13 @@ namespace FEAST
       template<typename Shape_, template<typename, int> class Traits_, typename Tag_, int shape_dim_>
       struct UniformDofMappingHelper<Shape_, Traits_, Tag_, 0, shape_dim_>
       {
-        enum
-        {
-          cell_count = Shape::FaceTraits<Shape_, 0>::count,
-          // number of dofs per cell
-          dofs_per_cell = Traits_<Tag_, 0>::count,
-          // number of dofs for all cells of this dimension
-          dof_cell_count = cell_count * dofs_per_cell,
-          // total dof count
-          dof_count = dof_cell_count
-        };
+        static constexpr int cell_count = Shape::FaceTraits<Shape_, 0>::count;
+        // number of dofs per cell
+        static constexpr int dofs_per_cell = Traits_<Tag_, 0>::count;
+        // number of dofs for all cells of this dimension
+        static constexpr int dof_cell_count = cell_count * dofs_per_cell;
+        // total dof count
+        static constexpr int dof_count = dof_cell_count;
 
         template<typename MeshType_>
         static Index assemble(Index dof_idx[], const MeshType_& mesh, Index cell, Index& k)

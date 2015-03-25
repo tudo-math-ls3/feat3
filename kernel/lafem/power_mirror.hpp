@@ -144,12 +144,8 @@ namespace FEAST
       /// sub-mirror index-type
       typedef typename SubMirrorType::IndexType IndexType;
 
-      /// dummy enum
-      enum
-        {
-          /// total number of sub-mirror blocks
-          num_blocks = count_
-        };
+      /// total number of sub-mirror blocks
+      static constexpr Index num_blocks = count_;
 
     protected:
       /// the one and only sub-mirror object

@@ -191,14 +191,10 @@ namespace FEAST
       static_assert(s_ >= n_, "invalid vector stride");
 
     public:
-      /// dummy enum
-      enum
-      {
-        /// the length of the vector
-        n = n_,
-        /// the stride of the vector
-        s = s_
-      };
+      /// the length of the vector
+      static constexpr int n = n_;
+      /// the stride of the vector
+      static constexpr int s = s_;
 
       /// the value type of the vector
       typedef T_ ValueType;
@@ -541,18 +537,14 @@ namespace FEAST
       static_assert(sn_ >= n_, "invalid column stride");
 
     public:
-      /// dummy enum
-      enum
-      {
-        /// the row count of the matrix
-        m = m_,
-        /// the column count of the matrix
-        n = n_,
-        /// the row stride of the matrix
-        sm = sm_,
-        /// the column stride of the matrix
-        sn = sn_
-      };
+      /// the row count of the matrix
+      static constexpr int m = m_;
+      /// the column count of the matrix
+      static constexpr int n = n_;
+      /// the row stride of the matrix
+      static constexpr int sm = sm_;
+      /// the column stride of the matrix
+      static constexpr int sn = sn_;
 
       /// the data type of the matrix
       typedef T_ ValueType;
@@ -1145,22 +1137,18 @@ namespace FEAST
       static_assert(sn_ >= n_, "invalid column stride");
 
     public:
-      /// dummy enum
-      enum
-      {
-        /// the tube count of the tensor
-        l = l_,
-        /// the row count of the tensor
-        m = m_,
-        /// the column count of the tensor
-        n = n_,
-        /// the tube stride of the tensor
-        sl = sl_,
-        /// the row stride of the tensor
-        sm = sm_,
-        /// the column stride of the tensor
-        sn = sn_
-      };
+      /// the tube count of the tensor
+      static constexpr int l = l_;
+      /// the row count of the tensor
+      static constexpr int m = m_;
+      /// the column count of the tensor
+      static constexpr int n = n_;
+      /// the tube stride of the tensor
+      static constexpr int sl = sl_;
+      /// the row stride of the tensor
+      static constexpr int sm = sm_;
+      /// the column stride of the tensor
+      static constexpr int sn = sn_;
 
       /// the data type of the tensor
       typedef T_ ValueType;

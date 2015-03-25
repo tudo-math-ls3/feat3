@@ -45,12 +45,8 @@ namespace FEAST
       /// sub-filter data-type
       typedef typename SubFilter_::DataType DataType;
 
-      /// dummy enum
-      enum
-        {
-          /// number of filter blocks
-          num_blocks = count_
-        };
+      /// number of filter blocks
+      static constexpr Index num_blocks = count_;
 
     protected:
       /// the first sub-filter
@@ -182,10 +178,7 @@ namespace FEAST
     public:
       typedef SubFilter_ SubFilterType;
 
-      enum
-        {
-          num_blocks = 1
-        };
+      static constexpr Index num_blocks = 1;
 
     protected:
       SubFilterType _first;

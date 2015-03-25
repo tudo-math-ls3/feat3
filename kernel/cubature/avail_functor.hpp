@@ -19,7 +19,7 @@ namespace FEAST
       template<
         typename Factory_,
         typename Functor_,
-        bool variadic_ = (Factory_::variadic != 0)>
+        bool variadic_ = Factory_::variadic>
       class AvailFunctorHelper;
 
       template<

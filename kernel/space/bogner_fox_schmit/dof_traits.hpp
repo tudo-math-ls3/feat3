@@ -19,11 +19,8 @@ namespace FEAST
       template<typename Shape_, int dim_>
       struct DofTraits
       {
-        enum
-        {
-          /// no dofs for any shape dimension > 0
-          count = 0
-        };
+        /// no dofs for any shape dimension > 0
+        static constexpr int count = 0;
 
         static Index derive_order(Index)
         {
@@ -34,11 +31,8 @@ namespace FEAST
       template<int shape_dim_>
       struct DofTraits<Shape::Hypercube<shape_dim_>, 0>
       {
-        enum
-        {
-          /// 2^n dofs per vertex
-          count = (1 << shape_dim_)
-        };
+        /// 2^n dofs per vertex
+        static constexpr int count = (1 << shape_dim_);
 
         static Index derive_order(Index assign_idx)
         {

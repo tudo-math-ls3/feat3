@@ -53,17 +53,12 @@ namespace FEAST
       /// trafo evaluator traits
       typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
 
-      /// dummy enum
-      enum
-      {
-        /// trafo domain dimension
-        domain_dim = SpaceEvalTraits::domain_dim,
-        /// trafo image dimension
-        image_dim = SpaceEvalTraits::image_dim,
-
-        /// maximum number of local DOFs
-        max_local_dofs = SpaceEvalTraits::max_local_dofs
-      };
+      /// trafo domain dimension
+      static constexpr int domain_dim = SpaceEvalTraits::domain_dim;
+      /// trafo image dimension
+      static constexpr int image_dim = SpaceEvalTraits::image_dim;
+      /// maximum number of local DOFs
+      static constexpr int max_local_dofs = SpaceEvalTraits::max_local_dofs;
 
       template<typename Cfg_>
       struct ConfigTraits
@@ -79,40 +74,31 @@ namespace FEAST
       };
 
       /**
-       * \brief Capability enumeration
+       * \brief Basis Function-Values capability
        *
-       * This enumeration specifies the capabilites of the evaluator, i.e. its values specifiy whether
-       * the evaluator is capable of computing basis function values, gradients, etc.
+       * This entry specifies whether the evaluator is capable of computing basis function values.\n
+       * If this value is non-zero, the evaluator implements the #eval_values member function.\n
+       * See #eval_values for details.
        */
-      enum EvaluatorCapabilities
-      {
-        /**
-         * \brief Basis Function-Values capability
-         *
-         * This entry specifies whether the evaluator is capable of computing basis function values.\n
-         * If this value is non-zero, the evaluator implements the #eval_values member function.\n
-         * See #eval_values for details.
-         */
-        can_value = 0,
+      static constexpr bool can_value = false;
 
-        /**
-         * \brief Basis Gradients capability
-         *
-         * This entry specifies whether the evaluator is capable of computing basis function gradients.\n
-         * If this value is non-zero, the evaluator implements the #eval_gradients member function.\n
-         * See #eval_gradients for details.
-         */
-        can_grad = 0,
+      /**
+       * \brief Basis Gradients capability
+       *
+       * This entry specifies whether the evaluator is capable of computing basis function gradients.\n
+       * If this value is non-zero, the evaluator implements the #eval_gradients member function.\n
+       * See #eval_gradients for details.
+       */
+      static constexpr bool can_grad = false;
 
-        /**
-         * \brief Basis Hessians capability
-         *
-         * This entry specifies whether the evaluator is capable of computing basis function hessian matrices.\n
-         * If this value is non-zero, the evaluator implements the #eval_hessians member function.\n
-         * See #eval_hessians for details.
-         */
-        can_hess = 0
-      };
+      /**
+       * \brief Basis Hessians capability
+       *
+       * This entry specifies whether the evaluator is capable of computing basis function hessian matrices.\n
+       * If this value is non-zero, the evaluator implements the #eval_hessians member function.\n
+       * See #eval_hessians for details.
+       */
+      static constexpr bool can_hess = false;
 
     protected:
       /// \cond internal
@@ -167,11 +153,11 @@ namespace FEAST
         typedef EvalData<SpaceEvalTraits, SpaceCfg_> EvalDataType;
 
         // compute basis values
-        Intern::BasisEvalHelper<EvalDataType::have_value != 0>::eval_values(space_data, cast(), trafo_data);
+        Intern::BasisEvalHelper<EvalDataType::have_value>::eval_values(space_data, cast(), trafo_data);
         // compute basis gradients
-        Intern::BasisEvalHelper<EvalDataType::have_grad != 0>::eval_gradients(space_data, cast(), trafo_data);
+        Intern::BasisEvalHelper<EvalDataType::have_grad>::eval_gradients(space_data, cast(), trafo_data);
         // compute basis hessians
-        Intern::BasisEvalHelper<EvalDataType::have_hess != 0>::eval_hessians(space_data, cast(), trafo_data);
+        Intern::BasisEvalHelper<EvalDataType::have_hess>::eval_hessians(space_data, cast(), trafo_data);
       }
 
       // Note:
@@ -253,21 +239,21 @@ namespace FEAST
         template<typename SpaceData_, typename Evaluator_, typename TrafoData_>
         static void eval_values(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
-          static_assert(Evaluator_::can_value != 0, "space evaluator does not support basis function values");
+          static_assert(Evaluator_::can_value, "space evaluator does not support basis function values");
           evaluator.eval_values(space_data, trafo_data);
         }
 
         template<typename SpaceData_, typename Evaluator_, typename TrafoData_>
         static void eval_gradients(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
-          static_assert(Evaluator_::can_grad != 0, "space evaluator does not support basis function gradients");
+          static_assert(Evaluator_::can_grad, "space evaluator does not support basis function gradients");
           evaluator.eval_gradients(space_data, trafo_data);
         }
 
         template<typename SpaceData_, typename Evaluator_, typename TrafoData_>
         static void eval_hessians(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
-          static_assert(Evaluator_::can_hess != 0, "space evaluator does not support basis function hessians");
+          static_assert(Evaluator_::can_hess, "space evaluator does not support basis function hessians");
           evaluator.eval_hessians(space_data, trafo_data);
         }
       };

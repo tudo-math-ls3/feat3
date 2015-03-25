@@ -18,16 +18,12 @@ namespace FEAST
        */
       struct ReferenceCapabilities
       {
-        /// dummy enum
-        enum
-        {
-          /// can compute reference function values
-          can_ref_value = 1,
-          /// can compute reference gradients
-          can_ref_grad = 1,
-          /// can compute reference hessians
-          can_ref_hess = 1,
-        };
+        /// can compute reference function values
+        static constexpr bool can_ref_value = true;
+        /// can compute reference gradients
+        static constexpr bool can_ref_grad = true;
+        /// can compute reference hessians
+        static constexpr bool can_ref_hess = true;
       };
 
       /// \cond internal
@@ -174,10 +170,7 @@ namespace FEAST
         struct CoeffTrafoConfig :
           public Trafo::ConfigBase
         {
-          enum
-          {
-            need_jac_mat = 1
-          };
+          static constexpr bool need_jac_mat = true;
         };
 
       public:
@@ -345,10 +338,7 @@ namespace FEAST
         struct CoeffTrafoConfig :
           public Trafo::ConfigBase
         {
-          enum
-          {
-            need_jac_mat = 1
-          };
+          static constexpr bool need_jac_mat = true;
         };
 
         /**
@@ -732,10 +722,7 @@ namespace FEAST
         struct CoeffTrafoConfig :
           public Trafo::ConfigBase
         {
-          enum
-          {
-            need_jac_mat = 1
-          };
+          static constexpr bool need_jac_mat = true;
         };
 
         /**

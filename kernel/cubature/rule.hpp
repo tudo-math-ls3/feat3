@@ -37,10 +37,7 @@ namespace FEAST
       typedef Weight_ WeightType;
       typedef Coord_ CoordType;
       typedef Point_ PointType;
-      enum
-      {
-        dimension = ShapeType::dimension
-      };
+      static constexpr int dimension = ShapeType::dimension;
 
     protected:
       String _name;

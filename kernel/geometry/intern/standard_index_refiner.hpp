@@ -29,12 +29,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<1>, 1, 0>
       {
-        enum
-        {
-          shape_dim = 1,
-          cell_dim = 1, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 1;
+        static constexpr int cell_dim = 1; // second template parameter
+        static constexpr int face_dim = 0;  // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -100,12 +97,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<2>, 1, 0>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 1, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 1; // second template parameter
+        static constexpr int face_dim = 0;  // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -186,12 +180,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<2>, 2, 0>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 2, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 2; // second template parameter
+        static constexpr int face_dim = 0;  // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -285,12 +276,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<2>, 2, 1>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 2, // second template parameter
-          face_dim = 1  // third template parameter
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 2; // second template parameter
+        static constexpr int face_dim = 1;  // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -397,12 +385,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<3>, 1, 0>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 1, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 1; // second template parameter
+        static constexpr int face_dim = 0;  // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -515,12 +500,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<3>, 2, 0>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 2, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 2; // second template parameter
+        static constexpr int face_dim = 0; // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -694,12 +676,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<3>, 3, 0>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 3, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 3; // second template parameter
+        static constexpr int face_dim = 0;  // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -875,12 +854,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<3>, 2, 1>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 2, // second template parameter
-          face_dim = 1  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 2; // second template parameter
+        static constexpr int face_dim = 1; // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1036,12 +1012,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<3>, 3, 1>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 3, // second template parameter
-          face_dim = 1  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 3; // second template parameter
+        static constexpr int face_dim = 1; // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1220,12 +1193,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Simplex<3>, 3, 2>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 3, // second template parameter
-          face_dim = 2  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 3; // second template parameter
+        static constexpr int face_dim = 2; // third template parameter
 
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1370,12 +1340,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<1>, 1, 0>
       {
-        enum
-        {
-          shape_dim = 1,
-          cell_dim = 1, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 1;
+        static constexpr int cell_dim = 1; // second template parameter
+        static constexpr int face_dim = 0; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1441,12 +1408,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<2>, 1, 0>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 1, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 1; // second template parameter
+        static constexpr int face_dim = 0; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1535,12 +1499,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<2>, 2, 0>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 2, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 2; // second template parameter
+        static constexpr int face_dim = 0; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1643,12 +1604,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<2>, 2, 1>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 2, // second template parameter
-          face_dim = 1  // third template parameter
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 2; // second template parameter
+        static constexpr int face_dim = 1; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1759,12 +1717,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<3>, 1, 0>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 1, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 1; // second template parameter
+        static constexpr int face_dim = 0; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1858,12 +1813,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<3>, 2, 0>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 2, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 2; // second template parameter
+        static constexpr int face_dim = 0; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -2053,12 +2005,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<3>, 3, 0>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 3, // second template parameter
-          face_dim = 0  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 3; // second template parameter
+        static constexpr int face_dim = 0; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -2227,12 +2176,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<3>, 2, 1>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 2, // second template parameter
-          face_dim = 1  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 2; // second template parameter
+        static constexpr int face_dim = 1; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -2429,12 +2375,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<3>, 3, 1>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 3, // second template parameter
-          face_dim = 1  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 3; // second template parameter
+        static constexpr int face_dim = 1; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -2654,12 +2597,9 @@ namespace FEAST
       template<>
       struct StandardIndexRefiner<Shape::Hypercube<3>, 3, 2>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 3, // second template parameter
-          face_dim = 2  // third template parameter
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 3; // second template parameter
+        static constexpr int face_dim = 2; // third template parameter
 
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;

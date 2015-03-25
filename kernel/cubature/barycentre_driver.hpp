@@ -18,13 +18,10 @@ namespace FEAST
         public DriverBase<Shape_>
       {
       public:
-        enum
-        {
-          /// this rule is not variadic
-          variadic = 0,
-          /// this rule has one point
-          num_points = 1
-        };
+        /// this rule is not variadic
+        static constexpr bool variadic = false;
+        /// this rule has one point
+        static constexpr int num_points = 1;
 
         ///Returns the name of the cubature rule.
         static String name()

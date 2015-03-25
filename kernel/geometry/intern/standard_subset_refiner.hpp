@@ -30,11 +30,8 @@ namespace FEAST
         {
           // fetch number of cells
           Index num_cells = target_set_in.get_num_entities();
-          enum
-          {
-            shape_dim = ShapeType::dimension,
-            num_childs = StandardRefinementTraits<ShapeType,cell_dim_>::count
-          };
+          static constexpr int shape_dim = ShapeType::dimension;
+          static constexpr int num_childs = StandardRefinementTraits<ShapeType,cell_dim_>::count;
 
           for(Index i(0); i < num_cells; ++i)
           {

@@ -45,11 +45,8 @@ namespace FEAST
       struct MacroIndexBuilder
       {
         typedef typename Shape::FaceTraits<Shape_, cell_dim_>::ShapeType CellType;
-        enum
-        {
-          num_cells = Shape::FaceTraits<Shape_, cell_dim_>::count,
-          num_indices = Shape::FaceTraits<CellType, face_dim_>::count
-        };
+        static constexpr int num_cells = Shape::FaceTraits<Shape_, cell_dim_>::count;
+        static constexpr int num_indices = Shape::FaceTraits<CellType, face_dim_>::count;
 
         static void build(IndexSet<num_indices>& idx)
         {
@@ -70,10 +67,7 @@ namespace FEAST
         int face_dim_>
       struct MacroIndexBuilder<Shape_, cell_dim_, face_dim_, cell_dim_>
       {
-        enum
-        {
-          num_indices = Shape::FaceTraits<Shape_, face_dim_>::count
-        };
+        static constexpr int num_indices = Shape::FaceTraits<Shape_, face_dim_>::count;
 
         static void build(IndexSet<num_indices>& idx)
         {

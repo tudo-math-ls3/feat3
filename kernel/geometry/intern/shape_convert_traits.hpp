@@ -52,18 +52,14 @@ namespace FEAST
         /// Shape type
         typedef Shape::Vertex ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension (=0)
-          cell_dim = ShapeType::dimension, // = 0
+        /// cell dimension (=0)
+        static constexpr int cell_dim = ShapeType::dimension; // = 0
 
-          /// face dimension (=0)
-          face_dim = face_dim_, // = 0
+        /// face dimension (=0)
+        static constexpr int face_dim = face_dim_; // = 0
 
-          /// Number of faces generated upon refinement
-          count = 1
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = 1;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -84,16 +80,12 @@ namespace FEAST
         typedef Shape::Hypercube<1> ShapeType;
         /// Face type
         typedef Shape::Vertex FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 1,
-          /// face dimension
-          face_dim = 0,
-          // number of faces generated
-          count = 0
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 1;
+        /// face dimension
+        static constexpr int face_dim = 0;
+        // number of faces generated
+        static constexpr int count = 0;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -114,16 +106,12 @@ namespace FEAST
         typedef Shape::Hypercube<1> ShapeType;
         /// Face type
         typedef Shape::Simplex<1> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 1,
-          /// face dimension
-          face_dim = 1,
-          // number of faces generated
-          count = 1
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 1;
+        /// face dimension
+        static constexpr int face_dim = 1;
+        // number of faces generated
+        static constexpr int count = 1;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -144,16 +132,12 @@ namespace FEAST
         typedef Shape::Hypercube<2> ShapeType;
         /// Face type
         typedef Shape::Vertex FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 2,
-          /// face dimension
-          face_dim = 0,
-          // number of faces generated
-          count = 1
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 2;
+        /// face dimension
+        static constexpr int face_dim = 0;
+        // number of faces generated
+        static constexpr int count = 1;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -174,16 +158,12 @@ namespace FEAST
         typedef Shape::Hypercube<2> ShapeType;
         /// Face type
         typedef Shape::Simplex<1> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 2,
-          /// face dimension
-          face_dim = 1,
-          // number of faces generated
-          count = 4
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 2;
+        /// face dimension
+        static constexpr int face_dim = 1;
+        // number of faces generated
+        static constexpr int count = 4;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -204,16 +184,12 @@ namespace FEAST
         typedef Shape::Hypercube<2> ShapeType;
         /// Face type
         typedef Shape::Simplex<2> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 2,
-          /// face dimension
-          face_dim = 2,
-          // number of faces generated
-          count = 4
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 2;
+        /// face dimension
+        static constexpr int face_dim = 2;
+        // number of faces generated
+        static constexpr int count = 4;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -234,16 +210,12 @@ namespace FEAST
         typedef Shape::Hypercube<3> ShapeType;
         /// Face type
         typedef Shape::Vertex FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
-          /// face dimension
-          face_dim = 0,
-          // number of faces generated
-          count = 1
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 3;
+        /// face dimension
+        static constexpr int face_dim = 0;
+        // number of faces generated
+        static constexpr int count = 1;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -264,16 +236,12 @@ namespace FEAST
         typedef Shape::Hypercube<3> ShapeType;
         /// Face type
         typedef Shape::Simplex<1> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
-          /// face dimension
-          face_dim = 1,
-          // number of faces generated
-          count = 14
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 3;
+        /// face dimension
+        static constexpr int face_dim = 1;
+        // number of faces generated
+        static constexpr int count = 14;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -294,16 +262,12 @@ namespace FEAST
         typedef Shape::Hypercube<3> ShapeType;
         /// Face type
         typedef Shape::Simplex<2> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
-          /// face dimension
-          face_dim = 2,
-          // number of faces generated
-          count = 36
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 3;
+        /// face dimension
+        static constexpr int face_dim = 2;
+        // number of faces generated
+        static constexpr int count = 36;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -324,16 +288,12 @@ namespace FEAST
         typedef Shape::Hypercube<3> ShapeType;
         /// Face type
         typedef Shape::Simplex<3> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
-          /// face dimension
-          face_dim = 3,
-          // number of faces generated
-          count = 24
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 3;
+        /// face dimension
+        static constexpr int face_dim = 3;
+        // number of faces generated
+        static constexpr int count = 24;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -358,16 +318,12 @@ namespace FEAST
         typedef Shape::Simplex<1> ShapeType;
         /// Face type
         typedef Shape::Vertex FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 1,
-          /// face dimension
-          face_dim = 0,
-          // number of faces generated
-          count = 1
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 1;
+        /// face dimension
+        static constexpr int face_dim = 0;
+        // number of faces generated
+        static constexpr int count = 1;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -388,16 +344,12 @@ namespace FEAST
         typedef Shape::Simplex<1> ShapeType;
         /// Face type
         typedef Shape::Hypercube<1> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 1,
-          /// face dimension
-          face_dim = 1,
-          // number of faces generated
-          count = 2
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 1;
+        /// face dimension
+        static constexpr int face_dim = 1;
+        // number of faces generated
+        static constexpr int count = 2;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -418,16 +370,12 @@ namespace FEAST
         typedef Shape::Simplex<2> ShapeType;
         /// Face type
         typedef Shape::Vertex FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 2,
-          /// face dimension
-          face_dim = 0,
-          // number of faces generated
-          count = 1
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 2;
+        /// face dimension
+        static constexpr int face_dim = 0;
+        // number of faces generated
+        static constexpr int count = 1;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -448,16 +396,12 @@ namespace FEAST
         typedef Shape::Simplex<2> ShapeType;
         /// Face type
         typedef Shape::Hypercube<1> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 2,
-          /// face dimension
-          face_dim = 1,
-          // number of faces generated
-          count = 3
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 2;
+        /// face dimension
+        static constexpr int face_dim = 1;
+        // number of faces generated
+        static constexpr int count = 3;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -478,16 +422,12 @@ namespace FEAST
         typedef Shape::Simplex<2> ShapeType;
         /// Face type
         typedef Shape::Hypercube<2> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 2,
-          /// face dimension
-          face_dim = 2,
-          // number of faces generated
-          count = 3
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 2;
+        /// face dimension
+        static constexpr int face_dim = 2;
+        // number of faces generated
+        static constexpr int count = 3;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -508,16 +448,12 @@ namespace FEAST
         typedef Shape::Simplex<3> ShapeType;
         /// Face type
         typedef Shape::Vertex FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
-          /// face dimension
-          face_dim = 0,
-          // number of faces generated
-          count = 1
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 3;
+        /// face dimension
+        static constexpr int face_dim = 0;
+        // number of faces generated
+        static constexpr int count = 1;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -538,16 +474,12 @@ namespace FEAST
         typedef Shape::Simplex<3> ShapeType;
         /// Face type
         typedef Shape::Hypercube<1> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
-          /// face dimension
-          face_dim = 1,
-          // number of faces generated
-          count = 4
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 3;
+        /// face dimension
+        static constexpr int face_dim = 1;
+        // number of faces generated
+        static constexpr int count = 4;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -568,16 +500,12 @@ namespace FEAST
         typedef Shape::Simplex<3> ShapeType;
         /// Face type
         typedef Shape::Hypercube<2> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
-          /// face dimension
-          face_dim = 2,
-          // number of faces generated
-          count = 6
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 3;
+        /// face dimension
+        static constexpr int face_dim = 2;
+        // number of faces generated
+        static constexpr int count = 6;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -598,16 +526,12 @@ namespace FEAST
         typedef Shape::Simplex<3> ShapeType;
         /// Face type
         typedef Shape::Hypercube<3> FaceType;
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
-          /// face dimension
-          face_dim = 3,
-          // number of faces generated
-          count = 4
-        };
+        /// cell dimension
+        static constexpr int cell_dim = 3;
+        /// face dimension
+        static constexpr int face_dim = 3;
+        // number of faces generated
+        static constexpr int count = 4;
 
         /// \brief Returns the name of the class.
         static inline String name()

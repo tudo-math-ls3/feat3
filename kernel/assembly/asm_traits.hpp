@@ -131,12 +131,8 @@ namespace FEAST
       struct AsmTrafoConfig :
         public TrafoConfig_
       {
-        /// dummy enumeration
-        enum
-        {
-          /// we need jacobian determinants for integration
-          need_jac_det = 1
-        };
+        /// we need jacobian determinants for integration
+        static constexpr bool need_jac_det = true;
       };
 
       /// trafo config: combine space and assembly trafo configs
@@ -165,14 +161,10 @@ namespace FEAST
       typedef DofMapping TrialDofMapping;
       typedef DofMapping MultDofMapping;
 
-      /// dummy enum
-      enum
-      {
-        /// trafo domain dimension
-        domain_dim = TrafoEvaluator::domain_dim,
-        /// trafo image dimension
-        image_dim = TrafoEvaluator::image_dim
-      };
+      /// trafo domain dimension
+      static constexpr int domain_dim = TrafoEvaluator::domain_dim;
+      /// trafo image dimension
+      static constexpr int image_dim = TrafoEvaluator::image_dim;
 
       /// analytic function evaluator traits
       typedef Trafo::AnalyticEvalTraits<TrafoEvaluator, TrafoEvalData> AnalyticEvalTraits;
@@ -286,12 +278,8 @@ namespace FEAST
       struct AsmTrafoConfig :
         public TrafoConfig_
       {
-        /// dummy enumeration
-        enum
-        {
-          /// we need jacobian determinants for integration
-          need_jac_det = 1
-        };
+        /// we need jacobian determinants for integration
+        static constexpr bool need_jac_det = true;
       };
 
       /// trafo config: combine space and assembly trafo configs
@@ -316,14 +304,10 @@ namespace FEAST
       typedef typename TrialSpaceType::DofMappingType TrialDofMapping;
       typedef TrialDofMapping MultDofMapping;
 
-      /// dummy enum
-      enum
-      {
-        /// trafo domain dimension
-        domain_dim = TrafoEvaluator::domain_dim,
-        /// trafo image dimension
-        image_dim = TrafoEvaluator::image_dim
-      };
+      /// trafo domain dimension
+      static constexpr int domain_dim = TrafoEvaluator::domain_dim;
+      /// trafo image dimension
+      static constexpr int image_dim = TrafoEvaluator::image_dim;
 
       /// analytic function evaluator traits
       typedef Trafo::AnalyticEvalTraits<TrafoEvaluator, TrafoEvalData> AnalyticEvalTraits;

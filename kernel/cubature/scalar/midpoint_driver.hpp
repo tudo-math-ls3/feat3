@@ -22,16 +22,12 @@ namespace FEAST
         public DriverBase
       {
       public:
-        /// dummy enum
-        enum
-        {
-          /// this rule is not variadic
-          variadic = 0,
-          /// this rule has 1 point
-          num_points = 1,
-          /// disable tensorisation
-          tensorise = 0
-        };
+        /// this rule is not variadic
+        static constexpr bool variadic = false;
+        /// disable tensorisation
+        static constexpr bool tensorise = false;
+        /// this rule has 1 point
+        static constexpr int num_points = 1;
 
         /// Returns the name of the cubature rule.
         static String name()

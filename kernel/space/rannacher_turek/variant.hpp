@@ -21,11 +21,11 @@ namespace FEAST
          */
         struct StdNonPar
         {
-          enum
+          /*enum
           {
             non_par = 1,
             bubble = 0
-          };
+          };*/
 
           static String name()
           {

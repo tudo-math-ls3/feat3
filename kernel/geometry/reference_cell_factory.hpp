@@ -39,12 +39,8 @@ namespace FEAST
       /// index holder type
       typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = ShapeType::dimension
-      };
+      /// shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
 
     public:
       virtual Index get_num_entities(int dim)

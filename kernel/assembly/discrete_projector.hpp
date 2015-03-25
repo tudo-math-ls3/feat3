@@ -24,10 +24,7 @@ namespace FEAST
       struct SpaceConfig :
         public Space::ConfigBase
       {
-        enum
-        {
-          need_value = 1
-        };
+        static constexpr bool need_value = true;
       };
       /// \endcond
 
@@ -58,11 +55,8 @@ namespace FEAST
         typedef typename TrafoType::MeshType MeshType;
         typedef typename MeshType::ShapeType ShapeType;
 
-        enum
-        {
-          shape_dim = ShapeType::dimension,
-          nverts = Shape::FaceTraits<ShapeType, 0>::count
-        };
+        static constexpr int shape_dim = ShapeType::dimension;
+        static constexpr int nverts = Shape::FaceTraits<ShapeType, 0>::count;
 
         // define assembly traits
         typedef AsmTraits1<typename VectorOut_::DataType, Space_, Trafo::ConfigBase, SpaceConfig> AsmTraits;
@@ -213,10 +207,7 @@ namespace FEAST
       struct SpaceConfig :
         public Space::ConfigBase
       {
-        enum
-        {
-          need_value = 1
-        };
+        static constexpr bool need_value = true;
       };
       /// \endcond
 

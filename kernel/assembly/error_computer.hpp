@@ -24,11 +24,8 @@ namespace FEAST
        */
       struct TrafoConfig : public Trafo::ConfigBase
       {
-        enum
-        {
-          need_img_point = 1,
-          need_jac_det = 1
-        };
+        static constexpr bool need_img_point = true;
+        static constexpr bool need_jac_det = true;
       };
 
       /**
@@ -38,10 +35,7 @@ namespace FEAST
        */
       struct SpaceConfig : public Space::ConfigBase
       {
-        enum
-        {
-          need_value = 1
-        };
+        static constexpr bool need_value = true;
       };
       /// \endcond
 
@@ -211,11 +205,8 @@ namespace FEAST
        */
       struct TrafoConfig : public Trafo::ConfigBase
       {
-        enum
-        {
-          need_img_point = 1,
-          need_jac_det = 1
-        };
+        static constexpr bool need_img_point = true;
+        static constexpr bool need_jac_det = true;
       };
 
       /**
@@ -225,10 +216,7 @@ namespace FEAST
        */
       struct SpaceConfig : public Space::ConfigBase
       {
-        enum
-        {
-          need_grad = 1
-        };
+        static constexpr bool need_grad = true;
       };
       /// \endcond
 
@@ -394,11 +382,8 @@ namespace FEAST
        */
       struct TrafoConfig : public Trafo::ConfigBase
       {
-        enum
-        {
-          need_img_point = 1,
-          need_jac_det = 1
-        };
+        static constexpr bool need_img_point = true;
+        static constexpr bool need_jac_det = true;
       };
 
       /**
@@ -408,10 +393,7 @@ namespace FEAST
        */
       struct SpaceConfig : public Space::ConfigBase
       {
-        enum
-        {
-          need_hess = 1
-        };
+        static constexpr bool need_hess = true;
       };
       /// \endcond
 

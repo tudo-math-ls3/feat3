@@ -26,12 +26,8 @@ namespace FEAST
       /// target set holder type
       typedef TargetSetHolder<ShapeType> TargetSetHolderType;
 
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = ShapeType::dimension
-      };
+      /// shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
 
       /**
        * \brief Target set type class template.
@@ -234,12 +230,8 @@ namespace FEAST
       /// target set holder type
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = ShapeType::dimension
-      };
+      /// shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
 
     protected:
       /// coarse cell subset reference

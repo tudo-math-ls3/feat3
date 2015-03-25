@@ -96,17 +96,15 @@ namespace Tutorial02
     // To inform the assembler about what computations we can perform, we define an enumeration,
     // which is just a C++ trick to get compile-time constants.
     // See the documentation of the Assembly::AnalyticFunction class for the names of these constants.
-    enum
-    {
-      // We are capable of computing the function values of 'u'.
-      can_value = 1,
-      // Moreover, we can also compute the gradient of 'u'. This will be required for the computation
-      // of the H1-error during the post-processing step.
-      can_grad = 1,
-      // Moreover, we can also compute the hessian of 'u', although we will not need it in this
-      // tutorial.
-      can_hess = 1
-    };
+
+    // We are capable of computing the function values of 'u'.
+    static constexpr bool can_value = true;
+    // Moreover, we can also compute the gradient of 'u'. This will be required for the computation
+    // of the H1-error during the post-processing step.
+    static constexpr bool can_grad = true;
+    // Moreover, we can also compute the hessian of 'u', although we will not need it in this
+    // tutorial.
+    static constexpr bool can_hess = true;
 
     // For the computation of these values, gradients and hessians we require some data from the
     // underlying transformation, namely the real point coordinates. These wishes are managed by
@@ -125,13 +123,10 @@ namespace Tutorial02
       struct TrafoConfig :
         public Trafo::ConfigBase
       {
-        enum
-        {
-          // At this point we express our wishes. The only thing that we require from the
-          // transformation are the 'real' point coordinates (i.e. 'x' and 'y'), so that we may
-          // evaluate our analytic function 'u' and/or its derivatives in these coordinates.
-          need_img_point = 1
-        };
+        // At this point we express our wishes. The only thing that we require from the
+        // transformation are the 'real' point coordinates (i.e. 'x' and 'y'), so that we may
+        // evaluate our analytic function 'u' and/or its derivatives in these coordinates.
+        static constexpr bool need_img_point = true;
       };
     }; // class PringlesFunction::ConfigTraits<...>
 

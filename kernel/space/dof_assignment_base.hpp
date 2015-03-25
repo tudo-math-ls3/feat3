@@ -142,11 +142,8 @@ namespace FEAST
       typedef Space_ SpaceType;
       typedef typename SpaceType::ShapeType ShapeType;
 
-      enum
-      {
-        // number of dofs for each cell
-        dofs_per_cell = DofTraits_<DofTag_, shape_dim_>::count
-      };
+      // number of dofs for each cell
+      static constexpr int dofs_per_cell = DofTraits_<DofTag_, shape_dim_>::count;
 
     protected:
       /// the offset of the first dof of this cell dimension

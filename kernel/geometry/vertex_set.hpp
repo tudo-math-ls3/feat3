@@ -41,14 +41,10 @@ namespace FEAST
       static_assert(stride_ >= num_coords_, "invalid stride_ parameter");
 
     public:
-      /// dummy enum
-      enum
-      {
-        /// number of coordinates per vertex
-        num_coords = num_coords_,
-        /// vertex stride
-        stride = stride_
-      };
+      /// number of coordinates per vertex
+      static constexpr int num_coords = num_coords_;
+      /// vertex stride
+      static constexpr int stride = stride_;
 
       /// vertex coordinate type
       typedef Coord_ CoordType;

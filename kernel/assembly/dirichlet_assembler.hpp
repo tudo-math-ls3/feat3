@@ -42,12 +42,8 @@ namespace FEAST
       typedef Space_ SpaceType;
 
     private:
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = SpaceType::shape_dim
-      };
+      /// shape dimension
+      static constexpr int shape_dim = SpaceType::shape_dim;
 
       /// dof-index set typedef
       typedef std::set<Index> IdxSet;

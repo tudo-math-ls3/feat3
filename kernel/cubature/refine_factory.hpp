@@ -142,7 +142,7 @@ namespace FEAST
 
     template<
       typename Factory_,
-      bool variadic_ = (Factory_::variadic != 0)>
+      bool variadic_ = Factory_::variadic>
     class RefineFactory DOXY({});
 
     template<typename Factory_>
@@ -153,11 +153,8 @@ namespace FEAST
       typedef Factory_ FactoryType;
       typedef typename Factory_::ShapeType ShapeType;
       typedef RefineFactoryBase<FactoryType> BaseClass;
-      enum
-      {
-        variadic = 0,
-        num_points = FactoryType::num_points
-      };
+      static constexpr bool variadic = false;
+      static constexpr int num_points = FactoryType::num_points;
 
     protected:
       Index _num_refines;
@@ -193,12 +190,9 @@ namespace FEAST
       typedef Factory_ FactoryType;
       typedef typename Factory_::ShapeType ShapeType;
       typedef RefineFactoryBase<FactoryType> BaseClass;
-      enum
-      {
-        variadic = 1,
-        min_points = FactoryType::min_points,
-        max_points = FactoryType::max_points
-      };
+      static constexpr bool variadic = true;
+      static constexpr int min_points = FactoryType::min_points;
+      static constexpr int max_points = FactoryType::max_points;
 
     protected:
       Index _num_points;
@@ -237,10 +231,7 @@ namespace FEAST
       public:
         typedef typename Rule_::WeightType Weight_;
         typedef typename Rule_::CoordType Coord_;
-        enum
-        {
-          count = 2
-        };
+        static constexpr int count = 2;
 
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
@@ -261,10 +252,7 @@ namespace FEAST
       public:
         typedef typename Rule_::WeightType Weight_;
         typedef typename Rule_::CoordType Coord_;
-        enum
-        {
-          count = 4
-        };
+        static constexpr int count = 4;
 
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
@@ -322,10 +310,7 @@ namespace FEAST
       public:
         typedef typename Rule_::WeightType Weight_;
         typedef typename Rule_::CoordType Coord_;
-        enum
-        {
-          count = 12
-        };
+        static constexpr int count = 12;
 
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
@@ -654,10 +639,7 @@ namespace FEAST
       public:
         typedef typename Rule_::WeightType Weight_;
         typedef typename Rule_::CoordType Coord_;
-        enum
-        {
-          count = 2
-        };
+        static constexpr int count = 2;
 
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
@@ -679,10 +661,7 @@ namespace FEAST
       public:
         typedef typename Rule_::WeightType Weight_;
         typedef typename Rule_::CoordType Coord_;
-        enum
-        {
-          count = 4
-        };
+        static constexpr int count = 4;
 
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
@@ -733,10 +712,7 @@ namespace FEAST
       public:
         typedef typename Rule_::WeightType Weight_;
         typedef typename Rule_::CoordType Coord_;
-        enum
-        {
-          count = 8
-        };
+        static constexpr int count = 8;
 
         static void refine(Rule_& rule, const Rule_& rule_in)
         {

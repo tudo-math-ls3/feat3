@@ -19,11 +19,8 @@ namespace FEAST
       template<typename Shape_, int dim_>
       struct DofTraits
       {
-        enum
-        {
-          /// no dofs for any shape dimension > 0
-          count = 0
-        };
+        /// no dofs for any shape dimension > 0
+        static constexpr int count = 0;
 
         static Index derive_order(Index)
         {
@@ -34,11 +31,8 @@ namespace FEAST
       template<typename Shape_>
       struct DofTraits<Shape_, 0>
       {
-        enum
-        {
-          /// 1 dof per vertex
-          count = 1
-        };
+        /// 1 dof per vertex
+        static constexpr int count = 1;
 
         static Index derive_order(Index)
         {

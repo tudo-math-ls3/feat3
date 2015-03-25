@@ -28,11 +28,8 @@ namespace FEAST
         public DriverBase<Shape_>
       {
       public:
-        enum
-        {
-          variadic = 0,
-          num_points = 0
-        };
+        static constexpr bool variadic = false;
+        static constexpr int num_points = 0;
 
         static String name()
         {

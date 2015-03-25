@@ -31,12 +31,8 @@ namespace FEAST
       typedef TupleFilter<Rest_...> RestClass;
 
     public:
-      /// dummy enum
-      enum
-        {
-          /// number of vector blocks
-          num_blocks = TupleFilter<Rest_...>::num_blocks + 1
-        };
+      /// number of vector blocks
+      static constexpr Index num_blocks = TupleFilter<Rest_...>::num_blocks + 1;
 
       /// sub-filter mem-type
       typedef typename First_::MemType MemType;
@@ -183,10 +179,7 @@ namespace FEAST
       friend class TupleFilter;
 
     public:
-      enum
-        {
-          num_blocks = 1
-        };
+      static constexpr Index num_blocks = 1;
 
       /// sub-filter mem-type
       typedef typename First_::MemType MemType;

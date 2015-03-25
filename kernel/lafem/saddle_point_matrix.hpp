@@ -99,14 +99,10 @@ namespace FEAST
                                                     typename MatrixB_::template ContainerType<Mem2_, DT2_, IT2_>,
                                                     typename MatrixD_::template ContainerType<Mem2_, DT2_, IT2_> >;
 
-      /// dummy enum
-      enum
-        {
-          /// number of row blocks (vertical size)
-          num_row_blocks = 2,
-          /// number of column blocks (horizontal size)
-          num_col_blocks = 2
-        };
+      /// number of row blocks (vertical size)
+      static constexpr int num_row_blocks = 2;
+      /// number of column blocks (horizontal size)
+      static constexpr int num_col_blocks = 2;
 
     protected:
       /// sub-matrix A

@@ -33,12 +33,8 @@ namespace FEAST
       typedef Shape::Hypercube<shape_dim_> ShapeType;
       /// cell type
       typedef typename Shape::FaceTraits<ShapeType, cell_dim_>::ShapeType CellType;
-      /// dummy enum
-      enum
-      {
-        /// number of indices
-        num_indices = Shape::FaceTraits<CellType, face_dim_>::count
-      };
+      /// number of indices
+      static constexpr int num_indices = Shape::FaceTraits<CellType, face_dim_>::count;
 
       /**
        * \brief ImageIterator implementation for Adjactor interface

@@ -30,24 +30,16 @@ namespace FEAST
         struct TestConfig :
           public Space::ConfigBase
         {
-          /// test-space requirement enumeration
-          enum
-          {
-            /// this functor requires test-function gradients
-            need_grad = 1
-          };
+          /// this operator requires test-function gradients
+          static constexpr bool need_grad = true;
         };
 
         /// trial space configuration
         struct TrialConfig :
           public Space::ConfigBase
         {
-          /// trial-space requirement enumeration
-          enum
-          {
-            /// this functor requires trial-function gradients
-            need_grad = 1
-          };
+          /// this operator requires trial-function gradients
+          static constexpr bool need_grad = true;
         };
 
         /**
@@ -110,24 +102,16 @@ namespace FEAST
         struct TestConfig :
           public Space::ConfigBase
         {
-          /// test-space requirement enumeration
-          enum
-          {
-            /// this functor requires test-function values
-            need_value = 1
-          };
+          /// this operator requires test-function values
+          static constexpr bool need_value = true;
         };
 
         /// trial space configuration
         struct TrialConfig :
           public Space::ConfigBase
         {
-          /// trial-space requirement enumeration
-          enum
-          {
-            /// this functor requires trial-function values
-            need_value = 1
-          };
+          /// this operator requires trial-function values
+          static constexpr bool need_value = true;
         };
 
         /**
@@ -198,24 +182,16 @@ namespace FEAST
         struct TestConfig :
           public Space::ConfigBase
         {
-          /// test-space requirement enumeration
-          enum
-          {
-            /// this functor requires test-function gradients
-            need_grad = 1
-          };
+          /// this operator requires test-function gradients
+          static constexpr bool need_grad = true;
         };
 
         /// trial space configuration
         struct TrialConfig :
           public Space::ConfigBase
         {
-          /// trial-space requirement enumeration
-          enum
-          {
-            /// this functor requires trial-function values
-            need_value = 1
-          };
+          /// this operator requires trial-function values
+          static constexpr bool need_value = true;
         };
 
         /**
@@ -290,16 +266,16 @@ namespace FEAST
         struct TestConfig :
           public Space::ConfigBase
         {
-          /// this functor requires test-function gradients
-          static constexpr int need_grad = 1;
+          /// this operator requires test-function gradients
+          static constexpr bool need_grad = true;
         };
 
         /// trial space configuration
         struct TrialConfig :
           public Space::ConfigBase
         {
-          /// this functor requires trial-function gradients
-          static constexpr int need_grad = 1;
+          /// this operator requires trial-function gradients
+          static constexpr bool need_grad = true;
         };
 
         /**
@@ -370,16 +346,16 @@ namespace FEAST
         struct TestConfig :
           public Space::ConfigBase
         {
-          /// this functor requires test-function gradients
-          static constexpr int need_grad = 1;
+          /// this operator requires test-function gradients
+          static constexpr bool need_grad = true;
         };
 
         /// trial space configuration
         struct TrialConfig :
           public Space::ConfigBase
         {
-          /// this functor requires trial-function gradients
-          static constexpr int need_grad = 1;
+          /// this operator requires trial-function gradients
+          static constexpr bool need_grad = true;
         };
 
         /**

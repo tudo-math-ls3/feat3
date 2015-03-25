@@ -44,16 +44,12 @@ namespace FEAST
       /// evaluation data type
       typedef DataType_ DataType;
 
-      /// dummy enumeration
-      enum
-      {
-        /// domain dimension
-        domain_dim = EvalPolicy::domain_dim,
-        /// image dimension
-        image_dim = EvalPolicy::image_dim,
-        /// maximum number of local dofs
-        max_local_dofs = max_local_dofs_
-      };
+      /// domain dimension
+      static constexpr int domain_dim = EvalPolicy::domain_dim;
+      /// image dimension
+      static constexpr int image_dim = EvalPolicy::image_dim;
+      /// maximum number of local dofs
+      static constexpr int max_local_dofs = max_local_dofs_;
 
       /// basis function value type
       typedef DataType BasisValueType;
@@ -101,16 +97,12 @@ namespace FEAST
       /// evaluation data type
       typedef DataType_ DataType;
 
-      /// dummy enumeration
-      enum
-      {
-        /// domain dimension
-        domain_dim = EvalPolicy::domain_dim,
-        /// image dimension
-        image_dim = EvalPolicy::image_dim,
-        /// maximum number of local dofs
-        max_local_dofs = max_local_dofs_
-      };
+      /// domain dimension
+      static constexpr int domain_dim = EvalPolicy::domain_dim;
+      /// image dimension
+      static constexpr int image_dim = EvalPolicy::image_dim;
+      /// maximum number of local dofs
+      static constexpr int max_local_dofs = max_local_dofs_;
 
       /// basis function value type
       typedef Tiny::Vector<DataType, image_dim> BasisValueType;
@@ -127,24 +119,18 @@ namespace FEAST
      */
     struct ConfigBase
     {
-      /**
-       * \brief Space requirements enumeration
-       */
-      enum SpaceRequirements
-      {
-        /// specifies whether the space should supply basis function values
-        need_value = 0,
-        /// specifies whether the space should supply basis function gradients
-        need_grad = 0,
-        /// specifies whether the space should supply basis function hessians
-        need_hess = 0,
-        /// specifies whether the space should supply reference basis function values
-        need_ref_value = 0,
-        /// specifies whether the space should supply reference basis function gradients
-        need_ref_grad = 0,
-        /// specifies whether the space should supply reference basis function hessians
-        need_ref_hess = 0
-      };
+      /// specifies whether the space should supply basis function values
+      static constexpr bool need_value = false;
+      /// specifies whether the space should supply basis function gradients
+      static constexpr bool need_grad = false;
+      /// specifies whether the space should supply basis function hessians
+      static constexpr bool need_hess = false;
+      /// specifies whether the space should supply reference basis function values
+      static constexpr bool need_ref_value = false;
+      /// specifies whether the space should supply reference basis function gradients
+      static constexpr bool need_ref_grad = false;
+      /// specifies whether the space should supply reference basis function hessians
+      static constexpr bool need_ref_hess = false;
     }; // struct ConfigBase
 
     /**
@@ -160,22 +146,18 @@ namespace FEAST
     template<typename Cfg1_, typename Cfg2_>
     struct ConfigOr
     {
-      /** \copydoc Space::ConfigBase::SpaceRequirements */
-      enum SpaceRequirements
-      {
-        /// specifies whether the space should supply basis function values
-        need_value = (Cfg1_::need_value != 0) || (Cfg2_::need_value != 0) ? 1 : 0,
-        /// specifies whether the space should supply basis function gradients
-        need_grad = (Cfg1_::need_grad != 0) || (Cfg2_::need_grad != 0) ? 1 : 0,
-        /// specifies whether the space should supply basis function hessians
-        need_hess = (Cfg1_::need_hess != 0) || (Cfg2_::need_hess != 0) ? 1 : 0,
-        /// specifies whether the space should supply reference basis function values
-        need_ref_value = (Cfg1_::need_ref_value != 0) || (Cfg2_::need_ref_value != 0) ? 1 : 0,
-        /// specifies whether the space should supply reference basis function gradients
-        need_ref_grad = (Cfg1_::need_ref_grad != 0) || (Cfg2_::need_ref_grad != 0) ? 1 : 0,
-        /// specifies whether the space should supply reference basis function hessians
-        need_ref_hess = (Cfg1_::need_ref_hess != 0) || (Cfg2_::need_ref_hess != 0) ? 1 : 0
-      };
+      /// specifies whether the space should supply basis function values
+      static constexpr bool need_value = Cfg1_::need_value || Cfg2_::need_value;
+      /// specifies whether the space should supply basis function gradients
+      static constexpr bool need_grad = Cfg1_::need_grad || Cfg2_::need_grad;
+      /// specifies whether the space should supply basis function hessians
+      static constexpr bool need_hess = Cfg1_::need_hess || Cfg2_::need_hess;
+      /// specifies whether the space should supply reference basis function values
+      static constexpr bool need_ref_value = Cfg1_::need_ref_value || Cfg2_::need_ref_value;
+      /// specifies whether the space should supply reference basis function gradients
+      static constexpr bool need_ref_grad = Cfg1_::need_ref_grad || Cfg2_::need_ref_grad;
+      /// specifies whether the space should supply reference basis function hessians
+      static constexpr bool need_ref_hess = Cfg1_::need_ref_hess || Cfg2_::need_ref_hess;
     }; // struct ConfigOr<...>
   } // namespace Space
 } // namespace FEAST

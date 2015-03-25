@@ -37,18 +37,14 @@ namespace FEAST
         /// Shape type
         typedef Shape_ ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = ShapeType::dimension,
+        /// cell dimension
+        static constexpr int cell_dim = ShapeType::dimension;
 
-          /// face dimension
-          face_dim = face_dim_,
+        /// face dimension
+        static constexpr int face_dim = face_dim_;
 
-          /// Number of faces generated upon refinement; depends on Shape_
-          count = ...
-        };
+        /// Number of faces generated upon refinement; depends on Shape_
+        static constexpr int count = ...;
       };
   #endif // DOXYGEN
 
@@ -66,18 +62,14 @@ namespace FEAST
         /// Shape type
         typedef Shape::Vertex ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension (=0)
-          cell_dim = ShapeType::dimension, // = 0
+        /// cell dimension (=0)
+        static constexpr int cell_dim = ShapeType::dimension; // = 0
 
-          /// face dimension (=0)
-          face_dim = face_dim_, // = 0
+        /// face dimension (=0)
+        static constexpr int face_dim = face_dim_; // = 0
 
-          /// Number of faces generated upon refinement
-          count = 1
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = 1;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -106,23 +98,19 @@ namespace FEAST
         /// Face type
         typedef typename Shape::FaceTraits<ShapeType, face_dim_>::ShapeType FaceType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = cell_dim_,
+        /// cell dimension
+        static constexpr int cell_dim = cell_dim_;
 
-          /// face dimension
-          face_dim = face_dim_,
+        /// face dimension
+        static constexpr int face_dim = face_dim_;
 
-          /**
-           * Number of faces generated upon refinement
-           *
-           * The total number of inner <em>m</em>-faces generated upon refinement of a single <em>n</em>-hypercubic
-           * cell is equal to the number of <em>(n-m)</em>-faces of the cell.
-           */
-          count = Shape::FaceTraits<ShapeType, cell_dim - face_dim>::count
-        };
+        /**
+         * Number of faces generated upon refinement
+         *
+         * The total number of inner <em>m</em>-faces generated upon refinement of a single <em>n</em>-hypercubic
+         * cell is equal to the number of <em>(n-m)</em>-faces of the cell.
+         */
+        static constexpr int count = Shape::FaceTraits<ShapeType, cell_dim - face_dim>::count;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -150,20 +138,14 @@ namespace FEAST
         /// Face type
         typedef typename Shape::FaceTraits<ShapeType, face_dim_>::ShapeType FaceType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 1,
+        /// cell dimension
+        static constexpr int cell_dim = 1;
 
-          /// face dimension
-          face_dim = face_dim_,
+        /// face dimension
+        static constexpr int face_dim = face_dim_;
 
-          /**
-           * Number of faces generated upon refinement
-           */
-          count = Shape::FaceTraits<ShapeType, cell_dim - face_dim>::count
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = Shape::FaceTraits<ShapeType, cell_dim - face_dim>::count;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -180,24 +162,17 @@ namespace FEAST
       template<>
       struct StandardRefinementTraits<Shape::Simplex<2>, 0>
       {
-
         /// Shape type
         typedef Shape::Simplex<2> ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 2,
+        /// cell dimension
+        static constexpr int cell_dim = 2;
 
-          /// face dimension
-          face_dim = 0,
+        /// face dimension
+        static constexpr int face_dim = 0;
 
-          /**
-           * Number of faces generated upon refinement
-           */
-          count = 0
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = 0;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -214,24 +189,17 @@ namespace FEAST
       template<>
       struct StandardRefinementTraits<Shape::Simplex<2>, 1>
       {
-
         /// Shape type
         typedef Shape::Simplex<2> ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 2,
+        /// cell dimension
+        static constexpr int cell_dim = 2;
 
-          /// face dimension
-          face_dim = 1,
+        /// face dimension
+        static constexpr int face_dim = 1;
 
-          /**
-           * Number of faces generated upon refinement
-           */
-          count = 3
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = 3;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -248,24 +216,17 @@ namespace FEAST
       template<>
       struct StandardRefinementTraits<Shape::Simplex<2>, 2>
       {
-
         /// Shape type
         typedef Shape::Simplex<2> ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 2,
+        /// cell dimension
+        static constexpr int cell_dim = 2;
 
-          /// face dimension
-          face_dim = 2,
+        /// face dimension
+        static constexpr int face_dim = 2;
 
-          /**
-           * Number of faces generated upon refinement
-           */
-          count = 4
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = 4;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -282,24 +243,17 @@ namespace FEAST
       template<>
       struct StandardRefinementTraits<Shape::Simplex<3>, 0>
       {
-
         /// Shape type
         typedef Shape::Simplex<3> ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
+        /// cell dimension
+        static constexpr int cell_dim = 3;
 
-          /// face dimension
-          face_dim = 0,
+        /// face dimension
+        static constexpr int face_dim = 0;
 
-          /**
-           * Number of faces generated upon refinement
-           */
-          count = 1
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = 1;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -316,24 +270,17 @@ namespace FEAST
       template<>
       struct StandardRefinementTraits<Shape::Simplex<3>, 1>
       {
-
         /// Shape type
         typedef Shape::Simplex<3> ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
+        /// cell dimension
+        static constexpr int cell_dim = 3;
 
-          /// face dimension
-          face_dim = 1,
+        /// face dimension
+        static constexpr int face_dim = 1;
 
-          /**
-           * Number of faces generated upon refinement
-           */
-          count = 6
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = 6;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -350,24 +297,17 @@ namespace FEAST
       template<>
       struct StandardRefinementTraits<Shape::Simplex<3>, 2>
       {
-
         /// Shape type
         typedef Shape::Simplex<3> ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
+        /// cell dimension
+        static constexpr int cell_dim = 3;
 
-          /// face dimension
-          face_dim = 2,
+        /// face dimension
+        static constexpr int face_dim = 2;
 
-          /**
-           * Number of faces generated upon refinement
-           */
-          count = 16
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = 16;
 
         /// \brief Returns the name of the class.
         static inline String name()
@@ -384,24 +324,17 @@ namespace FEAST
       template<>
       struct StandardRefinementTraits<Shape::Simplex<3>, 3>
       {
-
         /// Shape type
         typedef Shape::Simplex<3> ShapeType;
 
-        /// dummy enumeration
-        enum
-        {
-          /// cell dimension
-          cell_dim = 3,
+        /// cell dimension
+        static constexpr int cell_dim = 3;
 
-          /// face dimension
-          face_dim = 3,
+        /// face dimension
+        static constexpr int face_dim = 3;
 
-          /**
-           * Number of faces generated upon refinement
-           */
-          count = 12
-        };
+        /// Number of faces generated upon refinement
+        static constexpr int count = 12;
 
         /// \brief Returns the name of the class.
         static inline String name()

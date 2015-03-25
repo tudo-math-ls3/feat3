@@ -33,11 +33,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Simplex<1>, 1>
       {
-        enum
-        {
-          shape_dim = 1,
-          cell_dim = 1
-        };
+        static constexpr int shape_dim = 1;
+        static constexpr int cell_dim = 1;
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::Hypercube<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -94,11 +91,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Simplex<2>, 1>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 1
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 1;
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::Hypercube<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -187,11 +181,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Simplex<3>, 1>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 1
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 1;
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::Hypercube<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -310,11 +301,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Simplex<2>, 2>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 2
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 2;
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::Hypercube<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -408,11 +396,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Simplex<3>, 2>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 2
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 2;
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::Hypercube<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -662,11 +647,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Simplex<3>, 3>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 3
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 3;
         typedef Shape::Simplex<shape_dim> ShapeType;
         typedef Shape::Hypercube<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -882,11 +864,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Hypercube<1>, 1>
       {
-        enum
-        {
-          shape_dim = 1,
-          cell_dim = 1
-        };
+        static constexpr int shape_dim = 1;
+        static constexpr int cell_dim = 1;
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::Simplex<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -948,11 +927,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Hypercube<2>, 1>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 1
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 1;
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::Simplex<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1019,11 +995,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Hypercube<3>, 1>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 1
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 1;
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::Simplex<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1096,11 +1069,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Hypercube<2>, 2>
       {
-        enum
-        {
-          shape_dim = 2,
-          cell_dim = 2
-        };
+        static constexpr int shape_dim = 2;
+        static constexpr int cell_dim = 2;
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::Simplex<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1180,11 +1150,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Hypercube<3>, 2>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 2
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 2;
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::Simplex<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
@@ -1283,11 +1250,8 @@ namespace FEAST
       template<>
       struct ShapeConvertIndex<Shape::Hypercube<3>, 3>
       {
-        enum
-        {
-          shape_dim = 3,
-          cell_dim = 3
-        };
+        static constexpr int shape_dim = 3;
+        static constexpr int cell_dim = 3;
         typedef Shape::Hypercube<shape_dim> ShapeType;
         typedef Shape::Simplex<shape_dim> OtherShapeType;
         typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;

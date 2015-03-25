@@ -51,19 +51,11 @@ namespace FEAST
         /// shape type
         typedef typename TrafoType::ShapeType ShapeType;
 
-        /// dummy enum
-        enum
-        {
-          /// number of dofs per vertex = 2^dimension
-          num_vert_dofs = (1 << ShapeType::dimension),
-        };
+        /// number of dofs per vertex = 2^dimension
+        static constexpr int num_vert_dofs = (1 << ShapeType::dimension);
 
-        /** \copydoc ElementBase::ElementCapabilities */
-        enum ElementCapabilities
-        {
-          /// no node functionals available
-          have_node_func = 0
-        };
+        /// no node functionals available
+        static constexpr bool have_node_func = false;
 
         /** \copydoc ElementBase::local_degree */
         static constexpr int local_degree = 3;
@@ -78,12 +70,8 @@ namespace FEAST
           /// evaluation policy
           typedef typename TrafoEvaluator_::EvalPolicy EvalPolicy;
 
-          /// dummy enum
-          enum
-          {
-            /// number of local dofs := (number of vertices per cell) * (2^dimension)
-            num_loc_dofs = Shape::FaceTraits<ShapeType, 0>::count * num_vert_dofs
-          };
+          /// number of local dofs := (number of vertices per cell) * (2^dimension)
+          static constexpr int num_loc_dofs = Shape::FaceTraits<ShapeType, 0>::count * num_vert_dofs;
 
           /// space evaluation traits
           typedef StandardScalarEvalTraits<EvalPolicy, num_loc_dofs, DataType_> Traits;

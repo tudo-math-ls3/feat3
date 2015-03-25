@@ -146,7 +146,7 @@ namespace FEAST
     class RandomInteger;
 
     // Helper class: return non-negative integer
-    template<typename T_, bool signed_ = (Type::Traits<T_>::is_signed != 0)>
+    template<typename T_, bool signed_ = (Type::Traits<T_>::is_signed)>
     class NonNegInt
     {
     public:

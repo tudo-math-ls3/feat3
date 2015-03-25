@@ -19,16 +19,12 @@ namespace FEAST
        */
       struct ReferenceCapabilities
       {
-        /// dummy enum
-        enum
-        {
-          /// can compute reference function values
-          can_ref_value = 1,
-          /// can compute reference gradients
-          can_ref_grad = 1,
-          /// can't compute reference hessians
-          can_ref_hess = 0,
-        };
+        /// can compute reference function values
+        static constexpr bool can_ref_value = true;
+        /// can compute reference gradients
+        static constexpr bool can_ref_grad = true;
+        /// can't compute reference hessians
+        static constexpr bool can_ref_hess = false;
       };
 
       /**

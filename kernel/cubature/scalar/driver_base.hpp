@@ -19,12 +19,8 @@ namespace FEAST
       class DriverBase
       {
       public:
-        /// dummy enum
-        enum
-        {
-          /// by default, tensorise the cubature forumula
-          tensorise = 1
-        };
+        /// by default, tensorise the cubature forumula
+        static constexpr bool tensorise = true;
 
         /**
          * \brief Applies an alias-functor.

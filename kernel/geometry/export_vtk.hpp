@@ -23,10 +23,7 @@ namespace FEAST
       template<>
       struct VTKHelper< Shape::Simplex<1> >
       {
-        enum
-        {
-          type = 3 // VTK_LINE
-        };
+        static constexpr int type = 3; // VTK_LINE
         static inline int map(int i)
         {
           return i;
@@ -36,10 +33,7 @@ namespace FEAST
       template<>
       struct VTKHelper< Shape::Simplex<2> >
       {
-        enum
-        {
-          type = 5 // VTK_TRIANGLE
-        };
+        static constexpr int type = 5; // VTK_TRIANGLE
         static inline int map(int i)
         {
           return i;
@@ -49,10 +43,7 @@ namespace FEAST
       template<>
       struct VTKHelper< Shape::Simplex<3> >
       {
-        enum
-        {
-          type = 10 // VTK_TETRA
-        };
+        static constexpr int type = 10; // VTK_TETRA
         static inline int map(int i)
         {
           return i;
@@ -62,10 +53,7 @@ namespace FEAST
       template<>
       struct VTKHelper< Shape::Hypercube<1> >
       {
-        enum
-        {
-          type = 3 // VTK_LINE
-        };
+        static constexpr int type = 3; // VTK_LINE
         static inline int map(int i)
         {
           return i;
@@ -75,10 +63,7 @@ namespace FEAST
       template<>
       struct VTKHelper< Shape::Hypercube<2> >
       {
-        enum
-        {
-          type = 9 // VTK_QUAD
-        };
+        static constexpr int type = 9; // VTK_QUAD
         static inline int map(int i)
         {
           static int v[] = {0, 1, 3, 2};
@@ -89,10 +74,7 @@ namespace FEAST
       template<>
       struct VTKHelper< Shape::Hypercube<3> >
       {
-        enum
-        {
-          type = 12 // VTK_HEXAHEDRON
-        };
+        static constexpr int type = 12; // VTK_HEXAHEDRON
         static inline int map(int i)
         {
           static int v[] = {0, 1, 3, 2, 4, 5, 7, 6};

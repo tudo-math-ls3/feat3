@@ -294,10 +294,7 @@ namespace FEAST
       {
         typedef std::vector< std::vector<Index> > AdjStack;
         typedef AdjStack AdjStackMatrix[4][4];
-        enum
-        {
-          num_indices = Shape::FaceTraits<Shape_, 0>::count
-        };
+        static constexpr int num_indices = Shape::FaceTraits<Shape_, 0>::count;
         typedef IndexSet<num_indices> IdxSet;
 
         static void wrap(IndexSetHolder<Shape_>& idx, AdjStackMatrix& adj)

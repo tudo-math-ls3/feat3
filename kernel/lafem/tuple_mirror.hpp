@@ -32,12 +32,8 @@ namespace FEAST
       typedef TupleMirror<Rest_...> RestClass;
 
     public:
-      /// dummy enum
-      enum
-        {
-          /// number of mirror blocks
-          num_blocks = RestClass::num_blocks + 1
-        };
+      /// number of mirror blocks
+      static constexpr Index num_blocks = RestClass::num_blocks + 1;
 
       /// sub-mirror mem-type
       typedef typename First_::MemType MemType;
@@ -259,12 +255,8 @@ namespace FEAST
       friend class TupleMirror;
 
     public:
-      /// dummy enum
-      enum
-        {
-          /// number of mirror blocks
-          num_blocks = 1
-        };
+      /// number of mirror blocks
+      static constexpr Index num_blocks = 1;
 
       typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;

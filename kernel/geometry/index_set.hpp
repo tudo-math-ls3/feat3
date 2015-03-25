@@ -25,12 +25,8 @@ namespace FEAST
       static_assert(num_indices_ > 0, "invalid index count");
 
     public:
-      /// dummy enum
-      enum
-      {
-        /// number of indices per entry
-        num_indices = num_indices_
-      };
+      /// number of indices per entry
+      static constexpr int num_indices = num_indices_;
 
       /// index vector type
       typedef Index IndexVectorType[num_indices];

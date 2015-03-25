@@ -47,12 +47,8 @@ namespace FEAST
         /// shape type
         typedef typename TrafoType::ShapeType ShapeType;
 
-        /** \copydoc ElementBase::ElementCapabilities */
-        enum ElementCapabilities
-        {
-          /// node functionals available
-          have_node_func = 1
-        };
+        /// node functionals available
+        static constexpr bool have_node_func = true;
 
         /** \copydoc ElementBase::local_degree */
         static constexpr int local_degree = 1;
@@ -67,12 +63,8 @@ namespace FEAST
           /// evaluation policy
           typedef typename TrafoEvaluator_::EvalPolicy EvalPolicy;
 
-          /// dummy enum
-          enum
-          {
-            /// number of local dofs := number of facets per cell
-            num_loc_dofs = Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::count
-          };
+          /// number of local dofs := number of facets per cell
+          static constexpr int num_loc_dofs = Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::count;
 
           /// space evaluation traits
           typedef StandardScalarEvalTraits<EvalPolicy, num_loc_dofs, DataType_> Traits;
@@ -104,12 +96,8 @@ namespace FEAST
         class NodeFunctional
         {
         private:
-          /// dummy enum
-          enum
-          {
-            /// co-dimension
-            codim = ShapeType::dimension - shape_dim_,
-          };
+          /// co-dimension
+          static constexpr int codim = ShapeType::dimension - shape_dim_;
 
         public:
           /// node functional type

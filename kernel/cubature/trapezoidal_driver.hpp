@@ -18,11 +18,8 @@ namespace FEAST
         public DriverBase<Shape_>
       {
       public:
-        enum
-        {
-          /// this rule is not variadic
-          variadic = 0,
-        };
+        /// this rule is not variadic
+        static constexpr bool variadic = false;
 
         ///Returns the name of the cubature rule.
         static String name()
@@ -53,10 +50,7 @@ namespace FEAST
       public Intern::TrapezoidalDriverBase<Shape::Simplex<dim_> >
     {
     public:
-      enum
-      {
-        num_points = dim_ + 1
-      };
+      static constexpr int num_points = dim_ + 1;
 
       /**
        * \brief Fills the cubature rule structure.
@@ -90,10 +84,7 @@ namespace FEAST
       public Intern::TrapezoidalDriverBase<Shape::Hypercube<dim_> >
     {
     public:
-      enum
-      {
-        num_points = (1 << dim_) // = 2^dim_
-      };
+      static constexpr int num_points = (1 << dim_); // = 2^dim_
 
       /**
        * \brief Fills the cubature rule structure.

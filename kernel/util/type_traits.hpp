@@ -50,18 +50,14 @@ namespace FEAST
     template<>
     struct Traits<float>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is not integral
-        is_int = 0,
-        /// this type is floating
-        is_float = 1,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is signed
-        is_signed = 1
-      };
+      /// this type is not integral
+      static constexpr bool is_int = false;
+      /// this type is floating
+      static constexpr bool is_float = true;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
 
       /// this type is of floating class
       typedef FloatingClass TypeClass;
@@ -82,18 +78,14 @@ namespace FEAST
     template<>
     struct Traits<double>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is not integral
-        is_int = 0,
-        /// this type is floating
-        is_float = 1,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is signed
-        is_signed = 1
-      };
+      /// this type is not integral
+      static constexpr bool is_int = false;
+      /// this type is floating
+      static constexpr bool is_float = true;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
 
       /// this type is of floating class
       typedef FloatingClass TypeClass;
@@ -114,18 +106,14 @@ namespace FEAST
     template<>
     struct Traits<long double>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is not integral
-        is_int = 0,
-        /// this type is floating
-        is_float = 1,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is signed
-        is_signed = 1
-      };
+      /// this type is not integral
+      static constexpr bool is_int = false;
+      /// this type is floating
+      static constexpr bool is_float = true;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
 
       /// this type is of floating class
       typedef FloatingClass TypeClass;
@@ -146,18 +134,14 @@ namespace FEAST
     template<>
     struct Traits<unsigned int>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is  integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is unsigned
-        is_signed = 0
-      };
+      /// this type is  integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is unsigned
+      static constexpr bool is_signed = false;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -178,18 +162,14 @@ namespace FEAST
     template<>
     struct Traits<signed int>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is signed
-        is_signed = 1
-      };
+      /// this type is integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -210,18 +190,14 @@ namespace FEAST
     template<>
     struct Traits<unsigned char>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is unsigned
-        is_signed = 0
-      };
+      /// this type is integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is unsigned
+      static constexpr bool is_signed = false;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -242,18 +218,14 @@ namespace FEAST
     template<>
     struct Traits<signed char>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is signed
-        is_signed = 1
-      };
+      /// this type is integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -274,18 +246,14 @@ namespace FEAST
     template<>
     struct Traits<unsigned short>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is unsigned
-        is_signed = 0
-      };
+      /// this type is integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is unsigned
+      static constexpr bool is_signed = false;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -306,18 +274,14 @@ namespace FEAST
     template<>
     struct Traits<signed short>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is signed
-        is_signed = 1
-      };
+      /// this type is integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -338,18 +302,14 @@ namespace FEAST
     template<>
     struct Traits<unsigned long>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is unsigned
-        is_signed = 0
-      };
+      /// this type is integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is unsigned
+      static constexpr bool is_signed = false;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -370,18 +330,14 @@ namespace FEAST
     template<>
     struct Traits<signed long>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is signed
-        is_signed = 1
-      };
+      /// this type is integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -402,18 +358,14 @@ namespace FEAST
     template<>
     struct Traits<unsigned long long>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is unsigned
-        is_signed = 0
-      };
+      /// this type is integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is unsigned
+      static constexpr bool is_signed = false;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -434,18 +386,14 @@ namespace FEAST
     template<>
     struct Traits<signed long long>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is integral
-        is_int = 1,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is signed
-        is_signed = 1
-      };
+      /// this type is integral
+      static constexpr bool is_int = true;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
@@ -466,18 +414,14 @@ namespace FEAST
     template<>
     struct Traits<bool>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is not integral
-        is_int = 0,
-        /// this type is not floating
-        is_float = 0,
-        /// this type is not boolean
-        is_bool = 1,
-        /// this type is unsigned
-        is_signed = 0
-      };
+      /// this type is not integral
+      static constexpr bool is_int = false;
+      /// this type is not floating
+      static constexpr bool is_float = false;
+      /// this type is not boolean
+      static constexpr bool is_bool = true;
+      /// this type is unsigned
+      static constexpr bool is_signed = false;
 
       /// this type is of boolean class
       typedef BooleanClass TypeClass;
@@ -498,18 +442,14 @@ namespace FEAST
     template<>
     struct Traits<__float128>
     {
-      /// dummy enum
-      enum
-      {
-        /// this type is not integral
-        is_int = 0,
-        /// this type is floating
-        is_float = 1,
-        /// this type is not boolean
-        is_bool = 0,
-        /// this type is signed
-        is_signed = 1
-      };
+      /// this type is not integral
+      static constexpr bool is_int = false;
+      /// this type is floating
+      static constexpr bool is_float = true;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
 
       /// this type is of floating class
       typedef FloatingClass TypeClass;

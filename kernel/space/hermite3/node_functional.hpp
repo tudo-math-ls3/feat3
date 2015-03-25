@@ -48,11 +48,8 @@ namespace FEAST
         struct FunctionConfig :
           public Trafo::AnalyticConfigBase
         {
-          enum
-          {
-            need_value = 1,
-            need_grad = 1,
-          };
+          static constexpr bool need_value = true;
+          static constexpr bool need_grad = true;
         };
 
         typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
@@ -147,10 +144,7 @@ namespace FEAST
         struct FunctionConfig :
           public Trafo::AnalyticConfigBase
         {
-          enum
-          {
-            need_value = 1
-          };
+          static constexpr bool need_value = true;
         };
 
         typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
@@ -228,11 +222,8 @@ namespace FEAST
         struct FunctionConfig :
           public Trafo::AnalyticConfigBase
         {
-          enum
-          {
-            need_value = 1,
-            need_grad = 1,
-          };
+          static constexpr bool need_value = true;
+          static constexpr bool need_grad = true;
         };
 
         typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
@@ -325,12 +316,9 @@ namespace FEAST
         struct FunctionConfig :
           public Trafo::AnalyticConfigBase
         {
-          enum
-          {
-            need_value = 1,
-            need_grad = 1,
-            need_hess = 1
-          };
+          static constexpr bool need_value = true;
+          static constexpr bool need_grad = true;
+          static constexpr bool need_hess = true;
         };
 
         typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;

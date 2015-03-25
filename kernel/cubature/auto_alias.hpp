@@ -29,12 +29,8 @@ namespace FEAST
     class AutoAlias
     {
     public:
-      /// dummy enumeration
-      enum
-      {
-        /// Maximum specialised auto-degree parameter.
-        max_auto_degree = Intern::AutoDegree<Shape_>::max_degree
-      };
+      /// Maximum specialised auto-degree parameter.
+      static constexpr int max_auto_degree = Intern::AutoDegree<Shape_>::max_degree;
 
       static String map(const String& name)
       {
@@ -90,11 +86,8 @@ namespace FEAST
       class AutoDegree< Shape::Simplex<1> >
       {
       public:
-        enum
-        {
-          // We choose the Gauss-Legendre cubature rule, so our maximum degree is 2*n-1.
-          max_degree = 2*Scalar::GaussLegendreDriver::max_points - 1
-        };
+        // We choose the Gauss-Legendre cubature rule, so our maximum degree is 2*n-1.
+        static constexpr int max_degree = 2*Scalar::GaussLegendreDriver::max_points - 1;
 
         static String choose(Index degree)
         {
@@ -119,10 +112,7 @@ namespace FEAST
       class AutoDegree< Shape::Simplex<2> >
       {
       public:
-        enum
-        {
-          max_degree = 19
-        };
+        static constexpr int max_degree = 19;
 
         static String choose(Index degree)
         {
@@ -170,10 +160,7 @@ namespace FEAST
       class AutoDegree< Shape::Simplex<3> >
       {
       public:
-        enum
-        {
-          max_degree = 5
-        };
+        static constexpr int max_degree = 5;
 
         static String choose(Index degree)
         {
@@ -204,11 +191,8 @@ namespace FEAST
       class AutoDegree< Shape::Hypercube<dim_> >
       {
       public:
-        enum
-        {
-          // We choose the Gauss-Legendre cubature rule, so our maximum degree is 2*n-1.
-          max_degree = 2*Scalar::GaussLegendreDriver::max_points - 1
-        };
+        // We choose the Gauss-Legendre cubature rule, so our maximum degree is 2*n-1.
+        static constexpr int max_degree = 2*Scalar::GaussLegendreDriver::max_points - 1;
 
         static String choose(Index degree)
         {

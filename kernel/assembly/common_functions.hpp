@@ -407,13 +407,9 @@ namespace FEAST
         public AnalyticFunction
       {
       public:
-        /** \copydoc AnalyticFunction::FunctionCapabilities */
-        enum FunctionCapabilities
-        {
-          can_value = 1,
-          can_grad = 1,
-          can_hess = 1
-        };
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
 
         /** \copydoc AnalyticFunction::ConfigTraits */
         template<typename Config_>
@@ -503,13 +499,9 @@ namespace FEAST
         public AnalyticFunction
       {
       public:
-        /** \copydoc AnalyticFunction::FunctionCapabilities */
-        enum FunctionCapabilities
-        {
-          can_value = 1,
-          can_grad = 1,
-          can_hess = 1
-        };
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
 
         /** \copydoc AnalyticFunction::ConfigTraits */
         template<typename Config_>
@@ -523,10 +515,7 @@ namespace FEAST
           struct TrafoConfig :
             public Trafo::ConfigBase
           {
-            enum
-            {
-              need_img_point = 1
-            };
+            static constexpr bool need_img_point = true;
           };
         };
 
@@ -654,13 +643,10 @@ namespace FEAST
       public:
         /// Datatype for the point coordinates
         typedef typename ImgPointType_::DataType DataType;
-        /** \copydoc AnalyticFunction::FunctionCapabilities */
-        enum FunctionCapabilities
-        {
-          can_value = 1,
-          can_grad = 1,
-          can_hess = 1
-        };
+
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
 
         /** \copydoc AnalyticFunction::ConfigTraits */
         template<typename Config_>
@@ -674,10 +660,7 @@ namespace FEAST
           struct TrafoConfig :
             public Trafo::ConfigBase
           {
-            enum
-            {
-              need_img_point = 1
-            };
+            static constexpr bool need_img_point = true;
           };
         };
 
@@ -810,12 +793,9 @@ namespace FEAST
       public:
         /// Datatype for the point coordinates
         typedef typename ImgPointType_::DataType DataType;
-        /** \copydoc AnalyticFunction::FunctionCapabilities */
-        enum FunctionCapabilities
-        {
-          can_value = 1,
-          can_grad = 1,
-        };
+
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
 
         /** \copydoc AnalyticFunction::ConfigTraits */
         template<typename Config_>
@@ -829,10 +809,7 @@ namespace FEAST
           struct TrafoConfig :
             public Trafo::ConfigBase
           {
-            enum
-            {
-              need_img_point = 1
-            };
+            static constexpr bool need_img_point = true;
           };
         };
 
@@ -922,7 +899,6 @@ namespace FEAST
       template<typename DataType_>
       class HeavisideStatic
       {
-
       public:
 
         /// 1D: function value
@@ -976,7 +952,6 @@ namespace FEAST
       template<typename DataType_>
       class HeavisideRegStatic
       {
-
       public:
 
         /// 1D: function value
@@ -1151,16 +1126,12 @@ namespace FEAST
         public Assembly::AnalyticFunction
       {
       public:
-        /// dummy enum
-        enum
-        {
-          /// we provide function values
-          can_value = 1,
-          /// we provide function gradients
-          can_grad = 1,
-          /// we provide function hessians
-          can_hess = 1
-        };
+        /// we provide function values
+        static constexpr bool can_value = true;
+        /// we provide function gradients
+        static constexpr bool can_grad = true;
+        /// we provide function hessians
+        static constexpr bool can_hess = true;
 
         template<typename Config_>
         struct ConfigTraits
@@ -1168,10 +1139,7 @@ namespace FEAST
           struct TrafoConfig :
             public Trafo::ConfigBase
           {
-            enum
-            {
-              need_img_point = 1
-            };
+            static constexpr bool need_img_point = true;
           };
         };
 

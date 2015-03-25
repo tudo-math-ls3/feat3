@@ -41,12 +41,8 @@ namespace FEAST
         /// basis value coefficient type
         typedef typename SpaceEvalTraits::DataType DataType;
 
-        /** \copydoc EvaluatorBase::EvaluatorCapabilities */
-        enum EvaluatorCapabilities
-        {
-          /// can compute function values
-          can_value = 1
-        };
+        /// can compute function values
+        static constexpr bool can_value = true;
 
       public:
         /**

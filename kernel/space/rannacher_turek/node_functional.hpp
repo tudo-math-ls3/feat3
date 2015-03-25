@@ -51,12 +51,9 @@ namespace FEAST
         struct FunctionConfig :
           public Trafo::AnalyticConfigBase
         {
-          enum
-          {
-            need_value = 1,
-            need_grad = 0,
-            need_hess = 0
-          };
+          static constexpr bool need_value = true;
+          static constexpr bool need_grad = false;
+          static constexpr bool need_hess = false;
         };
 
         typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig FunctionTrafoConfig;
@@ -64,10 +61,7 @@ namespace FEAST
         struct TrafoConfig :
           public FunctionTrafoConfig
         {
-          enum
-          {
-            need_jac_det = 1
-          };
+          static constexpr bool need_jac_det = true;
         };
 
         typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;

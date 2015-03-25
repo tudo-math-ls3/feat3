@@ -14,7 +14,7 @@ namespace FEAST
     {
       template<
         typename Driver_,
-        bool variadic_ = (Driver_::variadic != 0)>
+        bool variadic_ = Driver_::variadic>
       class DriverFactoryAliasMapper;
     } // namespace Intern
     /// \endcond
@@ -40,7 +40,7 @@ namespace FEAST
     template<
       template<typename> class Driver_,
       typename Shape_,
-      bool variadic_ = (Driver_<Shape_>::variadic != 0)>
+      bool variadic_ = Driver_<Shape_>::variadic>
     class DriverFactory DOXY({});
 
     /**
@@ -56,11 +56,8 @@ namespace FEAST
     public:
       typedef Driver_<Shape_> DriverType;
       typedef Shape_ ShapeType;
-      enum
-      {
-        variadic = 0,
-        num_points = DriverType::num_points
-      };
+      static constexpr bool variadic = false;
+      static constexpr int num_points = DriverType::num_points;
 
     public:
       DriverFactory()
@@ -147,12 +144,9 @@ namespace FEAST
     public:
       typedef Driver_<Shape_> DriverType;
       typedef Shape_ ShapeType;
-      enum
-      {
-        variadic = 1,
-        min_points = DriverType::min_points,
-        max_points = DriverType::max_points
-      };
+      static constexpr bool variadic = true;
+      static constexpr int min_points = DriverType::min_points;
+      static constexpr int max_points = DriverType::max_points;
 
     protected:
       Index _num_points;

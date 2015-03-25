@@ -43,14 +43,10 @@ namespace FEAST
       /// index set holder type
       typedef StructIndexSetHolder<shape_dim_> IndexSetHolderType;
 
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = shape_dim_,
-        /// world dimension
-        world_dim = num_coords_
-      };
+      /// shape dimension
+      static constexpr int shape_dim = shape_dim_;
+      /// world dimension
+      static constexpr int world_dim = num_coords_;
 
       /**
        * \brief Index set type class template
@@ -321,12 +317,8 @@ namespace FEAST
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
 
-      /// dummy enum
-      enum
-      {
-        /// shape dimension
-        shape_dim = ShapeType::dimension
-      };
+      /// shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
 
     protected:
       /// coarse mesh reference

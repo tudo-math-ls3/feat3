@@ -34,12 +34,8 @@ namespace FEAST
       typedef TupleVector<Rest_...> RestClass;
 
     public:
-      /// dummy enum
-      enum
-        {
-          /// number of vector blocks
-          num_blocks = TupleVector<Rest_...>::num_blocks + 1
-        };
+      /// number of vector blocks
+      static constexpr Index num_blocks = TupleVector<Rest_...>::num_blocks + 1;
 
 
       /// sub-vector mem-type
@@ -339,10 +335,8 @@ namespace FEAST
       friend class TupleVector;
 
     public:
-      enum
-        {
-          num_blocks = 1
-        };
+      static constexpr Index num_blocks = 1;
+
       typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;

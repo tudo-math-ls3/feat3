@@ -45,12 +45,8 @@ namespace FEAST
         /// variant of the element
         typedef Variant_ VariantTag;
 
-        /** \copydoc ElementBase::ElementCapabilities */
-        enum ElementCapabilities
-        {
-          /// node functionals available
-          have_node_func = 1
-        };
+        /// node functionals available
+        static constexpr bool have_node_func = true;
 
         /** \copydoc ElementBase::local_degree */
         static constexpr int local_degree = 0;
@@ -96,12 +92,8 @@ namespace FEAST
         class NodeFunctional
         {
         private:
-          /// dummy enum
-          enum
-          {
-            /// co-dimension
-            codim = ShapeType::dimension - shape_dim_,
-          };
+          /// co-dimension
+          static constexpr int codim = ShapeType::dimension - shape_dim_;
 
         public:
           /// node functional type

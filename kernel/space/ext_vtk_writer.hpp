@@ -99,37 +99,25 @@ namespace FEAST
       struct TrafoVertexConfig :
         public Trafo::ConfigBase
       {
-        enum
-        {
-          need_img_point = 1
-        };
+        static constexpr bool need_img_point = true;
       };
 
       struct SpaceValueConfig :
         public Space::ConfigBase
       {
-        enum
-        {
-          need_value = 1
-        };
+        static constexpr bool need_value = true;
       };
 
       struct SpaceGradConfig :
         public Space::ConfigBase
       {
-        enum
-        {
-          need_grad = 1
-        };
+        static constexpr bool need_grad = true;
       };
 
       struct SpaceHessConfig :
         public Space::ConfigBase
       {
-        enum
-        {
-          need_hess = 1
-        };
+        static constexpr bool need_hess = true;
       };
 
     protected:

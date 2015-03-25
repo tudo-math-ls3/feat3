@@ -27,12 +27,8 @@ namespace FEAST
     class IndexTree
     {
     public:
-      /// dummy enum
-      enum
-      {
-        /// number of indices per index vector
-        num_indices = Shape::FaceTraits<Shape_, 0>::count
-      };
+      /// number of indices per index vector
+      static constexpr int num_indices = Shape::FaceTraits<Shape_, 0>::count;
 
       /// Index vector
       class IndexVector
@@ -364,10 +360,7 @@ namespace FEAST
       struct RisbWrapper
       {
         typedef typename Shape::FaceTraits<Shape_, face_dim_>::ShapeType FaceType;
-        enum
-        {
-          num_verts = Shape::FaceTraits<FaceType, 0>::count
-        };
+        static constexpr int num_verts = Shape::FaceTraits<FaceType, 0>::count;
 
         static void wrap(IndexSetHolder<Shape_>& ish)
         {

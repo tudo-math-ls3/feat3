@@ -31,12 +31,9 @@ namespace FEAST
       public DriverBase<Shape::Simplex<dim_> >
     {
     public:
-      enum
-      {
-        /// this rule is not variadic
-        variadic = 0,
-        num_points = (dim_ + 1)*(dim_ + 2)/2
-      };
+      /// this rule is not variadic
+      static constexpr bool variadic = false;
+      static constexpr int num_points = (dim_ + 1)*(dim_ + 2)/2;
 
       /// Returns the name of the cubature rule.
       static String name()
@@ -117,13 +114,10 @@ namespace FEAST
       public DriverBase<Shape::Simplex<3> >
     {
     public:
-      enum
-      {
-        /// this rule is not variadic
-        variadic = 0,
-        dim = 3,
-        num_points = (MetaMath::Factorial<dim + 4>::value)/(24*MetaMath::Factorial<dim>::value)
-      };
+      /// this rule is not variadic
+      static constexpr bool variadic = 0;
+      static constexpr int dim = 3;
+      static constexpr int num_points = (MetaMath::Factorial<dim + 4>::value)/(24*MetaMath::Factorial<dim>::value);
 
       /// Returns the name of the cubature rule.
       static String name()
