@@ -1357,6 +1357,8 @@ namespace FEAST
         //bool early_exit = 0;
         bool restarted = false;
 
+        // format solution vector
+        vec_sol.format();
 
         while(status == SolverStatus::progress)
         {
