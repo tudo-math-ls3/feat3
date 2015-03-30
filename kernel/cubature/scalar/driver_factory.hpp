@@ -152,8 +152,8 @@ namespace FEAST
         explicit DriverFactory(Index num_points) :
           _num_points(num_points)
         {
-          ASSERT_(num_points >= DriverType::min_points);
-          ASSERT_(num_points <= DriverType::max_points);
+          ASSERT_(num_points >= Index(DriverType::min_points));
+          ASSERT_(num_points <= Index(DriverType::max_points));
         }
 
         /**
@@ -180,7 +180,7 @@ namespace FEAST
         template<typename Weight_, typename Coord_>
         static bool create(Rule<Weight_, Coord_>& rule, Index num_points)
         {
-          if((num_points < DriverType::min_points) || (num_points > DriverType::max_points))
+          if((num_points < Index(DriverType::min_points)) || (num_points > Index(DriverType::max_points)))
             return false;
 
           rule = Rule<Weight_, Coord_>(num_points, (DriverType::name() + ":" + stringify(num_points)));

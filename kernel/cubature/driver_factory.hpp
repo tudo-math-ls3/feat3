@@ -183,7 +183,7 @@ namespace FEAST
       template<typename Weight_, typename Coord_, typename Point_>
       static bool create(Rule<Shape_, Weight_, Coord_, Point_>& rule, Index num_points)
       {
-        if((num_points < DriverType::min_points) || (num_points > DriverType::max_points))
+        if((num_points < Index(DriverType::min_points)) || (num_points > Index(DriverType::max_points)))
           return false;
 
         rule = Rule<Shape_, Weight_, Coord_, Point_>(DriverType::count(num_points),

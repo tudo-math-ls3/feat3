@@ -210,7 +210,7 @@ namespace FEAST
             rule.get_weight(count) = B3;
 
             // set point coords
-            for(Index k(0); k < dim; ++k)
+            for(Index k(0); k < Index(dim); ++k)
             {
               rule.get_coord(count,k) = ((k == j) || (k == i)) ? Coord_(1)/Coord_(2) : Coord_(0);
             } // k-loop

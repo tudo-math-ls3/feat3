@@ -83,7 +83,7 @@ namespace FEAST
             const Index cell)
             {
               DataType_ v = DataType_(0.);
-              for(Index d = 0; d < TrafoType_::MeshType::world_dim; d++)
+              for(Index d = 0; d < Index(TrafoType_::MeshType::world_dim); d++)
               {
                 v += Math::sqr(DataType_(vtx[idx(cell,1)][d]) - DataType_(vtx[idx(cell,0)][d]));
               }
@@ -178,7 +178,7 @@ namespace FEAST
               TrafoType_::MeshType::world_dim, shape_dim_ > A(0.);
 
               // Fill the matrix
-              for(Index i = 0; i < TrafoType_::MeshType::world_dim; i++ )
+              for(Index i = 0; i < Index(TrafoType_::MeshType::world_dim); i++ )
               {
                 for(Index j = 0; j < shape_dim_; j++)
                 {

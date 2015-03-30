@@ -42,7 +42,7 @@ namespace FEAST
 
         IndexVector(const IndexVector& iv)
         {
-          for(Index i(0); i < num_indices; ++i)
+          for(Index i(0); i < Index(num_indices); ++i)
             idx[i] = iv[i];
         }
 
@@ -59,7 +59,7 @@ namespace FEAST
         bool operator<(const IndexVector& other) const
         {
           // Lexicographical comparison ignoring the first entry
-          for(Index i(1); i < num_indices; ++i)
+          for(Index i(1); i < Index(num_indices); ++i)
           {
             if (idx[i] < other[i])
             {

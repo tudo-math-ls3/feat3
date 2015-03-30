@@ -155,8 +155,8 @@ namespace FEAST
        */
       Index operator()(Index i, Index j) const
       {
-        ASSERT_(i < _num_entities);
-        ASSERT_(j < num_indices);
+        ASSERT_(i < Index(_num_entities));
+        ASSERT_(j < Index(num_indices));
         return Intern::StructIndexMapping<shape_dim_, cell_dim_, face_dim_>::compute(i, j, _num_slices);
       }
 
@@ -178,14 +178,14 @@ namespace FEAST
       /** \copydoc Adjactor::image_begin() */
       ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT_(domain_node < _num_entities);
+        ASSERT_(domain_node < Index(_num_entities));
         return ImageIterator(_num_slices, domain_node, 0);
       }
 
       /** \copydoc Adjactor::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
-        ASSERT_(domain_node < _num_entities);
+        ASSERT_(domain_node < Index(_num_entities));
         return ImageIterator(_num_slices, domain_node, num_indices);
       }
     }; // class StructIndexSet<...>

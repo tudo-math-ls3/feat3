@@ -176,14 +176,14 @@ namespace FEAST
       CoordType& get_coord(Index i, Index j)
       {
         ASSERT(i < _num_points, "index i out-of-range");
-        ASSERT(j < dimension, "index j out-of-range");
+        ASSERT(j < Index(dimension), "index j out-of-range");
         return _points[i][j];
       }
 
       const CoordType& get_coord(Index i, Index j) const
       {
         ASSERT(i < _num_points, "index i out-of-range");
-        ASSERT(j < dimension, "index j out-of-range");
+        ASSERT(j < Index(dimension), "index j out-of-range");
         return _points[i][j];
       }
     }; // class Rule<...>
