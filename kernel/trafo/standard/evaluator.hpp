@@ -307,10 +307,7 @@ namespace FEAST
          */
         void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
         {
-          for(Index i(0); i < Index(image_dim); ++i)
-          {
-            hess_ten(i,0,0) = DataType(0);
-          }
+          hess_ten.format();
         }
       }; // class Evaluator<Simplex<1>,...>
 
@@ -476,10 +473,7 @@ namespace FEAST
          */
         void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
         {
-          for(Index i(0); i < Index(image_dim); ++i)
-          {
-            hess_ten.format(DataType(0));
-          }
+          hess_ten.format();
         }
       }; // class Evaluator<Simplex<2>,...>
 
@@ -651,10 +645,7 @@ namespace FEAST
          */
         void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
         {
-          for(Index i(0); i < Index(image_dim); ++i)
-          {
-            hess_ten.format(DataType(0));
-          }
+          hess_ten.format();
         }
       }; // class Evaluator<Simplex<3>,...>
 
@@ -816,10 +807,7 @@ namespace FEAST
          */
         void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
         {
-          for(Index i(0); i < Index(image_dim); ++i)
-          {
-            hess_ten(i,0,0) = DataType(0);
-          }
+          hess_ten.format();
         }
       }; // class Evaluator<Hypercube<1>,...>
 
@@ -1140,7 +1128,7 @@ namespace FEAST
               + dom_point[0] * (_coeff[i][1])
               + dom_point[1] * (_coeff[i][2] + dom_point[0]*_coeff[i][4])
               + dom_point[2] * (_coeff[i][3] + dom_point[0]*_coeff[i][5]
-                + dom_point[1]*(_coeff[i][6] + dom_point[0]*_coeff[i][7]));
+              + dom_point[1] * (_coeff[i][6] + dom_point[0]*_coeff[i][7]));
           }
         }
 
