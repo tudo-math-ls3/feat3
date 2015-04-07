@@ -357,6 +357,12 @@ namespace FEAST
       String _name;
       /// relative tolerance parameter
       DataType _tol_rel;
+      /// relative tolerance parameter
+      DataType _tol_abs;
+      /// relative divergence parameter
+      DataType _div_rel;
+      /// absolute divergence parameter
+      DataType _div_abs;
       /// minimum number of iterations
       Index _min_iter;
       /// maximum number of iterations
@@ -378,6 +384,9 @@ namespace FEAST
        * This constructor initialises the following values:
        *
        * - relative tolerance: sqrt(eps) (~1E-8 for double)
+       * - absolute tolerance: 1/eps^2 (~1E+32 for double)
+       * - relative divergence: 1/eps (~1E+16 for double)
+       * - absolute divergence: 1/eps^2 (~1E+32 for double)
        * - minimum iterations: 0
        * - maximum iterations: 100
        * - convergence plot: false
@@ -396,8 +405,10 @@ namespace FEAST
         _system_matrix(matrix),
         _system_filter(filter),
         _name(name),
-        //_tol_rel(1E-8),
         _tol_rel(Math::sqrt(Math::eps<DataType>())),
+        _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
+        _div_rel(DataType(1) / Math::eps<DataType>()),
+        _div_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
         _min_iter(0),
         _max_iter(100),
         _num_iter(0),
@@ -415,6 +426,48 @@ namespace FEAST
         _tol_rel = tol_rel;
       }
 
+      /// Sets the absolute tolerance for the solver.
+      void set_tol_abs(DataType tol_abs)
+      {
+        _tol_abs = tol_abs;
+      }
+
+      /// Returns the relative tolerance.
+      DataType get_tol_rel() const
+      {
+        return _tol_rel;
+      }
+
+      /// Returns the absolute tolerance.
+      DataType get_tol_abs() const
+      {
+        return _tol_abs;
+      }
+
+      /// Sets the relative divergence for the solver.
+      void set_div_rel(DataType div_rel)
+      {
+        _div_rel = div_rel;
+      }
+
+      /// Sets the absolute divergence for the solver.
+      void set_div_abs(DataType div_abs)
+      {
+        _div_abs = div_abs;
+      }
+
+      /// Returns the relative divergence.
+      DataType get_div_rel() const
+      {
+        return _div_rel;
+      }
+
+      /// Returns the absolute divergence.
+      DataType get_div_abs() const
+      {
+        return _div_abs;
+      }
+
       /// Sets the minimum iteration count for the solver.
       void set_min_iter(Index min_iter)
       {
@@ -425,6 +478,24 @@ namespace FEAST
       void set_max_iter(Index max_iter)
       {
         _max_iter = max_iter;
+      }
+
+      /// Returns number of performed iterations
+      Index get_num_iter() const
+      {
+        return _num_iter;
+      }
+
+      /// Returns the minimal number of iterations
+      Index get_min_iter() const
+      {
+        return _min_iter;
+      }
+
+      /// Returns the maximum number of iterations
+      Index get_max_iter() const
+      {
+        return _max_iter;
       }
 
       /**
@@ -441,13 +512,39 @@ namespace FEAST
       /// checks for convergence
       bool is_converged() const
       {
-        return ((_def_cur / _def_init) <= _tol_rel);
+        return (_def_cur <= _tol_abs) && (_def_cur <= (_tol_rel * _def_init));
       }
 
       /// checks for divergence
       bool is_diverged() const
       {
-        return _def_cur > DataType(1E+99);
+        return (_def_cur > _div_abs) || (_def_cur > (_div_rel * _def_init));
+      }
+
+      /// Returns the initial defect
+      DataType get_def_initial() const
+      {
+        return _def_init;
+      }
+
+      /// Returns the final defect
+      DataType get_def_final() const
+      {
+        return _def_cur;
+      }
+
+      /// Returns the overall convergence rate.
+      DataType get_conv_rate() const
+      {
+        // no iterations performed?
+        if(_num_iter <= Index(0))
+          return DataType(0);
+        // initial defect zero?
+        if(_def_init < Math::eps<DataType>())
+          return DataType(0);
+
+        // compute convergence rate: (def_final / def_initial) ^ (1 / #iter)
+        return Math::pow(_def_cur / _def_init, DataType(1) / DataType(_num_iter));
       }
 
       /**
