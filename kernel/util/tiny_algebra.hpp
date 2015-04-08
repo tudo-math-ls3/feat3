@@ -747,6 +747,26 @@ namespace FEAST
       }
 
       /**
+       * \brief Returns the trace of the matrix.
+       *
+       * This function computes and returns
+       * \f[ \sum_{i=0}^{\min(m,n)} A_{ii}\f]
+       * i.e. the sum of all main diagonal elements.
+       *
+       * \returns The trace of the matrix.
+       */
+      DataType trace() const
+      {
+        Index k = (m_ < n_ ? m_ : n_);
+        DataType r(0);
+        for(Index i(0); i < k; ++i)
+        {
+          r += v[i][i];
+        }
+        return r;
+      }
+
+      /**
        * \brief Returns the determinant of the matrix.
        *
        * \warning This function only works for \p m_ = \p n_ and will intentionally fail to compile in any other case.
