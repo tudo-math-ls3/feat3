@@ -17,6 +17,164 @@ namespace FEAST
     namespace Common
     {
       /**
+       * \brief Wrapper class for Tensor-Product scalar static functions
+       *
+       * This class can be used as a wrapper around another class implementing the
+       * StaticFunction interface for 1D. This class will then implement the 2D and 3D
+       * by using the tensor-product approach.
+       *
+       * \tparam Scalar_
+       * The name of the class implementing the StaticFunction interface for 1D.
+       *
+       * \tparam DataType_
+       * The data-type used by Scalar_.
+       *
+       * \author Peter Zajac
+       */
+      template<typename Scalar_, typename DataType_>
+      class TensorStatic
+      {
+      public:
+        /// 1D: function value
+        static DataType_ eval(DataType_ x)
+        {
+          return Scalar_::eval(x);
+        }
+
+        /// 1D: X-derivative
+        static DataType_ der_x(DataType_ x)
+        {
+          return Scalar_::der_x(x);
+        }
+
+        /// 1D: XX-derivative
+        static DataType_ der_xx(DataType_ x)
+        {
+          return Scalar_::der_xx(x);
+        }
+
+        /// 2D: function value
+        static DataType_ eval(DataType_ x, DataType_ y)
+        {
+          return Scalar_::eval(x) * Scalar_::eval(y);
+        }
+
+        /// 2D: X-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y)
+        {
+          return Scalar_::der_x(x) * Scalar_::eval(y);
+        }
+
+        /// 2D: Y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y)
+        {
+          return Scalar_::eval(x) * Scalar_::der_x(y);
+        }
+
+        /// 3D: function value
+        static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::eval(x) * Scalar_::eval(y) * Scalar_::eval(z);
+        }
+
+        /// 3D: X-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::der_x(x) * Scalar_::eval(y) * Scalar_::eval(z);
+        }
+
+        /// 3D: Y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::eval(x) * Scalar_::der_x(y) * Scalar_::eval(z);
+        }
+
+        /// 3D: Z-derivative
+        static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::eval(x) * Scalar_::eval(y) * Scalar_::der_x(z);
+        }
+
+        /// 2D: XX-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ y)
+        {
+          return Scalar_::der_xx(x) * Scalar_::eval(y);
+        }
+
+        /// 2D: YY-derivative
+        static DataType_ der_yy(DataType_ x, DataType_ y)
+        {
+          return Scalar_::eval(x) * Scalar_::der_xx(y);
+        }
+
+        /// 2D: XY-derivative
+        static DataType_ der_xy(DataType_ x, DataType_ y)
+        {
+          return Scalar_::der_x(x) * Scalar_::der_x(y);
+        }
+
+        /// 2D: YX-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y)
+        {
+          return Scalar_::der_x(x) * Scalar_::der_x(y);
+        }
+
+        /// 3D: XX-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::der_xx(x) * Scalar_::eval(y) * Scalar_::eval(z);
+        }
+
+        /// 3D: YY-derivative
+        static DataType_ der_yy(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::eval(x) * Scalar_::der_xx(y) * Scalar_::eval(z);
+        }
+
+        /// 3D: ZZ-derivative
+        static DataType_ der_zz(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::eval(x) * Scalar_::eval(y) * Scalar_::der_xx(z);
+        }
+
+        /// 3D: XY-derivative
+        static DataType_ der_xy(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::der_x(x) * Scalar_::der_y(x) * Scalar_::eval(z);
+        }
+
+        /// 3D: YX-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::der_x(x) * Scalar_::der_y(x) * Scalar_::eval(z);
+        }
+
+        /// 3D: XZ-derivative
+        static DataType_ der_xz(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::der_x(x) * Scalar_::eval(y) * Scalar_::der_x(z);
+        }
+
+        /// 3D: ZX-derivative
+        static DataType_ der_zx(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::der_x(x) * Scalar_::eval(y) * Scalar_::der_x(z);
+        }
+
+        /// 3D: YZ-derivative
+        static DataType_ der_yz(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::eval(x) * Scalar_::der_x(y) * Scalar_::der_x(z);
+        }
+
+        /// 3D: ZY-derivative
+        static DataType_ der_zy(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Scalar_::eval(x) * Scalar_::der_x(y) * Scalar_::der_x(z);
+        }
+      }; // class TensorStatic<...>
+
+      /**
        * \brief Sine-Tensor Static function
        *
        * This class implements the StaticFunction interface representing the function
@@ -395,19 +553,17 @@ namespace FEAST
       typedef StaticWrapperFunction<CosineWaveStatic, true, true, true> CosineWaveFunction;
 
       /**
-       * \brief Exponential-Bubble Static function
+       * \brief Exponential-Bubble scalar Static function
        *
        * This class implements the StaticFunction interface representing the function
-       *   - 1D: u(x)     = (exp(-(2*x - 1)^2) - exp(-1)) / (exp(-1) - 1)
-       *   - 2D: u(x,y)   = u(x) * u(y)
-       *   - 3D: u(x,y,z) = u(x) * u(y) * u(z)
+       *   - u(x) = (exp(-(2*x - 1)^2) - exp(-1)) / (exp(-1) - 1)
        *
        * This function fulfills homogene Dirichlet boundary conditions  on the unit-cube domain.
        *
        * \author Peter Zajac
        */
       template<typename DataType_>
-      class ExpBubbleStatic
+      class ExpBubbleScalarStatic
       {
       public:
         /// 1D: function value
@@ -416,52 +572,10 @@ namespace FEAST
           return (Math::exp(-Math::sqr(DataType_(2)*x - DataType_(1))) - Math::exp(-DataType_(1))) / (DataType_(1) - Math::exp(-DataType_(1)));
         }
 
-        /// 2D: function value
-        static DataType_ eval(DataType_ x, DataType_ y)
-        {
-          return eval(x) * eval(y);
-        }
-
-        /// 3D: function value
-        static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return eval(x) * eval(y) * eval(z);
-        }
-
         /// 1D: X-derivative
         static DataType_ der_x(DataType_ x)
         {
           return (DataType_(8)*x - DataType_(4))*Math::exp(-Math::sqr(DataType_(2)*x - DataType_(1))) / (Math::exp(-DataType_(1)) - DataType_(1));
-        }
-
-        /// 2D: X-derivative
-        static DataType_ der_x(DataType_ x, DataType_ y)
-        {
-          return der_x(x) * eval(y);
-        }
-
-        /// 2D: Y-derivative
-        static DataType_ der_y(DataType_ x, DataType_ y)
-        {
-          return eval(x) * der_x(y);
-        }
-
-        /// 3D: X-derivative
-        static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return der_x(x) * eval(y) * eval(z);
-        }
-
-        /// 3D: Y-derivative
-        static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return eval(x) * der_x(y) * eval(z);
-        }
-
-        /// 3D: Z-derivative
-        static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return eval(x) * eval(y) * der_x(z);
         }
 
         /// 1D: XX-derivative
@@ -469,85 +583,12 @@ namespace FEAST
         {
           return (DataType_(64)*x*(DataType_(1)-x)-DataType_(8)) * Math::exp(-Math::sqr(DataType_(2)*x - DataType_(1))) / (Math::exp(-DataType_(1)) - DataType_(1));
         }
+      }; // class ExpBubbleScalarStatic<...>
 
-        /// 2D: XX-derivative
-        static DataType_ der_xx(DataType_ x, DataType_ y)
-        {
-          return der_xx(x) * eval(y);
-        }
-
-        /// 2D: YY-derivative
-        static DataType_ der_yy(DataType_ x, DataType_ y)
-        {
-          return eval(x) * der_xx(y);
-        }
-
-        /// 2D: XY-derivative
-        static DataType_ der_xy(DataType_ x, DataType_ y)
-        {
-          return der_x(x) * der_x(y);
-        }
-
-        /// 2D: YX-derivative
-        static DataType_ der_yx(DataType_ x, DataType_ y)
-        {
-          return der_xy(x, y);
-        }
-
-        /// 3D: XX-derivative
-        static DataType_ der_xx(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return der_xx(x) * eval(y) * eval(z);
-        }
-
-        /// 3D: YY-derivative
-        static DataType_ der_yy(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return eval(x) * der_xx(y) * eval(z);
-        }
-
-        /// 3D: ZZ-derivative
-        static DataType_ der_zz(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return eval(x) * eval(y) * der_xx(z);
-        }
-
-        /// 3D: XY-derivative
-        static DataType_ der_xy(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return der_x(x) * der_y(x) * eval(z);
-        }
-
-        /// 3D: YX-derivative
-        static DataType_ der_yx(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return der_xy(x, y, z);
-        }
-
-        /// 3D: XZ-derivative
-        static DataType_ der_xz(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return der_x(x) * eval(y) * der_x(z);
-        }
-
-        /// 3D: ZX-derivative
-        static DataType_ der_zx(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return der_xz(x, y, z);
-        }
-
-        /// 3D: YZ-derivative
-        static DataType_ der_yz(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return eval(x) * der_x(y) * der_x(z);
-        }
-
-        /// 3D: ZY-derivative
-        static DataType_ der_zy(DataType_ x, DataType_ y, DataType_ z)
-        {
-          return der_yz(x, y, z);
-        }
-      }; // class ExpBubbleStatic<...>
+      /// \cond internal
+      template<typename DataType_>
+      using ExpBubbleStatic = TensorStatic<ExpBubbleScalarStatic<DataType_>, DataType_>;
+      /// \endcond
 
       /**
        * \brief Exponential-Bubble Analytic function
@@ -564,6 +605,60 @@ namespace FEAST
        * \author Peter Zajac
        */
       typedef StaticWrapperFunction<ExpBubbleStatic, true, true, true> ExpBubbleFunction;
+
+      /**
+       * \brief Q2-bubble scalar Static function
+       *
+       * This class implements the StaticFunction interface representing the function
+       *   - u(x) = 4*x*(1-x)
+       *
+       * This function fulfills homogene Dirichlet boundary conditions  on the unit-cube domain.
+       *
+       * \author Peter Zajac
+       */
+      template<typename DataType_>
+      class Q2BubbleScalarStatic
+      {
+      public:
+        /// 1D: function value
+        static DataType_ eval(DataType_ x)
+        {
+          return DataType_(4) * x * (DataType_(1) - x);
+        }
+
+        /// 1D: X-derivative
+        static DataType_ der_x(DataType_ x)
+        {
+          return DataType_(4) * (DataType_(1) - DataType_(2) * x);
+        }
+
+        /// 1D: XX-derivative
+        static DataType_ der_xx(DataType_)
+        {
+          return -DataType_(8);
+        }
+      }; // class Q2BubbleScalarStatic<...>
+
+      /// \cond internal
+      template<typename DataType_>
+      using Q2BubbleStatic = TensorStatic<Q2BubbleScalarStatic<DataType_>, DataType_>;
+      /// \endcond
+
+      /**
+       * \brief Exponential-Bubble Analytic function
+       *
+       * This class implements the AnalyticFunction interface representing the function
+       *   - 1D: u(x)     =  4*x*(1-x)
+       *   - 2D: u(x,y)   = 16*x*(1-x)*y*(1-y)
+       *   - 3D: u(x,y,z) = 64*x*(1-x)*y*(1-y)*z*(1-z)
+       *
+       * This class supports function values, gradient and hessians for all dimensions.
+       *
+       * This function fulfills homogene Dirichlet boundary conditions on the unit-cube domain.
+       *
+       * \author Peter Zajac
+       */
+      typedef StaticWrapperFunction<Q2BubbleStatic, true, true, true> Q2BubbleFunction;
 
       /**
        * \brief Constant Analytic function
