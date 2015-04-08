@@ -144,7 +144,7 @@ namespace FEAST
       /// \returns The index array.
       const IT_* get_indices() const
       {
-        return _sv.indices;
+        return _sv.indices();
       }
 
       /// \returns The value array.
