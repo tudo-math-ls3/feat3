@@ -137,6 +137,17 @@ namespace FEAST
         _sv.clear();
       }
 
+      /// \cond internal
+      SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector()
+      {
+        return _sv;
+      }
+      const SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector() const
+      {
+        return _sv;
+      }
+      /// \endcond
+
       /**
        * \brief Adds one element to the filter
        *
@@ -149,8 +160,14 @@ namespace FEAST
         _sv(idx, val);
       }
 
-      /// \returns The number of entries in the filter.
+      /// \returns The total size of the filter.
       Index size() const
+      {
+        return _sv.size();
+      }
+
+      /// \returns The number of entries in the filter.
+      Index used_elements() const
       {
         return _sv.used_elements();
       }

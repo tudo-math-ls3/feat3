@@ -48,11 +48,11 @@ namespace FEAST
       /**
        * \brief Constructor.
        *
-       * \param[in] num_entries
-       * The total number of entries for the unit filter.
+       * \param[in] size_in
+       * The total size of the unit filter.
        */
-      explicit UnitFilter(Index num_entries) :
-        _sv(num_entries)
+      explicit UnitFilter(Index size_in) :
+        _sv(size_in)
       {
       }
 
@@ -117,6 +117,17 @@ namespace FEAST
         _sv.clear();
       }
 
+      /// \cond internal
+      SparseVector<Mem_, DT_, IT_>& get_filter_vector()
+      {
+        return _sv;
+      }
+      const SparseVector<Mem_, DT_, IT_>& get_filter_vector() const
+      {
+        return _sv;
+      }
+      /// \endcond
+
       /**
        * \brief Adds one element to the filter
        *
@@ -129,8 +140,14 @@ namespace FEAST
         _sv(idx, val);
       }
 
-      /// \returns The number of entries in the filter.
+      /// \returns The total size of the filter.
       Index size() const
+      {
+        return _sv.size();
+      }
+
+      /// \returns The number of entries in the filter.
+      Index used_elements() const
       {
         return _sv.used_elements();
       }

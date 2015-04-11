@@ -67,7 +67,7 @@ public:
     br(6, tmp);
 
     // create filter
-    FilterType filter(IT_(7));
+    FilterType filter(n);
 
     tmp = DT_(-17);
     tmp(BlockSize_-1) = DT_(711);
@@ -76,6 +76,10 @@ public:
     filter.add(IT_(2), tmp);
     tmp = DT_(-7);
     filter.add(IT_(6), tmp);
+
+    // check sizes
+    TEST_CHECK_EQUAL(filter.size(), n);
+    TEST_CHECK_EQUAL(filter.used_elements(), Index(3));
 
     // apply the filter
     filter.template filter_def<Algo_>(a1);

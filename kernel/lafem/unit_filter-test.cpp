@@ -51,10 +51,14 @@ public:
     br(6, DT_(9));
 
     // create filter
-    FilterType filter(IT_(7));
+    FilterType filter(n);
     filter.add(IT_(0), DT_(3));
     filter.add(IT_(2), DT_(5));
     filter.add(IT_(6), DT_(9));
+
+    // check sizes
+    TEST_CHECK_EQUAL(filter.size(), n);
+    TEST_CHECK_EQUAL(filter.used_elements(), Index(3));
 
     // apply the filter
     filter.template filter_def<Algo_>(a1);
