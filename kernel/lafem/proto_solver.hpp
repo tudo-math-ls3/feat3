@@ -561,7 +561,7 @@ namespace FEAST
        * the solve() method to obtain a correction vector and update the solution vector with it.
        *
        * \param[in,out] vec_sol
-       * The vector that shall contains the initial solution upon entry and receives the solution
+       * The vector that contains the initial solution upon entry and receives the solution
        * of the linear system upon exit.
        *
        * \param[in] vec_rhs
@@ -734,8 +734,10 @@ namespace FEAST
       typedef SolverInterface<VectorType> PrecondType;
 
     protected:
-      // a pointer to the preconditioner
+      /// the pointer to the preconditioner
       PrecondType* _precond;
+      /// specifies whether to delete the preconditioner upon destruction
+      bool _del_precond;
 
       /**
        * \brief Constructor
@@ -752,13 +754,23 @@ namespace FEAST
        * \param[in] precond
        * A pointer to the preconditioner. May be nullptr.
        *
-       * \attention
-       * This class does \b not delete the preconditioner object upon destruction!
+       * \param[in] del_precond
+       * Specifies whether the preconditioner object should be deleted upund
+       * destruction of this solver object.
        */
-      explicit PreconditionedIterativeSolver(String name, const MatrixType& matrix, const FilterType& filter, PrecondType* precond = nullptr) :
+      explicit PreconditionedIterativeSolver(String name, const MatrixType& matrix, const FilterType& filter,
+        PrecondType* precond = nullptr, bool del_precond = false) :
         BaseClass(name, matrix, filter),
-        _precond(precond)
+        _precond(precond),
+        _del_precond(del_precond)
       {
+      }
+
+      /// virtual destructor
+      virtual ~PreconditionedIterativeSolver()
+      {
+        if((_precond != nullptr) && _del_precond)
+          delete _precond;
       }
 
     public:
@@ -873,9 +885,14 @@ namespace FEAST
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
+       *
+       * \param[in] del_precond
+       * Specifies whether the preconditioner object should be deleted upund
+       * destruction of this solver object.
        */
-      explicit FixPointSolver(const MatrixType& matrix, const FilterType& filter, PrecondType* precond = nullptr) :
-        BaseClass("FixPoint", matrix, filter, precond)
+      explicit FixPointSolver(const MatrixType& matrix, const FilterType& filter,
+        PrecondType* precond = nullptr, bool del_precond = false) :
+        BaseClass("FixPoint", matrix, filter, precond, del_precond)
       {
       }
 
@@ -951,7 +968,7 @@ namespace FEAST
           status = this->_set_new_defect(vec_def);
         }
 
-        // we should never reach this point...
+        // return our status
         return status;
       }
     }; // class FixPointSolver<...>
@@ -1009,9 +1026,14 @@ namespace FEAST
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
+       *
+       * \param[in] del_precond
+       * Specifies whether the preconditioner object should be deleted upund
+       * destruction of this solver object.
        */
-      explicit PCGSolver(const MatrixType& matrix, const FilterType& filter, PrecondType* precond = nullptr) :
-        BaseClass("PCG", matrix, filter, precond)
+      explicit PCGSolver(const MatrixType& matrix, const FilterType& filter,
+        PrecondType* precond = nullptr, bool del_precond = false) :
+        BaseClass("PCG", matrix, filter, precond, del_precond)
       {
       }
 
@@ -1157,8 +1179,6 @@ namespace FEAST
     protected:
       /// krylov dimension
       Index _krylov_dim;
-      /// right-hand-side vector
-      VectorType _vec_b;
       /// krylov basis vectors
       std::vector<VectorType> _vec_v, _vec_z;
       /// Givens rotation coefficients
@@ -1181,9 +1201,14 @@ namespace FEAST
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
+       *
+       * \param[in] del_precond
+       * Specifies whether the preconditioner object should be deleted upund
+       * destruction of this solver object.
        */
-      explicit FGMRESSolver(const MatrixType& matrix, const FilterType& filter, Index krylov_dim, PrecondType* precond = nullptr) :
-        BaseClass("FGMRES(" + stringify(krylov_dim) + ")", matrix, filter, precond),
+      explicit FGMRESSolver(const MatrixType& matrix, const FilterType& filter, Index krylov_dim,
+        PrecondType* precond = nullptr, bool del_precond = false) :
+        BaseClass("FGMRES(" + stringify(krylov_dim) + ")", matrix, filter, precond, del_precond),
         _krylov_dim(krylov_dim)
       {
         _c.reserve(krylov_dim);
@@ -1198,12 +1223,11 @@ namespace FEAST
       {
         if(!BaseClass::init_symbolic())
           return false;
-        _vec_b = this->_system_matrix.create_vector_r();
-        _vec_v.push_back(this->_vec_b.clone(CloneMode::Layout));
+        _vec_v.push_back(this->_system_matrix.create_vector_r());
         for(Index i(0); i < _krylov_dim; ++i)
         {
-          _vec_v.push_back(this->_vec_b.clone(CloneMode::Layout));
-          _vec_z.push_back(this->_vec_b.clone(CloneMode::Layout));
+          _vec_v.push_back(this->_vec_v.front().clone(CloneMode::Layout));
+          _vec_z.push_back(this->_vec_v.front().clone(CloneMode::Layout));
         }
         return true;
       }
@@ -1216,9 +1240,8 @@ namespace FEAST
 
       virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
-        // save input rhs vector
-        this->_vec_b.copy(vec_rhs);
-        this->_vec_v.at(0).copy(this->_vec_b);
+        // save input rhs vector as initial defect
+        this->_vec_v.at(0).copy(vec_rhs);
         this->_system_filter.template filter_def<AlgoType>(this->_vec_v.at(0));
 
         // clear solution vector
@@ -1230,10 +1253,7 @@ namespace FEAST
 
       virtual SolverStatus correct(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
-        // save input rhs vector
-        this->_vec_b.copy(vec_rhs);
-
-        // compute defect
+        // compute initial defect
         this->_system_matrix.template apply<AlgoType>(this->_vec_v.at(0), vec_sol, vec_rhs, -DataType(1));
         this->_system_filter.template filter_def<AlgoType>(this->_vec_v.at(0));
 
@@ -1242,10 +1262,10 @@ namespace FEAST
       }
 
     protected:
-      virtual SolverStatus _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
+      virtual SolverStatus _apply_intern(VectorType& vec_sol, const VectorType& vec_rhs)
       {
         // compute initial defect
-        SolverStatus status = this->_set_initial_defect(this->_vec_b);
+        SolverStatus status = this->_set_initial_defect(this->_vec_v.at(0));
 
         // outer GMRES loop
         while(status == SolverStatus::progress)
@@ -1325,7 +1345,7 @@ namespace FEAST
             vec_sol.template axpy<AlgoType>(this->_vec_z.at(k), vec_sol, this->_q.at(k));
 
           // compute "real" residual
-          this->_system_matrix.template apply<AlgoType>(this->_vec_v.at(0), vec_sol, this->_vec_b, -DataType(1));
+          this->_system_matrix.template apply<AlgoType>(this->_vec_v.at(0), vec_sol, vec_rhs, -DataType(1));
           this->_system_filter.template filter_def<AlgoType>(this->_vec_v.at(0));
 
           // set the current defect
@@ -1395,9 +1415,14 @@ namespace FEAST
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
+       *
+       * \param[in] del_precond
+       * Specifies whether the preconditioner object should be deleted upund
+       * destruction of this solver object.
        */
-      explicit BiCGStabSolver(const MatrixType& matrix, const FilterType& filter, PrecondType* precond = nullptr) :
-        BaseClass("BiCGStab", matrix, filter, precond)
+      explicit BiCGStabSolver(const MatrixType& matrix, const FilterType& filter,
+        PrecondType* precond = nullptr, bool del_precond = false) :
+        BaseClass("BiCGStab", matrix, filter, precond, del_precond)
       {
       }
 
@@ -1434,7 +1459,29 @@ namespace FEAST
         this->_vec_t_tilde.clear();
       }
 
+      virtual SolverStatus correct(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        // compute initial defect
+        this->_system_matrix.template apply<AlgoType_>(this->_vec_r, vec_sol, vec_rhs, -DataType(1));
+        this->_system_filter.template filter_def<AlgoType_>(this->_vec_r);
+
+        // apply
+        return _apply_intern(vec_sol, vec_rhs);
+      }
+
       virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        // save rhs vector as initial defect
+        this->_vec_r.copy(vec_rhs);
+        this->_system_filter.template filter_def<AlgoType_>(this->_vec_r);
+
+        // format solution vector
+        vec_sol.format();
+        return _apply_intern(vec_sol, vec_rhs);
+      }
+
+    protected:
+      virtual SolverStatus _apply_intern(VectorType& vec_sol, const VectorType& vec_rhs)
       {
         VectorType& vec_r        (this->_vec_r);
         VectorType& vec_r_tilde  (this->_vec_r_tilde);
@@ -1454,17 +1501,17 @@ namespace FEAST
         //bool early_exit = 0;
         bool restarted = false;
 
-        // format solution vector
-        vec_sol.format();
-
         while(status == SolverStatus::progress)
         {
-          mat_sys.template apply<AlgoType_>(vec_r, vec_sol, vec_rhs, -DataType(1));
-          fil_sys.template filter_def<AlgoType_>(vec_r);
-
           if (restarted == false)
           {
+            // initial defect is already computed
             status = this->_set_initial_defect(vec_r);
+          }
+          else
+          {
+            mat_sys.template apply<AlgoType_>(vec_r, vec_sol, vec_rhs, -DataType(1));
+            fil_sys.template filter_def<AlgoType_>(vec_r);
           }
 
           // apply preconditioner
