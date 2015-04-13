@@ -140,13 +140,13 @@ namespace FEAST
         /// 3D: XY-derivative
         static DataType_ der_xy(DataType_ x, DataType_ y, DataType_ z)
         {
-          return Scalar_::der_x(x) * Scalar_::der_y(x) * Scalar_::eval(z);
+          return Scalar_::der_x(x) * Scalar_::der_x(y) * Scalar_::eval(z);
         }
 
         /// 3D: YX-derivative
         static DataType_ der_yx(DataType_ x, DataType_ y, DataType_ z)
         {
-          return Scalar_::der_x(x) * Scalar_::der_y(x) * Scalar_::eval(z);
+          return Scalar_::der_x(x) * Scalar_::der_x(y) * Scalar_::eval(z);
         }
 
         /// 3D: XZ-derivative
