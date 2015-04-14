@@ -186,7 +186,7 @@ namespace FEAST
        * The corresponding eigenvalue is \f$ \lambda = -d (k\pi)^2 \f$, where \e d is the dimension of the domain.
        *
        * Moreover, on any rectangular/rectoid domain [x0,x1]x[y0,y1]x[z0,z1] with integral domain
-       * boundaries xi,yi,zi, this function fulfills homogene Dirichlet boundary conditions.
+       * boundaries xi,yi,zi, this function fulfills homogeneous Dirichlet boundary conditions.
        *
        * \author Peter Zajac
        */
@@ -356,7 +356,7 @@ namespace FEAST
        *
        * This class supports function values, gradient and hessians for all dimensions.
        *
-       * This function fulfills homogene Dirichlet boundary conditions on the unit-cube domain.
+       * This function fulfills homogeneous Dirichlet boundary conditions on the unit-cube domain.
        *
        * \author Peter Zajac
        */
@@ -374,7 +374,7 @@ namespace FEAST
        * The corresponding eigenvalue is \f$ \lambda = -d (k\pi)^2 \f$, where \e d is the dimension of the domain.
        *
        * Moreover, on any rectangular/rectoid domain [x0,x1]x[y0,y1]x[z0,z1] with integral domain
-       * boundaries xi,yi,zi, this function fulfills homogene Neumann boundary conditions including
+       * boundaries xi,yi,zi, this function fulfills homogeneous Neumann boundary conditions including
        * the integral-mean condition \f$ int_\Omega u = 0 \f$.
        *
        * \author Peter Zajac
@@ -545,7 +545,7 @@ namespace FEAST
        *
        * This class supports function values, gradient and hessians for all dimensions.
        *
-       * This function fulfills homogene Neumann boundary conditions and has vanishing integral
+       * This function fulfills homogeneous Neumann boundary conditions and has vanishing integral
        * mean on the unit-cube domain.
        *
        * \author Peter Zajac
@@ -558,7 +558,7 @@ namespace FEAST
        * This class implements the StaticFunction interface representing the function
        *   - u(x) = (exp(-(2*x - 1)^2) - exp(-1)) / (exp(-1) - 1)
        *
-       * This function fulfills homogene Dirichlet boundary conditions  on the unit-cube domain.
+       * This function fulfills homogeneous Dirichlet boundary conditions on the unit cube domain.
        *
        * \author Peter Zajac
        */
@@ -600,7 +600,7 @@ namespace FEAST
        *
        * This class supports function values, gradient and hessians for all dimensions.
        *
-       * This function fulfills homogene Dirichlet boundary conditions on the unit-cube domain.
+       * This function fulfills homogeneous Dirichlet boundary conditions on the unit-cube domain.
        *
        * \author Peter Zajac
        */
@@ -612,7 +612,7 @@ namespace FEAST
        * This class implements the StaticFunction interface representing the function
        *   - u(x) = 4*x*(1-x)
        *
-       * This function fulfills homogene Dirichlet boundary conditions  on the unit-cube domain.
+       * This function fulfills homogeneous Dirichlet boundary conditions on the unit-cube domain.
        *
        * \author Peter Zajac
        */
@@ -654,7 +654,7 @@ namespace FEAST
        *
        * This class supports function values, gradient and hessians for all dimensions.
        *
-       * This function fulfills homogene Dirichlet boundary conditions on the unit-cube domain.
+       * This function fulfills homogeneous Dirichlet boundary conditions on the unit-cube domain.
        *
        * \author Peter Zajac
        */
@@ -829,16 +829,12 @@ namespace FEAST
             DataType norm(value(tau));
 
             if(norm <= Math::eps<DataType>())
-            {
               return grad;
-            }
-            else
-            {
-              for(Index d(0); d < TrafoData::image_dim; ++d)
-                grad(d,tau.img_point[d] - _function._point(d));
 
-              return grad/norm;
-            }
+            for(Index d(0); d < TrafoData::image_dim; ++d)
+              grad(d,tau.img_point[d] - _function._point(d));
+
+            return grad/norm;
           }
 
           HessianType hessian(const TrafoData& tau) const
@@ -846,25 +842,21 @@ namespace FEAST
             HessianType hess(DataType(0));
             DataType norm(value(tau));
             if(norm <= Math::eps<DataType>())
-            {
               return hess;
-            }
-            else
+
+            norm = DataType(1)/norm;
+            DataType denom = Math::sqr(norm)*norm;
+
+            for(Index i(0); i < TrafoData::image_dim; ++i)
             {
-              norm = DataType(1)/norm;
-              DataType denom = Math::sqr(norm)*norm;
-
-              for(Index i(0); i < TrafoData::image_dim; ++i)
-              {
-                hess(i,i, DataType(1)*norm);
-                for(Index j(0); j < TrafoData::image_dim; ++i)
-                  hess(i,j,
-                  ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
-              }
-
-
-              return hess;
+              hess(i,i, DataType(1)*norm);
+              for(Index j(0); j < TrafoData::image_dim; ++i)
+                hess(i,j,
+                ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
             }
+
+
+            return hess;
           }
         }; // class DistanceFunction::Evaluator<...>
 
@@ -973,17 +965,12 @@ namespace FEAST
             GradientType grad(DataType(0));
             DataType norm(value(tau));
             if(norm <= Math::eps<DataType>())
-            {
               return grad;
-            }
-            else
-            {
 
-              for(Index d(0); d < TrafoData::image_dim; ++d)
-                grad(d,tau.img_point[d] - _function._point(d));
+            for(Index d(0); d < TrafoData::image_dim; ++d)
+              grad(d,tau.img_point[d] - _function._point(d));
 
-              return _function._b*grad/norm;
-            }
+            return _function._b*grad/norm;
           }
 
           HessianType hessian(const TrafoData& tau) const
@@ -991,24 +978,20 @@ namespace FEAST
             HessianType hess(DataType(0));
             DataType norm(value(tau));
             if(norm <= Math::eps<DataType>())
-            {
               return hess;
-            }
-            else
+
+            norm = DataType(1)/norm;
+            DataType denom = Math::sqr(_function._b)*Math::sqr(norm)*norm;
+
+            for(Index i(0); i < TrafoData::image_dim; ++i)
             {
-              norm = DataType(1)/norm;
-              DataType denom = Math::sqr(_function._b)*Math::sqr(norm)*norm;
-
-              for(Index i(0); i < TrafoData::image_dim; ++i)
-              {
-                hess(i,i, DataType(1)*norm);
-                for(Index j(0); j < TrafoData::image_dim; ++i)
-                  hess(i,j,
-                  ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
-              }
-
-              return hess;
+              hess(i,i, DataType(1)*norm);
+              for(Index j(0); j < TrafoData::image_dim; ++i)
+                hess(i,j,
+                ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
             }
+
+            return hess;
           }
         }; // class DistanceFunctionSD::Evaluator<...>
 
