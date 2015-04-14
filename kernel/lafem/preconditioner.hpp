@@ -2413,7 +2413,7 @@ namespace FEAST
               _a_columnwise[pcol_ind[l]].emplace_back(pval[l], i);
             }
           }
-        } // function create_a_aolumnwise
+        } // function create_a_columnwise
 
         void create_m_transpose ()
         {
