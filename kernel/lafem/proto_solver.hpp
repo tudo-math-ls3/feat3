@@ -910,6 +910,7 @@ namespace FEAST
       {
         this->_vec_cor.clear();
         this->_vec_def.clear();
+        BaseClass::done_symbolic();
       }
 
       virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
@@ -1053,6 +1054,7 @@ namespace FEAST
         this->_vec_tmp.clear();
         this->_vec_dir.clear();
         this->_vec_def.clear();
+        BaseClass::done_symbolic();
       }
 
       virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
@@ -1236,6 +1238,7 @@ namespace FEAST
       {
         _vec_v.clear();
         _vec_z.clear();
+        BaseClass::done_symbolic();
       }
 
       virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
@@ -1457,6 +1460,7 @@ namespace FEAST
         this->_vec_s_tilde.clear();
         this->_vec_t.clear();
         this->_vec_t_tilde.clear();
+        BaseClass::done_symbolic();
       }
 
       virtual SolverStatus correct(VectorType& vec_sol, const VectorType& vec_rhs) override
