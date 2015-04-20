@@ -84,7 +84,7 @@ class RumpfSmootherTest_2d
     typedef DataType_ DataType;
 
     typedef ShapeType_ ShapeType;
-    typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension,ShapeType::dimension, DataType> MeshType;
+    typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     typedef FunctionalType_<DataType, ShapeType> FunctionalType;
@@ -123,7 +123,6 @@ class RumpfSmootherTest_2d
       rumpflpumpfl.set_coords();
       rumpflpumpfl.init();
 
-
       // Compute initial functional value
       DataType fval_pre = rumpflpumpfl.compute_functional();
       // Optimise the mesh
@@ -131,7 +130,7 @@ class RumpfSmootherTest_2d
       // Compute new functional value
       DataType fval_post = rumpflpumpfl.compute_functional();
 
-      const DataType eps = Math::eps<DataType_>();
+      const DataType eps = Math::pow(Math::eps<DataType_>(),DataType(0.8));
       TEST_CHECK_EQUAL_WITHIN_EPS(fval_pre, fval_post, eps);
 
     }
@@ -162,8 +161,20 @@ template<typename A, typename B>
 using MyFunctionalQ1Hack_D2 = Geometry::RumpfFunctionalQ1Hack<A, B, Geometry::RumpfFunctional_D2>;
 
 RumpfSmootherTest_2d<float, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack> test_q1hack_f_1;
-RumpfSmootherTest_2d<float, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack_D2, MySmootherQ1Hack> test_q1hack_f_2;
 RumpfSmootherTest_2d<double, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack> test_q1hack_d_1;
+
+/// \compilerhack
+// The MSVC CTP_Nov2013 contains a bug that causes the compiler to skip template aliases when generating its
+// COMDATs (compiler generated decorated function names) so it cannot distinguish between these function names and
+// the ones above. The bug has been fixed in the regular version of the compiler (which we cannot use due to missing
+// C++11 features), but not in the CTP_Nov2013 version.
+//
+// See http://blogs.msdn.com/b/vcblog/archive/2014/08/04/bugs-fixed-in-visual-studio-2013-update-3.aspx
+//
+// Compiler hack to be removed once the new (Visual Studio 201{>13}) compiler is deployed.
+#ifndef FEAST_COMPILER_MICROSOFT
 RumpfSmootherTest_2d<double, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack_D2, MySmootherQ1Hack> test_q1hack_d_2;
+RumpfSmootherTest_2d<float, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack_D2, MySmootherQ1Hack> test_q1hack_f_2;
+#endif
 
 #endif

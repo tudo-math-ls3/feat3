@@ -7,11 +7,11 @@
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
-#include <kernel/assembly/dirichlet_assembler.hpp>         // for DirichletAssembler
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/lafem/bicgstab.hpp>
+#include <kernel/lafem/proto_solver.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/lafem/preconditioner.hpp>
@@ -71,6 +71,10 @@ namespace FEAST
         typedef LAFEM::DenseVector<MemType, DataType> SubVectorType;
         typedef LAFEM::SparseMatrixCSR<MemType, DataType> SubMatrixType;
 
+        // Chose your poison: UnitFilter means bogus UnitFilter values for the Laplacian, if they are zero then the
+        // whole method is equivalent to just using the Laplace smoother.
+        // Or use a filter for Neuman BVs for the Laplacian. Unfortunately, only homogeneous Neumann BVs are
+        // implemented now, and this does not make any sense for the mesh coordinate distribution point of view.
         typedef LAFEM::NoneFilter<MemType, DataType, IndexType> SubFilterType0;
         typedef LAFEM::UnitFilter<MemType, DataType, IndexType> SubFilterType1;
 
@@ -78,15 +82,13 @@ namespace FEAST
         typedef LAFEM::TupleVector<SubVectorType, SubVectorType> VectorType;
         typedef LAFEM::SaddlePointMatrix<SubMatrixType> MatrixType;
 
-        typedef Algo::Generic AlgoType;
-
       protected:
         SpaceType _trafo_space;
         MatrixType _sys_matrix;
         VectorType _vec_rhs;
         Cubature::DynamicFactory _cubature_factory;
         FilterType _filter;
-        Assembly::DirichletAssembler<SpaceType> _dirichlet_asm;
+        Assembly::UnitFilterAssembler<MeshType> _dirichlet_asm;
 
       public:
         /// Constructor
@@ -97,24 +99,28 @@ namespace FEAST
           _vec_rhs(),
           _cubature_factory("auto-degree:5"),
           _filter(),
-          _dirichlet_asm(_trafo_space)
+          _dirichlet_asm()
           {
             /// Type for the boundary mesh
-            typedef typename Geometry::CellSubSet<ShapeType> BoundaryType;
+            typedef typename Geometry::MeshPart<MeshType> BoundaryType;
             /// Factory for the boundary mesh
             typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
+
+            // Total number of vertices in the mesh
+            Index nvertices(this->_mesh.get_num_entities(0));
 
             // Get the boundary set
             BoundaryFactoryType boundary_factory(this->_mesh);
             BoundaryType boundary(boundary_factory);
 
-            //_filter.template at<0>() = std::move(SubFilterType0(this->_nk));
-            _filter.template at<1>() = std::move(SubFilterType1(this->_nk));
+            // This does not have to be set if we use a NoneFilter
+            //_filter.template at<0>() = std::move(SubFilterType0(nvertices));
+            _filter.template at<1>() = std::move(SubFilterType1(nvertices));
 
-            _vec_rhs.template at<0>() = std::move(SubVectorType(this->_nk));
-            _vec_rhs.template at<1>() = std::move(SubVectorType(this->_nk));
+            _vec_rhs.template at<0>() = std::move(SubVectorType(nvertices));
+            _vec_rhs.template at<1>() = std::move(SubVectorType(nvertices));
 
-            _dirichlet_asm.add_cell_set(boundary);
+            _dirichlet_asm.add_mesh_part(boundary);
 
           }
 
@@ -134,39 +140,40 @@ namespace FEAST
         /// \brief Optimises the mesh according to the criteria implemented in the mesh smoother.
         virtual void optimise() override
         {
+          // Total number of vertices in the mesh
+          Index nvertices(this->_mesh.get_num_entities(0));
+
           prepare();
-          // Create a dummy preconditioner
-          LAFEM::NonePreconditioner<AlgoType, MatrixType, VectorType> precond;
+          // Create a SSOR preconditioner
+          // No usable preconditioner for SaddlePointMatrix yet, so pass a nullptr to use NO preconditioner
+          //LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner> precond(_sys_matrix);
+          // Create a BiCGStab solver
+          LAFEM::BiCGStabSolver<MatrixType, FilterType> solver(_sys_matrix, _filter, nullptr);// &precond);
+          // Enable convergence plot
+          solver.set_plot(false);
+          solver.set_max_iter(5000);
+          // Initialise the solver
+          solver.init();
 
-          for(Index d(0); d < this->_world_dim; ++d)
+          prepare();
+
+          for(int d(0); d < MeshType::world_dim; ++d)
           {
-            VectorType v(SubVectorType(this->_nk,DataType(0)), this->_coords[d].clone());
-            //_dirichlet_asm.assemble(_filter.template at<0>(),SubVectorType(this->_nk,DataType(0)));
-            _dirichlet_asm.assemble(_filter.template at<1>(),this->_coords[d]);
-
-            // DEBUG: Dump filters
-            // _filter.template at<0>()._sv.write_out_mtx("filter0.mtx");
-            // _filter.template at<1>()._sv.write_out_mtx("filter1.mtx");
+            SubVectorType tmp(nvertices,DataType(0));
+            VectorType v(SubVectorType(nvertices,DataType(0)), this->_coords[d].clone());
+            // This does not need to be assembled if we use a NoneFilter
+            //_dirichlet_asm.assemble(_filter.template at<0>(), _trafo_space,tmp);
+            _dirichlet_asm.assemble(_filter.template at<1>(), _trafo_space, this->_coords[d]);
 
             _vec_rhs.template at<0>().format();
             _vec_rhs.template at<1>().format();
 
-            _filter.template filter_rhs<AlgoType>(_vec_rhs);
-            _filter.template filter_sol<AlgoType>(v);
+            _filter.filter_rhs(_vec_rhs);
+            _filter.filter_sol(v);
 
-            // Fire up the BiCGStab solver
-            LAFEM::BiCGStab<AlgoType>::value(
-              v,    // the initial solution vector
-              _sys_matrix,     // the system matrix
-              _vec_rhs,    // the right-hand-side vector
-              _filter,
-              precond,    // the dummy preconditioner
-              1000,        // maximum number of iterations
-              1E-8        // relative tolerance to achieve
-              );
+            // Correct our initial solution vector
+            solver.correct(v, _vec_rhs);
 
-            // DEBUG: Dump solution
-            // v.template at<0>().write_out_mtx("w.mtx");
             this->_coords[d] = std::move(v.template at<1>());
           }
           this->set_coords();

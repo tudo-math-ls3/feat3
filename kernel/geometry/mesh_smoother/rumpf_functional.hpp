@@ -472,6 +472,9 @@ namespace FEAST
 #endif
 
     template<typename DataType_, typename ShapeType_>
+    class RumpfFunctionalConc_D2;
+
+    template<typename DataType_, typename ShapeType_>
     class RumpfFunctionalLevelsetMonitor;
 
   }

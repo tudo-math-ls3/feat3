@@ -30,7 +30,7 @@ template
     typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
-//    typedef LaplaceSmoother<TrafoType, DataType, MemType> SmootherType;
+    //    typedef LaplaceSmoother<TrafoType, DataType, MemType> SmootherType;
     typedef DataType_ DataType;
 
     // Mesh and trafo
@@ -39,7 +39,6 @@ template
     MeshType mesh(mesh_factory);
     TrafoType trafo(mesh);
 
-    //DataType pi(Math::pi<DataType>());
     DataType deltat(DataType(1e-3));
 
     // The smoother in all its template glory
@@ -50,7 +49,7 @@ template
     mr_laplace.init();
 
     // Boundary stuff
-    typedef typename Geometry::CellSubSet<ShapeType> BoundaryType;
+    typedef typename Geometry::MeshPart<MeshType> BoundaryType;
     typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
     BoundaryFactoryType boundary_factory(mesh);
     BoundaryType boundary(boundary_factory);
@@ -90,22 +89,19 @@ template
     DataType* mesh_velocity(new DataType[mesh.get_num_entities(0)]);
 
     LAFEM::DenseVector<MemType, DataType_> coords_old[MeshType::world_dim];
-    for(Index d = 0; d < MeshType::world_dim; ++d)
+    for(int d(0); d < MeshType::world_dim; ++d)
       coords_old[d]= std::move(LAFEM::DenseVector<MemType, DataType>(mesh.get_num_entities(0)));
 
+    std::cout << "deltat = " << scientify(deltat) << std::endl;
 
-    Index outputstep(1);
-    deltat /= DataType(outputstep);
-    std::cout << "deltat = " << scientify(deltat) << ", outputstep = " << outputstep << std::endl;
-
-    while(time < DataType(0.2))
+    while(time < DataType(1e-1))
     {
 
       std::cout << "timestep " << n << std::endl;
       time+= deltat;
 
       // Save old vertex coordinates
-      for(Index d(0); d < MeshType::world_dim; ++d)
+      for(int d(0); d < MeshType::world_dim; ++d)
       {
         for(Index i(0); i < mesh.get_num_entities(0); ++i)
           coords_old[d](i, mr_laplace._coords[d](i));
@@ -127,15 +123,12 @@ template
 
       }
 
-      if( n%outputstep || outputstep==1)
-      {
-        filename = "pre_" + stringify(n) + ".vtk";
-        Geometry::ExportVTK<MeshType> writer_pre(mesh);
-//        mr_laplace.prepare();
-        writer_pre.add_scalar_vertex("mesh_velocity", mesh_velocity);
-        std::cout << "Writing " << filename << std::endl;
-        writer_pre.write(filename);
-      }
+      filename = "pre_" + stringify(n) + ".vtk";
+      Geometry::ExportVTK<MeshType> writer_pre(mesh);
+      //        mr_laplace.prepare();
+      writer_pre.add_scalar_vertex("mesh_velocity", mesh_velocity);
+      std::cout << "Writing " << filename << std::endl;
+      writer_pre.write(filename);
 
       mr_laplace.optimise();
 
@@ -145,7 +138,7 @@ template
       for(Index i(0); i < mesh.get_num_entities(0); ++i)
       {
         mesh_velocity[i] = DataType(0);
-        for(Index d(0); d < MeshType::world_dim; ++d)
+        for(int d(0); d < MeshType::world_dim; ++d)
           mesh_velocity[i] += Math::sqr(ideltat*(coords_old[d](i) - mr_laplace._coords[d](i)));
 
         mesh_velocity[i] = Math::sqrt(mesh_velocity[i]);
@@ -154,16 +147,11 @@ template
       }
       std::cout << "max mesh velocity = " << scientify(max_mesh_velocity) << std::endl;
 
-      if( n%outputstep || outputstep==1)
-      {
-
-        filename = "post_" + stringify(n) + ".vtk";
-        Geometry::ExportVTK<MeshType> writer_post(mesh);
-        writer_post.add_scalar_vertex("mesh_velocity", mesh_velocity);
-        std::cout << "Writing " << filename << std::endl;
-        writer_post.write(filename);
-
-      }
+      filename = "post_" + stringify(n) + ".vtk";
+      Geometry::ExportVTK<MeshType> writer_post(mesh);
+      writer_post.add_scalar_vertex("mesh_velocity", mesh_velocity);
+      std::cout << "Writing " << filename << std::endl;
+      writer_post.write(filename);
 
       n++;
     }

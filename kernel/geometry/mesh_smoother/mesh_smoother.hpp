@@ -54,23 +54,17 @@ namespace FEAST
         const TrafoType& _trafo;
         /// The mesh for the underlying transformation
         MeshType& _mesh;
-        /// Dimension
-        const Index _world_dim;
-        /// Number of vertices of _mesh
-        const Index _nk;
 
       public:
         /// Constructor
         explicit MeshSmoother(const TrafoType& trafo_) :
           _trafo (trafo_),
-          _mesh ( const_cast<MeshType&>(_trafo.get_mesh()) ),
-          _world_dim (_mesh.world_dim),
-          _nk (_mesh.get_num_entities(0))
-      {
-        for(Index d = 0; d < _world_dim; ++d)
-          _coords[d]= std::move(VectorType(_nk));
+          _mesh ( const_cast<MeshType&>(_trafo.get_mesh()) )
+          {
+            for(int d = 0; d < MeshType::world_dim; ++d)
+              _coords[d]= std::move(VectorType(_mesh.get_num_entities(0)));
 
-      }
+          }
 
         virtual ~MeshSmoother()
         {
@@ -82,26 +76,14 @@ namespace FEAST
           get_coords();
         }
 
-        /// \brief Returns the world dimension.
-        Index get_world_dim() const
-        {
-          return _world_dim;
-        }
-
-        /// \brief Returns the number of vertices of the underlying mesh.
-        Index get_num_vert() const
-        {
-          return _nk;
-        }
-
         /// \brief Gets the coordinates from the underlying mesh and saves them in _coords.
         virtual void get_coords()
         {
           const typename MeshType::VertexSetType& vertex_set = _mesh.get_vertex_set();
 
-          for(Index i(0); i < _nk; ++i)
+          for(Index i(0); i < _mesh.get_num_entities(0); ++i)
           {
-            for(Index d(0); d < _world_dim; ++d)
+            for(int d(0); d < MeshType::world_dim; ++d)
               _coords[d](i,DataType(vertex_set[i][d]));
           }
         }
@@ -111,9 +93,9 @@ namespace FEAST
         {
           typename MeshType::VertexSetType& vertex_set = _mesh.get_vertex_set();
 
-          for(Index i(0); i < _nk; ++i)
+          for(Index i(0); i < _mesh.get_num_entities(0); ++i)
           {
-            for(Index d(0); d < _world_dim; ++d)
+            for(int d(0); d < MeshType::world_dim; ++d)
               vertex_set[i][d] = _coords[d](i);
           }
         }

@@ -61,11 +61,11 @@ namespace FEAST
         {
           DataType penalty(0);
           // Loop over all edges of the current cell
-          for(Index edge(0); edge < Shape::FaceTraits<ShapeType,1>::count; ++edge)
+          for(int edge(0); edge < Shape::FaceTraits<ShapeType,1>::count; ++edge)
           {
             // These are the indices of the vertices on edge
-            int i(FimType::map(edge,0));
-            int j(FimType::map(edge,1));
+            Index i(Index(FimType::map(edge,0)));
+            Index j(Index(FimType::map(edge,1)));
 
             penalty += FEAST::Assembly::Common::template HeavisideRegStatic<DataType>::eval(-heaviside_reg_fac()
                 * lvlset_vals(i) * lvlset_vals(j));
@@ -95,11 +95,11 @@ namespace FEAST
           DataType lvlset_constraint_last)
           {
             // Compute local gradient
-            for(Index edge(0); edge < Shape::FaceTraits<ShapeType,1>::count; ++edge)
+            for(int edge(0); edge < Shape::FaceTraits<ShapeType,1>::count; ++edge)
             {
               // These are the indices of the vertices on edge
-              int i(FimType::map(edge,0));
-              int j(FimType::map(edge,1));
+              Index i(Index(FimType::map(edge,0)));
+              Index j(Index(FimType::map(edge,1)));
 
               auto lvlset_prod = -heaviside_reg_fac() * lvlset_vals(i) * lvlset_vals(j);
               // Derivative of the heaviside function

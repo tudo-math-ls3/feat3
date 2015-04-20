@@ -42,14 +42,14 @@ template
     typedef RumpfSmootherType_<DataType_, MemType, TrafoType, FunctionalType> RumpfSmootherType;
 
     // Mesh and trafo
-    Index level(3);
-    Geometry::RefineFactory<MeshType,Geometry::UnitStarCubeFactory> mesh_factory(level);
+    Index level(4);
+    Geometry::RefineFactory<MeshType,Geometry::UnitCubeFactory> mesh_factory(level);
     MeshType mesh(mesh_factory);
     TrafoType trafo(mesh);
 
     DataType deltat(DataType(1e-3));
 
-    DataType fac_norm = DataType(1e-2),fac_det = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(0e-4));
+    DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(1e-8));
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     std::cout << "deltat = " << scientify(deltat) << std::endl;
@@ -63,7 +63,7 @@ template
     rumpflpumpfl.print();
 
     // Boundary stuff
-    typedef typename Geometry::CellSubSet<ShapeType> BoundaryType;
+    typedef typename Geometry::MeshPart<MeshType> BoundaryType;
     typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
     BoundaryFactoryType boundary_factory(mesh);
     BoundaryType boundary(boundary_factory);
@@ -138,7 +138,7 @@ template
     for(Index d = 0; d < MeshType::world_dim; ++d)
       coords_old[d]= std::move(LAFEM::DenseVector<MemType, DataType>(mesh.get_num_entities(0)));
 
-    while(time < DataType(2e-1))
+    while(time < DataType(1e-1))
     {
 
       std::cout << "timestep " << n << std::endl;
@@ -235,6 +235,6 @@ int main()
 {
   typedef Mem::Main MemType;
 
-  BdryDeformApp<double, MemType, Shape::Simplex<2>, Geometry::RumpfFunctional, MySmoother>::run();
+  BdryDeformApp<double, MemType, Shape::Hypercube<2>, Geometry::RumpfFunctional, MySmoother>::run();
   return 0;
 }

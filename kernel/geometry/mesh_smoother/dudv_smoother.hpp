@@ -7,12 +7,12 @@
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/common_operators.hpp>            // for DuDvOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
-#include <kernel/assembly/dirichlet_assembler.hpp>         // for DirichletAssembler
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/lafem/bicgstab.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/preconditioner.hpp>
+#include <kernel/lafem/proto_solver.hpp>
 #include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/geometry/mesh_smoother/mesh_smoother.hpp>
@@ -72,9 +72,6 @@ namespace FEAST
         /// Filter for out system
         typedef LAFEM::UnitFilterBlocked<MemType, DataType, Index, MeshType::shape_dim> FilterType;
 
-        /// Up until now, there are no implementations for other backends
-        typedef Algo::Generic AlgoType;
-
       protected:
         /// Transformation
         SpaceType _trafo_space;
@@ -87,7 +84,7 @@ namespace FEAST
         /// Filter for the mesh problem
         FilterType _filter;
         /// Assembler for the boundary values for the mesh problem
-        Assembly::DirichletAssembler<SpaceType> _dirichlet_asm;
+        Assembly::UnitFilterAssembler<MeshType> _dirichlet_asm;
 
       public:
         /// Constructor
@@ -98,10 +95,10 @@ namespace FEAST
           _vec_rhs(trafo_.get_mesh().get_num_entities(0),DataType(0)),
           _cubature_factory("auto-degree:5"),
           _filter(trafo_.get_mesh().get_num_entities(0)),
-          _dirichlet_asm(_trafo_space)
+          _dirichlet_asm()
           {
             /// Type for the boundary mesh
-            typedef typename Geometry::CellSubSet<ShapeType> BoundaryType;
+            typedef typename Geometry::MeshPart<MeshType> BoundaryType;
             /// Factory for the boundary mesh
             typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
 
@@ -109,7 +106,7 @@ namespace FEAST
             BoundaryFactoryType boundary_factory(this->_mesh);
             BoundaryType boundary(boundary_factory);
 
-            _dirichlet_asm.add_cell_set(boundary);
+            _dirichlet_asm.add_mesh_part(boundary);
 
           }
 
@@ -129,45 +126,57 @@ namespace FEAST
         /// \brief Optimises the mesh according to the criteria implemented in the mesh smoother.
         virtual void optimise() override
         {
+          // Total number of vertices in the mesh
+          Index nvertices(this->_mesh.get_num_entities(0));
+
           prepare();
 
-          // Create a dummy preconditioner
-          LAFEM::NonePreconditioner<AlgoType, MatrixType, VectorType> precond;
-
-          VectorType coords_blocked(this->_nk, DataType(0));
-          for (Index i(0); i < this->_nk; ++i)
+          VectorType coords_blocked(nvertices, DataType(0));
+          for (Index i(0); i < nvertices; ++i)
           {
             Tiny::Vector<DataType, MeshType::world_dim> tmp;
 
-            for (Index d(0); d < MeshType::world_dim; ++d)
-               tmp(d) = this->_coords[d](i);
+            for (int d(0); d < MeshType::world_dim; ++d)
+               tmp(Index(d)) = this->_coords[d](i);
 
             coords_blocked(i, tmp);
           }
-          _dirichlet_asm.assemble(_filter, coords_blocked);
 
           _vec_rhs.format();
 
-          _filter.template filter_rhs<AlgoType>(_vec_rhs);
-          _filter.template filter_sol<AlgoType>(coords_blocked);
+          _dirichlet_asm.assemble(_filter, _trafo_space, coords_blocked);
 
-          // Fire up the BiCGStab solver
-          LAFEM::BiCGStab<AlgoType>::value(
-              coords_blocked,    // the initial solution vector
-              _sys_matrix,     // the system matrix
-              _vec_rhs,    // the right-hand-side vector
-              _filter,
-              precond,    // the dummy preconditioner
-              1000,        // maximum number of iterations
-              1E-8        // relative tolerance to achieve
-              );
+          _filter.filter_rhs(_vec_rhs);
+          _filter.filter_sol(coords_blocked);
 
-          for (Index i(0); i < this->_nk; ++i)
+          // Some preconditioners/solvers do not care about filtered matrices (SSOR, PCG), but other do (UMFPACK) or
+          // might (ILU)
+          _filter.filter_mat(_sys_matrix);
+          // Create a SSOR preconditioner
+          // This is not implemented for SparseMatrixCSRBlocked yet, so instead we use NO preconditioner at all
+          //LAFEM::PreconWrapper<MatrixType, LAFEM::DiagonalPreconditioner> precond();//_sys_matrix);
+          // Create a PCG solver
+          LAFEM::PCGSolver<MatrixType, FilterType> solver(_sys_matrix, _filter, nullptr);//&precond);
+          // Enable convergence plot
+          solver.set_plot(false);
+          solver.set_max_iter(5000);
+          // Initialise the solver
+          solver.init();
+
+          // Solve the system and correct coords_blocked
+          solver.correct(coords_blocked, _vec_rhs);
+
+          // Release the solver
+          solver.done();
+
+          // Copy back the new coordinates from the blocked vector
+          for (Index i(0); i < nvertices; ++i)
           {
-            for (Index d(0); d < MeshType::world_dim; ++d)
-              this->_coords[d](i, coords_blocked(i)(d));
+            for (int d(0); d < MeshType::world_dim; ++d)
+              this->_coords[d](i, coords_blocked(i)(Index(d)));
           }
 
+          // Copy back the coordinates to the underlying mesh
           this->set_coords();
 
           return;

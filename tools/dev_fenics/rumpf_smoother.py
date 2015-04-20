@@ -9,6 +9,7 @@ import math
 import sys
 from dolfin import *
 import mesh_deformation
+from mesh_deformation import gen_mesh, Top, NotTop
 import analytic_lvlset
 
 parameters["form_compiler"]["cpp_optimize"] = True
@@ -48,18 +49,6 @@ public:
 };
 """
 
-def everywhere(x,on_boundary): return on_boundary
-def midline(x,on_boundary): return (abs(x[1]-0.5) < 1e-10)
-def nowhere(x,on_boundary): return False
-
-
-def gen_mesh(n_gridpoints,dim):
-  if dim == 2:
-    mesh = RectangleMesh(0,0,1,1,n_gridpoints,n_gridpoints,"left");
-  else:
-    mesh = BoxMesh(0,0,0,1,1,1,n_gridpoints,n_gridpoints,n_gridpoints);
-
-  return mesh
 
 # Computes the sum of the determinants of the transformations of the standard
 # Rumpf simplex to the physical cells
@@ -86,7 +75,7 @@ def compute_sum_det(mesh):
 
 # Concentration function for mesh density
 def conc_function(dist):
-  alpha = 1e-2
+  alpha = 1e-1
   p = 0.5
 
   return pow(alpha + abs(dist), p);
@@ -158,7 +147,7 @@ def prepare_lvlset(lvlset_function, analytic_lvlset, t):
 # by computing the local Rumpf transformation matrix c, the local optimal
 # scales h, the local target cell sizes rumpf_lambda according to the given
 # mesh
-def prepare(c, h, rumpf_lambda, mesh, lvlset_function, t, use_r_adaptivity):
+def prepare(c, h, rumpf_lambda, mesh, lvlset_function, use_r_adaptivity):
   if(use_r_adaptivity==1):
     compute_lambda_nonuniform(rumpf_lambda, mesh, lvlset_function)
   else:
@@ -246,13 +235,13 @@ def assemble_operator(fac_norm, fac_det, fac_reg, p, C, u, v):
 def mesh_problem(mesh, function_space_family, function_space_parameter):
   use_r_adaptivity = 1
   # Regularisation parameter for the 1/det term in the Rumpf functional
-  fac_reg = Constant(1e-12)
+  fac_reg = (1e-12)
   # Factor for the Frobenius norm term in the Rumpf functional
-  fac_norm = Constant(1e0)
+  fac_norm = (1e0)
   # Factor for the det term in the Rumpf functional
-  fac_det = Constant(1e0)
+  fac_det = (1e0)
   # The det term is fac_det*det^exponent_det + fac_rec_det/(det + sqrt(det^2 + fac_reg^2))
-  exponent_det = 1
+  exponent_det = 2
   # Output file for the deformed mesh
   outfile =  File("results_rumpf_smoother/mesh.pvd")
   # Output file for the deformation plotted on the original mesh
@@ -260,15 +249,32 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
 
   # If we update the mesh for computation, that means that the computational
   # domain is the domain from the last timestep
-  update_mesh = True
+  update_mesh = False
 
   # Starting time
   t = 0.
   # Timestep size
   delta_t = 0.01
+  # End time
+  t_end = 0.5
 
+  print "delta_t = ", delta_t, " t_end = ", t_end
+  print "use_r_adaptivity = ", use_r_adaptivity, ", update_mesh = ", update_mesh
+  print "fac_norm = ", fac_norm, "fac_det = ", fac_det, "fac_reg = ", fac_reg, "exponent_det = ", exponent_det
   # Create a copy of the original mesh that we can deform
   deformed_mesh = Mesh(mesh)
+
+  # Define boundaries
+  boundaries = FacetFunction("uint", deformed_mesh)
+  top_boundary = Top()
+  other_boundaries = NotTop()
+  top_boundary.mark(boundaries, 1)
+  other_boundaries.mark(boundaries, 2)
+
+  def everywhere(x,on_boundary): return on_boundary
+
+  mesh_deformation.my_deform.bc0.t = t
+  mesh_deformation.my_deform.bc1.t = t
 
   # Function space for computations on the original mesh
   V = VectorFunctionSpace(mesh, function_space_family, function_space_parameter)
@@ -289,7 +295,7 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
   lvlset_function = Function(lvlset_space,name='lvlset')
 
   scaling = -1.
-  displacement = 0. #0.15
+  displacement = 0.15
   analytic_lvlset.my_lvlset_function.value.displacement = displacement
   analytic_lvlset.my_lvlset_function.value.scaling = scaling
 
@@ -341,8 +347,8 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
   F = action(F, coords)
   J = derivative(F, coords, u)
 
-  # bc2 is Dirichlet bcs on the boundary
-  bc = DirichletBC(V, mesh_deformation.my_deform.bc2, everywhere)
+  # bc1 is Dirichlet bcs on the boundary
+  bc = DirichletBC(V, mesh_deformation.my_deform.bc1, everywhere)
 
   problem = NonlinearVariationalProblem(F, coords, bc, J)
   solver  = NonlinearVariationalSolver(problem)
@@ -360,7 +366,7 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
   deform_0.vector().zero()
 
   # Now prepare everything again with (potentially) nonuniform rumpf_lambda
-  prepare(c, h, rumpf_lambda, deformed_mesh, lvlset_function, 0., use_r_adaptivity)
+  prepare(c, h, rumpf_lambda, deformed_mesh, lvlset_function, use_r_adaptivity)
 
   F = assemble_operator(fac_norm, fac_det, fac_reg, exponent_det, C, u, v)
 
@@ -371,30 +377,31 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
   J = derivative(F, coords, u)
 
   # Time loop
-  while (t < 0.5):
+  while (t < t_end):
     t += delta_t
     print "t = ", t
 
-    # Update the boundary values
-    # Assuming the mesh movement is linear in time...
-    if update_mesh:
-      mesh_deformation.my_deform.bc0.t = t
-      mesh_deformation.my_deform.bc1.t = t
-    else:
-      mesh_deformation.my_deform.bc0.t = t
-      mesh_deformation.my_deform.bc1.t = t
+    mesh_deformation.my_deform.bc0.t = t
+    mesh_deformation.my_deform.bc1.t = t
 
     # Save old vertex coordinates
     coords_old.vector()[:] = coords.vector()
 
-    prepare_lvlset(lvlset_function, analytic_lvlset, t)
-    prepare(c, h, rumpf_lambda, mesh, lvlset_function, t, use_r_adaptivity)
+    # t = 0 means Picard iteration at t = 0
+    prepare_lvlset(lvlset_function, analytic_lvlset, 0)
+    prepare(c, h, rumpf_lambda, mesh, lvlset_function, use_r_adaptivity)
 
     # Select boundary conditions here
-    bc0 = DirichletBC(V, mesh_deformation.my_deform.bc0, everywhere)
-    bc1 = DirichletBC(V, mesh_deformation.my_deform.bc0, midline)
-    bc2 = DirichletBC(V, mesh_deformation.my_deform.bc2, everywhere)
-    bcs = [bc2]
+    if use_r_adaptivity :
+      bc0 = DirichletBC(V, mesh_deformation.my_deform.bc1, everywhere)
+      bcs = [bc0]
+    else :
+      # The boundary condition should be this:
+      #bc0 = DirichletBC(V, mesh_deformation.my_deform.bc1, boundaries, 1)
+      # but (due to a bug in FEniCS 1.4?) we have to hard code the expression in this file
+      bc0 = DirichletBC(V, dolfin.Expression(("x[0]", "1 + t*sin(2*pi*x[0])"),t=t,pi=math.pi), boundaries, 1)
+      bc1 = DirichletBC(V, mesh_deformation.my_deform.bc1, boundaries, 2)
+      bcs = [bc0, bc1]
 
     # If we update the mesh for computation, save the coordinates and reassemble
     # the matrix on the deformed mesh
@@ -413,7 +420,9 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
     prm['newton_solver']['linear_solver']= 'petsc'
     # When using r-adaptivity, Newton has to be damped for the Krylov solvers
     # to converge
-    prm['newton_solver']['relaxation_parameter']= 0.1
+    if(use_r_adaptivity):
+      prm['newton_solver']['relaxation_parameter']= 0.1
+      prm['newton_solver']['krylov_solver']['gmres']['restart'] = 100
     prm['newton_solver']['maximum_iterations'] = 300
 
     solver.solve()
@@ -430,19 +439,19 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
 
     deformed_mesh.move(deform)
 
-    outfile << deformed_mesh
+    outfile << rumpf_lambda #deformed_mesh
     #outfile << lvlset_function
     outfile_u << deform_0
 
   return
 
 def main():
-    print list_linear_solver_methods()
-    dim = 2
-    mesh = gen_mesh(16, dim)
+  print list_linear_solver_methods()
+  dim = 2
+  mesh = gen_mesh(16, dim)
 
-    mesh_problem(mesh, "Lagrange", 1)
+  mesh_problem(mesh, "Lagrange", 1)
+  sys.exit(0)
 
 if __name__ == '__main__':
-        main()
-	sys.exit(0)
+  main()

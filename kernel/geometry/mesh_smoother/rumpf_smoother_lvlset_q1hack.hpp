@@ -88,7 +88,6 @@ namespace FEAST
           FunctionalType& functional_,
           LevelsetFunctionalType& lvlset_functional_,
           bool align_to_lvlset_,
-          bool from_original_,
           bool r_adaptivity_,
           AnalyticFunctionType_& analytic_function_,
           AnalyticFunctionGrad0Type_& analytic_function_grad0_,
@@ -98,7 +97,6 @@ namespace FEAST
             functional_,
             lvlset_functional_,
             align_to_lvlset_,
-            from_original_,
             r_adaptivity_ ,
             analytic_function_,
             analytic_function_grad0_,
@@ -142,13 +140,13 @@ namespace FEAST
             // ... and for each simplex in all permutations
             for(Index p(0); p < n_perms; ++p)
             {
-              for(Index d(0); d < this->_world_dim; d++)
+              for(Index d(0); d < MeshType::world_dim; d++)
               {
                 h(d) = this->_h[d](cell);
                 for(Index j(0); j < 3; j++)
                   x(d,j) = this->_coords[d](idx(cell,perm[p][j]));
               }
-              fval += this->_lambda(cell)*this->_functional.compute_local_functional(x,h);
+              fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h);
             } // permutations
 
             // The levelset penalty has to be computed for the hypercube case
@@ -233,7 +231,7 @@ namespace FEAST
             for(Index p(0); p < n_perms; ++p)
             {
               //std::cout << " permutation " << p << std::endl;
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < MeshType::world_dim; ++d)
               {
                 h(d) = this->_h[d](cell);
                 for(Index j(0); j < 3; ++j)
@@ -244,15 +242,15 @@ namespace FEAST
                 //std::cout << std::endl;
               }
 
-              fval += this->_lambda(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
+              fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
 
-              func_norm[cell] += this->_lambda(cell) * norm_A;
-              func_det[cell] += this->_lambda(cell) * det_A;
-              func_rec_det[cell] += this->_lambda(cell) * rec_det_A;
-              func_norm_tot += func_norm[cell];
-              func_det_tot += func_det[cell];
-              func_rec_det_tot += func_rec_det[cell];
+              func_norm[cell] += this->_mu(cell) * norm_A;
+              func_det[cell] += this->_mu(cell) * det_A;
+              func_rec_det[cell] += this->_mu(cell) * rec_det_A;
             }
+            func_norm_tot += func_norm[cell];
+            func_det_tot += func_det[cell];
+            func_rec_det_tot += func_rec_det[cell];
 
             // The levelset penalty has to be computed for the hypercube case
             for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
@@ -271,12 +269,15 @@ namespace FEAST
             ", func_rec_det = " << scientify(func_rec_det_tot) << ", func_lvlset = " <<
             scientify(this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last)) << std::endl;
 
+
           return fval;
         } // compute_functional
 
         /// \copydoc BaseClass::compute_gradient()
-        virtual void compute_gradient()
+        virtual void compute_gradient() override
         {
+          // Total number of vertices in the mesh
+          Index nvertices(this->_mesh.get_num_entities(0));
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -305,7 +306,7 @@ namespace FEAST
           };
 
           // Clear gradient vector
-          for(Index i(0); i < this->_world_dim*this->_nk; ++i)
+          for(Index i(0); i < MeshType::world_dim*nvertices; ++i)
             this->_grad[i] = DataType_(0);
 
           // Compute the functional value for each cell
@@ -313,7 +314,7 @@ namespace FEAST
           {
             for(Index p(0); p < n_perms; ++p)
             {
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < MeshType::world_dim; ++d)
               {
                 h(d) = this->_h[d](cell);
                 // Get local coordinates
@@ -327,10 +328,10 @@ namespace FEAST
               this->_functional.compute_local_grad(x, h, grad_loc);
 
               // Add local contributions to global gradient vector
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < MeshType::world_dim; ++d)
               {
                 for(Index j(0); j < 3; ++j)
-                  this->_grad[d*this->_nk + idx(cell,perm[p][j])] += this->_lambda(cell)*grad_loc(d,j);
+                  this->_grad[d*nvertices + idx(cell,perm[p][j])] += this->_mu(cell)*grad_loc(d,j);
               }
             } // permutations
 
@@ -340,30 +341,21 @@ namespace FEAST
             {
               lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
 
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < MeshType::world_dim; ++d)
                 lvlset_grad_vals(d,j) = this->_lvlset_grad_vtx_vec[d](idx(cell,j));
 
             }
             // Add levelset penalty term, which is not weighted with lambda
             this->_lvlset_functional.add_lvlset_penalty_grad(lvlset_vals, lvlset_grad_vals, grad_loc, this->lvlset_constraint_last);
-            for(Index d(0); d < this->_world_dim; ++d)
+            for(Index d(0); d < MeshType::world_dim; ++d)
             {
               // Add local contributions to global gradient vector
               for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                this->_grad[d*this->_nk + idx(cell,j)] += grad_loc(d,j);
+                this->_grad[d*nvertices + idx(cell,j)] += grad_loc(d,j);
             }
           }
 
-          // Set gradient to 0 where bdry_id == -1
-          // TODO: Convert this to proper filtering etc. and allow for more general BCs.
-          for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-          {
-            if(this->_bdry_id[i] == -1)
-            {
-              for(Index d(0); d < this->_world_dim; ++d)
-                this->_grad[d*this->_nk + i] = DataType(0);
-            }
-          }
+          this->_filter_grad();
 
         } // compute_gradient
 

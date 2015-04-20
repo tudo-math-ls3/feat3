@@ -139,6 +139,11 @@ namespace FEAST
             _b(b_)
             {
             }
+          /// Sets _point to x0_
+          void set_point(const ImgPointType_ x0_)
+          {
+            _point = x0_;
+          }
 
       }; // class DistanceFunctionSD_grad
 
@@ -230,9 +235,161 @@ namespace FEAST
 
       }; // class DistanceFunctionSD_grad
 
+      /**
+       * \brief Function representing the gradient of the minimum of two analytic functions
+       *
+       * This is needed i.e. if there are several objects implicitly defined by their zero level sets. The class
+       * in general supports function values, gradients and hessians for all dimensions, depending on the two analytic
+       * functions supporting these.
+       *
+       * \Warning As min is non differentiable in general, Bad Things(TM) may happen when computing the gradient
+       * and/or hessian where the function values are nearly identical.
+       *
+       * \tparam AnalyticFunctionType1
+       * Type for the first AnalyticFunction
+       *
+       * \tparam AnalyticFunctionType2
+       * Type for the second AnalyticFunction
+       *
+       * \author Jordi Paul
+       */
+      template<typename AnalyticFunctionType1, typename AnalyticFunctionType2, typename AnalyticFunctionType1Der, typename AnalyticFunctionType2Der>
+      class MinOfTwoFunctionsDer :
+        public AnalyticFunction
+      {
+        private:
+          /// The first AnalyticFunction
+          const AnalyticFunctionType1& _f1;
+          /// The second AnalyticFunction
+          const AnalyticFunctionType2& _f2;
+          /// The first AnalyticFunctions derivative
+          const AnalyticFunctionType1Der& _f1_der;
+          /// The second AnalyticFunctions derivative
+          const AnalyticFunctionType2Der& _f2_der;
+
+        public:
+          /// Can compute function values if both AnalyticFunctions can do that
+          static constexpr bool can_value = (AnalyticFunctionType1Der::can_value && AnalyticFunctionType2Der::can_value);
+          /// Can compute the function gradient if both AnalyticFunctions can do that
+          static constexpr bool can_grad = (AnalyticFunctionType1Der::can_grad && AnalyticFunctionType2Der::can_grad);
+          /// Can compute the function hessian if both AnalyticFunctions can do that
+          static constexpr bool can_hess = (AnalyticFunctionType1Der::can_hess && AnalyticFunctionType2Der::can_hess);
+
+          /** \copydoc AnalyticFunction::ConfigTraits */
+          template<typename Config_>
+          struct ConfigTraits
+          {
+            /// TrafoConfig of the first AnalyticFunction
+            typedef typename AnalyticFunctionType1Der::template ConfigTraits<Config_>::TrafoConfig TrafoConfig1;
+            /// TrafoConfig of the second AnalyticFunction
+            typedef typename AnalyticFunctionType2Der::template ConfigTraits<Config_>::TrafoConfig TrafoConfig2;
+
+            /**
+             * \brief Trafo configuration tag class
+             *
+             * \see Trafo::ConfigBase
+             *
+             * A quantity (i.e. the Jacobian matrix) is needed if any of the functions needs it.
+             */
+            typedef Trafo::ConfigOr<TrafoConfig1, TrafoConfig2> TrafoConfig;
+          };
+
+          /** \copydoc AnalyticFunction::Evaluator */
+          template<typename EvalTraits_>
+          class Evaluator :
+            public AnalyticFunction::Evaluator<EvalTraits_>
+        {
+          public:
+            /// trafo evaluator data
+            typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
+            /// trafo data type
+            typedef typename EvalTraits_::TrafoData TrafoData;
+            /// coefficient data type
+            typedef typename EvalTraits_::DataType DataType;
+            /// value type
+            typedef typename EvalTraits_::ValueType ValueType;
+            /// gradient type
+            typedef typename EvalTraits_::GradientType GradientType;
+            /// hessian type
+            typedef typename EvalTraits_::HessianType HessianType;
+            /// type for the points the analytic function is evaluated at
+            typedef typename EvalTraits_::ImagePointType ImgPointType;
+
+          private:
+            /// Function to evaluate
+            const MinOfTwoFunctionsDer& _function;
+            typename AnalyticFunctionType1::template Evaluator<EvalTraits_> _f1_eval;
+            typename AnalyticFunctionType2::template Evaluator<EvalTraits_> _f2_eval;
+            typename AnalyticFunctionType1Der::template Evaluator<EvalTraits_> _f1_der_eval;
+            typename AnalyticFunctionType2Der::template Evaluator<EvalTraits_> _f2_der_eval;
+
+          public:
+            /// Constructor
+            explicit Evaluator(const MinOfTwoFunctionsDer& function) :
+              _function(function),
+              _f1_eval(function._f1),
+              _f2_eval(function._f2),
+              _f1_der_eval(function._f1_der),
+              _f2_der_eval(function._f2_der)
+              {
+              }
+
+            ValueType value(const TrafoData& tau) const
+            {
+              ValueType fval1 = _f1_eval.value(tau);
+              ValueType fval2 = _f2_eval.value(tau);
+              if(Math::abs(fval1-fval2) < Math::eps<DataType>()) return ValueType(0);
+              return fval1 < fval2 ? _f1_der_eval.value(tau) : _f2_der_eval.value(tau);
+            }
+
+            GradientType gradient(const TrafoData& tau) const
+            {
+              ValueType fval1 = _f1_eval.value(tau);
+              ValueType fval2 = _f2_eval.value(tau);
+              if(Math::abs(fval1-fval2) < Math::eps<DataType>()) return GradientType(0);
+              return fval1 < fval2 ? _f1_der_eval.gradient(tau) : _f2_der_eval.gradient(tau);
+            }
+
+            HessianType hessian(const TrafoData& tau) const
+            {
+              ValueType fval1 = _f1_eval.value(tau);
+              ValueType fval2 = _f2_eval.value(tau);
+              if(Math::abs(fval1 - fval2) < Math::eps<DataType>()) return HessianType(0);
+              return fval1 < fval2 ? _f1_der_eval.hessian(tau) : _f2_der_eval.hessian(tau);
+            }
+
+        }; // class MinOfTwoFunctions::Evaluator<...>
+
+        public:
+          /// Constructor
+          explicit MinOfTwoFunctionsDer(const AnalyticFunctionType1& f1_, const AnalyticFunctionType2& f2_,
+          const AnalyticFunctionType1Der& f1_der_, const AnalyticFunctionType2Der& f2_der_) :
+            _f1(f1_),
+            _f2(f2_),
+            _f1_der(f1_der_),
+            _f2_der(f2_der_)
+            {
+            }
+
+      }; // class MinOfTwoFunctionsDer
+
     } // namespace Common
   } // namespace Assembly
 } // namespace FEAST
+
+template<typename PointType, typename DataType>
+void centre_point_outer(PointType& my_point, DataType time)
+{
+  my_point.v[0] = DataType(0.5) - DataType(0.125)*Math::cos(DataType(2)*Math::pi<DataType>()*DataType(time));
+  my_point.v[1] = DataType(0.5) - DataType(0.125)*Math::sin(DataType(2)*Math::pi<DataType>()*DataType(time));
+}
+
+template<typename PointType, typename DataType>
+void centre_point_inner(PointType& my_point, DataType time)
+{
+  my_point.v[0] = DataType(0.5) - DataType(0.1875)*Math::cos(DataType(2)*Math::pi<DataType>()*DataType(time));
+  my_point.v[1] = DataType(0.5) - DataType(0.1875)*Math::sin(DataType(2)*Math::pi<DataType>()*DataType(time));
+}
 
 /**
  * \brief Wrapper struct as functions do not seem to agree with template template parameters
@@ -268,29 +425,35 @@ template
     // Levelset function stuff
     typedef Tiny::Vector<DataType,2,2> ImgPointType;
 
-    typedef Assembly::Common::DistanceFunctionSD<ImgPointType> AnalyticFunctionType;
-    typedef Assembly::Common::DistanceFunctionSD_grad<ImgPointType, 0> AnalyticFunctionGrad0Type;
-    typedef Assembly::Common::DistanceFunctionSD_grad<ImgPointType, 1> AnalyticFunctionGrad1Type;
-    ImgPointType x0(DataType(0));
-    x0.v[0] = DataType(0.25) *(DataType(2) + Math::cos(DataType(0)));
-    x0.v[1] = DataType(0.25) *(DataType(2) + Math::sin(DataType(0)));
-    DataType displacement(0.15);
-    DataType scaling(-1);
-    AnalyticFunctionType analytic_lvlset(x0, displacement, scaling);
-    AnalyticFunctionGrad0Type analytic_lvlset_grad0(x0, displacement, scaling);
-    AnalyticFunctionGrad1Type analytic_lvlset_grad1(x0, displacement, scaling);
+    typedef Assembly::Common::DistanceFunctionSD<ImgPointType> AnalyticFunctionType1;
+    typedef Assembly::Common::DistanceFunctionSD_grad<ImgPointType, 0> AnalyticFunction1Grad0Type;
+    typedef Assembly::Common::DistanceFunctionSD_grad<ImgPointType, 1> AnalyticFunction1Grad1Type;
 
-    //const int plane = 0;
-    //typedef Assembly::Common::PlaneDistanceFunctionSD<plane, ImgPointType> AnalyticFunctionType;
-    //typedef Assembly::Common::PlaneDistanceFunctionSD_grad<plane, 0, ImgPointType> AnalyticFunctionGrad0Type;
-    //typedef Assembly::Common::PlaneDistanceFunctionSD_grad<plane, 1, ImgPointType> AnalyticFunctionGrad1Type;
-    //ImgPointType x0(DataType(0));
-    //x0.v[0] = DataType(0.5);
-    //x0.v[1] = DataType(0.5);
-    //DataType scaling(1);
-    //AnalyticFunctionType analytic_lvlset(x0, scaling);
-    //AnalyticFunctionGrad0Type analytic_lvlset_grad0(x0, scaling);
-    //AnalyticFunctionGrad1Type analytic_lvlset_grad1(x0, scaling);
+    typedef Assembly::Common::MinOfTwoFunctions<AnalyticFunctionType1, AnalyticFunctionType1> AnalyticFunctionType;
+    typedef Assembly::Common::MinOfTwoFunctionsDer<AnalyticFunctionType1, AnalyticFunctionType1, AnalyticFunction1Grad0Type, AnalyticFunction1Grad0Type> AnalyticFunctionGrad0Type;
+    typedef Assembly::Common::MinOfTwoFunctionsDer<AnalyticFunctionType1, AnalyticFunctionType1, AnalyticFunction1Grad1Type, AnalyticFunction1Grad1Type> AnalyticFunctionGrad1Type;
+
+    ImgPointType x0(DataType(0));
+
+    centre_point_outer(x0,DataType(0));
+    DataType scaling_outer(-1);
+    DataType radius_outer(0.35);
+
+    AnalyticFunctionType1 outer(x0, radius_outer, scaling_outer);
+    AnalyticFunction1Grad0Type outer_grad0(x0, radius_outer, scaling_outer);
+    AnalyticFunction1Grad1Type outer_grad1(x0, radius_outer, scaling_outer);
+
+    DataType scaling_inner(-scaling_outer);
+    DataType radius_inner(-scaling_inner*0.275);
+    centre_point_inner(x0,DataType(0));
+
+    AnalyticFunctionType1 inner(x0, radius_inner, scaling_inner);
+    AnalyticFunction1Grad0Type inner_grad0(x0, radius_inner, scaling_inner);
+    AnalyticFunction1Grad1Type inner_grad1(x0, radius_inner, scaling_inner);
+
+    AnalyticFunctionType analytic_lvlset(inner, outer);
+    AnalyticFunctionGrad0Type analytic_lvlset_grad0(inner, outer, inner_grad0, outer_grad0);
+    AnalyticFunctionGrad1Type analytic_lvlset_grad1(inner, outer, inner_grad1, outer_grad1);
 
     typedef RumpfSmootherType_
     <
@@ -308,7 +471,7 @@ template
     typedef LAFEM::DenseVector<MemType, DataType> VectorType;
 
     // Mesh and trafo
-    Index level(4);
+    Index level(5);
     Geometry::RefineFactory<MeshType,Geometry::UnitCubeFactory> mesh_factory(level);
     MeshType mesh(mesh_factory);
     TrafoType trafo(mesh);
@@ -320,14 +483,13 @@ template
 
     DataType deltat(DataType(0.025));
 
-    DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    DataType fac_norm = DataType(1e-2),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
     bool align_to_lvlset(false);
     bool r_adaptivity(true);
-    DataType r_adapt_reg = DataType(1e-3), r_adapt_pow = DataType(0.5);
+    DataType r_adapt_reg = DataType(1e-2), r_adapt_pow = DataType(0.5);
 
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
     LevelsetFunctionalType my_levelset_functional;
-
 
     // The smoother in all its template glory
     RumpfSmootherType rumpflpumpfl(trafo, my_functional, my_levelset_functional, align_to_lvlset, r_adaptivity,
@@ -340,6 +502,21 @@ template
     rumpflpumpfl.print();
 
     rumpflpumpfl.init();
+
+    // Set gradient to 0 where bdry_id == -(world_dim+1)
+    // TODO: Convert this to proper filtering etc. and allow for more general BCs.
+    const typename MeshType::VertexSetType& vertex_set = rumpflpumpfl._mesh.get_vertex_set();
+
+    for(Index i(0); i < rumpflpumpfl._mesh.get_num_entities(0); ++i)
+    {
+      rumpflpumpfl._bdry_id[i] = 0;
+      for(Index d(0); d < MeshType::world_dim; ++d)
+      {
+        if(Math::abs(vertex_set[i][d]) < Math::eps<DataType>()
+            || Math::abs(vertex_set[i][d] - DataType(1)) < Math::eps<DataType>() )
+          rumpflpumpfl._bdry_id[i] -= int(d+1);
+      }
+    }
 
     DataType* func_norm(new DataType[mesh.get_num_entities(2)]);
     DataType* func_det(new DataType[mesh.get_num_entities(2)]);
@@ -400,28 +577,37 @@ template
 
     // Old mesh coordinates for computing the mesh velocity
     LAFEM::DenseVector<MemType, DataType_> coords_old[MeshType::world_dim];
-    for(int d(0); d < MeshType::world_dim; ++d)
+    for(Index d = 0; d < MeshType::world_dim; ++d)
       coords_old[d]= std::move(LAFEM::DenseVector<MemType, DataType>(mesh.get_num_entities(0)));
 
 
-    while(time < DataType(0.5))
+    while(time < DataType(1))
     {
 
       std::cout << "timestep " << n << std::endl;
       time+= deltat;
 
       // Save old vertex coordinates
-      for(int d(0); d < MeshType::world_dim; ++d)
+      for(Index d(0); d < MeshType::world_dim; ++d)
       {
         for(Index i(0); i < mesh.get_num_entities(0); ++i)
           coords_old[d](i, rumpflpumpfl._coords[d](i));
       }
 
       // update leveset function
+      centre_point_outer(x0,time);
+      outer.set_point(x0);
+      outer_grad0.set_point(x0);
+      outer_grad1.set_point(x0);
+
+      centre_point_inner(x0,time);
+      inner.set_point(x0);
+      inner_grad0.set_point(x0);
+      inner_grad1.set_point(x0);
       //x0.v[0] = DataType(0.5) + DataType(0.35)*Math::sin(DataType(2)*pi*time);
       //x0.v[1] = DataType(0.5) + DataType(0.35)*Math::cos(DataType(2)*pi*time);
-      x0.v[0] = DataType(0.25) *(DataType(2) + Math::cos(time));
-      x0.v[1] = DataType(0.25) *(DataType(2) + Math::sin(DataType(3)*time));
+      //x0.v[0] = DataType(0.25) *(DataType(2) + Math::cos(time));
+      //x0.v[1] = DataType(0.25) *(DataType(2) + Math::sin(DataType(3)*time));
       // DEBUG: Do not set_point so it becomes a Picard iteration at t=0
       //analytic_lvlset.set_point(x0);
 
@@ -455,7 +641,7 @@ template
       for(Index i(0); i < mesh.get_num_entities(0); ++i)
       {
         mesh_velocity[i] = DataType(0);
-        for(int d(0); d < MeshType::world_dim; ++d)
+        for(Index d(0); d < MeshType::world_dim; ++d)
           mesh_velocity[i] += Math::sqr(ideltat*(coords_old[d](i) - rumpflpumpfl._coords[d](i)));
 
         mesh_velocity[i] = Math::sqrt(mesh_velocity[i]);
@@ -508,7 +694,7 @@ template<typename A, typename B, typename C, typename D, typename E, typename F,
 using MySmootherQ1Hack = Geometry::RumpfSmootherLevelsetAnalyticQ1Hack<A, B, C, D, E, F, G, H, I>;
 
 template<typename A, typename B>
-using MyFunctional= Geometry::RumpfFunctionalConc_D2<A, B>;
+using MyFunctional= Geometry::RumpfFunctionalConc<A, B>;
 
 template<typename A, typename B>
 using MyFunctionalQ1Hack = Geometry::RumpfFunctionalQ1Hack<A, B, Geometry::RumpfFunctional>;
@@ -517,6 +703,6 @@ int main()
 {
   typedef Mem::Main MemType;
 
-  LevelsetApp<double, MemType, Shape::Simplex<2>, MySmoother, MyFunctional, Geometry::RumpfFunctionalLevelset>::run();
+  LevelsetApp<double, MemType, Shape::Hypercube<2>, MySmoother, MyFunctional, Geometry::RumpfFunctionalLevelset>::run();
   return 0;
 }

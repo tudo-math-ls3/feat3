@@ -36,6 +36,8 @@ for line in source_file:
 
   # Replaces grad[i][j] by grad(i,j)
   output_line = re.sub(r'grad\[(.)\]\[(.)\]', r'grad(\1,\2)', output_line)
+  # Replaces grad_norm[i][j] by grad_norm(i,j)
+  output_line = re.sub(r'grad_norm\[(.)\]\[(.)\]', r'grad_norm(\1,\2)', output_line)
   # Replaces x[i][j] by x(i,j)
   output_line = re.sub(r'x\[(.)\]\[(.)\]', r'x(\1,\2)', output_line)
   # Replaces h[i] by h(i)
@@ -53,6 +55,9 @@ for line in source_file:
   # Cast all Maple generated doubles to DataType_. In case of quad precision, this might lose significant bits
   # TODO: Figure out how to change the Maple output to use integers that can be casted to DataType_
   output_line = re.sub(r'(0\.[1-9]*e[1-9])',r'DataType(\1)',output_line)
+  output_line = re.sub(r'0\.([1-9])e1',r'\1',output_line)
+  output_line = re.sub(r'0\.([1-9][0-9])e2',r'\1',output_line)
+  output_line = re.sub(r'0\.([1-9][0-9][0-9])e3',r'\1',output_line)
 
   output_file.write(output_line)
 

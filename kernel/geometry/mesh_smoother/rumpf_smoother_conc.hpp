@@ -115,9 +115,6 @@ namespace FEAST
          * \param[in] align_to_lvlset_
          * Align vertices/edges/faces with 0 levelset?
          *
-         * \param[in] from_original_
-         * Start mesh optimisation from original grid?
-         *
          * \param[in] r_adaptivity_
          * Use levelset-based r_adaptivity?
          *
@@ -136,19 +133,19 @@ namespace FEAST
           FunctionalType_& functional_,
           LevelsetFunctionalType_& levelset_functional_,
           bool align_to_lvlset_,
-          bool from_original_,
           bool r_adaptivity_,
           AnalyticFunctionType_& analytic_function_,
           AnalyticFunctionGrad0Type_& analytic_function_grad0_,
           AnalyticFunctionGrad1Type_& analytic_function_grad1_)
-          : BaseClass(trafo_, functional_, levelset_functional_, align_to_lvlset_, from_original_, r_adaptivity_,
+          : BaseClass(trafo_, functional_, levelset_functional_, align_to_lvlset_, r_adaptivity_,
           analytic_function_, analytic_function_grad0_, analytic_function_grad1_),
           _conc(trafo_.get_mesh().get_num_entities(ShapeType::dimension)),
           _sum_conc(DataType(0)),
           _grad_h(this->_mesh.get_num_entities(ShapeType::dimension),DataType(0))
           {
-            for(Index d(0); d < this->_world_dim; ++d)
+            for(int d(0); d < MeshType::world_dim; ++d)
               _grad_conc[d]= std::move(VectorType(this->_mesh.get_num_entities(ShapeType::dimension)));
+            this->_update_h = true;
           }
 
         /**
@@ -187,6 +184,9 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief Computes the mesh concentration function for each cell
+         **/
         void compute_conc()
         {
           // Total number of cells in the mesh
@@ -202,6 +202,7 @@ namespace FEAST
           _sum_conc = DataType(0);
           for(Index cell(0); cell < ncells; ++cell)
           {
+            // This will be the average of the levelset values at the vertices
             DataType tmp(0);
 
             for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
@@ -214,38 +215,87 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief Computes the value of the concentration function
+         *
+         * \param[in] dist
+         * The distance.
+         *
+         **/
         DataType conc_val(DataType dist)
         {
           //return DataType(1);
+          if(dist < DataType(0))
+            return DataType(2)*Math::pow(this->_r_adapt_reg + Math::abs(dist),this->_r_adapt_pow);
+
           return Math::pow(this->_r_adapt_reg + Math::abs(dist),this->_r_adapt_pow);
         }
 
+        /**
+         * \brief Computes the derivative of the concentration function
+         *
+         * \param[in] dist
+         * The distance.
+         *
+         **/
         DataType conc_der(DataType dist)
         {
           //return DataType(0);
+          if(dist < DataType(0))
+            return DataType(2)*this->_r_adapt_pow * Math::pow(this->_r_adapt_reg + Math::abs(dist),this->_r_adapt_pow - DataType(1))*Math::signum(dist);
+
           return this->_r_adapt_pow * Math::pow(this->_r_adapt_reg + Math::abs(dist),this->_r_adapt_pow - DataType(1))*Math::signum(dist);
         }
 
-
+        /**
+         * \brief Computes the local gradient of the concentration function wrt. the vertices
+         *
+         * \tparam Tgrad_
+         * Type of the local gradient, i.e. Tiny::Matrix
+         *
+         * \tparam Tl_
+         * Type for the vector of levelset values, i.e. Tiny::vector
+         *
+         * \tparam Tgradl_
+         * Type for the local gradient of the levelset values wrt. the vertices, i.e. Tiny::Matrix
+         *
+         * \param[out] grad_loc
+         * The gradient of the concentration wrt. the vertices
+         *
+         * \param[in] lvlset_vals_
+         * The levelset values at the vertices
+         *
+         * \param[in] lvlset_grad_vals_
+         * The grandient of the levelset wrt. the vertices, evaluated at the vertices themselves
+         *
+         **/
         template<typename Tgrad_, typename Tl_, typename Tgradl_>
-        void compute_grad_conc_local(Tgrad_& grad_loc_, Tl_& lvlset_vals_, Tgradl_& lvlset_grad_vals_)
+        void compute_grad_conc_local(Tgrad_& grad_loc_, const Tl_& lvlset_vals_, const Tgradl_& lvlset_grad_vals_)
         {
           grad_loc_ = DataType(0);
 
+            // This will be the average of the levelset values at the vertices
           DataType val(0);
-          for(Index i(0); i < Shape::FaceTraits<ShapeType,0>::count; ++i)
+          for(Index i(0); i < Index(Shape::FaceTraits<ShapeType,0>::count); ++i)
             val += lvlset_vals_(i);
 
           val = val/DataType(Shape::FaceTraits<ShapeType,0>::count);
 
-          for(Index d(0); d < MeshType::world_dim; ++d)
+          for(Index d(0); d < Index(MeshType::world_dim); ++d)
           {
-            for(Index i(0); i < Shape::FaceTraits<ShapeType,0>::count; ++i)
+            for(Index i(0); i < Index(Shape::FaceTraits<ShapeType,0>::count); ++i)
               grad_loc_(d,i) = conc_der(val) * lvlset_grad_vals_(d,i)
                 /DataType(Shape::FaceTraits<ShapeType,0>::count);
           }
         }
 
+        /**
+         * \copydoc Baseclass::compute_lambda()
+         *
+         *  In this case,
+         *  \f$ \lambda(T) = \frac{\mathrm{conc}(T)}{\sum_{K \in \mathcal{T} \mathrm{conc}(t)}} \f$
+         *
+         **/
         virtual void compute_lambda() override
         {
           compute_conc();
@@ -255,10 +305,14 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief Computes the local gradient of the optimal scales
+         *
+         **/
         void compute_grad_h()
         {
           VectorType grad_sum_det[MeshType::world_dim];
-          for(Index d(0); d < MeshType::world_dim; ++d)
+          for(int d(0); d < MeshType::world_dim; ++d)
             grad_sum_det[d] = std::move(VectorType(this->_mesh.get_num_entities(0), DataType(0)));
 
           // Index set for local/global numbering
@@ -267,7 +321,10 @@ namespace FEAST
           FEAST::Tiny::Vector <DataType_, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
           // This will hold the levelset gradient values for one element for passing to other routines
           FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> lvlset_grad_vals;
+          // This will hold the local gradient values for one element for passing to other routines
           FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> grad_loc(0);
+          // This will hold the computed local gradient values for one element for copy assigning to the blocked
+          // datatype
           FEAST::Tiny::Vector<DataType, MeshType::world_dim*Shape::FaceTraits<ShapeType,0>::count> tmp(0);
 
           DataType exponent = DataType(1)/DataType(MeshType::world_dim) - DataType(1);
@@ -282,14 +339,14 @@ namespace FEAST
             {
               // Get levelset
               lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < Index(MeshType::world_dim); ++d)
                 // Get levelset gradient
                 lvlset_grad_vals(d,j) = this->_lvlset_grad_vtx_vec[d](idx(cell,j));
             }
 
             compute_grad_conc_local(grad_loc, lvlset_vals, lvlset_grad_vals);
 
-            for(Index d(0); d < MeshType::world_dim; ++d)
+            for(Index d(0); d < Index(MeshType::world_dim); ++d)
             {
               for(Index i(0); i < Shape::FaceTraits<ShapeType,0>::count; ++i)
                 tmp(d*Shape::FaceTraits<ShapeType,0>::count + i) =
@@ -302,13 +359,14 @@ namespace FEAST
 
           }
 
-        }
+        } // compute_grad_h
 
+        /**
+         * \brief Computes the gradient of the mesh concentration
+         *
+         **/
         void compute_grad_conc()
         {
-          // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
-
           // Index set for local/global numbering
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
@@ -324,20 +382,20 @@ namespace FEAST
           FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> lvlset_grad_vals;
 
           // Compute the functional value for each cell
-          for(Index cell(0); cell < ncells; ++cell)
+          for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); ++cell)
           {
             for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
               // Get levelset
               lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < Index(MeshType::world_dim); ++d)
                 // Get levelset gradient
                 lvlset_grad_vals(d,j) = this->_lvlset_grad_vtx_vec[d](idx(cell,j));
             }
 
             compute_grad_conc_local(grad_loc, lvlset_vals, lvlset_grad_vals);
 
-            for(Index d(0); d < this->_world_dim; ++d)
+            for(Index d(0); d < Index(MeshType::world_dim); ++d)
             {
               // Add local contributions to global gradient vector
               for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
@@ -345,21 +403,15 @@ namespace FEAST
             }
           }
 
-          // Set gradient to 0 where bdry_id == -1
-          // TODO: Convert this to proper filtering etc. and allow for more general BCs.
-          for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-          {
-            if(this->_bdry_id[i] == -1)
-            {
-              for(Index d(0); d < this->_world_dim; ++d)
-                this->_grad[d*this->_nk + i] = DataType(0);
-            }
-          }
-        }
+          this->_filter_grad();
+
+        } // compute_grad_conc()
 
         /// \copydoc RumpfSmoother::compute_gradient()
         virtual void compute_gradient() override
         {
+          // Total number of vertices in the mesh
+          Index nvertices(this->_mesh.get_num_entities(0));
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -378,7 +430,7 @@ namespace FEAST
           FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> lvlset_grad_vals;
 
           // Clear gradient vector
-          for(Index i(0); i < this->_world_dim*this->_nk; ++i)
+          for(Index i(0); i < Index(MeshType::world_dim)*nvertices; ++i)
             this->_grad[i] = DataType_(0);
 
           // Compute the functional value for each cell
@@ -388,7 +440,7 @@ namespace FEAST
             {
               // Get levelset
               lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < Index(MeshType::world_dim); ++d)
               {
                 h(d) = this->_h[d](cell);
                 // Get local coordinates
@@ -407,24 +459,15 @@ namespace FEAST
             // Add levelset penalty term, which is not weighted with lambda
             this->_lvlset_functional.add_lvlset_penalty_grad(lvlset_vals, lvlset_grad_vals, grad_loc, this->lvlset_constraint_last);
 
-            for(Index d(0); d < this->_world_dim; ++d)
+            for(Index d(0); d < Index(MeshType::world_dim); ++d)
             {
               // Add local contributions to global gradient vector
               for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                this->_grad[d*this->_nk + idx(cell,j)] += grad_loc(d,j);
+                this->_grad[d*nvertices + idx(cell,j)] += grad_loc(d,j);
             }
           }
 
-          // Set gradient to 0 where bdry_id == -1
-          // TODO: Convert this to proper filtering etc. and allow for more general BCs.
-          for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-          {
-            if(this->_bdry_id[i] == -1)
-            {
-              for(Index d(0); d < this->_world_dim; ++d)
-                this->_grad[d*this->_nk + i] = DataType(0);
-            }
-          }
+          this->_filter_grad();
 
         } // compute_gradient
     }; // class RumpfSmootherLevelsetConcAnalytic

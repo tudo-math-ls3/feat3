@@ -52,10 +52,10 @@ namespace FEAST
         typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
         /// Who's my daddy?
         typedef RumpfSmootherBase<DataType_, MemType_, TrafoType, FunctionalType_, H_EvalType > BaseClass;
-        // The functional has to use Simplex<shape_dim> and the trafo Hypercube<shape_dim>
-        //static_assert( std::is_same<ShapeType, Shape::Hypercube<ShapeType::dimension> >::value &&
-        //std::is_same<typename FunctionalType::ShapeType, Shape::Simplex<ShapeType::dimension> >::value, "ShapeTypes of the transformation / functional have to be Hypercube<d>/Simplex<d> for RumpfSmootherQ1Hack" );
-
+        /// And who am I?
+        typedef RumpfSmootherQ1Hack<DataType_, MemType_, TrafoType_, FunctionalType_> MyType;
+        /// Since the functional contains a ShapeType, these have to be the same
+        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value, "ShapeTypes of the transformation and functional have to agree" );
         /// \copydoc RumpfSmoother()
         explicit RumpfSmootherQ1Hack( const TrafoType& trafo_, FunctionalType& functional_)
           : BaseClass(trafo_, functional_)
@@ -92,13 +92,13 @@ namespace FEAST
             // ... and for each simplex in all permutations
             for(Index p(0); p < n_perms; ++p)
             {
-              for(Index d(0); d < this->_world_dim; d++)
+              for(Index d(0); d < MeshType::world_dim; d++)
               {
                 h(d) = this->_h[d](cell);
                 for(Index j(0); j < 3; j++)
                   x(d,j) = this->_coords[d](idx(cell,perm[p][j]));
               }
-              fval += this->_lambda(cell)*this->_functional.compute_local_functional(x,h);
+              fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h);
             }
           }
 
@@ -147,7 +147,7 @@ namespace FEAST
             for(Index p(0); p < n_perms; ++p)
             {
               //std::cout << " permutation " << p << std::endl;
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < MeshType::world_dim; ++d)
               {
                 h(d) = this->_h[d](cell);
                 for(Index j(0); j < 3; ++j)
@@ -157,11 +157,11 @@ namespace FEAST
                 }
                 //std::cout << std::endl;
               }
-              fval += this->_lambda(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
+              fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
 
-              func_norm[cell] += this->_lambda(cell) * norm_A;
-              func_det[cell] += this->_lambda(cell) * det_A;
-              func_rec_det[cell] += this->_lambda(cell) * rec_det_A;
+              func_norm[cell] += this->_mu(cell) * norm_A;
+              func_det[cell] += this->_mu(cell) * det_A;
+              func_rec_det[cell] += this->_mu(cell) * rec_det_A;
             }
             func_norm_tot += func_norm[cell];
             func_det_tot += func_det[cell];
@@ -178,6 +178,8 @@ namespace FEAST
         /// \copydoc BaseClass::compute_gradient()
         virtual void compute_gradient()
         {
+          // Total number of vertices in the mesh
+          Index nvertices(this->_mesh.get_num_entities(0));
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -201,7 +203,7 @@ namespace FEAST
           FEAST::Tiny::Matrix<DataType_, MeshType::world_dim, 3 > grad_loc;
 
           // Clear gradient vector
-          for(Index i(0); i < this->_world_dim*this->_nk; ++i)
+          for(Index i(0); i < MeshType::world_dim*nvertices; ++i)
             this->_grad[i] = DataType_(0);
 
           // Compute the functional value for each cell...
@@ -210,7 +212,7 @@ namespace FEAST
             // ... and for each simplex in all permutations
             for(Index p(0); p < n_perms; ++p)
             {
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < MeshType::world_dim; ++d)
               {
                 h(d) = this->_h[d](cell);
                 // Get local coordinates
@@ -220,32 +222,28 @@ namespace FEAST
 
               this->_functional.compute_local_grad(x, h, grad_loc);
 
-              for(Index d(0); d < this->_world_dim; ++d)
+              for(Index d(0); d < MeshType::world_dim; ++d)
               {
                 // Add local contributions to global gradient vector
                 for(Index j(0); j < 3; ++j)
-                  this->_grad[d*this->_nk + idx(cell,perm[p][j])] += this->_lambda(cell)*grad_loc(d,j);
+                  this->_grad[d*nvertices + idx(cell,perm[p][j])] += this->_mu(cell)*grad_loc(d,j);
               }
             }
           }
 
-          // Set gradient to 0 where bdry_id == -1
-          // TODO: Convert this to proper filtering etc. and allow for more general BCs.
-          for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-          {
-            if(this->_bdry_id[i] == -1)
-            {
-              for(Index d(0); d < this->_world_dim; ++d)
-                this->_grad[d*this->_nk + i] = DataType(0);
-            }
-          }
+          this->_filter_grad();
 
         } // compute_gradient
 
         /// \copydoc MeshSmoother::optimise()
         virtual void optimise()
         {
-          ALGLIBWrapper<RumpfSmootherQ1Hack<DataType_, MemType_, TrafoType_, FunctionalType_>>::minimise_functional_cg(*this);
+          int total_grad_evals(0);
+          int total_iterations(0);
+          int termination_type(0);
+
+          ALGLIBWrapper<MyType>::minimise_functional_cg(total_grad_evals, total_iterations, termination_type,*this);
+          std::cout << total_iterations << " mincg iterations, " << total_grad_evals << " grad evals, terminationtype was " << termination_type << std::endl;
           // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
           this->set_coords();
         }

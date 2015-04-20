@@ -36,6 +36,8 @@ if (FEAST_HAVE_ALGLIB)
   SET (app_list
     ${app_list}
     rumpf_smoother_bdry_deform-app
+    rumpf_smoother_excentric-app
+    rumpf_smoother_excentric_lvlset-app
     rumpf_smoother_lvlset-app
     rumpf_smoother_resize-app
   )

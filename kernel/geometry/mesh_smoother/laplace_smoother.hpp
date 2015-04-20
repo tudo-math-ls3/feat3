@@ -7,13 +7,13 @@
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
-#include <kernel/assembly/dirichlet_assembler.hpp>         // for DirichletAssembler
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/preconditioner.hpp>
-#include <kernel/lafem/bicgstab.hpp>
+#include <kernel/lafem/proto_solver.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/unit_filter.hpp>
 #include <kernel/geometry/mesh_smoother/mesh_smoother.hpp>
@@ -67,15 +67,13 @@ namespace FEAST
         typedef LAFEM::SparseMatrixCSR<MemType, DataType> MatrixType;
         typedef LAFEM::UnitFilter<MemType, DataType> FilterType;
 
-        typedef Algo::Generic AlgoType;
-
       protected:
         SpaceType _trafo_space;
         MatrixType _sys_matrix;
         VectorType _vec_rhs;
         Cubature::DynamicFactory _cubature_factory;
         FilterType _filter;
-        Assembly::DirichletAssembler<SpaceType> _dirichlet_asm;
+        Assembly::UnitFilterAssembler<MeshType> _dirichlet_asm;
 
       public:
         /// Constructor
@@ -86,10 +84,10 @@ namespace FEAST
           _vec_rhs(trafo_.get_mesh().get_num_entities(0)),
           _cubature_factory("auto-degree:5"),
           _filter(trafo_.get_mesh().get_num_entities(0)),
-          _dirichlet_asm(_trafo_space)
+          _dirichlet_asm()
       {
         /// Type for the boundary mesh
-        typedef typename Geometry::CellSubSet<ShapeType> BoundaryType;
+        typedef typename Geometry::MeshPart<MeshType> BoundaryType;
         /// Factory for the boundary mesh
         typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
 
@@ -98,7 +96,7 @@ namespace FEAST
         BoundaryFactoryType boundary_factory(this->_mesh);
         BoundaryType boundary(boundary_factory);
 
-        _dirichlet_asm.add_cell_set(boundary);
+        _dirichlet_asm.add_mesh_part(boundary);
 
       }
 
@@ -117,28 +115,35 @@ namespace FEAST
         virtual void optimise() override
         {
           prepare();
-          // Create a dummy preconditioner
-          LAFEM::NonePreconditioner<AlgoType, MatrixType, VectorType> precond;
-          for(Index d(0); d < this->_world_dim; ++d)
-          {
-            _dirichlet_asm.assemble(_filter,this->_coords[d]);
+          // Create a SSOR preconditioner
+         auto precond(std::make_shared<LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner>>(_sys_matrix));
 
-            _filter.template filter_mat<AlgoType>(_sys_matrix);
+          // Create a PCG solver
+          LAFEM::PCGSolver<MatrixType, FilterType> solver(_sys_matrix, _filter, precond);
+          // Enable convergence plot
+          solver.set_plot(false);
+          solver.set_max_iter(5000);
+          // Initialise the solver
+          solver.init();
+
+          // Some preconditioners/solvers do not care about filtered matrices (SSOR, PCG), but other do (UMFPACK) or
+          // might (ILU)
+          _filter.filter_mat(_sys_matrix);
+          for(int d(0); d < MeshType::world_dim; ++d)
+          {
+            _dirichlet_asm.assemble(_filter, _trafo_space, this->_coords[d]);
 
             _vec_rhs.format();
-            _filter.template filter_rhs<AlgoType>(_vec_rhs);
-//            _filter.template filter_sol<AlgoType>(this->_coords[d]);
 
-            // Fire up the BiCGStab solver
-            LAFEM::BiCGStab<AlgoType>::value(
-              this->_coords[d],    // the initial solution vector
-              _sys_matrix,     // the system matrix
-              _vec_rhs,    // the right-hand-side vector
-              precond,    // the dummy preconditioner
-              1000,        // maximum number of iterations
-              1E-8        // relative tolerance to achieve
-              );
+            _filter.filter_rhs(_vec_rhs);
+
+            // Correct our initial solution vector
+            solver.correct(this->_coords[d], _vec_rhs);
           }
+
+          // Release the solver
+          solver.done();
+          // Copy back the coordinates to the underlying mesh
           this->set_coords();
 
           return;

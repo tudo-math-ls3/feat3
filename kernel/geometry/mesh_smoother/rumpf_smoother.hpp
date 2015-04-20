@@ -74,11 +74,10 @@ namespace FEAST
         /// Vector types for element sizes etc.
         typedef LAFEM::DenseVector<MemType_, DataType_> VectorType;
         /// Since the functional contains a ShapeType, these have to be the same
-        //static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
-        //"ShapeTypes of the transformation / functional have to agree" );
+        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
+        "ShapeTypes of the transformation / functional have to agree" );
 
         /// Global gradient of the functional
-        //
         // Later this could be a
         // VectorType _grad[MeshType::world_dim];
         DataType_* _grad;
@@ -125,32 +124,55 @@ namespace FEAST
           _bdry_id(new int[trafo_.get_mesh().get_num_entities(0)]),
           _mu(trafo_.get_mesh().get_num_entities(ShapeType::dimension),DataType(1)/DataType(trafo_.get_mesh().get_num_entities(ShapeType::dimension))),
           _lambda(trafo_.get_mesh().get_num_entities(ShapeType::dimension))
-      {
-        /// Type for the boundary mesh
-        typedef typename Geometry::CellSubSet<ShapeType> BoundaryType;
-        /// Factory for the boundary mesh
-        typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
+          {
+            /// Type for the boundary mesh
+            typedef typename Geometry::MeshPart<MeshType> BoundaryType;
+            /// Factory for the boundary mesh
+            typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
 
-        // Get the boundary set
-        BoundaryFactoryType boundary_factory(this->_mesh);
-        BoundaryType boundary(boundary_factory);
-        Geometry::TargetSet boundary_set = boundary.template get_target_set<0>();
+            // Get the boundary set
+            BoundaryFactoryType boundary_factory(this->_mesh);
+            BoundaryType boundary(boundary_factory);
+            Geometry::TargetSet boundary_set = boundary.template get_target_set<0>();
 
-        // Zilch bdry_id
-        for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-          _bdry_id[i] = 0;
+            // Zilch bdry_id
+            for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
+              _bdry_id[i] = 0;
 
-        // Set id for boundary vertices
-        for(Index i(0); i < boundary.get_num_entities(0); ++i)
-          _bdry_id[boundary_set[i]] = -1;
+            // Set id for boundary vertices
+            for(Index i(0); i < boundary.get_num_entities(0); ++i)
+              _bdry_id[boundary_set[i]] = -MeshType::world_dim;
 
-        for(Index d(0); d < this->_world_dim; ++d)
-          _h[d]= std::move(VectorType(this->_mesh.get_num_entities(ShapeType::dimension)));
+            for(Index d(0); d < MeshType::world_dim; ++d)
+              _h[d]= std::move(VectorType(this->_mesh.get_num_entities(ShapeType::dimension)));
 
-        //for(Index d = 0; d < this->_world_dim; ++d)
-        //  _grad[d]= std::move(VectorType(this->_mesh.get_num_entities(0)));
-      }
+            //for(Index d = 0; d < MeshType::world_dim; ++d)
+            //  _grad[d]= std::move(VectorType(this->_mesh.get_num_entities(0)));
+          }
 
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes
+         *
+         * In a truly optimal mesh (consisting ONLY of Rumpf reference cells of the right size), every cell's volume is
+         * exaclty lambda(cell). This is especially the goal for r-adaptivity.
+         * So in an optimal mesh, size(cell)/lambda(cell) = 1, so we compute the Euclidean norm of this vector, scaled
+         * by the number of cells so it is independant of the refinement level. Not sure if the scaling part is
+         * sensible, though.
+         *
+         **/
+        DataType cell_size_quality()
+        {
+          VectorType tmp(this->_mesh.get_num_entities(ShapeType::dimension));
+          DataType my_vol(0);
+
+          for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); ++cell)
+          {
+            my_vol = this->_trafo.template compute_vol<ShapeType, DataType>(cell);
+            tmp(cell, Math::abs(DataType(1) - my_vol/this->_lambda(cell)));
+          }
+
+          return tmp.norm2()/Math::sqrt(DataType(this->_mesh.get_num_entities(ShapeType::dimension)));
+        }
 
         /// \brief Destructor
         virtual ~RumpfSmootherBase()
@@ -196,7 +218,31 @@ namespace FEAST
         /// \brief Computes the weights _lambda.
         virtual void compute_lambda()
         {
-          compute_lambda_uniform();
+          compute_lambda_current();
+          //compute_lambda_uniform();
+        }
+
+        /// \brief Computes the uniformly distributed weights _lambda.
+        virtual void compute_lambda_current()
+        {
+          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+
+          // This will hold the coordinates for one element for passing to other routines
+          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          // Local cell dimensions for passing to other routines
+          FEAST::Tiny::Vector <DataType_, MeshType::world_dim> h;
+
+          DataType sum_lambda(0);
+          for(Index cell(0); cell < ncells; ++cell)
+          {
+            _lambda(cell, this->_trafo.template compute_vol<ShapeType, DataType>(cell));
+            sum_lambda+=_lambda(cell);
+          }
+
+          // Scale so that sum(lambda) = 1
+          sum_lambda = DataType(1)/sum_lambda;
+          for(Index k(0); k < ncells; ++k)
+            _lambda(k,sum_lambda*_lambda(k));
         }
 
         /// \brief Computes the uniformly distributed weights _lambda.
@@ -231,6 +277,39 @@ namespace FEAST
           for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); cell++)
             this->_mu(cell,fac);
         }
+
+        /// \brief Filters the functional gradient
+        virtual void _filter_grad()
+        {
+          // Total number of vertices in the mesh
+          Index nvertices(this->_mesh.get_num_entities(0));
+
+          // Set gradient to 0 where bdry_id == -(world_dim+1)
+          // TODO: Convert this to proper filtering etc. and allow for more general BCs.
+          for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
+          {
+            // Only filter if the id is negative
+            if(this->_bdry_id[i] < 0)
+            {
+              // Dirichlet in all directions
+              if(this->_bdry_id[i] == -(MeshType::world_dim))
+              {
+                for(Index d(0); d < MeshType::world_dim; ++d)
+                  this->_grad[d*nvertices + i] = DataType(0);
+              }
+              // Check for other boundary conditions
+              else
+              {
+                // Quick'n'dirty hack for just fixing one component
+                for(Index d(0); d < MeshType::world_dim; ++d)
+                {
+                  if(this->_bdry_id[i] == -int(d+1))
+                    this->_grad[d*nvertices + i] = DataType(0);
+                }
+              }
+            }
+          }
+        } // _filter_grad
 
     }; // class RumpfSmootherBase
 
@@ -279,8 +358,8 @@ namespace FEAST
          */
         explicit RumpfSmoother(const TrafoType& trafo_, FunctionalType& functional_)
           : BaseClass(trafo_, functional_)
-      {
-      }
+          {
+          }
 
         /// \brief Destructor
         virtual ~RumpfSmoother()
@@ -311,7 +390,7 @@ namespace FEAST
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d = 0; d < this->_world_dim; d++)
+            for(Index d = 0; d < MeshType::world_dim; d++)
             {
               h(d) = this->_h[d](cell);
               for(Index j = 0; j < Shape::FaceTraits<ShapeType,0>::count; j++)
@@ -364,7 +443,7 @@ namespace FEAST
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d = 0; d < this->_world_dim; d++)
+            for(Index d = 0; d < MeshType::world_dim; d++)
             {
               h(d) = this->_h[d](cell);
               // Get local coordinates
@@ -392,6 +471,8 @@ namespace FEAST
         /// \brief Computes the gradient of the functional with regard to the nodal coordinates.
         virtual void compute_gradient()
         {
+          // Total number of vertices in the mesh
+          Index nvertices(this->_mesh.get_num_entities(0));
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -406,13 +487,13 @@ namespace FEAST
           FEAST::Tiny::Matrix<DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> grad_loc;
 
           // Clear gradient vector
-          for(Index i(0); i < this->_world_dim*this->_nk; ++i)
+          for(Index i(0); i < MeshType::world_dim*nvertices; ++i)
             this->_grad[i] = DataType_(0);
 
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d(0); d < this->_world_dim; ++d)
+            for(Index d(0); d < MeshType::world_dim; ++d)
             {
               h(d) = this->_h[d](cell);
               // Get local coordinates
@@ -422,33 +503,303 @@ namespace FEAST
 
             this->_functional.compute_local_grad(x, h, grad_loc);
 
-            for(Index d(0); d < this->_world_dim; ++d)
+            for(Index d(0); d < MeshType::world_dim; ++d)
             {
               // Add local contributions to global gradient vector
               for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                this->_grad[d*this->_nk + idx(cell,j)] += this->_mu(cell)*grad_loc(d,j);
+                this->_grad[d*nvertices + idx(cell,j)] += this->_mu(cell)*grad_loc(d,j);
             }
           }
 
-          // Set gradient to 0 where bdry_id == -1
-          // TODO: Convert this to proper filtering etc. and allow for more general BCs.
-          for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
+          this->_filter_grad();
+
+        } // compute_gradient
+
+
+        /// \copydoc MeshSmoother::optimise()
+        virtual void optimise()
+        {
+          int total_grad_evals(0);
+          int total_iterations(0);
+          int termination_type(0);
+
+          ALGLIBWrapper<RumpfSmoother<DataType_, MemType_, TrafoType_, FunctionalType_, H_EvalType_>>::minimise_functional_cg(total_grad_evals, total_iterations, termination_type,*this);
+          // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
+          this->set_coords();
+          std::cout << total_iterations << " mincg iterations, " << total_grad_evals << " grad evals, terminationtype was " << termination_type << std::endl;
+        }
+
+        /**
+         * \brief Prepares the functional for evaluation.
+         *
+         * Needs to be called whenever any data like the mesh, the levelset function etc. changed.
+         *
+         **/
+        virtual void prepare()
+        {
+        }
+
+    }; // class RumpfSmoother
+
+    template
+    <
+      typename DataType_,
+      typename MemType_,
+      typename TrafoType_,
+      typename FunctionalType_,
+      typename H_EvalType_ = H_Evaluator<TrafoType_, DataType_>
+    >
+    class RumpfSmootherSplit:
+      public RumpfSmoother<DataType_, MemType_, TrafoType_, FunctionalType_, H_EvalType_>
+    {
+      public :
+        /// Our datatype
+        typedef DataType_ DataType;
+        /// Memory architecture
+        typedef MemType_ MemType;
+        /// Type for the transformation
+        typedef TrafoType_ TrafoType;
+        /// The mesh the transformation is defined on
+        typedef typename TrafoType::MeshType MeshType;
+        /// Type for the functional
+        typedef FunctionalType_ FunctionalType;
+        /// ShapeType of said mesh
+        typedef typename MeshType::ShapeType ShapeType;
+        /// Who's my daddy?
+        typedef RumpfSmoother<DataType, MemType, TrafoType, FunctionalType> BaseClass;
+        /// Vector types for element sizes etc.
+        typedef LAFEM::DenseVector<MemType_, DataType_> VectorType;
+        /// Since the functional contains a ShapeType, these have to be the same
+        //static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
+        //"ShapeTypes of the transformation / functional have to agree" );
+
+        /// Coordinates of the vertices, as they get changed in the optimisation process
+        VectorType _coords_old[MeshType::world_dim];
+        DataType relaxation_parameter;
+      public:
+        /**
+         * \brief Constructor
+         *
+         * \param[in] trafo_
+         * Reference to the underlying transformation
+         *
+         * \param[in] functional_
+         * Reference to the functional used
+         *
+         */
+        explicit RumpfSmootherSplit(const TrafoType& trafo_, FunctionalType& functional_)
+          : BaseClass(trafo_, functional_),
+          relaxation_parameter(0)
           {
-            if(this->_bdry_id[i] == -1)
+            for(Index d = 0; d < MeshType::world_dim; ++d)
+              _coords_old[d]= std::move(VectorType(this->_mesh.get_num_entities(0)));
+          }
+
+        /// \brief Destructor
+        virtual ~RumpfSmootherSplit()
+        {
+        };
+
+        /**
+         * \brief Computes the functional value on the current mesh.
+         *
+         * \returns
+         * The functional value
+         *
+         **/
+        virtual DataType compute_functional()
+        {
+          DataType_ fval(0);
+          // Total number of cells in the mesh
+          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+
+          // Index set for local/global numbering
+          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+
+          // This will hold the coordinates for one element for passing to other routines
+          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x_old;
+          // Local cell dimensions for passing to other routines
+          FEAST::Tiny::Vector<DataType_, MeshType::world_dim> h;
+
+          // Compute the functional value for each cell
+          for(Index cell(0); cell < ncells; ++cell)
+          {
+            for(Index d = 0; d < MeshType::world_dim; d++)
             {
-              for(Index d(0); d < this->_world_dim; ++d)
-                this->_grad[d*this->_nk + i] = DataType(0);
+              h(d) = this->_h[d](cell);
+              for(Index j = 0; j < Shape::FaceTraits<ShapeType,0>::count; j++)
+              {
+                x(d,j) = this->_coords[d](idx(cell,j));
+                x_old(d,j) = this->_coords_old[d](idx(cell,j));
+              }
+            }
+            fval += this->_mu(cell) * (this->_functional._fac_norm*this->_functional.compute_norm_A(x,h)
+                + this->_functional._fac_det*this->_functional.compute_det_A(x_old,h)
+                +this->_functional._fac_rec_det*this->_functional.compute_rec_det_A(x_old,h));
+          }
+
+          return fval;
+        } // compute_functional
+
+        /**
+         * \brief Computes the functional value on the current mesh.
+         *
+         * \param[in] func_norm
+         * The contribution of the Frobenius norm for each cell
+         *
+         * \param[in] func_det
+         * The contribution of the det term for each cell
+         *
+         * \param[in] func_rec_det
+         * The contribution of the 1/det term for each cell
+         *
+         * \returns
+         * The functional value
+         *
+         * Debug variant that saves the different contributions for each cell.
+         **/
+        virtual DataType compute_functional( DataType_* func_norm, DataType_* func_det, DataType_* func_rec_det )
+        {
+          DataType_ fval(0);
+          // Total number of cells in the mesh
+          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+
+          // Index set for local/global numbering
+          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+
+          // This will hold the coordinates for one element for passing to other routines
+          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          // Local cell dimensions for passing to other routines
+          FEAST::Tiny::Vector<DataType_, MeshType::world_dim> h;
+
+          DataType_ norm_A(0), det_A(0), rec_det_A(0);
+
+          DataType_ func_norm_tot(0);
+          DataType_ func_det_tot(0);
+          DataType_ func_rec_det_tot(0);
+          // Compute the functional value for each cell
+          for(Index cell(0); cell < ncells; ++cell)
+          {
+            for(Index d = 0; d < MeshType::world_dim; d++)
+            {
+              h(d) = this->_h[d](cell);
+              // Get local coordinates
+              for(Index j = 0; j < Shape::FaceTraits<ShapeType,0>::count; j++)
+                x(d,j) = this->_coords[d](idx(cell,j));
+            }
+
+            // Scale local functional value with lambda
+            fval += this->_mu(cell) * this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
+
+            func_norm[cell] = this->_mu(cell) * norm_A;
+            func_det[cell] = this->_mu(cell) * det_A;
+            func_rec_det[cell] = this->_mu(cell) * rec_det_A;
+            func_norm_tot += func_norm[cell];
+            func_det_tot += func_det[cell];
+            func_rec_det_tot += func_rec_det[cell];
+          }
+
+          std::cout << "fval = " << scientify(fval) << " func_norm = " << scientify(func_norm_tot)
+          << ", func_det = " << scientify(func_det_tot) << ", func_rec_det = " << scientify(func_rec_det_tot) << std::endl;
+
+          return fval;
+        } // compute_functional
+
+        /// \brief Computes the gradient of the functional with regard to the nodal coordinates.
+        virtual void compute_gradient()
+        {
+          // Total number of vertices in the mesh
+          Index nvertices(this->_mesh.get_num_entities(0));
+          // Total number of cells in the mesh
+          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+
+          // Index set for local/global numbering
+          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+
+          // This will hold the coordinates for one element for passing to other routines
+          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          // Local cell dimensions for passing to other routines
+          FEAST::Tiny::Vector<DataType_, MeshType::world_dim> h;
+          // This will hold the local gradient for one element for passing to other routines
+          FEAST::Tiny::Matrix<DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> grad_loc;
+
+          // Clear gradient vector
+          for(Index i(0); i < MeshType::world_dim*nvertices; ++i)
+            this->_grad[i] = DataType_(0);
+
+          // Compute the functional value for each cell
+          for(Index cell(0); cell < ncells; ++cell)
+          {
+            for(Index d(0); d < MeshType::world_dim; ++d)
+            {
+              h(d) = this->_h[d](cell);
+              // Get local coordinates
+              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+                x(d,j) = this->_coords[d](idx(cell,j));
+            }
+
+            this->_functional.compute_grad_norm(x, h, grad_loc);
+
+            for(Index d(0); d < MeshType::world_dim; ++d)
+            {
+              // Add local contributions to global gradient vector
+              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+                this->_grad[d*nvertices + idx(cell,j)] += this->_mu(cell)*grad_loc(d,j);
             }
           }
+
+          this->_filter_grad();
 
         } // compute_gradient
 
         /// \copydoc MeshSmoother::optimise()
         virtual void optimise()
         {
-          ALGLIBWrapper<RumpfSmoother<DataType_, MemType_, TrafoType_, FunctionalType_, H_EvalType_>>::minimise_functional_cg(*this);
-          // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
-          this->set_coords();
+          DataType diff(1);
+          DataType tol(Math::pow(Math::eps<DataType_>(),DataType(0.75) ));
+
+          int total_grad_evals(0);
+          int total_iterations(0);
+          int termination_type(0);
+
+          // coords_new = relaxation_parameter*coords + (1 - relaxation_parameter)*coords_old
+          relaxation_parameter = DataType(0.1);
+          for(Index iter(0); iter < 1000; ++iter)
+          {
+            diff = DataType(0);
+            int iterations(0);
+            int grad_evals(0);
+            // Save old coordinates for explicit terms
+            for(Index d(0); d < MeshType::world_dim; ++d)
+              this->_coords_old[d].clone(this->_coords[d]);
+
+            ALGLIBWrapper<RumpfSmoother<DataType_, MemType_, TrafoType_, FunctionalType_, H_EvalType_>>::minimise_functional_cg(grad_evals, iterations, termination_type,*this);
+
+            total_grad_evals += grad_evals;
+            total_iterations += iterations;
+
+            for(Index d(0); d < MeshType::world_dim; ++d)
+            {
+              for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
+                diff+= Math::sqr(this->_coords_old[d](i) - this->_coords[d](i));
+            }
+            diff = Math::sqrt(diff/DataType(this->_mesh.get_num_entities(0)));
+
+            // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
+            for(Index d(0); d < MeshType::world_dim; ++d)
+            {
+              this->_coords_old[d].template scale(this->_coords_old[d],DataType(1)-relaxation_parameter);
+              this->_coords[d].template axpy(this->_coords[d], this->_coords_old[d], relaxation_parameter);
+            }
+
+            this->set_coords();
+            if(diff < DataType(tol))
+            {
+              std::cout << iter << " fixed point iterations, " << total_iterations << " mincg iterations, " << total_grad_evals << " grad evals, last terminationtype was " << termination_type << std::endl;
+              return;
+            }
+          }
         }
 
         /**
@@ -490,11 +841,12 @@ namespace FEAST
        *
        *
        */
-      static void minimise_functional_cg(RumpfSmootherType_& my_smoother)
+      static void minimise_functional_cg(int& grad_eval_count, int& iteration_count, int& termination_type,
+      RumpfSmootherType_& my_smoother)
       {
 
-        const Index world_dim(my_smoother.get_world_dim());
-        const Index num_vert(my_smoother.get_num_vert());
+        const Index world_dim(RumpfSmootherType_::MeshType::world_dim);
+        const Index num_vert(my_smoother._mesh.get_num_entities(0));
 
         // Array for the coordinates for passing to ALGLIB's optimiser
         alglib::real_1d_array x;
@@ -506,9 +858,6 @@ namespace FEAST
             // Warning: Index/ae_int_t conversion
             x[alglib::ae_int_t(d*num_vert + j)] = double(my_smoother._coords[d](j));
         }
-
-        // DEBUG
-        // my_smoother.iteration_count = 0;
 
         double epsg = 1.e-10;
         double epsf = 0.;
@@ -531,7 +880,14 @@ namespace FEAST
         //alglib::mincgoptimize(state, ALGLIBWrapper::functional, nullptr, &my_smoother);
         //alglib::mincgresults(state, x, rep);
 
-        std::cout << "mincg: terminationtype " << rep.terminationtype << ", " << rep.iterationscount << " its, " << rep.nfev << " grad evals, " << std::endl;
+        //std::cout << "mincg: terminationtype " << rep.terminationtype << ", " << rep.iterationscount << " its, " << rep.nfev << " grad evals" << std::endl;
+
+        // Warning: ae_int_t to int conversions
+        iteration_count = int(rep.iterationscount);
+        grad_eval_count = int(rep.nfev);
+        termination_type = int(rep.terminationtype);
+        if(rep.terminationtype == -8)
+          throw InternalError(__func__, __FILE__, __LINE__, "Optimizer stopped with status -8");
 
       }
 
@@ -603,8 +959,8 @@ namespace FEAST
         // Evil downcast, but we know what we are doing, right?
         RumpfSmootherType_* my_smoother = reinterpret_cast<RumpfSmootherType_*> (ptr);
 
-        const Index world_dim(my_smoother->get_world_dim());
-        const Index num_vert(my_smoother->get_num_vert());
+        const Index world_dim(RumpfSmootherType_::MeshType::world_dim);
+        const Index num_vert(my_smoother->_mesh.get_num_entities(0));
 
         // Copy back the vertex coordinates, needed for computing the gradient on the modified mesh
         for(Index d(0); d < world_dim; ++d)
