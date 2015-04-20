@@ -3,8 +3,6 @@ import sys
 from build_system.feast_util import get_output
 
 def configure_gcc(cpu, buildid, compiler):
-  if not compiler:
-    compiler="g++"
   version = get_output(compiler + " -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__GNUC__"])

@@ -2,8 +2,6 @@ import platform
 from build_system.feast_util import get_output
 
 def configure_clang(cpu, buildid, compiler):
-  if not compiler:
-    compiler = "clang++"
   version = get_output(compiler + " -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__clang_major__"])

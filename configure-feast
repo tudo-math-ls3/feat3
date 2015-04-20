@@ -254,43 +254,40 @@ if not cuda_arch:
 
 #compiler selection
 if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
-  if not is_found("g++"):
-    print ("Error: Chosen compiler binary 'g++' not found!")
+  if not compiler:
+    compiler="g++"
+  if not is_found(compiler):
+    print ("Error: Chosen compiler binary '" + compiler +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "gcc")
   remove_string(unused_tokens, "gnu")
   os.environ["CC"] = "gcc"
-  if compiler:
-    os.environ["CXX"] = compiler
-  else:
-    os.environ["CXX"] = "g++"
+  os.environ["CXX"] = compiler
   cxxflags += " " + configure_gcc (cputype, buildid, compiler)
   if "coverage" in buildid:
     remove_string(unused_tokens, "coverage")
     ldflags += " -fprofile-arcs -ftest-coverage"
 elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
+  if not compiler:
+    compiler = "icpc"
   if not is_found("icpc"):
-    print ("Error: Chosen compiler binary 'icpc' not found!")
+    print ("Error: Chosen compiler binary '" + compiler +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "icc")
   remove_string(unused_tokens, "intel")
   os.environ["CC"] = "icc"
-  if compiler:
-    os.environ["CXX"] = compiler
-  else:
-    os.environ["CXX"] = "icpc"
+  os.environ["CXX"] = compiler
   cxxflags += " " + configure_icc (cputype, buildid, compiler, system_host_compiler)
 elif "clang" in buildid or "llvm" in buildid:
+  if not compiler:
+    compiler = "clang++"
   if not is_found("clang++"):
-    print ("Error: Chosen compiler binary 'clang++' not found!")
+    print ("Error: Chosen compiler binary '" + compiler +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "clang")
   remove_string(unused_tokens, "llvm")
   os.environ["CC"] = "clang"
-  if compiler:
-    os.environ["CXX"] = compiler
-  else:
-    os.environ["CXX"] = "clang++"
+  os.environ["CXX"] = compiler
   cxxflags += " " + configure_clang (cputype, buildid, compiler)
 elif "msc" in buildid:
   if not is_found("cl"):
