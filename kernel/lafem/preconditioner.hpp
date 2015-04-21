@@ -97,7 +97,7 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] damping A damping-parameter
+       * \param[in] damping A damping-parameter
        *
        * Creates a dummy preconditioner
        */
@@ -179,9 +179,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] mode A FileMode
+       * \param[in] mode A FileMode
        *
-       * param[in] filename A filename to the input matrix
+       * \param[in] filename A filename to the input matrix
        *
        * Creates a Matrix preconditioner from given source matrix file name.
        */
@@ -258,9 +258,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] damping A damping-parameter
+       * \param[in] damping A damping-parameter
        *
        * Creates a Jacobi preconditioner to the given matrix and damping-parameter
        */
@@ -355,9 +355,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] damping A damping-parameter
+       * \param[in] damping A damping-parameter
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
@@ -463,9 +463,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] damping A damping-parameter
+       * \param[in] damping A damping-parameter
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
@@ -570,9 +570,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] damping A damping-parameter
+       * \param[in] damping A damping-parameter
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
@@ -693,9 +693,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] p level of fillin
+       * \param[in] p level of fillin
        *           if p = 0, the layout of A is used for the ILU-decomposition
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
@@ -726,7 +726,7 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] LU external LU-matrix
+       * \param[in] LU external LU-matrix
        *           the LU-decomposition is not calculated internally;
        *           so this preconditioner only solves \f$y \leftarrow L^{-1} U^{-1} x\f$
        *
@@ -745,9 +745,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] layout An external layout for the LU-decomposition
+       * \param[in] layout An external layout for the LU-decomposition
        *
        * Creates a ILU preconditioner to the given matrix and layout
        */
@@ -1114,9 +1114,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] p level of fillin
+       * \param[in] p level of fillin
        *           if p = 0, the layout of A is used for the ILU-decomposition
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
@@ -1147,7 +1147,7 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] LU external LU-matrix
+       * \param[in] LU external LU-matrix
        *           the LU-decomposition is not calculated internally;
        *           so this preconditioner only solves \f$y \leftarrow L^{-1} U^{-1} x\f$
        *
@@ -1167,9 +1167,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] layout An external layout for the LU-decomposition
+       * \param[in] layout An external layout for the LU-decomposition
        *
        * Creates a ILU preconditioner to the given matrix and layout
        */
@@ -1567,9 +1567,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] p level of fillin
+       * \param[in] p level of fillin
        *           if p = 0, the layout of A is used for the ILU-decomposition
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
@@ -1582,7 +1582,7 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] LU external LU-matrix
+       * \param[in] LU external LU-matrix
        *           the LU-decomposition is not calculated internally;
        *           so this preconditioner only solves \f$y \leftarrow L^{-1} U^{-1} x\f$
        *
@@ -1633,7 +1633,8 @@ namespace FEAST
     /**
      * \brief SOR-Preconditioner for CSR-matrices.
      *
-     * This class specializes the SOR-Preconditioner \f$ \frac 1 \omega (D + \omega L)\f$ for CSR-matrices.
+     * This class specializes the SOR-Preconditioner \f$ \frac 1 \omega (D + \omega L)\f$ or
+     * \f$ \frac 1 \omega (D + \omega U)\f$ for CSR-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -1646,6 +1647,7 @@ namespace FEAST
     private:
       const SparseMatrixCSR<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
+      const bool _reverse;
 
     public:
       /// Our algotype
@@ -1666,19 +1668,24 @@ namespace FEAST
       virtual ~SORPreconditioner()
       {
       }
+
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 1)
+       * \param[in] omega The relaxation parameter of the preconditioner (default omega = 1)
+       *
+       * \param[in] reverse Specifies whether to solve with the upper triangular part instead of the lower one.
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
       SORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A,
-                        const DT_ omega = DT_(1)) :
+                        const DT_ omega = DT_(1),
+                        bool reverse = false) :
         _A(A),
-        _omega(omega)
+        _omega(omega),
+        _reverse(reverse)
       {
         if (_A.columns() != _A.rows())
         {
@@ -1716,17 +1723,36 @@ namespace FEAST
         const IT_ * prow_ptr(_A.row_ptr());
         const Index n(_A.rows());
 
-        // __forward-insertion__
-        // iteration over all rows
-        for (Index i(0), col; i < n; ++i)
+        if(!_reverse)
         {
-          DT_ d(0);
-          // iteration over all elements on the left side of the main-diagonal
-          for (col = prow_ptr[i]; pcol_ind[col] < i; ++col)
+          // __forward-insertion__
+          // iteration over all rows
+          for (Index i(0), col; i < n; ++i)
           {
-            d += pval[col] * pout[pcol_ind[col]];
+            DT_ d(0);
+            // iteration over all elements on the left side of the main-diagonal
+            for (col = prow_ptr[i]; pcol_ind[col] < i; ++col)
+            {
+              d += pval[col] * pout[pcol_ind[col]];
+            }
+            pout[i] = _omega * (pin[i] - d) / pval[col];
           }
-          pout[i] = _omega * (pin[i] - d) / pval[col];
+        }
+        else
+        {
+          // __backward-insertion__
+          // iteration over all rows
+          for (Index i(n), col; i > 0;)
+          {
+            --i;
+            DT_ d(0);
+            // iteration over all elements on the right side of the main-diagonal
+            for (col = prow_ptr[i+1]-1; pcol_ind[col] > i; --col)
+            {
+              d += pval[col] * pout[pcol_ind[col]];
+            }
+            pout[i] = _omega * (pin[i] - d) / pval[col];
+          }
         }
       }
     };
@@ -1736,7 +1762,7 @@ namespace FEAST
      * \brief SOR-Preconditioner for COO-matrices.
      *
      * This class specializes the SOR-Preconditioner \f$ \frac 1 \omega (D + \omega L)\f$ for COO-matrices.
-     *(
+     *
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
@@ -1748,6 +1774,7 @@ namespace FEAST
     private:
       const SparseMatrixCOO<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
+      const bool _reverse;
 
     public:
       /// Our algotype
@@ -1771,16 +1798,18 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 1)
+       * \param[in] omega The relaxation parameter of the preconditioner (default omega = 1)
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
       SORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A,
-                        const DT_ omega = DT_(1)) :
+                        const DT_ omega = DT_(1),
+                        bool reverse = false) :
         _A(A),
-        _omega(omega)
+        _omega(omega),
+        _reverse(reverse)
       {
         if (_A.columns() != _A.rows())
         {
@@ -1818,22 +1847,47 @@ namespace FEAST
         const IT_ * prow(_A.row_indices());
         const Index n(_A.rows());
 
-        // __forward-insertion__
-        // iteration over all rows
-        for (Index i(0), col(0); i < n; ++i)
+        if(!_reverse)
         {
-          // iteration over all elements on the left side of the main-diagonal
-          while (prow[col] < i)
+          // __forward-insertion__
+          // iteration over all rows
+          for (Index i(0), col(0); i < n; ++i)
           {
-            ++col;
+            // iteration over all elements on the left side of the main-diagonal
+            while (prow[col] < i)
+            {
+              ++col;
+            }
+            DT_ d(0);
+            while (pcol[col] < i)
+            {
+              d += pval[col] * pout[pcol[col]];
+              ++col;
+            }
+            pout[i] = _omega * (pin[i] - d) / pval[col];
           }
-          DT_ d(0);
-          while (pcol[col] < i)
+        }
+        else
+        {
+          // __backward-insertion__
+          // iteration over all rows
+          for (Index i(n), col(_A.used_elements() - 1); i > 0;)
           {
-            d += pval[col] * pout[pcol[col]];
-            ++col;
+            --i;
+
+            // iteration over all elements on the right side of the main-diagonal
+            while (prow[col] > i)
+            {
+              --col;
+            }
+            DT_ d(0);
+            while (pcol[col] > i)
+            {
+              d += pval[col] * pout[pcol[col]];
+              --col;
+            }
+            pout[i] = _omega * (pin[i] - d) / pval[col];
           }
-          pout[i] = _omega * (pin[i] - d) / pval[col];
         }
       }
     };
@@ -1855,6 +1909,7 @@ namespace FEAST
     private:
       const SparseMatrixELL<Mem_, DT_, IT_> & _A;
       const DT_ _omega;
+      const bool _reverse;
 
     public:
       /// Our algotype
@@ -1875,19 +1930,24 @@ namespace FEAST
       virtual ~SORPreconditioner()
       {
       }
+
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 1)
+       * \param[in] omega The relaxation parameter of the preconditioner (default omega = 1)
+       *
+       * \param[in] reverse Specifies whether to solve with the upper triangular part instead of the lower one.
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
       SORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A,
-                        const DT_ omega = DT_(1)) :
+                        const DT_ omega = DT_(1),
+                        bool reverse = false) :
         _A(A),
-        _omega(omega)
+        _omega(omega),
+        _reverse(reverse)
       {
         if (_A.columns() != _A.rows())
         {
@@ -1923,21 +1983,40 @@ namespace FEAST
         const DT_ * pval(_A.val());
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * pcs(_A.cs());
+        const IT_ * prl(_A.rl());
         const Index C(_A.C());
         const Index n(_A.rows());
 
-
-        // __forward-insertion__
-        // iteration over all rows
-        for (Index i(0), col; i < n; ++i)
+        if(!_reverse)
         {
-          DT_ d(0);
-          // iteration over all elements on the left side of the main-diagonal
-          for (col = pcs[i/C] + i%C; pcol_ind[col] < i; col += C)
+          // __forward-insertion__
+          // iteration over all rows
+          for (Index i(0), col; i < n; ++i)
           {
-            d += pval[col] * pout[pcol_ind[col]];
+            DT_ d(0);
+            // iteration over all elements on the left side of the main-diagonal
+            for (col = pcs[i/C] + i%C; pcol_ind[col] < i; col += C)
+            {
+              d += pval[col] * pout[pcol_ind[col]];
+            }
+            pout[i] = _omega * (pin[i] - d) / pval[col];
           }
-          pout[i] = _omega * (pin[i] - d) / pval[col];
+        }
+        else
+        {
+          // __backward-insertion__
+          // iteration over all rows
+          for (Index i(n), col; i > 0; )
+          {
+            --i;
+            DT_ d(0);
+            // iteration over all elements on the right side of the main-diagonal
+            for (col = pcs[i/C] + i%C + C * (prl[i] - 1); pcol_ind[col] > i; col -= C)
+            {
+              d += pval[col] * pout[pcol_ind[col]];
+            }
+            pout[i] = _omega * (pin[i] - d) / pval[col];
+          }
         }
       }
     };
@@ -1995,9 +2074,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A The system-matrix
+       * \param[in] A The system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 1)
+       * \param[in] omega A parameter of the preconditioner (default omega = 1)
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
@@ -2114,9 +2193,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A The system-matrix
+       * \param[in] A The system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 1)
+       * \param[in] omega A parameter of the preconditioner (default omega = 1)
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
@@ -2244,9 +2323,9 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A The system-matrix
+       * \param[in] A The system-matrix
        *
-       * param[in] omega A parameter of the preconditioner (default omega = 1)
+       * \param[in] omega A parameter of the preconditioner (default omega = 1)
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
@@ -3176,21 +3255,21 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] m full band-matrix with m diagonals on either side as initial layout (\f$2m + 1\f$ bands)
+       * \param[in] m full band-matrix with m diagonals on either side as initial layout (\f$2m + 1\f$ bands)
        *
-       * param[in] max_iter maximal number of iterations for creating new fill-in (default max_iter = 10)
+       * \param[in] max_iter maximal number of iterations for creating new fill-in (default max_iter = 10)
        *
-       * param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1e-2)
+       * \param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1e-2)
        *
-       * param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
+       * \param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
        *
-       * param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
+       * \param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
        *
-       * param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
+       * \param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
        *
-       * param[in] transpose If you do only want to calculate _M^T, set transpose = true (default transpose = false)
+       * \param[in] transpose If you do only want to calculate _M^T, set transpose = true (default transpose = false)
        *
        * Creates a SPAI preconditioner to the given matrix and the initial layout defined by a band-matrix with \f$2m + 1\f$ bands
        */
@@ -3234,21 +3313,21 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * param[in] A system-matrix
+       * \param[in] A system-matrix
        *
-       * param[in] layout the initial layout of the approximate inverse \f$M \approx A^{-1}\f$
+       * \param[in] layout the initial layout of the approximate inverse \f$M \approx A^{-1}\f$
        *
-       * param[in] max_iter maximal number of iterations for creating new fill-in (default max_iter = 10)
+       * \param[in] max_iter maximal number of iterations for creating new fill-in (default max_iter = 10)
        *
-       * param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1e-2)
+       * \param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1e-2)
        *
-       * param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
+       * \param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
        *
-       * param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
+       * \param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
        *
-       * param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
+       * \param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
        *
-       * param[in] transpose If you do only want to calculate _M^T, set transpose = true (default transpose = false)
+       * \param[in] transpose If you do only want to calculate _M^T, set transpose = true (default transpose = false)
        *
        * Creates a SPAI preconditioner to the given matrix and given initial layout
        */
@@ -3804,9 +3883,9 @@ namespace FEAST
       /**
        * \brief Constructor of Neumann-Polynomial-Preconditioner.
        *
-       * param[in] A system-matrix
-       * param[in] m order of the polynom
-       * param[in] precond A preconditioner used for the Polynomial preconditioner
+       * \param[in] A system-matrix
+       * \param[in] m order of the polynom
+       * \param[in] precond A preconditioner used for the Polynomial preconditioner
        *
        * Creates a Polynomial preconditioner to the given matrix and the given order
        */

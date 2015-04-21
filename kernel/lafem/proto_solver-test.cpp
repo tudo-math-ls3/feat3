@@ -156,3 +156,4 @@ public:
 };
 
 ProtoSolverTest<SparseMatrixCSR, Algo::Generic, double, Index> proto_solver_csr_generic_double_index;
+ProtoSolverTest<SparseMatrixELL, Algo::Generic, double, Index> proto_solver_ell_generic_double_index;
