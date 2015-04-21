@@ -17,6 +17,7 @@ from build_system.configure_msc import configure_msc
 from build_system.feast_util import remove_string
 from build_system.feast_util import remove_substring
 from build_system.feast_util import is_found
+from build_system.feast_util import find_exe
 from build_system.feast_util import get_output
 from build_system.thirdparty_package import *
 
@@ -88,6 +89,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Override cpu auto detection with provided string (see build_system/detect_cpu.py for a list).")
   print ("--compiler=path/to/binary")
   print ("  Override default c++ compiler binary by absolute path to binary.")
+  print ("")
+  print ("Note that the first gcc(g++) in $PATH is choosen as the cuda host compiler, if no other one is provided.")
   sys.exit()
 
 #get path to feast source trunk
@@ -229,7 +232,6 @@ for option in extra_options:
       print ("Error: multiple cuda_host_compiler parameters in\n" + "\n".join(extra_options))
       exit(1)
     cuda_host_compiler = option.replace("--cuda_host_compiler=", "", 1)
-    cmake_flags += " -DFEAST_CUDA_HOST_COMPILER=" + cuda_host_compiler
 
   if option.startswith("--compiler="):
     if compiler:
@@ -249,8 +251,6 @@ for option in extra_options:
 if not cputype:
   cputype = detect_cpu()
 cmake_flags += " -DFEAST_CPU_TYPE:STRING=" + cputype
-if not cuda_arch:
-  cuda_arch = "sm_20"
 
 #compiler selection
 if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
@@ -322,11 +322,17 @@ if "cuda" in buildid:
     sys.exit(1)
   remove_string(unused_tokens, "cuda")
   cmake_flags += " -DFEAST_BACKENDS_CUDA:BOOL=ON"
+  if not cuda_arch:
+    cuda_arch = "sm_20"
   cmake_flags += " -DFEAST_CUDA_ARCH=" + cuda_arch
 
   if "cudamemcheck" in buildid:
     remove_string(unused_tokens, "cudamemcheck")
     cmake_flags += " -DFEAST_CUDAMEMCHECK:BOOL=ON"
+
+  if not cuda_host_compiler:
+    cuda_host_compiler = find_exe("g++")
+  cmake_flags += " -DFEAST_CUDA_HOST_COMPILER=" + cuda_host_compiler
 
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")
@@ -383,6 +389,7 @@ if len(unused_tokens) == 0:
   #print ("Unused Build-ID tokens: none")
   pass
 else:
+  print
   print ("Warning: Unused Build-ID tokens: " + "-".join(unused_tokens))
 print
 print ("Extra Options: " + " ".join(extra_options))

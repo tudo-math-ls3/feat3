@@ -10,6 +10,9 @@ def is_found(name):
       return False
   return True
 
+def find_exe(name):
+  return get_output("which " + name)[0]
+
 def remove_string(array, string):
   while array.count(string) > 0:
     array.remove(string)
