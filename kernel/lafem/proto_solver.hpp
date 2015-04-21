@@ -221,16 +221,13 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * \param[in] matrix
-       * A reference to the matrix for the preconditioner.
-       *
        * \param[in] args
        * The remaining arguments which are passed to the preconditioner. For the required set of arguments,
        * see the documentation of the corresponding preconditioner class template.
        */
       template<typename... Args_>
-      explicit PreconWrapper(const Matrix_& matrix, Args_&&... args) :
-        _precond(matrix, std::forward<Args_>(args)...)
+      explicit PreconWrapper(Args_&&... args) :
+        _precond(std::forward<Args_>(args)...)
       {
       }
 
