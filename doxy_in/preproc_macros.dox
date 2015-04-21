@@ -213,6 +213,10 @@ If defined, the LAFEM subsystem of the FEAST kernel will implement the "LAFEM::U
 has been compiled and linked. If so, it will define the FEAST_HAVE_UMFPACK macro automatically.
 
 <hr>
+\subsection ppm_feast_have_cusolver FEAST_HAVE_CUSOLVER
+This macro is defined by the build system detects a cuda sdk version equal or greater 7, which includes the cusolver library.
+
+<hr>
 \subsection ppm_feast_have_alglib FEAST_HAVE_ALGLIB
 This macro is defined by the build system if the FEAST kernel is linked against the ALGLIB library.
 

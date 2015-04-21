@@ -28,11 +28,28 @@ if (FEAST_BACKENDS_CUDA)
   TARGET_LINK_LIBRARIES(kernel-lafem kernel-util-cuda)
 endif(FEAST_BACKENDS_CUDA)
 
+if (FEAST_BACKENDS_CUDA)
+  CUDA_ADD_LIBRARY(kernel-lafem-cuda
+    empty.cpp
+    cusolver.cu
+    STATIC
+  )
+  ADD_DEPENDENCIES(kernel-lafem kernel-lafem-cuda)
+  if (FEAST_HAVE_CUSOLVER)
+    #TODO replace by FindCUDA makro, once cusolve lib has been added there
+    find_library(CUDA_cusolver_LIBRARY NAMES cusolver PATHS "${CUDA_TOOLKIT_ROOT_DIR}/lib64")
+    target_link_libraries(kernel-lafem-cuda ${CUDA_cusolver_LIBRARY})
+  endif (FEAST_HAVE_CUSOLVER)
+  target_link_libraries(kernel-lafem-cuda ${CUDA_cusparse_LIBRARY})
+  TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-cuda)
+endif(FEAST_BACKENDS_CUDA)
+
 
 # list of lafem tests
 SET (test_list
   bicgstab-test
   bicgstab-meta-test
+  cusolver-test
   meta_to_scalar-test
   dense_matrix-test
   dense_vector-test

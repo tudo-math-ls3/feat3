@@ -31,6 +31,9 @@
 /// Do we have CUDA support enabled?
 #cmakedefine FEAST_BACKENDS_CUDA
 
+/// Do we have CuSolver support enabled?
+#cmakedefine FEAST_HAVE_CUSOLVER
+
 /// Do we have MKL support enabled?
 #cmakedefine FEAST_BACKENDS_MKL
 
