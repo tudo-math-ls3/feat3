@@ -1083,13 +1083,14 @@ namespace FEAST
        * \brief Write out matrix to MatrixMarktet mtx file.
        *
        * \param[in] filename The file where the matrix shall be stored.
+       * \param[in] symmetric Should we store only the lower half of the matrix in symmetric format?
        */
-      void write_out_mtx(String filename) const
+      void write_out_mtx(String filename, bool symmetric = false) const
       {
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        write_out_mtx(file);
+        write_out_mtx(file, symmetric);
         file.close();
       }
 
@@ -1097,21 +1098,53 @@ namespace FEAST
        * \brief Write out matrix to MatrixMarktet mtx file.
        *
        * \param[in] file The stream that shall be written to.
+       * \param[in] symmetric Should we store only the LD part of the matrix in symmetric format?
+       *
+       * \warning This routine does no check on symmetric properties of the source matrix!
        */
-      void write_out_mtx(std::ostream& file) const
+      void write_out_mtx(std::ostream& file, bool symmetric = false) const
       {
         SparseMatrixCSR<Mem::Main, DT_, IT_> temp;
         temp.convert(*this);
 
-        file << "%%MatrixMarket matrix coordinate real general" << std::endl;
-        file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;
-
-        for (Index row(0) ; row < rows() ; ++row)
+        if (symmetric)
         {
-          const Index end(temp.row_ptr()[row + 1]);
-          for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
+          file << "%%MatrixMarket matrix coordinate real symmetric" << std::endl;
+          std::vector<IT_> rowv;
+          std::vector<IT_> colv;
+          std::vector<DT_> valv;
+          for (Index row(0) ; row < rows() ; ++row)
           {
-            file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << std::endl;
+            const Index end(temp.row_ptr()[row + 1]);
+            for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
+            {
+              const IT_ col(temp.col_ind()[i]);
+              if (row >= col)
+              {
+                rowv.push_back(IT_(row + 1));
+                colv.push_back(col + 1);
+                valv.push_back(temp.val()[i]);
+              }
+            }
+          }
+          file << temp.rows() << " " << temp.columns() << " " << valv.size() << std::endl;
+          for (Index i(0) ; i < valv.size() ; ++i)
+          {
+            file << rowv.at(i) << " " << colv.at(i) << " " << std::scientific << valv.at(i) << std::endl;
+          }
+        }
+        else
+        {
+          file << "%%MatrixMarket matrix coordinate real general" << std::endl;
+          file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;
+
+          for (Index row(0) ; row < rows() ; ++row)
+          {
+            const Index end(temp.row_ptr()[row + 1]);
+            for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
+            {
+              file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << std::endl;
+            }
           }
         }
       }

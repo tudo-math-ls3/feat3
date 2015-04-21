@@ -139,6 +139,11 @@ public:
     SparseMatrixCSR<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
 
+    std::stringstream ts2;
+    f.write_out_mtx(ts2, true);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
+    TEST_CHECK_EQUAL(j2, f);
+
     auto kp = f.serialise();
     SparseMatrixCSR<Mem_, DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, f);
