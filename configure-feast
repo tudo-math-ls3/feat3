@@ -270,7 +270,7 @@ if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
 elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   if not compiler:
     compiler = "icpc"
-  if not is_found("icpc"):
+  if not is_found(compiler):
     print ("Error: Chosen compiler binary '" + compiler +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "icc")
@@ -281,7 +281,7 @@ elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
 elif "clang" in buildid or "llvm" in buildid:
   if not compiler:
     compiler = "clang++"
-  if not is_found("clang++"):
+  if not is_found(compiler):
     print ("Error: Chosen compiler binary '" + compiler +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "clang")
@@ -290,15 +290,14 @@ elif "clang" in buildid or "llvm" in buildid:
   os.environ["CXX"] = compiler
   cxxflags += " " + configure_clang (cputype, buildid, compiler)
 elif "msc" in buildid:
-  if not is_found("cl"):
-    print ("Error: Chosen compiler binary 'cl' not found!")
+  if not compiler:
+    compiler = "cl"
+  if not is_found(compiler):
+    print ("Error: Chosen compiler binary '" + compiler +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "msc")
   os.environ["CC"] = "cl"
-  if compiler:
-    os.environ["CXX"] = compiler
-  else:
-    os.environ["CXX"] = "cl"
+  os.environ["CXX"] = compiler
   cxxflags += " " + configure_msc (cputype, buildid)
 else:
   print ("Error: No supported compiler found in build id:")
