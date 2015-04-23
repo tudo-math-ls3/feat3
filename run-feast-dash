@@ -94,13 +94,13 @@ def run_test(build_id, branch, myDB, extra_opts):
   configure_command = src_dirname + os.sep + "configure-feast " + build_id + " " + extra_opts
   configure_output = get_output_utf8(configure_command)
   configure_output = "\n".join(configure_output)
-  if "Error" in configure_output:
+  if "error" in configure_output.lower():
     m = Message.create(runid=r, stage="configure", status="error", timestamp=time.time(), title="output", body=configure_output)
     m.save()
     r.endtime = time.time()
     r.save()
     return
-  elif "Warning" in configure_output:
+  elif "warning" in configure_output.lower():
     m = Message.create(runid=r, stage="configure", status="warning", timestamp=time.time(), title="output", body=configure_output)
     m.save()
   else:
