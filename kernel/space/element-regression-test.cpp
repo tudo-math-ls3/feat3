@@ -34,7 +34,6 @@ namespace ElementRegression
   typedef double DataType;
   typedef Index IndexType;
   typedef Mem::Main MemType;
-  typedef Algo::Generic AlgoType;
 
   typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
   typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
@@ -298,10 +297,10 @@ namespace ElementRegression
     virtual void solve_system(const MatrixType& matrix, const FilterType& filter, VectorType& vec_sol, const VectorType& vec_rhs) const
     {
       // create a SSOR preconditioner
-      LAFEM::PreconWrapper<AlgoType, MatrixType, LAFEM::SSORPreconditioner> precon(matrix, DataType(1));
+      LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner> precon(matrix, DataType(1));
 
       // create a PCG solver
-      LAFEM::PCGSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, &precon);
+      LAFEM::PCGSolver<MatrixType, FilterType> solver(matrix, filter, &precon);
 
       // configure solver
       solver.set_max_iter(1000);
@@ -360,9 +359,9 @@ namespace ElementRegression
       this->assemble_sol(vec_sol, space);
 
       // impose filter onto system
-      filter.template filter_mat<AlgoType>(matrix);
-      filter.template filter_sol<AlgoType>(vec_sol);
-      filter.template filter_rhs<AlgoType>(vec_rhs);
+      filter.filter_mat(matrix);
+      filter.filter_sol(vec_sol);
+      filter.filter_rhs(vec_rhs);
 
       // solve the system
       this->solve_system(matrix, filter, vec_sol, vec_rhs);

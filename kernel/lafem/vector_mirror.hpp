@@ -156,7 +156,6 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -203,7 +202,6 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -248,7 +246,6 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -300,7 +297,6 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -350,7 +346,6 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -360,7 +355,7 @@ namespace FEAST
                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
-        this->gather_prim<Algo_, Tx_, Ix_, Ty_, Iy_>(buffer, vector, buffer_offset);
+        this->gather_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, buffer_offset);
       }
 
       /**
@@ -379,7 +374,6 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -390,7 +384,7 @@ namespace FEAST
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
-        this->gather_axpy_prim<Algo_, Tx_, Ix_, Ty_, Iy_>(buffer, vector, alpha, buffer_offset);
+        this->gather_axpy_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, alpha, buffer_offset);
       }
 
       /**
@@ -406,7 +400,6 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -416,7 +409,7 @@ namespace FEAST
                         const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
-        this->scatter_prim<Algo_, Tx_, Ix_, Ty_, Iy_>(vector, buffer, buffer_offset);
+        this->scatter_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, buffer_offset);
       }
 
       /**
@@ -435,7 +428,6 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -446,7 +438,7 @@ namespace FEAST
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
-        this->scatter_axpy_prim<Algo_, Tx_, Ix_, Ty_, Iy_>(vector, buffer, alpha, buffer_offset);
+        this->scatter_axpy_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, alpha, buffer_offset);
       }
     }; // class VectorMirror<...>
   } // namespace LAFEM

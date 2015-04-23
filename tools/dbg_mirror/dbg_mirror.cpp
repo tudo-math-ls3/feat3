@@ -114,12 +114,12 @@ void test_mirror(
   Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat_1, mat_mir_1, loc_mat_1);
 
   // gather vectors
-  vec_mir_0.gather_dual<Algo::Generic>(buf_vec_0, loc_vec_0);
-  vec_mir_1.gather_dual<Algo::Generic>(buf_vec_1, loc_vec_1);
+  vec_mir_0.gather_dual(buf_vec_0, loc_vec_0);
+  vec_mir_1.gather_dual(buf_vec_1, loc_vec_1);
 
   // gather matrices
-  mat_mir_0.gather<Algo::Generic>(buf_mat_0, loc_mat_0);
-  mat_mir_1.gather<Algo::Generic>(buf_mat_1, loc_mat_1);
+  mat_mir_0.gather(buf_mat_0, loc_mat_0);
+  mat_mir_1.gather(buf_mat_1, loc_mat_1);
 
   // synchronise vectors
   sync_add(buf_vec_0, buf_vec_1);
@@ -140,12 +140,12 @@ void test_mirror(
   glob_mat_1.clone(loc_mat_1);
 
   // scatter vectors
-  vec_mir_0.scatter_dual<Algo::Generic>(glob_vec_0, buf_vec_0);
-  vec_mir_1.scatter_dual<Algo::Generic>(glob_vec_1, buf_vec_1);
+  vec_mir_0.scatter_dual(glob_vec_0, buf_vec_0);
+  vec_mir_1.scatter_dual(glob_vec_1, buf_vec_1);
 
   // scatter matrices
-  mat_mir_0.scatter<Algo::Generic>(glob_mat_0, buf_mat_0);
-  mat_mir_1.scatter<Algo::Generic>(glob_mat_1, buf_mat_1);
+  mat_mir_0.scatter(glob_mat_0, buf_mat_0);
+  mat_mir_1.scatter(glob_mat_1, buf_mat_1);
 
   // print output
   std::cout << "Vector-Local :0" << std::endl << loc_vec_0 << std::endl;

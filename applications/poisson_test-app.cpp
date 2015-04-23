@@ -505,7 +505,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     MatrixMirror<VectorMirror<Mem::Main, double>> mat_mirror(mirrors.at(i), mirrors.at(i));
     SparseMatrixCSR<Mem::Main, double> buf_mat;
     Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, mat_localsys);
-    mat_mirror.gather<Algo::Generic>(buf_mat, mat_localsys);
+    mat_mirror.gather(buf_mat, mat_localsys);
 
     double* val(buf_mat.val());
     Index* row_ptr(buf_mat.row_ptr());
@@ -572,7 +572,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     SparseMatrixCSR<Mem::Main, double> buf_mat;
     Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, mat_localsys);
 
-    mat_mirror.gather<Algo::Generic>(buf_mat, mat_localsys);
+    mat_mirror.gather(buf_mat, mat_localsys);
 
     SparseMatrixCSR<Mem::Main, double> other_buf_mat(buf_mat.rows(),
         buf_mat.columns(),
@@ -582,9 +582,9 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
 
     std::cout << "proc " << rank << "A0_omega_i " << buf_mat;
     std::cout << "proc " << rank << "A0_omega_j " << other_buf_mat;
-    buf_mat.axpy<Algo::Generic>(buf_mat, other_buf_mat);
+    buf_mat.axpy(buf_mat, other_buf_mat);
     std::cout << "proc " << rank << "A1_omega_i " << buf_mat;
-    mat_mirror.scatter<Algo::Generic>(mat_localsys, buf_mat);
+    mat_mirror.scatter(mat_localsys, buf_mat);
   }
 
   ///bring up a local preconditioning matrix TODO use a product wrapper and DV
@@ -604,7 +604,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
       SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_sys));
       mat_mirror.gather_op(buf_mat, mat_sys);
       DenseVector<Mem::Main, double> t(buf_mat.used_elements(), buf_mat.val());
-      t.template scale<Algo::Generic>(t, 0.5);
+      t.scale(t, 0.5);
       mat_mirror.scatter_op(mat_sys, buf_mat);
     }
   }*/
@@ -614,10 +614,10 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   dirichlet.assemble(filter);
 
   ///filter system
-  filter.filter_mat<Algo::Generic>(mat_sys);
-  filter.filter_mat<Algo::Generic>(mat_localsys);
-  filter.filter_rhs<Algo::Generic>(vec_rhs);
-  filter.filter_sol<Algo::Generic>(vec_sol);
+  filter.filter_mat(mat_sys);
+  filter.filter_mat(mat_localsys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
   //filter.filter_mat(mat_precon); //NO! we do this in the solver program when applying the correction filter after preconditioning
 
   std::cout << "proc " << rank << " A0 " << mat_sys << std::endl;
@@ -632,9 +632,9 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     SparseMatrixCSR,
     SparseMatrixCSR,
     UnitFilter> data(std::move(mat_sys), std::move(mat_precon), std::move(vec_sol), std::move(vec_rhs), std::move(filter),
-                     std::max(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::min_num_temp_vectors(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_vectors()),
-                     std::max(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::min_num_temp_scalars(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_scalars()),
-                     std::max(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::min_num_temp_indices(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_indices()));
+                     std::max(SolverPatternGeneration<ScaRCBlockSmoother>::min_num_temp_vectors(), SolverPatternGeneration<RichardsonLayer>::min_num_temp_vectors()),
+                     std::max(SolverPatternGeneration<ScaRCBlockSmoother>::min_num_temp_scalars(), SolverPatternGeneration<RichardsonLayer>::min_num_temp_scalars()),
+                     std::max(SolverPatternGeneration<ScaRCBlockSmoother>::min_num_temp_indices(), SolverPatternGeneration<RichardsonLayer>::min_num_temp_indices()));
 
   data.vector_mirrors() = std::move(mirrors);
   data.vector_mirror_sendbufs() = std::move(sendbufs);
@@ -643,10 +643,10 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   data.source_ranks() = std::move(sourceranks);
   data.localsys() = std::move(mat_localsys);
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::execute(data, 1000, 1e-8));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<ScaRCBlockSmoother>::execute(data, 1000, 1e-8));
 
   DenseVector<Mem::Main, double> dummy;
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 20, 1e-1));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer>::execute(data, dummy, 20, 1e-1));
 
   solver->set_preconditioner(block_solver);
 

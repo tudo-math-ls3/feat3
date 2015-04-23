@@ -13,13 +13,13 @@ namespace FEAST
   namespace Foundation
   {
       /// \todo add communicators
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct GlobalSynchScal0
       {
       };
 
       template <>
-      struct GlobalSynchScal0<Mem::Main, Algo::Generic>
+      struct GlobalSynchScal0<Mem::Main>
       {
         public:
 #ifndef SERIAL

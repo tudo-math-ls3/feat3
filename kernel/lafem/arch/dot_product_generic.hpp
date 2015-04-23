@@ -13,7 +13,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename DT_>
-      DT_ DotProduct<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ * const y, const Index size)
+      DT_ DotProduct<Mem::Main>::value_generic(const DT_ * const x, const DT_ * const y, const Index size)
       {
         DT_ r(0);
 
@@ -36,7 +36,7 @@ namespace FEAST
       }
 
       template <typename DT_>
-      DT_ TripleDotProduct<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
+      DT_ TripleDotProduct<Mem::Main>::value_generic(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
       {
         DT_ r(0);
 

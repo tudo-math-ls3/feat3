@@ -17,22 +17,22 @@ using namespace FEAST::TestSystem;
  **/
 template
 <
-  typename Algo_,
+  typename MemType_,
   typename DT_,
   typename IT_,
   Index BlockSize_
   >
 class UnitFilterBlockedVectorTest
-  : public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
+  : public FullTaggedTest<MemType_, DT_, IT_>
 {
   typedef Tiny::Vector<DT_, BlockSize_> ValueType;
-  typedef DenseVectorBlocked<typename Algo_::MemType, DT_, IT_, BlockSize_> VectorType;
-  typedef DenseVectorBlocked<typename Algo_::MemType, IT_, IT_, BlockSize_> IVectorType;
-  typedef UnitFilterBlocked<typename Algo_::MemType, DT_, IT_, BlockSize_> FilterType;
+  typedef DenseVectorBlocked<MemType_, DT_, IT_, BlockSize_> VectorType;
+  typedef DenseVectorBlocked<MemType_, IT_, IT_, BlockSize_> IVectorType;
+  typedef UnitFilterBlocked<MemType_, DT_, IT_, BlockSize_> FilterType;
 
 public:
   UnitFilterBlockedVectorTest()
-    : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("UnitFilterBlockedVectorTest")
+    : FullTaggedTest<MemType_, DT_, IT_>("UnitFilterBlockedVectorTest")
   {
   }
 
@@ -82,38 +82,38 @@ public:
     TEST_CHECK_EQUAL(filter.used_elements(), Index(3));
 
     // apply the filter
-    filter.template filter_def<Algo_>(a1);
-    filter.template filter_cor<Algo_>(a2);
-    filter.template filter_rhs<Algo_>(b1);
-    filter.template filter_sol<Algo_>(b2);
+    filter.filter_def(a1);
+    filter.filter_cor(a2);
+    filter.filter_rhs(b1);
+    filter.filter_sol(b2);
 
     // subtract reference results
-    a1.template axpy<Algo_>(ar, a1, -DT_(1));
-    a2.template axpy<Algo_>(ar, a2, -DT_(1));
-    b1.template axpy<Algo_>(br, b1, -DT_(1));
-    b2.template axpy<Algo_>(br, b2, -DT_(1));
+    a1.axpy(ar, a1, -DT_(1));
+    a2.axpy(ar, a2, -DT_(1));
+    b1.axpy(br, b1, -DT_(1));
+    b2.axpy(br, b2, -DT_(1));
 
     // check results
-    TEST_CHECK_EQUAL_WITHIN_EPS(a1.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(a2.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(b1.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(b2.template norm2<Algo_>(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(a1.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(a2.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(b1.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(b2.norm2(), DT_(0), tol);
   }
 };
 
-UnitFilterBlockedVectorTest<Algo::Generic, float, Index, 2> unit_filter_vector_test_generic_fi_2;
-UnitFilterBlockedVectorTest<Algo::Generic, double, Index, 2> unit_filter_vector_test_generic_di_2;
-UnitFilterBlockedVectorTest<Algo::Generic, float, Index, 3> unit_filter_vector_test_generic_fi_3;
-UnitFilterBlockedVectorTest<Algo::Generic, double, Index, 3> unit_filter_vector_test_generic_di_3;
-UnitFilterBlockedVectorTest<Algo::Generic, float, Index, 4> unit_filter_vector_test_generic_fi_4;
-UnitFilterBlockedVectorTest<Algo::Generic, double, Index, 4> unit_filter_vector_test_generic_di_4;
+UnitFilterBlockedVectorTest<Mem::Main, float, Index, 2> unit_filter_vector_test_generic_fi_2;
+UnitFilterBlockedVectorTest<Mem::Main, double, Index, 2> unit_filter_vector_test_generic_di_2;
+UnitFilterBlockedVectorTest<Mem::Main, float, Index, 3> unit_filter_vector_test_generic_fi_3;
+UnitFilterBlockedVectorTest<Mem::Main, double, Index, 3> unit_filter_vector_test_generic_di_3;
+UnitFilterBlockedVectorTest<Mem::Main, float, Index, 4> unit_filter_vector_test_generic_fi_4;
+UnitFilterBlockedVectorTest<Mem::Main, double, Index, 4> unit_filter_vector_test_generic_di_4;
 #ifdef FEAST_BACKENDS_CUDA
-UnitFilterBlockedVectorTest<Algo::CUDA, float, Index, 2> unit_filter_vector_test_cuda_fi_2;
-UnitFilterBlockedVectorTest<Algo::CUDA, float, Index, 3> unit_filter_vector_test_cuda_fi_3;
-UnitFilterBlockedVectorTest<Algo::CUDA, float, Index, 4> unit_filter_vector_test_cuda_fi_4;
-UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 2> unit_filter_vector_test_cuda_di_2;
-UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 3> unit_filter_vector_test_cuda_di_3;
-UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 4> unit_filter_vector_test_cuda_di_4;
+UnitFilterBlockedVectorTest<Mem::CUDA, float, Index, 2> unit_filter_vector_test_cuda_fi_2;
+UnitFilterBlockedVectorTest<Mem::CUDA, float, Index, 3> unit_filter_vector_test_cuda_fi_3;
+UnitFilterBlockedVectorTest<Mem::CUDA, float, Index, 4> unit_filter_vector_test_cuda_fi_4;
+UnitFilterBlockedVectorTest<Mem::CUDA, double, Index, 2> unit_filter_vector_test_cuda_di_2;
+UnitFilterBlockedVectorTest<Mem::CUDA, double, Index, 3> unit_filter_vector_test_cuda_di_3;
+UnitFilterBlockedVectorTest<Mem::CUDA, double, Index, 4> unit_filter_vector_test_cuda_di_4;
 #endif
 
 /**
@@ -123,28 +123,28 @@ UnitFilterBlockedVectorTest<Algo::CUDA, double, Index, 4> unit_filter_vector_tes
  */
 template
 <
-  typename Algo_,
+  typename MemType_,
   typename DT_,
   typename IT_,
   Index BlockHeight_,
   Index BlockWidth_
   >
 class UnitFilterBlockedMatrixTest
-  : public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
+  : public FullTaggedTest<MemType_, DT_, IT_>
 {
-  typedef SparseMatrixCSRBlocked<typename Algo_::MemType, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
+  typedef SparseMatrixCSRBlocked<MemType_, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
   typedef typename MatrixType::VectorTypeL VectorTypeR;
   typedef typename MatrixType::ValueType ValueType;
-  typedef DenseVector<typename Algo_::MemType, DT_, IT_> VectorType;
-  typedef DenseVector<typename Algo_::MemType, IT_, IT_> IVectorType;
-  typedef UnitFilterBlocked<typename Algo_::MemType, DT_, IT_, BlockHeight_> FilterType;
+  typedef DenseVector<MemType_, DT_, IT_> VectorType;
+  typedef DenseVector<MemType_, IT_, IT_> IVectorType;
+  typedef UnitFilterBlocked<MemType_, DT_, IT_, BlockHeight_> FilterType;
 
   static constexpr Index BlockHeight = BlockHeight_;
   static constexpr Index BlockWidth = BlockWidth_;
 
 public:
   UnitFilterBlockedMatrixTest()
-    : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("UnitFilterBlockedMatrixTest")
+    : FullTaggedTest<MemType_, DT_, IT_>("UnitFilterBlockedMatrixTest")
   {
   }
 
@@ -224,24 +224,25 @@ public:
     filter.add(IT_(6), tmp);
 
     // apply filter onto a
-    filter.template filter_mat<Algo_>(matrix_a);
+    filter.filter_mat(matrix_a);
 
     // subtract reference
-    matrix_a.template axpy<Algo_>(matrix_b, matrix_a, -DT_(1));
+    matrix_a.axpy(matrix_b, matrix_a, -DT_(1));
 
     // check difference
-    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a.template norm_frobenius<Algo_>(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a.norm_frobenius(), DT_(0), tol);
   }
 };
 
-UnitFilterBlockedMatrixTest<Algo::Generic, float, Index, 2, 2> unit_filter_matrix_test_generic_fi_22;
-UnitFilterBlockedMatrixTest<Algo::Generic, float, Index, 3, 3> unit_filter_matrix_test_generic_fi_33;
-UnitFilterBlockedMatrixTest<Algo::Generic, float, Index, 4, 4> unit_filter_matrix_test_generic_fi_44;
-UnitFilterBlockedMatrixTest<Algo::Generic, float, Index, 2, 3> unit_filter_matrix_test_generic_fi_23;
-UnitFilterBlockedMatrixTest<Algo::Generic, float, Index, 4, 3> unit_filter_matrix_test_generic_fi_43;
+UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 2, 2> unit_filter_matrix_test_generic_fi_22;
+UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 3, 3> unit_filter_matrix_test_generic_fi_33;
+UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 4, 4> unit_filter_matrix_test_generic_fi_44;
+UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 2, 3> unit_filter_matrix_test_generic_fi_23;
+UnitFilterBlockedMatrixTest<Mem::Main, float, Index, 4, 3> unit_filter_matrix_test_generic_fi_43;
 
-UnitFilterBlockedMatrixTest<Algo::Generic, double, Index, 2, 2> unit_filter_matrix_test_generic_di_22;
-UnitFilterBlockedMatrixTest<Algo::Generic, double, Index, 3, 3> unit_filter_matrix_test_generic_di_33;
-UnitFilterBlockedMatrixTest<Algo::Generic, double, Index, 4, 4> unit_filter_matrix_test_generic_di_44;
-UnitFilterBlockedMatrixTest<Algo::Generic, double, Index, 3, 2> unit_filter_matrix_test_generic_di_32;
-UnitFilterBlockedMatrixTest<Algo::Generic, double, Index, 3, 4> unit_filter_matrix_test_generic_di_34;
+UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 2, 2> unit_filter_matrix_test_generic_di_22;
+UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 3, 3> unit_filter_matrix_test_generic_di_33;
+UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 4, 4> unit_filter_matrix_test_generic_di_44;
+UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 3, 2> unit_filter_matrix_test_generic_di_32;
+UnitFilterBlockedMatrixTest<Mem::Main, double, Index, 3, 4> unit_filter_matrix_test_generic_di_34;
+///TODO cuda tests?

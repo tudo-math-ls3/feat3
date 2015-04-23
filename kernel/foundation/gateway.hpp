@@ -12,8 +12,8 @@ namespace FEAST
   namespace Foundation
   {
 
-    template<typename Mem_, typename Algo_, typename VectorT_>
-    class GlobalDotGateway : public LAFEM::Arch::DotGatewayBase<Mem_, Algo_, VectorT_>
+    template<typename Mem_, typename VectorT_>
+    class GlobalDotGateway : public LAFEM::Arch::DotGatewayBase<Mem_, VectorT_>
     {
       public:
         GlobalDotGateway(VectorT_& frequencies) :
@@ -24,7 +24,7 @@ namespace FEAST
         virtual typename VectorT_::DataType value(const VectorT_& x, const VectorT_& y) const
         {
           typename VectorT_::DataType r;
-          GlobalDot<Mem_, Algo_>::value(r,
+          GlobalDot<Mem_>::value(r,
                                         x,
                                         y,
                                         _frequencies);
@@ -35,8 +35,8 @@ namespace FEAST
         VectorT_& _frequencies;
     };
 
-    template<typename Mem_, typename Algo_, typename VectorT_>
-    class GlobalNorm2Gateway : public LAFEM::Arch::Norm2GatewayBase<Mem_, Algo_, VectorT_>
+    template<typename Mem_, typename VectorT_>
+    class GlobalNorm2Gateway : public LAFEM::Arch::Norm2GatewayBase<Mem_, VectorT_>
     {
       public:
         GlobalNorm2Gateway(VectorT_& frequencies) :
@@ -47,7 +47,7 @@ namespace FEAST
         virtual typename VectorT_::DataType value(const VectorT_& x) const
         {
           typename VectorT_::DataType r;
-          GlobalNorm2<Mem_, Algo_>::value(r,
+          GlobalNorm2<Mem_>::value(r,
                                           x,
                                           _frequencies);
           return r;
@@ -57,8 +57,8 @@ namespace FEAST
         VectorT_& _frequencies;
     };
 
-    template<typename Mem_, typename Algo_, typename VectorT_>
-    class GlobalNorm2SquaredGateway : public LAFEM::Arch::Norm2SquaredGatewayBase<Mem_, Algo_, VectorT_>
+    template<typename Mem_, typename VectorT_>
+    class GlobalNorm2SquaredGateway : public LAFEM::Arch::Norm2SquaredGatewayBase<Mem_, VectorT_>
     {
       public:
         GlobalNorm2SquaredGateway(VectorT_& frequencies) :
@@ -69,7 +69,7 @@ namespace FEAST
         virtual typename VectorT_::DataType value(const VectorT_& x) const
         {
           typename VectorT_::DataType r;
-          GlobalNorm2Squared<Mem_, Algo_>::value(r,
+          GlobalNorm2Squared<Mem_>::value(r,
                                                  x,
                                                  _frequencies);
           return r;
@@ -80,11 +80,10 @@ namespace FEAST
     };
 
     template<typename Mem_,
-             typename Algo_,
              typename VectorT_,
              typename VectorMirrorT_,
              template<typename, typename> class StorageT_ = std::vector>
-    class GlobalSynchVec0Gateway : public LAFEM::Arch::SynchVec0GatewayBase<Mem_, Algo_, VectorT_>
+    class GlobalSynchVec0Gateway : public LAFEM::Arch::SynchVec0GatewayBase<Mem_, VectorT_>
     {
       public:
 #ifndef SERIAL
@@ -123,7 +122,7 @@ namespace FEAST
 
         virtual VectorT_& value(VectorT_& x) const
         {
-          GlobalSynchVec0<Mem_, Algo_>::exec(
+          GlobalSynchVec0<Mem_>::exec(
                                               x,
                                               _mirrors,
                                               _other_ranks,
@@ -144,11 +143,10 @@ namespace FEAST
     };
 
     template<typename Mem_,
-             typename Algo_,
              typename VectorT_,
              typename VectorMirrorT_,
              template<typename, typename> class StorageT_ = std::vector>
-    class GlobalSynchVec1Gateway : public LAFEM::Arch::SynchVec1GatewayBase<Mem_, Algo_, VectorT_>
+    class GlobalSynchVec1Gateway : public LAFEM::Arch::SynchVec1GatewayBase<Mem_, VectorT_>
     {
       public:
 #ifndef SERIAL
@@ -191,7 +189,7 @@ namespace FEAST
 
         virtual VectorT_& value(VectorT_& x) const
         {
-          GlobalSynchVec1<Mem_, Algo_>::exec(
+          GlobalSynchVec1<Mem_>::exec(
                                               x,
                                               _mirrors,
                                               _frequencies,
@@ -214,12 +212,11 @@ namespace FEAST
     };
 
     template<typename Mem_,
-             typename Algo_,
              typename VectorT_,
              typename MatrixT_,
              typename VectorMirrorT_,
              template<typename, typename> class StorageT_ = std::vector>
-    class GlobalProductMat0Vec1Gateway : public LAFEM::Arch::ProductMat0Vec1GatewayBase<Mem_, Algo_, VectorT_, MatrixT_>
+    class GlobalProductMat0Vec1Gateway : public LAFEM::Arch::ProductMat0Vec1GatewayBase<Mem_, VectorT_, MatrixT_>
     {
       public:
 #ifndef SERIAL
@@ -260,7 +257,7 @@ namespace FEAST
 
         virtual VectorT_& value(VectorT_& r, const MatrixT_& A, const VectorT_& x)
         {
-          GlobalProductMat0Vec1<Mem_, Algo_>::exec(
+          GlobalProductMat0Vec1<Mem_>::exec(
                                                    r,
                                                    A,
                                                    x,

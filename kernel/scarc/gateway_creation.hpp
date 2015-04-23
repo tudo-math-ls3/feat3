@@ -28,53 +28,51 @@ namespace FEAST
       got_product_mat0_vec1
     };
 
-    template<GlobalOpType got_, typename Algo_, template<typename, typename> class StorageT_ = std::vector>
+    template<GlobalOpType got_, template<typename, typename> class StorageT_ = std::vector>
     struct GatewayCreation
     {
     };
 
-    template<typename Algo_>
-    struct GatewayCreation<got_dot, Algo_>
+    template<>
+    struct GatewayCreation<got_dot>
     {
       template<typename SynchedScaRCDataT_>
-      static Foundation::GlobalDotGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
+      static Foundation::GlobalDotGateway<typename SynchedScaRCDataT_::mem_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
       {
-        return Foundation::GlobalDotGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
+        return Foundation::GlobalDotGateway<typename SynchedScaRCDataT_::mem_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
       }
     };
 
-    template<typename Algo_>
-    struct GatewayCreation<got_nrm2, Algo_>
+    template<>
+    struct GatewayCreation<got_nrm2>
     {
       template<typename SynchedScaRCDataT_>
-      static Foundation::GlobalNorm2Gateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
+      static Foundation::GlobalNorm2Gateway<typename SynchedScaRCDataT_::mem_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
       {
-        return Foundation::GlobalNorm2Gateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
+        return Foundation::GlobalNorm2Gateway<typename SynchedScaRCDataT_::mem_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
       }
     };
 
-    template<typename Algo_>
-    struct GatewayCreation<got_nrm2sqr, Algo_>
+    template<>
+    struct GatewayCreation<got_nrm2sqr>
     {
       template<typename SynchedScaRCDataT_>
-      static Foundation::GlobalNorm2SquaredGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
+      static Foundation::GlobalNorm2SquaredGateway<typename SynchedScaRCDataT_::mem_, typename SynchedScaRCDataT_::vector_type_> value(SynchedScaRCDataT_& data)
       {
-        return Foundation::GlobalNorm2SquaredGateway<typename SynchedScaRCDataT_::mem_, Algo_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
+        return Foundation::GlobalNorm2SquaredGateway<typename SynchedScaRCDataT_::mem_, typename SynchedScaRCDataT_::vector_type_>(data.halo_frequencies());
       }
     };
 
-    template<typename Algo_, template<typename, typename> class StorageT_>
-    struct GatewayCreation<got_synch_vec0, Algo_, StorageT_>
+    template<template<typename, typename> class StorageT_>
+    struct GatewayCreation<got_synch_vec0, StorageT_>
     {
       template<typename SynchedScaRCDataT_>
       static Foundation::GlobalSynchVec0Gateway<typename SynchedScaRCDataT_::mem_,
-                                    Algo_,
                                     typename SynchedScaRCDataT_::vector_type_,
                                     typename SynchedScaRCDataT_::vector_mirror_type_,
                                     StorageT_> value(SynchedScaRCDataT_& data)
       {
         return Foundation::GlobalSynchVec0Gateway<typename SynchedScaRCDataT_::mem_,
-                                      Algo_,
                                       typename SynchedScaRCDataT_::vector_type_,
                                       typename SynchedScaRCDataT_::vector_mirror_type_,
                                       StorageT_>(
@@ -87,18 +85,16 @@ namespace FEAST
       }
     };
 
-    template<typename Algo_, template<typename, typename> class StorageT_>
-    struct GatewayCreation<got_synch_vec1, Algo_, StorageT_>
+    template<template<typename, typename> class StorageT_>
+    struct GatewayCreation<got_synch_vec1, StorageT_>
     {
       template<typename SynchedScaRCDataT_>
       static Foundation::GlobalSynchVec1Gateway<typename SynchedScaRCDataT_::mem_,
-                                    Algo_,
                                     typename SynchedScaRCDataT_::vector_type_,
                                     typename SynchedScaRCDataT_::vector_mirror_type_,
                                     StorageT_> value(SynchedScaRCDataT_& data)
       {
         return Foundation::GlobalSynchVec1Gateway<typename SynchedScaRCDataT_::mem_,
-                                      Algo_,
                                       typename SynchedScaRCDataT_::vector_type_,
                                       typename SynchedScaRCDataT_::vector_mirror_type_,
                                       StorageT_>(
@@ -112,19 +108,17 @@ namespace FEAST
       }
     };
 
-    template<typename Algo_, template<typename, typename> class StorageT_>
-    struct GatewayCreation<got_product_mat0_vec1, Algo_, StorageT_>
+    template<template<typename, typename> class StorageT_>
+    struct GatewayCreation<got_product_mat0_vec1, StorageT_>
     {
       template<typename SynchedScaRCDataT_>
       static Foundation::GlobalProductMat0Vec1Gateway<typename SynchedScaRCDataT_::mem_,
-                                    Algo_,
                                     typename SynchedScaRCDataT_::vector_type_,
                                     typename SynchedScaRCDataT_::matrix_type_,
                                     typename SynchedScaRCDataT_::vector_mirror_type_,
                                     StorageT_> value(SynchedScaRCDataT_& data)
       {
         return Foundation::GlobalProductMat0Vec1Gateway<typename SynchedScaRCDataT_::mem_,
-                                      Algo_,
                                       typename SynchedScaRCDataT_::vector_type_,
                                       typename SynchedScaRCDataT_::matrix_type_,
                                       typename SynchedScaRCDataT_::vector_mirror_type_,

@@ -28,15 +28,14 @@ using namespace FEAST::TestSystem;
  */
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseVectorBlockedTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorBlockedTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorBlockedTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedTest")
   {
   }
 
@@ -114,25 +113,24 @@ public:
     TEST_CHECK_EQUAL((void*)g.raw_elements(), (void*)f.raw_elements());
   }
 };
-DenseVectorBlockedTest<Mem::Main, NotSet, float, Index> cpu_dense_vector_blocked_test_float;
-DenseVectorBlockedTest<Mem::Main, NotSet, double, Index> cpu_dense_vector_blocked_test_double;
+DenseVectorBlockedTest<Mem::Main, float, Index> cpu_dense_vector_blocked_test_float;
+DenseVectorBlockedTest<Mem::Main, double, Index> cpu_dense_vector_blocked_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorBlockedTest<Mem::CUDA, NotSet, float, Index> cuda_dense_vector_blocked_test_float;
-DenseVectorBlockedTest<Mem::CUDA, NotSet, double, Index> cuda_dense_vector_blocked_test_double;
+DenseVectorBlockedTest<Mem::CUDA, float, Index> cuda_dense_vector_blocked_test_float;
+DenseVectorBlockedTest<Mem::CUDA, double, Index> cuda_dense_vector_blocked_test_double;
 #endif
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_,
   Index BS_>
 class DenseVectorBlockedAxpyTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorBlockedAxpyTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorBlockedAxpyTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedAxpyTest")
   {
   }
 
@@ -163,20 +161,20 @@ public:
       b.copy(b_local);
 
       DenseVectorBlocked<Mem_, DT_, IT_, BS_> c(size);
-      c.template axpy<Algo_>(a, b, s);
+      c.axpy(a, b, s);
       result_local.copy(c);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < BS_ ; ++j)
           TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], 1e-2);
 
-      a.template axpy<Algo_>(a, b, s);
+      a.axpy(a, b, s);
       result_local.copy(a);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < BS_ ; ++j)
           TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i).v[j], ref(i).v[j], 1e-2);
 
       a.copy(a_local);
-      b.template axpy<Algo_>(a, b, s);
+      b.axpy(a, b, s);
       result_local.copy(b);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < BS_ ; ++j)
@@ -184,30 +182,25 @@ public:
     }
   }
 };
-DenseVectorBlockedAxpyTest<Mem::Main, Algo::Generic, float, Index, 2> dv_axpy_test_float;
-DenseVectorBlockedAxpyTest<Mem::Main, Algo::Generic, double, Index, 2> dv_axpy_test_double;
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorBlockedAxpyTest<Mem::Main, Algo::MKL, float, Index, 2> mkl_dv_axpy_test_float;
-DenseVectorBlockedAxpyTest<Mem::Main, Algo::MKL, double, Index, 2> mkl_dv_axpy_test_double;
-#endif
+DenseVectorBlockedAxpyTest<Mem::Main, float, Index, 2> dv_axpy_test_float;
+DenseVectorBlockedAxpyTest<Mem::Main, double, Index, 2> dv_axpy_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorBlockedAxpyTest<Mem::CUDA, Algo::CUDA, float, Index, 2> cuda_dv_axpy_test_float;
-DenseVectorBlockedAxpyTest<Mem::CUDA, Algo::CUDA, double, Index, 2> cuda_dv_axpy_test_double;
+DenseVectorBlockedAxpyTest<Mem::CUDA, float, Index, 2> cuda_dv_axpy_test_float;
+DenseVectorBlockedAxpyTest<Mem::CUDA, double, Index, 2> cuda_dv_axpy_test_double;
 #endif
 
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_,
   Index BS_>
 class DenseVectorBlockedDotTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorBlockedDotTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorBlockedDotTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedDotTest")
   {
   }
 
@@ -239,41 +232,36 @@ public:
 
       // a*b = 1
       DT_ ref(DT_(1));
-      DT_ c  = a.template dot<Algo_>(b);
+      DT_ c  = a.dot(b);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = b.template dot<Algo_>(a);
+      c = b.dot(a);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = b.template dot<Algo_>(b);
-      ref = b.template norm2<Algo_>();
+      c = b.dot(b);
+      ref = b.norm2();
       ref *= ref;
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
     }
   }
 };
-DenseVectorBlockedDotTest<Mem::Main, Algo::Generic, float, Index, 2> dv_dot_product_test_float;
-DenseVectorBlockedDotTest<Mem::Main, Algo::Generic, double, Index, 2> dv_dot_product_test_double;
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorBlockedDotTest<Mem::Main, Algo::MKL, float, Index, 2> mkl_dv_dot_product_test_float;
-DenseVectorBlockedDotTest<Mem::Main, Algo::MKL, double, Index, 2> mkl_dv_dot_product_test_double;
-#endif
+DenseVectorBlockedDotTest<Mem::Main, float, Index, 2> dv_dot_product_test_float;
+DenseVectorBlockedDotTest<Mem::Main, double, Index, 2> dv_dot_product_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorBlockedDotTest<Mem::CUDA, Algo::CUDA, float, Index, 2> cuda_dv_dot_product_test_float;
-DenseVectorBlockedDotTest<Mem::CUDA, Algo::CUDA, double, Index, 2> cuda_dv_dot_product_test_double;
+DenseVectorBlockedDotTest<Mem::CUDA, float, Index, 2> cuda_dv_dot_product_test_float;
+DenseVectorBlockedDotTest<Mem::CUDA, double, Index, 2> cuda_dv_dot_product_test_double;
 #endif
 
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_,
   Index BS_>
 class DenseVectorBlockedComponentProductTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorBlockedComponentProductTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorBlockedComponentProductTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedComponentProductTest")
   {
   }
 
@@ -307,21 +295,21 @@ public:
       b.copy(b_local);
       DenseVectorBlocked<Mem_, DT_, IT_, BS_> c(size);
 
-      c.template component_product<Algo_>(a, b);
+      c.component_product(a, b);
       result_local.copy(c);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      a.template component_product<Algo_>(a, b);
+      a.component_product(a, b);
       result_local.copy(a);
       TEST_CHECK_EQUAL(result_local, ref);
 
       a.copy(a_local);
-      b.template component_product<Algo_>(a, b);
+      b.component_product(a, b);
       result_local.copy(b);
       TEST_CHECK_EQUAL(result_local, ref);
 
       b.copy(b_local);
-      a.template component_product<Algo_>(a, a);
+      a.component_product(a, a);
       result_local.copy(a);
       TEST_CHECK_EQUAL(result_local, ref2);
     }
@@ -332,29 +320,24 @@ public:
     run1();
   }
 };
-DenseVectorBlockedComponentProductTest<Mem::Main, Algo::Generic, float, Index, 2> dv_component_product_test_float;
-DenseVectorBlockedComponentProductTest<Mem::Main, Algo::Generic, double, Index, 2> dv_component_product_test_double;
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorBlockedComponentProductTest<Mem::Main, Algo::MKL, float, Index, 2> mkl_dv_component_product_test_float;
-DenseVectorBlockedComponentProductTest<Mem::Main, Algo::MKL, double, Index, 2> mkl_dv_component_product_test_double;
-#endif
+DenseVectorBlockedComponentProductTest<Mem::Main, float, Index, 2> dv_component_product_test_float;
+DenseVectorBlockedComponentProductTest<Mem::Main, double, Index, 2> dv_component_product_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorBlockedComponentProductTest<Mem::CUDA, Algo::CUDA, float, Index, 2> cuda_dv_component_product_test_float;
-DenseVectorBlockedComponentProductTest<Mem::CUDA, Algo::CUDA, double, Index, 2> cuda_dv_component_product_test_double;
+DenseVectorBlockedComponentProductTest<Mem::CUDA, float, Index, 2> cuda_dv_component_product_test_float;
+DenseVectorBlockedComponentProductTest<Mem::CUDA, double, Index, 2> cuda_dv_component_product_test_double;
 #endif
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_,
   Index BS_>
 class DenseVectorBlockedScaleTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorBlockedScaleTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorBlockedScaleTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedScaleTest")
   {
   }
 
@@ -379,40 +362,35 @@ public:
       a.copy(a_local);
       DenseVectorBlocked<Mem_, DT_, IT_, BS_> b(size);
 
-      b.template scale<Algo_>(a, s);
+      b.scale(a, s);
       result_local.copy(b);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      a.template scale<Algo_>(a, s);
+      a.scale(a, s);
       result_local.copy(a);
       TEST_CHECK_EQUAL(result_local, ref);
     }
   }
 };
-DenseVectorBlockedScaleTest<Mem::Main, Algo::Generic, float, Index, 2> dv_scale_test_float;
-DenseVectorBlockedScaleTest<Mem::Main, Algo::Generic, double, Index, 2> dv_scale_test_double;
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorBlockedScaleTest<Mem::Main, Algo::MKL, float, Index, 2> mkl_dv_scale_test_float;
-DenseVectorBlockedScaleTest<Mem::Main, Algo::MKL, double, Index, 2> mkl_dv_scale_test_double;
-#endif
+DenseVectorBlockedScaleTest<Mem::Main, float, Index, 2> dv_scale_test_float;
+DenseVectorBlockedScaleTest<Mem::Main, double, Index, 2> dv_scale_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorBlockedScaleTest<Mem::CUDA, Algo::CUDA, float, Index, 2> cuda_dv_scale_test_float;
-DenseVectorBlockedScaleTest<Mem::CUDA, Algo::CUDA, double, Index, 2> cuda_dv_scale_test_double;
+DenseVectorBlockedScaleTest<Mem::CUDA, float, Index, 2> cuda_dv_scale_test_float;
+DenseVectorBlockedScaleTest<Mem::CUDA, double, Index, 2> cuda_dv_scale_test_double;
 #endif
 
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_,
   Index BS_>
 class DenseVectorBlockedNorm2Test
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorBlockedNorm2Test()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorBlockedNorm2Test")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedNorm2Test")
   {
   }
 
@@ -437,21 +415,17 @@ public:
 
       DenseVectorBlocked<Mem_, DT_, IT_, BS_> a;
       a.convert(a_local);
-      DT_ c = a.template norm2<Algo_>();
+      DT_ c = a.norm2();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
 
-      c = a.template norm2sqr<Algo_>();
+      c = a.norm2sqr();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref*ref, eps);
     }
   }
 };
-DenseVectorBlockedNorm2Test<Mem::Main, Algo::Generic, float, Index, 2> dv_norm2_test_float;
-DenseVectorBlockedNorm2Test<Mem::Main, Algo::Generic, double, Index, 2> dv_norm2_test_double;
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorBlockedNorm2Test<Mem::Main, Algo::MKL, float, Index, 2> mkl_dv_norm2_test_float;
-DenseVectorBlockedNorm2Test<Mem::Main, Algo::MKL, double, Index, 2> mkl_dv_norm2_test_double;
-#endif
+DenseVectorBlockedNorm2Test<Mem::Main, float, Index, 2> dv_norm2_test_float;
+DenseVectorBlockedNorm2Test<Mem::Main, double, Index, 2> dv_norm2_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorBlockedNorm2Test<Mem::CUDA, Algo::CUDA, float, Index, 2> cuda_dv_norm2_test_float;
-DenseVectorBlockedNorm2Test<Mem::CUDA, Algo::CUDA, double, Index, 2> cuda_dv_norm2_test_double;
+DenseVectorBlockedNorm2Test<Mem::CUDA, float, Index, 2> cuda_dv_norm2_test_float;
+DenseVectorBlockedNorm2Test<Mem::CUDA, double, Index, 2> cuda_dv_norm2_test_double;
 #endif

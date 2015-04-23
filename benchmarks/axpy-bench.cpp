@@ -1,5 +1,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <benchmarks/benchmark.hpp>
 
@@ -8,6 +9,40 @@
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::Benchmark;
+
+template<typename Algo_, typename DT_, typename IT_>
+class AxpyBench;
+
+template<typename DT_, typename IT_>
+class AxpyBench<Algo::Generic, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & y, DT_ s)
+  {
+    Arch::Axpy<Mem::Main>::dv_generic(x.elements(), s, x.elements(), y.elements(), x.size());
+  }
+};
+
+template<typename DT_, typename IT_>
+class AxpyBench<Algo::MKL, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & y, DT_ s)
+  {
+    Arch::Axpy<Mem::Main>::dv_mkl(x.elements(), s, x.elements(), y.elements(), x.size());
+  }
+};
+
+template<typename DT_, typename IT_>
+class AxpyBench<Algo::CUDA, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & y, DT_ s)
+  {
+    Arch::Axpy<Mem::CUDA>::dv(x.elements(), s, x.elements(), y.elements(), x.size());
+  }
+};
+
 
 template <typename Algo_, typename VT_>
 void run()
@@ -30,7 +65,7 @@ void run()
   bytes *= 3;
   bytes *= sizeof(DT_);
 
-  auto func = [&] () { y.template axpy<Algo_>(x, y, s); };
+  auto func = [&] () { AxpyBench<Algo_, DT_, IT_>::f(x, y, s); };
   run_bench<Mem_>(func, flops, bytes);
 }
 

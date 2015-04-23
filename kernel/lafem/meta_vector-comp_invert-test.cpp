@@ -12,15 +12,13 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_, typename IndexType_>
+template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaVectorCompInvertTest
-  : public MetaVectorTestBase<Algo_, DataType_, IndexType_>
+  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
 {
 public:
-  typedef Algo_ AlgoType;
-  typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<Algo_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
   MetaVectorCompInvertTest() : BaseClass("MetaVectorCompInvertTest") {}
@@ -42,7 +40,7 @@ public:
     MetaVector z(this->gen_vector_null(n00, n01, n1));
 
     // set z <- 1 / y
-    z.template component_invert<AlgoType>(y);
+    z.component_invert(y);
 
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), DataType(1) / fy00(i), tol);
@@ -53,5 +51,5 @@ public:
   }
 };
 
-MetaVectorCompInvertTest<Algo::Generic, float, Index> meta_vector_comp_invert_test_generic_float;
-MetaVectorCompInvertTest<Algo::Generic, double, Index> meta_vector_comp_invert_test_generic_double;
+MetaVectorCompInvertTest<Mem::Main, float, Index> meta_vector_comp_invert_test_generic_float;
+MetaVectorCompInvertTest<Mem::Main, double, Index> meta_vector_comp_invert_test_generic_double;

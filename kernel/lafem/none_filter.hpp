@@ -38,17 +38,17 @@ namespace FEAST
         return NoneFilter();
       }
 
-      template<typename Algo_, typename Matrix_>
+      template<typename Matrix_>
       void filter_mat(Matrix_&) const
       {
       }
 
-      template<typename Algo_, typename Matrix_>
+      template<typename Matrix_>
       void filter_offdiag_row_mat(Matrix_&) const
       {
       }
 
-      template<typename Algo_, typename Matrix_>
+      template<typename Matrix_>
       void filter_offdiag_col_mat(Matrix_&) const
       {
       }
@@ -59,7 +59,6 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the right-hand-side vector to be filtered.
        */
-      template<typename Algo_>
       void filter_rhs(DenseVector<MemType,DataType,IndexType>&) const
       {
       }
@@ -70,7 +69,6 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the solution vector to be filtered.
        */
-      template<typename Algo_>
       void filter_sol(DenseVector<MemType,DataType,IndexType>&) const
       {
       }
@@ -81,7 +79,6 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the defect vector to be filtered.
        */
-      template<typename Algo_>
       void filter_def(DenseVector<MemType,DataType,IndexType>&) const
       {
       }
@@ -92,7 +89,6 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the correction vector to be filtered.
        */
-      template<typename Algo_>
       void filter_cor(DenseVector<MemType,DataType,IndexType>&) const
       {
       }

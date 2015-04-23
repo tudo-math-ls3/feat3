@@ -13,31 +13,43 @@ namespace FEAST
   {
     namespace Arch
     {
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct UnitFilter;
 
       template <>
-      struct UnitFilter<Mem::Main, Algo::Generic>
+      struct UnitFilter<Mem::Main>
       {
         template <typename DT_, typename IT_>
-        static void filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue);
+        static void filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
+        {
+          filter_rhs_generic(v, sv_elements, sv_indices, ue);
+        }
 
         template <typename DT_, typename IT_>
-        static void filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue);
+        static void filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
+        {
+          filter_def_generic(v, sv_indices, ue);
+        }
+
+        template <typename DT_, typename IT_>
+        static void filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue);
+
+        template <typename DT_, typename IT_>
+        static void filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue);
       };
 
-      extern template void UnitFilter<Mem::Main, Algo::Generic>::filter_rhs(float * v, const float * const sv_elements, const unsigned long * const sv_indices, const Index ue);
-      extern template void UnitFilter<Mem::Main, Algo::Generic>::filter_rhs(double * v, const double * const sv_elements, const unsigned long * const sv_indices, const Index ue);
-      extern template void UnitFilter<Mem::Main, Algo::Generic>::filter_rhs(float * v, const float * const sv_elements, const unsigned int * const sv_indices, const Index ue);
-      extern template void UnitFilter<Mem::Main, Algo::Generic>::filter_rhs(double * v, const double * const sv_elements, const unsigned int * const sv_indices, const Index ue);
+      extern template void UnitFilter<Mem::Main>::filter_rhs_generic(float * v, const float * const sv_elements, const unsigned long * const sv_indices, const Index ue);
+      extern template void UnitFilter<Mem::Main>::filter_rhs_generic(double * v, const double * const sv_elements, const unsigned long * const sv_indices, const Index ue);
+      extern template void UnitFilter<Mem::Main>::filter_rhs_generic(float * v, const float * const sv_elements, const unsigned int * const sv_indices, const Index ue);
+      extern template void UnitFilter<Mem::Main>::filter_rhs_generic(double * v, const double * const sv_elements, const unsigned int * const sv_indices, const Index ue);
 
-      extern template void UnitFilter<Mem::Main, Algo::Generic>::filter_def(float * v, const unsigned long * const sv_indices, const Index ue);
-      extern template void UnitFilter<Mem::Main, Algo::Generic>::filter_def(double * v, const unsigned long * const sv_indices, const Index ue);
-      extern template void UnitFilter<Mem::Main, Algo::Generic>::filter_def(float * v, const unsigned int * const sv_indices, const Index ue);
-      extern template void UnitFilter<Mem::Main, Algo::Generic>::filter_def(double * v, const unsigned int * const sv_indices, const Index ue);
+      extern template void UnitFilter<Mem::Main>::filter_def_generic(float * v, const unsigned long * const sv_indices, const Index ue);
+      extern template void UnitFilter<Mem::Main>::filter_def_generic(double * v, const unsigned long * const sv_indices, const Index ue);
+      extern template void UnitFilter<Mem::Main>::filter_def_generic(float * v, const unsigned int * const sv_indices, const Index ue);
+      extern template void UnitFilter<Mem::Main>::filter_def_generic(double * v, const unsigned int * const sv_indices, const Index ue);
 
       template <>
-      struct UnitFilter<Mem::CUDA, Algo::CUDA>
+      struct UnitFilter<Mem::CUDA>
       {
         template <typename DT_, typename IT_>
         static void filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue);

@@ -10,28 +10,26 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
-template<typename AlgoType_, typename DataType_, typename IndexType_>
+template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaMirrorTest :
-  public TestSystem::FullTaggedTest<typename AlgoType_::MemType, AlgoType_, DataType_, IndexType_>
+  public TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
 {
 public:
-  typedef AlgoType_ AlgoType;
-  typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
   typedef IndexType_ IndexType;
 
-  typedef DenseVector<MemType, DataType, IndexType> ScalarVector;
+  typedef DenseVector<MemType_, DataType, IndexType> ScalarVector;
   typedef PowerVector<ScalarVector, 2> PowerVector2;
   typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
-  typedef VectorMirror<MemType, DataType, IndexType> ScalarMirror;
+  typedef VectorMirror<MemType_, DataType, IndexType> ScalarMirror;
   typedef PowerMirror<ScalarMirror, 2> PowerMirror2;
   typedef TupleMirror<PowerMirror2, ScalarMirror> MetaMirror;
 
-  typedef SparseMatrixCSR<MemType, DataType, IndexType> ScalarMatrix;
+  typedef SparseMatrixCSR<MemType_, DataType, IndexType> ScalarMatrix;
 
   MetaMirrorTest() :
-    TestSystem::FullTaggedTest<typename AlgoType_::MemType, AlgoType_, DataType_, IndexType_>("MetaMirrorTest")
+    TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>("MetaMirrorTest")
   {
   }
 
@@ -120,26 +118,26 @@ public:
     ScalarVector buf_y(mirror_y.size(), DataType(0));
 
     // gather local vectors
-    mirror_x.template gather_prim<AlgoType>(buf_x, vec_x);
-    mirror_y.template gather_prim<AlgoType>(buf_y, vec_y);
+    mirror_x.gather_prim(buf_x, vec_x);
+    mirror_y.gather_prim(buf_y, vec_y);
 
     // combine buffers: x,y <- x+y
-    buf_x.template axpy<AlgoType>(buf_y, buf_x);
+    buf_x.axpy(buf_y, buf_x);
     buf_y.copy(buf_x);
 
     // scatter synced buffers
-    mirror_x.template scatter_prim<AlgoType>(vec_x, buf_x);
-    mirror_y.template scatter_prim<AlgoType>(vec_y, buf_y);
+    mirror_x.scatter_prim(vec_x, buf_x);
+    mirror_y.scatter_prim(vec_y, buf_y);
 
     // compute difference to reference
-    vec_x.template axpy<AlgoType>(sync_x, vec_x, -DataType(1));
-    vec_y.template axpy<AlgoType>(sync_y, vec_y, -DataType(1));
+    vec_x.axpy(sync_x, vec_x, -DataType(1));
+    vec_y.axpy(sync_y, vec_y, -DataType(1));
 
     // check difference norm
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_x.template norm2<AlgoType>(), DataType_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_y.template norm2<AlgoType>(), DataType_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_x.norm2(), DataType_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_y.norm2(), DataType_(0), tol);
   }
 };
 
-MetaMirrorTest<Algo::Generic, float, Index> meta_mirror_test_generic_float_index;
-MetaMirrorTest<Algo::Generic, double, Index> meta_mirror_test_generic_double_index;
+MetaMirrorTest<Mem::Main, float, Index> meta_mirror_test_generic_float_index;
+MetaMirrorTest<Mem::Main, double, Index> meta_mirror_test_generic_double_index;

@@ -110,7 +110,7 @@ void testmesh_hypercube_2D(Mesh<Dim2D>& target_mesh, std::vector<Attribute<doubl
 }
 
 #ifdef SERIAL
-template<typename Tag_, typename Algo_, typename DataType_>
+template<typename Tag_, typename DataType_>
 class ScaRCFunctorTest:
   public TaggedTest<Tag_, DataType_>
 {
@@ -138,7 +138,6 @@ class ScaRCFunctorTest:
         boundaries_copy.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D>, double> >(new Halo<0, PLEdge, Mesh<Dim2D>, double>(boundaries.at(i))));
 
       Refinement<Mem::Main,
-        Algo::Generic,
         mrt_standard>::execute(mesh, &boundaries_copy, attrs);
 
       boundaries.clear();
@@ -147,7 +146,6 @@ class ScaRCFunctorTest:
 
       ///partitioning and initial loadbalancing
       auto p_i(Partitioning<Mem::Main,
-          Algo::Generic,
           Dim2D,
           0,
           pl_vertex>::execute(mesh,
@@ -234,7 +232,7 @@ class ScaRCFunctorTest:
 
       DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
 
-      auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mbufs, fbuf));
+      auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mbufs, fbuf));
 
       DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
       Assembly::Common::ConstantFunction rhs_func(1.0);
@@ -248,8 +246,8 @@ class ScaRCFunctorTest:
 
       auto tags(HaloTags::value(p_i.comm_halos));
       //synching for type-0 -> type-1
-      auto mat_localsys(MatrixConversion<Mem::Main, Algo::Generic>::value(mat_sys, mirrors, other_ranks, tags));
-      GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(vec_rhs,
+      auto mat_localsys(MatrixConversion<Mem::Main>::value(mat_sys, mirrors, other_ranks, tags));
+      GlobalSynchVec0<Mem::Main>::exec(vec_rhs,
           mirrors,
           other_ranks,
           sendbufs,
@@ -263,11 +261,11 @@ class ScaRCFunctorTest:
       SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
 
       ///filter system
-      filter.filter_mat<Algo::Generic>(mat_sys);
-      filter.filter_mat<Algo::Generic>(mat_localsys);
-      filter.filter_rhs<Algo::Generic>(vec_rhs);
-      filter.filter_sol<Algo::Generic>(vec_sol);
-      filter.filter_mat<Algo::Generic>(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
+      filter.filter_mat(mat_sys);
+      filter.filter_mat(mat_localsys);
+      filter.filter_rhs(vec_rhs);
+      filter.filter_sol(vec_sol);
+      filter.filter_mat(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
 
       SynchronisedPreconditionedFilteredScaRCData<double,
         Mem::Main,
@@ -296,8 +294,7 @@ class ScaRCFunctorTest:
         SparseMatrixCSR<Mem::Main, double>,
         UnitFilter<Mem::Main, double>,
         std::vector,
-        Index,
-        Algo::Generic> > local_solver(new ScaRCFunctorPCG1<double,
+        Index> > local_solver(new ScaRCFunctorPCG1<double,
             Mem::Main,
             DenseVector<Mem::Main, double>,
             VectorMirror<Mem::Main, double>,
@@ -305,8 +302,7 @@ class ScaRCFunctorTest:
             SparseMatrixCSR<Mem::Main, double>,
             UnitFilter<Mem::Main, double>,
             std::vector,
-            Index,
-            Algo::Generic>(data) );
+            Index>(data) );
 
       ///layer 0 (local layer), preconditioner
       std::shared_ptr<ScaRCFunctorBase<double,
@@ -317,8 +313,7 @@ class ScaRCFunctorTest:
         SparseMatrixCSR<Mem::Main, double>,
         UnitFilter<Mem::Main, double>,
         std::vector,
-        Index,
-        Algo::Generic> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
+        Index> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
             Mem::Main,
             DenseVector<Mem::Main, double>,
             VectorMirror<Mem::Main, double>,
@@ -326,8 +321,7 @@ class ScaRCFunctorTest:
             SparseMatrixCSR<Mem::Main, double>,
             UnitFilter<Mem::Main, double>,
             std::vector,
-            Index,
-            Algo::Generic>(data) );
+            Index>(data) );
 
 
       local_solver->reset_preconditioner(local_precon);
@@ -349,5 +343,5 @@ class ScaRCFunctorTest:
       TEST_CHECK_EQUAL_WITHIN_EPS(data.sol()(8), DataType_(0.09375), std::numeric_limits<DataType_>::epsilon());
     }
 };
-ScaRCFunctorTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("ELL double");
+ScaRCFunctorTest<Mem::Main,  double> sf_cpu_double("ELL double");
 #endif

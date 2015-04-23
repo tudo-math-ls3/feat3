@@ -110,7 +110,6 @@ void check_dot_gateway_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -121,7 +120,6 @@ void check_dot_gateway_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -173,7 +171,7 @@ void check_dot_gateway_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -191,9 +189,9 @@ void check_dot_gateway_1D(Index rank)
 
   pdata.halo_frequencies() = std::move(frequencies);
 
-  auto dot_gate(GatewayCreation<got_dot, Algo::Generic>::value(pdata));
+  auto dot_gate(GatewayCreation<got_dot>::value(pdata));
 
-  double res(pdata.sol().dot<Algo::Generic>(pdata.rhs(), &dot_gate));
+  double res(pdata.sol().dot(pdata.rhs(), &dot_gate));
 
   TestResult<double, double, double> res0;
   res0 = test_check_equal_within_eps(res, 6., std::numeric_limits<double>::epsilon());
@@ -237,7 +235,6 @@ void check_nrm2_gateway_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -248,7 +245,6 @@ void check_nrm2_gateway_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -300,7 +296,7 @@ void check_nrm2_gateway_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -318,9 +314,9 @@ void check_nrm2_gateway_1D(Index rank)
 
   pdata.halo_frequencies() = std::move(frequencies);
 
-  auto nrm2_gate(GatewayCreation<got_nrm2, Algo::Generic>::value(pdata));
+  auto nrm2_gate(GatewayCreation<got_nrm2>::value(pdata));
 
-  double res(pdata.rhs().norm2<Algo::Generic>(&nrm2_gate));
+  double res(pdata.rhs().norm2(&nrm2_gate));
 
   TestResult<double, double, double> res0;
   res0 = test_check_equal_within_eps(res, std::sqrt(12.), std::numeric_limits<double>::epsilon());
@@ -364,7 +360,6 @@ void check_nrm2sqr_gateway_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -375,7 +370,6 @@ void check_nrm2sqr_gateway_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -427,7 +421,7 @@ void check_nrm2sqr_gateway_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -447,9 +441,9 @@ void check_nrm2sqr_gateway_1D(Index rank)
   auto tags(HaloTags::value(p0.comm_halos));
   pdata.tags() = std::move(tags);
 
-  auto nrm2sqr_gate(GatewayCreation<got_nrm2sqr, Algo::Generic>::value(pdata));
+  auto nrm2sqr_gate(GatewayCreation<got_nrm2sqr>::value(pdata));
 
-  double res(pdata.rhs().norm2sqr<Algo::Generic>(&nrm2sqr_gate));
+  double res(pdata.rhs().norm2sqr(&nrm2sqr_gate));
 
   TestResult<double, double, double> res0;
   res0 = test_check_equal_within_eps(res, 12., std::numeric_limits<double>::epsilon());
@@ -493,7 +487,6 @@ void check_synch0_gateway_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -504,7 +497,6 @@ void check_synch0_gateway_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -556,7 +548,7 @@ void check_synch0_gateway_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -581,9 +573,9 @@ void check_synch0_gateway_1D(Index rank)
   auto tags(HaloTags::value(p0.comm_halos));
   pdata.tags() = std::move(tags);
 
-  auto synch0_gate(GatewayCreation<got_synch_vec0, Algo::Generic>::value(pdata));
+  auto synch0_gate(GatewayCreation<got_synch_vec0>::value(pdata));
 
-  pdata.sol().synch0<Algo::Generic>(&synch0_gate);
+  pdata.sol().synch0(&synch0_gate);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;
@@ -631,7 +623,6 @@ void check_synch1_gateway_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -642,7 +633,6 @@ void check_synch1_gateway_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -694,7 +684,7 @@ void check_synch1_gateway_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -719,9 +709,9 @@ void check_synch1_gateway_1D(Index rank)
   auto tags(HaloTags::value(p0.comm_halos));
   pdata.tags() = std::move(tags);
 
-  auto synch1_gate(GatewayCreation<got_synch_vec1, Algo::Generic>::value(pdata));
+  auto synch1_gate(GatewayCreation<got_synch_vec1>::value(pdata));
 
-  pdata.sol().synch1<Algo::Generic>(&synch1_gate);
+  pdata.sol().synch1(&synch1_gate);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;
@@ -769,7 +759,6 @@ void check_prodmat0vec1_gateway_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -780,7 +769,6 @@ void check_prodmat0vec1_gateway_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -833,7 +821,7 @@ void check_prodmat0vec1_gateway_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -858,10 +846,10 @@ void check_prodmat0vec1_gateway_1D(Index rank)
   auto tags(HaloTags::value(p0.comm_halos));
   pdata.tags() = std::move(tags);
 
-  auto prod_gate(GatewayCreation<got_product_mat0_vec1, Algo::Generic>::value(pdata));
+  auto prod_gate(GatewayCreation<got_product_mat0_vec1>::value(pdata));
 
   DenseVector<Mem::Main, double> res(pdata.sol().size());
-  pdata.sys().apply<Algo::Generic>(res, pdata.sol(), &prod_gate);
+  pdata.sys().apply(res, pdata.sol(), &prod_gate);
 
   TestResult<double, double, double> res0;
   TestResult<double, double, double> res1;

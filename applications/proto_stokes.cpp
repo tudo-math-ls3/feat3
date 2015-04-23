@@ -39,7 +39,6 @@ namespace ProtoStokes
 // basic typedefs
 typedef double DataType;
 typedef Mem::Main MemType;
-typedef Algo::Generic AlgoType;
 
 // we're working on quads
 typedef Shape::Quadrilateral ShapeType;
@@ -317,12 +316,12 @@ public:
     Assembly::GridTransfer::assemble_prolongation(_prol_p, weight_p, _space_p, coarse._space_p, cubature_factory_pres);
 
     // invert weight vectors
-    weight_v.component_invert<AlgoType>(weight_v);
-    weight_p.component_invert<AlgoType>(weight_p);
+    weight_v.component_invert(weight_v);
+    weight_p.component_invert(weight_p);
 
     // scale matrix rows by weights
-    _prol_v.scale_rows<AlgoType>(_prol_v, weight_v);
-    _prol_p.scale_rows<AlgoType>(_prol_p, weight_p);
+    _prol_v.scale_rows(_prol_v, weight_v);
+    _prol_p.scale_rows(_prol_p, weight_p);
 
     // transpose to obtain restriction matrices
     _rest_v.transpose(_prol_v);
@@ -348,25 +347,25 @@ public:
     dirichlet_y.assemble(_filter_y);
 
     // filter matrices
-    _filter_x.filter_mat<AlgoType>(_matrix_a);
+    _filter_x.filter_mat(_matrix_a);
 
     // filter (off-diagonal) pressure gradient matrices
-    _filter_x.filter_offdiag_row_mat<AlgoType>(_matrix_b1);
-    _filter_y.filter_offdiag_row_mat<AlgoType>(_matrix_b2);
+    _filter_x.filter_offdiag_row_mat(_matrix_b1);
+    _filter_y.filter_offdiag_row_mat(_matrix_b2);
   }
 
   // filters the rhs vectors
   void filter_rhs(VectorType& rhs_x, VectorType& rhs_y)
   {
-    _filter_x.filter_rhs<AlgoType>(rhs_x);
-    _filter_y.filter_rhs<AlgoType>(rhs_y);
+    _filter_x.filter_rhs(rhs_x);
+    _filter_y.filter_rhs(rhs_y);
   }
 
   // filter the solution vectors
   void filter_sol(VectorType& sol_x, VectorType& sol_y)
   {
-    _filter_x.filter_sol<AlgoType>(sol_x);
-    _filter_y.filter_sol<AlgoType>(sol_y);
+    _filter_x.filter_sol(sol_x);
+    _filter_y.filter_sol(sol_y);
   }
 
   // computes the current velocity defect vectors
@@ -375,16 +374,16 @@ public:
     const VectorType& sol_x, const VectorType& sol_y, const VectorType& sol_p) const
   {
     // dx = bx - A*ux - B1*p
-    _matrix_a.apply<AlgoType>(def_x, sol_x, rhs_x, -DataType(1));
-    _matrix_b1.apply<AlgoType>(def_x, sol_p, def_x, -DataType(1));
+    _matrix_a.apply(def_x, sol_x, rhs_x, -DataType(1));
+    _matrix_b1.apply(def_x, sol_p, def_x, -DataType(1));
 
     // dy = by - A*uy - B2*p
-    _matrix_a.apply<AlgoType>(def_y, sol_y, rhs_y, -DataType(1));
-    _matrix_b2.apply<AlgoType>(def_y, sol_p, def_y, -DataType(1));
+    _matrix_a.apply(def_y, sol_y, rhs_y, -DataType(1));
+    _matrix_b2.apply(def_y, sol_p, def_y, -DataType(1));
 
     // filter defect vectors
-    _filter_x.filter_def<AlgoType>(def_x);
-    _filter_y.filter_def<AlgoType>(def_y);
+    _filter_x.filter_def(def_x);
+    _filter_y.filter_def(def_y);
   }
 
   // computes the current pressure/divergence defect vector
@@ -392,8 +391,8 @@ public:
     const VectorType& sol_x, const VectorType& sol_y, const VectorType& /*sol_p*/) const
   {
     // dp = bp - D1*ux - D2*uy
-    _matrix_d1.apply<AlgoType>(def_p, sol_x, rhs_p, -DataType(1));
-    _matrix_d2.apply<AlgoType>(def_p, sol_y, def_p, -DataType(1));
+    _matrix_d1.apply(def_p, sol_x, rhs_p, -DataType(1));
+    _matrix_d2.apply(def_p, sol_y, def_p, -DataType(1));
   }
 
   // computes the current system defect and returns its norm
@@ -411,9 +410,9 @@ public:
     _vec_sol_p.format();
 
     // compute defect norm
-    DataType dx = _vec_rhs_x.norm2<AlgoType>();
-    DataType dy = _vec_rhs_y.norm2<AlgoType>();
-    DataType dp = _vec_rhs_p.norm2<AlgoType>();
+    DataType dx = _vec_rhs_x.norm2();
+    DataType dy = _vec_rhs_y.norm2();
+    DataType dp = _vec_rhs_p.norm2();
     return Math::sqrt(dx*dx + dy*dy + dp*dp);
   }
 
@@ -421,11 +420,11 @@ public:
   void update_solution(VectorType& sol_x, VectorType& sol_y, VectorType& sol_p)
   {
     // update solution vector
-    _filter_x.filter_cor<AlgoType>(_vec_sol_x);
-    _filter_y.filter_cor<AlgoType>(_vec_sol_y);
-    sol_x.axpy<AlgoType>(_vec_sol_x, sol_x);
-    sol_y.axpy<AlgoType>(_vec_sol_y, sol_y);
-    sol_p.axpy<AlgoType>(_vec_sol_p, sol_p);
+    _filter_x.filter_cor(_vec_sol_x);
+    _filter_y.filter_cor(_vec_sol_y);
+    sol_x.axpy(_vec_sol_x, sol_x);
+    sol_y.axpy(_vec_sol_y, sol_y);
+    sol_p.axpy(_vec_sol_p, sol_p);
   }
 
   // applies the Schur-complement-SOR smoother
@@ -435,17 +434,17 @@ public:
     for(int step(0); step < nsteps; ++step)
     {
       // dx_k = bx - B1*p_{k-1}
-      _matrix_b1.apply<AlgoType>(_vec_def_x, _vec_sol_p, _vec_rhs_x, -DataType(1));
+      _matrix_b1.apply(_vec_def_x, _vec_sol_p, _vec_rhs_x, -DataType(1));
       SOR(na, _matrix_a, _vec_sol_x, _vec_def_x, wa);
 
       // dy_k = by - B2*p_{k-1}
-      _matrix_b2.apply<AlgoType>(_vec_def_y, _vec_sol_p, _vec_rhs_y, -DataType(1));
+      _matrix_b2.apply(_vec_def_y, _vec_sol_p, _vec_rhs_y, -DataType(1));
       SOR(na, _matrix_a, _vec_sol_y, _vec_def_y, wa);
 
       // dp_k = dp_{k-1} + bp - D1*ux_k - D2*uy_k
-      _vec_def_p.axpy<AlgoType>(_vec_rhs_p, _vec_def_p);
-      _matrix_d1.apply<AlgoType>(_vec_def_p, _vec_sol_x, _vec_def_p, -DataType(1));
-      _matrix_d2.apply<AlgoType>(_vec_def_p, _vec_sol_y, _vec_def_p, -DataType(1));
+      _vec_def_p.axpy(_vec_rhs_p, _vec_def_p);
+      _matrix_d1.apply(_vec_def_p, _vec_sol_x, _vec_def_p, -DataType(1));
+      _matrix_d2.apply(_vec_def_p, _vec_sol_y, _vec_def_p, -DataType(1));
       SOR(ns, _matrix_m, _vec_sol_p, _vec_def_p, ws);
     }
   }
@@ -454,37 +453,37 @@ public:
   void prolongate(StokesLevel& coarse)
   {
     // prolongate
-    _prol_v.apply<AlgoType>(_vec_def_x, coarse._vec_sol_x);
-    _prol_v.apply<AlgoType>(_vec_def_y, coarse._vec_sol_y);
-    _prol_p.apply<AlgoType>(_vec_def_p, coarse._vec_sol_p);
+    _prol_v.apply(_vec_def_x, coarse._vec_sol_x);
+    _prol_v.apply(_vec_def_y, coarse._vec_sol_y);
+    _prol_p.apply(_vec_def_p, coarse._vec_sol_p);
     // filter
-    _filter_x.filter_cor<AlgoType>(_vec_def_x);
-    _filter_y.filter_cor<AlgoType>(_vec_def_y);
+    _filter_x.filter_cor(_vec_def_x);
+    _filter_y.filter_cor(_vec_def_y);
     // correct
-    _vec_sol_x.axpy<AlgoType>(_vec_def_x, _vec_sol_x);
-    _vec_sol_y.axpy<AlgoType>(_vec_def_y, _vec_sol_y);
-    _vec_sol_p.axpy<AlgoType>(_vec_def_p, _vec_sol_p);
+    _vec_sol_x.axpy(_vec_def_x, _vec_sol_x);
+    _vec_sol_y.axpy(_vec_def_y, _vec_sol_y);
+    _vec_sol_p.axpy(_vec_def_p, _vec_sol_p);
   }
 
   // restricts the defect of this level onto the coarse level
   void restriction(StokesLevel& coarse)
   {
     // compute defect
-    _matrix_a.apply<AlgoType>(_vec_def_x, _vec_sol_x, _vec_rhs_x, -DataType(1));
-    _matrix_b1.apply<AlgoType>(_vec_def_x, _vec_sol_p, _vec_def_x, -DataType(1));
-    _matrix_a.apply<AlgoType>(_vec_def_y, _vec_sol_y, _vec_rhs_y, -DataType(1));
-    _matrix_b2.apply<AlgoType>(_vec_def_y, _vec_sol_p, _vec_def_y, -DataType(1));
-    _matrix_d1.apply<AlgoType>(_vec_def_p, _vec_sol_x, _vec_rhs_p, -DataType(1));
-    _matrix_d2.apply<AlgoType>(_vec_def_p, _vec_sol_y, _vec_def_p, -DataType(1));
+    _matrix_a.apply(_vec_def_x, _vec_sol_x, _vec_rhs_x, -DataType(1));
+    _matrix_b1.apply(_vec_def_x, _vec_sol_p, _vec_def_x, -DataType(1));
+    _matrix_a.apply(_vec_def_y, _vec_sol_y, _vec_rhs_y, -DataType(1));
+    _matrix_b2.apply(_vec_def_y, _vec_sol_p, _vec_def_y, -DataType(1));
+    _matrix_d1.apply(_vec_def_p, _vec_sol_x, _vec_rhs_p, -DataType(1));
+    _matrix_d2.apply(_vec_def_p, _vec_sol_y, _vec_def_p, -DataType(1));
 
     // restrict
-    _rest_v.apply<AlgoType>(coarse._vec_rhs_x, _vec_def_x);
-    _rest_v.apply<AlgoType>(coarse._vec_rhs_y, _vec_def_y);
-    _rest_p.apply<AlgoType>(coarse._vec_rhs_p, _vec_def_p);
+    _rest_v.apply(coarse._vec_rhs_x, _vec_def_x);
+    _rest_v.apply(coarse._vec_rhs_y, _vec_def_y);
+    _rest_p.apply(coarse._vec_rhs_p, _vec_def_p);
 
     // filter
-    coarse._filter_x.filter_def<AlgoType>(coarse._vec_rhs_x);
-    coarse._filter_y.filter_def<AlgoType>(coarse._vec_rhs_y);
+    coarse._filter_x.filter_def(coarse._vec_rhs_x);
+    coarse._filter_y.filter_def(coarse._vec_rhs_y);
 
     // format
     coarse._vec_sol_x.format();

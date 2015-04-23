@@ -120,6 +120,9 @@ namespace FEAST
 
     /**
      * \brief FEAST::Algo namespace
+     *
+     * \deprecated {The Algo Tag is not used anymore.
+     * Only the micro benchmarks are stuck to this to explicitly address the several backends.}
      */
     namespace Algo
     {
@@ -135,6 +138,9 @@ namespace FEAST
 
       /**
        * Tag-type for generic/C++-based operations.
+       *
+       * \deprecated {The Algo Tag is not used anymore.
+       * Only the micro benchmarks are stuck to this to explicitly address the several backends.}
        */
       struct Generic :
         public InstantiationPolicy<Generic, NonCopyable>
@@ -150,6 +156,9 @@ namespace FEAST
 
       /**
        * Tag-type for MKL-based operations.
+       *
+       * \deprecated {The Algo Tag is not used anymore.
+       * Only the micro benchmarks are stuck to this to explicitly address the several backends.}
        */
       struct MKL :
         public InstantiationPolicy<Generic, NonCopyable>
@@ -165,6 +174,9 @@ namespace FEAST
 
       /**
        * Tag-type for cuda-based operations.
+       *
+       * \deprecated {The Algo Tag is not used anymore.
+       * Only the micro benchmarks are stuck to this to explicitly address the several backends.}
        */
       struct CUDA :
         public InstantiationPolicy<CUDA, NonCopyable>

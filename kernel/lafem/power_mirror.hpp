@@ -16,97 +16,97 @@ namespace FEAST
       template<Index i_>
       struct PowerMirrorHelper
       {
-        template<typename Algo_, typename SM_, typename BV_, typename PV_>
+        template<typename SM_, typename BV_, typename PV_>
         static void gather_prim(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
         {
-          sm.template gather_prim<Algo_>(bv, pv.first(), bo);
-          PowerMirrorHelper<i_-1>::template gather_prim<Algo_>(sm, bv, pv.rest(), bo + sm.size());
+          sm.gather_prim(bv, pv.first(), bo);
+          PowerMirrorHelper<i_-1>::template gather_prim(sm, bv, pv.rest(), bo + sm.size());
         }
-        template<typename Algo_, typename SM_, typename BV_, typename PV_>
+        template<typename SM_, typename BV_, typename PV_>
         static void gather_dual(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
         {
-          sm.template gather_dual<Algo_>(bv, pv.first(), bo);
-          PowerMirrorHelper<i_-1>::template gather_dual<Algo_>(sm, bv, pv.rest(), bo + sm.size());
+          sm.gather_dual(bv, pv.first(), bo);
+          PowerMirrorHelper<i_-1>::template gather_dual(sm, bv, pv.rest(), bo + sm.size());
         }
-        template<typename Algo_, typename SM_, typename BV_, typename PV_, typename AT_>
+        template<typename SM_, typename BV_, typename PV_, typename AT_>
         static void gather_axpy_prim(const SM_& sm, BV_& bv, const PV_& pv, const AT_ a, const Index bo)
         {
-          sm.template gather_axpy_prim<Algo_>(bv, pv.first(), a, bo);
-          PowerMirrorHelper<i_-1>::template gather_axpy_prim<Algo_>(sm, bv, pv.rest(), a, bo + sm.size());
+          sm.gather_axpy_prim(bv, pv.first(), a, bo);
+          PowerMirrorHelper<i_-1>::template gather_axpy_prim(sm, bv, pv.rest(), a, bo + sm.size());
         }
-        template<typename Algo_, typename SM_, typename BV_, typename PV_, typename AT_>
+        template<typename SM_, typename BV_, typename PV_, typename AT_>
         static void gather_axpy_dual(const SM_& sm, BV_& bv, const PV_& pv, const AT_ a, const Index bo)
         {
-          sm.template gather_axpy_dual<Algo_>(bv, pv.first(), a, bo);
-          PowerMirrorHelper<i_-1>::template gather_axpy_dual<Algo_>(sm, bv, pv.rest(), a, bo + sm.size());
+          sm.gather_axpy_dual(bv, pv.first(), a, bo);
+          PowerMirrorHelper<i_-1>::template gather_axpy_dual(sm, bv, pv.rest(), a, bo + sm.size());
         }
-        template<typename Algo_, typename SM_, typename PV_, typename BV_>
+        template<typename SM_, typename PV_, typename BV_>
         static void scatter_prim(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
         {
-          sm.template scatter_prim<Algo_>(pv.first(), bv, bo);
-          PowerMirrorHelper<i_-1>::template scatter_prim<Algo_>(sm, pv.rest(), bv, bo + sm.size());
+          sm.scatter_prim(pv.first(), bv, bo);
+          PowerMirrorHelper<i_-1>::template scatter_prim(sm, pv.rest(), bv, bo + sm.size());
         }
-        template<typename Algo_, typename SM_, typename PV_, typename BV_>
+        template<typename SM_, typename PV_, typename BV_>
         static void scatter_dual(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
         {
-          sm.template scatter_dual<Algo_>(pv.first(), bv, bo);
-          PowerMirrorHelper<i_-1>::template scatter_dual<Algo_>(sm, pv.rest(), bv, bo + sm.size());
+          sm.scatter_dual(pv.first(), bv, bo);
+          PowerMirrorHelper<i_-1>::template scatter_dual(sm, pv.rest(), bv, bo + sm.size());
         }
-        template<typename Algo_, typename SM_, typename PV_, typename BV_, typename AT_>
+        template<typename SM_, typename PV_, typename BV_, typename AT_>
         static void scatter_axpy_prim(const SM_& sm, PV_& pv, const BV_& bv, const AT_ a, const Index bo)
         {
-          sm.template scatter_axpy_prim<Algo_>(pv.first(), bv, a, bo);
-          PowerMirrorHelper<i_-1>::template scatter_axpy_prim<Algo_>(sm, pv.rest(), bv, a, bo + sm.size());
+          sm.scatter_axpy_prim(pv.first(), bv, a, bo);
+          PowerMirrorHelper<i_-1>::template scatter_axpy_prim(sm, pv.rest(), bv, a, bo + sm.size());
         }
-        template<typename Algo_, typename SM_, typename PV_, typename BV_, typename AT_>
+        template<typename SM_, typename PV_, typename BV_, typename AT_>
         static void scatter_axpy_dual(const SM_& sm, PV_& pv, const BV_& bv, const AT_ a, const Index bo)
         {
-          sm.template scatter_axpy_dual<Algo_>(pv.first(), bv, a, bo);
-          PowerMirrorHelper<i_-1>::template scatter_axpy_dual<Algo_>(sm, pv.rest(), bv, a, bo + sm.size());
+          sm.scatter_axpy_dual(pv.first(), bv, a, bo);
+          PowerMirrorHelper<i_-1>::template scatter_axpy_dual(sm, pv.rest(), bv, a, bo + sm.size());
         }
       };
       template<>
       struct PowerMirrorHelper<Index(1)>
       {
-        template<typename Algo_, typename SM_, typename BV_, typename PV_>
+        template<typename SM_, typename BV_, typename PV_>
         static void gather_prim(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
         {
-          sm.template gather_prim<Algo_>(bv, pv.first(), bo);
+          sm.gather_prim(bv, pv.first(), bo);
         }
-        template<typename Algo_, typename SM_, typename BV_, typename PV_>
+        template<typename SM_, typename BV_, typename PV_>
         static void gather_dual(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
         {
-          sm.template gather_dual<Algo_>(bv, pv.first(), bo);
+          sm.gather_dual(bv, pv.first(), bo);
         }
-        template<typename Algo_, typename SM_, typename BV_, typename PV_, typename AT_>
+        template<typename SM_, typename BV_, typename PV_, typename AT_>
         static void gather_axpy_prim(const SM_& sm, BV_& bv, const PV_& pv, const AT_ a, const Index bo)
         {
-          sm.template gather_axpy_prim<Algo_>(bv, pv.first(), a, bo);
+          sm.gather_axpy_prim(bv, pv.first(), a, bo);
         }
-        template<typename Algo_, typename SM_, typename BV_, typename PV_, typename AT_>
+        template<typename SM_, typename BV_, typename PV_, typename AT_>
         static void gather_axpy_dual(const SM_& sm, BV_& bv, const PV_& pv, const AT_ a, const Index bo)
         {
-          sm.template gather_axpy_dual<Algo_>(bv, pv.first(), a, bo);
+          sm.gather_axpy_dual(bv, pv.first(), a, bo);
         }
-        template<typename Algo_, typename SM_, typename PV_, typename BV_>
+        template<typename SM_, typename PV_, typename BV_>
         static void scatter_prim(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
         {
-          sm.template scatter_prim<Algo_>(pv.first(), bv, bo);
+          sm.scatter_prim(pv.first(), bv, bo);
         }
-        template<typename Algo_, typename SM_, typename PV_, typename BV_>
+        template<typename SM_, typename PV_, typename BV_>
         static void scatter_dual(const SM_& sm, PV_& pv, const BV_& bv, const Index bo)
         {
-          sm.template scatter_dual<Algo_>(pv.first(), bv, bo);
+          sm.scatter_dual(pv.first(), bv, bo);
         }
-        template<typename Algo_, typename SM_, typename PV_, typename BV_, typename AT_>
+        template<typename SM_, typename PV_, typename BV_, typename AT_>
         static void scatter_axpy_prim(const SM_& sm, PV_& pv, const BV_& bv, const AT_ a, const Index bo)
         {
-          sm.template scatter_axpy_prim<Algo_>(pv.first(), bv, a, bo);
+          sm.scatter_axpy_prim(pv.first(), bv, a, bo);
         }
-        template<typename Algo_, typename SM_, typename PV_, typename BV_, typename AT_>
+        template<typename SM_, typename PV_, typename BV_, typename AT_>
         static void scatter_axpy_dual(const SM_& sm, PV_& pv, const BV_& bv, const AT_ a, const Index bo)
         {
-          sm.template scatter_axpy_dual<Algo_>(pv.first(), bv, a, bo);
+          sm.scatter_axpy_dual(pv.first(), bv, a, bo);
         }
       };
     } // namespace Intern
@@ -222,87 +222,87 @@ namespace FEAST
       }
 
       /** \copydoc VectorMirror::template gather_prim() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void gather_prim(
                        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                        const LAFEM::PowerVector<Tv_, count_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
-        Intern::PowerMirrorHelper<count_>::template gather_prim<Algo_>(_sub_mirror, buffer, vector, buffer_offset);
+        Intern::PowerMirrorHelper<count_>::template gather_prim(_sub_mirror, buffer, vector, buffer_offset);
       }
 
       /** \copydoc VectorMirror::template gather_axpy_prim() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void gather_axpy_prim(
                             LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                             const LAFEM::PowerVector<Tv_, count_>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
-        Intern::PowerMirrorHelper<count_>::template gather_axpy_prim<Algo_>(_sub_mirror, buffer, vector, alpha, buffer_offset);
+        Intern::PowerMirrorHelper<count_>::template gather_axpy_prim(_sub_mirror, buffer, vector, alpha, buffer_offset);
       }
 
       /** \copydoc VectorMirror::template scatter_prim() */
-      template<typename Algo_, typename Tv_, typename Tx_, typename Ix_>
+      template<typename Tv_, typename Tx_, typename Ix_>
       void scatter_prim(
                         LAFEM::PowerVector<Tv_, count_>& vector,
                         const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
-        Intern::PowerMirrorHelper<count_>::template scatter_prim<Algo_>(_sub_mirror, vector, buffer, buffer_offset);
+        Intern::PowerMirrorHelper<count_>::template scatter_prim(_sub_mirror, vector, buffer, buffer_offset);
       }
 
       /** \copydoc VectorMirror::template scatter_axpy_prim() */
-      template<typename Algo_, typename Tv_, typename Tx_, typename Ix_>
+      template<typename Tv_, typename Tx_, typename Ix_>
       void scatter_axpy_prim(
                              LAFEM::PowerVector<Tv_, count_>& vector,
                              const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
-        Intern::PowerMirrorHelper<count_>::template scatter_axpy_prim<Algo_>(_sub_mirror, vector, buffer, alpha, buffer_offset);
+        Intern::PowerMirrorHelper<count_>::template scatter_axpy_prim(_sub_mirror, vector, buffer, alpha, buffer_offset);
       }
 
       /** \copydoc VectorMirror::template gather_dual() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void gather_dual(
                        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                        const LAFEM::PowerVector<Tv_, count_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
-        Intern::PowerMirrorHelper<count_>::template gather_dual<Algo_>(_sub_mirror, buffer, vector, buffer_offset);
+        Intern::PowerMirrorHelper<count_>::template gather_dual(_sub_mirror, buffer, vector, buffer_offset);
       }
 
       /** \copydoc VectorMirror::template gather_axpy_dual() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void gather_axpy_dual(
                             LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                             const LAFEM::PowerVector<Tv_, count_>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
-        Intern::PowerMirrorHelper<count_>::template gather_axpy_dual<Algo_>(_sub_mirror, buffer, vector, alpha, buffer_offset);
+        Intern::PowerMirrorHelper<count_>::template gather_axpy_dual(_sub_mirror, buffer, vector, alpha, buffer_offset);
       }
 
       /** \copydoc VectorMirror::template scatter_dual() */
-      template<typename Algo_, typename Tv_, typename Tx_, typename Ix_>
+      template<typename Tv_, typename Tx_, typename Ix_>
       void scatter_dual(
                         LAFEM::PowerVector<Tv_, count_>& vector,
                         const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
-        Intern::PowerMirrorHelper<count_>::template scatter_dual<Algo_>(_sub_mirror, vector, buffer, buffer_offset);
+        Intern::PowerMirrorHelper<count_>::template scatter_dual(_sub_mirror, vector, buffer, buffer_offset);
       }
 
       /** \copydoc VectorMirror::template scatter_axpy_dual() */
-      template<typename Algo_, typename Tv_, typename Tx_, typename Ix_>
+      template<typename Tv_, typename Tx_, typename Ix_>
       void scatter_axpy_dual(
                              LAFEM::PowerVector<Tv_, count_>& vector,
                              const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
-        Intern::PowerMirrorHelper<count_>::template scatter_axpy_dual<Algo_>(_sub_mirror, vector, buffer, alpha, buffer_offset);
+        Intern::PowerMirrorHelper<count_>::template scatter_axpy_dual(_sub_mirror, vector, buffer, alpha, buffer_offset);
       }
     }; // class PowerMirror<...>
   } // namespace LAFEM

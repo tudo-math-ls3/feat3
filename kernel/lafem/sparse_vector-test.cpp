@@ -22,15 +22,14 @@ using namespace FEAST::TestSystem;
  */
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class SparseVectorTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   SparseVectorTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseVectorTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseVectorTest")
   {
   }
 
@@ -102,11 +101,11 @@ public:
     }
   }
 };
-SparseVectorTest<Mem::Main, NotSet, float, Index> cpu_sparse_vector_test_float;
-SparseVectorTest<Mem::Main, NotSet, double, Index> cpu_sparse_vector_test_double;
+SparseVectorTest<Mem::Main, float, Index> cpu_sparse_vector_test_float;
+SparseVectorTest<Mem::Main, double, Index> cpu_sparse_vector_test_double;
 //SparseVectorTest<Mem::Main, Index> cpu_sparse_vector_test_index;
 #ifdef FEAST_BACKENDS_CUDA
-SparseVectorTest<Mem::CUDA, NotSet, float, Index> cuda_sparse_vector_test_float;
-SparseVectorTest<Mem::CUDA, NotSet, double, Index> cuda_sparse_vector_test_double;
+SparseVectorTest<Mem::CUDA, float, Index> cuda_sparse_vector_test_float;
+SparseVectorTest<Mem::CUDA, double, Index> cuda_sparse_vector_test_double;
 //SparseVectorTest<Mem::CUDA, Index> cuda_sparse_vector_test_index;
 #endif

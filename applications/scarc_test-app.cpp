@@ -110,7 +110,6 @@ void check_scarc_rich_rich_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -125,7 +124,6 @@ void check_scarc_rich_rich_1D(Index rank)
   boundaries.at(1).push_back(1);
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -176,7 +174,7 @@ void check_scarc_rich_rich_1D(Index rank)
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
@@ -193,7 +191,7 @@ void check_scarc_rich_rich_1D(Index rank)
   dirichlet.assemble(filter);
 
   auto tags(HaloTags::value(p0.comm_halos));
-  auto mat_localsys(MatrixConversion<Mem::Main, Algo::Generic>::value(mat_sys, mirrors, other_ranks, tags));
+  auto mat_localsys(MatrixConversion<Mem::Main>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -202,11 +200,11 @@ void check_scarc_rich_rich_1D(Index rank)
   SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
 
   ///filter system
-  filter.filter_mat<Algo::Generic>(mat_sys);
-  filter.filter_mat<Algo::Generic>(mat_localsys);
-  filter.filter_rhs<Algo::Generic>(vec_rhs);
-  filter.filter_sol<Algo::Generic>(vec_sol);
-  filter.filter_mat<Algo::Generic>(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
+  filter.filter_mat(mat_sys);
+  filter.filter_mat(mat_localsys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
+  filter.filter_mat(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
 
   SynchronisedPreconditionedFilteredScaRCData<double,
                                               Mem::Main,
@@ -243,8 +241,7 @@ void check_scarc_rich_rich_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > solver(new ScaRCFunctorRichardson0<double,
+                                   Index> > solver(new ScaRCFunctorRichardson0<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -252,8 +249,7 @@ void check_scarc_rich_rich_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 1 (global layer), preconditioner
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -264,8 +260,7 @@ void check_scarc_rich_rich_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > block_smoother(new ScaRCFunctorPreconBlock<double,
+                                   Index> > block_smoother(new ScaRCFunctorPreconBlock<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -273,8 +268,7 @@ void check_scarc_rich_rich_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 0 (local layer)
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -285,8 +279,7 @@ void check_scarc_rich_rich_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > local_solver(new ScaRCFunctorRichardson1<double,
+                                   Index> > local_solver(new ScaRCFunctorRichardson1<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -294,8 +287,7 @@ void check_scarc_rich_rich_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 0 (local layer), preconditioner
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -306,8 +298,7 @@ void check_scarc_rich_rich_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
+                                   Index> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
                                                                                               Mem::Main,
                                                                                               DenseVector<Mem::Main, double>,
                                                                                               VectorMirror<Mem::Main, double>,
@@ -315,8 +306,7 @@ void check_scarc_rich_rich_1D(Index rank)
                                                                                               SparseMatrixCSR<Mem::Main, double>,
                                                                                               UnitFilter<Mem::Main, double>,
                                                                                               std::vector,
-                                                                                              Index,
-                                                                                              Algo::Generic>(data) );
+                                                                                              Index>(data) );
 
 
   solver->reset_preconditioner(block_smoother);
@@ -373,7 +363,6 @@ void check_scarc_pcg_rich_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -388,7 +377,6 @@ void check_scarc_pcg_rich_1D(Index rank)
   boundaries.at(1).push_back(1);
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -439,7 +427,7 @@ void check_scarc_pcg_rich_1D(Index rank)
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
@@ -456,7 +444,7 @@ void check_scarc_pcg_rich_1D(Index rank)
   dirichlet.assemble(filter);
 
   auto tags(HaloTags::value(p0.comm_halos));
-  auto mat_localsys(MatrixConversion<Mem::Main, Algo::Generic>::value(mat_sys, mirrors, other_ranks, tags));
+  auto mat_localsys(MatrixConversion<Mem::Main>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -465,11 +453,11 @@ void check_scarc_pcg_rich_1D(Index rank)
   SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
 
   ///filter system
-  filter.filter_mat<Algo::Generic>(mat_sys);
-  filter.filter_mat<Algo::Generic>(mat_localsys);
-  filter.filter_rhs<Algo::Generic>(vec_rhs);
-  filter.filter_sol<Algo::Generic>(vec_sol);
-  filter.filter_mat<Algo::Generic>(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
+  filter.filter_mat(mat_sys);
+  filter.filter_mat(mat_localsys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
+  filter.filter_mat(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
 
   SynchronisedPreconditionedFilteredScaRCData<double,
                                               Mem::Main,
@@ -506,8 +494,7 @@ void check_scarc_pcg_rich_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > solver(new ScaRCFunctorPCG0<double,
+                                   Index> > solver(new ScaRCFunctorPCG0<double,
                                                                                 Mem::Main,
                                                                                 DenseVector<Mem::Main, double>,
                                                                                 VectorMirror<Mem::Main, double>,
@@ -515,8 +502,7 @@ void check_scarc_pcg_rich_1D(Index rank)
                                                                                 SparseMatrixCSR<Mem::Main, double>,
                                                                                 UnitFilter<Mem::Main, double>,
                                                                                 std::vector,
-                                                                                Index,
-                                                                                Algo::Generic>(data) );
+                                                                                Index>(data) );
 
   ///layer 1 (global layer), preconditioner
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -527,8 +513,7 @@ void check_scarc_pcg_rich_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > block_smoother(new ScaRCFunctorPreconBlock<double,
+                                   Index> > block_smoother(new ScaRCFunctorPreconBlock<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -536,8 +521,7 @@ void check_scarc_pcg_rich_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 0 (local layer)
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -548,8 +532,7 @@ void check_scarc_pcg_rich_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > local_solver(new ScaRCFunctorRichardson1<double,
+                                   Index> > local_solver(new ScaRCFunctorRichardson1<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -557,8 +540,7 @@ void check_scarc_pcg_rich_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 0 (local layer), preconditioner
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -569,8 +551,7 @@ void check_scarc_pcg_rich_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
+                                   Index> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
                                                                                               Mem::Main,
                                                                                               DenseVector<Mem::Main, double>,
                                                                                               VectorMirror<Mem::Main, double>,
@@ -578,8 +559,7 @@ void check_scarc_pcg_rich_1D(Index rank)
                                                                                               SparseMatrixCSR<Mem::Main, double>,
                                                                                               UnitFilter<Mem::Main, double>,
                                                                                               std::vector,
-                                                                                              Index,
-                                                                                              Algo::Generic>(data) );
+                                                                                              Index>(data) );
 
 
   solver->reset_preconditioner(block_smoother);
@@ -637,7 +617,6 @@ void check_scarc_rich_pcg_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -652,7 +631,6 @@ void check_scarc_rich_pcg_1D(Index rank)
   boundaries.at(1).push_back(1);
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -703,7 +681,7 @@ void check_scarc_rich_pcg_1D(Index rank)
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
@@ -720,7 +698,7 @@ void check_scarc_rich_pcg_1D(Index rank)
   dirichlet.assemble(filter);
 
   auto tags(HaloTags::value(p0.comm_halos));
-  auto mat_localsys(MatrixConversion<Mem::Main, Algo::Generic>::value(mat_sys, mirrors, other_ranks, tags));
+  auto mat_localsys(MatrixConversion<Mem::Main>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -729,11 +707,11 @@ void check_scarc_rich_pcg_1D(Index rank)
   SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
 
   ///filter system
-  filter.filter_mat<Algo::Generic>(mat_sys);
-  filter.filter_mat<Algo::Generic>(mat_localsys);
-  filter.filter_rhs<Algo::Generic>(vec_rhs);
-  filter.filter_sol<Algo::Generic>(vec_sol);
-  filter.filter_mat<Algo::Generic>(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
+  filter.filter_mat(mat_sys);
+  filter.filter_mat(mat_localsys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
+  filter.filter_mat(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
 
   SynchronisedPreconditionedFilteredScaRCData<double,
                                               Mem::Main,
@@ -770,8 +748,7 @@ void check_scarc_rich_pcg_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > solver(new ScaRCFunctorRichardson0<double,
+                                   Index> > solver(new ScaRCFunctorRichardson0<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -779,8 +756,7 @@ void check_scarc_rich_pcg_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 1 (global layer), preconditioner
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -791,8 +767,7 @@ void check_scarc_rich_pcg_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > block_smoother(new ScaRCFunctorPreconBlock<double,
+                                   Index> > block_smoother(new ScaRCFunctorPreconBlock<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -800,8 +775,7 @@ void check_scarc_rich_pcg_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 0 (local layer)
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -812,8 +786,7 @@ void check_scarc_rich_pcg_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > local_solver(new ScaRCFunctorPCG1<double,
+                                   Index> > local_solver(new ScaRCFunctorPCG1<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -821,8 +794,7 @@ void check_scarc_rich_pcg_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 0 (local layer), preconditioner
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -833,8 +805,7 @@ void check_scarc_rich_pcg_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
+                                   Index> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
                                                                                               Mem::Main,
                                                                                               DenseVector<Mem::Main, double>,
                                                                                               VectorMirror<Mem::Main, double>,
@@ -842,8 +813,7 @@ void check_scarc_rich_pcg_1D(Index rank)
                                                                                               SparseMatrixCSR<Mem::Main, double>,
                                                                                               UnitFilter<Mem::Main, double>,
                                                                                               std::vector,
-                                                                                              Index,
-                                                                                              Algo::Generic>(data) );
+                                                                                              Index>(data) );
 
 
   solver->reset_preconditioner(block_smoother);
@@ -899,7 +869,6 @@ void check_scarc_pcg_pcg_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -914,7 +883,6 @@ void check_scarc_pcg_pcg_1D(Index rank)
   boundaries.at(1).push_back(1);
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -965,7 +933,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
@@ -982,7 +950,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
   dirichlet.assemble(filter);
 
   auto tags(HaloTags::value(p0.comm_halos));
-  auto mat_localsys(MatrixConversion<Mem::Main, Algo::Generic>::value(mat_sys, mirrors, other_ranks, tags));
+  auto mat_localsys(MatrixConversion<Mem::Main>::value(mat_sys, mirrors, other_ranks, tags));
 
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
@@ -991,11 +959,11 @@ void check_scarc_pcg_pcg_1D(Index rank)
   SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
 
   ///filter system
-  filter.filter_mat<Algo::Generic>(mat_sys);
-  filter.filter_mat<Algo::Generic>(mat_localsys);
-  filter.filter_rhs<Algo::Generic>(vec_rhs);
-  filter.filter_sol<Algo::Generic>(vec_sol);
-  filter.filter_mat<Algo::Generic>(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
+  filter.filter_mat(mat_sys);
+  filter.filter_mat(mat_localsys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
+  filter.filter_mat(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
 
   SynchronisedPreconditionedFilteredScaRCData<double,
                                               Mem::Main,
@@ -1032,8 +1000,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > solver(new ScaRCFunctorPCG0<double,
+                                   Index> > solver(new ScaRCFunctorPCG0<double,
                                                                                 Mem::Main,
                                                                                 DenseVector<Mem::Main, double>,
                                                                                 VectorMirror<Mem::Main, double>,
@@ -1041,8 +1008,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
                                                                                 SparseMatrixCSR<Mem::Main, double>,
                                                                                 UnitFilter<Mem::Main, double>,
                                                                                 std::vector,
-                                                                                Index,
-                                                                                Algo::Generic>(data) );
+                                                                                Index>(data) );
 
   ///layer 1 (global layer), preconditioner
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -1053,8 +1019,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > block_smoother(new ScaRCFunctorPreconBlock<double,
+                                   Index> > block_smoother(new ScaRCFunctorPreconBlock<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -1062,8 +1027,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 0 (local layer)
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -1074,8 +1038,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > local_solver(new ScaRCFunctorPCG1<double,
+                                   Index> > local_solver(new ScaRCFunctorPCG1<double,
                                                                                        Mem::Main,
                                                                                        DenseVector<Mem::Main, double>,
                                                                                        VectorMirror<Mem::Main, double>,
@@ -1083,8 +1046,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
                                                                                        SparseMatrixCSR<Mem::Main, double>,
                                                                                        UnitFilter<Mem::Main, double>,
                                                                                        std::vector,
-                                                                                       Index,
-                                                                                       Algo::Generic>(data) );
+                                                                                       Index>(data) );
 
   ///layer 0 (local layer), preconditioner
   std::shared_ptr<ScaRCFunctorBase<double,
@@ -1095,8 +1057,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
                                    SparseMatrixCSR<Mem::Main, double>,
                                    UnitFilter<Mem::Main, double>,
                                    std::vector,
-                                   Index,
-                                   Algo::Generic> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
+                                   Index> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
                                                                                               Mem::Main,
                                                                                               DenseVector<Mem::Main, double>,
                                                                                               VectorMirror<Mem::Main, double>,
@@ -1104,8 +1065,7 @@ void check_scarc_pcg_pcg_1D(Index rank)
                                                                                               SparseMatrixCSR<Mem::Main, double>,
                                                                                               UnitFilter<Mem::Main, double>,
                                                                                               std::vector,
-                                                                                              Index,
-                                                                                              Algo::Generic>(data) );
+                                                                                              Index>(data) );
 
 
   solver->reset_preconditioner(block_smoother);

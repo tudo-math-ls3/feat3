@@ -10,13 +10,13 @@ namespace FEAST
 {
   namespace Foundation
   {
-    template<typename M_, typename A_, typename HT_>
+    template<typename MemType_, typename HT_>
     struct Aura
     {
     };
 
     template<typename HT_>
-    struct Aura<Mem::Main, Algo::Generic, HT_>
+    struct Aura<Mem::Main, HT_>
     {
       template<typename MeshType_,
                typename WT_,

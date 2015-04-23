@@ -23,36 +23,22 @@ namespace FEAST
   {
     /// \cond internal
     // Helper class: selects the matrix and vector types
-    template<typename AlgoType_, typename DataType_, typename IndexType_>
+    template<typename MemType_, typename DataType_, typename IndexType_>
     struct MetaMatrixTestHelper
     {
       /// scalar vector type
-      typedef DenseVector<typename AlgoType_::MemType, DataType_, IndexType_> ScalarVector;
+      typedef DenseVector<MemType_, DataType_, IndexType_> ScalarVector;
       /// scalar matrix type A
-      typedef SparseMatrixCSR<typename AlgoType_::MemType, DataType_, IndexType_> ScalarMatrixA;
+      typedef SparseMatrixCSR<MemType_, DataType_, IndexType_> ScalarMatrixA;
       /// scalar matrix type B
-      typedef SparseMatrixELL<typename AlgoType_::MemType, DataType_, IndexType_> ScalarMatrixB;
+      typedef SparseMatrixELL<MemType_, DataType_, IndexType_> ScalarMatrixB;
       /// scalar matrix type D
-      typedef SparseMatrixCOO<typename AlgoType_::MemType, DataType_, IndexType_> ScalarMatrixD;
-    };
-
-    // MKL specialisation: There is no ELL implementation, so we choose COO for D matrices
-    template<typename DataType_, typename IndexType_>
-    struct MetaMatrixTestHelper<Algo::MKL, DataType_, IndexType_>
-    {
-      /// scalar vector type
-      typedef DenseVector<Mem::Main, DataType_, IndexType_> ScalarVector;
-      /// scalar matrix type A
-      typedef SparseMatrixCSR<Mem::Main, DataType_, IndexType_> ScalarMatrixA;
-      /// scalar matrix type B
-      typedef SparseMatrixCSR<Mem::Main, DataType_, IndexType_> ScalarMatrixB;
-      /// scalar matrix type D
-      typedef SparseMatrixCOO<Mem::Main, DataType_, IndexType_> ScalarMatrixD;
+      typedef SparseMatrixCOO<MemType_, DataType_, IndexType_> ScalarMatrixD;
     };
 
     // CUDA specialisation: There is no COO implementation, so we choose ELL for D matrices
     template<typename DataType_, typename IndexType_>
-    struct MetaMatrixTestHelper<Algo::CUDA, DataType_, IndexType_>
+    struct MetaMatrixTestHelper<Mem::CUDA, DataType_, IndexType_>
     {
       /// scalar vector type
       typedef DenseVector<Mem::CUDA, DataType_, IndexType_> ScalarVector;
@@ -102,16 +88,14 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename Algo_, typename DataType_, typename IndexType_>
+    template<typename MemType_, typename DataType_, typename IndexType_>
     class MetaMatrixTestBase
-      : public FEAST::TestSystem::FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>
+      : public FEAST::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
     {
     public:
-      typedef Algo_ AlgoType;
-      typedef typename AlgoType::MemType MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
-      typedef MetaMatrixTestHelper<AlgoType, DataType, IndexType> Helper;
+      typedef MetaMatrixTestHelper<MemType_, DataType, IndexType> Helper;
 
       /// scalar vector type
       typedef typename Helper::ScalarVector ScalarVector;
@@ -143,7 +127,7 @@ namespace FEAST
       typedef SaddlePointMatrix<VeloFullMatrix, GradMatrix, DiveMatrix> SystemFullMatrix;
 
       explicit MetaMatrixTestBase(const String & name) :
-        FEAST::TestSystem::FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>(name)
+        FEAST::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>(name)
       {
       }
 
@@ -181,11 +165,11 @@ namespace FEAST
         DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs3(vec_bubble.size());
 
         // compute rhs vector (by exploiting the eigenvector property)
-        mat_fe.template apply<Algo::Generic>(vec_rhs1, vec_bubble); // A11*u1
-        vec_rhs1.template axpy<Algo::Generic>(vec_eigen, vec_rhs1, ps_fd.lambda_min()); // B1*p
-        vec_rhs2.template scale<Algo::Generic>(vec_eigen, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
-        mat_fd.template apply<Algo::Generic>(vec_rhs3, vec_bubble); // D1*u1
-        vec_rhs3.template axpy<Algo::Generic>(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
+        mat_fe.apply(vec_rhs1, vec_bubble); // A11*u1
+        vec_rhs1.axpy(vec_eigen, vec_rhs1, ps_fd.lambda_min()); // B1*p
+        vec_rhs2.scale(vec_eigen, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
+        mat_fd.apply(vec_rhs3, vec_bubble); // D1*u1
+        vec_rhs3.axpy(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
 
         // set rhs vector
         vec_rhs.template at<Index(0)>().template at<Index(0)>().convert(vec_rhs1);
@@ -229,12 +213,12 @@ namespace FEAST
         DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs3(vec_bubble.size());
 
         // compute rhs vector (by exploiting the eigenvector property)
-        mat_fe.template apply<Algo::Generic>(vec_rhs1, vec_bubble); // A11*u1
-        mat_fd.template apply<Algo::Generic>(vec_rhs2, vec_bubble); // A21*u1
-        vec_rhs1.template axpy<Algo::Generic>(vec_eigen, vec_rhs1, ps_fd.lambda_min() + ps_fd.lambda_min()); // A12*u2 + B1*p
-        vec_rhs2.template axpy<Algo::Generic>(vec_eigen, vec_rhs2, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
-        mat_fd.template apply<Algo::Generic>(vec_rhs3, vec_bubble); // D1*u1
-        vec_rhs3.template axpy<Algo::Generic>(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
+        mat_fe.apply(vec_rhs1, vec_bubble); // A11*u1
+        mat_fd.apply(vec_rhs2, vec_bubble); // A21*u1
+        vec_rhs1.axpy(vec_eigen, vec_rhs1, ps_fd.lambda_min() + ps_fd.lambda_min()); // A12*u2 + B1*p
+        vec_rhs2.axpy(vec_eigen, vec_rhs2, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
+        mat_fd.apply(vec_rhs3, vec_bubble); // D1*u1
+        vec_rhs3.axpy(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
 
         // set rhs vector
         vec_rhs.template at<Index(0)>().template at<Index(0)>().convert(vec_rhs1);

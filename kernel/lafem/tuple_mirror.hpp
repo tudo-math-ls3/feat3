@@ -155,95 +155,95 @@ namespace FEAST
       }
 
       /** \copydoc VectorMirror::gather_prim() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void gather_prim(
                        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                        const LAFEM::TupleVector<Ty_,Tv_...>& vector,
                        const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_prim<Algo_>(buffer, vector.first(), buffer_offset);
-        _rest.template gather_prim<Algo_>(buffer, vector.rest(), buffer_offset + _first.size());
+        _first.gather_prim(buffer, vector.first(), buffer_offset);
+        _rest.gather_prim(buffer, vector.rest(), buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::gather_axpy_prim() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void gather_axpy_prim(
                             LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                             const LAFEM::TupleVector<Ty_,Tv_...>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_axpy_prim<Algo_>(buffer, vector.first(), alpha, buffer_offset);
-        _rest.template gather_axpy_prim<Algo_>(buffer, vector.rest(), alpha, buffer_offset + _first.size());
+        _first.gather_axpy_prim(buffer, vector.first(), alpha, buffer_offset);
+        _rest.gather_axpy_prim(buffer, vector.rest(), alpha, buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::scatter_prim() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void scatter_prim(
                         LAFEM::TupleVector<Ty_, Tv_...>& vector,
                         const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_prim<Algo_>(vector.first(), buffer, buffer_offset);
-        _rest.template scatter_prim<Algo_>(vector.rest(), buffer, buffer_offset + _first.size());
+        _first.scatter_prim(vector.first(), buffer, buffer_offset);
+        _rest.scatter_prim(vector.rest(), buffer, buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::scatter_axpy_prim() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void scatter_axpy_prim(
                              LAFEM::TupleVector<Ty_, Tv_...>& vector,
                              const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_axpy_prim<Algo_>(vector.first(), buffer, alpha, buffer_offset);
-        _rest.template scatter_axpy_prim<Algo_>(vector.rest(), buffer, alpha, buffer_offset + _first.size());
+        _first.scatter_axpy_prim(vector.first(), buffer, alpha, buffer_offset);
+        _rest.scatter_axpy_prim(vector.rest(), buffer, alpha, buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::gather_dual() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void gather_dual(
                        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                        const LAFEM::TupleVector<Ty_, Tv_...>& vector,
                        const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_dual<Algo_>(buffer, vector.first(), buffer_offset);
-        _rest.template gather_dual<Algo_>(buffer, vector.rest(), buffer_offset + _first.size());
+        _first.gather_dual(buffer, vector.first(), buffer_offset);
+        _rest.gather_dual(buffer, vector.rest(), buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::gather_axpy_dual() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void gather_axpy_dual(
                             LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                             const LAFEM::TupleVector<Ty_, Tv_...>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_axpy_dual<Algo_>(buffer, vector.first(), alpha, buffer_offset);
-        _rest.template gather_axpy_dual<Algo_>(buffer, vector.rest(), alpha, buffer_offset + _first.size());
+        _first.gather_axpy_dual(buffer, vector.first(), alpha, buffer_offset);
+        _rest.gather_axpy_dual(buffer, vector.rest(), alpha, buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::scatter_dual() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void scatter_dual(
                         LAFEM::TupleVector<Ty_, Tv_...>& vector,
                         const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_dual<Algo_>(vector.first(), buffer, buffer_offset);
-        _rest.template scatter_dual<Algo_>(vector.rest(), buffer, buffer_offset + _first.size());
+        _first.scatter_dual(vector.first(), buffer, buffer_offset);
+        _rest.scatter_dual(vector.rest(), buffer, buffer_offset + _first.size());
       }
 
       /** \copydoc VectorMirror::scatter_axpy_dual() */
-      template<typename Algo_, typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void scatter_axpy_dual(
                              LAFEM::TupleVector<Ty_, Tv_...>& vector,
                              const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_axpy_dual<Algo_>(vector.first(), buffer, alpha, buffer_offset);
-        _rest.template scatter_axpy_dual<Algo_>(vector.rest(), buffer, alpha, buffer_offset + _first.size());
+        _first.scatter_axpy_dual(vector.first(), buffer, alpha, buffer_offset);
+        _rest.scatter_axpy_dual(vector.rest(), buffer, alpha, buffer_offset + _first.size());
       }
     }; // class TupleMirror<...>
 
@@ -343,17 +343,17 @@ namespace FEAST
       // template parameter rather than a parameter pack.
       // In consequence, we need to allow a whole pack here, and catch invalid sizes by
       // a static_assert within the function body...
-      template<typename Algo_, typename Tx_, typename Ix_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename... Tv_>
       void gather_prim(
                        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                        const LAFEM::TupleVector<Tv_...>& vector,
                        const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template gather_prim<Algo_>(buffer, vector.first(), buffer_offset);
+        _first.gather_prim(buffer, vector.first(), buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename... Tv_>
       void gather_axpy_prim(
                             LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                             const LAFEM::TupleVector<Tv_...>& vector,
@@ -361,20 +361,20 @@ namespace FEAST
                             const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template gather_axpy_prim<Algo_>(buffer, vector.first(), alpha, buffer_offset);
+        _first.gather_axpy_prim(buffer, vector.first(), alpha, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename... Tv_>
       void scatter_prim(
                         LAFEM::TupleVector<Tv_...>& vector,
                         const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template scatter_prim<Algo_>(vector.first(), buffer, buffer_offset);
+        _first.scatter_prim(vector.first(), buffer, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename... Tv_>
       void scatter_axpy_prim(
                              LAFEM::TupleVector<Tv_...>& vector,
                              const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
@@ -382,20 +382,20 @@ namespace FEAST
                              const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template scatter_axpy_prim<Algo_>(vector.first(), buffer, alpha, buffer_offset);
+        _first.scatter_axpy_prim(vector.first(), buffer, alpha, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename... Tv_>
       void gather_dual(
                        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                        const LAFEM::TupleVector<Tv_...>& vector,
                        const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template gather_dual<Algo_>(buffer, vector.first(), buffer_offset);
+        _first.gather_dual(buffer, vector.first(), buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename... Tv_>
       void gather_axpy_dual(
                             LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                             const LAFEM::TupleVector<Tv_...>& vector,
@@ -403,20 +403,20 @@ namespace FEAST
                             const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template gather_axpy_dual<Algo_>(buffer, vector.first(), alpha, buffer_offset);
+        _first.template gather_axpy_dual(buffer, vector.first(), alpha, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename... Tv_>
       void scatter_dual(
                         LAFEM::TupleVector<Tv_...>& vector,
                         const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template scatter_dual<Algo_>(vector.first(), buffer, buffer_offset);
+        _first.scatter_dual(vector.first(), buffer, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename... Tv_>
+      template<typename Tx_, typename Ix_, typename... Tv_>
       void scatter_axpy_dual(
                              LAFEM::TupleVector<Tv_...>& vector,
                              const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
@@ -424,83 +424,83 @@ namespace FEAST
                              const Index buffer_offset = Index(0)) const
       {
         static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        _first.template scatter_axpy_dual<Algo_>(vector.first(), buffer, alpha, buffer_offset);
+        _first.scatter_axpy_dual(vector.first(), buffer, alpha, buffer_offset);
       }
 #else // all other compilers
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void gather_prim(
                        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                        const LAFEM::TupleVector<Tv_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_prim<Algo_>(buffer, vector.first(), buffer_offset);
+        _first.gather_prim(buffer, vector.first(), buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void gather_axpy_prim(
                             LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                             const LAFEM::TupleVector<Tv_>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_axpy_prim<Algo_>(buffer, vector.first(), alpha, buffer_offset);
+        _first.gather_axpy_prim(buffer, vector.first(), alpha, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void scatter_prim(
                         LAFEM::TupleVector<Tv_>& vector,
                         const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_prim<Algo_>(vector.first(), buffer, buffer_offset);
+        _first.scatter_prim(vector.first(), buffer, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void scatter_axpy_prim(
                              LAFEM::TupleVector<Tv_>& vector,
                              const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_axpy_prim<Algo_>(vector.first(), buffer, alpha, buffer_offset);
+        _first.scatter_axpy_prim(vector.first(), buffer, alpha, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void gather_dual(
                        LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                        const LAFEM::TupleVector<Tv_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_dual<Algo_>(buffer, vector.first(), buffer_offset);
+        _first.gather_dual(buffer, vector.first(), buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void gather_axpy_dual(
                             LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                             const LAFEM::TupleVector<Tv_>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
-        _first.template gather_axpy_dual<Algo_>(buffer, vector.first(), alpha, buffer_offset);
+        _first.gather_axpy_dual(buffer, vector.first(), alpha, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void scatter_dual(
                         LAFEM::TupleVector<Tv_>& vector,
                         const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_dual<Algo_>(vector.first(), buffer, buffer_offset);
+        _first.scatter_dual(vector.first(), buffer, buffer_offset);
       }
 
-      template<typename Algo_, typename Tx_, typename Ix_, typename Tv_>
+      template<typename Tx_, typename Ix_, typename Tv_>
       void scatter_axpy_dual(
                              LAFEM::TupleVector<Tv_>& vector,
                              const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
-        _first.template scatter_axpy_dual<Algo_>(vector.first(), buffer, alpha, buffer_offset);
+        _first.scatter_axpy_dual(vector.first(), buffer, alpha, buffer_offset);
       }
 #endif // FEAST_COMPILER_MICROSOFT
     };

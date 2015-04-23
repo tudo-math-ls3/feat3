@@ -270,29 +270,25 @@ namespace FEAST
         _container.format(value);
       }
 
-      template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
-        _container.template apply<Algo_>(r, x);
+        _container.apply(r, x);
       }
 
-      template<typename Algo_>
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
       {
-        _container.template apply<Algo_>(r, x);
+        _container.apply(r, x);
       }
 
-      template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
-        _container.template apply<Algo_>(r, x, y, alpha);
+        _container.apply(r, x, y, alpha);
       }
 
-      template<typename Algo_>
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
                  const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
-        _container.template apply<Algo_>(r, x, y, alpha);
+        _container.apply(r, x, y, alpha);
       }
 
 #ifdef FEAST_COMPILER_MICROSOFT

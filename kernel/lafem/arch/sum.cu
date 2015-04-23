@@ -28,7 +28,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_>
-void Sum<Mem::CUDA, Algo::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
+void Sum<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
 {
   Index blocksize(256);
   dim3 grid;
@@ -45,5 +45,5 @@ void Sum<Mem::CUDA, Algo::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ *
 #endif
 }
 
-template void Sum<Mem::CUDA, Algo::CUDA>::value(float *, const float * const, const float * const, const Index);
-template void Sum<Mem::CUDA, Algo::CUDA>::value(double *, const double * const, const double * const, const Index);
+template void Sum<Mem::CUDA>::value(float *, const float * const, const float * const, const Index);
+template void Sum<Mem::CUDA>::value(double *, const double * const, const double * const, const Index);

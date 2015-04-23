@@ -11,7 +11,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::ScaRC;
 
 
-template<typename Tag_, typename Algo_, typename DataType_>
+template<typename Tag_, typename DataType_>
 class ScaRCDataTest:
   public TaggedTest<Tag_, DataType_>
 {
@@ -90,4 +90,4 @@ class ScaRCDataTest:
       MultiLevelScaRCData<> mlsd(std::move(A5), std::move(b5), std::move(x5));
     }
 };
-ScaRCDataTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("StorageType: std::vector, DataType: double");
+ScaRCDataTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");

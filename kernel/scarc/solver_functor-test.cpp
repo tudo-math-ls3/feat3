@@ -11,7 +11,7 @@ using namespace FEAST::ScaRC;
 using namespace FEAST::TestSystem;
 
 
-template<typename Tag_, typename Algo_, typename DataType_>
+template<typename Tag_, typename DataType_>
 class SolverFunctorTest:
   public TaggedTest<Tag_, DataType_>
 {
@@ -29,18 +29,18 @@ class SolverFunctorTest:
 
       DenseVector<Tag_, DataType_> y_ref(1000, DataType_(0));
 
-      SumFunctorProxyLeft<Algo_, DenseVector<Tag_, DataType_> > sf(y, dummy, r);
+      SumFunctorProxyLeft<DenseVector<Tag_, DataType_> > sf(y, dummy, r);
       TEST_CHECK_THROWS(sf.execute(), ScaRCError);
 
       sf.substitute(l);
       sf.execute();
 
-      y_ref.template axpy<Algo_>(l, r);
+      y_ref.axpy(l, r);
       TEST_CHECK_EQUAL(y, y_ref);
 
       //---------------------------------------------------------------------------------------------
 
-      SumFunctorProxyResultLeft<Algo_, DenseVector<Tag_, DataType_> > sf1(dummy, dummy, r);
+      SumFunctorProxyResultLeft<DenseVector<Tag_, DataType_> > sf1(dummy, dummy, r);
       sf1.substitute(l);
       sf1.execute();
 
@@ -48,7 +48,7 @@ class SolverFunctorTest:
 
       //---------------------------------------------------------------------------------------------
 
-      SumFunctor<Algo_, DenseVector<Tag_, DataType_> > sf2(y, r, r);
+      SumFunctor<DenseVector<Tag_, DataType_> > sf2(y, r, r);
       sf2.execute();
 
       TEST_CHECK_EQUAL(y, y_ref);
@@ -63,17 +63,17 @@ class SolverFunctorTest:
         T(i, i, DataType_(1));
       SparseMatrixCSR<Tag_, DataType_> A(T);
 
-      CompoundSolverFunctor<Algo_, DenseVector<Tag_, DataType_> > cf;
-      cf.add_functor(new ProductFunctorProxyRight<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(b, A, dummy));
-      cf.add_functor(new SumFunctorProxyResultLeft<Algo_, DenseVector<Tag_, DataType_> >(dummy, dummy, b));
+      CompoundSolverFunctor<DenseVector<Tag_, DataType_> > cf;
+      cf.add_functor(new ProductFunctorProxyRight<DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(b, A, dummy));
+      cf.add_functor(new SumFunctorProxyResultLeft<DenseVector<Tag_, DataType_> >(dummy, dummy, b));
       cf.substitute(a);
       cf.execute();
 
       //reference
       DenseVector<Tag_, DataType_> a_ref(1000, DataType_(1));
       DenseVector<Tag_, DataType_> b_ref(1000, DataType_(1));
-      A.template apply<Algo_>(b_ref, a_ref);
-      a_ref.template axpy<Algo_>(b_ref, a_ref);
+      A.apply(b_ref, a_ref);
+      a_ref.axpy(b_ref, a_ref);
 
       TEST_CHECK_EQUAL(a, a_ref);
 
@@ -84,14 +84,14 @@ class SolverFunctorTest:
       // u <- u + precon(u), precon(.) := A*(.) := [[v <- u, precon(u), u <- u + v]]
       DenseVector<Tag_, DataType_> u(1000, DataType_(47.11));
       DenseVector<Tag_, DataType_> v(1000, DataType_(0));
-      CompoundSolverFunctor<Algo_, DenseVector<Tag_, DataType_> > cf1;
+      CompoundSolverFunctor<DenseVector<Tag_, DataType_> > cf1;
 
-      cf1.add_functor(new CopyFunctor<Algo_, DenseVector<Tag_, DataType_> >(v, u));
-      cf1.add_functor(new PreconFunctor<Algo_, DenseVector<Tag_, DataType_> >(u));
-      cf1.add_functor(new SumFunctor<Algo_, DenseVector<Tag_, DataType_> >(u, u, v));
+      cf1.add_functor(new CopyFunctor<DenseVector<Tag_, DataType_> >(v, u));
+      cf1.add_functor(new PreconFunctor<DenseVector<Tag_, DataType_> >(u));
+      cf1.add_functor(new SumFunctor<DenseVector<Tag_, DataType_> >(u, u, v));
 
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > p(new CompoundSolverFunctor<Algo_, DenseVector<Tag_, DataType_> >() );
-      ((CompoundSolverFunctor<Algo_, DenseVector<Tag_, DataType_> >* )(p.get()))->add_functor(new ProductFunctorProxyResultRight<Algo_, DenseVector<Tag_, DataType_> , SparseMatrixCSR<Tag_, DataType_> >(dummy, A, dummy) );
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > p(new CompoundSolverFunctor<DenseVector<Tag_, DataType_> >() );
+      ((CompoundSolverFunctor<DenseVector<Tag_, DataType_> >* )(p.get()))->add_functor(new ProductFunctorProxyResultRight<DenseVector<Tag_, DataType_> , SparseMatrixCSR<Tag_, DataType_> >(dummy, A, dummy) );
 
       cf1.set_preconditioner(p);
       cf1.execute();
@@ -100,8 +100,8 @@ class SolverFunctorTest:
       DenseVector<Tag_, DataType_> v_ref;
       v_ref.clone(u_ref);
 
-      A.template apply<Algo_>(u_ref, v_ref);
-      u_ref.template axpy<Algo_>(v_ref, u_ref);
+      A.apply(u_ref, v_ref);
+      u_ref.axpy(v_ref, u_ref);
 
       TEST_CHECK_EQUAL(u, u_ref);
 
@@ -113,8 +113,8 @@ class SolverFunctorTest:
 
       DenseVector<Tag_, DataType_> u1(1000, DataType_(1));
 
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > innerfunc(new SumFunctor<Algo_, DenseVector<Tag_, DataType_> >(u1, u1, u1));
-      IterateFunctor<Algo_, DenseVector<Tag_, DataType_>, double> iterfunc(innerfunc, dummy_scalar, dummy_scalar, used_iters, Index(3));
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > innerfunc(new SumFunctor<DenseVector<Tag_, DataType_> >(u1, u1, u1));
+      IterateFunctor<DenseVector<Tag_, DataType_>, double> iterfunc(innerfunc, dummy_scalar, dummy_scalar, used_iters, Index(3));
 
       iterfunc.execute();
 
@@ -127,7 +127,7 @@ class SolverFunctorTest:
       DenseVector<Tag_, DataType_> vb(1000, DataType_(1)), vy(1000), vxdummy;
       DenseVector<Tag_, DataType_> vy_ref(1000);
 
-      DefectFunctorProxyRight<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > defect(vy, vb, A, vxdummy);
+      DefectFunctorProxyRight<DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > defect(vy, vb, A, vxdummy);
       DenseVector<Tag_, DataType_> vx(1000, DataType_(1));
 
       TEST_CHECK_THROWS(defect.execute(), ScaRCError);
@@ -135,14 +135,14 @@ class SolverFunctorTest:
       defect.substitute(vx);
       defect.execute();
 
-      //vy_ref.template defect<Algo_>(vb, A, vx);
-      A.template apply<Algo_>(vy_ref, vx, vb, DataType_(-1));
+      //vy_ref.defect(vb, A, vx);
+      A.apply(vy_ref, vx, vb, DataType_(-1));
       TEST_CHECK_EQUAL(vy, vy_ref);
 
-      DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > defect1(vy, vb, A, vx);
+      DefectFunctor<DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > defect1(vy, vb, A, vx);
       TEST_CHECK_EQUAL(vy, vy_ref);
 
       //---------------------------------------------------------------------------------------------
     }
 };
-SolverFunctorTest<Mem::Main, Algo::Generic, double> sf_cpu_double("StorageType: std::vector, DataType: double");
+SolverFunctorTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");

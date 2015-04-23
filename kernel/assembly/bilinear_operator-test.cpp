@@ -27,7 +27,7 @@ using MyP0 = Space::Discontinuous::Element<Trafo_, Space::Discontinuous::Variant
 
 template<typename MatrixType_>
 class BilinearOperatorTest :
-  public TestSystem::FullTaggedTest<typename MatrixType_::MemType, Archs::None, typename MatrixType_::DataType, typename MatrixType_::IndexType>
+  public TestSystem::FullTaggedTest<typename MatrixType_::MemType, typename MatrixType_::DataType, typename MatrixType_::IndexType>
 {
   typedef typename MatrixType_::MemType MemType_;
   typedef typename MatrixType_::DataType DataType_;
@@ -43,7 +43,7 @@ class BilinearOperatorTest :
 
 public:
   BilinearOperatorTest() :
-    TestSystem::FullTaggedTest<typename MatrixType_::MemType, Archs::None, DataType_, IndexType_>("BilinearOperatorTest<" + MatrixType_::name() + ">")
+    TestSystem::FullTaggedTest<typename MatrixType_::MemType, DataType_, IndexType_>("BilinearOperatorTest<" + MatrixType_::name() + ">")
   {
   }
 
@@ -97,16 +97,16 @@ public:
     // Compute reference solution by assembling the matrix and multiplying x to it
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, my_operator, my_space, cubature_factory);
     VectorType ref(my_space.get_num_dofs(), DataType_(0));
-    matrix.template apply<Algo::Generic>(ref, x);
+    matrix.apply(ref, x);
 
     // Compute the result given by the apply1() routine
     VectorType res(my_space.get_num_dofs(), DataType_(0));
     Assembly::BilinearOperatorAssembler::apply1(res, x, my_operator, my_space, cubature_factory);
 
     // Compute || ref - res ||_l2
-    res.template axpy<Algo::Generic>(res, ref, DataType_(-1));
+    res.axpy(res, ref, DataType_(-1));
     const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
-    TEST_CHECK_EQUAL_WITHIN_EPS(res.template norm2<Algo::Generic>(), DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(res.norm2(), DataType_(0), eps);
 
   }
 
@@ -154,7 +154,7 @@ public:
       (matrix, my_operator, my_test_space, my_trial_space, cubature_factory);
 
     VectorType ref(my_test_space.get_num_dofs(), DataType_(0));
-    matrix.template apply<Algo::Generic>(ref, x);
+    matrix.apply(ref, x);
 
     // Compute the result given by the apply2() routine
     VectorType res(my_test_space.get_num_dofs(), DataType_(0));
@@ -162,10 +162,10 @@ public:
       (res, x, my_operator, my_test_space, my_trial_space, cubature_factory);
 
     // Compute || ref - res ||_l2
-    res.template axpy<Algo::Generic>(res, ref, DataType_(-1));
+    res.axpy(res, ref, DataType_(-1));
 
     const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
-    TEST_CHECK_EQUAL_WITHIN_EPS(res.template norm2<Algo::Generic>(), DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(res.norm2(), DataType_(0), eps);
 
   }
 
@@ -354,7 +354,7 @@ BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, __float128, unsigned long
 
 template<typename MemType_, typename DataType_, typename IndexType_>
 class BandedBilinearOperatorTest :
-  public TestSystem::FullTaggedTest<MemType_, Archs::None, DataType_, IndexType_>
+  public TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
 {
   typedef LAFEM::SparseMatrixBanded<Mem::Main, DataType_, IndexType_> MatrixType;
   typedef LAFEM::DenseVector<MemType_, DataType_, IndexType_> VectorType;
@@ -368,7 +368,7 @@ class BandedBilinearOperatorTest :
 
 public:
   BandedBilinearOperatorTest() :
-    TestSystem::FullTaggedTest<MemType_, Archs::None, DataType_, IndexType_>("BandedBilinearOperatorTest")
+    TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>("BandedBilinearOperatorTest")
   {
   }
 
@@ -414,7 +414,7 @@ public:
     std::vector<IndexType_> nsi;
     nsi.push_back(IndexType_(mesh.get_num_slices(0)));
     nsi.push_back(IndexType_(mesh.get_num_slices(1)));
-    MatrixType matrix(LAFEM::PointstarStructureFE<Algo::Generic>::template value<DataType_,IndexType_>(Index(0), nsi));
+    MatrixType matrix(LAFEM::PointstarStructureFE::template value<DataType_,IndexType_>(Index(0), nsi));
     matrix.format();
 
     // create a cubature factory
@@ -451,7 +451,7 @@ public:
     std::vector<IndexType_> nsi;
     nsi.push_back(IndexType_(mesh.get_num_slices(0)));
     nsi.push_back(IndexType_(mesh.get_num_slices(1)));
-    MatrixType matrix_1(LAFEM::PointstarStructureFE<Algo::Generic>::template value<DataType_,IndexType_>(Index(1), nsi));
+    MatrixType matrix_1(LAFEM::PointstarStructureFE::template value<DataType_,IndexType_>(Index(1), nsi));
 
     matrix_1.format();
     MatrixType matrix_2(matrix_1.clone());

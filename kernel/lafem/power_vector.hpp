@@ -237,11 +237,10 @@ namespace FEAST
        * \param[in] alpha
        * The scaling factor for \p x.
        */
-      template<typename Algo_>
       void axpy(const PowerVector& x, const PowerVector& y, DataType alpha = DataType(1))
       {
-        first().template axpy<Algo_>(x.first(), y.first(), alpha);
-        rest().template axpy<Algo_>(x.rest(), y.rest(), alpha);
+        first().axpy(x.first(), y.first(), alpha);
+        rest().axpy(x.rest(), y.rest(), alpha);
       }
 
       /**
@@ -250,11 +249,10 @@ namespace FEAST
        * \param[in] x The first factor.
        * \param[in] y The second factor.
        */
-      template <typename Algo_>
       void component_product(const PowerVector & x, const PowerVector & y)
       {
-        first().template component_product<Algo_>(x.first(), y.first());
-        rest().template component_product<Algo_>(x.rest(), y.rest());
+        first().component_product(x.first(), y.first());
+        rest().component_product(x.rest(), y.rest());
       }
 
       /**
@@ -266,11 +264,10 @@ namespace FEAST
        * \param[in] alpha
        * The nominator.
        */
-      template<typename Algo_>
       void component_invert(const PowerVector& x, DataType alpha = DataType(1))
       {
-        first().template component_invert<Algo_>(x.first(), alpha);
-        rest().template component_invert<Algo_>(x.rest(), alpha);
+        first().component_invert(x.first(), alpha);
+        rest().component_invert(x.rest(), alpha);
       }
 
       /**
@@ -282,11 +279,10 @@ namespace FEAST
        * \param[in] alpha
        * The scaling factor for \p x.
        */
-      template<typename Algo_>
       void scale(const PowerVector& x, DataType alpha)
       {
-        first().template scale<Algo_>(x.first(), alpha);
-        rest().template scale<Algo_>(x.rest(), alpha);
+        first().scale(x.first(), alpha);
+        rest().scale(x.rest(), alpha);
       }
 
       /**
@@ -295,38 +291,34 @@ namespace FEAST
        * \param[in] x
        * The second vector for the dot-product.
        */
-      template<typename Algo_>
       DataType dot(const PowerVector& x) const
       {
-        return first().template dot<Algo_>(x.first()) + rest().template dot<Algo_>(x.rest());
+        return first().dot(x.first()) + rest().dot(x.rest());
       }
 
       /**
        * \copydoc LAFEM::DenseVector::triple_dot()
        **/
-      template<typename Algo_>
       DataType triple_dot(const PowerVector& x, const PowerVector& y) const
       {
-        return first().template triple_dot<Algo_>(x.first(), y.first())
-          + rest().template triple_dot<Algo_>(x.rest(), y.rest());
+        return first().triple_dot(x.first(), y.first())
+          + rest().triple_dot(x.rest(), y.rest());
       }
 
       /**
        * \brief Returns the squared euclid norm of this vector.
        */
-      template<typename Algo_>
       DataType norm2sqr() const
       {
-        return first().template norm2sqr<Algo_>() + rest().template norm2sqr<Algo_>();
+        return first().norm2sqr() + rest().norm2sqr();
       }
 
       /**
        * \brief Returns the euclid norm of this vector.
        */
-      template<typename Algo_>
       DataType norm2() const
       {
-        return Math::sqrt(norm2sqr<Algo_>());
+        return Math::sqrt(norm2sqr());
       }
 
       /**
@@ -536,58 +528,49 @@ namespace FEAST
         first().copy(x.first());
       }
 
-      template<typename Algo_>
       void axpy(const PowerVector& x, const PowerVector& y, DataType alpha = DataType(1))
       {
-        first().template axpy<Algo_>(x.first(), y.first(), alpha);
+        first().axpy(x.first(), y.first(), alpha);
       }
 
-      template <typename Algo_>
       void component_product(const PowerVector & x, const PowerVector & y)
       {
-        first().template component_product<Algo_>(x.first(), y.first());
+        first().component_product(x.first(), y.first());
       }
 
-      template<typename Algo_>
       void component_invert(const PowerVector& x, DataType alpha = DataType(1))
       {
-        first().template component_invert<Algo_>(x.first(), alpha);
+        first().component_invert(x.first(), alpha);
       }
 
-      template<typename Algo_>
       void scale(const PowerVector& x, DataType alpha)
       {
-        first().template scale<Algo_>(x.first(), alpha);
+        first().scale(x.first(), alpha);
       }
 
-      template<typename Algo_>
       DataType dot(const PowerVector& x) const
       {
-        return first().template dot<Algo_>(x.first());
+        return first().dot(x.first());
       }
 
-      template<typename Algo_>
       DataType triple_dot(const PowerVector& x, const PowerVector& y) const
       {
-        return first().template triple_dot<Algo_>(x.first(), y.first());
+        return first().triple_dot(x.first(), y.first());
       }
 
-      template<typename Algo_>
       DataType triple_dot_i(const PowerVector& x, const PowerVector& y) const
       {
-        return first().template triple_dot_i<Algo_>(x.first(), y.first());
+        return first().triple_dot_i(x.first(), y.first());
       }
 
-      template<typename Algo_>
       DataType norm2sqr() const
       {
-        return first().template norm2sqr<Algo_>();
+        return first().norm2sqr();
       }
 
-      template<typename Algo_>
       DataType norm2() const
       {
-        return Math::sqrt(norm2sqr<Algo_>());
+        return Math::sqrt(norm2sqr());
       }
 
       const DataType operator()(Index index) const

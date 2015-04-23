@@ -14,7 +14,7 @@ namespace FEAST
     {
 
       template <typename DT_, typename IT_>
-      void ScaleRows<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/,
+      void ScaleRows<Mem::Main>::csr_generic(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/,
                                                     const IT_ * const row_ptr, const DT_ * const x,
                                                     const Index rows, const Index, const Index)
       {
@@ -29,7 +29,7 @@ namespace FEAST
       }
 
       template <typename DT_, typename IT_>
-      void ScaleRows<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const IT_ * const row_idx,
+      void ScaleRows<Mem::Main>::coo_generic(DT_ * r, const DT_ * const a, const IT_ * const row_idx,
                                                     const IT_ * const /*col_idx*/, const DT_ * const x,
                                                     const Index, const Index, const Index used_elements)
       {
@@ -40,7 +40,7 @@ namespace FEAST
       }
 
       template <typename DT_, typename IT_>
-      void ScaleRows<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/,
+      void ScaleRows<Mem::Main>::ell_generic(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/,
                                                     const IT_ * const cs, const IT_ * const cl, const IT_ * const /*rl*/,
                                                     const DT_ * const x, const Index C, const Index rows)
       {
@@ -71,7 +71,7 @@ namespace FEAST
       // ***********************************************
 
       template <typename DT_, typename IT_>
-      void ScaleCols<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const a, const IT_ * const col_ind,
+      void ScaleCols<Mem::Main>::csr_generic(DT_ * r, const DT_ * const a, const IT_ * const col_ind,
                                                     const IT_ * const row_ptr, const DT_ * const x,
                                                     const Index rows, const Index, const Index)
       {
@@ -86,7 +86,7 @@ namespace FEAST
       }
 
       template <typename DT_, typename IT_>
-      void ScaleCols<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const IT_ * const /*row_idx*/,
+      void ScaleCols<Mem::Main>::coo_generic(DT_ * r, const DT_ * const a, const IT_ * const /*row_idx*/,
                                                     const IT_ * const col_idx, const DT_ * const x, const Index,
                                                     const Index, const Index used_elements)
       {
@@ -97,7 +97,7 @@ namespace FEAST
       }
 
       template <typename DT_, typename IT_>
-      void ScaleCols<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind,
+      void ScaleCols<Mem::Main>::ell_generic(DT_ * r, const DT_ * const a, const IT_ * const col_ind,
                                                     const IT_ * const cs, const IT_ * const cl, const IT_ * const /*rl*/,
                                                     const DT_ * const x, const Index C, const Index rows)
       {

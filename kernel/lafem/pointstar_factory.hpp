@@ -807,7 +807,7 @@ namespace FEAST
         /**
          * Create matrix-structure
          */
-        SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix(PointstarStructureFD<Algo::Generic>::value<DataType_, IndexType_>(this->_num_of_subintervalls));
+        SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix(PointstarStructureFD::value<DataType_, IndexType_>(this->_num_of_subintervalls));
         const Index neq(matrix.rows());
         DataType_ * const pval(matrix.val());
 

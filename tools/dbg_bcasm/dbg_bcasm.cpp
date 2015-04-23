@@ -67,9 +67,9 @@ void test_bcasm(
   dirichlet.assemble(filter, bc_func);
 
   // filter system
-  filter.filter_mat<Algo::Generic>(mat_sys);
-  filter.filter_rhs<Algo::Generic>(vec_rhs);
-  filter.filter_sol<Algo::Generic>(vec_sol);
+  filter.filter_mat(mat_sys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
 
   // print output
   std::cout << "System Matrix:" << std::endl << mat_sys << std::endl;

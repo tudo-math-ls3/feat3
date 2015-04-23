@@ -15,13 +15,13 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestAttr:
-public TaggedTest<Tag_, IndexType_, Algo_>
+public TaggedTest<Tag_, IndexType_>
 {
 public:
   MeshTestAttr(const std::string & tag) :
-    TaggedTest<Tag_, IndexType_, Algo_>("MeshTestAttr<" + tag + ">")
+    TaggedTest<Tag_, IndexType_>("MeshTestAttr<" + tag + ">")
   {
   }
 
@@ -534,19 +534,19 @@ public:
     return true;
   }
 };
-MeshTestAttr<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mesh_test_cpu_v_v("std::vector, std::vector");
-MeshTestAttr<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mesh_test_cpu_d_v("std::deque, std::vector");
-MeshTestAttr<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mesh_test_cpu_v_d("std::vector, std::deque");
-MeshTestAttr<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mesh_test_cpu_d_d("std::deque, std::deque");
+MeshTestAttr<Mem::Main, Index, std::vector, std::vector<Index> > mesh_test_cpu_v_v("std::vector, std::vector");
+MeshTestAttr<Mem::Main, Index, std::deque, std::vector<Index> > mesh_test_cpu_d_v("std::deque, std::vector");
+MeshTestAttr<Mem::Main, Index, std::vector, std::deque<Index> > mesh_test_cpu_v_d("std::vector, std::deque");
+MeshTestAttr<Mem::Main, Index, std::deque, std::deque<Index> > mesh_test_cpu_d_d("std::deque, std::deque");
 //MeshTestAttr<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Mem::Main, unsigned long, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //TODO: ddw needs erase(i) member
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestGeometryInterface:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshTestGeometryInterface(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("MeshTestGeometryInterface<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("MeshTestGeometryInterface<" + tag + ">")
     {
     }
 
@@ -690,5 +690,5 @@ class MeshTestGeometryInterface:
       return true;
     }
 };
-MeshTestGeometryInterface<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mesh_test_fginter_cpu_v_v("std::vector, std::vector");
-MeshTestGeometryInterface<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mesh_test_fginter_cpu_v_d("std::vector, std::deque");
+MeshTestGeometryInterface<Mem::Main, Index, std::vector, std::vector<Index> > mesh_test_fginter_cpu_v_v("std::vector, std::vector");
+MeshTestGeometryInterface<Mem::Main, Index, std::vector, std::deque<Index> > mesh_test_fginter_cpu_v_d("std::vector, std::deque");

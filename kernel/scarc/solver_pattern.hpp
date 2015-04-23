@@ -45,7 +45,7 @@ namespace FEAST
     };
 
     ///pattern generation templates
-    template<typename Pattern_, typename Algo_>
+    template<typename Pattern_>
     struct SolverPatternGeneration
     {
     };
@@ -56,13 +56,10 @@ namespace FEAST
      *
      * Blockwise application of point smoothers with synchronisation by averaging.
      *
-     * \tparam Algo_
-     * algorithm (architecture) tag
-     *
      * \author Markus Geveler
      */
-    template<typename Algo_>
-    struct SolverPatternGeneration<ScaRCBlockSmoother, Algo_>
+    template<>
+    struct SolverPatternGeneration<ScaRCBlockSmoother>
     {
       static Index min_num_temp_scalars()
       {
@@ -104,15 +101,14 @@ namespace FEAST
         //data.eps() = eps;
 
         ///create compound functor
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
         ///get reference to functor (in order to cast only once)
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(result.get())));
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(result.get())));
 
         ///global defect :=  type-0[y]<-type-0[A]*type-1[x], type-1[y]<-SynchVec_acc, type-1[y]<-filter_defect(type-1[y])
-        cf.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.def(), data.sys(), data.sol()));
+        cf.add_functor(new ProductFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.def(), data.sys(), data.sol()));
 
-        cf.add_functor(new SynchVecFunctor<Algo_,
-                                           VT_<Tag_, DataType_, IT_>,
+        cf.add_functor(new SynchVecFunctor<VT_<Tag_, DataType_, IT_>,
                                            VMT_<Tag_, DataType_, IT_>,
                                            Foundation::com_accumulate,
                                            StoreT_>(data.def(),
@@ -122,27 +118,26 @@ namespace FEAST
                                                     data.dest_ranks(),
                                                     data.source_ranks()));
 
-        cf.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.def(), data.rhs(), data.def()));
+        cf.add_functor(new DifferenceFunctor<VT_<Tag_, DataType_, IT_> >(data.def(), data.rhs(), data.def()));
 
-        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
+        cf.add_functor(new FilterDefectFunctor<VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
 
         ///initial norm of defect with global comm
-        cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.def()));
+        cf.add_functor(new NormFunctor2wosqrt<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.def()));
 
-        cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm_0(),
+        cf.add_functor(new SynchScalFunctor<VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm_0(),
                                                                                                            data.scalars().at(0),
                                                                                                            data.scalars().at(1)));
 
-        cf.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), "outer_norm_0"));
+        cf.add_functor(new InspectionFunctor<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), "outer_norm_0"));
 
         ///main loop
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
-        cfiterate.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, VT_<Tag_, DataType_, IT_> >(data.def(), "outer_def_before"));
-        cfiterate.add_functor(new PreconFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.def()));
-        cfiterate.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, VT_<Tag_, DataType_, IT_> >(data.def(), "outer_def_after"));
-        cfiterate.add_functor(new SynchVecFunctor<Algo_,
-                                                  VT_<Tag_, DataType_, IT_>,
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
+        cfiterate.add_functor(new InspectionFunctor<VT_<Tag_, DataType_, IT_>, VT_<Tag_, DataType_, IT_> >(data.def(), "outer_def_before"));
+        cfiterate.add_functor(new PreconFunctor<VT_<Tag_, DataType_, IT_> >(data.def()));
+        cfiterate.add_functor(new InspectionFunctor<VT_<Tag_, DataType_, IT_>, VT_<Tag_, DataType_, IT_> >(data.def(), "outer_def_after"));
+        cfiterate.add_functor(new SynchVecFunctor<VT_<Tag_, DataType_, IT_>,
                                                   VMT_<Tag_, DataType_, IT_>,
                                                   Foundation::com_average,
                                                   StoreT_>(data.def(),
@@ -151,12 +146,11 @@ namespace FEAST
                                                            data.vector_mirror_recvbufs(),
                                                            data.dest_ranks(),
                                                            data.source_ranks()));
-        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
-        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.sol(), data.sol(), data.def()));
+        cfiterate.add_functor(new FilterCorrectionFunctor<VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
+        cfiterate.add_functor(new SumFunctor<VT_<Tag_, DataType_, IT_> >(data.sol(), data.sol(), data.def()));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.def(), data.sys(), data.sol()));
-        cfiterate.add_functor(new SynchVecFunctor<Algo_,
-                                           VT_<Tag_, DataType_, IT_>,
+        cfiterate.add_functor(new ProductFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.def(), data.sys(), data.sol()));
+        cfiterate.add_functor(new SynchVecFunctor<VT_<Tag_, DataType_, IT_>,
                                            VMT_<Tag_, DataType_, IT_>,
                                            Foundation::com_accumulate,
                                            StoreT_>(data.def(),
@@ -166,19 +160,19 @@ namespace FEAST
                                                     data.dest_ranks(),
                                                     data.source_ranks()));
 
-        cfiterate.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.def(), data.rhs(), data.def()));
-        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
+        cfiterate.add_functor(new DifferenceFunctor<VT_<Tag_, DataType_, IT_> >(data.def(), data.rhs(), data.def()));
+        cfiterate.add_functor(new FilterDefectFunctor<VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
 
-        cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.def()));
-        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm(),
+        cfiterate.add_functor(new NormFunctor2wosqrt<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.def()));
+        cfiterate.add_functor(new SynchScalFunctor<VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm(),
                                                                                                            data.scalars().at(0),
                                                                                                            data.scalars().at(1)));
 
-        cfiterate.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), "outer_norm"));
+        cfiterate.add_functor(new InspectionFunctor<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), "outer_norm"));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_, IT_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
 
 
-        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr,
+        cf.add_functor(new IterateFunctor<VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr,
                                                                                    data.scalars().at(0),
                                                                                    eps,
                                                                                    data.used_iters(),
@@ -189,8 +183,8 @@ namespace FEAST
       }
     };
 
-    template<typename Algo_>
-    struct SolverPatternGeneration<Richardson, Algo_>
+    template<>
+    struct SolverPatternGeneration<Richardson>
     {
       static Index min_num_temp_scalars()
       {
@@ -218,30 +212,30 @@ namespace FEAST
         data.eps() = eps;
 
         ///create compound functor
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
         ///get reference to functor (in order to cast only once)
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(result.get())));
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(result.get())));
 
         ///add functors to the solver program:
         //defect(t, b, A, x)
-        cf.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
+        cf.add_functor(new DefectFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
 
         //norm2(norm_0, t)
-        cf.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.temp().at(0)));
+        cf.add_functor(new NormFunctor2<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.temp().at(0)));
 
         //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
         ///TODO assumes scaled precon matrix
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(1), data.precon(), data.temp().at(0)));
-        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.sol(), data.temp().at(1), data.sol()));
+        cfiterate.add_functor(new ProductFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(1), data.precon(), data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctor<VT_<Tag_, DataType_, IT_> >(data.sol(), data.temp().at(1), data.sol()));
 
-        cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
-        cfiterate.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.temp().at(0)));
+        cfiterate.add_functor(new DefectFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
+        cfiterate.add_functor(new NormFunctor2<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.temp().at(0)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_, IT_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
 
-        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
+        cf.add_functor(new IterateFunctor<VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
 
         return result;
       }
@@ -269,15 +263,14 @@ namespace FEAST
         data.eps() = eps;
 
         ///create compound functor
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
         ///get reference to functor (in order to cast only once)
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(result.get())));
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(result.get())));
 
         ///add functors to the solver program:
         //defect(t, b, A, x)
-        cf.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
-        cf.add_functor(new SynchVecFunctor<Algo_,
-                                           VT_<Tag_, DataType_, IT_>,
+        cf.add_functor(new DefectFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
+        cf.add_functor(new SynchVecFunctor<VT_<Tag_, DataType_, IT_>,
                                            VMT_<Tag_, DataType_, IT_>,
                                            Foundation::com_exchange,
                                            StoreT_>(data.temp().at(0),
@@ -288,22 +281,21 @@ namespace FEAST
                                                     data.source_ranks()));
 
         //norm2(norm_0, t)
-        cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.temp().at(0)));
-        cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm_0(),
+        cf.add_functor(new NormFunctor2wosqrt<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.temp().at(0)));
+        cf.add_functor(new SynchScalFunctor<VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm_0(),
                                                                                                 data.scalars().at(1),
                                                                                                 data.scalars().at(2)));
 
         //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
         ///TODO assumes scaled precon matrix
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(1), data.precon(), data.temp().at(0)));
-        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.sol(), data.temp().at(1), data.sol()));
+        cfiterate.add_functor(new ProductFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(1), data.precon(), data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctor<VT_<Tag_, DataType_, IT_> >(data.sol(), data.temp().at(1), data.sol()));
 
-        cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
-        cfiterate.add_functor(new SynchVecFunctor<Algo_,
-                                                  VT_<Tag_, DataType_, IT_>,
+        cfiterate.add_functor(new DefectFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
+        cfiterate.add_functor(new SynchVecFunctor<VT_<Tag_, DataType_, IT_>,
                                                   VMT_<Tag_, DataType_, IT_>,
                                                   Foundation::com_exchange,
                                                   StoreT_>(data.temp().at(0),
@@ -313,13 +305,13 @@ namespace FEAST
                                                            data.dest_ranks(),
                                                            data.source_ranks()));
 
-        cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.temp().at(0)));
-        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm(),
+        cfiterate.add_functor(new NormFunctor2wosqrt<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.temp().at(0)));
+        cfiterate.add_functor(new SynchScalFunctor<VT_<Tag_, DataType_, IT_>, DataType_, Foundation::com_allreduce_sqrtsum>(data.norm(),
                                                                                                        data.scalars().at(1),
                                                                                                        data.scalars().at(2)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_, IT_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
 
-        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr,
+        cf.add_functor(new IterateFunctor<VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr,
                                                                                    data.scalars().at(0),
                                                                                    data.eps(),
                                                                                    data.used_iters(),
@@ -332,13 +324,10 @@ namespace FEAST
     /**
      * \brief Generates a (pointwise) Richardson pattern
      *
-     * \tparam Algo_
-     * algorithm (architecture) tag
-     *
      * \author Markus Geveler
      */
-    template<typename Algo_>
-    struct SolverPatternGeneration<RichardsonLayer, Algo_>
+    template<>
+    struct SolverPatternGeneration<RichardsonLayer>
     {
       static Index min_num_temp_scalars()
       {
@@ -381,47 +370,47 @@ namespace FEAST
         //data.scalars().at(0) = eps;      ///EPS
 
         ///create compound functor
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
         ///get reference to functor (in order to cast only once)
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(result.get())));
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(result.get())));
 
         ///add functors to the solver program:
         //use zero as start
-        cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(2), dummy, data.localsys(), data.temp().at(1)));
-        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.temp().at(2), data.filter()));
+        cf.add_functor(new DefectFunctorProxyRight<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(2), dummy, data.localsys(), data.temp().at(1)));
+        cf.add_functor(new FilterDefectFunctor<VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.temp().at(2), data.filter()));
 
-        cf.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.scalars().at(1), data.temp().at(2))); ///NORM_0
-        cf.add_functor(new InspectionFunctorSTL<Algo_, VT_<Tag_, DataType_, IT_>, DataType_>(data.scalars(), 1, "inner_norm_0"));
-        cf.add_functor(new InspectionConstFunctor<Algo_, VT_<Tag_, DataType_, IT_>, Index >(max_iter, "inner_max_iter"));
-        cf.add_functor(new InspectionConstFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(eps, "inner_eps"));
+        cf.add_functor(new NormFunctor2<VT_<Tag_, DataType_, IT_>, DataType_ >(data.scalars().at(1), data.temp().at(2))); ///NORM_0
+        cf.add_functor(new InspectionFunctorSTL<VT_<Tag_, DataType_, IT_>, DataType_>(data.scalars(), 1, "inner_norm_0"));
+        cf.add_functor(new InspectionConstFunctor<VT_<Tag_, DataType_, IT_>, Index >(max_iter, "inner_max_iter"));
+        cf.add_functor(new InspectionConstFunctor<VT_<Tag_, DataType_, IT_>, DataType_ >(eps, "inner_eps"));
 
         //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
         ///TODO assumes scaled precon matrix
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.precon(), data.temp().at(2)));
-        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.filter()));
-        cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_, IT_> >(data.temp().at(3), data.temp().at(3), data.temp().at(0)));
+        cfiterate.add_functor(new ProductFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.precon(), data.temp().at(2)));
+        cfiterate.add_functor(new FilterCorrectionFunctor<VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.filter()));
+        cfiterate.add_functor(new SumFunctorProxyResultLeft<VT_<Tag_, DataType_, IT_> >(data.temp().at(3), data.temp().at(3), data.temp().at(0)));
 
-        cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(2), dummy, data.localsys(), data.temp().at(3)));
-        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.temp().at(2), data.filter()));
+        cfiterate.add_functor(new DefectFunctorProxyRight<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(2), dummy, data.localsys(), data.temp().at(3)));
+        cfiterate.add_functor(new FilterDefectFunctor<VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.temp().at(2), data.filter()));
 
-        cfiterate.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.scalars().at(2), data.temp().at(2))); ///NORM_k
+        cfiterate.add_functor(new NormFunctor2<VT_<Tag_, DataType_, IT_>, DataType_ >(data.scalars().at(2), data.temp().at(2))); ///NORM_k
 
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_, IT_>, DataType_>(data.scalars().at(3), data.scalars().at(2), data.scalars().at(1))); ///NORM_k/NORM_0
 
-        cfiterate.add_functor(new InspectionFunctorSTL<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.scalars(), 2, "inner_norm"));
-        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr,
+        cfiterate.add_functor(new InspectionFunctorSTL<VT_<Tag_, DataType_, IT_>, DataType_ >(data.scalars(), 2, "inner_norm"));
+        cf.add_functor(new IterateFunctor<VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr,
                                                                                    data.scalars().at(3),
                                                                                    eps,
                                                                                    data.indices().at(1), ///used_iters
                                                                                    max_iter, ///max_iters
                                                                                    coc_less));
 
-        cf.add_functor(new CopyFunctorProxyResult<Algo_, VT_<Tag_, DataType_, IT_> >(dummy, data.temp().at(3)));
+        cf.add_functor(new CopyFunctorProxyResult<VT_<Tag_, DataType_, IT_> >(dummy, data.temp().at(3)));
 
-        cf.add_functor(new InspectionFunctorSTL<Algo_, VT_<Tag_, DataType_, IT_>, Index >(data.indices(), 1, "inner_used_iters"));
+        cf.add_functor(new InspectionFunctorSTL<VT_<Tag_, DataType_, IT_>, Index >(data.indices(), 1, "inner_used_iters"));
         return result;
       }
 
@@ -442,37 +431,37 @@ namespace FEAST
         data.eps() = eps;
 
         ///create compound functor
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
         ///get reference to functor (in order to cast only once)
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(result.get())));
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(result.get())));
 
         ///add functors to the solver program:
         //defect(t, b, A, x)
-        cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
+        cf.add_functor(new DefectFunctorProxyRight<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
 
         //norm2(norm_0, t)
-        cf.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.temp().at(0)));
+        cf.add_functor(new NormFunctor2<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.temp().at(0)));
 
         //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
         ///TODO assumes scaled precon matrix
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > cfiterateptr(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
-        cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_, IT_> >(dummy, dummy, data.temp().at(0)));
+        cfiterate.add_functor(new ProductFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctorProxyResultLeft<VT_<Tag_, DataType_, IT_> >(dummy, dummy, data.temp().at(0)));
 
-        cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
-        cfiterate.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.temp().at(0)));
+        cfiterate.add_functor(new DefectFunctorProxyRight<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
+        cfiterate.add_functor(new NormFunctor2<VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.temp().at(0)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_, IT_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
 
-        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
+        cf.add_functor(new IterateFunctor<VT_<Tag_, DataType_, IT_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
 
         return result;
       }
     };
 
-    template<typename Algo_>
-    struct SolverPatternGeneration<SpMVPreconApply, Algo_>
+    template<>
+    struct SolverPatternGeneration<SpMVPreconApply>
     {
       static Index min_num_temp_scalars()
       {
@@ -494,20 +483,20 @@ namespace FEAST
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > execute(PreconditionedSolverData<DataType_, Tag_, VT_, MT_, PT_, StoreT_>& data)
       {
         ///create compound functor
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
         ///get reference to functor (in order to cast only once)
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(result.get())));
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(result.get())));
 
         ///add functors to the solver program:
         //product(x, P, x)
-        cf.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.sol(), data.stored_prec, data.sol()));
+        cf.add_functor(new ProductFunctor<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.sol(), data.stored_prec, data.sol()));
 
         return result;
       }
     };
 
-    template<typename Algo_>
-    struct SolverPatternGeneration<SpMVPreconApplyLayer, Algo_>
+    template<>
+    struct SolverPatternGeneration<SpMVPreconApplyLayer>
     {
       static Index min_num_temp_scalars()
       {
@@ -530,13 +519,13 @@ namespace FEAST
                                                                                 VT_<Tag_, DataType_, IT_>& dummy)
       {
         ///create compound functor
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >());
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > result(new CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >());
         ///get reference to functor (in order to cast only once)
-        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(result.get())));
+        CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >& cf(*((CompoundSolverFunctor<VT_<Tag_, DataType_, IT_> >*)(result.get())));
 
         ///add functors to the solver program:
         //product(dummy, P, dummy)
-        cf.add_functor(new ProductFunctorProxyResultRight<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(dummy, data.stored_prec, dummy));
+        cf.add_functor(new ProductFunctorProxyResultRight<VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(dummy, data.stored_prec, dummy));
 
         return result;
       }

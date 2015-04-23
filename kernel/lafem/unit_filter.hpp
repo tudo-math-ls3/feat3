@@ -183,14 +183,10 @@ namespace FEAST
       /**
        * \brief Applies the filter onto a system matrix.
        *
-       * \tparam Algo_
-       * Backend
-       *
        * \param[in,out] matrix
        * A reference to the matrix to be filtered.
        *
        */
-      template<typename Algo_>
       void filter_mat(MatrixType & matrix) const
       {
       }
@@ -198,14 +194,10 @@ namespace FEAST
       /**
        * \brief Filter the non-diagonal entries, row wise
        *
-       * \tparam Algo_
-       * Backend
-       *
        * \param[in,out] matrix
        * A reference to the matrix to be filtered.
        *
        */
-      template<typename Algo_>
       void filter_offdiag_row_mat(MatrixType & matrix) const
       {
       }
@@ -213,21 +205,16 @@ namespace FEAST
       /**
        * \brief Filter the non-diagonal entries, column wise
        *
-       * \tparam Algo_
-       * Backend
-       *
        * \param[in,out] matrix
        * A reference to the matrix to be filtered.
        *
        */
-      template<typename Algo_>
       void filter_offdiag_col_mat(MatrixType & matrix) const
       {
       }
 
 #endif
       ///\cond internal
-      template<typename Algo_>
       void filter_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
@@ -245,7 +232,6 @@ namespace FEAST
         }
       }
 
-      template<typename Algo_>
       void filter_offdiag_row_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
@@ -262,13 +248,11 @@ namespace FEAST
         }
       }
 
-      template<typename Algo_>
       void filter_offdiag_col_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> &) const
       {
         // nothing to do here
       }
 
-      template<typename Algo_>
       void filter_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index tused_elements(matrix.used_elements());
@@ -293,7 +277,6 @@ namespace FEAST
         }
       }
 
-      template<typename Algo_>
       void filter_offdiag_row_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index tused_elements(matrix.used_elements());
@@ -317,13 +300,11 @@ namespace FEAST
         }
       }
 
-      template<typename Algo_>
       void filter_offdiag_col_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> &) const
       {
         // nothing to do here
       }
 
-      template<typename Algo_>
       void filter_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index tC(matrix.C());
@@ -342,7 +323,6 @@ namespace FEAST
         }
       }
 
-      template<typename Algo_>
       void filter_offdiag_row_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
         const Index tC(matrix.C());
@@ -360,7 +340,6 @@ namespace FEAST
         }
       }
 
-      template<typename Algo_>
       void filter_offdiag_col_mat(SparseMatrixELL<Mem::Main, DT_, IT_> &) const
       {
         // nothing to do here
@@ -373,11 +352,10 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the right-hand-side vector to be filtered.
        */
-      template<typename Algo_>
       void filter_rhs(DenseVector<Mem_, DT_, IT_> & vector) const
       {
         if(_sv.used_elements() > Index(0))
-          Arch::UnitFilter<Mem_, Algo_>::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
+          Arch::UnitFilter<Mem_>::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
       }
 
       /**
@@ -386,11 +364,10 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the solution vector to be filtered.
        */
-      template<typename Algo_>
       void filter_sol(DenseVector<Mem_, DT_, IT_> & vector) const
       {
         // same as rhs
-        filter_rhs<Algo_>(vector);
+        filter_rhs(vector);
       }
 
       /**
@@ -399,11 +376,10 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the defect vector to be filtered.
        */
-      template<typename Algo_>
       void filter_def(DenseVector<Mem_, DT_, IT_> & vector) const
       {
         if(_sv.used_elements() > Index(0))
-          Arch::UnitFilter<Mem_, Algo_>::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
+          Arch::UnitFilter<Mem_>::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
       }
 
       /**
@@ -412,11 +388,10 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the correction vector to be filtered.
        */
-      template<typename Algo_>
       void filter_cor(DenseVector<Mem_, DT_, IT_> & vector) const
       {
         // same as def
-        filter_def<Algo_>(vector);
+        filter_def(vector);
       }
     }; // class UnitFilter<...>
   } // namespace LAFEM

@@ -12,40 +12,59 @@ namespace FEAST
   {
     namespace Arch
     {
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct ScaleRows;
 
       template <>
-      struct ScaleRows<Mem::Main, Algo::Generic>
+      struct ScaleRows<Mem::Main>
       {
         template <typename DT_, typename IT_>
-        static void csr(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+        static void csr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        {
+          csr_generic(r, a, col_ind, row_ptr, x, rows, columns, used_elements);
+        }
 
         template <typename DT_, typename IT_>
-        static void coo(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+        static void coo(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        {
+          coo_generic(r, a, col_ind, row_ptr, x, rows, columns, used_elements);
+        }
 
         template <typename DT_, typename IT_>
-        static void ell(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const cs,
+        static void ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const cs,
+                        const IT_ * const cl, const IT_ * const rl, const DT_ * const x, const Index C, const Index rows)
+        {
+          ell_generic(r, a, col_ind, cs, cl, rl, x, C, rows);
+        }
+
+        template <typename DT_, typename IT_>
+        static void csr_generic(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+        template <typename DT_, typename IT_>
+        static void coo_generic(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+        template <typename DT_, typename IT_>
+        static void ell_generic(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const cs,
                         const IT_ * const cl, const IT_ * const /*rl*/, const DT_ * const x, const Index C, const Index rows);
       };
 
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::csr(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::csr(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::csr(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::csr(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::csr_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::csr_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::csr_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::csr_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
 
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::coo(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::coo(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::coo(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::coo(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::coo_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::coo_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::coo_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::coo_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
 
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::ell(float *, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::ell(double *, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::ell(float *, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
-      extern template void ScaleRows<Mem::Main, Algo::Generic>::ell(double *, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::ell_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::ell_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::ell_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
+      extern template void ScaleRows<Mem::Main>::ell_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
 
       template <>
-      struct ScaleRows<Mem::CUDA, Algo::CUDA>
+      struct ScaleRows<Mem::CUDA>
       {
         template <typename DT_, typename IT_>
         static void csr(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
@@ -58,40 +77,59 @@ namespace FEAST
 
       // ***********************************************
 
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct ScaleCols;
 
       template <>
-      struct ScaleCols<Mem::Main, Algo::Generic>
+      struct ScaleCols<Mem::Main>
       {
         template <typename DT_, typename IT_>
-        static void csr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+        static void csr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        {
+          csr_generic(r, a, col_ind, row_ptr, x, rows, columns, used_elements);
+        }
 
         template <typename DT_, typename IT_>
-        static void coo(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+        static void coo(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        {
+          coo_generic(r, a, col_ind, row_ptr, x, rows, columns, used_elements);
+        }
 
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const cs,
+                        const IT_ * const cl, const IT_ * const rl, const DT_ * const x, const Index C, const Index rows)
+        {
+          ell_generic(r, a, col_ind, cs, cl, rl, x, C, rows);
+        }
+
+        template <typename DT_, typename IT_>
+        static void csr_generic(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+        template <typename DT_, typename IT_>
+        static void coo_generic(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+        template <typename DT_, typename IT_>
+        static void ell_generic(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const cs,
                         const IT_ * const cl, const IT_ * const /*rl*/, const DT_ * const x, const Index C, const Index rows);
       };
 
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::csr(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::csr(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::csr(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::csr(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::csr_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::csr_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::csr_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::csr_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
 
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::coo(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::coo(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::coo(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::coo(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::coo_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::coo_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::coo_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::coo_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
 
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::ell(float *, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::ell(double *, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::ell(float *, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
-      extern template void ScaleCols<Mem::Main, Algo::Generic>::ell(double *, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::ell_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::ell_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::ell_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
+      extern template void ScaleCols<Mem::Main>::ell_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
 
       template <>
-      struct ScaleCols<Mem::CUDA, Algo::CUDA>
+      struct ScaleCols<Mem::CUDA>
       {
         template <typename DT_, typename IT_>
         static void csr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);

@@ -14,7 +14,7 @@ namespace FEAST
     {
 
       template <typename DT_>
-      void ComponentProduct<Mem::Main, Algo::Generic>::value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
+      void ComponentProduct<Mem::Main>::value_generic(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
       {
         if (r == x)
         {

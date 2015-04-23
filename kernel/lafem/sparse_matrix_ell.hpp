@@ -1516,13 +1516,10 @@ namespace FEAST
       /**
        * \brief Calculate \f$this \leftarrow y + \alpha x\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The first summand matrix to be scaled.
        * \param[in] y The second summand matrix
        * \param[in] alpha A scalar to multiply x with.
        */
-      template <typename Algo_>
       void axpy(
                 const SparseMatrixELL & x,
                 const SparseMatrixELL & y,
@@ -1548,27 +1545,24 @@ namespace FEAST
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-          Arch::Sum<Mem_, Algo_>::value(this->val(), x.val(), y.val(), this->val_size());
+          Arch::Sum<Mem_>::value(this->val(), x.val(), y.val(), this->val_size());
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-          Arch::Difference<Mem_, Algo_>::value(this->val(), y.val(), x.val(), this->val_size());
+          Arch::Difference<Mem_>::value(this->val(), y.val(), x.val(), this->val_size());
         // r <- y
         else if (Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
-          Arch::Axpy<Mem_, Algo_>::dv(this->val(), alpha, x.val(), y.val(), this->val_size());
+          Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->val_size());
       }
 
       /**
        * \brief Calculate \f$this \leftarrow \alpha x\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The matrix to be scaled.
        * \param[in] alpha A scalar to scale x with.
        */
-      template <typename Algo_>
       void scale(const SparseMatrixELL & x, const DT_ alpha)
       {
         if (x.rows() != this->rows())
@@ -1580,7 +1574,7 @@ namespace FEAST
         if (x.C() != this->C())
           throw InternalError(__func__, __FILE__, __LINE__, "Chunk size does not match!");
 
-        Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), alpha, this->val_size());
+        Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->val_size());
       }
 
       /**
@@ -1588,10 +1582,9 @@ namespace FEAST
        *
        * \returns The Frobenius norm of this matrix.
        */
-      template <typename Algo_>
       DT_ norm_frobenius() const
       {
-        return Arch::Norm2<Mem_, Algo_>::value(this->val(), this->val_size());
+        return Arch::Norm2<Mem_>::value(this->val(), this->val_size());
       }
 
       /**
@@ -1686,12 +1679,9 @@ namespace FEAST
       /**
        * \brief Calculate \f$ this_{ij} \leftarrow x_{ij}\cdot s_i\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The matrix whose rows are to be scaled.
        * \param[in] s The vector to the scale the rows by.
        */
-      template<typename Algo_>
       void scale_rows(const SparseMatrixELL & x, const DenseVector<Mem_,DT_,IT_> & s)
       {
         if (x.rows() != this->rows())
@@ -1703,19 +1693,16 @@ namespace FEAST
         if (s.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        Arch::ScaleRows<Mem_, Algo_>::ell(this->val(), x.val(), this->col_ind(), this->cs(),
+        Arch::ScaleRows<Mem_>::ell(this->val(), x.val(), this->col_ind(), this->cs(),
                                           this->cl(), this->rl(), s.elements(), this->C(), rows());
       }
 
       /**
        * \brief Calculate \f$ this_{ij} \leftarrow x_{ij}\cdot s_j\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The matrix whose columns are to be scaled.
        * \param[in] s The vector to the scale the columns by.
        */
-      template<typename Algo_>
       void scale_cols(const SparseMatrixELL & x, const DenseVector<Mem_,DT_,IT_> & s)
       {
         if (x.rows() != this->rows())
@@ -1727,7 +1714,7 @@ namespace FEAST
         if (s.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        Arch::ScaleCols<Mem_, Algo_>::ell(this->val(), x.val(), this->col_ind(), this->cs(),
+        Arch::ScaleCols<Mem_>::ell(this->val(), x.val(), this->col_ind(), this->cs(),
                                           this->cl(), this->rl(), s.elements(), this->C(), rows());
       }
 
@@ -1735,12 +1722,9 @@ namespace FEAST
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      template<typename Algo_>
       void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
       {
         if (r.size() != this->rows())
@@ -1748,7 +1732,7 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_, Algo_>::ell(r.elements(), this->val(), this->col_ind(), this->cs(), this->cl(),
+        Arch::ProductMatVec<Mem_>::ell(r.elements(), this->val(), this->col_ind(), this->cs(), this->cl(),
                                               x.elements(), this->C(), this->rows());
       }
 
@@ -1759,10 +1743,9 @@ namespace FEAST
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] gate The gate base pointer
        */
-      template<typename Algo_>
       void apply(DenseVector<Mem_,DT_, IT_>& r,
                  const DenseVector<Mem_, DT_, IT_>& x,
-                 Arch::ProductMat0Vec1GatewayBase<Mem_, Algo_, DenseVector<Mem_, DT_, IT_>, SparseMatrixELL<Mem_, DT_, IT_> >* gate)
+                 Arch::ProductMat0Vec1GatewayBase<Mem_, DenseVector<Mem_, DT_, IT_>, SparseMatrixELL<Mem_, DT_, IT_> >* gate)
       {
         if (r.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
@@ -1775,14 +1758,11 @@ namespace FEAST
       /**
        * \brief Calculate \f$r \leftarrow y + \alpha this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_>
       void apply(
                  DenseVector<Mem_,DT_, IT_>& r,
                  const DenseVector<Mem_, DT_, IT_>& x,
@@ -1800,7 +1780,7 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_, Algo_>::ell(r.elements(), y.elements(), this->val(), this->col_ind(),
+          Arch::Defect<Mem_>::ell(r.elements(), y.elements(), this->val(), this->col_ind(),
                                          this->cs(), this->cl(), x.elements(), this->C(), this->rows());
         }
         // r <- y
@@ -1809,7 +1789,7 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_, Algo_>::ell(r.elements(), alpha, x.elements(), y.elements(), this->val(),
+          Arch::Axpy<Mem_>::ell(r.elements(), alpha, x.elements(), y.elements(), this->val(),
                                        this->col_ind(), this->cs(), this->cl(), this->C(), this->rows());
         }
       }

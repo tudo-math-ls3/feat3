@@ -14,7 +14,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename DT_, typename IT_>
-      void UnitFilter<Mem::Main, Algo::Generic>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
+      void UnitFilter<Mem::Main>::filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
       {
         for(Index i(0); i < ue ; ++i)
         {
@@ -23,7 +23,7 @@ namespace FEAST
       }
 
       template <typename DT_, typename IT_>
-      void UnitFilter<Mem::Main, Algo::Generic>::filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
+      void UnitFilter<Mem::Main>::filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue)
       {
         for(Index i(0); i < ue ; ++i)
         {

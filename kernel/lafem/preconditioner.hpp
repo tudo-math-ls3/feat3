@@ -35,10 +35,8 @@ namespace FEAST
     /**
      * \brief Preconditioner base class
      *
-     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-     *
      */
-    template <typename Algo_, typename MT_, typename VT_>
+    template <typename MT_, typename VT_>
     class Preconditioner
     {
     public:
@@ -55,12 +53,10 @@ namespace FEAST
      *
      * This class represents a dummy for a preconditioner.
      *
-     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-     *
      * \author Dirk Ribbrock
      */
-    template <typename Algo_, typename MT_, typename VT_>
-    class NonePreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class NonePreconditioner : public Preconditioner<MT_, VT_>
     {
     private:
       typedef typename MT_::DataType DT_;
@@ -69,8 +65,6 @@ namespace FEAST
       const DT_ _damping;
 
     public:
-      /// Our algotype
-      typedef Algo_ AlgoType;
       /// Our datatype
       typedef typename MT_::DataType DataType;
       /// Our indextype
@@ -130,7 +124,7 @@ namespace FEAST
         }
         else
         {
-          out.template scale<Algo_>(in, _damping);
+          out.scale(in, _damping);
         }
       }
     };
@@ -140,19 +134,15 @@ namespace FEAST
      *
      * This class represents the a preconditioner, using a supplied matrix file as input.
      *
-     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-     *
      * \author Dirk Ribbrock
      */
-    template <typename Algo_, typename MT_, typename VT_>
-    class FilePreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class FilePreconditioner : public Preconditioner<MT_, VT_>
     {
     private:
       MT_ _mat;
 
     public:
-      /// Our algotype
-      typedef Algo_ AlgoType;
       /// Our datatype
       typedef typename MT_::DataType DataType;
       /// Our indextype
@@ -209,7 +199,7 @@ namespace FEAST
        */
       virtual void apply(VT_ & out, const VT_ & in) override
       {
-        _mat.template apply<Algo_>(out, in);
+        _mat.apply(out, in);
       }
     };
 
@@ -218,20 +208,16 @@ namespace FEAST
      *
      * This class represents the Diagonal-Preconditioner \f$M = D\f$.
      *
-     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-     *
      * \author Peter Zajac
      */
-    template <typename Algo_, typename MT_, typename VT_>
-    class DiagonalPreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class DiagonalPreconditioner : public Preconditioner<MT_, VT_>
     {
     private:
       /// the diagonal matrix vector
       VT_ _diag;
 
     public:
-      /// Our algotype
-      typedef Algo_ AlgoType;
       /// Our datatype
       typedef typename MT_::DataType DataType;
       /// Our indextype
@@ -285,7 +271,7 @@ namespace FEAST
        */
       virtual void apply(VT_ & out, const VT_ & in) override
       {
-        out.template component_product<Algo_>(_diag, in);
+        out.component_product(_diag, in);
       }
     };
 
@@ -294,19 +280,15 @@ namespace FEAST
      *
      * This class represents the Jacobi-Preconditioner \f$M = D\f$.
      *
-     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-     *
      * \author Dirk Ribbrock
      */
-    template <typename Algo_, typename MT_, typename VT_>
-    class JacobiPreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class JacobiPreconditioner : public Preconditioner<MT_, VT_>
     {
     private:
       VT_ _jac;
 
     public:
-      /// Our algotype
-      typedef Algo_ AlgoType;
       /// Our datatype
       typedef typename MT_::DataType DataType;
       /// Our indextype
@@ -374,7 +356,7 @@ namespace FEAST
        */
       virtual void apply(VT_ & out, const VT_ & in) override
       {
-        out.template component_product<Algo_>(_jac, in);
+        out.component_product(_jac, in);
       }
     };
 
@@ -386,8 +368,8 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Algo_, typename MT_, typename VT_>
-    class GaussSeidelPreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class GaussSeidelPreconditioner : public Preconditioner<MT_, VT_>
     {
     };
 
@@ -400,9 +382,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+    class GaussSeidelPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                                     DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -410,8 +392,6 @@ namespace FEAST
       const SparseMatrixCSR<Mem_, DT_, IT_> & _A;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -494,7 +474,7 @@ namespace FEAST
         }
 
         // damping of solution
-        out.template scale<Algo::Generic>(out, _damping);
+        out.scale(out, _damping);
       }
     };
 
@@ -507,9 +487,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+    class GaussSeidelPreconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
                                     DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -517,8 +497,6 @@ namespace FEAST
       const SparseMatrixCOO<Mem_, DT_, IT_> & _A;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -600,7 +578,7 @@ namespace FEAST
         }
 
         // damping of solution
-        out.template scale<Algo::Generic>(out, _damping);
+        out.scale(out, _damping);
       }
     };
 
@@ -613,9 +591,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+    class GaussSeidelPreconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
                                     DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -623,8 +601,6 @@ namespace FEAST
       const SparseMatrixELL<Mem_, DT_, IT_> & _A;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -709,7 +685,7 @@ namespace FEAST
         }
 
         // damping of solution
-        out.template scale<Algo::Generic>(out, _damping);
+        out.scale(out, _damping);
       }
     };
 
@@ -721,8 +697,8 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Algo_, typename MT_, typename VT_>
-    class ILUPreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class ILUPreconditioner : public Preconditioner<MT_, VT_>
     {
     };
 
@@ -735,9 +711,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+    class ILUPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                             DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -745,8 +721,6 @@ namespace FEAST
       SparseMatrixCSR<Mem_, DT_, IT_> _LU;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -1156,9 +1130,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class ILUPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+    class ILUPreconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
                             DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -1166,8 +1140,6 @@ namespace FEAST
       SparseMatrixELL<Mem_, DT_, IT_> _LU;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -1610,17 +1582,15 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class ILUPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+    class ILUPreconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
                             DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
-      ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+      ILUPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                         DenseVector<Mem_, DT_, IT_> > _precond;
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -1697,8 +1667,8 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Algo_, typename MT_, typename VT_>
-    class SORPreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class SORPreconditioner : public Preconditioner<MT_, VT_>
     {
     };
 
@@ -1712,9 +1682,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SORPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+    class SORPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                             DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -1723,8 +1693,6 @@ namespace FEAST
       const bool _reverse;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -1837,9 +1805,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SORPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+    class SORPreconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
                             DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -1848,8 +1816,6 @@ namespace FEAST
       const bool _reverse;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       // Our indextype
@@ -1970,9 +1936,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SORPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+    class SORPreconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
                             DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -1981,8 +1947,6 @@ namespace FEAST
       const bool _reverse;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -2096,8 +2060,8 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Algo_, typename MT_, typename VT_>
-    class SSORPreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class SSORPreconditioner : public Preconditioner<MT_, VT_>
     {
     };
 
@@ -2110,9 +2074,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SSORPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+    class SSORPreconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                              DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -2120,8 +2084,6 @@ namespace FEAST
       const DT_ _omega;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -2216,7 +2178,7 @@ namespace FEAST
           pout[i] -= _omega * d / pval[col];
         }
 
-        out.template scale<Algo::Generic>(out, _omega * (DT_(2.0) - _omega));
+        out.scale(out, _omega * (DT_(2.0) - _omega));
       } // function apply
     };
 
@@ -2229,9 +2191,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SSORPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+    class SSORPreconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
                              DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -2239,8 +2201,6 @@ namespace FEAST
       const DT_ _omega;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -2346,7 +2306,7 @@ namespace FEAST
           pout[i] -= _omega * d / pval[col];
         }
 
-        out.template scale<Algo::Generic>(out, _omega * (DT_(2.0) - _omega));
+        out.scale(out, _omega * (DT_(2.0) - _omega));
       } // function apply
     };
 
@@ -2359,9 +2319,9 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SSORPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+    class SSORPreconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
                              DenseVector<Mem_, DT_, IT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+      : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
                               DenseVector<Mem_, DT_, IT_> >
     {
     private:
@@ -2369,8 +2329,6 @@ namespace FEAST
       const DT_ _omega;
 
     public:
-      /// Our algotype
-      typedef Algo::Generic AlgoType;
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -2468,7 +2426,7 @@ namespace FEAST
           pout[i] -= _omega * d / pval[col];
         }
 
-        out.template scale<Algo::Generic>(out, _omega * (DT_(2.0) - _omega));
+        out.scale(out, _omega * (DT_(2.0) - _omega));
       } // function apply
     };
 
@@ -2483,15 +2441,15 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      template <typename Algo_, typename MT_, typename VT_>
-      class SPAIPreconditionerMTdepending : public Preconditioner<Algo_, MT_, VT_>
+      template <typename MT_, typename VT_>
+      class SPAIPreconditionerMTdepending : public Preconditioner<MT_, VT_>
       {
       };
 
       template <typename Mem_, typename DT_, typename IT_>
-      class SPAIPreconditionerMTdepending<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+      class SPAIPreconditionerMTdepending<SparseMatrixCSR<Mem_, DT_, IT_>,
                                           DenseVector<Mem_, DT_, IT_> >
-        : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_, IT_>,
+        : public Preconditioner<SparseMatrixCSR<Mem_, DT_, IT_>,
                                 DenseVector<Mem_, DT_, IT_> >
       {
       private:
@@ -2735,9 +2693,9 @@ namespace FEAST
 
 
       template <typename Mem_, typename DT_, typename IT_>
-      class SPAIPreconditionerMTdepending<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+      class SPAIPreconditionerMTdepending<SparseMatrixCOO<Mem_, DT_, IT_>,
                                           DenseVector<Mem_, DT_, IT_> >
-        : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_, IT_>,
+        : public Preconditioner<SparseMatrixCOO<Mem_, DT_, IT_>,
                                 DenseVector<Mem_, DT_, IT_> >
       {
       private:
@@ -2959,9 +2917,9 @@ namespace FEAST
 
 
       template <typename Mem_, typename DT_, typename IT_>
-      class SPAIPreconditionerMTdepending<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+      class SPAIPreconditionerMTdepending<SparseMatrixELL<Mem_, DT_, IT_>,
                                           DenseVector<Mem_, DT_, IT_> >
-        : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_, IT_>,
+        : public Preconditioner<SparseMatrixELL<Mem_, DT_, IT_>,
                                 DenseVector<Mem_, DT_, IT_> >
       {
       private:
@@ -3275,8 +3233,8 @@ namespace FEAST
     /// \endcond
 
 
-    template <typename Algo_, typename MT_, typename VT_>
-    class SPAIPreconditioner : public Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class SPAIPreconditioner : public Intern::SPAIPreconditionerMTdepending<MT_, VT_>
     {
     private:
       typedef typename MT_::DataType DT_;
@@ -3284,12 +3242,12 @@ namespace FEAST
       typedef typename MT_::IndexType IT_;
       typedef std::pair<DT_, IT_> PAIR_;
 
-      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_A;
-      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_m;
-      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_layout;
-      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_M;
-      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_m_columns;
-      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_a_columnwise;
+      using Intern::SPAIPreconditionerMTdepending<MT_, VT_>::_A;
+      using Intern::SPAIPreconditionerMTdepending<MT_, VT_>::_m;
+      using Intern::SPAIPreconditionerMTdepending<MT_, VT_>::_layout;
+      using Intern::SPAIPreconditionerMTdepending<MT_, VT_>::_M;
+      using Intern::SPAIPreconditionerMTdepending<MT_, VT_>::_m_columns;
+      using Intern::SPAIPreconditionerMTdepending<MT_, VT_>::_a_columnwise;
 
 
       const DT_ _eps_res;
@@ -3300,8 +3258,6 @@ namespace FEAST
       const bool _transpose;
 
     public:
-      /// Our algotype
-      typedef Algo_ AlgoType;
       /// Our datatype
       typedef typename MT_::DataType DataType;
       /// Our indextype
@@ -3348,7 +3304,7 @@ namespace FEAST
                          const DT_ eps_res_comp = 1e-3,
                          const DT_ max_rho = 1e-3,
                          const bool transpose = false) :
-        Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, m),
+        Intern::SPAIPreconditionerMTdepending<MT_, VT_>(A, m),
         _eps_res(eps_res),
         _fill_in(fill_in),
         _max_iter(max_iter),
@@ -3406,7 +3362,7 @@ namespace FEAST
                          const DT_ eps_res_comp = 1e-3,
                          const DT_ max_rho = 1e-3,
                          const bool transpose = false) :
-        Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, std::move(layout)),
+        Intern::SPAIPreconditionerMTdepending<MT_, VT_>(A, std::move(layout)),
         _eps_res(eps_res),
         _fill_in(fill_in),
         _max_iter(max_iter),
@@ -3465,7 +3421,7 @@ namespace FEAST
         }
         else
         {
-          _M.template apply<Algo::Generic>(out, in);
+          _M.apply(out, in);
         }
       }
 
@@ -3903,12 +3859,10 @@ namespace FEAST
      *
      * This class represents the Neumann-Polynomial-Preconditioner \f$M^{-1} = \sum_{k=0}^m (I - \tilde M^{-1}A)^k \tilde M^{-1}\f$
      *
-     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-     *
      * \author Christoph Lohmann
      */
-    template <typename Algo_, typename MT_, typename VT_>
-    class PolynomialPreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    template <typename MT_, typename VT_>
+    class PolynomialPreconditioner : public Preconditioner<MT_, VT_>
     {
     private:
       typedef typename MT_::MemType Mem_;
@@ -3921,11 +3875,9 @@ namespace FEAST
                                                    // 2 if out and in can be the same vectors for _precon.apply
                                                    // 3 else
       VT_ _aux1, _aux2, _aux3;                     // auxilary-vector
-      Preconditioner<Algo_, MT_, VT_> * _precond;
+      Preconditioner<MT_, VT_> * _precond;
 
     public:
-      /// Our algotype
-      typedef Algo_ AlgoType;
       /// Our datatype
       typedef typename MT_::DataType DataType;
       /// Our memory architecture type
@@ -3956,7 +3908,7 @@ namespace FEAST
        *
        * Creates a Polynomial preconditioner to the given matrix and the given order
        */
-      PolynomialPreconditioner(const MT_ & A, Index m, Preconditioner<Algo_, MT_, VT_> * precond) :
+      PolynomialPreconditioner(const MT_ & A, Index m, Preconditioner<MT_, VT_> * precond) :
         _A(A),
         _m(m),
         _num_of_auxs(3),
@@ -3972,7 +3924,7 @@ namespace FEAST
       }
 
       /// \cond internal
-      PolynomialPreconditioner(const MT_ & A, Index m, NonePreconditioner<Algo_, MT_, VT_> * precond) :
+      PolynomialPreconditioner(const MT_ & A, Index m, NonePreconditioner<MT_, VT_> * precond) :
         _A(A),
         _m(m),
         _num_of_auxs(1),
@@ -3987,7 +3939,7 @@ namespace FEAST
         }
       }
 
-      PolynomialPreconditioner(const MT_ & A, Index m, JacobiPreconditioner<Algo_, MT_, VT_> * precond) :
+      PolynomialPreconditioner(const MT_ & A, Index m, JacobiPreconditioner<MT_, VT_> * precond) :
         _A(A),
         _m(m),
         _num_of_auxs(2),
@@ -4002,7 +3954,7 @@ namespace FEAST
         }
       }
 
-      PolynomialPreconditioner(const MT_ & A, Index m, GaussSeidelPreconditioner<Algo_, MT_, VT_> * precond) :
+      PolynomialPreconditioner(const MT_ & A, Index m, GaussSeidelPreconditioner<MT_, VT_> * precond) :
         _A(A),
         _m(m),
         _num_of_auxs(2),
@@ -4017,7 +3969,7 @@ namespace FEAST
         }
       }
 
-      PolynomialPreconditioner(const MT_ & A, Index m, ILUPreconditioner<Algo_, MT_, VT_> * precond) :
+      PolynomialPreconditioner(const MT_ & A, Index m, ILUPreconditioner<MT_, VT_> * precond) :
         _A(A),
         _m(m),
         _num_of_auxs(2),
@@ -4032,7 +3984,7 @@ namespace FEAST
         }
       }
 
-      PolynomialPreconditioner(const MT_ & A, Index m, SORPreconditioner<Algo_, MT_, VT_> * precond) :
+      PolynomialPreconditioner(const MT_ & A, Index m, SORPreconditioner<MT_, VT_> * precond) :
         _A(A),
         _m(m),
         _num_of_auxs(2),
@@ -4047,7 +3999,7 @@ namespace FEAST
         }
       }
 
-      PolynomialPreconditioner(const MT_ & A, Index m, SSORPreconditioner<Algo_, MT_, VT_> * precond) :
+      PolynomialPreconditioner(const MT_ & A, Index m, SSORPreconditioner<MT_, VT_> * precond) :
         _A(A),
         _m(m),
         _num_of_auxs(2),
@@ -4095,12 +4047,12 @@ namespace FEAST
 
           for (Index i = 1; i <= _m; ++i)
           {
-            // _A.template apply<Algo_>(_aux1, in, out, DataType(-1.0));
-            // out.template axpy<Algo_>(out, _aux1);
+            // _A.apply(_aux1, in, out, DataType(-1.0));
+            // out.axpy(out, _aux1);
 
-            _A.template apply<Algo_>(_aux1, out);
-            out.template axpy<Algo_>(out, in);
-            out.template axpy<Algo_>(_aux1, out, DataType(-1.0));
+            _A.apply(_aux1, out);
+            out.axpy(out, in);
+            out.axpy(_aux1, out, DataType(-1.0));
           }
         }
         else if (_num_of_auxs == 2) // if out and in can be the same vectors
@@ -4110,10 +4062,10 @@ namespace FEAST
 
           for (Index i = 1; i <= _m; ++i)
           {
-            _A.template apply<Algo_>(_aux1, out);
+            _A.apply(_aux1, out);
             _precond->apply(_aux1, _aux1);
-            out.template axpy<Algo_>(out, _aux2);
-            out.template axpy<Algo_>(_aux1, out, DataType(-1.0));
+            out.axpy(out, _aux2);
+            out.axpy(_aux1, out, DataType(-1.0));
           }
         }
         else // if out and in must be different vectors
@@ -4123,10 +4075,10 @@ namespace FEAST
 
           for (Index i = 1; i <= _m; ++i)
           {
-            _A.template apply<Algo_>(_aux1, out);
+            _A.apply(_aux1, out);
             _precond->apply(_aux2, _aux1);
-            out.template axpy<Algo_>(out, _aux3);
-            out.template axpy<Algo_>(_aux2, out, DataType(-1.0));
+            out.axpy(out, _aux3);
+            out.axpy(_aux2, out, DataType(-1.0));
           }
         }
       } // function apply

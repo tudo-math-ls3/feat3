@@ -15,14 +15,13 @@ using namespace FEAST::TestSystem;
 
 template<typename Tag_,
   typename DataType_,
-  typename Algo_,
   template<typename, typename, typename> class ContType_>
 class DenseDataWrapperTest:
-  public TaggedTest<Tag_, DataType_, Algo_>
+  public TaggedTest<Tag_, DataType_>
 {
   public:
     DenseDataWrapperTest(const std::string & tag) :
-      TaggedTest<Tag_, DataType_, Algo_>("DenseDataWrapperTest<" + tag + ">")
+      TaggedTest<Tag_, DataType_>("DenseDataWrapperTest<" + tag + ">")
     {
     }
 
@@ -57,4 +56,4 @@ class DenseDataWrapperTest:
       std::vector<Foundation::DenseDataWrapper<15u, Tag_, DataType_, ContType_> > test2(std::move(test1));
     }
 };
-DenseDataWrapperTest<Mem::Main, double, Algo::Generic, DenseVector> ddw_test_DV("DenseVector<double>");
+DenseDataWrapperTest<Mem::Main, double, DenseVector> ddw_test_DV("DenseVector<double>");

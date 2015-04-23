@@ -12,11 +12,6 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Algo_>
-    struct PointstarStructureFE
-    {
-    };
-
     /**
      * \brief empty Finite-Elements pointstar matrix creator.
      *
@@ -24,8 +19,7 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <>
-    struct PointstarStructureFE<Algo::Generic>
+    struct PointstarStructureFE
     {
       /**
        * \brief Generates an empty FE-style pointstar banded matrix
@@ -104,11 +98,6 @@ namespace FEAST
       }
     }; // struct PointstarStructureFE
 
-    template <typename Algo_>
-    struct PointstarStructureFD
-    {
-    };
-
     /**
      * \brief empty Finite-Differences pointstar matrix creator.
      *
@@ -116,8 +105,7 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <>
-    struct PointstarStructureFD<Algo::Generic>
+    struct PointstarStructureFD
     {
       /**
        * \brief Generates an empty FD-style pointstar banded matrix

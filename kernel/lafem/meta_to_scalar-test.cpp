@@ -20,15 +20,14 @@ using namespace FEAST::TestSystem;
  *
  * \author Christoph Lohmann
  */
-template<typename Algo_, typename MT_>
+template<typename MT_>
 class MetaToScalarTest
-  : public MetaMatrixTestBase<Algo_, typename MT_::DataType, typename MT_::IndexType>
+  : public MetaMatrixTestBase<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>
 {
 public:
-  typedef Algo_ AlgoType;
   typedef typename MT_::DataType DataType;
   typedef typename MT_::IndexType IndexType;
-  typedef MetaMatrixTestBase<Algo_, DataType, IndexType> BaseClass;
+  typedef MetaMatrixTestBase<typename MT_::MemType, DataType, IndexType> BaseClass;
   typedef typename BaseClass::SystemDiagMatrix SystemMatrix;
   typedef typename BaseClass::SystemVector SystemVector;
 
@@ -49,7 +48,7 @@ public:
     this->gen_system(7, mat_sys, vec_sol, vec_rhs);
 
     // test t <- A*x; t <- t - b
-    vec_sol.template scale<Algo_>(vec_sol, DT_(0));
+    vec_sol.scale(vec_sol, DT_(0));
 
     MT_ mat_sys_scalar;
     mat_sys_scalar.convert(mat_sys);
@@ -60,11 +59,11 @@ public:
     for (Index i(0); i < vec_sol.size(); ++i)
     {
       vec_sol(i, DT_(1));
-      mat_sys.template apply<AlgoType>(vec_rhs, vec_sol);
+      mat_sys.apply(vec_rhs, vec_sol);
       DenseVector<Mem_, DT_, IT_> vec_sol_scalar;
       vec_sol_scalar.convert(vec_sol);
       vec_rhs_scalar2.copy(vec_rhs);
-      mat_sys_scalar.template apply<AlgoType>(vec_rhs_scalar, vec_sol_scalar);
+      mat_sys_scalar.apply(vec_rhs_scalar, vec_sol_scalar);
 
       for (Index j(0); j < vec_rhs_scalar.size(); ++j)
       {
@@ -77,7 +76,7 @@ public:
     /**
      * check VecMetaToScalar and "VecScalarToMeta"
      */
-    vec_rhs.template scale<Algo_>(vec_rhs, DT_(0));
+    vec_rhs.scale(vec_rhs, DT_(0));
 
     for (Index j(0); j < vec_rhs_scalar.size(); ++j)
     {
@@ -91,7 +90,7 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j), vec_rhs(j), tol);
     }
 
-    vec_rhs_scalar.template scale<Algo_>(vec_rhs_scalar, DT_(0));
+    vec_rhs_scalar.scale(vec_rhs_scalar, DT_(0));
 
     vec_rhs_scalar.copy(vec_rhs);
 
@@ -102,47 +101,47 @@ public:
   }
 };
 
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned int> > cpu_meta_matrix_to_coo_test_generic_float_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned int> > cpu_meta_matrix_to_coo_test_generic_double_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_coo_test_generic_float_ulong;
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_coo_test_generic_double_ulong;
+MetaToScalarTest<SparseMatrixCOO<Mem::Main, float, unsigned int> > cpu_meta_matrix_to_coo_test_generic_float_uint;
+MetaToScalarTest<SparseMatrixCOO<Mem::Main, double, unsigned int> > cpu_meta_matrix_to_coo_test_generic_double_uint;
+MetaToScalarTest<SparseMatrixCOO<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_coo_test_generic_float_ulong;
+MetaToScalarTest<SparseMatrixCOO<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_coo_test_generic_double_ulong;
 
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned int> > cpu_meta_matrix_to_csr_test_generic_float_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> > cpu_meta_matrix_to_csr_test_generic_double_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_csr_test_generic_float_ulong;
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_csr_test_generic_double_ulong;
+MetaToScalarTest<SparseMatrixCSR<Mem::Main, float, unsigned int> > cpu_meta_matrix_to_csr_test_generic_float_uint;
+MetaToScalarTest<SparseMatrixCSR<Mem::Main, double, unsigned int> > cpu_meta_matrix_to_csr_test_generic_double_uint;
+MetaToScalarTest<SparseMatrixCSR<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_csr_test_generic_float_ulong;
+MetaToScalarTest<SparseMatrixCSR<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_csr_test_generic_double_ulong;
 
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned int> > cpu_meta_matrix_to_ell_test_generic_float_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> > cpu_meta_matrix_to_ell_test_generic_double_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_ell_test_generic_float_ulong;
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_ell_test_generic_double_ulong;
+MetaToScalarTest<SparseMatrixELL<Mem::Main, float, unsigned int> > cpu_meta_matrix_to_ell_test_generic_float_uint;
+MetaToScalarTest<SparseMatrixELL<Mem::Main, double, unsigned int> > cpu_meta_matrix_to_ell_test_generic_double_uint;
+MetaToScalarTest<SparseMatrixELL<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_ell_test_generic_float_ulong;
+MetaToScalarTest<SparseMatrixELL<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_ell_test_generic_double_ulong;
 
 #ifdef FEAST_HAVE_QUADMATH
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_coo_test_generic_float128_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_coo_test_generic_float128_ulong;
+MetaToScalarTest<SparseMatrixCOO<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_coo_test_generic_float128_uint;
+MetaToScalarTest<SparseMatrixCOO<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_coo_test_generic_float128_ulong;
 
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_csr_test_generic_float128_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_csr_test_generic_float128_ulong;
+MetaToScalarTest<SparseMatrixCSR<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_csr_test_generic_float128_uint;
+MetaToScalarTest<SparseMatrixCSR<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_csr_test_generic_float128_ulong;
 
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_ell_test_generic_float128_uint;
-MetaToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_ell_test_generic_float128_ulong;
+MetaToScalarTest<SparseMatrixELL<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_ell_test_generic_float128_uint;
+MetaToScalarTest<SparseMatrixELL<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_ell_test_generic_float128_ulong;
 #endif
 
 #ifdef FEAST_BACKENDS_CUDA
-// MetaToScalarTest<Algo::CUDA, SparseMatrixCOO<Mem::CUDA, float, unsigned int> > cuda_meta_matrix_to_coo_test_generic_float_uint;
-// MetaToScalarTest<Algo::CUDA, SparseMatrixCOO<Mem::CUDA, double, unsigned int> > cuda_meta_matrix_to_coo_test_generic_double_uint;
-// MetaToScalarTest<Algo::CUDA, SparseMatrixCOO<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_coo_test_generic_float_ulong;
-// MetaToScalarTest<Algo::CUDA, SparseMatrixCOO<Mem::CUDA, double, unsigned long> > cuda_meta_matrix_to_coo_test_generic_double_ulong;
+// MetaToScalarTest<SparseMatrixCOO<Mem::CUDA, float, unsigned int> > cuda_meta_matrix_to_coo_test_generic_float_uint;
+// MetaToScalarTest<SparseMatrixCOO<Mem::CUDA, double, unsigned int> > cuda_meta_matrix_to_coo_test_generic_double_uint;
+// MetaToScalarTest<SparseMatrixCOO<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_coo_test_generic_float_ulong;
+// MetaToScalarTest<SparseMatrixCOO<Mem::CUDA, double, unsigned long> > cuda_meta_matrix_to_coo_test_generic_double_ulong;
 
-MetaToScalarTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, float, unsigned int> > cuda_meta_matrix_to_csr_test_generic_float_uint;
-MetaToScalarTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned int> > cuda_meta_matrix_to_csr_test_generic_double_uint;
-MetaToScalarTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_csr_test_generic_float_ulong;
-MetaToScalarTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned long> > cuda_meta_matrix_to_csr_test_generic_double_ulong;
+MetaToScalarTest<SparseMatrixCSR<Mem::CUDA, float, unsigned int> > cuda_meta_matrix_to_csr_test_generic_float_uint;
+MetaToScalarTest<SparseMatrixCSR<Mem::CUDA, double, unsigned int> > cuda_meta_matrix_to_csr_test_generic_double_uint;
+MetaToScalarTest<SparseMatrixCSR<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_csr_test_generic_float_ulong;
+MetaToScalarTest<SparseMatrixCSR<Mem::CUDA, double, unsigned long> > cuda_meta_matrix_to_csr_test_generic_double_ulong;
 
-MetaToScalarTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, float, unsigned int> > cuda_meta_matrix_to_ell_test_generic_float_uint;
-MetaToScalarTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned int> > cuda_meta_matrix_to_ell_test_generic_double_uint;
-MetaToScalarTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_ell_test_generic_float_ulong;
-MetaToScalarTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned long> > cuda_meta_matrix_to_ell_test_generic_double_ulong;
+MetaToScalarTest<SparseMatrixELL<Mem::CUDA, float, unsigned int> > cuda_meta_matrix_to_ell_test_generic_float_uint;
+MetaToScalarTest<SparseMatrixELL<Mem::CUDA, double, unsigned int> > cuda_meta_matrix_to_ell_test_generic_double_uint;
+MetaToScalarTest<SparseMatrixELL<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_ell_test_generic_float_ulong;
+MetaToScalarTest<SparseMatrixELL<Mem::CUDA, double, unsigned long> > cuda_meta_matrix_to_ell_test_generic_double_ulong;
 #endif
 
 
@@ -156,11 +155,10 @@ MetaToScalarTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned long> >
  */
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class VecMetaToScalarTest
-  : public FullTaggedTest<Mem_, DT_, Algo_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   typedef DenseVector<Mem_, DT_, IT_> DenseVec;
@@ -170,7 +168,7 @@ public:
   typedef TupleVector<PowerVec3, PowerVec2, PowerVec1, DenseVec> TupleVec;
 
   VecMetaToScalarTest()
-    : FullTaggedTest<Mem_, DT_, Algo_, IT_>("vec_meta_to_scalar_test")
+    : FullTaggedTest<Mem_, DT_, IT_>("vec_meta_to_scalar_test")
   {
   }
 
@@ -238,19 +236,19 @@ public:
     }
   }
 };
-VecMetaToScalarTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_vec_meta_to_scalar_test_generic_float_uint;
-VecMetaToScalarTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_vec_meta_to_scalar_test_generic_float_ulong;
-VecMetaToScalarTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_vec_meta_to_scalar_test_generic_double_uint;
-VecMetaToScalarTest<Mem::Main, Algo::Generic, double, unsigned long> cpu_vec_meta_to_scalar_test_generic_double_ulong;
+VecMetaToScalarTest<Mem::Main, float, unsigned int> cpu_vec_meta_to_scalar_test_generic_float_uint;
+VecMetaToScalarTest<Mem::Main, float, unsigned long> cpu_vec_meta_to_scalar_test_generic_float_ulong;
+VecMetaToScalarTest<Mem::Main, double, unsigned int> cpu_vec_meta_to_scalar_test_generic_double_uint;
+VecMetaToScalarTest<Mem::Main, double, unsigned long> cpu_vec_meta_to_scalar_test_generic_double_ulong;
 
 #ifdef FEAST_HAVE_QUADMATH
-VecMetaToScalarTest<Mem::Main, Algo::Generic, __float128, unsigned int> cpu_vec_meta_to_scalar_test_generic_float128_uint;
-VecMetaToScalarTest<Mem::Main, Algo::Generic, __float128, unsigned long> cpu_vec_meta_to_scalar_test_generic_float128_ulong;
+VecMetaToScalarTest<Mem::Main, __float128, unsigned int> cpu_vec_meta_to_scalar_test_generic_float128_uint;
+VecMetaToScalarTest<Mem::Main, __float128, unsigned long> cpu_vec_meta_to_scalar_test_generic_float128_ulong;
 #endif
 
 #ifdef FEAST_BACKENDS_CUDA
-VecMetaToScalarTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_vec_meta_to_scalar_test_generic_float_uint;
-VecMetaToScalarTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_vec_meta_to_scalar_test_generic_float_ulong;
-VecMetaToScalarTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_vec_meta_to_scalar_test_generic_double_uint;
-VecMetaToScalarTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_vec_meta_to_scalar_test_generic_double_ulong;
+VecMetaToScalarTest<Mem::CUDA, float, unsigned int> cuda_vec_meta_to_scalar_test_generic_float_uint;
+VecMetaToScalarTest<Mem::CUDA, float, unsigned long> cuda_vec_meta_to_scalar_test_generic_float_ulong;
+VecMetaToScalarTest<Mem::CUDA, double, unsigned int> cuda_vec_meta_to_scalar_test_generic_double_uint;
+VecMetaToScalarTest<Mem::CUDA, double, unsigned long> cuda_vec_meta_to_scalar_test_generic_double_ulong;
 #endif

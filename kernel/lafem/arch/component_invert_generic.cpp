@@ -7,8 +7,8 @@ namespace FEAST
   {
     namespace Arch
     {
-      template void ComponentInvert<Mem::Main, Algo::Generic>::value(float *, const float * const, const float, const Index);
-      template void ComponentInvert<Mem::Main, Algo::Generic>::value(double *, const double * const, const double, const Index);
+      template void ComponentInvert<Mem::Main>::value_generic(float *, const float * const, const float, const Index);
+      template void ComponentInvert<Mem::Main>::value_generic(double *, const double * const, const double, const Index);
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST

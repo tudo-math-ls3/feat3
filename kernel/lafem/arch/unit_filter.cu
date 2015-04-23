@@ -38,7 +38,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_, typename IT_>
-void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
+void UnitFilter<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
 {
   Index blocksize(256);
   dim3 grid;
@@ -55,13 +55,13 @@ void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv
 #endif
 }
 
-template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_rhs(float *, const float * const, const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_rhs(double *, const double * const, const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_rhs(float *, const float * const, const unsigned int * const, const Index);
-template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_rhs(double *, const double * const, const unsigned int * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_rhs(float *, const float * const, const unsigned long * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_rhs(double *, const double * const, const unsigned long * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_rhs(float *, const float * const, const unsigned int * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_rhs(double *, const double * const, const unsigned int * const, const Index);
 
 template <typename DT_, typename IT_>
-void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
+void UnitFilter<Mem::CUDA>::filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
 {
   Index blocksize(256);
   dim3 grid;
@@ -78,9 +78,9 @@ void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(DT_ * v, const IT_ * const sv
 #endif
 }
 
-template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(float *, const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(double *,  const unsigned long * const, const Index);
-template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(float *,  const unsigned int * const, const Index);
-template void UnitFilter<Mem::CUDA, Algo::CUDA>::filter_def(double *,  const unsigned int * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_def(float *, const unsigned long * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_def(double *,  const unsigned long * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_def(float *,  const unsigned int * const, const Index);
+template void UnitFilter<Mem::CUDA>::filter_def(double *,  const unsigned int * const, const Index);
 
 /// \endcond

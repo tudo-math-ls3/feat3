@@ -114,19 +114,19 @@ namespace FEAST
       }
       /// \endcond
 
-      template<typename Algo_, typename Matrix_>
+      template<typename Matrix_>
       void filter_mat(Matrix_ &) const
       {
         // nothing to do here
       }
 
-      template<typename Algo_, typename Matrix_>
+      template<typename Matrix_>
       void filter_offdiag_row_mat(Matrix_ &) const
       {
         // nothing to do here
       }
 
-      template<typename Algo_, typename Matrix_>
+      template<typename Matrix_>
       void filter_offdiag_col_mat(Matrix_ &) const
       {
         // nothing to do here
@@ -138,13 +138,12 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the right-hand-side vector to be filtered.
        */
-      template<typename Algo_>
       void filter_rhs(DenseVector<Mem_,DT_,IT_> & vector) const
       {
         // compute dual integral
-        DT_ integ = vector.template dot<Algo_>(_vec_prim);
+        DT_ integ = vector.dot(_vec_prim);
         // subtract mean
-        vector.template axpy<Algo_>(_vec_dual, vector, -integ / _volume);
+        vector.axpy(_vec_dual, vector, -integ / _volume);
       }
 
       /**
@@ -153,13 +152,12 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the solution vector to be filtered.
        */
-      template<typename Algo_>
       void filter_sol(DenseVector<Mem_,DT_,IT_> & vector) const
       {
         // compute primal integral
-        DT_ integ = vector.template dot<Algo_>(_vec_dual);
+        DT_ integ = vector.dot(_vec_dual);
         // subtract mean
-        vector.template axpy<Algo_>(_vec_prim, vector, -integ / _volume);
+        vector.axpy(_vec_prim, vector, -integ / _volume);
       }
 
       /**
@@ -168,11 +166,10 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the defect vector to be filtered.
        */
-      template<typename Algo_>
       void filter_def(DenseVector<Mem_,DT_,IT_> & vector) const
       {
         // same as rhs
-        filter_rhs<Algo_>(vector);
+        filter_rhs(vector);
       }
 
       /**
@@ -181,11 +178,10 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the correction vector to be filtered.
        */
-      template<typename Algo_>
       void filter_cor(DenseVector<Mem_,DT_,IT_> & vector) const
       {
         // same as sol
-        filter_sol<Algo_>(vector);
+        filter_sol(vector);
       }
     }; // class MeanFilter<...>
   } // namespace LAFEM

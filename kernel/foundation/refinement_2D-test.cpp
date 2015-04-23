@@ -16,13 +16,13 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class RefinementTest2D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     RefinementTest2D(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("RefinementTest2D<" + tag + ">")
+      TaggedTest<Tag_, Index>("RefinementTest2D<" + tag + ">")
     {
     }
 
@@ -100,7 +100,6 @@ class RefinementTest2D:
       halos.at(1)->push_back(3);
 
       Refinement<Mem::Main,
-                 Algo::Generic,
                  mrt_standard>::execute(m_fine, &halos, attrs);
 
 /*      Index size_set[3];
@@ -262,7 +261,7 @@ class RefinementTest2D:
       TEST_CHECK_EQUAL_WITHIN_EPS(attrs.at(1).get_data().at(8), double(0.5), std::numeric_limits<double>::epsilon());
     }
 };
-RefinementTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test2_cpu_v_v("std::vector, std::vector");
-RefinementTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test2_cpu_v_d("std::vector, std::deque");
-RefinementTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test2_cpu_d_v("std::deque, std::vector");
-RefinementTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test2_cpu_d_d("std::deque, std::deque");
+RefinementTest2D<Mem::Main, Index, std::vector, std::vector<Index> > ref_test2_cpu_v_v("std::vector, std::vector");
+RefinementTest2D<Mem::Main, Index, std::vector, std::deque<Index> > ref_test2_cpu_v_d("std::vector, std::deque");
+RefinementTest2D<Mem::Main, Index, std::deque, std::vector<Index> > ref_test2_cpu_d_v("std::deque, std::vector");
+RefinementTest2D<Mem::Main, Index, std::deque, std::deque<Index> > ref_test2_cpu_d_d("std::deque, std::deque");

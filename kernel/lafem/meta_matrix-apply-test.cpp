@@ -20,14 +20,13 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_, typename IndexType_>
+template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaMatrixApplyTest
-  : public MetaMatrixTestBase<Algo_, DataType_, IndexType_>
+  : public MetaMatrixTestBase<MemType_, DataType_, IndexType_>
 {
 public:
-  typedef Algo_ AlgoType;
   typedef DataType_ DataType;
-  typedef MetaMatrixTestBase<Algo_, DataType_, IndexType_> BaseClass;
+  typedef MetaMatrixTestBase<MemType_, DataType_, IndexType_> BaseClass;
 
   MetaMatrixApplyTest() : BaseClass("MetaMatrixApplyTest") {}
 
@@ -48,28 +47,28 @@ public:
 
     // test t <- b - A*x
     typename BaseClass::SystemVector vec_tmp(mat_sys.create_vector_l());
-    mat_sys.template apply<AlgoType>(vec_tmp, vec_sol, vec_rhs, -DataType_(1));
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
+    mat_sys.apply(vec_tmp, vec_sol, vec_rhs, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.norm2(), DataType_(0), tol);
 
     // test t <- A*x; t <- t - b
-    mat_sys.template apply<AlgoType>(vec_tmp, vec_sol);
-    vec_tmp.template axpy<AlgoType>(vec_rhs, vec_tmp, -DataType_(1));
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
+    mat_sys.apply(vec_tmp, vec_sol);
+    vec_tmp.axpy(vec_rhs, vec_tmp, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.norm2(), DataType_(0), tol);
 
     // generate densevectors
-    DenseVector<typename AlgoType::MemType, DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
+    DenseVector<MemType_, DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
     vec_sol_dense.convert(vec_sol);
     vec_rhs_dense.convert(vec_rhs);
-    DenseVector<typename AlgoType::MemType, DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
+    DenseVector<MemType_, DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
 
     // test t <- b - A*x with densevectors
-    mat_sys.template apply<AlgoType>(vec_tmp_dense, vec_sol_dense, vec_rhs_dense, -DataType_(1));
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.template norm2<AlgoType>(), DataType_(0), tol);
+    mat_sys.apply(vec_tmp_dense, vec_sol_dense, vec_rhs_dense, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.norm2(), DataType_(0), tol);
 
     // test t <- A*x; t <- t - b with densevectors
-    mat_sys.template apply<AlgoType>(vec_tmp_dense, vec_sol_dense);
-    vec_tmp_dense.template axpy<AlgoType>(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.template norm2<AlgoType>(), DataType_(0), tol);
+    mat_sys.apply(vec_tmp_dense, vec_sol_dense);
+    vec_tmp_dense.axpy(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.norm2(), DataType_(0), tol);
   }
 
   void test_full() const
@@ -83,38 +82,34 @@ public:
 
     // test t <- b - A*x
     typename BaseClass::SystemVector vec_tmp(mat_sys.create_vector_l());
-    mat_sys.template apply<AlgoType>(vec_tmp, vec_sol, vec_rhs, -DataType_(1));
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
+    mat_sys.apply(vec_tmp, vec_sol, vec_rhs, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.norm2(), DataType_(0), tol);
 
     // test t <- A*x; t <- t - b
-    mat_sys.template apply<AlgoType>(vec_tmp, vec_sol);
-    vec_tmp.template axpy<AlgoType>(vec_rhs, vec_tmp, -DataType_(1));
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
+    mat_sys.apply(vec_tmp, vec_sol);
+    vec_tmp.axpy(vec_rhs, vec_tmp, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.norm2(), DataType_(0), tol);
 
     // generate densevectors
-    DenseVector<typename AlgoType::MemType, DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
+    DenseVector<MemType_, DataType, IndexType_> vec_sol_dense, vec_rhs_dense;
     vec_sol_dense.convert(vec_sol);
     vec_rhs_dense.convert(vec_rhs);
-    DenseVector<typename AlgoType::MemType, DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
+    DenseVector<MemType_, DataType, IndexType_> vec_tmp_dense(mat_sys.rows());
 
     // test t <- b - A*x with densevectors
-    mat_sys.template apply<AlgoType>(vec_tmp_dense, vec_sol_dense, vec_rhs_dense, -DataType_(1));
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.template norm2<AlgoType>(), DataType_(0), tol);
+    mat_sys.apply(vec_tmp_dense, vec_sol_dense, vec_rhs_dense, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.norm2(), DataType_(0), tol);
 
     // test t <- A*x; t <- t - b with densevectors
-    mat_sys.template apply<AlgoType>(vec_tmp_dense, vec_sol_dense);
-    vec_tmp_dense.template axpy<AlgoType>(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.template norm2<AlgoType>(), DataType_(0), tol);
+    mat_sys.apply(vec_tmp_dense, vec_sol_dense);
+    vec_tmp_dense.axpy(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.norm2(), DataType_(0), tol);
   }
 };
 
-MetaMatrixApplyTest<Algo::Generic, float, Index> meta_matrix_apply_test_generic_float;
-MetaMatrixApplyTest<Algo::Generic, double, Index> meta_matrix_apply_test_generic_double;
-#ifdef FEAST_BACKENDS_MKL
-MetaMatrixApplyTest<Algo::MKL, float, Index> meta_matrix_apply_test_mkl_float;
-MetaMatrixApplyTest<Algo::MKL, double, Index> meta_matrix_apply_test_mkl_double;
-#endif
+MetaMatrixApplyTest<Mem::Main, float, Index> meta_matrix_apply_test_generic_float;
+MetaMatrixApplyTest<Mem::Main, double, Index> meta_matrix_apply_test_generic_double;
 #ifdef FEAST_BACKENDS_CUDA
-MetaMatrixApplyTest<Algo::CUDA, float, Index> meta_matrix_apply_test_cuda_float;
-MetaMatrixApplyTest<Algo::CUDA, double, Index> meta_matrix_apply_test_cuda_double;
+MetaMatrixApplyTest<Mem::CUDA, float, Index> meta_matrix_apply_test_cuda_float;
+MetaMatrixApplyTest<Mem::CUDA, double, Index> meta_matrix_apply_test_cuda_double;
 #endif

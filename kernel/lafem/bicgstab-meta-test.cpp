@@ -20,10 +20,10 @@ struct Precon;
 template <>
 struct Precon<SparsePreconType::pt_none>
 {
-  template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & /*sys*/, const Index /*opt*/)
+  template <typename MT_, typename VT_>
+  static Preconditioner<MT_, VT_> * get(const MT_ & /*sys*/, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new NonePreconditioner<Algo_, MT_, VT_> ();
+    Preconditioner<MT_, VT_> * t = new NonePreconditioner<MT_, VT_> ();
     return t;
   }
 };
@@ -31,10 +31,10 @@ struct Precon<SparsePreconType::pt_none>
 template <>
 struct Precon<SparsePreconType::pt_jacobi>
 {
-  template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
+  template <typename MT_, typename VT_>
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new JacobiPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
+    Preconditioner<MT_, VT_> * t = new JacobiPreconditioner<MT_, VT_> (sys, typename VT_::DataType(1));
     return t;
   }
 };
@@ -42,10 +42,10 @@ struct Precon<SparsePreconType::pt_jacobi>
 template <>
 struct Precon<SparsePreconType::pt_gauss_seidel>
 {
-  template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
+  template <typename MT_, typename VT_>
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new GaussSeidelPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
+    Preconditioner<MT_, VT_> * t = new GaussSeidelPreconditioner<MT_, VT_> (sys, typename VT_::DataType(1));
     return t;
   }
 };
@@ -53,10 +53,10 @@ struct Precon<SparsePreconType::pt_gauss_seidel>
 template <>
 struct Precon<SparsePreconType::pt_polynomial>
 {
-  template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  template <typename MT_, typename VT_>
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, 20, opt == 0);
+    Preconditioner<MT_, VT_> * t = new PolynomialPreconditioner<MT_, VT_> (sys, 20, opt == 0);
     return t;
   }
 };
@@ -64,10 +64,10 @@ struct Precon<SparsePreconType::pt_polynomial>
 template <>
 struct Precon<SparsePreconType::pt_ilu>
 {
-  template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  template <typename MT_, typename VT_>
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new ILUPreconditioner<Algo_, MT_, VT_> (sys, opt);
+    Preconditioner<MT_, VT_> * t = new ILUPreconditioner<MT_, VT_> (sys, opt);
     return t;
   }
 };
@@ -75,10 +75,10 @@ struct Precon<SparsePreconType::pt_ilu>
 template <>
 struct Precon<SparsePreconType::pt_sor>
 {
-  template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
+  template <typename MT_, typename VT_>
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new SORPreconditioner<Algo_, MT_, VT_> (sys);
+    Preconditioner<MT_, VT_> * t = new SORPreconditioner<MT_, VT_> (sys);
     return t;
   }
 };
@@ -86,10 +86,10 @@ struct Precon<SparsePreconType::pt_sor>
 template <>
 struct Precon<SparsePreconType::pt_ssor>
 {
-  template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
+  template <typename MT_, typename VT_>
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new SSORPreconditioner<Algo_, MT_, VT_> (sys);
+    Preconditioner<MT_, VT_> * t = new SSORPreconditioner<MT_, VT_> (sys);
     return t;
   }
 };
@@ -97,10 +97,10 @@ struct Precon<SparsePreconType::pt_ssor>
 template <>
 struct Precon<SparsePreconType::pt_spai>
 {
-  template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  template <typename MT_, typename VT_>
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
-    Preconditioner<Algo_, MT_, VT_> * t;
+    Preconditioner<MT_, VT_> * t;
 
     const bool transpose(opt%2 == 0);
     const bool start_layout((opt / 2)%2 == 0);
@@ -108,11 +108,11 @@ struct Precon<SparsePreconType::pt_spai>
 
     if (start_layout)
     {
-      t = new SPAIPreconditioner<Algo_, MT_, VT_> (sys, 2, max_iter, 1e-2, 100, 1e-3, 1e-3, transpose);
+      t = new SPAIPreconditioner<MT_, VT_> (sys, 2, max_iter, 1e-2, 100, 1e-3, 1e-3, transpose);
     }
     else
     {
-      t = new SPAIPreconditioner<Algo_, MT_, VT_> (sys, sys.layout(), max_iter, 1e-2, 10, 1e-3, 1e-3, transpose);
+      t = new SPAIPreconditioner<MT_, VT_> (sys, sys.layout(), max_iter, 1e-2, 10, 1e-3, 1e-3, transpose);
     }
     return t;
   }
@@ -130,9 +130,9 @@ struct Precon<SparsePreconType::pt_spai>
  *
  * \author Christoph Lohmann
  */
-template<typename PSF_, SparsePreconType PType_, typename Algo_, typename MT_, typename VT_>
+template<typename PSF_, SparsePreconType PType_,  typename MT_, typename VT_>
 class BiCGStabSaddlePointTest
-  : public MetaMatrixTestBase<Algo_, typename MT_::DataType, Index>
+  : public MetaMatrixTestBase<typename MT_::MemType, typename MT_::DataType, Index>
 {
 private:
   const Index _opt;
@@ -140,7 +140,7 @@ private:
 public:
   typedef typename VT_::DataType   DT_;
   typedef typename VT_::MemType    Mem_;
-  typedef MetaMatrixTestBase<Algo_, DT_, Index> BaseClass;
+  typedef MetaMatrixTestBase<typename MT_::MemType, DT_, Index> BaseClass;
   typedef typename BaseClass::SystemDiagMatrix SystemMatrix;
   typedef typename BaseClass::SystemVector SystemVector;
 
@@ -170,10 +170,10 @@ public:
     VT_ ref_local;
     ref_local.convert(ref);
     VT_ b(size);
-    mat_sys_scalar.template apply<Algo_>(b, ref);
+    mat_sys_scalar.apply(b, ref);
 
-    Preconditioner<Algo_, MT_, VT_> * precond(Precon<PType_>::template get<Algo_, MT_, VT_>(mat_sys_scalar, _opt));
-    BiCGStab<Algo_>::value(x, mat_sys_scalar, b, *precond, 1000, 1e-12);
+    Preconditioner<MT_, VT_> * precond(Precon<PType_>::template get<MT_, VT_>(mat_sys_scalar, _opt));
+    BiCGStab::value(x, mat_sys_scalar, b, *precond, 1000, 1e-12);
     delete precond;
 
     // check, if the result is correct
@@ -189,21 +189,18 @@ public:
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_none,
-                        Algo::Generic,
                         SparseMatrixCSR<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_csr_none_double("none");
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_none,
-                        Algo::Generic,
                         SparseMatrixCOO<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_coo_none_double("none");
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_none,
-                        Algo::Generic,
                         SparseMatrixELL<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_ell_none_double("none");
@@ -211,21 +208,18 @@ bicgstab_saddle_point_test_cpu_ell_none_double("none");
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixCSR<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_csr_spai_double_2("spai", 2);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixCOO<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_coo_spai_double_2("spai", 2);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixELL<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_ell_spai_double_2("spai", 2);
@@ -233,21 +227,18 @@ bicgstab_saddle_point_test_cpu_ell_spai_double_2("spai", 2);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixCSR<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_csr_spai_double_3("spai", 3);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixCOO<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_coo_spai_double_3("spai", 3);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixELL<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_ell_spai_double_3("spai", 3);
@@ -255,21 +246,18 @@ bicgstab_saddle_point_test_cpu_ell_spai_double_3("spai", 3);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixCSR<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_csr_spai_double_82("spai", 82);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixCOO<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_coo_spai_double_82("spai", 82);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixELL<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_ell_spai_double_82("spai", 82);
@@ -277,21 +265,18 @@ bicgstab_saddle_point_test_cpu_ell_spai_double_82("spai", 82);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixCSR<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_csr_spai_double_83("spai", 83);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixCOO<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_coo_spai_double_83("spai", 83);
 
 BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
                         SparsePreconType::pt_spai,
-                        Algo::Generic,
                         SparseMatrixELL<Mem::Main, double>,
                         DenseVector<Mem::Main, double> >
 bicgstab_saddle_point_test_cpu_ell_spai_double_83("spai", 83);

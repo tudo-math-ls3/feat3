@@ -22,17 +22,16 @@ using namespace FEAST::TestSystem;
  */
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseMatrixTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 
 public:
 
   DenseMatrixTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("dense_matrix_test")
+    : FullTaggedTest<Mem_, DT_, IT_>("dense_matrix_test")
   {
   }
 
@@ -74,9 +73,9 @@ public:
     TEST_CHECK_EQUAL(k, b);
   }
 };
-DenseMatrixTest<Mem::Main, NotSet, float, Index> cpu_dense_matrix_test_float;
-DenseMatrixTest<Mem::Main, NotSet, double, Index> cpu_dense_matrix_test_double;
+DenseMatrixTest<Mem::Main, float, Index> cpu_dense_matrix_test_float;
+DenseMatrixTest<Mem::Main, double, Index> cpu_dense_matrix_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DenseMatrixTest<Mem::CUDA, NotSet, float, Index> cuda_dense_matrix_test_float;
-DenseMatrixTest<Mem::CUDA, NotSet, double, Index> cuda_dense_matrix_test_double;
+DenseMatrixTest<Mem::CUDA, float, Index> cuda_dense_matrix_test_float;
+DenseMatrixTest<Mem::CUDA, double, Index> cuda_dense_matrix_test_double;
 #endif

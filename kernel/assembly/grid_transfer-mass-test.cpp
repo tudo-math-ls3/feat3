@@ -21,7 +21,6 @@ template<typename ShapeType, template<typename> class Element_, Index level_coar
 class GridTransferMassTest :
   public TestSystem::BaseTest
 {
-  typedef Algo::Generic AlgoType;
   typedef Mem::Main MemType;
   typedef double DataType;
   typedef Index IndexType;
@@ -84,8 +83,8 @@ public:
     prol_matrix.format();
     weight_vector.format();
     Assembly::GridTransfer::assemble_prolongation(prol_matrix, weight_vector, space_f, space_c, cubature_factory);
-    weight_vector.template component_invert<AlgoType>(weight_vector);
-    prol_matrix.template scale_rows<AlgoType>(prol_matrix, weight_vector);
+    weight_vector.component_invert(weight_vector);
+    prol_matrix.scale_rows(prol_matrix, weight_vector);
 
     // transpose to obtain restriction matrix
     MatrixType rest_matrix(prol_matrix.transpose());
@@ -97,10 +96,10 @@ public:
     // finally, restrict the fine mesh mass matrix onto the coarse mesh and
     // subtract it from the coarse mesh mass matrix, i.e.
     // M_c <- M_c - R * M_f * P
-    mat_mirror.template gather_axpy<AlgoType>(mass_c, mass_f, -DataType(1));
+    mat_mirror.gather_axpy(mass_c, mass_f, -DataType(1));
 
     // the resulting matrix should now be the null matrix
-    DataType err = Math::sqr(mass_c.template norm_frobenius<AlgoType>());
+    DataType err = Math::sqr(mass_c.norm_frobenius());
 
     // and check for zero
     TEST_CHECK_EQUAL_WITHIN_EPS(err, DataType(0), eps);

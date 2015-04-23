@@ -20,14 +20,13 @@ using namespace FEAST::TestSystem;
  *
  * \author Christoph Lohmann
  */
-template<typename Algo_, typename DataType_, typename IndexType_>
+template<typename DataType_, typename IndexType_>
 class MetaMatrixIOTest
-  : public MetaMatrixTestBase<Algo_, DataType_, IndexType_>
+  : public MetaMatrixTestBase<Mem::Main, DataType_, IndexType_>
 {
 public:
-  typedef Algo_ AlgoType;
   typedef DataType_ DataType;
-  typedef MetaMatrixTestBase<Algo_, DataType_, IndexType_> BaseClass;
+  typedef MetaMatrixTestBase<Mem::Main, DataType_, IndexType_> BaseClass;
 
   MetaMatrixIOTest() : BaseClass("MetaMatrixIOTest") {}
 
@@ -55,9 +54,5 @@ public:
   }
 };
 
-//MetaMatrixIOTest<Algo::Generic, float, Index> meta_matrix_io_test_generic_float;
-//MetaMatrixIOTest<Algo::Generic, double, Index> meta_matrix_io_test_generic_double;
-#ifdef FEAST_BACKENDS_CUDA
-//MetaMatrixIOTest<Algo::CUDA, float, Index> meta_matrix_io_test_cuda_float;
-//MetaMatrixIOTest<Algo::CUDA, double, Index> meta_matrix_io_test_cuda_double;
-#endif
+//MetaMatrixIOTest<float, Index> meta_matrix_io_test_generic_float;
+//MetaMatrixIOTest<double, Index> meta_matrix_io_test_generic_double;

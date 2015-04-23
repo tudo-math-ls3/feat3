@@ -38,8 +38,7 @@ namespace FEAST
              typename PreconContType_,
              typename FilterType_,
              template<typename, typename> class StorageType_ = std::vector,
-             typename IT_ = Index,
-             typename Algo_ = Algo::Generic
+             typename IT_ = Index
              >
     class ScaRCFunctorBase
     {
@@ -99,8 +98,7 @@ namespace FEAST
                                                           PreconContType_,
                                                           FilterType_,
                                                           StorageType_,
-                                                          IT_,
-                                                          Algo_> >& precon) :
+                                                          IT_> >& precon) :
           _precon(precon),
           _data(&data),
           _eps(1e-8),
@@ -148,8 +146,7 @@ namespace FEAST
                                                                            PreconContType_,
                                                                            FilterType_,
                                                                            StorageType_,
-                                                                           IT_,
-                                                                           Algo_> >& precon)
+                                                                           IT_> >& precon)
         {
           _precon = precon;
         }
@@ -238,8 +235,7 @@ namespace FEAST
                                          PreconContType_,
                                          FilterType_,
                                          StorageType_,
-                                         IT_,
-                                         Algo_> > _precon;
+                                         IT_> > _precon;
         SynchronisedPreconditionedFilteredScaRCData<DataType_,
                                                     MemTag_,
                                                     VectorType_,
@@ -269,8 +265,7 @@ namespace FEAST
              typename PreconContType_,
              typename FilterType_,
              template<typename, typename> class StorageType_ = std::vector,
-             typename IT_ = Index,
-             typename Algo_ = Algo::Generic
+             typename IT_ = Index
              >
     class CompositeScaRCFunctor : public ScaRCFunctorBase<DataType_,
                                                           MemTag_,
@@ -280,8 +275,7 @@ namespace FEAST
                                                           PreconContType_,
                                                           FilterType_,
                                                           StorageType_,
-                                                          IT_,
-                                                          Algo_>
+                                                          IT_>
     {
       public:
 
@@ -330,8 +324,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data),
+                           IT_>(data),
           _functors()
         {
         }
@@ -354,8 +347,7 @@ namespace FEAST
                                                                PreconContType_,
                                                                FilterType_,
                                                                StorageType_,
-                                                               IT_,
-                                                               Algo_> >& precon) :
+                                                               IT_> >& precon) :
           ScaRCFunctorBase<DataType_,
                            MemTag_,
                            VectorType_,
@@ -364,8 +356,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data, precon),
+                           IT_>(data, precon),
           _functors()
         {
         }
@@ -394,8 +385,7 @@ namespace FEAST
                                                       PreconContType_,
                                                       FilterType_,
                                                       StorageType_,
-                                                      IT_,
-                                                      Algo_> >,
+                                                      IT_> >,
                      std::allocator<std::shared_ptr<ScaRCFunctorBase<DataType_,
                                                                      MemTag_,
                                                                      VectorType_,
@@ -404,8 +394,7 @@ namespace FEAST
                                                                      PreconContType_,
                                                                      FilterType_,
                                                                      StorageType_,
-                                                                     IT_,
-                                                                     Algo_> > > > _functors;
+                                                                     IT_> > > > _functors;
     };
 
     template<typename DataType_,
@@ -416,8 +405,7 @@ namespace FEAST
              typename PreconContType_,
              typename FilterType_,
              template<typename, typename> class StorageType_ = std::vector,
-             typename IT_ = Index,
-             typename Algo_ = Algo::Generic
+             typename IT_ = Index
              >
     class ScaRCFunctorNULL : public ScaRCFunctorBase<DataType_,
                                                      MemTag_,
@@ -427,8 +415,7 @@ namespace FEAST
                                                      PreconContType_,
                                                      FilterType_,
                                                      StorageType_,
-                                                     IT_,
-                                                     Algo_>
+                                                     IT_>
     {
       public:
 
@@ -465,8 +452,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data)
+                           IT_>(data)
         {
         }
 
@@ -488,8 +474,7 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_> >& precon) :
+                                                           IT_> >& precon) :
           ScaRCFunctorBase<DataType_,
                            MemTag_,
                            VectorType_,
@@ -498,8 +483,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data, precon)
+                           IT_>(data, precon)
         {
         }
 
@@ -513,8 +497,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(other)
+                           IT_>(other)
         {
         }
     };
@@ -527,8 +510,7 @@ namespace FEAST
              typename PreconContType_,
              typename FilterType_,
              template<typename, typename> class StorageType_ = std::vector,
-             typename IT_ = Index,
-             typename Algo_ = Algo::Generic
+             typename IT_ = Index
              >
     class ScaRCFunctorRichardson0 : public ScaRCFunctorBase<DataType_,
                                                            MemTag_,
@@ -538,8 +520,7 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_>
+                                                           IT_>
     {
       public:
 
@@ -548,14 +529,14 @@ namespace FEAST
           ///TODO add omega to PreconData interface
 
           //temp0 <- FILTER(temp0);
-          //this->_data->filter().template filter_def<Algo_>(temp0);
+          //this->_data->filter().filter_def(temp0);
 
           this->_used_iters = 0;
           _temp0.copy(this->_data->sol());
           while(true)
           {
             ///temp0 <- b - SYNCH(Ax)
-            Foundation::GlobalDefect<MemTag_, Algo_>::exec(_temp0,
+            Foundation::GlobalDefect<MemTag_>::exec(_temp0,
                                                            this->_data->rhs(),
                                                            this->_data->sys(),
                                                            _temp0,
@@ -570,7 +551,7 @@ namespace FEAST
             {
               if(this->_used_iters == 0)
               {
-                Foundation::GlobalNorm2<MemTag_, Algo_>::value(
+                Foundation::GlobalNorm2<MemTag_>::value(
                                                                this->_norm_0,
                                                                _temp0,
                                                                this->_data->halo_frequencies()
@@ -578,7 +559,7 @@ namespace FEAST
               }
               else
               {
-                Foundation::GlobalNorm2<MemTag_, Algo_>::value(
+                Foundation::GlobalNorm2<MemTag_>::value(
                     this->_norm,
                     _temp0,
                     this->_data->halo_frequencies()
@@ -598,7 +579,7 @@ namespace FEAST
             ++(this->_used_iters);
 
             this->_precon->apply(_temp1, _temp0, this->_data->rhs());
-            _temp0.template axpy<Algo_>(this->_data->sol(), _temp1);
+            _temp0.axpy(this->_data->sol(), _temp1);
             this->_data->sol().copy(_temp0);
 
           }
@@ -610,7 +591,7 @@ namespace FEAST
           ///TODO add omega to PreconData interface
 
           //temp0 <- FILTER(temp0);
-          //this->_data->filter().template filter_def<Algo_>(temp0);
+          //this->_data->filter().filter_def(temp0);
 
           this->_used_iters = 0;
           _temp0.copy(apply_to);
@@ -618,7 +599,7 @@ namespace FEAST
           while(true)
           {
             ///temp0 <- b - SYNCH(Ax)
-            Foundation::GlobalDefect<MemTag_, Algo_>::exec(_temp0,
+            Foundation::GlobalDefect<MemTag_>::exec(_temp0,
                                                apply_rhs,
                                                this->_data->sys(),
                                                _temp0,
@@ -633,7 +614,7 @@ namespace FEAST
             {
               if(this->_used_iters == 0)
               {
-                Foundation::GlobalNorm2<MemTag_, Algo_>::value(
+                Foundation::GlobalNorm2<MemTag_>::value(
                     this->_norm_0,
                     _temp0,
                     this->_data->halo_frequencies()
@@ -641,7 +622,7 @@ namespace FEAST
               }
               else
               {
-                Foundation::GlobalNorm2<MemTag_, Algo_>::value(
+                Foundation::GlobalNorm2<MemTag_>::value(
                     this->_norm,
                     _temp0,
                     this->_data->halo_frequencies()
@@ -662,7 +643,7 @@ namespace FEAST
             ++(this->_used_iters);
 
             this->_precon->apply(_temp1, _temp0, apply_rhs);
-            _temp0.template axpy<Algo_>(store_to, _temp1);
+            _temp0.axpy(store_to, _temp1);
             store_to.copy(_temp0);
           }
         }
@@ -691,8 +672,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data),
+                           IT_>(data),
           _temp0(data.sol().size()),
           _temp1(data.sol().size())
         {
@@ -704,8 +684,7 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_> >(new ScaRCFunctorNULL<DataType_,
+                                                           IT_> >(new ScaRCFunctorNULL<DataType_,
                                                                                          MemTag_,
                                                                                          VectorType_,
                                                                                          VectorMirrorType_,
@@ -713,8 +692,7 @@ namespace FEAST
                                                                                          PreconContType_,
                                                                                          FilterType_,
                                                                                          StorageType_,
-                                                                                         IT_,
-                                                                                         Algo_>(data));
+                                                                                         IT_>(data));
         }
 
         ///CTOR
@@ -735,8 +713,7 @@ namespace FEAST
                                                                 PreconContType_,
                                                                 FilterType_,
                                                                 StorageType_,
-                                                                IT_,
-                                                                Algo_> >& precon) :
+                                                                IT_> >& precon) :
           ScaRCFunctorBase<DataType_,
                            MemTag_,
                            VectorType_,
@@ -745,8 +722,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data, precon),
+                           IT_>(data, precon),
           _temp0(data.sol().size()),
           _temp1(data.sol().size())
         {
@@ -762,8 +738,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(other),
+                           IT_>(other),
           _temp0(other._data.sol().size()),
           _temp1(other._data.sol().size())
         {
@@ -782,8 +757,7 @@ namespace FEAST
              typename PreconContType_,
              typename FilterType_,
              template<typename, typename> class StorageType_ = std::vector,
-             typename IT_ = Index,
-             typename Algo_ = Algo::Generic
+             typename IT_ = Index
              >
     class ScaRCFunctorPreconSpM1V1 : public ScaRCFunctorBase<DataType_,
                                                            MemTag_,
@@ -793,19 +767,18 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_>
+                                                           IT_>
     {
       public:
 
         virtual void execute()
         {
-          this->_data->precon().template apply<Algo_>(this->_data->sol(), this->_data->sol());
+          this->_data->precon().apply(this->_data->sol(), this->_data->sol());
         }
 
         virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_&)
         {
-          this->_data->precon().template apply<Algo_>(store_to, apply_to);
+          this->_data->precon().apply(store_to, apply_to);
         }
 
         ///returns a string that describes the functor
@@ -832,8 +805,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data)
+                           IT_>(data)
         {
           this->_precon = std::shared_ptr<ScaRCFunctorBase<DataType_,
                                                            MemTag_,
@@ -843,8 +815,7 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_> >(new ScaRCFunctorNULL<DataType_,
+                                                           IT_> >(new ScaRCFunctorNULL<DataType_,
                                                                                          MemTag_,
                                                                                          VectorType_,
                                                                                          VectorMirrorType_,
@@ -852,8 +823,7 @@ namespace FEAST
                                                                                          PreconContType_,
                                                                                          FilterType_,
                                                                                          StorageType_,
-                                                                                         IT_,
-                                                                                         Algo_>(data));
+                                                                                         IT_>(data));
         }
 
         ///CTOR
@@ -874,8 +844,7 @@ namespace FEAST
                                                                 PreconContType_,
                                                                 FilterType_,
                                                                 StorageType_,
-                                                                IT_,
-                                                                Algo_> >& precon) :
+                                                                IT_> >& precon) :
           ScaRCFunctorBase<DataType_,
                            MemTag_,
                            VectorType_,
@@ -884,8 +853,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data, precon)
+                           IT_>(data, precon)
         {
         }
 
@@ -899,8 +867,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(other)
+                           IT_>(other)
         {
         }
     };
@@ -913,8 +880,7 @@ namespace FEAST
              typename PreconContType_,
              typename FilterType_,
              template<typename, typename> class StorageType_ = std::vector,
-             typename IT_ = Index,
-             typename Algo_ = Algo::Generic
+             typename IT_ = Index
              >
     class ScaRCFunctorRichardson1 : public ScaRCFunctorBase<DataType_,
                                                            MemTag_,
@@ -924,8 +890,7 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_>
+                                                           IT_>
     {
       public:
 
@@ -934,20 +899,20 @@ namespace FEAST
           ///TODO add omega to PreconData interface
 
           //temp0 <- FILTER(temp0);
-          //this->_data->filter().template filter_def<Algo_>(temp0);
+          //this->_data->filter().filter_def(temp0);
 
           this->_used_iters = 0;
           _temp0.copy(this->_data->sol());
           while(true)
           {
             ///temp0 <- b - Ax
-            this->_data->localsys().template apply<Algo_>(_temp0, _temp0, this->_data->rhs(), -DataType_(1));
+            this->_data->localsys().apply(_temp0, _temp0, this->_data->rhs(), -DataType_(1));
             if(this->_conv_check)
             {
               if(this->_used_iters == 0)
-                this->_norm_0 = this->_temp0.template norm2<Algo_>();
+                this->_norm_0 = this->_temp0.norm2();
               else
-                this->_norm = this->_temp0.template norm2<Algo_>();
+                this->_norm = this->_temp0.norm2();
             }
 
             if(this->_conv_check)
@@ -962,7 +927,7 @@ namespace FEAST
             ++(this->_used_iters);
 
             this->_precon->apply(_temp1, _temp0, this->_data->rhs());
-            _temp0.template axpy<Algo_>(this->_data->sol(), _temp1);
+            _temp0.axpy(this->_data->sol(), _temp1);
             this->_data->sol().copy(_temp0);
           }
 
@@ -973,7 +938,7 @@ namespace FEAST
           ///TODO add omega to PreconData interface
 
           //temp0 <- FILTER(temp0);
-          //this->_data->filter().template filter_def<Algo_>(temp0);
+          //this->_data->filter().filter_def(temp0);
 
           this->_used_iters = 0;
           _temp0.copy(apply_to);
@@ -981,16 +946,16 @@ namespace FEAST
           while(true)
           {
             ///temp0 <- b - Ax
-            this->_data->localsys().template apply<Algo_>(_temp0, _temp0, apply_rhs, -DataType_(1));
+            this->_data->localsys().apply(_temp0, _temp0, apply_rhs, -DataType_(1));
 
             if(this->_conv_check)
             {
               if(this->_used_iters == 0)
               {
-                this->_norm_0 = _temp0.template norm2<Algo_>();
+                this->_norm_0 = _temp0.norm2();
               }
               else
-                this->_norm = _temp0.template norm2<Algo_>();
+                this->_norm = _temp0.norm2();
             }
 
             if(this->_conv_check)
@@ -1005,7 +970,7 @@ namespace FEAST
             ++(this->_used_iters);
 
             this->_precon->apply(_temp1, _temp0, apply_rhs);
-            _temp0.template axpy<Algo_>(store_to, _temp1);
+            _temp0.axpy(store_to, _temp1);
             store_to.copy(_temp0);
           }
 
@@ -1035,8 +1000,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data),
+                           IT_>(data),
           _temp0(data.sol().size()),
           _temp1(data.sol().size())
         {
@@ -1048,8 +1012,7 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_> >(new ScaRCFunctorNULL<DataType_,
+                                                           IT_> >(new ScaRCFunctorNULL<DataType_,
                                                                                          MemTag_,
                                                                                          VectorType_,
                                                                                          VectorMirrorType_,
@@ -1057,8 +1020,7 @@ namespace FEAST
                                                                                          PreconContType_,
                                                                                          FilterType_,
                                                                                          StorageType_,
-                                                                                         IT_,
-                                                                                         Algo_>(data));
+                                                                                         IT_>(data));
         }
 
         ///CTOR
@@ -1079,8 +1041,7 @@ namespace FEAST
                                                                 PreconContType_,
                                                                 FilterType_,
                                                                 StorageType_,
-                                                                IT_,
-                                                                Algo_> >& precon) :
+                                                                IT_> >& precon) :
           ScaRCFunctorBase<DataType_,
                            MemTag_,
                            VectorType_,
@@ -1089,8 +1050,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data, precon),
+                           IT_>(data, precon),
           _temp0(data.sol().size()),
           _temp1(data.sol().size())
         {
@@ -1106,8 +1066,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(other),
+                           IT_>(other),
           _temp0(other.data.sol().size()),
           _temp1(other.data.sol().size())
         {
@@ -1126,8 +1085,7 @@ namespace FEAST
              typename PreconContType_,
              typename FilterType_,
              template<typename, typename> class StorageType_ = std::vector,
-             typename IT_ = Index,
-             typename Algo_ = Algo::Generic
+             typename IT_ = Index
              >
     class ScaRCFunctorPreconBlock : public ScaRCFunctorBase<DataType_,
                                                            MemTag_,
@@ -1137,15 +1095,14 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_>
+                                                           IT_>
     {
       public:
 
         virtual void execute()
         {
           //global defect
-          Foundation::GlobalDefect<MemTag_, Algo_>::exec(this->_data->def(),
+          Foundation::GlobalDefect<MemTag_>::exec(this->_data->def(),
                                              this->_data->rhs(),
                                              this->_data->sys(),
                                              this->_data->sol(),
@@ -1160,7 +1117,7 @@ namespace FEAST
           this->_precon->apply(_temp1, _temp0, this->_data->def());
 
           //synchronisation
-          Foundation::GlobalSynchVec1<MemTag_, Algo_>::exec(
+          Foundation::GlobalSynchVec1<MemTag_>::exec(
                                                  _temp1,
                                                  this->_data->vector_mirrors(),
                                                  this->_data->halo_frequencies(),
@@ -1172,13 +1129,13 @@ namespace FEAST
                                                 );
 
           //global correction
-          this->_data->sol().template axpy<Algo_>(this->_data->sol(), _temp1);
+          this->_data->sol().axpy(this->_data->sol(), _temp1);
 
         }
 
         virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
         {
-          Foundation::GlobalDefect<MemTag_, Algo_>::exec(_temp0,
+          Foundation::GlobalDefect<MemTag_>::exec(_temp0,
                                              apply_rhs,
                                              this->_data->sys(),
                                              apply_to,
@@ -1194,7 +1151,7 @@ namespace FEAST
           this->_precon->apply(_temp2, _temp1, _temp0);
 
           //synchronisation
-          Foundation::GlobalSynchVec1<MemTag_, Algo_>::exec(
+          Foundation::GlobalSynchVec1<MemTag_>::exec(
                                                  _temp2,
                                                  this->_data->vector_mirrors(),
                                                  this->_data->halo_frequencies(),
@@ -1206,7 +1163,7 @@ namespace FEAST
                                                 );
 
           //global correction
-          store_to.template axpy<Algo_>(apply_to, _temp2);
+          store_to.axpy(apply_to, _temp2);
         }
 
         ///returns a string that describes the functor
@@ -1233,8 +1190,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data),
+                           IT_>(data),
           _temp0(data.sol().size()),
           _temp1(data.sol().size()),
           _temp2(data.sol().size())
@@ -1247,8 +1203,7 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_> >(new ScaRCFunctorNULL<DataType_,
+                                                           IT_> >(new ScaRCFunctorNULL<DataType_,
                                                                                          MemTag_,
                                                                                          VectorType_,
                                                                                          VectorMirrorType_,
@@ -1256,8 +1211,7 @@ namespace FEAST
                                                                                          PreconContType_,
                                                                                          FilterType_,
                                                                                          StorageType_,
-                                                                                         IT_,
-                                                                                         Algo_>(data));
+                                                                                         IT_>(data));
         }
 
         ///CTOR
@@ -1278,8 +1232,7 @@ namespace FEAST
                                                                 PreconContType_,
                                                                 FilterType_,
                                                                 StorageType_,
-                                                                IT_,
-                                                                Algo_> >& precon) :
+                                                                IT_> >& precon) :
           ScaRCFunctorBase<DataType_,
                            MemTag_,
                            VectorType_,
@@ -1288,8 +1241,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data, precon),
+                           IT_>(data, precon),
           _temp0(data.sol().size()),
           _temp1(data.sol().size()),
           _temp2(data.sol().size())
@@ -1306,8 +1258,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(other),
+                           IT_>(other),
           _temp0(other.data.sol().size()),
           _temp1(other.data.sol().size()),
           _temp2(other.data.sol().size())
@@ -1328,8 +1279,7 @@ namespace FEAST
              typename PreconContType_,
              typename FilterType_,
              template<typename, typename> class StorageType_ = std::vector,
-             typename IT_ = Index,
-             typename Algo_ = Algo::Generic
+             typename IT_ = Index
              >
     class ScaRCFunctorPCG0 : public ScaRCFunctorBase<DataType_,
                                                       MemTag_,
@@ -1339,14 +1289,13 @@ namespace FEAST
                                                       PreconContType_,
                                                       FilterType_,
                                                       StorageType_,
-                                                      IT_,
-                                                      Algo_>
+                                                      IT_>
     {
       public:
 
         virtual void execute()
         {
-          Foundation::GlobalDefect<MemTag_, Algo_>::exec(_r,
+          Foundation::GlobalDefect<MemTag_>::exec(_r,
                                              this->_data->rhs(),
                                              this->_data->sys(),
                                              this->_data->sol(),
@@ -1361,14 +1310,14 @@ namespace FEAST
 
           if(this->_conv_check)
           {
-            Foundation::GlobalNorm2<MemTag_, Algo_>::value(
+            Foundation::GlobalNorm2<MemTag_>::value(
                 this->_norm_0,
                 _r,
                 this->_data->halo_frequencies()
                 );
           }
 
-          Foundation::GlobalDot<MemTag_, Algo_>::value(
+          Foundation::GlobalDot<MemTag_>::value(
                                            _alpha_new,
                                            _r,
                                            _p,
@@ -1379,7 +1328,7 @@ namespace FEAST
           ///TODO: config objs!
           while(this->_used_iters < this->_max_iters)
           {
-            Foundation::GlobalProductMat0Vec1<MemTag_, Algo_>::exec(
+            Foundation::GlobalProductMat0Vec1<MemTag_>::exec(
                                                         _v,
                                                         this->_data->sys(),
                                                         _p,
@@ -1391,7 +1340,7 @@ namespace FEAST
                                                         this->_data->communicators().at(0)
                                                        );
 
-            Foundation::GlobalDot<MemTag_, Algo_>::value(
+            Foundation::GlobalDot<MemTag_>::value(
                                              temp,
                                              _v,
                                              _p,
@@ -1403,13 +1352,13 @@ namespace FEAST
             ++(this->_used_iters);
 
             //x <- x + lambda * p
-            this->_data->sol().template axpy<Algo_>(_p, this->_data->sol(), _lambda);
+            this->_data->sol().axpy(_p, this->_data->sol(), _lambda);
             //r <- r - lambda * v
-            _r.template axpy<Algo_>(_v, _r, -_lambda);
+            _r.axpy(_v, _r, -_lambda);
 
             if(this->_conv_check)
             {
-              Foundation::GlobalNorm2<MemTag_, Algo_>::value(
+              Foundation::GlobalNorm2<MemTag_>::value(
                   this->_norm,
                   _r,
                   this->_data->halo_frequencies()
@@ -1433,7 +1382,7 @@ namespace FEAST
 
             _alpha = _alpha_new;
 
-            Foundation::GlobalDot<MemTag_, Algo_>::value(
+            Foundation::GlobalDot<MemTag_>::value(
                                              _alpha_new,
                                              _r,
                                              _z,
@@ -1443,16 +1392,16 @@ namespace FEAST
             DataType_ talpha_new(_alpha_new / (std::abs(_alpha) > std::numeric_limits<DataType_>::epsilon() ? _alpha : (std::numeric_limits<DataType_>::epsilon())));
 
             //p <- talpha_new * p
-            _p.template scale<Algo_>(_p, talpha_new);
+            _p.scale(_p, talpha_new);
 
             //p <- p + z
-            _p.template axpy<Algo_>(_p, _z);
+            _p.axpy(_p, _z);
           }
         }
 
         virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
         {
-          Foundation::GlobalDefect<MemTag_, Algo_>::exec(_r,
+          Foundation::GlobalDefect<MemTag_>::exec(_r,
                                              apply_rhs,
                                              this->_data->sys(),
                                              apply_to,
@@ -1467,14 +1416,14 @@ namespace FEAST
 
           if(this->_conv_check)
           {
-            Foundation::GlobalNorm2<MemTag_, Algo_>::value(
+            Foundation::GlobalNorm2<MemTag_>::value(
                 this->_norm_0,
                 _r,
                 this->_data->halo_frequencies()
                 );
           }
 
-          Foundation::GlobalDot<MemTag_, Algo_>::value(
+          Foundation::GlobalDot<MemTag_>::value(
                                            _alpha_new,
                                            _r,
                                            _p,
@@ -1485,7 +1434,7 @@ namespace FEAST
           store_to.copy(apply_to);
           while(this->_used_iters < this->_max_iters)
           {
-            Foundation::GlobalProductMat0Vec1<MemTag_, Algo_>::exec(
+            Foundation::GlobalProductMat0Vec1<MemTag_>::exec(
                                                         _v,
                                                         this->_data->sys(),
                                                         _p,
@@ -1497,7 +1446,7 @@ namespace FEAST
                                                         this->_data->communicators().at(0)
                                                        );
 
-            Foundation::GlobalDot<MemTag_, Algo_>::value(
+            Foundation::GlobalDot<MemTag_>::value(
                                              temp,
                                              _v,
                                              _p,
@@ -1509,13 +1458,13 @@ namespace FEAST
             ++(this->_used_iters);
 
             //x <- x + lambda * p
-            store_to.template axpy<Algo_>(_p, store_to, _lambda);
+            store_to.axpy(_p, store_to, _lambda);
             //r <- r - lambda * v
-            _r.template axpy<Algo_>(_v, _r, -_lambda);
+            _r.axpy(_v, _r, -_lambda);
 
             if(this->_conv_check)
             {
-              Foundation::GlobalNorm2<MemTag_, Algo_>::value(
+              Foundation::GlobalNorm2<MemTag_>::value(
                   this->_norm,
                   _r,
                   this->_data->halo_frequencies()
@@ -1539,7 +1488,7 @@ namespace FEAST
 
             _alpha = _alpha_new;
 
-            Foundation::GlobalDot<MemTag_, Algo_>::value(
+            Foundation::GlobalDot<MemTag_>::value(
                                              _alpha_new,
                                              _r,
                                              _z,
@@ -1549,10 +1498,10 @@ namespace FEAST
             DataType_ talpha_new(_alpha_new / (std::abs(_alpha) > std::numeric_limits<DataType_>::epsilon() ? _alpha : (std::numeric_limits<DataType_>::epsilon())));
 
             //p <- talpha_new * p
-            _p.template scale<Algo_>(_p, talpha_new);
+            _p.scale(_p, talpha_new);
 
             //p <- p + z
-            _p.template axpy<Algo_>(_p, _z);
+            _p.axpy(_p, _z);
           }
         }
 
@@ -1580,8 +1529,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data),
+                           IT_>(data),
           _p(data.sol().size()),
           _r(data.sol().size()),
           _v(data.sol().size()),
@@ -1598,8 +1546,7 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_> >(new ScaRCFunctorNULL<DataType_,
+                                                           IT_> >(new ScaRCFunctorNULL<DataType_,
                                                                                          MemTag_,
                                                                                          VectorType_,
                                                                                          VectorMirrorType_,
@@ -1607,8 +1554,7 @@ namespace FEAST
                                                                                          PreconContType_,
                                                                                          FilterType_,
                                                                                          StorageType_,
-                                                                                         IT_,
-                                                                                         Algo_>(data));
+                                                                                         IT_>(data));
         }
 
         ///CTOR
@@ -1629,8 +1575,7 @@ namespace FEAST
                                                                 PreconContType_,
                                                                 FilterType_,
                                                                 StorageType_,
-                                                                IT_,
-                                                                Algo_> >& precon) :
+                                                                IT_> >& precon) :
           ScaRCFunctorBase<DataType_,
                            MemTag_,
                            VectorType_,
@@ -1639,8 +1584,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data, precon),
+                           IT_>(data, precon),
           _p(data.sol().size()),
           _r(data.sol().size()),
           _v(data.sol().size()),
@@ -1661,8 +1605,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(other),
+                           IT_>(other),
           _p(other._data.sol().size()),
           _r(other._data.sol().size()),
           _v(other._data.sol().size()),
@@ -1693,8 +1636,7 @@ namespace FEAST
              typename PreconContType_,
              typename FilterType_,
              template<typename, typename> class StorageType_ = std::vector,
-             typename IT_ = Index,
-             typename Algo_ = Algo::Generic
+             typename IT_ = Index
              >
     class ScaRCFunctorPCG1 : public ScaRCFunctorBase<DataType_,
                                                            MemTag_,
@@ -1704,41 +1646,40 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_>
+                                                           IT_>
     {
       public:
 
         virtual void execute()
         {
-          this->_data->localsys().template apply<Algo_>(_r, this->_data->sol(), this->_data->rhs(), -DataType_(1));
+          this->_data->localsys().apply(_r, this->_data->sol(), this->_data->rhs(), -DataType_(1));
 
           this->_precon->apply(_p, _r, this->_data->rhs());
 
           if(this->_conv_check)
-            this->_norm_0 = _r.template norm2<Algo_>();
+            this->_norm_0 = _r.norm2();
 
-          _alpha_new = _r.template dot<Algo_>(_p);
+          _alpha_new = _r.dot(_p);
 
           DataType_ temp;
           while(this->_used_iters < this->_max_iters)
           {
-            this->_data->localsys().template apply<Algo_>(_v, _p);
+            this->_data->localsys().apply(_v, _p);
 
-            temp = _v.template dot<Algo_>(_p);
+            temp = _v.dot(_p);
 
             _lambda = _alpha_new / (std::abs(temp) > std::numeric_limits<DataType_>::epsilon() ? temp : (std::numeric_limits<DataType_>::epsilon()));
 
             ++(this->_used_iters);
 
             //x <- x + lambda * p
-            this->_data->sol().template axpy<Algo_>(_p, this->_data->sol(), _lambda);
+            this->_data->sol().axpy(_p, this->_data->sol(), _lambda);
             //r <- r - lambda * v
-            _r.template axpy<Algo_>(_v, _r, -_lambda);
+            _r.axpy(_v, _r, -_lambda);
 
             if(this->_conv_check)
             {
-              this->_norm = _r.template norm2<Algo_>();
+              this->_norm = _r.norm2();
             }
 
             if(this->_conv_check)
@@ -1758,49 +1699,49 @@ namespace FEAST
 
             _alpha = _alpha_new;
 
-            _alpha_new = _r.template dot<Algo_>(_z);
+            _alpha_new = _r.dot(_z);
 
             DataType_ talpha_new(_alpha_new / (std::abs(_alpha) > std::numeric_limits<DataType_>::epsilon() ? _alpha : (std::numeric_limits<DataType_>::epsilon())));
 
             //p <- talpha_new * p
-            _p.template scale<Algo_>(_p, talpha_new);
+            _p.scale(_p, talpha_new);
 
             //p <- p + z
-            _p.template axpy<Algo_>(_p, _z);
+            _p.axpy(_p, _z);
           }
         }
 
         virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
         {
-          this->_data->localsys().template apply<Algo_>(_r, apply_to, apply_rhs, -DataType_(1));
+          this->_data->localsys().apply(_r, apply_to, apply_rhs, -DataType_(1));
 
           this->_precon->apply(_p, _r, apply_rhs);
 
           if(this->_conv_check)
-            this->_norm_0 = _r.template norm2<Algo_>();
+            this->_norm_0 = _r.norm2();
 
-          _alpha_new = _r.template dot<Algo_>(_p);
+          _alpha_new = _r.dot(_p);
 
           DataType_ temp;
           store_to.copy(apply_to);
           while(this->_used_iters < this->_max_iters)
           {
-            this->_data->localsys().template apply<Algo_>(_v, _p);
+            this->_data->localsys().apply(_v, _p);
 
-            temp = _v.template dot<Algo_>(_p);
+            temp = _v.dot(_p);
 
             _lambda = _alpha_new / (std::abs(temp) > std::numeric_limits<DataType_>::epsilon() ? temp : (std::numeric_limits<DataType_>::epsilon()));
 
             ++(this->_used_iters);
 
             //x <- x + lambda * p
-            store_to.template axpy<Algo_>(_p, store_to, _lambda);
+            store_to.axpy(_p, store_to, _lambda);
             //r <- r - lambda * v
-            _r.template axpy<Algo_>(_v, _r, -_lambda);
+            _r.axpy(_v, _r, -_lambda);
 
             if(this->_conv_check)
             {
-              this->_norm = _r.template norm2<Algo_>();
+              this->_norm = _r.norm2();
             }
 
             if(this->_conv_check)
@@ -1820,15 +1761,15 @@ namespace FEAST
 
             _alpha = _alpha_new;
 
-            _alpha_new = _r.template dot<Algo_>(_z);
+            _alpha_new = _r.dot(_z);
 
             DataType_ talpha_new(_alpha_new / (std::abs(_alpha) > std::numeric_limits<DataType_>::epsilon() ? _alpha : (std::numeric_limits<DataType_>::epsilon())));
 
             //p <- talpha_new * p
-            _p.template scale<Algo_>(_p, talpha_new);
+            _p.scale(_p, talpha_new);
 
             //p <- p + z
-            _p.template axpy<Algo_>(_p, _z);
+            _p.axpy(_p, _z);
           }
         }
 
@@ -1856,8 +1797,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data),
+                           IT_>(data),
           _p(data.sol().size()),
           _r(data.sol().size()),
           _v(data.sol().size()),
@@ -1874,8 +1814,7 @@ namespace FEAST
                                                            PreconContType_,
                                                            FilterType_,
                                                            StorageType_,
-                                                           IT_,
-                                                           Algo_> >(new ScaRCFunctorNULL<DataType_,
+                                                           IT_> >(new ScaRCFunctorNULL<DataType_,
                                                                                          MemTag_,
                                                                                          VectorType_,
                                                                                          VectorMirrorType_,
@@ -1883,8 +1822,7 @@ namespace FEAST
                                                                                          PreconContType_,
                                                                                          FilterType_,
                                                                                          StorageType_,
-                                                                                         IT_,
-                                                                                         Algo_>(data));
+                                                                                         IT_>(data));
         }
 
         ///CTOR
@@ -1905,8 +1843,7 @@ namespace FEAST
                                                                 PreconContType_,
                                                                 FilterType_,
                                                                 StorageType_,
-                                                                IT_,
-                                                                Algo_> >& precon) :
+                                                                IT_> >& precon) :
           ScaRCFunctorBase<DataType_,
                            MemTag_,
                            VectorType_,
@@ -1915,8 +1852,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(data, precon),
+                           IT_>(data, precon),
           _p(data.sol().size()),
           _r(data.sol().size()),
           _v(data.sol().size()),
@@ -1937,8 +1873,7 @@ namespace FEAST
                            PreconContType_,
                            FilterType_,
                            StorageType_,
-                           IT_,
-                           Algo_>(other),
+                           IT_>(other),
           _p(other._data.sol().size()),
           _r(other._data.sol().size()),
           _v(other._data.sol().size()),

@@ -658,13 +658,10 @@ namespace FEAST
       /**
        * \brief Calculate \f$this \leftarrow y + \alpha x\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The first summand matrix to be scaled.
        * \param[in] y The second summand matrix
        * \param[in] alpha A scalar to multiply x with.
        */
-      template <typename Algo_>
       void axpy(
                 const SparseMatrixBanded & x,
                 const SparseMatrixBanded & y,
@@ -690,27 +687,24 @@ namespace FEAST
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-          Arch::Sum<Mem_, Algo_>::value(this->val(), x.val(), y.val(), this->rows() * this->num_of_offsets());
+          Arch::Sum<Mem_>::value(this->val(), x.val(), y.val(), this->rows() * this->num_of_offsets());
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-          Arch::Difference<Mem_, Algo_>::value(this->val(), y.val(), x.val(), this->rows() * this->num_of_offsets());
+          Arch::Difference<Mem_>::value(this->val(), y.val(), x.val(), this->rows() * this->num_of_offsets());
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
-          Arch::Axpy<Mem_, Algo_>::dv(this->val(), alpha, x.val(), y.val(), this->rows() * this->num_of_offsets());
+          Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->rows() * this->num_of_offsets());
       }
 
       /**
        * \brief Calculate \f$this \leftarrow \alpha x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The matrix to be scaled.
        * \param[in] alpha A scalar to scale x with.
        */
-      template <typename Algo_>
       void scale(const SparseMatrixBanded & x, const DT_ alpha)
       {
         if (x.rows() != this->rows())
@@ -722,7 +716,7 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
 
-        Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), alpha, this->rows() * this->num_of_offsets());
+        Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->rows() * this->num_of_offsets());
       }
 
       /**
@@ -730,21 +724,17 @@ namespace FEAST
        *
        * \returns The Frobenius norm of this matrix.
        */
-      template <typename Algo_>
       DT_ norm_frobenius() const
       {
-        return Arch::Norm2<Mem_, Algo_>::value(this->val(), this->rows() * this->num_of_offsets());
+        return Arch::Norm2<Mem_>::value(this->val(), this->rows() * this->num_of_offsets());
       }
 
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      template<typename Algo_>
       void apply(DenseVector<Mem_,DT_, IT_>& r, const DenseVector<Mem_, DT_, IT_>& x) const
       {
         if (r.size() != this->rows())
@@ -752,7 +742,7 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_, Algo_>::banded(r.elements(),
+        Arch::ProductMatVec<Mem_>::banded(r.elements(),
                                                  this->val(),
                                                  this->offsets(),
                                                  x.elements(),
@@ -764,14 +754,11 @@ namespace FEAST
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_>
       void apply(DenseVector<Mem_,DT_, IT_>& r,
                  const DenseVector<Mem_, DT_, IT_>& x,
                  const DenseVector<Mem_, DT_, IT_>& y,
@@ -788,7 +775,7 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_, Algo_>::banded(r.elements(),
+          Arch::Defect<Mem_>::banded(r.elements(),
                                             y.elements(),
                                             this->val(),
                                             this->offsets(),
@@ -803,7 +790,7 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_, Algo_>::banded(r.elements(),
+          Arch::Axpy<Mem_>::banded(r.elements(),
                                           y.elements(),
                                           alpha,
                                           this->val(),

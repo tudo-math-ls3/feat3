@@ -45,7 +45,7 @@ void check_global_synch_scal0(Index rank)
 
   DT_ x(2), r;
 
-  GlobalSynchScal0<Mem::Main, Algo::Generic>::value(r, x);
+  GlobalSynchScal0<Mem::Main>::value(r, x);
 
   TestResult<double, double, double> res;
   res = test_check_equal_within_eps(r, x * nprocs, std::numeric_limits<DT_>::epsilon());

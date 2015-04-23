@@ -16,15 +16,14 @@ using namespace FEAST::TestSystem;
  */
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class SparseMatrixCSRBlockedTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   SparseMatrixCSRBlockedTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixCSRBlockedTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRBlockedTest")
   {
   }
 
@@ -79,15 +78,15 @@ public:
     TEST_CHECK_EQUAL((void*)f.row_ptr(), (void*)c.row_ptr());
   }
 };
-SparseMatrixCSRBlockedTest<Mem::Main, NotSet, float, unsigned long> cpu_sparse_matrix_csr_blocked_test_float_ulong;
-SparseMatrixCSRBlockedTest<Mem::Main, NotSet, double, unsigned long> cpu_sparse_matrix_csr_blocked_test_double_ulong;
-SparseMatrixCSRBlockedTest<Mem::Main, NotSet, float, unsigned int> cpu_sparse_matrix_csr_blocked_test_float_uint;
-SparseMatrixCSRBlockedTest<Mem::Main, NotSet, double, unsigned int> cpu_sparse_matrix_csr_blocked_test_double_uint;
+SparseMatrixCSRBlockedTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_csr_blocked_test_float_ulong;
+SparseMatrixCSRBlockedTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_csr_blocked_test_double_ulong;
+SparseMatrixCSRBlockedTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_csr_blocked_test_float_uint;
+SparseMatrixCSRBlockedTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_csr_blocked_test_double_uint;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixCSRBlockedTest<Mem::CUDA, NotSet, float, unsigned long> cuda_sparse_matrix_csr_blocked_test_float_ulong;
-SparseMatrixCSRBlockedTest<Mem::CUDA, NotSet, double, unsigned long> cuda_sparse_matrix_csr_blocked_test_double_ulong;
-SparseMatrixCSRBlockedTest<Mem::CUDA, NotSet, float, unsigned int> cuda_sparse_matrix_csr_blocked_test_float_uint;
-SparseMatrixCSRBlockedTest<Mem::CUDA, NotSet, double, unsigned int> cuda_sparse_matrix_csr_blocked_test_double_uint;
+SparseMatrixCSRBlockedTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_csr_blocked_test_float_ulong;
+SparseMatrixCSRBlockedTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_csr_blocked_test_double_ulong;
+SparseMatrixCSRBlockedTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_csr_blocked_test_float_uint;
+SparseMatrixCSRBlockedTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_csr_blocked_test_double_uint;
 #endif
 
 /**
@@ -99,15 +98,14 @@ SparseMatrixCSRBlockedTest<Mem::CUDA, NotSet, double, unsigned int> cuda_sparse_
  */
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class SparseMatrixCSRBlockedApplyTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   SparseMatrixCSRBlockedApplyTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixCSRBlockedApplyTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRBlockedApplyTest")
   {
   }
 
@@ -145,57 +143,57 @@ public:
 
     SparseMatrixCSR<Mem_, DT_, IT_> csr;
     csr.convert(c);
-    csr.template apply<Algo_>(ref, x);
+    csr.apply(ref, x);
 
-    c.template apply<Algo_>(r, x);
+    c.apply(r, x);
 
     TEST_CHECK_EQUAL(r, ref);
 
-    c.template apply<Algo_>(rb, x);
+    c.apply(rb, x);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.template apply<Algo_>(r, xb);
+    c.apply(r, xb);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.template apply<Algo_>(rb, xb);
+    c.apply(rb, xb);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
     DT_ alpha(-1);
-    csr.template apply<Algo_>(ref, x, y, alpha);
-    c.template apply<Algo_>(r, x, y, alpha);
+    csr.apply(ref, x, y, alpha);
+    c.apply(r, x, y, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.template apply<Algo_>(rb, x, yb, alpha);
+    c.apply(rb, x, yb, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.template apply<Algo_>(r, xb, y, alpha);
+    c.apply(r, xb, y, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.template apply<Algo_>(rb, xb, yb, alpha);
+    c.apply(rb, xb, yb, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
     alpha = DT_(1.234);
-    csr.template apply<Algo_>(ref, x, y, alpha);
-    c.template apply<Algo_>(r, x, y, alpha);
+    csr.apply(ref, x, y, alpha);
+    c.apply(r, x, y, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.template apply<Algo_>(rb, x, yb, alpha);
+    c.apply(rb, x, yb, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.template apply<Algo_>(r, xb, y, alpha);
+    c.apply(r, xb, y, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
-    c.template apply<Algo_>(rb, xb, yb, alpha);
+    c.apply(rb, xb, yb, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
   }
 };
-SparseMatrixCSRBlockedApplyTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_sparse_matrix_csr_blocked_apply_test_float_ulong;
-SparseMatrixCSRBlockedApplyTest<Mem::Main, Algo::Generic, double, unsigned long> cpu_sparse_matrix_csr_blocked_apply_test_double_ulong;
-SparseMatrixCSRBlockedApplyTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_sparse_matrix_csr_blocked_apply_test_float_uint;
-SparseMatrixCSRBlockedApplyTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_sparse_matrix_csr_blocked_apply_test_double_uint;
+SparseMatrixCSRBlockedApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_csr_blocked_apply_test_float_ulong;
+SparseMatrixCSRBlockedApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_csr_blocked_apply_test_double_ulong;
+SparseMatrixCSRBlockedApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_csr_blocked_apply_test_float_uint;
+SparseMatrixCSRBlockedApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_csr_blocked_apply_test_double_uint;

@@ -9,13 +9,13 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 
-template<typename Tag_, typename DataType1_, typename Algo_, typename DataType2_, template<typename, typename> class ST_>
+template<typename Tag_, typename DataType1_, typename DataType2_, template<typename, typename> class ST_>
 class AttributeTest:
-  public TaggedTest<Tag_, DataType1_, Algo_>
+  public TaggedTest<Tag_, DataType1_>
 {
   public:
     AttributeTest(const std::string & tag) :
-      TaggedTest<Tag_, DataType1_, Algo_>("AttributeTest<" + tag + ">")
+      TaggedTest<Tag_, DataType1_>("AttributeTest<" + tag + ">")
     {
     }
 
@@ -40,9 +40,9 @@ class AttributeTest:
       }
     }
 };
-AttributeTest<Mem::Main, Index, Algo::Generic, float, std::vector> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataTypes: ulong, float");
-AttributeTest<Mem::Main, double, Algo::Generic, float, std::vector> attribute_test_cpu_v_double_float("StorageType: std::vector, DataTypes: double, float");
-AttributeTest<Mem::Main, double, Algo::Generic, int, std::vector> attribute_test_cpu_v_double_int("StorageType: std::vector, DataTypes: double, int");
-AttributeTest<Mem::Main, Index, Algo::Generic, float, std::deque> attribute_test_cpu_d_ulong_float("StorageType: std::deque, DataTypes: ulong, float");
-AttributeTest<Mem::Main, double, Algo::Generic, float, std::deque> attribute_test_cpu_d_double_float("StorageType: std::deque, DataTypes: double, float");
-AttributeTest<Mem::Main, double, Algo::Generic, int, std::deque> attribute_test_cpu_d_double_int("StorageType: std::deque, DataTypes: double, int");
+AttributeTest<Mem::Main, Index, float, std::vector> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataTypes: ulong, float");
+AttributeTest<Mem::Main, double, float, std::vector> attribute_test_cpu_v_double_float("StorageType: std::vector, DataTypes: double, float");
+AttributeTest<Mem::Main, double, int, std::vector> attribute_test_cpu_v_double_int("StorageType: std::vector, DataTypes: double, int");
+AttributeTest<Mem::Main, Index, float, std::deque> attribute_test_cpu_d_ulong_float("StorageType: std::deque, DataTypes: ulong, float");
+AttributeTest<Mem::Main, double, float, std::deque> attribute_test_cpu_d_double_float("StorageType: std::deque, DataTypes: double, float");
+AttributeTest<Mem::Main, double, int, std::deque> attribute_test_cpu_d_double_int("StorageType: std::deque, DataTypes: double, int");

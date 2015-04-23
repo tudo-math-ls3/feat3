@@ -10,13 +10,13 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class PDataTest:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     PDataTest(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("PDataTest<" + tag + ">")
+      TaggedTest<Tag_, Index>("PDataTest<" + tag + ">")
     {
     }
 
@@ -30,7 +30,7 @@ class PDataTest:
         double> p;
     }
 };
-PDataTest<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test_cpu_v_v("std::vector, std::vector");
-PDataTest<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test_cpu_v_d("std::vector, std::deque");
-PDataTest<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test_cpu_d_v("std::deque, std::vector");
-PDataTest<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test_cpu_d_d("std::deque, std::deque");
+PDataTest<Mem::Main, Index, std::vector, std::vector<Index> > ref_test_cpu_v_v("std::vector, std::vector");
+PDataTest<Mem::Main, Index, std::vector, std::deque<Index> > ref_test_cpu_v_d("std::vector, std::deque");
+PDataTest<Mem::Main, Index, std::deque, std::vector<Index> > ref_test_cpu_d_v("std::deque, std::vector");
+PDataTest<Mem::Main, Index, std::deque, std::deque<Index> > ref_test_cpu_d_d("std::deque, std::deque");

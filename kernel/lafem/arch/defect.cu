@@ -92,7 +92,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_>
-void Defect<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+void Defect<Mem::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
 {
   Index blocksize(256);
   dim3 grid;
@@ -108,21 +108,21 @@ void Defect<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Defect<Mem::CUDA, Algo::CUDA>::csr(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::csr(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csr(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csr(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
 
 template <typename DT_>
-void Defect<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+void Defect<Mem::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
 {
-  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA, Algo::CUDA>::csr(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
-  FEAST::LAFEM::Arch::Difference<Mem::CUDA, Algo::CUDA>::value(r, rhs, r, rows);
+  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA>::csr(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
+  FEAST::LAFEM::Arch::Difference<Mem::CUDA>::value(r, rhs, r, rows);
 }
-template void Defect<Mem::CUDA, Algo::CUDA>::csr(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::csr(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csr(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::csr(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
 
 
 template <typename DT_, typename IT_>
-void Defect<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
+void Defect<Mem::CUDA>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
 {
   Index blocksize(256);
   dim3 grid;
@@ -138,13 +138,13 @@ void Defect<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const rhs, const DT
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Defect<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
+template void Defect<Mem::CUDA>::ell(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
+template void Defect<Mem::CUDA>::ell(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
+template void Defect<Mem::CUDA>::ell(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
+template void Defect<Mem::CUDA>::ell(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
 
 template <typename DT_, typename IT_>
-void Defect<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
+void Defect<Mem::CUDA>::banded(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
 {
   Index blocksize(128);
   dim3 grid;
@@ -154,7 +154,7 @@ void Defect<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const rhs, const
 
   FEAST::LAFEM::Intern::cuda_defect_banded<<<grid, block>>>(r, rhs, x, val, offsets, num_of_offsets, rows, columns);
 }
-template void Defect<Mem::CUDA, Algo::CUDA>::banded(float *, const float *, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::banded(double *, const double *, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::banded(float *, const float *, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::banded(double *, const double *, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::banded(float *, const float *, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::banded(double *, const double *, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::banded(float *, const float *, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA>::banded(double *, const double *, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);

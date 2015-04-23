@@ -12,13 +12,13 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::LAFEM;
 
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class TopologyTest:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     TopologyTest(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("TopologyTest<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("TopologyTest<" + tag + ">")
     {
     }
 
@@ -77,8 +77,8 @@ class TopologyTest:
       TEST_CHECK_EQUAL(t3.at(0).at(3), 4ul);
     }
 };
-TopologyTest<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > topology_test_cpu_v_v("std::vector, std::vector");
-TopologyTest<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > topology_test_cpu_d_v("std::deque, std::vector");
-TopologyTest<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > topology_test_cpu_v_d("std::vector, std::deque");
-TopologyTest<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > topology_test_cpu_d_d("std::deque, std::deque");
-TopologyTest<Mem::Main, Index, Algo::Generic, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, Index, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV");
+TopologyTest<Mem::Main, Index, std::vector, std::vector<Index> > topology_test_cpu_v_v("std::vector, std::vector");
+TopologyTest<Mem::Main, Index, std::deque, std::vector<Index> > topology_test_cpu_d_v("std::deque, std::vector");
+TopologyTest<Mem::Main, Index, std::vector, std::deque<Index> > topology_test_cpu_v_d("std::vector, std::deque");
+TopologyTest<Mem::Main, Index, std::deque, std::deque<Index> > topology_test_cpu_d_d("std::deque, std::deque");
+TopologyTest<Mem::Main, Index, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, Index, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV");

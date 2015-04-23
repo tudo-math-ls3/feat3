@@ -58,7 +58,6 @@ int main(int argc, char** argv)
       if (all_filter == false)
       {
         if((find(labels.begin(), labels.end(), (*i)->get_memory_name()) == labels.end()) &&
-            (find(labels.begin(), labels.end(), (*i)->get_algo_name()) == labels.end()) &&
             (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()) &&
             (find(labels.begin(), labels.end(), (*i)->get_index_name()) == labels.end()) )
         {
@@ -74,7 +73,6 @@ int main(int argc, char** argv)
         for (auto li(labels.begin()) ; li != labels.end() ; ++li)
         {
           if(*li != (*i)->get_memory_name() &&
-              *li != (*i)->get_algo_name() &&
               *li != (*i)->get_prec_name() &&
               *li != (*i)->get_index_name())
           {
@@ -101,7 +99,6 @@ int main(int argc, char** argv)
     {
       std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id()
         << " [Memory: " << (*i)->get_memory_name() << "]"
-        << " [Algo: " << (*i)->get_algo_name() << "]"
         << " [Precision: "<< (*i)->get_prec_name() << "]"
         << " [Indexing: "<< (*i)->get_index_name() << "]"
         << std::endl;

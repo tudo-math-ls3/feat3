@@ -24,29 +24,12 @@ All operations are member functions of the related containers.
 With little exceptions, the object which hosts the function call will contain the calculation result.
 \note Namely the BLAS2-like operations of axpy and apply break this rule by being a member of the corresponding matrix.
 
-All operations are function templates, which expect a struct from FEAST::Algo to specify which architectural and algorithmical specialisation of the operation shall be used.
-
-\note Not all Algo structs are compatible with all Mem structs. For example FEAST::Algo::CUDA is incompatible with FEAST::Mem::Main.
-
 A typical call may look like these:
 \code{.cpp}
 // compute dot product
-double d = vector1.dot<Algo::Generic>(vector2);
+double d = vector1.dot(vector2);
 // compute matrix vector product
-system_matrix.apply<Algo::CUDA>(y, rhs);
-\endcode
-
-\note
-You need to announce the operation as a template, if you call it from inside a function or class, which is a template itself.
-\code{.cpp}
-template <typename bazz>
-void foo()
-{
-  // compute dot product
-  double d = vector1.template dot<Algo::Generic>(vector2);
-  // compute matrix vector product
-  system_matrix.template apply<Algo::CUDA>(y, rhs);
-}
+system_matrix.apply(y, rhs);
 \endcode
 
 \section lafem_sec_data_handling Data handling

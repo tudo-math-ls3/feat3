@@ -11,13 +11,13 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshUtilTest2D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshUtilTest2D(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("MeshUtilTest2D<" + tag + ">")
+      TaggedTest<Tag_, Index>("MeshUtilTest2D<" + tag + ">")
     {
     }
 
@@ -129,7 +129,6 @@ class MeshUtilTest2D:
       OT_<std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > > halos;
 
       Refinement<Mem::Main,
-                 Algo::Generic,
                  mrt_standard>::execute(m_fine, &halos, attrs);
       TEST_CHECK(MeshUtil::iz_property_quad(m_fine, attrs.at(0), attrs.at(1)));
       /*std::cout << "BEFORE!" << std::endl;
@@ -194,7 +193,6 @@ class MeshUtilTest2D:
       Index rank(0);
 
       PData<Dim2D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim2D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -211,19 +209,19 @@ class MeshUtilTest2D:
       TEST_CHECK(MeshUtil::iz_property_quad(*((Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>*)(p0.submesh.get())), *( (Attribute<double, OT_>*)(p0.attrs.at(0).get()) ), *( (Attribute<double, OT_>*)(p0.attrs.at(1).get()) )));
     }
 };
-MeshUtilTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mu_test_cpu_v_v_2d("std::vector, std::vector");
-/*MeshUtilTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mu_test_cpu_v_d_2d("std::vector, std::deque");
-MeshUtilTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mu_test_cpu_d_v_2d("std::deque, std::vector");
-MeshUtilTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mu_test_cpu_d_d_2d("std::deque, std::deque");*/
+MeshUtilTest2D<Mem::Main, Index, std::vector, std::vector<Index> > mu_test_cpu_v_v_2d("std::vector, std::vector");
+/*MeshUtilTest2D<Mem::Main, Index, std::vector, std::deque<Index> > mu_test_cpu_v_d_2d("std::vector, std::deque");
+MeshUtilTest2D<Mem::Main, Index, std::deque, std::vector<Index> > mu_test_cpu_d_v_2d("std::deque, std::vector");
+MeshUtilTest2D<Mem::Main, Index, std::deque, std::deque<Index> > mu_test_cpu_d_d_2d("std::deque, std::deque");*/
 
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshUtilTest2D_triangle:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshUtilTest2D_triangle(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("MeshUtilTest2D_triangle<" + tag + ">")
+      TaggedTest<Tag_, Index>("MeshUtilTest2D_triangle<" + tag + ">")
     {
     }
 
@@ -319,20 +317,20 @@ class MeshUtilTest2D_triangle:
 
     }
 };
-MeshUtilTest2D_triangle<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mu_test_cpu_v_v_2d_tria("std::vector, std::vector");
-/*MeshUtilTest2D_triangle<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mu_test_cpu_v_d_2d_tria("std::vector, std::deque");
-MeshUtilTest2D_triangle<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mu_test_cpu_d_v_2d_tria("std::deque, std::vector");
-MeshUtilTest2D_triangle<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mu_test_cpu_d_d_2d_tria("std::deque, std::deque");*/
+MeshUtilTest2D_triangle<Mem::Main, Index, std::vector, std::vector<Index> > mu_test_cpu_v_v_2d_tria("std::vector, std::vector");
+/*MeshUtilTest2D_triangle<Mem::Main, Index, std::vector, std::deque<Index> > mu_test_cpu_v_d_2d_tria("std::vector, std::deque");
+MeshUtilTest2D_triangle<Mem::Main, Index, std::deque, std::vector<Index> > mu_test_cpu_d_v_2d_tria("std::deque, std::vector");
+MeshUtilTest2D_triangle<Mem::Main, Index, std::deque, std::deque<Index> > mu_test_cpu_d_d_2d_tria("std::deque, std::deque");*/
 
 
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshUtilTest2D_triangle_fine:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshUtilTest2D_triangle_fine(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("MeshUtilTest2D_triangle_fine<" + tag + ">")
+      TaggedTest<Tag_, Index>("MeshUtilTest2D_triangle_fine<" + tag + ">")
     {
     }
 
@@ -497,18 +495,18 @@ class MeshUtilTest2D_triangle_fine:
 
     }
 };
-MeshUtilTest2D_triangle_fine<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mu_test_cpu_v_v_2d_tria_fine("std::vector, std::vector");
-/*MeshUtilTest2D_triangle<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mu_test_cpu_v_d_2d_tria("std::vector, std::deque");
-MeshUtilTest2D_triangle<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mu_test_cpu_d_v_2d_tria("std::deque, std::vector");
-MeshUtilTest2D_triangle<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mu_test_cpu_d_d_2d_tria("std::deque, std::deque");*/
+MeshUtilTest2D_triangle_fine<Mem::Main, Index, std::vector, std::vector<Index> > mu_test_cpu_v_v_2d_tria_fine("std::vector, std::vector");
+/*MeshUtilTest2D_triangle<Mem::Main, Index, std::vector, std::deque<Index> > mu_test_cpu_v_d_2d_tria("std::vector, std::deque");
+MeshUtilTest2D_triangle<Mem::Main, Index, std::deque, std::vector<Index> > mu_test_cpu_d_v_2d_tria("std::deque, std::vector");
+MeshUtilTest2D_triangle<Mem::Main, Index, std::deque, std::deque<Index> > mu_test_cpu_d_d_2d_tria("std::deque, std::deque");*/
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshUtilTest3D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshUtilTest3D(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("MeshUtilTest3D<" + tag + ">")
+      TaggedTest<Tag_, Index>("MeshUtilTest3D<" + tag + ">")
     {
     }
 
@@ -622,7 +620,6 @@ class MeshUtilTest3D:
       OT_<std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > > halos;
 
       Refinement<Mem::Main,
-                 Algo::Generic,
                  mrt_standard>::execute(m_fine, &halos, attrs);
       MeshUtil::establish_iz_property_quad(m_fine, attrs.at(0), attrs.at(1), attrs.at(2));
       TEST_CHECK(MeshUtil::iz_property_quad(m_fine, attrs.at(0), attrs.at(1), attrs.at(2)));
@@ -688,7 +685,6 @@ class MeshUtilTest3D:
       Index rank(0);
 
       PData<Dim3D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim3D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -705,20 +701,20 @@ class MeshUtilTest3D:
       TEST_CHECK(MeshUtil::iz_property(*((Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>*)(p0.submesh.get())), *( (Attribute<double, OT_>*)(p0.attrs.at(0).get()) ), *( (Attribute<double, OT_>*)(p0.attrs.at(1).get()) )));*/
     }
 };
-MeshUtilTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mu_test_cpu_v_v_3d("std::vector, std::vector");
-/*MeshUtilTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mu_test_cpu_v_d_3d("std::vector, std::deque");
-MeshUtilTest3D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mu_test_cpu_d_v_3d("std::deque, std::vector");
-MeshUtilTest3D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mu_test_cpu_d_d_3d("std::deque, std::deque");*/
+MeshUtilTest3D<Mem::Main, Index, std::vector, std::vector<Index> > mu_test_cpu_v_v_3d("std::vector, std::vector");
+/*MeshUtilTest3D<Mem::Main, Index, std::vector, std::deque<Index> > mu_test_cpu_v_d_3d("std::vector, std::deque");
+MeshUtilTest3D<Mem::Main, Index, std::deque, std::vector<Index> > mu_test_cpu_d_v_3d("std::deque, std::vector");
+MeshUtilTest3D<Mem::Main, Index, std::deque, std::deque<Index> > mu_test_cpu_d_d_3d("std::deque, std::deque");*/
 
 
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshUtilTest3D_hexa:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshUtilTest3D_hexa(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("MeshUtilTest3D_hexa<" + tag + ">")
+      TaggedTest<Tag_, Index>("MeshUtilTest3D_hexa<" + tag + ">")
     {
     }
 
@@ -913,7 +909,6 @@ class MeshUtilTest3D_hexa:
       OT_<std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > > halos;
 
       Refinement<Mem::Main,
-                 Algo::Generic,
                  mrt_standard>::execute(m_fine, &halos, attrs);
 
       MeshUtil::establish_iz_property_hexa(m_fine, attrs.at(0), attrs.at(1), attrs.at(2));
@@ -980,7 +975,6 @@ class MeshUtilTest3D_hexa:
       Index rank(0);
 
       PData<Dim3D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim3D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -997,20 +991,20 @@ class MeshUtilTest3D_hexa:
       TEST_CHECK(MeshUtil::iz_property_quad(*((Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>*)(p0.submesh.get())), *( (Attribute<double, OT_>*)(p0.attrs.at(0).get()) ), *( (Attribute<double, OT_>*)(p0.attrs.at(1).get()) )));*/
     }
 };
-MeshUtilTest3D_hexa<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mu_test_cpu_v_v_3d_hexa("std::vector, std::vector");
-/*MeshUtilTest3D_hexa<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mu_test_cpu_v_d_3d_hexa("std::vector, std::deque");
-MeshUtilTest3D_hexa<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mu_test_cpu_d_v_3d_hexa("std::deque, std::vector");
-MeshUtilTest3D_hexa<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mu_test_cpu_d_d_3d_hexa("std::deque, std::deque");*/
+MeshUtilTest3D_hexa<Mem::Main, Index, std::vector, std::vector<Index> > mu_test_cpu_v_v_3d_hexa("std::vector, std::vector");
+/*MeshUtilTest3D_hexa<Mem::Main, Index, std::vector, std::deque<Index> > mu_test_cpu_v_d_3d_hexa("std::vector, std::deque");
+MeshUtilTest3D_hexa<Mem::Main, Index, std::deque, std::vector<Index> > mu_test_cpu_d_v_3d_hexa("std::deque, std::vector");
+MeshUtilTest3D_hexa<Mem::Main, Index, std::deque, std::deque<Index> > mu_test_cpu_d_d_3d_hexa("std::deque, std::deque");*/
 
 
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshUtilTest3D_tetra:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshUtilTest3D_tetra(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("MeshUtilTest3D_tetra<" + tag + ">")
+      TaggedTest<Tag_, Index>("MeshUtilTest3D_tetra<" + tag + ">")
     {
     }
 
@@ -1497,7 +1491,7 @@ class MeshUtilTest3D_tetra:
       TEST_CHECK(MeshUtil::property_tetra(m_fine));
     }
 };
-MeshUtilTest3D_tetra<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mu_test_cpu_v_v_3d_tetra("std::vector, std::vector");
-/*MeshUtilTest3D_tetra<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mu_test_cpu_v_d_3d_tetra("std::vector, std::deque");
-MeshUtilTest3D_tetra<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mu_test_cpu_d_v_3d_tetra("std::deque, std::vector");
-MeshUtilTest3D_tetra<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mu_test_cpu_d_d_3d_tetra("std::deque, std::deque");*/
+MeshUtilTest3D_tetra<Mem::Main, Index, std::vector, std::vector<Index> > mu_test_cpu_v_v_3d_tetra("std::vector, std::vector");
+/*MeshUtilTest3D_tetra<Mem::Main, Index, std::vector, std::deque<Index> > mu_test_cpu_v_d_3d_tetra("std::vector, std::deque");
+MeshUtilTest3D_tetra<Mem::Main, Index, std::deque, std::vector<Index> > mu_test_cpu_d_v_3d_tetra("std::deque, std::vector");
+MeshUtilTest3D_tetra<Mem::Main, Index, std::deque, std::deque<Index> > mu_test_cpu_d_d_3d_tetra("std::deque, std::deque");*/

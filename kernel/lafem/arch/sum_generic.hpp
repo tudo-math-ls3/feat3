@@ -13,7 +13,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename DT_>
-      void Sum<Mem::Main, Algo::Generic>::value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
+      void Sum<Mem::Main>::value_generic(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
       {
         if (r == x)
         {

@@ -16,7 +16,7 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::LAFEM;
 using namespace FEAST::ScaRC;
 
-template<typename Tag_, typename Algo_, typename DataType_>
+template<typename Tag_, typename DataType_>
 class SolverTest:
   public TaggedTest<Tag_, DataType_>
 {
@@ -45,7 +45,7 @@ class SolverTest:
       DenseVector<Tag_, DataType_> x_ref(A.rows(), DataType_(2));
       DenseVector<Tag_, DataType_> x(A.rows(), DataType_(0));
       DenseVector<Tag_, DataType_> b(A.rows());
-      A.template apply<Algo_>(b, x_ref);
+      A.apply(b, x_ref);
 
       SparseMatrixCOO<Tag_, DataType_> P_proxy(x.size(), x.size());
       for(Index i(0) ; i < x.size() ; ++i)
@@ -55,9 +55,9 @@ class SolverTest:
       SparseMatrixELL<Tag_, DataType_> P(P_proxy);
 
       PreconditionedSolverData<DataType_, Tag_, DenseVector, SparseMatrixELL, SparseMatrixELL >data(std::move(A), std::move(P), std::move(x), std::move(b),
-                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
-                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(data, 2000, 1e-8));
+                        SolverPatternGeneration<Richardson>::min_num_temp_vectors(),
+                        SolverPatternGeneration<Richardson>::min_num_temp_scalars());
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson>::execute(data, 2000, 1e-8));
       solver->execute();
 
       for(Index i(0) ; i < data.sol().size() ; ++i)
@@ -66,7 +66,7 @@ class SolverTest:
       //synchronised version must at least (uses other reduction mechanism) deliver the same
       SparseMatrixELL<Tag_, DataType_> A1(fcoo);
       DenseVector<Tag_, DataType_> b1(A1.rows());
-      A1.template apply<Algo_>(b1, x_ref);
+      A1.apply(b1, x_ref);
       DenseVector<Tag_, DataType_> x1(A1.rows(), DataType_(0));
       SparseMatrixELL<Tag_, DataType_> P1(P_proxy);
 
@@ -76,9 +76,9 @@ class SolverTest:
                                            VectorMirror,
                                            SparseMatrixELL,
                                            SparseMatrixELL >data1(std::move(A1), std::move(P1), std::move(x1), std::move(b1),
-                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
-                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver1(SolverPatternGeneration<Richardson, Algo_>::execute(data1, 2000, 1e-8));
+                        SolverPatternGeneration<Richardson>::min_num_temp_vectors(),
+                        SolverPatternGeneration<Richardson>::min_num_temp_scalars());
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver1(SolverPatternGeneration<Richardson>::execute(data1, 2000, 1e-8));
       solver1->execute();
 
       for(Index i(0) ; i < data1.sol().size() ; ++i)
@@ -86,5 +86,5 @@ class SolverTest:
       std::cout << "M7" << std::endl;
     }
 };
-SolverTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("ELL double");
+SolverTest<Mem::Main, double> sf_cpu_double("ELL double");
 #endif // SERIAL

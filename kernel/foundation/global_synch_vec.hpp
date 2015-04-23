@@ -11,13 +11,13 @@ namespace FEAST
   namespace Foundation
   {
       /// \todo add communicators
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct GlobalSynchVec0
       {
       };
 
-      template <typename Algo_>
-      struct GlobalSynchVec0<Mem::Main, Algo_>
+      template <>
+      struct GlobalSynchVec0<Mem::Main>
       {
         public:
 
@@ -63,7 +63,7 @@ namespace FEAST
             StorageT_<Status, std::allocator<Status> > sendstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
-              mirrors.at(i).template gather_dual<Algo_>(sendbufs.at(i), target);
+              mirrors.at(i).gather_dual(sendbufs.at(i), target);
 
               Status ss;
 
@@ -97,7 +97,7 @@ namespace FEAST
                   Comm::test(recvrequests.at(i), recvflags[i], recvstatus.at(i));
                   if(recvflags[i] != 0)
                   {
-                    mirrors.at(i).template scatter_axpy_dual<Algo_>(target, recvbufs.at(i));
+                    mirrors.at(i).scatter_axpy_dual(target, recvbufs.at(i));
                     ++count;
                     taskflags[i] = 1;
                   }
@@ -130,13 +130,13 @@ namespace FEAST
 #endif
       };
 
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct GlobalSynchVec1
       {
       };
 
-      template <typename Algo_>
-      struct GlobalSynchVec1<Mem::Main, Algo_>
+      template <>
+      struct GlobalSynchVec1<Mem::Main>
       {
         public:
 
@@ -182,7 +182,7 @@ namespace FEAST
             StorageT_<Status, std::allocator<Status> > sendstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
-              mirrors.at(i).template gather_dual<Algo_>(sendbufs.at(i), target);
+              mirrors.at(i).gather_dual(sendbufs.at(i), target);
 
               Status ss;
 
@@ -219,7 +219,7 @@ namespace FEAST
                   Comm::test(recvrequests.at(i), recvflags[i], recvstatus.at(i));
                   if(recvflags[i] != 0)
                   {
-                    mirrors.at(i).template scatter_axpy_dual<Algo_>(target, recvbufs.at(i));
+                    mirrors.at(i).scatter_axpy_dual(target, recvbufs.at(i));
                     ++count;
                     taskflags[i] = 1;
                   }
@@ -228,7 +228,7 @@ namespace FEAST
             }
 
             // scale target vector by frequencies
-            target.template component_product<Algo_>(target, frequencies);
+            target.component_product(target, frequencies);
 
             for(Index i(0) ; i < sendrequests.size() ; ++i)
             {

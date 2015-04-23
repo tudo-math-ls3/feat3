@@ -11,7 +11,7 @@ namespace FEAST
   namespace Foundation
   {
       /// \todo add communicators
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct GlobalNorm2
       {
         public:
@@ -22,13 +22,13 @@ namespace FEAST
                                                    const VectorT_& frequencies)
           {
             ///assumes type-1 vector (full entries at inner boundaries)
-            GlobalDot<Mem_, Algo_>::value(r, a, a , frequencies);
+            GlobalDot<Mem_>::value(r, a, a , frequencies);
             r = typename VectorT_::DataType(std::sqrt(r));
             return r;
           }
       };
 
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct GlobalNorm2Squared
       {
         public:
@@ -39,7 +39,7 @@ namespace FEAST
                                                    const VectorT_& frequencies)
           {
             ///assumes type-1 vector (full entries at inner boundaries)
-            GlobalDot<Mem_, Algo_>::value(r, a, a , frequencies);
+            GlobalDot<Mem_>::value(r, a, a , frequencies);
             return r;
           }
       };

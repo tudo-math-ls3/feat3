@@ -22,7 +22,6 @@ namespace FEAST
     };
 
     template<typename Tag_,
-             typename Arch_,
              Dimensions dim_,
              PolytopeLevels pl_,
              MeshRefinementTypes mrt_,
@@ -33,10 +32,8 @@ namespace FEAST
 
     ///enforce interpretation of arbitrary mesh as 'residing in 1D space'
     template<typename Tag_,
-             typename Arch_,
              HaloRefinementTypes hrt_>
     struct PolytopeRefinement<Tag_,
-                              Arch_,
                               dim_1D,
                               pl_edge,
                               mrt_standard,
@@ -124,10 +121,8 @@ namespace FEAST
 
     ///enforce interpretation of arbitrary mesh as 'residing in 2D space'
     template<typename Tag_,
-             typename Arch_,
              HaloRefinementTypes hrt_>
     struct PolytopeRefinement<Tag_,
-                              Arch_,
                               dim_2D,
                               pl_edge,
                               mrt_standard,
@@ -249,10 +244,8 @@ namespace FEAST
 
     ///enforce interpretation of arbitrary mesh as 'residing in 3D space'
     template<typename Tag_,
-             typename Arch_,
              HaloRefinementTypes hrt_>
     struct PolytopeRefinement<Tag_,
-                              Arch_,
                               dim_3D,
                               pl_edge,
                               mrt_standard,
@@ -383,7 +376,6 @@ namespace FEAST
     };
 
     template<typename Tag_,
-             typename Arch_,
              MeshRefinementTypes mrt_ = mrt_standard,
              HaloRefinementTypes hrt_ = hrt_refine>
     struct Refinement
@@ -404,7 +396,6 @@ namespace FEAST
         for(Index i(0) ; i < num_edges; ++i)
         {
           PolytopeRefinement<Tag_,
-                             Arch_,
                              dim_1D,
                              pl_edge,
                              mrt_,
@@ -434,7 +425,6 @@ namespace FEAST
         for(Index i(0) ; i < num_edges; ++i)
         {
           PolytopeRefinement<Tag_,
-                             Arch_,
                              dim_2D,
                              pl_edge,
                              mrt_,
@@ -840,7 +830,6 @@ namespace FEAST
         for(Index i(0) ; i < num_edges; ++i)
         {
           PolytopeRefinement<Tag_,
-                             Arch_,
                              dim_3D,
                              pl_edge,
                              mrt_,

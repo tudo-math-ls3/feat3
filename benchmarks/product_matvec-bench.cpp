@@ -12,6 +12,92 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::Benchmark;
 
+template<typename Algo_, SparseLayoutId, typename DT_, typename IT_>
+class ProductMatVecBench;
+
+template<typename DT_, typename IT_>
+class ProductMatVecBench<Algo::Generic, SparseLayoutId::lt_csr, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
+    SparseMatrixCSR<Mem::Main, DT_, IT_> & A)
+  {
+    Arch::ProductMatVec<Mem::Main>::csr_generic(x.elements(), A.val(), A.col_ind(), A.row_ptr(),
+                                              b.elements(), A.rows(), A.columns(), A.used_elements());
+  }
+};
+
+template<typename DT_, typename IT_>
+class ProductMatVecBench<Algo::MKL, SparseLayoutId::lt_csr, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
+    SparseMatrixCSR<Mem::Main, DT_, IT_> & A)
+  {
+    Arch::ProductMatVec<Mem::Main>::csr_mkl(x.elements(), A.val(), A.col_ind(), A.row_ptr(),
+                                              b.elements(), A.rows(), A.columns(), A.used_elements());
+  }
+};
+
+template<typename DT_, typename IT_>
+class ProductMatVecBench<Algo::CUDA, SparseLayoutId::lt_csr, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & b,
+    SparseMatrixCSR<Mem::CUDA, DT_, IT_> & A)
+  {
+    Arch::ProductMatVec<Mem::CUDA>::csr(x.elements(), A.val(), A.col_ind(), A.row_ptr(),
+                                              b.elements(), A.rows(), A.columns(), A.used_elements());
+  }
+};
+
+template<typename DT_, typename IT_>
+class ProductMatVecBench<Algo::Generic, SparseLayoutId::lt_ell, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
+    SparseMatrixELL<Mem::Main, DT_, IT_> & A)
+  {
+    Arch::ProductMatVec<Mem::Main>::ell_generic(x.elements(), A.val(), A.col_ind(), A.cs(), A.cl(),
+                                              b.elements(), A.C(), A.rows());
+  }
+};
+
+template<typename DT_, typename IT_>
+class ProductMatVecBench<Algo::CUDA, SparseLayoutId::lt_ell, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & b,
+    SparseMatrixELL<Mem::CUDA, DT_, IT_> & A)
+  {
+    Arch::ProductMatVec<Mem::CUDA>::ell(x.elements(), A.val(), A.col_ind(), A.cs(), A.cl(),
+                                              b.elements(), A.C(), A.rows());
+  }
+};
+
+template<typename DT_, typename IT_>
+class ProductMatVecBench<Algo::Generic, SparseLayoutId::lt_banded, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::Main, DT_, IT_> & x, const DenseVector<Mem::Main, DT_, IT_> & b,
+    SparseMatrixBanded<Mem::Main, DT_, IT_> & A)
+  {
+    Arch::ProductMatVec<Mem::Main>::banded_generic(x.elements(), A.val(), A.offsets(), b.elements(), A.num_of_offsets(), A.rows(), A.columns());
+  }
+};
+
+template<typename DT_, typename IT_>
+class ProductMatVecBench<Algo::CUDA, SparseLayoutId::lt_banded, DT_, IT_>
+{
+  public:
+  static void f(DenseVector<Mem::CUDA, DT_, IT_> & x, const DenseVector<Mem::CUDA, DT_, IT_> & b,
+    SparseMatrixBanded<Mem::CUDA, DT_, IT_> & A)
+  {
+    Arch::ProductMatVec<Mem::CUDA>::banded(x.elements(), A.val(), A.offsets(), b.elements(), A.num_of_offsets(), A.rows(), A.columns());
+  }
+};
+
+
 template <typename Algo_, typename SM_>
 void run()
 {
@@ -24,7 +110,7 @@ void run()
   num_of_nodes.push_back(1300);
 
   // generate FE matrix A
-  SparseMatrixBanded<Mem::Main, DT_, IT_> bm(PointstarStructureFE<Algo::Generic>::template value<DT_>(1, num_of_nodes));
+  SparseMatrixBanded<Mem::Main, DT_, IT_> bm(PointstarStructureFE::template value<DT_>(1, num_of_nodes));
   for (Index i(0) ; i < bm.get_elements_size().at(0) ; ++i)
     bm.val()[i] = DT_((i%4) + 1);
   SM_ sys;
@@ -45,10 +131,10 @@ void run()
   bytes += sys.used_elements() * sizeof(IT_);
   bytes += size * sizeof(DT_);
 
-  auto func = [&] () { sys.template apply<Algo_>(x, b); };
+  auto func = [&] () { ProductMatVecBench<Algo_, SM_::layout_id, DT_, IT_>::f(x, b, sys); };
   run_bench<Mem_>(func, flops, bytes);
 
-  std::cout<<"control norm: "<<x.template norm2<Algo_>()<<std::endl;
+  std::cout<<"control norm: "<<x.norm2()<<std::endl;
 }
 
 int main(int /*argc*/, char ** /*argv*/)

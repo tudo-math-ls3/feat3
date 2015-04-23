@@ -14,7 +14,7 @@ namespace FEAST
   {
     namespace Arch
     {
-      template <typename Mem_, typename Algo_, typename VectorT_>
+      template <typename Mem_, typename VectorT_>
       class DotGatewayBase
       {
       public:
@@ -26,57 +26,82 @@ namespace FEAST
       };
 
       // Dot Product
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct DotProduct;
 
       template <>
-      struct DotProduct<Mem::Main, Algo::Generic>
+      struct DotProduct<Mem::Main>
       {
         template <typename DT_>
-        static DT_ value(const DT_ * const x, const DT_ * const y, const Index size);
+        static DT_ value(const DT_ * const x, const DT_ * const y, const Index size)
+        {
+#ifdef FEAST_BACKENDS_MKL
+          return value_mkl(x, y, size);
+#else
+          return value_generic(x, y, size);
+#endif
+        }
+
+#if defined(FEAST_HAVE_QUADMATH) && !defined(__CUDACC__)
+        static __float128 value(const __float128 * const x, const __float128 * const y, const Index size)
+        {
+          return value_generic(x, y, size);
+        }
+#endif
+
+        template <typename DT_>
+        static DT_ value_generic(const DT_ * const x, const DT_ * const y, const Index size);
+
+        static float value_mkl(const float * const x, const float * const y, const Index size);
+        static double value_mkl(const double * const x, const double * const y, const Index size);
       };
 
-      extern template float DotProduct<Mem::Main, Algo::Generic>::value(const float * const, const float * const, const Index);
-      extern template double DotProduct<Mem::Main, Algo::Generic>::value(const double * const, const double * const, const Index);
+      extern template float DotProduct<Mem::Main>::value_generic(const float * const, const float * const, const Index);
+      extern template double DotProduct<Mem::Main>::value_generic(const double * const, const double * const, const Index);
 
       template <>
-      struct DotProduct<Mem::Main, Algo::MKL>
-      {
-        static float value(const float * const x, const float * const y, const Index size);
-
-        static double value(const double * const x, const double * const y, const Index size);
-      };
-
-      template <>
-      struct DotProduct<Mem::CUDA, Algo::CUDA>
+      struct DotProduct<Mem::CUDA>
       {
         template <typename DT_>
         static DT_ value(const DT_ * const x, const DT_ * const y, const Index size);
       };
 
       // Triple dot product
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct TripleDotProduct;
 
       template <>
-      struct TripleDotProduct<Mem::Main, Algo::Generic>
+      struct TripleDotProduct<Mem::Main>
       {
         template <typename DT_>
-        static DT_ value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size);
+        static DT_ value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
+        {
+#ifdef FEAST_BACKENDS_MKL
+          return value_mkl(x, y, z, size);
+#else
+          return value_generic(x, y, z, size);
+#endif
+        }
+
+#if defined(FEAST_HAVE_QUADMATH) && !defined(__CUDACC__)
+        static __float128 value(const __float128 * const x, const __float128 * const y, const __float128 * const z, const Index size)
+        {
+          return value_generic(x, y, z, size);
+        }
+#endif
+
+        template <typename DT_>
+        static DT_ value_generic(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size);
+
+        static float value_mkl(const float * const x, const float * const y, const float * const z, const Index size);
+        static double value_mkl(const double * const x, const double * const y, const double * const z, const Index size);
       };
 
-      extern template float TripleDotProduct<Mem::Main, Algo::Generic>::value(const float * const, const float * const, const float * const, const Index);
-      extern template double TripleDotProduct<Mem::Main, Algo::Generic>::value(const double * const, const double * const, const double * const, const Index);
+      extern template float TripleDotProduct<Mem::Main>::value_generic(const float * const, const float * const, const float * const, const Index);
+      extern template double TripleDotProduct<Mem::Main>::value_generic(const double * const, const double * const, const double * const, const Index);
 
       template <>
-      struct TripleDotProduct<Mem::Main, Algo::MKL>
-      {
-        static float value(const float * const x, const float * const y, const float * const z, const Index size);
-        static double value(const double * const x, const double * const y, const double * const z, const Index size);
-      };
-
-      template <>
-      struct TripleDotProduct<Mem::CUDA, Algo::CUDA>
+      struct TripleDotProduct<Mem::CUDA>
       {
         template <typename DT_>
         static DT_ value(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size);

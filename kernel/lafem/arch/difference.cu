@@ -28,7 +28,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_>
-void Difference<Mem::CUDA, Algo::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
+void Difference<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
 {
   Index blocksize(256);
   dim3 grid;
@@ -45,5 +45,5 @@ void Difference<Mem::CUDA, Algo::CUDA>::value(DT_ * r, const DT_ * const x, cons
 #endif
 }
 
-template void Difference<Mem::CUDA, Algo::CUDA>::value(float *, const float * const, const float * const, const Index);
-template void Difference<Mem::CUDA, Algo::CUDA>::value(double *, const double * const, const double * const, const Index);
+template void Difference<Mem::CUDA>::value(float *, const float * const, const float * const, const Index);
+template void Difference<Mem::CUDA>::value(double *, const double * const, const double * const, const Index);

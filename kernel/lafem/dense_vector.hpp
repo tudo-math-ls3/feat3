@@ -916,13 +916,10 @@ namespace FEAST
       /**
        * \brief Calculate \f$this \leftarrow \alpha x + y\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The first summand vector to be scaled.
        * \param[in] y The second summand vector
        * \param[in] alpha A scalar to multiply x with.
        */
-      template <typename Algo_>
       void axpy(
                 const DenseVector & x,
                 const DenseVector & y,
@@ -936,27 +933,24 @@ namespace FEAST
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-          Arch::Sum<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
+          Arch::Sum<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-          Arch::Difference<Mem_, Algo_>::value(this->elements(), y.elements(), x.elements(), this->size());
+          Arch::Difference<Mem_>::value(this->elements(), y.elements(), x.elements(), this->size());
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
-          Arch::Axpy<Mem_, Algo_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());
+          Arch::Axpy<Mem_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());
       }
 
       /**
        * \brief Calculate \f$this_i \leftarrow x_i \cdot y_i\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The first factor.
        * \param[in] y The second factor.
        */
-      template <typename Algo_>
       void component_product(const DenseVector & x, const DenseVector & y)
       {
         if (this->size() != x.size())
@@ -964,13 +958,11 @@ namespace FEAST
         if (this->size() != y.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        Arch::ComponentProduct<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
+        Arch::ComponentProduct<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
       }
 
       /**
        * \brief Performs \f$ this_i \leftarrow \alpha / x_i \f$
-       *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
        *
        * \param[in] x
        * The vector whose components serve as denominators.
@@ -978,36 +970,30 @@ namespace FEAST
        * \param[in] alpha
        * The nominator.
        */
-      template <typename Algo_>
       void component_invert(const DenseVector & x, const DT_ alpha = DT_(1))
       {
         if (this->size() != x.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        Arch::ComponentInvert<Mem_, Algo_>::value(this->elements(), x.elements(), alpha, this->size());
+        Arch::ComponentInvert<Mem_>::value(this->elements(), x.elements(), alpha, this->size());
       }
 
       /**
        * \brief Calculate \f$this \leftarrow \alpha x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The vector to be scaled.
        * \param[in] alpha A scalar to scale x with.
        */
-      template <typename Algo_>
       void scale(const DenseVector & x, const DT_ alpha)
       {
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        Arch::Scale<Mem_, Algo_>::value(this->elements(), x.elements(), alpha, this->size());
+        Arch::Scale<Mem_>::value(this->elements(), x.elements(), alpha, this->size());
       }
 
       /**
        * \brief Calculate \f$result \leftarrow x^T \mathrm{diag}(this) y \f$
-       *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
        *
        * \param[in] x The first vector.
        *
@@ -1015,31 +1001,27 @@ namespace FEAST
        *
        * \return The computed triple dot product.
        */
-      template <typename Algo_>
       DataType triple_dot(const DenseVector & x, const DenseVector & y) const
       {
         if (x.size() != this->size() || y.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector sizes does not match!");
 
-        return Arch::TripleDotProduct<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
+        return Arch::TripleDotProduct<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
       }
 
       /**
        * \brief Calculate \f$result \leftarrow this \cdot this\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The other vector.
        *
        * \return The computed dot product.
        */
-      template <typename Algo_>
       DataType dot(const DenseVector & x) const
       {
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        return Arch::DotProduct<Mem_, Algo_>::value(this->elements(), x.elements(), this->size());
+        return Arch::DotProduct<Mem_>::value(this->elements(), x.elements(), this->size());
       }
 
       /**
@@ -1050,8 +1032,7 @@ namespace FEAST
        * \param[in] gate The gateway to be used for the global operation.
        *
        */
-      template <typename Algo_>
-      DataType dot(const DenseVector & x, const Arch::DotGatewayBase<Mem_, Algo_, DenseVector>* gate) const
+      DataType dot(const DenseVector & x, const Arch::DotGatewayBase<Mem_, DenseVector>* gate) const
       {
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
@@ -1062,13 +1043,10 @@ namespace FEAST
       /**
        * \brief Calculates and returns the euclid norm of this vector, global version.
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \return The computed norm.
        *
        */
-      template <typename Algo_>
-      DT_ norm2(const Arch::Norm2GatewayBase<Mem_, Algo_, DenseVector>* gate) const
+      DT_ norm2(const Arch::Norm2GatewayBase<Mem_, DenseVector>* gate) const
       {
         return gate->value(*this);
       }
@@ -1076,23 +1054,17 @@ namespace FEAST
       /**
        * \brief Calculates and returns the euclid norm of this vector.
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        */
-      template <typename Algo_>
       DT_ norm2() const
       {
-        return Arch::Norm2<Mem_, Algo_>::value(this->elements(), this->size());
+        return Arch::Norm2<Mem_>::value(this->elements(), this->size());
       }
 
       /**
        * \brief Calculates and returns the euclid norm of this vector, global version.
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        */
-      template <typename Algo_>
-      DT_ norm2sqr(const Arch::Norm2SquaredGatewayBase<Mem_, Algo_, DenseVector>* gate) const
+      DT_ norm2sqr(const Arch::Norm2SquaredGatewayBase<Mem_, DenseVector>* gate) const
       {
         return gate->value(*this);
       }
@@ -1100,24 +1072,20 @@ namespace FEAST
       /**
        * \brief Calculates and returns the squared euclid norm of this vector.
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \return The computed norm.
        *
        */
-      template <typename Algo_>
       DT_ norm2sqr() const
       {
         // fallback
-        return Math::sqr(this->norm2<Algo_>());
+        return Math::sqr(this->norm2());
       }
 
       /**
        * \brief Synchronise type-0 vector
        *
        */
-      template <typename Algo_>
-      DenseVector& synch0(const Arch::SynchVec0GatewayBase<Mem_, Algo_, DenseVector>* gate)
+      DenseVector& synch0(const Arch::SynchVec0GatewayBase<Mem_, DenseVector>* gate)
       {
         return gate->value(*this);
       }
@@ -1126,8 +1094,7 @@ namespace FEAST
        * \brief Synchronise type-1 vector
        *
        */
-      template <typename Algo_>
-      DenseVector& synch1(const Arch::SynchVec1GatewayBase<Mem_, Algo_, DenseVector>* gate)
+      DenseVector& synch1(const Arch::SynchVec1GatewayBase<Mem_, DenseVector>* gate)
       {
         return gate->value(*this);
       }

@@ -12,15 +12,13 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_, typename IndexType_>
+template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaVectorAxpyTest
-  : public MetaVectorTestBase<Algo_, DataType_, IndexType_>
+  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
 {
 public:
-  typedef Algo_ AlgoType;
-  typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<Algo_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
   MetaVectorAxpyTest() : BaseClass("MetaVectorAxpyTest") {}
@@ -46,7 +44,7 @@ public:
 
     // test: z <- 0.7*x + y
     // purpose: general test
-    z.template axpy<AlgoType>(x, y, DataType(0.7));
+    z.axpy(x, y, DataType(0.7));
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), DataType(0.7)*fx00(i) + fy00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -56,8 +54,8 @@ public:
 
     // test: z <- 0*x + y; z <- 0.7*x + z
     // purpose: case z=y; case alpha = 0
-    z.template axpy<AlgoType>(x, y, DataType(0));
-    z.template axpy<AlgoType>(x, z, DataType(0.7));
+    z.axpy(x, y, DataType(0));
+    z.axpy(x, z, DataType(0.7));
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), DataType(0.7)*fx00(i) + fy00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -68,7 +66,7 @@ public:
     // test: z <- x; z <- 0.7*z + y
     // purpose: case z=x
     z.copy(x);
-    z.template axpy<AlgoType>(z, y, DataType(0.7));
+    z.axpy(z, y, DataType(0.7));
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), DataType(0.7)*fx00(i) + fy00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -78,7 +76,7 @@ public:
 
     // test: z <- x + y
     // purpose: alpha = 1
-    z.template axpy<AlgoType>(x, y, DataType(1));
+    z.axpy(x, y, DataType(1));
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i) + fy00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -88,7 +86,7 @@ public:
 
     // test: z <- -x + y
     // purpose: alpha = -1
-    z.template axpy<AlgoType>(x, y, -DataType(1));
+    z.axpy(x, y, -DataType(1));
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), -fx00(i) + fy00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -98,13 +96,9 @@ public:
   }
 };
 
-MetaVectorAxpyTest<Algo::Generic, float, Index> meta_vector_axpy_test_generic_float;
-MetaVectorAxpyTest<Algo::Generic, double, Index> meta_vector_axpy_test_generic_double;
-#ifdef FEAST_BACKENDS_MKL
-MetaVectorAxpyTest<Algo::MKL, float, Index> meta_vector_axpy_test_mkl_float;
-MetaVectorAxpyTest<Algo::MKL, double, Index> meta_vector_axpy_test_mkl_double;
-#endif
+MetaVectorAxpyTest<Mem::Main, float, Index> meta_vector_axpy_test_generic_float;
+MetaVectorAxpyTest<Mem::Main, double, Index> meta_vector_axpy_test_generic_double;
 #ifdef FEAST_BACKENDS_CUDA
-MetaVectorAxpyTest<Algo::CUDA, float, Index> meta_vector_axpy_test_cuda_float;
-MetaVectorAxpyTest<Algo::CUDA, double, Index> meta_vector_axpy_test_cuda_double;
+MetaVectorAxpyTest<Mem::CUDA, float, Index> meta_vector_axpy_test_cuda_float;
+MetaVectorAxpyTest<Mem::CUDA, double, Index> meta_vector_axpy_test_cuda_double;
 #endif

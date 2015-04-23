@@ -10,7 +10,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
-void Axpy<Mem::Main, Algo::MKL>::dv(float * r, const float a, const float * const x, const float * const y, const Index size)
+void Axpy<Mem::Main>::dv_mkl(float * r, const float a, const float * const x, const float * const y, const Index size)
 {
   if (r == y)
   {
@@ -31,7 +31,7 @@ void Axpy<Mem::Main, Algo::MKL>::dv(float * r, const float a, const float * cons
   }
 }
 
-void Axpy<Mem::Main, Algo::MKL>::dv(double * r, const double a, const double * const x, const double * const y, const Index size)
+void Axpy<Mem::Main>::dv_mkl(double * r, const double a, const double * const x, const double * const y, const Index size)
 {
   if (r == y)
   {
@@ -52,7 +52,7 @@ void Axpy<Mem::Main, Algo::MKL>::dv(double * r, const double a, const double * c
   }
 }
 
-void Axpy<Mem::Main, Algo::MKL>::csr(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
+void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
@@ -85,7 +85,7 @@ void Axpy<Mem::Main, Algo::MKL>::csr(float * r, const float a, const float * con
   }
 }
 
-void Axpy<Mem::Main, Algo::MKL>::csr(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
+void Axpy<Mem::Main>::csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
@@ -118,7 +118,7 @@ void Axpy<Mem::Main, Algo::MKL>::csr(double * r, const double a, const double * 
   }
 }
 
-void Axpy<Mem::Main, Algo::MKL>::coo(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
+void Axpy<Mem::Main>::coo_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
 {
   MKL_INT ue = (MKL_INT)used_elements;
   MKL_INT mrows = (MKL_INT)rows;
@@ -152,7 +152,7 @@ void Axpy<Mem::Main, Algo::MKL>::coo(float * r, const float a, const float * con
   }
 }
 
-void Axpy<Mem::Main, Algo::MKL>::coo(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
+void Axpy<Mem::Main>::coo_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
 {
   MKL_INT ue = (MKL_INT)used_elements;
   MKL_INT mrows = (MKL_INT)rows;

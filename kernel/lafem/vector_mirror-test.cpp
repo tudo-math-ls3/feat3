@@ -15,20 +15,20 @@ using namespace FEAST::TestSystem;
  * \author Peter Zajac
  */
 template<
-  typename Algo_,
+  typename MemType_,
   typename DT_,
   typename IT_>
 class VectorMirrorTest
-  : public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
+  : public FullTaggedTest<MemType_, DT_, IT_>
 {
-  typedef DenseVector<typename Algo_::MemType, DT_, IT_> VectorType;
-  typedef DenseVector<typename Algo_::MemType, IT_, IT_> IVectorType;
-  typedef SparseMatrixCSR<typename Algo_::MemType, DT_, IT_> MatrixType;
-  typedef VectorMirror<typename Algo_::MemType, DT_, IT_> MirrorType;
+  typedef DenseVector<MemType_, DT_, IT_> VectorType;
+  typedef DenseVector<MemType_, IT_, IT_> IVectorType;
+  typedef SparseMatrixCSR<MemType_, DT_, IT_> MatrixType;
+  typedef VectorMirror<MemType_, DT_, IT_> MirrorType;
 
 public:
   VectorMirrorTest()
-    : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("VectorMirrorTest")
+    : FullTaggedTest<MemType_, DT_, IT_>("VectorMirrorTest")
   {
   }
 
@@ -99,53 +99,53 @@ public:
     VectorType vec_buf_tmp(Index(1), DT_(0));
 
     // gather from a
-    mirror0.template gather_prim<Algo_>(vec_buf_tmp, a1);
-    vec_buf_abc.template axpy<Algo_>(vec_buf_tmp, vec_buf_abc);
-    mirror1.template gather_prim<Algo_>(vec_buf_tmp, a1);
-    vec_buf_ac.template axpy<Algo_>(vec_buf_tmp, vec_buf_ac);
-    mirror2.template gather_prim<Algo_>(vec_buf_tmp, a1);
-    vec_buf_ab.template axpy<Algo_>(vec_buf_tmp, vec_buf_ab);
+    mirror0.gather_prim(vec_buf_tmp, a1);
+    vec_buf_abc.axpy(vec_buf_tmp, vec_buf_abc);
+    mirror1.gather_prim(vec_buf_tmp, a1);
+    vec_buf_ac.axpy(vec_buf_tmp, vec_buf_ac);
+    mirror2.gather_prim(vec_buf_tmp, a1);
+    vec_buf_ab.axpy(vec_buf_tmp, vec_buf_ab);
 
     // gather from b
-    mirror0.template gather_prim<Algo_>(vec_buf_tmp, b1);
-    vec_buf_abc.template axpy<Algo_>(vec_buf_tmp, vec_buf_abc);
-    mirror1.template gather_prim<Algo_>(vec_buf_tmp, b1);
-    vec_buf_ab.template axpy<Algo_>(vec_buf_tmp, vec_buf_ab);
-    mirror2.template gather_prim<Algo_>(vec_buf_tmp, b1);
-    vec_buf_bc.template axpy<Algo_>(vec_buf_tmp, vec_buf_bc);
+    mirror0.gather_prim(vec_buf_tmp, b1);
+    vec_buf_abc.axpy(vec_buf_tmp, vec_buf_abc);
+    mirror1.gather_prim(vec_buf_tmp, b1);
+    vec_buf_ab.axpy(vec_buf_tmp, vec_buf_ab);
+    mirror2.gather_prim(vec_buf_tmp, b1);
+    vec_buf_bc.axpy(vec_buf_tmp, vec_buf_bc);
 
     // gather from c
-    mirror0.template gather_prim<Algo_>(vec_buf_tmp, c1);
-    vec_buf_abc.template axpy<Algo_>(vec_buf_tmp, vec_buf_abc);
-    mirror1.template gather_prim<Algo_>(vec_buf_tmp, c1);
-    vec_buf_bc.template axpy<Algo_>(vec_buf_tmp, vec_buf_bc);
-    mirror2.template gather_prim<Algo_>(vec_buf_tmp, c1);
-    vec_buf_ac.template axpy<Algo_>(vec_buf_tmp, vec_buf_ac);
+    mirror0.gather_prim(vec_buf_tmp, c1);
+    vec_buf_abc.axpy(vec_buf_tmp, vec_buf_abc);
+    mirror1.gather_prim(vec_buf_tmp, c1);
+    vec_buf_bc.axpy(vec_buf_tmp, vec_buf_bc);
+    mirror2.gather_prim(vec_buf_tmp, c1);
+    vec_buf_ac.axpy(vec_buf_tmp, vec_buf_ac);
 
     // scatter to a
-    mirror0.template scatter_prim<Algo_>(a1, vec_buf_abc);
-    mirror1.template scatter_prim<Algo_>(a1, vec_buf_ac);
-    mirror2.template scatter_prim<Algo_>(a1, vec_buf_ab);
+    mirror0.scatter_prim(a1, vec_buf_abc);
+    mirror1.scatter_prim(a1, vec_buf_ac);
+    mirror2.scatter_prim(a1, vec_buf_ab);
 
     // scatter to b
-    mirror0.template scatter_prim<Algo_>(b1, vec_buf_abc);
-    mirror1.template scatter_prim<Algo_>(b1, vec_buf_ab);
-    mirror2.template scatter_prim<Algo_>(b1, vec_buf_bc);
+    mirror0.scatter_prim(b1, vec_buf_abc);
+    mirror1.scatter_prim(b1, vec_buf_ab);
+    mirror2.scatter_prim(b1, vec_buf_bc);
 
     // scatter to c
-    mirror0.template scatter_prim<Algo_>(c1, vec_buf_abc);
-    mirror1.template scatter_prim<Algo_>(c1, vec_buf_bc);
-    mirror2.template scatter_prim<Algo_>(c1, vec_buf_ac);
+    mirror0.scatter_prim(c1, vec_buf_abc);
+    mirror1.scatter_prim(c1, vec_buf_bc);
+    mirror2.scatter_prim(c1, vec_buf_ac);
 
     // subtract reference results
-    a1.template axpy<Algo_>(a2, a1, -DT_(1));
-    b1.template axpy<Algo_>(b2, b1, -DT_(1));
-    c1.template axpy<Algo_>(c2, c1, -DT_(1));
+    a1.axpy(a2, a1, -DT_(1));
+    b1.axpy(b2, b1, -DT_(1));
+    c1.axpy(c2, c1, -DT_(1));
 
     // check norms
-    TEST_CHECK_EQUAL_WITHIN_EPS(a1.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(b1.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(c1.template norm2<Algo_>(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(a1.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(b1.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(c1.norm2(), DT_(0), tol);
   }
 
   void test_2() const
@@ -209,43 +209,43 @@ public:
     VectorType vec_buf_tmp(Index(1), DT_(0));
 
     // gather from a
-    mirror0.template gather_axpy_prim<Algo_>(vec_buf_abc, a1);
-    mirror1.template gather_axpy_prim<Algo_>(vec_buf_ac, a1);
-    mirror2.template gather_axpy_prim<Algo_>(vec_buf_ab, a1);
+    mirror0.gather_axpy_prim(vec_buf_abc, a1);
+    mirror1.gather_axpy_prim(vec_buf_ac, a1);
+    mirror2.gather_axpy_prim(vec_buf_ab, a1);
 
     // gather from b
-    mirror0.template gather_axpy_prim<Algo_>(vec_buf_abc, b1);
-    mirror1.template gather_axpy_prim<Algo_>(vec_buf_ab, b1);
-    mirror2.template gather_axpy_prim<Algo_>(vec_buf_bc, b1);
+    mirror0.gather_axpy_prim(vec_buf_abc, b1);
+    mirror1.gather_axpy_prim(vec_buf_ab, b1);
+    mirror2.gather_axpy_prim(vec_buf_bc, b1);
 
     // gather from c
-    mirror0.template gather_axpy_prim<Algo_>(vec_buf_abc, c1);
-    mirror1.template gather_axpy_prim<Algo_>(vec_buf_bc, c1);
-    mirror2.template gather_axpy_prim<Algo_>(vec_buf_ac, c1);
+    mirror0.gather_axpy_prim(vec_buf_abc, c1);
+    mirror1.gather_axpy_prim(vec_buf_bc, c1);
+    mirror2.gather_axpy_prim(vec_buf_ac, c1);
 
     // scatter to a
     a1.copy(a2);
-    mirror0.template scatter_axpy_prim<Algo_>(a1, vec_buf_abc, -DT_(1));
-    mirror1.template scatter_axpy_prim<Algo_>(a1, vec_buf_ac, -DT_(1));
-    mirror2.template scatter_axpy_prim<Algo_>(a1, vec_buf_ab, -DT_(1));
+    mirror0.scatter_axpy_prim(a1, vec_buf_abc, -DT_(1));
+    mirror1.scatter_axpy_prim(a1, vec_buf_ac, -DT_(1));
+    mirror2.scatter_axpy_prim(a1, vec_buf_ab, -DT_(1));
 
     // scatter to b
     b1.copy(b2);
-    mirror0.template scatter_axpy_prim<Algo_>(b1, vec_buf_abc, -DT_(1));
-    mirror1.template scatter_axpy_prim<Algo_>(b1, vec_buf_ab, -DT_(1));
-    mirror2.template scatter_axpy_prim<Algo_>(b1, vec_buf_bc, -DT_(1));
+    mirror0.scatter_axpy_prim(b1, vec_buf_abc, -DT_(1));
+    mirror1.scatter_axpy_prim(b1, vec_buf_ab, -DT_(1));
+    mirror2.scatter_axpy_prim(b1, vec_buf_bc, -DT_(1));
 
     // scatter to c
     c1.copy(c2);
-    mirror0.template scatter_axpy_prim<Algo_>(c1, vec_buf_abc, -DT_(1));
-    mirror1.template scatter_axpy_prim<Algo_>(c1, vec_buf_bc, -DT_(1));
-    mirror2.template scatter_axpy_prim<Algo_>(c1, vec_buf_ac, -DT_(1));
+    mirror0.scatter_axpy_prim(c1, vec_buf_abc, -DT_(1));
+    mirror1.scatter_axpy_prim(c1, vec_buf_bc, -DT_(1));
+    mirror2.scatter_axpy_prim(c1, vec_buf_ac, -DT_(1));
 
     // check norms
-    TEST_CHECK_EQUAL_WITHIN_EPS(a1.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(b1.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(c1.template norm2<Algo_>(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(a1.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(b1.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(c1.norm2(), DT_(0), tol);
   }
 };
 
-VectorMirrorTest<Algo::Generic, double, Index> vector_mirror_test_generic_d;
+VectorMirrorTest<Mem::Main, double, Index> vector_mirror_test_generic_d;

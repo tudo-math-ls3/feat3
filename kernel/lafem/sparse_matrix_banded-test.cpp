@@ -28,15 +28,14 @@ using namespace FEAST::TestSystem;
  */
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class SparseMatrixBandedTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   SparseMatrixBandedTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedTest")
   {
   }
 
@@ -144,36 +143,35 @@ public:
   }
 };
 
-SparseMatrixBandedTest<Mem::Main, NotSet, float, unsigned long> cpu_sparse_matrix_banded_test_float_ulong;
-SparseMatrixBandedTest<Mem::Main, NotSet, double, unsigned long> cpu_sparse_matrix_banded_test_double_ulong;
-SparseMatrixBandedTest<Mem::Main, NotSet, float, unsigned int> cpu_sparse_matrix_banded_test_float_uint;
-SparseMatrixBandedTest<Mem::Main, NotSet, double, unsigned int> cpu_sparse_matrix_banded_test_double_uint;
+SparseMatrixBandedTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_test_float_ulong;
+SparseMatrixBandedTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_test_double_ulong;
+SparseMatrixBandedTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_test_float_uint;
+SparseMatrixBandedTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_test_double_uint;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixBandedTest<Mem::CUDA, NotSet, float, unsigned long> cuda_sparse_matrix_banded_test_float_ulong;
-SparseMatrixBandedTest<Mem::CUDA, NotSet, double, unsigned long> cuda_sparse_matrix_banded_test_double_ulong;
-SparseMatrixBandedTest<Mem::CUDA, NotSet, float, unsigned int> cuda_sparse_matrix_banded_test_float_uint;
-SparseMatrixBandedTest<Mem::CUDA, NotSet, double, unsigned int> cuda_sparse_matrix_banded_test_double_uint;
+SparseMatrixBandedTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_test_float_ulong;
+SparseMatrixBandedTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_test_double_ulong;
+SparseMatrixBandedTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_test_float_uint;
+SparseMatrixBandedTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_test_double_uint;
 #endif
 
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class SparseMatrixBandedApplyTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 private:
   const Index _opt;
 public:
   SparseMatrixBandedApplyTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedApplyTest"), _opt(0)
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedApplyTest"), _opt(0)
   {
   }
 
   SparseMatrixBandedApplyTest(const Index opt)
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedApplyTest: "
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedApplyTest: "
                                             + stringify(opt) + " offsets"), _opt(opt)
   {
   }
@@ -238,7 +236,7 @@ public:
       ref1(i, 0);
     }
 
-    sys.template apply<Algo_>(r, x);
+    sys.apply(r, x);
 
     for(Index i(0); i < sys.rows(); ++i)
     {
@@ -260,7 +258,7 @@ public:
       ref2(i, ref1(i) + Math::cos(DT_(i)));
     }
 
-    sys.template apply<Algo_>(r, x, ref2, DT_(-1.0));
+    sys.apply(r, x, ref2, DT_(-1.0));
 
     // check, if the result is correct
     for (Index i(0) ; i < r.size() ; ++i)
@@ -274,7 +272,7 @@ public:
       ref2(i, ref2(i) * s);
     }
 
-    sys.template apply<Algo_>(r, x, ref2, -s);
+    sys.apply(r, x, ref2, -s);
 
     // check, if the result is correct
     for (Index i(0) ; i < r.size() ; ++i)
@@ -285,38 +283,33 @@ public:
   }
 };
 
-SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong;
-SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong;
-SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint;
-SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint;
+SparseMatrixBandedApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong;
+SparseMatrixBandedApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong;
+SparseMatrixBandedApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint;
+SparseMatrixBandedApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint;
 
-SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong_9(9);
-SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong_9(9);
-SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint_9(9);
-SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint_9(9);
-// #ifdef FEAST_BACKENDS_MKL
-// SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sparse_matrix_banded_apply_test_float_ulong;
-// SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sparse_matrix_banded_apply_test_double_ulong;
-// #endif
+SparseMatrixBandedApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong_9(9);
+SparseMatrixBandedApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong_9(9);
+SparseMatrixBandedApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint_9(9);
+SparseMatrixBandedApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint_9(9);
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sparse_matrix_banded_apply_test_float_ulong;
-SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sparse_matrix_banded_apply_test_double_ulong;
-SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sparse_matrix_banded_apply_test_float_uint;
-SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sparse_matrix_banded_apply_test_double_uint;
+SparseMatrixBandedApplyTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_apply_test_float_ulong;
+SparseMatrixBandedApplyTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_apply_test_double_ulong;
+SparseMatrixBandedApplyTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_apply_test_float_uint;
+SparseMatrixBandedApplyTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_apply_test_double_uint;
 #endif
 
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class SparseMatrixBandedScaleTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   SparseMatrixBandedScaleTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedScaleTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedScaleTest")
   {
   }
 
@@ -364,25 +357,21 @@ public:
     SparseMatrixBanded<Mem_, DT_, IT_> b;
     b.clone(a);
 
-    b.template scale<Algo_>(a, s);
+    b.scale(a, s);
     TEST_CHECK_EQUAL(b, ref);
 
-    a.template scale<Algo_>(a, s);
+    a.scale(a, s);
     TEST_CHECK_EQUAL(a, ref);
   }
 };
 
-SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_sparse_matrix_banded_scale_test_float_ulong;
-SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, double, unsigned long> cpu_sparse_matrix_banded_scale_test_double_ulong;
-SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_sparse_matrix_banded_scale_test_float_uint;
-SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_sparse_matrix_banded_scale_test_double_uint;
-#ifdef FEAST_BACKENDS_MKL
-SparseMatrixBandedScaleTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sparse_matrix_banded_scale_test_float_ulong;
-SparseMatrixBandedScaleTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sparse_matrix_banded_scale_test_double_ulong;
-#endif
+SparseMatrixBandedScaleTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_scale_test_float_ulong;
+SparseMatrixBandedScaleTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_scale_test_double_ulong;
+SparseMatrixBandedScaleTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_scale_test_float_uint;
+SparseMatrixBandedScaleTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_scale_test_double_uint;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sparse_matrix_banded_scale_test_float_ulong;
-SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sparse_matrix_banded_scale_test_double_ulong;
-SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sparse_matrix_banded_scale_test_float_uint;
-SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sparse_matrix_banded_scale_test_double_uint;
+SparseMatrixBandedScaleTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_scale_test_float_ulong;
+SparseMatrixBandedScaleTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_scale_test_double_ulong;
+SparseMatrixBandedScaleTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_scale_test_float_uint;
+SparseMatrixBandedScaleTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_scale_test_double_uint;
 #endif

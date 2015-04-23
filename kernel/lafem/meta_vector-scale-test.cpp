@@ -12,15 +12,13 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_, typename IndexType_>
+template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaVectorScaleTest
-  : public MetaVectorTestBase<Algo_, DataType_, IndexType_>
+  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
 {
 public:
-  typedef Algo_ AlgoType;
-  typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<Algo_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
   MetaVectorScaleTest() : BaseClass("MetaVectorScaleTest") {}
@@ -42,7 +40,7 @@ public:
 
     // test: z <- 0.7*x
     // purpose: general test
-    z.template scale<AlgoType>(x, DataType(0.7));
+    z.scale(x, DataType(0.7));
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), DataType(0.7)*fx00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -52,7 +50,7 @@ public:
 
     // test: z <- x
     // purpose: alpha = 1
-    z.template scale<AlgoType>(x, DataType(1));
+    z.scale(x, DataType(1));
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -62,7 +60,7 @@ public:
 
     // test: z <- -x
     // purpose: alpha = -1
-    z.template scale<AlgoType>(x, -DataType(1));
+    z.scale(x, -DataType(1));
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), -fx00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -72,7 +70,7 @@ public:
 
     // test: z <- 0*x
     // purpose: alpha = 0
-    z.template scale<AlgoType>(x, -DataType(0));
+    z.scale(x, -DataType(0));
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), DataType(0), tol);
     for(Index i(0); i < n01; ++i)
@@ -82,13 +80,9 @@ public:
   }
 };
 
-MetaVectorScaleTest<Algo::Generic, float, Index> meta_vector_scale_test_generic_float;
-MetaVectorScaleTest<Algo::Generic, double, Index> meta_vector_scale_test_generic_double;
-#ifdef FEAST_BACKENDS_MKL
-MetaVectorScaleTest<Algo::MKL, float, Index> meta_vector_scale_test_mkl_float;
-MetaVectorScaleTest<Algo::MKL, double, Index> meta_vector_scale_test_mkl_double;
-#endif
+MetaVectorScaleTest<Mem::Main, float, Index> meta_vector_scale_test_generic_float;
+MetaVectorScaleTest<Mem::Main, double, Index> meta_vector_scale_test_generic_double;
 #ifdef FEAST_BACKENDS_CUDA
-MetaVectorScaleTest<Algo::CUDA, float, Index> meta_vector_scale_test_cuda_float;
-MetaVectorScaleTest<Algo::CUDA, double, Index> meta_vector_scale_test_cuda_double;
+MetaVectorScaleTest<Mem::CUDA, float, Index> meta_vector_scale_test_cuda_float;
+MetaVectorScaleTest<Mem::CUDA, double, Index> meta_vector_scale_test_cuda_double;
 #endif

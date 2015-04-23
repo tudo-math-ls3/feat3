@@ -13,7 +13,7 @@ namespace FEAST
   namespace Foundation
   {
       /// \todo add communicators
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct GlobalDefect
       {
         public:
@@ -35,7 +35,7 @@ namespace FEAST
             ///assumes type-1 vector (full entries at inner boundaries)
             ///assumes type-0 matrix (entry fractions at inner boundaries)
 
-            GlobalProductMat0Vec1<Mem::Main, Algo::Generic>::exec(
+            GlobalProductMat0Vec1<Mem::Main>::exec(
                                                                   target,
                                                                   A,
                                                                   x,
@@ -46,7 +46,7 @@ namespace FEAST
                                                                   tags,
                                                                   communicator);
 
-            LAFEM::Arch::Difference<Mem_, Algo_>::value(target.elements(), b.elements(), target.elements(), target.size());
+            LAFEM::Arch::Difference<Mem_>::value(target.elements(), b.elements(), target.elements(), target.size());
           }
 #else
           template<typename MatrixT_, typename SystemVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
@@ -63,8 +63,8 @@ namespace FEAST
                            Communicator = Communicator(0)
                            )
           {
-            A.template apply<Algo_>(target, x);
-            LAFEM::Arch::Difference<Mem_, Algo_>::value(target.elements(), b.elements(), target.elements(), target.size());
+            A.apply(target, x);
+            LAFEM::Arch::Difference<Mem_>::value(target.elements(), b.elements(), target.elements(), target.size());
           }
 #endif
       };

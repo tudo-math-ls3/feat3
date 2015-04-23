@@ -13,7 +13,7 @@ namespace FEAST
   namespace Foundation
   {
       /// \todo add communicators
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct HaloFrequencies
       {
         public:
@@ -34,11 +34,11 @@ namespace FEAST
             for(Index i(0); i < Index(mirrors.size()); ++i)
             {
               mirror_buffers.at(i).format(typename BufferVectorT_::DataType(1));
-              mirrors.at(i).template scatter_axpy_dual<Algo_>(frequency_buffer, mirror_buffers.at(i));
+              mirrors.at(i).scatter_axpy_dual(frequency_buffer, mirror_buffers.at(i));
             }
 
             // invert frequencies
-            frequency_buffer.template component_invert<Algo_>(frequency_buffer);
+            frequency_buffer.component_invert(frequency_buffer);
 
             return frequency_buffer.clone();
           }

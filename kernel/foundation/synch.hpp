@@ -11,13 +11,13 @@ namespace FEAST
   namespace Foundation
   {
     /// \todo add communicators
-    template<typename Tag_, Tier2CommModes cm_>
+    template<Tier2CommModes cm_>
     struct SynchVec
     {
     };
 
-    template<typename Tag_>
-    struct SynchVec<Tag_, com_exchange>
+    template <>
+    struct SynchVec<com_exchange>
     {
       //single target, single mirror
       template<typename VectorT_, typename VectorMirrorT_>
@@ -28,7 +28,7 @@ namespace FEAST
                                  Index dest_rank,
                                  Index source_rank)
       {
-        mirror.template gather_dual<Tag_>(sendbuf, target);
+        mirror.gather_dual(sendbuf, target);
 
         Status s;
         Comm::send_recv(sendbuf.elements(),
@@ -39,7 +39,7 @@ namespace FEAST
                         source_rank,
                         s);
 
-        mirror.template scatter_dual<Tag_>(target, recvbuf);
+        mirror.scatter_dual(target, recvbuf);
       }
 
       //single target, multiple mirrors (stemming from multiple halos)
@@ -53,7 +53,7 @@ namespace FEAST
       {
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
-          SynchVec<Tag_, com_exchange>::execute(target,
+          SynchVec<com_exchange>::execute(target,
                                                        mirrors.at(i),
                                                        sendbufs.at(i),
                                                        recvbufs.at(i),
@@ -63,8 +63,8 @@ namespace FEAST
       }
     };
 
-    template<typename Tag_>
-    struct SynchVec<Tag_, com_accumulate>
+    template<>
+    struct SynchVec<com_accumulate>
     {
       //single target, single mirror
       template<typename VectorT_, typename VectorMirrorT_>
@@ -75,7 +75,7 @@ namespace FEAST
                                  Index dest_rank,
                                  Index source_rank)
       {
-        mirror.template gather_dual<Tag_>(sendbuf, target);
+        mirror.gather_dual(sendbuf, target);
 
         Status s;
         Comm::send_recv(sendbuf.elements(),
@@ -86,9 +86,9 @@ namespace FEAST
                                source_rank,
                                s);
 
-        recvbuf.template axpy<Tag_>(sendbuf, recvbuf);
+        recvbuf.axpy(sendbuf, recvbuf);
 
-        mirror.template scatter_dual<Tag_>(target, recvbuf);
+        mirror.scatter_dual(target, recvbuf);
       }
 
       //single target, multiple mirrors (stemming from multiple halos)
@@ -107,7 +107,7 @@ namespace FEAST
       {
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
-          mirrors.at(i).template gather_dual<Tag_>(sendbufs.at(i), target);
+          mirrors.at(i).gather_dual(sendbufs.at(i), target);
 
           Status s;
           Comm::send_recv(sendbufs.at(i).elements(),
@@ -123,17 +123,17 @@ namespace FEAST
 
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
-          mirrors.at(i).template gather_dual<Tag_>(sendbufs.at(i), target); //we dont need the sendbuf any more
+          mirrors.at(i).gather_dual(sendbufs.at(i), target); //we dont need the sendbuf any more
 
-          recvbufs.at(i).template axpy<Tag_>(sendbufs.at(i), recvbufs.at(i));
+          recvbufs.at(i).axpy(sendbufs.at(i), recvbufs.at(i));
 
-          mirrors.at(i).template scatter_dual<Tag_>(target, recvbufs.at(i));
+          mirrors.at(i).scatter_dual(target, recvbufs.at(i));
         }
       }
     };
 
-    template<typename Tag_>
-    struct SynchVec<Tag_, com_average>
+    template<>
+    struct SynchVec<com_average>
     {
       //single target, single mirror
       template<typename VectorT_, typename VectorMirrorT_>
@@ -144,7 +144,7 @@ namespace FEAST
                                  Index dest_rank,
                                  Index source_rank)
       {
-        mirror.template gather_dual<Tag_>(sendbuf, target);
+        mirror.gather_dual(sendbuf, target);
 
         Comm::send_recv(sendbuf.elements(),
                                sendbuf.size(),
@@ -153,10 +153,10 @@ namespace FEAST
                                recvbuf.size(),
                                source_rank);
 
-        recvbuf.template axpy<Tag_>(sendbuf, recvbuf);
-        recvbuf.template scale<Tag_>(recvbuf, typename VectorT_::DataType(0.5));
+        recvbuf.axpy(sendbuf, recvbuf);
+        recvbuf.scale(recvbuf, typename VectorT_::DataType(0.5));
 
-        mirror.template scatter_dual<Tag_>(target, recvbuf);
+        mirror.scatter_dual(target, recvbuf);
       }
 
       //single target, multiple mirrors (stemming from multiple halos)
@@ -168,16 +168,16 @@ namespace FEAST
                                  StorageT_<Index, std::allocator<Index> >& dest_ranks,
                                  StorageT_<Index, std::allocator<Index> >& source_ranks)
       {
-        SynchVec<Tag_, com_accumulate>::execute(target, mirrors, sendbufs, recvbufs, dest_ranks, source_ranks);
+        SynchVec<com_accumulate>::execute(target, mirrors, sendbufs, recvbufs, dest_ranks, source_ranks);
 
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
           //average by two along non-vertex halos only (implies divide by four along vertex halos) TODO: generalize will in most cases not work
           if(mirrors.at(i).size() != 1)
           {
-            mirrors.at(i).template gather_dual<Tag_>(sendbufs.at(i), target);
-            sendbufs.at(i).template scale<Tag_>(sendbufs.at(i), typename VectorT_::DataType(0.5));
-            mirrors.at(i).template scatter_dual<Tag_>(target, sendbufs.at(i));
+            mirrors.at(i).gather_dual(sendbufs.at(i), target);
+            sendbufs.at(i).scale(sendbufs.at(i), typename VectorT_::DataType(0.5));
+            mirrors.at(i).scatter_dual(target, sendbufs.at(i));
           }
         }
       }

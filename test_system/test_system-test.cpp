@@ -118,14 +118,14 @@ TaggedUnitTest<Archs::None, int> taggedunittesti ("TaggedUnitTest-test int");
 *
 * \author Dirk Ribbrock
 */
-template <typename Mem_, typename Algo_, typename DT_, typename IT_>
+template <typename Mem_, typename DT_, typename IT_>
 class FullTaggedUnitTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   /// Constructor
   FullTaggedUnitTest(const String & id_in)
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>(id_in)
+    : FullTaggedTest<Mem_, DT_, IT_>(id_in)
   {
   }
 
@@ -146,5 +146,5 @@ public:
     TEST_CHECK_NOT_EQUAL(a, c);
   }
 };
-FullTaggedUnitTest<Archs::None, Archs::None, float, Index> fulltaggedunittestf ("FullTaggedUnitTest-test float");
-FullTaggedUnitTest<Archs::None, Archs::None, double, Index> fulltaggedunittestd ("FullTaggedUnitTest-test double");
+FullTaggedUnitTest<Archs::None, float, Index> fulltaggedunittestf ("FullTaggedUnitTest-test float");
+FullTaggedUnitTest<Archs::None, double, Index> fulltaggedunittestd ("FullTaggedUnitTest-test double");

@@ -363,14 +363,12 @@ namespace FEAST
        * \param[in] x
        * The multiplicant vector.
        */
-      template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
-        first().template apply<Algo_>(r.first(), x);
-        rest().template apply<Algo_>(r.rest(), x);
+        first().apply(r.first(), x);
+        rest().apply(r.rest(), x);
       }
 
-      template<typename Algo_>
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
       {
         if (r.size() != this->rows())
@@ -381,8 +379,8 @@ namespace FEAST
         DenseVector<MemType, DataType, IndexType> r_first(r, first().rows(), 0);
         DenseVector<MemType, DataType, IndexType> r_rest(r, rest().rows(), first().rows());
 
-        first().template apply<Algo_>(r_first, x);
-        rest().template apply<Algo_>(r_rest, x);
+        first().apply(r_first, x);
+        rest().apply(r_rest, x);
       }
 
       /**
@@ -401,14 +399,12 @@ namespace FEAST
        * The summand vector
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
-        first().template apply<Algo_>(r.first(), x, y.first(), alpha);
-        rest().template apply<Algo_>(r.rest(), x, y.rest(), alpha);
+        first().apply(r.first(), x, y.first(), alpha);
+        rest().apply(r.rest(), x, y.rest(), alpha);
       }
 
-      template<typename Algo_>
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType , IndexType>& x,
                  const DenseVector<MemType, DataType , IndexType>& y, DataType alpha = DataType(1)) const
       {
@@ -425,8 +421,8 @@ namespace FEAST
         DenseVector<MemType, DataType, IndexType> y_first(y, first().rows(), 0);
         DenseVector<MemType, DataType, IndexType> y_rest(y, rest().rows(), first().rows());
 
-        first().template apply<Algo_>(r_first, x, y_first, alpha);
-        rest().template apply<Algo_>(r_rest, x, y_rest, alpha);
+        first().apply(r_first, x, y_first, alpha);
+        rest().apply(r_rest, x, y_rest, alpha);
       }
 
       /// Returns a new compatible L-Vector.
@@ -735,29 +731,25 @@ namespace FEAST
         first().format(value);
       }
 
-      template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
-        first().template apply<Algo_>(r.first(), x);
+        first().apply(r.first(), x);
       }
 
-      template<typename Algo_>
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
       {
-        first().template apply<Algo_>(r, x);
+        first().apply(r, x);
       }
 
-      template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
-        first().template apply<Algo_>(r.first(), x, y.first(), alpha);
+        first().apply(r.first(), x, y.first(), alpha);
       }
 
-      template<typename Algo_>
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
                  const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
-        first().template apply<Algo_>(r, x, y, alpha);
+        first().apply(r, x, y, alpha);
       }
 
       /// Returns a new compatible L-Vector.

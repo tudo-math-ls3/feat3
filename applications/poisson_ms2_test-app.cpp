@@ -85,7 +85,6 @@ int main()
     boundaries_copy.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D>, double> >(new Halo<0, PLEdge, Mesh<Dim2D>, double>(boundaries.at(i))));
 
   Refinement<Mem::Main,
-    Algo::Generic,
     mrt_standard>::execute(mesh, &boundaries_copy, attrs);
   boundaries.clear();
 
@@ -94,7 +93,6 @@ int main()
 
   ///partitioning and initial loadbalancing
   auto p_i(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(mesh,
@@ -188,7 +186,7 @@ int main()
 
   DenseVector<Mem::Main, double> fbuf(mat_sys.rows());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mbufs, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mbufs, fbuf));
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
@@ -202,8 +200,8 @@ int main()
 
   //synching for type-0 -> type-1
   auto tags(HaloTags::value(p_i.comm_halos));
-  auto mat_localsys(MatrixConversion<Mem::Main, Algo::Generic>::value(mat_sys, mirrors, other_ranks, tags));
-  GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(vec_rhs,
+  auto mat_localsys(MatrixConversion<Mem::Main>::value(mat_sys, mirrors, other_ranks, tags));
+  GlobalSynchVec0<Mem::Main>::exec(vec_rhs,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
@@ -217,11 +215,11 @@ int main()
   SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
 
   ///filter system
-  filter.filter_mat<Algo::Generic>(mat_sys);
-  filter.filter_mat<Algo::Generic>(mat_localsys);
-  filter.filter_rhs<Algo::Generic>(vec_rhs);
-  filter.filter_sol<Algo::Generic>(vec_sol);
-  filter.filter_mat<Algo::Generic>(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
+  filter.filter_mat(mat_sys);
+  filter.filter_mat(mat_localsys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
+  filter.filter_mat(mat_precon); //TODO: check if -> NO! we do this in the solver program when applying the correction filter after preconditioning
 
   SynchronisedPreconditionedFilteredScaRCData<double,
                                               Mem::Main,
@@ -343,8 +341,7 @@ int main()
       SparseMatrixCSR<Mem::Main, double>,
       UnitFilter<Mem::Main, double>,
       std::vector,
-      Index,
-      Algo::Generic> > solver(new ScaRCFunctorPCG0<double,
+      Index> > solver(new ScaRCFunctorPCG0<double,
           Mem::Main,
           DenseVector<Mem::Main, double>,
           VectorMirror<Mem::Main, double>,
@@ -352,8 +349,7 @@ int main()
           SparseMatrixCSR<Mem::Main, double>,
           UnitFilter<Mem::Main, double>,
           std::vector,
-          Index,
-          Algo::Generic>(data) );
+          Index>(data) );
 
     ///layer 1 (global layer), preconditioner
     std::shared_ptr<ScaRCFunctorBase<double,
@@ -364,8 +360,7 @@ int main()
       SparseMatrixCSR<Mem::Main, double>,
       UnitFilter<Mem::Main, double>,
       std::vector,
-      Index,
-      Algo::Generic> > block_smoother(new ScaRCFunctorPreconBlock<double,
+      Index> > block_smoother(new ScaRCFunctorPreconBlock<double,
           Mem::Main,
           DenseVector<Mem::Main, double>,
           VectorMirror<Mem::Main, double>,
@@ -373,8 +368,7 @@ int main()
           SparseMatrixCSR<Mem::Main, double>,
           UnitFilter<Mem::Main, double>,
           std::vector,
-          Index,
-          Algo::Generic>(data) );
+          Index>(data) );
 
     ///layer 0 (local layer)
     std::shared_ptr<ScaRCFunctorBase<double,
@@ -385,8 +379,7 @@ int main()
       SparseMatrixCSR<Mem::Main, double>,
       UnitFilter<Mem::Main, double>,
       std::vector,
-      Index,
-      Algo::Generic> > local_solver(new ScaRCFunctorPCG1<double,
+      Index> > local_solver(new ScaRCFunctorPCG1<double,
           Mem::Main,
           DenseVector<Mem::Main, double>,
           VectorMirror<Mem::Main, double>,
@@ -394,8 +387,7 @@ int main()
           SparseMatrixCSR<Mem::Main, double>,
           UnitFilter<Mem::Main, double>,
           std::vector,
-          Index,
-          Algo::Generic>(data) );
+          Index>(data) );
 
     ///layer 0 (local layer), preconditioner
     std::shared_ptr<ScaRCFunctorBase<double,
@@ -406,8 +398,7 @@ int main()
       SparseMatrixCSR<Mem::Main, double>,
       UnitFilter<Mem::Main, double>,
       std::vector,
-      Index,
-      Algo::Generic> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
+      Index> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
           Mem::Main,
           DenseVector<Mem::Main, double>,
           VectorMirror<Mem::Main, double>,
@@ -415,8 +406,7 @@ int main()
           SparseMatrixCSR<Mem::Main, double>,
           UnitFilter<Mem::Main, double>,
           std::vector,
-          Index,
-          Algo::Generic>(data) );
+          Index>(data) );
 
 
     solver->reset_preconditioner(block_smoother);
@@ -442,8 +432,7 @@ int main()
       SparseMatrixCSR<Mem::Main, double>,
       UnitFilter<Mem::Main, double>,
       std::vector,
-      Index,
-      Algo::Generic> > local_solver(new ScaRCFunctorPCG1<double,
+      Index> > local_solver(new ScaRCFunctorPCG1<double,
           Mem::Main,
           DenseVector<Mem::Main, double>,
           VectorMirror<Mem::Main, double>,
@@ -451,8 +440,7 @@ int main()
           SparseMatrixCSR<Mem::Main, double>,
           UnitFilter<Mem::Main, double>,
           std::vector,
-          Index,
-          Algo::Generic>(data) );
+          Index>(data) );
 
     ///layer 0 (local layer), preconditioner
     std::shared_ptr<ScaRCFunctorBase<double,
@@ -463,8 +451,7 @@ int main()
       SparseMatrixCSR<Mem::Main, double>,
       UnitFilter<Mem::Main, double>,
       std::vector,
-      Index,
-      Algo::Generic> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
+      Index> > local_precon(new ScaRCFunctorPreconSpM1V1<double,
           Mem::Main,
           DenseVector<Mem::Main, double>,
           VectorMirror<Mem::Main, double>,
@@ -472,8 +459,7 @@ int main()
           SparseMatrixCSR<Mem::Main, double>,
           UnitFilter<Mem::Main, double>,
           std::vector,
-          Index,
-          Algo::Generic>(data) );
+          Index>(data) );
 
 
     local_solver->reset_preconditioner(local_precon);

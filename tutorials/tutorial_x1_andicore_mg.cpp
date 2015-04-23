@@ -69,8 +69,6 @@ namespace TutorialX1
   typedef double DataType;
   // Moreover, we use main memory (aka "RAM") for our containers.
   typedef Mem::Main MemType;
-  // And we'll use the Generic algorithm implementation for now.
-  typedef Algo::Generic AlgoType;
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -437,7 +435,7 @@ namespace TutorialX1
 
     // Define the preconditioner, aka the smoother (because smoothing is
     // realised as a preconditioned Richardson "solve")
-    typedef LAFEM::Preconditioner<AlgoType, MatrixType, VectorType> SmootherType;
+    typedef LAFEM::Preconditioner<MatrixType, VectorType> SmootherType;
 
     // Define everything that is actually needed:
     MeshType mesh;
@@ -525,7 +523,7 @@ namespace TutorialX1
       dirichlet_asm.assemble(filter);
 
       // apply filter onto matrix
-      filter.filter_mat<AlgoType>(mat_sys);
+      filter.filter_mat(mat_sys);
     }
 
     void assemble_rhs_sol(const AndicoreData& data)
@@ -551,8 +549,8 @@ namespace TutorialX1
       vec_sol.format();
 
       // apply filter
-      filter.filter_rhs<AlgoType>(vec_rhs);
-      filter.filter_sol<AlgoType>(vec_sol);
+      filter.filter_rhs(vec_rhs);
+      filter.filter_sol(vec_sol);
     }
 
     // This function assembles the prolongation and restriction matrices for the grid transfer between
@@ -570,8 +568,8 @@ namespace TutorialX1
       Assembly::GridTransfer::assemble_prolongation(mat_prol, weight, space, coarse.space, cubature_factory);
 
       // Scale the prolongation matrix rows by the inverted weights
-      weight.component_invert<AlgoType>(weight);
-      mat_prol.scale_rows<AlgoType>(mat_prol, weight);
+      weight.component_invert(weight);
+      mat_prol.scale_rows(mat_prol, weight);
 
       // Finally, transpose to obtain the restriction matrix
       mat_rest.transpose(mat_prol);
@@ -593,9 +591,9 @@ namespace TutorialX1
     // and returns the defect's norm.
     DataType compute_defect()
     {
-      mat_sys.apply<AlgoType>(vec_def, vec_sol, vec_rhs, -DataType(1));
-      filter.filter_def<AlgoType>(vec_def);
-      return vec_def.norm2<AlgoType>();
+      mat_sys.apply(vec_def, vec_sol, vec_rhs, -DataType(1));
+      filter.filter_def(vec_def);
+      return vec_def.norm2();
     }
 
     // This function applies the smoother for a desired number of Richardson steps.
@@ -608,9 +606,9 @@ namespace TutorialX1
         // apply smoother
         smoother->apply(vec_cor, vec_def);
         // apply correction filter
-        filter.filter_cor<AlgoType>(vec_cor);
+        filter.filter_cor(vec_cor);
         // update solution vector
-        vec_sol.axpy<AlgoType>(vec_cor, vec_sol);
+        vec_sol.axpy(vec_cor, vec_sol);
         // compute new defect vector
         compute_defect();
       }
@@ -622,9 +620,9 @@ namespace TutorialX1
     void restrict_def(SystemLevel& coarse) const
     {
       // Restrict defect into coarse rhs
-      mat_rest.apply<AlgoType>(coarse.vec_rhs, vec_def);
+      mat_rest.apply(coarse.vec_rhs, vec_def);
       // Apply the defect filter (Yes, the defect and not the rhs filter!)
-      coarse.filter.filter_def<AlgoType>(coarse.vec_rhs);
+      coarse.filter.filter_def(coarse.vec_rhs);
       // Format sol vector
       coarse.vec_sol.format();
       // Copy rhs to defect
@@ -636,11 +634,11 @@ namespace TutorialX1
     void prolongate_sol(const SystemLevel& coarse)
     {
       // Prolongate coarse sol into correction
-      mat_prol.apply<AlgoType>(vec_cor, coarse.vec_sol);
+      mat_prol.apply(vec_cor, coarse.vec_sol);
       // Apply correction filter
-      filter.filter_cor<AlgoType>(vec_cor);
+      filter.filter_cor(vec_cor);
       // Update our sol vector.
-      vec_sol.axpy<AlgoType>(vec_cor, vec_sol);
+      vec_sol.axpy(vec_cor, vec_sol);
     }
 
     // This function computes the L2/H1-errors of the solution vector against the analytic solution.
@@ -724,7 +722,7 @@ namespace TutorialX1
 
       // create smoother
       (*it)->set_smoother(
-        new LAFEM::JacobiPreconditioner<AlgoType, SystemLevel::MatrixType, SystemLevel::VectorType>((*it)->mat_sys, 0.7)
+        new LAFEM::JacobiPreconditioner<SystemLevel::MatrixType, SystemLevel::VectorType>((*it)->mat_sys, 0.7)
       );
     }
 
@@ -748,7 +746,7 @@ namespace TutorialX1
       }
 
       // coarse grid solve utilising the level's "smoother" as a preconditioner
-      LAFEM::BiCGStab<AlgoType>::value(
+      LAFEM::BiCGStab::value(
         levels.front()->vec_sol,    // the iteration (solution) vector
         levels.front()->mat_sys,    // the system matrix
         levels.front()->vec_rhs,    // the rhs vector

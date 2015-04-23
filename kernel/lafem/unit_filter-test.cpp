@@ -15,18 +15,18 @@ using namespace FEAST::TestSystem;
  * \author Peter Zajac
  */
 template<
-  typename Algo_,
+  typename MemType_,
   typename DT_,
   typename IT_>
 class UnitFilterVectorTest
-  : public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
+  : public FullTaggedTest<MemType_, DT_, IT_>
 {
-  typedef DenseVector<typename Algo_::MemType, DT_, IT_> VectorType;
-  typedef DenseVector<typename Algo_::MemType, IT_, IT_> IVectorType;
-  typedef UnitFilter<typename Algo_::MemType, DT_, IT_> FilterType;
+  typedef DenseVector<MemType_, DT_, IT_> VectorType;
+  typedef DenseVector<MemType_, IT_, IT_> IVectorType;
+  typedef UnitFilter<MemType_, DT_, IT_> FilterType;
 public:
   UnitFilterVectorTest()
-    : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("UnitFilterVectorTest")
+    : FullTaggedTest<MemType_, DT_, IT_>("UnitFilterVectorTest")
   {
   }
 
@@ -61,30 +61,30 @@ public:
     TEST_CHECK_EQUAL(filter.used_elements(), Index(3));
 
     // apply the filter
-    filter.template filter_def<Algo_>(a1);
-    filter.template filter_cor<Algo_>(a2);
-    filter.template filter_rhs<Algo_>(b1);
-    filter.template filter_sol<Algo_>(b2);
+    filter.filter_def(a1);
+    filter.filter_cor(a2);
+    filter.filter_rhs(b1);
+    filter.filter_sol(b2);
 
     // subtract reference results
-    a1.template axpy<Algo_>(ar, a1, -DT_(1));
-    a2.template axpy<Algo_>(ar, a2, -DT_(1));
-    b1.template axpy<Algo_>(br, b1, -DT_(1));
-    b2.template axpy<Algo_>(br, b2, -DT_(1));
+    a1.axpy(ar, a1, -DT_(1));
+    a2.axpy(ar, a2, -DT_(1));
+    b1.axpy(br, b1, -DT_(1));
+    b2.axpy(br, b2, -DT_(1));
 
     // check results
-    TEST_CHECK_EQUAL_WITHIN_EPS(a1.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(a2.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(b1.template norm2<Algo_>(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(b2.template norm2<Algo_>(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(a1.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(a2.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(b1.norm2(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(b2.norm2(), DT_(0), tol);
   }
 };
 
-UnitFilterVectorTest<Algo::Generic, float, Index> unit_filter_vector_test_generic_fi;
-UnitFilterVectorTest<Algo::Generic, double, Index> unit_filter_vector_test_generic_di;
+UnitFilterVectorTest<Mem::Main, float, Index> unit_filter_vector_test_generic_fi;
+UnitFilterVectorTest<Mem::Main, double, Index> unit_filter_vector_test_generic_di;
 #ifdef FEAST_BACKENDS_CUDA
-UnitFilterVectorTest<Algo::CUDA, float, Index> unit_filter_vector_test_cuda_fi;
-UnitFilterVectorTest<Algo::CUDA, double, Index> unit_filter_vector_test_cuda_di;
+UnitFilterVectorTest<Mem::CUDA, float, Index> unit_filter_vector_test_cuda_fi;
+UnitFilterVectorTest<Mem::CUDA, double, Index> unit_filter_vector_test_cuda_di;
 #endif
 
 /**
@@ -93,18 +93,18 @@ UnitFilterVectorTest<Algo::CUDA, double, Index> unit_filter_vector_test_cuda_di;
  * \author Peter Zajac
  */
 template<
-  typename Algo_,
+  typename MemType_,
   typename DT_,
   typename IT_>
 class UnitFilterMatrixTest
-  : public FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>
+  : public FullTaggedTest<MemType_, DT_, IT_>
 {
-  typedef DenseVector<typename Algo_::MemType, DT_, IT_> VectorType;
-  typedef DenseVector<typename Algo_::MemType, IT_, IT_> IVectorType;
-  typedef UnitFilter<typename Algo_::MemType, DT_, IT_> FilterType;
+  typedef DenseVector<MemType_, DT_, IT_> VectorType;
+  typedef DenseVector<MemType_, IT_, IT_> IVectorType;
+  typedef UnitFilter<MemType_, DT_, IT_> FilterType;
 public:
   UnitFilterMatrixTest()
-    : FullTaggedTest<typename Algo_::MemType, Algo_, DT_, IT_>("UnitFilterMatrixTest")
+    : FullTaggedTest<MemType_, DT_, IT_>("UnitFilterMatrixTest")
   {
   }
 
@@ -112,7 +112,7 @@ public:
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
-    typedef SparseMatrixCSR<typename Algo_::MemType, DT_, IT_> MatrixType;
+    typedef SparseMatrixCSR<MemType_, DT_, IT_> MatrixType;
     IVectorType row_ptr(IT_(8));
     IVectorType col_idx(IT_(18));
 
@@ -165,15 +165,16 @@ public:
     filter.add(IT_(6), DT_(9));
 
     // apply filter onto a
-    filter.template filter_mat<Algo_>(matrix_a);
+    filter.filter_mat(matrix_a);
 
     // subtract reference
-    matrix_a.template axpy<Algo_>(matrix_b, matrix_a, -DT_(1));
+    matrix_a.axpy(matrix_b, matrix_a, -DT_(1));
 
     // check difference
-    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a.template norm_frobenius<Algo_>(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a.norm_frobenius(), DT_(0), tol);
   }
 };
 
-UnitFilterMatrixTest<Algo::Generic, float, Index> unit_filter_matrix_test_generic_fi;
-UnitFilterMatrixTest<Algo::Generic, double, Index> unit_filter_matrix_test_generic_di;
+UnitFilterMatrixTest<Mem::Main, float, Index> unit_filter_matrix_test_generic_fi;
+UnitFilterMatrixTest<Mem::Main, double, Index> unit_filter_matrix_test_generic_di;
+///TODO cuda tests?

@@ -16,14 +16,13 @@ using namespace FEAST::Foundation;
 
 template<typename Tag_,
          typename IndexType_,
-         typename Algo_,
          template<typename, typename> class OT_, typename IT_>
 class HaloTest:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     HaloTest(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("HaloTest<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("HaloTest<" + tag + ">")
     {
     }
 
@@ -124,18 +123,18 @@ class HaloTest:
       //typedef typename decltype(h)::template CommLink<double> CommLinkT_;
     }
 };
-HaloTest<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halo_test_cpu_v_v("std::vector, std::vector");
-HaloTest<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > halo_test_cpu_d_v("std::deque, std::vector");
-HaloTest<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halo_test_cpu_v_d("std::vector, std::deque");
-HaloTest<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > halo_test_cpu_d_d("std::deque, std::deque");
+HaloTest<Mem::Main, Index, std::vector, std::vector<Index> > halo_test_cpu_v_v("std::vector, std::vector");
+HaloTest<Mem::Main, Index, std::deque, std::vector<Index> > halo_test_cpu_d_v("std::deque, std::vector");
+HaloTest<Mem::Main, Index, std::vector, std::deque<Index> > halo_test_cpu_v_d("std::vector, std::deque");
+HaloTest<Mem::Main, Index, std::deque, std::deque<Index> > halo_test_cpu_d_d("std::deque, std::deque");
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class HaloTestGeometryInterface:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     HaloTestGeometryInterface(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("HaloTestGeometryInterface<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("HaloTestGeometryInterface<" + tag + ">")
     {
     }
 
@@ -266,5 +265,5 @@ class HaloTestGeometryInterface:
       TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[0], 3ul);
     }
 };
-HaloTestGeometryInterface<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halo_test_fginter_cpu_v_v("std::vector, std::vector");
-HaloTestGeometryInterface<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halo_test_fginter_cpu_v_d("std::vector, std::deque");
+HaloTestGeometryInterface<Mem::Main, Index, std::vector, std::vector<Index> > halo_test_fginter_cpu_v_v("std::vector, std::vector");
+HaloTestGeometryInterface<Mem::Main, Index, std::vector, std::deque<Index> > halo_test_fginter_cpu_v_d("std::vector, std::deque");

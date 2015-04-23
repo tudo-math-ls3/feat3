@@ -16,13 +16,13 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class RefinementTest1D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     RefinementTest1D(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("RefinementTest1D<" + tag + ">")
+      TaggedTest<Tag_, Index>("RefinementTest1D<" + tag + ">")
     {
     }
 
@@ -65,7 +65,6 @@ class RefinementTest1D:
 
 
       Refinement<Mem::Main,
-                 Algo::Generic,
                  mrt_standard,
                  hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -101,7 +100,7 @@ class RefinementTest1D:
       TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(1), IndexType_(1));
     }
 };
-RefinementTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test_cpu_v_v("std::vector, std::vector");
-RefinementTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test_cpu_v_d("std::vector, std::deque");
-RefinementTest1D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test_cpu_d_v("std::deque, std::vector");
-RefinementTest1D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test_cpu_d_d("std::deque, std::deque");
+RefinementTest1D<Mem::Main, Index, std::vector, std::vector<Index> > ref_test_cpu_v_v("std::vector, std::vector");
+RefinementTest1D<Mem::Main, Index, std::vector, std::deque<Index> > ref_test_cpu_v_d("std::vector, std::deque");
+RefinementTest1D<Mem::Main, Index, std::deque, std::vector<Index> > ref_test_cpu_d_v("std::deque, std::vector");
+RefinementTest1D<Mem::Main, Index, std::deque, std::deque<Index> > ref_test_cpu_d_d("std::deque, std::deque");

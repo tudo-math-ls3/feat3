@@ -518,13 +518,10 @@ namespace FEAST
       /**
        * \brief Calculate \f$this \leftarrow y + \alpha x\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The first summand matrix to be scaled.
        * \param[in] y The second summand matrix
        * \param[in] alpha A scalar to multiply x with.
        */
-      template <typename Algo_>
       void axpy(
                 const SparseMatrixCSRBlocked & x,
                 const SparseMatrixCSRBlocked & y,
@@ -546,27 +543,24 @@ namespace FEAST
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-          Arch::Sum<Mem_, Algo_>::value(this->raw_val(), x.raw_val(), y.raw_val(), this->raw_used_elements());
+          Arch::Sum<Mem_>::value(this->raw_val(), x.raw_val(), y.raw_val(), this->raw_used_elements());
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-          Arch::Difference<Mem_, Algo_>::value(this->raw_val(), y.raw_val(), x.raw_val(), this->raw_used_elements());
+          Arch::Difference<Mem_>::value(this->raw_val(), y.raw_val(), x.raw_val(), this->raw_used_elements());
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
-          Arch::Axpy<Mem_, Algo_>::dv(this->raw_val(), alpha, x.raw_val(), y.raw_val(), this->raw_used_elements());
+          Arch::Axpy<Mem_>::dv(this->raw_val(), alpha, x.raw_val(), y.raw_val(), this->raw_used_elements());
       }
 
       /**
        * \brief Calculate \f$this \leftarrow \alpha x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The matrix to be scaled.
        * \param[in] alpha A scalar to scale x with.
        */
-      template <typename Algo_>
       void scale(const SparseMatrixCSRBlocked & x, const DT_ alpha)
       {
         if (x.rows() != this->rows())
@@ -576,7 +570,7 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
-        Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), alpha, this->raw_used_elements());
+        Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->raw_used_elements());
       }
 
       /**
@@ -584,10 +578,9 @@ namespace FEAST
        *
        * \returns The Frobenius norm of this matrix.
        */
-      template <typename Algo_>
       DT_ norm_frobenius() const
       {
-        return Arch::Norm2<Mem_, Algo_>::value(this->raw_val(), this->raw_used_elements());
+        return Arch::Norm2<Mem_>::value(this->raw_val(), this->raw_used_elements());
       }
 
       /**
@@ -596,7 +589,6 @@ namespace FEAST
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      template<typename Algo_>
       void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
       {
         if (r.size() != this->raw_rows())
@@ -604,19 +596,16 @@ namespace FEAST
         if (x.size() != this->raw_columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
                                                                                              x.elements(), this->rows(), columns(), used_elements());
       }
 
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      template<typename Algo_>
       void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
       {
         if (r.size() != this->rows())
@@ -624,19 +613,16 @@ namespace FEAST
         if (x.size() != this->raw_columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
                                                                                              x.elements(), this->rows(), columns(), used_elements());
       }
 
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      template<typename Algo_>
       void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
       {
         if (r.size() != this->raw_rows())
@@ -644,19 +630,16 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
                                                                                              x.raw_elements(), this->rows(), columns(), used_elements());
       }
 
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      template<typename Algo_>
       void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
       {
         if (r.size() != this->rows())
@@ -664,21 +647,18 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
                                                                                              x.raw_elements(), this->rows(), columns(), used_elements());
       }
 
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_>
       void apply(
                  DenseVector<Mem_,DT_, IT_> & r,
                  const DenseVector<Mem_, DT_, IT_> & x,
@@ -696,7 +676,7 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), y.elements(), this->raw_val(), this->col_ind(),
+          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), y.elements(), this->raw_val(), this->col_ind(),
                                                                                         this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
@@ -705,7 +685,7 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), alpha, x.elements(), y.elements(),
+          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), alpha, x.elements(), y.elements(),
                                                                                       this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
       }
@@ -713,14 +693,11 @@ namespace FEAST
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_>
       void apply(
                  DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
                  const DenseVector<Mem_, DT_, IT_> & x,
@@ -738,7 +715,7 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
+          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
                                                                                         this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
@@ -748,7 +725,7 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.elements(), y.raw_elements(),
+          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.elements(), y.raw_elements(),
                                                                                       this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
       }
@@ -756,14 +733,11 @@ namespace FEAST
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_>
       void apply(
                  DenseVector<Mem_,DT_, IT_> & r,
                  const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
@@ -781,7 +755,7 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), y.elements(), this->raw_val(), this->col_ind(),
+          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), y.elements(), this->raw_val(), this->col_ind(),
                                                                                         this->row_ptr(), x.raw_elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
@@ -791,7 +765,7 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), alpha, x.raw_elements(), y.elements(),
+          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), alpha, x.raw_elements(), y.elements(),
                                                                                       this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
       }
@@ -799,14 +773,11 @@ namespace FEAST
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_>
       void apply(
                  DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
                  const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
@@ -824,7 +795,7 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
+          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
                                                                                         this->row_ptr(), x.raw_elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
@@ -833,7 +804,7 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.raw_elements(), y.raw_elements(),
+          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.raw_elements(), y.raw_elements(),
                                                                                       this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
       }

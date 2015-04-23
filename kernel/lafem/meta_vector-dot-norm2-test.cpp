@@ -12,15 +12,13 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_, typename IndexType_>
+template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaVectorDotNorm2Test
-  : public MetaVectorTestBase<Algo_, DataType_, IndexType_>
+  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
 {
 public:
-  typedef Algo_ AlgoType;
-  typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<Algo_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
   MetaVectorDotNorm2Test() : BaseClass("MetaVectorDotNorm2Test") {}
@@ -66,25 +64,21 @@ public:
     DataType x_norm2(Math::sqrt(x_dot_x));
 
     // test x*y
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.template dot<AlgoType>(y), x_dot_y, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(x.dot(y), x_dot_y, tol);
 
     // test x*x
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.template dot<AlgoType>(x), x_dot_x, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(x.dot(x), x_dot_x, tol);
 
     // test norm2(x)
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.template norm2<AlgoType>(), x_norm2, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(x.norm2(), x_norm2, tol);
   }
 };
 
-MetaVectorDotNorm2Test<Algo::Generic, float, Index> meta_vector_dot_norm2_test_generic_float;
-MetaVectorDotNorm2Test<Algo::Generic, double, Index> meta_vector_dot_norm2_test_generic_double;
-#ifdef FEAST_BACKENDS_MKL
-MetaVectorDotNorm2Test<Algo::MKL, float, Index> meta_vector_dot_norm2_test_mkl_float;
-MetaVectorDotNorm2Test<Algo::MKL, double, Index> meta_vector_dot_norm2_test_mkl_double;
-#endif
+MetaVectorDotNorm2Test<Mem::Main, float, Index> meta_vector_dot_norm2_test_generic_float;
+MetaVectorDotNorm2Test<Mem::Main, double, Index> meta_vector_dot_norm2_test_generic_double;
 #ifdef FEAST_BACKENDS_CUDA
-MetaVectorDotNorm2Test<Algo::CUDA, float, Index> meta_vector_dot_norm2_test_cuda_float;
-MetaVectorDotNorm2Test<Algo::CUDA, double, Index> meta_vector_dot_norm2_test_cuda_double;
+MetaVectorDotNorm2Test<Mem::CUDA, float, Index> meta_vector_dot_norm2_test_cuda_float;
+MetaVectorDotNorm2Test<Mem::CUDA, double, Index> meta_vector_dot_norm2_test_cuda_double;
 #endif
 
 /**
@@ -94,15 +88,13 @@ MetaVectorDotNorm2Test<Algo::CUDA, double, Index> meta_vector_dot_norm2_test_cud
  *
  * \author Jordi Paul
  */
-template<typename Algo_, typename DataType_, typename IndexType_>
+template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaVectorTripleDotTest
-  : public MetaVectorTestBase<Algo_, DataType_, IndexType_>
+  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
 {
 public:
-  typedef Algo_ AlgoType;
-  typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<Algo_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
   MetaVectorTripleDotTest() : BaseClass("MetaVectorTripleDotTest") {}
@@ -147,27 +139,21 @@ public:
     }
 
     // test y^T diag(x) z
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.template triple_dot<AlgoType>(y, z), tdot, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.template triple_dot<AlgoType>(z, y), tdot, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(x.triple_dot(y, z), tdot, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(x.triple_dot(z, y), tdot, tol);
 
     // test x^T diag(y) z
-    TEST_CHECK_EQUAL_WITHIN_EPS(y.template triple_dot<AlgoType>(x, z), tdot, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(y.template triple_dot<AlgoType>(z, x), tdot, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(y.triple_dot(x, z), tdot, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(y.triple_dot(z, x), tdot, tol);
 
     // test x^T diag(z) y
-    TEST_CHECK_EQUAL_WITHIN_EPS(z.template triple_dot<AlgoType>(x, y), tdot, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(z.template triple_dot<AlgoType>(y, x), tdot, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(z.triple_dot(x, y), tdot, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(z.triple_dot(y, x), tdot, tol);
   }
 };
 
-MetaVectorTripleDotTest<Algo::Generic, float, Index> meta_vector_triple_dot_test_generic_float;
-MetaVectorTripleDotTest<Algo::Generic, double, Index> meta_vector_triple_dot_test_generic_double;
+MetaVectorTripleDotTest<Mem::Main, float, Index> meta_vector_triple_dot_test_generic_float;
+MetaVectorTripleDotTest<Mem::Main, double, Index> meta_vector_triple_dot_test_generic_double;
 #ifdef FEAST_HAVE_QUADMATH
-MetaVectorTripleDotTest<Algo::Generic, __float128, Index> meta_vector_triple_dot_test_generic_float128;
-#endif
-#ifdef FEAST_BACKENDS_MKL
-// TODO Add MKL tests as soon as the triple_dot routines are implemented for that backend
-#endif
-#ifdef FEAST_BACKENDS_CUDA
-// TODO Add CUDA tests as soon as the triple_dot routines are implemented for that backend
+MetaVectorTripleDotTest<Mem::Main, __float128, Index> meta_vector_triple_dot_test_generic_float128;
 #endif

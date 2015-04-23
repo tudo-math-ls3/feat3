@@ -208,60 +208,52 @@ namespace FEAST
         rest().copy(x.rest());
       }
 
-      template<typename Algo_>
       void axpy(const TupleVector& x, const TupleVector& y, DataType alpha = DataType(1))
       {
-        first().template axpy<Algo_>(x.first(), y.first(), alpha);
-        rest().template axpy<Algo_>(x.rest(), y.rest(), alpha);
+        first().axpy(x.first(), y.first(), alpha);
+        rest().axpy(x.rest(), y.rest(), alpha);
       }
 
-      template <typename Algo_>
       void component_product(const TupleVector & x, const TupleVector & y)
       {
-        first().template component_product<Algo_>(x.first(), y.first());
-        rest().template component_product<Algo_>(x.rest(), y.rest());
+        first().component_product(x.first(), y.first());
+        rest().component_product(x.rest(), y.rest());
       }
 
-      template<typename Algo_>
       void component_invert(const TupleVector& x, DataType alpha = DataType(1))
       {
-        first().template component_invert<Algo_>(x.first(), alpha);
-        rest().template component_invert<Algo_>(x.rest(), alpha);
+        first().component_invert(x.first(), alpha);
+        rest().component_invert(x.rest(), alpha);
       }
 
-      template<typename Algo_>
       void scale(const TupleVector& x, DataType alpha)
       {
-        first().template scale<Algo_>(x.first(), alpha);
-        rest().template scale<Algo_>(x.rest(), alpha);
+        first().scale(x.first(), alpha);
+        rest().scale(x.rest(), alpha);
       }
 
-      template<typename Algo_>
       DataType dot(const TupleVector& x) const
       {
-        return first().template dot<Algo_>(x.first()) + rest().template dot<Algo_>(x.rest());
+        return first().dot(x.first()) + rest().dot(x.rest());
       }
 
       /**
        * \copydoc LAFEM::DenseVector::triple_dot()
        **/
-      template<typename Algo_>
       DataType triple_dot(const TupleVector& x, const TupleVector& y) const
       {
-        return first().template triple_dot<Algo_>(x.first(), y.first())
-          + rest().template triple_dot<Algo_>(x.rest(), y.rest());
+        return first().triple_dot(x.first(), y.first())
+          + rest().triple_dot(x.rest(), y.rest());
       }
 
-      template<typename Algo_>
       DataType norm2sqr() const
       {
-        return first().template norm2sqr<Algo_>() + rest().template norm2sqr<Algo_>();
+        return first().norm2sqr() + rest().norm2sqr();
       }
 
-      template<typename Algo_>
       DataType norm2() const
       {
-        return Math::sqrt(norm2sqr<Algo_>());
+        return Math::sqrt(norm2sqr());
       }
 
       const typename First_::DataType operator()(Index index) const
@@ -450,58 +442,49 @@ namespace FEAST
         first().copy(x.first());
       }
 
-      template<typename Algo_>
       void axpy(const TupleVector& x, const TupleVector& y, DataType alpha = DataType(1))
       {
-        first().template axpy<Algo_>(x.first(), y.first(), alpha);
+        first().axpy(x.first(), y.first(), alpha);
       }
 
-      template <typename Algo_>
       void component_product(const TupleVector & x, const TupleVector & y)
       {
-        first().template component_product<Algo_>(x.first(), y.first());
+        first().component_product(x.first(), y.first());
       }
 
-      template<typename Algo_>
       void component_invert(const TupleVector& x, DataType alpha = DataType(1))
       {
-        first().template component_invert<Algo_>(x.first(), alpha);
+        first().component_invert(x.first(), alpha);
       }
 
-      template<typename Algo_>
       void scale(const TupleVector& x, DataType alpha)
       {
-        first().template scale<Algo_>(x.first(), alpha);
+        first().scale(x.first(), alpha);
       }
 
-      template<typename Algo_>
       DataType dot(const TupleVector& x) const
       {
-        return first().template dot<Algo_>(x.first());
+        return first().dot(x.first());
       }
 
-      template<typename Algo_>
       DataType triple_dot(const TupleVector& x, const TupleVector& y) const
       {
-        return first().template triple_dot<Algo_>(x.first(), y.first());
+        return first().triple_dot(x.first(), y.first());
       }
 
-      template<typename Algo_>
       DataType triple_dot_i(const TupleVector& x, const TupleVector& y) const
       {
-        return first().template triple_dot_i<Algo_>(x.first(), y.first());
+        return first().triple_dot_i(x.first(), y.first());
       }
 
-      template<typename Algo_>
       DataType norm2sqr() const
       {
-        return first().template norm2sqr<Algo_>();
+        return first().norm2sqr();
       }
 
-      template<typename Algo_>
       DataType norm2() const
       {
-        return first().template norm2<Algo_>();
+        return first().norm2();
       }
 
       const typename First_::DataType operator()(Index index) const

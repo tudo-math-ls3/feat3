@@ -123,7 +123,6 @@ int main(int argc, char* argv[])
 
   std::cout << "p_" << me << " #procs: " << num_procs << std::endl;
   PData<Dim2D, TopoT, vector, Mesh, DT> p0(Partitioning<Mem::Main,
-                                                        Algo::Generic,
                                                         Dim2D,
                                                         0,
                                                         pl_vertex>::execute(m,

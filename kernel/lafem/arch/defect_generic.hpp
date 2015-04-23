@@ -18,7 +18,7 @@ namespace FEAST
     {
 
       template <typename DT_, typename IT_>
-      void Defect<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
+      void Defect<Mem::Main>::csr_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
       {
         for (Index row(0) ; row < rows ; ++row)
         {
@@ -33,7 +33,7 @@ namespace FEAST
       }
 
       template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
-      void Defect<Mem::Main, Algo::Generic>::csrb(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
+      void Defect<Mem::Main>::csrb_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
       {
         Tiny::Vector<DT_, BlockHeight_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockHeight_> *>(r));
         const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const bval(reinterpret_cast<const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const>(val));
@@ -153,7 +153,7 @@ namespace FEAST
       } // namespace Intern
 
       template <typename DT_, typename IT_>
-      void Defect<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const val,
+      void Defect<Mem::Main>::ell_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val,
                                                  const IT_ * const col_ind, const IT_ * const cs,
                                                  const IT_ * const cl, const DT_ * const x,
                                                  const Index C, const Index rows)
@@ -185,7 +185,7 @@ namespace FEAST
       }
 
       template <typename DT_, typename IT_>
-      void Defect<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const row_ptr, const IT_ * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements)
+      void Defect<Mem::Main>::coo_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const row_ptr, const IT_ * const col_ptr, const DT_ * const x, const Index rows, const Index, const Index used_elements)
       {
         Index iter(0);
         for (IT_ row(0); row < IT_(rows); ++row)
@@ -311,7 +311,7 @@ namespace FEAST
 
 
       template <typename DT_, typename IT_>
-      void Defect<Mem::Main, Algo::Generic>::banded(DT_ * r, const DT_ * const rhs,
+      void Defect<Mem::Main>::banded_generic(DT_ * r, const DT_ * const rhs,
                                                     const DT_ * const val, const IT_ * const offsets, const DT_ * const x,
                                                     const Index num_of_offsets, const Index rows, const Index columns)
       {

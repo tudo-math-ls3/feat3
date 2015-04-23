@@ -13,26 +13,24 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
-template<typename Algo_, typename DataType_, typename IndexType_>
+template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaFilterTest :
-  public FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>
+  public FullTaggedTest<MemType_, DataType_, IndexType_>
 {
 public:
-  typedef Algo_ AlgoType;
-  typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
   typedef IndexType_ IndexType;
 
-  typedef DenseVector<MemType, DataType, IndexType> ScalarVector;
+  typedef DenseVector<MemType_, DataType, IndexType> ScalarVector;
   typedef PowerVector<ScalarVector, 2> PowerVector2;
   typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
-  typedef UnitFilter<MemType, DataType, IndexType> ScalarFilter1;
-  typedef MeanFilter<MemType, DataType, IndexType> ScalarFilter2;
+  typedef UnitFilter<MemType_, DataType, IndexType> ScalarFilter1;
+  typedef MeanFilter<MemType_, DataType, IndexType> ScalarFilter2;
   typedef PowerFilter<ScalarFilter1, 2> PowerFilter2;
   typedef TupleFilter<PowerFilter2, ScalarFilter2> MetaFilter;
 
-  MetaFilterTest() : FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>("MetaFilterTest") {}
+  MetaFilterTest() : FullTaggedTest<MemType_, DataType_, IndexType_>("MetaFilterTest") {}
 
   static MetaFilter gen_filter(Index m)
   {
@@ -131,22 +129,22 @@ public:
     MetaVector vec_def(vec_sol.clone());
 
     // appy sol filter
-    filter.template filter_sol<AlgoType>(vec_sol);
-    filter.template filter_def<AlgoType>(vec_def);
+    filter.filter_sol(vec_sol);
+    filter.filter_def(vec_def);
 
     // generate ref vectors
     const MetaVector ref_sol(gen_vector_sol(m));
     const MetaVector ref_def(gen_vector_def(m));
 
     // subtract reference
-    vec_sol.template axpy<AlgoType>(ref_sol, vec_sol, -DataType(1));
-    vec_def.template axpy<AlgoType>(ref_def, vec_def, -DataType(1));
+    vec_sol.axpy(ref_sol, vec_sol, -DataType(1));
+    vec_def.axpy(ref_def, vec_def, -DataType(1));
 
     // check norm
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_sol.template norm2<AlgoType>(), DataType(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_def.template norm2<AlgoType>(), DataType(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_sol.norm2(), DataType(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_def.norm2(), DataType(0), tol);
   }
 };
 
-MetaFilterTest<Algo::Generic, double, Index> meta_filter_test_generic_double;
-MetaFilterTest<Algo::Generic, float, Index> meta_filter_test_generic_float;
+MetaFilterTest<Mem::Main, double, Index> meta_filter_test_generic_double;
+MetaFilterTest<Mem::Main, float, Index> meta_filter_test_generic_float;

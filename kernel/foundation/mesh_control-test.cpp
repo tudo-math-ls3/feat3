@@ -31,13 +31,13 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlTest1D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshControlTest1D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlTest1D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("MeshControlTest1D<" + tag + ">")
     {
     }
 
@@ -106,16 +106,16 @@ class MeshControlTest1D:
       delete[] size_set;
     }
 };
-MeshControlTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > meshcontrol1d_testvv("std::vector, std::vector");
-MeshControlTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > meshcontrol1d_testvd("std::vector, std::deque");
+MeshControlTest1D<Mem::Main, Index, std::vector, std::vector<Index> > meshcontrol1d_testvv("std::vector, std::vector");
+MeshControlTest1D<Mem::Main, Index, std::vector, std::deque<Index> > meshcontrol1d_testvd("std::vector, std::deque");
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlTest2D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshControlTest2D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlTest2D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("MeshControlTest2D<" + tag + ">")
     {
     }
 
@@ -247,16 +247,16 @@ class MeshControlTest2D:
       delete[] size_set;
     }
 };
-MeshControlTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > meshcontrol_testvv("std::vector, std::vector");
-MeshControlTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > meshcontrol_testvd("std::vector, std::deque");
+MeshControlTest2D<Mem::Main, Index, std::vector, std::vector<Index> > meshcontrol_testvv("std::vector, std::vector");
+MeshControlTest2D<Mem::Main, Index, std::vector, std::deque<Index> > meshcontrol_testvd("std::vector, std::deque");
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlTest3D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshControlTest3D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlTest3D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("MeshControlTest3D<" + tag + ">")
     {
     }
 
@@ -585,8 +585,8 @@ class MeshControlTest3D:
       delete[] size_set;
     }
 };
-MeshControlTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > meshcontrol3d_testvv("std::vector, std::vector");
-MeshControlTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > meshcontrol3d_testvd("std::vector, std::deque");
+MeshControlTest3D<Mem::Main, Index, std::vector, std::vector<Index> > meshcontrol3d_testvv("std::vector, std::vector");
+MeshControlTest3D<Mem::Main, Index, std::vector, std::deque<Index> > meshcontrol3d_testvd("std::vector, std::deque");
 
 template<typename T_>
 class RhsFunc
@@ -600,13 +600,13 @@ public:
 
 typedef Assembly::StaticWrapperFunction<RhsFunc> RhsFunction;
 
-template<typename Tag_, typename IndexType_, typename Algo_, typename MatrixType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename MatrixType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlPartitioningTest2D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     MeshControlPartitioningTest2D(const String & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlPartitioningTest2D<" + tag + ", " + MatrixType_::name() + ">")
+      TaggedTest<Tag_, IndexType_>("MeshControlPartitioningTest2D<" + tag + ", " + MatrixType_::name() + ">")
     {
     }
 
@@ -866,9 +866,9 @@ class MeshControlPartitioningTest2D:
       dirichlet.assemble(filter);
 
       // filter system
-      filter.filter_mat<Algo::Generic>(mat_sys);
-      filter.filter_rhs<Algo::Generic>(vec_rhs);
-      filter.filter_sol<Algo::Generic>(vec_sol);
+      filter.filter_mat(mat_sys);
+      filter.filter_rhs(vec_rhs);
+      filter.filter_sol(vec_sol);
 
       ///assemble mirrors
       std::vector<LAFEM::VectorMirror<Mem::Main, double> > mirrors;
@@ -896,11 +896,11 @@ class MeshControlPartitioningTest2D:
 
     }
 };
-MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_csr("std::vector, std::vector");
-MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_csr("std::vector, std::deque");
+MeshControlPartitioningTest2D<Mem::Main, Index, SparseMatrixCSR<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_csr("std::vector, std::vector");
+MeshControlPartitioningTest2D<Mem::Main, Index, SparseMatrixCSR<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_csr("std::vector, std::deque");
 
-MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCOO<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_coo("std::vector, std::vector");
-MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixCOO<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_coo("std::vector, std::deque");
+MeshControlPartitioningTest2D<Mem::Main, Index, SparseMatrixCOO<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_coo("std::vector, std::vector");
+MeshControlPartitioningTest2D<Mem::Main, Index, SparseMatrixCOO<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_coo("std::vector, std::deque");
 
-MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixELL<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_ell("std::vector, std::vector");
-MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, SparseMatrixELL<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_ell("std::vector, std::deque");
+MeshControlPartitioningTest2D<Mem::Main, Index, SparseMatrixELL<Mem::Main, double, Index>, std::vector, std::vector<Index> > meshcontrolpart_testvv_ell("std::vector, std::vector");
+MeshControlPartitioningTest2D<Mem::Main, Index, SparseMatrixELL<Mem::Main, double, Index>, std::vector, std::deque<Index> > meshcontrolpart_testvd_ell("std::vector, std::deque");

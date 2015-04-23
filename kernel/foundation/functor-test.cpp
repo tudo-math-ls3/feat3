@@ -10,13 +10,13 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 
-template<typename Tag_= Mem::Main, typename IndexType_ = Index, typename Algo_ = Algo::Generic>
+template<typename Tag_= Mem::Main, typename IndexType_ = Index>
 class FunctorTest:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     FunctorTest(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("FunctorTest<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("FunctorTest<" + tag + ">")
     {
     }
 

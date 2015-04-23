@@ -103,7 +103,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_>
-void Axpy<Mem::CUDA, Algo::CUDA>::dv(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
+void Axpy<Mem::CUDA>::dv(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
 {
   Index blocksize(256);
   dim3 grid;
@@ -120,11 +120,11 @@ void Axpy<Mem::CUDA, Algo::CUDA>::dv(DT_ * r, const DT_ a, const DT_ * const x, 
 #endif
 }
 
-template void Axpy<Mem::CUDA, Algo::CUDA>::dv(float *, const float, const float * const, const float * const, const Index);
-template void Axpy<Mem::CUDA, Algo::CUDA>::dv(double *, const double, const double * const, const double * const, const Index);
+template void Axpy<Mem::CUDA>::dv(float *, const float, const float * const, const float * const, const Index);
+template void Axpy<Mem::CUDA>::dv(double *, const double, const double * const, const double * const, const Index);
 
 template <typename DT_>
-void Axpy<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements)
 {
   Index blocksize(256);
   dim3 grid;
@@ -140,21 +140,21 @@ void Axpy<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x,
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Axpy<Mem::CUDA, Algo::CUDA>::csr(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Axpy<Mem::CUDA, Algo::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA>::csr(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
 
 template <typename DT_>
-void Axpy<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements)
 {
-  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA, Algo::CUDA>::csr(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
-  FEAST::LAFEM::Arch::Scale<Mem::CUDA, Algo::CUDA>::value(r, r, a, rows);
-  FEAST::LAFEM::Arch::Sum<Mem::CUDA, Algo::CUDA>::value(r, r, y, rows);
+  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA>::csr(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
+  FEAST::LAFEM::Arch::Scale<Mem::CUDA>::value(r, r, a, rows);
+  FEAST::LAFEM::Arch::Sum<Mem::CUDA>::value(r, r, y, rows);
 }
-template void Axpy<Mem::CUDA, Algo::CUDA>::csr(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Axpy<Mem::CUDA, Algo::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA>::csr(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 
 template <typename DT_, typename IT_>
-void Axpy<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
+void Axpy<Mem::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
 {
   Index blocksize(256);
   dim3 grid;
@@ -170,13 +170,13 @@ void Axpy<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x,
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Axpy<Mem::CUDA, Algo::CUDA>::ell(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
-template void Axpy<Mem::CUDA, Algo::CUDA>::ell(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
-template void Axpy<Mem::CUDA, Algo::CUDA>::ell(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-template void Axpy<Mem::CUDA, Algo::CUDA>::ell(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
+template void Axpy<Mem::CUDA>::ell(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
+template void Axpy<Mem::CUDA>::ell(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
+template void Axpy<Mem::CUDA>::ell(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
+template void Axpy<Mem::CUDA>::ell(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
 
 template <typename DT_, typename IT_>
-void Axpy<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
+void Axpy<Mem::CUDA>::banded(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
 {
   Index blocksize(128);
   dim3 grid;
@@ -186,7 +186,7 @@ void Axpy<Mem::CUDA, Algo::CUDA>::banded(DT_ * r, const DT_ * const y, const DT_
 
   FEAST::LAFEM::Intern::cuda_axpy_banded<<<grid, block>>>(r, alpha, x, y, val, offsets, num_of_offsets, rows, columns);
 }
-template void Axpy<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const float, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-template void Axpy<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const double, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
-template void Axpy<Mem::CUDA, Algo::CUDA>::banded(float *, const float * const, const float, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-template void Axpy<Mem::CUDA, Algo::CUDA>::banded(double *, const double * const, const double, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA>::banded(float *, const float * const, const float, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA>::banded(double *, const double * const, const double, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA>::banded(float *, const float * const, const float, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void Axpy<Mem::CUDA>::banded(double *, const double * const, const double, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);

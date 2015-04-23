@@ -12,21 +12,27 @@ namespace FEAST
   {
     namespace Arch
     {
-      template<typename Mem_, typename Algo_>
+      template<typename Mem_>
       struct ComponentInvert;
 
       template<>
-      struct ComponentInvert<Mem::Main, Algo::Generic>
+      struct ComponentInvert<Mem::Main>
       {
         template<typename DT_>
-        static void value(DT_* r, const DT_* const x, const DT_ s, const Index size);
+        static void value(DT_* r, const DT_* const x, const DT_ s, const Index size)
+        {
+          value_generic(r, x, s, size);
+        }
+
+        template<typename DT_>
+        static void value_generic(DT_* r, const DT_* const x, const DT_ s, const Index size);
       };
 
-      extern template void ComponentInvert<Mem::Main, Algo::Generic>::value(float*, const float* const, const float, const Index);
-      extern template void ComponentInvert<Mem::Main, Algo::Generic>::value(double*, const double* const, const double, const Index);
+      extern template void ComponentInvert<Mem::Main>::value_generic(float*, const float* const, const float, const Index);
+      extern template void ComponentInvert<Mem::Main>::value_generic(double*, const double* const, const double, const Index);
 
       template<>
-      struct ComponentInvert<Mem::CUDA, Algo::CUDA>
+      struct ComponentInvert<Mem::CUDA>
       {
         template<typename DT_>
         static void value(DT_* r, const DT_* const x, const DT_ s, const Index size);

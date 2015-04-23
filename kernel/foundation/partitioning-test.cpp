@@ -11,13 +11,13 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class PartitioningTest1D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     PartitioningTest1D(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("PartitioningTest1D<" + tag + ">")
+      TaggedTest<Tag_, Index>("PartitioningTest1D<" + tag + ">")
     {
     }
 
@@ -63,7 +63,6 @@ class PartitioningTest1D:
       //Index level(4);
 
       PData<Dim1D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim1D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -111,18 +110,18 @@ class PartitioningTest1D:
 
     }
 };
-PartitioningTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test_cpu_v_v("std::vector, std::vector");
-PartitioningTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test_cpu_v_d("std::vector, std::deque");
-PartitioningTest1D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test_cpu_d_v("std::deque, std::vector");
-PartitioningTest1D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test_cpu_d_d("std::deque, std::deque");
+PartitioningTest1D<Mem::Main, Index, std::vector, std::vector<Index> > ref_test_cpu_v_v("std::vector, std::vector");
+PartitioningTest1D<Mem::Main, Index, std::vector, std::deque<Index> > ref_test_cpu_v_d("std::vector, std::deque");
+PartitioningTest1D<Mem::Main, Index, std::deque, std::vector<Index> > ref_test_cpu_d_v("std::deque, std::vector");
+PartitioningTest1D<Mem::Main, Index, std::deque, std::deque<Index> > ref_test_cpu_d_d("std::deque, std::deque");
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class PartitioningTest2D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     PartitioningTest2D(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("PartitioningTest2D<" + tag + ">")
+      TaggedTest<Tag_, Index>("PartitioningTest2D<" + tag + ">")
     {
     }
 
@@ -208,7 +207,6 @@ class PartitioningTest2D:
       //Index level(4);
 
       PData<Dim2D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim2D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -349,18 +347,18 @@ class PartitioningTest2D:
       TEST_CHECK_EQUAL(((Foundation::Attribute<double, OT_>*)p0.attrs.at(1).get())->at(5), 0.5);
     }
 };
-PartitioningTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test_cpu_v_v_2d("std::vector, std::vector");
-PartitioningTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test_cpu_v_d_2d("std::vector, std::deque");
-PartitioningTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test_cpu_d_v_2d("std::deque, std::vector");
-PartitioningTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test_cpu_d_d_2d("std::deque, std::deque");
+PartitioningTest2D<Mem::Main, Index, std::vector, std::vector<Index> > ref_test_cpu_v_v_2d("std::vector, std::vector");
+PartitioningTest2D<Mem::Main, Index, std::vector, std::deque<Index> > ref_test_cpu_v_d_2d("std::vector, std::deque");
+PartitioningTest2D<Mem::Main, Index, std::deque, std::vector<Index> > ref_test_cpu_d_v_2d("std::deque, std::vector");
+PartitioningTest2D<Mem::Main, Index, std::deque, std::deque<Index> > ref_test_cpu_d_d_2d("std::deque, std::deque");
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class PartitioningTest3D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     PartitioningTest3D(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("PartitioningTest3D<" + tag + ">")
+      TaggedTest<Tag_, Index>("PartitioningTest3D<" + tag + ">")
     {
     }
 
@@ -566,7 +564,6 @@ class PartitioningTest3D:
       //Index level(4);
 
       PData<Dim3D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim3D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -803,18 +800,18 @@ class PartitioningTest3D:
 
     }
 };
-PartitioningTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test_cpu_v_v_3d("std::vector, std::vector");
-PartitioningTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test_cpu_v_d_3d("std::vector, std::deque");
-PartitioningTest3D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test_cpu_d_v_3d("std::deque, std::vector");
-PartitioningTest3D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test_cpu_d_d_3d("std::deque, std::deque");
+PartitioningTest3D<Mem::Main, Index, std::vector, std::vector<Index> > ref_test_cpu_v_v_3d("std::vector, std::vector");
+PartitioningTest3D<Mem::Main, Index, std::vector, std::deque<Index> > ref_test_cpu_v_d_3d("std::vector, std::deque");
+PartitioningTest3D<Mem::Main, Index, std::deque, std::vector<Index> > ref_test_cpu_d_v_3d("std::deque, std::vector");
+PartitioningTest3D<Mem::Main, Index, std::deque, std::deque<Index> > ref_test_cpu_d_d_3d("std::deque, std::deque");
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class PartitioningTest2DHaloOrdering:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     PartitioningTest2DHaloOrdering(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("PartitioningTest2DHaloOrdering<" + tag + ">")
+      TaggedTest<Tag_, Index>("PartitioningTest2DHaloOrdering<" + tag + ">")
     {
     }
 
@@ -896,7 +893,6 @@ class PartitioningTest2DHaloOrdering:
       boundaries.at(3).push_back(3);
 
       PData<Dim2D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim2D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -905,7 +901,6 @@ class PartitioningTest2DHaloOrdering:
                                                                                                           attrs
                                                                                                           ));
       PData<Dim2D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p1(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim2D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -945,8 +940,8 @@ class PartitioningTest2DHaloOrdering:
             }
           }
 
-      auto h_new0(Aura<Mem::Main, Algo::Generic, Halo<0, PLEdge, Mesh<Dim2D> > >::value(p0.comm_halos));
-      auto h_new1(Aura<Mem::Main, Algo::Generic, Halo<0, PLEdge, Mesh<Dim2D> > >::value(p1.comm_halos));
+      auto h_new0(Aura<Mem::Main, Halo<0, PLEdge, Mesh<Dim2D> > >::value(p0.comm_halos));
+      auto h_new1(Aura<Mem::Main, Halo<0, PLEdge, Mesh<Dim2D> > >::value(p1.comm_halos));
       for(Index i(0) ; i < h_new0.size() ; ++i)
       {
         Index elem_nr_loc_0(h_new0.get_element(i));
@@ -973,4 +968,4 @@ class PartitioningTest2DHaloOrdering:
       }
     }
 };
-PartitioningTest2DHaloOrdering<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > parthaloorder_test_cpu_v_v_2d("std::vector, std::vector");
+PartitioningTest2DHaloOrdering<Mem::Main, Index, std::vector, std::vector<Index> > parthaloorder_test_cpu_v_v_2d("std::vector, std::vector");

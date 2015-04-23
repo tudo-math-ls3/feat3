@@ -47,11 +47,11 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_>
-DT_ Norm2<Mem::CUDA, Algo::CUDA>::value(const DT_ * const x, const Index size)
+DT_ Norm2<Mem::CUDA>::value(const DT_ * const x, const Index size)
 {
   DT_ result = Intern::cuda_norm2(x, size);
   return result;
 }
 
-template float Norm2<Mem::CUDA, Algo::CUDA>::value(const float * const, const Index);
-template double Norm2<Mem::CUDA, Algo::CUDA>::value(const double * const, const Index);
+template float Norm2<Mem::CUDA>::value(const float * const, const Index);
+template double Norm2<Mem::CUDA>::value(const double * const, const Index);

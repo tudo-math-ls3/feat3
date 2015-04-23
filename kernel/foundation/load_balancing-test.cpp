@@ -11,13 +11,13 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class LoadBalancingTest1D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     LoadBalancingTest1D(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("LoadBalancingTest1D<" + tag + ">")
+      TaggedTest<Tag_, Index>("LoadBalancingTest1D<" + tag + ">")
     {
     }
 
@@ -63,7 +63,6 @@ class LoadBalancingTest1D:
       //Index level(4);
 
       PData<Dim1D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim1D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -79,18 +78,18 @@ class LoadBalancingTest1D:
 
     }
 };
-LoadBalancingTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test_cpu_v_v("std::vector, std::vector");
-LoadBalancingTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test_cpu_v_d("std::vector, std::deque");
-LoadBalancingTest1D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test_cpu_d_v("std::deque, std::vector");
-LoadBalancingTest1D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test_cpu_d_d("std::deque, std::deque");
+LoadBalancingTest1D<Mem::Main, Index, std::vector, std::vector<Index> > ref_test_cpu_v_v("std::vector, std::vector");
+LoadBalancingTest1D<Mem::Main, Index, std::vector, std::deque<Index> > ref_test_cpu_v_d("std::vector, std::deque");
+LoadBalancingTest1D<Mem::Main, Index, std::deque, std::vector<Index> > ref_test_cpu_d_v("std::deque, std::vector");
+LoadBalancingTest1D<Mem::Main, Index, std::deque, std::deque<Index> > ref_test_cpu_d_d("std::deque, std::deque");
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class LoadBalancingTest2D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     LoadBalancingTest2D(const std::string & tag) :
-      TaggedTest<Tag_, Index, Algo_>("LoadBalancingTest2D<" + tag + ">")
+      TaggedTest<Tag_, Index>("LoadBalancingTest2D<" + tag + ">")
     {
     }
 
@@ -176,7 +175,6 @@ class LoadBalancingTest2D:
       //Index level(4);
 
       PData<Dim2D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
-                                                                                      Algo_,
                                                                                       Dim2D,
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
@@ -191,7 +189,7 @@ class LoadBalancingTest2D:
       TEST_CHECK_EQUAL_WITHIN_EPS(p0.comp_cost, double(2), std::numeric_limits<double>::epsilon());
     }
 };
-LoadBalancingTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test_cpu_v_v_2d("std::vector, std::vector");
-LoadBalancingTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test_cpu_v_d_2d("std::vector, std::deque");
-LoadBalancingTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test_cpu_d_v_2d("std::deque, std::vector");
-LoadBalancingTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test_cpu_d_d_2d("std::deque, std::deque");
+LoadBalancingTest2D<Mem::Main, Index, std::vector, std::vector<Index> > ref_test_cpu_v_v_2d("std::vector, std::vector");
+LoadBalancingTest2D<Mem::Main, Index, std::vector, std::deque<Index> > ref_test_cpu_v_d_2d("std::vector, std::deque");
+LoadBalancingTest2D<Mem::Main, Index, std::deque, std::vector<Index> > ref_test_cpu_d_v_2d("std::deque, std::vector");
+LoadBalancingTest2D<Mem::Main, Index, std::deque, std::deque<Index> > ref_test_cpu_d_d_2d("std::deque, std::deque");

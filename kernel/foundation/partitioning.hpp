@@ -79,7 +79,6 @@ namespace FEAST
     };
 
     template<typename Tag_,
-             typename Arch_,
              typename Dim_,
              unsigned delta_,
              PolytopeLevels level_,
@@ -123,7 +122,7 @@ namespace FEAST
 
           for(Index i(0) ; i < num_refs ; ++i)
           {
-            Refinement<Tag_, Arch_, mrt_, hrt_refine>::execute(result.basemesh,
+            Refinement<Tag_, mrt_, hrt_refine>::execute(result.basemesh,
                                                                &boundaries_copy,
                                                                origin_coords);
 

@@ -117,7 +117,7 @@ namespace FEAST
 
 
     ///always substitute left argument
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class SumFunctorProxyLeft : public SolverFunctorBase<VT_>
     {
       public:
@@ -139,7 +139,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          _y.template axpy<Algo_>(_l, _r);
+          _y.axpy(_l, _r);
         }
 
         SumFunctorProxyLeft& operator=(const SumFunctorProxyLeft& rhs)
@@ -173,7 +173,7 @@ namespace FEAST
     };
 
     ///always substitute result and left arguments
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class SumFunctorProxyResultLeft : public SolverFunctorBase<VT_>
     {
       public:
@@ -195,7 +195,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          _y.template axpy<Algo_>(_l, _r);
+          _y.axpy(_l, _r);
         }
 
         SumFunctorProxyResultLeft& operator=(const SumFunctorProxyResultLeft& rhs)
@@ -230,7 +230,7 @@ namespace FEAST
     };
 
     ///always substitute all arguments
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class SumFunctorProxyAll : public SolverFunctorBase<VT_>
     {
       public:
@@ -252,7 +252,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          _y.template axpy<Algo_>(_l, _r);
+          _y.axpy(_l, _r);
         }
 
         SumFunctorProxyAll& operator=(const SumFunctorProxyAll& rhs)
@@ -288,7 +288,7 @@ namespace FEAST
     };
 
 
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class SumFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -307,7 +307,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y.template axpy<Algo_>(_l, _r);
+          _y.axpy(_l, _r);
         }
 
         SumFunctor& operator=(const SumFunctor& rhs)
@@ -339,7 +339,7 @@ namespace FEAST
     };
 
     ///always substitute left argument
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class DifferenceFunctorProxyLeft : public SolverFunctorBase<VT_>
     {
       public:
@@ -361,8 +361,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
 
-          //_y.template difference<Algo_>( _l, _r);
-          _y.template axpy<Algo_>(_r, _l, typename VT_::DataType(-1));
+          //_y.difference( _l, _r);
+          _y.axpy(_r, _l, typename VT_::DataType(-1));
         }
 
         DifferenceFunctorProxyLeft& operator=(const DifferenceFunctorProxyLeft& rhs)
@@ -397,7 +397,7 @@ namespace FEAST
 
 
     ///always substitute result and left arguments
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class DifferenceFunctorProxyResultLeft : public SolverFunctorBase<VT_>
     {
       public:
@@ -419,7 +419,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
 
-          //_y.template difference<Algo_>( _l, _r);
+          //_y.difference( _l, _r);
           _y.template axpy(_r, _l, typename VT_::DataType(-1));
         }
 
@@ -455,7 +455,7 @@ namespace FEAST
     };
 
     ///always substitute all arguments
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class DifferenceFunctorProxyAll : public SolverFunctorBase<VT_>
     {
       public:
@@ -477,8 +477,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
 
-          //_y.template difference<Algo_>( _l, _r);
-          _y.template axpy<Algo_>(_r, _l, typename VT_::DataType(-1));
+          //_y.difference( _l, _r);
+          _y.axpy(_r, _l, typename VT_::DataType(-1));
         }
 
         DifferenceFunctorProxyAll& operator=(const DifferenceFunctorProxyAll& rhs)
@@ -514,7 +514,7 @@ namespace FEAST
     };
 
 
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class DifferenceFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -533,8 +533,8 @@ namespace FEAST
 
         virtual void execute()
         {
-          //_y.template difference<Algo_>( _l, _r);
-          _y.template axpy<Algo_>(_r, _l, typename VT_::DataType(-1));
+          //_y.difference( _l, _r);
+          _y.axpy(_r, _l, typename VT_::DataType(-1));
         }
 
         DifferenceFunctor& operator=(const DifferenceFunctor& rhs)
@@ -566,7 +566,7 @@ namespace FEAST
     };
 
     ///always substitute right argument
-    template<typename Algo_, typename VT_, typename MT_>
+    template<typename VT_, typename MT_>
     class ProductFunctorProxyRight : public SolverFunctorBase<VT_>
     {
       public:
@@ -588,8 +588,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
 
-          //_y.template product_matvec<Algo_>(_l, _r);
-          _l.template apply<Algo_>(_y, _r);
+          //_y.product_matvec(_l, _r);
+          _l.apply(_y, _r);
         }
 
         ProductFunctorProxyRight& operator=(const ProductFunctorProxyRight& rhs)
@@ -623,7 +623,7 @@ namespace FEAST
     };
 
     ///always substitute result and right arguments
-    template<typename Algo_, typename VT_, typename MT_>
+    template<typename VT_, typename MT_>
     class ProductFunctorProxyResultRight : public SolverFunctorBase<VT_>
     {
       public:
@@ -645,8 +645,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
 
-          //_y.template product_matvec<Algo_>(_l, _r);
-          _l.template apply<Algo_>(_y, _r);
+          //_y.product_matvec(_l, _r);
+          _l.apply(_y, _r);
         }
 
         ProductFunctorProxyResultRight& operator=(const ProductFunctorProxyResultRight& rhs)
@@ -680,7 +680,7 @@ namespace FEAST
         VT_& _r;
     };
 
-    template<typename Algo_, typename VT_, typename MT_>
+    template<typename VT_, typename MT_>
     class ProductFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -699,8 +699,8 @@ namespace FEAST
 
         virtual void execute()
         {
-          //_y.template product_matvec<Algo_>(_l, _r);
-          _l.template apply<Algo_>(_y, _r);
+          //_y.product_matvec(_l, _r);
+          _l.apply(_y, _r);
         }
 
         ProductFunctor& operator=(const ProductFunctor& rhs)
@@ -731,7 +731,7 @@ namespace FEAST
         const VT_& _r;
     };
 
-    template<typename Algo_, typename VT_, typename MT_>
+    template<typename VT_, typename MT_>
     class DefectFunctorProxyRight : public SolverFunctorBase<VT_>
     {
       public:
@@ -754,8 +754,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DefectFunctor can not be executed!");
 
-          //_y.template defect<Algo_>(_l, _m, _r);
-          _m.template apply<Algo_>(_y, _r, _l, typename MT_::DataType(-1));
+          //_y.defect(_l, _m, _r);
+          _m.apply(_y, _r, _l, typename MT_::DataType(-1));
         }
 
         DefectFunctorProxyRight& operator=(const DefectFunctorProxyRight& rhs)
@@ -791,7 +791,7 @@ namespace FEAST
         VT_& _r;
     };
 
-    template<typename Algo_, typename VT_, typename MT_>
+    template<typename VT_, typename MT_>
     class DefectFunctorProxyResultRight : public SolverFunctorBase<VT_>
     {
       public:
@@ -814,8 +814,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DefectFunctor can not be executed!");
 
-          //_y.template defect<Algo_>(_l, _m, _r);
-          _m.template apply<Algo_>(_y, _r, _l, typename MT_::DataType(-1));
+          //_y.defect(_l, _m, _r);
+          _m.apply(_y, _r, _l, typename MT_::DataType(-1));
         }
 
         DefectFunctorProxyResultRight& operator=(const DefectFunctorProxyResultRight& rhs)
@@ -852,7 +852,7 @@ namespace FEAST
         VT_& _r;
     };
 
-    template<typename Algo_, typename VT_, typename MT_>
+    template<typename VT_, typename MT_>
     class DefectFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -872,8 +872,8 @@ namespace FEAST
 
         virtual void execute()
         {
-          //_y.template defect<Algo_>(_l, _m, _r);
-          _m.template apply<Algo_>(_y, _r, _l, typename MT_::DataType(-1));
+          //_y.defect(_l, _m, _r);
+          _m.apply(_y, _r, _l, typename MT_::DataType(-1));
         }
 
         DefectFunctor& operator=(const DefectFunctor& rhs)
@@ -908,7 +908,7 @@ namespace FEAST
     };
 
 
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class PreconFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -978,7 +978,7 @@ namespace FEAST
         std::shared_ptr<SolverFunctorBase<VT_> > _functor;
     };
 
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class PreconFunctorProxy : public SolverFunctorBase<VT_>
     {
       public:
@@ -1070,7 +1070,7 @@ namespace FEAST
       coc_countloop
     };
 
-    template<typename Algo_, typename VT_, typename ST_>
+    template<typename VT_, typename ST_>
     class IterateFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -1177,7 +1177,7 @@ namespace FEAST
         ComparisonOpCode _opcode;
     };
 
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class CopyFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -1223,7 +1223,7 @@ namespace FEAST
         const VT_& _x;
     };
 
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class CopyFunctorProxyResult : public SolverFunctorBase<VT_>
     {
       public:
@@ -1274,7 +1274,7 @@ namespace FEAST
         const VT_& _x;
     };
 
-    template<typename Algo_, typename VT_, typename ST_>
+    template<typename VT_, typename ST_>
     class NormFunctor2wosqrt : public SolverFunctorBase<VT_>
     {
       public:
@@ -1292,7 +1292,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = _x.template norm2sqr<Algo_>();
+          _y = _x.norm2sqr();
         }
 
         NormFunctor2wosqrt& operator=(const NormFunctor2wosqrt& rhs)
@@ -1320,7 +1320,7 @@ namespace FEAST
         const VT_& _x;
     };
 
-    template<typename Algo_, typename VT_, typename ST_>
+    template<typename VT_, typename ST_>
     class NormFunctor2wosqrtProxyRight : public SolverFunctorBase<VT_>
     {
       public:
@@ -1338,7 +1338,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = _x.template norm2sqr<Algo_>();
+          _y = _x.norm2sqr();
         }
 
         NormFunctor2wosqrtProxyRight& operator=(const NormFunctor2wosqrtProxyRight& rhs)
@@ -1368,7 +1368,7 @@ namespace FEAST
         VT_& _x;
     };
 
-    template<typename Algo_, typename VT_, typename ST_>
+    template<typename VT_, typename ST_>
     class NormFunctor2 : public SolverFunctorBase<VT_>
     {
       public:
@@ -1386,7 +1386,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = _x.template norm2<Algo_>();
+          _y = _x.norm2();
         }
 
         NormFunctor2& operator=(const NormFunctor2& rhs)
@@ -1414,7 +1414,7 @@ namespace FEAST
         const VT_& _x;
     };
 
-    template<typename Algo_, typename VT_, typename ST_>
+    template<typename VT_, typename ST_>
     class NormFunctor2ProxyRight : public SolverFunctorBase<VT_>
     {
       public:
@@ -1432,7 +1432,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = _x.template norm2<Algo_>();
+          _y = _x.norm2();
         }
 
         NormFunctor2ProxyRight& operator=(const NormFunctor2ProxyRight& rhs)
@@ -1512,7 +1512,7 @@ namespace FEAST
         const DT_& _r;
     };
 
-    template<typename Algo_, typename VT_, template<typename, typename> class StorageType_ = std::vector>
+    template<typename VT_, template<typename, typename> class StorageType_ = std::vector>
     class CompoundSolverFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -1612,8 +1612,7 @@ namespace FEAST
 
     };
 
-    template<typename Algo_,
-             typename VT_,
+    template<typename VT_,
              typename VMT_,
              Foundation::Tier2CommModes cm_,
              template<typename, typename> class StoreT_ = std::vector>
@@ -1643,7 +1642,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          Foundation::SynchVec<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          Foundation::SynchVec<cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
         }
 
         SynchVecFunctor& operator=(const SynchVecFunctor& rhs)
@@ -1684,8 +1683,7 @@ namespace FEAST
         StoreT_<Index, std::allocator<Index> >& _source_ranks;
     };
 
-    template<typename Algo_,
-             typename VT_,
+    template<typename VT_,
              typename VMT_,
              Foundation::Tier2CommModes cm_,
              template<typename, typename> class StoreT_ = std::vector>
@@ -1718,7 +1716,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SynchVecFunctor can not be executed!");
 
-          Foundation::SynchVec<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          Foundation::SynchVec<cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
         }
 
         SynchVecFunctorProxy& operator=(const SynchVecFunctorProxy& rhs)
@@ -1761,8 +1759,7 @@ namespace FEAST
         StoreT_<Index, std::allocator<Index> >& _source_ranks;
     };
 
-    template<typename Algo_,
-             typename VT_,
+    template<typename VT_,
              typename DT_,
              Foundation::Tier2CommModes cm_>
     class SynchScalFunctor : public SolverFunctorBase<VT_>
@@ -1817,7 +1814,7 @@ namespace FEAST
     };
 
     ///filter functors
-    template<typename Algo_, typename VT_, typename FilterType_>
+    template<typename VT_, typename FilterType_>
     class FilterDefectFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -1835,7 +1832,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _r.template filter_def<Algo_>(_l);
+          _r.filter_def(_l);
         }
 
         FilterDefectFunctor& operator=(const FilterDefectFunctor& rhs)
@@ -1863,7 +1860,7 @@ namespace FEAST
         const FilterType_& _r;
     };
 
-    template<typename Algo_, typename VT_, typename FilterType_>
+    template<typename VT_, typename FilterType_>
     class FilterCorrectionFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -1881,7 +1878,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _r.template filter_cor<Algo_>(_l);
+          _r.filter_cor(_l);
         }
 
         FilterCorrectionFunctor& operator=(const FilterCorrectionFunctor& rhs)
@@ -1909,7 +1906,7 @@ namespace FEAST
         const FilterType_& _r;
     };
 
-    template<typename Algo_, typename VT_, typename T_>
+    template<typename VT_, typename T_>
     class InspectionFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -1955,7 +1952,7 @@ namespace FEAST
         const std::string _tracetag;
     };
 
-    template<typename Algo_, typename VT_, typename T_, template<typename, typename> class StoT_ = std::vector>
+    template<typename VT_, typename T_, template<typename, typename> class StoT_ = std::vector>
     class InspectionFunctorSTL : public SolverFunctorBase<VT_>
     {
       public:
@@ -2005,7 +2002,7 @@ namespace FEAST
         const std::string _tracetag;
     };
 
-    template<typename Algo_, typename VT_, typename T_>
+    template<typename VT_, typename T_>
     class InspectionConstFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -2051,7 +2048,7 @@ namespace FEAST
         const std::string _tracetag;
     };
 
-    template<typename Algo_, typename VT_>
+    template<typename VT_>
     class SetFunctor : public SolverFunctorBase<VT_>
     {
       public:

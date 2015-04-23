@@ -28,7 +28,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_>
-void Scale<Mem::CUDA, Algo::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
+void Scale<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
 {
   Index blocksize(256);
   dim3 grid;
@@ -44,5 +44,5 @@ void Scale<Mem::CUDA, Algo::CUDA>::value(DT_ * r, const DT_ * const x, const DT_
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Scale<Mem::CUDA, Algo::CUDA>::value(float *, const float * const, const float, const Index);
-template void Scale<Mem::CUDA, Algo::CUDA>::value(double *, const double * const, const double, const Index);
+template void Scale<Mem::CUDA>::value(float *, const float * const, const float, const Index);
+template void Scale<Mem::CUDA>::value(double *, const double * const, const double, const Index);

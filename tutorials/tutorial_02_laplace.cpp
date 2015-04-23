@@ -77,8 +77,6 @@ namespace Tutorial02
   typedef double DataType;
   // Moreover, we use main memory (aka "RAM") for our containers.
   typedef Mem::Main MemType;
-  // And we'll use the Generic algorithm implementation for now.
-  typedef Algo::Generic AlgoType;
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -361,11 +359,11 @@ namespace Tutorial02
     std::cout << "Imposing boundary conditions..." << std::endl;
 
     // Apply the filter onto the system matrix...
-    filter.filter_mat<AlgoType>(matrix);
+    filter.filter_mat(matrix);
     // ...the right-hand-side vector...
-    filter.filter_rhs<AlgoType>(vec_rhs);
+    filter.filter_rhs(vec_rhs);
     // ...and the solution vector.
-    filter.filter_sol<AlgoType>(vec_sol);
+    filter.filter_sol(vec_sol);
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Solver set-up
@@ -373,10 +371,10 @@ namespace Tutorial02
     std::cout << "Solving linear system..." << std::endl;
 
     // Create a SSOR preconditioner
-    LAFEM::PreconWrapper<AlgoType, MatrixType, LAFEM::SSORPreconditioner> precond(matrix);
+    LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner> precond(matrix);
 
     // Create a PCG solver
-    LAFEM::PCGSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, &precond);
+    LAFEM::PCGSolver<MatrixType, FilterType> solver(matrix, filter, &precond);
 
     // Enable convergence plot
     solver.set_plot(true);

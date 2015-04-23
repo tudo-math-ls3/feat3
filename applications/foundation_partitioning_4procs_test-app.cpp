@@ -102,7 +102,6 @@ int main(int argc, char* argv[])
 
   ///partitioning and initial loadbalancing
   auto p_i(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(mesh,

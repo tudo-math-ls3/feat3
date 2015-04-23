@@ -13,28 +13,41 @@ namespace FEAST
   {
     namespace Arch
     {
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct ComponentProduct;
 
       template <>
-      struct ComponentProduct<Mem::Main, Algo::Generic>
+      struct ComponentProduct<Mem::Main>
       {
         template <typename DT_>
-        static void value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size);
+        static void value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
+        {
+#ifdef FEAST_BACKENDS_MKL
+          value_mkl(r, x, y, size);
+#else
+          value_generic(r, x, y, size);
+#endif
+        }
+
+#if defined(FEAST_HAVE_QUADMATH) && !defined(__CUDACC__)
+        static void value(__float128 * r, const __float128 * const x, const __float128 * const y, const Index size)
+        {
+          value_generic(r, x, y, size);
+        }
+#endif
+
+        template <typename DT_>
+        static void value_generic(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size);
+
+        static void value_mkl(float * r, const float * const x, const float * const y, const Index size);
+        static void value_mkl(double * r, const double * const x, const double * const y, const Index size);
       };
 
-      extern template void ComponentProduct<Mem::Main, Algo::Generic>::value(float *, const float * const, const float * const, const Index);
-      extern template void ComponentProduct<Mem::Main, Algo::Generic>::value(double *, const double * const, const double * const, const Index);
+      extern template void ComponentProduct<Mem::Main>::value_generic(float *, const float * const, const float * const, const Index);
+      extern template void ComponentProduct<Mem::Main>::value_generic(double *, const double * const, const double * const, const Index);
 
       template <>
-      struct ComponentProduct<Mem::Main, Algo::MKL>
-      {
-        static void value(float * r, const float * const x, const float * const y, const Index size);
-        static void value(double * r, const double * const x, const double * const y, const Index size);
-      };
-
-      template <>
-      struct ComponentProduct<Mem::CUDA, Algo::CUDA>
+      struct ComponentProduct<Mem::CUDA>
       {
         template <typename DT_>
         static void value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size);

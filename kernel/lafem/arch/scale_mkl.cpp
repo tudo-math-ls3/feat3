@@ -8,7 +8,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
-void Scale<Mem::Main, Algo::MKL>::value(float * r, const float * const x, const float s, const Index size)
+void Scale<Mem::Main>::value_mkl(float * r, const float * const x, const float s, const Index size)
 {
   if (r == x)
   {
@@ -21,7 +21,7 @@ void Scale<Mem::Main, Algo::MKL>::value(float * r, const float * const x, const 
   }
 }
 
-void Scale<Mem::Main, Algo::MKL>::value(double * r, const double * const x, const double s, const Index size)
+void Scale<Mem::Main>::value_mkl(double * r, const double * const x, const double s, const Index size)
 {
   if (r == x)
   {

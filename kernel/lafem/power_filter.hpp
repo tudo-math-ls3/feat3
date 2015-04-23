@@ -136,35 +136,35 @@ namespace FEAST
       }
 
       /** \copydoc UnitFilter::filter_rhs() */
-      template<typename Algo_, typename SubVector_>
+      template<typename SubVector_>
       void filter_rhs(PowerVector<SubVector_, count_>& vector) const
       {
-        first().template filter_rhs<Algo_>(vector.first());
-        rest().template filter_rhs<Algo_>(vector.rest());
+        first().filter_rhs(vector.first());
+        rest().filter_rhs(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_sol() */
-      template<typename Algo_, typename SubVector_>
+      template<typename SubVector_>
       void filter_sol(PowerVector<SubVector_, count_>& vector) const
       {
-        first().template filter_sol<Algo_>(vector.first());
-        rest().template filter_sol<Algo_>(vector.rest());
+        first().filter_sol(vector.first());
+        rest().filter_sol(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_def() */
-      template<typename Algo_, typename SubVector_>
+      template<typename SubVector_>
       void filter_def(PowerVector<SubVector_, count_>& vector) const
       {
-        first().template filter_def<Algo_>(vector.first());
-        rest().template filter_def<Algo_>(vector.rest());
+        first().filter_def(vector.first());
+        rest().filter_def(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_cor() */
-      template<typename Algo_, typename SubVector_>
+      template<typename SubVector_>
       void filter_cor(PowerVector<SubVector_, count_>& vector) const
       {
-        first().template filter_cor<Algo_>(vector.first());
-        rest().template filter_cor<Algo_>(vector.rest());
+        first().filter_cor(vector.first());
+        rest().filter_cor(vector.rest());
       }
     }; // class PowerFilter<...>
 
@@ -243,28 +243,28 @@ namespace FEAST
         return _first;
       }
 
-      template<typename Algo_, typename SubVector_>
+      template<typename SubVector_>
       void filter_rhs(PowerVector<SubVector_, 1>& vector) const
       {
-        first().template filter_rhs<Algo_>(vector.first());
+        first().filter_rhs(vector.first());
       }
 
-      template<typename Algo_, typename SubVector_>
+      template<typename SubVector_>
       void filter_sol(PowerVector<SubVector_, 1>& vector) const
       {
-        first().template filter_sol<Algo_>(vector.first());
+        first().filter_sol(vector.first());
       }
 
-      template<typename Algo_, typename SubVector_>
+      template<typename SubVector_>
       void filter_def(PowerVector<SubVector_, 1>& vector) const
       {
-        first().template filter_def<Algo_>(vector.first());
+        first().filter_def(vector.first());
       }
 
-      template<typename Algo_, typename SubVector_>
+      template<typename SubVector_>
       void filter_cor(PowerVector<SubVector_, 1>& vector) const
       {
-        first().template filter_cor<Algo_>(vector.first());
+        first().filter_cor(vector.first());
       }
     };
     /// \endcond

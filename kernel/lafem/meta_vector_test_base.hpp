@@ -17,22 +17,20 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename Algo_, typename DataType_, typename IndexType_>
+    template<typename MemType_, typename DataType_, typename IndexType_>
     class MetaVectorTestBase
-      : public FEAST::TestSystem::FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>
+      : public FEAST::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
     {
     public:
-      typedef Algo_ AlgoType;
-      typedef typename AlgoType::MemType MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
 
-      typedef DenseVector<MemType, DataType, IndexType> ScalarVector;
+      typedef DenseVector<MemType_, DataType, IndexType> ScalarVector;
       typedef PowerVector<ScalarVector, 2> PowerVector2;
       typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
       explicit MetaVectorTestBase(const char* name) :
-        FEAST::TestSystem::FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>(name)
+        FEAST::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>(name)
       {
       }
 

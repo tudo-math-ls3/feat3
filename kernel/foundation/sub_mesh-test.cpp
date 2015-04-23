@@ -13,13 +13,13 @@ using namespace FEAST::TestSystem;
 
 using namespace FEAST::Foundation;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class SubMeshTest :
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     SubMeshTest(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("SubMeshTest<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("SubMeshTest<" + tag + ">")
     {
     }
 
@@ -132,7 +132,7 @@ class SubMeshTest :
       TEST_CHECK_EQUAL(sm_face.get_map().at(0), 0ul);
     }
 };
-SubMeshTest<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > submesh_test_fginter_cpu_v_v("std::vector, std::vector");
-SubMeshTest<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > submesh_test_fginter_cpu_v_d("std::vector, std::deque");
-SubMeshTest<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > submesh_test_fginter_cpu_d_v("std::deque, std::vector");
-SubMeshTest<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > submesh_test_fginter_cpu_d_d("std::deque, std::deque");
+SubMeshTest<Mem::Main, Index, std::vector, std::vector<Index> > submesh_test_fginter_cpu_v_v("std::vector, std::vector");
+SubMeshTest<Mem::Main, Index, std::vector, std::deque<Index> > submesh_test_fginter_cpu_v_d("std::vector, std::deque");
+SubMeshTest<Mem::Main, Index, std::deque, std::vector<Index> > submesh_test_fginter_cpu_d_v("std::deque, std::vector");
+SubMeshTest<Mem::Main, Index, std::deque, std::deque<Index> > submesh_test_fginter_cpu_d_d("std::deque, std::deque");

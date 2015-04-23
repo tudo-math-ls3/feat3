@@ -27,15 +27,14 @@ using namespace FEAST::TestSystem;
  */
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseVectorTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorTest")
   {
   }
 
@@ -152,32 +151,32 @@ public:
     TEST_CHECK_EQUAL((void*)clone4.elements(), (void*)clone1.elements());
   }
 };
-DenseVectorTest<Mem::Main, NotSet, float, unsigned int> cpu_dense_vector_test_float_uint;
-DenseVectorTest<Mem::Main, NotSet, double, unsigned int> cpu_dense_vector_test_double_uint;
-DenseVectorTest<Mem::Main, NotSet, float, unsigned long> cpu_dense_vector_test_float_ulong;
-DenseVectorTest<Mem::Main, NotSet, double, unsigned long> cpu_dense_vector_test_double_ulong;
+DenseVectorTest<Mem::Main, float, unsigned int> cpu_dense_vector_test_float_uint;
+DenseVectorTest<Mem::Main, double, unsigned int> cpu_dense_vector_test_double_uint;
+DenseVectorTest<Mem::Main, float, unsigned long> cpu_dense_vector_test_float_ulong;
+DenseVectorTest<Mem::Main, double, unsigned long> cpu_dense_vector_test_double_ulong;
 #ifdef FEAST_HAVE_QUADMATH
-DenseVectorTest<Mem::Main, NotSet, __float128, unsigned int> cpu_dense_vector_test_float128_uint;
-DenseVectorTest<Mem::Main, NotSet, __float128, unsigned long> cpu_dense_vector_test_float128_ulong;
+DenseVectorTest<Mem::Main, __float128, unsigned int> cpu_dense_vector_test_float128_uint;
+DenseVectorTest<Mem::Main, __float128, unsigned long> cpu_dense_vector_test_float128_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorTest<Mem::CUDA, NotSet, float, unsigned int> cuda_dense_vector_test_float_uint;
-DenseVectorTest<Mem::CUDA, NotSet, double, unsigned int> cuda_dense_vector_test_double_uint;
-DenseVectorTest<Mem::CUDA, NotSet, float, unsigned long> cuda_dense_vector_test_float_ulong;
-DenseVectorTest<Mem::CUDA, NotSet, double, unsigned long> cuda_dense_vector_test_double_ulong;
+DenseVectorTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_test_float_uint;
+DenseVectorTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_test_double_uint;
+DenseVectorTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_test_float_ulong;
+DenseVectorTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_test_double_ulong;
 #endif
 
+/*
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseVectorAxpyTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorAxpyTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorAxpyTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorAxpyTest")
   {
   }
 
@@ -202,56 +201,49 @@ public:
       b.copy(b_local);
 
       DenseVector<Mem_, DT_, IT_> c(size);
-      c.template axpy<Algo_>(a, b, s);
+      c.axpy(a, b, s);
       result_local.copy(c);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
-      a.template axpy<Algo_>(a, b, s);
+      a.axpy(a, b, s);
       result_local.copy(a);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
       a.copy(a_local);
-      b.template axpy<Algo_>(a, b, s);
+      b.axpy(a, b, s);
       result_local.copy(b);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
     }
   }
 };
-DenseVectorAxpyTest<Mem::Main, Algo::Generic, float, unsigned int> dv_axpy_test_float_uint;
-DenseVectorAxpyTest<Mem::Main, Algo::Generic, double, unsigned int> dv_axpy_test_double_uint;
-DenseVectorAxpyTest<Mem::Main, Algo::Generic, float, unsigned long> dv_axpy_test_float_ulong;
-DenseVectorAxpyTest<Mem::Main, Algo::Generic, double, unsigned long> dv_axpy_test_double_ulong;
+DenseVectorAxpyTest<Mem::Main, float, unsigned int> dv_axpy_test_float_uint;
+DenseVectorAxpyTest<Mem::Main, double, unsigned int> dv_axpy_test_double_uint;
+DenseVectorAxpyTest<Mem::Main, float, unsigned long> dv_axpy_test_float_ulong;
+DenseVectorAxpyTest<Mem::Main, double, unsigned long> dv_axpy_test_double_ulong;
 #ifdef FEAST_HAVE_QUADMATH
-DenseVectorAxpyTest<Mem::Main, Algo::Generic, __float128, unsigned int> dv_axpy_test_float128_uint;
-DenseVectorAxpyTest<Mem::Main, Algo::Generic, __float128, unsigned long> dv_axpy_test_float128_ulong;
-#endif
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorAxpyTest<Mem::Main, Algo::MKL, float, unsigned int> mkl_dv_axpy_test_float_uint;
-DenseVectorAxpyTest<Mem::Main, Algo::MKL, double, unsigned int> mkl_dv_axpy_test_double_uint;
-DenseVectorAxpyTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_dv_axpy_test_float_ulong;
-DenseVectorAxpyTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_dv_axpy_test_double_ulong;
+DenseVectorAxpyTest<Mem::Main, __float128, unsigned int> dv_axpy_test_float128_uint;
+DenseVectorAxpyTest<Mem::Main, __float128, unsigned long> dv_axpy_test_float128_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorAxpyTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_dv_axpy_test_float_uint;
-DenseVectorAxpyTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_dv_axpy_test_double_uint;
-DenseVectorAxpyTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_dv_axpy_test_float_ulong;
-DenseVectorAxpyTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_axpy_test_double_ulong;
+DenseVectorAxpyTest<Mem::CUDA, float, unsigned int> cuda_dv_axpy_test_float_uint;
+DenseVectorAxpyTest<Mem::CUDA, double, unsigned int> cuda_dv_axpy_test_double_uint;
+DenseVectorAxpyTest<Mem::CUDA, float, unsigned long> cuda_dv_axpy_test_float_ulong;
+DenseVectorAxpyTest<Mem::CUDA, double, unsigned long> cuda_dv_axpy_test_double_ulong;
 #endif
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseVectorDotTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorDotTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorDotTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorDotTest")
   {
   }
 
@@ -277,39 +269,33 @@ public:
 
       // a*b = 1
       DT_ ref(DT_(1));
-      DT_ c  = a.template dot<Algo_>(b);
+      DT_ c  = a.dot(b);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = b.template dot<Algo_>(a);
+      c = b.dot(a);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = b.template dot<Algo_>(b);
-      ref = b.template norm2<Algo_>();
+      c = b.dot(b);
+      ref = b.norm2();
       ref *= ref;
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
     }
   }
 };
-DenseVectorDotTest<Mem::Main, Algo::Generic, float, unsigned int> dv_dot_product_test_float_uint;
-DenseVectorDotTest<Mem::Main, Algo::Generic, double, unsigned int> dv_dot_product_test_double_uint;
-DenseVectorDotTest<Mem::Main, Algo::Generic, float, unsigned long> dv_dot_product_test_float_ulong;
-DenseVectorDotTest<Mem::Main, Algo::Generic, double, unsigned long> dv_dot_product_test_double_ulong;
+DenseVectorDotTest<Mem::Main, float, unsigned int> dv_dot_product_test_float_uint;
+DenseVectorDotTest<Mem::Main, double, unsigned int> dv_dot_product_test_double_uint;
+DenseVectorDotTest<Mem::Main, float, unsigned long> dv_dot_product_test_float_ulong;
+DenseVectorDotTest<Mem::Main, double, unsigned long> dv_dot_product_test_double_ulong;
 #ifdef FEAST_HAVE_QUADMATH
-DenseVectorDotTest<Mem::Main, Algo::Generic, __float128, unsigned int> dv_dot_product_test_float128_uint;
-DenseVectorDotTest<Mem::Main, Algo::Generic, __float128, unsigned long> dv_dot_product_test_float128_ulong;
-#endif
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorDotTest<Mem::Main, Algo::MKL, float, unsigned int> mkl_dv_dot_product_test_float_uint;
-DenseVectorDotTest<Mem::Main, Algo::MKL, double, unsigned int> mkl_dv_dot_product_test_double_uint;
-DenseVectorDotTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_dv_dot_product_test_float_ulong;
-DenseVectorDotTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_dv_dot_product_test_double_ulong;
+DenseVectorDotTest<Mem::Main, __float128, unsigned int> dv_dot_product_test_float128_uint;
+DenseVectorDotTest<Mem::Main, __float128, unsigned long> dv_dot_product_test_float128_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorDotTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_dv_dot_product_test_float_uint;
-DenseVectorDotTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_dv_dot_product_test_double_uint;
-DenseVectorDotTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_dv_dot_product_test_float_ulong;
-DenseVectorDotTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_dot_product_test_double_ulong;
+DenseVectorDotTest<Mem::CUDA, float, unsigned int> cuda_dv_dot_product_test_float_uint;
+DenseVectorDotTest<Mem::CUDA, double, unsigned int> cuda_dv_dot_product_test_double_uint;
+DenseVectorDotTest<Mem::CUDA, float, unsigned long> cuda_dv_dot_product_test_float_ulong;
+DenseVectorDotTest<Mem::CUDA, double, unsigned long> cuda_dv_dot_product_test_double_ulong;
 #endif
 
-
+*/
 /**
  * \brief DenseVector triple_dot test class
  *
@@ -318,17 +304,17 @@ DenseVectorDotTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_dot_pro
  * \author Jordi Paul
  *
  **/
+/*
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseVectorTripleDotTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorTripleDotTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorTripleDotTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorTripleDotTest")
   {
   }
 
@@ -363,57 +349,50 @@ public:
       // a^T diag(c) b = 1
       DT_ ref(DT_(1));
 
-      DT_ res  = a.template triple_dot<Algo_>(b,c);
+      DT_ res  = a.triple_dot(b,c);
       TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
-      res  = a.template triple_dot<Algo_>(c,b);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
-
-      res = b.template triple_dot<Algo_>(a,c);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
-      res = b.template triple_dot<Algo_>(c,a);
+      res  = a.triple_dot(c,b);
       TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
 
-      res = c.template triple_dot<Algo_>(a,b);
+      res = b.triple_dot(a,c);
       TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
-      res = c.template triple_dot<Algo_>(b,a);
+      res = b.triple_dot(c,a);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+
+      res = c.triple_dot(a,b);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      res = c.triple_dot(b,a);
       TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
 
     }
   }
 };
-DenseVectorTripleDotTest<Mem::Main, Algo::Generic, float, unsigned int> dv_triple_dot_product_test_float_uint;
-DenseVectorTripleDotTest<Mem::Main, Algo::Generic, double, unsigned int> dv_triple_dot_product_test_double_uint;
-DenseVectorTripleDotTest<Mem::Main, Algo::Generic, float, unsigned long> dv_triple_dot_product_test_float_ulong;
-DenseVectorTripleDotTest<Mem::Main, Algo::Generic, double, unsigned long> dv_triple_dot_product_test_double_ulong;
+DenseVectorTripleDotTest<Mem::Main, float, unsigned int> dv_triple_dot_product_test_float_uint;
+DenseVectorTripleDotTest<Mem::Main, double, unsigned int> dv_triple_dot_product_test_double_uint;
+DenseVectorTripleDotTest<Mem::Main, float, unsigned long> dv_triple_dot_product_test_float_ulong;
+DenseVectorTripleDotTest<Mem::Main, double, unsigned long> dv_triple_dot_product_test_double_ulong;
 #ifdef FEAST_HAVE_QUADMATH
-DenseVectorTripleDotTest<Mem::Main, Algo::Generic, __float128, unsigned int> dv_triple_dot_product_test_float128_uint;
-DenseVectorTripleDotTest<Mem::Main, Algo::Generic, __float128, unsigned long> dv_triple_dot_product_test_float128_ulong;
-#endif
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorTripleDotTest<Mem::Main, Algo::MKL, float, unsigned int> mkl_dv_triple_dot_product_test_float_uint;
-DenseVectorTripleDotTest<Mem::Main, Algo::MKL, double, unsigned int> mkl_dv_triple_dot_product_test_double_uint;
-DenseVectorTripleDotTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_dv_triple_dot_product_test_float_ulong;
-DenseVectorTripleDotTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_dv_triple_dot_product_test_double_ulong;
+DenseVectorTripleDotTest<Mem::Main, __float128, unsigned int> dv_triple_dot_product_test_float128_uint;
+DenseVectorTripleDotTest<Mem::Main, __float128, unsigned long> dv_triple_dot_product_test_float128_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorTripleDotTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_dv_triple_dot_product_test_float_uint;
-DenseVectorTripleDotTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_dv_triple_dot_product_test_double_uint;
-DenseVectorTripleDotTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_dv_triple_dot_product_test_float_ulong;
-DenseVectorTripleDotTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_triple_dot_product_test_double_ulong;
+DenseVectorTripleDotTest<Mem::CUDA, float, unsigned int> cuda_dv_triple_dot_product_test_float_uint;
+DenseVectorTripleDotTest<Mem::CUDA, double, unsigned int> cuda_dv_triple_dot_product_test_double_uint;
+DenseVectorTripleDotTest<Mem::CUDA, float, unsigned long> cuda_dv_triple_dot_product_test_float_ulong;
+DenseVectorTripleDotTest<Mem::CUDA, double, unsigned long> cuda_dv_triple_dot_product_test_double_ulong;
 #endif
 
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseVectorComponentProductTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorComponentProductTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorComponentProductTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorComponentProductTest")
   {
   }
 
@@ -440,21 +419,21 @@ public:
       b.copy(b_local);
       DenseVector<Mem_, DT_, IT_> c(size);
 
-      c.template component_product<Algo_>(a, b);
+      c.component_product(a, b);
       result_local.copy(c);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      a.template component_product<Algo_>(a, b);
+      a.component_product(a, b);
       result_local.copy(a);
       TEST_CHECK_EQUAL(result_local, ref);
 
       a.copy(a_local);
-      b.template component_product<Algo_>(a, b);
+      b.component_product(a, b);
       result_local.copy(b);
       TEST_CHECK_EQUAL(result_local, ref);
 
       b.copy(b_local);
-      a.template component_product<Algo_>(a, a);
+      a.component_product(a, a);
       result_local.copy(a);
       TEST_CHECK_EQUAL(result_local, ref2);
     }
@@ -465,39 +444,32 @@ public:
     run1();
   }
 };
-DenseVectorComponentProductTest<Mem::Main, Algo::Generic, float, unsigned int> dv_component_product_test_float_uint;
-DenseVectorComponentProductTest<Mem::Main, Algo::Generic, double, unsigned int> dv_component_product_test_double_uint;
-DenseVectorComponentProductTest<Mem::Main, Algo::Generic, float, unsigned long> dv_component_product_test_float_ulong;
-DenseVectorComponentProductTest<Mem::Main, Algo::Generic, double, unsigned long> dv_component_product_test_double_ulong;
+DenseVectorComponentProductTest<Mem::Main, float, unsigned int> dv_component_product_test_float_uint;
+DenseVectorComponentProductTest<Mem::Main, double, unsigned int> dv_component_product_test_double_uint;
+DenseVectorComponentProductTest<Mem::Main, float, unsigned long> dv_component_product_test_float_ulong;
+DenseVectorComponentProductTest<Mem::Main, double, unsigned long> dv_component_product_test_double_ulong;
 #ifdef FEAST_HAVE_QUADMATH
-DenseVectorComponentProductTest<Mem::Main, Algo::Generic, __float128, unsigned int> dv_component_product_test_float128_uint;
-DenseVectorComponentProductTest<Mem::Main, Algo::Generic, __float128, unsigned long> dv_component_product_test_float128_ulong;
-#endif
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorComponentProductTest<Mem::Main, Algo::MKL, float, unsigned int> mkl_dv_component_product_test_float_uint;
-DenseVectorComponentProductTest<Mem::Main, Algo::MKL, double, unsigned int> mkl_dv_component_product_test_double_uint;
-DenseVectorComponentProductTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_dv_component_product_test_float_ulong;
-DenseVectorComponentProductTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_dv_component_product_test_double_ulong;
+DenseVectorComponentProductTest<Mem::Main, __float128, unsigned int> dv_component_product_test_float128_uint;
+DenseVectorComponentProductTest<Mem::Main, __float128, unsigned long> dv_component_product_test_float128_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorComponentProductTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_dv_component_product_test_float_uint;
-DenseVectorComponentProductTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_dv_component_product_test_double_uint;
-DenseVectorComponentProductTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_dv_component_product_test_float_ulong;
-DenseVectorComponentProductTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_component_product_test_double_ulong;
+DenseVectorComponentProductTest<Mem::CUDA, float, unsigned int> cuda_dv_component_product_test_float_uint;
+DenseVectorComponentProductTest<Mem::CUDA, double, unsigned int> cuda_dv_component_product_test_double_uint;
+DenseVectorComponentProductTest<Mem::CUDA, float, unsigned long> cuda_dv_component_product_test_float_ulong;
+DenseVectorComponentProductTest<Mem::CUDA, double, unsigned long> cuda_dv_component_product_test_double_ulong;
 #endif
 
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseVectorScaleTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorScaleTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorScaleTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorScaleTest")
   {
   }
 
@@ -519,49 +491,42 @@ public:
       a.copy(a_local);
       DenseVector<Mem_, DT_, IT_> b(size);
 
-      b.template scale<Algo_>(a, s);
+      b.scale(a, s);
       result_local.copy(b);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      a.template scale<Algo_>(a, s);
+      a.scale(a, s);
       result_local.copy(a);
       TEST_CHECK_EQUAL(result_local, ref);
     }
   }
 };
-DenseVectorScaleTest<Mem::Main, Algo::Generic, float, unsigned int> dv_scale_test_float_uint;
-DenseVectorScaleTest<Mem::Main, Algo::Generic, double, unsigned int> dv_scale_test_double_uint;
-DenseVectorScaleTest<Mem::Main, Algo::Generic, float, unsigned long> dv_scale_test_float_ulong;
-DenseVectorScaleTest<Mem::Main, Algo::Generic, double, unsigned long> dv_scale_test_double_ulong;
+DenseVectorScaleTest<Mem::Main, float, unsigned int> dv_scale_test_float_uint;
+DenseVectorScaleTest<Mem::Main, double, unsigned int> dv_scale_test_double_uint;
+DenseVectorScaleTest<Mem::Main, float, unsigned long> dv_scale_test_float_ulong;
+DenseVectorScaleTest<Mem::Main, double, unsigned long> dv_scale_test_double_ulong;
 #ifdef FEAST_HAVE_QUADMATH
-DenseVectorScaleTest<Mem::Main, Algo::Generic, __float128, unsigned int> dv_scale_test_float128_uint;
-DenseVectorScaleTest<Mem::Main, Algo::Generic, __float128, unsigned long> dv_scale_test_float128_ulong;
-#endif
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorScaleTest<Mem::Main, Algo::MKL, float, unsigned int> mkl_dv_scale_test_float_uint;
-DenseVectorScaleTest<Mem::Main, Algo::MKL, double, unsigned int> mkl_dv_scale_test_double_uint;
-DenseVectorScaleTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_dv_scale_test_float_ulong;
-DenseVectorScaleTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_dv_scale_test_double_ulong;
+DenseVectorScaleTest<Mem::Main, __float128, unsigned int> dv_scale_test_float128_uint;
+DenseVectorScaleTest<Mem::Main, __float128, unsigned long> dv_scale_test_float128_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorScaleTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_dv_scale_test_float_uint;
-DenseVectorScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_dv_scale_test_double_uint;
-DenseVectorScaleTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_dv_scale_test_float_ulong;
-DenseVectorScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_scale_test_double_ulong;
+DenseVectorScaleTest<Mem::CUDA, float, unsigned int> cuda_dv_scale_test_float_uint;
+DenseVectorScaleTest<Mem::CUDA, double, unsigned int> cuda_dv_scale_test_double_uint;
+DenseVectorScaleTest<Mem::CUDA, float, unsigned long> cuda_dv_scale_test_float_ulong;
+DenseVectorScaleTest<Mem::CUDA, double, unsigned long> cuda_dv_scale_test_double_ulong;
 #endif
 
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseVectorNorm2Test
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   DenseVectorNorm2Test()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("DenseVectorNorm2Test")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorNorm2Test")
   {
   }
 
@@ -583,49 +548,41 @@ public:
 
       DenseVector<Mem_, DT_, IT_> a;
       a.convert(a_local);
-      DT_ c = a.template norm2<Algo_>();
+      DT_ c = a.norm2();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
 
-      c = a.template norm2sqr<Algo_>();
+      c = a.norm2sqr();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref*ref, eps);
     }
   }
 };
-DenseVectorNorm2Test<Mem::Main, Algo::Generic, float, unsigned int> dv_norm2_test_float_uint;
-DenseVectorNorm2Test<Mem::Main, Algo::Generic, double, unsigned int> dv_norm2_test_double_uint;
-DenseVectorNorm2Test<Mem::Main, Algo::Generic, float, unsigned long> dv_norm2_test_float_ulong;
-DenseVectorNorm2Test<Mem::Main, Algo::Generic, double, unsigned long> dv_norm2_test_double_ulong;
+DenseVectorNorm2Test<Mem::Main, float, unsigned int> dv_norm2_test_float_uint;
+DenseVectorNorm2Test<Mem::Main, double, unsigned int> dv_norm2_test_double_uint;
+DenseVectorNorm2Test<Mem::Main, float, unsigned long> dv_norm2_test_float_ulong;
+DenseVectorNorm2Test<Mem::Main, double, unsigned long> dv_norm2_test_double_ulong;
 #ifdef FEAST_HAVE_QUADMATH
-DenseVectorNorm2Test<Mem::Main, Algo::Generic, __float128, unsigned int> dv_norm2_test_float128_uint;
-DenseVectorNorm2Test<Mem::Main, Algo::Generic, __float128, unsigned long> dv_norm2_test_float128_ulong;
-#endif
-#ifdef FEAST_BACKENDS_MKL
-DenseVectorNorm2Test<Mem::Main, Algo::MKL, float, unsigned int> mkl_dv_norm2_test_float_uint;
-DenseVectorNorm2Test<Mem::Main, Algo::MKL, double, unsigned int> mkl_dv_norm2_test_double_uint;
-DenseVectorNorm2Test<Mem::Main, Algo::MKL, float, unsigned long> mkl_dv_norm2_test_float_ulong;
-DenseVectorNorm2Test<Mem::Main, Algo::MKL, double, unsigned long> mkl_dv_norm2_test_double_ulong;
+DenseVectorNorm2Test<Mem::Main, __float128, unsigned int> dv_norm2_test_float128_uint;
+DenseVectorNorm2Test<Mem::Main, __float128, unsigned long> dv_norm2_test_float128_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorNorm2Test<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_dv_norm2_test_float_uint;
-DenseVectorNorm2Test<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_dv_norm2_test_double_uint;
-DenseVectorNorm2Test<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_dv_norm2_test_float_ulong;
-DenseVectorNorm2Test<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_dv_norm2_test_double_ulong;
+DenseVectorNorm2Test<Mem::CUDA, float, unsigned int> cuda_dv_norm2_test_float_uint;
+DenseVectorNorm2Test<Mem::CUDA, double, unsigned int> cuda_dv_norm2_test_double_uint;
+DenseVectorNorm2Test<Mem::CUDA, float, unsigned long> cuda_dv_norm2_test_float_ulong;
+DenseVectorNorm2Test<Mem::CUDA, double, unsigned long> cuda_dv_norm2_test_double_ulong;
 #endif
-
 
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class DenseVectorComponentInvertTest
-  : public FullTaggedTest<Mem_, DT_, Algo_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   typedef DenseVector<Mem_, DT_, IT_> VectorType;
 
   DenseVectorComponentInvertTest()
-    : FullTaggedTest<Mem_, DT_, Algo_, IT_>("DenseVectorComponentInvertTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorComponentInvertTest")
   {
   }
 
@@ -646,15 +603,15 @@ public:
       vec.convert(tvec);
 
       VectorType vec2(vec.clone());
-      vec2.template component_invert<Algo_>(vec2, alpha);
-      vec2.template component_product<Algo_>(vec2, vec);
+      vec2.component_invert(vec2, alpha);
+      vec2.template component_product(vec2, vec);
       for (Index i(0); i < size; ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(vec2(i), alpha, eps);
       }
 
       VectorType vec3(size);
-      vec3.template component_invert<Algo_>(vec);
+      vec3.component_invert(vec);
       for (Index i(0); i < size; ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(vec3(i), DT_(1.0) / vec(i), eps);
@@ -663,16 +620,13 @@ public:
   }
 };
 
-DenseVectorComponentInvertTest<Mem::Main, Algo::Generic, float, Index> dv_component_invert_test_float;
-DenseVectorComponentInvertTest<Mem::Main, Algo::Generic, double, Index> dv_component_invert_test_double;
+DenseVectorComponentInvertTest<Mem::Main, float, Index> dv_component_invert_test_float;
+DenseVectorComponentInvertTest<Mem::Main, double, Index> dv_component_invert_test_double;
 #ifdef FEAST_HAVE_QUADMATH
-DenseVectorComponentInvertTest<Mem::Main, Algo::Generic, __float128, Index> dv_component_invert_test_float128;
-#endif
-#ifdef FEAST_BACKENDS_MKL
-//DenseVectorComponentInvertTest<Mem::Main, Algo::MKL, float, Index> mkl_dv_component_invert_test_float;
-//DenseVectorComponentInvertTest<Mem::Main, Algo::MKL, double, Index> mkl_dv_component_invert_test_double;
+DenseVectorComponentInvertTest<Mem::Main, __float128, Index> dv_component_invert_test_float128;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorComponentInvertTest<Mem::CUDA, Algo::CUDA, float, Index> cuda_dv_component_invert_test_float;
-DenseVectorComponentInvertTest<Mem::CUDA, Algo::CUDA, double, Index> cuda_dv_component_invert_test_double;
+DenseVectorComponentInvertTest<Mem::CUDA, float, Index> cuda_dv_component_invert_test_float;
+DenseVectorComponentInvertTest<Mem::CUDA, double, Index> cuda_dv_component_invert_test_double;
 #endif
+*/

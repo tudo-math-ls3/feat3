@@ -12,7 +12,7 @@ namespace FEAST
   namespace Foundation
   {
       /// \todo add communicators
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct GlobalProductMat0Vec1
       {
         public:
@@ -34,8 +34,8 @@ namespace FEAST
             ///assumes type-1 vector (full entries at inner boundaries)
             ///assumes type-0 matrix (entry fractions at inner boundaries)
 
-            A.template apply<Algo_>(target, x);
-            GlobalSynchVec0<Mem_, Algo_>::exec(
+            A.apply(target, x);
+            GlobalSynchVec0<Mem_>::exec(
                                                target,
                                                mirrors,
                                                other_ranks,

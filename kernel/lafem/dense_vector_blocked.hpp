@@ -346,7 +346,6 @@ namespace FEAST
        * \param[in] y The second summand vector
        * \param[in] alpha A scalar to multiply x with.
        */
-      template <typename Algo_>
       void axpy(
                 const DenseVectorBlocked & x,
                 const DenseVectorBlocked & y,
@@ -360,16 +359,16 @@ namespace FEAST
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-          Arch::Sum<Mem_, Algo_>::value(raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
+          Arch::Sum<Mem_>::value(raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-          Arch::Difference<Mem_, Algo_>::value(raw_elements(), y.raw_elements(), x.raw_elements(), this->raw_size());
+          Arch::Difference<Mem_>::value(raw_elements(), y.raw_elements(), x.raw_elements(), this->raw_size());
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
-          Arch::Axpy<Mem_, Algo_>::dv(raw_elements(), alpha, x.raw_elements(), y.raw_elements(), this->raw_size());
+          Arch::Axpy<Mem_>::dv(raw_elements(), alpha, x.raw_elements(), y.raw_elements(), this->raw_size());
       }
 
       /**
@@ -378,7 +377,6 @@ namespace FEAST
        * \param[in] x The first factor.
        * \param[in] y The second factor.
        */
-      template <typename Algo_>
       void component_product(const DenseVectorBlocked & x, const DenseVectorBlocked & y)
       {
         if (this->size() != x.size())
@@ -386,7 +384,7 @@ namespace FEAST
         if (this->size() != y.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        Arch::ComponentProduct<Mem_, Algo_>::value(raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
+        Arch::ComponentProduct<Mem_>::value(raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
       }
 
       /**
@@ -395,13 +393,12 @@ namespace FEAST
        * \param[in] x The vector to be scaled.
        * \param[in] alpha A scalar to scale x with.
        */
-      template <typename Algo_>
       void scale(const DenseVectorBlocked & x, const DT_ alpha)
       {
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        Arch::Scale<Mem_, Algo_>::value(raw_elements(), x.raw_elements(), alpha, this->raw_size());
+        Arch::Scale<Mem_>::value(raw_elements(), x.raw_elements(), alpha, this->raw_size());
       }
 
       /**
@@ -411,13 +408,12 @@ namespace FEAST
        *
        * \return The calculated dot product.
        */
-      template <typename Algo_>
       DataType dot(const DenseVectorBlocked & x) const
       {
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        return Arch::DotProduct<Mem_, Algo_>::value(raw_elements(), x.raw_elements(), this->raw_size());
+        return Arch::DotProduct<Mem_>::value(raw_elements(), x.raw_elements(), this->raw_size());
       }
 
       /**
@@ -425,10 +421,9 @@ namespace FEAST
        *
        * \return The calculated norm.
        */
-      template <typename Algo_>
       DT_ norm2() const
       {
-        return Arch::Norm2<Mem_, Algo_>::value(raw_elements(), this->raw_size());
+        return Arch::Norm2<Mem_>::value(raw_elements(), this->raw_size());
       }
 
       /**
@@ -436,11 +431,10 @@ namespace FEAST
        *
        * \return The calculated norm.
        */
-      template <typename Algo_>
       DT_ norm2sqr() const
       {
         // fallback
-        return Math::sqr(this->norm2<Algo_>());
+        return Math::sqr(this->norm2());
       }
       ///@}
 

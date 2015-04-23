@@ -12,19 +12,19 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
-template <typename Algo_, SparsePreconType Type_>
+template <SparsePreconType Type_>
 struct Precon;
 
 /**
  * none preconditioner
  */
-template <typename Algo_>
-struct Precon<Algo_, SparsePreconType::pt_none>
+template <>
+struct Precon<SparsePreconType::pt_none>
 {
   template <typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & /*sys*/, const Index /*opt*/)
+  static Preconditioner<MT_, VT_> * get(const MT_ & /*sys*/, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new NonePreconditioner<Algo_, MT_, VT_> ();
+    Preconditioner<MT_, VT_> * t = new NonePreconditioner<MT_, VT_> ();
     return t;
   }
 };
@@ -32,13 +32,13 @@ struct Precon<Algo_, SparsePreconType::pt_none>
 /**
  * Jacobi preconditioner
  */
-template <typename Algo_>
-struct Precon<Algo_, SparsePreconType::pt_jacobi>
+template <>
+struct Precon<SparsePreconType::pt_jacobi>
 {
   template <typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new JacobiPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
+    Preconditioner<MT_, VT_> * t = new JacobiPreconditioner<MT_, VT_> (sys, typename VT_::DataType(1));
     return t;
   }
 };
@@ -46,13 +46,13 @@ struct Precon<Algo_, SparsePreconType::pt_jacobi>
 /**
  * Gauss-Seidel preconditioner
  */
-template <typename Algo_>
-struct Precon<Algo_, SparsePreconType::pt_gauss_seidel>
+template <>
+struct Precon<SparsePreconType::pt_gauss_seidel>
 {
   template <typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new GaussSeidelPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
+    Preconditioner<MT_, VT_> * t = new GaussSeidelPreconditioner<MT_, VT_> (sys, typename VT_::DataType(1));
     return t;
   }
 };
@@ -60,13 +60,13 @@ struct Precon<Algo_, SparsePreconType::pt_gauss_seidel>
 /**
  * ILU preconditioner
  */
-template <typename Algo_>
-struct Precon<Algo_, SparsePreconType::pt_ilu>
+template <>
+struct Precon<SparsePreconType::pt_ilu>
 {
   template <typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new ILUPreconditioner<Algo_, MT_, VT_> (sys, opt);
+    Preconditioner<MT_, VT_> * t = new ILUPreconditioner<MT_, VT_> (sys, opt);
     return t;
   }
 };
@@ -74,13 +74,13 @@ struct Precon<Algo_, SparsePreconType::pt_ilu>
 /**
  * SOR preconditioner
  */
-template <typename Algo_>
-struct Precon<Algo_, SparsePreconType::pt_sor>
+template <>
+struct Precon<SparsePreconType::pt_sor>
 {
   template <typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new SORPreconditioner<Algo_, MT_, VT_> (sys);
+    Preconditioner<MT_, VT_> * t = new SORPreconditioner<MT_, VT_> (sys);
     return t;
   }
 };
@@ -88,13 +88,13 @@ struct Precon<Algo_, SparsePreconType::pt_sor>
 /**
  * SSOR preconditioner
  */
-template <typename Algo_>
-struct Precon<Algo_, SparsePreconType::pt_ssor>
+template <>
+struct Precon<SparsePreconType::pt_ssor>
 {
   template <typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new SSORPreconditioner<Algo_, MT_, VT_> (sys);
+    Preconditioner<MT_, VT_> * t = new SSORPreconditioner<MT_, VT_> (sys);
     return t;
   }
 };
@@ -102,13 +102,13 @@ struct Precon<Algo_, SparsePreconType::pt_ssor>
 /**
  * SPAI preconditioner
  */
-template <typename Algo_>
-struct Precon<Algo_, SparsePreconType::pt_spai>
+template <>
+struct Precon<SparsePreconType::pt_spai>
 {
   template <typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
-    Preconditioner<Algo_, MT_, VT_> * t;
+    Preconditioner<MT_, VT_> * t;
 
     const bool transpose(opt%2 == 0);
     const bool start_layout((opt / 2)%2 == 0);
@@ -116,64 +116,62 @@ struct Precon<Algo_, SparsePreconType::pt_spai>
 
     if (start_layout)
     {
-      t = new SPAIPreconditioner<Algo_, MT_, VT_> (sys, 2, max_iter, 1e-2, 10, 1e-3, 1e-3, transpose);
+      t = new SPAIPreconditioner<MT_, VT_> (sys, 2, max_iter, 1e-2, 10, 1e-3, 1e-3, transpose);
     }
     else
     {
-      t = new SPAIPreconditioner<Algo_, MT_, VT_> (sys, sys.layout(), max_iter, 1e-2, 10, 1e-3, 1e-3, transpose);
+      t = new SPAIPreconditioner<MT_, VT_> (sys, sys.layout(), max_iter, 1e-2, 10, 1e-3, 1e-3, transpose);
     }
     return t;
   }
 };
 
 /**
- * Polynomial preconditioner for Algo::Generic
+ * Polynomial preconditioner for Mem::Main
  */
 template <>
-struct Precon<Algo::Generic, SparsePreconType::pt_polynomial>
+struct Precon<SparsePreconType::pt_polynomial>
 {
-  typedef Algo::Generic Algo_;
-
   template <typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  static Preconditioner<MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
     const Index iter_poly(2);
-    Preconditioner<Algo_, MT_, VT_> * t;
+    Preconditioner<MT_, VT_> * t;
 
     if (opt%10 == 0)
     {
-      auto * temp = Precon<Algo_, SparsePreconType::pt_none>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+      auto * temp = Precon<SparsePreconType::pt_none>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 1)
     {
-      auto * temp = Precon<Algo_, SparsePreconType::pt_jacobi>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+      auto * temp = Precon<SparsePreconType::pt_jacobi>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 2)
     {
-      auto * temp = Precon<Algo_, SparsePreconType::pt_gauss_seidel>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+      auto * temp = Precon<SparsePreconType::pt_gauss_seidel>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 3)
     {
-      auto * temp = Precon<Algo_, SparsePreconType::pt_sor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+      auto * temp = Precon<SparsePreconType::pt_sor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 4)
     {
-      auto * temp = Precon<Algo_, SparsePreconType::pt_ssor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+      auto * temp = Precon<SparsePreconType::pt_ssor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 5)
     {
-      auto * temp = Precon<Algo_, SparsePreconType::pt_ilu>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+      auto * temp = Precon<SparsePreconType::pt_ilu>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 6)
     {
-      auto * temp = Precon<Algo_, SparsePreconType::pt_spai>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+      auto * temp = Precon<SparsePreconType::pt_spai>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<MT_, VT_> (sys, iter_poly, temp);
     }
     else
     {
@@ -183,65 +181,6 @@ struct Precon<Algo::Generic, SparsePreconType::pt_polynomial>
     return t;
   }
 };
-
-/**
- * Polynomial preconditioner for Algo::CUDA
- */
-template <>
-struct Precon<Algo::CUDA, SparsePreconType::pt_polynomial>
-{
-  typedef Algo::CUDA Algo_;
-
-  template <typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
-  {
-    const Index iter_poly(2);
-    Preconditioner<Algo_, MT_, VT_> * t;
-
-    if (opt%10 == 0)
-    {
-      auto * temp = Precon<Algo_, SparsePreconType::pt_none>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    }
-    else if (opt%10 == 1)
-    {
-      auto * temp = Precon<Algo_, SparsePreconType::pt_jacobi>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    }
-    // else if (opt%10 == 2)
-    // {
-    //   auto * temp = Precon<Algo_, SparsePreconType::pt_gauss_seidel>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    // }
-    // else if (opt%10 == 3)
-    // {
-    //   auto * temp = Precon<Algo_, SparsePreconType::pt_sor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    // }
-    // else if (opt%10 == 4)
-    // {
-    //   auto * temp = Precon<Algo_, SparsePreconType::pt_ssor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    // }
-    // else if (opt%10 == 5)
-    // {
-    //   auto * temp = Precon<Algo_, SparsePreconType::pt_ilu>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    // }
-    // else if (opt%10 == 6)
-    // {
-    //   auto * temp = Precon<Algo_, SparsePreconType::pt_spai>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
-    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    // }
-    else
-    {
-      throw InternalError(__func__, __FILE__, __LINE__, "Parameter " + stringify(opt) + " not allowed!");
-    }
-
-    return t;
-  }
-};
-
 
 /**
  * \brief BiCGStabTest
@@ -250,10 +189,9 @@ struct Precon<Algo::CUDA, SparsePreconType::pt_polynomial>
  *
  * \author Christoph Lohmann
  */
-template<typename PSF_, SparsePreconType PType_, typename Algo_, typename MT_>
+template<typename PSF_, SparsePreconType PType_, typename MT_>
 class BiCGStabTest
   : public FullTaggedTest<typename MT_::MemType,
-                          Algo_,
                           typename MT_::DataType,
                           typename MT_::IndexType>
 {
@@ -267,7 +205,7 @@ public:
   typedef DenseVector<Mem_, DT_, IT_> VT_;
 
   BiCGStabTest(String pname, Index opt = 0)
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_> ("bicgstab_test: "
+    : FullTaggedTest<Mem_, DT_, IT_> ("bicgstab_test: "
                                              + MT_::name()
                                              + " "
                                              + pname
@@ -288,10 +226,10 @@ public:
     ref.convert(factory.vector_q2_bubble());
     VT_ ref_local(ref.size());
     VT_ b(size);
-    sys.template apply<Algo_>(b, ref);
+    sys.apply(b, ref);
 
-    Preconditioner<Algo_, MT_, VT_> * precond(Precon<Algo_, PType_>::template get<MT_, VT_>(sys, _opt));
-    BiCGStab<Algo_>::value(x, sys, b, *precond, 1000, 1e-12);
+    Preconditioner<MT_, VT_> * precond(Precon<PType_>::template get<MT_, VT_>(sys, _opt));
+    BiCGStab::value(x, sys, b, *precond, 1000, 1e-12);
     delete precond;
 
     ref_local.copy(ref);
@@ -306,418 +244,352 @@ public:
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_none_double_uint("none");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_none_double_uint("none");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_none_double_uint("none");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_jac_double_uint("jacobi");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_jac_double_uint("jacobi");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_jac_double_uint("jacobi");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_gs_double_uint("gauss-seidel");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_gs_double_uint("gauss-seidel");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_gs_double_uint("gauss-seidel");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_poly_double_uint_0("polynmial", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_poly_double_uint_0("polynmial", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_poly_double_uint_0("polynmial", 0);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_poly_double_uint_1("polynmial", 1);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_poly_double_uint_1("polynmial", 1);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_poly_double_uint_1("polynmial", 1);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_poly_double_uint_2("polynmial", 2);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_poly_double_uint_2("polynmial", 2);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_poly_double_uint_2("polynmial", 2);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_poly_double_uint_3("polynmial", 3);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_poly_double_uint_3("polynmial", 3);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_poly_double_uint_3("polynmial", 3);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_poly_double_uint_4("polynmial", 4);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_poly_double_uint_4("polynmial", 4);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_poly_double_uint_4("polynmial", 4);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_poly_double_uint_5("polynmial", 5);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_poly_double_uint_5("polynmial", 5);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_poly_double_uint_5("polynmial", 5);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_poly_double_uint_6("polynmial", 6);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_poly_double_uint_6("polynmial", 6);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_poly_double_uint_6("polynmial", 6);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_ilu_double_uint_0("ilu", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_ilu_double_uint_0("ilu", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_ilu_double_uint_0("ilu", 0);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_ilu_double_uint_10("ilu", 10);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_ilu_double_uint_10("ilu", 10);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_ilu_double_uint_10("ilu", 10);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_sor,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_sor_double_uint("sor");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_sor,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_sor_double_uint("sor");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_sor,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_sor_double_uint("sor");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ssor,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_ssor_double_uint("ssor");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ssor,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_ssor_double_uint("ssor");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ssor,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_ssor_double_uint("ssor");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_spai_double_uint_0("spai", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_spai_double_uint_0("spai", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_spai_double_uint_0("spai", 0);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_spai_double_uint_1("spai", 1);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_spai_double_uint_1("spai", 1);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_spai_double_uint_1("spai", 1);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_spai_double_uint_2("spai", 2);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_spai_double_uint_2("spai", 2);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_spai_double_uint_2("spai", 2);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_spai_double_uint_3("spai", 3);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_spai_double_uint_3("spai", 3);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_spai_double_uint_3("spai", 3);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_spai_double_uint_80("spai", 80);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_spai_double_uint_80("spai", 80);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_spai_double_uint_80("spai", 80);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_spai_double_uint_81("spai", 81);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_spai_double_uint_81("spai", 81);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_spai_double_uint_81("spai", 81);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_spai_double_uint_82("spai", 82);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_spai_double_uint_82("spai", 82);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_spai_double_uint_82("spai", 82);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_csr_spai_double_uint_83("spai", 83);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_coo_spai_double_uint_83("spai", 83);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned int> >
 bicgstab_test_cpu_ell_spai_double_uint_83("spai", 83);
 
@@ -725,1070 +597,354 @@ bicgstab_test_cpu_ell_spai_double_uint_83("spai", 83);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_none_double_ulong("none");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_none_double_ulong("none");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_none_double_ulong("none");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_jac_double_ulong("jacobi");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_jac_double_ulong("jacobi");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_jac_double_ulong("jacobi");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_gs_double_ulong("gauss-seidel");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_gs_double_ulong("gauss-seidel");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_gs_double_ulong("gauss-seidel");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_poly_double_ulong_0("polynmial", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_poly_double_ulong_0("polynmial", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_poly_double_ulong_0("polynmial", 0);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_poly_double_ulong_1("polynmial", 1);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_poly_double_ulong_1("polynmial", 1);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_poly_double_ulong_1("polynmial", 1);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_poly_double_ulong_2("polynmial", 2);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_poly_double_ulong_2("polynmial", 2);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_poly_double_ulong_2("polynmial", 2);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_poly_double_ulong_3("polynmial", 3);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_poly_double_ulong_3("polynmial", 3);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_poly_double_ulong_3("polynmial", 3);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_poly_double_ulong_4("polynmial", 4);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_poly_double_ulong_4("polynmial", 4);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_poly_double_ulong_4("polynmial", 4);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_poly_double_ulong_5("polynmial", 5);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_poly_double_ulong_5("polynmial", 5);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_poly_double_ulong_5("polynmial", 5);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_poly_double_ulong_6("polynmial", 6);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_poly_double_ulong_6("polynmial", 6);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_poly_double_ulong_6("polynmial", 6);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_ilu_double_ulong_0("ilu", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_ilu_double_ulong_0("ilu", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_ilu_double_ulong_0("ilu", 0);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_ilu_double_ulong_10("ilu", 10);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_ilu_double_ulong_10("ilu", 10);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_ilu_double_ulong_10("ilu", 10);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_sor,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_sor_double_ulong("sor");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_sor,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_sor_double_ulong("sor");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_sor,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_sor_double_ulong("sor");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ssor,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_ssor_double_ulong("ssor");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ssor,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_ssor_double_ulong("ssor");
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ssor,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_ssor_double_ulong("ssor");
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_spai_double_ulong_0("spai", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_spai_double_ulong_0("spai", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_spai_double_ulong_0("spai", 0);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_spai_double_ulong_1("spai", 1);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_spai_double_ulong_1("spai", 1);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_spai_double_ulong_1("spai", 1);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_spai_double_ulong_2("spai", 2);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_spai_double_ulong_2("spai", 2);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_spai_double_ulong_2("spai", 2);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_spai_double_ulong_3("spai", 3);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_spai_double_ulong_3("spai", 3);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_spai_double_ulong_3("spai", 3);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_spai_double_ulong_80("spai", 80);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_spai_double_ulong_80("spai", 80);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_spai_double_ulong_80("spai", 80);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_spai_double_ulong_81("spai", 81);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_spai_double_ulong_81("spai", 81);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_spai_double_ulong_81("spai", 81);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_spai_double_ulong_82("spai", 82);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_spai_double_ulong_82("spai", 82);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_spai_double_ulong_82("spai", 82);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCSR<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_csr_spai_double_ulong_83("spai", 83);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixCOO<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_coo_spai_double_ulong_83("spai", 83);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
-             Algo::Generic,
              SparseMatrixELL<Mem::Main, double, unsigned long> >
 bicgstab_test_cpu_ell_spai_double_ulong_83("spai", 83);
-
-
-
-
-#ifdef FEAST_BACKENDS_CUDA
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_none,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_none_double_uint("none");
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_none,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_none_double_uint("none");*/
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_none,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_none_double_uint("none");
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_jacobi,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_jac_double_uint("jacobi");
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_jacobi,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_jac_double_uint("jacobi");*/
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_jacobi,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_jac_double_uint("jacobi");
-
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_gauss_seidel,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_gs_double_uint("gauss-seidel");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_gauss_seidel,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_gs_double_uint("gauss-seidel");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_gauss_seidel,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_gs_double_uint("gauss-seidel");*/
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_poly_double_uint_0("polynmial", 0);
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-            SparsePreconType::pt_polynomial,
-            Algo::CUDA,
-            SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_poly_double_uint_0("polynmial", 0);*/
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_poly_double_uint_0("polynmial", 0);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_poly_double_uint_1("polynmial", 1);
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_poly_double_uint_1("polynmial", 1);*/
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_poly_double_uint_1("polynmial", 1);
-
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_ilu_double_uint_0("ilu", 0);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_ilu_double_uint_0("ilu", 0);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_ilu_double_uint_0("ilu", 0);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_ilu_double_uint_10("ilu", 10);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_ilu_double_uint_10("ilu", 10);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_ilu_double_uint_10("ilu", 10);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_sor,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_sor_double_uint("sor");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_sor,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_sor_double_uint("sor");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_sor,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_sor_double_uint("sor");
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ssor,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_ssor_double_uint("ssor");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ssor,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_ssor_double_uint("ssor");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ssor,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_ssor_double_uint("ssor");
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_spai_double_uint_0("spai", 0);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_spai_double_uint_0("spai", 0);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_spai_double_uint_0("spai", 0);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_spai_double_uint_1("spai", 1);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_spai_double_uint_1("spai", 1);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_spai_double_uint_1("spai", 1);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_spai_double_uint_2("spai", 2);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_spai_double_uint_2("spai", 2);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_spai_double_uint_2("spai", 2);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_spai_double_uint_3("spai", 3);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_spai_double_uint_3("spai", 3);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_spai_double_uint_3("spai", 3);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_spai_double_uint_80("spai", 80);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_spai_double_uint_80("spai", 80);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_spai_double_uint_80("spai", 80);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_spai_double_uint_81("spai", 81);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_spai_double_uint_81("spai", 81);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_spai_double_uint_81("spai", 81);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_spai_double_uint_82("spai", 82);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_spai_double_uint_82("spai", 82);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_spai_double_uint_82("spai", 82);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_csr_spai_double_uint_83("spai", 83);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_coo_spai_double_uint_83("spai", 83);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned int> >
-bicgstab_test_cuda_ell_spai_double_uint_83("spai", 83);*/
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_none,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_none_double_ulong("none");
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_none,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_none_double_ulong("none");*/
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_none,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_none_double_ulong("none");
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_jacobi,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_jac_double_ulong("jacobi");
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_jacobi,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_jac_double_ulong("jacobi");*/
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_jacobi,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_jac_double_ulong("jacobi");
-
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_gauss_seidel,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_gs_double_ulong("gauss-seidel");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_gauss_seidel,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_gs_double_ulong("gauss-seidel");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_gauss_seidel,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_gs_double_ulong("gauss-seidel");*/
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_poly_double_ulong_0("polynmial", 0);
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-            SparsePreconType::pt_polynomial,
-            Algo::CUDA,
-            SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_poly_double_ulong_0("polynmial", 0);*/
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_poly_double_ulong_0("polynmial", 0);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_poly_double_ulong_1("polynmial", 1);
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_poly_double_ulong_1("polynmial", 1);*/
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_poly_double_ulong_1("polynmial", 1);
-
-
-/*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_ilu_double_ulong_0("ilu", 0);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_ilu_double_ulong_0("ilu", 0);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_ilu_double_ulong_0("ilu", 0);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_ilu_double_ulong_10("ilu", 10);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_ilu_double_ulong_10("ilu", 10);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ilu,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_ilu_double_ulong_10("ilu", 10);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_sor,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_sor_double_ulong("sor");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_sor,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_sor_double_ulong("sor");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_sor,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_sor_double_ulong("sor");
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ssor,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_ssor_double_ulong("ssor");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ssor,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_ssor_double_ulong("ssor");
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_ssor,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_ssor_double_ulong("ssor");
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_spai_double_ulong_0("spai", 0);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_spai_double_ulong_0("spai", 0);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_spai_double_ulong_0("spai", 0);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_spai_double_ulong_1("spai", 1);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_spai_double_ulong_1("spai", 1);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_spai_double_ulong_1("spai", 1);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_spai_double_ulong_2("spai", 2);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_spai_double_ulong_2("spai", 2);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_spai_double_ulong_2("spai", 2);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_spai_double_ulong_3("spai", 3);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_spai_double_ulong_3("spai", 3);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_spai_double_ulong_3("spai", 3);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_spai_double_ulong_80("spai", 80);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_spai_double_ulong_80("spai", 80);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_spai_double_ulong_80("spai", 80);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_spai_double_ulong_81("spai", 81);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_spai_double_ulong_81("spai", 81);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_spai_double_ulong_81("spai", 81);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_spai_double_ulong_82("spai", 82);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_spai_double_ulong_82("spai", 82);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_spai_double_ulong_82("spai", 82);
-
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCSR<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_csr_spai_double_ulong_83("spai", 83);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_coo_spai_double_ulong_83("spai", 83);
-
-BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_spai,
-             Algo::CUDA,
-             SparseMatrixELL<Mem::CUDA, double, unsigned long> >
-bicgstab_test_cuda_ell_spai_double_ulong_83("spai", 83);*/
-#endif
 
 
 /**
@@ -1798,9 +954,9 @@ bicgstab_test_cuda_ell_spai_double_ulong_83("spai", 83);*/
  *
  * \author Christoph Lohmann
  */
-template<SparsePreconType PType_, typename Algo_, typename VT_>
+template<SparsePreconType PType_, typename VT_>
 class BiCGStabBandedTest
-  : public FullTaggedTest<typename VT_::MemType, Algo_,
+  : public FullTaggedTest<typename VT_::MemType,
                           typename VT_::DataType, typename VT_::IndexType>
 {
 private:
@@ -1813,7 +969,7 @@ public:
   typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
 
   BiCGStabBandedTest(String pname, Index opt = 0)
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_> ("bicgstab_banded_test: "
+    : FullTaggedTest<Mem_, DT_, IT_> ("bicgstab_banded_test: "
                                              + pname
                                              + " opt = "
                                              + stringify(opt)), _opt(opt)
@@ -1843,10 +999,10 @@ public:
     VT_ ref;
     ref.convert(factory.vector_q2_bubble());
     VT_ b(size);
-    sys.template apply<Algo_>(b, ref);
+    sys.apply(b, ref);
 
-    Preconditioner<Algo_, MatrixType, VT_> * precond(Precon<Algo_, PType_>::template get<MatrixType, VT_>(sys, _opt));
-    BiCGStab<Algo_>::value(x, sys, b, *precond, 1000, 1e-12);
+    Preconditioner<MatrixType, VT_> * precond(Precon<PType_>::template get<MatrixType, VT_>(sys, _opt));
+    BiCGStab::value(x, sys, b, *precond, 1000, 1e-12);
     delete precond;
 
     // check, if the result is correct
@@ -1858,22 +1014,18 @@ public:
 };
 
 BiCGStabBandedTest<SparsePreconType::pt_none,
-                   Algo::Generic,
                    DenseVector<Mem::Main, double, unsigned int> >
 bicgstabbanded_test_cpu_none_double_uint("none");
 
 BiCGStabBandedTest<SparsePreconType::pt_jacobi,
-                   Algo::Generic,
                    DenseVector<Mem::Main, double, unsigned int> >
 bicgstabbanded_test_cpu_jac_double_uint("jacobi");
 
 BiCGStabBandedTest<SparsePreconType::pt_none,
-                   Algo::Generic,
                    DenseVector<Mem::Main, double, unsigned long> >
 bicgstabbanded_test_cpu_none_double_ulong("none");
 
 BiCGStabBandedTest<SparsePreconType::pt_jacobi,
-                   Algo::Generic,
                    DenseVector<Mem::Main, double, unsigned long> >
 bicgstabbanded_test_cpu_jac_double_ulong("jacobi");
 
@@ -1885,9 +1037,9 @@ bicgstabbanded_test_cpu_jac_double_ulong("jacobi");
  *
  * \author Christoph Lohmann
  */
-template<typename Algo_, typename MT_>
+template<typename MT_>
 class ILUTest
-  : public FullTaggedTest<typename MT_::MemType, Algo_, typename MT_::DataType, typename MT_::IndexType>
+  : public FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>
 {
 private:
   typedef typename MT_::DataType  DT_;
@@ -1898,7 +1050,7 @@ private:
 public:
 
   ILUTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("ilu_test" + MT_::name())
+    : FullTaggedTest<Mem_, DT_, IT_>("ilu_test" + MT_::name())
   {
   }
 
@@ -1946,15 +1098,15 @@ public:
     LU.convert(cLU);
 
     // calculate the reference-solution
-    //tmp.template product_matvec<Algo_>(U, x);
-    U.template apply<Algo_>(tmp, x);
-    //b.template product_matvec<Algo_>(L, tmp);
-    L.template apply<Algo_>(b, tmp);
+    //tmp.product_matvec(U, x);
+    U.apply(tmp, x);
+    //b.product_matvec(L, tmp);
+    L.apply(b, tmp);
 
     // save reference-solution
     ref.copy(x);
 
-    ILUPreconditioner<Algo_, MT_, VectorType> precond(LU);
+    ILUPreconditioner<MT_, VectorType> precond(LU);
     precond.apply(x, b);
 
     // check, if the result is coorect
@@ -1965,19 +1117,9 @@ public:
   }
 };
 
-ILUTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> > ilu_test_cpu_csr_double_uint;
-ILUTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned long> > ilu_test_cpu_csr_double_ulong;
-ILUTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned int> > ilu_test_cpu_coo_double_uint;
-ILUTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, unsigned long> > ilu_test_cpu_coo_double_ulong;
-ILUTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> > ilu_test_cpu_ell_double_uint;
-ILUTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned long> > ilu_test_cpu_ell_double_ulong;
-
-
-/*#ifdef FEAST_BACKENDS_CUDA
-ILUTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned int> > ilu_test_cuda_csr_double_uint;
-ILUTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned long> > ilu_test_cuda_csr_double_ulong;
-ILUTest<Algo::CUDA, SparseMatrixCOO<Mem::CUDA, double, unsigned int> > ilu_test_cuda_coo_double_uint;
-ILUTest<Algo::CUDA, SparseMatrixCOO<Mem::CUDA, double, unsigned long> > ilu_test_cuda_coo_double_ulong;
-ILUTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned int> > ilu_test_cuda_ell_double_uint;
-ILUTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned long> > ilu_test_cuda_ell_double_ulong;
-#endif*/
+ILUTest<SparseMatrixCSR<Mem::Main, double, unsigned int> > ilu_test_cpu_csr_double_uint;
+ILUTest<SparseMatrixCSR<Mem::Main, double, unsigned long> > ilu_test_cpu_csr_double_ulong;
+ILUTest<SparseMatrixCOO<Mem::Main, double, unsigned int> > ilu_test_cpu_coo_double_uint;
+ILUTest<SparseMatrixCOO<Mem::Main, double, unsigned long> > ilu_test_cpu_coo_double_ulong;
+ILUTest<SparseMatrixELL<Mem::Main, double, unsigned int> > ilu_test_cpu_ell_double_uint;
+ILUTest<SparseMatrixELL<Mem::Main, double, unsigned long> > ilu_test_cpu_ell_double_ulong;

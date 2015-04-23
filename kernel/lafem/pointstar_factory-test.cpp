@@ -7,7 +7,7 @@ using namespace FEAST::TestSystem;
 
 template<typename DataType_, typename IndexType_>
 class PointstarFactoryTest :
-  public FEAST::TestSystem::FullTaggedTest<Mem::Main, NotSet, DataType_, IndexType_>
+  public FEAST::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>
 {
 public:
   typedef DenseVector<Mem::Main, DataType_, IndexType_> VectorType;
@@ -15,7 +15,7 @@ public:
 
 public:
   PointstarFactoryTest() :
-    FEAST::TestSystem::FullTaggedTest<Mem::Main, NotSet, DataType_, IndexType_>("PointstarFactoryTest")
+    FEAST::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>("PointstarFactoryTest")
   {
   }
 
@@ -43,11 +43,11 @@ public:
 
         // compute w = A*ev - lambda_min*ev
         VectorType w(ev.size());
-        a.template apply<Algo::Generic>(w, ev);
-        w.template axpy<Algo::Generic>(ev, w, -lambda_min);
+        a.apply(w, ev);
+        w.axpy(ev, w, -lambda_min);
 
         // check norm of w
-        TEST_CHECK_EQUAL_WITHIN_EPS(w.template norm2<Algo::Generic>(), DataType_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DataType_(0), tol);
       }
     }
 
@@ -67,11 +67,11 @@ public:
 
       // compute w = A*ev - lambda_min*ev
       VectorType w(ev.size());
-      a.template apply<Algo::Generic>(w, ev);
-      w.template axpy<Algo::Generic>(ev, w, -lambda_min);
+      a.apply(w, ev);
+      w.axpy(ev, w, -lambda_min);
 
       // check norm of w
-      TEST_CHECK_EQUAL_WITHIN_EPS(w.template norm2<Algo::Generic>(), DataType_(0), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DataType_(0), tol);
       //std::cout << m << ": " << scientify(lambda_min,10) << " , " << scientify(w(0)/ev(0),10) << std::endl;
     }
   }
@@ -92,7 +92,7 @@ PointstarFactoryTest<double, unsigned long> pointstar_factory_test_double_ulong;
 
 template<typename DataType_, typename IndexType_>
 class PointstarStructureTest :
-  public FEAST::TestSystem::FullTaggedTest<Mem::Main, NotSet, DataType_, IndexType_>
+  public FEAST::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>
 {
 public:
   typedef DenseVector<Mem::Main, DataType_, IndexType_> VectorType;
@@ -100,7 +100,7 @@ public:
 
 public:
   PointstarStructureTest() :
-    FEAST::TestSystem::FullTaggedTest<Mem::Main, NotSet, DataType_, IndexType_>("PointstarStructureTest")
+    FEAST::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>("PointstarStructureTest")
   {
   }
 
@@ -132,11 +132,11 @@ public:
 
     // compute w = A*ev - lambda_min*ev
     VectorType w(ev.size());
-    a.template apply<Algo::Generic>(w, ev);
-    w.template axpy<Algo::Generic>(ev, w, -lambda_min);
+    a.apply(w, ev);
+    w.axpy(ev, w, -lambda_min);
 
     // check norm of w
-    TEST_CHECK_EQUAL_WITHIN_EPS(w.template norm2<Algo::Generic>(), DataType_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DataType_(0), tol);
 
 
     std::vector<IndexType_> num_of_subintervalls2;
@@ -144,7 +144,7 @@ public:
     num_of_subintervalls2.push_back(4);
     num_of_subintervalls2.push_back(3);
 
-    MatrixType b(PointstarStructureFE<Algo::Generic>::value<DataType_>(3, num_of_subintervalls2));
+    MatrixType b(PointstarStructureFE::value<DataType_>(3, num_of_subintervalls2));
   }
 };
 

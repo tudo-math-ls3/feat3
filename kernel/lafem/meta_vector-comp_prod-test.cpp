@@ -12,15 +12,13 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_, typename IndexType_>
+template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaVectorCompProdTest
-  : public MetaVectorTestBase<Algo_, DataType_, IndexType_>
+  : public MetaVectorTestBase<MemType_, DataType_, IndexType_>
 {
 public:
-  typedef Algo_ AlgoType;
-  typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<Algo_, DataType_, IndexType_> BaseClass;
+  typedef MetaVectorTestBase<MemType_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
   MetaVectorCompProdTest() : BaseClass("MetaVectorCompProdTest") {}
@@ -46,7 +44,7 @@ public:
 
     // test: z <- x * y
     // purpose: general test
-    z.template component_product<AlgoType>(x, y);
+    z.component_product(x, y);
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i) * fy00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -57,7 +55,7 @@ public:
     // test: z <- x; z <- z * y
     // purpose: z = x
     z.copy(x);
-    z.template component_product<AlgoType>(z, y);
+    z.component_product(z, y);
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i) * fy00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -68,7 +66,7 @@ public:
     // test: z <- y; z <- x * z
     // purpose: z = y
     z.copy(y);
-    z.template component_product<AlgoType>(x, z);
+    z.component_product(x, z);
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i) * fy00(i), tol);
     for(Index i(0); i < n01; ++i)
@@ -78,13 +76,9 @@ public:
   }
 };
 
-MetaVectorCompProdTest<Algo::Generic, float, Index> meta_vector_comp_prod_test_generic_float;
-MetaVectorCompProdTest<Algo::Generic, double, Index> meta_vector_comp_prod_test_generic_double;
-#ifdef FEAST_BACKENDS_MKL
-MetaVectorCompProdTest<Algo::MKL, float, Index> meta_vector_comp_prod_test_mkl_float;
-MetaVectorCompProdTest<Algo::MKL, double, Index> meta_vector_comp_prod_test_mkl_double;
-#endif
+MetaVectorCompProdTest<Mem::Main, float, Index> meta_vector_comp_prod_test_generic_float;
+MetaVectorCompProdTest<Mem::Main, double, Index> meta_vector_comp_prod_test_generic_double;
 #ifdef FEAST_BACKENDS_CUDA
-MetaVectorCompProdTest<Algo::CUDA, float, Index> meta_vector_comp_prod_test_cuda_float;
-MetaVectorCompProdTest<Algo::CUDA, double, Index> meta_vector_comp_prod_test_cuda_double;
+MetaVectorCompProdTest<Mem::CUDA, float, Index> meta_vector_comp_prod_test_cuda_float;
+MetaVectorCompProdTest<Mem::CUDA, double, Index> meta_vector_comp_prod_test_cuda_double;
 #endif

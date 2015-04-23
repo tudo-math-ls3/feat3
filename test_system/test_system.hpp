@@ -161,8 +161,6 @@ namespace FEAST
       const String _id;
       /// memory description String
       String _mem_name;
-      /// algorithm description String
-      String _algo_name;
       /// precision description String
       String _prec_name;
       /// index type description String
@@ -180,7 +178,6 @@ namespace FEAST
       BaseTest(const String& id_in)
         : _id(id_in),
         _mem_name(Type::Traits<Archs::None>::name()),
-        _algo_name(Type::Traits<Archs::None>::name()),
         _prec_name(Type::Traits<Archs::None>::name()),
         _index_name(Type::Traits<Archs::None>::name())
       {
@@ -223,12 +220,6 @@ namespace FEAST
         return _prec_name;
       }
 
-      /// returns our used algorithm platform
-      virtual String get_algo_name()
-      {
-        return _algo_name;
-      }
-
       /// returns our target platform
       virtual String get_index_name()
       {
@@ -251,8 +242,7 @@ namespace FEAST
      */
     template<
       typename Mem_,
-      typename DataType_,
-      typename Algo_ = NotSet>
+      typename DataType_>
     class TaggedTest
       : public BaseTest
     {
@@ -267,7 +257,6 @@ namespace FEAST
         : BaseTest(id_in)
       {
         _mem_name = Type::Traits<Mem_>::name();
-        _algo_name = Type::Traits<Algo_>::name();
         _prec_name = Type::Traits<DataType_>::name();
         _index_name = NotSet::name();
       }
@@ -285,7 +274,6 @@ namespace FEAST
      */
     template<
       typename Mem_,
-      typename Algo_,
       typename DT_,
       typename IT_>
     class FullTaggedTest
@@ -302,7 +290,6 @@ namespace FEAST
         : BaseTest(id_in)
       {
         _mem_name = Type::Traits<Mem_>::name();
-        _algo_name = Type::Traits<Algo_>::name();
         _prec_name = Type::Traits<DT_>::name();
         _index_name = Type::Traits<IT_>::name();
       }

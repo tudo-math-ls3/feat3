@@ -147,7 +147,6 @@ namespace FEAST
        * A reference to the operator matrix whose entries are to be gathered.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename MT_>
@@ -172,7 +171,6 @@ namespace FEAST
        * The scaling factor for the operation.
        */
       template<
-        typename Algo_,
         typename Tx_,
         typename Ix_,
         typename MT_>
@@ -195,7 +193,6 @@ namespace FEAST
        * A reference to the buffer matrix whose entries are to be scattered.
        */
       template<
-        typename Algo_,
         typename MT_,
         typename Tx_,
         typename Ix_>
@@ -220,7 +217,6 @@ namespace FEAST
        * The scaling factor for the operation.
        */
       template<
-        typename Algo_,
         typename MT_,
         typename Tx_,
         typename Ix_>

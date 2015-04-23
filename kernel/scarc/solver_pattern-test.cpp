@@ -13,7 +13,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::ScaRC;
 
 
-template<typename Tag_, typename Algo_, typename DataType_>
+template<typename Tag_, typename DataType_>
 class SolverPatternTest:
   public TaggedTest<Tag_, DataType_>
 {
@@ -34,9 +34,9 @@ class SolverPatternTest:
       P.clone(A);
 
       PreconditionedSolverData<> data(std::move(A), std::move(P), std::move(x), std::move(b),
-                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
-                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(data, 20, 1e-8));
+                        SolverPatternGeneration<Richardson>::min_num_temp_vectors(),
+                        SolverPatternGeneration<Richardson>::min_num_temp_scalars());
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson>::execute(data, 20, 1e-8));
       TEST_CHECK_EQUAL(solver->type_name(), "CompoundSolverFunctor[DefectFunctor, NormFunctor2, IterateFunctor[CompoundSolverFunctor[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
       solver->execute();
 
@@ -51,12 +51,12 @@ class SolverPatternTest:
       //---------------------------------------------------------------------------------------------------------------------------------------------
       DenseVector<Tag_, DataType_> dummy;
       PreconditionedSolverData<> data3(std::move(A1), std::move(P1), std::move(x1), std::move(b1),
-                         SolverPatternGeneration<RichardsonLayer, Algo_>::min_num_temp_vectors(),
-                         SolverPatternGeneration<RichardsonLayer, Algo_>::min_num_temp_scalars());
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver3(SolverPatternGeneration<RichardsonLayer, Algo_>::execute(data3, dummy, 20, 1e-8));
+                         SolverPatternGeneration<RichardsonLayer>::min_num_temp_vectors(),
+                         SolverPatternGeneration<RichardsonLayer>::min_num_temp_scalars());
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver3(SolverPatternGeneration<RichardsonLayer>::execute(data3, dummy, 20, 1e-8));
       TEST_CHECK_EQUAL(solver3->type_name(), "CompoundSolverFunctor[DefectFunctor, NormFunctor2, IterateFunctor[CompoundSolverFunctor[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
       TEST_CHECK_THROWS(solver3->execute(), ScaRCError);
 
     }
 };
-SolverPatternTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("StorageType: std::vector, DataType: double");
+SolverPatternTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");

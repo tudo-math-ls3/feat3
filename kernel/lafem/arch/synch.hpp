@@ -14,7 +14,7 @@ namespace FEAST
   {
     namespace Arch
     {
-      template <typename Mem_, typename Algo_, typename VectorT_>
+      template <typename Mem_, typename VectorT_>
       class SynchVec0GatewayBase
       {
       public:
@@ -25,7 +25,7 @@ namespace FEAST
         }
       };
 
-      template <typename Mem_, typename Algo_, typename VectorT_>
+      template <typename Mem_, typename VectorT_>
       class SynchVec1GatewayBase
       {
       public:

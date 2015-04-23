@@ -13,13 +13,13 @@ namespace FEAST
   namespace Foundation
   {
       /// \todo add communicators
-      template <typename Mem_, typename Algo_>
+      template <typename Mem_>
       struct GlobalDot
       {
       };
 
-      template <typename Algo_>
-      struct GlobalDot<Mem::Main, Algo_>
+      template <>
+      struct GlobalDot<Mem::Main>
       {
         public:
 #ifndef SERIAL
@@ -30,11 +30,11 @@ namespace FEAST
                                                    const VectorT_& frequencies)
           {
             if(frequencies.size() == 0)
-              return a.template dot<Algo_>(b);
+              return a.dot(b);
 
             // assumes that a and b are type-1 vectors (full entries at inner boundaries)
             // Compute a^T diag(frequencies) b
-            typename VectorT_::DataType sum = frequencies.template triple_dot<Algo_>(a, b);
+            typename VectorT_::DataType sum = frequencies.triple_dot(a, b);
 
             typename VectorT_::DataType sendbuf(sum), recvbuf;
 
@@ -61,7 +61,7 @@ namespace FEAST
                                                    const VectorT_& b,
                                                    const VectorT_&)
           {
-            r = a.template dot<Algo_>(b);
+            r = a.dot(b);
             return r;
           }
 #endif

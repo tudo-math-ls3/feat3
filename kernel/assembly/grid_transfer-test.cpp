@@ -13,7 +13,7 @@ using namespace FEAST::TestSystem;
 
 template<typename MatrixType_>
 class GridTransferTest :
-  public TestSystem::FullTaggedTest<Archs::None, Archs::None, typename MatrixType_::DataType, typename MatrixType_::IndexType>
+  public TestSystem::FullTaggedTest<Archs::None, typename MatrixType_::DataType, typename MatrixType_::IndexType>
 {
   typedef typename MatrixType_::MemType MemType_;
   typedef typename MatrixType_::DataType DataType_;
@@ -29,7 +29,7 @@ class GridTransferTest :
 
 public:
   GridTransferTest() :
-    TestSystem::FullTaggedTest<Archs::None, Archs::None, DataType_, IndexType_>("GridTransferTest<" + MatrixType_::name() + ">")
+    TestSystem::FullTaggedTest<Archs::None, DataType_, IndexType_>("GridTransferTest<" + MatrixType_::name() + ">")
   {
   }
 
@@ -102,8 +102,8 @@ public:
       assemble_prolongation(prol_matrix, weight_vector, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:2"));
 
     // invert weight vector and scale matrix rows
-    weight_vector.template component_invert<Algo::Generic>(weight_vector);
-    prol_matrix.template scale_rows<Algo::Generic>(prol_matrix, weight_vector);
+    weight_vector.component_invert(weight_vector);
+    prol_matrix.scale_rows(prol_matrix, weight_vector);
 
     // reference data array
     const DataType_ d0 = DataType_(0);
@@ -181,8 +181,8 @@ public:
       assemble_prolongation(prol_matrix, weight_vector, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:3"));
 
     // invert weight vector and scale matrix rows
-    weight_vector.template component_invert<Algo::Generic>(weight_vector);
-    prol_matrix.template scale_rows<Algo::Generic>(prol_matrix, weight_vector);
+    weight_vector.component_invert(weight_vector);
+    prol_matrix.scale_rows(prol_matrix, weight_vector);
 
     // reference data array
     const DataType_ d0 = DataType_(0);

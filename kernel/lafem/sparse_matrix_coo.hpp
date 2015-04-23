@@ -1469,13 +1469,10 @@ namespace FEAST
       /**
        * \brief Calculate \f$this \leftarrow y + \alpha x\f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The first summand matrix to be scaled.
        * \param[in] y The second summand matrix
        * \param[in] alpha A scalar to multiply x with.
        */
-      template <typename Algo_>
       void axpy(
                 const SparseMatrixCOO & x,
                 const SparseMatrixCOO & y,
@@ -1497,27 +1494,24 @@ namespace FEAST
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-          Arch::Sum<Mem_, Algo_>::value(this->val(), x.val(), y.val(), this->used_elements());
+          Arch::Sum<Mem_>::value(this->val(), x.val(), y.val(), this->used_elements());
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-          Arch::Difference<Mem_, Algo_>::value(this->val(), y.val(), x.val(), this->used_elements());
+          Arch::Difference<Mem_>::value(this->val(), y.val(), x.val(), this->used_elements());
         // r <- y
         else if (Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
-          Arch::Axpy<Mem_, Algo_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
+          Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
       }
 
       /**
        * \brief Calculate \f$this \leftarrow \alpha x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[in] x The matrix to be scaled.
        * \param[in] alpha A scalar to scale x with.
        */
-      template <typename Algo_>
       void scale(const SparseMatrixCOO & x, const DT_ alpha)
       {
         if (x.rows() != this->rows())
@@ -1527,7 +1521,7 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
-        Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), alpha, this->used_elements());
+        Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->used_elements());
       }
 
       /**
@@ -1535,10 +1529,9 @@ namespace FEAST
        *
        * \returns The Frobenius norm of this matrix.
        */
-      template <typename Algo_>
       DT_ norm_frobenius() const
       {
-        return Arch::Norm2<Mem_, Algo_>::value(this->val(), this->used_elements());
+        return Arch::Norm2<Mem_>::value(this->val(), this->used_elements());
       }
 
       /**
@@ -1617,7 +1610,6 @@ namespace FEAST
        * \param[in] x The matrix whose rows are to be scaled.
        * \param[in] s The vector to the scale the rows by.
        */
-      template<typename Algo_>
       void scale_rows(const SparseMatrixCOO & x, const DenseVector<Mem_,DT_,IT_> & s)
       {
         if (x.rows() != this->rows())
@@ -1629,7 +1621,7 @@ namespace FEAST
         if (s.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        Arch::ScaleRows<Mem_, Algo_>::coo(this->val(), x.val(), this->row_indices(), this->column_indices(),
+        Arch::ScaleRows<Mem_>::coo(this->val(), x.val(), this->row_indices(), this->column_indices(),
                                           s.elements(), this->rows(), this->columns(), this->used_elements());
       }
 
@@ -1639,7 +1631,6 @@ namespace FEAST
        * \param[in] x The matrix whose columns are to be scaled.
        * \param[in] s The vector to the scale the columns by.
        */
-      template<typename Algo_>
       void scale_cols(const SparseMatrixCOO & x, const DenseVector<Mem_,DT_,IT_> & s)
       {
         if (x.rows() != this->rows())
@@ -1651,19 +1642,16 @@ namespace FEAST
         if (s.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        Arch::ScaleCols<Mem_, Algo_>::coo(this->val(), x.val(), this->row_indices(), this->column_indices(),
+        Arch::ScaleCols<Mem_>::coo(this->val(), x.val(), this->row_indices(), this->column_indices(),
                                           s.elements(), this->rows(), this->columns(), this->used_elements());
       }
 
       /**
        * \brief Calculate \f$r \leftarrow this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      template<typename Algo_>
       void apply(DenseVector<Mem_,DT_, IT_>& r, const DenseVector<Mem_, DT_, IT_>& x) const
       {
         if (r.size() != this->rows())
@@ -1671,7 +1659,7 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_, Algo_>::coo(r.elements(), this->val(), this->row_indices(),
+        Arch::ProductMatVec<Mem_>::coo(r.elements(), this->val(), this->row_indices(),
                                               this->column_indices(), x.elements(), this->rows(), this->used_elements());
       }
 
@@ -1682,10 +1670,9 @@ namespace FEAST
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] gate The gate base pointer
        */
-      template<typename Algo_>
       void apply(DenseVector<Mem_,DT_, IT_>& r,
                  const DenseVector<Mem_, DT_, IT_>& x,
-                 Arch::ProductMat0Vec1GatewayBase<Mem_, Algo_, DenseVector<Mem_, DT_, IT_>, SparseMatrixCOO<Mem_, DT_, IT_> >* gate
+                 Arch::ProductMat0Vec1GatewayBase<Mem_, DenseVector<Mem_, DT_, IT_>, SparseMatrixCOO<Mem_, DT_, IT_> >* gate
                  )
       {
         if (r.size() != this->rows())
@@ -1699,14 +1686,11 @@ namespace FEAST
       /**
        * \brief Calculate \f$r \leftarrow y + \alpha this\cdot x \f$
        *
-       * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_>
       void apply(
                  DenseVector<Mem_,DT_, IT_>& r,
                  const DenseVector<Mem_, DT_, IT_>& x,
@@ -1724,8 +1708,8 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_, Algo_>::coo(r.elements(), y.elements(), this->val(),
-                                         this->row_indices(), this->column_indices(), x.elements(), this->rows(), this->used_elements());
+          Arch::Defect<Mem_>::coo(r.elements(), y.elements(), this->val(),
+                                         this->row_indices(), this->column_indices(), x.elements(), this->rows(), this->columns(), this->used_elements());
         }
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -1733,7 +1717,7 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_, Algo_>::coo(r.elements(), alpha, x.elements(), y.elements(),
+          Arch::Axpy<Mem_>::coo(r.elements(), alpha, x.elements(), y.elements(),
                                        this->val(), this->row_indices(), this->column_indices(), this->rows(), this->used_elements());
         }
       }

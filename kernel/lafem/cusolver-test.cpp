@@ -17,7 +17,6 @@ public:
   {
     typedef SparseMatrixCSR<Mem::Main, double, unsigned int> MatrixType;
     typedef DenseVector<Mem::Main, double, unsigned int> VectorType;
-    typedef Algo::Generic AlgoType;
 
     const double tol = Math::pow(Math::eps<double>(), 0.6);
 
@@ -35,7 +34,7 @@ public:
     // create an rhs vector
     VectorType vec_rhs;
     vec_rhs.convert(mat_sys.create_vector_r());
-    vec_rhs.scale<AlgoType>(vec_ref, psf.lambda_min());
+    vec_rhs.scale(vec_ref, psf.lambda_min());
 
     // create an empty solution vector
     VectorType vec_sol;
@@ -45,10 +44,10 @@ public:
     CuSolverLU::solve(vec_sol, mat_sys, vec_rhs);
 
     // subtract reference solution
-    vec_sol.axpy<AlgoType>(vec_ref, vec_sol, -1.0);
+    vec_sol.axpy(vec_ref, vec_sol, -1.0);
 
     // compute the norm
-    double nrm2 = vec_sol.norm2<AlgoType>();
+    double nrm2 = vec_sol.norm2();
 
     // check norm
     TEST_CHECK_EQUAL_WITHIN_EPS(nrm2, 0.0, tol);
@@ -66,7 +65,6 @@ public:
   {
     typedef SparseMatrixCSR<Mem::CUDA, double, unsigned int> MatrixType;
     typedef DenseVector<Mem::CUDA, double, unsigned int> VectorType;
-    typedef Algo::CUDA AlgoType;
 
     const double tol = Math::pow(Math::eps<double>(), 0.6);
 
@@ -84,7 +82,7 @@ public:
     // create an rhs vector
     VectorType vec_rhs;
     vec_rhs.convert(mat_sys.create_vector_r());
-    vec_rhs.scale<AlgoType>(vec_ref, psf.lambda_min());
+    vec_rhs.scale(vec_ref, psf.lambda_min());
 
     // create an empty solution vector
     VectorType vec_sol;
@@ -94,10 +92,10 @@ public:
     CuSolverQR::solve(vec_sol, mat_sys, vec_rhs);
 
     // subtract reference solution
-    vec_sol.axpy<AlgoType>(vec_ref, vec_sol, -1.0);
+    vec_sol.axpy(vec_ref, vec_sol, -1.0);
 
     // compute the norm
-    double nrm2 = vec_sol.norm2<AlgoType>();
+    double nrm2 = vec_sol.norm2();
 
     // check norm
     TEST_CHECK_EQUAL_WITHIN_EPS(nrm2, 0.0, tol);

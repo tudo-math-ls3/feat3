@@ -15,14 +15,13 @@ using namespace FEAST::Foundation;
 
 template<typename Tag_,
          typename IndexType_,
-         typename Algo_,
          template<typename, typename> class OT_, typename IT_>
 class AuraTest:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     AuraTest(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("AuraTest<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("AuraTest<" + tag + ">")
     {
     }
 
@@ -109,10 +108,10 @@ class AuraTest:
       halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D> > >(new Halo<0, PLVertex, Mesh<Dim2D> >(h2)));
       halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D> > >(new Halo<0, PLVertex, Mesh<Dim2D> >(h3)));
 
-      auto h_new(Aura<Tag_, Algo_, decltype(h0)>::value(halos));
+      auto h_new(Aura<Tag_, decltype(h0)>::value(halos));
 
       TEST_CHECK(std::find(h_new.get_elements().begin(), h_new.get_elements().end(), 0) !=  h_new.get_elements().end());
       TEST_CHECK(std::find(h_new.get_elements().begin(), h_new.get_elements().end(), 1) !=  h_new.get_elements().end());
     }
 };
-AuraTest<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > aura_test_cpu_v_v("std::vector, std::vector");
+AuraTest<Mem::Main, Index, std::vector, std::vector<Index> > aura_test_cpu_v_v("std::vector, std::vector");

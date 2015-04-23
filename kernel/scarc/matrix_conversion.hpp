@@ -18,8 +18,7 @@ namespace FEAST
   {
 #ifndef SERIAL
     ///type-0 to type-1 matrix conversion
-    template<typename Mem_,
-             typename Algo_>
+    template<typename Mem_>
     struct MatrixConversion
     {
       template<typename DT_,
@@ -49,7 +48,7 @@ namespace FEAST
           LAFEM::MatrixMirror<VMT_> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
           LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> sendbuf_mat;
           Assembly::MirrorAssembler::assemble_buffer_matrix(sendbuf_mat, mat_mirror, result);
-          mat_mirror.template gather<Algo_>(sendbuf_mat, result);
+          mat_mirror.gather(sendbuf_mat, result);
 
           send_buf.push_back(sendbuf_mat.serialise());
         }
@@ -109,7 +108,7 @@ namespace FEAST
               {
                 LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> other_mat(recv_buf.at(i));
                 LAFEM::MatrixMirror<VMT_> mat_mirror(vec_mirrors.at(i), vec_mirrors.at(i));
-                mat_mirror.template scatter_axpy<Algo_>(result, other_mat);
+                mat_mirror.scatter_axpy(result, other_mat);
                 ++count;
                 taskflags[i] = 1;
               }
@@ -129,8 +128,7 @@ namespace FEAST
         return result;
       }
 #else
-    template<typename Mem_,
-             typename Algo_>
+    template<typename Mem_>
     struct MatrixConversion
     {
       template<typename DT_,

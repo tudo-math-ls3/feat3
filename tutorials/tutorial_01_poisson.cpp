@@ -114,11 +114,6 @@ namespace Tutorial01
   // architectures, but we do not want to make use of anything that does not reside in host memory.
   typedef Mem::Main MemType;
 
-  // And we'll use the Generic algorithm implementation for now. Similar to the last typedef,
-  // this essentially means that we turn off any fancyness in the implementation, which is
-  // appropriate for the scope of this tutorial -- we do not need GPUs or anything like that.
-  typedef Algo::Generic AlgoType;
-
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   // Here's our tutorial's main function
@@ -362,13 +357,13 @@ namespace Tutorial01
     // yet. So we need to apply the filter onto the system matrix and both vectors now.
 
     // Apply the filter onto the system matrix...
-    filter.filter_mat<AlgoType>(matrix);
+    filter.filter_mat(matrix);
 
     // ...the right-hand-side vector...
-    filter.filter_rhs<AlgoType>(vec_rhs);
+    filter.filter_rhs(vec_rhs);
 
     // ...and the solution vector.
-    filter.filter_sol<AlgoType>(vec_sol);
+    filter.filter_sol(vec_sol);
 
     // Now we have set up the linear system representing our discretised Poisson PDE, including
     // the homogene Dirichlet boundary conditions.
@@ -382,10 +377,10 @@ namespace Tutorial01
     std::cout << "Solving linear system..." << std::endl;
 
     // Create a SSOR preconditioner
-    LAFEM::PreconWrapper<AlgoType, MatrixType, LAFEM::SSORPreconditioner> precond(matrix);
+    LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner> precond(matrix);
 
     // Create a PCG solver
-    LAFEM::PCGSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, &precond);
+    LAFEM::PCGSolver<MatrixType, FilterType> solver(matrix, filter, &precond);
 
     // Enable convergence plot
     solver.set_plot(true);

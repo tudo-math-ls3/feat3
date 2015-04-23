@@ -195,7 +195,6 @@ void check_global_dot_2D_concave(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -243,10 +242,10 @@ void check_global_dot_2D_concave(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
-  GlobalDot<Mem::Main, Algo::Generic>::value(result, a, b, frequencies);
+  GlobalDot<Mem::Main>::value(result, a, b, frequencies);
 
   TestResult<double, double, double> res;
   res = test_check_equal_within_eps(result, 16., std::numeric_limits<double>::epsilon()*10);
@@ -381,7 +380,6 @@ void check_global_synchvec0_2D_concave(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -435,7 +433,7 @@ void check_global_synchvec0_2D_concave(Index rank)
   other_ranks.push_back(p0.comm_halos.at(1)->get_other());
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(a,
+  GlobalSynchVec0<Mem::Main>::exec(a,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
@@ -589,7 +587,6 @@ void check_global_synchvec1_2D_concave(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -650,10 +647,10 @@ void check_global_synchvec1_2D_concave(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec1<Mem::Main, Algo::Generic>::exec(a,
+  GlobalSynchVec1<Mem::Main>::exec(a,
                                                   mirrors,
                                                   frequencies,
                                                   other_ranks,
@@ -805,7 +802,6 @@ void check_global_synchvec0_2D_gateway_concave(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -859,7 +855,7 @@ void check_global_synchvec0_2D_gateway_concave(Index rank)
   other_ranks.push_back(p0.comm_halos.at(1)->get_other());
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec0Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
+  GlobalSynchVec0Gateway<Mem::Main, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
@@ -1014,7 +1010,6 @@ void check_global_synchvec1_2D_gateway_concave(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -1075,10 +1070,10 @@ void check_global_synchvec1_2D_gateway_concave(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec1Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
+  GlobalSynchVec1Gateway<Mem::Main, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           frequencies,
                                                                                                                           other_ranks,
@@ -1234,7 +1229,6 @@ void check_global_dot_2D_gateway_concave(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -1282,9 +1276,9 @@ void check_global_dot_2D_gateway_concave(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalDotGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalDotGateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(a.dot(b, &gate));
 
   TestResult<double, double, double> res;
@@ -1420,7 +1414,6 @@ void check_global_nrm2_2D_concave(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -1468,10 +1461,10 @@ void check_global_nrm2_2D_concave(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
-  GlobalNorm2<Mem::Main, Algo::Generic>::value(result, b, frequencies);
+  GlobalNorm2<Mem::Main>::value(result, b, frequencies);
 
   TestResult<double, double, double> res;
   res = test_check_equal_within_eps(result, std::sqrt(32.), std::numeric_limits<double>::epsilon()*10);
@@ -1606,7 +1599,6 @@ void check_global_nrm2_2D_gateway_concave(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -1654,9 +1646,9 @@ void check_global_nrm2_2D_gateway_concave(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalNorm2Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalNorm2Gateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2(&gate));
 
   TestResult<double, double, double> res;
@@ -1792,7 +1784,6 @@ void check_global_nrm2sqr_2D_gateway_concave(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -1840,9 +1831,9 @@ void check_global_nrm2sqr_2D_gateway_concave(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalNorm2SquaredGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalNorm2SquaredGateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2sqr(&gate));
 
   TestResult<double, double, double> res;

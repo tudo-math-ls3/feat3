@@ -203,9 +203,6 @@ namespace FEAST
       /**
        * \brief Applies the filter onto a system matrix.
        *
-       * \tparam Algo_
-       * Backend
-       *
        * \tparam BlockWidth_
        * The input matrix' block width
        *
@@ -216,7 +213,6 @@ namespace FEAST
        * blocksize.
        *
        */
-      template<typename Algo_>
       void filter_mat(MatrixType & matrix) const
       {
       }
@@ -224,9 +220,6 @@ namespace FEAST
       /**
        * \brief Filter the non-diagonal row entries
        *
-       * \tparam Algo_
-       * Backend
-       *
        * \tparam BlockWidth_
        * The input matrix' block width
        *
@@ -237,7 +230,6 @@ namespace FEAST
        * blocksize.
        *
        */
-      template<typename Algo_>
       void filter_offdiag_row_mat(MatrixType & matrix) const
       {
       }
@@ -245,9 +237,6 @@ namespace FEAST
       /**
        * \brief Filter the non-diagonal column entries
        *
-       * \tparam Algo_
-       * Backend
-       *
        * \tparam BlockWidth_
        * The input matrix' block width
        *
@@ -258,14 +247,13 @@ namespace FEAST
        * blocksize.
        *
        */
-      template<typename Algo_>
       void filter_offdiag_col_mat(MatrixType & matrix) const
       {
       }
 
 #endif
       /// \cond internal
-      template<typename Algo_, Index BlockWidth_>
+      template<Index BlockWidth_>
       void filter_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
@@ -288,7 +276,7 @@ namespace FEAST
         }
       }
 
-      template<typename Algo_, Index BlockWidth_>
+      template<Index BlockWidth_>
       void filter_offdiag_row_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
@@ -305,7 +293,7 @@ namespace FEAST
         }
       }
 
-      template<typename Algo_, Index BlockWidth_>
+      template<Index BlockWidth_>
       void filter_offdiag_col_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> &) const
       {
         // nothing to do here
@@ -318,10 +306,9 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the right-hand-side vector to be filtered.
        */
-      template<typename Algo_>
       void filter_rhs(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
       {
-        Arch::UnitFilterBlocked<Mem_, Algo_>::template filter_rhs<DT_, IT_, BlockSize_>
+        Arch::UnitFilterBlocked<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
           (vector.raw_elements(), _sv.raw_elements(), _sv.indices(), _sv.used_elements());
       }
 
@@ -331,11 +318,10 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the solution vector to be filtered.
        */
-      template<typename Algo_>
       void filter_sol(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
       {
         // same as rhs
-        filter_rhs<Algo_>(vector);
+        filter_rhs(vector);
       }
 
       /**
@@ -344,10 +330,9 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the defect vector to be filtered.
        */
-      template<typename Algo_>
       void filter_def(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
       {
-        Arch::UnitFilterBlocked<Mem_, Algo_>::template filter_def<DT_, IT_, BlockSize_>
+        Arch::UnitFilterBlocked<Mem_>::template filter_def<DT_, IT_, BlockSize_>
           (vector.raw_elements(), _sv.indices(), _sv.used_elements() );
       }
 
@@ -357,11 +342,10 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the correction vector to be filtered.
        */
-      template<typename Algo_>
       void filter_cor(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
       {
         // same as def
-        filter_def<Algo_>(vector);
+        filter_def(vector);
       }
     }; // class UnitFilterBlocked<...>
   } // namespace LAFEM

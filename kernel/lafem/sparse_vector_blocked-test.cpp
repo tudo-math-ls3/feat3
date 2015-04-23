@@ -22,15 +22,14 @@ using namespace FEAST::TestSystem;
  */
 template<
   typename Mem_,
-  typename Algo_,
   typename DT_,
   typename IT_>
 class SparseVectorBlockedTest
-  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
   SparseVectorBlockedTest()
-    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseVectorBlockedTest")
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseVectorBlockedTest")
   {
   }
 
@@ -68,9 +67,9 @@ public:
     }
   }
 };
-SparseVectorBlockedTest<Mem::Main, NotSet, float, Index> cpu_sparse_vector_blocked_test_float;
-SparseVectorBlockedTest<Mem::Main, NotSet, double, Index> cpu_sparse_vector_blocked_test_double;
+SparseVectorBlockedTest<Mem::Main, float, Index> cpu_sparse_vector_blocked_test_float;
+SparseVectorBlockedTest<Mem::Main, double, Index> cpu_sparse_vector_blocked_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-SparseVectorBlockedTest<Mem::CUDA, NotSet, float, Index> cuda_sparse_vector_blocked_test_float;
-SparseVectorBlockedTest<Mem::CUDA, NotSet, double, Index> cuda_sparse_vector_blocked_test_double;
+SparseVectorBlockedTest<Mem::CUDA, float, Index> cuda_sparse_vector_blocked_test_float;
+SparseVectorBlockedTest<Mem::CUDA, double, Index> cuda_sparse_vector_blocked_test_double;
 #endif

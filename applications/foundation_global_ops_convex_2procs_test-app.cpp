@@ -107,7 +107,6 @@ void check_global_dot_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -118,7 +117,6 @@ void check_global_dot_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -164,10 +162,10 @@ void check_global_dot_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
-  GlobalDot<Mem::Main, Algo::Generic>::value(result, a, b, frequencies);
+  GlobalDot<Mem::Main>::value(result, a, b, frequencies);
 
   TestResult<double, double, double> res;
   res = test_check_equal_within_eps(result, 6., std::numeric_limits<double>::epsilon());
@@ -232,13 +230,11 @@ void check_global_dot_2D(Index rank)
   std::vector<std::shared_ptr<HaloBase<Mesh<Dim2D>, double> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim2D>, double> > > > halos;
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard>::execute(m_fine, &halos, attrs);
 
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(
@@ -265,7 +261,7 @@ void check_global_dot_2D(Index rank)
   MeshControl<dim_2D>::fill_adjacencies(*((Mesh<Dim2D>*)p0.submesh.get()), confmesh);
   MeshControl<dim_2D>::fill_vertex_sets(*((Mesh<Dim2D>*)p0.submesh.get()), confmesh, attrs.at(0), attrs.at(1));
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set0(HaloInterface<0, Dim2D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
@@ -282,10 +278,10 @@ void check_global_dot_2D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
-  GlobalDot<Mem::Main, Algo::Generic>::value(result, a, b, frequencies);
+  GlobalDot<Mem::Main>::value(result, a, b, frequencies);
 
   TestResult<double, double, double> res;
   res = test_check_equal_within_eps(result, 18., std::numeric_limits<double>::epsilon());
@@ -481,13 +477,11 @@ void check_global_dot_3D(Index rank)
   std::vector<std::shared_ptr<HaloBase<Mesh<Dim3D>, double> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim3D>, double> > > > halos;
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard>::execute(m_fine, &halos, attrs);
 
   std::vector<Halo<0, PLFace, Mesh<Dim3D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim3D,
                        0,
                        pl_vertex>::execute(
@@ -514,7 +508,7 @@ void check_global_dot_3D(Index rank)
   MeshControl<dim_3D>::fill_adjacencies(*((Mesh<Dim3D>*)p0.submesh.get()), confmesh);
   MeshControl<dim_3D>::fill_vertex_sets(*((Mesh<Dim3D>*)p0.submesh.get()), confmesh, attrs.at(0), attrs.at(1), attrs.at(2));
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set0(HaloInterface<0, Dim3D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<3> > > trafo(confmesh);
@@ -531,10 +525,10 @@ void check_global_dot_3D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
-  GlobalDot<Mem::Main, Algo::Generic>::value(result, a, b, frequencies);
+  GlobalDot<Mem::Main>::value(result, a, b, frequencies);
 
   TestResult<double, double, double> res;
   res = test_check_equal_within_eps(result, 54., std::numeric_limits<double>::epsilon());
@@ -578,7 +572,6 @@ void check_global_synchvec0_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -589,7 +582,6 @@ void check_global_synchvec0_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -635,7 +627,7 @@ void check_global_synchvec0_1D(Index rank)
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(a,
+  GlobalSynchVec0<Mem::Main>::exec(a,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
@@ -711,7 +703,6 @@ void check_global_synchvec0_2D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -719,7 +710,6 @@ void check_global_synchvec0_2D(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -743,7 +733,7 @@ void check_global_synchvec0_2D(Index rank)
   MeshControl<dim_2D>::fill_adjacencies(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh);
   MeshControl<dim_2D>::fill_vertex_sets(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1));
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
@@ -765,7 +755,7 @@ void check_global_synchvec0_2D(Index rank)
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(a,
+  GlobalSynchVec0<Mem::Main>::exec(a,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
@@ -990,7 +980,6 @@ void check_global_synchvec0_3D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -1001,7 +990,6 @@ void check_global_synchvec0_3D(Index rank)
   std::vector<Halo<0, PLFace, Mesh<Dim3D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim3D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -1025,7 +1013,7 @@ void check_global_synchvec0_3D(Index rank)
   MeshControl<dim_3D>::fill_adjacencies(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh);
   MeshControl<dim_3D>::fill_vertex_sets(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1), attrs.at(2));
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<3> > > trafo(confmesh);
@@ -1047,7 +1035,7 @@ void check_global_synchvec0_3D(Index rank)
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec0<Mem::Main, Algo::Generic>::exec(a,
+  GlobalSynchVec0<Mem::Main>::exec(a,
                                                   mirrors,
                                                   other_ranks,
                                                   sendbufs,
@@ -1125,7 +1113,6 @@ void check_global_synchvec1_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -1136,7 +1123,6 @@ void check_global_synchvec1_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -1187,10 +1173,10 @@ void check_global_synchvec1_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec1<Mem::Main, Algo::Generic>::exec(a,
+  GlobalSynchVec1<Mem::Main>::exec(a,
                                                   mirrors,
                                                   frequencies,
                                                   other_ranks,
@@ -1267,7 +1253,6 @@ void check_global_synchvec1_2D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -1275,7 +1260,6 @@ void check_global_synchvec1_2D(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -1299,7 +1283,7 @@ void check_global_synchvec1_2D(Index rank)
   MeshControl<dim_2D>::fill_adjacencies(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh);
   MeshControl<dim_2D>::fill_vertex_sets(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1));
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
@@ -1326,10 +1310,10 @@ void check_global_synchvec1_2D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec1<Mem::Main, Algo::Generic>::exec(a,
+  GlobalSynchVec1<Mem::Main>::exec(a,
                                                   mirrors,
                                                   frequencies,
                                                   other_ranks,
@@ -1550,7 +1534,6 @@ void check_global_synchvec1_3D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -1558,7 +1541,6 @@ void check_global_synchvec1_3D(Index rank)
   std::vector<Halo<0, PLFace, Mesh<Dim3D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim3D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -1582,7 +1564,7 @@ void check_global_synchvec1_3D(Index rank)
   MeshControl<dim_3D>::fill_adjacencies(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh);
   MeshControl<dim_3D>::fill_vertex_sets(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1), attrs.at(2));
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<3> > > trafo(confmesh);
@@ -1609,10 +1591,10 @@ void check_global_synchvec1_3D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec1<Mem::Main, Algo::Generic>::exec(a,
+  GlobalSynchVec1<Mem::Main>::exec(a,
                                                   mirrors,
                                                   frequencies,
                                                   other_ranks,
@@ -1671,7 +1653,6 @@ void check_global_product_mat_vec_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -1682,7 +1663,6 @@ void check_global_product_mat_vec_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -1733,7 +1713,7 @@ void check_global_product_mat_vec_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -1744,7 +1724,7 @@ void check_global_product_mat_vec_1D(Index rank)
 
   DenseVector<Mem::Main, double> result(a.size(), double(0));
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalProductMat0Vec1<Mem::Main, Algo::Generic>::exec(
+  GlobalProductMat0Vec1<Mem::Main>::exec(
                                                         result,
                                                         mat_sys,
                                                         a,
@@ -1800,7 +1780,6 @@ void check_global_defect_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -1811,7 +1790,6 @@ void check_global_defect_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -1863,7 +1841,7 @@ void check_global_defect_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -1874,7 +1852,7 @@ void check_global_defect_1D(Index rank)
 
   DenseVector<Mem::Main, double> result(a.size(), double(0));
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalDefect<Mem::Main, Algo::Generic>::exec(
+  GlobalDefect<Mem::Main>::exec(
                                                result,
                                                b,
                                                mat_sys,
@@ -1931,7 +1909,6 @@ void check_global_dot_1D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -1942,7 +1919,6 @@ void check_global_dot_1D_gateway(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -1988,9 +1964,9 @@ void check_global_dot_1D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalDotGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalDotGateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(a.dot(b, &gate));
 
   TestResult<double, double, double> res;
@@ -2058,7 +2034,6 @@ void check_global_dot_2D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -2066,7 +2041,6 @@ void check_global_dot_2D_gateway(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -2093,7 +2067,7 @@ void check_global_dot_2D_gateway(Index rank)
   MeshControl<dim_2D>::fill_vertex_sets(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1));
 
   //Foundation::HaloControl<Foundation::dim_2D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
   //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
@@ -2113,9 +2087,9 @@ void check_global_dot_2D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalDotGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalDotGateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(a.dot(b, &gate));
 
   TestResult<double, double, double> res;
@@ -2315,7 +2289,6 @@ void check_global_dot_3D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -2323,7 +2296,6 @@ void check_global_dot_3D_gateway(Index rank)
   std::vector<Halo<0, PLFace, Mesh<Dim3D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim3D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -2350,7 +2322,7 @@ void check_global_dot_3D_gateway(Index rank)
   MeshControl<dim_3D>::fill_vertex_sets(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1),  attrs.at(2));
 
   //Foundation::HaloControl<Foundation::dim_3D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim3D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
   //CellSubSet<Shape::Hypercube<3> > cell_sub_set(polytopes_in_subset);
@@ -2370,9 +2342,9 @@ void check_global_dot_3D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalDotGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalDotGateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(a.dot(b, &gate));
 
   TestResult<double, double, double> res;
@@ -2417,7 +2389,6 @@ void check_global_nrm2_1D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -2428,7 +2399,6 @@ void check_global_nrm2_1D(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -2473,10 +2443,10 @@ void check_global_nrm2_1D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
-  GlobalNorm2<Mem::Main, Algo::Generic>::value(result, b, frequencies);
+  GlobalNorm2<Mem::Main>::value(result, b, frequencies);
 
   TestResult<double, double, double> res;
   res = test_check_equal_within_eps(result, std::sqrt(12.), std::numeric_limits<double>::epsilon());
@@ -2543,7 +2513,6 @@ void check_global_nrm2_2D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -2551,7 +2520,6 @@ void check_global_nrm2_2D(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -2577,7 +2545,7 @@ void check_global_nrm2_2D(Index rank)
   MeshControl<dim_2D>::fill_vertex_sets(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1));
 
   //Foundation::HaloControl<Foundation::dim_2D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim2D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
   //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
@@ -2597,10 +2565,10 @@ void check_global_nrm2_2D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
-  GlobalNorm2<Mem::Main, Algo::Generic>::value(result, b, frequencies);
+  GlobalNorm2<Mem::Main>::value(result, b, frequencies);
 
 
   TestResult<double, double, double> res;
@@ -2800,7 +2768,6 @@ void check_global_nrm2_3D(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -2808,7 +2775,6 @@ void check_global_nrm2_3D(Index rank)
   std::vector<Halo<0, PLFace, Mesh<Dim3D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim3D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -2834,7 +2800,7 @@ void check_global_nrm2_3D(Index rank)
   MeshControl<dim_3D>::fill_vertex_sets(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1), attrs.at(2));
 
   //Foundation::HaloControl<Foundation::dim_3D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim3D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
   //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
@@ -2854,10 +2820,10 @@ void check_global_nrm2_3D(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   double result(0);
-  GlobalNorm2<Mem::Main, Algo::Generic>::value(result, b, frequencies);
+  GlobalNorm2<Mem::Main>::value(result, b, frequencies);
 
   TestResult<double, double, double> res;
   res = test_check_equal_within_eps(result, std::sqrt(108.), std::numeric_limits<double>::epsilon());
@@ -2901,7 +2867,6 @@ void check_global_nrm2_1D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -2912,7 +2877,6 @@ void check_global_nrm2_1D_gateway(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -2956,9 +2920,9 @@ void check_global_nrm2_1D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(b.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalNorm2Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalNorm2Gateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2(&gate));
 
   TestResult<double, double, double> res;
@@ -3026,7 +2990,6 @@ void check_global_nrm2_2D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -3034,7 +2997,6 @@ void check_global_nrm2_2D_gateway(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -3059,7 +3021,7 @@ void check_global_nrm2_2D_gateway(Index rank)
   MeshControl<dim_2D>::fill_vertex_sets(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1));
 
   //Foundation::HaloControl<Foundation::dim_2D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim2D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
   //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
@@ -3079,9 +3041,9 @@ void check_global_nrm2_2D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(b.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalNorm2Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalNorm2Gateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2(&gate));
 
   TestResult<double, double, double> res;
@@ -3281,7 +3243,6 @@ void check_global_nrm2_3D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -3289,7 +3250,6 @@ void check_global_nrm2_3D_gateway(Index rank)
   std::vector<Halo<0, PLFace, Mesh<Dim3D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim3D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -3314,7 +3274,7 @@ void check_global_nrm2_3D_gateway(Index rank)
   MeshControl<dim_3D>::fill_vertex_sets(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1), attrs.at(2));
 
   //Foundation::HaloControl<Foundation::dim_3D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim3D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
   //CellSubSet<Shape::Hypercube<3> > cell_sub_set(polytopes_in_subset);
@@ -3334,9 +3294,9 @@ void check_global_nrm2_3D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(b.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalNorm2Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalNorm2Gateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2(&gate));
 
   TestResult<double, double, double> res;
@@ -3381,7 +3341,6 @@ void check_global_nrm2sqr_1D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -3392,7 +3351,6 @@ void check_global_nrm2sqr_1D_gateway(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -3436,9 +3394,9 @@ void check_global_nrm2sqr_1D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(b.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalNorm2SquaredGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalNorm2SquaredGateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2sqr(&gate));
 
   TestResult<double, double, double> res;
@@ -3506,7 +3464,6 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -3514,7 +3471,6 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -3539,7 +3495,7 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
   MeshControl<dim_2D>::fill_vertex_sets(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1));
 
   //Foundation::HaloControl<Foundation::dim_2D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim2D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
   //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
@@ -3559,9 +3515,9 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(b.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalNorm2SquaredGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalNorm2SquaredGateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2sqr(&gate));
 
   TestResult<double, double, double> res;
@@ -3761,7 +3717,6 @@ void check_global_nrm2sqr_3D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -3769,7 +3724,6 @@ void check_global_nrm2sqr_3D_gateway(Index rank)
   std::vector<Halo<0, PLFace, Mesh<Dim3D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim3D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -3794,7 +3748,7 @@ void check_global_nrm2sqr_3D_gateway(Index rank)
   MeshControl<dim_3D>::fill_vertex_sets(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1), attrs.at(2));
 
   //Foundation::HaloControl<Foundation::dim_3D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim3D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
   //CellSubSet<Shape::Hypercube<3> > cell_sub_set(polytopes_in_subset);
@@ -3814,9 +3768,9 @@ void check_global_nrm2sqr_3D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(b.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
-  GlobalNorm2SquaredGateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double> > gate(frequencies);
+  GlobalNorm2SquaredGateway<Mem::Main, DenseVector<Mem::Main, double> > gate(frequencies);
   double result(b.norm2sqr(&gate));
 
   TestResult<double, double, double> res;
@@ -3861,7 +3815,6 @@ void check_global_synchvec0_1D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -3872,7 +3825,6 @@ void check_global_synchvec0_1D_gateway(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -3918,7 +3870,7 @@ void check_global_synchvec0_1D_gateway(Index rank)
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec0Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
+  GlobalSynchVec0Gateway<Mem::Main, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
@@ -3995,7 +3947,6 @@ void check_global_synchvec0_2D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -4003,7 +3954,6 @@ void check_global_synchvec0_2D_gateway(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -4028,7 +3978,7 @@ void check_global_synchvec0_2D_gateway(Index rank)
   MeshControl<dim_2D>::fill_adjacencies(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh);
   MeshControl<dim_2D>::fill_vertex_sets(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1));
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
@@ -4050,7 +4000,7 @@ void check_global_synchvec0_2D_gateway(Index rank)
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec0Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
+  GlobalSynchVec0Gateway<Mem::Main, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
@@ -4275,7 +4225,6 @@ void check_global_synchvec0_3D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -4283,7 +4232,6 @@ void check_global_synchvec0_3D_gateway(Index rank)
   std::vector<Halo<0, PLFace, Mesh<Dim3D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim3D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -4308,7 +4256,7 @@ void check_global_synchvec0_3D_gateway(Index rank)
   MeshControl<dim_3D>::fill_adjacencies(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh);
   MeshControl<dim_3D>::fill_vertex_sets(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1), attrs.at(2));
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<3> > > trafo(confmesh);
@@ -4330,7 +4278,7 @@ void check_global_synchvec0_3D_gateway(Index rank)
   other_ranks.push_back(p0.comm_halos.at(0)->get_other());
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec0Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
+  GlobalSynchVec0Gateway<Mem::Main, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           other_ranks,
                                                                                                                           sendbufs,
@@ -4409,7 +4357,6 @@ void check_global_synchvec1_1D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -4420,7 +4367,6 @@ void check_global_synchvec1_1D_gateway(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -4471,10 +4417,10 @@ void check_global_synchvec1_1D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec1Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
+  GlobalSynchVec1Gateway<Mem::Main, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           frequencies,
                                                                                                                           other_ranks,
@@ -4552,7 +4498,6 @@ void check_global_synchvec1_2D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -4560,7 +4505,6 @@ void check_global_synchvec1_2D_gateway(Index rank)
   std::vector<Halo<0, PLEdge, Mesh<Dim2D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim2D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -4585,7 +4529,7 @@ void check_global_synchvec1_2D_gateway(Index rank)
   MeshControl<dim_2D>::fill_adjacencies(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh);
   MeshControl<dim_2D>::fill_vertex_sets(*((Mesh<Dim2D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1));
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
@@ -4612,10 +4556,10 @@ void check_global_synchvec1_2D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec1Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
+  GlobalSynchVec1Gateway<Mem::Main, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           frequencies,
                                                                                                                           other_ranks,
@@ -4837,7 +4781,6 @@ void check_global_synchvec1_3D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -4845,7 +4788,6 @@ void check_global_synchvec1_3D_gateway(Index rank)
   std::vector<Halo<0, PLFace, Mesh<Dim3D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim3D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -4871,7 +4813,7 @@ void check_global_synchvec1_3D_gateway(Index rank)
   MeshControl<dim_3D>::fill_vertex_sets(*((Mesh<Dim3D>*)(p0.submesh.get())), confmesh, attrs.at(0), attrs.at(1), attrs.at(2));
 
 
-  auto h_new(Aura<Mem::Main, Algo::Generic, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
+  auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<3> > > trafo(confmesh);
@@ -4898,10 +4840,10 @@ void check_global_synchvec1_3D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   auto tags(HaloTags::value(p0.comm_halos));
-  GlobalSynchVec1Gateway<Mem::Main, Algo::Generic, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
+  GlobalSynchVec1Gateway<Mem::Main, DenseVector<Mem::Main, double>, VectorMirror<Mem::Main, double> > gate(
                                                                                                                           mirrors,
                                                                                                                           frequencies,
                                                                                                                           other_ranks,
@@ -4961,7 +4903,6 @@ void check_global_product_mat_vec_1D_gateway(Index rank)
   //set up halos
 
   Refinement<Mem::Main,
-             Algo::Generic,
              mrt_standard,
              hrt_refine>::execute(m_fine, &halos, attrs);
 
@@ -4972,7 +4913,6 @@ void check_global_product_mat_vec_1D_gateway(Index rank)
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries; //not needed
 
   auto p0(Partitioning<Mem::Main,
-                       Algo::Generic,
                        Dim1D,
                        0,
                        pl_vertex>::execute(m_fine,
@@ -5023,7 +4963,7 @@ void check_global_product_mat_vec_1D_gateway(Index rank)
 
   DenseVector<Mem::Main, double> fbuf(a.size());
 
-  auto frequencies(HaloFrequencies<Mem::Main, Algo::Generic>::value(mirrors, mirror_buffers, fbuf));
+  auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
@@ -5035,7 +4975,6 @@ void check_global_product_mat_vec_1D_gateway(Index rank)
   DenseVector<Mem::Main, double> result(a.size(), double(0));
   auto tags(HaloTags::value(p0.comm_halos));
   GlobalProductMat0Vec1Gateway<Mem::Main,
-                               Algo::Generic,
                                DenseVector<Mem::Main, double>,
                                SparseMatrixCSR<Mem::Main, double>,
                                VectorMirror<Mem::Main, double>

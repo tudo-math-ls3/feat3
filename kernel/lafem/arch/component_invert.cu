@@ -28,7 +28,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_>
-void ComponentInvert<Mem::CUDA, Algo::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
+void ComponentInvert<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
 {
   Index blocksize(256);
   dim3 grid;
@@ -45,5 +45,5 @@ void ComponentInvert<Mem::CUDA, Algo::CUDA>::value(DT_ * r, const DT_ * const x,
 #endif
 }
 
-template void ComponentInvert<Mem::CUDA, Algo::CUDA>::value(float *, const float * const, const float, const Index);
-template void ComponentInvert<Mem::CUDA, Algo::CUDA>::value(double *, const double * const, const double, const Index);
+template void ComponentInvert<Mem::CUDA>::value(float *, const float * const, const float, const Index);
+template void ComponentInvert<Mem::CUDA>::value(double *, const double * const, const double, const Index);

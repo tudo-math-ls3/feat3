@@ -31,7 +31,7 @@ public:
 
     // create an rhs vector
     VectorType vec_rhs(mat_sys.create_vector_r());
-    vec_rhs.scale<Algo::Generic>(vec_ref, psf.lambda_min());
+    vec_rhs.scale(vec_ref, psf.lambda_min());
 
     // create an empty solution vector
     VectorType vec_sol(mat_sys.create_vector_r());
@@ -45,10 +45,10 @@ public:
     }
 
     // subtract reference solution
-    vec_sol.axpy<Algo::Generic>(vec_ref, vec_sol, -1.0);
+    vec_sol.axpy(vec_ref, vec_sol, -1.0);
 
     // compute the norm
-    double nrm2 = vec_sol.norm2<Algo::Generic>();
+    double nrm2 = vec_sol.norm2();
 
     // check norm
     TEST_CHECK_EQUAL_WITHIN_EPS(nrm2, 0.0, tol);

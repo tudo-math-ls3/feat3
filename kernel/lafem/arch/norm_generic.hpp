@@ -16,7 +16,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename DT_>
-      DT_ Norm2<Mem::Main, Algo::Generic>::value(const DT_ * const x, const Index size)
+      DT_ Norm2<Mem::Main>::value_generic(const DT_ * const x, const Index size)
       {
         DT_ r(0);
         for (Index i(0) ; i < size ; ++i)

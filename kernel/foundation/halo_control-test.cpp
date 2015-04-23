@@ -16,13 +16,13 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class HaloControlTest1D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     HaloControlTest1D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("HaloControlTest1D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("HaloControlTest1D<" + tag + ">")
     {
     }
 
@@ -127,18 +127,18 @@ class HaloControlTest1D:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halocontrol1d_testvv("std::vector, std::vector");
-HaloControlTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halocontrol1d_testvd("std::vector, std::deque");
+HaloControlTest1D<Mem::Main, Index, std::vector, std::vector<Index> > halocontrol1d_testvv("std::vector, std::vector");
+HaloControlTest1D<Mem::Main, Index, std::vector, std::deque<Index> > halocontrol1d_testvd("std::vector, std::deque");
 
 
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class HaloControlTest2D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     HaloControlTest2D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("HaloControlTest2D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("HaloControlTest2D<" + tag + ">")
     {
     }
 
@@ -312,16 +312,16 @@ class HaloControlTest2D:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halocontrol_testvv("std::vector, std::vector");
-HaloControlTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halocontrol_testvd("std::vector, std::deque");
+HaloControlTest2D<Mem::Main, Index, std::vector, std::vector<Index> > halocontrol_testvv("std::vector, std::vector");
+HaloControlTest2D<Mem::Main, Index, std::vector, std::deque<Index> > halocontrol_testvd("std::vector, std::deque");
 
-template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class HaloControlTest3D:
-  public TaggedTest<Tag_, IndexType_, Algo_>
+  public TaggedTest<Tag_, IndexType_>
 {
   public:
     HaloControlTest3D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_, Algo_>("HaloControlTest3D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_>("HaloControlTest3D<" + tag + ">")
     {
     }
 
@@ -668,5 +668,5 @@ class HaloControlTest3D:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halocontrol3d_testvv("std::vector, std::vector");
-HaloControlTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halocontrol3d_testvd("std::vector, std::deque");
+HaloControlTest3D<Mem::Main, Index, std::vector, std::vector<Index> > halocontrol3d_testvv("std::vector, std::vector");
+HaloControlTest3D<Mem::Main, Index, std::vector, std::deque<Index> > halocontrol3d_testvd("std::vector, std::deque");
