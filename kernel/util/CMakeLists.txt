@@ -34,7 +34,9 @@ SET (test_list
   meta_math-test
   property_map-test
   random-test
+  simple_arg_parser-test
   string-test
+  string_mapped-test
   tiny_algebra-test
 )
 
