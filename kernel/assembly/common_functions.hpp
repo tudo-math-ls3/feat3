@@ -1005,7 +1005,7 @@ namespace FEAST
 
       public:
         /// Constructor
-        explicit DistanceFunctionSD(const ImgPointType_ x0_, const DataType a_, const DataType b_) :
+        explicit DistanceFunctionSD(const ImgPointType_& x0_, const DataType a_, const DataType b_) :
           _point(x0_),
           _a(a_),
           _b(b_)
@@ -1013,7 +1013,7 @@ namespace FEAST
         }
 
         /// Sets _point to x0_
-        void set_point(const ImgPointType_ x0_)
+        void set_point(const ImgPointType_& x0_)
         {
           _point = x0_;
         }
@@ -1132,6 +1132,132 @@ namespace FEAST
           _point = x0_;
         }
       }; // class PlaneDistanceFunctionSD
+
+      /**
+       * \brief Function representing the minimum of two analytic functions
+       *
+       * This is needed i.e. if there are several objects implicitly defined by their zero level sets. The class
+       * in general supports function values, gradients and hessians for all dimensions, depending on the two analytic
+       * functions supporting these.
+       *
+       * \warning As min is non differentiable in general, Bad Things(TM) may happen when computing the gradient
+       * and/or hessian where the function values are nearly identical.
+       *
+       * \tparam AnalyticFunctionType1
+       * Type for the first AnalyticFunction
+       *
+       * \tparam AnalyticFunctionType2
+       * Type for the second AnalyticFunction
+       *
+       * \author Jordi Paul
+       */
+      template<typename AnalyticFunctionType1, typename AnalyticFunctionType2>
+      class MinOfTwoFunctions :
+        public AnalyticFunction
+      {
+        private:
+          /// The first AnalyticFunction
+          const AnalyticFunctionType1& _f1;
+          /// The second AnalyticFunction
+          const AnalyticFunctionType2& _f2;
+
+        public:
+          /// Can compute function values if both AnalyticFunctions can do that
+          static constexpr bool can_value = (AnalyticFunctionType1::can_value && AnalyticFunctionType2::can_value);
+          /// Can compute the function gradient if both AnalyticFunctions can do that
+          static constexpr bool can_grad = (AnalyticFunctionType1::can_grad && AnalyticFunctionType2::can_grad);
+          /// Can compute the function hessian if both AnalyticFunctions can do that
+          static constexpr bool can_hess = (AnalyticFunctionType1::can_hess && AnalyticFunctionType2::can_hess);
+
+          /** \copydoc AnalyticFunction::ConfigTraits */
+          template<typename Config_>
+          struct ConfigTraits
+          {
+            /// TrafoConfig of the first AnalyticFunction
+            typedef typename AnalyticFunctionType1::template ConfigTraits<Config_>::TrafoConfig TrafoConfig1;
+            /// TrafoConfig of the second AnalyticFunction
+            typedef typename AnalyticFunctionType2::template ConfigTraits<Config_>::TrafoConfig TrafoConfig2;
+
+            /**
+             * \brief Trafo configuration tag class
+             *
+             * \see Trafo::ConfigBase
+             *
+             * A quantity (i.e. the Jacobian matrix) is needed if any of the functions needs it.
+             */
+            typedef Trafo::ConfigOr<TrafoConfig1, TrafoConfig2> TrafoConfig;
+          };
+
+          /** \copydoc AnalyticFunction::Evaluator */
+          template<typename EvalTraits_>
+          class Evaluator :
+            public AnalyticFunction::Evaluator<EvalTraits_>
+        {
+          public:
+            /// trafo evaluator data
+            typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
+            /// trafo data type
+            typedef typename EvalTraits_::TrafoData TrafoData;
+            /// coefficient data type
+            typedef typename EvalTraits_::DataType DataType;
+            /// value type
+            typedef typename EvalTraits_::ValueType ValueType;
+            /// gradient type
+            typedef typename EvalTraits_::GradientType GradientType;
+            /// hessian type
+            typedef typename EvalTraits_::HessianType HessianType;
+            /// type for the points the analytic function is evaluated at
+            typedef typename EvalTraits_::ImagePointType ImgPointType;
+
+          private:
+            /// Function to evaluate
+            const MinOfTwoFunctions& _function;
+            /// Evaluator for the first AnalyticFunction
+            typename AnalyticFunctionType1::template Evaluator<EvalTraits_> _f1_eval;
+            /// Evaluator for the second AnalyticFunction
+            typename AnalyticFunctionType2::template Evaluator<EvalTraits_> _f2_eval;
+
+          public:
+            /// Constructor
+            explicit Evaluator(const MinOfTwoFunctions& function) :
+              _f1_eval(function._f1),
+              _f2_eval(function._f2),
+              _function(function)
+              {
+              }
+
+            ValueType value(const TrafoData& tau) const
+            {
+              return Math::min(_f1_eval.value(tau),_f2_eval.value(tau));
+            }
+
+            GradientType gradient(const TrafoData& tau) const
+            {
+              ValueType fval1 = _f1_eval.value(tau);
+              ValueType fval2 = _f2_eval.value(tau);
+              if(Math::abs(fval1-fval2) < Math::eps<DataType>) return GradientType(0);
+              return fval1 < fval2 ? _f1_eval.gradient(tau) : _f2_eval.gradient(tau);
+            }
+
+            HessianType hessian(const TrafoData& tau) const
+            {
+              ValueType fval1 = _f1_eval.value(tau);
+              ValueType fval2 = _f2_eval.value(tau);
+              if(Math::abs(fval1 - fval2) < Math::eps<DataType>) return HessianType(0);
+              return fval1 < fval2 ? _f1_eval.hessian(tau) : _f2_eval.hessian(tau);
+            }
+
+        }; // class MinOfTwoFunctions::Evaluator<...>
+
+        public:
+          /// Constructor
+          explicit MinOfTwoFunctions(const AnalyticFunctionType1& f1_, const AnalyticFunctionType2& f2_) :
+            _f1(f1_),
+            _f2(f2_)
+            {
+            }
+
+      }; // class MinOfTwoFunctions
 
       /**
        * \brief Heaviside static function
