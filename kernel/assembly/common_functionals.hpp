@@ -107,7 +107,19 @@ namespace FEAST
             _func_value = _func_eval.value(tau);
           }
 
-          /** \copydoc LinearFunctional::Evaluator::operator() */
+          // copy pasted since Doxygen does not like the operator part in
+          // \copydoc LinearFunctional::Evaluator::operator()
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the linear functional for a given test function in a single point.
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the linear functional.
+           **/
           DataType operator()(const TestBasisData& psi) const
           {
             return _func_value * psi.value;
@@ -221,7 +233,19 @@ namespace FEAST
             _func_value = - _func_eval.hessian(tau).trace();
           }
 
-          /** \copydoc LinearFunctional::Evaluator::operator() */
+          // copy pasted since Doxygen does not like the operator part in
+          // \copydoc LinearFunctional::Evaluator::operator()
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the linear functional for a given test function in a single point.
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the linear functional.
+           **/
           DataType operator()(const TestBasisData& psi) const
           {
             return _func_value * psi.value;

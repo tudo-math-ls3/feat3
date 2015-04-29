@@ -75,7 +75,21 @@ namespace FEAST
           {
           }
 
-          /** \copydoc BilinearOperator::Evaluator::operator() */
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear functor.
+           **/
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return dot(phi.grad, psi.grad);
@@ -147,7 +161,21 @@ namespace FEAST
           {
           }
 
-          /** \copydoc BilinearOperator::Evaluator::operator() */
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear functor.
+           **/
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.value * psi.value;
@@ -227,7 +255,23 @@ namespace FEAST
           {
           }
 
-          /** \copydoc BilinearOperator::Evaluator::operator() */
+          // copy pasted since Doxygen does not like the operator part in
+          // \copydoc BilinearOperator::Evaluator::operator()
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear functor.
+           **/
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.value * psi.grad[derivative_];
@@ -311,7 +355,21 @@ namespace FEAST
           {
           }
 
-          /** \copydoc BilinearOperator::Evaluator::operator() */
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear functor.
+           **/
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return DataType(ir==ic)*dot(phi.grad,psi.grad) + phi.grad[ir] * psi.grad[ic];
@@ -340,7 +398,9 @@ namespace FEAST
         public BilinearOperator
       {
       public:
+        /// Every block is a dimension x dimension matrix
         static constexpr int BlockHeight = dimension_;
+        /// Every block is a dimension x dimension matrix
         static constexpr int BlockWidth = dimension_;
         /// test space configuration
         struct TestConfig :
@@ -393,7 +453,21 @@ namespace FEAST
           {
           }
 
-          /** \copydoc BilinearOperator::Evaluator::operator() */
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear functor.
+           **/
           OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             OperatorValueType r(DataType(0));

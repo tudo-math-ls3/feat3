@@ -1220,9 +1220,9 @@ namespace FEAST
           public:
             /// Constructor
             explicit Evaluator(const MinOfTwoFunctions& function) :
+              _function(function),
               _f1_eval(function._f1),
-              _f2_eval(function._f2),
-              _function(function)
+              _f2_eval(function._f2)
               {
               }
 
@@ -1508,9 +1508,15 @@ namespace FEAST
         /// we provide function hessians
         static constexpr bool can_hess = true;
 
+        /** \copydoc AnalyticFunction::ConfigTraits */
         template<typename Config_>
         struct ConfigTraits
         {
+          /**
+           * \brief Trafo configuration tag class
+           *
+           * \see Trafo::ConfigBase
+           **/
           struct TrafoConfig :
             public Trafo::ConfigBase
           {
@@ -1518,6 +1524,7 @@ namespace FEAST
           };
         };
 
+        /** \copydoc AnalyticFunction::Evaluator */
         template<typename EvalTraits_>
         class Evaluator :
           public Assembly::AnalyticFunction::Evaluator<EvalTraits_>
@@ -1531,9 +1538,11 @@ namespace FEAST
           typedef typename EvalTraits_::HessianType HessianType;
 
         private:
+          /// The polynomial function
           const PolynomialFunction1D& _function;
 
         public:
+          /// Constructor
           explicit Evaluator(const PolynomialFunction1D& function) :
             _function(function)
           {
@@ -1581,7 +1590,7 @@ namespace FEAST
         }; // class PolynomialFunction1D::Evaluator
 
       private:
-        // the polynomial coefficient vector
+        /// the polynomial coefficient vector
         std::vector<DataType_> _coeff;
 
       public:
