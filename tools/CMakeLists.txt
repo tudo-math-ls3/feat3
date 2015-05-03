@@ -58,3 +58,12 @@ TARGET_LINK_LIBRARIES (dv2exp feast)
 
 ADD_EXECUTABLE(exp2dv io/exp_to_dv.cpp)
 TARGET_LINK_LIBRARIES (exp2dv feast)
+
+ADD_EXECUTABLE(csr2tga io/csr_to_tga.cpp)
+TARGET_LINK_LIBRARIES (csr2tga feast)
+
+ADD_EXECUTABLE(ell2tga io/ell_to_tga.cpp)
+TARGET_LINK_LIBRARIES (ell2tga feast)
+
+ADD_EXECUTABLE(mtx2tga io/mtx_to_tga.cpp)
+TARGET_LINK_LIBRARIES (mtx2tga feast)
