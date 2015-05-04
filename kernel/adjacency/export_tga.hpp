@@ -28,7 +28,7 @@ namespace FEAST
      * - Please keep in mind that uncompressed image files become very large very quickly,
      *   e.g. adjactor with an domain/image dimension of ~16000 will result in a TGA file
      *   size of ~250 MB!
-     * - This exporter is implemented in an <e>endian-invariant</e> way, i.e. it should
+     * - This exporter is implemented in an <em>endian-invariant</em> way, i.e. it should
      *   work correctly on both little-endian and big-endian platforms.
      *
      * \author Peter Zajac
@@ -118,7 +118,7 @@ namespace FEAST
           }
 
           // write scan-line
-          os.write(scan.data(), scan.size());
+          os.write(scan.data(), std::streamsize(scan.size()));
 
           // clear pixels
           for(auto it = adj.image_begin(i); it != jt; ++it)
