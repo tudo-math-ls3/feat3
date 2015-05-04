@@ -159,6 +159,16 @@ namespace FEAST
       }
 
       /**
+       * \brief Returns a descriptive string.
+       *
+       * \returns A string describing the solver.
+       */
+      virtual String name()
+      {
+        return "SolverInterface";
+      }
+
+      /**
        * \brief Solver application method
        *
        * This method applies the solver represented by this object onto a given right-hand-side vector
@@ -264,6 +274,11 @@ namespace FEAST
         _umfpack()
         {
         }
+
+      virtual String name() override
+      {
+        return "Umfpack";
+      }
 
       virtual bool init_symbolic() override
       {
@@ -1035,6 +1050,11 @@ namespace FEAST
       {
       }
 
+      virtual String name() override
+      {
+        return "PCG";
+      }
+
       virtual bool init_symbolic() override
       {
         if(!BaseClass::init_symbolic())
@@ -1216,6 +1236,11 @@ namespace FEAST
         _h.resize(krylov_dim);
         for(Index i(0); i < krylov_dim; ++i)
           _h.at(i).resize(i+1);
+      }
+
+      virtual String name() override
+      {
+        return "FGMRES";
       }
 
       virtual bool init_symbolic() override
@@ -1424,6 +1449,11 @@ namespace FEAST
         PrecondType* precond = nullptr, bool del_precond = false) :
         BaseClass("BiCGStab", matrix, filter, precond, del_precond)
       {
+      }
+
+      virtual String name() override
+      {
+        return "BiCGStab";
       }
 
       virtual bool init_symbolic() override
