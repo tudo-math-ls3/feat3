@@ -70,6 +70,21 @@ public:
     // create the argument parser
     SimpleArgParser args(argc, argv);
 
+    // push a set of supported options
+    args.support("lvlmin");
+    args.support("range");
+    args.support("precon1");
+    args.support("quiet");
+    // we leave 'foobar' and 'precon2' unsupported here
+
+    // check for unsupported options
+    std::deque<std::pair<int,String> > unsupp = args.query_unsupported();
+    TEST_CHECK_EQUAL(unsupp.size(), std::size_t(2));
+    TEST_CHECK_EQUAL(unsupp.front().first, 6);
+    TEST_CHECK_EQUAL(unsupp.front().second, "foobar");
+    TEST_CHECK_EQUAL(unsupp.back().first, 12);
+    TEST_CHECK_EQUAL(unsupp.back().second, "precon2");
+
     // check number of (skipped) arguments
     TEST_CHECK_EQUAL(args.num_args(), argc);
     TEST_CHECK_EQUAL(args.num_skipped_args(), 2);
@@ -93,29 +108,41 @@ public:
     TEST_CHECK_EQUAL(args.check("minerva"), -1);
     TEST_CHECK_EQUAL(args.check("athena"), -1);
 
+    // try to query 'quiet'
+    const auto* isd_quiet = args.query("quiet");
+    TEST_CHECK_NOT_EQUAL(isd_quiet, nullptr);
+    TEST_CHECK_EQUAL(isd_quiet->first, 4);
+    TEST_CHECK_EQUAL(isd_quiet->second.size(), std::size_t(1));
+    TEST_CHECK_EQUAL(isd_quiet->second.front(), "-noisy");
+
+    // try to query a missing option
+    const auto* isd_juno = args.query("juno");
+    TEST_CHECK_EQUAL(isd_juno, nullptr);
+
     // try to parse lvlmin
     Index lvlmin(0);
-    TEST_CHECK_EQUAL(args.query("lvlmin", lvlmin), 1);
+    TEST_CHECK_EQUAL(args.parse("lvlmin", lvlmin), 1);
     TEST_CHECK_EQUAL(lvlmin, Index(17));
 
     // try to parse range 0 and 1; range 2 is missing
     int range0(0), range1(0), range2(0);
-    TEST_CHECK_EQUAL(args.query("range", range0, range1, range2), 2);
+    TEST_CHECK_EQUAL(args.parse("range", range0, range1, range2), 2);
     TEST_CHECK_EQUAL(range0, -2);
     TEST_CHECK_EQUAL(range1,  7);
     TEST_CHECK_EQUAL(range2,  0);
 
     // try to parse precon1
     MyPrecon precon1(MyPrecon::none);
-    TEST_CHECK_EQUAL(args.query("precon1", string_mapped(precon1, precon_map)), 1);
+    TEST_CHECK_EQUAL(args.parse("precon1", string_mapped(precon1, precon_map)), 1);
     TEST_CHECK_EQUAL(precon1, MyPrecon::spai);
 
     // try to parse argument #5 "-noisy" as an int
     int noisy(0);
-    TEST_CHECK_EQUAL(args.query("quiet", noisy), -5);
+    TEST_CHECK_EQUAL(args.parse("quiet", noisy), -5);
 
     // try to parse argument #13 "mamba" as a precon
     MyPrecon precon2(MyPrecon::none);
-    TEST_CHECK_EQUAL(args.query("precon2", string_mapped(precon2, precon_map)), -13);
+    TEST_CHECK_EQUAL(args.parse("precon2", string_mapped(precon2, precon_map)), -13);
+
   }
 } simple_arg_parser_test;
