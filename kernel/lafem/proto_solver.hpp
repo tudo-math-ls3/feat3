@@ -365,8 +365,8 @@ namespace FEAST
       const MatrixType& _system_matrix;
       /// the filter for the solver
       const FilterType& _system_filter;
-      /// name of the solver
-      String _name;
+      /// name of the solver in plots
+      String _plot_name;
       /// relative tolerance parameter
       DataType _tol_rel;
       /// relative tolerance parameter
@@ -412,11 +412,11 @@ namespace FEAST
        * \param[in] filter
        * A reference to the system filter.
        */
-      explicit IterativeSolver(String name, const MatrixType& matrix, const FilterType& filter) :
+      explicit IterativeSolver(String plot_name, const MatrixType& matrix, const FilterType& filter) :
         BaseClass(),
         _system_matrix(matrix),
         _system_filter(filter),
-        _name(name),
+        _plot_name(plot_name),
         _tol_rel(Math::sqrt(Math::eps<DataType>())),
         _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
         _div_rel(DataType(1) / Math::eps<DataType>()),
@@ -629,7 +629,7 @@ namespace FEAST
 
         // plot?
         if(this->_plot)
-          std::cout << this->_name << ": " << stringify(0).pad_front(_iter_digits)
+          std::cout << this->_plot_name << ": " << stringify(0).pad_front(_iter_digits)
                     << " : " << scientify(this->_def_init) << std::endl;
 
         // continue iterating
@@ -664,7 +664,7 @@ namespace FEAST
 
         // plot?
         if(this->_plot)
-          std::cout << this->_name << ": " << stringify(this->_num_iter).pad_front(_iter_digits)
+          std::cout << this->_plot_name << ": " << stringify(this->_num_iter).pad_front(_iter_digits)
                     << " : " << scientify(this->_def_cur) << std::endl;
 
         // is diverged?
@@ -707,7 +707,7 @@ namespace FEAST
 
         // plot?
         if(this->_plot)
-          std::cout << this->_name << "* " << stringify(this->_num_iter).pad_front(_iter_digits)
+          std::cout << this->_plot_name << "* " << stringify(this->_num_iter).pad_front(_iter_digits)
                     << " : " << scientify(this->_def_cur) << std::endl;
       }
     }; // class IterativeSolver
@@ -770,9 +770,9 @@ namespace FEAST
        * Specifies whether the preconditioner object should be deleted upund
        * destruction of this solver object.
        */
-      explicit PreconditionedIterativeSolver(String name, const MatrixType& matrix, const FilterType& filter,
+      explicit PreconditionedIterativeSolver(String plot_name, const MatrixType& matrix, const FilterType& filter,
         PrecondType* precond = nullptr, bool del_precond = false) :
-        BaseClass(name, matrix, filter),
+        BaseClass(plot_name, matrix, filter),
         _precond(precond),
         _del_precond(del_precond)
       {
