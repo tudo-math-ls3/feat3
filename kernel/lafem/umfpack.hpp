@@ -25,6 +25,58 @@ namespace FEAST
       /// compatible vector type
       typedef DenseVector<Mem::Main, double> VectorType;
 
+      /**
+       * \brief Base-class for UMFPACK errors
+       *
+       * An instance of this class may be thrown if there is no derived class
+       * which suits the error that occurred.
+       */
+      class Error : public Exception
+      {
+      public:
+        explicit Error(const String& msg) : Exception(msg) {}
+      };
+
+      /**
+       * \brief Out-Of-Memory error
+       *
+       * This exception is self-explanatory: UMFPACK went out of memory.
+       */
+      class OutOfMemoryError : public Error
+      {
+      public:
+        OutOfMemoryError() : Error("out of memory") {}
+      };
+
+      /**
+       * \brief Invalid matrix structure error
+       *
+       * This exception is thrown if the matrix structure is invalid.\n
+       * According to UMFPACK's documentation, this may have one of the following reasons:
+       * - Number of non-zero entries is negative
+       * - row_ptr[0] is nonzero
+       * - row_ptr[i+1] < row_ptr[i] for some row i
+       * - a row_ptr entry is out-of-bounds
+       * - duplicate entries in a matrix row
+       * - matrix entries are not sorted by ascending column indices
+       */
+      class InvalidMatrixError : public Error
+      {
+      public:
+        InvalidMatrixError() : Error("invalid matrix structure") {}
+      };
+
+      /**
+       * \brief Singular matrix error
+       *
+       * This error is self-explanatory: The matrix is singular.
+       */
+      class SingularMatrixError : public Error
+      {
+      public:
+        SingularMatrixError() : Error("singular matrix") {}
+      };
+
     private:
       /// system matrix pointer
       const MatrixType* _system_matrix;

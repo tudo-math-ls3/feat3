@@ -174,13 +174,13 @@ namespace FEAST
       case UMFPACK_OK:
         break;
       case UMFPACK_ERROR_out_of_memory:
-        throw InternalError("UMFPACK: out of memory");
+        throw Umfpack::OutOfMemoryError();
       case UMFPACK_ERROR_invalid_matrix:
-        throw InternalError("UMFPACK: invalid matrix");
+        throw Umfpack::InvalidMatrixError();
       case UMFPACK_ERROR_internal_error:
-        throw InternalError("UMFPACK: internal error");
+        throw Umfpack::Error("internal error");
       default:
-        throw InternalError("UMFPACK: unknown error");
+        throw Umfpack::Error("unknown error");
       }
 
       // gather statistics
@@ -213,17 +213,17 @@ namespace FEAST
       case UMFPACK_OK:
         break;
       case UMFPACK_ERROR_out_of_memory:
-        throw InternalError("UMFPACK: out of memory");
+        throw Umfpack::OutOfMemoryError();
       case UMFPACK_ERROR_invalid_matrix:
-        throw InternalError("UMFPACK: invalid matrix");
-      case UMFPACK_ERROR_different_pattern:
-        throw InternalError("UMFPACK: different pattern");
+        throw Umfpack::InvalidMatrixError();
       case UMFPACK_WARNING_singular_matrix:
-        throw InternalError("UMFPACK: singular matrix");
+        throw Umfpack::SingularMatrixError();
+      case UMFPACK_ERROR_different_pattern:
+        throw Umfpack::Error("different pattern");
       case UMFPACK_ERROR_internal_error:
-        throw InternalError("UMFPACK: internal error");
+        throw Umfpack::Error("internal error");
       default:
-        throw InternalError("UMFPACK: unknown error");
+        throw Umfpack::Error("unknown error");
       }
 
       // gather statistics
@@ -286,8 +286,10 @@ namespace FEAST
       {
       case UMFPACK_OK:
         break;
+      case UMFPACK_ERROR_internal_error:
+        throw Umfpack::Error("internal error");
       default:
-        throw InternalError("UMFPACK: error");
+        throw Umfpack::Error("unknown error");
       }
     }
   } // namespace LAFEM
