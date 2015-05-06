@@ -1198,6 +1198,8 @@ namespace FEAST
     protected:
       /// krylov dimension
       Index _krylov_dim;
+      /// inner pseudo-residual scaling factor
+      DataType _inner_res_scale;
       /// krylov basis vectors
       std::vector<VectorType> _vec_v, _vec_z;
       /// Givens rotation coefficients
@@ -1218,6 +1220,10 @@ namespace FEAST
        * \param[in] krylov_dim
        * The maximum Krylov subspace dimension. Must be > 0.
        *
+       * \param[in] inner_res_scale
+       * The scaling factor for the inner GMRES loop residual.
+       * Set this to zero unless you know what you are doing.
+       *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
        *
@@ -1226,9 +1232,10 @@ namespace FEAST
        * destruction of this solver object.
        */
       explicit FGMRESSolver(const MatrixType& matrix, const FilterType& filter, Index krylov_dim,
-        PrecondType* precond = nullptr, bool del_precond = false) :
+        DataType inner_res_scale = DataType(0), PrecondType* precond = nullptr, bool del_precond = false) :
         BaseClass("FGMRES(" + stringify(krylov_dim) + ")", matrix, filter, precond, del_precond),
-        _krylov_dim(krylov_dim)
+        _krylov_dim(krylov_dim),
+        _inner_res_scale(inner_res_scale)
       {
         _c.reserve(krylov_dim);
         _s.reserve(krylov_dim);
@@ -1305,7 +1312,7 @@ namespace FEAST
 
           // inner GMRES loop
           Index i(0);
-          for(; i < this->_krylov_dim; ++i)
+          while(i < this->_krylov_dim)
           {
             // apply preconditioner
             if(!this->_apply_precond(this->_vec_z.at(i), this->_vec_v.at(i)))
@@ -1347,8 +1354,30 @@ namespace FEAST
             this->_q.at(i) *= this->_c.back();
 
             // push our new defect
-            if((i+1) < this->_krylov_dim)
-              this->_set_new_defect_norm(this->_q.back());
+            if(++i < this->_krylov_dim)
+            {
+              // get the absolute defect
+              DataType def_cur = Math::abs(this->_q.back());
+
+              // did we diverge?
+              if((def_cur > this->_div_abs) || (def_cur > (this->_div_rel * this->_def_init)))
+                break;
+
+              // minimum number of iterations performed?
+              if(!(this->_num_iter < this->_min_iter))
+              {
+                // did we converge?
+                if((def_cur <= _inner_res_scale * this->_tol_abs) && (def_cur <= _inner_res_scale * (this->_tol_rel * this->_def_init)))
+                  break;
+
+                // maximum number of iterations performed?
+                if(this->_num_iter >= this->_max_iter)
+                  break;
+              }
+
+              // set our pseudo defect
+              this->_set_new_defect_norm(def_cur);
+            }
           }
 
           Index n = Math::min(i, this->_krylov_dim);
