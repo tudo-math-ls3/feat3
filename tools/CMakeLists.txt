@@ -35,6 +35,9 @@ TARGET_LINK_LIBRARIES(dbg-nodefunc feast)
 ADD_EXECUTABLE(dbg-patch dbg_patch/dbg_patch.cpp)
 TARGET_LINK_LIBRARIES(dbg-patch feast)
 
+ADD_EXECUTABLE(matrix-info matrix_info/matrix_info.cpp)
+TARGET_LINK_LIBRARIES(matrix-info feast)
+
 ADD_EXECUTABLE(csr2mtx io/csr_to_mtx.cpp)
 TARGET_LINK_LIBRARIES (csr2mtx feast)
 

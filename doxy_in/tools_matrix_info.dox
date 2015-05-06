@@ -1,0 +1,87 @@
+/** \page tools_matrix_info The matrix-info Tool
+
+This page describes the usage of the <c>matrix-info</c> tool, which provides a fast and simple way to get some basic
+information about a matrix file.
+
+This tool can provide information about:
+- The matrix dimensions.
+- The matrix sparsity pattern.
+- The matrix content.
+
+Once the <c>matrix-info</c> tool has been built, it can be used in the following way:
+\verbatim
+matrix-info <matrix-filename> [<matrix-format>] [options...]
+\endverbatim
+where
+- <c><matrix-filename></c> is the filename of the matrix that is to be analysed.
+- <c><matrix-format></c> is the optional file format of the matrix file.
+  If this argument is missing, then the file extension of the matrix filename
+  is used as the format.\n
+  The following formats are currently supported by this tool:
+  - <c>mtx</c>: text-based MatrixMarket format.
+  - <c>coo</c>: binary COO format
+  - <c>csr</c>: binary CSR format.
+  - <c>ell</c>: binary ELL format.
+  - <c>bm</c>: binary banded format.
+
+Furthermore, the following options are available:
+- <b><c>\--nztol <tol></c></b>\n
+Specifies the relative tolerance for non-zero entries, where <c><tol></c> is a small non-negative floating point number.
+If not specified, \f$\sqrt{\varepsilon}\approx \frac{3}{2} 10^{-8}\f$ is used.
+
+In the following, for the given input matrix \f$A\in \mathbb{R}^{m\times n}\f$, let \f$\mathcal{S}(A) \subseteq \{1,\dots,m\}\times\{1,\dots,n\}\f$
+denote the sparsity pattern of \e A, i.e. the set of all (i,j) pairs which exist in the sparse matrix \e A.
+
+The tool provides the following information:
+- <b>Matrix Filename</b>: self-explanatory
+- <b>Non-Zero Tolerance</b>: the tolerance used by this tool for detecting non-zeros.
+  A matrix entry \f$a_{ij}\f$ is interpreted as zero, if \f$|a_{ij}| < \mathrm{nztol}\cdot\|A\|_{\max}\f$.
+- <b>Number of Rows</b>: self-explanatory
+- <b>Number of Columns</b>: self-explanatory
+- <b>Max Row Degre</b>: specifies the maximum number of symbolical non-zero entries per row, i.e.
+  \f[\max_{1\leq i\leq m}\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)\big\}\Big)\f]
+- <b>Max Column Degre</b>: specifies the maximum number of symbolical non-zero entries per column
+- <b>Max Row Bandwidth</b>: specifies the maximum row bandwith, i.e.
+  \f[\max_{1\leq i\leq m}\Big\{ \underset{1\leq j\leq n}{\mathrm{argmax}}\big\{(i,j)\in\mathcal{S}(A)\big\}
+- \underset{1\leq j\leq n}{\mathrm{argmin}}\big\{(i,j)\in\mathcal{S}(A)\big\}\Big\}\f]
+- <b>Max Column Bandwidth</b>: specifies the maximum column bandwith.
+- <b>Symbolical Non-Zeros</b>: specifies the total number of entries in the sparsity pattern of \e A, i.e.
+  \f[\mathrm{card}\Big(\mathcal{S}(A)\Big)\f]
+- <b>Numerical Non-Zeros</b>: specifies the total number of entries of \e A, which are non-zero, i.e.
+  \f[\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)~:~|a_{ij}| \geq \mathrm{nztol}\cdot\|A\|_{\max}~\big\}\Big)\f]
+- <b>Has Main Diag Structure</b>: specifies whether the main diagonal is included in the matrix sparsity pattern.
+- <b>Has Symmetric Structure</b>: specifies whether the matrix sparsity pattern is symmetric, i.e. specifies whether it holds that
+  \f[(i,j)\in\mathcal{S}(A) \Longleftrightarrow (j,i)\in\mathcal{S}(A)\f]
+- <b>Has Symmetric Content</b>: specifies whether the matrix is symmetric, i.e. specifies whether it holds that
+  \f[|a_{ij} - a_{ji}| < \mathrm{nztol}\cdot\|A\|_{\max}\f]
+  Note that this will always be false if the matrix sparsity pattern is not symmetric, even if the matrix is numerically symmetric.
+- <b>Matrix Content</b>: classifies the entries in the sparsity pattern of the matrix. This can be one of the following eight:
+  - <b>empty</b>: the sparsity pattern of the matrix is empty
+  - <b>zero</b>: all entries in the sparsity pattern are zero
+  - <b>non-zero</b>: all entries in the sparsity pattern are non-zero
+  - <b>positive</b>: all entries in the sparsity pattern are positive
+  - <b>negative</b>: all entries in the sparsity pattern are negative
+  - <b>non-positive</b>: all entries in the sparsity pattern are non-positive
+  - <b>non-negative</b>: all entries in the sparsity pattern are non-negative
+  - <b>mixed</b>: the sparsity pattern contains positive, negative and zero elements
+- <b>Diagonal Content</b>: classifies the entries which are on the main diagonal of the matrix. See <b>Matrix Content</b> for possible values.
+- <b>Lower Content</b>: classifies the entries which are below the main diagonal of the matrix. See <b>Matrix Content</b> for possible values.
+- <b>Upper Content</b>: classifies the entries which are above the main diagonal of the matrix. See <b>Matrix Content</b> for possible values.
+- <b>Row-Diag Dominance Factor</b>: specifies the row-diagonal dominance factor, i.e.
+ \f[ \max_{1\leq i\leq m} \Big\{\frac{1}{|a_{ij}|}\Big(\sum_{j=1}^n |a_{ij}|\Big)-1\Big\}\f]
+  where
+  - a value < 1 indicates that the matrix is strictly diagonal dominant
+  - a value = 1 indicates that the matrix is weakly diagonal dominant
+  - a value > 1 indicates that the matrix is not diagonal dominant
+- <b>Col-Diag Dominance Factor</b>: specifies the column-diagonal dominance factor. See <b>Row-Diag Dominance Factor</b>.
+- <b>Frobenius Norm</b>: specifies the Frobenius norm of the matrix, i.e.
+  \f[\|A\|_F = \Big(\sum_{i=1}^m\sum_{j=1}^n |a_{ij}|^2\Big)^{\frac{1}{2}}\f]
+- <b>Col-Sum Norm</b>: specifies the column-sum norm of the matrix, i.e.
+  \f[\|A\|_1 = \max_{1\leq j\leq n} \sum_{i=1}^m |a_{ij}|\f]
+- <b>Row-Sum Norm</b>: specifies the row-sum norm of the matrix, i.e.
+  \f[\|A\|_\infty = \max_{1\leq i\leq m} \sum_{j=1}^n |a_{ij}|\f]
+- <b>Maximum Norm</b>: specifies the maximum norm of the matrix, i.e.
+  \f[\|A\|_{\max} = \max_{\substack{1\leq i\leq m\\1\leq j\leq n}} |a_{ij}|\f]
+
+
+**/

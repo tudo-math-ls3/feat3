@@ -2,22 +2,31 @@
 
 This page describes small utility programms, located in the tools subfolder
 
+\section tools_sec_matrix_info Matrix Info
+The tool <c>matrix-info</c> (located in the <c>tools/matrix_info</c> folder) is
+a small tool for getting information about a given matrix.\n
+The documentation of this tool can be found on the
+\refitem tools_matrix_info matrix-info tool page.
+
 \section tools_sec_io File conversion
 - csr2ell
 - csr2mtx
-- csr2mtx
+- csr2tga
 - dv2exp
 - ell2csr
 - ell2mtx
+- ell2tga
 - exp2dv
 - mtx2csr
 - mtx2ell
+- mtx2tga
 
 General syntax:
 \code{.cpp}
 ./binary <input-file> <output-file>
 \endcode
 Convert a matrix file from one format into another.
+
 
 \section tools_fem FEM tools
 \todo add documentation
