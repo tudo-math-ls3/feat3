@@ -216,8 +216,8 @@ namespace FEAST
       /**
        * \brief Enumerates the index vector representatives.
        *
-       * This function loops over all index vector representatives in the index tree and assignes
-       * an unique id to each representative. The id's are distributed in consecutive order beginning
+       * This function loops over all index vector representatives in the index tree and assigns
+       * an unique id to each representative. The ids are distributed in consecutive order beginning
        * from zero.
        *
        * \returns
@@ -235,7 +235,10 @@ namespace FEAST
           typename RepSet::iterator jt(_rep_set_vec[i].end());
           for(; it != jt; ++it, ++cur_id)
           {
-            (*it)[0] = cur_id;
+            // The RepSet is an std::set and its elements cannot be modified as this might screw up the ordering.
+            // As we specifically abuse the 0th entry in each set element for saving an index and exclude that
+            // from the comparison operator, it is ok to cast away the const qualifier and modify the 0th entry.
+            const_cast<IndexVector&>(*it)[0] = cur_id;
           }
         }
 

@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_INTERN_SUB_INDEX_MAPPING_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/intern/congurency_mapping.hpp>
+#include <kernel/geometry/intern/congruency_mapping.hpp>
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 
 namespace FEAST
