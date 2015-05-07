@@ -127,7 +127,7 @@ public:
       // create an SPAI preconditioner
       PreconWrapper<AlgoType, MatrixType, SPAIPreconditioner> precon(matrix, matrix.layout());
       // create a fix-point solver
-      FGMRESSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, 16, &precon);
+      FGMRESSolver<AlgoType, MatrixType, FilterType> solver(matrix, filter, 16, 0.0, &precon);
       test_solver("FGMRES(16)-SPAI", solver, vec_sol, vec_ref, vec_rhs);
     }
 
