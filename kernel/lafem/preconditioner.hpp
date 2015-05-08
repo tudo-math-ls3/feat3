@@ -22,6 +22,7 @@ namespace FEAST
     {
       pt_none = 0,
       pt_file,
+      pt_diagonal,
       pt_jacobi,
       pt_gauss_seidel,
       pt_polynomial,
@@ -101,7 +102,7 @@ namespace FEAST
        *
        * Creates a dummy preconditioner
        */
-      NonePreconditioner(const DT_ damping = DT_(1)) : _damping(damping)
+      explicit NonePreconditioner(const DT_ damping = DT_(1)) : _damping(damping)
       {
       }
 
@@ -185,7 +186,7 @@ namespace FEAST
        *
        * Creates a Matrix preconditioner from given source matrix file name.
        */
-      FilePreconditioner(const FileMode mode, const String filename) :
+      explicit FilePreconditioner(const FileMode mode, const String filename) :
         _mat(mode, filename)
       {
       }
@@ -212,6 +213,81 @@ namespace FEAST
       }
     };
 
+    /**
+     * \brief Diagonal-Preconditioner.
+     *
+     * This class represents the Diagonal-Preconditioner \f$M = D\f$.
+     *
+     * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+     *
+     * \author Peter Zajac
+     */
+    template <typename Algo_, typename MT_, typename VT_>
+    class DiagonalPreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    {
+    private:
+      /// the diagonal matrix vector
+      VT_ _diag;
+
+    public:
+      /// Our algotype
+      typedef Algo_ AlgoType;
+      /// Our datatype
+      typedef typename MT_::DataType DataType;
+      /// Our indextype
+      typedef typename MT_::IndexType IndexType;
+      /// Our memory architecture type
+      typedef typename MT_::MemType MemType;
+      /// Our vectortype
+      typedef VT_ VectorType;
+      /// Our matrixtype
+      typedef MT_ MatrixType;
+      /// Our used precon type
+      const static SparsePreconType PreconType = SparsePreconType::pt_diagonal;
+
+      // ensure matrix and vector have the same mem-, data- and index-type
+      static_assert(std::is_same<MemType, typename VT_::MemType>::value,
+                    "matrix and vector have different mem-types");
+      static_assert(std::is_same<DataType, typename VT_::DataType>::value,
+                    "matrix and vector have different data-types");
+      static_assert(std::is_same<IndexType, typename VT_::IndexType>::value,
+                    "matrix and vector have different index-types");
+
+      virtual ~DiagonalPreconditioner()
+      {
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] diag A vector representing the diagonal matrix to be used.
+       */
+      explicit DiagonalPreconditioner(VT_&& diag) :
+        _diag(std::forward(diag))
+      {
+      }
+
+      /**
+       * \brief Returns a descriptive string.
+       *
+       * \returns A string describing the container.
+       */
+      static String name()
+      {
+        return "Diagonal_Preconditioner";
+      }
+
+      /**
+       * \brief apply the preconditioner
+       *
+       * \param[out] out The preconditioner result.
+       * \param[in] in The vector to be preconditioned.
+       */
+      virtual void apply(VT_ & out, const VT_ & in) override
+      {
+        out.template component_product<Algo_>(_diag, in);
+      }
+    };
 
     /**
      * \brief Jacobi-Preconditioner.
@@ -264,7 +340,7 @@ namespace FEAST
        *
        * Creates a Jacobi preconditioner to the given matrix and damping-parameter
        */
-      JacobiPreconditioner(const MT_ & A, const typename VT_::DataType damping = DataType(1)) :
+      explicit JacobiPreconditioner(const MT_ & A, const typename VT_::DataType damping = DataType(1)) :
         _jac(A.rows())
       {
         if (A.columns() != A.rows())
@@ -361,8 +437,7 @@ namespace FEAST
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
-      GaussSeidelPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A,
-                                const DT_ damping = DT_(1)) :
+      explicit GaussSeidelPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ damping = DT_(1)) :
         _damping(damping),
         _A(A)
       {
@@ -469,8 +544,7 @@ namespace FEAST
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
-      GaussSeidelPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A,
-                                const DT_ damping = DT_(1)) :
+      explicit GaussSeidelPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ damping = DT_(1)) :
         _damping(damping),
         _A(A)
       {
@@ -576,8 +650,7 @@ namespace FEAST
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
-      GaussSeidelPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A,
-                                const DT_ damping = DT_(1)) :
+      explicit GaussSeidelPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ damping = DT_(1)) :
         _damping(damping),
         _A(A)
       {
@@ -700,7 +773,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const Index p) :
+      explicit ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const Index p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -732,7 +805,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & LU) :
+      explicit ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & LU) :
         _A(LU)
       {
         if (_LU.columns() != _LU.rows())
@@ -1121,7 +1194,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const Index p) :
+      explicit ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const Index p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -1153,7 +1226,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & LU) :
+      explicit ILUPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & LU) :
         _A(LU)
       {
         if (_LU.columns() != _LU.rows())
@@ -1574,7 +1647,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const Index p) :
+      explicit ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const Index p) :
         _precond(SparseMatrixCSR<Mem_, DT_, IT_> (A), p)
       {
       }
@@ -1588,7 +1661,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & LU) :
+      explicit ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & LU) :
         _precond(SparseMatrixCSR<Mem_, DT_, IT_> (LU))
       {
       }
@@ -1680,9 +1753,7 @@ namespace FEAST
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
-      SORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A,
-                        const DT_ omega = DT_(1),
-                        bool reverse = false) :
+      explicit SORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1), bool reverse = false) :
         _A(A),
         _omega(omega),
         _reverse(reverse)
@@ -1804,9 +1875,7 @@ namespace FEAST
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
-      SORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A,
-                        const DT_ omega = DT_(1),
-                        bool reverse = false) :
+      explicit SORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1), bool reverse = false) :
         _A(A),
         _omega(omega),
         _reverse(reverse)
@@ -1942,9 +2011,7 @@ namespace FEAST
        *
        * Creates a SOR preconditioner to the given matrix and parameter
        */
-      SORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A,
-                        const DT_ omega = DT_(1),
-                        bool reverse = false) :
+      explicit SORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1), bool reverse = false) :
         _A(A),
         _omega(omega),
         _reverse(reverse)
@@ -2080,7 +2147,7 @@ namespace FEAST
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
+      explicit SSORPreconditioner(const SparseMatrixCSR<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -2199,7 +2266,7 @@ namespace FEAST
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
+      explicit SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
@@ -2329,7 +2396,7 @@ namespace FEAST
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
+      explicit SSORPreconditioner(const SparseMatrixELL<Mem_, DT_, IT_> & A, const DT_ omega = DT_(1)) :
         _A(A),
         _omega(omega)
       {
