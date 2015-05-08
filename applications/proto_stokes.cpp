@@ -467,7 +467,7 @@ public:
   }
 
   // restricts the defect of this level onto the coarse level
-  void restrict(StokesLevel& coarse)
+  void restriction(StokesLevel& coarse)
   {
     // compute defect
     _matrix_a.apply<AlgoType>(_vec_def_x, _vec_sol_x, _vec_rhs_x, -DataType(1));
@@ -642,7 +642,7 @@ int main(int /*argc*/, char** /*argv*/)
       levels.at(lvl - lvl_min)->smooth(16, 2, 1, 1.0, 1.0);
 
       // restrict
-      levels.at(lvl - lvl_min)->restrict(*levels.at(lvl - lvl_min - 1));
+      levels.at(lvl - lvl_min)->restriction(*levels.at(lvl - lvl_min - 1));
     }
 
     // coarse-grid solve
