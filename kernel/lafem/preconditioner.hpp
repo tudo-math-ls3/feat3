@@ -263,7 +263,7 @@ namespace FEAST
        * \param[in] diag A vector representing the diagonal matrix to be used.
        */
       explicit DiagonalPreconditioner(VT_&& diag) :
-        _diag(std::forward(diag))
+        _diag(std::forward<VT_>(diag))
       {
       }
 
