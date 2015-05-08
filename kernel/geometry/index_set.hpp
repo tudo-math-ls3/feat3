@@ -15,7 +15,13 @@ namespace FEAST
     /**
      * \brief Conformal Index-Set class template
      *
-     * \todo detailed documentation
+     * This is used for storing information about i.e. which vertices are present in each
+     * - edge
+     * - face
+     * - cell
+     *
+     * and similar types of information, like edges@faces, edges@cells, faces@cells, depending
+     * on the dimension.
      *
      * \author Peter Zajac
      */
@@ -41,9 +47,10 @@ namespace FEAST
       typedef const Index* ImageIterator;
 
     protected:
-      /// number of entities
+      /// number of entities, i.e. number of cells
       Index _num_entities;
-      /// index bound; necessary for Adjunctor implementation
+      /// index bound;, i.e. number of edges if the IndexSet is to hold the information edges@cells.
+      /// Necessary for Adjunctor implementation
       Index _index_bound;
 
       /// index vector array
@@ -109,6 +116,23 @@ namespace FEAST
         {
           delete [] _indices;
         }
+      }
+
+      /// Move assignment operator
+      IndexSet& operator=(IndexSet&& other)
+      {
+        if(_indices != nullptr)
+          delete[] _indices;
+
+        _indices = (other._indices);
+
+        _num_entities = other._num_entities;
+        _index_bound = other._index_bound;
+
+        other._indices = nullptr;
+        other._num_entities = 0;
+        other._index_bound = 0;
+        return *this;
       }
 
       /**
@@ -396,6 +420,32 @@ namespace FEAST
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
+    /**
+     * \brief Class for holding a cross product of IndexSets
+     *
+     * \tparam Shape_
+     * The shape type of the highest dimensional cell type, i.e. Hypercube<3>
+     *
+     * Depending on the shape type and the dimension, the mesh consists of objects associated with every dimension,
+     * i.e. dim =
+     *  0: vertices
+     *  1: edges
+     *  2: faces (Shape_::dimension==3) or cells (Shape_::dimension==2)
+     *  3: cells.
+     *
+     * An IndexSetHolder stores the complete adjacency structure in a matrix:
+     *
+     * @      |vertex|edge|face|cell
+     * -----------------------------
+     * vertex |        v@e  v@f  v@c
+     * edge   |             e@f  e@c
+     * face   |                  f@c
+     * cell   |
+     *
+     * Each entry in the IndexSetHolder is an IndexSet containing information of the type:
+     * For every cell: Which edges are present in that cell (e@c)
+     *
+     */
     template<typename Shape_>
     class IndexSetHolder :
       public IndexSetHolder<typename Shape::FaceTraits<Shape_, Shape_::dimension - 1>::ShapeType>

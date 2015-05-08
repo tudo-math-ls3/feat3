@@ -265,13 +265,35 @@ namespace FEAST
     class IndexCalculator
     {
     public:
-      // cell-type (e.g. edge), Shape_ = shape-type (e.g quad)
-      typedef typename Shape::FaceTraits<Shape_, face_dim_>::ShapeType CellType;
-      typedef IndexTree<CellType> IndexTreeType;
+      /// Type of the subshape to calculate the missing information at
+      typedef typename Shape::FaceTraits<Shape_, face_dim_>::ShapeType FaceType;
+      typedef IndexTree<FaceType> IndexTreeType;
 
     public:
       /**
-       * \brief Calculates an index set.
+       * \brief Calculates an index set from vertex@shape information
+       *
+       * Assume that for a Hypercube<3>, we have the vertex@cell information. This routine can generate the
+       * edge@cell or face@cell information from this.
+       *
+       * More generic: From vertex@shape, generate subshape@shape, where the type/dimension of subshape is determined
+       * by face_dim_
+       *
+       * \tparam IndexSetIn_
+       * Type for the vertex@shape information IndexSet.
+       *
+       * \tparam IndexSetOut_
+       * Type for the subshape@shape information IndexSet.
+       *
+       * \param[in] index_tree
+       * For every entity of subshape, this IndexTree holds the information which vertices this entity contains.
+       *
+       * \param[in] index_set_in
+       * Provided vertex@shape information.
+       *
+       * \param[out] index_out
+       * subshape@shape information.
+       *
        */
       template<
         typename IndexSetIn_,
@@ -318,6 +340,75 @@ namespace FEAST
 
         // okay, all index vectors found
         return true;
+      }
+
+      /**
+       * \brief For given vertex@shape information, numbers subshapes and calculates vertex@subshape
+       */
+      template<typename IndexSetIn_, typename IndexSetOut_>
+      static void compute_vertex_subshape( const IndexSetIn_& index_set_in, IndexSetOut_& index_set_out)
+      {
+        CONTEXT(name() + "::compute()");
+
+        // Type for shape to vertex@subshape mapping
+        typedef Intern::FaceIndexMapping<Shape_, face_dim_, 0> FimType;
+        // Number of shapes
+        const Index num_shapes(index_set_in.get_num_entities());
+        // Number of verticex
+        const Index num_verts(index_set_in.get_index_bound());
+        // Number of vertices per subshape
+        const Index num_verts_subshape(Shape::FaceTraits<FaceType,0>::count);
+        // Number of subshapes per shape, i.e. a Simplex<3> has four Simplex<2> as subshapes
+        const Index num_subshapes_shape(Shape::FaceTraits<Shape_,face_dim_>::count);
+
+        // For every vertex, the IndexTree saves which subshapes it is contained in
+        IndexTreeType my_index_tree(num_verts);
+        // This saves the global vertex numbers in the current subshape
+        typename IndexTreeType::IndexVector current_face_indices;
+
+        // Generate the IndexTree of subshapes
+        for(Index k(0); k < num_shapes; ++k)
+        {
+          for(Index l(0); l < num_subshapes_shape; ++l)
+          {
+            // Get the ith index in the current subshape from the subshape to index mapping for shape k
+            for(Index i(0); i < num_verts_subshape; ++i)
+              current_face_indices[i] = index_set_in[k][FimType::map(int(l),int(i))];
+
+            // Insert the current subshape into the IndexTree. We need to give an id as 2nd argument, this does not
+            // get used in any way
+            my_index_tree.insert(current_face_indices, num_verts+1);
+          }
+        }
+
+        // Enumerate the subshape entities. my_index_tree[i] is the set of all subshapes having i as first vertex.
+        // Each set k of those consists of IndexVectors v, where v[0] is the index of the subshape in the subshape
+        // numbering and the subsequent entries are the vertex numbers.
+        const Index num_subshapes(my_index_tree.enumerate());
+
+        // The output IndexSet has num_subshapes entities and the maximum index is the number of vertices
+        IndexSetOut_ my_index_set(num_subshapes, num_verts);
+        index_set_out = std::move(my_index_set);
+
+        for(Index i(0); i < num_verts; ++i)
+        {
+          // Size of the ith set in the IndexTree
+          Index n = my_index_tree.get_set_size(i);
+
+          // Iterate over the set
+          for(Index j(0); j < n; ++j)
+          {
+            // This is the index of the subshape
+            Index my_index = my_index_tree.get_index(i, j, 0);
+            index_set_out[my_index][0] = i;
+            // Iterate over the IndexVector that the set element j represents
+            // Skip index 0 as this is contains the index of the subshape in the subshape numbering
+            for(Index k(1); k < (IndexTreeType::num_indices); ++k)
+              index_set_out[my_index][k] = my_index_tree.get_index(i, j, k);
+          }
+
+        }
+        return;
       }
 
       static String name()

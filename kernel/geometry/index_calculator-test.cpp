@@ -1,4 +1,6 @@
 #include <test_system/test_system.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/test_aux/index_calculator_meshes.hpp>
 #include <kernel/geometry/test_aux/tetris_hexa.hpp>
 #include <kernel/geometry/test_aux/standard_tetra.hpp>
@@ -254,3 +256,102 @@ public:
   } // tetra_index_calculator_test()
 
 } index_calculator_test;
+
+/**
+ * \brief Class for IndexCalculator::compute tests
+ *
+ * \test Tests calculation of vertex@subshape information from vertex@shape information.
+ *
+ * \tparam Shape_
+ * Shape for the mesh cells
+ *
+ * \tparam ShapeDim
+ * Dimension of the mesh cells, this determines the the vertex@shape information
+ *
+ * \tparam SubshapeDim
+ * Dimension of the subshape for which the vertex@subshape information is generated and checked
+ *
+ * \author Jordi Paul
+ */
+template<template<int> class Shape_, int ShapeDim, int SubshapeDim>
+class IndexCalculatorVertexTest
+: public TestSystem::TaggedTest<Archs::None, Archs::None>
+{
+  public:
+    /// The complete shape type for the mesh cells
+    typedef Shape_<ShapeDim> ShapeType;
+    /// Type for the subshapes
+    typedef Shape_<SubshapeDim> SubshapeType;
+
+    IndexCalculatorVertexTest() :
+      TestSystem::TaggedTest<Archs::None, Archs::None>("index_calculator_vertex-test")
+      {
+      }
+
+    // run the tests
+    virtual void run() const
+    {
+      typedef ConformalMesh<ShapeType> MeshType;
+
+      typedef IndexTree<SubshapeType> IndexTreeType;
+      typedef typename IndexTreeType::IndexVector IndexVectorType;
+
+      // vertex@shape IndexSet
+      typedef IndexSet<Shape::FaceTraits<ShapeType,0>::count> VertAtShapeIndexSetType;
+      // vertex@subshape IndexSet
+      typedef IndexSet<Shape::FaceTraits<SubshapeType,0>::count> VertAtSubshapeIndexSetType;
+
+      // Generate a mesh of specified ShapeType
+      RefineFactory< MeshType, UnitCubeFactory> my_factory(1);
+      MeshType my_mesh(my_factory);
+
+      // Now parse the mesh's original IndexSet into an IndexTree
+      IndexTreeType original_tree(my_mesh.get_num_entities(0));
+      original_tree.parse(my_mesh.template get_index_set<SubshapeDim,0>());
+
+      // This is the IndexSet providing the vertex@shape information
+      VertAtShapeIndexSetType my_vert_at_cell_index_set = my_mesh.template get_index_set<ShapeDim,0>();
+
+      // Calculate vertex@subshape information from the VertAtShapeIndexSet
+      VertAtSubshapeIndexSetType my_vert_at_subshape_index_set;
+      IndexCalculator<ShapeType, SubshapeDim>::compute_vertex_subshape
+        (my_vert_at_cell_index_set, my_vert_at_subshape_index_set);
+
+      // Temporary object for passing to find()
+      IndexVectorType indices_at_edge;
+
+      // Check if every subshape in the new IndexSet was present in the original
+      for(Index i(0); i < my_vert_at_subshape_index_set.get_num_entities(); ++i)
+      {
+        for(Index j(0); j < IndexTreeType::num_indices; ++j)
+          indices_at_edge[j] = my_vert_at_subshape_index_set[i][j];
+
+        std::pair<bool, Index> bi = original_tree.find(indices_at_edge);
+        TEST_CHECK_MSG(bi.first,"New subshape not found in orginal IndexSet");
+      }
+
+      // Parse the new IndexSet into an IndexTree
+      IndexTreeType new_tree(my_vert_at_subshape_index_set.get_num_entities());
+      new_tree.parse(my_vert_at_subshape_index_set);
+      // Original vert@subshape information
+      VertAtSubshapeIndexSetType original_vert_at_subshape_index_set(my_mesh.template get_index_set<SubshapeDim,0>());
+
+      // Check if every subshape in the original IndexSet ist present in the new IndexSet
+      for(Index i(0); i < original_vert_at_subshape_index_set.get_num_entities(); ++i)
+      {
+        for(Index j(0); j < IndexTreeType::num_indices; ++j)
+          indices_at_edge[j] = original_vert_at_subshape_index_set[i][j];
+
+        std::pair<bool, Index> bi = new_tree.find(indices_at_edge);
+        TEST_CHECK_MSG(bi.first,"Original subshape not found in new IndexSet");
+      }
+    } // run
+};
+
+IndexCalculatorVertexTest<Shape::Hypercube, 2, 1> test_hypercube_2_1;
+IndexCalculatorVertexTest<Shape::Hypercube, 3, 1> test_hypercube_3_1;
+IndexCalculatorVertexTest<Shape::Hypercube, 3, 2> test_hypercube_3_2;
+
+IndexCalculatorVertexTest<Shape::Simplex, 2, 1> test_simplex_2_1;
+IndexCalculatorVertexTest<Shape::Simplex, 3, 1> test_simplex_3_1;
+IndexCalculatorVertexTest<Shape::Simplex, 3, 2> test_simplex_3_2;
