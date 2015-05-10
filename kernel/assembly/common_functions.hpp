@@ -500,7 +500,7 @@ namespace FEAST
         }
 
         /// 3D: YX-derivative
-        static DataType_ der_yx(DataType_ x, DataType_ y, DataType_ z)
+        static DataType_ der_yx(DataType_ x, DataType_ y, DataType_ /*z*/)
         {
           return der_xy(x, y);
         }
@@ -512,7 +512,7 @@ namespace FEAST
         }
 
         /// 3D: ZX-derivative
-        static DataType_ der_zx(DataType_ x, DataType_ y, DataType_ z)
+        static DataType_ der_zx(DataType_ x, DataType_ y, DataType_ /*z*/)
         {
           return der_xz(x, y);
         }
@@ -524,7 +524,7 @@ namespace FEAST
         }
 
         /// 3D: ZY-derivative
-        static DataType_ der_zy(DataType_ x, DataType_ y, DataType_ z)
+        static DataType_ der_zy(DataType_ x, DataType_ y, DataType_ /*z*/)
         {
           return der_yz(x, y);
         }

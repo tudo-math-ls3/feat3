@@ -219,7 +219,7 @@ namespace Tutorial02
       }
 
       // And finally, one evaluation function for the hessian:
-      HessianType hessian(const TrafoData& tau) const
+      HessianType hessian() const
       {
         // create an auxiliary hessian:
         HessianType hess;
