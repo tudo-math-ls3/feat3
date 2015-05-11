@@ -121,7 +121,7 @@ namespace FEAST
         return msg;
       }
 #else
-      std::string synch(Foundation::Communicator c = Foundation::Communicator(0))
+      std::string synch(Foundation::Communicator /*c = Foundation::Communicator(0)*/)
       {
         msg = std::string(stream.str());
         return msg;
