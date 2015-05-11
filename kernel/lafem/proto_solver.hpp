@@ -908,6 +908,11 @@ namespace FEAST
       {
       }
 
+      virtual String name() override
+      {
+        return "FixPoint";
+      }
+
       virtual bool init_symbolic() override
       {
         if(!BaseClass::init_symbolic())
