@@ -266,6 +266,8 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  execute runs only if it was not tested before - develop and master will always be tested.")
   print ("cuda_arch=sm_20")
   print ("  use user defined cuda arch.")
+  print ("nomkl")
+  print ("  do not use mkl")
   sys.exit();
 
 dump_filename = ""
@@ -275,6 +277,7 @@ sqlport = 3306
 note = ""
 nothirdparty = False
 nomemcheck = False
+nomkl = False
 system_host_compiler = ""
 cuda_host_compiler = ""
 onlynew = False
@@ -295,6 +298,8 @@ for i in range(1, len(sys.argv)):
     nothirdparty = True
   if sys.argv[i].startswith("nomemcheck"):
     nomemcheck = True
+  if sys.argv[i].startswith("nomkl"):
+    nomkl = True
   if sys.argv[i].startswith("system_host_compiler="):
     system_host_compiler = sys.argv[i].replace("system_host_compiler=", "", 1)
   if sys.argv[i].startswith("cuda_host_compiler="):
@@ -397,6 +402,9 @@ if (not nothirdparty):
   addition = addition + "-alglib"
   addition = addition + "-umfpack"
 
+if (not nomkl):
+  addition = addition + "-mkl"
+
 quadmath_add = ""
 gcc_version = get_output("/usr/bin/g++ -dM -E -")
 gcc_version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in gcc_version]))
@@ -422,53 +430,46 @@ for branch in branches:
 
   run_test("guess", branch, myDB, extra_opts)
 
-  if platform.system() == "Darwin": # schwarzkopf has no mkl
-    run_test("mpi-gcc-debug" + addition, branch, myDB, extra_opts)
-    run_test("mpi-gcc-opt" + addition, branch, myDB, extra_opts)
-    run_test("serial-gcc-debug" + addition, branch, myDB, extra_opts)
-    run_test("serial-gcc-opt" + addition, branch, myDB, extra_opts)
-    continue
-
   if (not nomemcheck):
     if is_found ("valgrind") and is_found ("nvcc") and is_found("g++"):
-        run_test("serial-gcc-debug-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
+        run_test("serial-gcc-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
     elif is_found ("valgrind") and is_found("g++"):
-        run_test("serial-gcc-debug-mkl-valgrind" + addition + quadmath_add, branch, myDB, extra_opts)
+        run_test("serial-gcc-debug-valgrind" + addition + quadmath_add, branch, myDB, extra_opts)
     elif is_found ("nvcc") and is_found("g++"):
-        run_test("serial-gcc-debug-mkl-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
+        run_test("serial-gcc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
     '''
     if is_found ("valgrind") and is_found ("nvcc") and is_found("icpc"):
-        run_test("serial-icc-debug-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
+        run_test("serial-icc-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
     elif is_found ("valgrind") and is_found("icpc"):
-        run_test("serial-icc-debug-mkl-valgrind" + addition + quadmath_add, branch, myDB, extra_opts)
+        run_test("serial-icc-debug-valgrind" + addition + quadmath_add, branch, myDB, extra_opts)
     elif is_found ("nvcc") and is_found("icpc"):
-        run_test("serial-icc-debug-mkl-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
+        run_test("serial-icc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
 
     if is_found ("valgrind") and is_found ("nvcc") and is_found("clang++"):
-        run_test("serial-clang-debug-mkl-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
+        run_test("serial-clang-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
     elif is_found ("valgrind") and is_found("clang++"):
-        run_test("serial-clang-debug-mkl-valgrind" + addition, branch, myDB, extra_opts)
+        run_test("serial-clang-debug-valgrind" + addition, branch, myDB, extra_opts)
     elif is_found ("nvcc") and is_found("clang++"):
-        run_test("serial-clang-debug-mkl-cudamemcheck" + addition, branch, myDB, extra_opts)
+        run_test("serial-clang-debug-cudamemcheck" + addition, branch, myDB, extra_opts)
     '''
 
   if is_found("mpic++"):
     if is_found("g++"):
-      run_test("mpi-gcc-debug-mkl" + addition + quadmath_add, branch, myDB, extra_opts)
-      run_test("mpi-gcc-opt-mkl" + addition + quadmath_add, branch, myDB, extra_opts)
+      run_test("mpi-gcc-debug" + addition + quadmath_add, branch, myDB, extra_opts)
+      run_test("mpi-gcc-opt" + addition + quadmath_add, branch, myDB, extra_opts)
     if is_found("clang++"):
-      run_test("mpi-clang-debug-mkl" + addition, branch, myDB, extra_opts)
-      run_test("mpi-clang-opt-mkl" + addition, branch, myDB, extra_opts)
+      run_test("mpi-clang-debug" + addition, branch, myDB, extra_opts)
+      run_test("mpi-clang-opt" + addition, branch, myDB, extra_opts)
     if is_found("icpc"):
-      run_test("mpi-icc-debug-mkl" + addition + quadmath_add, branch, myDB, extra_opts)
-      run_test("mpi-icc-opt-mkl" + addition + quadmath_add, branch, myDB, extra_opts)
+      run_test("mpi-icc-debug" + addition + quadmath_add, branch, myDB, extra_opts)
+      run_test("mpi-icc-opt" + addition + quadmath_add, branch, myDB, extra_opts)
 
   if is_found("g++"):
-    run_test("serial-gcc-debug-mkl" + addition + quadmath_add, branch, myDB, extra_opts)
-    run_test("serial-gcc-opt-mkl" + addition + quadmath_add, branch, myDB, extra_opts)
+    run_test("serial-gcc-debug" + addition + quadmath_add, branch, myDB, extra_opts)
+    run_test("serial-gcc-opt" + addition + quadmath_add, branch, myDB, extra_opts)
   if is_found("clang++"):
-    run_test("serial-clang-debug-mkl" + addition, branch, myDB, extra_opts)
-    run_test("serial-clang-opt-mkl" + addition, branch, myDB, extra_opts)
+    run_test("serial-clang-debug" + addition, branch, myDB, extra_opts)
+    run_test("serial-clang-opt" + addition, branch, myDB, extra_opts)
   if is_found("icpc"):
-    run_test("serial-icc-debug-mkl" + addition + quadmath_add, branch, myDB, extra_opts)
-    run_test("serial-icc-opt-mkl" + addition + quadmath_add, branch, myDB, extra_opts)
+    run_test("serial-icc-debug" + addition + quadmath_add, branch, myDB, extra_opts)
+    run_test("serial-icc-opt" + addition + quadmath_add, branch, myDB, extra_opts)
