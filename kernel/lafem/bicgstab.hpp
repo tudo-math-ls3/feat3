@@ -198,12 +198,12 @@ namespace FEAST
         {
           //rdefect(b, A, x);
           Aapply(r, x, b, -DT_(1));
-          filterfilter_def(r);
+          filter.filter_def(r);
 
           defnorm_0 = r.norm2();
           defnorm = defnorm_0;
           precon.apply(r_tilde_0, r);
-          filterfilter_cor(r_tilde_0);
+          filter.filter_cor(r_tilde_0);
 
           if (restarted == false)
           {
@@ -221,9 +221,9 @@ namespace FEAST
 
             //vproduct_matvec(A, p_tilde);
             Aapply(v, p_tilde);
-            filterfilter_def(v);
+            filter.filter_def(v);
             precon.apply(v_tilde, v);
-            filterfilter_cor(v_tilde);
+            filter.filter_cor(v_tilde);
 
             gamma_tilde = v_tildedot(r_tilde_0);
 
@@ -261,10 +261,10 @@ namespace FEAST
 
             //tproduct_matvec(A, s_tilde);
             Aapply(t, s_tilde);
-            filterfilter_def(t);
+            filter.filter_def(t);
 
             precon.apply(t_tilde, t);
-            filterfilter_cor(t_tilde);
+            filter.filter_cor(t_tilde);
 
             gamma_tilde = t_tildedot(t_tilde);
             omega_tilde = t_tildedot(s_tilde);
