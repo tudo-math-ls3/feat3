@@ -89,6 +89,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Override cpu auto detection with provided string (see build_system/detect_cpu.py for a list).")
   print ("--compiler=path/to/binary")
   print ("  Override default c++ compiler binary by absolute path to binary.")
+  print ("--cuda_verbose")
+  print ("  Be way more verbosive on cuda compilation steps")
   print ("")
   print ("Note that the first gcc(g++) in $PATH is choosen as the cuda host compiler, if no other one is provided.")
   sys.exit()
@@ -213,6 +215,8 @@ system_host_compiler = ""
 cuda_host_compiler = ""
 compiler = ""
 cuda_arch = ""
+cuda_verbose = False
+
 for option in extra_options:
   if option.startswith("--cpu="):
     if cputype:
@@ -244,6 +248,9 @@ for option in extra_options:
       print ("Error: multiple cuda_arch parameters in\n" + "\n".join(extra_options))
       exit(1)
     cuda_arch = option.replace("--cuda_arch=", "", 1)
+
+  if option.startswith("--cuda_verbose"):
+    cuda_verbose = True
 
   if option.startswith("--export_compile_commands"):
     cmake_flags += " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
@@ -324,6 +331,9 @@ if "cuda" in buildid:
   if not cuda_arch:
     cuda_arch = "sm_20"
   cmake_flags += " -DFEAST_CUDA_ARCH=" + cuda_arch
+
+  if cuda_verbose:
+    cmake_flags += " -DFEAST_CUDA_VERBOSE:BOOL=ON"
 
   if "cudamemcheck" in buildid:
     remove_string(unused_tokens, "cudamemcheck")
