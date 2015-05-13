@@ -3533,19 +3533,23 @@ namespace FEAST
             }
 
             // mulitply last/new rows of matrix qr with \f$Q^\top\f$
-            for (Index k1(nn); k1 < nn_new; ++k1)
+            // (the resctriction of nn > 1 could not be correct, but prevents the creation of NaNs)
+            if (nn > 1)
             {
-              // calculate \f$e_k1 = Q^\top \cdot e_k1\f$
-              for (Index j(0); j < nn; ++j)
+              for (Index k1(nn); k1 < nn_new; ++k1)
               {
-                DT_ s = DT_(0.0);
-                for (Index l(j); l < qr[j].size(); ++l)
+                // calculate \f$e_k1 = Q^\top \cdot e_k1\f$
+                for (Index j(0); j < nn; ++j)
                 {
-                  s += qr[j][l] * qr[k1][l];
-                }
-                for (Index l(j); l < qr[j].size(); ++l)
-                {
-                  qr[k1][l] -= qr[j][l] * s;
+                  DT_ s = DT_(0.0);
+                  for (Index l(j); l < qr[j].size(); ++l)
+                  {
+                    s += qr[j][l] * qr[k1][l];
+                  }
+                  for (Index l(j); l < qr[j].size(); ++l)
+                  {
+                    qr[k1][l] -= qr[j][l] * s;
+                  }
                 }
               }
             }
