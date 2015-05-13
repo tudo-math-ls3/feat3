@@ -443,7 +443,8 @@ namespace FEAST
      * cell   |
      *
      * Each entry in the IndexSetHolder is an IndexSet containing information of the type:
-     * For every cell: Which edges are present in that cell (e@c)
+     * For every cell: Which edges are present in that cell (e@c) etc.
+     *
      *
      */
     template<typename Shape_>
@@ -460,15 +461,15 @@ namespace FEAST
       struct IndexSet
       {
         /// index set type
-        typedef
-          Geometry::IndexSet<
-            Shape::FaceTraits<
-              typename Shape::FaceTraits<
-                Shape_,
-                cell_dim_>
-              ::ShapeType,
-              face_dim_>
-            ::count> Type;
+        typedef Geometry::IndexSet
+        <
+          Shape::FaceTraits
+          <
+            typename Shape::FaceTraits<Shape_, cell_dim_> ::ShapeType,
+            face_dim_
+          >
+          ::count
+        > Type;
       }; // struct IndexSet<...>
 
     protected:
@@ -582,6 +583,116 @@ namespace FEAST
         return "IndexSetHolder<Vertex>";
       }
     };
+
+    /**
+     * \brief Helper class to update the sizes of elements of an IndexSetHolder
+     *
+     * \tparam shape_dim_
+     * Dimension of highest dimensional shape
+     *
+     * \tparam co_dim_
+     * Codimension wrt. the subshape that causes the size updates.
+     *
+     * When using meshes that contain only the vertex@shape information, the number of edges/faces is unknown so the
+     * corresponding IndexSets in the IndexSetHolder are initialised with size 0. If the IndexSet to dimensions
+     * (shape_dim_-co_dim_, 0) is created, all IndexSets using the number of entities of dimension shape_dim_-co_dim_
+     * need to be updated.
+     *
+     * To make this more clear:
+     * _shape_dim = 1: Nothing to do, as vertex@shape is already present.
+     * _shape_dim = 2: After vert@edge is computed, update the size of edge@cell.
+     * _shape_dim = 3: After vert@face is computed, update the size of face@cell.
+     *                 After vert@edge is computed, update the sizes of edge@cell and edge@face.
+     *
+     * \warning Because of the information hierarchy, these routines assume that the vertex@shape information is
+     * present and correct for the highest dimensional shape and for all shapes with lower codimension!
+     *
+     * \author Jordi Paul
+     *
+     */
+    template<Index shape_dim_, Index co_dim_>
+    struct IndexSetHolderDimensionUpdater
+    {
+      /**
+       * \brief Updates the size of certain IndexSets in an IndexSetHolder depending on shape_dim_ and co_dim_
+       *
+       * \tparam IndexSetHolderType_
+       * Type of the IndexSetHolder
+       *
+       * \param[in,out] ish
+       * IndexSetHolder whose IndexSets get updated
+       */
+      template<typename IndexSetHolderType_>
+      static void update(IndexSetHolderType_& DOXY(ish))
+      {
+        //dummy
+      }
+    };
+
+    /// \cond internal
+    /**
+     * \brief Specialisation for codimension 1
+     *
+     */
+    template<Index shape_dim_>
+    struct IndexSetHolderDimensionUpdater<shape_dim_,1>
+    {
+      template<typename IndexSetHolderType_>
+      static void update(IndexSetHolderType_& ish)
+      {
+        auto& vert_at_subshape_index_set(ish.template get_index_set<shape_dim_-1,0>());
+
+        Index num_shapes(ish.template get_index_set<shape_dim_,0>().get_num_entities());
+        // Get the type of the IndexSet to dimensions <Shape_::dimension, face_dim_>
+        typename std::remove_reference<decltype( (ish.template get_index_set<shape_dim_, shape_dim_-1>()) )>::type
+          // The output IndexSet has num_shapes entities and the maximum index is the number of vertices
+          subshape_at_shape_index_set(num_shapes, vert_at_subshape_index_set.get_num_entities());
+
+        // Replace the corresponding IndexSet in the IndexSetHolder by the just generated IndexSet of the right
+        // size
+        ish.template get_index_set<shape_dim_, shape_dim_-1>() = std::move(subshape_at_shape_index_set);
+      }
+    };
+
+    /**
+     * \brief Specialisation for codimension 2
+     *
+     */
+    template<Index shape_dim_>
+    struct IndexSetHolderDimensionUpdater<shape_dim_,2>
+    {
+      template<typename IndexSetHolderType_>
+      static void update(IndexSetHolderType_& ish)
+      {
+        // Update edge@cell IndexSet dimensions
+        // vert@edge IndexSet
+        auto& vert_at_subshape_index_set(ish.template get_index_set<shape_dim_-2,0>());
+        // Number of cells
+        Index num_shapes(ish.template get_index_set<shape_dim_,0>().get_num_entities());
+        // Get the type of the IndexSet to dimensions <Shape_::dimension, Shape::dimension-2>
+        typename std::remove_reference<decltype( (ish.template get_index_set<shape_dim_, shape_dim_-2>()) )>::type
+          // The output IndexSet has num_shapes entities and the maximum index is the number of subshapes (=edges)
+          subshape_at_shape_index_set(num_shapes, vert_at_subshape_index_set.get_num_entities());
+        // Replace the corresponding IndexSet in the IndexSetHolder by the just generated IndexSet of the right
+        // size
+        ish.template get_index_set<shape_dim_, shape_dim_-2>() = std::move(subshape_at_shape_index_set);
+
+        // Now do it again for the edge@face IndexSet
+        // vert@face IndexSet
+        auto& vert_at_intermediate_index_set(ish.template get_index_set<shape_dim_-1,0>());
+        // Number of faces
+        Index num_intermediate_shapes(ish.template get_index_set<shape_dim_-1,0>().get_num_entities());
+        // Get the type of the IndexSet to dimensions <Shape_::dimension-1, Shape::dimension-2>
+        typename std::remove_reference<decltype( (ish.template get_index_set<shape_dim_-1, shape_dim_-2>()) )>::type
+          // The output IndexSet has num_intermediate_shapes entities and the maximum index is the number of edges
+          subshape_at_intermediate_index_set(
+            num_intermediate_shapes, vert_at_intermediate_index_set.get_num_entities());
+        // Replace the corresponding IndexSet in the IndexSetHolder by the just generated IndexSet of the right
+        // size
+        ish.template get_index_set<shape_dim_-1, shape_dim_-2>() = std::move(subshape_at_intermediate_index_set);
+      }
+    };
+    /// \endcond
     /// \endcond
   } // namespace Geometry
 } // namespace FEAST

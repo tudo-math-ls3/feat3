@@ -124,7 +124,7 @@ namespace FEAST
       {
         CONTEXT(name() + "::ConformalMesh() [factory]");
 
-        // compute entity counts
+        // Compute entity counts
         Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
 
         // fill vertex set
@@ -132,6 +132,11 @@ namespace FEAST
 
         // fill index sets
         factory.fill_index_sets(_index_set_holder);
+
+        // Recompute entity counts. This is mainly for the MeshStreamerFactory, as complete information about the
+        // number of edges/faces might not be known until after fill_index_sets is called
+        Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
+
       }
 
       /**

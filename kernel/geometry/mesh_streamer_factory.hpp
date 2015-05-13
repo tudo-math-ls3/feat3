@@ -14,6 +14,7 @@ namespace FEAST
   namespace Geometry
   {
     /// \cond internal
+    /// Forward declarations of things to come
     namespace Intern
     {
       template<typename Shape_>
@@ -21,6 +22,9 @@ namespace FEAST
 
       template<typename Shape_>
       struct MeshStreamerTargeter;
+
+      template<Index dim_>
+      struct NumEntitiesExtractor;
     }
     /// \endcond
 
@@ -51,34 +55,50 @@ namespace FEAST
     private:
       MeshStreamer& _mesh_reader;
       MeshStreamer::MeshDataContainer* _mesh_data;
+      /// num_entities information, might differ from the information in _mesh_data
+      Index _num_entities[Shape_::dimension+1];
 
     public:
       explicit MeshStreamerFactory(MeshStreamer& mesh_reader) :
         _mesh_reader(mesh_reader),
         _mesh_data(mesh_reader.get_mesh())
       {
+        // Parse preliminary num_entities from _mesh_data
+        for(Index d(0); d <= Shape_::dimension; ++d)
+          _num_entities[d] = parse_num_entities(d);
+      }
+
+      /// \brief Parses num_entities information from _mesh_data
+      virtual Index parse_num_entities(Index dim)
+      {
+        {
+          switch(dim)
+          {
+            case 0:
+              return _mesh_data->vertex_count;
+            case 1:
+              return _mesh_data->edge_count;
+            case 2:
+              return _mesh_data->tria_count + _mesh_data->quad_count;
+            case 3:
+              return _mesh_data->tetra_count + _mesh_data->hexa_count;
+            default:
+              return 0;
+          }
+        }
       }
 
       virtual Index get_num_entities(int dim)
       {
-        switch(dim)
-        {
-        case 0:
-          return _mesh_data->vertex_count;
-        case 1:
-          return _mesh_data->edge_count;
-        case 2:
-          return _mesh_data->tria_count + _mesh_data->quad_count;
-        case 3:
-          return _mesh_data->tetra_count + _mesh_data->hexa_count;
-        default:
-          return 0;
-        }
+        ASSERT( (dim >= 0) && (dim <= Shape_::dimension), "No num_entities for dimension!");
+        return _num_entities[dim];
       }
 
       virtual void fill_vertex_set(VertexSetType& vertex_set)
       {
+
         const Index num_vertices(Index(_mesh_data->coords.size()));
+
         for(Index i(0); i < num_vertices; ++i)
         {
           // get a reference to the corresponding vertex
@@ -101,9 +121,14 @@ namespace FEAST
 
         // build redundant index sets
         RedundantIndexSetBuilder<Shape_>::compute(index_set_holder);
-      }
-    }; // class MeshStreamerFactory<ConformalMesh<...>>
 
+        // Set entries in num_entities. This has to be called after using the RedundantIndexSetBuilder because
+        // the information from _mesh_data might not have been complete: If the mesh file did not contain edge/face
+        // data, the number of entities of the corresponding dimension was zero.
+        Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(index_set_holder, _num_entities);
+      }
+
+    }; // class MeshStreamerFactory<ConformalMesh<...>>
 
     /**
      * \brief MeshStreamerFactory implementation for CellSubSet
@@ -202,6 +227,8 @@ namespace FEAST
       MeshStreamer& _mesh_reader;
       String _name;
       MeshStreamer::MeshDataContainer* _mesh_data;
+      /// num_entities information, might differ from the information in _mesh_data
+      Index _num_entities[Shape_::dimension+1];
 
     public:
       explicit MeshStreamerFactory(MeshStreamer& mesh_reader, String name) :
@@ -209,6 +236,10 @@ namespace FEAST
         _name(name),
         _mesh_data(nullptr)
       {
+        // Parse preliminary num_entities from _mesh_data
+        for(Index d(0); d <= Shape_::dimension; ++d)
+          _num_entities[d] = parse_num_entities(d);
+
         MeshStreamer::MeshNode* root(_mesh_reader.get_root_mesh_node());
         ASSERT_(root != nullptr);
 
@@ -224,21 +255,30 @@ namespace FEAST
         throw InternalError("No sub-mesh found with name '" + name + "'");
       }
 
+      /// \brief Parses num_entities information from _mesh_data
+      virtual Index parse_num_entities(Index dim)
+      {
+        {
+          switch(dim)
+          {
+            case 0:
+              return _mesh_data->vertex_count;
+            case 1:
+              return _mesh_data->edge_count;
+            case 2:
+              return _mesh_data->tria_count + _mesh_data->quad_count;
+            case 3:
+              return _mesh_data->tetra_count + _mesh_data->hexa_count;
+            default:
+              return 0;
+          }
+        }
+      }
+
       virtual Index get_num_entities(int dim)
       {
-        switch(dim)
-        {
-        case 0:
-          return _mesh_data->vertex_count;
-        case 1:
-          return _mesh_data->edge_count;
-        case 2:
-          return _mesh_data->tria_count + _mesh_data->quad_count;
-        case 3:
-          return _mesh_data->tetra_count + _mesh_data->hexa_count;
-        default:
-          return 0;
-        }
+        ASSERT( (dim >= 0) && (dim <= Shape_::dimension), "No num_entities for dimension!");
+        return _num_entities[dim];
       }
 
       virtual int get_num_coords()
@@ -278,6 +318,11 @@ namespace FEAST
 
         // build redundant index sets
         RedundantIndexSetBuilder<Shape_>::compute(index_set_holder);
+
+        // Set entries in num_entities. This has to be called after using the RedundantIndexSetBuilder because
+        // the information from _mesh_data might not have been complete: If the mesh file did not contain edge/face
+        // data, the number of entities of the corresponding dimension was zero.
+        Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(index_set_holder, _num_entities);
       }
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
@@ -368,6 +413,65 @@ namespace FEAST
           {
             trg[i] = pix[i];
           }
+        }
+      };
+
+      /**
+       * \brief Helper class for extracting num_entities information from an IndexSetHolder
+       *
+       * \tparam dim_
+       * Maximum dimension of the shape to extract said information for.
+       *
+       * If the mesh file read by the MeshStreamer used by the MeshStreamerFactory does not provide complete
+       * information about edge@cell, edge@face and/or face@cell, the number of edges/faces is not correct in
+       * the _mesh_data object. After fill_index_sets() is called, the size of these index set in the corresponding
+       * IndexSetHolder gives the right number of edges/faces.
+       *
+       * Because the get_index_set routine uses the dimensions as template parameters, the loop has to be realised
+       * by template recursion and as the end of that recursion needs partial specialisation, a helper class.
+       *
+       * \author Jordi Paul
+       *
+       */
+      template<Index dim_>
+      struct NumEntitiesExtractor
+      {
+        /**
+         * \brief Computes certain entries of num_entities from an IndexSetHolder
+         *
+         * \tparam IndexSetHolderType_
+         * Type of the IndexSetHolder
+         *
+         * \param[in] ish
+         * IndexSetHolder to set num_entities from
+         *
+         * \param[out] num_entities
+         * num_entities[d] = Number of objects of dimension d
+         *
+         */
+        template<typename IndexSetHolderType_>
+        static void set_num_entities(IndexSetHolderType_& ish, Index* num_entities)
+        {
+          // The number of entities of dimension dim_ is the length of the vertex@shape[dim_] IndexSet
+          num_entities[dim_] = ish.template get_index_set<dim_,0>().get_num_entities();
+          // Recurse down
+          NumEntitiesExtractor<dim_-1>::set_num_entities(ish, num_entities);
+        }
+      };
+
+      /**
+       * \brief Full specialisation of NumEntitiesExtractor as end of the template recursion
+       *
+       * As num_entities[0] = number of vertices and this information must be present and correct, this stops at 1.
+       *
+       */
+      template<>
+      struct NumEntitiesExtractor<1>
+      {
+        template<typename IndexSetHolderType_>
+        static void set_num_entities(IndexSetHolderType_& ish, Index* num_entities)
+        {
+          num_entities[1] = ish.template get_index_set<1,0>().get_num_entities();
         }
       };
     }

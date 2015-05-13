@@ -401,6 +401,7 @@ namespace FEAST
             // This is the index of the subshape
             Index my_index = my_index_tree.get_index(i, j, 0);
             index_set_out[my_index][0] = i;
+
             // Iterate over the IndexVector that the set element j represents
             // Skip index 0 as this is contains the index of the subshape in the subshape numbering
             for(Index k(1); k < (IndexTreeType::num_indices); ++k)
@@ -450,28 +451,63 @@ namespace FEAST
         }
       };
 
+      /**
+       * \brief Wrapper struct for generating subshape@shape information
+       *
+       * \tparam Shape_
+       * Highest dimensional shape type
+       *
+       * \tparam face_dim_
+       * Dimension of the subshape
+       *
+       * Using template recursion, this generates subshape@shape information for all subshapes of lower dimension,
+       * i.e. for Simplex<3> it generates edge@face, edge@cell and face@cell
+       */
       template<typename Shape_, int face_dim_ = Shape_::dimension - 1>
       struct RisbWrapper
       {
         typedef typename Shape::FaceTraits<Shape_, face_dim_>::ShapeType FaceType;
         static constexpr int num_verts = Shape::FaceTraits<FaceType, 0>::count;
 
+        /**
+         * \brief Generates subshape@shape information contained in an IndexSetHolder
+         *
+         * \param[in,out] ish
+         * IndexsetHolder to be filled.
+         *
+         * The only information this really needs is vertex@shape. If vertex@subshape is missing for any subshape,
+         * it is generated using IndexCalculator.
+         *
+         */
         static void wrap(IndexSetHolder<Shape_>& ish)
         {
+          auto& vert_at_subshape_index_set(ish.template get_index_set<face_dim_,0>());
+
+          // Check if vertex@subshape information is present (needed later on) and compute it if necessary
+          if(vert_at_subshape_index_set.get_num_entities() == 0)
+          {
+            IndexCalculator<Shape_, face_dim_>::compute_vertex_subshape(
+              ish.template get_index_set<Shape_::dimension, 0>(), vert_at_subshape_index_set);
+
+            // Update dimensions of other IndexSets in the IndexSetHolder
+            IndexSetHolderDimensionUpdater<Shape_::dimension, Shape_::dimension-face_dim_>::update(ish);
+          }
+
           // recurse down
           RisbWrapper<Shape_, face_dim_ - 1>::wrap(ish);
 
           // get vertices-at-face index set
-          IndexSet<num_verts>& vert_adj(ish.template get_index_set<face_dim_, 0>());
+          IndexSet<num_verts>& vert_adj(vert_at_subshape_index_set);
 
           // build an index-tree from it
           IndexTree<FaceType> idx_tree(vert_adj.get_index_bound());
           idx_tree.parse(vert_adj);
 
-          // call the helper
+          // Call the helper. This in turn calls IndexCalculater::compute, which needs vertex@shape and
+          // vertex@subshape information for all subshapes.
           RisbHelper<Shape_, face_dim_>::compute(ish, idx_tree);
         }
-      };
+      }; // RisbWrapper<Shape_, face_dim_>
 
       template<typename Shape_>
       struct RisbWrapper<Shape_, 0>
@@ -480,7 +516,7 @@ namespace FEAST
         {
           // dummy
         }
-      };
+      }; // RisbWrapper<Shape_, 0>
     } // namespace Intern
     /// \endcond
 
