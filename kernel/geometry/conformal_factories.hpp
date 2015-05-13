@@ -374,18 +374,18 @@ namespace FEAST
 
       public:
         template<typename... Arguments>
-        explicit RefineFactory(Index num_refines, Arguments... args) :
+        explicit RefineFactory(Index num_refines, Arguments&&... args) :
           _coarse_mesh(nullptr),
           _factory(nullptr)
       {
         if(num_refines <= 0)
         {
-          _factory = new MyFactoryType(args...);
+          _factory = new MyFactoryType(std::forward<Arguments>(args)...);
           return;
         }
 
         // create coarse mesh
-        MyFactoryType my_factory;
+        MyFactoryType my_factory(std::forward<Arguments>(args)...);
         _coarse_mesh = new MeshType(my_factory);
 
         // create refinery
