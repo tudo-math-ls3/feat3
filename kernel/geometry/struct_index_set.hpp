@@ -66,20 +66,20 @@ namespace FEAST
         {
         }
 
-        /** \copydoc Adjactor::ImageIterator::operator*() */
+        /** \copydoc Adjacency::Adjactor::ImageIterator::operator*() */
         Index operator*() const
         {
           return Intern::StructIndexMapping<shape_dim_, cell_dim_, face_dim_>::compute(_i, _j, _num_slices);
         }
 
-        /** \copydoc Adjactor::ImageIterator::operator++() */
+        /** \copydoc Adjacency::Adjactor::ImageIterator::operator++() */
         ImageIterator& operator++()
         {
           ++_j;
           return *this;
         }
 
-        /** \copydoc Adjactor::ImageIterator::operator!=() */
+        /** \copydoc Adjacency::Adjactor::ImageIterator::operator!=() */
         bool operator!=(const ImageIterator& other) const
         {
           return (_i != other._i) || (_j != other._j);
@@ -163,26 +163,26 @@ namespace FEAST
       /* *************************************************************************************** */
       /*          A D J A C T O R     I N T E R F A C E     I M P L E M E N T A T I O N          */
       /* *************************************************************************************** */
-      /** \copydoc Adjactor::get_num_nodes_domain() */
+      /** \copydoc Adjacency::Adjactor::get_num_nodes_domain() */
       Index get_num_nodes_domain() const
       {
         return _num_entities;
       }
 
-      /** \copydoc Adjactor::get_num_nodes_image() */
+      /** \copydoc Adjacency::Adjactor::get_num_nodes_image() */
       Index get_num_nodes_image() const
       {
         return _index_bound;
       }
 
-      /** \copydoc Adjactor::image_begin() */
+      /** \copydoc Adjacency::Adjactor::image_begin() */
       ImageIterator image_begin(Index domain_node) const
       {
         ASSERT_(domain_node < Index(_num_entities));
         return ImageIterator(_num_slices, domain_node, 0);
       }
 
-      /** \copydoc Adjactor::image_end() */
+      /** \copydoc Adjacency::Adjactor::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
         ASSERT_(domain_node < Index(_num_entities));

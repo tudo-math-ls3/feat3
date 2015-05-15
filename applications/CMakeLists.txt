@@ -23,6 +23,7 @@ SET (app_list
   foundation_global_ops_concave_4procs_test-app
   foundation_global_ops_synch_scal_test-app
   foundation_partitioning_4procs_test-app
+  mesh_streamer-app
   scarc_test-app
   scarc_1proc_test-app
   scarc_gateway_test-app

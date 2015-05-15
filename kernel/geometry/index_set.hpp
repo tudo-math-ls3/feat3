@@ -20,7 +20,7 @@ namespace FEAST
      * - face
      * - cell
      *
-     * and similar types of information, like edges@faces, edges@cells, faces@cells, depending
+     * and similar types of information, like edges\@faces, edges\@cells, faces\@cells, depending
      * on the dimension.
      *
      * \author Peter Zajac
@@ -49,7 +49,7 @@ namespace FEAST
     protected:
       /// number of entities, i.e. number of cells
       Index _num_entities;
-      /// index bound;, i.e. number of edges if the IndexSet is to hold the information edges@cells.
+      /// index bound;, i.e. number of edges if the IndexSet is to hold the information edges\@cells.
       /// Necessary for Adjunctor implementation
       Index _index_bound;
 
@@ -57,6 +57,7 @@ namespace FEAST
       IndexVectorType* _indices;
 
     private:
+      /// Copy assignment operator
       IndexSet& operator=(const IndexSet&);
 
     public:
@@ -267,19 +268,19 @@ namespace FEAST
       /* *************************************************************************************** */
       /*          A D J A C T O R     I N T E R F A C E     I M P L E M E N T A T I O N          */
       /* *************************************************************************************** */
-      /** \copydoc Adjactor::get_num_nodes_domain() */
+      /** \copydoc Adjacency::Adjactor::get_num_nodes_domain() */
       Index get_num_nodes_domain() const
       {
         return _num_entities;
       }
 
-      /** \copydoc Adjactor::get_num_nodes_image() */
+      /** \copydoc Adjacency::Adjactor::get_num_nodes_image() */
       Index get_num_nodes_image() const
       {
         return _index_bound;
       }
 
-      /** \copydoc Adjactor::image_begin() */
+      /** \copydoc Adjacency::Adjactor::image_begin() */
       ImageIterator image_begin(Index domain_node) const
       {
         CONTEXT(name() + "::image_begin()");
@@ -288,7 +289,7 @@ namespace FEAST
         return &_indices[domain_node][0];
       }
 
-      /** \copydoc Adjactor::image_end() */
+      /** \copydoc Adjacency::Adjactor::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
         CONTEXT(name() + "::image_end()");
@@ -629,7 +630,6 @@ namespace FEAST
       }
     };
 
-    /// \cond internal
     /**
      * \brief Specialisation for codimension 1
      *
@@ -692,7 +692,6 @@ namespace FEAST
         ish.template get_index_set<shape_dim_-1, shape_dim_-2>() = std::move(subshape_at_intermediate_index_set);
       }
     };
-    /// \endcond
     /// \endcond
   } // namespace Geometry
 } // namespace FEAST

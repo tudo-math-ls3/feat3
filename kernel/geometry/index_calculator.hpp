@@ -81,7 +81,7 @@ namespace FEAST
       /// Vector of IV rep sets
       typedef std::vector<RepSet> RepSetVector;
 
-      // representative set vector
+      /// representative set vector
       RepSetVector _rep_set_vec;
 
     public:
@@ -246,6 +246,7 @@ namespace FEAST
         return cur_id;
       }
 
+      /// \brief Returns the class name
       static String name()
       {
         return "IndexTree<" + Shape_::name() + ">";
@@ -267,32 +268,33 @@ namespace FEAST
     public:
       /// Type of the subshape to calculate the missing information at
       typedef typename Shape::FaceTraits<Shape_, face_dim_>::ShapeType FaceType;
+      /// Type for the IndexTree containing vertex\@subshape information
       typedef IndexTree<FaceType> IndexTreeType;
 
     public:
       /**
-       * \brief Calculates an index set from vertex@shape information
+       * \brief Calculates an index set from vertex\@shape information
        *
-       * Assume that for a Hypercube<3>, we have the vertex@cell information. This routine can generate the
-       * edge@cell or face@cell information from this.
+       * Assume that for a Hypercube<3>, we have the vertex\@cell information. This routine can generate the
+       * edge\@cell or face\@cell information from this.
        *
-       * More generic: From vertex@shape, generate subshape@shape, where the type/dimension of subshape is determined
-       * by face_dim_
+       * More generic: From vertex\@shape, generate subshape\@shape, where the type/dimension of subshape is
+       * determined by face_dim_
        *
        * \tparam IndexSetIn_
-       * Type for the vertex@shape information IndexSet.
+       * Type for the vertex\@shape information IndexSet.
        *
        * \tparam IndexSetOut_
-       * Type for the subshape@shape information IndexSet.
+       * Type for the subshape\@shape information IndexSet.
        *
        * \param[in] index_tree
        * For every entity of subshape, this IndexTree holds the information which vertices this entity contains.
        *
        * \param[in] index_set_in
-       * Provided vertex@shape information.
+       * Provided vertex\@shape information.
        *
-       * \param[out] index_out
-       * subshape@shape information.
+       * \param[out] index_set_out
+       * subshape\@shape information.
        *
        */
       template<
@@ -343,7 +345,7 @@ namespace FEAST
       }
 
       /**
-       * \brief For given vertex@shape information, numbers subshapes and calculates vertex@subshape
+       * \brief For given vertex\@shape information, numbers subshapes and calculates vertex\@subshape
        */
       template<typename IndexSetIn_, typename IndexSetOut_>
       static void compute_vertex_subshape( const IndexSetIn_& index_set_in, IndexSetOut_& index_set_out)
@@ -412,6 +414,7 @@ namespace FEAST
         return;
       }
 
+      /// \brief Returns the class name
       static String name()
       {
         return "IndexCalculator<" + Shape_::name() + "," + stringify(face_dim_) + ">";
@@ -531,6 +534,7 @@ namespace FEAST
     class RedundantIndexSetBuilder
     {
     public:
+      /// \brief Routine that does the actual work
       static void compute(IndexSetHolder<Shape_>& index_set_holder)
       {
         Intern::RisbWrapper<Shape_>::wrap(index_set_holder);
