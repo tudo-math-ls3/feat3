@@ -44,6 +44,9 @@ TARGET_LINK_LIBRARIES (csr2mtx feast)
 ADD_EXECUTABLE(ell2mtx io/ell_to_mtx.cpp)
 TARGET_LINK_LIBRARIES (ell2mtx feast)
 
+ADD_EXECUTABLE(mesh_streamer-app mesh_streamer/mesh_streamer-app.cpp)
+TARGET_LINK_LIBRARIES (mesh_streamer-app feast)
+
 ADD_EXECUTABLE(mtx2csr io/mtx_to_csr.cpp)
 TARGET_LINK_LIBRARIES (mtx2csr feast)
 

@@ -64,7 +64,7 @@ namespace FEAST
         _mesh_data(mesh_reader.get_mesh())
       {
         // Parse preliminary num_entities from _mesh_data
-        for(Index d(0); d <= Shape_::dimension; ++d)
+        for(Index d(0); d <= Index(Shape_::dimension); ++d)
           _num_entities[d] = parse_num_entities(d);
       }
 

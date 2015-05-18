@@ -32,7 +32,7 @@ namespace FEAST
 
     public:
       /// number of indices per entry
-      static constexpr int num_indices = num_indices_;
+      static constexpr Index num_indices = num_indices_;
 
       /// index vector type
       typedef Index IndexVectorType[num_indices];

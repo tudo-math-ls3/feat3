@@ -102,7 +102,7 @@ namespace FEAST
             abacus.clear(vtx_out);
 
             // add all other vertices onto it
-            for(int k(0); k < IndexSetType::num_indices; ++k)
+            for(Index k(0); k < IndexSetType::num_indices; ++k)
             {
               abacus.add(vtx_out, vertex_set_in[idx_in[k]]);
             }
@@ -163,7 +163,7 @@ namespace FEAST
             abacus.clear(vtx_out);
 
             // add all other vertices onto it
-            for(int k(0); k < IndexSetType::num_indices; ++k)
+            for(Index k(0); k < IndexSetType::num_indices; ++k)
             {
               abacus.add(vtx_out, vertex_set_in[idx_in[k]]);
             }
@@ -250,7 +250,7 @@ namespace FEAST
             abacus.clear(vtx_out);
 
             // add all other vertices onto it
-            for(int k(0); k < IndexSetType::num_indices; ++k)
+            for(Index k(0); k < IndexSetType::num_indices; ++k)
             {
               abacus.add(vtx_out, vertex_set_in[idx_in[k]]);
             }

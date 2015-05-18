@@ -122,9 +122,9 @@ namespace FEAST
 
             for(Index i(0); i < Index(Shape::FaceTraits<ShapeType, cell_dim_>::count); ++i)
             {
-              for(int j(0); j < idx.num_indices; ++j)
+              for(Index j(0); j < idx.num_indices; ++j)
               {
-                idx[i][j] = Index(FimType::map(int(i), j));
+                idx[i][j] = Index(FimType::map(int(i), int(j)));
               }
             }
           }
@@ -134,9 +134,9 @@ namespace FEAST
           {
             typename IndexSetHolderType::template IndexSet<2, face_dim_>::Type&
               idx(index_set_holder.template get_index_set<2, face_dim_>());
-            for(int j(0); j < idx.num_indices; ++j)
+            for(Index j(0); j < idx.num_indices; ++j)
             {
-              idx[0][j] = Index(j);
+              idx[0][j] = j;
             }
           }
     };
@@ -208,9 +208,9 @@ namespace FEAST
 
             for(Index i(0); i < Index(Shape::FaceTraits<ShapeType, cell_dim_>::count); ++i)
             {
-              for(int j(0); j < idx.num_indices; ++j)
+              for(Index j(0); j < idx.num_indices; ++j)
               {
-                idx[i][j] = Index(FimType::map(int(i), j));
+                idx[i][j] = Index(FimType::map(int(i), int(j)));
               }
             }
           }
@@ -220,7 +220,7 @@ namespace FEAST
           {
             typename IndexSetHolderType::template IndexSet<3, face_dim_>::Type&
               idx(index_set_holder.template get_index_set<3, face_dim_>());
-            for(int j(0); j < idx.num_indices; ++j)
+            for(Index j(0); j < idx.num_indices; ++j)
             {
               idx[0][j] = Index(j);
             }
