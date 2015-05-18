@@ -50,6 +50,8 @@ public:
     a.format();
     a(1,2,7);
     a(5,5,2);
+    a(5,7,3);
+    a(5,2,4);
     SparseMatrixCSR<Mem_, DT_, IT_> b(a);
     TEST_CHECK_EQUAL(b.used_elements(), a.used_elements());
     TEST_CHECK_EQUAL(b.size(), a.size());
@@ -57,6 +59,15 @@ public:
     TEST_CHECK_EQUAL(b.columns(), a.columns());
     TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
+    TEST_CHECK_EQUAL(b(5, 2), a(5, 2));
+    TEST_CHECK_EQUAL(b(1, 1), a(1, 1));
+    Index bandw, bandw_idx;
+    b.bandwidth_row(bandw, bandw_idx);
+    TEST_CHECK_EQUAL(bandw, Index(6));
+    TEST_CHECK_EQUAL(bandw_idx, Index(5));
+    b.bandwidth_column(bandw, bandw_idx);
+    TEST_CHECK_EQUAL(bandw, Index(5));
+    TEST_CHECK_EQUAL(bandw_idx, Index(2));
 
     SparseMatrixCSR<Mem_, DT_, IT_> bl(b.layout());
     TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
@@ -81,7 +92,7 @@ public:
 
     SparseMatrixCSR<Mem_, DT_, IT_> z;
     z.convert(b);
-    TEST_CHECK_EQUAL(z.used_elements(), 2ul);
+    TEST_CHECK_EQUAL(z.used_elements(), 4ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
     TEST_CHECK_EQUAL(z.columns(), a.columns());

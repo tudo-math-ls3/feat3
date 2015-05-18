@@ -1270,6 +1270,46 @@ namespace FEAST
       }
 
       /**
+       * \brief Retrieve maximum bandwidth among all rows.
+       *
+       * \param[out] bandw The maximum bandwidth.
+       * \param[out] bandw_i The row, where the bandwith is maximal.
+       */
+      void bandwidth_row(Index & bandw, Index & bandw_i)
+      {
+        SparseMatrixCSR<Mem::Main, DT_, IT_> tm;
+        tm.convert(*this);
+        bandw = 0;
+        bandw_i = 0;
+        for (Index row(0) ; row < rows() ; ++row)
+        {
+          if (tm.row_ptr()[row+1] == tm.row_ptr()[row])
+            continue;
+
+          Index temp = tm.col_ind()[tm.row_ptr()[row+1]-1] - tm.col_ind()[tm.row_ptr()[row]] + 1;
+          if(temp > bandw)
+          {
+            bandw = temp;
+            bandw_i = row;
+          }
+        }
+      }
+
+      /**
+       * \brief Retrieve maximum bandwidth among all columns.
+       *
+       * \param[out] bandw The maximum bandwidth.
+       * \param[out] bandw_i The column, where the bandwith is maximal.
+       */
+      void bandwidth_column(Index & bandw, Index & bandw_i)
+      {
+        SparseMatrixCSR<Mem::Main, DT_, IT_> tm;
+        tm.convert(*this);
+        tm.transpose(tm);
+        tm.bandwidth_row(bandw, bandw_i);
+      }
+
+      /**
        * \brief Returns a descriptive string.
        *
        * \returns A string describing the container.
