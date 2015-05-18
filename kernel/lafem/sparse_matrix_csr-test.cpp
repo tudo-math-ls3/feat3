@@ -61,6 +61,7 @@ public:
     TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
     TEST_CHECK_EQUAL(b(5, 2), a(5, 2));
     TEST_CHECK_EQUAL(b(1, 1), a(1, 1));
+
     Index bandw, bandw_idx;
     b.bandwidth_row(bandw, bandw_idx);
     TEST_CHECK_EQUAL(bandw, Index(6));
@@ -68,6 +69,14 @@ public:
     b.bandwidth_column(bandw, bandw_idx);
     TEST_CHECK_EQUAL(bandw, Index(5));
     TEST_CHECK_EQUAL(bandw_idx, Index(2));
+
+    Index radius, radius_idx;
+    b.radius_row(radius, radius_idx);
+    TEST_CHECK_EQUAL(radius, Index(3));
+    TEST_CHECK_EQUAL(radius_idx, Index(5));
+    b.radius_column(radius, radius_idx);
+    TEST_CHECK_EQUAL(radius, Index(3));
+    TEST_CHECK_EQUAL(radius_idx, Index(2));
 
     SparseMatrixCSR<Mem_, DT_, IT_> bl(b.layout());
     TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());

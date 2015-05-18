@@ -1273,7 +1273,7 @@ namespace FEAST
        * \brief Retrieve maximum bandwidth among all rows.
        *
        * \param[out] bandw The maximum bandwidth.
-       * \param[out] bandw_i The row, where the bandwith is maximal.
+       * \param[out] bandw_i The row, where the bandwidth is maximal.
        */
       void bandwidth_row(Index & bandw, Index & bandw_i)
       {
@@ -1299,7 +1299,7 @@ namespace FEAST
        * \brief Retrieve maximum bandwidth among all columns.
        *
        * \param[out] bandw The maximum bandwidth.
-       * \param[out] bandw_i The column, where the bandwith is maximal.
+       * \param[out] bandw_i The column, where the bandwidth is maximal.
        */
       void bandwidth_column(Index & bandw, Index & bandw_i)
       {
@@ -1307,6 +1307,60 @@ namespace FEAST
         tm.convert(*this);
         tm.transpose(tm);
         tm.bandwidth_row(bandw, bandw_i);
+      }
+
+      /**
+       * \brief Retrieve maximum radius among all rows.
+       *
+       * The radius is defined as the maximal distance to the main diagonal
+       *
+       * \param[out] radius The maximum radius.
+       * \param[out] radius_i The row, where the radius is maximal.
+       */
+      void radius_row(Index & radius, Index & radius_i)
+      {
+        SparseMatrixCSR<Mem::Main, DT_, IT_> tm;
+        tm.convert(*this);
+        radius = 0;
+        radius_i = 0;
+
+        for (Index row(0) ; row < rows() ; ++row)
+        {
+          if (tm.row_ptr()[row+1] == tm.row_ptr()[row])
+            continue;
+
+          if (tm.row_ptr()[row+1] > 0)
+          {
+            Index temp1 = tm.col_ind()[tm.row_ptr()[row+1]-1];
+            if(Math::max(temp1,row) - Math::min(temp1, row) > radius)
+            {
+              radius = Math::max(temp1,row) - Math::min(temp1, row);
+              radius_i = row;
+            }
+          }
+          Index temp2 = tm.col_ind()[tm.row_ptr()[row]];
+          if(Math::max(temp2,row) - Math::min(temp2, row) > radius)
+          {
+            radius = Math::max(temp2,row) - Math::min(temp2, row);
+            radius_i = row;
+          }
+        }
+      }
+
+      /**
+       * \brief Retrieve maximum radius among all column.
+       *
+       * The radius is defined as the maximal distance to the main diagonal
+       *
+       * \param[out] radius The maximum radius.
+       * \param[out] radius_i The column, where the radius is maximal.
+       */
+      void radius_column(Index & radius, Index & radius_i)
+      {
+        SparseMatrixCSR<Mem::Main, DT_, IT_> tm;
+        tm.convert(*this);
+        tm.transpose(tm);
+        tm.radius_row(radius, radius_i);
       }
 
       /**
