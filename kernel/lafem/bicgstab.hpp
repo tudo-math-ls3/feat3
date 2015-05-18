@@ -197,7 +197,7 @@ namespace FEAST
         do
         {
           //rdefect(b, A, x);
-          Aapply(r, x, b, -DT_(1));
+          A.apply(r, x, b, -DT_(1));
           filter.filter_def(r);
 
           defnorm_0 = r.norm2();
@@ -212,7 +212,7 @@ namespace FEAST
           r_tilde.copy(r_tilde_0);
           p_tilde.copy(r_tilde_0);
 
-          rho_tilde = r_tilde_0dot(r_tilde_0);
+          rho_tilde = r_tilde_0.dot(r_tilde_0);
 
           // main BiCGStab loop
           do
@@ -220,12 +220,12 @@ namespace FEAST
             iter = iter + 1;
 
             //vproduct_matvec(A, p_tilde);
-            Aapply(v, p_tilde);
+            A.apply(v, p_tilde);
             filter.filter_def(v);
             precon.apply(v_tilde, v);
             filter.filter_cor(v_tilde);
 
-            gamma_tilde = v_tildedot(r_tilde_0);
+            gamma_tilde = v_tilde.dot(r_tilde_0);
 
             if (Math::abs(gamma_tilde) < Math::abs(rho_tilde)*1e-14)
             {
@@ -245,29 +245,29 @@ namespace FEAST
             }
 
             DT_ malpha_tilde(-alpha_tilde);
-            saxpy(v, r, malpha_tilde);
+            s.axpy(v, r, malpha_tilde);
 
             defnorm = s.norm2();
             if (defnorm < eps_relative * defnorm_00)
             {
-              xaxpy(p_tilde, x, alpha_tilde);
+              x.axpy(p_tilde, x, alpha_tilde);
 
               //early_exit = 1;
               converged = 1;
               //std::cout << "Breakpoint 3 (converged)" << std::endl;
               break;
             }
-            s_tildeaxpy(v_tilde, r_tilde, malpha_tilde);
+            s_tilde.axpy(v_tilde, r_tilde, malpha_tilde);
 
             //tproduct_matvec(A, s_tilde);
-            Aapply(t, s_tilde);
+            A.apply(t, s_tilde);
             filter.filter_def(t);
 
             precon.apply(t_tilde, t);
             filter.filter_cor(t_tilde);
 
-            gamma_tilde = t_tildedot(t_tilde);
-            omega_tilde = t_tildedot(s_tilde);
+            gamma_tilde = t_tilde.dot(t_tilde);
+            omega_tilde = t_tilde.dot(s_tilde);
 
             if (Math::abs(gamma_tilde) < Math::abs(omega_tilde) * 1e-14)
             {
@@ -277,11 +277,11 @@ namespace FEAST
             }
             omega_tilde = omega_tilde / gamma_tilde;
 
-            xaxpy(s_tilde, x, omega_tilde);
-            xaxpy(p_tilde, x, alpha_tilde);
+            x.axpy(s_tilde, x, omega_tilde);
+            x.axpy(p_tilde, x, alpha_tilde);
 
             DT_ momega_tilde(-omega_tilde);
-            raxpy(t, s, momega_tilde);
+            r.axpy(t, s, momega_tilde);
 
             defnorm = r.norm2();
             if (defnorm < eps_relative * defnorm_00)
@@ -291,16 +291,16 @@ namespace FEAST
               break;
             }
 
-            r_tildeaxpy(t_tilde, s_tilde, momega_tilde);
+            r_tilde.axpy(t_tilde, s_tilde, momega_tilde);
 
             rho_tilde_old = rho_tilde;
-            rho_tilde = r_tildedot(r_tilde_0);
+            rho_tilde = r_tilde.dot(r_tilde_0);
 
             beta_tilde = (alpha_tilde / omega_tilde) * (rho_tilde / rho_tilde_old);
 
-            p_tildeaxpy(v_tilde, p_tilde, momega_tilde);
-            p_tildescale(p_tilde, beta_tilde);
-            p_tildeaxpy(p_tilde, r_tilde);
+            p_tilde.axpy(v_tilde, p_tilde, momega_tilde);
+            p_tilde.scale(p_tilde, beta_tilde);
+            p_tilde.axpy(p_tilde, r_tilde);
 
           } while (iter <= max_iters);
 
