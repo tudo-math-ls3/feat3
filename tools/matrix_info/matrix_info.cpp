@@ -58,24 +58,24 @@ namespace MatrixInfo
           SparseMatrixELL<MemType, DataType, IndexType> mtmp;
           mtmp.read_from(file_mode, filename);
           matrix.convert(mtmp);
+          return true;
         }
-        return true;
 
       case FileMode::fm_coo:
         {
           SparseMatrixCOO<MemType, DataType, IndexType> mtmp;
           mtmp.read_from(file_mode, filename);
           matrix.convert(mtmp);
+          return true;
         }
-        return true;
 
       case FileMode::fm_bm:
         {
           SparseMatrixBanded<MemType, DataType, IndexType> mtmp;
           mtmp.read_from(file_mode, filename);
           matrix.convert(mtmp);
+          return true;
         }
-        return true;
 
       default:
         return false;
