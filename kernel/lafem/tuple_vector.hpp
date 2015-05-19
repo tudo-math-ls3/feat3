@@ -124,10 +124,52 @@ namespace FEAST
       /// deleted copy-assign operator
       TupleVector& operator=(const TupleVector&) = delete;
 
-      /// Creates and returns a deep copy of this vector.
+      /**
+       * \brief Creates and returns a copy of this vector
+       *
+       * \param[in] clone_mode
+       * Determines the type of clone returned (shallow, weak, layout, deep)
+       *
+       */
+      TupleVector clone(CloneMode clone_mode) const
+      {
+        return TupleVector(_first.clone(clone_mode), _rest.clone(clone_mode));
+      }
+
+      /**
+       * \brief Creates and returns a copy of this vector
+       *
+       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
+       *
+       */
       TupleVector clone() const
       {
         return TupleVector(_first.clone(), _rest.clone());
+      }
+
+      /**
+       * \brief Turns this vector into a clone of other
+       *
+       * \param[in] clone_mode
+       * Determines the type of clone returned (shallow, weak, layout, deep)
+       *
+       */
+      void clone(const TupleVector& other, CloneMode clone_mode)
+      {
+        _first.clone(other._first, clone_mode);
+        _rest.clone(other._rest, clone_mode);
+      }
+
+      /**
+       * \brief Turns this vector into a clone of other
+       *
+       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
+       *
+       */
+      void clone(const TupleVector& other)
+      {
+        _first.clone(other._first);
+        _rest.clone(other._rest);
       }
 
       /// \cond internal
@@ -199,6 +241,13 @@ namespace FEAST
       {
         first().format(value);
         rest().format(value);
+      }
+
+      /// Clears the vector
+      void clear()
+      {
+        first().clear();
+        rest().clear();
       }
 
       //template<typename First2_, typename... Rest2_>
@@ -382,12 +431,49 @@ namespace FEAST
       /// deleted copy-assign operator
       TupleVector& operator=(const TupleVector&) = delete;
 
-      /// Creates and returns a deep copy of this vector.
+      /**
+       * \brief Creates and returns a copy of this vector
+       *
+       * \param[in] clone_mode
+       * Determines the type of clone returned (shallow, weak, layout, deep)
+       *
+       */
+      TupleVector clone(CloneMode clone_mode) const
+      {
+        return TupleVector(_first.clone(clone_mode));
+      }
+
+      /**
+       * \brief Creates and returns a copy of this vector
+       *
+       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
+       */
       TupleVector clone() const
       {
-        First_ f;
-        f.clone(_first);
-        return TupleVector(std::move(f));
+        return TupleVector(_first.clone());
+      }
+
+      /**
+       * \brief Turns this vector into a clone of other
+       *
+       * \param[in] clone_mode
+       * Determines the type of clone returned (shallow, weak, layout, deep)
+       *
+       */
+      void clone(const TupleVector& other, CloneMode clone_mode)
+      {
+        _first.clone(other._first, clone_mode);
+      }
+
+      /**
+       * \brief Turns this vector into a clone of other
+       *
+       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
+       *
+       */
+      void clone(const TupleVector& other)
+      {
+        _first.clone(other._first);
       }
 
       First_& first()
@@ -434,6 +520,11 @@ namespace FEAST
       void format(DataType value = DataType(0))
       {
         _first.format(value);
+      }
+
+      void clear()
+      {
+        _first.clear();
       }
 
       //template<typename First2_>

@@ -130,11 +130,50 @@ namespace FEAST
       }
 
       /**
-       * \brief Creates and returns a deep copy of this vector.
+       * \brief Creates and returns a copy of this vector
+       *
+       * \param[in] clone_mode
+       * Determines the type of clone returned (shallow, weak, layout, deep)
+       *
+       */
+      PowerVector clone(CloneMode clone_mode) const
+      {
+        return PowerVector(_first.clone(clone_mode), _rest.clone(clone_mode));
+      }
+
+      /**
+       * \brief Creates and returns a copy of this vector
+       *
+       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
        */
       PowerVector clone() const
       {
         return PowerVector(_first.clone(), _rest.clone());
+      }
+
+      /**
+       * \brief Turns this vector into a clone of other
+       *
+       * \param[in] clone_mode
+       * Determines the type of clone returned (shallow, weak, layout, deep)
+       *
+       */
+      void clone(const PowerVector& other, CloneMode clone_mode)
+      {
+        _first.clone(other._first, clone_mode);
+        _rest.clone(other._rest, clone_mode);
+      }
+
+      /**
+       * \brief Turns this vector into a clone of other
+       *
+       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
+       *
+       */
+      void clone(const PowerVector& other)
+      {
+        _first.clone(other._first);
+        _rest.clone(other._rest);
       }
 
       /**
@@ -473,9 +512,49 @@ namespace FEAST
       {
       }
 
+      /**
+       * \brief Creates and returns a copy of this vector
+       *
+       * \param[in] clone_mode
+       * Determines the type of clone returned (shallow, weak, layout, deep)
+       *
+       */
+      PowerVector clone(CloneMode clone_mode) const
+      {
+        return PowerVector(_first.clone(clone_mode));
+      }
+
+      /**
+       * \brief Creates and returns a copy of this vector
+       *
+       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
+       */
       PowerVector clone() const
       {
         return PowerVector(_first.clone());
+      }
+
+      /**
+       * \brief Turns this vector into a clone of other
+       *
+       * \param[in] clone_mode
+       * Determines the type of clone returned (shallow, weak, layout, deep)
+       *
+       */
+      void clone(const PowerVector& other, CloneMode clone_mode)
+      {
+        _first.clone(other._first, clone_mode);
+      }
+
+      /**
+       * \brief Turns this vector into a clone of other
+       *
+       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
+       *
+       */
+      void clone(const PowerVector& other)
+      {
+        _first.clone(other._first);
       }
 
       template<Index i>
