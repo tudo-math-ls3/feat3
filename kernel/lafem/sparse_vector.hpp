@@ -10,6 +10,7 @@
 #include <kernel/lafem/vector_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/adjacency/permutation.hpp>
 
 namespace FEAST
 {
@@ -731,6 +732,26 @@ namespace FEAST
       const Index & sorted() const
       {
         return this->_scalar_index.at(4);
+      }
+
+      /// Permutate vector according to the given Permutation
+      void permute(Adjacency::Permutation & perm)
+      {
+        SparseVector<Mem::Main, DT_, IT_> local;
+        local.convert(*this);
+        SparseVector<Mem::Main, DT_, IT_> target(this->size());
+
+        Index perm_size(perm.size());
+        const Index * const perm_pos(perm.get_perm_pos());
+        for (Index i(0) ; i < perm_size ; ++i)
+        {
+          Index source_i(perm_pos[i]);
+          if (local(source_i) != zero_element())
+          {
+            target(i, local(source_i));
+          }
+        }
+        this->assign(target);
       }
 
       /**

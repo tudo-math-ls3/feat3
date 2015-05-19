@@ -51,6 +51,15 @@ public:
     TEST_CHECK_EQUAL(a(5), DT_(6));
     TEST_CHECK_EQUAL(a(6), DT_(8));
 
+    Random rng;
+    Adjacency::Permutation prm_rnd(a.size(), rng);
+    SparseVector<Mem_, DT_, IT_> ap(a.clone());
+    ap.permute(prm_rnd);
+    prm_rnd = prm_rnd.inverse();
+    ap.permute(prm_rnd);
+    TEST_CHECK_EQUAL(ap, a);
+    TEST_CHECK_EQUAL(ap.used_elements(), Index(3));
+
     std::stringstream ts;
     a.write_out(FileMode::fm_mtx, ts);
     SparseVector<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);

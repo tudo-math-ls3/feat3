@@ -122,6 +122,7 @@ namespace FEAST
       {
         return _sv;
       }
+
       const SparseVector<Mem_, DT_, IT_>& get_filter_vector() const
       {
         return _sv;

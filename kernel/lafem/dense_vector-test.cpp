@@ -100,6 +100,13 @@ public:
     TEST_CHECK_EQUAL(a(1), DT_(8));
     TEST_CHECK_EQUAL(a(2), DT_(41));
 
+    Random rng;
+    Adjacency::Permutation prm_rnd(a.size(), rng);
+    DenseVector<Mem_, DT_, IT_> ap(a.clone());
+    ap.permute(prm_rnd);
+    prm_rnd = prm_rnd.inverse();
+    ap.permute(prm_rnd);
+    TEST_CHECK_EQUAL(ap, a);
 
     DenseVector<Mem_, DT_, IT_> k(123);
     for (Index i(0) ; i < k.size() ; ++i)

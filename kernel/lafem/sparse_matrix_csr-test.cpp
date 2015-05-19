@@ -610,8 +610,9 @@ public:
       a.apply(r, x);
       DT_ ref_norm = r.norm2();
 
-      //crashes with CUDA
-      Adjacency::Graph graph(Adjacency::rt_as_is, a);
+      SparseMatrixCSR<Mem::Main, DT_, IT_> a_main;
+      a_main.convert(a);
+      Adjacency::Graph graph(Adjacency::rt_as_is, a_main);
 
       Adjacency::Permutation perm = Adjacency::CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_desc);
 
@@ -634,9 +635,9 @@ SparseMatrixCSRPermuteTest<Mem::Main, double, unsigned int> sm_csr_permute_test_
 SparseMatrixCSRPermuteTest<Mem::Main, __float128, unsigned long> sm_csr_permute_test_float128_ulong;
 SparseMatrixCSRPermuteTest<Mem::Main, __float128, unsigned int> sm_csr_permute_test_float128_uint;
 #endif
-/*#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAST_BACKENDS_CUDA
 SparseMatrixCSRPermuteTest<Mem::CUDA, float, unsigned long> cuda_sm_csr_permute_test_float_ulong;
 SparseMatrixCSRPermuteTest<Mem::CUDA, double, unsigned long> cuda_sm_csr_permute_test_double_ulong;
 SparseMatrixCSRPermuteTest<Mem::CUDA, float, unsigned int> cuda_sm_csr_permute_test_float_uint;
 SparseMatrixCSRPermuteTest<Mem::CUDA, double, unsigned int> cuda_sm_csr_permute_test_double_uint;
-#endif*/
+#endif

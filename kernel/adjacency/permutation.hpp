@@ -4,11 +4,10 @@
 
 // includes, FEAST
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/random.hpp>
 
 namespace FEAST
 {
-  class Random;
-
   namespace Adjacency
   {
     /**

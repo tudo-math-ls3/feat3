@@ -1,6 +1,5 @@
 #include <test_system/test_system.hpp>
 #include <kernel/adjacency/permutation.hpp>
-#include <kernel/util/random.hpp>
 #include <iostream>
 #include <ctime>
 #include <stdlib.h>
