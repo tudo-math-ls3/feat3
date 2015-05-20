@@ -327,7 +327,7 @@ namespace FEAST
           {
             // get the vertex-index-vector of cell j:
             // loop over all indices of the cell-vertex-vector
-            for(Index k(0); k < IndexTreeType::num_indices; ++k)
+            for(Index k(0); k < Index(IndexTreeType::num_indices); ++k)
             {
               current_face_indices[k]  = current_cell_in[FimType::map(int(j), int(k))];
             }
