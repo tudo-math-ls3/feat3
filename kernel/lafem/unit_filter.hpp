@@ -218,6 +218,9 @@ namespace FEAST
       ///\cond internal
       void filter_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
       {
+        if(_sv.size() != matrix.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+
         const Index* row_ptr(matrix.row_ptr());
         const Index* col_idx(matrix.col_ind());
         DT_* v(matrix.val());
@@ -235,6 +238,9 @@ namespace FEAST
 
       void filter_offdiag_row_mat(SparseMatrixCSR<Mem::Main, DT_, IT_> & matrix) const
       {
+        if(_sv.size() != matrix.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+
         const Index* row_ptr(matrix.row_ptr());
         DT_* v(matrix.val());
 
@@ -256,6 +262,9 @@ namespace FEAST
 
       void filter_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
       {
+        if(_sv.size() != matrix.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+
         const Index tused_elements(matrix.used_elements());
         const Index* row_idx(matrix.row_indices());
         const Index* col_idx(matrix.column_indices());
@@ -280,6 +289,9 @@ namespace FEAST
 
       void filter_offdiag_row_mat(SparseMatrixCOO<Mem::Main, DT_, IT_> & matrix) const
       {
+        if(_sv.size() != matrix.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+
         const Index tused_elements(matrix.used_elements());
         const Index* row_idx(matrix.row_indices());
         DT_* v(matrix.val());
@@ -308,6 +320,9 @@ namespace FEAST
 
       void filter_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
+        if(_sv.size() != matrix.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+
         const Index tC(matrix.C());
         const Index * pcs(matrix.cs());
         const Index * pcol_ind(matrix.col_ind());
@@ -326,6 +341,9 @@ namespace FEAST
 
       void filter_offdiag_row_mat(SparseMatrixELL<Mem::Main, DT_, IT_> & matrix) const
       {
+        if(_sv.size() != matrix.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+
         const Index tC(matrix.C());
         const Index * pcs(matrix.cs());
         DT_* pval(matrix.val());
@@ -355,6 +373,8 @@ namespace FEAST
        */
       void filter_rhs(DenseVector<Mem_, DT_, IT_> & vector) const
       {
+        if(_sv.size() != vector.size())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
           Arch::UnitFilter<Mem_>::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
       }
@@ -379,6 +399,8 @@ namespace FEAST
        */
       void filter_def(DenseVector<Mem_, DT_, IT_> & vector) const
       {
+        if(_sv.size() != vector.size())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
           Arch::UnitFilter<Mem_>::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
       }

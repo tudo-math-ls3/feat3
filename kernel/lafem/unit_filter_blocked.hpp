@@ -256,6 +256,9 @@ namespace FEAST
       template<Index BlockWidth_>
       void filter_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
+        if(_sv.size() != matrix.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+
         const Index* row_ptr(matrix.row_ptr());
         const Index* col_idx(matrix.col_ind());
         typename SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_>::ValueType* v(matrix.val());
@@ -279,6 +282,9 @@ namespace FEAST
       template<Index BlockWidth_>
       void filter_offdiag_row_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
+        if(_sv.size() != matrix.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
+
         const Index* row_ptr(matrix.row_ptr());
         DT_* v(matrix.val());
 
@@ -308,8 +314,11 @@ namespace FEAST
        */
       void filter_rhs(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
       {
-        Arch::UnitFilterBlocked<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
-          (vector.raw_elements(), _sv.raw_elements(), _sv.indices(), _sv.used_elements());
+        if(_sv.size() != vector.size())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        if(_sv.used_elements() > Index(0))
+          Arch::UnitFilterBlocked<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
+            (vector.raw_elements(), _sv.raw_elements(), _sv.indices(), _sv.used_elements());
       }
 
       /**
@@ -332,8 +341,11 @@ namespace FEAST
        */
       void filter_def(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
       {
-        Arch::UnitFilterBlocked<Mem_>::template filter_def<DT_, IT_, BlockSize_>
-          (vector.raw_elements(), _sv.indices(), _sv.used_elements() );
+        if(_sv.size() != vector.size())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+        if(_sv.used_elements() > Index(0))
+          Arch::UnitFilterBlocked<Mem_>::template filter_def<DT_, IT_, BlockSize_>
+            (vector.raw_elements(), _sv.indices(), _sv.used_elements() );
       }
 
       /**
