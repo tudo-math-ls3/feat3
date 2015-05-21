@@ -6,7 +6,7 @@ This page describes small utility programms, located in the tools subfolder
 The tool <c>matrix-info</c> (located in the <c>tools/matrix_info</c> folder) is
 a small tool for getting information about a given matrix.\n
 The documentation of this tool can be found on the
-\refitem tools_matrix_info matrix-info tool page.
+\ref tools_matrix_info page.
 
 \section tools_sec_io File conversion
 - csr2ell
