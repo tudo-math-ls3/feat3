@@ -137,7 +137,7 @@ namespace FEAST
         CONTEXT("When creating SparseVector");
 
         if (indices_in.size() != elements_in.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
 
         this->_scalar_index.push_back(elements_in.size());
         this->_scalar_index.push_back(elements_in.size());

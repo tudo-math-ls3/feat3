@@ -14,7 +14,6 @@ namespace FEAST
   namespace Geometry
   {
     /// \cond internal
-    /// Forward declarations of things to come
     namespace Intern
     {
       template<typename Shape_>

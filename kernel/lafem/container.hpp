@@ -175,13 +175,13 @@ namespace FEAST
           return;
 
         if (_elements.size() != other.get_elements().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
         if (_indices.size() != other.get_indices().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
         if (_scalar_index.size() != other.get_scalar_index().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
         if (_scalar_dt.size() != other.get_scalar_dt().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
 
         this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
         this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
@@ -189,14 +189,14 @@ namespace FEAST
         for (Index i(0) ; i < _elements.size() ; ++i)
         {
           if (_elements_size.at(i) != other.get_elements_size().at(i))
-            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
           Util::MemoryPool<Mem_>::template copy<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
         }
 
         for (Index i(0) ; i < _indices.size() ; ++i)
         {
           if (_indices_size.at(i) != other.get_indices_size().at(i))
-            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
           Util::MemoryPool<Mem_>::template copy<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
         }
       }
@@ -205,13 +205,13 @@ namespace FEAST
       void _copy_content(const Container<Mem2_, DT_, IT_> & other)
       {
         if (_elements.size() != other.get_elements().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
         if (_indices.size() != other.get_indices().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
         if (_scalar_index.size() != other.get_scalar_index().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
         if (_scalar_dt.size() != other.get_scalar_dt().size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
 
         this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
         this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
@@ -219,7 +219,7 @@ namespace FEAST
         for (Index i(0) ; i < _elements.size() ; ++i)
         {
           if (_elements_size.at(i) != other.get_elements_size().at(i))
-            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
           if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
             Util::MemoryPool<Mem2_>::template download<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
           else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
@@ -231,7 +231,7 @@ namespace FEAST
         for (Index i(0) ; i < _indices.size() ; ++i)
         {
           if (_indices_size.at(i) != other.get_indices_size().at(i))
-            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size mismatch!");
           if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
             Util::MemoryPool<Mem2_>::template download<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
           else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
@@ -411,7 +411,7 @@ namespace FEAST
         {
           gsize += tc._indices_size.at(i) * sizeof(IT2_); // actual array sizes
         }
-        gsize +=16; //padding for datatype alignment missmatch
+        gsize +=16; //padding for datatype alignment mismatch
 
         std::vector<char> result((size_t(gsize)));
         char * array(result.data());

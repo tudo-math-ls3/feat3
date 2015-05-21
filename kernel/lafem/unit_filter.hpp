@@ -67,7 +67,7 @@ namespace FEAST
         _sv(size_in, values, indices)
       {
         if (values.size() != indices.size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size missmatch!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
       }
 
       /// move-ctor
