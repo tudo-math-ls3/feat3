@@ -78,12 +78,14 @@ namespace FEAST
       /**
        * \brief Constructor.
        *
+       * \param[in] size The size of the created filter.
        * \param[in] values DenseVector containing element values
        * \param[in] indices DenseVector containing element indices
        */
-      explicit UnitFilterBlocked(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & values,
+      explicit UnitFilterBlocked(Index size_in,
+                                 DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & values,
                                  DenseVectorBlocked<Mem_, IT_, IT_, BlockSize_> & indices) :
-        _sv(values.size(), values, indices)
+        _sv(size_in, values, indices)
       {
         if (values.size() != indices.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size missmatch!");

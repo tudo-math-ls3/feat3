@@ -59,11 +59,12 @@ namespace FEAST
       /**
        * \brief Constructor.
        *
+       * \param[in] size The size of the created filter.
        * \param[in] values DenseVector containing element values
        * \param[in] indices DenseVector containing element indices
        */
-      explicit UnitFilter(DenseVector<Mem_, DT_, IT_> & values, DenseVector<Mem_, IT_, IT_> & indices) :
-        _sv(values.size(), values, indices)
+      explicit UnitFilter(Index size_in, DenseVector<Mem_, DT_, IT_> & values, DenseVector<Mem_, IT_, IT_> & indices) :
+        _sv(size_in, values, indices)
       {
         if (values.size() != indices.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size missmatch!");

@@ -41,7 +41,7 @@ public:
     DenseVector<Mem::Main, IndexType, IndexType> idx(2);
     idx(0, 0);
     idx(1, m-1);
-    UnitFilter<Mem::Main, DataType, IndexType> unit_filter(fv, idx);
+    UnitFilter<Mem::Main, DataType, IndexType> unit_filter(m, fv, idx);
 
     // create vectors for mean-filter
     DenseVector<Mem::Main, DataType, IndexType> mfv(m, DataType(1)), mfw(m, DataType(0));
