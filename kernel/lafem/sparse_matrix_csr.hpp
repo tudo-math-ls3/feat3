@@ -682,7 +682,6 @@ namespace FEAST
       void convert(const MT_ & a)
       {
         CONTEXT("When converting SparseMatrixCSR");
-        std::cerr<<"Warning: Generic matrix convert used!"<<std::endl;
 
         typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
         ta.convert(a);

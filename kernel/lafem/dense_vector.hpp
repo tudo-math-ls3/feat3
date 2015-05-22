@@ -396,7 +396,6 @@ namespace FEAST
       {
         CONTEXT("When converting DenseVector");
 
-        std::cerr<<"Warning: Generic vector convert used!"<<std::endl;
         this->template _convert<VT_>(a);
       }
 
