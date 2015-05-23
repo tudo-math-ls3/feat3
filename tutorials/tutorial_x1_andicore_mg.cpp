@@ -33,15 +33,15 @@
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
 // FEAST-Assembly includes
-#include <kernel/assembly/linear_functional.hpp>           // NEW: for LinearOperator
-#include <kernel/assembly/bilinear_operator.hpp>           // NEW: for BilinearOperator
+#include <kernel/assembly/linear_functional.hpp>           // for LinearOperator
+#include <kernel/assembly/bilinear_operator.hpp>           // for BilinearOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
 #include <kernel/assembly/dirichlet_assembler.hpp>         // for DirichletAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
 #include <kernel/assembly/common_functions.hpp>            // for SineBubbleFunction
-#include <kernel/assembly/grid_transfer.hpp>
+#include <kernel/assembly/grid_transfer.hpp>               // for GridTransfer
 
 // FEAST-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
@@ -49,10 +49,10 @@
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
 // FEAST-LAFEM provisional solver includes
-#include <kernel/lafem/preconditioner.hpp>                 // for NonePreconditioner
-#include <kernel/lafem/bicgstab.hpp>                       // for BiCGStab
+#include <kernel/lafem/preconditioner.hpp>                 // for JacobiPreconditioner
+#include <kernel/lafem/proto_solver.hpp>                   // for BiCGStabSolver
 
-// we need std::vector because we keep track of the hierarchy through it, mostly because we're lazy
+// we need std::vector as a container for our level hierarchy
 #include <vector>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -409,8 +409,6 @@ namespace TutorialX1
 
   //
   // Now we need a class to keep track of multigrid levels.
-  // Since we are lazy, we just wrap up pointers/references to all level-dependent information
-  // here, and decide that we couldn't care less otherwise.
   //
   // See the main() below on how this class is actually supposed to be used.
   //
@@ -433,9 +431,8 @@ namespace TutorialX1
     // Define the filter type
     typedef LAFEM::UnitFilter<MemType, DataType> FilterType;
 
-    // Define the preconditioner, aka the smoother (because smoothing is
-    // realised as a preconditioned Richardson "solve")
-    typedef LAFEM::Preconditioner<MatrixType, VectorType> SmootherType;
+    // Define the smoother; this is the base-class for all solvers and preconditioners
+    typedef LAFEM::SolverInterface<VectorType> SmootherType;
 
     // Define everything that is actually needed:
     MeshType mesh;
@@ -457,7 +454,7 @@ namespace TutorialX1
     MatrixType mat_prol;
     MatrixType mat_rest;
 
-    // A pointer for our smoother and/or coarse mesh preconditioner
+    // A pointer for our smoother or coarse mesh preconditioner
     SmootherType* smoother;
 
   public:
@@ -578,6 +575,8 @@ namespace TutorialX1
     // You guess: sets the smoother for this level
     void set_smoother(SmootherType* new_smoother)
     {
+      if(smoother != nullptr)
+        delete smoother;
       smoother = new_smoother;
     }
 
@@ -604,7 +603,7 @@ namespace TutorialX1
       for(Index i(0); i < numsteps; ++i)
       {
         // apply smoother
-        smoother->apply(vec_cor, vec_def);
+        smoother->solve(vec_cor, vec_def);
         // apply correction filter
         filter.filter_cor(vec_cor);
         // update solution vector
@@ -720,10 +719,31 @@ namespace TutorialX1
     {
       (*it)->assemble_system(andicore_data);
 
-      // create smoother
+      // create a damped Jacobi smoother
       (*it)->set_smoother(
-        new LAFEM::JacobiPreconditioner<SystemLevel::MatrixType, SystemLevel::VectorType>((*it)->mat_sys, 0.7)
+        new LAFEM::PreconWrapper<SystemLevel::MatrixType, LAFEM::JacobiPreconditioner>((*it)->mat_sys, 0.7)
       );
+    }
+
+    // now let's create a coarse-grid solver
+    // we use a BiCGStab solver and utilise the Jacobi smoother on the coarse grid as a preconditioner
+    // Note: We need to create the coarse grid solver on the heap because it references data which
+    // is owned by our level objects. These are going to be deleted at the end of this function and,
+    // if we created the solver on the stack, it would have orphaned references afterwards.
+    LAFEM::BiCGStabSolver<SystemLevel::MatrixType, SystemLevel::FilterType>* coarse_solver =
+      new LAFEM::BiCGStabSolver<SystemLevel::MatrixType, SystemLevel::FilterType>
+        (levels.front()->mat_sys, levels.front()->filter, levels.front()->smoother);
+
+    // configure the coarse grid solver
+    coarse_solver->set_tol_rel(1E-5);
+    coarse_solver->set_max_iter(50);
+
+    // let's initialise the coarse grid solver
+    if(!coarse_solver->init())
+    {
+      // this shouldn't have happened...
+      std::cerr << "ERROR: Failed to initialse coarse grid solver!" << std::endl;
+      return 1;
     }
 
     // assemble rhs/sol on finest level
@@ -731,7 +751,7 @@ namespace TutorialX1
 
     // compute initial defect
     DataType def_init = levels.back()->compute_defect();
-    std::cout << "Iteration 0 | Defect: " << scientify(def_init) << std::endl;
+    std::cout << "Iteration   0 | Defect: " << scientify(def_init) << std::endl;
 
     // the main multigrid loop
     for(Index iter(1); iter <= 20; ++iter)
@@ -745,14 +765,13 @@ namespace TutorialX1
         levels.at(j)->restrict_def(*levels.at(j-1));
       }
 
-      // coarse grid solve utilising the level's "smoother" as a preconditioner
-      LAFEM::BiCGStab::value(
-        levels.front()->vec_sol,    // the iteration (solution) vector
-        levels.front()->mat_sys,    // the system matrix
-        levels.front()->vec_rhs,    // the rhs vector
-         *levels.front()->smoother, // the preconditioner
-         50,                        // maximum number of iteration
-         1E-5);                     // relative stopping criterion
+      // apply the coarse grid solver and check its status
+      LAFEM::SolverStatus cgs_status = coarse_solver->solve(levels.front()->vec_sol, levels.front()->vec_rhs);
+      if(!status_success(cgs_status))
+      {
+        std::cerr << "ERROR: Coarse grid solver broke down!" << std::endl;
+        break;
+      }
 
       // prolongation loop
       for(std::size_t j(1); j < levels.size(); ++j)
@@ -767,12 +786,16 @@ namespace TutorialX1
 
       // compute new defect
       DataType def = levels.back()->compute_defect();
-      std::cout << "Iteration " << iter << " | Defect: " << scientify(def) << std::endl;
+      std::cout << "Iteration " << stringify(iter).pad_front(3) << " | Defect: " << scientify(def) << std::endl;
 
       // check for relative stopping criterion
-      if(def / def_init < 1E-8)
+      if(def < 1E-8 * def_init)
         break;
     }
+
+    // release and delete our coarse-grid solver
+    coarse_solver->done();
+    delete coarse_solver;
 
     // compute errors
     levels.back()->compute_errors();
