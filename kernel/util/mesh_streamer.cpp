@@ -1896,7 +1896,7 @@ namespace FEAST
       if ( !mesh_data.chart.empty() )
         ofs << "chart " << mesh_data.chart << std::endl;
     }
-    ofs << "type " << mesh_data.convert_mesh_type(mesh_data.mesh_type) << std::endl;
+    ofs << " type " << mesh_data.convert_mesh_type(mesh_data.mesh_type) << std::endl;
     ofs << "shape " << mesh_data.convert_shape_type(mesh_data.shape_type) << std::endl;
     if(mesh_data.coord_per_vertex!=0)
       ofs << "coords " << mesh_data.coord_per_vertex << std::endl;
@@ -1944,7 +1944,7 @@ namespace FEAST
     {
       for (Index j(0); j < mesh_data.coord_per_vertex ; ++j)
       {
-        ofs << (mesh_data.coords[i])[j] << " ";
+        ofs  << " " << (mesh_data.coords[i])[j];
       }
       ofs << std::endl;
     }

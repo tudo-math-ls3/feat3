@@ -36,7 +36,7 @@ namespace FEAST
        * function template.
        *
        * \tparam cell_dim_
-       * The cell dimesnion parameter as passed to the CellSubSet::get_target_set() function template.
+       * The cell dimension parameter as passed to the CellSubSet::get_target_set() function template.
        */
       template<int cell_dim_>
       struct TargetSet

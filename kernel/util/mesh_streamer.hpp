@@ -104,7 +104,7 @@ namespace FEAST
        * The number of lines that has been read when the programme is done.
        */
       Index _parse_parents_chunk(Index cur_line, std::istream& ifs, String line);
-    };
+    }; // class MeshStreamer::BaseContainer
 
     /**
      * \brief Mesh data container class
@@ -157,18 +157,15 @@ namespace FEAST
       };
 
     public:
-
-      // basic information
+      /// Name of the chart file that contains an analytic description of the geometry
       String chart;
-
-      // mesh data
+      /// Mesh data
       MeshType mesh_type;
+      /// Shape of the mesh
       ShapeType shape_type;
-
-      // coordinates
+      /// Coordinates
       CoordStack coords;
-
-      // adjacencies
+      /// Adjacencies: Adjacency[i][j] contains which entities of dimension i lie at entities of dimension j
       AdjStack adjacencies[4][4];
 
     public:
