@@ -50,6 +50,7 @@ if (FEAST_BACKENDS_MKL)
     libmkl_intel_ilp64.a
     libmkl_sequential.a
     libmkl_core.a
+    pthread
   )
 endif(FEAST_BACKENDS_MKL)
 
