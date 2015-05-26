@@ -3,7 +3,7 @@
 #define KERNEL_UTIL_MATH_HPP 1
 
 // includes, FEAST
-#include <kernel/base_header.hpp>
+#include <kernel/util/type_traits.hpp>
 
 // includes, system
 #include <cmath>
@@ -40,7 +40,7 @@ extern "C"
     inline double func(double x, double y) {return std::func(x,y);} \
     inline long double func(long double x, long double y) {return std::func(x,y);}
 
-    // double argument function wrapper
+    // double argument function wrapper, second argument is pointer
 #define WRAP_STD_MATH2PTR(func) \
     inline float func(float x, float* y) {return std::func(x,y);} \
     inline double func(double x, double* y) {return std::func(x,y);} \
@@ -183,6 +183,8 @@ namespace FEAST
     template<typename T_>
     inline T_ sqrt(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "sqrt can only be applied to floating point types");
+
       if(x <= T_(0))
         return T_(0);
 
@@ -215,6 +217,8 @@ namespace FEAST
     template<typename T_>
     inline T_ sin(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "sin can only be applied to floating point types");
+
       // use the exponential sum formula:
       //           infty        x^(2*n+1)
       // sin(x) :=  sum (-1)^n -----------
@@ -248,6 +252,8 @@ namespace FEAST
     template<typename T_>
     inline T_ cos(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "cos can only be applied to floating point types");
+
       // use the exponential sum formula:
       //           infty        x^(2*n)
       // cos(x) :=  sum (-1)^n ---------
@@ -281,6 +287,8 @@ namespace FEAST
     template<typename T_>
     inline T_ tan(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "tan can only be applied to floating point types");
+
       return sin(x) / cos(x);
     }
 
@@ -298,6 +306,8 @@ namespace FEAST
     template<typename T_>
     inline T_ sinh(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "sinh can only be applied to floating point types");
+
       // use the exponential sum formula:
       //            infty  x^(2*n+1)
       // sinh(x) :=  sum  -----------
@@ -331,6 +341,8 @@ namespace FEAST
     template<typename T_>
     inline T_ cosh(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "cosh can only be applied to floating point types");
+
       // use the exponential sum formula:
       //            infty   x^(2*n)
       // cosh(x) :=  sum   ---------
@@ -364,6 +376,8 @@ namespace FEAST
     template<typename T_>
     inline T_ tanh(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "tanh can only be applied to floating point types");
+
       return sinh(x) / cosh(x);
     }
 
@@ -381,6 +395,8 @@ namespace FEAST
     template<typename T_>
     inline T_ exp(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "exp can only be applied to floating point types");
+
       T_ y(T_(1)), yl(T_(0)), z(y);
       int n(0);
       do
@@ -405,6 +421,8 @@ namespace FEAST
     template<typename T_>
     inline T_ log(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "log can only be applied to floating point types");
+
       // use Newton iteration: y_{k+1} = y_k + 2*(x - exp(y_k))/(x + exp(y_k))
       T_ y(T_(0)), yl(T_(0));
       do
@@ -430,6 +448,8 @@ namespace FEAST
     template<typename T_>
     inline T_ log10(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "log10 can only be applied to floating point types");
+
       return log(x) / log(T_(10));
     }
 
@@ -448,6 +468,8 @@ namespace FEAST
     template<typename T_>
     inline T_ pow(T_ x, T_ y)
     {
+      static_assert(Type::Traits<T_>::is_float, "pow can only be applied to floating point types");
+
       return Math::exp(y * Math::log(x));
     }
 
@@ -465,6 +487,8 @@ namespace FEAST
     template<typename T_>
     inline T_ atan(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "atan can only be applied to floating point types");
+
       // the exponential sum converges only for |x| < 1, but we can reduce any |x| >= 1 by
       // atan(x) = 2*atan( x / (1 + sqrt(1 + x^2)))
       int k(0);
@@ -502,6 +526,8 @@ namespace FEAST
     template<typename T_>
     inline T_ atan2(T_ y, T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "atan2 can only be applied to floating point types");
+
       // see http://en.wikipedia.org/wiki/Atan2#Variations_and_notation
       return T_(2) * atan((Math::sqrt(x*x + y*y) - x) / y);
     }
@@ -516,6 +542,8 @@ namespace FEAST
     template<typename T_>
     inline T_ pi()
     {
+      static_assert(Type::Traits<T_>::is_float, "pi can only be applied to floating point types");
+
       // use the Bailey-Borwein-Plouffe formula:
       //       infty   1     (   4      2      1      1  )
       // pi :=  sum  ----  * ( ---- - ---- - ---- - ---- )
@@ -561,6 +589,8 @@ namespace FEAST
     template<typename T_>
     inline T_ eps()
     {
+      static_assert(Type::Traits<T_>::is_float, "eps can only be applied to floating point types");
+
       const T_ z(T_(1));
       const T_ t(T_(0.5));
       T_ y(t), yl(t);
@@ -608,6 +638,8 @@ namespace FEAST
     template<typename T_>
     inline T_ asin(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "asin can only be applied to floating point types");
+
       return signum(x) * Math::atan(Math::sqrt((x*x) / (T_(1) - x*x)));
     }
 
@@ -624,11 +656,81 @@ namespace FEAST
     template<typename T_>
     inline T_ acos(T_ x)
     {
+      static_assert(Type::Traits<T_>::is_float, "acos can only be applied to floating point types");
+
       return T_(0.5) * pi<T_>() - Math::asin(x);
     }
 
     WRAP_STD_MATH1(acos)
     WRAP_QUAD_MATH1(acos)
+
+    /**
+     * \brief Checks whether a value is finite.
+     *
+     * A value is finite if it is neither NaN nor inifinity.
+     *
+     * \note There exists no generic implementation for this function.
+     *
+     * \param[in] x The value to be checked for finiteness.
+     *
+     * \returns \c true if \p x is finite, otherwise \c false.
+     */
+    template<typename T_>
+    inline bool isfinite(T_ x);
+
+    WRAP_STD_MATH1(isfinite);
+
+#ifdef FEAST_HAVE_QUADMATH
+    inline bool isfinite(__float128 x)
+    {
+      // https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/finiteq.c
+      return (::finiteq(x) != 0);
+    }
+#endif // FEAST_HAVE_QUADMATH
+
+    /**
+     * \brief Checks whether a value is infinite.
+     *
+     * \note There exists no generic implementation for this function.
+     *
+     * \param[in] x The value to be checked for infinity.
+     *
+     * \returns \c true if \p x is +/-infinity, otherwise \c false.
+     */
+    template<typename T_>
+    inline bool isinf(T_ x);
+
+    WRAP_STD_MATH1(isinf);
+
+#ifdef FEAST_HAVE_QUADMATH
+    inline bool isinf(__float128 x)
+    {
+      // https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isinfq.c
+      return (::isinfq(x) != 0);
+    }
+#endif // FEAST_HAVE_QUADMATH
+
+    /**
+     * \brief Checks whether a value is Not-A-Number.
+     *
+     * \note There exists no generic implementation for this function.
+     *
+     * \param[in] x The value to be checked for NaN.
+     *
+     * \returns \c true if \p x is NaN, otherwise \c false.
+     */
+    template<typename T_>
+    inline bool isnan(T_ x);
+
+    WRAP_STD_MATH1(isnan);
+
+#ifdef FEAST_HAVE_QUADMATH
+    inline bool isnan(__float128 x)
+    {
+      // https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isnanq.c
+      return (::isnanq(x) != 0);
+    }
+#endif // FEAST_HAVE_QUADMATH
 
     /**
      * \brief Calculates the (partial) factorial.
@@ -656,6 +758,8 @@ namespace FEAST
     template<typename T_>
     inline T_ factorial(T_ n, T_ m = T_(0))
     {
+      static_assert(Type::Traits<T_>::is_int, "factorial can only be applied to integral types");
+
       // calculate the factorial
       T_ k(T_(1));
       for(m = max(T_(1), m); m <= n; ++m)
@@ -686,6 +790,8 @@ namespace FEAST
     template<typename T_>
     inline T_ binomial(T_ n, T_ k)
     {
+      static_assert(Type::Traits<T_>::is_int, "binomial can only be applied to integral types");
+
       if(k > n)
       {
         return T_(0); // by definition
