@@ -47,10 +47,7 @@ ADD_LIBRARY(kernel-lafem-arch STATIC ${kernel-lafem-arch-list})
 
 if (FEAST_BACKENDS_MKL)
   TARGET_LINK_LIBRARIES(kernel-lafem-arch
-    libmkl_intel_ilp64.a
-    libmkl_sequential.a
-    libmkl_core.a
-    pthread
+     -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lpthread -lm -ldl
   )
 endif(FEAST_BACKENDS_MKL)
 
