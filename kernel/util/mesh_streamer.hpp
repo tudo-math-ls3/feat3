@@ -28,9 +28,11 @@ namespace FEAST
     class BaseContainer
     {
     public:
-      // basic information
+      /// Basic information
       String name;
+      /// Name of the parent
       String parent;
+      /// Info string
       String info;
 
       // number of entities
@@ -44,17 +46,18 @@ namespace FEAST
 
       Index coord_per_vertex;
 
-      // parent indices ([0] -> vertices etc.)
-      std::vector<Index> parent_indices [4];
+      /// parent_indices[d](i) = j means that entity i of dimension d in this container corresponds to entity j in the
+      /// parent
+      std::vector<Index> parent_indices[4];
 
     public:
-      // default CTOR
+      // Default CTOR
       BaseContainer()
       {
         CONTEXT("BaseContainer::BaseContainer()");
       }
 
-      // default DTOR
+      /// Default DTOR
       virtual ~BaseContainer()
       {
         CONTEXT("BaseContainer::~BaseContainer()");

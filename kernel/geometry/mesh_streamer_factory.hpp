@@ -27,6 +27,7 @@ namespace FEAST
 
       template<Index dim_>
       struct NumEntitiesExtractor;
+
     }
     /// \endcond
 
@@ -73,20 +74,18 @@ namespace FEAST
       /// \brief Parses num_entities information from _mesh_data
       virtual Index parse_num_entities(Index dim)
       {
+        switch(dim)
         {
-          switch(dim)
-          {
-            case 0:
-              return _mesh_data->vertex_count;
-            case 1:
-              return _mesh_data->edge_count;
-            case 2:
-              return _mesh_data->tria_count + _mesh_data->quad_count;
-            case 3:
-              return _mesh_data->tetra_count + _mesh_data->hexa_count;
-            default:
-              return 0;
-          }
+          case 0:
+            return _mesh_data->vertex_count;
+          case 1:
+            return _mesh_data->edge_count;
+          case 2:
+            return _mesh_data->tria_count + _mesh_data->quad_count;
+          case 3:
+            return _mesh_data->tetra_count + _mesh_data->hexa_count;
+          default:
+            return 0;
         }
       }
 
@@ -154,8 +153,6 @@ namespace FEAST
       MeshStreamer& _mesh_reader;
       String _name;
       MeshStreamer::BaseContainer* _target_data;
-      /// num_entities information, might differ from the information in _mesh_data
-      Index _num_entities[Shape_::dimension+1];
 
     public:
       explicit MeshStreamerFactory(MeshStreamer& mesh_reader, String name) :
@@ -171,9 +168,10 @@ namespace FEAST
           if(sub_mesh_node != nullptr)
           {
             _target_data = &sub_mesh_node->mesh_data;
-            // Parse preliminary num_entities from _mesh_data
-            for(Index d(0); d <= Index(Shape_::dimension); ++d)
-              _num_entities[d] = parse_num_entities(d);
+
+            Intern::MeshDataContainerUpdater<Shape_::dimension>::
+              update_parent_data(_target_data, mesh_reader.get_mesh());
+
             return;
           }
 
@@ -182,9 +180,9 @@ namespace FEAST
           if(cell_set_node != nullptr)
           {
             _target_data = &cell_set_node->cell_set;
-            // Parse preliminary num_entities from _mesh_data
-            for(Index d(0); d <= Index(Shape_::dimension); ++d)
-              _num_entities[d] = parse_num_entities(d);
+            Intern::MeshDataContainerUpdater<Shape_::dimension>::
+              update_parent_data( _target_data, mesh_reader.get_mesh());
+
             return;
           }
 
@@ -192,14 +190,8 @@ namespace FEAST
           throw InternalError("No sub-mesh or cell-set found with name '" + name + "'");
         }
 
+      /// \brief Parses num_entities information from _target_data
       virtual Index get_num_entities(int dim)
-      {
-        ASSERT( (dim >= 0) && (dim <= Shape_::dimension), "No num_entities for dimension!");
-        return _num_entities[dim];
-      }
-
-        /// \brief Parses num_entities information from _target_data
-      virtual Index parse_num_entities(Index dim)
       {
         switch(dim)
         {
@@ -343,6 +335,9 @@ namespace FEAST
         // the information from _mesh_data might not have been complete: If the mesh file did not contain edge/face
         // data, the number of entities of the corresponding dimension was zero.
         Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(index_set_holder, _num_entities);
+
+        // Update _mesh_data with the new information
+        Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(_mesh_data, index_set_holder);
       }
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
@@ -415,6 +410,7 @@ namespace FEAST
             trg[i] = pix[i];
           }
         }
+
       };
 
       template<>
@@ -471,60 +467,164 @@ namespace FEAST
         const IndexSetHolderType_& DOXY(ish))
         {
         }
+
+        static Index& get_entity_count(Index target_dim, MeshStreamer::BaseContainer* target_data, const MeshStreamer::MeshDataContainer* const mesh_data)
+        {
+          // Determine what the dimension target_dim entities are
+          switch(target_dim)
+          {
+            case 1 :
+              return target_data->edge_count;
+            case 2 :
+              // We have simplices
+              if(mesh_data->shape_type == mesh_data->st_tria || mesh_data->shape_type == mesh_data->st_tetra)
+                return target_data->tria_count;
+              // We have hypercubes
+              if(mesh_data->shape_type == mesh_data->st_quad || mesh_data->shape_type == mesh_data->st_hexa)
+                return target_data->quad_count;
+              // We have a mixed mesh
+              if(mesh_data->shape_type == mesh_data->st_tria_quad || mesh_data->shape_type == mesh_data->st_tetra_hexa)
+                throw InternalError("No mixed meshes. Please.");
+              break;
+            case 3 :
+              // We have simplices
+              if(mesh_data->shape_type == mesh_data->st_tria || mesh_data->shape_type == mesh_data->st_tetra)
+              return target_data->tetra_count;
+              // We have hypercubes
+              if(mesh_data->shape_type == mesh_data->st_quad || mesh_data->shape_type == mesh_data->st_hexa)
+                return target_data->hexa_count;
+              // We have a mixed mesh
+              if(mesh_data->shape_type == mesh_data->st_tria_quad || mesh_data->shape_type == mesh_data->st_tetra_hexa)
+                throw InternalError("No mixed meshes. Please.");
+              break;
+            default:
+              throw InternalError("Unknown target_dim!");
+              break;
+          }
+          throw InternalError("Could not determine target entity count!");
+        }
+
+        static void update_parent_data(MeshStreamer::BaseContainer* target_data,
+        const MeshStreamer::MeshDataContainer* const mesh_data, Index target_dim = dim_)
+        {
+          if(target_dim < 1)
+            return;
+          if(target_dim == 2 || target_dim == 3)
+            update_parent_data(target_data, mesh_data, target_dim-1);
+          if(target_dim > 3)
+            throw InternalError("CellSubSets exist only up to dimension 3!");
+
+          Index& entity_count(get_entity_count(target_dim, target_data, mesh_data));
+
+          if(entity_count == 0)
+          {
+            ASSERT(target_data->parent_indices[target_dim].size() == 0, "CellSubSet does not have entities of target_dim, but a parent mapping for them!");
+            // For each vertex in the parent, this will contain its index in the CellSubSet, or the number of
+            // vertices if it is not present
+            Index* parent_vertex_to_sub(new Index[mesh_data->vertex_count]);
+            for(Index i(0); i < mesh_data->vertex_count; ++i)
+              parent_vertex_to_sub[i] = mesh_data->vertex_count;
+
+            for(Index i(0); i < target_data->vertex_count; ++i)
+            {
+              parent_vertex_to_sub[(target_data->parent_indices[0])[i]] = i;
+              //std::cout << "global vertex " << (target_data->parent_indices[0])[i] << " is local vertex " << i << std::endl;
+            }
+            //std::cout << "num vertices " << mesh_data->vertex_count << std::endl;
+            //std::cout << "num edges " <<  mesh_data->edge_count << " adjacencies size = " << ((mesh_data->adjacencies[0][1])).size() << std::endl;
+
+            // For every edge in the parent, check if all its vertices are in the CellSubSet
+            for(Index entity(0); entity < mesh_data->adjacencies[0][target_dim].size(); ++entity)
+            {
+              //std::cout << "entity " << entity;
+              bool is_in_sub(true);
+              // Check all local vertices
+              for(Index j(0); j < ((mesh_data->adjacencies[0][target_dim])[0]).size(); ++j)
+              {
+                // This is the global index of local vertex j
+                Index i = ((mesh_data->adjacencies[0][target_dim])[entity])[j];
+                //std::cout << " " << i;
+
+                if(parent_vertex_to_sub[i] == mesh_data->vertex_count)
+                  is_in_sub = false;
+              }
+              //std::cout << std::endl;
+
+              // Add this entity if all vertices were in the CellSubSet
+              if(is_in_sub)
+              {
+                target_data->parent_indices[target_dim].push_back(entity);
+                //std::cout << "Add entity " << entity << " as " << target_data->parent_indices[target_dim].size() << std::endl;
+              }
+            }
+            entity_count = target_data->parent_indices[target_dim].size();
+
+            // Clean up
+            delete[] parent_vertex_to_sub;
+
+          }
+        }// MeshDataContainerUpdater<dim>::update_parent_data()
       };
 
       template<>
       struct MeshDataContainerUpdater<2>
       {
         template<typename IndexSetHolderType_>
-        static void update_from_ish(
-          MeshStreamer::MeshDataContainer* mesh_data, const IndexSetHolderType_& ish)
+        static void update_from_ish( MeshStreamer::MeshDataContainer* mesh_data, const IndexSetHolderType_& ish)
+        {
+
+          if(mesh_data->shape_type == mesh_data->st_tria_quad || mesh_data->shape_type == mesh_data->st_tetra_hexa)
+            throw InternalError("No mixed meshes, please.");
+
+          // The first relevant data is vertex@edge, meaning dimension 1
+          if(mesh_data->edge_count == 0)
           {
+            ASSERT(mesh_data->adjacencies[0][1].size() == 0, "_mesh_data contains no edges, but adjacency vector is not empty!");
+            // Update vertex@edge information
+            auto& vert_at_edge = ish.template get_index_set<1,0>();
+            // Set number of edges
+            mesh_data->edge_count = vert_at_edge.get_num_entities();
 
-            if(mesh_data->shape_type == mesh_data->st_tria_quad || mesh_data->shape_type == mesh_data->st_tetra_hexa)
-              throw InternalError("No mixed meshes, please.");
-
-            // The first relevant data is vertex@edge, meaning dimension 1
-            if(mesh_data->edge_count == 0)
+            for(Index edge(0); edge < mesh_data->edge_count; ++edge)
             {
-              ASSERT(mesh_data->adjacencies[0][1].size() == 0, "_mesh_data contains no edges, but adjacency vector is not empty!");
-              // Update vertex@edge information
-              auto& vert_at_edge = ish.template get_index_set<1,0>();
-              // Set number of edges
-              mesh_data->edge_count = vert_at_edge.get_num_entities();
+              // idx will contain all indices for edge
+              std::vector<Index> idx;
+              for(Index i(0); i < vert_at_edge.num_indices; ++i)
+                idx.push_back(vert_at_edge(edge,i));
 
-              for(Index edge(0); edge < mesh_data->edge_count; ++edge)
-              {
-                // idx will contain all indices for edge
-                std::vector<Index> idx;
-                for(Index i(0); i < vert_at_edge.num_indices; ++i)
-                  idx.push_back(vert_at_edge(edge,i));
-
-                // Add this edge to the global adjacency vector
-                mesh_data->adjacencies[0][1].push_back(idx);
-              }
-
-              // Next: edge@cell
-              ASSERT(mesh_data->adjacencies[1][2].size() == 0, "_mesh_data has no edges, but edge@cell adjacency information!");
-              // Update edge@cell information
-              auto& edge_at_cell = ish.template get_index_set<1,0>();
-
-              // Do not set the number of shapes of dimension 2 here. Either this method is called in a 2d context
-              // (then that number is correct anyway) or in a 3d context (then that number is set in the higher
-              // dimensional) version
-
-              for(Index cell(0); cell < mesh_data->tria_count + mesh_data->quad_count; ++cell)
-              {
-                // idx will contain all indices for edge
-                std::vector<Index> idx;
-                // The _index_bound for the cell to edges mapping is the number of edges
-                for(Index edge(0); edge < edge_at_cell.num_indices; ++edge)
-                  idx.push_back(edge_at_cell(cell,edge));
-                // Add this edge to the global adjacency vector
-                mesh_data->adjacencies[1][2].push_back(idx);
-              }
+              // Add this edge to the global adjacency vector
+              mesh_data->adjacencies[0][1].push_back(idx);
             }
-          } // MeshDataContainerUpdater<2>::update_from_ish()
+
+            // Next: edge@cell
+            ASSERT(mesh_data->adjacencies[1][2].size() == 0, "_mesh_data has no edges, but edge@cell adjacency information!");
+            // Update edge@cell information
+            auto& edge_at_cell = ish.template get_index_set<1,0>();
+
+            // Do not set the number of shapes of dimension 2 here. Either this method is called in a 2d context
+            // (then that number is correct anyway) or in a 3d context (then that number is set in the higher
+            // dimensional) version
+
+            for(Index cell(0); cell < mesh_data->tria_count + mesh_data->quad_count; ++cell)
+            {
+              // idx will contain all indices for edge
+              std::vector<Index> idx;
+              // The _index_bound for the cell to edges mapping is the number of edges
+              for(Index edge(0); edge < edge_at_cell.num_indices; ++edge)
+                idx.push_back(edge_at_cell(cell,edge));
+              // Add this edge to the global adjacency vector
+              mesh_data->adjacencies[1][2].push_back(idx);
+            }
+          }
+        } // MeshDataContainerUpdater<2>::update_from_ish()
+
+        static void update_parent_data(MeshStreamer::BaseContainer* target_data,
+        const MeshStreamer::MeshDataContainer* const mesh_data, Index target_dim = Index(2))
+        {
+          MeshDataContainerUpdater<0>::update_parent_data(target_data, mesh_data, target_dim);
+        }
+
+
       }; //MeshDataContainerUpdater<2>
 
       template<>
@@ -603,6 +703,12 @@ namespace FEAST
           } // handling faces
 
         } // MeshDataContainerUpdater<3>::update_from_ish()
+
+        static void update_parent_data(MeshStreamer::BaseContainer* target_data,
+        const MeshStreamer::MeshDataContainer* const mesh_data, Index target_dim = Index(3))
+        {
+          MeshDataContainerUpdater<0>::update_parent_data(target_data, mesh_data, target_dim);
+        }
       }; // MeshDataContainerUpdater<3>
 
       /**
@@ -663,7 +769,7 @@ namespace FEAST
           num_entities[1] = ish.template get_index_set<1,0>().get_num_entities();
         }
       };
-    }
+    } // namespace intern
     /// \endcond
   } // namespace Geometry
 } // namespace FEAST
