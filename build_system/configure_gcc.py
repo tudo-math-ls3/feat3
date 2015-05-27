@@ -16,7 +16,7 @@ def configure_gcc(cpu, buildid, compiler):
 
   cxxflags = "-pipe -std=c++11 -ggdb"
 
-  if major >= 4  and minor >= 9:
+  if (major == 4  and minor >= 9) or major > 4:
     cxxflags += " -fdiagnostics-color=always"
 
   if "coverage" in buildid:
@@ -24,7 +24,7 @@ def configure_gcc(cpu, buildid, compiler):
 
   # For 'quadmath', we need to enable extended numeric literals, as otherwise the g++ will
   # not recognise the 'q' suffix for __float128 constants when compiling with --std=c++11 starting from gcc version 4.8.
-  if major >= 4 and minor >= 8 and "quadmath" in buildid:
+  if ((major >= 4 and minor >= 8) or major > 4) and "quadmath" in buildid:
     cxxflags += " -fext-numeric-literals"
 
   if "debug" in buildid:
@@ -35,10 +35,19 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -D_GLIBCXX_DEBUG"
     #if major >= 4 and minor >= 8 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
       #cxxflags += " -fsanitize=address"
-    if major >= 4 and minor >= 9:
+      #sanitziers need these libraries
+      cxxflags += " -lpthread -ldl"
+    if (major >= 4 and minor >= 9) or major > 4:
       cxxflags += " -fsanitize=undefined"
+    if major >= 5:
+      cxxflags += " -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=bounds"
+      cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
+      cxxflags += " -Wswitch-bool -Wsizeof-array-argument -Wbool-compare"
+      #cxxflags += " -Wnon-virtual-dtor -Wsuggest-final-types  -Wsuggest-final-methods"
   elif "opt" in buildid:
     cxxflags += " -O3 -funsafe-loop-optimizations"
+    if major >= 5:
+      cxxflags +=" -malign-data=cacheline"
     if cpu == "unknown":
       cxxflags += " -mtune=generic"
       print ("Warning: cpu type not detected, using -mtune=generic instead.")

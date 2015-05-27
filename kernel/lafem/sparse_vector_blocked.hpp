@@ -412,7 +412,7 @@ namespace FEAST
        *
        * \returns Non zero element count.
        */
-      const Index & used_elements() const override
+      Index used_elements() const override
       {
         if (sorted() == 0)
           const_cast<SparseVectorBlocked *>(this)->sort();

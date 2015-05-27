@@ -887,9 +887,9 @@ namespace FEAST
        *
        * \returns The number of data values.
        */
-      virtual const Index & used_elements() const
+      virtual Index used_elements() const
       {
-        return std::forward<Index>(this->size());
+        return this->size();
       }
 
       /**

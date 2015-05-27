@@ -20,8 +20,8 @@ def configure_clang(cpu, buildid, compiler):
     cxxflags += " -O0 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -fdiagnostics-show-template-tree -fdiagnostics-show-category=name -fno-omit-frame-pointer -fno-optimize-sibling-calls -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene"
     if platform.system() != "Darwin":
       cxxflags += " -fsanitize=undefined" # darwin clang does not like sanitize=undefined
-    if "mpi" not in buildid and "cuda" not in buildid and "valgrind" not in buildid and "xcode" not in buildid:
-      cxxflags += " -fsanitize=address" # -fsanitize=memory" -fsanitize=address-full
+    #if "mpi" not in buildid and "cuda" not in buildid and "valgrind" not in buildid and "xcode" not in buildid:
+      #cxxflags += " -fsanitize=address" # -fsanitize=memory" -fsanitize=address-full
 
   elif "opt" in buildid:
     cxxflags += " -O3"
