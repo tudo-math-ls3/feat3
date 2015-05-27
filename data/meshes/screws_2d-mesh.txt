@@ -934,6 +934,7 @@
    verts   180
   </counts>
   <vert_idx>
+           0
            1
            2
            3
@@ -1113,7 +1114,6 @@
          177
          178
          179
-         180
   </vert_idx>
  </cellset>
  <cellset>
@@ -1128,6 +1128,7 @@
    verts   180
   </counts>
   <vert_idx>
+         360
          361
          362
          363
@@ -1307,7 +1308,6 @@
          537
          538
          539
-         540
   </vert_idx>
  </cellset>
  </feast_mesh_file>
