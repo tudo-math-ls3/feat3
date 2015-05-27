@@ -504,11 +504,11 @@ namespace FEAST
 
     // HEADER section
     ofs << "<header>" << std::endl;
-    ofs << "version " << "1" << std::endl;
+    ofs << " version " << "1" << std::endl;
     if ( !_chart_path.empty() )
-      ofs << "chart_file " << _chart_path << std::endl;
-    ofs << "submeshes " << _num_submeshes << std::endl;
-    ofs << "cellsets " << _num_cellsets << std::endl;
+      ofs << " chart_file " << _chart_path << std::endl;
+    ofs << " submeshes " << _num_submeshes << std::endl;
+    ofs << " cellsets " << _num_cellsets << std::endl;
     // END OF HEADER section
     ofs << "</header>" << std::endl;
 
@@ -516,7 +516,7 @@ namespace FEAST
     {
       // INFO section
       ofs << "<info>" << std::endl;
-      ofs << _info << std::endl;
+      ofs << " " <<_info << std::endl;
       // END OF INFO section
       ofs << "</info>" << std::endl;
     }
@@ -1778,101 +1778,101 @@ namespace FEAST
     ofs << "<cellset>" << std::endl;
 
     // header section
-    ofs << "<header>" << std::endl;
-    ofs << "name " << cell_set.name << std::endl;
-    ofs << "parent " << cell_set.parent <<std::endl;
-    ofs << "</header>" << std::endl;
+    ofs << " <header>" << std::endl;
+    ofs << "  name " << cell_set.name << std::endl;
+    ofs << "  parent " << cell_set.parent <<std::endl;
+    ofs << " </header>" << std::endl;
 
     // info section
     if( !cell_set.info.empty() )
     {
-      ofs << "<info>" << std::endl;
-      ofs << cell_set.info << std::endl;
-      ofs << "</info>" << std::endl;
+      ofs << " <info>" << std::endl;
+      ofs << "  " << cell_set.info << std::endl;
+      ofs << " </info>" << std::endl;
     }
     // count section
-    ofs << "<counts>" << std::endl;
+    ofs << " <counts>" << std::endl;
     if(cell_set.slices.size() == 0)
     {
     if( cell_set.vertex_count != 0)
-      ofs << "verts " << cell_set.vertex_count << std::endl;
+      ofs << "  verts " << cell_set.vertex_count << std::endl;
     if( cell_set.edge_count != 0)
-      ofs << "edges " << cell_set.edge_count << std::endl;
+      ofs << "  edges " << cell_set.edge_count << std::endl;
     if( cell_set.quad_count != 0)
-      ofs << "quads " << cell_set.quad_count << std::endl;
+      ofs << "  quads " << cell_set.quad_count << std::endl;
     if( cell_set.tria_count != 0)
-      ofs << "trias " << cell_set.tria_count << std::endl;
+      ofs << "  trias " << cell_set.tria_count << std::endl;
     if( cell_set.tetra_count != 0)
-      ofs << "tetras " << cell_set.tetra_count << std::endl;
+      ofs << "  tetras " << cell_set.tetra_count << std::endl;
     if( cell_set.hexa_count != 0)
-      ofs << "hexas " << cell_set.hexa_count << std::endl;
+      ofs << "  hexas " << cell_set.hexa_count << std::endl;
     }
     else
     {
-      ofs << "slices ";
+      ofs << "  slices";
       for (Index i(0); i < cell_set.slices.size() ; ++i)
       {
-        ofs << cell_set.slices.at(i) <<" ";
+        ofs  << "   " << cell_set.slices.at(i);
       }
       ofs << std::endl;
     }
-    ofs << "</counts>" << std::endl;
+    ofs << " </counts>" << std::endl;
 
     // parent indices
-    ofs << "<vert_idx>" << std::endl;
+    ofs << " <vert_idx>" << std::endl;
     for (Index i(0); i < cell_set.vertex_count ; ++i)
     {
-      ofs << (cell_set.parent_indices[0])[i] << std::endl;
+      ofs << "  " << (cell_set.parent_indices[0])[i] << std::endl;
     }
-    ofs << "</vert_idx>" << std::endl;
+    ofs << " </vert_idx>" << std::endl;
 
     if ( !(cell_set.edge_count == 0) )
     {
-      ofs << "<edge_idx>" << std::endl;
+      ofs << " <edge_idx>" << std::endl;
       for (Index i(0); i < cell_set.edge_count ; ++i)
       {
-        ofs << (cell_set.parent_indices[1])[i] << std::endl;
+        ofs << "  " << (cell_set.parent_indices[1])[i] << std::endl;
       }
-      ofs << "</edge_idx>" << std::endl;
+      ofs << " </edge_idx>" << std::endl;
       }
 
     if ( !(cell_set.tria_count == 0) )
     {
-      ofs << "<tria_idx>" << std::endl;
+      ofs << " <tria_idx>" << std::endl;
       for (Index i(0); i < cell_set.tria_count ; ++i)
       {
-        ofs << (cell_set.parent_indices[2])[i] << std::endl;
+        ofs << "  " << (cell_set.parent_indices[2])[i] << std::endl;
       }
-      ofs << "</tria_idx>" << std::endl;
+      ofs << " </tria_idx>" << std::endl;
     }
     if ( !(cell_set.quad_count == 0) )
     {
-      ofs << "<quad_idx>" << std::endl;
+      ofs << " <quad_idx>" << std::endl;
       for (Index i(0); i < cell_set.quad_count ; ++i)
       {
-        ofs << (cell_set.parent_indices[2])[i] << std::endl;
+        ofs << "  " << (cell_set.parent_indices[2])[i] << std::endl;
       }
-      ofs << "</quad_idx>" << std::endl;
+      ofs << " </quad_idx>" << std::endl;
     }
 
     if ( !(cell_set.tetra_count == 0) )
     {
-      ofs << "<tetra_idx>" << std::endl;
+      ofs << " <tetra_idx>" << std::endl;
       for (Index i(0); i < cell_set.tetra_count ; ++i)
       {
-        ofs << (cell_set.parent_indices[3])[i] << std::endl;
+        ofs << "  " << (cell_set.parent_indices[3])[i] << std::endl;
       }
-      ofs << "</tetra_idx>" << std::endl;
+      ofs << "  </tetra_idx>" << std::endl;
     }
 
     if ( !(cell_set.hexa_count == 0) )
     {
-      ofs << "<hexa_idx>" << std::endl;
+      ofs << " <hexa_idx>" << std::endl;
       for (Index i(0); i < cell_set.hexa_count ; ++i)
       {
-        ofs << (cell_set.parent_indices[3])[i] << std::endl;
+        ofs << "  " << (cell_set.parent_indices[3])[i] << std::endl;
       }
-      ofs << "</hexa_idx>" << std::endl;
+      ofs << " </hexa_idx>" << std::endl;
     }
     ofs << "</cellset>" << std::endl;
   }//write_cell_set_data
@@ -1888,103 +1888,103 @@ namespace FEAST
       ofs << "<mesh>" << std::endl;
 
     // header section
-    ofs << "<header>" << std::endl;
+    ofs << " <header>" << std::endl;
     if (submesh)
     {
-      ofs << "name " << mesh_data.name << std::endl;
-      ofs << "parent " << mesh_data.parent << std::endl;
+      ofs << "  name " << mesh_data.name << std::endl;
+      ofs << "  parent " << mesh_data.parent << std::endl;
       if ( !mesh_data.chart.empty() )
-        ofs << "chart " << mesh_data.chart << std::endl;
+        ofs << "  chart " << mesh_data.chart << std::endl;
     }
-    ofs << " type " << mesh_data.convert_mesh_type(mesh_data.mesh_type) << std::endl;
-    ofs << "shape " << mesh_data.convert_shape_type(mesh_data.shape_type) << std::endl;
+    ofs << "  type " << mesh_data.convert_mesh_type(mesh_data.mesh_type) << std::endl;
+    ofs << "  shape " << mesh_data.convert_shape_type(mesh_data.shape_type) << std::endl;
     if(mesh_data.coord_per_vertex!=0)
-      ofs << "coords " << mesh_data.coord_per_vertex << std::endl;
-    ofs << "</header>" << std::endl;
+      ofs << "  coords " << mesh_data.coord_per_vertex << std::endl;
+    ofs << " </header>" << std::endl;
 
     // info section
     if( !mesh_data.info.empty() )
     {
-      ofs << "<info>" << std::endl;
+      ofs << " <info>" << std::endl;
       ofs << mesh_data.info << std::endl;
-      ofs << "</info>" << std::endl;
+      ofs << " </info>" << std::endl;
     }
 
     // count section
-    ofs << "<counts>" << std::endl;
+    ofs << " <counts>" << std::endl;
     if(mesh_data.mesh_type == MeshDataContainer::mt_conformal)
     {
     if( mesh_data.vertex_count != 0)
-      ofs << "verts " << mesh_data.vertex_count << std::endl;
+      ofs << "  verts " << mesh_data.vertex_count << std::endl;
     if( mesh_data.edge_count != 0)
-      ofs << "edges " << mesh_data.edge_count << std::endl;
+      ofs << "  edges " << mesh_data.edge_count << std::endl;
     if( mesh_data.quad_count != 0)
-      ofs << "quads " << mesh_data.quad_count << std::endl;
+      ofs << "  quads " << mesh_data.quad_count << std::endl;
     if( mesh_data.tria_count != 0)
-      ofs << "trias " << mesh_data.tria_count << std::endl;
+      ofs << "  trias " << mesh_data.tria_count << std::endl;
     if( mesh_data.tetra_count != 0)
-      ofs << "tetras " << mesh_data.tetra_count << std::endl;
+      ofs << "  tetras " << mesh_data.tetra_count << std::endl;
     if( mesh_data.hexa_count != 0)
-      ofs << "hexas " << mesh_data.hexa_count << std::endl;
+      ofs << "  hexas " << mesh_data.hexa_count << std::endl;
     }
     else if( mesh_data.mesh_type == MeshDataContainer::mt_structured)
     {
-      ofs << "slices ";
+      ofs << "  slices";
       for (Index i(0); i < mesh_data.slices.size() ; ++i)
       {
-        ofs << mesh_data.slices.at(i) <<" ";
+        ofs << " " << mesh_data.slices.at(i);
       }
       ofs << std::endl;
     }
-    ofs << "</counts>" << std::endl;
+    ofs << " </counts>" << std::endl;
 
     // coord section
-    ofs << "<coords>" << std::endl;
+    ofs << " <coords>" << std::endl;
     for (Index i(0); i < mesh_data.vertex_count ; ++i)
     {
       for (Index j(0); j < mesh_data.coord_per_vertex ; ++j)
       {
-        ofs  << " " << (mesh_data.coords[i])[j];
+        ofs  << "  " << scientify((mesh_data.coords[i])[j]);
       }
       ofs << std::endl;
     }
-    ofs << "</coords>" << std::endl;
+    ofs << " </coords>" << std::endl;
 
     // adjacency section
     if(mesh_data.mesh_type == MeshDataContainer::mt_conformal)
     {
-      ofs << "<vert@edge>" << std::endl;
+      ofs << " <vert@edge>" << std::endl;
       for (Index i(0); i < (mesh_data.adjacencies[0][1]).size() ; ++i)
       {
-        ofs << ((mesh_data.adjacencies[0][1])[i])[0] << " ";
-        ofs << ((mesh_data.adjacencies[0][1])[i])[1] << std::endl;
+        ofs << "  " << ((mesh_data.adjacencies[0][1])[i])[0];
+        ofs << " " << ((mesh_data.adjacencies[0][1])[i])[1] << std::endl;
       }
-      ofs << "</vert@edge>" << std::endl;
+      ofs << " </vert@edge>" << std::endl;
 
       if (!( (mesh_data.adjacencies[0][2]).size() == 0 ))
       {
         if ( ((mesh_data.adjacencies[0][2])[0]).size() == 3 )
         {
-          ofs << "<vert@tria>" << std::endl;
+          ofs << " <vert@tria>" << std::endl;
           for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
           {
-            ofs << ((mesh_data.adjacencies[0][2])[i])[0] << " ";
-            ofs << ((mesh_data.adjacencies[0][2])[i])[1] << " ";
-            ofs << ((mesh_data.adjacencies[0][2])[i])[2] << std::endl;
+            ofs << "  " << ((mesh_data.adjacencies[0][2])[i])[0];
+            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[1];
+            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[2] << std::endl;
           }
-          ofs << "</vert@tria>" << std::endl;
+          ofs << " </vert@tria>" << std::endl;
         }
         else if ( ((mesh_data.adjacencies[0][2])[0]).size() == 4 )
         {
-          ofs << "<vert@quad>" << std::endl;
+          ofs << " <vert@quad>" << std::endl;
           for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
           {
-            ofs << ((mesh_data.adjacencies[0][2])[i])[0] << " ";
-            ofs << ((mesh_data.adjacencies[0][2])[i])[1] << " ";
-            ofs << ((mesh_data.adjacencies[0][2])[i])[2] << " ";
-            ofs << ((mesh_data.adjacencies[0][2])[i])[3] << std::endl;
+            ofs << "  " << ((mesh_data.adjacencies[0][2])[i])[0];
+            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[1];
+            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[2];
+            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[3] << std::endl;
           }
-          ofs << "</vert@quad>" << std::endl;
+          ofs << " </vert@quad>" << std::endl;
         }
       }
 
@@ -1992,31 +1992,31 @@ namespace FEAST
       {
         if ( ((mesh_data.adjacencies[0][3])[0]).size() == 4 )
         {
-          ofs << "<vert@tetra>" << std::endl;
+          ofs << " <vert@tetra>" << std::endl;
           for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
           {
-            ofs << ((mesh_data.adjacencies[0][3])[i])[0] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[1] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[2] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[3] << std::endl;
+            ofs << "  " << ((mesh_data.adjacencies[0][3])[i])[0];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[1];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[2];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[3] << std::endl;
           }
-          ofs << "</vert@tetra>" << std::endl;
+          ofs << " </vert@tetra>" << std::endl;
         }
         else if ( ((mesh_data.adjacencies[0][3])[0]).size() == 8 )
         {
-          ofs << "<vert@hexa>" << std::endl;
+          ofs << " <vert@hexa>" << std::endl;
           for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
           {
-            ofs << ((mesh_data.adjacencies[0][3])[i])[0] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[1] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[2] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[3] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[4] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[5] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[6] << " ";
-            ofs << ((mesh_data.adjacencies[0][3])[i])[7] << std::endl;
+            ofs << "  " << ((mesh_data.adjacencies[0][3])[i])[0];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[1];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[2];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[3];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[4];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[5];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[6];
+            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[7] << std::endl;
           }
-          ofs << "</vert@hexa>" << std::endl;
+          ofs << " </vert@hexa>" << std::endl;
         }
       }
     }
@@ -2024,61 +2024,61 @@ namespace FEAST
     // if it is a submesh, add the parent indices
     if (submesh)
     {
-      ofs << "<vert_idx>" << std::endl;
+      ofs << " <vert_idx>" << std::endl;
       for (Index i(0); i < mesh_data.vertex_count ; ++i)
       {
-        ofs << (mesh_data.parent_indices[0])[i] << std::endl;
+        ofs << "  " << (mesh_data.parent_indices[0])[i] << std::endl;
       }
-      ofs << "</vert_idx>" << std::endl;
+      ofs << " </vert_idx>" << std::endl;
 
       if ( !(mesh_data.edge_count == 0) )
       {
-        ofs << "<edge_idx>" << std::endl;
+        ofs << " <edge_idx>" << std::endl;
         for (Index i(0); i < mesh_data.edge_count ; ++i)
         {
-          ofs << (mesh_data.parent_indices[1])[i] << std::endl;
+          ofs << "  " << (mesh_data.parent_indices[1])[i] << std::endl;
         }
-        ofs << "</edge_idx>" << std::endl;
+        ofs << " </edge_idx>" << std::endl;
       }
 
       if ( !(mesh_data.tria_count == 0) )
       {
-        ofs << "<tria_idx>" << std::endl;
+        ofs << " <tria_idx>" << std::endl;
         for (Index i(0); i < mesh_data.tria_count ; ++i)
         {
-          ofs << (mesh_data.parent_indices[2])[i] << std::endl;
+          ofs << "  " << (mesh_data.parent_indices[2])[i] << std::endl;
         }
-        ofs << "</tria_idx>" << std::endl;
+        ofs << " </tria_idx>" << std::endl;
       }
 
       if ( !(mesh_data.quad_count == 0) )
       {
-        ofs << "<quad_idx>" << std::endl;
+        ofs << " <quad_idx>" << std::endl;
         for (Index i(0); i < mesh_data.quad_count ; ++i)
         {
-          ofs << (mesh_data.parent_indices[2])[i] << std::endl;
+          ofs << "  " << (mesh_data.parent_indices[2])[i] << std::endl;
         }
-        ofs << "</quad_idx>" << std::endl;
+        ofs << " </quad_idx>" << std::endl;
       }
 
       if ( !(mesh_data.tetra_count == 0) )
       {
-        ofs << "<tetra_idx>" << std::endl;
+        ofs << " <tetra_idx>" << std::endl;
         for (Index i(0); i < mesh_data.tetra_count ; ++i)
         {
-          ofs << (mesh_data.parent_indices[3])[i] << std::endl;
+          ofs << "  " << (mesh_data.parent_indices[3])[i] << std::endl;
         }
-        ofs << "</tetra_idx>" << std::endl;
+        ofs << " </tetra_idx>" << std::endl;
       }
 
       if ( !(mesh_data.hexa_count == 0) )
       {
-        ofs << "<hexa_idx>" << std::endl;
+        ofs << " <hexa_idx>" << std::endl;
         for (Index i(0); i < mesh_data.hexa_count ; ++i)
         {
-          ofs << (mesh_data.parent_indices[3])[i] << std::endl;
+          ofs << "  " << (mesh_data.parent_indices[3])[i] << std::endl;
         }
-        ofs << "</hexa_idx>" << std::endl;
+        ofs << " </hexa_idx>" << std::endl;
       }
     }
 
