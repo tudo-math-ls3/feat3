@@ -268,8 +268,8 @@ namespace FEAST
       explicit UmfpackSolver(const MatrixType& matrix) :
         _matrix(matrix),
         _umfpack()
-        {
-        }
+      {
+      }
 
       virtual String name() override
       {
@@ -559,10 +559,10 @@ namespace FEAST
        *
        * In contrast to the solve() method of the SolverInterface base class, this method uses the
        * vector \p vec_sol as the initial solution vector for the iterative solution process instead of
-       * ignoring its contents upon entry and strating with the null vector.
+       * ignoring its contents upon entry and starting with the null vector.
        *
        * \note The default implementation creates a temporary vector, computes the defect, applies
-       * the solve() method to obtain a correction vector and update the solution vector with it.
+       * the solve() method to obtain a correction vector and updates the solution vector with it.
        *
        * \param[in,out] vec_sol
        * The vector that contains the initial solution upon entry and receives the solution
@@ -621,8 +621,15 @@ namespace FEAST
 
         // plot?
         if(this->_plot)
-          std::cout << this->_plot_name << ": " << stringify(0).pad_front(_iter_digits)
-                    << " : " << scientify(this->_def_init) << std::endl;
+        {
+          std::cout << this->_plot_name
+            <<  ": " << stringify(0).pad_front(_iter_digits)
+            << " : " << scientify(this->_def_init) << std::endl;
+        }
+
+        // ensure that the defect is neither NaN nor infinity
+        if(!Math::isfinite(this->_def_init))
+          return SolverStatus::aborted;
 
         // continue iterating
         return SolverStatus::progress;
@@ -656,8 +663,15 @@ namespace FEAST
 
         // plot?
         if(this->_plot)
-          std::cout << this->_plot_name << ": " << stringify(this->_num_iter).pad_front(_iter_digits)
-                    << " : " << scientify(this->_def_cur) << std::endl;
+        {
+          std::cout << this->_plot_name
+            <<  ": " << stringify(this->_num_iter).pad_front(_iter_digits)
+            << " : " << scientify(this->_def_cur) << std::endl;
+        }
+
+        // ensure that the defect is neither NaN nor infinity
+        if(!Math::isfinite(this->_def_cur))
+          return SolverStatus::aborted;
 
         // is diverged?
         if(is_diverged())
@@ -699,8 +713,11 @@ namespace FEAST
 
         // plot?
         if(this->_plot)
-          std::cout << this->_plot_name << "* " << stringify(this->_num_iter).pad_front(_iter_digits)
-                    << " : " << scientify(this->_def_cur) << std::endl;
+        {
+          std::cout << this->_plot_name
+            <<  "* " << stringify(this->_num_iter).pad_front(_iter_digits)
+            << " : " << scientify(this->_def_cur) << std::endl;
+        }
       }
     }; // class IterativeSolver
 
