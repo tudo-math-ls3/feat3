@@ -46,6 +46,12 @@ extern "C"
     inline double func(double x, double* y) {return std::func(x,y);} \
     inline long double func(long double x, long double* y) {return std::func(x,y);}
 
+    // single argument function wrapper, bool return type
+#define WRAP_STD_MATH1BRET(func) \
+    inline bool func(float x) {return std::func(x);} \
+    inline bool func(double x) {return std::func(x);} \
+    inline bool func(long double x) {return std::func(x);}
+
 namespace FEAST
 {
   /**
@@ -678,7 +684,7 @@ namespace FEAST
     template<typename T_>
     inline bool isfinite(T_ x);
 
-    WRAP_STD_MATH1(isfinite);
+    WRAP_STD_MATH1BRET(isfinite);
 
 #ifdef FEAST_HAVE_QUADMATH
     inline bool isfinite(__float128 x)
@@ -700,7 +706,7 @@ namespace FEAST
     template<typename T_>
     inline bool isinf(T_ x);
 
-    WRAP_STD_MATH1(isinf);
+    WRAP_STD_MATH1BRET(isinf);
 
 #ifdef FEAST_HAVE_QUADMATH
     inline bool isinf(__float128 x)
@@ -722,7 +728,7 @@ namespace FEAST
     template<typename T_>
     inline bool isnan(T_ x);
 
-    WRAP_STD_MATH1(isnan);
+    WRAP_STD_MATH1BRET(isnan);
 
 #ifdef FEAST_HAVE_QUADMATH
     inline bool isnan(__float128 x)
