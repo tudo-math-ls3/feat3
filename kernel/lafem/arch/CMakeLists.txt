@@ -71,7 +71,6 @@ if (FEAST_BACKENDS_CUDA)
     unit_filter_blocked.cu
     STATIC
   )
-  ADD_DEPENDENCIES(kernel-lafem-arch kernel-lafem-arch-cuda)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-arch-cuda)
   target_link_libraries(kernel-lafem-arch-cuda ${CUDA_cusparse_LIBRARY})
   TARGET_LINK_LIBRARIES(kernel-lafem-arch kernel-lafem-arch-cuda)

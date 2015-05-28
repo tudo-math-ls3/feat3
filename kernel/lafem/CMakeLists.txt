@@ -34,7 +34,6 @@ if (FEAST_BACKENDS_CUDA)
     cusolver.cu
     STATIC
   )
-  ADD_DEPENDENCIES(kernel-lafem kernel-lafem-cuda)
   if (FEAST_HAVE_CUSOLVER)
     #TODO replace by FindCUDA makro, once cusolve lib has been added there
     find_library(CUDA_cusolver_LIBRARY NAMES cusolver PATHS "${CUDA_TOOLKIT_ROOT_DIR}/lib64")
