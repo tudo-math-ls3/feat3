@@ -47,6 +47,7 @@ if (FEAST_HAVE_UMFPACK)
   TARGET_LINK_LIBRARIES (feast thirdparty-umfpack)
 endif(FEAST_HAVE_UMFPACK)
 
+#libquadmath needs to be the last library linked against
 if (FEAST_HAVE_QUADMATH)
   TARGET_LINK_LIBRARIES (feast -lquadmath)
 endif (FEAST_HAVE_QUADMATH)

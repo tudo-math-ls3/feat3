@@ -419,7 +419,7 @@ namespace FEAST
         DT2_ * dtarray(reinterpret_cast<DT2_ *>(array));
         IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
 
-        // clang/icc seems to use older libc++ without std::underlying_type
+        /// \compilerhack clang/icc seems to use older libc++ without std::underlying_type
 #if defined(FEAST_COMPILER_CLANG) || defined(FEAST_COMPILER_INTEL)
         uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
 #else
