@@ -281,6 +281,7 @@ elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
     print ("Error: Chosen compiler binary '" + compiler +"' not found!")
     sys.exit(1)
   remove_string(unused_tokens, "icc")
+  remove_string(unused_tokens, "icpc")
   remove_string(unused_tokens, "intel")
   os.environ["CC"] = "icc"
   os.environ["CXX"] = compiler
@@ -388,6 +389,10 @@ for i in clean:
 #export compiler/linker flags
 os.environ["CXXFLAGS"] = cxxflags
 os.environ["LDFLAGS"] = ldflags
+#set system host compiler in cflags to pass cmake's c compiler check
+if "icc" in buildid or "intel" in buildid or "icpc" in buildid:
+  if system_host_compiler:
+    os.environ["CFLAGS"] = " -gcc-name=" + system_host_compiler
 
 print("cmake version: " + get_output("cmake --version")[0])
 
