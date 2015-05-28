@@ -42,6 +42,7 @@ namespace FEAST
       /// sub-matrix index type
       typedef typename First_::IndexType IndexType;
 
+      /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       template<typename... RestVecL_>
       using VecLHelper = typename RestClass::template VecLHelper<RestVecL_..., typename First_::VectorTypeL>;
@@ -543,6 +544,8 @@ namespace FEAST
        *
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template <typename First2_, typename... Rest2_>
@@ -574,6 +577,7 @@ namespace FEAST
       /// Compatible R-vector type
       typedef TupleVector<typename First_::VectorTypeR> VectorTypeR;
 
+      /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       template<typename... RestVecL_>
       using VecLHelper = TupleVector<RestVecL_..., typename First_::VectorTypeL>;
@@ -840,6 +844,8 @@ namespace FEAST
        * \param[in] other The source Matrix.
        *
        * Use source matrix content as content of current matrix
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template <typename First2_, typename... Rest2_>
@@ -861,6 +867,8 @@ namespace FEAST
        *
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template <typename First2_, typename... Rest2_>

@@ -223,6 +223,7 @@ namespace FEAST
         return TupleFilter(_first.clone());
       }
 
+      /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       template<typename... SubFilter2_>
       void convert(const TupleFilter<SubFilter2_...>& other)
@@ -262,6 +263,7 @@ namespace FEAST
         return first();
       }
 
+      /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       /** \copydoc UnitFilter::filter_rhs() */
       template<typename... Tv_>

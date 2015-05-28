@@ -503,6 +503,8 @@ namespace FEAST
        * \param[in] other The source Matrix.
        *
        * Use source matrix content as content of current matrix
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template <typename SubType_>
@@ -523,6 +525,8 @@ namespace FEAST
        *
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template <typename SubType_>
@@ -825,6 +829,8 @@ namespace FEAST
        * \param[in] other The source Matrix.
        *
        * Use source matrix content as content of current matrix
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template <typename SubType_>
@@ -844,6 +850,8 @@ namespace FEAST
        *
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template <typename SubType_>

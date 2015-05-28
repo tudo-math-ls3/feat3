@@ -427,6 +427,8 @@ namespace FEAST
        * \param[in] other The source Vector.
        *
        * Use source vector content as content of current vector
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template<typename SubType2_>
@@ -686,6 +688,8 @@ namespace FEAST
        * \param[in] other The source Vector.
        *
        * Use source vector content as content of current vector
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template<typename SubType2_>

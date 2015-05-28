@@ -372,6 +372,8 @@ namespace FEAST
        *
        * \param[in] x
        * The multiplicant vector.
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template<typename VectorL_, typename VectorR_>
@@ -418,6 +420,8 @@ namespace FEAST
        * \param[in] y
        * The summand vector
        * \param[in] alpha A scalar to scale the product with.
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template<typename VectorL_, typename VectorR_>

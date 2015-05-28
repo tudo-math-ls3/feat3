@@ -294,6 +294,7 @@ namespace FEAST
         return TupleMirror(_first.clone());
       }
 
+      /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       template<typename... SubMirror2_>
       void convert(const TupleMirror<SubMirror2_...>& other)
@@ -338,6 +339,7 @@ namespace FEAST
         return _first;
       }
 
+      /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       // The MSVC compiler has a bug, which does not allow us to specify 'Tv_' as a single
       // template parameter rather than a parameter pack.

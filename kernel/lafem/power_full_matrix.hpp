@@ -291,6 +291,7 @@ namespace FEAST
         _container.apply(r, x, y, alpha);
       }
 
+      /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       template< typename SubType_>
       void convert(const PowerFullMatrix<SubType_, width_, height_>& other)
@@ -308,6 +309,8 @@ namespace FEAST
        *
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template< typename SubType_>

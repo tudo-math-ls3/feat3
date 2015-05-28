@@ -45,6 +45,7 @@ namespace FEAST
       /// sub-vector index-type
       typedef typename First_::IndexType IndexType;
 
+      /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       /// helper class template for ContainerType template
       template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
@@ -382,6 +383,7 @@ namespace FEAST
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;
 
+      /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
       using ContHelper = class TupleVector<RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
@@ -610,6 +612,8 @@ namespace FEAST
        * \param[in] other The source Vector.
        *
        * Use source vector content as content of current vector
+       *
+       * \compilerhack MSVC 2013 template bug workaround
        */
 #ifdef FEAST_COMPILER_MICROSOFT
       template <typename First2_, typename... Rest2_>
