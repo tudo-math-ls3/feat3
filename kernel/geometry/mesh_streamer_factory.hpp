@@ -125,7 +125,7 @@ namespace FEAST
         Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(index_set_holder, _num_entities);
 
         // Update _mesh_data with the new information
-        Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(_mesh_data, index_set_holder);
+        FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(_mesh_data, index_set_holder);
       }
 
     }; // class MeshStreamerFactory<ConformalMesh<...>>
@@ -165,7 +165,7 @@ namespace FEAST
           {
             _target_data = &sub_mesh_node->mesh_data;
 
-            Intern::MeshDataContainerUpdater<Shape_::dimension>::
+            FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::
               update_parent_data(_target_data, mesh_reader.get_mesh());
 
             return;
@@ -176,7 +176,7 @@ namespace FEAST
           if(cell_set_node != nullptr)
           {
             _target_data = &cell_set_node->cell_set;
-            Intern::MeshDataContainerUpdater<Shape_::dimension>::
+            FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::
               update_parent_data( _target_data, mesh_reader.get_mesh());
 
             return;
@@ -301,7 +301,7 @@ namespace FEAST
 
       virtual void fill_vertex_set(VertexSetType& vertex_set)
       {
-        const int num_coords = get_num_coords();
+        const Index num_coords = Index(get_num_coords());
         const Index num_vertices(Index(_mesh_data->coords.size()));
 
         for(Index i(0); i < num_vertices; ++i)
@@ -309,13 +309,11 @@ namespace FEAST
           // get a reference to the corresponding vertex
           MeshStreamer::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
 
-          ASSERT(int(vtx.size()) == num_coords, "Vertex coordinate count mismatch!");
+          ASSERT(vtx.size() == num_coords, "Vertex coordinate count mismatch!");
 
           // copy vertex coordinates
-          for(int j(0); j < num_coords; ++j)
-          {
+          for(Index j(0); j < num_coords; ++j)
             vertex_set[i][j] = Coord_(vtx[j]);
-          }
         }
       }
 
@@ -333,7 +331,7 @@ namespace FEAST
         Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(index_set_holder, _num_entities);
 
         // Update _mesh_data with the new information
-        Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(_mesh_data, index_set_holder);
+        FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(_mesh_data, index_set_holder);
       }
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)

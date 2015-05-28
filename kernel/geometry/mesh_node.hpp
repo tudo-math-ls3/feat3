@@ -6,6 +6,8 @@
 #include <kernel/geometry/cell_sub_set_node.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/conformal_sub_mesh.hpp>
+#include <kernel/geometry/mesh_streamer_factory.hpp>
+#include <kernel/util/mesh_streamer.hpp>
 
 // includes, STL
 #include <map>
@@ -73,6 +75,8 @@ namespace FEAST
 
     /**
      * \brief Mesh Node base class
+     *
+     * A MeshNode is a container for bundling a mesh with SubMeshes and CellSubSets referring to it.
      *
      * \author Peter Zajac
      */
@@ -452,6 +456,58 @@ namespace FEAST
       explicit RootMeshNode(MeshType* mesh) :
         BaseClass(mesh)
       {
+      }
+
+      /**
+       * \brief Constructs a RootMeshNode from a streamed mesh
+       *
+       * \param[in] mesh_reader
+       * MeshStreamer that contains the information from the streamed mesh.
+       *
+       */
+      explicit RootMeshNode(MeshStreamer& mesh_reader) :
+        BaseClass(nullptr)
+      {
+        // Construct a new Geometry::Mesh using the MeshStreamer and a MeshStreamerFactory
+        MeshStreamerFactory<MeshType> my_factory(mesh_reader);
+        this->_mesh = new MeshType(my_factory);
+
+        // Generate a MeshStreamer::MeshNode, as this then contains the information about the SubMeshes and
+        // CellSubSets present in the MeshStreamer
+        MeshStreamer::MeshNode* root(mesh_reader.get_root_mesh_node());
+        ASSERT_(root != nullptr);
+
+        // Add SubMeshNodes and CellSubSetNodes to the new RootMeshNode by iterating over the MeshStreamer::MeshNode
+        // Careful: MeshStreamer::SubMeshNodes and MeshStreamer::CellSubSetNodes use Strings as their names and
+        // identifiers, whereas the RootMeshNode uses an Index for this
+        Index i(0);
+        for(auto& it:root->sub_mesh_map)
+        {
+          // Create a factory for the SubMesh
+          MeshStreamerFactory<typename Policy_::SubMeshType> submesh_factory(mesh_reader, it.first);
+          // Construct the SubMesh using that factory
+          typename Policy_::SubMeshType* my_submesh(new typename Policy_::SubMeshType(submesh_factory));
+          // Create the SubMeshNode using that SubMesh
+          SubMeshNode<Policy_>* my_submesh_node(new SubMeshNode<Policy_>(my_submesh));
+          // Add the new SubMeshNode to the RootMeshNode
+          this->add_submesh_node(i++, my_submesh_node);
+        }
+
+        // Add CellSubsetNodes
+        i = 0;
+        for(auto& it:root->cell_set_map)
+        {
+          // Create a factory for the CellSubSet
+          MeshStreamerFactory<typename Policy_::CellSubSetType> cell_subset_factory(mesh_reader, it.first);
+          // Construct the CellSubSet using that factory
+          typename Policy_::CellSubSetType* my_cell_subset
+            (new typename Policy_::CellSubSetType(cell_subset_factory));
+          // Create the CellSubSetNode using that CellSubSet
+          CellSubSetNode<Policy_>* my_cell_subset_node(new CellSubSetNode<Policy_>(my_cell_subset));
+          // Add the new CellSubSetNode to the RootMeshNode
+          this->add_subset_node(i++, my_cell_subset_node);
+        }
+
       }
 
       /// virtual destructor
