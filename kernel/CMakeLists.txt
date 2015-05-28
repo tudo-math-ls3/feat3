@@ -47,6 +47,11 @@ if (FEAST_HAVE_UMFPACK)
   TARGET_LINK_LIBRARIES (feast thirdparty-umfpack)
 endif(FEAST_HAVE_UMFPACK)
 
+if (FEAST_HAVE_QUADMATH)
+  TARGET_LINK_LIBRARIES (feast -lquadmath)
+endif (FEAST_HAVE_QUADMATH)
+
+
 # list of kernel tests
 SET (test_list
   shape-test

@@ -191,10 +191,6 @@ else:
   print ("Error: No supported build mode (opt/debug) found in build id:")
   print (buildid_string)
   sys.exit(1)
-if "quadmath" in buildid:
-  remove_string(unused_tokens, "quadmath")
-  cmake_flags += " -DFEAST_HAVE_QUADMATH:BOOL=ON"
-  ldflags += " -lquadmath"
 
 # parallelisation selection
 if "serial" in buildid:
@@ -356,6 +352,11 @@ if "valgrind" in buildid:
   print("valgrind version: " + get_output("valgrind --version")[0])
   remove_string(unused_tokens, "valgrind")
   cmake_flags += " -DFEAST_VALGRIND:BOOL=ON"
+
+if "quadmath" in buildid:
+  remove_string(unused_tokens, "quadmath")
+  cmake_flags += " -DFEAST_HAVE_QUADMATH:BOOL=ON"
+
 
 # optional third party libraries
 for package in available_packages(trunk_dirname+os.sep+"build_system",trunk_dirname+os.sep+"thirdparty"):
