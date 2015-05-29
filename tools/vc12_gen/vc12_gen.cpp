@@ -128,7 +128,7 @@ public:
   /// generates a pseudo-random 32-bit int
   static int gen_random_int()
   {
-    static int s((int)time(NULL));
+    static int s((int)time(nullptr));
     static int x(362436069);
     static int y(521288629);
     static int z(88675123);

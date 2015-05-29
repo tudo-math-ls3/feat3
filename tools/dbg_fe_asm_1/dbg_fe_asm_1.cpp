@@ -30,7 +30,7 @@ int imat = 0;
 QuadMesh* read_quad_mesh(const char* filename)
 {
   FILE* file = fopen(filename, "rb");
-  ASSERT_(file != NULL);
+  ASSERT_(file != nullptr);
 
   int magic, ne[3], idx[4];
   double vtx[2];
@@ -103,7 +103,7 @@ QuadMesh* read_quad_mesh(const char* filename)
 bool verify_struct(const char* filename, const Adjacency::Graph& graph)
 {
   FILE* file = fopen(filename, "rb");
-  ASSERT_(file != NULL);
+  ASSERT_(file != nullptr);
 
   int magic;
   unsigned int ne[2],idx;
@@ -178,7 +178,7 @@ template<typename DataType_>
 double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix, double& asm_time)
 {
   FILE* file = fopen(filename, "rb");
-  ASSERT_(file != NULL);
+  ASSERT_(file != nullptr);
 
   int magic;
   unsigned int ne[2];

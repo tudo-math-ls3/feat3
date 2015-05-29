@@ -517,7 +517,7 @@ public:
       if(test_45.size() != 1ul) return false;
       if(test_45.at(0) != 1ul) return false;
     }
-    catch(std::exception e)
+    catch(const std::exception & e)
     {
       std::cout << "testing v f" << std::endl;
     }
@@ -527,7 +527,7 @@ public:
     {
       Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(3, m3);
     }
-    catch(std::exception e)
+    catch(const std::exception & e)
     {
       std::cout << "copy" << std::endl;
     }

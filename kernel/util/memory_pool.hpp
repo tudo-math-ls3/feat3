@@ -74,9 +74,9 @@ namespace FEAST
         template <typename DT_>
         DT_ * allocate_memory(const Index count)
         {
-          DT_ * memory(NULL);
+          DT_ * memory(nullptr);
           memory = (DT_*)::malloc(count * sizeof(DT_));
-          if (memory == NULL)
+          if (memory == nullptr)
             throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
 
           Intern::MemoryInfo mi;

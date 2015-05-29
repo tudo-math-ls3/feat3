@@ -43,7 +43,7 @@ public:
 
   virtual void run() const
   {
-    Random::SeedType seed(Random::SeedType(time(NULL)));
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
     std::cout << "seed: " << seed << std::endl;
 
@@ -182,7 +182,7 @@ public:
   {
     DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.5)));
 
-    Random::SeedType seed(Random::SeedType(time(NULL)));
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
     std::cout << "seed: " << seed << std::endl;
 
@@ -317,7 +317,7 @@ public:
 
   virtual void run() const
   {
-    Random::SeedType seed(Random::SeedType(time(NULL)));
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
     std::cout << "seed: " << seed << std::endl;
 
