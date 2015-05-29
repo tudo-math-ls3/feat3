@@ -880,7 +880,7 @@ namespace FEAST
               target_data->parent_indices[target_dim].push_back(entity);
           }
           // Update the entity count
-          entity_count = target_data->parent_indices[target_dim].size();
+          entity_count = Index(target_data->parent_indices[target_dim].size());
 
           // Clean up
           delete[] parent_vertex_to_sub;
