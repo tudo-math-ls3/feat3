@@ -70,7 +70,7 @@ namespace FEAST
           const char* const function,
           const char* const file,
           const long line,
-          const String & message) throw ()
+          const String & message)
         : _message(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message )
       {
       }
@@ -81,7 +81,7 @@ namespace FEAST
       }
 
       /// description
-      const char* what() const throw ()
+      const char* what() const throw()
       {
         return _message.c_str();
       }

@@ -13,14 +13,14 @@ namespace FEAST
       public Exception
     {
       public:
-        MeshError(const std::string & message_in) throw ();
+        MeshError(const std::string & message_in);
     };
 
     class MeshInternalIndexOutOfBounds :
       public MeshError
     {
       public:
-        MeshInternalIndexOutOfBounds(Index index, Index max_index) throw ();
+        MeshInternalIndexOutOfBounds(Index index, Index max_index);
     };
   }
 }

@@ -14,14 +14,14 @@ namespace FEAST
         public Exception
     {
         public:
-            AttributeError(const std::string & message_in) throw ();
+            AttributeError(const std::string & message_in);
     };
 
     class AttributeTypeMismatch :
         public AttributeError
     {
         public:
-            AttributeTypeMismatch() throw ();
+            AttributeTypeMismatch();
     };
   }
 }

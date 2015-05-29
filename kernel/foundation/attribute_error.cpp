@@ -4,12 +4,12 @@
 using namespace FEAST;
 using namespace Foundation;
 
-AttributeError::AttributeError(const std::string & message_in) throw () :
+AttributeError::AttributeError(const std::string & message_in) :
     Exception(message_in)
 {
 }
 
-AttributeTypeMismatch::AttributeTypeMismatch() throw () :
+AttributeTypeMismatch::AttributeTypeMismatch() :
     AttributeError("Type mismatch in attribute")
 {
 }

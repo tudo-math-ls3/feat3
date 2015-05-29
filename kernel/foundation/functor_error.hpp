@@ -14,7 +14,7 @@ namespace FEAST
         public Exception
     {
         public:
-            FunctorError(const std::string & message_in) throw ();
+            FunctorError(const std::string & message_in);
     };
   }
 }

@@ -14,14 +14,14 @@ namespace FEAST
         public Exception
     {
         public:
-            CommunicationError(const std::string & message_in) throw ();
+            CommunicationError(const std::string & message_in);
     };
 
     class CommunicationHaloOverlapMismatch :
         public CommunicationError
     {
         public:
-            CommunicationHaloOverlapMismatch(Index comm_overlap, Index halo_overlap) throw ();
+            CommunicationHaloOverlapMismatch(Index comm_overlap, Index halo_overlap);
     };
   }
 }

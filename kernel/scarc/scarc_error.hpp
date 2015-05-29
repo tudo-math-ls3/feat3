@@ -13,7 +13,7 @@ namespace FEAST
         public Exception
     {
         public:
-            ScaRCError(const std::string & message_in) throw ();
+            ScaRCError(const std::string & message_in);
     };
 
   }
