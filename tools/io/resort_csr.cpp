@@ -9,14 +9,16 @@ using namespace FEAST::Adjacency;
 
 int main(int argc, char ** argv)
 {
-    if (argc != 3)
+    if (argc != 3 && argc != 2)
     {
-        std::cout<<"Usage 'resort-csr csr-file csr-file-resorted'"<<std::endl;
+        std::cout<<"Usage: 'resort-csr csr-file [csr-file-resorted]'"<<std::endl;
         exit(EXIT_FAILURE);
     }
 
     String input(argv[1]);
-    String output(argv[2]);
+    String output;
+    if (argc != 2)
+      output = argv[2];
 
     SparseMatrixCSR<Mem::Main, double, Index> orig(FileMode::fm_csr, input);
     Graph graph(Adjacency::rt_as_is, orig);
@@ -222,5 +224,6 @@ int main(int argc, char ** argv)
       std::cout<<"false root_default sort_desc: "<<best_radius<<std::endl;
     }
 
-    best.write_out(FileMode::fm_csr, output);
+    if (argc != 2)
+      best.write_out(FileMode::fm_csr, output);
 }
