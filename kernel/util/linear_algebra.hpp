@@ -347,7 +347,12 @@ namespace FEAST
       ASSERT_(y != nullptr);
       ASSERT_(x != nullptr);
 
+      /// \compilerhack Intel C++ 14 loop vectorisation bug
+#if defined(FEAST_COMPILER_INTEL) && (FEAST_COMPILER_INTEL < 1500)
+      for(TypeSize_ i(0) ; (i+1) < (n+1) ; ++i)
+#else
       for(TypeSize_ i(0) ; i < n ; ++i)
+#endif
       {
         y[i] += alpha * TypeY_(x[i]);
       }

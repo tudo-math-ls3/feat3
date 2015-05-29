@@ -456,7 +456,13 @@ namespace FEAST
     inline T_ dot(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
     {
       T_ r(0);
+
+      /// \compilerhack Intel C++ 14 loop vectorisation bug
+#if defined(FEAST_COMPILER_INTEL) && (FEAST_COMPILER_INTEL < 1500)
+      for(Index i(0); (i+1) < Index(n_+1); ++i)
+#else
       for(Index i(0); i < Index(n_); ++i)
+#endif
       {
         r += a.v[i] * b.v[i];
       }
