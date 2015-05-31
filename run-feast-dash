@@ -72,6 +72,7 @@ def run_test(build_id, branch, myDB, extra_opts):
 
   #prepare build dir
   shutil.rmtree(build_dirname, True)
+  time.sleep(5)
   os.mkdir(build_dirname)
 
   #git pull
