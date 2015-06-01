@@ -44,7 +44,7 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
       cxxflags += " -Wswitch-bool -Wsizeof-array-argument -Wbool-compare"
       cxxflags += " -Wsuggest-final-types  -Wsuggest-final-methods"
-      #cxxflags += " -Wnon-virtual-dtor"
+      #cxxflags += " -Wnon-virtual-dtor -Wdelete-non-virtual-dtor"
   elif "opt" in buildid:
     cxxflags += " -O3 -funsafe-loop-optimizations"
     if major >= 5:
