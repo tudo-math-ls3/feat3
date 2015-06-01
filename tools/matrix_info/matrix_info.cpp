@@ -231,6 +231,7 @@ namespace MatrixInfo
     std::vector<Index> vnze_row(nrows, Index(0));
     std::vector<Index> vnze_col(ncols, Index(0));
     std::vector<Index> diag_ptr(nmin, ~Index(0));
+    std::vector<Index> row_degree_distribution_counts(10, Index(0));
 
     // initialise statistical values
     Index row_degree = 0;
@@ -241,6 +242,7 @@ namespace MatrixInfo
     Index col_degree_idx = 0;
     Index col_bandw = 0;
     Index col_bandw_idx = 0;
+    String row_degree_distribution = "";
 
     // various norms
     DataType norm_col_sum = DataType(0);
@@ -305,6 +307,7 @@ namespace MatrixInfo
         row_degree_idx = i;
       }
 
+
       // compute bandwidth
       if(my_row_degree > 0)
       {
@@ -357,6 +360,22 @@ namespace MatrixInfo
 
       // do we have a structural diagonal entry?
       have_struct_diag = have_struct_diag && my_struct_diag;
+    }
+
+    // now loop again over the matrix rows
+    // we need to now the max row degree to calculate row distribution
+    for(Index i(0); i < nrows; ++i)
+    {
+      float percentage(float(vnze_row[i]) / float(row_degree) * float(100));
+      row_degree_distribution_counts[Index(percentage) / Index(row_degree_distribution_counts.size())] += Index(1);
+    }
+    // format distribution string
+    for(Index i(0) ; i < Index(row_degree_distribution_counts.size()) ; ++i)
+    {
+      float percentage(float(row_degree_distribution_counts[i]) / float(nrows) * float(100));
+      row_degree_distribution += stringify(Index(percentage));
+      if (i < row_degree_distribution_counts.size() - 1)
+        row_degree_distribution += " | ";
     }
 
     // compute frobenius norm
@@ -488,6 +507,7 @@ namespace MatrixInfo
     std::cout << String("Number of Columns").pad_back(pad_len, '.') << ": " << ncols << std::endl;
     std::cout << String("Max Row Degree").pad_back(pad_len, '.') << ": " << row_degree << " (max in row " << row_degree_idx << ")" << std::endl;
     std::cout << String("Max Column Degree").pad_back(pad_len, '.') << ": " << col_degree << " (max in col " << col_degree_idx << ")" << std::endl;
+    std::cout << String("Row Degree Distribution").pad_back(pad_len, '.') << ": " << row_degree_distribution << std::endl;
     std::cout << String("Max Row Bandwidth").pad_back(pad_len, '.') << ": " << row_bandw << " (max in row " << row_bandw_idx << ")" << std::endl;
     std::cout << String("Max Column Bandwidth").pad_back(pad_len, '.') << ": " << col_bandw << " (max in col " << col_bandw_idx << ")" << std::endl;
     std::cout << String("Symbolical Non-Zeros").pad_back(pad_len, '.') << ": " << nnze << std::endl;
