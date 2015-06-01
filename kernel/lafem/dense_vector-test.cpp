@@ -173,7 +173,7 @@ DenseVectorTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_test_float_ul
 DenseVectorTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_test_double_ulong;
 #endif
 
-/*
+
 template<
   typename Mem_,
   typename DT_,
@@ -302,7 +302,7 @@ DenseVectorDotTest<Mem::CUDA, float, unsigned long> cuda_dv_dot_product_test_flo
 DenseVectorDotTest<Mem::CUDA, double, unsigned long> cuda_dv_dot_product_test_double_ulong;
 #endif
 
-*/
+
 /**
  * \brief DenseVector triple_dot test class
  *
@@ -311,7 +311,7 @@ DenseVectorDotTest<Mem::CUDA, double, unsigned long> cuda_dv_dot_product_test_do
  * \author Jordi Paul
  *
  **/
-/*
+
 template<
   typename Mem_,
   typename DT_,
@@ -636,4 +636,3 @@ DenseVectorComponentInvertTest<Mem::Main, __float128, Index> dv_component_invert
 DenseVectorComponentInvertTest<Mem::CUDA, float, Index> cuda_dv_component_invert_test_float;
 DenseVectorComponentInvertTest<Mem::CUDA, double, Index> cuda_dv_component_invert_test_double;
 #endif
-*/
