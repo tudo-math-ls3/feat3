@@ -611,7 +611,7 @@ public:
 
       VectorType vec2(vec.clone());
       vec2.component_invert(vec2, alpha);
-      vec2.template component_product(vec2, vec);
+      vec2.component_product(vec2, vec);
       for (Index i(0); i < size; ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(vec2(i), alpha, eps);
