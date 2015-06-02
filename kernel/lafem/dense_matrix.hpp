@@ -322,6 +322,22 @@ namespace FEAST
       }
       ///@}
 
+      /// \cond internal
+
+      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
+      void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
+                    const Index col_start, const Index stride = 1) const
+      {
+        const DT_ * pval(this->elements());
+
+        for (Index i(0); i < columns(); ++i)
+        {
+          pval_set[i * stride] = pval[columns() * row + i];
+          pcol_set[i * stride] = IT_(i) + IT_(col_start);
+        }
+      }
+      /// \endcond
+
       /**
        * \brief DenseMatrix comparison operator
        *
