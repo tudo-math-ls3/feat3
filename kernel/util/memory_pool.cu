@@ -55,10 +55,13 @@ MemoryPool<Mem::CUDA>::~MemoryPool()
 template <typename DT_>
 DT_ * MemoryPool<Mem::CUDA>::allocate_memory(const Index count)
 {
-  DT_ * memory(NULL);
+  DT_ * memory(nullptr);
+  if (count == 0)
+    return memory;
+
   if (cudaErrorMemoryAllocation == cudaMalloc((void**)&memory, count * sizeof(DT_)))
     throw InternalError("MemoryPool<CUDA> cuda allocation error (cudaErrorMemoryAllocation)");
-  if (memory == NULL)
+  if (memory == nullptr)
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA> allocation error (null pointer returned)");
   Intern::MemoryInfo mi;
   mi.counter = 1;
@@ -69,6 +72,9 @@ DT_ * MemoryPool<Mem::CUDA>::allocate_memory(const Index count)
 
 void MemoryPool<Mem::CUDA>::increase_memory(void * address)
 {
+  if (address == nullptr)
+    return;
+
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::increase_memory: Memory address not found!");

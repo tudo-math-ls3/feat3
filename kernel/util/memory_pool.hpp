@@ -56,7 +56,6 @@ namespace FEAST
         {
         }
 
-
       public:
         ~MemoryPool()
         {
@@ -75,6 +74,9 @@ namespace FEAST
         DT_ * allocate_memory(const Index count)
         {
           DT_ * memory(nullptr);
+          if (count == 0)
+            return memory;
+
           memory = (DT_*)::malloc(count * sizeof(DT_));
           if (memory == nullptr)
             throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
@@ -90,6 +92,9 @@ namespace FEAST
         /// increase memory counter
         void increase_memory(void * address)
         {
+          if (address == nullptr)
+            return;
+
           std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
           if (it == _pool.end())
             throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::increase_memory: Memory address not found!");
