@@ -25,7 +25,6 @@ namespace FEAST
   // default constructor
   MeshStreamer::MeshStreamer() :
     _num_submeshes(0),
-    _num_cellsets(0),
     _chart_path(""),
     _root_mesh_node(nullptr)
   {
@@ -42,16 +41,16 @@ namespace FEAST
     }
   }
 
-  // returns the parent mesh specified by "parent_name"
-  MeshStreamer::CellSetParent* MeshStreamer::_find_cell_set_parent(String parent_name)
-  {
-    CONTEXT("MeshStreamer::_find_cell_set_parent");
-    if(parent_name == "root")
-      return _root_mesh_node;
-    if(_root_mesh_node != nullptr)
-      return _root_mesh_node->find_cell_set_parent(parent_name);
-    return nullptr;
-  }
+//  // returns the parent mesh specified by "parent_name"
+//  MeshStreamer::CellSetParent* MeshStreamer::_find_cell_set_parent(String parent_name)
+//  {
+//    CONTEXT("MeshStreamer::_find_cell_set_parent");
+//    if(parent_name == "root")
+//      return _root_mesh_node;
+//    if(_root_mesh_node != nullptr)
+//      return _root_mesh_node->find_cell_set_parent(parent_name);
+//    return nullptr;
+//  }
 
   // returns the sub mesh parent specified by "parent_name"
   MeshStreamer::MeshNode* MeshStreamer::_find_sub_mesh_parent(String parent_name)
@@ -161,15 +160,16 @@ namespace FEAST
       }
 
       // if it is a submesh chunk
-      else if(line == "<submesh>")
+      else if(line == "<meshpart>")
       {
         cur_line = _parse_mesh_section(cur_line, true, ifs);
       }
 
-      // if it is a cellset chunk
-      else if(line == "<cellset>")
+      // if it is a chart chunk
+      else if(line == "<chart>")
       {
-        cur_line = _parse_cellset_section(cur_line, ifs);
+        // TODO
+        //cur_line = _parse_chart_section(cur_line, ifs);
       }
 
       // if it is the end
@@ -238,34 +238,17 @@ namespace FEAST
     }
 
     // submeshes
-    if(line_vec[0] == "submeshes")
+    if(line_vec[0] == "meshparts")
     {
       if(!(line_vec.size() == 2))
       {
-        throw SyntaxError("Missing number of submeshes in line " + stringify(cur_line));
+        throw SyntaxError("Missing number of meshparts in line " + stringify(cur_line));
       }
       (line_vec.at(1)).parse(_num_submeshes);
     }
     else
     {
-      throw SyntaxError("Expected number of submeshes, line " + stringify(cur_line));
-    }
-
-    line = read_next_line(ifs,cur_line);
-    line.split_by_charset(line_vec);
-
-    // cellsets
-    if(line_vec[0] == "cellsets")
-    {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing number of cellsets in line " + stringify(cur_line));
-      }
-      (line_vec.at(1)).parse(_num_cellsets);
-    }
-    else
-    {
-      throw SyntaxError("Expected number of cellsets, line " + stringify(cur_line));
+      throw SyntaxError("Expected number of meshparts, line " + stringify(cur_line));
     }
 
     line = read_next_line(ifs,cur_line);
@@ -307,31 +290,6 @@ namespace FEAST
     infoline.trim_me();
     return infoline;
   } // Index MeshStreamer::_parse_info_section(Index cur_line, std::istream& ifs)
-
-  // parses the cellset-section stream ifs
-  Index MeshStreamer::_parse_cellset_section(Index cur_line, std::istream& ifs)
-  {
-    CONTEXT("MeshStreamer::_parse_cellset_section");
-
-    // (auxiliary) variables
-    String line;
-
-    // create a new cell-set node
-    CellSetNode* cell_set_node = new CellSetNode();
-
-    // cellset data container of the root mesh
-    CellSetContainer& current_set(cell_set_node->cell_set);
-
-    cur_line = current_set._parse_cellset_section(cur_line, ifs);
-
-    CellSetParent* parent = _find_cell_set_parent(current_set.parent);
-    ASSERT_(parent != nullptr);
-    parent->cell_set_map.insert(std::make_pair(current_set.name, cell_set_node));
-
-    // return number of lines read so far
-    return cur_line;
-  } // Index MeshStreamer::_parse_cellset_section(Index cur_line, std::istream& ifs)
-
 
   // parses the given mesh-section stream
   Index MeshStreamer::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
@@ -440,15 +398,6 @@ namespace FEAST
     return _num_submeshes;
   }
 
-
-  // returns the number of cellsets
-  Index MeshStreamer::get_num_cellsets() const
-  {
-    CONTEXT("MeshStreamer::get_num_cellsets()");
-    return _num_cellsets;
-  }
-
-
   // returns the global mesh information
   String MeshStreamer::get_info() const
   {
@@ -467,16 +416,6 @@ namespace FEAST
       return &_root_mesh_node->mesh_data;
     MeshNode* node = _root_mesh_node->find_sub_mesh(name);
     return (node != nullptr) ? &node->mesh_data : nullptr;
-  }
-
-  // returns a pointer to the CellSetContainer specified by "name"
-  MeshStreamer::CellSetContainer* MeshStreamer::get_cell_set(String name)
-  {
-    CONTEXT("MeshStreamer::get_cell_set()");
-    if(_root_mesh_node == nullptr)
-      return nullptr;
-    CellSetNode* node = _root_mesh_node->find_cell_set(name);
-    return (node != nullptr) ? &node->cell_set : nullptr;
   }
 
   // writes the data into a file specified by "filename"
@@ -507,8 +446,7 @@ namespace FEAST
     ofs << " version " << "1" << std::endl;
     if ( !_chart_path.empty() )
       ofs << " chart_file " << _chart_path << std::endl;
-    ofs << " submeshes " << _num_submeshes << std::endl;
-    ofs << " cellsets " << _num_cellsets << std::endl;
+    ofs << " meshparts " << _num_submeshes << std::endl;
     // END OF HEADER section
     ofs << "</header>" << std::endl;
 
@@ -807,117 +745,6 @@ namespace FEAST
     return cur_line;
   } // MeshStreamer::BaseContainer::_parse_parents_chunk
 
-
-  // parses the cellset-section stream ifs
-  Index MeshStreamer::CellSetContainer::_parse_cellset_section(Index cur_line, std::istream& ifs)
-  {
-    CONTEXT("MeshStreamer::CellSetContainer::_parse_cellset_section");
-
-    // (auxiliary) variables
-    String line;
-    std::vector<String> line_vec;
-
-    // get a line
-    line = read_next_line(ifs,cur_line);
-    if(!(line=="<header>"))
-    {
-      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-    }
-
-    line = read_next_line(ifs,cur_line);
-    line.split_by_charset(line_vec);
-
-    if(line_vec[0] == "name")
-    {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing name in line " + stringify(cur_line));
-      }
-      name = line_vec.at(1);
-    }
-    else
-    {
-      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-    }
-
-    line = read_next_line(ifs,cur_line);
-    line.split_by_charset(line_vec);
-
-    // if it is the parent
-    if(line_vec[0] == "parent")
-    {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing parent in line " + stringify(cur_line));
-      }
-      parent = line_vec.at(1);
-    }
-    else
-    {
-      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-    }
-
-    line = read_next_line(ifs,cur_line);
-
-    // end of the header section
-    if(!(line == "</header>"))
-    {
-      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-    }
-
-    line = read_next_line(ifs,cur_line);
-
-    if(line == "<info>")
-    {
-      info = _parse_info_section(cur_line, ifs);
-
-      line = read_next_line(ifs,cur_line);
-    } // info sub-chunk
-
-    // if it is the counts sub chunk
-    if(line == "<counts>")
-    {
-      cur_line = _parse_counts_chunk(cur_line, ifs);
-    } // counts sub-chunk
-    else
-    {
-      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-    }
-
-    while(!ifs.eof() && ifs.good())
-    {
-      line = read_next_line(ifs,cur_line);
-      // if it is a parent index chunk
-      if(line == "<vert_idx>" ||
-         line == "<edge_idx>" ||
-         line == "<tria_idx>" ||
-         line == "<quad_idx>" ||
-         line == "<tetra_idx>" ||
-         line == "<hexa_idx>")
-      {
-        cur_line = _parse_parents_chunk(cur_line, ifs, line);
-      } // parent index sub chunk
-
-      // if it is the end of the cellset section
-      else if(line == "</cellset>")
-      {
-        break;
-      }
-      else
-      {
-        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-      }
-    } // while
-
-    if(line != "</cellset>" && !(!ifs.eof() && ifs.good()))
-    {
-      throw SyntaxError("Reached end of file but expected </cellset> at line " + stringify(cur_line));
-    }
-    // return number of lines read so far
-    return cur_line;
-  } // Index MeshStreamer::CellSetContainer::_parse_cellset_section(Index cur_line, std::istream& ifs)
-
-
   // parses the given mesh-section stream
   Index MeshStreamer::MeshDataContainer::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
   {
@@ -930,7 +757,7 @@ namespace FEAST
     std::vector<String> line_vec;
 
     // if it is the root mesh
-    String break_line = submesh ? "</submesh>" : "</mesh>";
+    String break_line = submesh ? "</meshpart>" : "</mesh>";
 
     coord_per_vertex = 0;
 
@@ -1030,9 +857,19 @@ namespace FEAST
     {
       throw SyntaxError("Unknown file format in line " + stringify(cur_line));
     }
-
     line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
+
+    if(line_vec[0] == "attribute_sets")
+    {
+      if(!(line_vec.size() == 2))
+      {
+        throw SyntaxError("Missing number of attribute sets in line " + stringify(cur_line));
+      }
+      (line_vec.at(1)).parse(attribute_count);
+      line = read_next_line(ifs,cur_line);
+      line.split_by_charset(line_vec);
+    }
 
     if(line_vec[0] == "coord_file")
     {
@@ -1061,7 +898,7 @@ namespace FEAST
       }
       else
       {
-        throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
+        coord_per_vertex = 0;
       }
     }
     else
@@ -1132,7 +969,7 @@ namespace FEAST
       cur_line = _parse_coords_chunk(cur_line, ifs);
       line = read_next_line(ifs,cur_line);
     }
-    else if(!coordfile)
+    else if(!coordfile && coord_per_vertex!=0)
     {
       throw SyntaxError("Unknown file format. Expected <coords> in line " + stringify(cur_line));
     }// coords sub-chunk
@@ -1159,6 +996,10 @@ namespace FEAST
       {
         cur_line = _parse_parents_chunk(cur_line, ifs, line);
       } // parent index sub chunk
+      else if(line=="<attribute>")
+      {
+        cur_line = _parse_attribute_chunk(cur_line, ifs);
+      }
 
       // if it is the end of the mesh section
       else if(line == break_line)
@@ -1167,16 +1008,25 @@ namespace FEAST
       }
       else
       {
-        throw SyntaxError("Unknown file format. Expected </mesh> or </submesh> in line " + stringify(cur_line));
+        throw SyntaxError("Unknown file format. Expected </mesh> or </meshpart> in line " + stringify(cur_line));
       }
 
       line = read_next_line(ifs,cur_line);
     } // while
 
+
     if(line != break_line && !(!ifs.eof() && ifs.good()))
     {
       throw SyntaxError("Reached end of file but expected " + break_line + " at line " + stringify(cur_line));
     }
+
+    // Sanity check: Does the number of parsed attributes match the specified number?
+    Index real_num_attributes(0);
+    for(Index i(0); i < 4; ++i)
+      real_num_attributes += (this->attributes[i]).size();
+
+    if(real_num_attributes != this->attribute_count)
+      throw InternalError("Parsed " + stringify(real_num_attributes) + " attribute sets but " + stringify(this->attribute_count) + " were specified!");
 
     // return number of lines read so far
     return cur_line;
@@ -1499,6 +1349,135 @@ namespace FEAST
 
   } // MeshStreamer::MeshDataContainer::parse_adjacency_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
 
+  /// Parses an attribute chunk
+  Index MeshStreamer::MeshDataContainer::_parse_attribute_chunk(Index cur_line, std::istream& ifs)
+  {
+    Index dimension(~Index(0));
+    String my_name("noname");
+    Index value_dim(0);
+    Index value_count(0);
+
+    String line("");
+    std::vector<String> line_vec;
+
+    line = read_next_line(ifs,cur_line);
+    if(line!="<header>")
+      throw SyntaxError("Attribute section does not start with header section in line " + stringify(cur_line));
+
+    line = read_next_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
+    if(line_vec[0] == "dimension")
+    {
+      if(!(line_vec.size() == 2))
+      {
+        throw SyntaxError("Missing dimension number in line " + stringify(cur_line));
+      }
+
+      (line_vec.at(1)).parse(dimension);
+    }
+    else
+      throw SyntaxError("Expected dimension in line " + stringify(cur_line));
+
+    line = read_next_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
+    if(line_vec[0] == "name")
+    {
+      if(!(line_vec.size() == 2))
+      {
+        throw SyntaxError("Missing name indentifier in line " + stringify(cur_line));
+      }
+
+      (line_vec.at(1)).parse(my_name);
+    }
+
+    line = read_next_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
+    if(line_vec[0] == "value_dim")
+    {
+      if(!(line_vec.size() == 2))
+      {
+        throw SyntaxError("Missing value_dim count in line " + stringify(cur_line));
+      }
+
+      (line_vec.at(1)).parse(value_dim);
+    }
+
+    line = read_next_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
+    if(line_vec[0] == "value_count")
+    {
+      if(!(line_vec.size() == 2))
+      {
+        throw SyntaxError("Missing value_count count in line " + stringify(cur_line));
+      }
+
+      (line_vec.at(1)).parse(value_count);
+    }
+
+    line = read_next_line(ifs,cur_line);
+    if(line!="</header>")
+      throw SyntaxError("Expected end of attribute header in line " + stringify(cur_line));
+
+    // Init AttributeContainer with the parsed sizes
+    AttributesContainer my_attribute_container(my_name, value_dim, value_count);
+
+    line = read_next_line(ifs,cur_line);
+    if(line!="<values>")
+      throw SyntaxError("Expected <values> in line " + stringify(cur_line));
+
+    while(!ifs.eof() && ifs.good())
+    {
+      // get a line
+      line = read_next_line(ifs,cur_line);
+
+      // if it is the end of the values sub chunk
+      if(line == "</values>")
+      {
+        break;
+      }
+      else
+      {
+        // auxiliary variables
+        typename AttributesContainer::ValueType current_value;
+        typename AttributesContainer::ValueVec v;
+
+        // separate by " "
+        line.split_by_charset(line_vec);
+
+        // parse the substrings
+        for(Index i(0); i < line_vec.size(); ++i)
+        {
+          if ( !(line_vec[i]).parse(current_value) )
+          {
+            throw SyntaxError("Wrong value format in line " + stringify(cur_line));
+          }
+          v.push_back(current_value);
+        }
+
+        // if the number of entries does not match the coord_per_vertex variable
+        if (v.size() != value_dim)
+        {
+          throw SyntaxError("Entry does not match value_dim count in line " + stringify(cur_line));
+        }
+
+        // add to the coordinate stack
+        my_attribute_container.values.push_back(v);
+      }
+    }
+    line = read_next_line(ifs,cur_line);
+    if(line!="</attribute>")
+      throw SyntaxError("Expected </attribute> in line " + stringify(cur_line));
+
+    // Sanity check: Does the number of parsed values match the specified number?
+    if(my_attribute_container.values.size() != my_attribute_container.value_count)
+      throw InternalError("Parsed " + stringify(my_attribute_container.values.size()) + " values but " + stringify(my_attribute_container.value_count) + " were specified");
+
+    // Add the temporay AttributeContainer to the MeshDataContainer's attributes
+    (this->attributes[dimension]).push_back(my_attribute_container);
+
+    return cur_line;
+
+  } // MeshStreamer::MeshDataContainer::_parse_attribute_chunk
 
   // parses a coords subchunk
   Index MeshStreamer::MeshDataContainer::_parse_coords_chunk(Index cur_line, std::istream& ifs)
@@ -1699,6 +1678,10 @@ namespace FEAST
   // converts shapetype (ShapeType to String)
   String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType shape_type_in)
   {
+    if(shape_type_in == st_vert)
+    {
+      return "vertex";
+    }
     if(shape_type_in == st_edge)
     {
       return "edge";
@@ -1736,6 +1719,10 @@ namespace FEAST
   // converts shapetype (String to ShapeType)
   MeshStreamer::MeshDataContainer::ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type_in)
   {
+    if(shape_type_in == "vertex")
+    {
+      return st_vert;
+    }
     if(shape_type_in == "edge")
     {
       return st_edge;
@@ -1766,116 +1753,9 @@ namespace FEAST
     }
     else
     {
-      // todo error anpassen
-      throw InternalError("Unknown shapetype");
+      throw InternalError("Unknown shapetype: "+ shape_type_in);
     }
   } // ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type) const
-
-
-  // writes the stored cell set data into the output stream.
-  void MeshStreamer::CellSetNode::write(std::ostream& ofs) const
-  {
-    ofs << "<cellset>" << std::endl;
-
-    // header section
-    ofs << " <header>" << std::endl;
-    ofs << "  name " << cell_set.name << std::endl;
-    ofs << "  parent " << cell_set.parent <<std::endl;
-    ofs << " </header>" << std::endl;
-
-    // info section
-    if( !cell_set.info.empty() )
-    {
-      ofs << " <info>" << std::endl;
-      ofs << "  " << cell_set.info << std::endl;
-      ofs << " </info>" << std::endl;
-    }
-    // count section
-    ofs << " <counts>" << std::endl;
-    if(cell_set.slices.size() == 0)
-    {
-    if( cell_set.vertex_count != 0)
-      ofs << "  verts " << cell_set.vertex_count << std::endl;
-    if( cell_set.edge_count != 0)
-      ofs << "  edges " << cell_set.edge_count << std::endl;
-    if( cell_set.quad_count != 0)
-      ofs << "  quads " << cell_set.quad_count << std::endl;
-    if( cell_set.tria_count != 0)
-      ofs << "  trias " << cell_set.tria_count << std::endl;
-    if( cell_set.tetra_count != 0)
-      ofs << "  tetras " << cell_set.tetra_count << std::endl;
-    if( cell_set.hexa_count != 0)
-      ofs << "  hexas " << cell_set.hexa_count << std::endl;
-    }
-    else
-    {
-      ofs << "  slices";
-      for (Index i(0); i < cell_set.slices.size() ; ++i)
-      {
-        ofs  << "   " << cell_set.slices.at(i);
-      }
-      ofs << std::endl;
-    }
-    ofs << " </counts>" << std::endl;
-
-    // parent indices
-    ofs << " <vert_idx>" << std::endl;
-    for (Index i(0); i < cell_set.vertex_count ; ++i)
-    {
-      ofs << "  " << (cell_set.parent_indices[0])[i] << std::endl;
-    }
-    ofs << " </vert_idx>" << std::endl;
-
-    if ( !(cell_set.edge_count == 0) )
-    {
-      ofs << " <edge_idx>" << std::endl;
-      for (Index i(0); i < cell_set.edge_count ; ++i)
-      {
-        ofs << "  " << (cell_set.parent_indices[1])[i] << std::endl;
-      }
-      ofs << " </edge_idx>" << std::endl;
-      }
-
-    if ( !(cell_set.tria_count == 0) )
-    {
-      ofs << " <tria_idx>" << std::endl;
-      for (Index i(0); i < cell_set.tria_count ; ++i)
-      {
-        ofs << "  " << (cell_set.parent_indices[2])[i] << std::endl;
-      }
-      ofs << " </tria_idx>" << std::endl;
-    }
-    if ( !(cell_set.quad_count == 0) )
-    {
-      ofs << " <quad_idx>" << std::endl;
-      for (Index i(0); i < cell_set.quad_count ; ++i)
-      {
-        ofs << "  " << (cell_set.parent_indices[2])[i] << std::endl;
-      }
-      ofs << " </quad_idx>" << std::endl;
-    }
-
-    if ( !(cell_set.tetra_count == 0) )
-    {
-      ofs << " <tetra_idx>" << std::endl;
-      for (Index i(0); i < cell_set.tetra_count ; ++i)
-      {
-        ofs << "  " << (cell_set.parent_indices[3])[i] << std::endl;
-      }
-      ofs << "  </tetra_idx>" << std::endl;
-    }
-
-    if ( !(cell_set.hexa_count == 0) )
-    {
-      ofs << " <hexa_idx>" << std::endl;
-      for (Index i(0); i < cell_set.hexa_count ; ++i)
-      {
-        ofs << "  " << (cell_set.parent_indices[3])[i] << std::endl;
-      }
-      ofs << " </hexa_idx>" << std::endl;
-    }
-    ofs << "</cellset>" << std::endl;
-  }//write_cell_set_data
 
   // Writes the mesh data of this mesh and all submeshes related to this mesh
   // into the output stream.
@@ -1883,7 +1763,7 @@ namespace FEAST
   {
     // choose the right tag
     if (submesh)
-      ofs << "<submesh>" << std::endl;
+      ofs << "<meshpart>" << std::endl;
     else
       ofs << "<mesh>" << std::endl;
 
@@ -1900,13 +1780,15 @@ namespace FEAST
     ofs << "  shape " << mesh_data.convert_shape_type(mesh_data.shape_type) << std::endl;
     if(mesh_data.coord_per_vertex!=0)
       ofs << "  coords " << mesh_data.coord_per_vertex << std::endl;
+    if( mesh_data.attribute_count > 0)
+      ofs << "  attribute_sets " << mesh_data.attribute_count << std::endl;
     ofs << " </header>" << std::endl;
 
     // info section
     if( !mesh_data.info.empty() )
     {
       ofs << " <info>" << std::endl;
-      ofs << mesh_data.info << std::endl;
+      ofs << "  " << mesh_data.info << std::endl;
       ofs << " </info>" << std::endl;
     }
 
@@ -1938,17 +1820,20 @@ namespace FEAST
     }
     ofs << " </counts>" << std::endl;
 
-    // coord section
-    ofs << " <coords>" << std::endl;
-    for (Index i(0); i < mesh_data.vertex_count ; ++i)
+    // coord section (if any)
+    if(mesh_data.coord_per_vertex > 0)
     {
-      for (Index j(0); j < mesh_data.coord_per_vertex ; ++j)
+      ofs << " <coords>" << std::endl;
+      for (Index i(0); i < mesh_data.vertex_count ; ++i)
       {
-        ofs  << "  " << scientify((mesh_data.coords[i])[j]);
+        for (Index j(0); j < mesh_data.coord_per_vertex ; ++j)
+        {
+          ofs  << "  " << scientify((mesh_data.coords[i])[j]);
+        }
+        ofs << std::endl;
       }
-      ofs << std::endl;
+      ofs << " </coords>" << std::endl;
     }
-    ofs << " </coords>" << std::endl;
 
     // adjacency section
     if(mesh_data.mesh_type == MeshDataContainer::mt_conformal)
@@ -2082,24 +1967,53 @@ namespace FEAST
       }
     }
 
+    if(mesh_data.attribute_count > 0)
+    {
+      Index attributes_written(0);
+      for(Index attribute_dim(0); attribute_dim < 4; ++attribute_dim)
+      {
+        for(auto& it:mesh_data.attributes[attribute_dim])
+        {
+          attributes_written++;
+          // Write one attribute
+          ofs << " <attribute>" << std::endl;
+          // Write header
+          ofs << "  <header>" << std::endl;
+          ofs << "   dimension " << attribute_dim << std::endl;
+          ofs << "   name " << it.name << std::endl;
+          ofs << "   value_dim " << it.value_dim << std::endl;
+          ofs << "   value_count " << it.values.size() << std::endl;
+          ofs << "  </header>" << std::endl;
+          // Write values
+          ofs << "  <values>" << std::endl;
+          // Iterate over all value vectors
+          for(auto& val_vec_it:it.values)
+          {
+            ASSERT(val_vec_it.size() == it.value_dim, "Expected value of dimension " + stringify(it.value_dim) + " but got " + stringify(val_vec_it.size()));
+            ofs << "   ";
+            // Write all member of the value vector
+            for(auto& val_it:val_vec_it)
+              ofs << " " << val_it << std::endl;
+          }
+          ofs << "  </values>" << std::endl;
+          ofs << " </attribute>" << std::endl;
+        }
+      }
+      if(attributes_written != mesh_data.attribute_count)
+        throw InternalError("MeshDataContainer is supposed to contain " + stringify(mesh_data.attribute_count) + " attributes but " + stringify(attributes_written) + " were written");
+    }
+
     // choose the right tag to end the mesh section
     if (submesh)
-      ofs<<"</submesh>"<<std::endl;
+      ofs<<"</meshpart>"<<std::endl;
     else
       ofs<<"</mesh>"<<std::endl;
 
     // loop through all submeshes related to this mesh and drop the data as well
      SubMeshMap::const_iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
      for(; it != jt; ++it)
-     {
        it->second->write(ofs, true);
-     }
-      // loop through all cell sets related to this mesh and drop the data as well
-     CellSetMap::const_iterator it_cell(cell_set_map.begin()), jt_cell(cell_set_map.end());
-     for(; it_cell != jt_cell; ++it_cell)
-     {
-       it_cell->second->write(ofs);
-     }
+
    }// write_mesh_data
 
 } //namespace FEAST

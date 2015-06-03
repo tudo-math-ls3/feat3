@@ -760,7 +760,11 @@ namespace FEAST
         };
 
         // create mesh
-        TriaSubMesh* mesh = new TriaSubMesh(num_entities, 2);
+        TriaSubMesh* mesh = new TriaSubMesh(num_entities, true);
+        // create a MeshAttribute that holds one value for each vertex
+        typename TriaSubMesh::AttributeType my_vertex_set(num_entities[0],2);
+        // Add the attribute to mesh
+        mesh->add_attribute<0>(my_vertex_set);
 
         // set up vertex coordinates array
         Real vtx[] =
@@ -770,7 +774,7 @@ namespace FEAST
           10.0, 0.0,
           6.0, 7.0
         };
-        copy_vtx(mesh->get_vertex_set(), vtx);
+        copy_vtx(mesh->get_attributes<0>()[0], vtx);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -847,7 +851,7 @@ namespace FEAST
           3.0, 8.5,
           5.0, 0.0
         };
-        if(!comp_vtx(mesh.get_vertex_set(), vtx))
+        if(!comp_vtx(mesh.get_attributes<0>()[0], vtx))
           throw String("Vertex coordinate refinement failure");
 
         // check vertices-at-edge array
@@ -939,7 +943,11 @@ namespace FEAST
         };
 
         // create mesh
-        TriaSubMesh* mesh = new TriaSubMesh(num_entities, 1, 1);
+        TriaSubMesh* mesh = new TriaSubMesh(num_entities, true);
+        // create a MeshAttribute that holds one value for each vertex
+        typename TriaSubMesh::AttributeType my_vertex_set(num_entities[0], 1, 1);
+        // Add the attribute to mesh
+        mesh->add_attribute<0>(my_vertex_set);
 
         // set up vertex coordinates array
         Real vtx[] =
@@ -950,7 +958,7 @@ namespace FEAST
           3.0,
           4.0
         };
-        copy_vtx(mesh->get_vertex_set(), vtx);
+        copy_vtx(mesh->get_attributes<0>()[0], vtx);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -1002,7 +1010,7 @@ namespace FEAST
           2.5,
           3.5
         };
-        if(!comp_vtx(mesh.get_vertex_set(), vtx))
+        if(!comp_vtx(mesh.get_attributes<0>()[0], vtx))
           throw String("Vertex coordinate refinement failure");
 
         // check vertices-at-edge array

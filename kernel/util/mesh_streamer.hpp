@@ -26,6 +26,45 @@ namespace FEAST
   class MeshStreamer
   {
   public:
+    /**
+     * \brief Class for saving mesh attributes belonging to one shape dimension
+     *
+     * \author Jordi Paul
+     */
+    class AttributesContainer
+    {
+      public:
+        typedef double ValueType;
+        typedef std::vector<ValueType> ValueVec;
+
+        String name;
+        Index value_dim;
+        Index value_count;
+        std::vector<ValueVec> values;
+
+        explicit AttributesContainer() :
+          name(""),
+          value_dim(0),
+          value_count(0)
+        {
+          CONTEXT("AttributesContainer::AttributesContainer()");
+        }
+
+        explicit AttributesContainer(String name_, Index value_dim_, Index value_count_) :
+          name(name_),
+          value_dim(value_dim_),
+          value_count(value_count_)
+        {
+          CONTEXT("AttributesContainer::AttributesContainer(String, Index, Index)");
+        }
+
+        /// Default DTOR
+        ~AttributesContainer()
+        {
+          CONTEXT("AttributesContainer::~AttributesContainer()");
+        }
+    };
+
     class BaseContainer
     {
     public:
@@ -44,15 +83,19 @@ namespace FEAST
       Index tetra_count;
       Index hexa_count;
       std::vector<Index> slices;
-
+      /// Number of attributes
+      Index attribute_count;
+      /// Number of coordinates
       Index coord_per_vertex;
 
       /// parent_indices[d](i) = j means that entity i of dimension d in this container corresponds to entity j in the
       /// parent
       std::vector<Index> parent_indices[4];
 
+      std::vector<AttributesContainer> attributes[4];
+
     public:
-      // Default CTOR
+      /// Default CTOR
       BaseContainer()
       {
         CONTEXT("BaseContainer::BaseContainer()");
@@ -144,6 +187,8 @@ namespace FEAST
       {
         /// unknown shape type
         st_unknown = 0,
+        /// 0d vertex set
+        st_vert,
         /// 1D edge mesh
         st_edge,
         /// 2D triangular mesh
@@ -229,6 +274,19 @@ namespace FEAST
       */
       static ShapeType convert_shape_type(const String shape_type);
 
+      /**
+       * \brief Parses an attribute subchunk
+       *
+       * \param[in] ifs
+       * A reference to the input stream to be parsed.
+       *
+       * \param[in] cur_line
+       * A counter that specifies the number of lines read so far.
+       *
+       * \returns
+       * The number of lines that has been read when the programme is done.
+       */
+      Index _parse_attribute_chunk(Index cur_line, std::istream& ifs);
 
       /**
       * \brief Parses a mesh-section-data-input stream.
@@ -323,115 +381,115 @@ namespace FEAST
 
     }; // MeshDataContainer
 
-    /**
-     * \brief Cell set container class
-     *
-     * This class stores the data related to a cell set.
-     *
-     * \author Constantin Christof
-     */
-    class CellSetContainer :
-      public BaseContainer
-    {
-    public:
-      // default CTOR
-      CellSetContainer()
-      {
-        CONTEXT("CellSetContainer::CellSetContainer()");
-      }
+//    /**
+//     * \brief Cell set container class
+//     *
+//     * This class stores the data related to a cell set.
+//     *
+//     * \author Constantin Christof
+//     */
+//    class CellSetContainer :
+//      public BaseContainer
+//    {
+//    public:
+//      // default CTOR
+//      CellSetContainer()
+//      {
+//        CONTEXT("CellSetContainer::CellSetContainer()");
+//      }
+//
+//      // default DTOR
+//      ~CellSetContainer()
+//      {
+//        CONTEXT("CellSetContainer::~CellSetContainer()");
+//      }
+//
+//      /**
+//       * \brief Parses a mesh-cellset-data-input stream.
+//       *
+//       * \param[in] ifs
+//       * A reference to the input stream to be parsed.
+//       *
+//       * \param[in] cur_line
+//       * A counter that specifies the number of lines read so far.
+//       *
+//       * \returns
+//       * The number of lines that has been read when the programme is done.
+//       */
+//      Index _parse_cellset_section(Index cur_line, std::istream& ifs);
+//
+//    }; // CellSetContainer
 
-      // default DTOR
-      ~CellSetContainer()
-      {
-        CONTEXT("CellSetContainer::~CellSetContainer()");
-      }
+//    class CellSetNode;
 
-      /**
-       * \brief Parses a mesh-cellset-data-input stream.
-       *
-       * \param[in] ifs
-       * A reference to the input stream to be parsed.
-       *
-       * \param[in] cur_line
-       * A counter that specifies the number of lines read so far.
-       *
-       * \returns
-       * The number of lines that has been read when the programme is done.
-       */
-      Index _parse_cellset_section(Index cur_line, std::istream& ifs);
-
-    }; // CellSetContainer
-
-    class CellSetNode;
-
-    /**
-     * \brief Base-Class for Cell-Set node parents
-     *
-     * This class acts as a base class for the CellSetNode and MeshNode classes.
-     *
-     * \author Peter Zajac
-     */
-    class CellSetParent
-    {
-    public:
-      // a map of cell-set nodes
-      typedef std::map<String, CellSetNode*, String::NoCaseLess> CellSetMap;
-
-      // the cell-set map of this node
-      CellSetMap cell_set_map;
-
-    public:
-      virtual ~CellSetParent()
-      {
-        CellSetMap::iterator it(cell_set_map.begin()), jt(cell_set_map.end());
-        for(; it != jt; ++it)
-        {
-          delete it->second;
-        }
-      }
-
-      /**
-       * \brief Finds a cell-set node within this sub-tree.
-       */
-      CellSetNode* find_cell_set(String name)
-      {
-        // perform depth-first-search
-        CellSetMap::iterator it(cell_set_map.begin()), jt(cell_set_map.end());
-        for(; it != jt; ++it)
-        {
-          if(it->first.compare_no_case(name) == 0)
-            return it->second;
-
-          CellSetNode* node = it->second->find_cell_set(name);
-          if(node != nullptr)
-            return node;
-        }
-
-        // parent not found
-        return nullptr;
-      }
-    };
-
-    /**
-     * \brief Cell-Set node class
-     *
-     * This class implements a tree node that contains a CellSetContainer as well as
-     * its child cell-set nodes.
-     *
-     * \author Peter Zajac
-     */
-    class CellSetNode :
-      public CellSetParent
-    {
-    public:
-      CellSetContainer cell_set;
-
-      /**
-       * \brief Writes the stored cell set data into the output stream.
-       */
-      void write(std::ostream &ofs) const;
-
-    };
+//    /**
+//     * \brief Base-Class for Cell-Set node parents
+//     *
+//     * This class acts as a base class for the CellSetNode and MeshNode classes.
+//     *
+//     * \author Peter Zajac
+//     */
+//    class CellSetParent
+//    {
+//    public:
+//      // a map of cell-set nodes
+//      typedef std::map<String, CellSetNode*, String::NoCaseLess> CellSetMap;
+//
+//      // the cell-set map of this node
+//      CellSetMap cell_set_map;
+//
+//    public:
+//      virtual ~CellSetParent()
+//      {
+//        CellSetMap::iterator it(cell_set_map.begin()), jt(cell_set_map.end());
+//        for(; it != jt; ++it)
+//        {
+//          delete it->second;
+//        }
+//      }
+//
+//      /**
+//       * \brief Finds a cell-set node within this sub-tree.
+//       */
+//      CellSetNode* find_cell_set(String name)
+//      {
+//        // perform depth-first-search
+//        CellSetMap::iterator it(cell_set_map.begin()), jt(cell_set_map.end());
+//        for(; it != jt; ++it)
+//        {
+//          if(it->first.compare_no_case(name) == 0)
+//            return it->second;
+//
+//          CellSetNode* node = it->second->find_cell_set(name);
+//          if(node != nullptr)
+//            return node;
+//        }
+//
+//        // parent not found
+//        return nullptr;
+//      }
+//    };
+//
+//    /**
+//     * \brief Cell-Set node class
+//     *
+//     * This class implements a tree node that contains a CellSetContainer as well as
+//     * its child cell-set nodes.
+//     *
+//     * \author Peter Zajac
+//     */
+//    class CellSetNode :
+//      public CellSetParent
+//    {
+//    public:
+//      CellSetContainer cell_set;
+//
+//      /**
+//       * \brief Writes the stored cell set data into the output stream.
+//       */
+//      void write(std::ostream &ofs) const;
+//
+//    };
 
     /**
      * \brief Mesh node class
@@ -441,8 +499,7 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    class MeshNode :
-      public CellSetParent
+    class MeshNode// : public CellSetParent
     {
     public:
       // a map of sub-mesh nodes
@@ -500,21 +557,21 @@ namespace FEAST
         return count;
       }
 
-      /**
-       * \brief Finds a cell-set parent node within this sub-tree.
-       *
-       * The returned node may be either a CellSetNode or a MeshNode.
-       */
-      CellSetParent* find_cell_set_parent(String parent_name)
-      {
-        // search mesh nodes
-        MeshNode* node = find_sub_mesh(parent_name);
-        if(node != nullptr)
-          return node;
+      ///**
+      // * \brief Finds a cell-set parent node within this sub-tree.
+      // *
+      // * The returned node may be either a CellSetNode or a MeshNode.
+      // */
+      //CellSetParent* find_cell_set_parent(String parent_name)
+      //{
+      //  // search mesh nodes
+      //  MeshNode* node = find_sub_mesh(parent_name);
+      //  if(node != nullptr)
+      //    return node;
 
-        // search cell sets
-        return find_cell_set(parent_name);
-      }
+      //  // search cell sets
+      //  return find_cell_set(parent_name);
+      //}
 
       /**
        * \brief Writes the mesh data of this mesh and all submeshes related to this mesh
@@ -527,7 +584,6 @@ namespace FEAST
 
     // general information
     Index _num_submeshes;
-    Index _num_cellsets;
 
     // file paths
     String _chart_path;
@@ -599,11 +655,6 @@ namespace FEAST
     Index get_num_submeshes() const;
 
     /**
-     * \brief Returns the number of cellsets.
-     */
-    Index get_num_cellsets() const;
-
-    /**
      * \brief Returns the file's information.
      */
     String get_info() const;
@@ -625,14 +676,6 @@ namespace FEAST
     MeshStreamer::MeshDataContainer* get_mesh(String name = "root");
 
     /**
-     * \brief Returns a cell-set container.
-     *
-     * \param[in] name
-     * The name of the cell-set that is to be returned.
-     */
-    MeshStreamer::CellSetContainer* get_cell_set(String name);
-
-    /**
      * \brief Writes the mesh data into a file
      *
      * \param[in] filename
@@ -651,7 +694,7 @@ namespace FEAST
 
   private:
 
-    MeshStreamer::CellSetParent* _find_cell_set_parent(String parent_name);
+    //MeshStreamer::CellSetParent* _find_cell_set_parent(String parent_name);
     MeshStreamer::MeshNode* _find_sub_mesh_parent(String parent_name);
 
     /**
@@ -700,19 +743,6 @@ namespace FEAST
      */
     Index _parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs);
 
-    /**
-     * \brief Parses a mesh-cellset-data-input stream.
-     *
-     * \param[in] ifs
-     * A reference to the input stream to be parsed.
-     *
-     * \param[in] cur_line
-     * A counter that specifies the number of lines read so far.
-     *
-     * \returns
-     * The number of lines that has been read when the programme is done.
-     */
-    Index _parse_cellset_section(Index cur_line, std::istream& ifs);
   }; // class MeshStreamer
 
   /// \cond internal

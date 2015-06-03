@@ -49,11 +49,11 @@
 #include <kernel/util/string.hpp>                          // for String
 
 // FEAST-Geometry includes
-#include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
-#include <kernel/geometry/cell_sub_set.hpp>                // for CellSubSet
-#include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
+#include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
+#include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
+#include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 
 // FEAST-Trafo includes
 #include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
@@ -130,10 +130,10 @@ namespace Tutorial01
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
 
     // Moreover, we need to define a boundary type, which is required for the assembly of boundary
-    // conditions. In this example, we employ the CellSubSet class template for this purpose, which is
+    // conditions. In this example, we employ the MeshPart class template for this purpose, which is
     // perfectly appropriate for the pure Dirichlet case we want to solve. Note that this class template
-    // is also templatised in the shape that we're using.
-    typedef Geometry::CellSubSet<ShapeType> BoundaryType;
+    // is also templatised in the MeshType that we're using.
+    typedef Geometry::MeshPart<MeshType> BoundaryType;
 
     // In this tutorial, we will generate the mesh and its boundary information by using a so-called
     // factory instead of reading them from a file. This is a convenient shortcut that FEAST provides,

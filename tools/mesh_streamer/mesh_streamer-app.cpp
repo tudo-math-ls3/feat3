@@ -1,6 +1,8 @@
 #include<kernel/geometry/conformal_factories.hpp>
 #include<kernel/geometry/export_vtk.hpp>
 #include<kernel/geometry/mesh_streamer_factory.hpp>
+#include<kernel/geometry/mesh_node.hpp>
+#include<kernel/geometry/mesh_part.hpp>
 #include<kernel/util/mesh_streamer.hpp>
 #include<kernel/util/simple_arg_parser.hpp>
 
@@ -32,6 +34,23 @@ struct MeshStreamerApp
   {
     RefineFactory<MeshType_, MeshStreamerFactory> my_factory(level, my_streamer);
     MeshType_ my_mesh(my_factory);
+
+    //typedef typename MeshType_::ShapeType ShapeType;
+    //typedef StandardConformalMeshNodePolicy<ShapeType> MeshNodePolicy;
+
+    //typedef typename MeshNodePolicy::RootMeshType MeshType;
+    //typedef RootMeshNode<MeshNodePolicy> RootMeshNodeType;
+
+    //RootMeshNodeType my_root_mesh_node(my_streamer);
+
+    //MeshStreamerFactory<MeshPart<MeshType_>> my_mesh_part_factory(my_streamer,"1");
+    //MeshPart<MeshType_>  my_mesh_part(my_mesh_part_factory);
+    //MeshStreamer::MeshNode* root_mesh_node = my_streamer.get_root_mesh_node();
+    //my_streamer.write_mesh_file("streamed_mesh.txt");
+    //std::cout << "MeshPart num_entities = [";
+    //for(int d(0); d <= my_mesh_part.shape_dim; ++d)
+    //  std::cout << " " << my_mesh_part.get_num_entities(d);
+    //std::cout << "]" << std::endl;
 
     String output_name = "mesh_streamer_" + stringify(level) + ".vtk";
     // Create a VTK exporter for our mesh

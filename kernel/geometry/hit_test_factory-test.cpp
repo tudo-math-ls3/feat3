@@ -1,8 +1,8 @@
 #include <test_system/test_system.hpp>
 #include <kernel/geometry/hit_test_factory.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
-#include <kernel/geometry/cell_sub_set.hpp>                // for CellSubSet
 #include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
+#include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 #include <kernel/util/string.hpp>                          // for String
 
 using namespace FEAST;
@@ -30,7 +30,7 @@ public:
   {
     typedef Shape::Quadrilateral ShapeType;
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
-    typedef Geometry::CellSubSet<ShapeType> BoundaryType;
+    typedef Geometry::MeshPart<MeshType> BoundaryType;
     typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactoryType;
     typedef Geometry::StandardRefinery<MeshType> RefineryType;
 

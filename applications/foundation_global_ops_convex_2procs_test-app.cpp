@@ -3,7 +3,6 @@
 #include <kernel/foundation/comm_base.hpp>
 
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication.hpp>
 #include <kernel/foundation/halo.hpp>
@@ -145,7 +144,7 @@ void check_global_dot_1D(Index rank)
   //Foundation::HaloControl<Foundation::dim_1D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
   auto cell_sub_set(HaloInterface<0, Dim1D>::convert(p0.comm_halos.at(0).get()));
 
-  //CellSubSet<Shape::Hypercube<1> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<ConformalMesh<Shape::Hypercube<1> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_1D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<1> > > trafo(confmesh);
@@ -1947,7 +1946,7 @@ void check_global_dot_1D_gateway(Index rank)
   //Foundation::HaloControl<Foundation::dim_1D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
   auto cell_sub_set(HaloInterface<0, Dim1D>::convert(p0.comm_halos.at(0).get()));
 
-  //CellSubSet<Shape::Hypercube<1> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_1D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<1> > > trafo(confmesh);
@@ -2070,7 +2069,7 @@ void check_global_dot_2D_gateway(Index rank)
   auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
-  //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim2D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
@@ -2325,7 +2324,7 @@ void check_global_dot_3D_gateway(Index rank)
   auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
-  //CellSubSet<Shape::Hypercube<3> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_3D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim3D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<3> > > trafo(confmesh);
@@ -2426,7 +2425,7 @@ void check_global_nrm2_1D(Index rank)
   //Foundation::HaloControl<Foundation::dim_1D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
   auto cell_sub_set(HaloInterface<0, Dim1D>::convert(p0.comm_halos.at(0).get()));
 
-  //CellSubSet<Shape::Hypercube<1> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_1D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<1> > > trafo(confmesh);
@@ -2548,7 +2547,7 @@ void check_global_nrm2_2D(Index rank)
   auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
-  //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim2D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
@@ -2803,7 +2802,7 @@ void check_global_nrm2_3D(Index rank)
   auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
-  //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_3D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim3D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<3> > > trafo(confmesh);
@@ -2903,7 +2902,7 @@ void check_global_nrm2_1D_gateway(Index rank)
   //Foundation::HaloControl<Foundation::dim_1D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
   auto cell_sub_set(HaloInterface<0, Dim1D>::convert(p0.comm_halos.at(0).get()));
 
-  //CellSubSet<Shape::Hypercube<1> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_1D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<1> > > trafo(confmesh);
@@ -3024,7 +3023,7 @@ void check_global_nrm2_2D_gateway(Index rank)
   auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
-  //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim2D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
@@ -3277,7 +3276,7 @@ void check_global_nrm2_3D_gateway(Index rank)
   auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
-  //CellSubSet<Shape::Hypercube<3> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_3D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim3D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<3> > > trafo(confmesh);
@@ -3377,7 +3376,7 @@ void check_global_nrm2sqr_1D_gateway(Index rank)
   //Foundation::HaloControl<Foundation::dim_1D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), polytopes_in_subset);
   auto cell_sub_set(HaloInterface<0, Dim1D>::convert(p0.comm_halos.at(0).get()));
 
-  //CellSubSet<Shape::Hypercube<1> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_1D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim1D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<1> > > trafo(confmesh);
@@ -3498,7 +3497,7 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
   auto h_new(Aura<Mem::Main, Halo<0, PLVertex, Mesh<Dim2D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim2D>::convert(h_new));
 
-  //CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim2D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
@@ -3751,7 +3750,7 @@ void check_global_nrm2sqr_3D_gateway(Index rank)
   auto h_new(Aura<Mem::Main, Halo<0, PLFace, Mesh<Dim3D> > >::value(p0.comm_halos)); //we can do this since we know there is only one other process
   auto cell_sub_set(HaloInterface<0, Dim3D>::convert(h_new));
 
-  //CellSubSet<Shape::Hypercube<3> > cell_sub_set(polytopes_in_subset);
+  //MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > > cell_sub_set(polytopes_in_subset);
   //HaloControl<dim_3D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim3D> >*)(p0.comm_halos.at(0).get())), cell_sub_set);
 
   Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<3> > > trafo(confmesh);

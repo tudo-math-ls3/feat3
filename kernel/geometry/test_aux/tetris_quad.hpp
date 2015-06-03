@@ -4,8 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/conformal_sub_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 
 namespace FEAST
 {
@@ -15,8 +14,8 @@ namespace FEAST
     namespace TestAux
     {
       typedef ConformalMesh<Shape::Quadrilateral> QuadMesh;
-      typedef ConformalSubMesh<Shape::Quadrilateral> QuadSubMesh;
-      typedef CellSubSet<Shape::Quadrilateral> QuadCellSubSet;
+      typedef MeshPart<QuadMesh> QuadSubMesh;
+      typedef MeshPart<QuadMesh> QuadCellSubSet;
 
       /**
        * \brief Creates the 2D tetris mesh.

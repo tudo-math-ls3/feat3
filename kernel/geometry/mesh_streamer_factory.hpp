@@ -4,9 +4,8 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/conformal_sub_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/geometry/index_calculator.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/util/mesh_streamer.hpp>
 
 namespace FEAST
@@ -16,6 +15,9 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
+      template<Index dim_>
+      struct AttributeSetBuilder;
+
       template<typename Shape_>
       struct MeshStreamerIndexer;
 
@@ -130,106 +132,240 @@ namespace FEAST
 
     }; // class MeshStreamerFactory<ConformalMesh<...>>
 
+//    /**
+//     * \brief MeshStreamerFactory implementation for CellSubSet
+//     *
+//     * \author Peter Zajac
+//     */
+//    template<typename Shape_>
+//    class MeshStreamerFactory< CellSubSet<Shape_> > :
+//      public Factory< CellSubSet<Shape_> >
+//    {
+//    public:
+//      /// mesh type
+//      typedef CellSubSet<Shape_> MeshType;
+//      /// target set holder type
+//      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+//
+//    private:
+//      MeshStreamer& _mesh_reader;
+//      String _name;
+//      MeshStreamer::BaseContainer* _target_data;
+//
+//    public:
+//      explicit MeshStreamerFactory(MeshStreamer& mesh_reader, String name) :
+//        _mesh_reader(mesh_reader),
+//        _name(name),
+//        _target_data(nullptr)
+//        {
+//          MeshStreamer::MeshNode* root(_mesh_reader.get_root_mesh_node());
+//          ASSERT_(root != nullptr);
+//
+//          // try to find a sub-mesh node
+//          MeshStreamer::MeshNode* sub_mesh_node(root->find_sub_mesh(name));
+//          if(sub_mesh_node != nullptr)
+//          {
+//            _target_data = &sub_mesh_node->mesh_data;
+//
+//            FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::
+//              update_parent_data(_target_data, mesh_reader.get_mesh());
+//
+//            return;
+//          }
+//
+//          // try to find a cell-set node
+//          MeshStreamer::CellSetNode* cell_set_node(root->find_cell_set(name));
+//          if(cell_set_node != nullptr)
+//          {
+//            _target_data = &cell_set_node->cell_set;
+//            FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::
+//              update_parent_data( _target_data, mesh_reader.get_mesh());
+//
+//            return;
+//          }
+//
+//          // no child with 'name' found
+//          throw InternalError("No sub-mesh or cell-set found with name '" + name + "'");
+//        }
+//
+//      /// \brief Parses num_entities information from _target_data
+//      virtual Index get_num_entities(int dim)
+//      {
+//        switch(dim)
+//        {
+//          case 0:
+//            return _target_data->vertex_count;
+//          case 1:
+//            return _target_data->edge_count;
+//          case 2:
+//            return _target_data->tria_count + _target_data->quad_count;
+//          case 3:
+//            return _target_data->tetra_count + _target_data->hexa_count;
+//          default:
+//            return 0;
+//        }
+//      }
+//
+//      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+//      {
+//        Intern::MeshStreamerTargeter<Shape_>::wrap(target_set_holder, _target_data->parent_indices);
+//      }
+//    }; // class MeshStreamerFactory<CellSubSet<...>>
+//
+//    /**
+//     * \brief MeshStreamerFactory implementation for ConformalSubMesh
+//     *
+//     * \author Peter Zajac
+//     */
+//    template<
+//      typename Shape_,
+//      typename Coord_>
+//    class MeshStreamerFactory< ConformalSubMesh<Shape_, Coord_> > :
+//      public Factory< ConformalSubMesh<Shape_, Coord_> >
+//    {
+//    public:
+//      /// mesh typedef
+//      typedef ConformalSubMesh<Shape_, Coord_> MeshType;
+//      /// vertex set type
+//      typedef typename MeshType::VertexSetType VertexSetType;
+//      /// index set holder type
+//      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+//      /// target set holder type
+//      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+//
+//    private:
+//      MeshStreamer& _mesh_reader;
+//      String _name;
+//      MeshStreamer::MeshDataContainer* _mesh_data;
+//      /// num_entities information, might differ from the information in _mesh_data
+//      Index _num_entities[Shape_::dimension+1];
+//
+//    public:
+//      explicit MeshStreamerFactory(MeshStreamer& mesh_reader, String name) :
+//        _mesh_reader(mesh_reader),
+//        _name(name),
+//        _mesh_data(nullptr)
+//      {
+//        // Parse preliminary num_entities from _mesh_data
+//        for(Index d(0); d <= Index(Shape_::dimension); ++d)
+//          _num_entities[d] = parse_num_entities(d);
+//
+//        MeshStreamer::MeshNode* root(_mesh_reader.get_root_mesh_node());
+//        ASSERT_(root != nullptr);
+//
+//        // try to find a sub-mesh node
+//        MeshStreamer::MeshNode* sub_mesh_node(root->find_sub_mesh(name));
+//        if(sub_mesh_node != nullptr)
+//        {
+//          _mesh_data = &sub_mesh_node->mesh_data;
+//          return;
+//        }
+//
+//        // no child with 'name' found
+//        throw InternalError("No sub-mesh found with name '" + name + "'");
+//      }
+//
+//      /// \brief Parses num_entities information from _mesh_data
+//      virtual Index parse_num_entities(Index dim)
+//      {
+//        {
+//          switch(dim)
+//          {
+//            case 0:
+//              return _mesh_data->vertex_count;
+//            case 1:
+//              return _mesh_data->edge_count;
+//            case 2:
+//              return _mesh_data->tria_count + _mesh_data->quad_count;
+//            case 3:
+//              return _mesh_data->tetra_count + _mesh_data->hexa_count;
+//            default:
+//              return 0;
+//          }
+//        }
+//      }
+//
+//      virtual Index get_num_entities(int dim)
+//      {
+//        ASSERT( (dim >= 0) && (dim <= Shape_::dimension), "No num_entities for dimension!");
+//        return _num_entities[dim];
+//      }
+//
+//      virtual int get_num_coords()
+//      {
+//        return int(_mesh_data->coord_per_vertex);
+//      }
+//
+//      virtual int get_vertex_stride()
+//      {
+//        return get_num_coords();
+//      }
+//
+//      virtual void fill_vertex_set(VertexSetType& vertex_set)
+//      {
+//        const Index num_coords = Index(get_num_coords());
+//        const Index num_vertices(Index(_mesh_data->coords.size()));
+//
+//        for(Index i(0); i < num_vertices; ++i)
+//        {
+//          // get a reference to the corresponding vertex
+//          MeshStreamer::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
+//
+//          ASSERT(vtx.size() == num_coords, "Vertex coordinate count mismatch!");
+//
+//          // copy vertex coordinates
+//          for(Index j(0); j < num_coords; ++j)
+//            vertex_set[i][j] = Coord_(vtx[j]);
+//        }
+//      }
+//
+//      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+//      {
+//        // call wrapper
+//        Intern::MeshStreamerIndexer<Shape_>::wrap(index_set_holder, _mesh_data->adjacencies);
+//
+//        // build redundant index sets
+//        RedundantIndexSetBuilder<Shape_>::compute(index_set_holder);
+//
+//        // Set entries in num_entities. This has to be called after using the RedundantIndexSetBuilder because
+//        // the information from _mesh_data might not have been complete: If the mesh file did not contain edge/face
+//        // data, the number of entities of the corresponding dimension was zero.
+//        Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(index_set_holder, _num_entities);
+//
+//        // Update _mesh_data with the new information
+//        FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(_mesh_data, index_set_holder);
+//      }
+//
+//      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+//      {
+//        Intern::MeshStreamerTargeter<Shape_>::wrap(target_set_holder, _mesh_data->parent_indices);
+//      }
+//    }; // class MeshStreamerFactory<ConformalSubMesh<...>>
+
     /**
-     * \brief MeshStreamerFactory implementation for CellSubSet
+     * \brief MeshStreamerFactory implementation for MeshPart
      *
-     * \author Peter Zajac
+     * \author Jordi Paul
      */
-    template<typename Shape_>
-    class MeshStreamerFactory< CellSubSet<Shape_> > :
-      public Factory< CellSubSet<Shape_> >
+    template< typename Shape_>
+    class MeshStreamerFactory< MeshPart<ConformalMesh<Shape_> > > :
+      public Factory< MeshPart<ConformalMesh<Shape_>> >
     {
     public:
-      /// mesh type
-      typedef CellSubSet<Shape_> MeshType;
-      /// target set holder type
-      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
-
-    private:
-      MeshStreamer& _mesh_reader;
-      String _name;
-      MeshStreamer::BaseContainer* _target_data;
-
-    public:
-      explicit MeshStreamerFactory(MeshStreamer& mesh_reader, String name) :
-        _mesh_reader(mesh_reader),
-        _name(name),
-        _target_data(nullptr)
-        {
-          MeshStreamer::MeshNode* root(_mesh_reader.get_root_mesh_node());
-          ASSERT_(root != nullptr);
-
-          // try to find a sub-mesh node
-          MeshStreamer::MeshNode* sub_mesh_node(root->find_sub_mesh(name));
-          if(sub_mesh_node != nullptr)
-          {
-            _target_data = &sub_mesh_node->mesh_data;
-
-            FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::
-              update_parent_data(_target_data, mesh_reader.get_mesh());
-
-            return;
-          }
-
-          // try to find a cell-set node
-          MeshStreamer::CellSetNode* cell_set_node(root->find_cell_set(name));
-          if(cell_set_node != nullptr)
-          {
-            _target_data = &cell_set_node->cell_set;
-            FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::
-              update_parent_data( _target_data, mesh_reader.get_mesh());
-
-            return;
-          }
-
-          // no child with 'name' found
-          throw InternalError("No sub-mesh or cell-set found with name '" + name + "'");
-        }
-
-      /// \brief Parses num_entities information from _target_data
-      virtual Index get_num_entities(int dim)
-      {
-        switch(dim)
-        {
-          case 0:
-            return _target_data->vertex_count;
-          case 1:
-            return _target_data->edge_count;
-          case 2:
-            return _target_data->tria_count + _target_data->quad_count;
-          case 3:
-            return _target_data->tetra_count + _target_data->hexa_count;
-          default:
-            return 0;
-        }
-      }
-
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
-      {
-        Intern::MeshStreamerTargeter<Shape_>::wrap(target_set_holder, _target_data->parent_indices);
-      }
-    }; // class MeshStreamerFactory<CellSubSet<...>>
-
-    /**
-     * \brief MeshStreamerFactory implementation for ConformalSubMesh
-     *
-     * \author Peter Zajac
-     */
-    template<
-      typename Shape_,
-      typename Coord_>
-    class MeshStreamerFactory< ConformalSubMesh<Shape_, Coord_> > :
-      public Factory< ConformalSubMesh<Shape_, Coord_> >
-    {
-    public:
-      /// mesh typedef
-      typedef ConformalSubMesh<Shape_, Coord_> MeshType;
-      /// vertex set type
+      /// Type of mesh the MeshPart refers to
+      typedef ConformalMesh<Shape_> MeshType;
+      /// Type of the MeshPart
+      typedef MeshPart<MeshType> MeshPartType;
+      /// Vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
-      /// index set holder type
-      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
-      /// target set holder type
-      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+      /// Attribute type
+      typedef typename MeshPartType::AttributeType AttributeType;
+      /// Attribute holder type
+      typedef typename MeshPartType::AttributeHolderType AttributeHolderType;
+      /// Index set holder type
+      typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
+      /// Target set holder type
+      typedef typename MeshPartType::TargetSetHolderType TargetSetHolderType;
 
     private:
       MeshStreamer& _mesh_reader;
@@ -244,10 +380,6 @@ namespace FEAST
         _name(name),
         _mesh_data(nullptr)
       {
-        // Parse preliminary num_entities from _mesh_data
-        for(Index d(0); d <= Shape_::dimension; ++d)
-          _num_entities[d] = parse_num_entities(d);
-
         MeshStreamer::MeshNode* root(_mesh_reader.get_root_mesh_node());
         ASSERT_(root != nullptr);
 
@@ -256,6 +388,10 @@ namespace FEAST
         if(sub_mesh_node != nullptr)
         {
           _mesh_data = &sub_mesh_node->mesh_data;
+          // Parse preliminary num_entities from _mesh_data
+          for(int d(0); d <= Shape_::dimension; ++d)
+            _num_entities[d] = parse_num_entities(d);
+
           return;
         }
 
@@ -289,60 +425,95 @@ namespace FEAST
         return _num_entities[dim];
       }
 
-      virtual int get_num_coords()
+      virtual void fill_attribute_sets(AttributeHolderType& attributes)
       {
-        return int(_mesh_data->coord_per_vertex);
+        Intern::AttributeSetBuilder<Shape_::dimension>::build(attributes, _mesh_data);
       }
 
-      virtual int get_vertex_stride()
+      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder)
       {
-        return get_num_coords();
-      }
-
-      virtual void fill_vertex_set(VertexSetType& vertex_set)
-      {
-        const Index num_coords = Index(get_num_coords());
-        const Index num_vertices(Index(_mesh_data->coords.size()));
-
-        for(Index i(0); i < num_vertices; ++i)
+        ASSERT(index_set_holder == nullptr, "fill_index_sets: index_set_holder != nullptr!");
+        // If _mesh_data contains adjacency information, fill index_set_holder
+        if(_mesh_data->adjacencies[0][Shape_::dimension].size() > 0)
         {
-          // get a reference to the corresponding vertex
-          MeshStreamer::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
+          index_set_holder = new IndexSetHolderType(_num_entities);
+          // call wrapper
+          Intern::MeshStreamerIndexer<Shape_>::wrap(*index_set_holder, _mesh_data->adjacencies);
 
-          ASSERT(vtx.size() == num_coords, "Vertex coordinate count mismatch!");
+          // build redundant index sets
+          RedundantIndexSetBuilder<Shape_>::compute(*index_set_holder);
 
-          // copy vertex coordinates
-          for(Index j(0); j < num_coords; ++j)
-            vertex_set[i][j] = Coord_(vtx[j]);
+          // Set entries in num_entities. This has to be called after using the RedundantIndexSetBuilder because
+          // the information from _mesh_data might not have been complete: If the mesh file did not contain edge/face
+          // data, the number of entities of the corresponding dimension was zero.
+          Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(*index_set_holder, _num_entities);
+
+          // Update _mesh_data with the new information
+          FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(_mesh_data, *index_set_holder);
         }
-      }
-
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
-      {
-        // call wrapper
-        Intern::MeshStreamerIndexer<Shape_>::wrap(index_set_holder, _mesh_data->adjacencies);
-
-        // build redundant index sets
-        RedundantIndexSetBuilder<Shape_>::compute(index_set_holder);
-
-        // Set entries in num_entities. This has to be called after using the RedundantIndexSetBuilder because
-        // the information from _mesh_data might not have been complete: If the mesh file did not contain edge/face
-        // data, the number of entities of the corresponding dimension was zero.
-        Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(index_set_holder, _num_entities);
-
-        // Update _mesh_data with the new information
-        FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(_mesh_data, index_set_holder);
       }
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
       {
         Intern::MeshStreamerTargeter<Shape_>::wrap(target_set_holder, _mesh_data->parent_indices);
       }
-    }; // class MeshStreamerFactory<ConformalSubMesh<...>>
+    }; // class MeshStreamerFactory<MeshPart<...>>
 
     /// \cond internal
     namespace Intern
     {
+      template<Index dim_>
+      struct AttributeSetBuilder
+      {
+        template<typename AttributeHolderType_, typename MeshDataContainerType_>
+        static void build(AttributeHolderType_& attribute_set_holder, const MeshDataContainerType_& mesh_data)
+        {
+          AttributeSetBuilder<dim_-1>::build(attribute_set_holder, mesh_data);
+
+          auto& attributes = attribute_set_holder.template get_mesh_attributes<dim_>();
+          AttributeSetBuilder<dim_>::wrap(attributes, mesh_data->attributes[dim_]);
+        }
+
+        template<typename AttributeSetType_, typename AttributeContainerType_>
+        static void wrap(AttributeSetType_& attributes, const AttributeContainerType_ attribute_container)
+        {
+          typedef typename AttributeSetType_::value_type::CoordType DataType;
+
+          for(auto& it:attribute_container)
+          {
+            const Index value_count(it.value_count);
+            const Index value_dim(it.value_dim);
+
+            typename AttributeSetType_::value_type new_attribute(value_count, int(value_dim), 0);
+
+            for(Index i(0); i < value_count; ++i)
+            {
+              const std::vector<double>& vals(it.values[i]);
+
+              ASSERT(vals.size() == value_dim, "Attribute value count mismatch!");
+
+              // copy vertex coordinates
+              for(Index j(0); j < value_dim; ++j)
+                new_attribute[i][j] = DataType(vals[j]);
+            }
+            attributes.push_back(new_attribute);
+
+          }
+
+        } // static void
+      }; // struct AttributeSetBuilder<dim_>
+
+      template<>
+      struct AttributeSetBuilder<0>
+      {
+        template<typename AttributeHolderType_, typename MeshDataContainerType_>
+        static void build(AttributeHolderType_& attribute_set_holder, const MeshDataContainerType_& mesh_data)
+        {
+          auto& attributes = attribute_set_holder.template get_mesh_attributes<0>();
+          AttributeSetBuilder<1>::wrap(attributes, mesh_data->attributes[0]);
+        }
+      };
+
       template<typename Shape_>
       struct MeshStreamerIndexer
       {

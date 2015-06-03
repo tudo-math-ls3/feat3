@@ -1,8 +1,7 @@
 <feast_mesh_file>
 <header>
  version 1
- submeshes 0
- cellsets 0
+ meshparts 0
 </header>
 <info>
  This is the unit-square mesh consisting of a single quadrilateral cell.

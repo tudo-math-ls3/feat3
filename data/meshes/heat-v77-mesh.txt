@@ -2,8 +2,7 @@
 <header>
  version 1
  chart_file heat-v77-chart.txt
- submeshes 2
- cellsets 0
+ meshparts 2
 </header>
 <mesh>
  <header>
@@ -71,34 +70,19 @@
   7 4 14 15
  </vert@quad>
 </mesh>
-<submesh>
+<meshpart>
  <header>
   name 1
   parent root
   chart 1
   type conformal
   shape edge
-  coords 1
+  attribute_sets 1
  </header>
  <counts>
   verts 13
   edges 12
  </counts>
- <coords>
-  0
-  0.4
-  0.6
-  1
-  1.32
-  1.48
-  2
-  2.4
-  2.6
-  3
-  3.52
-  3.68
-  4
- </coords>
  <vert@edge>
   0 1
   1 2
@@ -142,27 +126,43 @@
   23
   21
  </edge_idx>
-</submesh>
-<submesh>
+ <attribute>
+  <header>
+   dimension 1
+   name Parametrisation
+   value_dim 1
+   value_count 13
+  </header>
+  <values>
+   0
+   0.4
+   0.6
+   1
+   1.32
+   1.48
+   2
+   2.4
+   2.6
+   3
+   3.52
+   3.68
+   4
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
  <header>
   name 2
   parent root
   chart 2
   type conformal
   shape edge
-  coords 1
+  attribute_sets 1
  </header>
  <counts>
   verts 5
   edges 4
  </counts>
- <coords>
-  0
-  0.25
-  0.5
-  0.75
-  1
- </coords>
  <vert@edge>
   0 1
   1 2
@@ -182,5 +182,20 @@
   16
   22
  </edge_idx>
-</submesh>
+ <attribute>
+  <header>
+   dimension 1
+   name Parametrisation
+   value_dim 1
+   value_count 5
+  </header>
+  <values>
+   0
+   0.25
+   0.5
+   0.75
+   1
+  </values>
+ </attribute>
+</meshpart>
 </feast_mesh_file>

@@ -8,7 +8,7 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
 
 typedef ConformalMesh<Shape::Hexahedron> HexaMesh;
-typedef ConformalSubMesh<Shape::Hexahedron> SubMesh;
+typedef MeshPart<HexaMesh> SubMesh;
 
 typedef StandardRefinery<HexaMesh> HexaMeshRefinery;
 typedef StandardRefinery<SubMesh, HexaMesh> SubMeshRefinery;

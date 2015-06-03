@@ -3,9 +3,8 @@
 #define KERNEL_GEOMETRY_MESH_NODE_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/cell_sub_set_node.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/conformal_sub_mesh.hpp>
+#include <kernel/geometry/mesh_part_node.hpp>
 #include <kernel/geometry/mesh_streamer_factory.hpp>
 #include <kernel/util/mesh_streamer.hpp>
 
@@ -26,6 +25,7 @@ namespace FEAST
       {
       }
     };
+
     /// \endcond
 
     /**
@@ -42,13 +42,11 @@ namespace FEAST
       /// chart for the root mesh
       typedef DummyChart RootMeshChartType;
 
-      /// sub-mesh type
-      typedef ConformalSubMesh<Shape_> SubMeshType;
       /// chart for the sub-mesh
-      typedef DummyChart SubMeshChartType;
+      /// MeshPart type
+      typedef MeshPart<RootMeshType> MeshPartType;
+      typedef DummyChart MeshPartChartType;
 
-      /// cell subset type
-      typedef CellSubSet<Shape_> CellSubSetType;
     };
 
     /// \cond internal
@@ -62,21 +60,21 @@ namespace FEAST
 
     // helper policy template for SubMeshNode class template
     template<typename MeshNodePolicy_>
-    struct SubMeshNodePolicy
+    struct MeshPartNodePolicy
     {
-      typedef typename MeshNodePolicy_::SubMeshType MeshType;
-      typedef typename MeshNodePolicy_::SubMeshChartType ChartType;
+      typedef typename MeshNodePolicy_::MeshPartType MeshType;
+      typedef typename MeshNodePolicy_::MeshPartChartType ChartType;
     };
 
     // forward declarations
     template<typename Policy_>
-    class SubMeshNode DOXY({});
+    class MeshPartNode DOXY({});
     /// \endcond
 
     /**
      * \brief Mesh Node base class
      *
-     * A MeshNode is a container for bundling a mesh with SubMeshes and CellSubSets referring to it.
+     * A MeshNode is a container for bundling a mesh with MeshParts referring to it.
      *
      * \author Peter Zajac
      */
@@ -84,16 +82,16 @@ namespace FEAST
       typename Policy_,
       typename MeshNodePolicy_>
     class MeshNode
-      : public CellSubSetParent<Policy_>
+      : public MeshPartParent<Policy_>
     {
     public:
       /// base class typedef
-      typedef CellSubSetParent<Policy_> BaseClass;
+      typedef MeshPartParent<Policy_> BaseClass;
 
       /// submesh type
-      typedef typename Policy_::SubMeshType SubMeshType;
+      typedef typename Policy_::MeshPartType MeshPartType;
       /// submesh node type
-      typedef SubMeshNode<Policy_> SubMeshNodeType;
+      typedef MeshPartNode<Policy_> MeshPartNodeType;
 
       /// mesh type of this node
       typedef typename MeshNodePolicy_::MeshType MeshType;
@@ -102,19 +100,16 @@ namespace FEAST
 
     protected:
       /**
-       * \brief SubMeshNode bin class
+       * \brief MeshPartNode bin class
        */
-      class SubMeshNodeBin
+      class MeshPartNodeBin
       {
       public:
-        SubMeshNodeType* node;
+        MeshPartNodeType* node;
         const MeshChartType* chart;
 
       public:
-        explicit SubMeshNodeBin(
-          SubMeshNodeType* node_,
-          const MeshChartType* chart_)
-           :
+        explicit MeshPartNodeBin(MeshPartNodeType* node_, const MeshChartType* chart_) :
           node(node_),
           chart(chart_)
         {
@@ -122,19 +117,19 @@ namespace FEAST
       };
 
       /// submesh node bin container type
-      typedef std::map<Index,SubMeshNodeBin> SubMeshNodeContainer;
+      typedef std::map<Index,MeshPartNodeBin> MeshPartNodeContainer;
       /// submesh node iterator type
-      typedef typename SubMeshNodeContainer::iterator SubMeshNodeIterator;
+      typedef typename MeshPartNodeContainer::iterator MeshPartNodeIterator;
       /// submesh node const-iterator type
-      typedef typename SubMeshNodeContainer::const_iterator SubMeshNodeConstIterator;
+      typedef typename MeshPartNodeContainer::const_iterator MeshPartNodeConstIterator;
       /// submesh node reverse-iterator type
-      typedef typename SubMeshNodeContainer::reverse_iterator SubMeshNodeReverseIterator;
+      typedef typename MeshPartNodeContainer::reverse_iterator MeshPartNodeReverseIterator;
 
     protected:
       /// a pointer to the mesh of this node
       MeshType* _mesh;
       /// child submesh nodes
-      SubMeshNodeContainer _submesh_nodes;
+      MeshPartNodeContainer _mesh_part_nodes;
 
     protected:
       /**
@@ -157,8 +152,8 @@ namespace FEAST
         CONTEXT(name() + "::~MeshNode()");
 
         // loop over all submesh nodes in reverse order and delete them
-        SubMeshNodeReverseIterator it(_submesh_nodes.rbegin());
-        SubMeshNodeReverseIterator jt(_submesh_nodes.rend());
+        MeshPartNodeReverseIterator it(_mesh_part_nodes.rbegin());
+        MeshPartNodeReverseIterator jt(_mesh_part_nodes.rend());
         for(; it != jt; ++it)
         {
           if(it->second.node != nullptr)
@@ -191,86 +186,86 @@ namespace FEAST
       }
 
       /**
-       * \brief Adds a new submesh child node.
+       * \brief Adds a new mesh_part child node.
        *
        * \param[in] id
        * The id of the child node.
        *
-       * \param[in] submesh_node
-       * A pointer to the submesh node to be added.
+       * \param[in] mesh_part_node
+       * A pointer to the mesh_part node to be added.
        *
        * \param[in] chart
        * A pointer to the chart that the subnode is to be associated with. May be \c nullptr.
        *
        * \returns
-       * \p submesh_node if the insertion was successful, otherwise \c nullptr.
+       * \p mesh_part_node if the insertion was successful, otherwise \c nullptr.
        */
-      SubMeshNodeType* add_submesh_node(
+      MeshPartNodeType* add_mesh_part_node(
         Index id,
-        SubMeshNodeType* submesh_node,
+        MeshPartNodeType* mesh_part_node,
         const MeshChartType* chart = nullptr)
       {
-        CONTEXT(name() + "::add_submesh_node()");
-        if(submesh_node != nullptr)
+        CONTEXT(name() + "::add_mesh_part_node()");
+        if(mesh_part_node != nullptr)
         {
-          if(_submesh_nodes.insert(std::make_pair(id,SubMeshNodeBin(submesh_node, chart))).second)
+          if(_mesh_part_nodes.insert(std::make_pair(id,MeshPartNodeBin(mesh_part_node, chart))).second)
           {
-            return submesh_node;
+            return mesh_part_node;
           }
         }
         return nullptr;
       }
 
       /**
-       * \brief Searches for a submesh node.
+       * \brief Searches for a mesh_part node.
        *
        * \param[in] id
        * The id of the node to be found.
        *
        * \returns
-       * A pointer to the submesh node associated with \p id or \c nullptr if no such node was found.
+       * A pointer to the mesh_part node associated with \p id or \c nullptr if no such node was found.
        */
-      SubMeshNodeType* find_submesh_node(Index id)
+      MeshPartNodeType* find_mesh_part_node(Index id)
       {
-        CONTEXT(name() + "::find_submesh_node()");
-        SubMeshNodeIterator it(_submesh_nodes.find(id));
-        return (it != _submesh_nodes.end()) ? it->second.node : nullptr;
+        CONTEXT(name() + "::find_mesh_part_node()");
+        MeshPartNodeIterator it(_mesh_part_nodes.find(id));
+        return (it != _mesh_part_nodes.end()) ? it->second.node : nullptr;
       }
 
-      /** \copydoc find_submesh_node() */
-      const SubMeshNodeType* find_submesh_node(Index id) const
+      /** \copydoc find_mesh_part_node() */
+      const MeshPartNodeType* find_mesh_part_node(Index id) const
       {
-        CONTEXT(name() + "::find_submesh_node() [const]");
-        SubMeshNodeConstIterator it(_submesh_nodes.find(id));
-        return (it != _submesh_nodes.end()) ? it->second.node : nullptr;
+        CONTEXT(name() + "::find_mesh_part_node() [const]");
+        MeshPartNodeConstIterator it(_mesh_part_nodes.find(id));
+        return (it != _mesh_part_nodes.end()) ? it->second.node : nullptr;
       }
 
       /**
-       * \brief Searches for a submesh.
+       * \brief Searches for a mesh_part.
        *
        * \param[in] id
-       * The id of the node associated with the submesh to be found.
+       * The id of the node associated with the mesh_part to be found.
        *
        * \returns
-       * A pointer to the submesh associated with \p id or \c nullptr if no such node was found.
+       * A pointer to the mesh_part associated with \p id or \c nullptr if no such node was found.
        */
-      SubMeshType* find_submesh(Index id)
+      MeshPartType* find_mesh_part(Index id)
       {
-        CONTEXT(name() + "::find_submesh()");
-        SubMeshNodeType* node = find_submesh_node(id);
+        CONTEXT(name() + "::find_mesh_part()");
+        MeshPartNodeType* node = find_mesh_part_node(id);
         return (node != nullptr) ? node->get_mesh() : nullptr;
       }
 
-      /** \copydoc find_submesh() */
-      const SubMeshType* find_submesh(Index id) const
+      /** \copydoc find_mesh_part() */
+      const MeshPartType* find_mesh_part(Index id) const
       {
-        CONTEXT(name() + "::find_submesh() [const]");
-        const SubMeshNodeType* node = find_submesh_node(id);
+        CONTEXT(name() + "::find_mesh_part() [const]");
+        const MeshPartNodeType* node = find_mesh_part_node(id);
         return (node != nullptr) ? node->get_mesh() : nullptr;
       }
 
       /**
-       * \brief Searches for a submesh chart.
+       * \brief Searches for a mesh_part chart.
        *
        * \param[in] id
        * The id of the node associated with the chart to be found.
@@ -279,37 +274,37 @@ namespace FEAST
        * A pointer to the chart associated with \p id of \c nullptr if no such node was found or if
        * the corresponding node did not have a chart.
        */
-      MeshChartType* find_submesh_chart(Index id)
+      MeshChartType* find_mesh_part_chart(Index id)
       {
-        CONTEXT(name() + "::find_submesh_chart()");
-        SubMeshNodeIterator it(_submesh_nodes.find(id));
-        return (it != _submesh_nodes.end()) ? it->second.chart : nullptr;
+        CONTEXT(name() + "::find_mesh_part_chart()");
+        MeshPartNodeIterator it(_mesh_part_nodes.find(id));
+        return (it != _mesh_part_nodes.end()) ? it->second.chart : nullptr;
       }
 
-      /** \copydoc find_submesh_chart() */
-      const MeshChartType* find_submesh_chart(Index id) const
+      /** \copydoc find_mesh_part_chart() */
+      const MeshChartType* find_mesh_part_chart(Index id) const
       {
-        CONTEXT(name() + "::find_submesh_chart() [const]");
-        SubMeshNodeConstIterator it(_submesh_nodes.find(id));
-        return (it != _submesh_nodes.end()) ? it->second.chart : nullptr;
+        CONTEXT(name() + "::find_mesh_part_chart() [const]");
+        MeshPartNodeConstIterator it(_mesh_part_nodes.find(id));
+        return (it != _mesh_part_nodes.end()) ? it->second.chart : nullptr;
       }
 
       /**
        * \brief Adapts this mesh node.
        *
-       * This function loops over all submesh nodes and uses their associated charts (if given)
+       * This function loops over all mesh_part nodes and uses their associated charts (if given)
        * to adapt the mesh in this node.
        *
        * \param[in] recursive
-       * If set to \c true, all submesh nodes are adapted prior to adapting this node.
+       * If set to \c true, all mesh_part nodes are adapted prior to adapting this node.
        */
       void adapt(bool recursive = true)
       {
         CONTEXT(name() + "::adapt()");
 
-        // loop over all submesh nodes
-        SubMeshNodeIterator it(_submesh_nodes.begin());
-        SubMeshNodeIterator jt(_submesh_nodes.end());
+        // loop over all mesh_part nodes
+        MeshPartNodeIterator it(_mesh_part_nodes.begin());
+        MeshPartNodeIterator jt(_mesh_part_nodes.end());
         for(; it != jt; ++it)
         {
           // adapt child node
@@ -332,10 +327,10 @@ namespace FEAST
        * This function adapts this node by a specific chart whose id is given.
        *
        * \param[in] id
-       * The id of the submesh node that is to be used for adaption.
+       * The id of the mesh_part node that is to be used for adaption.
        *
        * \param[in] recursive
-       * If set to \c true, the submesh node associated with \p id will be adapted prior to adapting this node.
+       * If set to \c true, the mesh_part node associated with \p id will be adapted prior to adapting this node.
        *
        * \returns
        * \c true if this node was adapted successfully or \c false if no node is associated with \p id or if
@@ -345,9 +340,9 @@ namespace FEAST
       {
         CONTEXT(name() + "::adapt_by_id()");
 
-        // try to find the corresponding submesh node
-        SubMeshNodeIterator it(_submesh_nodes.find(id));
-        if(it == _submesh_nodes.end())
+        // try to find the corresponding mesh_part node
+        MeshPartNodeIterator it(_mesh_part_nodes.find(id));
+        if(it == _mesh_part_nodes.end())
           return false;
 
         // adapt child node
@@ -386,44 +381,26 @@ namespace FEAST
        */
       void refine_children(MeshNode& refined_node) const
       {
-        // refine submeshes
-        refine_submeshes(refined_node);
-
-        // refine subsets
-        refine_subsets(refined_node);
+        // refine mesh_partes
+        refine_mesh_parts(refined_node);
       }
 
       /**
-       * \brief Refines all child submesh nodes of this node.
+       * \brief Refines all child mesh_part nodes of this node.
        *
        * \param[in,out] refined_node
        * A reference to the node generated by refining this node.
        */
-      void refine_submeshes(MeshNode& refined_node) const
+      void refine_mesh_parts(MeshNode& refined_node) const
       {
-        SubMeshNodeConstIterator it(_submesh_nodes.begin());
-        SubMeshNodeConstIterator jt(_submesh_nodes.end());
+        MeshPartNodeConstIterator it(_mesh_part_nodes.begin());
+        MeshPartNodeConstIterator jt(_mesh_part_nodes.end());
         for(; it != jt; ++it)
         {
-          refined_node.add_submesh_node(it->first, it->second.node->refine(*_mesh), it->second.chart);
+          refined_node.add_mesh_part_node(it->first, it->second.node->refine(*_mesh), it->second.chart);
         }
       }
 
-      /**
-       * \brief Refines all child cell subset nodes of this node.
-       *
-       * \param[in,out] refined_node
-       * A reference to the node generated by refining this node.
-       */
-      void refine_subsets(MeshNode& refined_node) const
-      {
-        typename BaseClass::CellSubSetNodeConstIterator it(this->_subset_nodes.begin());
-        typename BaseClass::CellSubSetNodeConstIterator jt(this->_subset_nodes.end());
-        for(; it != jt; ++it)
-        {
-          refined_node.add_subset_node(it->first, it->second->refine(*_mesh));
-        }
-      }
     }; // class MeshNode
 
     /* ***************************************************************************************** */
@@ -472,42 +449,34 @@ namespace FEAST
         MeshStreamerFactory<MeshType> my_factory(mesh_reader);
         this->_mesh = new MeshType(my_factory);
 
-        // Generate a MeshStreamer::MeshNode, as this then contains the information about the SubMeshes and
-        // CellSubSets present in the MeshStreamer
+        // Generate a MeshStreamer::MeshNode, as this then contains the information about the MeshPartes and
+        // MeshParts present in the MeshStreamer
         MeshStreamer::MeshNode* root(mesh_reader.get_root_mesh_node());
         ASSERT_(root != nullptr);
 
-        // Add SubMeshNodes and CellSubSetNodes to the new RootMeshNode by iterating over the MeshStreamer::MeshNode
-        // Careful: MeshStreamer::SubMeshNodes and MeshStreamer::CellSubSetNodes use Strings as their names and
+        // Add MeshPartNodes and MeshPartNodes to the new RootMeshNode by iterating over the MeshStreamer::MeshNode
+        // Careful: MeshStreamer::MeshPartNodes and MeshStreamer::MeshPartNodes use Strings as their names and
         // identifiers, whereas the RootMeshNode uses an Index for this
         Index i(0);
         for(auto& it:root->sub_mesh_map)
         {
-          // Create a factory for the SubMesh
-          MeshStreamerFactory<typename Policy_::SubMeshType> submesh_factory(mesh_reader, it.first);
-          // Construct the SubMesh using that factory
-          typename Policy_::SubMeshType* my_submesh(new typename Policy_::SubMeshType(submesh_factory));
-          // Create the SubMeshNode using that SubMesh
-          SubMeshNode<Policy_>* my_submesh_node(new SubMeshNode<Policy_>(my_submesh));
-          // Add the new SubMeshNode to the RootMeshNode
-          this->add_submesh_node(i++, my_submesh_node);
+          // Create a factory for the MeshPart
+          MeshStreamerFactory<typename Policy_::MeshPartType> mesh_part_factory(mesh_reader, it.first);
+          // Construct the MeshPart using that factory
+          typename Policy_::MeshPartType* my_mesh_part(new typename Policy_::MeshPartType(mesh_part_factory));
+          // Create the MeshPartNode using that MeshPart
+          MeshPartNode<Policy_>* my_mesh_part_node(new MeshPartNode<Policy_>(my_mesh_part));
+          // Add the new MeshPartNode to the RootMeshNode
+          this->add_mesh_part_node(i++, my_mesh_part_node);
         }
 
-        // Add CellSubsetNodes
-        i = 0;
-        for(auto& it:root->cell_set_map)
-        {
-          // Create a factory for the CellSubSet
-          MeshStreamerFactory<typename Policy_::CellSubSetType> cell_subset_factory(mesh_reader, it.first);
-          // Construct the CellSubSet using that factory
-          typename Policy_::CellSubSetType* my_cell_subset
-            (new typename Policy_::CellSubSetType(cell_subset_factory));
-          // Create the CellSubSetNode using that CellSubSet
-          CellSubSetNode<Policy_>* my_cell_subset_node(new CellSubSetNode<Policy_>(my_cell_subset));
-          // Add the new CellSubSetNode to the RootMeshNode
-          this->add_subset_node(i++, my_cell_subset_node);
-        }
+      }
 
+      MeshStreamer* create_mesh_writer()
+      {
+        MeshStreamer* mesh_writer(new MeshStreamer);
+
+        return mesh_writer;
       }
 
       /// virtual destructor
@@ -546,79 +515,6 @@ namespace FEAST
         return "RootMeshNode<...>";
       }
     }; // class RootMeshNode
-
-    /* ***************************************************************************************** */
-
-    /**
-     * \brief Sub-Mesh node class template
-     *
-     * This class template is used for all mesh nodes of a mesh tree except for the root node.
-     *
-     * \author Peter Zajac
-     */
-    template<typename Policy_>
-    class SubMeshNode
-      : public MeshNode<Policy_, SubMeshNodePolicy<Policy_> >
-    {
-    public:
-      /// base class typedef
-      typedef MeshNode<Policy_, SubMeshNodePolicy<Policy_> > BaseClass;
-
-      /// the mesh type of this node
-      typedef typename BaseClass::MeshType MeshType;
-
-    public:
-      /**
-       * \brief Constructor.
-       *
-       * \param[in] mesh
-       * A pointer to the mesh for this node.
-       */
-      explicit SubMeshNode(MeshType* mesh) :
-        BaseClass(mesh)
-      {
-      }
-
-      /// virtual destructor
-      virtual ~SubMeshNode()
-      {
-      }
-
-      /**
-       * \brief Refines this node and its sub-tree.
-       *
-       * \param[in] parent
-       * A reference to the parent mesh of this node's submesh.
-       *
-       * \returns
-       * A pointer to a SubMeshNode containing the refined mesh tree.
-       */
-      template<typename ParentType_>
-      SubMeshNode* refine(const ParentType_& parent) const
-      {
-        // create a refinery
-        StandardRefinery<MeshType, ParentType_> refinery(*this->_mesh, parent);
-
-        // create a new sub-mesh node
-        SubMeshNode* fine_node = new SubMeshNode(new MeshType(refinery));
-
-        // refine our children
-        this->refine_children(*fine_node);
-
-        // okay
-        return fine_node;
-      }
-
-      /**
-       * \brief Returns the name of the class.
-       * \returns
-       * The name of the class as a String.
-       */
-      static String name()
-      {
-        return "SubMeshNode<...>";
-      }
-    }; // class SubMeshNode
 
   } // namespace Geometry
 } // namespace FEAST

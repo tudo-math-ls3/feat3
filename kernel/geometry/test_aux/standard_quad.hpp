@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/conformal_sub_mesh.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 
 namespace FEAST
 {
@@ -14,7 +14,7 @@ namespace FEAST
     namespace TestAux
     {
       typedef ConformalMesh<Shape::Quadrilateral> QuadMesh;
-      typedef ConformalSubMesh<Shape::Quadrilateral> QuadSubMesh;
+      typedef MeshPart<QuadMesh> QuadSubMesh;
 
       QuadMesh* create_quad_mesh_2d(int orientation);
 

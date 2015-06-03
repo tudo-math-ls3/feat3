@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/intern/patch_index_mapping.hpp>
 
 namespace FEAST
@@ -25,7 +25,7 @@ namespace FEAST
     public:
       /// mesh typedef
       typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
-      typedef CellSubSet<Shape_> CellSetType;
+      typedef MeshPart<MeshType> CellSetType;
 
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;

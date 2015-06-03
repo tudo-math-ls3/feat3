@@ -20,11 +20,11 @@ namespace FEAST
     {
       ///for concrete halos
       template<typename Level_, typename MeshType_, typename WT_, template<typename, typename> class ST_>
-      static Geometry::CellSubSet<Shape::Hypercube<1> > convert(Halo<delta_, Level_, MeshType_, WT_, ST_> source)
+      static Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > > convert(Halo<delta_, Level_, MeshType_, WT_, ST_> source)
       {
         typename MeshType_::index_type_ target_sizes[2];
         HaloControl<Dim1D::tag_value, WT_>::fill_sizes(source, &target_sizes[0]);
-        Geometry::CellSubSet<Shape::Hypercube<1> > result(&target_sizes[0]);
+        Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > > result(&target_sizes[0]);
         HaloControl<Dim1D::tag_value, WT_>::fill_target_set(source, result);
 
         return result;
@@ -32,7 +32,7 @@ namespace FEAST
 
       ///delegate-overload for anonymous halos
       template<typename MeshType_, typename WT_, template<typename, typename> class ST_>
-      static Geometry::CellSubSet<Shape::Hypercube<1> > convert(HaloBase<MeshType_, WT_, ST_>* source)
+      static Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > > convert(HaloBase<MeshType_, WT_, ST_>* source)
       {
         typename MeshType_::index_type_ target_sizes[2];
 
@@ -48,7 +48,7 @@ namespace FEAST
             throw InternalError("Undefined polytope level!");
         }
 
-        Geometry::CellSubSet<Shape::Hypercube<1> > result(&target_sizes[0]);
+        Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > > result(&target_sizes[0]);
 
         switch(source->get_level())
         {
@@ -71,11 +71,11 @@ namespace FEAST
     {
       ///for concrete halos
       template<typename Level_, typename MeshType_, typename WT_, template<typename, typename> class ST_>
-      static Geometry::CellSubSet<Shape::Hypercube<2> > convert(Halo<delta_, Level_, MeshType_, WT_, ST_> source)
+      static Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > convert(Halo<delta_, Level_, MeshType_, WT_, ST_> source)
       {
         typename MeshType_::index_type_ target_sizes[3];
         HaloControl<Dim2D::tag_value, WT_>::fill_sizes(source, &target_sizes[0]);
-        Geometry::CellSubSet<Shape::Hypercube<2> > result(&target_sizes[0]);
+        Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > result(&target_sizes[0]);
         HaloControl<Dim2D::tag_value, WT_>::fill_target_set(source, result);
 
         return result;
@@ -83,7 +83,7 @@ namespace FEAST
 
       ///delegate-overload for anonymous halos
       template<typename MeshType_, typename WT_, template<typename, typename> class ST_>
-      static Geometry::CellSubSet<Shape::Hypercube<2> > convert(HaloBase<MeshType_, WT_, ST_>* source)
+      static Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > convert(HaloBase<MeshType_, WT_, ST_>* source)
       {
         typename MeshType_::index_type_ target_sizes[3];
 
@@ -102,7 +102,7 @@ namespace FEAST
             throw InternalError("Undefined polytope level!");
         }
 
-        Geometry::CellSubSet<Shape::Hypercube<2> > result(&target_sizes[0]);
+        Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > result(&target_sizes[0]);
 
         switch(source->get_level())
         {
@@ -128,11 +128,11 @@ namespace FEAST
     {
       ///for concrete halos
       template<typename Level_, typename MeshType_, typename WT_, template<typename, typename> class ST_>
-      static Geometry::CellSubSet<Shape::Hypercube<3> > convert(Halo<delta_, Level_, MeshType_, WT_, ST_> source)
+      static Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > > convert(Halo<delta_, Level_, MeshType_, WT_, ST_> source)
       {
         typename MeshType_::index_type_ target_sizes[4];
         HaloControl<Dim3D::tag_value, WT_>::fill_sizes(source, &target_sizes[0]);
-        Geometry::CellSubSet<Shape::Hypercube<3> > result(&target_sizes[0]);
+        Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > > result(&target_sizes[0]);
         HaloControl<Dim3D::tag_value, WT_>::fill_target_set(source, result);
 
         return result;
@@ -140,7 +140,7 @@ namespace FEAST
 
       ///delegate-overload for anonymous halos
       template<typename MeshType_, typename WT_, template<typename, typename> class ST_>
-      static Geometry::CellSubSet<Shape::Hypercube<3> > convert(HaloBase<MeshType_, WT_, ST_>* source)
+      static Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > > convert(HaloBase<MeshType_, WT_, ST_>* source)
       {
         typename MeshType_::index_type_ target_sizes[4];
 
@@ -162,7 +162,7 @@ namespace FEAST
             throw InternalError("Undefined polytope level!");
         }
 
-        Geometry::CellSubSet<Shape::Hypercube<3> > result(&target_sizes[0]);
+        Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > > result(&target_sizes[0]);
 
         switch(source->get_level())
         {

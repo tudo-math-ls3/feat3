@@ -3,9 +3,9 @@
 #define KERNEL_GEOMETRY_HIT_TEST_FACTORY_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/cell_sub_set.hpp>
-#include <kernel/util/tiny_algebra.hpp>
 #include <kernel/geometry/index_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
+#include <kernel/util/tiny_algebra.hpp>
 
 namespace FEAST
 {
@@ -28,7 +28,7 @@ namespace FEAST
     /**
      * \brief Hit-Test Factory class template
      *
-     * This class template can be used to create a CellSubSet for a particular mesh,
+     * This class template can be used to create a MeshPart for a particular mesh,
      * which consists of all entities that are inside the region characterised by a
      * hit-test function.
      *
@@ -45,12 +45,12 @@ namespace FEAST
       typename HitFunc_,
       typename Mesh_>
     class HitTestFactory
-      : public Factory< CellSubSet<typename Mesh_::ShapeType> >
+      : public Factory< MeshPart<Mesh_> >
     {
     public:
       typedef typename Mesh_::ShapeType ShapeType;
-      /// mesh type
-      typedef CellSubSet<ShapeType> MeshType;
+      /// mesh part type
+      typedef MeshPart<Mesh_> MeshType;
       /// target set holder type
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
@@ -91,6 +91,17 @@ namespace FEAST
         // call wrapper
         Intern::HitTestTargeter<ShapeType>::wrap(target_set_holder, _target_data);
       }
+
+      virtual void fill_attribute_sets(typename MeshType::AttributeHolderType& DOXY(attribute_holder))
+      {
+        // do nothing as the object has no attribute sets
+      }
+
+      virtual void fill_index_sets(typename MeshType::IndexSetHolderType*& DOXY(index_set_holder))
+      {
+        // do nothing as the object has no index sets
+      }
+
     }; // class HitTestFactory
 
     /// \cond internal

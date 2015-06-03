@@ -1,5 +1,5 @@
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
@@ -15,7 +15,7 @@
 using namespace FEAST;
 
 typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
-typedef Geometry::CellSubSet<Shape::Quadrilateral> QuadCellSet;
+typedef Geometry::MeshPart<QuadMesh> QuadCellSet;
 typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
 typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;

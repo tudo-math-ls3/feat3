@@ -2,14 +2,15 @@
 #include <kernel/geometry/test_aux/tetris_quad.hpp>
 #include <kernel/geometry/test_aux/standard_quad.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
 
 typedef ConformalMesh<Shape::Quadrilateral> RootMesh;
-typedef ConformalSubMesh<Shape::Quadrilateral> SubMesh;
-typedef CellSubSet<Shape::Quadrilateral> SubSet;
+typedef MeshPart<RootMesh> SubMesh;
+typedef MeshPart<RootMesh> SubSet;
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;
 typedef StandardRefinery<SubMesh,RootMesh> SubRootMeshRefinery;

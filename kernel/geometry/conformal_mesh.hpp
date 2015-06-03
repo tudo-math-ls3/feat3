@@ -238,6 +238,18 @@ namespace FEAST
         CONTEXT(name() + "::get_index_set_holder() [const]");
         return _index_set_holder;
       }
+
+      IndexSetHolderType* get_topology()
+      {
+        CONTEXT(name() + "::get_topology()");
+        return &_index_set_holder;
+      }
+
+      const IndexSetHolderType* get_topology() const
+      {
+        CONTEXT(name() + "::get_topology() [const]");
+        return &_index_set_holder;
+      }
       /// \endcond
 
       /**

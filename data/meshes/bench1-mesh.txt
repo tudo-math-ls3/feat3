@@ -2,8 +2,7 @@
 <header>
  version 1
  chart_file bench1-chart.txt
- submeshes 2
- cellsets 0
+ meshparts 2
 </header>
 <info>
  This is the bench1 mesh-file, which defines the standard
@@ -599,65 +598,22 @@
   150 19 149 18
  </vert@quad>
 </mesh>
-<submesh>
+<meshpart>
  <header>
   name 1
   parent root
   chart 1
   type conformal
   shape edge
-  coords 1
+  attribute_sets 1
  </header>
  <info>
-  This submesh defines the outer rectangular boundary component.
+  This meshpart defines the outer rectangular boundary component.
  </info>
  <counts>
   verts 41
   edges 40
  </counts>
- <coords>
-  0
-  0.0588
-  0.091
-  0.109
-  0.122
-  0.1595
-  0.182
-  0.204
-  0.227
-  0.259
-  0.341
-  0.395
-  0.455
-  0.591
-  0.682
-  0.841
-  1
-  1.245
-  1.485
-  1.733
-  2
-  2.159
-  2.318
-  2.409
-  2.545
-  2.605
-  2.659
-  2.741
-  2.773
-  2.799
-  2.818
-  2.841
-  2.878
-  2.891
-  2.909
-  2.941
-  3
-  3.34
-  3.51
-  3.685
-  4
- </coords>
  <vert@edge>
   0 1
   1 2
@@ -785,38 +741,74 @@
   226
   0
  </edge_idx>
-</submesh>
-<submesh>
+ <attribute>
+  <header>
+   dimension 1
+   name Parametrisation
+   value_dim 1
+   value_count 41
+  </header>
+  <values>
+   0
+   0.0588
+   0.091
+   0.109
+   0.122
+   0.1595
+   0.182
+   0.204
+   0.227
+   0.259
+   0.341
+   0.395
+   0.455
+   0.591
+   0.682
+   0.841
+   1
+   1.245
+   1.485
+   1.733
+   2
+   2.159
+   2.318
+   2.409
+   2.545
+   2.605
+   2.659
+   2.741
+   2.773
+   2.799
+   2.818
+   2.841
+   2.878
+   2.891
+   2.909
+   2.941
+   3
+   3.34
+   3.51
+   3.685
+   4
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
  <header>
-  name 2
+  name Parametrisation
   parent root
   chart 2
   type conformal
   shape edge
-  coords 1
+  attribute_sets 1
  </header>
  <info>
-  This submesh defines the inner circular boundary component.
+  This meshpart defines the inner circular boundary component.
  </info>
  <counts>
   verts 13
   edges 12
  </counts>
- <coords>
-  0
-  0.125
-  0.25
-  0.3125
-  0.375
-  0.4375
-  0.5
-  0.5625
-  0.625
-  0.6825
-  0.75
-  0.875
-  1
- </coords>
  <vert@edge>
   0 1
   1 2
@@ -860,5 +852,28 @@
   271
   269
  </edge_idx>
-</submesh>
+ <attribute>
+  <header>
+   dimension 1
+   name Parametrisation
+   value_dim 1
+   value_count 13
+  </header>
+  <values>
+   0
+   0.125
+   0.25
+   0.3125
+   0.375
+   0.4375
+   0.5
+   0.5625
+   0.625
+   0.6825
+   0.75
+   0.875
+   1
+  </values>
+ </attribute>
+</meshpart>
 </feast_mesh_file>

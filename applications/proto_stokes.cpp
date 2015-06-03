@@ -14,9 +14,9 @@ for further application development.
 
 // FEAST includes
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
@@ -45,7 +45,7 @@ typedef Shape::Quadrilateral ShapeType;
 
 // geometry typedefs
 typedef Geometry::ConformalMesh<ShapeType> MeshType;
-typedef Geometry::CellSubSet<ShapeType> CellSetType;
+typedef Geometry::MeshPart<MeshType> CellSetType;
 typedef Geometry::Factory<MeshType> MeshFactoryType;
 typedef Geometry::Factory<CellSetType> CellFactoryType;
 
@@ -168,6 +168,16 @@ public:
     et[0] = 0;
     et[1] = 1;
     et[2] = 2;
+  }
+
+  virtual void fill_attribute_sets(CellSetType::AttributeHolderType& DOXY(attribute_holder))
+  {
+    // do nothing as this class does not have any attributes
+  }
+
+  virtual void fill_index_sets(CellSetType::IndexSetHolderType*& DOXY(index_set_holder))
+  {
+    // do nothing as this class does not have a topology
   }
 }; // class Factory<CellSubSet<...>>
 

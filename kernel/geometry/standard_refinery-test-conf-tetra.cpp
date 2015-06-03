@@ -7,7 +7,7 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
 
 typedef ConformalMesh<Shape::Tetrahedron> RootMesh;
-typedef ConformalSubMesh<Shape::Tetrahedron> SubMesh;
+typedef MeshPart<RootMesh> SubMesh;
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;
 typedef StandardRefinery<SubMesh, RootMesh> SubMeshRefinery;

@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_PATCH_HALO_FACTORY_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 
 // includes, system
 #include <map>
@@ -24,12 +24,12 @@ namespace FEAST
     class PatchHaloFactory DOXY({});
 
     template<typename Shape_>
-    class PatchHaloFactory< CellSubSet<Shape_> > :
-      public Factory< CellSubSet<Shape_> >
+    class PatchHaloFactory< MeshPart<ConformalMesh<Shape_> > > :
+      public Factory< MeshPart<ConformalMesh<Shape_> > >
     {
     public:
       /// mesh type
-      typedef CellSubSet<Shape_> MeshType;
+      typedef MeshPart<ConformalMesh<Shape_> > MeshType;
       /// target set holder type
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
@@ -58,7 +58,18 @@ namespace FEAST
       {
         Intern::PatchHaloWrapper<Shape_>::map(_ics, _halo_set.get_target_set_holder(), target_set_holder);
       }
-    }; // class PatchHaloFactory<CellSubSet<...>>
+
+      virtual void fill_attribute_sets(typename MeshType::AttributeHolderType& DOXY(attribute_holder))
+      {
+        // do nothing as the object has no attribute sets
+      }
+
+      virtual void fill_index_sets(typename MeshType::IndexSetHolderType*& DOXY(index_set_holder))
+      {
+        // do nothing as the object has no index sets
+      }
+
+    }; // class PatchHaloFactory<MeshPart<...>>
 
     /// \cond internal
     namespace Intern

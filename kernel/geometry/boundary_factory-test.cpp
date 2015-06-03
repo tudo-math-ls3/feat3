@@ -8,7 +8,7 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
 
 typedef ConformalMesh<Shape::Quadrilateral> RootMesh;
-typedef CellSubSet<Shape::Quadrilateral> SubSet;
+typedef MeshPart<RootMesh> SubSet;
 
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;

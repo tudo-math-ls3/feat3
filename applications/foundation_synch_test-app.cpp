@@ -11,7 +11,7 @@
 #include <kernel/lafem/vector_mirror.hpp>
 
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>
 
 #include <kernel/space/lagrange1/element.hpp>
@@ -51,7 +51,7 @@ struct TestResult
 };
 
 typedef Geometry::ConformalMesh<Shape::Quadrilateral> quad_mesh_type_;
-typedef Geometry::CellSubSet<Shape::Quadrilateral> quad_cell_subset_type_;
+typedef Geometry::MeshPart<quad_mesh_type_> quad_cell_subset_type_;
 typedef Trafo::Standard::Mapping<quad_mesh_type_> quad_trafo_type_;
 typedef Space::Lagrange1::Element<quad_trafo_type_> quad_space_type_;
 

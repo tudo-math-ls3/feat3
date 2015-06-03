@@ -203,7 +203,9 @@ namespace ElementRegression
   {
   protected:
     typedef Geometry::ConformalMesh<Shape_> MeshType;
-    typedef Geometry::CellSubSet<Shape_> RegionType;
+    typedef Geometry::MeshPart<MeshType> RegionType;
+    //typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactory;
+    typedef Geometry::BoundaryFactory<MeshType> RegionFactory;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Element_<TrafoType, ElArgs_...> SpaceType;
 

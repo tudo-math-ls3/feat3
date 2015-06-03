@@ -1963,7 +1963,11 @@ namespace FEAST
         };
 
         // create mesh
-        TetraSubMesh* mesh = new TetraSubMesh(num_entities, 2);
+        TetraSubMesh* mesh = new TetraSubMesh(num_entities, true);
+        // create a MeshAttribute that holds one value for each vertex
+        typename TetraSubMesh::AttributeType my_vertex_set(num_entities[0], 2);
+        // Add the attribute to mesh
+        mesh->add_attribute<0>(my_vertex_set);
 
         // set up vertex coordinates array
         Real vtx[] =
@@ -1973,7 +1977,7 @@ namespace FEAST
           2.0, 4.0,
           4.0, 0.0
         };
-        copy_vtx(mesh->get_vertex_set(), vtx);
+        copy_vtx(mesh->get_attributes<0>()[0], vtx);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -2055,7 +2059,7 @@ namespace FEAST
           1.0, 2.0,
           1.0, 1.0
         };
-        if(!comp_vtx(mesh.get_vertex_set(), vtx))
+        if(!comp_vtx((mesh.get_attributes<0>())[0], vtx))
           throw String("Vertex coordinate refinement failure");
 
         // check vertices-at-edge array

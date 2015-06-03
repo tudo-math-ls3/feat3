@@ -32,8 +32,7 @@ public:
     ioss << "<header>  " << endl;
     ioss << " version 1" << endl;
     ioss << " chart_file unit_quad_chart.txt" << endl;
-    ioss << " submeshes 1" << endl;
-    ioss << " cellsets 1" << endl;
+    ioss << " meshparts 2" << endl;
     ioss << "</header>" << endl;
     ioss << "   <info>    " << endl;
     ioss << "This file contains a simple unit-square..." << endl;
@@ -70,10 +69,12 @@ public:
     ioss << " </vert@quad>" << endl;
     ioss << "</mesh>" << endl;
     // cellset
-    ioss << "<cellset>" << endl;
+    ioss << "<meshpart>" << endl;
     ioss << " <header>" << endl;
     ioss << "  name cellset_1" << endl;
     ioss << "  parent root" << endl;
+    ioss << "  type conformal" << endl;
+    ioss << "  shape vertex" << endl;
     ioss << " </header>" << endl;
     ioss << " <info>" << endl;
     ioss << " I am a cellset!" << endl;
@@ -87,15 +88,15 @@ public:
     ioss << "3" << endl;
     ioss << "0" << endl;
     ioss << " </vert_idx>" << endl;
-    ioss << "</cellset>" << endl;
+    ioss << "</meshpart>" << endl;
     // submesh
-    ioss << "<submesh>   " << endl;
+    ioss << "<meshpart>   " << endl;
     ioss << " <header>" << endl;
     ioss << "  name outer" << endl;
     ioss << "  parent root" << endl;
     ioss << "  type conformal  " << endl;
     ioss << "  shape edge " << endl;
-    ioss << "  coords    1" << endl;
+    ioss << "  attribute_sets 1" << endl;
     ioss << "</header>" << endl;
     ioss << " <info>  " << endl;
     ioss << " This is a submesh that..." << endl;
@@ -104,13 +105,21 @@ public:
     ioss << "   verts    5   " << endl;
     ioss << "  edges 4" << endl;
     ioss << "  </counts>" << endl;
-    ioss << " <coords> " << endl;
-    ioss << "  0.0" << endl;
-    ioss << "  1.0" << endl;
-    ioss << "  2.0" << endl;
+    ioss << " <attribute> " << endl;
+    ioss << "  <header> " << endl;
+    ioss << "   dimension 0" << endl;
+    ioss << "   name Parametrisation" << endl;
+    ioss << "   value_dim 1" << endl;
+    ioss << "   value_count 5" << endl;
+    ioss << "  </header> " << endl;
+    ioss << "   <values> " << endl;
+    ioss << "    0.0" << endl;
+    ioss << "    1.0" << endl;
+    ioss << "    2.0" << endl;
     ioss << "3.0" << endl;
-    ioss << "  4.0 " << endl;
-    ioss << " </coords> " << endl;
+    ioss << "    4.0 " << endl;
+    ioss << " </values> " << endl;
+    ioss << " </attribute> " << endl;
     ioss << " <vert@edge>" << endl;
     ioss << " 0  1" << endl;
     ioss << "1  2   " << endl;
@@ -130,7 +139,7 @@ public:
     ioss << "1" << endl;
     ioss << "2" << endl;
     ioss << " </edge_idx>" << endl;
-    ioss << "</submesh>" << endl;
+    ioss << "</meshpart>" << endl;
     ioss << "</feast_mesh_file>";
 
     // two mesh reader objects for reading and writing the mesh data
@@ -154,13 +163,13 @@ public:
 
     // insert the temporary MeshNodes
     writer._insert_sub_mesh(tempMN1);
-    TEST_CHECK_EQUAL(writer.get_num_submeshes(), Index(2));
+    TEST_CHECK_EQUAL(writer.get_num_submeshes(), Index(3));
     TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh1"), tempMN1);
     TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh1")->mesh_data.name, "tempSubmesh1");
     TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh1")->mesh_data.info, "super info1");
 
     writer._insert_sub_mesh(tempMN2);
-    TEST_CHECK_EQUAL(writer.get_num_submeshes(), Index(3));
+    TEST_CHECK_EQUAL(writer.get_num_submeshes(), Index(4));
     TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh2"), tempMN2);
     TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh2")->mesh_data.name, "tempSubmesh2");
     TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh2")->mesh_data.info, "super info2");
@@ -179,8 +188,7 @@ public:
 
     // check members
     TEST_CHECK_EQUAL(reader.get_chart_path(), "unit_quad_chart.txt");
-    TEST_CHECK_EQUAL(reader.get_num_submeshes(), Index(1));
-    TEST_CHECK_EQUAL(reader.get_num_cellsets(), Index(1));
+    TEST_CHECK_EQUAL(reader.get_num_submeshes(), Index(2));
     TEST_CHECK_EQUAL(reader.get_info(), "This file contains a simple unit-square..." );
 
     // test the get_mesh function
@@ -311,7 +319,7 @@ public:
     //
 
     String cellset_name = "cellset_1";
-    MeshStreamer::CellSetContainer* cellset = reader.get_cell_set(cellset_name);
+    MeshStreamer::MeshDataContainer* cellset = reader.get_mesh(cellset_name);
 
     TEST_CHECK_EQUAL(cellset->name, "cellset_1");
     TEST_CHECK_EQUAL(cellset->parent, "root");
@@ -362,13 +370,13 @@ public:
     TEST_CHECK_EQUAL(sub_mesh.chart , "");
     TEST_CHECK_EQUAL(sub_mesh.convert_mesh_type(sub_mesh.mesh_type) , "conformal");
     TEST_CHECK_EQUAL(sub_mesh.convert_shape_type(sub_mesh.shape_type) , "edge");
-    TEST_CHECK_EQUAL(sub_mesh.coord_per_vertex , Index(1));
     TEST_CHECK_EQUAL(sub_mesh.vertex_count , Index(5));
     TEST_CHECK_EQUAL(sub_mesh.edge_count , Index(4));
     TEST_CHECK_EQUAL(sub_mesh.tria_count , Index(0));
     TEST_CHECK_EQUAL(sub_mesh.quad_count , Index(0));
     TEST_CHECK_EQUAL(sub_mesh.tetra_count , Index(0));
     TEST_CHECK_EQUAL(sub_mesh.hexa_count, Index(0));
+    TEST_CHECK_EQUAL(sub_mesh.attributes[0][0].value_dim, Index(1));
 
     TEST_CHECK_EQUAL(sub_mesh.info, "This is a submesh that...");
 
@@ -495,8 +503,7 @@ public:
     ioss1 << "<feast_mesh_file>" << endl;
     ioss1 << "<header>  " << endl;
     ioss1 << "  version 1" << endl;
-    ioss1 << "  submeshes 0" << endl;
-    ioss1 << "  cellsets 0" << endl;
+    ioss1 << "  meshparts 0" << endl;
     ioss1 << "</header>" << endl;
     ioss1 << "<mesh>" << endl;
     ioss1 << "  <header>" << endl;
@@ -525,8 +532,7 @@ public:
     ioss2 << "<feast_mesh_file>" << endl;
     ioss2 << "<header>  " << endl;
     ioss2 << "  version 1" << endl;
-    ioss2 << "  submeshes 0" << endl;
-    ioss2 << "  cellsets 0" << endl;
+    ioss2 << "  meshparts 0" << endl;
     ioss2 << "</header>" << endl;
     ioss2 << "<mesh>" << endl;
     ioss2 << "  <header>" << endl;
@@ -556,8 +562,7 @@ public:
     ioss3 << "<feast_mesh_file>" << endl;
     ioss3 << "<header>  " << endl;
     ioss3 << "  version   " << endl;
-    ioss3 << "  submeshes 0" << endl;
-    ioss3 << "  cellsets 0" << endl;
+    ioss3 << "  meshparts 0" << endl;
     ioss3 << "</header>" << endl;
     ioss3 << "<mesh>" << endl;
     ioss3 << "  <header>" << endl;
@@ -587,8 +592,7 @@ public:
     ioss4 << "<feast_mesh_file>" << endl;
     ioss4 << "<header>  " << endl;
     ioss4 << "  version 1" << endl;
-    ioss4 << "  submeshes 0" << endl;
-    ioss4 << "  cellsets 0" << endl;
+    ioss4 << "  meshparts 0" << endl;
     ioss4 << "</header>" << endl;
     ioss4 << "<mesh>" << endl;
     ioss4 << "  <header>" << endl;
@@ -628,8 +632,7 @@ public:
     ioss << "<header>  " << endl;
     ioss << " version 1" << endl;
     ioss << " chart_file unit_quad_chart.txt" << endl;
-    ioss << " submeshes 0" << endl;
-    ioss << " cellsets 0" << endl;
+    ioss << " meshparts 0" << endl;
     ioss << "</header>" << endl;
     ioss << "   <info>    " << endl;
     ioss << "This file contains a simple unit-square..." << endl;
@@ -677,7 +680,6 @@ public:
     // check members
     TEST_CHECK_EQUAL(reader.get_chart_path(), "unit_quad_chart.txt");
     TEST_CHECK_EQUAL(reader.get_num_submeshes(), Index(0));
-    TEST_CHECK_EQUAL(reader.get_num_cellsets(), Index(0));
     TEST_CHECK_EQUAL(reader.get_info(), "This file contains a simple unit-square..." );
 
     // test the get_mesh function

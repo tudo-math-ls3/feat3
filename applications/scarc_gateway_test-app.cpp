@@ -3,7 +3,6 @@
 #include <kernel/foundation/comm_base.hpp>
 
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication.hpp>
 #include <kernel/foundation/halo.hpp>

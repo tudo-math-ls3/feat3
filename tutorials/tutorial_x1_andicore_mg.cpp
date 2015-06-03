@@ -17,11 +17,11 @@
 #include <kernel/util/string.hpp>                          // for String
 
 // FEAST-Geometry includes
-#include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
-#include <kernel/geometry/cell_sub_set.hpp>                // for CellSubSet
-#include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
+#include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
+#include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
+#include <kernel/geometry/mesh_part.hpp>                   // for CellSubSet
 
 // FEAST-Trafo includes
 #include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
@@ -418,7 +418,7 @@ namespace TutorialX1
     // Define the mesh type
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
     // Define the boundary type
-    typedef Geometry::CellSubSet<ShapeType> BoundaryType;
+    typedef Geometry::MeshPart<MeshType> BoundaryType;
     // Define the trafo...
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     // and the space, as usual

@@ -7,7 +7,6 @@
 
 #include<kernel/foundation/mesh_control.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 
 #include<deque>

@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/conformal_sub_mesh.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 
 namespace FEAST
 {
@@ -15,7 +15,7 @@ namespace FEAST
     {
 
       typedef ConformalMesh<Shape::Triangle> TriaMesh;
-      typedef ConformalSubMesh<Shape::Triangle> TriaSubMesh;
+      typedef MeshPart<TriaMesh> TriaSubMesh;
 
       TriaMesh* create_tria_mesh_2d(int orientation);
 

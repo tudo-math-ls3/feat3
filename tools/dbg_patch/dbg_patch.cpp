@@ -1,14 +1,14 @@
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
-#include <kernel/geometry/patch_factory.hpp>
 #include <kernel/geometry/macro_factory.hpp>
+#include <kernel/geometry/mesh_part.hpp>
+#include <kernel/geometry/patch_factory.hpp>
 #include <kernel/geometry/patch_halo_factory.hpp>
 #include <kernel/geometry/test_aux/tetris_factory.hpp>
 
 using namespace FEAST;
 
 typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
-typedef Geometry::CellSubSet<Shape::Quadrilateral> QuadCellSet;
+typedef Geometry::MeshPart<QuadMesh> QuadCellSet;
 typedef Geometry::TestAux::TetrisFactory<QuadMesh> TetrisFactory;
 typedef Geometry::StandardRefinery<QuadMesh> Refinery;
 typedef Geometry::PatchFactory<QuadMesh> PatchFactory;
@@ -89,6 +89,16 @@ public:
       _fill_base_interface(target_set_holder);
       break;
     }
+  }
+
+  virtual void fill_attribute_sets(typename QuadCellSet::AttributeHolderType& DOXY(attribute_holder))
+  {
+    // do nothing as the class has no attribute sets
+  }
+
+  virtual void fill_index_sets(typename QuadCellSet::IndexSetHolderType*& DOXY(index_set_holder))
+  {
+    // do nothing as the class has no index sets
   }
 
 protected:

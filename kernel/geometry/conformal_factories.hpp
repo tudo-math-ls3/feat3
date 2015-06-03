@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 #include <kernel/geometry/shape_convert_factory.hpp>
@@ -230,13 +230,13 @@ namespace FEAST
 
     /// \cond internal
     template<>
-      class UnitCubeFactory< CellSubSet<Shape::Hypercube<2> > > :
-      public Factory< CellSubSet<Shape::Hypercube<2> > >
+      class UnitCubeFactory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >:
+      public Factory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >
       {
         public:
           typedef Shape::Hypercube<2> ShapeType;
-          /// mesh type
-          typedef CellSubSet<ShapeType> MeshType;
+          /// mesh part type
+          typedef MeshPart<ConformalMesh<ShapeType>> MeshType;
           /// target set holder type
           typedef MeshType::TargetSetHolderType TargetSetHolderType;
 
@@ -270,7 +270,7 @@ namespace FEAST
             ei[2] = 2;
             ei[3] = 3;
           }
-      }; //UnitCubeFactory< CellSubSet<Shape::Hypercube<2> > >
+      }; //UnitCubeFactory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >
 
     /// \endcond
 

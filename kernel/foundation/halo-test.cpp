@@ -7,7 +7,7 @@
 #include <kernel/foundation/halo.hpp>
 #include <kernel/archs.hpp>
 #include<kernel/geometry/conformal_mesh.hpp>
-#include<kernel/geometry/cell_sub_set.hpp>
+#include<kernel/geometry/mesh_part.hpp>
 #include<deque>
 
 using namespace FEAST;
@@ -250,9 +250,9 @@ class HaloTestGeometryInterface:
       Foundation::Halo<0, PLEdge, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
       h.push_back(3);
 
-      //create CellSubSet
+      //create MeshPart
       Index polytopes_in_subset[3] = {2, 1, 0}; //no overlap and one edge means two vertices but no faces
-      Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+      Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(polytopes_in_subset);
 
       typename Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> >::storage_type_ adjacent_vertices(h.get_mesh()->get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, h.get_element(0)));
 

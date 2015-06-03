@@ -4,7 +4,7 @@
 #include <kernel/foundation/comm_base.hpp>
 
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication.hpp>
 #include <kernel/foundation/halo.hpp>
@@ -121,11 +121,11 @@ int main()
 
   ///convert comm_halos
   ///TODO: Peter-> why is CSS's copy assignment private, while copy-ctor is not?
-  std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > halo_subsets;
+  std::vector<std::shared_ptr<MeshPart<ConformalMesh<Shape::Hypercube<2> > > > > halo_subsets;
   for(auto& ch_i : p_i.comm_halos)
   {
-    CellSubSet<Shape::Hypercube<2> > cell_sub_set(HaloInterface<0, Dim2D>::convert(ch_i.get()));
-    halo_subsets.push_back(std::shared_ptr<CellSubSet<Shape::Hypercube<2> > >(new CellSubSet<Shape::Hypercube<2> >(cell_sub_set)));
+    MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(HaloInterface<0, Dim2D>::convert(ch_i.get()));
+    halo_subsets.push_back(std::shared_ptr<MeshPart<ConformalMesh<Shape::Hypercube<2> > > >(new MeshPart<ConformalMesh<Shape::Hypercube<2> > > (cell_sub_set)));
   }
 
   ///Trafo, Space, and boundary assembler
@@ -134,11 +134,11 @@ int main()
   Assembly::DirichletAssembler<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
 
   ///convert boundaries and add to dirichlet assembler
-  std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > boundary_subsets;
+  std::vector<std::shared_ptr<MeshPart<ConformalMesh<Shape::Hypercube<2> > > > > boundary_subsets;
   for(auto& b_i : p_i.boundaries)
   {
-    CellSubSet<Shape::Hypercube<2> > cell_sub_set(HaloInterface<0, Dim2D>::convert(&b_i));
-    boundary_subsets.push_back(std::shared_ptr<CellSubSet<Shape::Hypercube<2> > >(new CellSubSet<Shape::Hypercube<2> >(cell_sub_set)));
+    MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(HaloInterface<0, Dim2D>::convert(&b_i));
+    boundary_subsets.push_back(std::shared_ptr<MeshPart<ConformalMesh<Shape::Hypercube<2> > > >(new MeshPart<ConformalMesh<Shape::Hypercube<2> > > (cell_sub_set)));
     dirichlet.add_cell_set(cell_sub_set);
   }
   ///vector mirrors

@@ -327,6 +327,13 @@ namespace FEAST
           num_entities[Shape_::dimension],
           num_entities[face_dim_])
       {
+        CONTEXT(name() + "::IndexSetWrapper(const Index*)");
+      }
+
+      explicit IndexSetWrapper() :
+        BaseClass(),
+        _index_set()
+      {
         CONTEXT(name() + "::IndexSetWrapper()");
       }
 
@@ -334,6 +341,7 @@ namespace FEAST
         BaseClass(other),
         _index_set(other._index_set)
       {
+        CONTEXT(name() + "::IndexSetWrapper(const IndexSetWrapper&)");
       }
 
       virtual ~IndexSetWrapper()
@@ -382,12 +390,19 @@ namespace FEAST
           num_entities[Shape_::dimension],
           num_entities[0])
       {
-        CONTEXT(name() + "::IndexSetWrapper()");
+        CONTEXT(name() + "::IndexSetWrapper(const Index*)");
       }
 
       IndexSetWrapper(const IndexSetWrapper& other) :
         _index_set(other._index_set)
       {
+        CONTEXT(name() + "::IndexSetWrapper(const IndexSetWrapper&)");
+      }
+
+      explicit IndexSetWrapper() :
+        _index_set()
+      {
+        CONTEXT(name() + "::IndexSetWrapper()");
       }
 
       virtual ~IndexSetWrapper()
@@ -481,14 +496,22 @@ namespace FEAST
         BaseClass(num_entities),
         _index_set_wrapper(num_entities)
       {
-        CONTEXT(name() + "::IndexSetHolder()");
+        CONTEXT(name() + "::IndexSetHolder(Index*)");
       }
 
       IndexSetHolder(const IndexSetHolder& other) :
         BaseClass(other),
         _index_set_wrapper(other._index_set_wrapper)
       {
+        CONTEXT(name() + "::IndexSetHolder(IndexSetHolder&)");
       }
+
+      explicit IndexSetHolder() :
+        BaseClass(),
+        _index_set_wrapper()
+        {
+          CONTEXT(name() + "::IndexSetHolder()");
+        }
 
       virtual ~IndexSetHolder()
       {
@@ -567,11 +590,17 @@ namespace FEAST
     public:
       explicit IndexSetHolder(const Index* /*num_entities*/)
       {
-        CONTEXT(name() + "::IndexSetHolder()");
+        CONTEXT(name() + "::IndexSetHolder(Index*)");
       }
 
       IndexSetHolder(const IndexSetHolder&)
       {
+        CONTEXT(name() + "::IndexSetHolder(IndexSetHolder&)");
+      }
+
+      explicit IndexSetHolder()
+      {
+        CONTEXT(name() + "::IndexSetHolder()");
       }
 
       virtual ~IndexSetHolder()

@@ -4,7 +4,7 @@
 
 #include <kernel/foundation/halo.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 
 namespace FEAST
 {
@@ -47,7 +47,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, PLVertex, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<1> >& target)
+        static void fill_target_set(const HaloType_<0, PLVertex, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > >& target)
         {
           ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
           target.template get_target_set<0>()[0] = halo.get_element(0);
@@ -63,7 +63,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const Geometry::CellSubSet<Shape::Hypercube<1> >& source, HaloType_<0, PLVertex, b_, DT_, c_>& halo)
+        static void fill_target_set(const Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > >& source, HaloType_<0, PLVertex, b_, DT_, c_>& halo)
         {
           halo.get_elements().clear();
           halo.push_back(source.template get_target_set<0>()[0]);
@@ -80,7 +80,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, PLVertex, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<2> >& target)
+        static void fill_target_set(const HaloType_<0, PLVertex, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > >& target)
         {
           ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
           target.template get_target_set<0>()[0] = halo.get_element(0);
@@ -96,7 +96,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const Geometry::CellSubSet<Shape::Hypercube<2> >& source, HaloType_<0, PLVertex, b_, DT_, c_>& halo)
+        static void fill_target_set(const Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > >& source, HaloType_<0, PLVertex, b_, DT_, c_>& halo)
         {
           halo.get_elements().clear();
           halo.push_back(source.template get_target_set<0>()[0]);
@@ -112,7 +112,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, PLEdge, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<0, PLEdge, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& target)
         {
           ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
           target.template get_target_set<1>()[0] = halo.get_element(0);
@@ -128,7 +128,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const Geometry::CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, PLVertex, b_, DT_, c_>& halo)
+        static void fill_target_set(const Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& source, HaloType_<0, PLVertex, b_, DT_, c_>& halo)
         {
           halo.get_elements().clear();
           halo.push_back(source.template get_target_set<0>()[0]);
@@ -165,7 +165,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<a_, PLEdge, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<1> >& target)
+        static void fill_target_set(const HaloType_<a_, PLEdge, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > >& target)
         {
           ASSERT(a_ != 0, "Error: Halos with 0-overlap may not contain edges in 1D!");
 
@@ -205,7 +205,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const Geometry::CellSubSet<Shape::Hypercube<1> >& source, HaloType_<a_, PLEdge, b_, DT_, c_>& halo)
+        static void fill_target_set(const Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<1> > >& source, HaloType_<a_, PLEdge, b_, DT_, c_>& halo)
         {
           typedef typename HaloType_<a_, PLEdge, b_, DT_, c_>::index_type_ IndexType;
 
@@ -250,7 +250,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, PLEdge, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<2> >& target)
+        static void fill_target_set(const HaloType_<0, PLEdge, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > >& target)
         {
           typedef typename HaloType_<0, PLEdge, b_, DT_, c_>::index_type_ IndexType;
           typename HaloType_<0, PLEdge, b_, DT_, c_>::mesh_type_::storage_type_ vertices_performed;
@@ -285,7 +285,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const Geometry::CellSubSet<Shape::Hypercube<2> >& source, HaloType_<0, PLEdge, b_, DT_, c_>& halo)
+        static void fill_target_set(const Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > >& source, HaloType_<0, PLEdge, b_, DT_, c_>& halo)
         {
           typedef typename HaloType_<0, PLEdge, b_, DT_, c_>::index_type_ IndexType;
 
@@ -305,7 +305,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, PLEdge, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<0, PLEdge, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& target)
         {
           typedef typename HaloType_<0, PLEdge, b_, DT_, c_>::index_type_ IndexType;
 
@@ -332,7 +332,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const Geometry::CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, PLEdge, b_, DT_, c_>& halo)
+        static void fill_target_set(const Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& source, HaloType_<0, PLEdge, b_, DT_, c_>& halo)
         {
           typedef typename HaloType_<0, PLEdge, b_, DT_, c_>::index_type_ IndexType;
 
@@ -371,7 +371,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, PLVertex, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<2> >& target)
+        static void fill_target_set(const HaloType_<0, PLVertex, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > >& target)
         {
           typedef typename HaloType_<0, PLVertex, b_, DT_, c_>::index_type_ IndexType;
           typename HaloType_<0, PLVertex, b_, DT_, c_>::mesh_type_::storage_type_ vertices_performed;
@@ -474,7 +474,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<a_, PLFace, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<2> >& target)
+        static void fill_target_set(const HaloType_<a_, PLFace, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > >& target)
         {
           ASSERT(a_ != 0, "Error: Halos with 0-overlap may not contain faces in 2D!");
 
@@ -547,7 +547,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const Geometry::CellSubSet<Shape::Hypercube<2> >& source, HaloType_<a_, PLFace, b_, DT_, c_>& halo)
+        static void fill_target_set(const Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<2> > >& source, HaloType_<a_, PLFace, b_, DT_, c_>& halo)
         {
           typedef typename HaloType_<a_, PLFace, b_, DT_, c_>::index_type_ IndexType;
 
@@ -642,7 +642,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, PLFace, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<0, PLFace, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& target)
         {
           typedef typename HaloType_<0, PLFace, b_, DT_, c_>::index_type_ IndexType;
 
@@ -712,7 +712,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const Geometry::CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, PLFace, b_, DT_, c_>& halo)
+        static void fill_target_set(const Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& source, HaloType_<0, PLFace, b_, DT_, c_>& halo)
         {
           typedef typename HaloType_<0, PLFace, b_, DT_, c_>::index_type_ IndexType;
 
@@ -751,7 +751,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, PLVertex, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<0, PLVertex, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& target)
         {
           typedef typename HaloType_<0, PLVertex, b_, DT_, c_>::index_type_ IndexType;
           ///add all vertices
@@ -791,7 +791,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, PLEdge, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<0, PLEdge, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& target)
         {
           typedef typename HaloType_<0, PLEdge, b_, DT_, c_>::index_type_ IndexType;
 
@@ -913,7 +913,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<a_, PLPolyhedron, b_, DT_, c_>& halo, Geometry::CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<a_, PLPolyhedron, b_, DT_, c_>& halo, Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& target)
         {
           typedef typename HaloType_<a_, PLPolyhedron, b_, DT_, c_>::index_type_ IndexType;
 
@@ -1006,7 +1006,7 @@ namespace FEAST
             typename,
             template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const Geometry::CellSubSet<Shape::Hypercube<3> >& source, HaloType_<a_, PLPolyhedron, b_, DT_, c_>& halo)
+        static void fill_target_set(const Geometry::MeshPart<Geometry::ConformalMesh<Shape::Hypercube<3> > >& source, HaloType_<a_, PLPolyhedron, b_, DT_, c_>& halo)
         {
           typedef typename HaloType_<a_, PLPolyhedron, b_, DT_, c_>::index_type_ IndexType;
 

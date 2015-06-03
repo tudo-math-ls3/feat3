@@ -3,7 +3,7 @@
 #include <kernel/foundation/comm_base.hpp>
 
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication.hpp>
 #include <kernel/foundation/halo.hpp>
@@ -181,9 +181,9 @@ void check_global_dot_2D(Index rank)
     HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D> >*)(p0.comm_halos.at(2).get())), polytopes_in_subset2);
   }
 
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set0(polytopes_in_subset0);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set2(polytopes_in_subset2);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set0(polytopes_in_subset0);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set1(polytopes_in_subset1);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set2(polytopes_in_subset2);
 
   if(rank == 0)
   {
@@ -350,9 +350,9 @@ void check_global_dot_2D_gateway(Index rank)
     HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D> >*)(p0.comm_halos.at(2).get())), polytopes_in_subset2);
   }
 
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set0(polytopes_in_subset0);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set2(polytopes_in_subset2);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set0(polytopes_in_subset0);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set1(polytopes_in_subset1);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set2(polytopes_in_subset2);
 
   if(rank == 0)
   {
@@ -519,9 +519,9 @@ void check_global_nrm2_2D(Index rank)
     HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D> >*)(p0.comm_halos.at(2).get())), polytopes_in_subset2);
   }
 
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set0(polytopes_in_subset0);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set2(polytopes_in_subset2);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set0(polytopes_in_subset0);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set1(polytopes_in_subset1);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set2(polytopes_in_subset2);
 
   if(rank == 0)
   {
@@ -688,9 +688,9 @@ void check_global_nrm2_2D_gateway(Index rank)
     HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D> >*)(p0.comm_halos.at(2).get())), polytopes_in_subset2);
   }
 
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set0(polytopes_in_subset0);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set2(polytopes_in_subset2);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set0(polytopes_in_subset0);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set1(polytopes_in_subset1);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set2(polytopes_in_subset2);
 
   if(rank == 0)
   {
@@ -857,9 +857,9 @@ void check_global_synchvec0_2D(Index rank)
     HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D> >*)(p0.comm_halos.at(2).get())), polytopes_in_subset2);
   }
 
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set0(polytopes_in_subset0);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set2(polytopes_in_subset2);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set0(polytopes_in_subset0);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set1(polytopes_in_subset1);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set2(polytopes_in_subset2);
 
   if(rank == 0)
   {
@@ -1053,9 +1053,9 @@ void check_global_synchvec1_2D(Index rank)
     HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D> >*)(p0.comm_halos.at(2).get())), polytopes_in_subset2);
   }
 
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set0(polytopes_in_subset0);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set2(polytopes_in_subset2);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set0(polytopes_in_subset0);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set1(polytopes_in_subset1);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set2(polytopes_in_subset2);
 
   if(rank == 0)
   {
@@ -1262,9 +1262,9 @@ void check_global_synchvec0_2D_gateway(Index rank)
     HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D> >*)(p0.comm_halos.at(2).get())), polytopes_in_subset2);
   }
 
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set0(polytopes_in_subset0);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set2(polytopes_in_subset2);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set0(polytopes_in_subset0);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set1(polytopes_in_subset1);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set2(polytopes_in_subset2);
 
   if(rank == 0)
   {
@@ -1460,9 +1460,9 @@ void check_global_synchvec1_2D_gateway(Index rank)
     HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D> >*)(p0.comm_halos.at(2).get())), polytopes_in_subset2);
   }
 
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set0(polytopes_in_subset0);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set2(polytopes_in_subset2);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set0(polytopes_in_subset0);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set1(polytopes_in_subset1);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set2(polytopes_in_subset2);
 
   if(rank == 0)
   {
@@ -1671,9 +1671,9 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
     HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D> >*)(p0.comm_halos.at(2).get())), polytopes_in_subset2);
   }
 
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set0(polytopes_in_subset0);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
-  CellSubSet<Shape::Hypercube<2> > cell_sub_set2(polytopes_in_subset2);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set0(polytopes_in_subset0);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set1(polytopes_in_subset1);
+  MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set2(polytopes_in_subset2);
 
   if(rank == 0)
   {

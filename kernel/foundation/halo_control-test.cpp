@@ -5,7 +5,7 @@
 #include<kernel/foundation/attribute.hpp>
 #include<kernel/foundation/mesh.hpp>
 #include<kernel/foundation/dense_data_wrapper.hpp>
-#include<kernel/geometry/cell_sub_set.hpp>
+#include<kernel/geometry/mesh_part.hpp>
 #include<kernel/lafem/dense_vector.hpp>
 #include<kernel/archs.hpp>
 #include<deque>
@@ -15,6 +15,9 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
+
+template<typename Shape_>
+using CellSubSet = Geometry::MeshPart<Geometry::ConformalMesh<Shape_>>;
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class HaloControlTest1D:
@@ -263,7 +266,7 @@ class HaloControlTest2D:
       TEST_CHECK_EQUAL(polytopes_in_subset[1], Index(1));
       TEST_CHECK_EQUAL(polytopes_in_subset[2], Index(0));
 
-      Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+      CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
       Foundation::HaloControl<Foundation::dim_2D>::fill_target_set(h, cell_sub_set);
 
       TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[0], 1ul);
@@ -282,7 +285,7 @@ class HaloControlTest2D:
       TEST_CHECK_EQUAL(polytopes_in_subset1[1], Index(4));
       TEST_CHECK_EQUAL(polytopes_in_subset1[2], Index(1));
 
-      Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
+      CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
       Foundation::HaloControl<Foundation::dim_2D>::fill_target_set(h1, cell_sub_set1);
 
       TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[0], 0ul);

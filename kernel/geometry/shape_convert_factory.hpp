@@ -4,8 +4,8 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/conformal_sub_mesh.hpp>
 #include <kernel/geometry/index_calculator.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/intern/shape_convert_index.hpp>
 #include <kernel/geometry/intern/shape_convert_target.hpp>
 #include <kernel/geometry/intern/shape_convert_traits.hpp>
@@ -129,15 +129,15 @@ namespace FEAST
     template<
       typename Shape_,
       typename Coord_>
-    class ShapeConvertFactory<ConformalSubMesh<Shape_, Coord_> > :
-      public Factory<ConformalSubMesh<Shape_, Coord_> >
+    class ShapeConvertFactory<MeshPart<ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, Coord_> > > :
+      public Factory<MeshPart<ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, Coord_> > >
     {
     public:
-      typedef Factory<ConformalSubMesh<Shape_, Coord_> > BaseClass;
+      typedef Factory<MeshPart<ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, Coord_> > > BaseClass;
       typedef Shape_ ShapeType;
       typedef typename Intern::OtherShape<Shape_>::Type OtherShapeType;
-      typedef ConformalSubMesh<Shape_, Coord_> MeshType;
-      typedef ConformalSubMesh<OtherShapeType, Coord_> OtherMeshType;
+      typedef MeshPart<ConformalMesh<Shape_, Shape_::dimension, Shape_::dimension, Coord_> > MeshType;
+      typedef MeshPart<ConformalMesh<OtherShapeType, Shape_::dimension, Shape_::dimension, Coord_> > OtherMeshType;
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
       /// index set holder type
@@ -206,7 +206,7 @@ namespace FEAST
       {
         // TODO
       }
-    }; // class ShapeConvertFactory<ConformalSubMesh<...>>
+    }; // class ShapeConvertFactory<MeshPart<ConformalMesh<...>>>
   } // namespace Geometry
 } // namespace FEAST
 

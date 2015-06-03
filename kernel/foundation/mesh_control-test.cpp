@@ -5,12 +5,12 @@
 #include<kernel/foundation/mesh_control.hpp>
 #include<kernel/foundation/dense_data_wrapper.hpp>
 #include<kernel/geometry/macro_factory.hpp>
+#include<kernel/geometry/mesh_part.hpp>
 #include<kernel/geometry/patch_factory.hpp>
 #include<kernel/lafem/dense_vector.hpp>
 #include<kernel/lafem/vector_mirror.hpp>
 #include<kernel/foundation/halo_control.hpp>
 #include<kernel/foundation/halo.hpp>
-#include<kernel/geometry/cell_sub_set.hpp>
 #include<kernel/archs.hpp>
 #include<deque>
 #include<algorithm>
@@ -30,6 +30,9 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
+
+template<typename Shape_>
+using CellSubSet = Geometry::MeshPart<Geometry::ConformalMesh<Shape_>>;
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlTest1D:
@@ -785,7 +788,7 @@ class MeshControlPartitioningTest2D:
       basemeshtype_ finemost_macro(mesh_refinery_macro);
 
       ///get refined halos
-      std::vector<std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > > > finemost_cell_subsets;
+      std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > finemost_cell_subsets;
       for(Index i(0) ; i < halos.size() ; ++i)
       {
         //transform found->geo
@@ -796,7 +799,7 @@ class MeshControlPartitioningTest2D:
         else
           HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
 
-        Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+        CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
 
         if(halos.at(i)->get_level() == pl_vertex)
           HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
@@ -804,29 +807,29 @@ class MeshControlPartitioningTest2D:
           HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
 
         //refine
-        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, basemeshtype_> cell_refinery(cell_sub_set, fine_basemesh);
+        Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> >, basemeshtype_> cell_refinery(cell_sub_set, fine_basemesh);
 
         //add
-        finemost_cell_subsets.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(cell_refinery)));
+        finemost_cell_subsets.push_back(std::shared_ptr<CellSubSet<Shape::Hypercube<2> > >(new CellSubSet<Shape::Hypercube<2> >(cell_refinery)));
 
         delete[] polytopes_in_subset;
       }
 
       ///get refined macro boundaries
-      std::vector<std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > > > finemost_macro_boundaries;
+      std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > finemost_macro_boundaries;
       for(Index i(0) ; i < macro_boundaries.size() ; ++i)
       {
         //transform found->geo
         Index* polytopes_in_subset = new Index[3];
         HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(macro_boundaries.at(i).get())), polytopes_in_subset);
-        Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+        CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
         HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(macro_boundaries.at(i).get())), cell_sub_set);
 
         //refine
-        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, basemeshtype_> cell_refinery(cell_sub_set, macro_mesh);
+        Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> >, basemeshtype_> cell_refinery(cell_sub_set, macro_mesh);
 
         //add
-        finemost_macro_boundaries.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(cell_refinery)));
+        finemost_macro_boundaries.push_back(std::shared_ptr<CellSubSet<Shape::Hypercube<2> > >(new CellSubSet<Shape::Hypercube<2> >(cell_refinery)));
 
         delete[] polytopes_in_subset;
       }

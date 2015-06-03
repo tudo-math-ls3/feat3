@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/intern/boundary_computer.hpp>
 
 namespace FEAST
@@ -20,7 +20,7 @@ namespace FEAST
     /**
      * \brief BoundaryFactory implementation for ConformalMesh
      *
-     * The boundary factory is a CellSubSet-factory, which creates a cell-sub-set containing all boundary
+     * The boundary factory is a MeshPart factory, which creates a MeshPart without topology containing all boundary
      * faces for a given conformal mesh.
      *
      * \author Peter Zajac
@@ -31,13 +31,15 @@ namespace FEAST
       int stride_,
       typename Coord_>
     class BoundaryFactory<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > :
-      public Factory<CellSubSet<Shape_> >
+      public Factory<MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_>>>
     {
     public:
+      /// Our base class
+      typedef Factory<MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_>>> BaseClass;
       /// the input mesh type
       typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> InputMeshType;
-      /// the cell set type
-      typedef CellSubSet<Shape_> MeshType;
+      /// The MeshPart type
+      typedef MeshPart<InputMeshType> MeshType;
       /// target set holder type
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
@@ -66,11 +68,21 @@ namespace FEAST
         return _face_computer.get_num_entities(dim);
       }
 
-      /// Fills the cellset's target set.
+      /// Fills the MeshPart's target set, except that it doesn't
+      virtual void fill_attribute_sets(typename BaseClass::AttributeHolderType& DOXY(target_set_holder))
+      {
+      }
+      /// Fills the MeshPart's index_set_holder, except that it doesn't as there is no topology
+      virtual void fill_index_sets(typename BaseClass::IndexSetHolderType*& DOXY(index_set_holder))
+      {
+      }
+
+      /// Fills the MeshPart's target set.
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
       {
         _face_computer.fill_target_sets(target_set_holder);
       }
+
     }; // BoundaryFactory<ConformalMesh<...>>
   } // namespace Geometry
 } // namespace FEAST

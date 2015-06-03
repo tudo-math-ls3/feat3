@@ -1,8 +1,7 @@
  <feast_mesh_file>
  <header>
   version 1
-  submeshes 0
-  cellsets 2
+  meshparts 2
  </header>
  <info>
   Coarse mesh exported by RocheMesher
@@ -1462,10 +1461,13 @@
          359         180         539         360         899         720        1079         900
   </vert@hexa>
  </mesh>
- <cellset>
+ <meshpart>
   <header>
    name 1
    parent root
+   type conformal
+   shape quad
+   attribute_sets 0
   </header>
   <info>
    This is the inner boundary
@@ -1835,11 +1837,14 @@
          718
          719
   </vert_idx>
- </cellset>
- <cellset>
+ </meshpart>
+ <meshpart>
   <header>
    name 2
    parent root
+   type conformal
+   shape quad
+   attribute_sets 0
   </header>
   <info>
    This is the outer boundary
@@ -2209,5 +2214,5 @@
         1078
         1079
   </vert_idx>
- </cellset>
+ </meshpart>
  </feast_mesh_file>
