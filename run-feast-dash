@@ -13,6 +13,7 @@ import shutil
 import time
 import datetime
 import random
+import multiprocessing
 import peewee as pw
 from build_system.feast_util import is_found
 from build_system.feast_util import get_output
@@ -165,7 +166,7 @@ def run_test(build_id, branch, myDB, extra_opts):
         idx += 1
 
   if "ninja" in build_id:
-    make_command = "ninja -v -k 999 all tests"
+    make_command = "ninja -v -k 999 -l " + str(max(2, multiprocessing.cpu_count() - 2)) + " all tests"
     make_output = get_output_utf8(make_command)
   else:
     make_command = "make -j 4 -O -k all"
@@ -239,7 +240,6 @@ def run_test(build_id, branch, myDB, extra_opts):
 
 
 ################## MAIN ######################
-
 #TODO help, ? und nicht in sys.argv[0] suchen
 # output help screen
 if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.argv)):
