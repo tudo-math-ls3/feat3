@@ -110,7 +110,6 @@ namespace FEAST
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
         this->_scalar_dt.push_back(DT_(0));
       }
 
