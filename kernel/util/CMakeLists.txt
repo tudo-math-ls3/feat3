@@ -16,6 +16,7 @@ ADD_LIBRARY(kernel-util STATIC
 
 if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-util-cuda
+    cuda_util.cu
     memory_pool.cu
     STATIC
   )
