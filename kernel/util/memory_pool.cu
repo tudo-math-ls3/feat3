@@ -134,15 +134,18 @@ DT_ MemoryPool<Mem::CUDA>::get_element(const DT_ * data, const Index index)
 template <typename DT_>
 void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index count)
 {
-  Index blocksize(128);
+  Index blocksize(256);
   dim3 grid;
   dim3 block;
   block.x = blocksize;
   grid.x = (unsigned)ceil((count)/(double)(block.x));
   FEAST::Util::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
+#ifdef FEAST_DEBUG
+  cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::set_memory failed!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 
 template <typename DT_>
