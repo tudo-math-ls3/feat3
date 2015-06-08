@@ -60,6 +60,12 @@ public:
     TEST_CHECK_EQUAL(filter.size(), n);
     TEST_CHECK_EQUAL(filter.used_elements(), Index(3));
 
+    FilterType filter2;
+    filter2.convert(filter);
+    TEST_CHECK_EQUAL(filter2.get_filter_vector()(2), filter.get_filter_vector()(2));
+    filter2.clone(filter);
+    TEST_CHECK_EQUAL(filter2.get_filter_vector()(2), filter.get_filter_vector()(2));
+
     // apply the filter
     filter.filter_def(a1);
     filter.filter_cor(a2);

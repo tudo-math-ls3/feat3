@@ -102,14 +102,14 @@ namespace FEAST
       /// \brief Clones data from another UnitFilter
       void clone(const UnitFilter & other)
       {
-        _sv.clone(other._sv);
+        _sv.clone(other.get_filter_vector());
       }
 
       /// \brief Converts data from another UnitFilter
       template<typename Mem2_, typename DT2_, typename IT2_>
       void convert(const UnitFilter<Mem2_, DT2_, IT2_>& other)
       {
-        _sv.convert(other._sv);
+        _sv.convert(other.get_filter_vector());
       }
 
       /// \brief Clears the underlying data (namely the SparseVector)
