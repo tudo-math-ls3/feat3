@@ -4,10 +4,8 @@
 #include <cstring>
 
 #ifdef FEAST_TESTING_VC
-extern "C" {
-unsigned int __stdcall GetErrorMode(void);
-unsigned int __stdcall SetErrorMode(unsigned int);
-}
+// prototype for InitTestSystem defined in "visual_studio\init_test_sys.c"
+extern "C" void __stdcall InitTestSystem();
 #endif // FEAST_TESTING_VC
 
 using namespace FEAST;
@@ -16,13 +14,15 @@ using namespace FEAST::TestSystem;
 int main(int argc, char** argv)
 {
 #ifdef FEAST_TESTING_VC
-  // disable any error prompts for testing
-  SetErrorMode(GetErrorMode() | 0x8003);
-  // disable handling of abort function
-  _set_abort_behavior(0, 0x1);
+  // Do not initialise VC test system if '--no-init' is the first option;
+  // this way, we can attach the debugger if we run the test by hand
+  if((argc < 2) || (0 != strcmp(argv[1], "--no-init")))
+  {
+    InitTestSystem();
+  }
 #else
   std::cout << "CTEST_FULL_OUTPUT" << std::endl;
-#endif
+#endif // FEAST_TESTING_VC
 
   int result(EXIT_SUCCESS);
 #ifdef FEAST_BACKENDS_CUDA
