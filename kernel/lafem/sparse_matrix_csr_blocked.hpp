@@ -85,9 +85,9 @@ namespace FEAST
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our block height
-      static constexpr Index BlockHeight = BlockHeight_;
+      static constexpr int BlockHeight = BlockHeight_;
       /// Our block width
-      static constexpr Index BlockWidth = BlockWidth_;
+      static constexpr int BlockWidth = BlockWidth_;
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_csr;
       /// Value type, meaning the type of each block

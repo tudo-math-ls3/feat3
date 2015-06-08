@@ -471,7 +471,7 @@ namespace FEAST
           OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             OperatorValueType r(DataType(0));
-            for(Index i(0); i < OperatorValueType::m; ++i)
+            for(Index i(0); i < Index(OperatorValueType::m); ++i)
             {
               r(i,i) = dot(phi.grad, psi.grad) + phi.grad[i]*psi.grad[i];
               for(Index j(0); j < i; ++j)
