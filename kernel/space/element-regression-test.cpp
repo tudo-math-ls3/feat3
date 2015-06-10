@@ -5,19 +5,12 @@
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/space/argyris/element.hpp>
-#include <kernel/space/discontinuous/element.hpp>
-#include <kernel/space/hermite3/element.hpp>
-#include <kernel/space/lagrange1/element.hpp>
-#include <kernel/space/lagrange2/element.hpp>
-#include <kernel/space/rannacher_turek/element.hpp>
-#include <kernel/space/crouzeix_raviart/element.hpp>
-#include <kernel/space/bogner_fox_schmit/element.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/none_filter.hpp>
@@ -25,6 +18,15 @@
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/proto_solver.hpp>
 #include <kernel/util/time_stamp.hpp>
+
+#include <kernel/space/argyris/element.hpp>
+#include <kernel/space/bogner_fox_schmit/element.hpp>
+#include <kernel/space/crouzeix_raviart/element.hpp>
+#include <kernel/space/discontinuous/element.hpp>
+#include <kernel/space/hermite3/element.hpp>
+#include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/lagrange2/element.hpp>
+#include <kernel/space/rannacher_turek/element.hpp>
 
 namespace ElementRegression
 {
@@ -190,6 +192,7 @@ namespace ElementRegression
       }
     }
   };
+
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -201,9 +204,6 @@ namespace ElementRegression
   protected:
     typedef Geometry::ConformalMesh<Shape_> MeshType;
     typedef Geometry::CellSubSet<Shape_> RegionType;
-    //typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactory;
-    typedef Geometry::BoundaryFactory<MeshType> RegionFactory;
-
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Element_<TrafoType> SpaceType;
 
@@ -216,7 +216,7 @@ namespace ElementRegression
 
   public:
     explicit ElementRegressionBase(String name, Index level, double h0, double h1, double h2) :
-      TestSystem::BaseTest(name),
+      TestSystem::BaseTest(name + ":" + SpaceType::name() + ":" + Shape_::name() + ":" + stringify(_level)),
       _level(level),
       cubature_factory("auto-degree:" + stringify(Math::sqr(SpaceType::local_degree+1)+1)),
       h0_ref(h0),
@@ -245,8 +245,11 @@ namespace ElementRegression
       Tiny::Matrix<double, nl, 3> errs;
       TimeStamp stamp;
 
+      Index nl_min = Index(1);
+      Index nl_max = Math::min(_level, Index(nl));
+
       //for(Index i(0); i < Index(nl); ++i)
-      for(Index i(0); i <= Math::min(_level, Index(nl)); ++i)
+      for(Index i(nl_min); i <= nl_max; ++i)
       {
         // run test
         errs[i] = run_level(i);
@@ -257,7 +260,7 @@ namespace ElementRegression
         if(h1_) std::cout << " " << scientify(errs[i][1], 12);
         if(h2_) std::cout << " " << scientify(errs[i][2], 12);
         std::cout << " |";
-        if(i > 0)
+        if(i > nl_min)
         {
           if(h0_) std::cout << " " << scientify(errs[i-1][0] / errs[i][0], 12);
           if(h1_) std::cout << " " << scientify(errs[i-1][1] / errs[i][1], 12);
@@ -294,6 +297,86 @@ namespace ElementRegression
       }
     }
 
+    virtual Tiny::Vector<double, 3> run_level(Index level) const = 0;
+  };
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+
+  template<typename Shape_, template<typename> class Element_, bool h0_, bool h1_, bool h2_>
+  class ElementRegressionInterpol :
+    public ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_>
+  {
+  public:
+    typedef ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_> BaseClass;
+
+    typedef typename BaseClass::MeshType MeshType;
+    typedef typename BaseClass::RegionType RegionType;
+    typedef typename BaseClass::TrafoType TrafoType;
+    typedef typename BaseClass::SpaceType SpaceType;
+
+    explicit ElementRegressionInterpol(Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0) :
+      BaseClass("INT", level, h0, h1, h2)
+    {
+    }
+
+    virtual Tiny::Vector<double, 3> run_level(Index level) const override
+    {
+      // create mesh
+      MeshType mesh(MeshGen<Shape_>::make(level));
+
+      // slighty disturb the mesh
+      MeshDisturb<Shape_::dimension>::apply(mesh, 0.05 / double(1 << level));
+
+      // create boundary
+      Geometry::BoundaryFactory<MeshType> bnd_factory(mesh);
+      RegionType boundary(bnd_factory);
+
+      // create trafo
+      TrafoType trafo(mesh);
+
+      // create space
+      SpaceType space(trafo);
+
+      // interpolate our solution function
+      VectorType vector(space.get_num_dofs());
+      Assembly::Interpolator::project(vector, this->sol_func, space);
+
+      // error vector
+      Tiny::Vector<double, 3> err;
+
+      // compute H0/H1/H2-errors
+      err[0] = H0Error<h0_>::compute(vector, this->sol_func, space, this->cubature_factory);
+      err[1] = H1Error<h1_>::compute(vector, this->sol_func, space, this->cubature_factory);
+      err[2] = H2Error<h2_>::compute(vector, this->sol_func, space, this->cubature_factory);
+
+      // return error vector
+      return err;
+    }
+  };
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+
+  template<typename Shape_, template<typename...> class Element_, bool h0_, bool h1_, bool h2_>
+  class ElementRegressionSystem :
+    public ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_>
+  {
+  public:
+    typedef ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_> BaseClass;
+
+    typedef typename BaseClass::MeshType MeshType;
+    typedef typename BaseClass::RegionType RegionType;
+    typedef typename BaseClass::TrafoType TrafoType;
+    typedef typename BaseClass::SpaceType SpaceType;
+
+    explicit ElementRegressionSystem(String name, Index level, double h0, double h1, double h2) :
+      BaseClass(name, level, h0, h1, h2)
+    {
+    }
+
     virtual void solve_system(const MatrixType& matrix, const FilterType& filter, VectorType& vec_sol, const VectorType& vec_rhs) const
     {
       // create a SSOR preconditioner
@@ -318,7 +401,7 @@ namespace ElementRegression
       solver.done();
     }
 
-    Tiny::Vector<double, 3> run_level(Index level) const
+    virtual Tiny::Vector<double, 3> run_level(Index level) const override
     {
       // create mesh
       MeshType mesh(MeshGen<Shape_>::make(level));
@@ -327,7 +410,7 @@ namespace ElementRegression
       MeshDisturb<Shape_::dimension>::apply(mesh, 0.05 / double(1 << level));
 
       // create boundary
-      RegionFactory bnd_factory(mesh);
+      Geometry::BoundaryFactory<MeshType> bnd_factory(mesh);
       RegionType boundary(bnd_factory);
 
       // create trafo
@@ -390,16 +473,16 @@ namespace ElementRegression
 
   template<typename Shape_, template<typename> class Element_, bool h0_, bool h1_, bool h2_>
   class ElementRegressionL2 :
-    public ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_>
+    public ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_>
   {
   public:
-    typedef ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_> BaseClass;
+    typedef ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_> BaseClass;
 
     typedef typename BaseClass::RegionType RegionType;
     typedef typename BaseClass::SpaceType SpaceType;
 
-    explicit ElementRegressionL2(String name, Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0) :
-      BaseClass(name, level, h0, h1, h2)
+    explicit ElementRegressionL2(Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0) :
+      BaseClass("L2", level, h0, h1, h2)
     {
     }
 
@@ -422,16 +505,16 @@ namespace ElementRegression
 
   template<typename Shape_, template<typename> class Element_, bool h0_, bool h1_, bool h2_>
   class ElementRegressionH1 :
-    public ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_>
+    public ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_>
   {
   public:
-    typedef ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_> BaseClass;
+    typedef ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_> BaseClass;
 
     typedef typename BaseClass::RegionType RegionType;
     typedef typename BaseClass::SpaceType SpaceType;
 
-    explicit ElementRegressionH1(String name, Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0) :
-      BaseClass(name, level, h0, h1, h2)
+    explicit ElementRegressionH1(Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0) :
+      BaseClass("H1", level, h0, h1, h2)
     {
     }
 
@@ -462,6 +545,122 @@ namespace ElementRegression
   template<typename Trafo_>
   using RannacherTurekStdNonPar = Space::RannacherTurek::Element<Trafo_>;
 
+
+  /* ############################################################################################# */
+  /* ############################################################################################# */
+  /* ############################################################################################# */
+  // Discontinuous-0 element (aka P0/Q0)
+
+  // Interpolation Hypercube<1>
+  ElementRegressionInterpol<Shape::Hypercube<1>, Discontinuous0, true, false, false>
+    int_hy1_discontinuous0_lvl5(5, 2.019358459600e-002);
+
+  // Interpolation Hypercube<2>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Discontinuous0, true, false, false>
+    int_hy2_discontinuous0_lvl4(4, 4.023170882191e-002);
+
+  // Interpolation Hypercube<3>
+  ElementRegressionInterpol<Shape::Hypercube<3>, Discontinuous0, true, false, false>
+    int_hy3_discontinuous0_lvl3(3, 6.920948509400e-002);
+
+  // Interpolation Simplex<2>
+  ElementRegressionInterpol<Shape::Simplex<2>, Discontinuous0, true, false, false>
+    int_sx2_discontinuous0_lvl3(3, 4.652869047574e-002);
+
+  // Interpolation Simplex<3>
+  ElementRegressionInterpol<Shape::Simplex<3>, Discontinuous0, true, false, false>
+    int_sx3_discontinuous0_lvl2(2, 6.042741607084e-002);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Lagrange-1 element (aka P1/Q1)
+
+  // Interpolation Hypercube<1>
+  ElementRegressionInterpol<Shape::Hypercube<1>, Space::Lagrange1::Element, true, true, false>
+    int_hy1_lagrange1_lvl5(5, 6.374300340530e-004, 6.343140191651e-002);
+
+  // Interpolation Hypercube<2>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Space::Lagrange1::Element, true, true, false>
+    int_hy2_lagrange1_lvl4(4, 3.392065460728e-003, 1.270820247318e-001);
+
+  // Interpolation Hypercube<3>
+  ElementRegressionInterpol<Shape::Hypercube<3>, Space::Lagrange1::Element, true, true, false>
+    int_hy3_lagrange1_lvl3(3, 1.400674108905e-002, 2.261504131381e-001);
+
+  // Interpolation Simplex<2>
+  ElementRegressionInterpol<Shape::Simplex<2>, Space::Lagrange1::Element, true, true, false>
+    int_sx2_lagrange1_lvl3(3, 7.145236132824e-003, 2.549649415216e-001);
+
+  // Interpolation Simplex<3>
+  ElementRegressionInterpol<Shape::Simplex<3>, Space::Lagrange1::Element, true, true, false>
+    int_sx3_lagrange1_lvl2(2, 2.334296314873e-002, 5.347979318175e-001);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Lagrange-2 element (aka P2/Q2)
+
+  // Interpolation Hypercube<1>
+  ElementRegressionInterpol<Shape::Hypercube<1>, Space::Lagrange2::Element, true, true, true>
+    int_hy1_lagrange2_lvl4(4, 3.183204796132e-005, 3.238402046955e-003, 3.967721647842e-001);
+
+  // Interpolation Hypercube<2>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Space::Lagrange2::Element, true, true, true>
+    int_hy2_lagrange2_lvl3(3, 2.545483838641e-004, 1.304807029180e-002, 8.020441638704e-001);
+
+  // Interpolation Hypercube<3>
+  ElementRegressionInterpol<Shape::Hypercube<3>, Space::Lagrange2::Element, true, true, true>
+    int_hy3_lagrange2_lvl2(2, 1.736674508307e-003, 4.480090797344e-002, 1.381246248538e+000);
+
+  // Interpolation Simplex<2>
+  ElementRegressionInterpol<Shape::Simplex<2>, Space::Lagrange2::Element, true, true, true>
+    int_sx2_lagrange2_lvl3(3, 1.806543043741e-004, 1.313481388559e-002, 9.791050171640e-001);
+
+  // Interpolation Simplex<3>
+  ElementRegressionInterpol<Shape::Simplex<3>, Space::Lagrange2::Element, true, true, true>
+    int_sx3_lagrange2_lvl2(2, 1.090590184712e-003, 5.661280319448e-002, 2.129317058613e+000);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Ranancher-Turek element (aka Q1~)
+
+  // Interpolation Hypercube<2>
+  ElementRegressionInterpol<Shape::Hypercube<2>, RannacherTurekStdNonPar, true, true, false>
+    int_hy2_rannacher_turek_lvl4(4, 2.500068277725e-003, 1.783313801003e-001);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Crouzeix-Raviart element
+
+  // Interpolation Simplex<2>
+  ElementRegressionInterpol<Shape::Simplex<2>, Space::CrouzeixRaviart::Element, true, true, false>
+    int_sx2_crouzeix_raviart_lvl4(4, 8.995898938549e-004, 1.100847779732e-001);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Hermite-3 element
+
+  // Interpolation Hypercube<1>
+  ElementRegressionInterpol<Shape::Hypercube<1>, Space::Hermite3::Element, true, true, true>
+    int_hy1_hermite3_lvl5(5, 1.185419582132e-007, 1.270547785014e-005, 2.568553585246e-003);
+
+  // Interpolation Simplex<2>
+  ElementRegressionInterpol<Shape::Simplex<2>, Space::Hermite3::Element, true, true, true>
+    int_sx2_hermite3_lvl4(4, 7.698098703027e-007, 1.618142170926e-004, 3.377837471015e-002);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Argyris element
+
+  // Interpolation Simplex<2>
+  ElementRegressionInterpol<Shape::Simplex<2>, Space::Argyris::Element, true, true, true>
+    int_sx2_argyris_lvl3(3, 2.682673846080e-008, 1.197864886810e-006, 8.035421521830e-005);
+
   /* ############################################################################################# */
   /* ############################################################################################# */
   /* ############################################################################################# */
@@ -469,23 +668,23 @@ namespace ElementRegression
 
   // L2-Projection Hypercube<1>
   ElementRegressionL2<Shape::Hypercube<1>, Discontinuous0, true, false, false>
-    l2_hy1_ldiscontinuous0_lvl5("L2:Discontinuous0:Hypercube<1>:5", 5, 2.019148792005e-002);
+    l2_hy1_discontinuous0_lvl5(5, 2.019148792005e-002);
 
   // L2-Projection Hypercube<2>
   ElementRegressionL2<Shape::Hypercube<2>, Discontinuous0, true, false, false>
-    l2_hy2_ldiscontinuous0_lvl4("L2:Discontinuous0:Hypercube<2>:4", 4, 4.018779996141e-002);
+    l2_hy2_discontinuous0_lvl4(4, 4.018779996141e-002);
 
   // L2-Projection Hypercube<3>
   ElementRegressionL2<Shape::Hypercube<3>, Discontinuous0, true, false, false>
-    l2_hy3_ldiscontinuous0_lvl3("L2:Discontinuous0:Hypercube<3>:3", 3, 6.885897034156e-002);
+    l2_hy3_discontinuous0_lvl3(3, 6.885897034156e-002);
 
   // L2-Projection Simplex<2>
   ElementRegressionL2<Shape::Simplex<2>, Discontinuous0, true, false, false>
-    l2_sx2_ldiscontinuous0_lvl3("L2:Discontinuous0:Simplex<2>:3", 3, 4.647768730126e-002);
+    l2_sx2_discontinuous0_lvl3(3, 4.647768730126e-002);
 
   // L2-Projection Simplex<3>
   ElementRegressionL2<Shape::Simplex<3>, Discontinuous0, true, false, false>
-    l2_sx3_ldiscontinuous0_lvl2("L2:Discontinuous0:Simplex<3>:2", 2, 6.018518308883e-002);
+    l2_sx3_discontinuous0_lvl2(2, 6.018518308883e-002);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -494,23 +693,23 @@ namespace ElementRegression
 
   // L2-Projection Hypercube<1>
   ElementRegressionL2<Shape::Hypercube<1>, Space::Lagrange1::Element, true, true, false>
-    l2_hy1_lagrange1_lvl5("L2:Lagrange1:Hypercube<1>:5", 5, 2.665286837321e-004, 6.356129208899e-002);
+    l2_hy1_lagrange1_lvl5(5, 2.665286837321e-004, 6.356129208899e-002);
 
   // L2-Projection Hypercube<2>
   ElementRegressionL2<Shape::Hypercube<2>, Space::Lagrange1::Element, true, true, false>
-    l2_hy2_lagrange1_lvl4("L2:Lagrange1:Hypercube<2>:4", 4, 1.051542601586e-003, 1.271471192054e-001);
+    l2_hy2_lagrange1_lvl4(4, 1.051542601586e-003, 1.271471192054e-001);
 
   // L2-Projection Hypercube<3>
   ElementRegressionL2<Shape::Hypercube<3>, Space::Lagrange1::Element, true, true, false>
-    l2_hy3_lagrange1_lvl3("L2:Lagrange1:Hypercube<3>:3", 3, 3.670654860222e-003, 2.220142781953e-001);
+    l2_hy3_lagrange1_lvl3(3, 3.670654860222e-003, 2.220142781953e-001);
 
   // L2-Projection Simplex<2>
   ElementRegressionL2<Shape::Simplex<2>, Space::Lagrange1::Element, true, true, false>
-    l2_sx2_lagrange1_lvl3("L2:Lagrange1:Simplex<2>:3", 3, 2.874906340752e-003, 2.375203126593e-001);
+    l2_sx2_lagrange1_lvl3(3, 2.874906340752e-003, 2.375203126593e-001);
 
   // L2-Projection Simplex<3>
   ElementRegressionL2<Shape::Simplex<3>, Space::Lagrange1::Element, true, true, false>
-    l2_sx3_lagrange1_lvl2("L2:Lagrange1:Simplex<3>:2", 2, 1.073303905424e-002, 4.969272469307e-001);
+    l2_sx3_lagrange1_lvl2(2, 1.073303905424e-002, 4.969272469307e-001);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -519,23 +718,23 @@ namespace ElementRegression
 
   // L2-Projection Hypercube<1>
   ElementRegressionL2<Shape::Hypercube<1>, Space::Lagrange2::Element, true, true, true>
-    l2_hy1_lagrange2_lvl4("L2:Lagrange2:Hypercube<1>:4", 4, 2.918342684669e-005, 3.411668271045e-003, 4.000134360015e-001);
+    l2_hy1_lagrange2_lvl4(4, 2.918342684669e-005, 3.411668271045e-003, 4.000134360015e-001);
 
   // L2-Projection Hypercube<2>
   ElementRegressionL2<Shape::Hypercube<2>, Space::Lagrange2::Element, true, true, true>
-    l2_hy2_lagrange2_lvl3("L2:Lagrange2:Hypercube<2>:3", 3, 2.149226355212e-004, 1.420342358641e-002, 8.128053861467e-001);
+    l2_hy2_lagrange2_lvl3(3, 2.149226355212e-004, 1.420342358641e-002, 8.128053861467e-001);
 
   // L2-Projection Hypercube<3>
   ElementRegressionL2<Shape::Hypercube<3>, Space::Lagrange2::Element, true, true, true>
-    l2_hy3_lagrange2_lvl2("L2:Lagrange2:Hypercube<3>:2", 2, 1.211653471543e-003, 4.968583665489e-002, 1.402115404765e+000);
+    l2_hy3_lagrange2_lvl2(2, 1.211653471543e-003, 4.968583665489e-002, 1.402115404765e+000);
 
   // L2-Projection Simplex<2>
   ElementRegressionL2<Shape::Simplex<2>, Space::Lagrange2::Element, true, true, true>
-    l2_sx2_lagrange2_lvl3("L2:Lagrange2:Simplex<2>:3", 3, 1.477450949611e-004, 1.202305256340e-002, 8.967033891044e-001);
+    l2_sx2_lagrange2_lvl3(3, 1.477450949611e-004, 1.202305256340e-002, 8.967033891044e-001);
 
   // L2-Projection Simplex<3>
   ElementRegressionL2<Shape::Simplex<3>, Space::Lagrange2::Element, true, true, true>
-    l2_sx3_lagrange2_lvl2("L2:Lagrange2:Simplex<3>:2", 2, 6.920385959247e-004, 5.149687612368e-002, 2.013985124586e+000);
+    l2_sx3_lagrange2_lvl2(2, 6.920385959247e-004, 5.149687612368e-002, 2.013985124586e+000);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -544,7 +743,7 @@ namespace ElementRegression
 
   // L2-Projection Hypercube<2>
   ElementRegressionL2<Shape::Hypercube<2>, RannacherTurekStdNonPar, true, true, false>
-    l2_hy2_rannacher_turek_lvl4("L2:RannacherTurek:Hypercube<2>:4", 4, 1.911701836636e-003, 1.786971993692e-001);
+    l2_hy2_rannacher_turek_lvl4(4, 1.911701836636e-003, 1.786971993692e-001);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -553,7 +752,7 @@ namespace ElementRegression
 
   // L2-Projection Simplex<2>
   ElementRegressionL2<Shape::Simplex<2>, Space::CrouzeixRaviart::Element, true, true, false>
-    l2_sx2_crouzeix_raviart_lvl4("L2:CrouzeixRaviart:Simplex<2>:4", 4, 5.736744214046e-004, 1.076734893721e-001);
+    l2_sx2_crouzeix_raviart_lvl4(4, 5.736744214046e-004, 1.076734893721e-001);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -562,7 +761,7 @@ namespace ElementRegression
 
   // L2-Projection Hypercube<2>
   ElementRegressionL2<Shape::Hypercube<2>, Space::BognerFoxSchmit::Element, true, true, true>
-    l2_hy2_bogner_fox_schmit_lvl3("L2:BognerFoxSchmit:Hypercube<2>:3", 3, 9.371691544851e-005, 9.890219682180e-003, 6.424848635514e-001);
+    l2_hy2_bogner_fox_schmit_lvl3(3, 9.371691544851e-005, 9.890219682180e-003, 6.424848635514e-001);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -571,7 +770,7 @@ namespace ElementRegression
 
   // L2-Projection Hypercube<1>
   ElementRegressionL2<Shape::Hypercube<1>, Space::Hermite3::Element, true, true, true>
-    l2_hy1_hermite3_lvl5("L2:Hermite3:Hypercube<1>:5", 5, 6.183857974105e-008, 1.250686784444e-005, 2.633222452923e-003);
+    l2_hy1_hermite3_lvl5(5, 6.183857974105e-008, 1.250686784444e-005, 2.633222452923e-003);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -580,7 +779,7 @@ namespace ElementRegression
 
   // L2-Projection Simplex<2>
   ElementRegressionL2<Shape::Simplex<2>, Space::Argyris::Element, true, true, true>
-    l2_sx2_argyris_lvl3("L2:Argyris:Simplex<2>:3", 3, 9.132110987091e-008, 1.598712842387e-005, 2.195620770059e-003);
+    l2_sx2_argyris_lvl3(3, 9.132110987091e-008, 1.598712842387e-005, 2.195620770059e-003);
 
   /* ############################################################################################# */
   /* ############################################################################################# */
@@ -590,23 +789,23 @@ namespace ElementRegression
 
   // H1-Projection Hypercube<1>
   ElementRegressionH1<Shape::Hypercube<1>, Space::Lagrange1::Element, true, true, false>
-    h1_hy1_lagrange1_lvl5("H1:Lagrange1:Hypercube<1>:5", 5, 6.374300356367e-004, 6.343140191651e-002);
+    h1_hy1_lagrange1_lvl5(5, 6.374300356367e-004, 6.343140191651e-002);
 
   // H1-Projection Hypercube<2>
   ElementRegressionH1<Shape::Hypercube<2>, Space::Lagrange1::Element, true, true, false>
-    h1_hy2_lagrange1_lvl4("H1:Lagrange1:Hypercube<2>:4", 4, 1.942272640429e-003, 1.268651495575e-001);
+    h1_hy2_lagrange1_lvl4(4, 1.942272640429e-003, 1.268651495575e-001);
 
   // H1-Projection Hypercube<3>
   ElementRegressionH1<Shape::Hypercube<3>, Space::Lagrange1::Element, true, true, false>
-    h1_hy3_lagrange1_lvl3("H1:Lagrange1:Hypercube<3>:3", 3, 5.920955962244e-003, 2.207053505554e-001);
+    h1_hy3_lagrange1_lvl3(3, 5.920955962244e-003, 2.207053505554e-001);
 
   // H1-Projection Simplex<2>
   ElementRegressionH1<Shape::Simplex<2>, Space::Lagrange1::Element, true, true, false>
-    h1_sx2_lagrange1_lvl3("H1:Lagrange1:Simplex<2>:3", 3, 6.259087730394e-003, 2.332900934924e-001);
+    h1_sx2_lagrange1_lvl3(3, 6.259087730394e-003, 2.332900934924e-001);
 
   // H1-Projection Simplex<3>
   ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange1::Element, true, true, false>
-    h1_sx3_lagrange1_lvl1("H1:Lagrange1:Simplex<3>:2", 2, 2.472424266085e-002, 4.803811239931e-001);
+    h1_sx3_lagrange1_lvl1(2, 2.472424266085e-002, 4.803811239931e-001);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -615,23 +814,23 @@ namespace ElementRegression
 
   // H1-Projection Hypercube<1>
   ElementRegressionH1<Shape::Hypercube<1>, Space::Lagrange2::Element, true, true, true>
-    h1_hy1_lagrange2_lvl4("H1:Lagrange2:Hypercube<1>:4", 4, 3.183068629008e-005, 3.238329097007e-003, 3.967568427665e-001);
+    h1_hy1_lagrange2_lvl4(4, 3.183068629008e-005, 3.238329097007e-003, 3.967568427665e-001);
 
   // H1-Projection Hypercube<2>
   ElementRegressionH1<Shape::Hypercube<2>, Space::Lagrange2::Element, true, true, true>
-    h1_hy2_lagrange2_lvl3("H1:Lagrange2:Hypercube<2>:3", 3, 2.511253226626e-004, 1.302093337879e-002, 8.012538477278e-001);
+    h1_hy2_lagrange2_lvl3(3, 2.511253226626e-004, 1.302093337879e-002, 8.012538477278e-001);
 
   // H1-Projection Hypercube<3>
   ElementRegressionH1<Shape::Hypercube<3>, Space::Lagrange2::Element, true, true, true>
-    h1_hy3_lagrange2_lvl1("H1:Lagrange2:Hypercube<3>:2", 2, 1.675103396311e-003, 4.471054331889e-002, 1.379478609799e+000);
+    h1_hy3_lagrange2_lvl1(2, 1.675103396311e-003, 4.471054331889e-002, 1.379478609799e+000);
 
   // H1-Projection Simplex<2>
   ElementRegressionH1<Shape::Simplex<2>, Space::Lagrange2::Element, true, true, true>
-    h1_sx2_lagrange2_lvl3("H1:Lagrange2:Simplex<2>:3", 3, 1.702956582454e-004, 1.202216232129e-002, 8.981919665319e-001);
+    h1_sx2_lagrange2_lvl3(3, 1.702956582454e-004, 1.202216232129e-002, 8.981919665319e-001);
 
   // H1-Projection Simplex<3>
   ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange2::Element, true, true, true>
-    h1_sx3_lagrange2_lvl1("H1:Lagrange2:Simplex<3>:2", 2, 1.008388594508e-003, 5.001897374726e-002, 1.934606569160e+000);
+    h1_sx3_lagrange2_lvl1(2, 1.008388594508e-003, 5.001897374726e-002, 1.934606569160e+000);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -640,7 +839,7 @@ namespace ElementRegression
 
   // H1-Projection Hypercube<2>
   ElementRegressionH1<Shape::Hypercube<2>, RannacherTurekStdNonPar, true, true, false>
-    h1_hy2_rannacher_turek_lvl4("H1:RannacherTurek:Hypercube<2>:4", 4, 1.940017656827e-003, 1.787395012244e-001);
+    h1_hy2_rannacher_turek_lvl4(4, 1.940017656827e-003, 1.787395012244e-001);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -649,15 +848,6 @@ namespace ElementRegression
 
   // H1-Projection Simplex<2>
   ElementRegressionH1<Shape::Simplex<2>, Space::CrouzeixRaviart::Element, true, true, false>
-    h1_sx2_crouzeix_raviart_lvl4("H1:CrouzeixRaviart:Simplex<2>:4", 4, 2.028469318821e-003, 1.463272513514e-001);
-
-  /* ********************************************************************************************* */
-  /* ********************************************************************************************* */
-  /* ********************************************************************************************* */
-  // Hermite-3 element
-
-  // L2-Projection Hypercube<1>
-  ElementRegressionH1<Shape::Hypercube<1>, Space::Hermite3::Element, true, true, true>
-    h1_hy1_hermite3_lvl5("H1:Hermite3:Hypercube<1>:5", 5, 6.199872813170e-008, 1.243908289727e-005, 2.594740745804e-003);
+    h1_sx2_crouzeix_raviart_lvl4(4, 2.028469318821e-003, 1.463272513514e-001);
 
 } // namespace ElementRegression
