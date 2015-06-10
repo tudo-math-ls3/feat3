@@ -14,6 +14,12 @@ namespace FEAST
 {
   namespace Assembly
   {
+    /**
+     * \brief Assembly Common namespace
+     *
+     * This namespace encapsulated commonly used functions, operators and functionals for use
+     * with the various assembly classes, which are often used in standard benchmark problems.
+     */
     namespace Common
     {
       /**
