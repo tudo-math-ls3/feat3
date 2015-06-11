@@ -7,6 +7,8 @@
 #include <kernel/lafem/forward.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
+#include <kernel/lafem/arch/scale.hpp>
+#include <kernel/lafem/arch/norm.hpp>
 
 
 namespace FEAST
@@ -319,6 +321,36 @@ namespace FEAST
       Index get_length_of_line(const Index /*row*/) const
       {
         return this->columns();
+      }
+
+      ///@name Linear algebra operations
+      ///@{
+      /**
+       * \brief Calculate \f$this \leftarrow \alpha x \f$
+       *
+       * \param[in] x The matrix to be scaled.
+       * \param[in] alpha A scalar to scale x with.
+       */
+      void scale(const DenseMatrix & x, const DT_ alpha)
+      {
+        if (x.rows() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
+        if (x.columns() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
+        if (x.used_elements() != this->used_elements())
+          throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
+
+        Arch::Scale<Mem_>::value(this->elements(), x.elements(), alpha, this->used_elements());
+      }
+
+      /**
+       * \brief Calculates the Frobenius norm of this matrix.
+       *
+       * \returns The Frobenius norm of this matrix.
+       */
+      DT_ norm_frobenius() const
+      {
+        return Arch::Norm2<Mem_>::value(this->elements(), this->used_elements());
       }
       ///@}
 
