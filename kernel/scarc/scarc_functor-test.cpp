@@ -180,7 +180,7 @@ class ScaRCFunctorTest:
       Assembly::DirichletAssembler<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
 
       ///convert boundaries and add to dirichlet assembler
-      std::vector<std::shared_ptr<MeshPart<ConformalMesh<<Shape::Hypercube<2> > > > > boundary_subsets;
+      std::vector<std::shared_ptr<MeshPart<ConformalMesh<Shape::Hypercube<2> > > > > boundary_subsets;
       for(auto& b_i : p_i.boundaries)
       {
         MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(HaloInterface<0, Dim2D>::convert(&b_i));

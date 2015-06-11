@@ -15,41 +15,92 @@ namespace FEAST
   namespace Geometry
   {
 
+    /// Alias for MeshAttribute
     template<typename A>
     using MeshAttribute = VertexSetVariable<A>;
 
-    /// \cond internal
+    /**
+     * \brief Class for holding MeshAttributes for all shape dimensions
+     *
+     * \tparam Shape_
+     * Shape type of the highest dimensional cell type, i.e. 3 for Hypercube<3> meshes
+     *
+     * \tparam DataType_
+     * DataType used in the attribute's values, i.e. double
+     *
+     * A MeshAttribute is some kind of data that refers to an entity type in a mesh, like vertices, edges, faces or
+     * cells. The MeshAttributeHolder contains the set of attributes for its dimension (Shape_::dimension) and
+     * inherits from its lower dimensional version. By this inheritance structure, it contains all MeshAttribute
+     * information from dimension 0 (vertices) up to Shape_::dimension.
+     *
+     * A MeshAttribute's values themselves are vector valued in general. The most important use of a MeshAttribute
+     * at the time of writing is the parametrisation variable in (boundary) submeshes. A d-dimensional boundary mesh
+     * therefore can have a MeshAttribute of dimension 0 (meaning it refers to vertices) as parametrisation variable,
+     * which in turn has values of dimension d.
+     *
+     * Up until now, only MeshAttributes of dimension 0 are implemented and used, although this might change in the
+     * future.
+     *
+     * Note that a MeshAttribute needs to be refined if the mesh it refers to is refined. For dimension 0 attributes,
+     * it is clear how to refine them: Linear interpolation. For attributes of the highest possible dimension
+     * (meaning cell attributes), new cells inherit the value from their parent cells. For attributes of intermediate
+     * dimension, this is not clear.
+     *
+     * \author Jordi Paul
+     *
+     */
     template<typename Shape_, typename DataType_>
     class MeshAttributeHolder :
       public MeshAttributeHolder<typename Shape::FaceTraits<Shape_, Shape_::dimension - 1>::ShapeType, DataType_>
     {
     public:
+      /// Type of the highest dimensional entity
       typedef Shape_ ShapeType;
+      /// Dimension of ShapeType
       static constexpr int shape_dim = ShapeType::dimension;
+      /// Type the MeshAttribute uses
       typedef DataType_ DataType;
+      /// Type of the Attribute
       typedef MeshAttribute<DataType_> AttributeType;
+      /// Type for the set of all Attributes belonging to shape_dim
       typedef std::vector<MeshAttribute<DataType_>> AttributeSetType;
 
     protected:
-      typedef MeshAttributeHolder<typename Shape::FaceTraits<ShapeType, shape_dim - 1>::ShapeType, DataType_> BaseClass;
+      /// This type's base class, meaning a MeshAttributeHolder of one dimension less
+      typedef MeshAttributeHolder
+      <
+        typename Shape::FaceTraits<ShapeType, shape_dim - 1>::ShapeType, DataType_
+      > BaseClass;
 
+      /// The set of all attributes belonging to shape_dim
       AttributeSetType _mesh_attributes;
 
     public:
+      /// \brief Empty default constructor
       explicit MeshAttributeHolder()
       {
       }
 
+      /// \brief Copy constructor
       MeshAttributeHolder(const MeshAttributeHolder& other) :
+        BaseClass(other),
         _mesh_attributes(other._mesh_attributes)
       {
       }
 
+      /// \brief Virtual destructor
       virtual ~MeshAttributeHolder()
       {
         CONTEXT(name() + "::~MeshAttributeHolder()");
       }
 
+      /**
+       * \brief Returns a reference to the set of attributes belonging to dimension dim_
+       *
+       * \tparam dim_
+       * Shape dim of the mesh entity the attribute set retrieved refers to
+       *
+       */
       template<int dim_>
       AttributeSetType& get_mesh_attributes()
       {
@@ -60,6 +111,7 @@ namespace FEAST
         return MeshAttributeHolder<CellType, DataType_>::_mesh_attributes;
       }
 
+      /// \copydoc get_mesh_attributes()
       template<int dim_>
       const AttributeSetType& get_mesh_attributes() const
       {
@@ -70,36 +122,62 @@ namespace FEAST
         return MeshAttributeHolder<CellType, DataType_>::_mesh_attributes;
       }
 
+      /**
+       * \brief Returns the number of attributes in the attribute set of dimension dim
+       *
+       * \param[in] dim
+       * Dimension the number of attributes is to be computed for
+       *
+       */
       virtual Index get_num_attributes(Index dim) const
       {
         CONTEXT(name() + "::get_num_attributes()");
         ASSERT(int(dim) <= shape_dim, "invalid dimension parameter");
-        if(dim == shape_dim)
-        {
+
+        if(int(dim) == shape_dim)
+          // If the requested dimension is mine...
           return _mesh_attributes.size();
-        }
+
+        // Otherwise recurse down
         return BaseClass::get_num_attributes(dim);
       }
 
+      /// \brief Return the name of the class
       static String name()
       {
         return "MeshAttributeHolder<" + Shape_::name() + ">";
       }
 
+      /**
+       * \brief Adds one attribute of shape dimension dim to the corresponding set
+       *
+       * \param[in] attribute
+       * The Attribute to be added.
+       *
+       * \param[in] dim
+       * Shape dimension of attribute.
+       *
+       * \warning Checks whether attribute has the same number of entries as the corresponding mesh has entities of
+       * dimension dim have to be performed by the caller!
+       */
       virtual void add_attribute(const AttributeType& attribute, Index dim)
       {
-        ASSERT(dim <= shape_dim, "Attribute shape dim exceeds MeshPart shape dim!");
+        ASSERT(int(dim) <= shape_dim, "Attribute shape dim exceeds MeshPart shape dim!");
 
-        std::cout << "AttributeSetHolder<" << shape_dim << ">::add_attribute(...," << dim <<")" << std::endl;
-
-        if(dim == shape_dim)
+        if(int(dim) == shape_dim)
+          // If the requested dimension is mine...
           _mesh_attributes.push_back(attribute);
         else
+          // Otherwise recurse down
           BaseClass::add_attribute(attribute, dim);
 
       }
-    };
+    }; // class MeshAttributeHolder<Shape_, DataType_>
 
+    /// \cond internal
+    /**
+     * \brief Specialisation for dimension 0
+     */
     template<typename DataType_>
     class MeshAttributeHolder<Shape::Vertex, DataType_>
     {
@@ -160,11 +238,11 @@ namespace FEAST
         _mesh_attributes.push_back(attribute_);
       }
 
-      virtual void add_attribute(const MeshAttribute<DataType_>&& attribute_, Index dim)
-      {
-        ASSERT(dim == 0, "Only attributes of shape dim 0 can be added to MeshParts of shape dim 0");
-        _mesh_attributes.push_back(std::move(attribute_));
-      }
+      //virtual void add_attribute(const MeshAttribute<DataType_>&& attribute_, Index dim)
+      //{
+      //  ASSERT(dim == 0, "Only attributes of shape dim 0 can be added to MeshParts of shape dim 0");
+      //  _mesh_attributes.push_back(std::move(attribute_));
+      //}
 
       static String name()
       {
@@ -173,12 +251,72 @@ namespace FEAST
     };
     /// \endcond
 
+    /**
+     * \brief Class template for partial meshes
+     *
+     * A MeshPart is a part of another mesh (called parent mesh) and is defined by mapping its own mesh entities
+     * (like vertices, edges etc.) to the corresponding mesh entities of the parent mesh. For at least one arbitrary
+     * shape dimension a mapping has to exist, but a MeshPart can have one mapping for each shape dimension of the
+     * mesh it refers to.
+     *
+     * A MeshPart does not need to be connected or to have a topology, although it can implicitly use the parent's
+     * topology. It can have sets of MeshAttributes for each shape dimension. If the parent mesh is refine, it is
+     * possible to use that information to create a refined version of the MeshPart, although particular care has to
+     * be taken when refining the MeshAttributes.
+     *
+     * A MeshPart can supply its own topology, which can be different from the parent's. One important example for
+     * this is a MeshPart that defines the boundary of its parent mesh. If the boundary is parametrised using a
+     * MeshAttribute and the boundary is closed, the parametrisation requires the doubling of some mesh entities to
+     * correctly represent the parametrisation variable.
+     *
+     * \verbatim
+     *
+     *   Parent:      MeshPart representing the closed boundary:
+     *   3----2       0--1--2--3--4
+     *   |    |         map to
+     *   |    |       0--1--2--3--0
+     *   0----1
+     *
+     * \endverbatim
+     *
+     * Vertex 0 of the parent mesh has two different parametrisation variables, as it is both the first and the last
+     * vertex of the closed boundary. This can be easily represented by having two vertices in the MeshPart point to
+     * the same vertex of the parent mesh.
+     *
+     * At least one parent mapping has to be given, but it is possible to deduct the other parent mappings from this.
+     * There are two possibilities:
+     * 1. Bottom to top: Starting with the lowest dimensional parent mapping, an entity is considered to be in the
+     *    MeshPart if all its sub shapes are in the MeshPart, i.e. for a given edge parent mapping in 3d, all faces
+     *    consisting exclusively of edges in the MeshPart are considered to be in the MeshPart as well. This is then
+     *    repeated for cells as well.
+     * 2. Top to bottom: Starting with the highest dimensional parent mapping, all subshapes of these entities are
+     *    considered to be in the MeshPart as well, i.e. for a given face parent mapping in 3d, all edges belonging
+     *    to faces in the MeshPart are considered to be in the MeshPart as well.
+     *
+     * \warning Extra care has to be taken with this when it comes to refinement when adding higher dimensional
+     * parent information. Consider the case of a the parent mesh partitioned into several patches and a MeshPart
+     * consisting of two vertices where more than two patches meet. If the mesh is refined, there are still exactly
+     * two vertices where more than two patches meet.
+     * If by chance those two vertices share an edge in the coarse mesh and bottom to top parent deduction is used,
+     * an edge is added to the MeshPart. Refinement of said edge then leads to the addition of a new vertex to the
+     * MeshPart, which is correct in terms of mesh topology, but the MeshPart then no longer represents the set of
+     * patch cross points.
+     *
+     */
     template<typename MeshType_>
     class MeshPart
     {
-
     };
 
+    /**
+     * \brief MeshPart Implementation for conformal meshes
+     *
+     * \tparam ShapeType_
+     * Shape type of the ConformalMesh this Meshpart refers to.
+     *
+     * \copydoc MeshPart
+     *
+     */
     template<typename ShapeType_>
     class MeshPart<ConformalMesh<ShapeType_>>
     {
@@ -193,7 +331,7 @@ namespace FEAST
         typedef TargetSetHolder<ShapeType> TargetSetHolderType;
         /// Data type for attributes
         typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
-
+        /// Type for mesh attributes
         typedef MeshAttribute<AttributeDataType> AttributeType;
         /// Mesh attribute holder type
         typedef MeshAttributeHolder<ShapeType, AttributeDataType> AttributeHolderType;
@@ -227,9 +365,22 @@ namespace FEAST
           > Type;
         }; // struct IndexSet<...>
 
+        /**
+         * \brief Attribute set type class template
+         *
+         * This is used to define the return type of the get_attributes() function template.
+         *
+         * \tparam cell_dim_
+         * Shape dim of the attribute set
+         *
+         * \tparam DataType_
+         * Type used in members of the attribute set
+         *
+         */
         template<int cell_dim_, typename DataType_>
         struct AttributeSet
         {
+          /// Attribute set type
           typedef std::vector<FEAST::Geometry::MeshAttribute<DataType_>> Type;
         };
 
@@ -260,6 +411,7 @@ namespace FEAST
         TargetSetHolderType _target_set_holder;
 
       private:
+        /// \brief Copy assignment operator
         MeshPart& operator=(const MeshPart&);
 
       public:
@@ -269,6 +421,9 @@ namespace FEAST
          * \param[in] num_entities
          * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
          * Must not be \c nullptr.
+         *
+         * \param[in] create_topology
+         * Determines if the MeshPart is to have a mesh topology.
          *
          */
         explicit MeshPart(const Index num_entities[], bool create_topology = false) :
@@ -326,6 +481,7 @@ namespace FEAST
             for(int i(0); i <= shape_dim; ++i)
               _num_entities[i] = other.get_num_entities(i);
 
+            // Only create _index_set_holder if other has one as well
             if(other.has_topology())
               _index_set_holder = new IndexSetHolderType(*other._index_set_holder);
           }
@@ -339,10 +495,12 @@ namespace FEAST
             delete _index_set_holder;
         }
 
+        /// \brief Checks if this MeshPart has a mesh topology
         bool has_topology() const
         {
           return (_index_set_holder != nullptr);
         }
+
         /**
          * \brief Returns the number of entities.
          *
@@ -360,6 +518,12 @@ namespace FEAST
           return _num_entities[dim];
         }
 
+        /**
+         * \brief Returns the AttributeSet belonging to dimension dim_
+         *
+         * \tparam dim_
+         * Shape dimension we want to have the attribute set for
+         */
         template<int dim_>
         typename AttributeSet<dim_, AttributeDataType>::Type& get_attributes()
         {
@@ -367,6 +531,7 @@ namespace FEAST
           return _attribute_holder.template get_mesh_attributes<dim_>();
         }
 
+        /// \copydoc get_attributes()
         template<int dim_>
         const typename AttributeSet<dim_, AttributeDataType>::Type& get_attributes() const
         {
@@ -374,18 +539,36 @@ namespace FEAST
           return _attribute_holder.template get_mesh_attributes<dim_>();
         }
 
+        /**
+         * \brief Computes the total number of Attributes in this MeshPart
+         *
+         * \returns The total number of Attributes in all attribute sets
+         */
         Index get_num_attributes() const
         {
           Index num_attribute_sets(0);
+          // Sum up the number of attributes over all attribute sets
           for(Index d(0); d < Index(shape_dim); ++d)
             num_attribute_sets += _attribute_holder.get_num_attributes(d);
+
           return num_attribute_sets;
         }
 
+        /**
+         * \brief Adds one attribute to this MeshPart
+         *
+         * \tparam dim_
+         * Shape dimension of the Attribute to be added
+         *
+         * \param[in] attribute
+         * Attribute to be added.
+         */
         template<int dim_>
         void add_attribute(const AttributeType& attribute)
         {
-          CONTEXT(name() + "::get_attributes()");
+          CONTEXT(name() + "::add_attribute()");
+          // Check if the attribute to be added has the same number of entities as the MeshPart wrt. dim_
+          ASSERT(attribute.get_num_vertices() == _target_set_holder.template get_target_set<dim_>().get_num_entities(), "Attribute/entity count mismatch!");
           _attribute_holder.template get_mesh_attributes<dim_>().push_back(attribute);
         }
 
@@ -433,12 +616,14 @@ namespace FEAST
           return _attribute_holder;
         }
 
+        /// Returns a reference to the index set holder of the mesh.
         IndexSetHolderType* get_topology()
         {
           CONTEXT(name() + "::get_topology()");
           return _index_set_holder;
         }
 
+        /// \copydoc get_topology()
         const IndexSetHolderType* get_topology() const
         {
           CONTEXT(name() + "::get_topology() [const]");
@@ -474,13 +659,18 @@ namespace FEAST
           return _target_set_holder.template get_target_set<cell_dim_>();
         }
 
-        /// \cond internal
+        /**
+         * \cond internal
+         *
+         * Returns a reference to the target set holder of the mesh.
+         */
         TargetSetHolderType& get_target_set_holder()
         {
           CONTEXT(name() + "::get_target_set_holder()");
           return _target_set_holder;
         }
 
+        /// \copydoc get_target_set_holder()
         const TargetSetHolderType& get_target_set_holder() const
         {
           CONTEXT(name() + "::get_target_set_holder() [const]");
@@ -498,6 +688,17 @@ namespace FEAST
           return "MeshPart<...>";
         }
 
+        /**
+         * \brief Fills the target sets from bottom to top
+         *
+         * \tparam shape_dim
+         * Bottom dimension to start from.
+         *
+         * \param[in,out] parent_mesh
+         * Parent this MeshPart refers to.
+         *
+         * \todo: Not implemented yet
+         */
         template<Index shape_dim_>
         void deduct_target_sets_from_bottom(const MeshType& parent_mesh)
         {
@@ -508,15 +709,25 @@ namespace FEAST
 
         }
 
+        /**
+         * \brief Fills the target sets from top to bottom
+         *
+         * \todo: Not implemented yet
+         */
         virtual void deduct_target_sets_from_top()
         {
         }
 
+        /**
+         * \brief Fills the index set from bottom to top
+         *
+         * \todo: Not implemented yet
+         */
         virtual void deduct_index_set_holder()
         {
         }
 
-    }; // class MeshPart
+    }; // class MeshPart<ConformalMesh<Shape_>>
 
     /**
      * \brief Factory specialisation for MeshPart class template
@@ -667,19 +878,31 @@ namespace FEAST
           return _num_entities_fine[dim];
         }
 
+        /**
+         * \brief Fills attribute sets where applicable
+         *
+         * \param[in,out] attribute_set_holder
+         * Container for the attribute sets being added to
+         *
+         */
         virtual void fill_attribute_sets(AttributeHolderType& attribute_set_holder)
         {
+          // Attributes of shape dimension 0 only make sense if we have a mesh topology
           if(_coarse_mesh.has_topology())
           {
+            // Iterate over the dim 0 attributes in the coarse mesh
             for(Index i(0); i < _coarse_mesh.get_attribute_holder().template get_mesh_attributes<0>().size(); ++i)
             {
               auto& coarse_attribute =_coarse_mesh.template get_attributes<0>()[i];
 
+              // Create a new empty attribute of the desired size
               AttributeType refined_attribute(get_num_entities(0), coarse_attribute.get_num_coords());
 
+              // Refine the attribute in the coarse mesh and write the result to the new attribute
               Intern::StandardVertexRefineWrapper<ShapeType, AttributeType>
                 ::refine(refined_attribute, coarse_attribute, *_coarse_mesh.get_topology());
 
+              // Add the attribute to the corresponding set
               attribute_set_holder.add_attribute(refined_attribute,0);
             }
           }
@@ -695,6 +918,7 @@ namespace FEAST
         {
           ASSERT(index_set_holder == nullptr, "fill_index_sets: index_set_holder != nullptr!");
 
+          // Only create the topology for the refined mesh if the coarse mesh has a topology
           if(_coarse_mesh.has_topology())
           {
             index_set_holder = new IndexSetHolderType(_num_entities_fine);
@@ -715,6 +939,7 @@ namespace FEAST
           // refine target indices
          const IndexSetHolderType* coarse_ish(_coarse_mesh.get_topology());
 
+         // The refinement is different depending on the coarse mesh having a mesh topology
          if(_coarse_mesh.has_topology())
            Intern::TargetRefineWrapper<ShapeType>
              ::refine(target_set_holder, _num_entities_parent, _coarse_mesh.get_target_set_holder(),

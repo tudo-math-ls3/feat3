@@ -1438,8 +1438,8 @@ namespace FEAST
       else
       {
         // auxiliary variables
-        typename AttributesContainer::ValueType current_value;
-        typename AttributesContainer::ValueVec v;
+        AttributesContainer::ValueType current_value;
+        AttributesContainer::ValueVec v;
 
         // separate by " "
         line.split_by_charset(line_vec);

@@ -33,6 +33,8 @@ namespace FEAST
      *
      * \tparam Shape_
      * The shape tag class for the mesh.
+     *
+     * This contains type names for meshes, partial meshes that refer to them, and charts for those meshes.
      */
     template<typename Shape_>
     struct StandardConformalMeshNodePolicy
@@ -42,9 +44,9 @@ namespace FEAST
       /// chart for the root mesh
       typedef DummyChart RootMeshChartType;
 
-      /// chart for the sub-mesh
-      /// MeshPart type
+      /// Type for partial meshes refering to a root mesh
       typedef MeshPart<RootMeshType> MeshPartType;
+      /// Type for charts of partial meshes
       typedef DummyChart MeshPartChartType;
 
     };
@@ -58,7 +60,7 @@ namespace FEAST
       typedef typename MeshNodePolicy_::RootMeshChartType ChartType;
     };
 
-    // helper policy template for SubMeshNode class template
+    // helper policy template MeshPartNode class template
     template<typename MeshNodePolicy_>
     struct MeshPartNodePolicy
     {
@@ -75,6 +77,12 @@ namespace FEAST
      * \brief Mesh Node base class
      *
      * A MeshNode is a container for bundling a mesh with MeshParts referring to it.
+     *
+     * \tparam Policy_
+     * Bundle of type names for meshes and partial meshes.
+     *
+     * \tparam MeshNodePolicy_
+     * Bundle of type names for other MeshNodes containing meshes and MeshParts.
      *
      * \author Peter Zajac
      */
@@ -100,21 +108,33 @@ namespace FEAST
 
     protected:
       /**
-       * \brief MeshPartNode bin class
+       * \brief Container class for bundling MeshPartNodes with their corresponding charts
        */
       class MeshPartNodeBin
       {
       public:
+        /// This container's MeshPartNode
         MeshPartNodeType* node;
+        /// Chart belonging to node
         const MeshChartType* chart;
 
       public:
+        /**
+         * \brief Constructor
+         *
+         * \param node_
+         * MeshPartNode for this container.
+         *
+         * \param chart_
+         * Chart for this container.
+         *
+         */
         explicit MeshPartNodeBin(MeshPartNodeType* node_, const MeshChartType* chart_) :
           node(node_),
           chart(chart_)
         {
         }
-      };
+      }; // class MeshPartNodeBin
 
       /// submesh node bin container type
       typedef std::map<Index,MeshPartNodeBin> MeshPartNodeContainer;
@@ -217,7 +237,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Searches for a mesh_part node.
+       * \brief Searches this container for a MeshPartNode
        *
        * \param[in] id
        * The id of the node to be found.
@@ -241,7 +261,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Searches for a mesh_part.
+       * \brief Searches this container for a MeshPart
        *
        * \param[in] id
        * The id of the node associated with the mesh_part to be found.
@@ -265,7 +285,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Searches for a mesh_part chart.
+       * \brief Searches for a chart belonging to a MeshPart by index
        *
        * \param[in] id
        * The id of the node associated with the chart to be found.
@@ -472,6 +492,14 @@ namespace FEAST
 
       }
 
+      /**
+       * \brief Creates a MeshStreamer object for writing
+       *
+       * \todo Implement this
+       *
+       * \returns MeshStreamer containing all data to be written.
+       *
+       */
       MeshStreamer* create_mesh_writer()
       {
         MeshStreamer* mesh_writer(new MeshStreamer);

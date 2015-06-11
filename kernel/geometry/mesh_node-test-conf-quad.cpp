@@ -77,7 +77,7 @@ public:
       root_node_c->add_mesh_part_node(7, new MeshPartNodeType(subset_quad_c));
 
     // add edge cell subset node
-    MeshPartNodeType* subsetnode_quad_edge_c =
+    //MeshPartNodeType* subsetnode_quad_edge_c =
       subsetnode_quad_c->add_mesh_part_node(42, new MeshPartNodeType(subset_quad_edge_c));
 
     /* ********************************************************************* */

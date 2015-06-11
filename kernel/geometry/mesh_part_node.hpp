@@ -16,8 +16,6 @@ namespace FEAST
     template<typename Policy_>
     class MeshPartNode DOXY({});
 
-    /* ***************************************************************************************** */
-
     /**
      * \brief MeshPartNode parent base class
      *
@@ -29,21 +27,25 @@ namespace FEAST
     class MeshPartParent
     {
     public:
-      /// policy typedef
+      /// Policy for determining mesh types in the containers
       typedef Policy_ Policy;
-      /// cell subset type
+      /// Type for partial meshes
       typedef typename Policy_::MeshPartType MeshPartType;
-      /// cell subset node type
+      /// Type for mesh nodes containing partial meshes
       typedef MeshPartNode<Policy_> MeshPartNodeType;
 
     protected:
+      /// Map to access partial mesh nodes with an Index
       typedef std::map<Index, MeshPartNodeType*> MeshPartNodeContainer;
+      /// Iterator for that container
       typedef typename MeshPartNodeContainer::iterator MeshPartNodeIterator;
+      /// Const iterator for that container
       typedef typename MeshPartNodeContainer::const_iterator MeshPartNodeConstIterator;
+      /// Reverse iterator for that container
       typedef typename MeshPartNodeContainer::reverse_iterator MeshPartNodeReverseIterator;
 
     protected:
-      /// child cell subset nodes
+      /// Container for more partial nodes refering to this one
       MeshPartNodeContainer _mesh_part_nodes;
 
       /// protected default constructor
