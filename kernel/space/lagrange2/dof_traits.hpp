@@ -21,11 +21,6 @@ namespace FEAST
       {
         /// no dofs for any shape dimension > 0
         static constexpr int count = 0;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
 
       template<typename Shape_>
@@ -33,11 +28,6 @@ namespace FEAST
       {
         /// 1 dof per vertex
         static constexpr int count = 1;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
 
       template<int shape_dim_>
@@ -45,11 +35,6 @@ namespace FEAST
       {
         /// 1 dof per simplex edge
         static constexpr int count = 1;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
 
       template<int shape_dim_, int face_dim_>
@@ -57,11 +42,6 @@ namespace FEAST
       {
         /// 1 dof per hypercube face
         static constexpr int count = 1;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
 
       template<int shape_dim_>
@@ -69,11 +49,6 @@ namespace FEAST
       {
         /// 1 dof per hypercube face
         static constexpr int count = 1;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
     } // namespace Lagrange2
   } // namespace Space

@@ -26,33 +26,18 @@ namespace FEAST
       {
         /// no dofs for any shape dimension > 0
         static constexpr int count = 0;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
 
       template<int dim_, int degree_>
       struct DofTraits<DofTag<Shape::Hypercube<dim_>, Variant::StdPolyP<degree_> >, dim_>
       {
         static constexpr int count = MetaMath::Binomial<dim_ + degree_, degree_>::value;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
 
       template<int dim_, int degree_>
       struct DofTraits<DofTag<Shape::Simplex<dim_>, Variant::StdPolyP<degree_> >, dim_>
       {
         static constexpr int count = MetaMath::Binomial<dim_ + degree_, degree_>::value;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
     } // namespace Discontinuous
   } // namespace Space

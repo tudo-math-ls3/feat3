@@ -21,11 +21,6 @@ namespace FEAST
       {
         /// no dofs for any shape dimension > 0
         static constexpr int count = 0;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
 
       template<int dim_>
@@ -33,11 +28,6 @@ namespace FEAST
       {
         /// 1 dof per facet
         static constexpr int count = 1;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
     } // namespace CrouzeixRaviart
   } // namespace Space

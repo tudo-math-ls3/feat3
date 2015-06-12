@@ -20,11 +20,6 @@ namespace FEAST
       struct DofTraits
       {
         static constexpr int count = 0;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
 
       template<>
@@ -32,11 +27,6 @@ namespace FEAST
       {
         /// 6 dofs per vertex
         static constexpr int count = 6;
-
-        static Index derive_order(Index assign_idx)
-        {
-          return assign_idx == Index(0) ? Index(0) : (assign_idx < 3  ? Index(1) : Index(2));
-        }
       };
 
       template<>
@@ -44,11 +34,6 @@ namespace FEAST
       {
         /// 1 dof per edge
         static constexpr int count = 1;
-
-        static Index derive_order(Index)
-        {
-          return Index(1);
-        }
       };
     } // namespace Argyris
   } // namespace Space

@@ -21,11 +21,6 @@ namespace FEAST
       {
         /// no dofs for any shape dimension > 0
         static constexpr int count = 0;
-
-        static Index derive_order(Index)
-        {
-          return Index(0);
-        }
       };
 
       template<int shape_dim_>
@@ -33,11 +28,6 @@ namespace FEAST
       {
         /// 2^n dofs per vertex
         static constexpr int count = (1 << shape_dim_);
-
-        static Index derive_order(Index assign_idx)
-        {
-          return assign_idx == Index(0) ? Index(0) : (assign_idx <= Index(shape_dim_) ? Index(1) : Index(2));
-        }
       };
     } // namespace BognerFoxSchmit
   } // namespace Space

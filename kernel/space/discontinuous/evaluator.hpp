@@ -68,7 +68,7 @@ namespace FEAST
          */
         Index get_num_local_dofs() const
         {
-          return 1;
+          return Index(1);
         }
 
         /** \copydoc Space::EvaluatorBase::eval_values() */
