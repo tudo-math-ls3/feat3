@@ -43,7 +43,7 @@ All containers provide at least three different member functions for proper conv
 
 \note There does not exist a copy constructor nor copy assignment operator. This prevents the user from triggering unwanted copy operations and memory transfers.
 
-\section lafem_sec_container_reset Container Reset
+\section lafem_sec_container_reset Container reset
 All containers offer the format() and clear() operations:
 - clear: simply frees all allocated arrays and leaves the container in an undefined state.
 
@@ -55,4 +55,23 @@ Every sparse matrix consists of its non-zero data arrays and a data layout (stor
 A FEAST::LAFEM::SparseLayout object can be retrieved by any matrix via the corresponding layout() member function to create another matrix with the same shared (except FEAST::LAFEM::SparseMatrixCOO and FEAST::LAFEM::SparseVector, which enforce deep copies) data layout.
 
 Thus empty matrices with identical layout can be created easily and memory consumption can be reduced by reusing existing data layout arrays.
+
+\section lafem_sec_typedefs Common typedefs
+- DataType
+- IndexType
+- MemoryType
+- ContainerType, the base container type
+
+Usage:
+\code{.cpp}
+typedef DenseVector<Mem::Main, float, Index> VT_main;
+typedef typename VT_::template ContainerType<Mem::CUDA, typename VT_main::DataType, unsigned int> VT_cuda;
+\endcode
+
+\section lafem_sec_template_abbreviation Common typename abbreviations
+- DT_ - Datatype (float, double)
+- IT_ - Indextype (Index, unsigned long)
+- Mem_ - Memorytype (Mem::Main, Mem::CUDA)
+- VT_ - Vectortype (DenseVector<...>)
+- MT_ - Matrixtype, not to be confused with Mem_
 **/
