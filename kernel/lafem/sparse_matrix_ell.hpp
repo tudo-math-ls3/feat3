@@ -487,10 +487,10 @@ namespace FEAST
         this->_scalar_index.push_back((_rows() + _C() - Index(1)) / _C());
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(other.used_elements());
-        this->_scalar_dt.push_back(other.zero_element());
 
         SparseMatrixBanded<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
+        this->_scalar_dt.push_back(cother.zero_element());
 
         IT_ * tcl = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_num_of_chunks());
         Util::MemoryPool<Mem::Main>::instance()->set_memory(tcl, IT_(0), _num_of_chunks());
@@ -742,10 +742,10 @@ namespace FEAST
         this->_scalar_index.push_back((_rows() + _C() - Index(1)) / _C());
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(other.used_elements());
-        this->_scalar_dt.push_back(other.zero_element());
 
         SparseMatrixCOO<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
+        this->_scalar_dt.push_back(cother.zero_element());
 
         IT_ * tcl = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_num_of_chunks());
         Util::MemoryPool<Mem::Main>::instance()->set_memory(tcl, IT_(0), _num_of_chunks());

@@ -350,10 +350,10 @@ namespace FEAST
         this->_scalar_index.push_back(other.rows());
         this->_scalar_index.push_back(other.columns());
         this->_scalar_index.push_back(other.used_elements());
-        this->_scalar_dt.push_back(other.zero_element());
 
         SparseMatrixCOO<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
+        this->_scalar_dt.push_back(cother.zero_element());
 
         this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());
@@ -434,10 +434,10 @@ namespace FEAST
         this->_scalar_index.push_back(other.rows());
         this->_scalar_index.push_back(other.columns());
         this->_scalar_index.push_back(other.used_elements());
-        this->_scalar_dt.push_back(other.zero_element());
 
         SparseMatrixELL<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
+        this->_scalar_dt.push_back(cother.zero_element());
 
         this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());
@@ -511,10 +511,10 @@ namespace FEAST
         this->_scalar_index.push_back(other.rows());
         this->_scalar_index.push_back(other.columns());
         this->_scalar_index.push_back(other.used_elements());
-        this->_scalar_dt.push_back(other.zero_element());
 
         SparseMatrixBanded<Mem::Main, DT_, IT_> cother;
         cother.convert(other);
+        this->_scalar_dt.push_back(cother.zero_element());
 
         this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());
@@ -611,10 +611,10 @@ namespace FEAST
         this->_scalar_index.push_back(other.raw_rows());
         this->_scalar_index.push_back(other.raw_columns());
         this->_scalar_index.push_back(other.raw_used_elements());
-        this->_scalar_dt.push_back(other.zero_element());
 
         SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> cother;
         cother.convert(other);
+        this->_scalar_dt.push_back(cother.zero_element());
 
         this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());
