@@ -324,6 +324,7 @@ class User(MySQLModel):
 
 class BranchQueue(MySQLModel):
   branch = pw.CharField()
+  status = pw.IntegerField()
 
 class Run(MySQLModel):
   branch = pw.CharField()
@@ -418,6 +419,8 @@ if major > 4 or (major == 4 and minor > 5):
 #iterate over all branches, that are queued for testing
 branches = BranchQueue.select()
 for branch in branches:
+  if branch.status != 0:
+    continue
   #check if branch is present in repository
   branch = branch.branch
   found_branch = False
