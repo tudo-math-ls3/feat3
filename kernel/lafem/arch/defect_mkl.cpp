@@ -8,7 +8,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
-void Defect<Mem::Main>::csr_mkl(float * r, const float * const rhs, const float * const val, const Index * const col_ind, const Index * const row_ptr, const float * const x, const Index rows, const Index /*columns*/, const Index)
+void Defect<Mem::Main>::csr_mkl(float * r, const float * const rhs, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const float * const x, const Index rows, const Index /*columns*/, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
@@ -18,7 +18,7 @@ void Defect<Mem::Main>::csr_mkl(float * r, const float * const rhs, const float 
   delete[] t;
 }
 
-void Defect<Mem::Main>::csr_mkl(double * r, const double * const rhs, const double * const val, const Index * const col_ind, const Index * const row_ptr, const double * const x, const Index rows, const Index /*columns*/, const Index)
+void Defect<Mem::Main>::csr_mkl(double * r, const double * const rhs, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const double * const x, const Index rows, const Index /*columns*/, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
@@ -28,7 +28,7 @@ void Defect<Mem::Main>::csr_mkl(double * r, const double * const rhs, const doub
   delete[] t;
 }
 
-void Defect<Mem::Main>::coo_mkl(float * r, const float * const rhs, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const float * const x, const Index rows, const Index /*columns*/, const Index used_elements)
+void Defect<Mem::Main>::coo_mkl(float * r, const float * const rhs, const float * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const float * const x, const Index rows, const Index /*columns*/, const Index used_elements)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
@@ -39,7 +39,7 @@ void Defect<Mem::Main>::coo_mkl(float * r, const float * const rhs, const float 
   delete[] t;
 }
 
-void Defect<Mem::Main>::coo_mkl(double * r, const double * const rhs, const double * const val, const Index * const row_ptr, const Index * const col_ptr, const double * const x, const Index rows, const Index /*columns*/, const Index used_elements)
+void Defect<Mem::Main>::coo_mkl(double * r, const double * const rhs, const double * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const double * const x, const Index rows, const Index /*columns*/, const Index used_elements)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';

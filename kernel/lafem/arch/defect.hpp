@@ -26,7 +26,7 @@ namespace FEAST
         }
 
         template <typename DT_>
-        static void csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const Index * const col_ind, const Index * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
         {
 #ifdef FEAST_BACKENDS_MKL
           csr_mkl(r, rhs, val, col_ind, row_ptr, x, rows, columns, used_elements);
@@ -61,7 +61,7 @@ namespace FEAST
         }
 
         template <typename DT_>
-        static void coo(DT_ * r, const DT_ * const rhs, const DT_ * const val, const Index * const row_ptr, const Index * const col_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        static void coo(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
         {
 #ifdef FEAST_BACKENDS_MKL
           coo_mkl(r, rhs, val, row_ptr, col_ptr, x, rows, columns, used_elements);
@@ -98,11 +98,11 @@ namespace FEAST
         template <typename DT_, typename IT_>
         static void banded_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
 
-        static void csr_mkl(float * r, const float * const rhs, const float * const val, const Index * const col_ind, const Index * const row_ptr, const float * const x, const Index rows, const Index, const Index);
-        static void csr_mkl(double * r, const double * const rhs, const double * const val, const Index * const col_ind, const Index * const row_ptr, const double * const x, const Index rows, const Index, const Index);
+        static void csr_mkl(float * r, const float * const rhs, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const float * const x, const Index rows, const Index, const Index);
+        static void csr_mkl(double * r, const double * const rhs, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const double * const x, const Index rows, const Index, const Index);
 
-        static void coo_mkl(float * r, const float * const rhs, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements);
-        static void coo_mkl(double * r, const double * const rhs, const double * const val, const Index * const row_ptr, const Index * const col_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements);
+        static void coo_mkl(float * r, const float * const rhs, const float * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements);
+        static void coo_mkl(double * r, const double * const rhs, const double * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements);
       };
 
       extern template void Defect<Mem::Main>::csr_generic(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
