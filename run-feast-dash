@@ -379,7 +379,7 @@ else:
   addition += "-unixmake"
 if is_found ("nvcc"):
   addition = addition + "-cuda"
-if is_found ("ccache") and not is_found("nvcc"): # ccache is broken in conjunction with cmake 2.8.12 and cuda
+if is_found ("ccache"):
   addition = addition + "-ccache"
 
 #unconditionally add umfpack/alglib and delete it before the first test run to trigger package downloads
