@@ -308,7 +308,6 @@ namespace FEAST
             data.phi[i].grad.set_vec_mat_mult(loc_grad, _inv_lin_mat);
           }
         }
-
       }; // Evaluator<..., Variant::StdNonPar, Shape::Quadrilateral>
     } // namespace RannacherTurek
   } // namespace Space

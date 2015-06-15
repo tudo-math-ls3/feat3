@@ -22,6 +22,9 @@ namespace FEAST
         template<int degree_ = 0>
         struct StdPolyP
         {
+          /// This variant's local polynomial degree
+          static constexpr int local_degree = degree_;
+
           static String name()
           {
             return String("StdPolyP<") + stringify(degree_) + ">";

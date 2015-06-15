@@ -17,14 +17,13 @@ namespace FEAST
       };
 
       /**
-       * \brief Lagrange-1 Dof-Traits class template.
+       * \brief Discontinuous Dof-Traits class template.
        *
        * \author Peter Zajac
        */
       template<typename Tag_, int dim_>
       struct DofTraits
       {
-        /// no dofs for any shape dimension > 0
         static constexpr int count = 0;
       };
 

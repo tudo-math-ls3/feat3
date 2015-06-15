@@ -49,7 +49,10 @@ namespace FEAST
         static constexpr bool have_node_func = true;
 
         /** \copydoc ElementBase::local_degree */
-        static constexpr int local_degree = 0;
+        static constexpr int local_degree = VariantTag::local_degree;
+
+        /// number of local dofs
+        static constexpr int num_local_dofs = DofTraits<DofTag<ShapeType, VariantTag>, ShapeType::dimension>::count;
 
         /** \copydoc ElementBase::Evaluator */
         template<
@@ -62,15 +65,15 @@ namespace FEAST
           typedef typename TrafoEvaluator_::EvalPolicy EvalPolicy;
 
           /// space evaluation traits
-          typedef StandardScalarEvalTraits<EvalPolicy, 1, DataType_> Traits;
+          typedef StandardScalarEvalTraits<EvalPolicy, num_local_dofs, DataType_> Traits;
 
         public:
           /// space evaluator type
-          typedef Discontinuous::Evaluator<Element, Traits, TrafoEvaluator_, VariantTag> Type;
+          typedef Discontinuous::Evaluator<Element, TrafoEvaluator_, Traits, VariantTag> Type;
         };
 
         /** \copydoc ElementBase::DofMappingType */
-        typedef DofMappingSingleEntity<Element, 0> DofMappingType;
+        typedef DofMappingSingleEntity<Element, 0, num_local_dofs> DofMappingType;
 
         /** \copydoc ElementBase::DofAssignment */
         template<
@@ -120,7 +123,7 @@ namespace FEAST
         Index get_num_dofs() const
         {
           // number of DOFs = number of cells in the mesh
-          return this->get_mesh().get_num_entities(ShapeType::dimension);
+          return this->get_mesh().get_num_entities(ShapeType::dimension) * Index(num_local_dofs);
         }
 
         /** \copydoc ElementBase::name() */

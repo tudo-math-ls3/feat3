@@ -197,7 +197,7 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
 
-  template<typename Shape_, template<typename...> class Element_, bool h0_, bool h1_, bool h2_>
+  template<typename Shape_, template<typename...> class Element_, bool h0_, bool h1_, bool h2_, typename... ElArgs_>
   class ElementRegressionBase :
     public TestSystem::BaseTest
   {
@@ -205,7 +205,7 @@ namespace ElementRegression
     typedef Geometry::ConformalMesh<Shape_> MeshType;
     typedef Geometry::CellSubSet<Shape_> RegionType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    typedef Element_<TrafoType> SpaceType;
+    typedef Element_<TrafoType, ElArgs_...> SpaceType;
 
     typedef Assembly::Common::SineBubbleFunction SolFunction;
 
@@ -304,12 +304,12 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
 
-  template<typename Shape_, template<typename> class Element_, bool h0_, bool h1_, bool h2_>
+  template<typename Shape_, template<typename...> class Element_, bool h0_, bool h1_, bool h2_, typename... ElArgs_>
   class ElementRegressionInterpol :
-    public ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_>
+    public ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_, ElArgs_...>
   {
   public:
-    typedef ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_> BaseClass;
+    typedef ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_, ElArgs_...> BaseClass;
 
     typedef typename BaseClass::MeshType MeshType;
     typedef typename BaseClass::RegionType RegionType;
@@ -360,12 +360,12 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
 
-  template<typename Shape_, template<typename...> class Element_, bool h0_, bool h1_, bool h2_>
+  template<typename Shape_, template<typename...> class Element_, bool h0_, bool h1_, bool h2_, typename... ElArgs_>
   class ElementRegressionSystem :
-    public ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_>
+    public ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_, ElArgs_...>
   {
   public:
-    typedef ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_> BaseClass;
+    typedef ElementRegressionBase<Shape_, Element_, h0_, h1_, h2_, ElArgs_...> BaseClass;
 
     typedef typename BaseClass::MeshType MeshType;
     typedef typename BaseClass::RegionType RegionType;
@@ -471,12 +471,12 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
 
-  template<typename Shape_, template<typename> class Element_, bool h0_, bool h1_, bool h2_>
+  template<typename Shape_, template<typename...> class Element_, bool h0_, bool h1_, bool h2_, typename... ElArgs_>
   class ElementRegressionL2 :
-    public ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_>
+    public ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_, ElArgs_...>
   {
   public:
-    typedef ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_> BaseClass;
+    typedef ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_, ElArgs_...> BaseClass;
 
     typedef typename BaseClass::RegionType RegionType;
     typedef typename BaseClass::SpaceType SpaceType;
@@ -503,12 +503,12 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
 
-  template<typename Shape_, template<typename> class Element_, bool h0_, bool h1_, bool h2_>
+  template<typename Shape_, template<typename...> class Element_, bool h0_, bool h1_, bool h2_, typename... ElArgs_>
   class ElementRegressionH1 :
-    public ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_>
+    public ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_, ElArgs_...>
   {
   public:
-    typedef ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_> BaseClass;
+    typedef ElementRegressionSystem<Shape_, Element_, h0_, h1_, h2_, ElArgs_...> BaseClass;
 
     typedef typename BaseClass::RegionType RegionType;
     typedef typename BaseClass::SpaceType SpaceType;
@@ -539,37 +539,55 @@ namespace ElementRegression
     }
   };
 
-  template<typename Trafo_>
-  using Discontinuous0 = Space::Discontinuous::Element<Trafo_, Space::Discontinuous::Variant::StdPolyP<0>>;
-
-  template<typename Trafo_>
-  using RannacherTurekStdNonPar = Space::RannacherTurek::Element<Trafo_>;
-
-
   /* ############################################################################################# */
   /* ############################################################################################# */
   /* ############################################################################################# */
   // Discontinuous-0 element (aka P0/Q0)
 
   // Interpolation Hypercube<1>
-  ElementRegressionInterpol<Shape::Hypercube<1>, Discontinuous0, true, false, false>
+  ElementRegressionInterpol<Shape::Hypercube<1>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     int_hy1_discontinuous0_lvl5(5, 2.019358459600e-002);
 
   // Interpolation Hypercube<2>
-  ElementRegressionInterpol<Shape::Hypercube<2>, Discontinuous0, true, false, false>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     int_hy2_discontinuous0_lvl4(4, 4.023170882191e-002);
 
   // Interpolation Hypercube<3>
-  ElementRegressionInterpol<Shape::Hypercube<3>, Discontinuous0, true, false, false>
+  ElementRegressionInterpol<Shape::Hypercube<3>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     int_hy3_discontinuous0_lvl3(3, 6.920948509400e-002);
 
   // Interpolation Simplex<2>
-  ElementRegressionInterpol<Shape::Simplex<2>, Discontinuous0, true, false, false>
+  ElementRegressionInterpol<Shape::Simplex<2>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     int_sx2_discontinuous0_lvl3(3, 4.652869047574e-002);
 
   // Interpolation Simplex<3>
-  ElementRegressionInterpol<Shape::Simplex<3>, Discontinuous0, true, false, false>
+  ElementRegressionInterpol<Shape::Simplex<3>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     int_sx3_discontinuous0_lvl2(2, 6.042741607084e-002);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Discontinuous-1 element (aka P1dc)
+
+  // Interpolation Hypercube<1>
+  ElementRegressionInterpol<Shape::Hypercube<1>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    int_hy1_discontinuous1_lvl5(5, 3.903950715797e-004, 6.343140191651e-002);
+
+  // Interpolation Hypercube<2>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    int_hy2_discontinuous1_lvl4(4, 2.506700785425e-003, 1.783826344447e-001);
+
+  // Interpolation Hypercube<3>
+  ElementRegressionInterpol<Shape::Hypercube<3>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    int_hy3_discontinuous1_lvl3(3, 1.099318729260e-002, 3.762276070837e-001);
+
+  // Interpolation Simplex<2>
+  ElementRegressionInterpol<Shape::Simplex<2>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    int_sx2_discontinuous1_lvl3(3, 7.145236132824e-003, 2.549649415216e-001);
+
+  // Interpolation Simplex<3>
+  ElementRegressionInterpol<Shape::Simplex<3>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    int_sx3_discontinuous1_lvl2(2, 2.334296314873e-002, 5.347979318175e-001);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -627,7 +645,7 @@ namespace ElementRegression
   // Ranancher-Turek element (aka Q1~)
 
   // Interpolation Hypercube<2>
-  ElementRegressionInterpol<Shape::Hypercube<2>, RannacherTurekStdNonPar, true, true, false>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Space::RannacherTurek::Element, true, true, false, Space::RannacherTurek::Variant::StdNonPar>
     int_hy2_rannacher_turek_lvl4(4, 2.500068277725e-003, 1.783313801003e-001);
 
   /* ********************************************************************************************* */
@@ -667,24 +685,49 @@ namespace ElementRegression
   // Discontinuous-0 element (aka P0/Q0)
 
   // L2-Projection Hypercube<1>
-  ElementRegressionL2<Shape::Hypercube<1>, Discontinuous0, true, false, false>
+  ElementRegressionL2<Shape::Hypercube<1>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     l2_hy1_discontinuous0_lvl5(5, 2.019148792005e-002);
 
   // L2-Projection Hypercube<2>
-  ElementRegressionL2<Shape::Hypercube<2>, Discontinuous0, true, false, false>
+  ElementRegressionL2<Shape::Hypercube<2>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     l2_hy2_discontinuous0_lvl4(4, 4.018779996141e-002);
 
   // L2-Projection Hypercube<3>
-  ElementRegressionL2<Shape::Hypercube<3>, Discontinuous0, true, false, false>
+  ElementRegressionL2<Shape::Hypercube<3>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     l2_hy3_discontinuous0_lvl3(3, 6.885897034156e-002);
 
   // L2-Projection Simplex<2>
-  ElementRegressionL2<Shape::Simplex<2>, Discontinuous0, true, false, false>
+  ElementRegressionL2<Shape::Simplex<2>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     l2_sx2_discontinuous0_lvl3(3, 4.647768730126e-002);
 
   // L2-Projection Simplex<3>
-  ElementRegressionL2<Shape::Simplex<3>, Discontinuous0, true, false, false>
+  ElementRegressionL2<Shape::Simplex<3>, Space::Discontinuous::Element, true, false, false, Space::Discontinuous::Variant::StdPolyP<0>>
     l2_sx3_discontinuous0_lvl2(2, 6.018518308883e-002);
+
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  /* ********************************************************************************************* */
+  // Discontinuous-1 element (aka P0/Q0)
+
+  // L2-Projection Hypercube<1>
+  ElementRegressionL2<Shape::Hypercube<1>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    l2_hy1_discontinuous1_lvl5(5, 2.602535197460e-004, 6.343245888649e-002);
+
+  // L2-Projection Hypercube<2>
+  ElementRegressionL2<Shape::Hypercube<2>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    l2_hy2_discontinuous1_lvl4(4, 1.908779428796e-003, 1.784054134714e-001);
+
+  // L2-Projection Hypercube<3>
+  ElementRegressionL2<Shape::Hypercube<3>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    l2_hy3_discontinuous1_lvl3(3, 8.576331121695e-003, 3.754920164364e-001);
+
+  // L2-Projection Simplex<2>
+  ElementRegressionL2<Shape::Simplex<2>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    l2_sx2_discontinuous1_lvl3(3, 2.269755384588e-003, 2.152403144585e-001);
+
+  // L2-Projection Simplex<3>
+  ElementRegressionL2<Shape::Simplex<3>, Space::Discontinuous::Element, true, true, false, Space::Discontinuous::Variant::StdPolyP<1>>
+    l2_sx3_discontinuous1_lvl2(2, 6.111473872536e-003, 3.568249688054e-001);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -742,7 +785,7 @@ namespace ElementRegression
   // Ranancher-Turek element (aka Q1~)
 
   // L2-Projection Hypercube<2>
-  ElementRegressionL2<Shape::Hypercube<2>, RannacherTurekStdNonPar, true, true, false>
+  ElementRegressionL2<Shape::Hypercube<2>, Space::RannacherTurek::Element, true, true, false, Space::RannacherTurek::Variant::StdNonPar>
     l2_hy2_rannacher_turek_lvl4(4, 1.911701836636e-003, 1.786971993692e-001);
 
   /* ********************************************************************************************* */
@@ -838,7 +881,7 @@ namespace ElementRegression
   // Ranancher-Turek element (aka Q1~)
 
   // H1-Projection Hypercube<2>
-  ElementRegressionH1<Shape::Hypercube<2>, RannacherTurekStdNonPar, true, true, false>
+  ElementRegressionH1<Shape::Hypercube<2>, Space::RannacherTurek::Element, true, true, false, Space::RannacherTurek::Variant::StdNonPar>
     h1_hy2_rannacher_turek_lvl4(4, 1.940017656827e-003, 1.787395012244e-001);
 
   /* ********************************************************************************************* */
