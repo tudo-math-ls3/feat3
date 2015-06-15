@@ -35,10 +35,10 @@ namespace FEAST
 
           for(Index i(0); i < num_cells; ++i)
           {
-            for(Index j(0); j < Index(num_childs); ++j)
+            for(int j(0); j < num_childs; ++j)
             {
-              target_set_out[offset + i*Index(num_childs) + j] =
-                index_offsets[shape_dim] + target_set_in[i]*Index(num_childs) + j;
+              target_set_out[offset + i*Index(num_childs) + Index(j)] =
+                index_offsets[shape_dim] + target_set_in[i]*Index(num_childs) + Index(j);
             }
           }
 

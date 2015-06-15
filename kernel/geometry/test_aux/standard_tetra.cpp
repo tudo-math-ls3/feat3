@@ -1965,7 +1965,7 @@ namespace FEAST
         // create mesh
         TetraSubMesh* mesh = new TetraSubMesh(num_entities, true);
         // create a MeshAttribute that holds one value for each vertex
-        typename TetraSubMesh::AttributeType my_vertex_set(num_entities[0], 2);
+        TetraSubMesh::AttributeType my_vertex_set(num_entities[0], 2);
         // Add the attribute to mesh
         mesh->add_attribute<0>(my_vertex_set);
 

@@ -136,7 +136,7 @@ namespace FEAST
 
         if(int(dim) == shape_dim)
           // If the requested dimension is mine...
-          return _mesh_attributes.size();
+          return Index(_mesh_attributes.size());
 
         // Otherwise recurse down
         return BaseClass::get_num_attributes(dim);
@@ -229,7 +229,7 @@ namespace FEAST
 #else
         (void)dim;
 #endif
-        return _mesh_attributes.size();
+        return Index(_mesh_attributes.size());
       }
 
       virtual void add_attribute(const MeshAttribute<DataType_>& attribute_, Index dim)
@@ -314,11 +314,20 @@ namespace FEAST
      * \tparam ShapeType_
      * Shape type of the ConformalMesh this Meshpart refers to.
      *
+     * \tparam num_coords_
+     * Number of coordinates per vertex
+     *
+     * \tparam stride_
+     * Padded num_coords_
+     *
+     * \tparam Coord_
+     * Data type for vertex coordinates, i.e. double
+     *
      * \copydoc MeshPart
      *
      */
-    template<typename ShapeType_>
-    class MeshPart<ConformalMesh<ShapeType_>>
+    template<typename ShapeType_, int num_coords_, int stride_, typename Coord_>
+    class MeshPart<ConformalMesh<ShapeType_, num_coords_, stride_, Coord_>>
     {
       public:
         /// Shape type
@@ -702,10 +711,18 @@ namespace FEAST
         template<Index shape_dim_>
         void deduct_target_sets_from_bottom(const MeshType& parent_mesh)
         {
-          if(shape_dim > 0)
-            deduct_target_sets_from_bottom<shape_dim_-1>(parent_mesh);
+          if(shape_dim == 0)
+            return;
 
-          typename TargetSet<shape_dim_>::Type my_target_set(_target_set_holder.template get_target_set<shape_dim_>);
+          deduct_target_sets_from_bottom<shape_dim_-1>(parent_mesh);
+
+          //typename TargetSet<shape_dim_>::Type my_target_set(_target_set_holder.template get_target_set<shape_dim_>());
+
+          //if(my_target_set.get_num_entities() == 0)
+          //{
+          //  typename TargetSet<shape_dim_>::Type lower_target_set(_target_set_holder.template get_target_set<shape_dim_-1>());
+
+          //}
 
         }
 

@@ -1450,7 +1450,7 @@ namespace FEAST
         // create mesh
         HexaSubMesh* mesh = new HexaSubMesh(num_entities, true);
         // create a MeshAttribute that holds one value for each vertex
-        typename HexaSubMesh::AttributeType my_vertex_set(num_entities[0],2);
+        HexaSubMesh::AttributeType my_vertex_set(num_entities[0],2);
         // Add the attribute to mesh
         mesh->add_attribute<0>(my_vertex_set);
 

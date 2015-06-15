@@ -762,7 +762,7 @@ namespace FEAST
         // create mesh
         TriaSubMesh* mesh = new TriaSubMesh(num_entities, true);
         // create a MeshAttribute that holds one value for each vertex
-        typename TriaSubMesh::AttributeType my_vertex_set(num_entities[0],2);
+        TriaSubMesh::AttributeType my_vertex_set(num_entities[0],2);
         // Add the attribute to mesh
         mesh->add_attribute<0>(my_vertex_set);
 
@@ -945,7 +945,7 @@ namespace FEAST
         // create mesh
         TriaSubMesh* mesh = new TriaSubMesh(num_entities, true);
         // create a MeshAttribute that holds one value for each vertex
-        typename TriaSubMesh::AttributeType my_vertex_set(num_entities[0], 1, 1);
+        TriaSubMesh::AttributeType my_vertex_set(num_entities[0], 1, 1);
         // Add the attribute to mesh
         mesh->add_attribute<0>(my_vertex_set);
 

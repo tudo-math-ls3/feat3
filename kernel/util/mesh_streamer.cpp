@@ -1023,7 +1023,7 @@ namespace FEAST
     // Sanity check: Does the number of parsed attributes match the specified number?
     Index real_num_attributes(0);
     for(Index i(0); i < 4; ++i)
-      real_num_attributes += (this->attributes[i]).size();
+      real_num_attributes += Index((this->attributes[i]).size());
 
     if(real_num_attributes != this->attribute_count)
       throw InternalError("Parsed " + stringify(real_num_attributes) + " attribute sets but " + stringify(this->attribute_count) + " were specified!");
