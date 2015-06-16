@@ -56,7 +56,7 @@ A FEAST::LAFEM::SparseLayout object can be retrieved by any matrix via the corre
 
 Thus empty matrices with identical layout can be created easily and memory consumption can be reduced by reusing existing data layout arrays.
 
-\section lafem_sec_typedefs Common typedefs
+\section lafem_sec_typedefs Common container typedefs
 - DataType
 - IndexType
 - MemoryType
@@ -74,4 +74,5 @@ typedef typename VT_::template ContainerType<Mem::CUDA, typename VT_main::DataTy
 - Mem_ - Memorytype (Mem::Main, Mem::CUDA)
 - VT_ - Vectortype (DenseVector<...>)
 - MT_ - Matrixtype, not to be confused with Mem_
+- FT_ - Filtertype (UnitFilter, NoneFilter)
 **/
