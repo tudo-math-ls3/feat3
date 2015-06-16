@@ -276,6 +276,15 @@ namespace FEAST
         {
           Intern::AssignStruct::template assign<Mem_, DT_>(this->_elements, other.get_elements());
         }
+        else if (std::is_same<Mem_, Mem2_>::value)
+        {
+          for (Index i(0) ; i < this->_elements_size.size() ; ++i)
+          {
+            const Index tsize(this->_elements_size.at(i));
+            this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(tsize));
+            Util::MemoryPool<Mem_>::convert(this->_elements.at(i), other.get_elements().at(i), tsize);
+          }
+        }
         else
         {
           for (Index i(0) ; i < this->_elements_size.size() ; ++i)
@@ -303,8 +312,7 @@ namespace FEAST
               Util::MemoryPool<Mem2_>::template download<DT2_>(pother, other.get_elements().at(i), tsize);
             }
 
-            for (Index j(0) ; j < tsize ; ++j)
-              pthis[j] = DT_(pother[j]);
+            Util::MemoryPool<Mem::Main>::convert(pthis, pother, tsize);
 
             if (! std::is_same<Mem_, Mem::Main>::value)
             {
@@ -319,6 +327,15 @@ namespace FEAST
         if (std::is_same<Mem_, Mem2_>::value && std::is_same<IT_, IT2_>::value)
         {
           Intern::AssignStruct::template assign<Mem_, IT_>(this->_indices, other.get_indices());
+        }
+        else if (std::is_same<Mem_, Mem2_>::value)
+        {
+          for (Index i(0) ; i < this->_indices_size.size() ; ++i)
+          {
+            const Index tsize(this->_indices_size.at(i));
+            this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(tsize));
+            Util::MemoryPool<Mem_>::convert(this->_indices.at(i), other.get_indices().at(i), tsize);
+          }
         }
         else
         {
@@ -349,8 +366,7 @@ namespace FEAST
               Util::MemoryPool<Mem2_>::template download<IT2_>(pother, other.get_indices().at(i), tsize);
             }
 
-            for (Index j(0) ; j < tsize ; ++j)
-              pthis[j] = IT_(pother[j]);
+            Util::MemoryPool<Mem::Main>::convert(pthis, pother, tsize);
 
             if (! std::is_same<Mem_, Mem::Main>::value)
             {
