@@ -246,6 +246,13 @@ namespace FEAST
         rest().format(value);
       }
 
+      /// Clears the vector.
+      void clear()
+      {
+        first().clear();
+        rest().clear();
+      }
+
       /// Returns a descriptive string for this container.
       static String name()
       {
@@ -596,6 +603,11 @@ namespace FEAST
       void format(DataType value = DataType(0))
       {
         _first.format(value);
+      }
+
+      void clear()
+      {
+        first().clear();
       }
 
       static String name()
