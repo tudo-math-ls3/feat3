@@ -22,10 +22,12 @@ The third template parameter is used as the datatype for the allocation of all i
 \section lafem_sec_ops LA Operations
 All operations are member functions of the related containers.
 With little exceptions, the object which hosts the function call will contain the calculation result.
-\note Namely the BLAS2-like operations of axpy and apply break this rule by being a member of the corresponding matrix.
+\note Namely the BLAS2-like operations of axpy and apply break this rule by being a member of the corresponding matrix. The BLAS1 reduction operations, which return a single scalar, break this rule, too.
 
 A typical call may look like these:
 \code{.cpp}
+// compute component product
+vector1.componen_product(vector1, vector2)
 // compute dot product
 double d = vector1.dot(vector2);
 // compute matrix vector product
