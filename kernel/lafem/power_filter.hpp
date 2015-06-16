@@ -44,6 +44,8 @@ namespace FEAST
       typedef typename SubFilter_::MemType MemType;
       /// sub-filter data-type
       typedef typename SubFilter_::DataType DataType;
+      /// sub-filter index-type
+      typedef typename SubFilter_::IndexType IndexType;
 
       /// number of filter blocks
       static constexpr Index num_blocks = count_;
@@ -177,6 +179,9 @@ namespace FEAST
 
     public:
       typedef SubFilter_ SubFilterType;
+      typedef typename SubFilter_::MemType MemType;
+      typedef typename SubFilter_::DataType DataType;
+      typedef typename SubFilter_::IndexType IndexType;
 
       static constexpr Index num_blocks = 1;
 

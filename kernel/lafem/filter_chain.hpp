@@ -1,9 +1,8 @@
 #pragma once
-#ifndef KERNEL_LAFEM_TUPLE_FILTER_HPP
-#define KERNEL_LAFEM_TUPLE_FILTER_HPP 1
+#ifndef KERNEL_LAFEM_FILTER_CHAIN_HPP
+#define KERNEL_LAFEM_FILTER_CHAIN_HPP 1
 
 // includes, FEAST
-#include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/meta_element.hpp>
 
 namespace FEAST
@@ -11,32 +10,29 @@ namespace FEAST
   namespace LAFEM
   {
     /**
-     * \brief TupleVector meta-filter class template
+     * \brief Filter Chainclass template
      *
-     * This class template implements a composition of sub-filters of arbitrary classes,
-     * which can be applied onto TupleVector meta-container objects.
-     *
-     * \note If you are looking for a way to define a filter which is a composition of
-     * filters successively applied onto the same vector, see the FilterChain class template.
+     * This class template implements a chain of filters which are successively applied
+     * onto a vector.
      *
      * \tparam First_, Rest_...
-     * The filters to be composed.
+     * The filters to be chained.
      *
      * \author Peter Zajac
      */
     template<
       typename First_,
       typename... Rest_>
-    class TupleFilter
+    class FilterChain
     {
       template<typename,typename...>
-      friend class TupleFilter;
+      friend class FilterChain;
 
-      typedef TupleFilter<Rest_...> RestClass;
+      typedef FilterChain<Rest_...> RestClass;
 
     public:
       /// number of vector blocks
-      static constexpr Index num_blocks = TupleFilter<Rest_...>::num_blocks + 1;
+      static constexpr Index num_blocks = FilterChain<Rest_...>::num_blocks + 1;
 
       /// sub-filter mem-type
       typedef typename First_::MemType MemType;
@@ -60,7 +56,7 @@ namespace FEAST
       RestClass _rest;
 
       /// data-emplacement ctor; this one is protected for a reason
-      explicit TupleFilter(First_&& the_first, RestClass&& the_rest) :
+      explicit FilterChain(First_&& the_first, RestClass&& the_rest) :
         _first(std::move(the_first)),
         _rest(std::move(the_rest))
       {
@@ -68,26 +64,26 @@ namespace FEAST
 
     public:
       /// default ctor
-      TupleFilter()
+      FilterChain()
       {
       }
 
       /// sub-filter emplacement ctor
-      explicit TupleFilter(First_&& the_first, Rest_&&... the_rest) :
+      explicit FilterChain(First_&& the_first, Rest_&&... the_rest) :
         _first(std::move(the_first)),
         _rest(std::move(the_rest...))
       {
       }
 
       /// move-ctor
-      TupleFilter(TupleFilter&& other) :
+      FilterChain(FilterChain&& other) :
         _first(std::move(other._first)),
         _rest(std::move(other._rest))
       {
       }
 
       /// move-assign operator
-      TupleFilter& operator=(TupleFilter&& other)
+      FilterChain& operator=(FilterChain&& other)
       {
         if(this != &other)
         {
@@ -97,13 +93,13 @@ namespace FEAST
         return *this;
       }
 
-      TupleFilter clone() const
+      FilterChain clone() const
       {
-        return TupleFilter(_first.clone(), _rest.clone());
+        return FilterChain(_first.clone(), _rest.clone());
       }
 
       template<typename... SubFilter2_>
-      void convert(const TupleFilter<SubFilter2_...>& other)
+      void convert(const FilterChain<SubFilter2_...>& other)
       {
         _first.convert(other._first);
         _rest.convert(other._rest);
@@ -147,44 +143,44 @@ namespace FEAST
       }
 
       /** \copydoc UnitFilter::filter_rhs() */
-      template<typename Ty_, typename... Tv_>
-      void filter_rhs(TupleVector<Ty_, Tv_...>& vector) const
+      template<typename Vector_>
+      void filter_rhs(Vector_& vector) const
       {
-        first().filter_rhs(vector.first());
-        rest().filter_rhs(vector.rest());
+        first().filter_rhs(vector);
+        rest().filter_rhs(vector);
       }
 
       /** \copydoc UnitFilter::filter_sol() */
-      template<typename Ty_, typename... Tv_>
-      void filter_sol(TupleVector<Ty_, Tv_...>& vector) const
+      template<typename Vector_>
+      void filter_sol(Vector_& vector) const
       {
-        first().filter_sol(vector.first());
-        rest().filter_sol(vector.rest());
+        first().filter_sol(vector);
+        rest().filter_sol(vector);
       }
 
       /** \copydoc UnitFilter::filter_def() */
-      template<typename Ty_, typename... Tv_>
-      void filter_def(TupleVector<Ty_, Tv_...>& vector) const
+      template<typename Vector_>
+      void filter_def(Vector_& vector) const
       {
-        first().filter_def(vector.first());
-        rest().filter_def(vector.rest());
+        first().filter_def(vector);
+        rest().filter_def(vector);
       }
 
       /** \copydoc UnitFilter::filter_cor() */
-      template<typename Ty_, typename... Tv_>
-      void filter_cor(TupleVector<Ty_, Tv_...>& vector) const
+      template<typename Vector_>
+      void filter_cor(Vector_& vector) const
       {
-        first().filter_cor(vector.first());
-        rest().filter_cor(vector.rest());
+        first().filter_cor(vector);
+        rest().filter_cor(vector);
       }
-    }; // class TupleFilter
+    }; // class FilterChain
 
     /// \cond internal
     template<typename First_>
-    class TupleFilter<First_>
+    class FilterChain<First_>
     {
       template<typename,typename...>
-      friend class TupleFilter;
+      friend class FilterChain;
 
     public:
       static constexpr Index num_blocks = 1;
@@ -202,24 +198,24 @@ namespace FEAST
 
     public:
       /// default ctor
-      TupleFilter()
+      FilterChain()
       {
       }
 
       /// sub-filter emplacement ctor
-      explicit TupleFilter(First_&& the_first) :
+      explicit FilterChain(First_&& the_first) :
         _first(std::move(the_first))
       {
       }
 
       /// move-ctor
-      TupleFilter(TupleFilter&& other) :
+      FilterChain(FilterChain&& other) :
         _first(std::move(other._first))
       {
       }
 
       /// move-assign operator
-      TupleFilter& operator=(TupleFilter&& other)
+      FilterChain& operator=(FilterChain&& other)
       {
         if(this != &other)
         {
@@ -228,22 +224,22 @@ namespace FEAST
         return *this;
       }
 
-      TupleFilter clone() const
+      FilterChain clone() const
       {
-        return TupleFilter(_first.clone());
+        return FilterChain(_first.clone());
       }
 
       /// \compilerhack MSVC 2013 template bug workaround
 #ifdef FEAST_COMPILER_MICROSOFT
       template<typename... SubFilter2_>
-      void convert(const TupleFilter<SubFilter2_...>& other)
+      void convert(const FilterChain<SubFilter2_...>& other)
       {
-        static_assert(sizeof...(SubFilter2_) == std::size_t(1), "invalid TupleFilter size");
+        static_assert(sizeof...(SubFilter2_) == std::size_t(1), "invalid FilterChain size");
         _first.convert(other._first);
       }
 #else
       template<typename SubFilter2_>
-      void convert(const TupleFilter<SubFilter2_>& other)
+      void convert(const FilterChain<SubFilter2_>& other)
       {
         _first.convert(other._first);
       }
@@ -273,71 +269,35 @@ namespace FEAST
         return first();
       }
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
       /** \copydoc UnitFilter::filter_rhs() */
-      template<typename... Tv_>
-      void filter_rhs(TupleVector<Tv_...>& vector) const
+      template<typename Vector_>
+      void filter_rhs(Vector_& vector) const
       {
-        static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        first().filter_rhs(vector.first());
+        first().filter_rhs(vector);
       }
 
       /** \copydoc UnitFilter::filter_sol() */
-      template<typename... Tv_>
-      void filter_sol(TupleVector<Tv_...>& vector) const
+      template<typename Vector_>
+      void filter_sol(Vector_& vector) const
       {
-        static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        first().filter_sol(vector.first());
+        first().filter_sol(vector);
       }
 
       /** \copydoc UnitFilter::filter_def() */
-      template<typename... Tv_>
-      void filter_def(TupleVector<Tv_...>& vector) const
+      template<typename Vector_>
+      void filter_def(Vector_& vector) const
       {
-        static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        first().filter_def(vector.first());
+        first().filter_def(vector);
       }
 
       /** \copydoc UnitFilter::filter_cor() */
-      template<typename... Tv_>
-      void filter_cor(TupleVector<Tv_...>& vector) const
+      template<typename Vector_>
+      void filter_cor(Vector_& vector) const
       {
-        static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        first().filter_cor(vector.first());
+        first().filter_cor(vector);
       }
-#else // any other compiler
-      /** \copydoc UnitFilter::filter_rhs() */
-      template<typename Tv_>
-      void filter_rhs(TupleVector<Tv_>& vector) const
-      {
-        first().filter_rhs(vector.first());
-      }
-
-      /** \copydoc UnitFilter::filter_sol() */
-      template<typename Tv_>
-      void filter_sol(TupleVector<Tv_>& vector) const
-      {
-        first().filter_sol(vector.first());
-      }
-
-      /** \copydoc UnitFilter::filter_def() */
-      template<typename Tv_>
-      void filter_def(TupleVector<Tv_>& vector) const
-      {
-        first().filter_def(vector.first());
-      }
-
-      /** \copydoc UnitFilter::filter_cor() */
-      template<typename Tv_>
-      void filter_cor(TupleVector<Tv_>& vector) const
-      {
-        first().filter_cor(vector.first());
-      }
-#endif // FEAST_COMPILER_MICROSOFT
-    }; // class TupleFilter
-    /// \endcond
+    }; // class FilterChain
   } // namespace LAFEM
 } // namespace FEAST
 
-#endif // KERNEL_LAFEM_TUPLE_FILTER_HPP
+#endif // KERNEL_LAFEM_FILTER_CHAIN_HPP
