@@ -60,7 +60,7 @@
 
 // FEAST-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
-//#include <kernel/space/lagrange1/element.hpp>            // the Lagrange-2 Element (aka "Q2")
+//#include <kernel/space/lagrange2/element.hpp>            // the Lagrange-2 Element (aka "Q2")
 //#include <kernel/space/rannacher_turek/element.hpp>      // the Rannacher-Turek Element (aka "Q1~")
 
 // FEAST-Cubature includes
