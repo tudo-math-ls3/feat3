@@ -9,7 +9,6 @@ INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 # list of util source files
 ADD_LIBRARY(kernel-util STATIC
   exception.cpp
-  memory_pool.cpp
   mesh_streamer.cpp
   property_map.cpp
 )
