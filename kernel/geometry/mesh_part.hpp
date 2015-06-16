@@ -15,6 +15,13 @@ namespace FEAST
   namespace Geometry
   {
 
+    // Forward declarations
+    namespace Intern
+    {
+      template<Index, Index>
+      struct TargetSetComputer;
+    }
+
     /// Alias for MeshAttribute
     template<typename A>
     using MeshAttribute = VertexSetVariable<A>;
@@ -234,7 +241,11 @@ namespace FEAST
 
       virtual void add_attribute(const MeshAttribute<DataType_>& attribute_, Index dim)
       {
+#if defined DEBUG
         ASSERT(dim == 0, "Only attributes of shape dim 0 can be added to MeshParts of shape dim 0");
+#else
+        (void)dim;
+#endif
         _mesh_attributes.push_back(attribute_);
       }
 
@@ -700,47 +711,47 @@ namespace FEAST
         /**
          * \brief Fills the target sets from bottom to top
          *
-         * \tparam shape_dim
-         * Bottom dimension to start from.
+         * \tparam end_dim_
+         * Dimension to stop at (meaning the lowest dimension).
+         *
+         * \tparam current_dim_
+         * Dimension to generate parent information for.
          *
          * \param[in,out] parent_mesh
          * Parent this MeshPart refers to.
          *
-         * \todo: Not implemented yet
          */
-        template<Index shape_dim_>
-        void deduct_target_sets_from_bottom(const MeshType& parent_mesh)
+        template<Index end_dim_, Index current_dim_ = ShapeType_::dimension>
+        void compute_target_sets_from_bottom(const MeshType& parent_mesh)
         {
-          if(shape_dim == 0)
-            return;
-
-          deduct_target_sets_from_bottom<shape_dim_-1>(parent_mesh);
-
-          //typename TargetSet<shape_dim_>::Type my_target_set(_target_set_holder.template get_target_set<shape_dim_>());
-
-          //if(my_target_set.get_num_entities() == 0)
-          //{
-          //  typename TargetSet<shape_dim_>::Type lower_target_set(_target_set_holder.template get_target_set<shape_dim_-1>());
-
-          //}
-
+          Intern::template TargetSetComputer<end_dim_, current_dim_>::bottom_to_top(_target_set_holder, parent_mesh.get_index_set_holder());
         }
 
         /**
          * \brief Fills the target sets from top to bottom
          *
-         * \todo: Not implemented yet
+         * \tparam end_dim_
+         * Dimension to stop at (meaning the highest dimension).
+         *
+         * \tparam current_dim_
+         * Dimension to generate parent information for.
+         *
+         * \param[in,out] parent_mesh
+         * Parent this MeshPart refers to.
+         *
          */
-        virtual void deduct_target_sets_from_top()
+        template<Index end_dim_, Index current_dim_ = 0>
+        void compute_target_sets_from_top(const MeshType& parent_mesh)
         {
+          Intern::template TargetSetComputer<end_dim_, current_dim_>::top_to_bottom(_target_set_holder, parent_mesh.get_index_set_holder());
         }
 
         /**
-         * \brief Fills the index set from bottom to top
+         * \brief Fills the mesh topology from parent information
          *
          * \todo: Not implemented yet
          */
-        virtual void deduct_index_set_holder()
+        virtual void compute_index_set_holder()
         {
         }
 
@@ -967,6 +978,209 @@ namespace FEAST
         }
 
     }; // class StandardRefinery<MeshPart<...>,...>
+
+    /// \cond internal
+    namespace Intern
+    {
+      /**
+       * \brief Wrapper class for filling TargetSetHolder objects
+       *
+       * \tparam end_dim_
+       * Dimension to stop the template recursion at.
+       *
+       * \tparam current_dim_
+       * Dimension for which a new container is filled.
+       *
+       * \author Jordi Paul
+       *
+       */
+      template<Index end_dim_, Index current_dim_>
+      struct TargetSetComputer
+      {
+        /**
+         * \brief Fills a TargetSetHolder from bottom to top using information from an IndexSetHolder
+         *
+         * The IndexSetHolder contains the topology of the parent mesh that the TargetSetHolder refers to.
+         *
+         * \tparam TargetSetHolderType
+         * Type of the TargetSetHolder to be filled.
+         *
+         * \tparam IndexSetHolderType
+         * Type containing mesh topology information.
+         *
+         */
+        template<typename TargetSetHolderType, typename IndexSetHolderType>
+        static void bottom_to_top(TargetSetHolderType& _target_set_holder, const IndexSetHolderType& parent_ish)
+        {
+          // Template recursion: Call the lower dimensional version first
+          TargetSetComputer<end_dim_, current_dim_-1>::template bottom_to_top(_target_set_holder, parent_ish);
+
+          typedef typename IndexSetHolderType::template IndexSet<current_dim_, current_dim_-1>::Type ParentIndexSetType;
+
+          // TargetSet to fill
+          TargetSet& my_target_set(_target_set_holder.template get_target_set<current_dim_>());
+
+          // Only do something if the target set is still empty
+          if(my_target_set.get_num_entities() == 0)
+          {
+            // Lower dimensional target set known to exist
+            TargetSet& ts_below(_target_set_holder.template get_target_set<current_dim_-1>());
+
+            // Indexset for entities of dimension current_dim_-1 at entities of dimension current_dim_
+            const ParentIndexSetType& is_parent_below(parent_ish.template get_index_set<current_dim_, current_dim_-1>());
+            // IndexSet for storing the indices of the MeshPart entities lying at entities of the parent
+            ParentIndexSetType lower_parent_to_mesh_part(Index(is_parent_below.get_num_indices()));
+
+            // For every entity of the parent, this will save whether it is referenced by the TargetSet
+            TargetSet lower_origin_set(is_parent_below.get_index_bound());
+            // and this is the marker for that
+            Index marker(is_parent_below.get_index_bound());
+            for(Index i(0); i < lower_origin_set.get_num_entities(); ++i)
+              lower_origin_set[i] = 0;
+            // Set the values to something bogus for every index present
+            for(Index i(0); i < ts_below.get_num_entities(); ++i)
+              lower_origin_set[ts_below[i]] = marker;
+
+            // Count the number of entities that get added
+            Index num_entities_current_dim(0);
+
+            // Temporary TargetSet initialised with the maximum possible size (= number of entities in the parent mesh,
+            // which is the case if the MeshPart contains all entities of the parent mesh)
+            TargetSet tmp_target_set(is_parent_below.get_num_entities());
+
+            // Check all entities of dimension current_dim_ from the parent
+            for(Index i(0); i < is_parent_below.get_num_entities(); ++i)
+            {
+              bool is_in_mesh_part(true);
+
+              // Check if all entities of dimension current_dim_-1 at entity i are referenced by the TargetSet
+              for(Index j(0); j < ParentIndexSetType::num_indices; ++j)
+              {
+                // This is the index in the parent
+                Index parent_index(is_parent_below[i][j]);
+                if(lower_origin_set[parent_index] != marker)
+                  is_in_mesh_part = false;
+              }
+
+              // If all subshapes belonged to the MeshPart, create the new parent mapping
+              if(is_in_mesh_part)
+              {
+                tmp_target_set[num_entities_current_dim] = i;
+                num_entities_current_dim++;
+              }
+            }
+
+            // tmp_target_set possibly has the wrong size, so manually create a correctly sized TargetSet
+            TargetSet new_target_set(num_entities_current_dim);
+            for(Index i(0); i < new_target_set.get_num_entities(); ++i)
+              new_target_set[i] = tmp_target_set[i];
+
+            // Update the information in the TargetSetHolder
+            my_target_set = std::move(new_target_set);
+          }
+        } // void bottom_to_top<typename, typename>()
+
+        /**
+         * \brief Fills a TargetSetHolder from top to bottom using information from an IndexSetHolder
+         *
+         * The IndexSetHolder contains the topology of the parent mesh that the TargetSetHolder refers to.
+         *
+         * \tparam TargetSetHolderType
+         * Type of the TargetSetHolder to be filled.
+         *
+         * \tparam IndexSetHolderType
+         * Type containing mesh topology information.
+         *
+         */
+        template<typename TargetSetHolderType, typename IndexSetHolderType>
+        static void top_to_bottom(TargetSetHolderType& _target_set_holder, const IndexSetHolderType& parent_ish)
+        {
+          // Call higher dimensional version first
+          TargetSetComputer<end_dim_, current_dim_+1>::template top_to_bottom(_target_set_holder, parent_ish);
+
+          typedef typename IndexSetHolderType::template IndexSet<current_dim_+1, current_dim_>::Type ParentIndexSetType;
+
+          // TargetSet to fill
+          TargetSet& my_target_set(_target_set_holder.template get_target_set<current_dim_>());
+
+          // Only do something if the target set is still empty
+          if(my_target_set.get_num_entities() == 0)
+          {
+            // Higher dimensional target set known to exist
+            TargetSet& ts_above(_target_set_holder.template get_target_set<current_dim_+1>());
+
+            // Indexset for entities of dimension current_dim_ at entities of dimension current_dim_+1
+            const ParentIndexSetType& is_parent_above(parent_ish.template get_index_set<current_dim_+1, current_dim_>());
+            // IndexSet for storing the indices of the MeshPart entities lying at entities of the parent
+            ParentIndexSetType upper_parent_to_mesh_part(Index(is_parent_above.get_num_indices()));
+
+            // For every entity of current_dim_ of the parent, this will save whether it belongs to an entity of
+            // dimensin current_dim_+1 that is referenced through the TargetSetHolder
+            TargetSet upper_origin_set(is_parent_above.get_index_bound());
+            // And this is the marker for that
+            Index marker(is_parent_above.get_index_bound());
+            for(Index i(0); i < upper_origin_set.get_num_entities(); ++i)
+              upper_origin_set[i] = 0;
+
+            for(Index i(0); i < ts_above.get_num_entities(); ++i)
+            {
+              // Index of the current entity in the parent
+              Index parent_index(ts_above[i]);
+              for(Index j(0); int(j) < is_parent_above.get_num_indices(); ++j)
+              {
+                // This is i.e. the global number of local edge j at face parent_index in the parent
+                Index parent_sub_entity_index(is_parent_above[parent_index][j]);
+                upper_origin_set[parent_sub_entity_index] = marker;
+              }
+            }
+
+            // Temporary TargetSet initialised with the maximum possible size (= number of entities in the parent mesh,
+            // which is the case if the MeshPart contains all entities of the parent mesh)
+            TargetSet tmp_target_set(is_parent_above.get_num_entities());
+            // Count the number of entities that get added
+            Index num_entities_current_dim(0);
+            for(Index i(0); i < upper_origin_set.get_num_entities(); ++i)
+            {
+              if(upper_origin_set[i] == marker)
+              {
+                tmp_target_set[num_entities_current_dim] = i;
+                num_entities_current_dim++;
+              }
+            }
+
+            // tmp_target_set possibly has the wrong size, so manually create a correctly sized TargetSet
+            TargetSet new_target_set(num_entities_current_dim);
+            for(Index i(0); i < new_target_set.get_num_entities(); ++i)
+              new_target_set[i] = tmp_target_set[i];
+
+            // Update the information in the TargetSetHolder
+            my_target_set = std::move(new_target_set);
+          }
+
+        }
+      }; // struct TargetSetComputer<Index, Index>
+
+      /**
+       * \brief Specialisation as end of template recursion
+       */
+      template<Index end_dim_>
+      struct TargetSetComputer<end_dim_, end_dim_>
+      {
+        /// \brief End of template recursion: Nothing to do
+        template<typename TargetSetHolderType, typename IndexSetHolderType>
+        static void bottom_to_top(TargetSetHolderType& , const IndexSetHolderType&)
+        {
+        }
+
+        /// \brief End of template recursion: Nothing to do
+        template<typename TargetSetHolderType, typename IndexSetHolderType>
+        static void top_to_bottom(TargetSetHolderType& , const IndexSetHolderType&)
+        {
+        }
+      }; // struct TargetSetComputer<Index>
+    } // namespace Intern
+    /// \endcond
+
   } // namespace Geometry
 } // namespace FEAST
 #endif

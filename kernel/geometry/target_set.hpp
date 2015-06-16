@@ -25,6 +25,7 @@ namespace FEAST
 
     private:
       TargetSet& operator=(const TargetSet&);
+    public:
 
     public:
       /**
@@ -73,6 +74,28 @@ namespace FEAST
           delete [] _indices;
         }
       }
+
+      /**
+       * \brief Move assignment operator
+       *
+       * \param[in] other
+       * Other target set that gets moved to this.
+       *
+       */
+      TargetSet& operator=(TargetSet&& other)
+      {
+        _num_entities = other._num_entities;
+
+        if(_indices != nullptr)
+          delete[] _indices;
+
+        _indices = other._indices;
+
+        other._num_entities = 0;
+        other._indices = nullptr;
+        return *this;
+      }
+
 
       /// Returns the number of entities.
       Index get_num_entities() const

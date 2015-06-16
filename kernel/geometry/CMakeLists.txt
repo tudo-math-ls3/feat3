@@ -19,6 +19,7 @@ SET (test_list
   hit_test_factory-test
   index_calculator-test
   mesh_node-test-conf-quad
+  mesh_part-test
   shape_convert-test
   standard_refinery-test-conf-quad
   standard_refinery-test-conf-hexa
