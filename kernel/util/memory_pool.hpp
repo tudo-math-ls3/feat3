@@ -177,6 +177,16 @@ namespace FEAST
         static void synchronize()
         {
         }
+
+        /// Convert datatype DT2_ from src into DT1_ in dest
+        template <typename DT1_, typename DT2_>
+        static void convert(DT1_ * dest, const DT2_ * src, const Index count)
+        {
+          for (Index i(0) ; i < count ; ++i)
+          {
+            dest[i] = (DT1_)src[i];
+          }
+        }
     };
 
     extern template float * MemoryPool<Mem::Main>::allocate_memory<float>(const Index);
@@ -254,6 +264,10 @@ namespace FEAST
         /// Copy memory area from src to dest
         template <typename DT_>
         static void copy(DT_ * dest, const DT_ * src, const Index count);
+
+        /// Convert datatype DT2_ from src into DT1_ in dest
+        template <typename DT1_, typename DT2_>
+        static void convert(DT1_ * dest, const DT2_ * src, const Index count);
 
         static void synchronize();
 

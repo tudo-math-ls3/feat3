@@ -23,6 +23,15 @@ namespace FEAST
           return;
         ptr[idx] = val;
       }
+
+      template <typename DT1_, typename DT2_>
+      __global__ void cuda_convert(DT1_ * dest, const DT2_ * src, const Index count)
+      {
+        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+        if (idx >= count)
+          return;
+        dest[idx] = src[idx];
+      }
     }
   }
 }
@@ -158,6 +167,23 @@ void MemoryPool<Mem::CUDA>::copy(DT_ * dest, const DT_ * src, const Index count)
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::copy failed!");
 }
 
+template <typename DT1_, typename DT2_>
+void MemoryPool<Mem::CUDA>::convert(DT1_ * dest, const DT2_ * src, const Index count)
+{
+  Index blocksize(256);
+  dim3 grid;
+  dim3 block;
+  block.x = blocksize;
+  grid.x = (unsigned)ceil((count)/(double)(block.x));
+  FEAST::Util::Intern::cuda_convert<<<grid, block>>>(dest, src, count);
+#ifdef FEAST_DEBUG
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::convert failed!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
+}
+
 void MemoryPool<Mem::CUDA>::synchronize()
 {
   cudaDeviceSynchronize();
@@ -210,3 +236,8 @@ template void MemoryPool<Mem::CUDA>::copy<float>(float *, const float *, const I
 template void MemoryPool<Mem::CUDA>::copy<double>(double *, const double *, const Index);
 template void MemoryPool<Mem::CUDA>::copy<unsigned int>(unsigned int *, const unsigned int *, const Index);
 template void MemoryPool<Mem::CUDA>::copy<unsigned long>(unsigned long *, const unsigned long *, const Index);
+
+template void MemoryPool<Mem::CUDA>::convert<float, double>(float *, const double *, const Index);
+template void MemoryPool<Mem::CUDA>::convert<double, float>(double *, const float *, const Index);
+template void MemoryPool<Mem::CUDA>::convert<unsigned int, unsigned long>(unsigned int *, const unsigned long *, const Index);
+template void MemoryPool<Mem::CUDA>::convert<unsigned long, unsigned int>(unsigned long *, const unsigned int *, const Index);
