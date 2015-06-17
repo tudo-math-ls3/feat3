@@ -92,6 +92,15 @@ namespace FEAST
         return MeanFilter(_vec_prim.clone(), _vec_dual.clone(), _volume);
       }
 
+      /// Conversion method
+      template<typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const MeanFilter<Mem2_, DT2_, IT2_>& other)
+      {
+        _vec_prim.convert(other.get_vec_prim());
+        _vec_dual.convert(other.get_vec_dual());
+        _volume = other.get_volume();
+      }
+
       /// \cond internal
       VectorType & get_vec_prim()
       {
@@ -111,6 +120,11 @@ namespace FEAST
       const VectorType & get_vec_dual() const
       {
         return _vec_dual;
+      }
+
+      DT_ get_volume() const
+      {
+        return _volume;
       }
       /// \endcond
 
