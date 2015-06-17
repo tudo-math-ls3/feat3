@@ -223,6 +223,8 @@ namespace FEAST
       Index _num_cells;
       /// vertex variable list
       VarVector _vars_vertex;
+      /// vertex field list
+      VarVector _fields_vertex;
       /// cell variable list
       VarVector _vars_cell;
 
@@ -243,6 +245,11 @@ namespace FEAST
           delete [] _vars_cell.back().second;
           _vars_cell.pop_back();
         }
+        while(!_fields_vertex.empty())
+        {
+          delete [] _fields_vertex.back().second;
+          _fields_vertex.pop_back();
+        }
         while(!_vars_vertex.empty())
         {
           delete [] _vars_vertex.back().second;
@@ -260,6 +267,42 @@ namespace FEAST
           d[i] = double(data[i]);
         }
         _vars_vertex.push_back(VarPair(name, d));
+      }
+
+      template<typename T_>
+      void add_field_vertex(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
+      {
+        ASSERT_(x != nullptr);
+        double* d = new double[3*_num_verts];
+
+        if(z != nullptr)
+        {
+          for(Index i(0); i < _num_verts; ++i)
+          {
+            d[3*i+0] = double(x[i]);
+            d[3*i+1] = double(y[i]);
+            d[3*i+2] = double(z[i]);
+          }
+        }
+        else if(y != nullptr)
+        {
+          for(Index i(0); i < _num_verts; ++i)
+          {
+            d[3*i+0] = double(x[i]);
+            d[3*i+1] = double(y[i]);
+            d[3*i+2] = 0.0;
+          }
+        }
+        else
+        {
+          for(Index i(0); i < _num_verts; ++i)
+          {
+            d[3*i+0] = double(x[i]);
+            d[3*i+1] = 0.0;
+            d[3*i+2] = 0.0;
+          }
+        }
+        _fields_vertex.push_back(VarPair(name, d));
       }
 
       template<typename T_>
@@ -291,19 +334,28 @@ namespace FEAST
         // write mesh header
         Intern::VTKHeader<MeshType>::write(ofs, _mesh);
 
-        // write vertex variables
-        if(!_vars_vertex.empty())
-        {
+        if(!(_vars_vertex.empty() && _fields_vertex.empty()))
           ofs << "POINT_DATA " << _num_verts << std::endl;
-          for(Index i(0); i < Index(_vars_vertex.size()); ++i)
+
+        // write vertex variables
+        for(Index i(0); i < Index(_vars_vertex.size()); ++i)
+        {
+          const VarPair& var(_vars_vertex[i]);
+          ofs << "SCALARS " << var.first << " double 1" << std::endl;
+          ofs << "LOOKUP_TABLE default" << std::endl;
+          for(Index j(0); j < _num_verts; ++j)
           {
-            const VarPair& var(_vars_vertex[i]);
-            ofs << "SCALARS " << var.first << " double 1" << std::endl;
-            ofs << "LOOKUP_TABLE default" << std::endl;
-            for(Index j(0); j < _num_verts; ++j)
-            {
-              ofs << var.second[j] << std::endl;
-            }
+            ofs << var.second[j] << std::endl;
+          }
+        }
+        // write vertex fields
+        for(Index i(0); i < Index(_fields_vertex.size()); ++i)
+        {
+          const VarPair& var(_fields_vertex[i]);
+          ofs << "VECTORS " << var.first << " double" << std::endl;
+          for(Index j(0); j < _num_verts; ++j)
+          {
+            ofs << var.second[3*j+0] << " " << var.second[3*j+1] << " " << var.second[3*j+2] << std::endl;
           }
         }
 
