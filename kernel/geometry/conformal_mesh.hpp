@@ -90,6 +90,7 @@ namespace FEAST
       IndexSetHolderType _index_set_holder;
 
     private:
+      /// \brief Copy assignment operator declared but not implemented
       ConformalMesh& operator=(const ConformalMesh&);
 
     public:

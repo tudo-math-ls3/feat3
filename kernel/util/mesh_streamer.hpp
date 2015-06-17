@@ -873,7 +873,7 @@ namespace FEAST
           // First call the lower dimensional version
           update_parent_data(target_data, mesh_data, target_dim-1);
         if(target_dim > 3)
-          throw InternalError("CellSubSets exist only up to dimension 3!");
+          throw InternalError("MeshParts exist only up to dimension 3!");
 
         // Get a reference to the number of entities of target_dim in target_data, the shape is read from mesh_data
         Index& entity_count(get_entity_count(target_dim, target_data, mesh_data));

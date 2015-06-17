@@ -12,6 +12,8 @@ namespace FEAST
     /**
      * \brief Target set class
      *
+     * A MeshPart refers to its parent mesh through several TargetSets.
+     *
      * \author Peter Zajac
      */
     class TargetSet
@@ -20,12 +22,12 @@ namespace FEAST
       /// number of entities
       Index _num_entities;
 
-      /// index array
+      /// Index array. _indices[i] = j means that entity i represents entity j in the parent
       Index* _indices;
 
     private:
+      /// \brief Prevent the compiler from generating a copy assignment operator by declaring without implementing
       TargetSet& operator=(const TargetSet&);
-    public:
 
     public:
       /**
@@ -146,8 +148,17 @@ namespace FEAST
       }
     }; // class TargetSet
 
-    /* ***************************************************************************************** */
     /// \cond internal
+    /**
+     * \brief Template recursive array of TargetSets
+     *
+     * A MeshPart refering to a mesh of Shape_ can have Shape_::dimension+1 TargetSets and this class provides the
+     * means of accessing them. It inherits from the TargetSetHolder class wrt. the same shape of one dimension less.
+     *
+     * \tparam Shape_
+     * Shape type this class refers to.
+     *
+     */
     template<typename Shape_>
     class TargetSetHolder :
       public TargetSetHolder<typename Shape::FaceTraits<Shape_, Shape_::dimension - 1>::ShapeType>
@@ -217,6 +228,9 @@ namespace FEAST
       }
     };
 
+    /**
+     * \brief TargetSetHolder for lowest possible dimension as end of the recursive inheritance
+     */
     template<>
     class TargetSetHolder<Shape::Vertex>
     {
