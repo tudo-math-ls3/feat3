@@ -167,6 +167,16 @@ void MemoryPool<Mem::CUDA>::copy(DT_ * dest, const DT_ * src, const Index count)
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::copy failed!");
 }
 
+template <typename DT_>
+void MemoryPool<Mem::CUDA>::convert(DT_ * dest, const DT_ * src, const Index count)
+{
+  if (dest == src)
+    return;
+
+  if (cudaSuccess != cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToDevice))
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::copy failed!");
+}
+
 template <typename DT1_, typename DT2_>
 void MemoryPool<Mem::CUDA>::convert(DT1_ * dest, const DT2_ * src, const Index count)
 {
@@ -241,3 +251,7 @@ template void MemoryPool<Mem::CUDA>::convert<float, double>(float *, const doubl
 template void MemoryPool<Mem::CUDA>::convert<double, float>(double *, const float *, const Index);
 template void MemoryPool<Mem::CUDA>::convert<unsigned int, unsigned long>(unsigned int *, const unsigned long *, const Index);
 template void MemoryPool<Mem::CUDA>::convert<unsigned long, unsigned int>(unsigned long *, const unsigned int *, const Index);
+template void MemoryPool<Mem::CUDA>::convert<float>(float *, const float *, const Index);
+template void MemoryPool<Mem::CUDA>::convert<double>(double *, const double *, const Index);
+template void MemoryPool<Mem::CUDA>::convert<unsigned int>(unsigned int *, const unsigned int *, const Index);
+template void MemoryPool<Mem::CUDA>::convert<unsigned long>(unsigned long *, const unsigned long *, const Index);

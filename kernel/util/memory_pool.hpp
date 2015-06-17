@@ -174,8 +174,14 @@ namespace FEAST
           ::memcpy(dest, src, count * sizeof(DT_));
         }
 
-        static void synchronize()
+        /// Copy memory area from src to dest
+        template <typename DT_>
+        static void convert(DT_ * dest, const DT_ * src, const Index count)
         {
+          if (dest == src)
+            return;
+
+          ::memcpy(dest, src, count * sizeof(DT_));
         }
 
         /// Convert datatype DT2_ from src into DT1_ in dest
@@ -187,6 +193,11 @@ namespace FEAST
             dest[i] = (DT1_)src[i];
           }
         }
+
+        static void synchronize()
+        {
+        }
+
     };
 
     template <>
@@ -234,6 +245,10 @@ namespace FEAST
         /// Copy memory area from src to dest
         template <typename DT_>
         static void copy(DT_ * dest, const DT_ * src, const Index count);
+
+        /// Copy memory area from src to dest
+        template <typename DT_>
+        static void convert(DT_ * dest, const DT_ * src, const Index count);
 
         /// Convert datatype DT2_ from src into DT1_ in dest
         template <typename DT1_, typename DT2_>
