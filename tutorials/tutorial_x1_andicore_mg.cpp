@@ -21,7 +21,7 @@
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
 #include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
-#include <kernel/geometry/mesh_part.hpp>                   // for CellSubSet
+#include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 
 // FEAST-Trafo includes
 #include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
