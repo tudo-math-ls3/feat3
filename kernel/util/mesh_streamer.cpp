@@ -1362,7 +1362,7 @@ namespace FEAST
   {
     Index dimension(~Index(0));
     String my_name("noname");
-    Index value_dim(0);
+    int value_dim(0);
     Index value_count(0);
 
     String line("");
@@ -1463,7 +1463,7 @@ namespace FEAST
         }
 
         // if the number of entries does not match the coord_per_vertex variable
-        if (v.size() != value_dim)
+        if (v.size() != Index(value_dim))
         {
           throw SyntaxError("Entry does not match value_dim count in line " + stringify(cur_line));
         }
@@ -1997,7 +1997,7 @@ namespace FEAST
           // Iterate over all value vectors
           for(auto& val_vec_it:it.values)
           {
-            ASSERT(val_vec_it.size() == it.value_dim, "Expected value of dimension " + stringify(it.value_dim) + " but got " + stringify(val_vec_it.size()));
+            ASSERT(val_vec_it.size() == Index(it.value_dim), "Expected value of dimension " + stringify(it.value_dim) + " but got " + stringify(val_vec_it.size()));
             ofs << "   ";
             // Write all member of the value vector
             for(auto& val_it:val_vec_it)

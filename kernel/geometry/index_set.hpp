@@ -32,7 +32,7 @@ namespace FEAST
 
     public:
       /// number of indices per entry
-      static constexpr Index num_indices = num_indices_;
+      static constexpr int num_indices = num_indices_;
 
       /// index vector type
       typedef Index IndexVectorType[num_indices];
@@ -652,7 +652,7 @@ namespace FEAST
      * \author Jordi Paul
      *
      */
-    template<Index shape_dim_, Index co_dim_>
+    template<int shape_dim_, int co_dim_>
     struct IndexSetHolderDimensionUpdater
     {
       /**
@@ -675,7 +675,7 @@ namespace FEAST
      * \brief Specialisation for codimension 1
      *
      */
-    template<Index shape_dim_>
+    template<int shape_dim_>
     struct IndexSetHolderDimensionUpdater<shape_dim_,1>
     {
       template<typename IndexSetHolderType_>
@@ -699,7 +699,7 @@ namespace FEAST
      * \brief Specialisation for codimension 2
      *
      */
-    template<Index shape_dim_>
+    template<int shape_dim_>
     struct IndexSetHolderDimensionUpdater<shape_dim_,2>
     {
       template<typename IndexSetHolderType_>

@@ -38,7 +38,7 @@ namespace FEAST
         typedef std::vector<ValueType> ValueVec;
 
         String name;
-        Index value_dim;
+        int value_dim;
         Index value_count;
         std::vector<ValueVec> values;
 
@@ -50,7 +50,7 @@ namespace FEAST
           CONTEXT("AttributesContainer::AttributesContainer()");
         }
 
-        explicit AttributesContainer(String name_, Index value_dim_, Index value_count_) :
+        explicit AttributesContainer(String name_, int value_dim_, Index value_count_) :
           name(name_),
           value_dim(value_dim_),
           value_count(value_count_)
@@ -381,116 +381,6 @@ namespace FEAST
 
     }; // MeshDataContainer
 
-//    /**
-//     * \brief Cell set container class
-//     *
-//     * This class stores the data related to a cell set.
-//     *
-//     * \author Constantin Christof
-//     */
-//    class CellSetContainer :
-//      public BaseContainer
-//    {
-//    public:
-//      // default CTOR
-//      CellSetContainer()
-//      {
-//        CONTEXT("CellSetContainer::CellSetContainer()");
-//      }
-//
-//      // default DTOR
-//      ~CellSetContainer()
-//      {
-//        CONTEXT("CellSetContainer::~CellSetContainer()");
-//      }
-//
-//      /**
-//       * \brief Parses a mesh-cellset-data-input stream.
-//       *
-//       * \param[in] ifs
-//       * A reference to the input stream to be parsed.
-//       *
-//       * \param[in] cur_line
-//       * A counter that specifies the number of lines read so far.
-//       *
-//       * \returns
-//       * The number of lines that has been read when the programme is done.
-//       */
-//      Index _parse_cellset_section(Index cur_line, std::istream& ifs);
-//
-//    }; // CellSetContainer
-
-//    class CellSetNode;
-
-//    /**
-//     * \brief Base-Class for Cell-Set node parents
-//     *
-//     * This class acts as a base class for the CellSetNode and MeshNode classes.
-//     *
-//     * \author Peter Zajac
-//     */
-//    class CellSetParent
-//    {
-//    public:
-//      // a map of cell-set nodes
-//      typedef std::map<String, CellSetNode*, String::NoCaseLess> CellSetMap;
-//
-//      // the cell-set map of this node
-//      CellSetMap cell_set_map;
-//
-//    public:
-//      virtual ~CellSetParent()
-//      {
-//        CellSetMap::iterator it(cell_set_map.begin()), jt(cell_set_map.end());
-//        for(; it != jt; ++it)
-//        {
-//          delete it->second;
-//        }
-//      }
-//
-//      /**
-//       * \brief Finds a cell-set node within this sub-tree.
-//       */
-//      CellSetNode* find_cell_set(String name)
-//      {
-//        // perform depth-first-search
-//        CellSetMap::iterator it(cell_set_map.begin()), jt(cell_set_map.end());
-//        for(; it != jt; ++it)
-//        {
-//          if(it->first.compare_no_case(name) == 0)
-//            return it->second;
-//
-//          CellSetNode* node = it->second->find_cell_set(name);
-//          if(node != nullptr)
-//            return node;
-//        }
-//
-//        // parent not found
-//        return nullptr;
-//      }
-//    };
-//
-//    /**
-//     * \brief Cell-Set node class
-//     *
-//     * This class implements a tree node that contains a CellSetContainer as well as
-//     * its child cell-set nodes.
-//     *
-//     * \author Peter Zajac
-//     */
-//    class CellSetNode :
-//      public CellSetParent
-//    {
-//    public:
-//      CellSetContainer cell_set;
-//
-//      /**
-//       * \brief Writes the stored cell set data into the output stream.
-//       */
-//      void write(std::ostream &ofs) const;
-//
-//    };
-
     /**
      * \brief Mesh node class
      *
@@ -499,7 +389,7 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    class MeshNode// : public CellSetParent
+    class MeshNode
     {
     public:
       // a map of sub-mesh nodes
@@ -766,7 +656,7 @@ namespace FEAST
      * \author Jordi Paul
      *
      */
-    template<Index dim_>
+    template<int dim_>
     struct MeshDataContainerUpdater
     {
       /**
@@ -815,7 +705,7 @@ namespace FEAST
        * \returns A reference to the number of entities of dimension target_dim entry in target_data.
        *
        */
-      static Index& get_entity_count(Index target_dim, MeshStreamer::BaseContainer* target_data,
+      static Index& get_entity_count(int target_dim, MeshStreamer::BaseContainer* target_data,
       const MeshStreamer::MeshDataContainer* const mesh_data)
       {
         // Determine what the dimension target_dim entities are
@@ -873,7 +763,7 @@ namespace FEAST
        *
        */
       static void update_parent_data(MeshStreamer::BaseContainer* target_data,
-      const MeshStreamer::MeshDataContainer* const mesh_data, Index target_dim = dim_)
+      const MeshStreamer::MeshDataContainer* const mesh_data, int target_dim = dim_)
       {
         if(target_dim < 1)
           // Nothing could be missing
@@ -950,8 +840,8 @@ namespace FEAST
           {
             // idx will contain all indices for edge
             std::vector<Index> idx;
-            for(Index i(0); i < vert_at_edge.num_indices; ++i)
-              idx.push_back(vert_at_edge(edge,i));
+            for(int i(0); i < vert_at_edge.num_indices; ++i)
+              idx.push_back(vert_at_edge(edge,Index(i)));
 
             // Add this edge to the global adjacency vector
             mesh_data->adjacencies[0][1].push_back(idx);
@@ -971,8 +861,8 @@ namespace FEAST
             // idx will contain all indices for edge
             std::vector<Index> idx;
             // The _index_bound for the cell to edges mapping is the number of edges
-            for(Index edge(0); edge < edge_at_cell.num_indices; ++edge)
-              idx.push_back(edge_at_cell(cell,edge));
+            for(int edge(0); edge < edge_at_cell.num_indices; ++edge)
+              idx.push_back(edge_at_cell(cell,Index(edge)));
             // Add this edge to the global adjacency vector
             mesh_data->adjacencies[1][2].push_back(idx);
           }
@@ -980,7 +870,7 @@ namespace FEAST
       } // MeshDataContainerUpdater<2>::update_from_ish()
 
       static void update_parent_data(MeshStreamer::BaseContainer* target_data,
-      const MeshStreamer::MeshDataContainer* const mesh_data, Index target_dim = Index(2))
+      const MeshStreamer::MeshDataContainer* const mesh_data, int target_dim = 2)
       {
         // Just call the generic version
         MeshDataContainerUpdater<0>::update_parent_data(target_data, mesh_data, target_dim);
@@ -1020,8 +910,8 @@ namespace FEAST
           {
             // idx will contain all indices for face
             std::vector<Index> idx;
-            for(Index i(0); i < vert_at_face.num_indices; ++i)
-              idx.push_back(vert_at_face(face,i));
+            for(int i(0); i < vert_at_face.num_indices; ++i)
+              idx.push_back(vert_at_face(face,Index(i)));
 
             // Add this edge to the global adjacency vector
             mesh_data->adjacencies[0][2].push_back(idx);
@@ -1040,8 +930,8 @@ namespace FEAST
             // idx will contain all indices for edge
             std::vector<Index> idx;
             // num_indices is the (local!) number of edges per cell
-            for(Index edge(0); edge < edge_at_cell.num_indices; ++edge)
-              idx.push_back(edge_at_cell(cell,edge));
+            for(int edge(0); edge < edge_at_cell.num_indices; ++edge)
+              idx.push_back(edge_at_cell(cell,Index(edge)));
             // Add this edge to the global adjacency vector
             mesh_data->adjacencies[1][3].push_back(idx);
           }
@@ -1056,8 +946,8 @@ namespace FEAST
             // idx will contain all indices for face
             std::vector<Index> idx;
             // num_indices is the (local!) number of faces per cell
-            for(Index face(0); face < face_at_cell.num_indices; ++face)
-              idx.push_back(face_at_cell(cell,face));
+            for(int face(0); face < face_at_cell.num_indices; ++face)
+              idx.push_back(face_at_cell(cell,Index(face)));
             // Add this face to the global adjacency vector
             mesh_data->adjacencies[2][3].push_back(idx);
           }
@@ -1067,7 +957,7 @@ namespace FEAST
       } // MeshDataContainerUpdater<3>::update_from_ish()
 
       static void update_parent_data(MeshStreamer::BaseContainer* target_data,
-      const MeshStreamer::MeshDataContainer* const mesh_data, Index target_dim = Index(3))
+      const MeshStreamer::MeshDataContainer* const mesh_data, int target_dim = 3)
       {
         // Just call the generic version
         MeshDataContainerUpdater<0>::update_parent_data(target_data, mesh_data, target_dim);

@@ -15,7 +15,7 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      template<Index dim_>
+      template<int dim_>
       struct AttributeSetBuilder;
 
       template<typename Shape_>
@@ -24,7 +24,7 @@ namespace FEAST
       template<typename Shape_>
       struct MeshStreamerTargeter;
 
-      template<Index dim_>
+      template<int dim_>
       struct NumEntitiesExtractor;
     }
     /// \endcond
@@ -65,12 +65,12 @@ namespace FEAST
         _mesh_data(mesh_reader.get_mesh())
       {
         // Parse preliminary num_entities from _mesh_data
-        for(Index d(0); d <= Index(Shape_::dimension); ++d)
+        for(int d(0); d <= Shape_::dimension; ++d)
           _num_entities[d] = parse_num_entities(d);
       }
 
       /// \brief Parses num_entities information from _mesh_data
-      virtual Index parse_num_entities(Index dim)
+      virtual Index parse_num_entities(int dim)
       {
         switch(dim)
         {
@@ -103,12 +103,12 @@ namespace FEAST
           // get a reference to the corresponding vertex
           MeshStreamer::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
 
-          ASSERT(Index(vtx.size()) == Index(num_coords_), "Vertex coordinate count mismatch!");
+          ASSERT(vtx.size() == Index(num_coords_), "Vertex coordinate count mismatch!");
 
           // copy vertex coordinates
-          for(Index j(0); j < Index(num_coords_); ++j)
+          for(int j(0); j < num_coords_; ++j)
           {
-            vertex_set[i][j] = Coord_(vtx[j]);
+            vertex_set[i][j] = Coord_(vtx[Index(j)]);
           }
         }
       }
@@ -194,7 +194,7 @@ namespace FEAST
       }
 
       /// \brief Parses num_entities information from _mesh_data
-      virtual Index parse_num_entities(Index dim)
+      virtual Index parse_num_entities(int dim)
       {
         {
           switch(dim)
@@ -256,7 +256,7 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      template<Index dim_>
+      template<int dim_>
       struct AttributeSetBuilder
       {
         template<typename AttributeHolderType_, typename MeshDataContainerType_>
@@ -275,19 +275,19 @@ namespace FEAST
 
           for(auto& it:attribute_container)
           {
-            const Index value_count(it.value_count);
-            const Index value_dim(it.value_dim);
+            const int value_count(it.value_count);
+            const int value_dim(it.value_dim);
 
-            typename AttributeSetType_::value_type new_attribute(value_count, int(value_dim), 0);
+            typename AttributeSetType_::value_type new_attribute(value_count, value_dim, 0);
 
-            for(Index i(0); i < value_count; ++i)
+            for(int i(0); i < value_count; ++i)
             {
               const std::vector<double>& vals(it.values[i]);
 
               ASSERT(vals.size() == value_dim, "Attribute value count mismatch!");
 
               // copy vertex coordinates
-              for(Index j(0); j < value_dim; ++j)
+              for(int j(0); j < value_dim; ++j)
                 new_attribute[i][j] = DataType(vals[j]);
             }
             attributes.push_back(new_attribute);
@@ -332,9 +332,9 @@ namespace FEAST
             ASSERT(Index(ic.size()) == Index(num_indices), "Index tuple size mismatch");
 
             // copy indices
-            for(Index j(0); j < Index(num_indices); ++j)
+            for(int j(0); j < num_indices; ++j)
             {
-              idx(i,j) = ic[j];
+              idx(i,Index(j)) = ic[Index(j)];
             }
           }
         }
@@ -408,7 +408,7 @@ namespace FEAST
        * \author Jordi Paul
        *
        */
-      template<Index dim_>
+      template<int dim_>
       struct NumEntitiesExtractor
       {
         /**

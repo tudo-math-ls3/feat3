@@ -18,7 +18,7 @@ namespace FEAST
     // Forward declarations
     namespace Intern
     {
-      template<Index, Index>
+      template<int, int>
       struct TargetSetComputer;
     }
 
@@ -136,12 +136,13 @@ namespace FEAST
        * Dimension the number of attributes is to be computed for
        *
        */
-      virtual Index get_num_attributes(Index dim) const
+      virtual Index get_num_attributes(int dim) const
       {
         CONTEXT(name() + "::get_num_attributes()");
-        ASSERT(int(dim) <= shape_dim, "invalid dimension parameter");
+        ASSERT(dim > 0, "dim has to be > 0");
+        ASSERT(dim <= shape_dim, "dim has to be < shape_dim");
 
-        if(int(dim) == shape_dim)
+        if(dim == shape_dim)
           // If the requested dimension is mine...
           return Index(_mesh_attributes.size());
 
@@ -167,11 +168,12 @@ namespace FEAST
        * \warning Checks whether attribute has the same number of entries as the corresponding mesh has entities of
        * dimension dim have to be performed by the caller!
        */
-      virtual void add_attribute(const AttributeType& attribute, Index dim)
+      virtual void add_attribute(const AttributeType& attribute, int dim)
       {
-        ASSERT(int(dim) <= shape_dim, "Attribute shape dim exceeds MeshPart shape dim!");
+        ASSERT(dim >= 0, "dim has to be >= 0");
+        ASSERT(dim <= shape_dim, "dim has to be <= shape_dim");
 
-        if(int(dim) == shape_dim)
+        if(dim == shape_dim)
           // If the requested dimension is mine...
           _mesh_attributes.push_back(attribute);
         else
@@ -228,7 +230,7 @@ namespace FEAST
         return _mesh_attributes;
       }
 
-      virtual Index get_num_attributes(Index dim) const
+      virtual Index get_num_attributes(int dim) const
       {
         CONTEXT(name() + "::get_num_attributes()");
 #if defined DEBUG
@@ -239,7 +241,7 @@ namespace FEAST
         return Index(_mesh_attributes.size());
       }
 
-      virtual void add_attribute(const MeshAttribute<DataType_>& attribute_, Index dim)
+      virtual void add_attribute(const MeshAttribute<DataType_>& attribute_, int dim)
       {
 #if defined DEBUG
         ASSERT(dim == 0, "Only attributes of shape dim 0 can be added to MeshParts of shape dim 0");
@@ -249,7 +251,7 @@ namespace FEAST
         _mesh_attributes.push_back(attribute_);
       }
 
-      //virtual void add_attribute(const MeshAttribute<DataType_>&& attribute_, Index dim)
+      //virtual void add_attribute(const MeshAttribute<DataType_>&& attribute_, int dim)
       //{
       //  ASSERT(dim == 0, "Only attributes of shape dim 0 can be added to MeshParts of shape dim 0");
       //  _mesh_attributes.push_back(std::move(attribute_));
@@ -564,11 +566,11 @@ namespace FEAST
          *
          * \returns The total number of Attributes in all attribute sets
          */
-        Index get_num_attributes() const
+        int get_num_attributes() const
         {
-          Index num_attribute_sets(0);
+          int num_attribute_sets(0);
           // Sum up the number of attributes over all attribute sets
-          for(Index d(0); d < Index(shape_dim); ++d)
+          for(int d(0); d < shape_dim; ++d)
             num_attribute_sets += _attribute_holder.get_num_attributes(d);
 
           return num_attribute_sets;
@@ -721,7 +723,7 @@ namespace FEAST
          * Parent this MeshPart refers to.
          *
          */
-        template<Index end_dim_, Index current_dim_ = ShapeType_::dimension>
+        template<int end_dim_, int current_dim_ = ShapeType_::dimension>
         void compute_target_sets_from_bottom(const MeshType& parent_mesh)
         {
           Intern::template TargetSetComputer<end_dim_, current_dim_>::bottom_to_top(_target_set_holder, parent_mesh.get_index_set_holder());
@@ -740,7 +742,7 @@ namespace FEAST
          * Parent this MeshPart refers to.
          *
          */
-        template<Index end_dim_, Index current_dim_ = 0>
+        template<int end_dim_, int current_dim_ = 0>
         void compute_target_sets_from_top(const MeshType& parent_mesh)
         {
           Intern::template TargetSetComputer<end_dim_, current_dim_>::top_to_bottom(_target_set_holder, parent_mesh.get_index_set_holder());
@@ -994,7 +996,7 @@ namespace FEAST
        * \author Jordi Paul
        *
        */
-      template<Index end_dim_, Index current_dim_>
+      template<int end_dim_, int current_dim_>
       struct TargetSetComputer
       {
         /**
@@ -1054,7 +1056,7 @@ namespace FEAST
               bool is_in_mesh_part(true);
 
               // Check if all entities of dimension current_dim_-1 at entity i are referenced by the TargetSet
-              for(Index j(0); j < ParentIndexSetType::num_indices; ++j)
+              for(int j(0); j < ParentIndexSetType::num_indices; ++j)
               {
                 // This is the index in the parent
                 Index parent_index(is_parent_below[i][j]);
@@ -1163,7 +1165,7 @@ namespace FEAST
       /**
        * \brief Specialisation as end of template recursion
        */
-      template<Index end_dim_>
+      template<int end_dim_>
       struct TargetSetComputer<end_dim_, end_dim_>
       {
         /// \brief End of template recursion: Nothing to do

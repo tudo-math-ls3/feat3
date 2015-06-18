@@ -323,13 +323,13 @@ namespace FEAST
           ConstIndexVectorRefIn current_cell_in = index_set_in[i];
 
           // loop over all cells of shape i
-          for(Index j(0); j < IndexSetOut_::num_indices; ++j)
+          for(int j(0); j < IndexSetOut_::num_indices; ++j)
           {
             // get the vertex-index-vector of cell j:
             // loop over all indices of the cell-vertex-vector
-            for(Index k(0); k < Index(IndexTreeType::num_indices); ++k)
+            for(int k(0); k < IndexTreeType::num_indices; ++k)
             {
-              current_face_indices[k]  = current_cell_in[FimType::map(int(j), int(k))];
+              current_face_indices[Index(k)]  = current_cell_in[FimType::map(j, k)];
             }
 
             // try to find the index of the vector within the tree

@@ -120,11 +120,11 @@ namespace FEAST
             typename IndexSetHolderType::template IndexSet<cell_dim_, face_dim_>::Type&
               idx(index_set_holder.template get_index_set<cell_dim_, face_dim_>());
 
-            for(Index i(0); i < Index(Shape::FaceTraits<ShapeType, cell_dim_>::count); ++i)
+            for(int i(0); i < Shape::FaceTraits<ShapeType, cell_dim_>::count; ++i)
             {
-              for(Index j(0); j < idx.num_indices; ++j)
+              for(int j(0); j < idx.num_indices; ++j)
               {
-                idx[i][j] = Index(FimType::map(int(i), int(j)));
+                idx[Index(i)][Index(j)] = Index(FimType::map(i, j));
               }
             }
           }
@@ -134,9 +134,9 @@ namespace FEAST
           {
             typename IndexSetHolderType::template IndexSet<2, face_dim_>::Type&
               idx(index_set_holder.template get_index_set<2, face_dim_>());
-            for(Index j(0); j < idx.num_indices; ++j)
+            for(int j(0); j < idx.num_indices; ++j)
             {
-              idx[0][j] = j;
+              idx[0][Index(j)] = Index(j);
             }
           }
     };
@@ -206,11 +206,11 @@ namespace FEAST
             typename IndexSetHolderType::template IndexSet<cell_dim_, face_dim_>::Type&
               idx(index_set_holder.template get_index_set<cell_dim_, face_dim_>());
 
-            for(Index i(0); i < Index(Shape::FaceTraits<ShapeType, cell_dim_>::count); ++i)
+            for(int i(0); i < Shape::FaceTraits<ShapeType, cell_dim_>::count; ++i)
             {
-              for(Index j(0); j < idx.num_indices; ++j)
+              for(int j(0); j < idx.num_indices; ++j)
               {
-                idx[i][j] = Index(FimType::map(int(i), int(j)));
+                idx[Index(i)][Index(j)] = Index(FimType::map(i, j));
               }
             }
           }
@@ -220,9 +220,9 @@ namespace FEAST
           {
             typename IndexSetHolderType::template IndexSet<3, face_dim_>::Type&
               idx(index_set_holder.template get_index_set<3, face_dim_>());
-            for(Index j(0); j < idx.num_indices; ++j)
+            for(int j(0); j < idx.num_indices; ++j)
             {
-              idx[0][j] = Index(j);
+              idx[Index(0)][Index(j)] = Index(j);
             }
           }
     };
