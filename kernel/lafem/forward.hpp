@@ -16,10 +16,10 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_>
     class SparseVector;
 
-    template <typename Mem_, typename DT_, typename IT_, Index BlockSize_>
+    template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
     class DenseVectorBlocked;
 
-    template <typename Mem_, typename DT_, typename IT_, Index BlockSize_>
+    template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
     class SparseVectorBlocked;
 
     template <typename Mem_, typename DT_, typename IT_>
@@ -28,7 +28,7 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixCSR;
 
-    template <typename Mem_, typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+    template <typename Mem_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
     class SparseMatrixCSRBlocked;
 
     template <typename Mem_, typename DT_, typename IT_>

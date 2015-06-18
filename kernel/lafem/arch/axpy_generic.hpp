@@ -60,7 +60,7 @@ namespace FEAST
         }
       }
 
-      template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+      template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
       void Axpy<Mem::Main>::csrb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
                                                 const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
       {
@@ -75,9 +75,9 @@ namespace FEAST
           const IT_ end(row_ptr[row + 1]);
           for (IT_ i(row_ptr[row]) ; i < end ; ++i)
           {
-            for (Index h(0) ; h < BlockHeight_ ; ++h)
+            for (int h(0) ; h < BlockHeight_ ; ++h)
             {
-              for (Index w(0) ; w < BlockWidth_ ; ++w)
+              for (int w(0) ; w < BlockWidth_ ; ++w)
               {
                 bsum[h] += bval[i][h][w] * bx[col_ind[i]][w];
               }

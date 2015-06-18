@@ -48,7 +48,7 @@ namespace FEAST
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_, typename IT_, Index BlockSize_>
+    template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
     class DenseVectorBlocked : public Container<Mem_, DT_, IT_>, public VectorBase
     {
     public:
@@ -59,7 +59,7 @@ namespace FEAST
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our size of a single block
-      static constexpr Index BlockSize = BlockSize_;
+      static constexpr int BlockSize = BlockSize_;
 
       /**
        * \brief Constructor
@@ -141,7 +141,7 @@ namespace FEAST
        * Creates a vector from a DenseVector source
        */
       explicit DenseVectorBlocked(const DenseVector<Mem_, DT_, IT_> & other) :
-        Container<Mem_, DT_, IT_>(other.size() / BlockSize_)
+        Container<Mem_, DT_, IT_>(other.size() / Index(BlockSize_))
       {
         CONTEXT("When creating DenseVectorBlocked");
         convert(other);
@@ -220,11 +220,11 @@ namespace FEAST
       {
         CONTEXT("When converting DenseVectorBlocked");
 
-        ASSERT(other.size() % BlockSize_ == 0, "Error: DenseVector cannot be partionated with given blocksize!");
+        ASSERT(other.size() % Index(BlockSize_) == 0, "Error: DenseVector cannot be partionated with given blocksize!");
 
         this->clear();
 
-        this->_scalar_index.push_back(other.size() / BlockSize_);
+        this->_scalar_index.push_back(other.size() / Index(BlockSize_));
 
         this->_elements.push_back(other.get_elements().at(0));
         this->_elements_size.push_back(raw_size());
@@ -272,7 +272,7 @@ namespace FEAST
       /// The raw number of elements of type DT_
       Index raw_size() const
       {
-        return this->size() * BlockSize_;
+        return this->size() * Index(BlockSize_);
       }
 
       /**
@@ -288,7 +288,7 @@ namespace FEAST
 
         ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector blocked size " + stringify(this->size()) + " !");
         Tiny::Vector<DT_, BlockSize_> t;
-        Util::MemoryPool<Mem_>::download(t.v, this->_elements.at(0) + index * BlockSize_, BlockSize_);
+        Util::MemoryPool<Mem_>::download(t.v, this->_elements.at(0) + index * Index(BlockSize_), Index(BlockSize_));
         return t;
       }
 
@@ -303,7 +303,7 @@ namespace FEAST
         CONTEXT("When setting DenseVectorBlocked element");
 
         ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector blocked size " + stringify(this->size()) + " !");
-        Util::MemoryPool<Mem_>::upload(this->_elements.at(0) + index * BlockSize_, value.v, BlockSize_);
+        Util::MemoryPool<Mem_>::upload(this->_elements.at(0) + index * Index(BlockSize_), value.v, Index(BlockSize_));
       }
 
       /**
@@ -505,7 +505,7 @@ namespace FEAST
         for (Index i(0) ; i < b.size() ; ++i)
         {
           Tiny::Vector<DT_, BlockSize_> t = b(i);
-          for (Index j(0) ; j < BlockSize_ ; ++j)
+          for (int j(0) ; j < BlockSize_ ; ++j)
             lhs << "  " << t[j];
         }
         lhs << "]";

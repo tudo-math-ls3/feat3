@@ -195,11 +195,11 @@ namespace FEAST
       static constexpr int max_points = FactoryType::max_points;
 
     protected:
-      Index _num_points;
+      int _num_points;
       Index _num_refines;
 
     public:
-      explicit RefineFactory(Index num_points, Index num_refines = 1) :
+      explicit RefineFactory(int num_points, Index num_refines = 1) :
         _num_points(num_points),
         _num_refines(num_refines)
       {
@@ -214,7 +214,7 @@ namespace FEAST
       }
 
       template<typename Weight_, typename Coord_, typename Point_>
-      static void create(Rule<ShapeType, Weight_, Coord_, Point_>& rule, Index num_points, Index num_refines)
+      static void create(Rule<ShapeType, Weight_, Coord_, Point_>& rule, int num_points, Index num_refines)
       {
         Rule<ShapeType, Weight_, Coord_, Point_> rule_in;
         FactoryType::create(rule_in, num_points);
@@ -235,8 +235,8 @@ namespace FEAST
 
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
-          Index n = rule_in.get_num_points();
-          for(Index i(0); i < n; ++i)
+          int n = rule_in.get_num_points();
+          for(int i(0); i < n; ++i)
           {
             rule.get_coord(  i, 0) = Coord_(0.5) *  rule_in.get_coord(i,0);
             rule.get_coord(n+i, 0) = Coord_(0.5) * (rule_in.get_coord(i,0) + Coord_(1));
@@ -256,7 +256,7 @@ namespace FEAST
 
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
-          Index n = rule_in.get_num_points();
+          int n = rule_in.get_num_points();
 
           // points of the child triangles
           Coord_ v[4][3][2];
@@ -289,9 +289,9 @@ namespace FEAST
           v[3][2][1] = Coord_(0);
 
           // refining
-          for(Index i(0); i <= 3; ++i)
+          for(int i(0); i <= 3; ++i)
           {
-            for(Index j(0); j < n; ++j)
+            for(int j(0); j < n; ++j)
             {
               Coord_ x = rule_in.get_coord(j,0);
               Coord_ y = rule_in.get_coord(j,1);
@@ -593,13 +593,13 @@ namespace FEAST
           v[11][3][2] = Coord_(1)/Coord_(4);
 
 
-          Index n = rule_in.get_num_points();
+          int n = rule_in.get_num_points();
           Weight_ vol;
 
           // refining
-          for(Index i(0); i <= 11; ++i)
+          for(int i(0); i <= 11; ++i)
           {
-            for(Index j(0); j < n; ++j)
+            for(int j(0); j < n; ++j)
             {
               Coord_ x = rule_in.get_coord(j,0);
               Coord_ y = rule_in.get_coord(j,1);
@@ -643,8 +643,8 @@ namespace FEAST
 
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
-          Index n = rule_in.get_num_points();
-          for(Index i(0); i < n; ++i)
+          int n = rule_in.get_num_points();
+          for(int i(0); i < n; ++i)
           {
             rule.get_coord(  i, 0) = Coord_(0.5) * rule_in.get_coord(i,0) - Coord_(0.5);
             rule.get_coord(n+i, 0) = Coord_(0.5) * rule_in.get_coord(i,0) + Coord_(0.5);
@@ -666,10 +666,10 @@ namespace FEAST
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
 
-          Index n = rule_in.get_num_points();
+          int n = rule_in.get_num_points();
 
           // refining
-          for(Index i(0); i <= 3; ++i)
+          for(int i(0); i <= 3; ++i)
           {
             // shift
             Coord_ dx = Coord_(0);
@@ -696,7 +696,7 @@ namespace FEAST
               dy = Coord_(1)/Coord_(2);
             }
 
-            for(Index j(0); j < n; ++j)
+            for(int j(0); j < n; ++j)
             {
               rule.get_coord(i*n + j, 0) = Coord_(0.5) * rule_in.get_coord(j,0) + dx;
               rule.get_coord(i*n + j, 1) = Coord_(0.5) * rule_in.get_coord(j,1) + dy;
@@ -717,10 +717,10 @@ namespace FEAST
         static void refine(Rule_& rule, const Rule_& rule_in)
         {
 
-          Index n = rule_in.get_num_points();
+          int n = rule_in.get_num_points();
 
           // refining
-          for(Index i(0); i <= 7; ++i)
+          for(int i(0); i <= 7; ++i)
           {
             // shift
             Coord_ dx = Coord_(0);
@@ -776,7 +776,7 @@ namespace FEAST
               dz =  Coord_(1)/Coord_(2);
             }
 
-            for(Index j(0); j < n; ++j)
+            for(int j(0); j < n; ++j)
             {
               rule.get_coord(i*n + j, 0) = Coord_(0.5) * rule_in.get_coord(j,0) + dx;
               rule.get_coord(i*n + j, 1) = Coord_(0.5) * rule_in.get_coord(j,1) + dy;

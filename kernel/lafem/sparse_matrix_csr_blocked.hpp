@@ -53,7 +53,7 @@ namespace FEAST
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+    template <typename Mem_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
     class SparseMatrixCSRBlocked : public Container<Mem_, DT_, IT_>
     {
     private:
@@ -155,7 +155,7 @@ namespace FEAST
         LAFEM::DenseVector<Mem::Main, IT_, IT_> vrow_ptr(num_rows+1);
         LAFEM::DenseVector<Mem::Main, IT_, IT_> vcol_idx(num_nnze);
         // The data array has to account for the block size
-        LAFEM::DenseVector<Mem::Main, DT_, IT_> vdata(num_nnze*BlockHeight_*BlockWidth_, DT_(0));
+        LAFEM::DenseVector<Mem::Main, DT_, IT_> vdata(num_nnze*Index(BlockHeight_*BlockWidth_), DT_(0));
 
         const Index * dom_ptr(graph.get_domain_ptr());
         const Index * img_idx(graph.get_image_idx());
@@ -195,7 +195,7 @@ namespace FEAST
         ASSERT(val_in.size() % (BlockHeight_ * BlockWidth_) == 0, "Error: " + stringify(val_in.size()) + " not multiple of container blocksize!");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
-        this->_scalar_index.push_back(val_in.size() / (BlockHeight_ * BlockWidth_));
+        this->_scalar_index.push_back(val_in.size() / Index(BlockHeight_ * BlockWidth_));
         this->_scalar_dt.push_back(DT_(0));
 
         this->_elements.push_back(val_in.elements());
@@ -326,7 +326,7 @@ namespace FEAST
           if (Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == col)
           {
             Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> t;
-            Util::MemoryPool<Mem_>::download((DT_*)t.v, this->_elements.at(0) + i * BlockHeight_ * BlockWidth_, BlockHeight_ * BlockWidth_);
+            Util::MemoryPool<Mem_>::download((DT_*)t.v, this->_elements.at(0) + i * Index(BlockHeight_*BlockWidth_), Index(BlockHeight_*BlockWidth_));
             return t;
           }
           if (Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i) > col)
@@ -374,7 +374,7 @@ namespace FEAST
        */
       Index raw_rows() const
       {
-        return this->_scalar_index.at(1) * BlockHeight_;
+        return this->_scalar_index.at(1) * Index(BlockHeight_);
       }
 
       /**
@@ -400,7 +400,7 @@ namespace FEAST
       /// The raw number of non zero elements of type DT_
       Index raw_used_elements() const
       {
-        return used_elements() * BlockHeight_ * BlockWidth_;
+        return used_elements() * Index(BlockHeight_ * BlockWidth_);
       }
 
       /**
@@ -930,12 +930,12 @@ namespace FEAST
         lhs << "[" << std::endl;
         for (Index i(0) ; i < b.rows() ; ++i)
         {
-          for (Index k(0) ; k < BlockHeight_ ; ++k)
+          for (int k(0) ; k < BlockHeight_ ; ++k)
           {
             lhs << "[";
             for (Index j(0) ; j < b.columns() ; ++j)
             {
-              for (Index l(0) ; l < BlockWidth_ ; ++l)
+              for (int l(0) ; l < BlockWidth_ ; ++l)
                 lhs << "  " << b(i, j).v[k][l];
             }
             lhs << "]" << std::endl;

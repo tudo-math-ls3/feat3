@@ -129,7 +129,7 @@ namespace FEAST
           space_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = space_eval.get_num_local_dofs();
+          int num_loc_dofs = space_eval.get_num_local_dofs();
 
           // loop over all vertices of the cell
           for(int k(0); k < nverts; ++k)
@@ -139,7 +139,7 @@ namespace FEAST
             // initialise domain point
             for(int i(0); i < shape_dim; ++i)
             {
-              dom_point[Index(i)] = DataType(RefCell::coord(k, i));
+              dom_point[i] = DataType(RefCell::coord(k, i));
             }
 
             // compute trafo data
@@ -152,7 +152,7 @@ namespace FEAST
             DataType value(DataType(0));
 
             // basis function loop
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
               // evaluate fe function
               value += lvad(i) * space_data.phi[i].value;
@@ -303,14 +303,14 @@ namespace FEAST
           space_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = space_eval.get_num_local_dofs();
+          int num_loc_dofs = space_eval.get_num_local_dofs();
 
           // compute function value
           DataType value(DataType(0));
           DataType area(DataType(0));
 
           // loop over all quadrature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -321,7 +321,7 @@ namespace FEAST
             DataType v(DataType(0));
 
             // basis function loop
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functor and integrate
               v += lvad(i) * space_data.phi[i].value;

@@ -209,13 +209,13 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local entries
-        for(Index i(0); i < mapping.get_num_local_dofs(); ++i)
+        for(int i(0); i < mapping.get_num_local_dofs(); ++i)
         {
           // pre-multiply local entry by alpha
           DataType_ dx(alpha * loc_vec(i));
 
           // loop over all entry contributions
-          for(Index ic(0); ic < mapping.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < mapping.get_num_contribs(i); ++ic)
           {
             // update vector data
             _data[mapping.get_index(i, ic)] += DataType_(mapping.get_weight(i, ic)) * dx;
@@ -260,13 +260,13 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local entries
-        for(Index i(0); i < mapping.get_num_local_dofs(); ++i)
+        for(int i(0); i < mapping.get_num_local_dofs(); ++i)
         {
           // clear accumulation entry
           DataType_ dx(DataType_(0));
 
           // loop over all entry contributions
-          for(Index ic(0); ic < mapping.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < mapping.get_num_contribs(i); ++ic)
           {
             // update accumulator
             dx += DataType_(mapping.get_weight(i, ic)) * _data[mapping.get_index(i, ic)];
@@ -341,10 +341,10 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
+        for(int i(0); i < row_map.get_num_local_dofs(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_map.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
           {
             // fetch row entry weight and pre-multiply by alpha
             DataType_ iw = alpha * DataType_(row_map.get_weight(i, ic));
@@ -359,10 +359,10 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_map.get_num_local_dofs(); ++j)
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
             {
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_map.get_num_contribs(j); ++jc)
+              for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
               {
                 // fetch trial function dof weight
                 DataType_ jw = DataType_(col_map.get_weight(j, jc));
@@ -460,10 +460,10 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
+        for(int i(0); i < row_map.get_num_local_dofs(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_map.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
           {
             // fetch row index
             Index ix = row_map.get_index(i, ic);
@@ -475,13 +475,13 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_map.get_num_local_dofs(); ++j)
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
             {
               // clear  accumulation entry
               DataType_ dx(DataType_(0));
 
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_map.get_num_contribs(j); ++jc)
+              for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
               {
                 // fetch column index
                 Index jx = col_map.get_index(j, jc);
@@ -583,10 +583,10 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
+        for(int i(0); i < row_map.get_num_local_dofs(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_map.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
           {
             // fetch row entry weight and pre-multiply by alpha
             DataType_ iw = alpha * DataType_(row_map.get_weight(i, ic));
@@ -607,10 +607,10 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_map.get_num_local_dofs(); ++j)
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
             {
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_map.get_num_contribs(j); ++jc)
+              for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
               {
                 // fetch trial function dof weight
                 DataType_ jw = DataType_(col_map.get_weight(j, jc));
@@ -716,10 +716,10 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
+        for(int i(0); i < row_map.get_num_local_dofs(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_map.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
           {
             // fetch row index
             Index ix = row_map.get_index(i, ic);
@@ -737,13 +737,13 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_map.get_num_local_dofs(); ++j)
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
             {
               // clear  accumulation entry
               DataType_ dx(DataType_(0));
 
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_map.get_num_contribs(j); ++jc)
+              for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
               {
                 // fetch column index
                 Index jx = col_map.get_index(j, jc);
@@ -853,10 +853,10 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
+        for(int i(0); i < row_map.get_num_local_dofs(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_map.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
           {
             // fetch row entry weight and pre-multiply by alpha
             DataType_ iw = alpha * DataType_(row_map.get_weight(i, ic));
@@ -871,10 +871,10 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_map.get_num_local_dofs(); ++j)
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
             {
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_map.get_num_contribs(j); ++jc)
+              for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
               {
                 // fetch trial function dof weight
                 DataType_ jw = DataType_(col_map.get_weight(j, jc));
@@ -976,10 +976,10 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
+        for(int i(0); i < row_map.get_num_local_dofs(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_map.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
           {
             // fetch row index
             IndexType_ ix = IndexType_(row_map.get_index(i, ic));
@@ -991,13 +991,13 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_map.get_num_local_dofs(); ++j)
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
             {
               // clear  accumulation entry
               DataType_ dx(DataType_(0));
 
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_map.get_num_contribs(j); ++jc)
+              for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
               {
                 // fetch column index
                 Index jx = col_map.get_index(j, jc);
@@ -1097,10 +1097,10 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
+        for(int i(0); i < row_map.get_num_local_dofs(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_map.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
           {
             // fetch row entry weight and pre-multiply by alpha
             DataType_ iw = alpha * DataType_(row_map.get_weight(i, ic));
@@ -1118,10 +1118,10 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_map.get_num_local_dofs(); ++j)
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
             {
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_map.get_num_contribs(j); ++jc)
+              for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
               {
                 // fetch trial function dof weight
                 DataType_ jw = DataType_(col_map.get_weight(j, jc));
@@ -1222,10 +1222,10 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
+        for(int i(0); i < row_map.get_num_local_dofs(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_map.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
           {
             // fetch row index
             Index ix = row_map.get_index(i, ic);
@@ -1240,13 +1240,13 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_map.get_num_local_dofs(); ++j)
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
             {
               // clear  accumulation entry
               DataType_ dx(DataType_(0));
 
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_map.get_num_contribs(j); ++jc)
+              for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
               {
                 // fetch column index
                 Index jx = col_map.get_index(j, jc);
@@ -1293,7 +1293,7 @@ namespace FEAST
      *
      * \author Jordi Paul
      */
-    template<typename DataType_, typename IndexType_, Index BlockHeight_, Index BlockWidth_>
+    template<typename DataType_, typename IndexType_, int BlockHeight_, int BlockWidth_>
     class ScatterAxpy< LAFEM::SparseMatrixCSRBlocked<Mem::Main, DataType_, IndexType_, BlockHeight_, BlockWidth_> >
     {
     public:
@@ -1352,10 +1352,10 @@ namespace FEAST
                       DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_map.get_num_local_dofs(); ++i)
+        for(int i(0); i < row_map.get_num_local_dofs(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_map.get_num_contribs(i); ++ic)
+          for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
           {
             // fetch row entry weight and pre-multiply by alpha
             DataType_ iw = alpha * DataType_(row_map.get_weight(i, ic));
@@ -1370,10 +1370,10 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_map.get_num_local_dofs(); ++j)
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
             {
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_map.get_num_contribs(j); ++jc)
+              for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
               {
                 // fetch trial function dof weight
                 DataType_ jw = DataType_(col_map.get_weight(j, jc));

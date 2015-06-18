@@ -20,7 +20,7 @@ template
   typename MemType_,
   typename DT_,
   typename IT_,
-  Index BlockSize_
+  int BlockSize_
   >
 class UnitFilterBlockedVectorTest
   : public FullTaggedTest<MemType_, DT_, IT_>
@@ -40,7 +40,7 @@ public:
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
-    const Index n = 7;
+    const int n = 7;
     VectorType a1(n, DT_(1));
     VectorType a2(n, DT_(1));
 
@@ -78,7 +78,7 @@ public:
     filter.add(IT_(6), tmp);
 
     // check sizes
-    TEST_CHECK_EQUAL(filter.size(), n);
+    TEST_CHECK_EQUAL(filter.size(), Index(n));
     TEST_CHECK_EQUAL(filter.used_elements(), Index(3));
 
     FilterType filter2;
@@ -133,8 +133,8 @@ template
   typename MemType_,
   typename DT_,
   typename IT_,
-  Index BlockHeight_,
-  Index BlockWidth_
+  int BlockHeight_,
+  int BlockWidth_
   >
 class UnitFilterBlockedMatrixTest
   : public FullTaggedTest<MemType_, DT_, IT_>
@@ -146,8 +146,8 @@ class UnitFilterBlockedMatrixTest
   typedef DenseVector<MemType_, IT_, IT_> IVectorType;
   typedef UnitFilterBlocked<MemType_, DT_, IT_, BlockHeight_> FilterType;
 
-  static constexpr Index BlockHeight = BlockHeight_;
-  static constexpr Index BlockWidth = BlockWidth_;
+  static constexpr int BlockHeight = BlockHeight_;
+  static constexpr int BlockWidth = BlockWidth_;
 
 public:
   UnitFilterBlockedMatrixTest()
@@ -212,7 +212,7 @@ public:
     matrix_b.val()[16] = b_tmp;
 
     // Set the corresponding diagonal blocks to the unit matrix (possibly non-square)
-    for(Index i(0); i < Math::min(BlockHeight, BlockWidth); ++i)
+    for(int i(0); i < Math::min(BlockHeight, BlockWidth); ++i)
       b_tmp(i,i) = DT_(1);
 
     matrix_b.val()[0] = b_tmp;

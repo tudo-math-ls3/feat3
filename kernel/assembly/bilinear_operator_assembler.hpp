@@ -121,14 +121,14 @@ namespace FEAST
           oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_test_dofs = test_eval.get_num_local_dofs();
-          Index num_loc_trial_dofs = trial_eval.get_num_local_dofs();
+          int num_loc_test_dofs = test_eval.get_num_local_dofs();
+          int num_loc_trial_dofs = trial_eval.get_num_local_dofs();
 
           // format local matrix
           lmd.format();
 
           // loop over all quadrature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -141,10 +141,10 @@ namespace FEAST
             oper_eval.set_point(trafo_data);
 
             // test function loop
-            for(Index i(0); i < num_loc_test_dofs; ++i)
+            for(int i(0); i < num_loc_test_dofs; ++i)
             {
               // trial function loop
-              for(Index j(0); j < num_loc_trial_dofs; ++j)
+              for(int j(0); j < num_loc_trial_dofs; ++j)
               {
                 // evaluate functor and integrate
                 lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
@@ -272,13 +272,13 @@ namespace FEAST
           oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = space_eval.get_num_local_dofs();
+          int num_loc_dofs = space_eval.get_num_local_dofs();
 
           // format local matrix
           lmd.format();
 
           // loop over all quadrature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -290,10 +290,10 @@ namespace FEAST
             oper_eval.set_point(trafo_data);
 
             // test function loop
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
               // trial function loop
-              for(Index j(0); j < num_loc_dofs; ++j)
+              for(int j(0); j < num_loc_dofs; ++j)
               {
                 // evaluate functor and integrate
                 lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
@@ -435,13 +435,13 @@ namespace FEAST
           oper_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = space_eval.get_num_local_dofs();
+          int num_loc_dofs = space_eval.get_num_local_dofs();
 
           // format local matrix
           lmd.format();
 
           // loop over all quadrature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -453,10 +453,10 @@ namespace FEAST
             oper_eval.set_point(trafo_data);
 
             // test function loop
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
               // trial function loop
-              for(Index j(0); j < num_loc_dofs; ++j)
+              for(int j(0); j < num_loc_dofs; ++j)
               {
                 // evaluate functor and integrate
                 lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
@@ -608,10 +608,10 @@ namespace FEAST
             oper_eval.prepare(trafo_eval);
 
             // fetch number of local dofs
-            Index num_loc_dofs = space_eval.get_num_local_dofs();
+            int num_loc_dofs = space_eval.get_num_local_dofs();
 
             // loop over all quadrature points and integrate
-            for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+            for(int k(0); k < cubature_rule.get_num_points(); ++k)
             {
               // compute trafo data
               trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -623,10 +623,10 @@ namespace FEAST
               oper_eval.set_point(trafo_data);
 
               // test function loop
-              for(Index i(0); i < num_loc_dofs; ++i)
+              for(int i(0); i < num_loc_dofs; ++i)
               {
                 // trial function loop
-                for(Index j(0); j < num_loc_dofs; ++j)
+                for(int j(0); j < num_loc_dofs; ++j)
                 {
                   // Integrate the FE function
                   ret_loc(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
@@ -785,11 +785,11 @@ namespace FEAST
             oper_eval.prepare(trafo_eval);
 
             // fetch number of local dofs
-            Index num_loc_test_dofs = test_eval.get_num_local_dofs();
-            Index num_loc_trial_dofs = trial_eval.get_num_local_dofs();
+            int num_loc_test_dofs = test_eval.get_num_local_dofs();
+            int num_loc_trial_dofs = trial_eval.get_num_local_dofs();
 
             // loop over all quadrature points and integrate
-            for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+            for(int k(0); k < cubature_rule.get_num_points(); ++k)
             {
               // compute trafo data
               trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -802,10 +802,10 @@ namespace FEAST
               oper_eval.set_point(trafo_data);
 
               // test function loop
-              for(Index i(0); i < num_loc_test_dofs; ++i)
+              for(int i(0); i < num_loc_test_dofs; ++i)
               {
                 // trial function loop
-                for(Index j(0); j < num_loc_trial_dofs; ++j)
+                for(int j(0); j < num_loc_trial_dofs; ++j)
                 {
                   // Integrate the FE function
                   ret_loc(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *

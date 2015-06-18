@@ -44,9 +44,9 @@ namespace FEAST
         return "silvester-open";
       }
 
-      static Index count(Index points)
+      static int count(int points)
       {
-        return ((points+1)*(points+2)) / Index(2);
+        return ((points+1)*(points+2)) / 2;
       }
 
       /**
@@ -59,9 +59,9 @@ namespace FEAST
         typename Weight_,
         typename Coord_,
         typename Point_>
-      static void fill(Rule<Shape::Simplex<2>, Weight_, Coord_, Point_>& rule, Index num_points)
+      static void fill(Rule<Shape::Simplex<2>, Weight_, Coord_, Point_>& rule, int num_points)
       {
-        Index off(0);
+        int off(0);
         switch(num_points)
         {
         case 2:

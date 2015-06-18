@@ -266,11 +266,11 @@ namespace FEAST
           for(; it != jt; ++it)
           {
             dof_assign.prepare(*it);
-            const Index num_assign(dof_assign.get_num_assigned_dofs());
-            for(Index j(0); j < num_assign; ++j)
+            const int num_assign(dof_assign.get_num_assigned_dofs());
+            for(int j(0); j < num_assign; ++j)
             {
-              const Index num_contribs(dof_assign.get_num_contribs(j));
-              for(Index k(0); k < num_contribs; ++k)
+              const int num_contribs(dof_assign.get_num_contribs(j));
+              for(int k(0); k < num_contribs; ++k)
               {
                 idx.insert(dof_assign.get_index(j, k));
               }
@@ -318,11 +318,11 @@ namespace FEAST
 
             dof_assign.prepare(*it);
 
-            const Index num_assign(dof_assign.get_num_assigned_dofs());
-            for(Index j(0); j < num_assign; ++j)
+            const int num_assign(dof_assign.get_num_assigned_dofs());
+            for(int j(0); j < num_assign; ++j)
             {
-              const Index num_contribs(dof_assign.get_num_contribs(j));
-              for(Index k(0); k < num_contribs; ++k)
+              const int num_contribs(dof_assign.get_num_contribs(j));
+              for(int k(0); k < num_contribs; ++k)
               {
                 Index index(dof_assign.get_index(j, k));
                 DataType_ weight(dof_assign.get_weight(j, k));

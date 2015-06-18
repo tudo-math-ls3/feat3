@@ -42,50 +42,50 @@ namespace FEAST
         return "dunavant";
       }
 
-      static Index count(Index points)
+      static int count(int points)
       {
         switch(points)
         {
         case 2:
-          return Index(3);
+          return 3;
         case 3:
-          return Index(4);
+          return 4;
         case 4:
-          return Index(6);
+          return 6;
         case 5:
-          return Index(7);
+          return 7;
         case 6:
-          return Index(12);
+          return 12;
         case 7:
-          return Index(13);
+          return 13;
         case 8:
-          return Index(16);
+          return 16;
         case 9:
-          return Index(19);
+          return 19;
         case 10:
-          return Index(25);
+          return 25;
         case 11:
-          return Index(27);
+          return 27;
         case 12:
-          return Index(33);
+          return 33;
         case 13:
-          return Index(37);
+          return 37;
         case 14:
-          return Index(42);
+          return 42;
         case 15:
-          return Index(48);
+          return 48;
         case 16:
-          return Index(52);
+          return 52;
         case 17:
-          return Index(61);
+          return 61;
         case 18:
-          return Index(70);
+          return 70;
         case 19:
-          return Index(73);
+          return 73;
         case 20:
-          return Index(79);
+          return 79;
         default:
-          return Index(0);
+          return 0;
         }
       }
 
@@ -99,9 +99,9 @@ namespace FEAST
         typename Weight_,
         typename Coord_,
         typename Point_>
-      static void fill(Rule<Shape::Simplex<2>, Weight_, Coord_, Point_>& rule, Index num_points)
+      static void fill(Rule<Shape::Simplex<2>, Weight_, Coord_, Point_>& rule, int num_points)
       {
-        Index off(0);
+        int off(0);
         switch(num_points)
         {
         case 2:

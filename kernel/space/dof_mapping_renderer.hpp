@@ -43,12 +43,12 @@ namespace FEAST
         dom_ptr[0] = Index(0);
         for(Index i(0); i < num_cells; ++i)
         {
-          Index num_adj(0);
+          int num_adj(0);
           dof_map.prepare(i);
-          for(Index j(0); j < dof_map.get_num_local_dofs(); ++j)
+          for(int j(0); j < dof_map.get_num_local_dofs(); ++j)
             num_adj += dof_map.get_num_contribs(j);
           dof_map.finish();
-          dom_ptr[i+1] = dom_ptr[i] + num_adj;
+          dom_ptr[i+1] = dom_ptr[i] + Index(num_adj);
         }
 
         // allocate the index array
@@ -59,9 +59,9 @@ namespace FEAST
         {
           Index l(dom_ptr[i]);
           dof_map.prepare(i);
-          for(Index j(0); j < dof_map.get_num_local_dofs(); ++j)
+          for(int j(0); j < dof_map.get_num_local_dofs(); ++j)
           {
-            for(Index k(0); k < dof_map.get_num_contribs(j); ++k, ++l)
+            for(int k(0); k < dof_map.get_num_contribs(j); ++k, ++l)
               img_idx[l] = dof_map.get_index(j, k);
           }
           dof_map.finish();

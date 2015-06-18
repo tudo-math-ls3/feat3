@@ -117,7 +117,7 @@ namespace FEAST
         typename AsmTraits::LocalMatrixType mass;
 
         // pivot array for factorisation
-        Index pivot[mass.n];
+        int pivot[mass.n];
 
         // create local vector data
         typename AsmTraits::LocalVectorType lvad;
@@ -157,7 +157,7 @@ namespace FEAST
           func_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs(space_eval.get_num_local_dofs());
+          int num_loc_dofs(space_eval.get_num_local_dofs());
 
           // format local system
           lvad.format();
@@ -167,7 +167,7 @@ namespace FEAST
           DataType volume(DataType(0));
 
           // loop over all cubature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -185,13 +185,13 @@ namespace FEAST
             volume += omega;
 
             // test function loop
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
               // assemble RHS entry
               lvad(i) += omega * fv * space_data.phi[i].value;
 
               // trial function loop
-              for(Index j(0); j < num_loc_dofs; ++j)
+              for(int j(0); j < num_loc_dofs; ++j)
               {
                 mass(i,j) += omega * space_data.phi[i].value * space_data.phi[j].value;
               }
@@ -206,10 +206,10 @@ namespace FEAST
           trafo_eval.finish();
 
           // try to factorise the local mass matrix
-          LinAlg::mat_factorise(num_loc_dofs, num_loc_dofs, Index(mass.n), &mass.v[0][0], pivot);
+          LinAlg::mat_factorise(num_loc_dofs, num_loc_dofs, mass.n, &mass.v[0][0], pivot);
 
           // solve M*x=f
-          LinAlg::mat_solve_vec<false>(num_loc_dofs, &lvad.v[0], Index(mass.n), &mass.v[0][0], pivot);
+          LinAlg::mat_solve_vec<false>(num_loc_dofs, &lvad.v[0], mass.n, &mass.v[0][0], pivot);
 
           // choose weight
           if(weight_type == wt_volume)

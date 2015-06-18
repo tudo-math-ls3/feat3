@@ -42,7 +42,7 @@ namespace FEAST
         }
 #endif
 
-        template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
         {
           csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, rhs, val, col_ind, row_ptr, x, rows, columns, used_elements);
@@ -92,7 +92,7 @@ namespace FEAST
         template <typename DT_, typename IT_>
         static void csr_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
 
-        template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_>

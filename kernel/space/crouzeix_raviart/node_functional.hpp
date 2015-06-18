@@ -34,7 +34,7 @@ namespace FEAST
       {
       public:
         typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
-        static constexpr Index max_assigned_dofs = Index(1);
+        static constexpr int max_assigned_dofs = 1;
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -61,7 +61,7 @@ namespace FEAST
           _trafo_eval(space.get_trafo())
         {
           // initialize facet barycentre
-          for(Index i(0); i < Index(ShapeType::dimension-1); ++i)
+          for(int i(0); i < ShapeType::dimension-1; ++i)
             _barycentre[i] = DataType_(1) / DataType_(ShapeType::dimension);
         }
 
@@ -77,7 +77,7 @@ namespace FEAST
           BaseClass::finish();
         }
 
-        Index get_num_assigned_dofs() const
+        int get_num_assigned_dofs() const
         {
           return max_assigned_dofs;
         }

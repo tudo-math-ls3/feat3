@@ -152,7 +152,7 @@ namespace FEAST
           mid_point.format();
           for(int i(0); i < num_vertex; ++i)
           {
-            for(Index j(0); j < Index(VertexSet_::num_coords); ++j)
+            for(int j(0); j < VertexSet_::num_coords; ++j)
             {
               mid_point[j] += vertex_set[index_tuple[i]][j];
             }
@@ -193,7 +193,7 @@ namespace FEAST
         {
           typedef typename VertexSet_::CoordType DataType;
           Tiny::Vector<DataType, VertexSet_::num_coords> mid_point;
-          for(Index j(0); j < Index(VertexSet_::num_coords); ++j)
+          for(int j(0); j < VertexSet_::num_coords; ++j)
           {
             mid_point[j] = vertex_set[vertex][j];
           }

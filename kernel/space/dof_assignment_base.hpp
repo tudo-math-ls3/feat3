@@ -48,35 +48,30 @@ namespace FEAST
         _cell_index = ~Index(0);
       }
 
-      Index get_max_assigned_dofs() const
+      int get_max_assigned_dofs() const
       {
         return 1;
       }
 
 #ifdef DOXYGEN
-      Index get_num_assigned_dofs() const;
+      int get_num_assigned_dofs() const;
 #endif // DOXYGEN
 
-      Index get_max_contribs() const
+      int get_max_contribs() const
       {
         return 1;
       }
 
-      Index get_num_contribs(Index /*assign_idx*/) const
+      int get_num_contribs(int /*assign_idx*/) const
       {
         return 1;
-      }
-
-      Index get_derive_order(Index /*assign_idx*/) const
-      {
-        return 0;
       }
 
 #ifdef DOXYGEN
-      Index get_index(Index assign_idx, Index contrib_idx = 0) const;
+      Index get_index(int assign_idx, int contrib_idx = 0) const;
 #endif // DOXYGEN
 
-      DataType_ get_weight(Index /*assign_idx*/, Index /*contrib_idx*/ = 0) const
+      DataType_ get_weight(int /*assign_idx*/, int /*contrib_idx*/ = 0) const
       {
         return DataType_(1.0);
       }
@@ -157,27 +152,21 @@ namespace FEAST
       }
 
       /** \copydoc DofAssignmentBase::get_max_assigned_dofs() */
-      Index get_max_assigned_dofs() const
+      int get_max_assigned_dofs() const
       {
-        return Index(dofs_per_cell);
+        return dofs_per_cell;
       }
 
       /** \copydoc DofAssignmentBase::get_num_assigned_dofs() */
-      Index get_num_assigned_dofs() const
+      int get_num_assigned_dofs() const
       {
-        return Index(dofs_per_cell);
-      }
-
-      /** \copydoc DofAssignmentBase::get_derive_order() */
-      Index get_derive_order(Index assign_idx)
-      {
-        return DofTraits_<DofTag_, shape_dim_>::derive_order(assign_idx);
+        return dofs_per_cell;
       }
 
       /** \copydoc DofAssignmentBase::get_index() */
-      Index get_index(Index assign_idx, Index DOXY(contrib_idx) = 0) const
+      Index get_index(int assign_idx, int DOXY(contrib_idx) = 0) const
       {
-        return _dof_offset + Index(dofs_per_cell) * this->_cell_index + assign_idx;
+        return _dof_offset + Index(dofs_per_cell) * this->_cell_index + Index(assign_idx);
       }
     };
   } // namespace Space

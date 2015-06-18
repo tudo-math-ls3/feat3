@@ -60,7 +60,7 @@ namespace FEAST
             + stringify(int(Factory_::max_points)) + ">");
         }
 
-        void alias(const String& name, Index num_points)
+        void alias(const String& name, int num_points)
         {
           _functor.add_alias(name, Factory_::name() + ":" + stringify(num_points));
         }

@@ -13,23 +13,25 @@ namespace FEAST
   {
     namespace Arch
     {
-      template <typename DT_, typename IT_, Index BlockSize_>
+      template <typename DT_, typename IT_, int BlockSize_>
       void UnitFilterBlocked<Mem::Main>::filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
       {
+        Index block_size = Index(BlockSize_);
         for(Index i(0); i < ue; ++i)
         {
-          for(Index j(0) ; j < BlockSize_ ; ++j)
-            v[BlockSize_ * sv_indices[i] + j] = sv_elements[BlockSize_ * i + j];
+          for(Index j(0) ; j < block_size ; ++j)
+            v[block_size * sv_indices[i] + j] = sv_elements[block_size * i + Index(j)];
         }
       }
 
-      template <typename DT_, typename IT_, Index BlockSize_>
+      template <typename DT_, typename IT_, int BlockSize_>
       void UnitFilterBlocked<Mem::Main>::filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue)
       {
+        Index block_size = Index(BlockSize_);
         for(Index i(0); i < ue; ++i)
         {
           for(Index j(0) ; j < BlockSize_ ; ++j)
-            v[BlockSize_ * sv_indices[i] + j] = DT_(0);
+            v[block_size * sv_indices[i] + j] = DT_(0);
         }
       }
 

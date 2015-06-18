@@ -37,7 +37,7 @@ namespace FEAST
       {
       public:
         typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
-        static constexpr Index max_assigned_dofs = Index(1);
+        static constexpr int max_assigned_dofs = 1;
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -87,7 +87,7 @@ namespace FEAST
           BaseClass::finish();
         }
 
-        Index get_num_assigned_dofs() const
+        int get_num_assigned_dofs() const
         {
           return max_assigned_dofs;
         }
@@ -117,7 +117,7 @@ namespace FEAST
           TrafoEvalData trafo_data;
 
           // integrate over facet
-          for(Index i(0); i < _cub_rule.get_num_points(); ++i)
+          for(int i(0); i < _cub_rule.get_num_points(); ++i)
           {
             _trafo_eval(trafo_data, _cub_rule.get_point(i));
             value += _cub_rule.get_weight(i) * trafo_data.jac_det * func_eval.value(trafo_data);

@@ -66,7 +66,7 @@ namespace FEAST
          * \returns
          * The number of local dofs.
          */
-        Index get_num_local_dofs() const
+        int get_num_local_dofs() const
         {
           return Index(1);
         }
@@ -144,9 +144,9 @@ namespace FEAST
          * \returns
          * The number of local dofs.
          */
-        Index get_num_local_dofs() const
+        int get_num_local_dofs() const
         {
-          return Index(shape_dim_ + 1);
+          return (shape_dim_ + 1);
         }
 
         /**
@@ -164,7 +164,7 @@ namespace FEAST
           const DomainPointType& point) const
         {
           data.phi[0].ref_value = DataType(1);
-          for(Index i(0); i < Index(shape_dim_); ++i)
+          for(int i(0); i < shape_dim_; ++i)
             data.phi[0].ref_value -= (data.phi[i+1].ref_value = point[i]);
         }
 
@@ -182,10 +182,10 @@ namespace FEAST
           EvalData_& data,
           const DomainPointType& DOXY(point)) const
         {
-          for(Index i(0); i < Index(shape_dim_); ++i)
+          for(int i(0); i < shape_dim_; ++i)
           {
             data.phi[0].ref_grad[i] = -DataType(1);
-            for(Index j(0); j < Index(shape_dim_); ++j)
+            for(int j(0); j < shape_dim_; ++j)
               data.phi[i+1].ref_grad[j] = DataType(i == j ? 1 : 0);
           }
         }
@@ -305,7 +305,7 @@ namespace FEAST
          * \returns
          * The number of local dofs.
          */
-        Index get_num_local_dofs() const
+        int get_num_local_dofs() const
         {
           return Index(shape_dim_ + 1);
         }
@@ -342,7 +342,7 @@ namespace FEAST
 
           // evaluate basis functions
           data.phi[0].value = DataType(1);
-          for(Index i(0); i < Index(shape_dim_); ++i)
+          for(int i(0); i < shape_dim_; ++i)
             data.phi[i+1].value = pt[i];
         }
 
@@ -357,10 +357,10 @@ namespace FEAST
           pt.set_mat_vec_mult(_inv_lin_mat, trafo_data.img_point - _inv_lin_vec);
 
           // loop over all basis functions
-          for(Index i(0); i < (shape_dim_+1); ++i)
+          for(int i(0); i < (shape_dim_+1); ++i)
           {
             // compute local gradient
-            for(Index j(0); j < shape_dim_; ++j)
+            for(int j(0); j < shape_dim_; ++j)
               loc_grad[j] = DataType(i == (j+1) ? 1 : 0);
 
             // multiply by transpose inverse linearised trafo matrix for chain rule

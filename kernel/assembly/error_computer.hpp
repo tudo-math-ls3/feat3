@@ -146,10 +146,10 @@ namespace FEAST
           func_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = space_eval.get_num_local_dofs();
+          int num_loc_dofs = space_eval.get_num_local_dofs();
 
           // loop over all quadrature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -161,7 +161,7 @@ namespace FEAST
             typename AsmTraits::ValueType value(func_eval.value(trafo_data));
 
             // test function loop
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
               // subtract basis function value
               value -= lvad[i] * space_data.phi[i].value;
@@ -325,10 +325,10 @@ namespace FEAST
           func_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = space_eval.get_num_local_dofs();
+          int num_loc_dofs = space_eval.get_num_local_dofs();
 
           // loop over all quadrature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -340,7 +340,7 @@ namespace FEAST
             typename AsmTraits::GradientType value(func_eval.gradient(trafo_data));
 
             // test function loop
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
               // subtract basis function gradient
               value -= lvad[i] * space_data.phi[i].grad;
@@ -504,10 +504,10 @@ namespace FEAST
           func_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = space_eval.get_num_local_dofs();
+          int num_loc_dofs = space_eval.get_num_local_dofs();
 
           // loop over all quadrature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -519,7 +519,7 @@ namespace FEAST
             typename AsmTraits::HessianType value(func_eval.hessian(trafo_data));
 
             // test function loop
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
               // subtract basis function gradient
               value -= lvad[i] * space_data.phi[i].hess;

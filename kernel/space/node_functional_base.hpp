@@ -72,7 +72,7 @@ namespace FEAST
       /**
        * \brief Returns the number of assigned dofs on the current cell.
        */
-      Index get_num_assigned_dofs() const;
+      int get_num_assigned_dofs() const;
 
       /**
        * \brief Evaluation operator.
@@ -120,7 +120,7 @@ namespace FEAST
       }
 
       /** \copydoc NodeFunctionalBase::get_num_assigned_dofs() */
-      Index get_num_assigned_dofs() const
+      int get_num_assigned_dofs() const
       {
         return max_assigned_dofs;
       }

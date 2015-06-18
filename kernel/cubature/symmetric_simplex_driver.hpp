@@ -33,16 +33,16 @@ namespace FEAST
         typename Weight_,
         typename Coord_,
         typename Point_>
-      static Index fill_sym1(
+      static int fill_sym1(
         Rule<Shape::Simplex<2>, Weight_, Coord_, Point_>& rule,
-        Index off,
+        int off,
         Weight_ w,
         Coord_ x0)
       {
         rule.get_weight(off) = w;
         rule.get_coord(off, 0) = x0; // 000
         rule.get_coord(off, 1) = x0;
-        return Index(1);
+        return 1;
       }
 
       /// Adds the three permutations of the barycentric point (x0,x1,x1) to the rule.
@@ -50,9 +50,9 @@ namespace FEAST
         typename Weight_,
         typename Coord_,
         typename Point_>
-      static Index fill_sym2(
+      static int fill_sym2(
         Rule<Shape::Simplex<2>, Weight_, Coord_, Point_>& rule,
-        Index off,
+        int off,
         Weight_ w,
         Coord_ x0,
         Coord_ x1)
@@ -66,7 +66,7 @@ namespace FEAST
         rule.get_weight(++off) = w;
         rule.get_coord(off, 0) = x1; // 110
         rule.get_coord(off, 1) = x1;
-        return Index(3);
+        return 3;
       }
 
       /// Adds the six permutations of the barycentric point (x0,x1,x2) to the rule.
@@ -74,9 +74,9 @@ namespace FEAST
         typename Weight_,
         typename Coord_,
         typename Point_>
-      static Index fill_sym3(
+      static int fill_sym3(
         Rule<Shape::Simplex<2>, Weight_, Coord_, Point_>& rule,
-        Index off,
+        int off,
         Weight_ w,
         Coord_ x0,
         Coord_ x1,
@@ -100,7 +100,7 @@ namespace FEAST
         rule.get_weight(++off) = w;
         rule.get_coord(off, 0) = x0; // 021
         rule.get_coord(off, 1) = x2;
-        return Index(6);
+        return 6;
       }
     }; // class SymmetricSimplexDriver<Simplex<...>,...>
 

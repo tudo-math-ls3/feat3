@@ -28,7 +28,7 @@ namespace FEAST
           typedef typename Space_::template NodeFunctional<shape_dim_, DataType>::Type NodeFunc;
 
           // check for empty node functional set
-          static constexpr Index max_dofs = NodeFunc::max_assigned_dofs;
+          static constexpr int max_dofs = NodeFunc::max_assigned_dofs;
           if(max_dofs <= 0)
             return;
 
@@ -55,15 +55,15 @@ namespace FEAST
             dof_assign.prepare(i);
 
             // loop over all assigned DOFs
-            const Index num_dofs = dof_assign.get_num_assigned_dofs();
-            for(Index j(0); j < num_dofs; ++j)
+            const int num_dofs = dof_assign.get_num_assigned_dofs();
+            for(int j(0); j < num_dofs; ++j)
             {
               // evaluate node functional
               DataType v = node_data[j];
 
               // loop over all contributions
-              const Index num_contribs = dof_assign.get_num_contribs(j);
-              for(Index k(0); k < num_contribs; ++k)
+              const int num_contribs = dof_assign.get_num_contribs(j);
+              for(int k(0); k < num_contribs; ++k)
               {
                 Index idx(dof_assign.get_index(j,k));
                 vector(idx, vector(idx) + dof_assign.get_weight(j,k) * v);

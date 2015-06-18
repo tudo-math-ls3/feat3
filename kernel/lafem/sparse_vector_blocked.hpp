@@ -40,7 +40,7 @@ namespace FEAST
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_, typename IT_, Index BlockSize_>
+    template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
     class SparseVectorBlocked : public Container<Mem_, DT_, IT_>, public VectorBase
     {
     private:
@@ -52,16 +52,17 @@ namespace FEAST
         for (Index i(1), j ; i < size ; ++i)
         {
           swap_key = Util::MemoryPool<Mem_>::get_element(key, i);
-          Util::MemoryPool<Mem_>::download(swap1.v, val1 + i * BlockSize_, BlockSize_);
+          Util::MemoryPool<Mem_>::download(swap1.v, val1 + i * Index(BlockSize_), Index(BlockSize_));
           j = i;
           while (j > 0 && Util::MemoryPool<Mem_>::get_element(key, j - 1) > swap_key)
           {
             Util::MemoryPool<Mem_>::copy(key + j, key + j - 1, 1);
-            Util::MemoryPool<Mem_>::copy(val1 + j * BlockSize_, val1 + (j - 1) * BlockSize_, BlockSize_);
+            Util::MemoryPool<Mem_>::copy(val1 + j * Index(BlockSize_),
+            val1 + (j - 1) * Index(BlockSize_), Index(BlockSize_));
             --j;
           }
           Util::MemoryPool<Mem_>::set_memory(key + j, swap_key);
-          Util::MemoryPool<Mem_>::upload(val1 + j * BlockSize_, swap1.v, BlockSize);
+          Util::MemoryPool<Mem_>::upload(val1 + j * Index(BlockSize_), swap1.v, Index(BlockSize));
         }
       }
 
@@ -88,7 +89,7 @@ namespace FEAST
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Our size of a single block
-      static constexpr Index BlockSize = BlockSize_;
+      static constexpr int BlockSize = BlockSize_;
 
       /**
        * \brief Constructor
@@ -265,7 +266,7 @@ namespace FEAST
       /// The raw number of elements of type DT_
       Index raw_size() const
       {
-        return this->size() * BlockSize_;
+        return this->size() * Index(BlockSize_);
       }
 
       /**
@@ -298,7 +299,7 @@ namespace FEAST
         if (i < used_elements() && Util::MemoryPool<Mem_>::get_element(indices(), i) == index)
         {
           Tiny::Vector<DT_, BlockSize_> t;
-          Util::MemoryPool<Mem_>::download(t.v, this->_elements.at(0) + i * BlockSize_, BlockSize_);
+          Util::MemoryPool<Mem_>::download(t.v, this->_elements.at(0) + i * Index(BlockSize_), Index(BlockSize_));
           return t;
         }
         else
@@ -325,14 +326,14 @@ namespace FEAST
         // vector is empty, no arrays allocated
         if (this->_elements.size() == 0)
         {
-          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(alloc_increment() * BlockSize_));
-          this->_elements_size.push_back(alloc_increment() * BlockSize_);
-          Util::MemoryPool<Mem_>::instance()->template set_memory<DT_>(this->_elements.back(), DT_(4711), alloc_increment() * BlockSize_);
+          this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(alloc_increment() * Index(BlockSize_)));
+          this->_elements_size.push_back(alloc_increment() * Index(BlockSize_));
+          Util::MemoryPool<Mem_>::instance()->template set_memory<DT_>(this->_elements.back(), DT_(4711), alloc_increment() * Index(BlockSize_));
           this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(alloc_increment()));
           this->_indices_size.push_back(alloc_increment());
           Util::MemoryPool<Mem_>::instance()->template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
           _allocated_elements() = alloc_increment();
-          Util::MemoryPool<Mem_>::upload(this->_elements.at(0), val.v, BlockSize_);
+          Util::MemoryPool<Mem_>::upload(this->_elements.at(0), val.v, Index(BlockSize_));
           Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0), IT_(index));
           _used_elements() = 1;
         }
@@ -340,7 +341,8 @@ namespace FEAST
         // append element in already allocated arrays
         else if(_used_elements() < allocated_elements())
         {
-          Util::MemoryPool<Mem_>::upload(this->_elements.at(0) + _used_elements() * BlockSize_, val.v, BlockSize_);
+          Util::MemoryPool<Mem_>::upload(this->_elements.at(0) + _used_elements() * Index(BlockSize_), val.v,
+          Index(BlockSize_));
           Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
           ++_used_elements();
         }
@@ -350,12 +352,14 @@ namespace FEAST
         {
           _allocated_elements() += alloc_increment();
 
-          DT_ * elements_new(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(allocated_elements() * BlockSize_));
-          Util::MemoryPool<Mem_>::instance()->template set_memory<DT_>(elements_new, DT_(4711), allocated_elements() * BlockSize_);
+          DT_ * elements_new(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(
+            allocated_elements() * Index(BlockSize_)));
+          Util::MemoryPool<Mem_>::instance()->template set_memory<DT_>(elements_new, DT_(4711),
+          allocated_elements() * Index(BlockSize_));
           IT_ * indices_new(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(allocated_elements()));
           Util::MemoryPool<Mem_>::instance()->template set_memory<IT_>(indices_new, IT_(4711), allocated_elements());
 
-          Util::MemoryPool<Mem_>::copy(elements_new, this->_elements.at(0), _used_elements() * BlockSize_);
+          Util::MemoryPool<Mem_>::copy(elements_new, this->_elements.at(0), _used_elements() * Index(BlockSize_));
           Util::MemoryPool<Mem_>::copy(indices_new, this->_indices.at(0), _used_elements());
 
           Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(0));
@@ -364,11 +368,12 @@ namespace FEAST
           this->_elements.at(0) = elements_new;
           this->_indices.at(0) = indices_new;
 
-          Util::MemoryPool<Mem_>::upload(this->_elements.at(0) + used_elements() * BlockSize_, val.v, BlockSize_);
+          Util::MemoryPool<Mem_>::upload(this->_elements.at(0) + used_elements() * Index(BlockSize_), val.v,
+          Index(BlockSize_));
           Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
 
           ++_used_elements();
-          this->_elements_size.at(0) = allocated_elements() * BlockSize_;
+          this->_elements_size.at(0) = allocated_elements() * Index(BlockSize_);
           this->_indices_size.at(0) = allocated_elements();
         }
       }
@@ -495,7 +500,7 @@ namespace FEAST
         {
           auto ta = a(i);
           auto tb = b(i);
-          for (Index j(0) ; j < BlockSize_ ; ++j)
+          for (int j(0) ; j < BlockSize_ ; ++j)
             if (ta[j] != tb[j])
               return false;
         }
@@ -515,7 +520,7 @@ namespace FEAST
         for (Index i(0) ; i < b.size() ; ++i)
         {
           Tiny::Vector<DT_, BlockSize_> t = b(i);
-          for (Index j(0) ; j < BlockSize_ ; ++j)
+          for (int j(0) ; j < BlockSize_ ; ++j)
             lhs << "  " << t[j];
         }
         lhs << "]";

@@ -46,12 +46,12 @@ namespace FEAST
           for(Index i(0); i < num_entities; ++i)
           {
             dof_assign.prepare(target_set[i]);
-            Index num_assign(dof_assign.get_num_assigned_dofs());
-            for(Index j(0); j < num_assign; ++j)
+            int num_assign(dof_assign.get_num_assigned_dofs());
+            for(int j(0); j < num_assign; ++j)
             {
-              contribs += dof_assign.get_num_contribs(j);
+              contribs += Index(dof_assign.get_num_contribs(j));
             }
-            count += num_assign;
+            count += Index(num_assign);
             dof_assign.finish();
           }
 
@@ -76,12 +76,12 @@ namespace FEAST
           for(Index i(0); i < num_entities; ++i)
           {
             dof_assign.prepare(target_set[i]);
-            Index num_assign(dof_assign.get_num_assigned_dofs());
-            for(Index j(0); j < num_assign; ++j, ++ptr)
+            int num_assign(dof_assign.get_num_assigned_dofs());
+            for(int j(0); j < num_assign; ++j, ++ptr)
             {
               *ptr = offset;
-              Index num_contribs(dof_assign.get_num_contribs(j));
-              for(Index k(0); k < num_contribs; ++k, ++offset)
+              int num_contribs(dof_assign.get_num_contribs(j));
+              for(int k(0); k < num_contribs; ++k, ++offset)
               {
                 idx[offset] = dof_assign.get_index(j, k);
               }
@@ -135,9 +135,9 @@ namespace FEAST
         int shape_dim_ = Space_::shape_dim>
       struct MaxDofContrib
       {
-        static Index value(const Space_& space)
+        static int value(const Space_& space)
         {
-          Index max_contrib(MaxDofContrib<Space_, shape_dim_-1>::value(space));
+          int max_contrib(MaxDofContrib<Space_, shape_dim_-1>::value(space));
           typename Space_::template DofAssignment<shape_dim_>::Type dof_assign(space);
           return std::max(max_contrib, dof_assign.get_max_contribs());
         }
@@ -146,7 +146,7 @@ namespace FEAST
       template<typename Space_>
       struct MaxDofContrib<Space_, 0>
       {
-        static Index value(const Space_& space)
+        static int value(const Space_& space)
         {
           typename Space_::template DofAssignment<0>::Type dof_assign(space);
           return dof_assign.get_max_contribs();
@@ -177,7 +177,7 @@ namespace FEAST
         if(Intern::MaxDofContrib<Space_>::value(space) != 1)
           throw InternalError("Cannot compute Dof-Mirror graph: multiple DOF contributions!");
 
-        Index contribs = 0;
+        Index contribs(0);
         Index count = Intern::DofMirrorHelpWrapper<Space_, CellSet_>::count(contribs, space, cell_set);
         Adjacency::Graph graph(count, space.get_num_dofs(), contribs);
         Index* ptr = graph.get_domain_ptr();

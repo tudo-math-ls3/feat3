@@ -247,14 +247,13 @@ namespace ElementRegression
       Tiny::Matrix<double, nl, 3> errs;
       TimeStamp stamp;
 
-      Index nl_min = Index(1);
-      Index nl_max = Math::min(_level, Index(nl));
+      int nl_min(1);
+      int nl_max = (Math::min(int(_level), nl));
 
-      //for(Index i(0); i < Index(nl); ++i)
-      for(Index i(nl_min); i <= nl_max; ++i)
+      for(int i(nl_min); i <= nl_max; ++i)
       {
         // run test
-        errs[i] = run_level(i);
+        errs[i] = run_level(Index(i));
 
         // plot errors
         std::cout << i << ":";

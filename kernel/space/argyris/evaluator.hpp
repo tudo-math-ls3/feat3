@@ -128,7 +128,7 @@ namespace FEAST
          * \returns
          * The number of local dofs.
          */
-        Index get_num_local_dofs() const
+        int get_num_local_dofs() const
         {
           return 21;
         }
@@ -175,7 +175,7 @@ namespace FEAST
           node_mat.format();
 
           // loop over all vertices
-          for(Index vi(0); vi < Index(3); ++vi)
+          for(int vi(0); vi < 3; ++vi)
           {
             // compute vertex coordinate
             dom_point[0] = (vi == 1) ? DataType(1) : DataType(0);
@@ -190,44 +190,44 @@ namespace FEAST
             // initialise monomial powers
             Tiny::Vector<DataType, 6> vx, vy;
             vx(0) = vy(0) = DataType(1);
-            for(Index l(0); l < 5; ++l)
+            for(int l(0); l < 5; ++l)
             {
               vx(l+1) = vx(l) * img_point[0];
               vy(l+1) = vy(l) * img_point[1];
             }
 
             // set monomial values
-            Index k(0);
-            for(Index i(0); i < 6; ++i)
+            int k(0);
+            for(int i(0); i < 6; ++i)
             {
-              for(Index j(0); i+j < 6; ++j, ++k)
+              for(int j(0); i+j < 6; ++j, ++k)
               {
                 // monomial value
                 node_mat(k, 6*vi+0) = vx(i) * vy(j);
                 // dx-derivative
-                if(i > Index(0))
+                if(i > 0)
                   node_mat(k, 6*vi+1) = DataType(i) * vx(i-1) * vy(j);
                 // dy-derivative
-                if(j > Index(0))
+                if(j > 0)
                   node_mat(k, 6*vi+2) = DataType(j) * vy(j-1) * vx(i);
                 // dxx-derivative
-                if(i > Index(1))
+                if(i > 1)
                   node_mat(k, 6*vi+3) = DataType(i) * DataType(i-1) * vx(i-2) * vy(j);
                 // dyy-derivative
-                if(j > Index(1))
+                if(j > 1)
                   node_mat(k, 6*vi+4) = DataType(j) * DataType(j-1) * vy(j-2) * vx(i);
                 // dxy-derivative
-                if(i*j > Index(0))
+                if(i*j > 0)
                   node_mat(k, 6*vi+5) = DataType(i) * vx(i-1) * DataType(j) * vy(j-1);
               }
             }
           }
 
-          for(Index ei(0); ei < 3; ++ei)
+          for(int ei(0); ei < 3; ++ei)
           {
             // compute edge midpoint
-            dom_point[0] = (ei != Index(1) ? DataType(0.5) : DataType(0));
-            dom_point[1] = (ei != Index(2) ? DataType(0.5) : DataType(0));
+            dom_point[0] = (ei != int(1) ? DataType(0.5) : DataType(0));
+            dom_point[1] = (ei != int(2) ? DataType(0.5) : DataType(0));
             trafo_eval.map_point(img_point, dom_point);
             img_point -= _barycentre;
 
@@ -239,22 +239,22 @@ namespace FEAST
             // initialise monomial powers
             Tiny::Vector<DataType, 6> vx, vy;
             vx(0) = vy(0) = DataType(1);
-            for(Index l(0); l < 5; ++l)
+            for(int l(0); l < 5; ++l)
             {
               vx(l+1) = vx(l) * img_point[0];
               vy(l+1) = vy(l) * img_point[1];
             }
 
             // set monomial values
-            Index k(0);
-            for(Index i(0); i < 6; ++i)
+            int k(0);
+            for(int i(0); i < 6; ++i)
             {
-              for(Index j(0); i+j < 6; ++j, ++k)
+              for(int j(0); i+j < 6; ++j, ++k)
               {
                 // edge normal derivative
-                if(i > Index(0))
+                if(i > 0)
                   node_mat(k, 18+ei) += DataType(i) * dnx * vx(i-1) * vy(j);
-                if(j > Index(0))
+                if(j > 0)
                   node_mat(k, 18+ei) += DataType(j) * dny * vy(j-1) * vx(i);
               }
             }
@@ -272,19 +272,19 @@ namespace FEAST
           // initialise monomial powers
           Tiny::Vector<DataType, 6> vx, vy;
           vx(0) = vy(0) = DataType(1);
-          for(Index l(0); l < 5; ++l)
+          for(int l(0); l < 5; ++l)
           {
             vx(l+1) = vx(l) * (tau.img_point[0] - _barycentre[0]);
             vy(l+1) = vy(l) * (tau.img_point[1] - _barycentre[1]);
           }
 
           // compute basis function values
-          for(Index l(0); l < 21; ++l)
+          for(int l(0); l < 21; ++l)
           {
-            Index k(0);
+            int k(0);
             DataType v(DataType(0));
-            for(Index i(0); i < 6; ++i)
-              for(Index j(0); i+j < 6; ++j, ++k)
+            for(int i(0); i < 6; ++i)
+              for(int j(0); i+j < 6; ++j, ++k)
                 v += _coeff(l,k) * vx(i) * vy(j);
             phi.phi[l].value = v;
           }
@@ -298,24 +298,24 @@ namespace FEAST
           // initialise monomial powers
           Tiny::Vector<DataType, 6> vx, vy;
           vx(0) = vy(0) = DataType(1);
-          for(Index l(0); l < 5; ++l)
+          for(int l(0); l < 5; ++l)
           {
             vx(l+1) = vx(l) * (tau.img_point[0] - _barycentre[0]);
             vy(l+1) = vy(l) * (tau.img_point[1] - _barycentre[1]);
           }
 
           // compute basis function gradients
-          for(Index l(0); l < 21; ++l)
+          for(int l(0); l < 21; ++l)
           {
-            Index k(0);
+            int k(0);
             DataType dx(DataType(0)), dy(DataType(0));
-            for(Index i(0); i < 6; ++i)
+            for(int i(0); i < 6; ++i)
             {
-              for(Index j(0); i+j < 6; ++j, ++k)
+              for(int j(0); i+j < 6; ++j, ++k)
               {
-                if(i > Index(0))
+                if(i > 0)
                   dx += _coeff(l,k) * DataType(i) * vx(i-1) * vy(j);
-                if(j > Index(0))
+                if(j > 0)
                   dy += _coeff(l,k) * DataType(j) * vy(j-1) * vx(i);
               }
             }
@@ -332,26 +332,26 @@ namespace FEAST
           // initialise monomial powers
           Tiny::Vector<DataType, 6> vx, vy;
           vx(0) = vy(0) = DataType(1);
-          for(Index l(0); l < 5; ++l)
+          for(int l(0); l < 5; ++l)
           {
             vx(l+1) = vx(l) * (tau.img_point[0] - _barycentre[0]);
             vy(l+1) = vy(l) * (tau.img_point[1] - _barycentre[1]);
           }
 
           // compute basis function hessians
-          for(Index l(0); l < 21; ++l)
+          for(int l(0); l < 21; ++l)
           {
-            Index k(0);
+            int k(0);
             DataType dxx(DataType(0)), dyy(DataType(0)), dxy(DataType(0));
-            for(Index i(0); i < 6; ++i)
+            for(int i(0); i < 6; ++i)
             {
-              for(Index j(0); i+j < 6; ++j, ++k)
+              for(int j(0); i+j < 6; ++j, ++k)
               {
-                if(i > Index(1))
+                if(i > 1)
                   dxx += _coeff(l,k) * DataType(i) * DataType(i-1) * vx(i-2) * vy(j);
-                if(j > Index(1))
+                if(j > 1)
                   dyy += _coeff(l,k) * DataType(j) * DataType(j-1) * vy(j-2) * vx(i);
-                if(i*j > Index(0))
+                if(i*j > 0)
                   dxy += _coeff(l,k) * DataType(i) * vx(i-1) * DataType(j) * vy(j-1);
               }
             }

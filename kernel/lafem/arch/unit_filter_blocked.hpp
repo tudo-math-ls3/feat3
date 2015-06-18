@@ -19,22 +19,22 @@ namespace FEAST
       template <>
       struct UnitFilterBlocked<Mem::Main>
       {
-        template <typename DT_, typename IT_, Index BlockSize_>
+        template <typename DT_, typename IT_, int BlockSize_>
         static void filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
         {
           filter_rhs_generic<DT_, IT_, BlockSize_>(v, sv_elements, sv_indices, ue);
         }
 
-        template <typename DT_, typename IT_, Index BlockSize_>
+        template <typename DT_, typename IT_, int BlockSize_>
         static void filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
         {
           filter_def_generic<DT_, IT_, BlockSize_>(v, sv_indices, ue);
         }
 
-        template <typename DT_, typename IT_, Index BlockSize_>
+        template <typename DT_, typename IT_, int BlockSize_>
         static void filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue);
 
-        template <typename DT_, typename IT_, Index BlockSize_>
+        template <typename DT_, typename IT_, int BlockSize_>
         static void filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue);
       };
 
@@ -63,10 +63,10 @@ namespace FEAST
       template <>
       struct UnitFilterBlocked<Mem::CUDA>
       {
-        template <typename DT_, typename IT_, Index BlockSize_>
+        template <typename DT_, typename IT_, int BlockSize_>
         static void filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue);
 
-        template <typename DT_, typename IT_, Index BlockSize_>
+        template <typename DT_, typename IT_, int BlockSize_>
         static void filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue);
       };
 

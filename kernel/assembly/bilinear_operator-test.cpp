@@ -53,19 +53,19 @@ public:
 
     // Argyris has polynomial degree 6, so the integration for the indentity operator has only to be exact to
     // degree 6 + 6 = 12
-    test_apply1<Space::Argyris::Element, Shape::Simplex<2>, Assembly::Common::IdentityOperator, Index(2)>(2,12);
+    test_apply1<Space::Argyris::Element, Shape::Simplex<2>, Assembly::Common::IdentityOperator, 2>(2,12);
     // degree 1 + 1 - 2 = 0
-    test_apply1<Space::Lagrange1::Element, Shape::Hypercube<3>, Assembly::Common::LaplaceOperator, Index(3)>(2, 0);
+    test_apply1<Space::Lagrange1::Element, Shape::Hypercube<3>, Assembly::Common::LaplaceOperator, 3>(2, 0);
 
     // RT has degree 1, BFC has degree 3, so the integration for the Laplace operator has only to be exact to
     // degree 1 + 3 - 2 = 2
-    test_apply2<MyRT, Space::BognerFoxSchmit::Element, Shape::Hypercube<2>, Assembly::Common::LaplaceOperator, Index(2)>(3, 2);
+    test_apply2<MyRT, Space::BognerFoxSchmit::Element, Shape::Hypercube<2>, Assembly::Common::LaplaceOperator, 2>(3, 2);
     // degree 0 + 1 = 1
-    test_apply2<MyP0, Space::Lagrange1::Element, Shape::Simplex<3>, Assembly::Common::IdentityOperator, Index(3)>(1, 1);
+    test_apply2<MyP0, Space::Lagrange1::Element, Shape::Simplex<3>, Assembly::Common::IdentityOperator, 3>(1, 1);
   }
 
-  template<template<typename> class SpaceType_, typename ShapeType_, typename OperatorType_, Index dim_>
-  void test_apply1(const Index level, const Index cubature_degree) const
+  template<template<typename> class SpaceType_, typename ShapeType_, typename OperatorType_, int dim_>
+  void test_apply1(const Index level, const int cubature_degree) const
   {
     typedef Geometry::ConformalMesh<ShapeType_, dim_, dim_, DataType_> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
@@ -116,9 +116,9 @@ public:
     template<typename> class TrialSpaceType_,
     typename ShapeType_,
     typename OperatorType_,
-    Index dim_
+    int dim_
   >
-  void test_apply2(const Index level, const Index cubature_degree) const
+  void test_apply2(const Index level, const int cubature_degree) const
   {
     typedef Geometry::ConformalMesh<ShapeType_, dim_, dim_, DataType_> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
@@ -286,12 +286,12 @@ public:
       gather2(lmd2, dof_mapping, dof_mapping);
 
       // loop over all 4x4 entries
-      for(Index i(0); i < 4; ++i)
+      for(int i(0); i < 4; ++i)
       {
-        Index nvi = qatv(vatq(cell,i));
-        for(Index j(0); j < 4; ++j)
+        Index nvi = qatv(vatq(cell,Index(i)));
+        for(int j(0); j < 4; ++j)
         {
-          Index nvj = qatv(vatq(cell,j));
+          Index nvj = qatv(vatq(cell,Index(j)));
           if(i == j)
           {
             // main diagonal entry
@@ -504,12 +504,12 @@ public:
       gather2(lmd2, dof_mapping, dof_mapping);
 
       // loop over all 4x4 entries
-      for(Index i(0); i < 4; ++i)
+      for(int i(0); i < 4; ++i)
       {
-        Index nvi = qatv(vatq(cell,i));
-        for(Index j(0); j < 4; ++j)
+        Index nvi = qatv(vatq(cell,Index(i)));
+        for(int j(0); j < 4; ++j)
         {
-          Index nvj = qatv(vatq(cell,j));
+          Index nvj = qatv(vatq(cell,Index(j)));
           if(i == j)
           {
             // main diagonal entry

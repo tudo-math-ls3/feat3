@@ -235,10 +235,10 @@ namespace FEAST
         {
           // gather local vector
           dof_map.prepare(cell);
-          for(Index i(0); i < dof_map.get_num_local_dofs(); ++i)
+          for(int i(0); i < dof_map.get_num_local_dofs(); ++i)
           {
             DataType dx(0);
-            for(Index j(0); j < dof_map.get_num_contribs(i); ++j)
+            for(int j(0); j < dof_map.get_num_contribs(i); ++j)
               dx += dof_map.get_weight(i,j) * DataType(data[dof_map.get_index(i,j)]);
             loc_vec[i] = dx;
           }
@@ -261,7 +261,7 @@ namespace FEAST
 
             // compute value
             DataType value(0);
-            for(Index i(0); i < space_eval.get_num_local_dofs(); ++i)
+            for(int i(0); i < space_eval.get_num_local_dofs(); ++i)
               value += loc_vec[i] * space_data.phi[i].value;
 
             // write value
@@ -316,10 +316,10 @@ namespace FEAST
         {
           // gather local vector
           dof_map.prepare(cell);
-          for(Index i(0); i < dof_map.get_num_local_dofs(); ++i)
+          for(int i(0); i < dof_map.get_num_local_dofs(); ++i)
           {
             DataType dx(0);
-            for(Index j(0); j < dof_map.get_num_contribs(i); ++j)
+            for(int j(0); j < dof_map.get_num_contribs(i); ++j)
               dx += dof_map.get_weight(i,j) * DataType(data[dof_map.get_index(i,j)]);
             loc_vec[i] = dx;
           }
@@ -343,14 +343,14 @@ namespace FEAST
             // compute value
             BasisGradientType grad;
             grad.format();
-            for(Index i(0); i < space_eval.get_num_local_dofs(); ++i)
+            for(int i(0); i < space_eval.get_num_local_dofs(); ++i)
               grad += loc_vec[i] * space_data.phi[i].grad;
 
             // write value
             _ofs << grad[0];
-            for(Index i(1); i < Index(ShapeType::dimension); ++i)
+            for(int i(1); i < ShapeType::dimension; ++i)
               _ofs << " " << grad[i];
-            for(Index i(ShapeType::dimension); i < Index(3); ++i)
+            for(int i(ShapeType::dimension); i < 3; ++i)
               _ofs << " 0.0";
             _ofs << std::endl;
           }
@@ -404,10 +404,10 @@ namespace FEAST
         {
           // gather local vector
           dof_map.prepare(cell);
-          for(Index i(0); i < dof_map.get_num_local_dofs(); ++i)
+          for(int i(0); i < dof_map.get_num_local_dofs(); ++i)
           {
             DataType dx(0);
-            for(Index j(0); j < dof_map.get_num_contribs(i); ++j)
+            for(int j(0); j < dof_map.get_num_contribs(i); ++j)
               dx += dof_map.get_weight(i,j) * DataType(data[dof_map.get_index(i,j)]);
             loc_vec[i] = dx;
           }
@@ -431,20 +431,20 @@ namespace FEAST
             // compute value
             BasisHessianType hess;
             hess.format();
-            for(Index i(0); i < space_eval.get_num_local_dofs(); ++i)
+            for(int i(0); i < space_eval.get_num_local_dofs(); ++i)
               hess += loc_vec[i] * space_data.phi[i].hess;
 
             // write value
-            for(Index i(0); i < Index(ShapeType::dimension); ++i)
+            for(int i(0); i < ShapeType::dimension; ++i)
             {
               _ofs << hess(i,0);
-              for(Index j(1); j < Index(ShapeType::dimension); ++j)
+              for(int j(1); j < ShapeType::dimension; ++j)
                 _ofs << " " << hess(i,j);
-              for(Index j(ShapeType::dimension); j < Index(3); ++j)
+              for(int j(ShapeType::dimension); j < 3; ++j)
                 _ofs << " 0.0";
               _ofs << std::endl;
             }
-            for(Index i(ShapeType::dimension); i < Index(3); ++i)
+            for(int i(ShapeType::dimension); i < 3; ++i)
             {
               _ofs << "0.0";
               for(int j(1); j < 3; ++j)
@@ -496,9 +496,9 @@ namespace FEAST
 
             // write image coords
             _ofs << trafo_data.img_point[0];
-            for(Index j(1); j < Index(ShapeType::dimension); ++j)
+            for(int j(1); j < ShapeType::dimension; ++j)
               _ofs << " " << trafo_data.img_point[j];
-            for(Index j(ShapeType::dimension); j < Index(3); ++j)
+            for(int j(ShapeType::dimension); j < 3; ++j)
               _ofs << " 0.0";
             _ofs << std::endl;
           }
@@ -558,7 +558,7 @@ namespace FEAST
         const typename RefMeshType::VertexSetType& ref_vtx = _ref_mesh->get_vertex_set();
 
         // set domain point
-        for(Index j(0); j < Index(ShapeType::dimension); ++j)
+        for(int j(0); j < ShapeType::dimension; ++j)
           dom_point[j] = ref_vtx[i][j];
       }
     };

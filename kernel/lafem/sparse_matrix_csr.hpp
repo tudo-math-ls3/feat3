@@ -599,7 +599,7 @@ namespace FEAST
        *
        * Use source matrix content as content of current matrix
        */
-      template <typename Mem2_, typename DT2_, typename IT2_, Index BlockHeight_, Index BlockWidth_>
+      template <typename Mem2_, typename DT2_, typename IT2_, int BlockHeight_, int BlockWidth_>
       void convert(const SparseMatrixCSRBlocked<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
       {
         CONTEXT("When converting SparseMatrixCSR");
@@ -643,19 +643,19 @@ namespace FEAST
         Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> *mval(reinterpret_cast<Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> *>(cother.val()));
         for (Index orow(0) ; orow < cother.rows() ; ++orow)
         {
-          for (Index row(0) ; row < BlockHeight_ ; ++row)
+          for (int row(0) ; row < BlockHeight_ ; ++row)
           {
             for(Index ocol(cother.row_ptr()[orow]) ; ocol < cother.row_ptr()[orow + 1] ; ++ocol)
             {
               Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> *tbm(mval + ocol);
-              for (Index col(0) ; col < BlockWidth_ ; ++col)
+              for (int col(0) ; col < BlockWidth_ ; ++col)
               {
                 tval[ait] = (*tbm)(row,col);
                 tcol_ind[ait] = cother.col_ind()[ocol] * (IT_)BlockWidth_ + (IT_)col;
                 ++ait;
               }
             }
-            trow_ptr[orow * BlockHeight_ + row + 1] = (IT_)ait;
+            trow_ptr[orow * Index(BlockHeight_) + Index(row) + 1] = (IT_)ait;
           }
         }
 

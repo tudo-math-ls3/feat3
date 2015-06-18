@@ -25,7 +25,7 @@ namespace FEAST
           static void make(T_& p)
           {
             typedef typename T_::DataType DT;
-            for(Index i(0); i < Index(dim_); ++i)
+            for(int i(0); i < dim_; ++i)
               p[i] = DT(1) / DT(dim_+1);
           }
         };
@@ -37,7 +37,7 @@ namespace FEAST
           static void make(T_& p)
           {
             typedef typename T_::DataType DT;
-            for(Index i(0); i < Index(dim_); ++i)
+            for(int i(0); i < dim_; ++i)
               p[i] = DT(0);
           }
         };
@@ -69,7 +69,7 @@ namespace FEAST
       {
       public:
         typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
-        static constexpr Index max_assigned_dofs = Index(1);
+        static constexpr int max_assigned_dofs = 1;
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -109,7 +109,7 @@ namespace FEAST
           BaseClass::finish();
         }
 
-        Index get_num_assigned_dofs() const
+        int get_num_assigned_dofs() const
         {
           return max_assigned_dofs;
         }
@@ -155,7 +155,7 @@ namespace FEAST
       {
       public:
         typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
-        static constexpr Index max_assigned_dofs = Index(shape_dim_+1);
+        static constexpr int max_assigned_dofs = shape_dim_+1;
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -193,7 +193,7 @@ namespace FEAST
           BaseClass::finish();
         }
 
-        Index get_num_assigned_dofs() const
+        int get_num_assigned_dofs() const
         {
           return max_assigned_dofs;
         }
@@ -223,10 +223,10 @@ namespace FEAST
 
           // loop over all nodal points
           DomainPointType dom_point;
-          for(Index i(0); i < max_assigned_dofs; ++i)
+          for(int i(0); i < max_assigned_dofs; ++i)
           {
             // set up domain point
-            for(Index j(0); j < Index(shape_dim_); ++j)
+            for(int j(0); j < shape_dim_; ++j)
             {
               dom_point[j] = DataType_(j+1 == i ? 1 : 0);
             }
@@ -252,7 +252,7 @@ namespace FEAST
       {
       public:
         typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
-        static constexpr Index max_assigned_dofs = Index(shape_dim_+1);
+        static constexpr int max_assigned_dofs = shape_dim_+1;
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -290,7 +290,7 @@ namespace FEAST
           BaseClass::finish();
         }
 
-        Index get_num_assigned_dofs() const
+        int get_num_assigned_dofs() const
         {
           return max_assigned_dofs;
         }
@@ -324,7 +324,7 @@ namespace FEAST
           node_data[0] = func_eval.value(trafo_data);
 
           // loop over all nodal points
-          for(Index i(0); i < Index(shape_dim_); ++i)
+          for(int i(0); i < shape_dim_; ++i)
           {
             // evaluate domain point #1
             dom_point[i] = DataType_(1);

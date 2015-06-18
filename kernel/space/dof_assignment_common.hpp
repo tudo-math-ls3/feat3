@@ -42,37 +42,37 @@ namespace FEAST
       }
 
       /** \copydoc DofAssignmentBase::get_max_assigned_dofs() */
-      Index get_max_assigned_dofs() const
+      int get_max_assigned_dofs() const
       {
         return 0;
       }
 
       /** \copydoc DofAssignmentBase::get_num_assigned_dofs() */
-      Index get_num_assigned_dofs() const
+      int get_num_assigned_dofs() const
       {
         return 0;
       }
 
       /** \copydoc DofAssignmentBase::get_max_contribs() */
-      Index get_max_contribs() const
+      int get_max_contribs() const
       {
         return 0;
       }
 
       /** \copydoc DofAssignmentBase::get_num_contribs() */
-      Index get_num_contribs(Index /*assign_idx*/) const
+      int get_num_contribs(int /*assign_idx*/) const
       {
         throw InternalError("invalid call of DofAssignmentNull::get_num_contribs()");
       }
 
       /** \copydoc DofAssignmentBase::get_index() */
-      Index get_index(Index /*assign_idx*/, Index /*contrib_idx*/ = 0) const
+      Index get_index(int /*assign_idx*/, int /*contrib_idx*/ = 0) const
       {
         throw InternalError("invalid call of DofAssignmentNull::get_index()");
       }
 
       /** \copydoc DofAssignmentBase::get_weight() */
-      DataType_ get_weight(Index /*assign_idx*/, Index /*contrib_idx*/ = 0) const
+      DataType_ get_weight(int /*assign_idx*/, int /*contrib_idx*/ = 0) const
       {
         throw InternalError("invalid call of DofAssignmentNull::get_weight()");
       }
@@ -111,21 +111,21 @@ namespace FEAST
       }
 
       /** \copydoc DofAssignmentBase::get_max_assigned_dofs() */
-      Index get_max_assigned_dofs() const
+      int get_max_assigned_dofs() const
       {
-        return Index(dofs_per_cell_);
+        return dofs_per_cell_;
       }
 
       /** \copydoc DofAssignmentBase::get_num_assigned_dofs() */
-      Index get_num_assigned_dofs() const
+      int get_num_assigned_dofs() const
       {
-        return Index(dofs_per_cell_);
+        return dofs_per_cell_;
       }
 
       /** \copydoc DofAssignmentBase::get_index() */
-      Index get_index(Index assign_idx, Index DOXY(contrib_idx) = 0) const
+      Index get_index(int assign_idx, int DOXY(contrib_idx) = 0) const
       {
-        return Index(dofs_per_cell_) * this->_cell_index + assign_idx;
+        return Index(dofs_per_cell_) * this->_cell_index + Index(assign_idx);
       }
     }; // class DofAssignmentIdentity
 

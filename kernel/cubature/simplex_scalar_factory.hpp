@@ -22,13 +22,13 @@ namespace FEAST
         Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>& rule,
         const Scalar::Rule<Weight_, Coord_>& scalar_rule)
       {
-        Index num_points = scalar_rule.get_num_points();
+        int num_points = scalar_rule.get_num_points();
 #ifdef FEAST_CUBATURE_SCALAR_PREFIX
         rule = Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>(num_points, "scalar:" + scalar_rule.get_name());
 #else
         rule = Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>(num_points, scalar_rule.get_name());
 #endif // FEAST_CUBATURE_SCALAR_PREFIX
-        for(Index i(0); i < num_points; ++i)
+        for(int i(0); i < num_points; ++i)
         {
           rule.get_weight(i) = scalar_rule.get_weight(i) * Weight_(0.5);
           rule.get_coord(i, 0) = (scalar_rule.get_coord(i) + Coord_(1)) * Coord_(0.5);
@@ -110,7 +110,7 @@ namespace FEAST
           _functor.alias("scalar:" + name);
         }
 
-        void alias(const String& name, Index num_points)
+        void alias(const String& name, int num_points)
         {
           _functor.alias("scalar:" + name, num_points);
         }
@@ -167,10 +167,10 @@ namespace FEAST
       static constexpr int max_points = ScalarFactoryType::max_points;
 
     protected:
-      Index _num_points;
+      int _num_points;
 
     public:
-      explicit SimplexScalarFactory(Index num_points) :
+      explicit SimplexScalarFactory(int num_points) :
         _num_points(num_points)
       {
       }
@@ -184,7 +184,7 @@ namespace FEAST
       }
 
       template<typename Weight_, typename Coord_, typename Point_>
-      static void create(Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>& rule, Index num_points)
+      static void create(Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>& rule, int num_points)
       {
         // call scalar factory to create the scalar rule
         Scalar::Rule<Weight_, Coord_> scalar_rule;

@@ -149,10 +149,10 @@ namespace FEAST
       static constexpr int max_points = DriverType::max_points;
 
     protected:
-      Index _num_points;
+      int _num_points;
 
     public:
-      explicit DriverFactory(Index num_points) :
+      explicit DriverFactory(int num_points) :
         _num_points(num_points)
       {
         ASSERT_(num_points >= DriverType::min_points);
@@ -181,9 +181,9 @@ namespace FEAST
        * The number of points for the cubature rule.
        */
       template<typename Weight_, typename Coord_, typename Point_>
-      static bool create(Rule<Shape_, Weight_, Coord_, Point_>& rule, Index num_points)
+      static bool create(Rule<Shape_, Weight_, Coord_, Point_>& rule, int num_points)
       {
-        if((num_points < Index(DriverType::min_points)) || (num_points > Index(DriverType::max_points)))
+        if((num_points < DriverType::min_points) || (num_points > DriverType::max_points))
           return false;
 
         rule = Rule<Shape_, Weight_, Coord_, Point_>(DriverType::count(num_points),
@@ -230,7 +230,7 @@ namespace FEAST
           return false;
 
         // check substring
-        Index num_points = 0;
+        int num_points(0);
         if(!tail.trim().parse(num_points))
           return false;
 
@@ -305,7 +305,7 @@ namespace FEAST
         {
         }
 
-        void alias(const String& alias_name, Index num_points)
+        void alias(const String& alias_name, int num_points)
         {
           if(!_mapped)
           {

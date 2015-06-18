@@ -103,13 +103,13 @@ namespace FEAST
           func_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = test_eval.get_num_local_dofs();
+          int num_loc_dofs = test_eval.get_num_local_dofs();
 
           // format local matrix
           lvad.format();
 
           // loop over all quadrature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -121,7 +121,7 @@ namespace FEAST
             func_eval.set_point(trafo_data);
 
             // test function loop
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functor and integrate
               lvad(i) += trafo_data.jac_det * cubature_rule.get_weight(k) * func_eval(test_data.phi[i]);

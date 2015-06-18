@@ -64,15 +64,15 @@ namespace FEAST
         typename Point_>
       static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
-        for(Index i(0); i <= Index(dim_); ++i)
+        for(int i(0); i <= (dim_); ++i)
         {
           // set weight
           rule.get_weight(i) = Weight_(1) / Weight_(MetaMath::Factorial<dim_ + 1>::value);
 
           // set point coords
-          for(Index j(0); j < Index(dim_); ++j)
+          for(int j(0); j < (dim_); ++j)
           {
-            rule.get_coord(i,j) = Index(j+1) == i ? Coord_(1) : Coord_(0);
+            rule.get_coord(i,j) = (j+1) == i ? Coord_(1) : Coord_(0);
           }
         }
       }
@@ -98,13 +98,13 @@ namespace FEAST
         typename Point_>
       static void fill(Rule<Shape::Hypercube<dim_>, Weight_, Coord_, Point_>& rule)
       {
-        for(Index i(0); i < Index(1 << dim_); ++i)
+        for(int i(0); i < (1 << dim_); ++i)
         {
           // set weight
           rule.get_weight(i) = Weight_(1);
 
           // set point coords
-          for(Index j(0); j < Index(dim_); ++j)
+          for(int j(0); j < (dim_); ++j)
           {
             rule.get_coord(i,j) = Coord_(((i >> j) & 1) << 1) - Coord_(1);
           }

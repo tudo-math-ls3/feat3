@@ -60,13 +60,13 @@ namespace FEAST
         Coord_ s = (Coord_(dim_ + 2) + Coord_(dim_) * Math::sqrt(Coord_(dim_ + 2)))/
                    (Coord_(dim_ + 2) * Coord_(dim_ + 1));
 
-        for(Index i(0); i <= Index(dim_); ++i)
+        for(int i(0); i <= dim_; ++i)
         {
           // set weight
           rule.get_weight(i) = Weight_(1) / Weight_(MetaMath::Factorial<dim_ + 1>::value);
 
           // set point coords
-          for(Index j(0); j < Index(dim_); ++j)
+          for(int j(0); j < dim_; ++j)
           {
             rule.get_coord(i,j) = (i == j) ? s : r;
           }
@@ -124,15 +124,15 @@ namespace FEAST
 
         // B-point
         rule.get_weight(0) = B;
-        for(Index j(0); j < Index(dim_); ++j)
+        for(int j(0); j < dim_; ++j)
         {
           rule.get_coord(0,j) = Coord_(1) / Coord_(dim_ + 1);
         }
 
         // C-points
-        Index count = 0;
+        int count = 0;
 
-        for(Index i(0); i <= Index(dim_); ++i)
+        for(int i(0); i <= dim_; ++i)
         {
           ++count;
 
@@ -140,7 +140,7 @@ namespace FEAST
           rule.get_weight(count) = C;
 
           // set point coords
-          for(Index j(0); j < Index(dim_); ++j)
+          for(int j(0); j < dim_; ++j)
           {
             rule.get_coord(count,j) = Coord_((i == j) ? 3 : 1) / Coord_(dim_ + 3);
           }
@@ -208,24 +208,24 @@ namespace FEAST
         Coord_ v  = (Coord_(10) + Coord_(2)*Math::sqrt(Coord_(15)))/Coord_(40);
 
         // counter
-        Index count = 0;
+        int count = 0;
 
         // A-point
         rule.get_weight(count) = A;
-        for(Index j(0); j < Index(dim); ++j)
+        for(int j(0); j < dim; ++j)
         {
           rule.get_coord(count,j) = Coord_(1)/Coord_(4);
         }
         ++count;
 
         // B1-points
-        for(Index i(0); i <= Index(dim); ++i)
+        for(int i(0); i <= dim; ++i)
         {
           // set weight
           rule.get_weight(count) = B1;
 
           // set point coords
-          for(Index j(0); j < Index(dim); ++j)
+          for(int j(0); j < dim; ++j)
           {
             rule.get_coord(count,j) = (i == j) ? t1 : s1;
           }
@@ -233,14 +233,14 @@ namespace FEAST
         }
 
         // B2-points
-        for(Index i(0); i <= Index(dim); ++i)
+        for(int i(0); i <= dim; ++i)
         {
 
           // set weight
           rule.get_weight(count) = B2;
 
           // set point coords
-          for(Index j(0); j < Index(dim); ++j)
+          for(int j(0); j < dim; ++j)
           {
             rule.get_coord(count,j) = (i == j) ? t2 : s2;
           }
@@ -248,9 +248,9 @@ namespace FEAST
         }
 
         // C-points
-        for(Index i(0); i <= Index(dim); ++i)
+        for(int i(0); i <= dim; ++i)
         {
-          for(Index j(0); j < i; ++j)
+          for(int j(0); j < i; ++j)
           {
             if(i != j)
             {
@@ -258,7 +258,7 @@ namespace FEAST
               rule.get_weight(count) = C;
 
               // set point coords
-              for(Index k(0); k < Index(dim); ++k)
+              for(int k(0); k < dim; ++k)
               {
                 rule.get_coord(count,k) = (k == i) || (k == j) ? u : v;
               }

@@ -38,9 +38,9 @@ namespace FEAST
 
     public:
       /** \copydoc DofMappingBase::get_num_local_dofs() */
-      Index get_num_local_dofs() const
+      int get_num_local_dofs() const
       {
-        return Index(dofs_per_cell_);
+        return dofs_per_cell_;
       }
 
       /** \copydoc DofMappingBase::get_num_global_dofs() */
@@ -50,9 +50,9 @@ namespace FEAST
       }
 
       /** \copydoc DofMappingBase::get_index() */
-      Index get_index(Index local_dof_idx, Index /*contrib_idx*/ = 0) const
+      Index get_index(int local_dof_idx, int /*contrib_idx*/ = 0) const
       {
-        return Index(dofs_per_cell_) * this->_cell_index + local_dof_idx;
+        return Index(dofs_per_cell_) * this->_cell_index + Index(local_dof_idx);
       }
     }; // class DofMappingIdentity<...>
 
@@ -115,9 +115,9 @@ namespace FEAST
       }
 
       /** \copydoc DofMappingBase::get_num_local_dofs() */
-      Index get_num_local_dofs() const
+      int get_num_local_dofs() const
       {
-        return Index(IndexSetType::num_indices) * Index(dofs_per_cell_);
+        return IndexSetType::num_indices * dofs_per_cell_;
       }
 
       /** \copydoc DofMappingBase::get_num_global_dofs() */
@@ -127,10 +127,10 @@ namespace FEAST
       }
 
       /** \copydoc DofMappingBase::get_index() */
-      Index get_index(Index local_dof_idx, Index /*contrib_idx*/ = 0) const
+      Index get_index(int local_dof_idx, int /*contrib_idx*/ = 0) const
       {
-        Index ldi_q = local_dof_idx / dofs_per_cell_;
-        Index ldi_r = local_dof_idx % dofs_per_cell_;
+        Index ldi_q = Index(local_dof_idx) / dofs_per_cell_;
+        Index ldi_r = Index(local_dof_idx) % dofs_per_cell_;
         return Index(dofs_per_cell_) * _index_set(this->_cell_index, ldi_q) + ldi_r;
       }
     };
@@ -220,9 +220,9 @@ namespace FEAST
       }
 
       /** \copydoc DofMappingBase::get_num_local_dofs() */
-      Index get_num_local_dofs() const
+      int get_num_local_dofs() const
       {
-        return Index(dof_count);
+        return dof_count;
       }
 
       /** \copydoc DofMappingBase::get_num_global_dofs() */
@@ -232,9 +232,9 @@ namespace FEAST
       }
 
       /** \copydoc DofMappingBase::get_index() */
-      Index get_index(Index local_dof_idx, Index /*contrib_idx*/ = 0) const
+      Index get_index(int local_dof_idx, int /*contrib_idx*/ = 0) const
       {
-        ASSERT(local_dof_idx < Index(dof_count), "dof-index out-of-range");
+        ASSERT( (local_dof_idx >= 0) && (local_dof_idx < dof_count), "dof-index out-of-range");
         return dof_idx[local_dof_idx];
       }
     };
@@ -265,7 +265,7 @@ namespace FEAST
           {
             for(int j(0); j < dofs_per_cell; ++j, ++k)
             {
-              dof_idx[k] = offs + index_set(cell,i) * dofs_per_cell + Index(j);
+              dof_idx[k] = offs + index_set(cell,i) * Index(dofs_per_cell) + Index(j);
             }
           }
           return offs + Index(dofs_per_cell) * mesh.get_num_entities(cell_dim_);
@@ -328,11 +328,11 @@ namespace FEAST
           const auto& index_set(mesh.template get_index_set<shape_dim_, 0>());
 
           k = 0;
-          for(Index i(0); i < Index(cell_count); ++i)
+          for(int i(0); i < cell_count; ++i)
           {
             for(int j(0); j < dofs_per_cell; ++j, ++k)
             {
-              dof_idx[k] = index_set(cell,i) * dofs_per_cell + Index(j);
+              dof_idx[k] = index_set(cell,Index(i)) * dofs_per_cell + Index(j);
             }
           }
           return Index(dofs_per_cell) * mesh.get_num_entities(0);

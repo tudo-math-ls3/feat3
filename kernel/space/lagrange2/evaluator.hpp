@@ -164,7 +164,7 @@ namespace FEAST
          * \returns
          * The number of local dofs.
          */
-        Index get_num_local_dofs() const
+        int get_num_local_dofs() const
         {
           return 6;
         }
@@ -312,7 +312,7 @@ namespace FEAST
          * \returns
          * The number of local dofs.
          */
-        Index get_num_local_dofs() const
+        int get_num_local_dofs() const
         {
           return 10;
         }
@@ -539,7 +539,7 @@ namespace FEAST
          * \returns
          * The number of local dofs.
          */
-        Index get_num_local_dofs() const
+        int get_num_local_dofs() const
         {
           return 3;
         }
@@ -658,7 +658,7 @@ namespace FEAST
          * \returns
          * The number of local dofs.
          */
-        Index get_num_local_dofs() const
+        int get_num_local_dofs() const
         {
           return 9;
         }
@@ -846,7 +846,7 @@ namespace FEAST
          * \returns
          * The number of local dofs.
          */
-        Index get_num_local_dofs() const
+        int get_num_local_dofs() const
         {
           return 27;
         }

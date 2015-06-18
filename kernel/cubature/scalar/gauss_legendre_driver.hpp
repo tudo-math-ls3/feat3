@@ -50,7 +50,7 @@ namespace FEAST
         template<
           typename Weight_,
           typename Coord_>
-        static void fill(Rule<Weight_, Coord_>& rule, Index num_points)
+        static void fill(Rule<Weight_, Coord_>& rule, int num_points)
         {
           // auxiliary variables
           Coord_ dc;

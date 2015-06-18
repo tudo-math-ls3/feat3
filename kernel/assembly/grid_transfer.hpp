@@ -144,7 +144,7 @@ namespace FEAST
         Tiny::Vector<DataType, FineSpaceEvaluator::max_local_dofs> lvd;
 
         // pivaot array for factorisation
-        Index pivot[FineSpaceEvaluator::max_local_dofs];
+        int pivot[FineSpaceEvaluator::max_local_dofs];
 
         // calculate child count
         const Index num_children = fine_trafo_eval.get_num_cells() / coarse_trafo_eval.get_num_cells();
@@ -159,7 +159,7 @@ namespace FEAST
           coarse_space_eval.prepare(coarse_trafo_eval);
 
           // fetch number of local coarse DOFs
-          Index coarse_num_loc_dofs = coarse_space_eval.get_num_local_dofs();
+          int coarse_num_loc_dofs = coarse_space_eval.get_num_local_dofs();
 
           // prepare coarse mesh dof-mapping
           coarse_dof_mapping.prepare(ccell);
@@ -177,7 +177,7 @@ namespace FEAST
             fine_space_eval.prepare(fine_trafo_eval);
 
             // fetch number of local fine DOFs
-            Index fine_num_loc_dofs = fine_space_eval.get_num_local_dofs();
+            int fine_num_loc_dofs = fine_space_eval.get_num_local_dofs();
 
             // format local matrices
             mass.format();
@@ -185,10 +185,10 @@ namespace FEAST
             lvd.format();
 
             // loop over all cubature points and integrate
-            for(Index k(0); k < fine_cubature.get_num_points(); ++k)
+            for(int k(0); k < fine_cubature.get_num_points(); ++k)
             {
               // compute coarse mesh cubature point index
-              Index l = child * fine_cubature.get_num_points() + k;
+              int l(int(child) * fine_cubature.get_num_points() + k);
 
               // compute trafo data
               fine_trafo_eval(fine_trafo_data, fine_cubature.get_point(k));
@@ -199,10 +199,10 @@ namespace FEAST
               coarse_space_eval(coarse_space_data, coarse_trafo_data);
 
               // fine mesh test function loop
-              for(Index i(0); i < fine_num_loc_dofs; ++i)
+              for(int i(0); i < fine_num_loc_dofs; ++i)
               {
                 // fine mesh trial function loop
-                for(Index j(0); j < fine_num_loc_dofs; ++j)
+                for(int j(0); j < fine_num_loc_dofs; ++j)
                 {
                   mass(i,j) += fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
                     fine_space_data.phi[i].value * fine_space_data.phi[j].value;
@@ -210,7 +210,7 @@ namespace FEAST
                 }
 
                 // coarse mesh trial function loop
-                for(Index j(0); j < coarse_num_loc_dofs; ++j)
+                for(int j(0); j < coarse_num_loc_dofs; ++j)
                 {
                   lmd(i,j) +=
                     fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
@@ -228,12 +228,12 @@ namespace FEAST
 
             // factorise fine mesh mass matrix
             LinAlg::mat_factorise(fine_num_loc_dofs, fine_num_loc_dofs,
-              Index(FineSpaceEvaluator::max_local_dofs), &mass.v[0][0], pivot);
+              FineSpaceEvaluator::max_local_dofs, &mass.v[0][0], pivot);
 
             // solve M*X = N
             LinAlg::mat_solve_mat<false>(fine_num_loc_dofs, coarse_num_loc_dofs,
-              Index(CoarseSpaceEvaluator::max_local_dofs), &lmd.v[0][0],
-              Index(FineSpaceEvaluator::max_local_dofs), &mass.v[0][0], pivot);
+              CoarseSpaceEvaluator::max_local_dofs, &lmd.v[0][0],
+              FineSpaceEvaluator::max_local_dofs, &mass.v[0][0], pivot);
 
             // prepare fine mesh dof-mapping
             fine_dof_mapping.prepare(fcell);

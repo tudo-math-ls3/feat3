@@ -85,7 +85,7 @@ public:
    space_eval.prepare(trafo_eval);
 
     // check the number of local DOFs
-    Index num_loc_dofs = space_eval.get_num_local_dofs();
+    int num_loc_dofs = space_eval.get_num_local_dofs();
     TEST_CHECK_EQUAL(num_loc_dofs, Index(4));
 
     // create local matrix assembly data
@@ -94,7 +94,7 @@ public:
     M = DataType_(0);
 
     // loop over all 16 quadrature points and integrate
-    for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+    for(int k(0); k < cubature_rule.get_num_points(); ++k)
     {
       // compute trafo data
       trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -103,10 +103,10 @@ public:
       space_eval(space_data, trafo_data);
 
       // test function loop
-      for(Index i(0); i < num_loc_dofs; ++i)
+      for(int i(0); i < num_loc_dofs; ++i)
       {
         // trial function loop
-        for(Index j(0); j < num_loc_dofs; ++j)
+        for(int j(0); j < num_loc_dofs; ++j)
         {
           // mass matrix entry
           M(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) * (
@@ -161,10 +161,10 @@ public:
     Lr(3,3) =  DataType_(4) / DataType_(15);
 
     // test function loop
-    for(Index i(0); i < num_loc_dofs; ++i)
+    for(int i(0); i < num_loc_dofs; ++i)
     {
       // trial function loop
-      for(Index j(0); j < num_loc_dofs; ++j)
+      for(int j(0); j < num_loc_dofs; ++j)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), Mr(i,j), eps);
         TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), Lr(i,j), eps);

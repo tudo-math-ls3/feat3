@@ -213,7 +213,7 @@ namespace FEAST
       /// \brief value-assignment constructor
       explicit Vector(DataType value)
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] = value;
         }
@@ -223,7 +223,7 @@ namespace FEAST
       template<int sx_>
       Vector(const Vector<T_, n_, sx_>& x)
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] = x.v[i];
         }
@@ -232,7 +232,7 @@ namespace FEAST
       /// value-assignment operator
       Vector& operator=(DataType value)
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] = value;
         }
@@ -243,7 +243,7 @@ namespace FEAST
       template<int sx_>
       Vector& operator=(const Vector<T_, n_, sx_>& x)
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] = x.v[i];
         }
@@ -258,30 +258,30 @@ namespace FEAST
        *
        * \returns A (const) reference to the <c>i</c>-th entry of the vector.
        */
-      T_& operator()(Index i)
+      T_& operator()(int i)
       {
-        ASSERT(i < Index(n_), "index i out-of-bounds");
+        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator()() */
-      const T_& operator()(Index i) const
+      const T_& operator()(int i) const
       {
-        ASSERT(i < Index(n_), "index i out-of-bounds");
+        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator()() */
-      T_& operator[](Index i)
+      T_& operator[](int i)
       {
-        ASSERT(i < Index(n_), "index i out-of-bounds");
+        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator[]() */
-      const T_& operator[](Index i) const
+      const T_& operator[](int i) const
       {
-        ASSERT(i < Index(n_), "index i out-of-bounds");
+        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
@@ -314,7 +314,7 @@ namespace FEAST
       /// scalar-multiply operator
       Vector& operator*=(T_ alpha)
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] *= alpha;
         }
@@ -325,7 +325,7 @@ namespace FEAST
       template <int sx_>
       Vector& operator*=(const Vector<T_, n_, sx_>& x)
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] *= x.v[i];
         }
@@ -336,7 +336,7 @@ namespace FEAST
       template<int sx_>
       Vector& operator+=(const Vector<T_, n_, sx_>& x)
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] += x.v[i];
         }
@@ -347,7 +347,7 @@ namespace FEAST
       template<int sx_>
       Vector& operator-=(const Vector<T_, n_, sx_>& x)
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] -= x.v[i];
         }
@@ -362,7 +362,7 @@ namespace FEAST
        */
       void format(DataType alpha = DataType(0))
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] = alpha;
         }
@@ -386,10 +386,10 @@ namespace FEAST
       template<int m_, int sma_, int sna_, int sx_>
       Vector& set_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x)
       {
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
         {
           v[i] = T_(0);
-          for(Index j(0); j < Index(m_); ++j)
+          for(int j(0); j < m_; ++j)
           {
             v[i] += a.v[i][j] * x.v[j];
           }
@@ -415,10 +415,10 @@ namespace FEAST
       template<int m_, int sma_, int sna_, int sx_>
       Vector& set_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(Index j(0); j < Index(n_); ++j)
+        for(int j(0); j < n_; ++j)
         {
           v[j] = T_(0);
-          for(Index i(0); i < Index(m_); ++i)
+          for(int i(0); i < m_; ++i)
           {
             v[j] += a.v[i][j] * x.v[i];
           }
@@ -435,7 +435,7 @@ namespace FEAST
       ValueType norm_euclid() const
       {
         DataType r(DataType(0));
-        for(Index i(0); i < Index(n_); ++i)
+        for(int i(0); i < n_; ++i)
           r += Math::sqr(v[i]);
         return Math::sqrt(r);
       }
@@ -459,9 +459,9 @@ namespace FEAST
 
       /// \compilerhack Intel C++ 14 loop vectorisation bug
 #if defined(FEAST_COMPILER_INTEL) && (FEAST_COMPILER_INTEL < 1500)
-      for(Index i(0); (i+1) < Index(n_+1); ++i)
+      for(int i(0); (i+1) < n_+1; ++i)
 #else
-      for(Index i(0); i < Index(n_); ++i)
+      for(int i(0); i < n_; ++i)
 #endif
       {
         r += a.v[i] * b.v[i];
@@ -561,7 +561,7 @@ namespace FEAST
       /// value-assignment constructor
       explicit Matrix(DataType value)
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           v[i] = value;
         }
@@ -571,7 +571,7 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           v[i] = a.v[i];
         }
@@ -580,7 +580,7 @@ namespace FEAST
       /// value-assignment operator
       Matrix& operator=(DataType value)
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           v[i] = value;
         }
@@ -591,7 +591,7 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix& operator=(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           v[i] = a.v[i];
         }
@@ -607,18 +607,18 @@ namespace FEAST
        * \returns
        * A (const) reference to the matrix entry at position (i,j).
        */
-      T_& operator()(Index i, Index j)
+      T_& operator()(int i, int j)
       {
-        ASSERT(i < Index(m_), "index i out-of-bounds");
-        ASSERT(j < Index(n_), "index j out-of-bounds");
+        ASSERT( (i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERT( (j >= 0) && (j < n_), "index j out-of-bounds");
         return v[i][j];
       }
 
       /** \copydoc operator()() */
-      const T_& operator()(Index i, Index j) const
+      const T_& operator()(int i, int j) const
       {
-        ASSERT(i < Index(m_), "index i out-of-bounds");
-        ASSERT(j < Index(n_), "index j out-of-bounds");
+        ASSERT( (i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERT( (j >= 0) && (j < n_), "index j out-of-bounds");
         return v[i][j];
       }
 
@@ -631,16 +631,16 @@ namespace FEAST
        * \returns
        * A (const) reference to the <c>i</c>-th row of the matrix.S
        */
-      RowType& operator[](Index i)
+      RowType& operator[](int i)
       {
-        ASSERT(i < Index(m_), "index i out-of-bounds");
+        ASSERT( (i >= 0) && (i <m_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator[]() */
-      const RowType& operator[](Index i) const
+      const RowType& operator[](int i) const
       {
-        ASSERT(i < Index(m_), "index i out-of-bounds");
+        ASSERT( (i >= 0) && (i <m_), "index i out-of-bounds");
         return v[i];
       }
 
@@ -675,7 +675,7 @@ namespace FEAST
       /// scalar-right-multiply-by operator
       Matrix& operator*=(DataType alpha)
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           v[i] *= alpha;
         }
@@ -686,7 +686,7 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix& operator+=(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           v[i] += a.v[i];
         }
@@ -697,7 +697,7 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix& operator-=(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           v[i] -= a.v[i];
         }
@@ -712,7 +712,7 @@ namespace FEAST
        */
       void format(DataType alpha = DataType(0))
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           v[i].format(alpha);
         }
@@ -732,10 +732,10 @@ namespace FEAST
       DataType hessian_sqr_norm() const
       {
         DataType r(0);
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           r += Math::sqr(v[i][i]);
-          for(Index j(0); j < Index(n_); ++j)
+          for(int j(0); j < n_; ++j)
           {
             r += Math::sqr(v[i][j]);
           }
@@ -754,9 +754,9 @@ namespace FEAST
        */
       DataType trace() const
       {
-        Index k = (m_ < n_ ? m_ : n_);
+        int k = (m_ < n_ ? m_ : n_);
         DataType r(0);
-        for(Index i(0); i < k; ++i)
+        for(int i(0); i < k; ++i)
         {
           r += v[i][i];
         }
@@ -830,9 +830,9 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix& set_transpose(const Matrix<T_, n_, m_, sma_, sna_>& a)
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
+          for(int j(0); j < n_; ++j)
           {
             v[i][j] = a.v[j][i];
           }
@@ -859,7 +859,7 @@ namespace FEAST
       DataType scalar_product(const Vector<T_, m_, snx_>& x, const Vector<T_, n_, sny_>& y) const
       {
         DataType r(DataType(0));
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
           r += x[i] * dot(v[i], y);
         }
@@ -890,12 +890,12 @@ namespace FEAST
         const Matrix<T_, l_, n_, smb_, snb_>& b,
         DataType alpha = DataType(1))
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
+          for(int j(0); j < n_; ++j)
           {
             DataType r(0);
-            for(Index k(0); k < Index(l_); ++k)
+            for(int k(0); k < l_; ++k)
             {
               r += a.v[i][k] * b.v[k][j];
             }
@@ -955,15 +955,15 @@ namespace FEAST
         const Matrix<T_, l_, n_, smd_, snd_>& d,
         DataType alpha = DataType(1))
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
+          for(int j(0); j < n_; ++j)
           {
             DataType r(0);
-            for(Index p(0); p < Index(k_); ++p)
+            for(int p(0); p < k_; ++p)
             {
               DataType t(0);
-              for(Index q(0); q < Index(l_); ++q)
+              for(int q(0); q < l_; ++q)
               {
                 t += a(p,q) * d(q,j);
               }
@@ -1033,12 +1033,12 @@ namespace FEAST
         const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
         DataType alpha = DataType(1))
       {
-        for(Index i(0); i < Index(m_); ++i)
+        for(int i(0); i < m_; ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
+          for(int j(0); j < n_; ++j)
           {
             DataType r(0);
-            for(Index k(0); k < Index(l_); ++k)
+            for(int k(0); k < l_; ++k)
             {
               r += x(k) * t(k,i,j);
             }
@@ -1129,9 +1129,9 @@ namespace FEAST
     inline T_ dot(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
     {
       T_ r(0);
-      for(Index i(0); i < Index(m_); ++i)
+      for(int i(0); i < m_; ++i)
       {
-        for(Index j(0); j < Index(n_); ++j)
+        for(int j(0); j < n_; ++j)
           r += a(i,j) * b(i,j);
       }
       return r;
@@ -1185,7 +1185,7 @@ namespace FEAST
       /// value-assignment constructor
       explicit Tensor3(DataType value)
       {
-        for(Index i(0); i < Index(l_); ++i)
+        for(int i(0); i < l_; ++i)
           v[i] = value;
       }
 
@@ -1193,14 +1193,14 @@ namespace FEAST
       template<int sla_, int sma_, int sna_>
       Tensor3(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
-        for(Index i(0); i < Index(l_); ++i)
+        for(int i(0); i < l_; ++i)
           v[i] = a.v[i];
       }
 
       /// value-assignment operator
       Tensor3& operator=(DataType value)
       {
-        for(Index i(0); i < Index(l_); ++i)
+        for(int i(0); i < l_; ++i)
           v[i] = value;
         return *this;
       }
@@ -1209,7 +1209,7 @@ namespace FEAST
       template<int sla_, int sma_, int sna_>
       Tensor3& operator=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
-        for(Index i(0); i < Index(l_); ++i)
+        for(int i(0); i < l_; ++i)
           v[i] = a.v[i];
         return *this;
       }
@@ -1223,20 +1223,20 @@ namespace FEAST
        * \returns
        * A (const) reference to the tensor entry at position (h,i,j).
        */
-      T_& operator()(Index h, Index i, Index j)
+      T_& operator()(int h, int i, int j)
       {
-        ASSERT(h < Index(l_), "index h out-of-bounds");
-        ASSERT(i < Index(m_), "index i out-of-bounds");
-        ASSERT(j < Index(n_), "index j out-of-bounds");
+        ASSERT( (h >= 0) && (h < l_), "index h out-of-bounds");
+        ASSERT( (i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERT( (j >= 0) && (j < n_), "index j out-of-bounds");
         return v[h](i,j);
       }
 
       /** \copydoc operator()() */
-      const T_& operator()(Index h, Index i, Index j) const
+      const T_& operator()(int h, int i, int j) const
       {
-        ASSERT(h < Index(l_), "index h out-of-bounds");
-        ASSERT(i < Index(m_), "index i out-of-bounds");
-        ASSERT(j < Index(n_), "index j out-of-bounds");
+        ASSERT( (h >= 0) && (h < l_), "index h out-of-bounds");
+        ASSERT( (i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERT( (j >= 0) && (j < n_), "index j out-of-bounds");
         return v[h](i,j);
       }
 
@@ -1249,16 +1249,16 @@ namespace FEAST
        * \returns
        * A (const) reference to the matrix representing the <c>h</c>-th plane of the tensor.
        */
-      PlaneType& operator[](Index h)
+      PlaneType& operator[](int h)
       {
-        ASSERT(h < Index(l_), "index h out-of-bounds");
+        ASSERT( (h >= 0) && (h < l_), "index h out-of-bounds");
         return v[h];
       }
 
       /** \copydoc operator[]() */
-      const PlaneType& operator[](Index h) const
+      const PlaneType& operator[](int h) const
       {
-        ASSERT(h < Index(l_), "index h out-of-bounds");
+        ASSERT( (h >= 0) && (h < l_), "index h out-of-bounds");
         return v[h];
       }
 
@@ -1277,9 +1277,9 @@ namespace FEAST
       template<int ll_, int mm_, int nn_>
       Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast()
       {
-        static_assert((ll_ > 0) && (ll_ <= sl_), "invalid cast tube count");
-        static_assert((mm_ > 0) && (mm_ <= sm_), "invalid cast row count");
-        static_assert((nn_ > 0) && (nn_ <= sn_), "invalid cast column count");
+        static_assert((ll_ >= 0) && (ll_ <= sl_), "invalid cast tube count");
+        static_assert((mm_ >= 0) && (mm_ <= sm_), "invalid cast row count");
+        static_assert((nn_ >= 0) && (nn_ <= sn_), "invalid cast column count");
         return reinterpret_cast<Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>&>(*this);
       }
 
@@ -1287,16 +1287,16 @@ namespace FEAST
       template<int ll_, int mm_, int nn_>
       const Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast() const
       {
-        static_assert((ll_ > 0) && (ll_ <= sl_), "invalid cast tube count");
-        static_assert((mm_ > 0) && (mm_ <= sm_), "invalid cast row count");
-        static_assert((nn_ > 0) && (nn_ <= sn_), "invalid cast column count");
+        static_assert((ll_ >= 0) && (ll_ <= sl_), "invalid cast tube count");
+        static_assert((mm_ >= 0) && (mm_ <= sm_), "invalid cast row count");
+        static_assert((nn_ >= 0) && (nn_ <= sn_), "invalid cast column count");
         return reinterpret_cast<Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>&>(*this);
       }
 
       /// scalar right-multiply-by operator
       Tensor3& operator*=(DataType alpha)
       {
-        for(Index i(0); i < Index(l_); ++i)
+        for(int i(0); i < l_; ++i)
           v[i] *= alpha;
         return *this;
       }
@@ -1305,7 +1305,7 @@ namespace FEAST
       template<int sla_, int sma_, int sna_>
       Tensor3& operator+=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
-        for(Index i(0); i < Index(l_); ++i)
+        for(int i(0); i < l_; ++i)
           v[i] += a.v[i];
         return *this;
       }
@@ -1314,7 +1314,7 @@ namespace FEAST
       template<int sla_, int sma_, int sna_>
       Tensor3& operator-=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
-        for(Index i(0); i < Index(l_); ++i)
+        for(int i(0); i < l_; ++i)
           v[i] -= a.v[i];
         return *this;
       }
@@ -1351,14 +1351,14 @@ namespace FEAST
         const Tensor3<T_, k_, m_, n_, slt_, smt_, snt_>& t,
         DataType alpha = DataType(1))
       {
-        for(Index h(0); h < Index(l_); ++h)
+        for(int h(0); h < l_; ++h)
         {
-          for(Index i(0); i < Index(m_); ++i)
+          for(int i(0); i < m_; ++i)
           {
-            for(Index j(0); j < Index(n_); ++j)
+            for(int j(0); j < n_; ++j)
             {
               DataType r(0);
-              for(Index p(0); p < Index(k_); ++p)
+              for(int p(0); p < k_; ++p)
               {
                 r += a(h,p) * t(p,i,j);
               }
@@ -1403,16 +1403,16 @@ namespace FEAST
         const Matrix<T_, mt_, m_, smd_, snd_>& d,
         DataType alpha = DataType(1))
       {
-        for(Index h(0); h < Index(l_); ++h)
+        for(int h(0); h < l_; ++h)
         {
-          for(Index i(0); i < Index(m_); ++i)
+          for(int i(0); i < m_; ++i)
           {
-            for(Index j(0); j < Index(n_); ++j)
+            for(int j(0); j < n_; ++j)
             {
               DataType r(0);
-              for(Index p(0); p < Index(mt_); ++p)
+              for(int p(0); p < mt_; ++p)
               {
-                for(Index q(0); q < Index(nt_); ++q)
+                for(int q(0); q < nt_; ++q)
                 {
                   r += t(h,p,q) * b(p,i) * d(q,j);
                 }
@@ -2090,9 +2090,9 @@ namespace FEAST
         static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           // copy matrix a to b
-          for (Index i(0); i < n_; ++i)
+          for (int i(0); i < n_; ++i)
           {
-            for (Index j(0); j < n_; ++j)
+            for (int j(0); j < n_; ++j)
             {
               b[i][j] = a[i][j];
             }
@@ -2105,21 +2105,21 @@ namespace FEAST
           // (chapter 2.1 Gauss-Jordan Elimination; page 39)
           // -------------------------------------------------------
           // The integer arrays ipiv, indxr, and indxc are used for bookkeeping on the pivoting.
-          Index indxc[n_];
-          Index indxr[n_];
-          Index ipiv [n_];
-          for (Index j(0); j < n_; ++j)
+          int indxc[n_];
+          int indxr[n_];
+          int ipiv [n_];
+          for (int j(0); j < n_; ++j)
             ipiv[j] = 0;
           // This is the main loop over the columns to be reduced.
-          for (Index i(0), icol(0), irow(0); i < n_; ++i)
+          for (int i(0), icol(0), irow(0); i < n_; ++i)
           {
             T_ big(T_(0.0));
             // This is the outer loop of the search for a pivot element.
-            for (Index j(0); j < n_; ++j)
+            for (int j(0); j < n_; ++j)
             {
               if (ipiv[j] != 1)
               {
-                for (Index k(0); k < n_; ++k)
+                for (int k(0); k < n_; ++k)
                 {
                   if (ipiv[k] == 0)
                   {
@@ -2145,7 +2145,7 @@ namespace FEAST
             // scrambled by columns.
             if (irow != icol)
             {
-              for (Index j(0); j < n_; ++j)
+              for (int j(0); j < n_; ++j)
               {
                 _swap(b[irow][j], b[icol][j]);
               }
@@ -2155,18 +2155,18 @@ namespace FEAST
             indxc[i] = icol;
             T_ pivinv(T_(1.0) / b[icol][icol]);
             b[icol][icol] = T_(1.0);
-            for (Index j(0); j < n_; ++j)
+            for (int j(0); j < n_; ++j)
             {
               b[icol][j] *= pivinv;
             }
             // Next, we reduce the rows except for the pivot one, of course.
-            for (Index j(0); j < n_; ++j)
+            for (int j(0); j < n_; ++j)
             {
               if (j != icol)
               {
                 T_ dum(b[j][icol]);
                 b[j][icol] = T_(0.0);
-                for (Index k(0); k < n_; ++k)
+                for (int k(0); k < n_; ++k)
                 {
                   b[j][k] -= b[icol][k]*dum;
                 }
@@ -2177,12 +2177,12 @@ namespace FEAST
           // only remains to unscram- ble the solution in view of the column
           // interchanges. We do this by interchanging pairs of columns in the
           // reverse order that the permutation was built up.
-          for (Index j(n_); j > 0;)
+          for (int j(n_); j > 0;)
           {
             --j;
             if (indxr[j] != indxc[j])
             {
-              for (Index k(0); k < n_; ++k)
+              for (int k(0); k < n_; ++k)
               {
                 _swap(b[k][indxr[j]], b[k][indxc[j]]);
               }

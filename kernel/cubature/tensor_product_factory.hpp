@@ -17,7 +17,7 @@ namespace FEAST
     class TensorProductDriver<Shape::Hypercube<1> >
     {
     public:
-      static Index count(Index num_points)
+      static int count(int num_points)
       {
         return num_points;
       }
@@ -30,7 +30,7 @@ namespace FEAST
         Rule<Shape::Hypercube<1>, Weight_, Coord_, Point_>& rule,
         const Scalar::Rule<Weight_, Coord_>& scalar_rule)
       {
-        for(Index i(0); i < scalar_rule.get_num_points(); ++i)
+        for(int i(0); i < scalar_rule.get_num_points(); ++i)
         {
           rule.get_weight(i) = scalar_rule.get_weight(i);
           rule.get_coord(i, 0) = scalar_rule.get_coord(i);
@@ -42,7 +42,7 @@ namespace FEAST
     class TensorProductDriver<Shape::Hypercube<2> >
     {
     public:
-      static Index count(Index num_points)
+      static int count(int num_points)
       {
         return num_points * num_points;
       }
@@ -55,12 +55,12 @@ namespace FEAST
         Rule<Shape::Hypercube<2>, Weight_, Coord_, Point_>& rule,
         const Scalar::Rule<Weight_, Coord_>& scalar_rule)
       {
-        Index num_points = scalar_rule.get_num_points();
-        for(Index i(0); i < num_points; ++i)
+        int num_points = scalar_rule.get_num_points();
+        for(int i(0); i < num_points; ++i)
         {
-          for(Index j(0); j < num_points; ++j)
+          for(int j(0); j < num_points; ++j)
           {
-            Index l = i*num_points + j;
+            int l = i*num_points + j;
             rule.get_weight(l) = scalar_rule.get_weight(i) * scalar_rule.get_weight(j);
             rule.get_coord(l, 0) = scalar_rule.get_coord(i);
             rule.get_coord(l, 1) = scalar_rule.get_coord(j);
@@ -73,7 +73,7 @@ namespace FEAST
     class TensorProductDriver<Shape::Hypercube<3> >
     {
     public:
-      static Index count(Index num_points)
+      static int count(int num_points)
       {
         return num_points * num_points * num_points;
       }
@@ -86,14 +86,14 @@ namespace FEAST
         Rule<Shape::Hypercube<3>, Weight_, Coord_, Point_>& rule,
         const Scalar::Rule<Weight_, Coord_>& scalar_rule)
       {
-        Index num_points = scalar_rule.get_num_points();
-        for(Index i(0); i < num_points; ++i)
+        int num_points = scalar_rule.get_num_points();
+        for(int i(0); i < num_points; ++i)
         {
-          for(Index j(0); j < num_points; ++j)
+          for(int j(0); j < num_points; ++j)
           {
-            for(Index k(0); k < num_points; ++k)
+            for(int k(0); k < num_points; ++k)
             {
-              Index l = (i*num_points + j)*num_points + k;
+              int l = (i*num_points + j)*num_points + k;
               rule.get_weight(l) = scalar_rule.get_weight(i) * scalar_rule.get_weight(j) * scalar_rule.get_weight(k);
               rule.get_coord(l, 0) = scalar_rule.get_coord(i);
               rule.get_coord(l, 1) = scalar_rule.get_coord(j);
@@ -123,7 +123,7 @@ namespace FEAST
         Rule<Shape_, Weight_, Coord_, Point_>& rule,
         const Scalar::Rule<Weight_, Coord_>& scalar_rule)
       {
-        Index num_points = TensorProductDriverType::count(scalar_rule.get_num_points());
+        int num_points = TensorProductDriverType::count(scalar_rule.get_num_points());
 #ifdef FEAST_CUBATURE_TENSOR_PREFIX
         rule = Rule<Shape_, Weight_, Coord_, Point_>(num_points, "tensor:" + scalar_rule.get_name());
 #else
@@ -212,7 +212,7 @@ namespace FEAST
           _functor.alias("tensor:" + name);
         }
 
-        void alias(const String& name, Index num_points)
+        void alias(const String& name, int num_points)
         {
           _functor.alias("tensor:" + name, num_points);
         }
@@ -274,10 +274,10 @@ namespace FEAST
       static constexpr int max_points = ScalarFactoryType::max_points;
 
     protected:
-      Index _num_points;
+      int _num_points;
 
     public:
-      explicit TensorProductFactory(Index num_points) :
+      explicit TensorProductFactory(int num_points) :
         _num_points(num_points)
       {
       }
@@ -291,7 +291,7 @@ namespace FEAST
       }
 
       template<typename Weight_, typename Coord_, typename Point_>
-      static void create(Rule<Shape_, Weight_, Coord_, Point_>& rule, Index num_points)
+      static void create(Rule<Shape_, Weight_, Coord_, Point_>& rule, int num_points)
       {
         // call scalar factory to create the scalar rule
         Scalar::Rule<Weight_, Coord_> scalar_rule;

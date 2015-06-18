@@ -70,7 +70,7 @@ namespace FEAST
        * \returns
        * The total number of local degrees of freedom for the currently active cell.
        */
-      Index get_num_local_dofs() const;
+      int get_num_local_dofs() const;
 
       /**
        * \brief Return the number of global dofs.
@@ -84,7 +84,7 @@ namespace FEAST
       /**
        * \brief Returns the maximum number of dof contributions.
        */
-      Index get_max_contribs() const
+      int get_max_contribs() const
       {
         return 1;
       }
@@ -98,7 +98,7 @@ namespace FEAST
        * \returns
        * The number of global dof contributions for the specified local dof.
        */
-      Index get_num_contribs(Index /*local_dof_idx*/) const
+      int get_num_contribs(int /*local_dof_idx*/) const
       {
         return 1;
       }
@@ -116,7 +116,7 @@ namespace FEAST
        * \returns
        * The mapped dof contribution index.
        */
-      Index get_index(Index local_dof_idx, Index contrib_idx = 0) const;
+      Index get_index(int local_dof_idx, int contrib_idx = 0) const;
 #endif // DOXYGEN
 
       /**
@@ -131,7 +131,7 @@ namespace FEAST
        * \returns
        * The mapped dof contribution index.
        */
-      Real get_weight(Index /*local_dof_idx*/, Index /*contrib_idx*/ = 0) const
+      Real get_weight(int /*local_dof_idx*/, int /*contrib_idx*/ = 0) const
       {
         return Real(1.0);
       }

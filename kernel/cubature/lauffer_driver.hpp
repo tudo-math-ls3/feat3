@@ -59,31 +59,31 @@ namespace FEAST
         Weight_ C = Weight_(4)/Weight_((dim_ + 1)*(dim_ + 2)) * V;
 
         // B-points
-        for(Index i(0); i <= Index(dim_); ++i)
+        for(int i(0); i <= dim_; ++i)
         {
           // set weight
           rule.get_weight(i) = B;
 
           // set point coords
-          for(Index j(0); j < Index(dim_); ++j)
+          for(int j(0); j < dim_; ++j)
           {
             rule.get_coord(i,j) = (i == j) ? Coord_(1) : Coord_(0);
           }
         }
 
         // counter
-        Index count = Index(dim_);
+        int count = dim_;
 
         // C-points
-        for(Index i(1); i <= Index(dim_); ++i)
+        for(int i(1); i <= dim_; ++i)
         {
-          for(Index k(0); k < i; ++k)
+          for(int k(0); k < i; ++k)
           {
             ++count;
             rule.get_weight(count) = C;
 
             // set point coords
-            for(Index j(0); j < Index(dim_); ++j)
+            for(int j(0); j < dim_; ++j)
             {
               rule.get_coord(count,j) = ((j == k) || (j == i)) ? Coord_(1)/Coord_(2) : Coord_(0);
             } // j-loop
@@ -155,16 +155,16 @@ namespace FEAST
           Weight_(256)/
           Weight_((dim + 1)*(dim + 2)*(dim + 3)*(dim + 4)) * V;
 
-        Index count = 0;
+        int count = 0;
 
         // B1-points
-        for(Index i(0); i <= Index(dim); ++i)
+        for(int i(0); i <= dim; ++i)
         {
           // set weight
           rule.get_weight(count) = B1;
 
           // set point coords
-          for(Index j(0); j < Index(dim); ++j)
+          for(int j(0); j < dim; ++j)
           {
             rule.get_coord(count,j) = (i == j) ? Coord_(1) : Coord_(0);
           }
@@ -172,9 +172,9 @@ namespace FEAST
         }
 
         // B2-points
-        for(Index i(0); i <= Index(dim); ++i)
+        for(int i(0); i <= dim; ++i)
         {
-          for(Index j(0); j <= Index(dim); ++j)
+          for(int j(0); j <= dim; ++j)
           {
             if(i != j)
             {
@@ -182,7 +182,7 @@ namespace FEAST
               rule.get_weight(count) = B2;
 
               // set point coords
-              for(Index k(0); k < Index(dim); ++k)
+              for(int k(0); k < dim; ++k)
               {
                 if(k == i)
                 {
@@ -203,14 +203,14 @@ namespace FEAST
         }
 
         // B3-points
-        for(Index i(1); i <= Index(dim); ++i)
+        for(int i(1); i <= dim; ++i)
         {
-          for(Index j(0); j < i; ++j)
+          for(int j(0); j < i; ++j)
           {
             rule.get_weight(count) = B3;
 
             // set point coords
-            for(Index k(0); k < Index(dim); ++k)
+            for(int k(0); k < dim; ++k)
             {
               rule.get_coord(count,k) = ((k == j) || (k == i)) ? Coord_(1)/Coord_(2) : Coord_(0);
             } // k-loop
@@ -219,18 +219,18 @@ namespace FEAST
         } // i-loop
 
         // B4-points
-        for(Index i(0); i <= Index(dim); ++i)
+        for(int i(0); i <= dim; ++i)
         {
-          for(Index j(0); j <= Index(dim); ++j)
+          for(int j(0); j <= dim; ++j)
           {
-            for(Index k(0); k < j; ++k)
+            for(int k(0); k < j; ++k)
             {
               if(i != j && i != k && j != k)
               {
                 rule.get_weight(count) = B4;
 
                 // set point coords
-                for(Index l(0); l < Index(dim); ++l)
+                for(int l(0); l < dim; ++l)
                 {
                   if(l == j || l == k)
                   {
@@ -252,18 +252,18 @@ namespace FEAST
         } //i-loop
 
         // B5-points
-        for(Index i(1); i <= Index(dim); ++i)
+        for(int i(1); i <= dim; ++i)
         {
-          for(Index j(0); j < i; ++j)
+          for(int j(0); j < i; ++j)
           {
-            for(Index k(0); k < j; ++k)
+            for(int k(0); k < j; ++k)
             {
-              for(Index l(0); l < k; ++l)
+              for(int l(0); l < k; ++l)
               {
                 rule.get_weight(count) = B5;
 
                 // set point coords
-                for(Index m(0); m < Index(dim); ++m)
+                for(int m(0); m < dim; ++m)
                 {
                   if(m == i || m == j || m == k || m == l)
                   {

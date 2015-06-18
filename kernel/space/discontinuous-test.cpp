@@ -95,14 +95,14 @@ public:
     space_eval.prepare(trafo_eval);
 
     // check the number of local DOFs
-    Index num_loc_dofs = space_eval.get_num_local_dofs();
+    int num_loc_dofs = space_eval.get_num_local_dofs();
     TEST_CHECK_EQUAL(num_loc_dofs, 1u);
 
     // create local matrix assembly data
     DataType_ M(0);
 
     // loop over all 4 quadrature points and integrate
-    for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+    for(int k(0); k < cubature_rule.get_num_points(); ++k)
     {
       // compute trafo data
       trafo_eval(trafo_data, cubature_rule.get_point(k));

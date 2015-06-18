@@ -36,7 +36,7 @@ namespace FEAST
       typename Mem_,
       typename DT_,
       typename IT_,
-      Index BlockSize_>
+      int BlockSize_>
     class UnitFilterBlocked
     {
     public:
@@ -47,7 +47,7 @@ namespace FEAST
       /// index-type typedef
       typedef IT_ IndexType;
       /// The block size
-      static constexpr Index BlockSize = BlockSize_;
+      static constexpr int BlockSize = BlockSize_;
       /// Value type
       typedef Tiny::Vector<DataType, BlockSize> ValueType;
 
@@ -127,7 +127,7 @@ namespace FEAST
       }
 
       /// \brief Converts data from another UnitFilter
-      template<typename Mem2_, typename DT2_, typename IT2_, Index BS_>
+      template<typename Mem2_, typename DT2_, typename IT2_, int BS_>
       void convert(const UnitFilterBlocked<Mem2_, DT2_, IT2_, BS_>& other)
       {
         _sv.convert(other.get_filter_vector());
@@ -255,7 +255,7 @@ namespace FEAST
 
 #endif
       /// \cond internal
-      template<Index BlockWidth_>
+      template<int BlockWidth_>
       void filter_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
         if(_sv.size() != matrix.rows())
@@ -274,14 +274,14 @@ namespace FEAST
             v[j].format(DT_(0));
             if(col_idx[j] == ix)
             {
-              for(Index l(0); l < Math::min(BlockSize_, BlockWidth_); ++l)
+              for(int l(0); l < Math::min(BlockSize_, BlockWidth_); ++l)
                 v[j](l,l) = DT_(1);
             }
           }
         }
       }
 
-      template<Index BlockWidth_>
+      template<int BlockWidth_>
       void filter_offdiag_row_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
         if(_sv.size() != matrix.rows())
@@ -301,7 +301,7 @@ namespace FEAST
         }
       }
 
-      template<Index BlockWidth_>
+      template<int BlockWidth_>
       void filter_offdiag_col_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> &) const
       {
         // nothing to do here

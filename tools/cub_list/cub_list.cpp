@@ -58,7 +58,7 @@ public:
       + stringify(int(Factory_::max_points)) + ">");
   }
 
-  void alias(const String& name, Index num_points)
+  void alias(const String& name, int num_points)
   {
     _functor.add_alias(name, Factory_::name() + ":" + stringify(num_points));
   }
@@ -132,7 +132,7 @@ void test_dynamic_scalar(const String& name)
   // print output
   std::cout << "\nPrinting scalar cubature rule '" << rule.get_name() << "':" << std::endl;
   printf("      Weight          Coord\n");
-  for(Index i(0); i < rule.get_num_points(); ++i)
+  for(int i(0); i < rule.get_num_points(); ++i)
   {
     printf("%3i: %15.12f %15.12f\n", int(i), rule.get_weight(i), rule.get_coord(i));
   }
@@ -201,10 +201,10 @@ void test_dynamic(const String& name)
     printf("         Z-Coord");
   printf("\n");
 
-  for(Index i(0); i < rule.get_num_points(); ++i)
+  for(int i(0); i < rule.get_num_points(); ++i)
   {
     printf("%3i: %15.12f", int(i), rule.get_weight(i));
-    for(Index j(0); j < Index(Shape_::dimension); ++j)
+    for(int j(0); j < Shape_::dimension; ++j)
       printf(" %15.12f", rule.get_coord(i,j));
     printf("\n");
   }

@@ -103,11 +103,11 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
-    for(Index i(0); i < 2; ++i)
+    for(int i(0); i < 2; ++i)
     {
-      for(Index j(0); j < 2; ++j)
+      for(int j(0); j < 2; ++j)
       {
-        for(Index k(0); k < 2; ++k)
+        for(int k(0); k < 2; ++k)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
@@ -233,11 +233,11 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
-    for(Index i(0); i < 3; ++i)
+    for(int i(0); i < 3; ++i)
     {
-      for(Index j(0); j < 3; ++j)
+      for(int j(0); j < 3; ++j)
       {
-        for(Index k(0); k < 3; ++k)
+        for(int k(0); k < 3; ++k)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
@@ -389,11 +389,11 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], -DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
-    for(Index i(0); i < 2; ++i)
+    for(int i(0); i < 2; ++i)
     {
-      for(Index j(0); j < 2; ++j)
+      for(int j(0); j < 2; ++j)
       {
-        for(Index k(0); k < 2; ++k)
+        for(int k(0); k < 2; ++k)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
@@ -459,11 +459,11 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], -DataType_(6)/DataType_(10), eps);
 
     // check hessian tensor
-    for(Index i(0); i < 2; ++i)
+    for(int i(0); i < 2; ++i)
     {
-      for(Index j(0); j < 2; ++j)
+      for(int j(0); j < 2; ++j)
       {
-        for(Index k(0); k < 2; ++k)
+        for(int k(0); k < 2; ++k)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
@@ -533,11 +533,11 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
-    for(Index i(0); i < 3; ++i)
+    for(int i(0); i < 3; ++i)
     {
-      for(Index j(0); j < 3; ++j)
+      for(int j(0); j < 3; ++j)
       {
-        for(Index k(0); k < 3; ++k)
+        for(int k(0); k < 3; ++k)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
@@ -611,11 +611,11 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
-    for(Index i(0); i < 3; ++i)
+    for(int i(0); i < 3; ++i)
     {
-      for(Index j(0); j < 3; ++j)
+      for(int j(0); j < 3; ++j)
       {
-        for(Index k(0); k < 3; ++k)
+        for(int k(0); k < 3; ++k)
         {
           TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }

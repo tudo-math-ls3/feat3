@@ -41,7 +41,7 @@ namespace FEAST
 
     protected:
       String _name;
-      Index _num_points;
+      int _num_points;
       WeightType* _weights;
       PointType* _points;
 
@@ -54,7 +54,7 @@ namespace FEAST
       {
       }
 
-      explicit Rule(Index num_points, const String& name) :
+      explicit Rule(int num_points, const String& name) :
         _name(name),
         _num_points(num_points),
         _weights(nullptr),
@@ -62,8 +62,8 @@ namespace FEAST
       {
         if(num_points > 0)
         {
-          _weights = new WeightType[num_points];
-          _points = new PointType[num_points];
+          _weights = new WeightType[size_t(num_points)];
+          _points = new PointType[size_t(num_points)];
         }
       }
 
@@ -85,7 +85,7 @@ namespace FEAST
         _points(other._points)
       {
         other._name.clear();
-        other._num_points = Index(0);
+        other._num_points = 0;
         other._weights = nullptr;
         other._points = nullptr;
       }
@@ -108,7 +108,7 @@ namespace FEAST
         _points = other._points;
 
         other._name.clear();
-        other._num_points = Index(0);
+        other._num_points = 0;
         other._weights = nullptr;
         other._points = nullptr;
 
@@ -130,10 +130,10 @@ namespace FEAST
       Rule clone() const
       {
         Rule rule(_num_points, _name);
-        for(Index i(0); i < _num_points; ++i)
+        for(int i(0); i < _num_points; ++i)
         {
           rule._weights[i] = _weights[i];
-          for(Index j(0); j < Index(dimension); ++j)
+          for(int j(0); j < dimension; ++j)
             rule._points[i][j] = _points[i][j];
         }
         return std::move(rule);
@@ -144,46 +144,46 @@ namespace FEAST
         return _name;
       }
 
-      Index get_num_points() const
+      int get_num_points() const
       {
         return _num_points;
       }
 
-      WeightType& get_weight(Index i)
+      WeightType& get_weight(int i)
       {
         ASSERT(i < _num_points, "index out-of-range");
         return _weights[i];
       }
 
-      const WeightType& get_weight(Index i) const
+      const WeightType& get_weight(int i) const
       {
         ASSERT(i < _num_points, "index out-of-range");
         return _weights[i];
       }
 
-      PointType& get_point(Index i)
+      PointType& get_point(int i)
       {
         ASSERT(i < _num_points, "index out-of-range");
         return _points[i];
       }
 
-      const PointType& get_point(Index i) const
+      const PointType& get_point(int i) const
       {
         ASSERT(i < _num_points, "index out-of-range");
         return _points[i];
       }
 
-      CoordType& get_coord(Index i, Index j)
+      CoordType& get_coord(int i, int j)
       {
-        ASSERT(i < _num_points, "index i out-of-range");
-        ASSERT(j < Index(dimension), "index j out-of-range");
+        ASSERT(i >= 0 && i < _num_points, "index i out-of-range");
+        ASSERT(j >= 0 && j < dimension, "index j out-of-range");
         return _points[i][j];
       }
 
-      const CoordType& get_coord(Index i, Index j) const
+      const CoordType& get_coord(int i, int j) const
       {
-        ASSERT(i < _num_points, "index i out-of-range");
-        ASSERT(j < Index(dimension), "index j out-of-range");
+        ASSERT(i >= 0 && i < _num_points, "index i out-of-range");
+        ASSERT(j >= 0 && j < dimension, "index j out-of-range");
         return _points[i][j];
       }
     }; // class Rule<...>

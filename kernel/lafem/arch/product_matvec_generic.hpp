@@ -30,7 +30,7 @@ namespace FEAST
         }
       }
 
-      template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+      template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
       void ProductMatVec<Mem::Main>::csrb_generic(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
       {
         Tiny::Vector<DT_, BlockHeight_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockHeight_> *>(r));
@@ -43,9 +43,9 @@ namespace FEAST
           const IT_ end(row_ptr[row + 1]);
           for (IT_ i(row_ptr[row]) ; i < end ; ++i)
           {
-            for (Index h(0) ; h < BlockHeight_ ; ++h)
+            for (int h(0) ; h < BlockHeight_ ; ++h)
             {
-              for (Index w(0) ; w < BlockWidth_ ; ++w)
+              for (int w(0) ; w < BlockWidth_ ; ++w)
               {
                 bsum[h] += bval[i][h][w] * bx[col_ind[i]][w];
               }

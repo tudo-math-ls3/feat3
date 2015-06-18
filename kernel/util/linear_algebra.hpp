@@ -1838,7 +1838,7 @@ namespace FEAST
             }
 
             // eliminate row i of L
-            size_t k = i * stride_a;
+            TypeSize_ k(i * stride_a);
             for(TypeSize_ j(0) ; j < i ; ++j)
             {
               x[i] -= TypeX_(a[k + j]) * x[j];

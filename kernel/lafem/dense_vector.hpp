@@ -225,7 +225,7 @@ namespace FEAST
        *
        * Creates a vector from a given source blocked vector
        */
-      template <Index BS_>
+      template <int BS_>
       explicit DenseVector(const DenseVectorBlocked<Mem_, DT_, IT_, BS_> & other) :
         Container<Mem_, DT_, IT_>(other.raw_size())
       {
@@ -366,7 +366,7 @@ namespace FEAST
        *
        * Use source vector content as content of current vector
        */
-      template <typename Mem2_, typename DT2_, typename IT2_, Index BS2_>
+      template <typename Mem2_, typename DT2_, typename IT2_, int BS2_>
       void convert(const DenseVectorBlocked<Mem2_, DT2_, IT2_, BS2_> & other)
       {
         CONTEXT("When converting DenseVector");

@@ -26,9 +26,9 @@ private:
   template<int n_, int sm_, int sn_>
   static void _init_lehmer_mat(Matrix<DataType_, n_, n_, sm_, sn_>& a)
   {
-    for(Index i(0) ; i < n_ ; ++i)
+    for(int i(0) ; i < n_ ; ++i)
     {
-      for(Index j(0) ; j < n_ ; ++j)
+      for(int j(0) ; j < n_ ; ++j)
       {
         a(i,j) = DataType_(Math::min(i, j) + 1) / DataType_(Math::max(i, j) + 1);
       }
@@ -43,7 +43,7 @@ private:
     a = DataType_(0);
     a(0,0) = DataType_(4) / DataType_(3);
     a(0,1) = b = -DataType_(2) / DataType_(3);
-    for(Index i(1) ; i < n_ - 1 ; ++i)
+    for(int i(1) ; i < n_ - 1 ; ++i)
     {
       a(i,i-1) = b;
       a(i,i  ) = DataType_(4*cub(i+1)) / DataType_(4*sqr(i+1) - 1);

@@ -43,7 +43,7 @@ namespace FEAST
         /// The name of the cubature rule.
         String _name;
         /// The total number of points in the cubature rule.
-        Index _num_points;
+        int _num_points;
         /// Cubature weights array.
         WeightType* _weights;
         /// Cubature point coordinates array.
@@ -70,7 +70,7 @@ namespace FEAST
          * \param[in] name
          * The name of the cubature rule.
          */
-        explicit Rule(Index num_points, String name) :
+        explicit Rule(int num_points, String name) :
           _name(name),
           _num_points(num_points),
           _weights(nullptr),
@@ -78,8 +78,8 @@ namespace FEAST
         {
           if(num_points > 0)
           {
-            _weights = new WeightType[num_points];
-            _coords = new CoordType[num_points];
+            _weights = new WeightType[size_t(num_points)];
+            _coords = new CoordType[size_t(num_points)];
           }
         }
 
@@ -91,7 +91,7 @@ namespace FEAST
           _coords(other._coords)
         {
           other._name.clear();
-          other._num_points = Index(0);
+          other._num_points = 0;
           other._weights = nullptr;
           other._coords = nullptr;
         }
@@ -114,7 +114,7 @@ namespace FEAST
           _coords = other._coords;
 
           other._name.clear();
-          other._num_points = Index(0);
+          other._num_points = 0;
           other._weights = nullptr;
           other._coords = nullptr;
 
@@ -137,7 +137,7 @@ namespace FEAST
         Rule clone() const
         {
           Rule rule(_num_points, _name);
-          for(Index i(0); i < _num_points; ++i)
+          for(int i(0); i < _num_points; ++i)
           {
             rule._weights[i] = _weights[i];
             rule._coords[i] = _coords[i];
@@ -150,33 +150,33 @@ namespace FEAST
           return _name;
         }
 
-        Index get_num_points() const
+        int get_num_points() const
         {
           return _num_points;
         }
 
-        WeightType& get_weight(Index i)
+        WeightType& get_weight(int i)
         {
           ASSERT_(_weights != nullptr);
           ASSERT(i < _num_points, "index out-of-range");
           return _weights[i];
         }
 
-        const WeightType& get_weight(Index i) const
+        const WeightType& get_weight(int i) const
         {
           ASSERT_(_weights != nullptr);
           ASSERT(i < _num_points, "index out-of-range");
           return _weights[i];
         }
 
-        CoordType& get_coord(Index i)
+        CoordType& get_coord(int i)
         {
           ASSERT_(_coords != nullptr);
           ASSERT(i < _num_points, "index out-of-range");
           return _coords[i];
         }
 
-        const CoordType& get_coord(Index i) const
+        const CoordType& get_coord(int i) const
         {
           ASSERT_(_coords != nullptr);
           ASSERT(i < _num_points, "index out-of-range");
