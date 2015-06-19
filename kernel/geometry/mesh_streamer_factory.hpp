@@ -137,13 +137,17 @@ namespace FEAST
      *
      * \author Jordi Paul
      */
-    template< typename Shape_>
-    class MeshStreamerFactory< MeshPart<ConformalMesh<Shape_> > > :
-      public Factory< MeshPart<ConformalMesh<Shape_>> >
+    template<
+      typename Shape_,
+      int num_coords_,
+      int stride_,
+      typename Coord_>
+    class MeshStreamerFactory< MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > > :
+      public Factory< MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > >
     {
     public:
       /// Type of mesh the MeshPart refers to
-      typedef ConformalMesh<Shape_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
       /// Type of the MeshPart
       typedef MeshPart<MeshType> MeshPartType;
       /// Vertex set type
