@@ -2,7 +2,7 @@
 <header>
  version 1
  chart_file bench1-chart.txt
- meshparts 2
+ meshparts 5
 </header>
 <info>
  This is the bench1 mesh-file, which defines the standard
@@ -600,7 +600,7 @@
 </mesh>
 <meshpart>
  <header>
-  name 1
+  name bottom
   parent root
   chart 1
   type conformal
@@ -608,11 +608,11 @@
   attribute_sets 1
  </header>
  <info>
-  This meshpart defines the outer rectangular boundary component.
+  This meshpart defines the bottom edge of the outer rectangular boundary.
  </info>
  <counts>
-  verts 41
-  edges 40
+  verts 17
+  edges 16
  </counts>
  <vert@edge>
   0 1
@@ -631,30 +631,6 @@
   13 14
   14 15
   15 16
-  16 17
-  17 18
-  18 19
-  19 20
-  20 21
-  21 22
-  22 23
-  23 24
-  24 25
-  25 26
-  26 27
-  27 28
-  28 29
-  29 30
-  30 31
-  31 32
-  32 33
-  33 34
-  34 35
-  35 36
-  36 37
-  37 38
-  38 39
-  39 40
  </vert@edge>
  <vert_idx>
   24
@@ -674,30 +650,6 @@
   114
   30
   29
-  31
-  32
-  33
-  43
-  34
-  108
-  136
-  137
-  138
-  139
-  140
-  141
-  142
-  143
-  57
-  35
-  36
-  37
-  38
-  39
-  40
-  41
-  42
-  24
  </vert_idx>
  <edge_idx>
   1
@@ -717,36 +669,13 @@
   152
   157
   158
-  155
-  220
-  222
-  223
-  219
-  215
-  208
-  202
-  196
-  189
-  187
-  185
-  183
-  181
-  179
-  176
-  237
-  235
-  231
-  232
-  229
-  226
-  0
  </edge_idx>
  <attribute>
   <header>
    dimension 1
    name Parametrisation
    value_dim 1
-   value_count 41
+   value_count 17
   </header>
   <values>
    0
@@ -766,9 +695,138 @@
    0.682
    0.841
    1
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
+ <header>
+  name right
+  parent root
+  chart 1
+  type conformal
+  shape edge
+  attribute_sets 1
+ </header>
+ <info>
+  This meshpart defines the right edge of the outer rectangular boundary.
+ </info>
+ <counts>
+  verts 5
+  edges 4
+ </counts>
+ <vert@edge>
+  0 1
+  1 2
+  2 3
+  3 4
+ </vert@edge>
+ <vert_idx>
+  29
+  31
+  32
+  33
+  43
+ </vert_idx>
+ <edge_idx>
+  158
+  155
+  220
+  222
+ </edge_idx>
+ <attribute>
+  <header>
+   dimension 1
+   name Parametrisation
+   value_dim 1
+   value_count 5
+  </header>
+  <values>
+   1
    1.245
    1.485
    1.733
+   2
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
+ <header>
+  name top
+  parent root
+  chart 1
+  type conformal
+  shape edge
+  attribute_sets 1
+ </header>
+ <info>
+  This meshpart defines the top edge of the outer rectangular boundary.
+ </info>
+ <counts>
+  verts 17
+  edges 16
+ </counts>
+ <vert@edge>
+  0 1
+  1 2
+  2 3
+  3 4
+  4 5
+  5 6
+  6 7
+  7 8
+  8 9
+  9 10
+  10 11
+  11 12
+  12 13
+  13 14
+  14 15
+ </vert@edge>
+ <vert_idx>
+  43
+  34
+  108
+  136
+  137
+  138
+  139
+  140
+  141
+  142
+  143
+  57
+  35
+  36
+  37
+  38
+  39
+ </vert_idx>
+ <edge_idx>
+  223
+  219
+  215
+  208
+  202
+  196
+  189
+  187
+  185
+  183
+  181
+  179
+  176
+  237
+  235
+  231
+ </edge_idx>
+ <attribute>
+  <header>
+   dimension 1
+   name Parametrisation
+   value_dim 1
+   value_count 17
+  </header>
+  <values>
    2
    2.159
    2.318
@@ -786,6 +844,54 @@
    2.909
    2.941
    3
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
+ <header>
+  name left
+  parent root
+  chart 1
+  type conformal
+  shape edge
+  attribute_sets 1
+ </header>
+ <info>
+  This meshpart defines the left edge of the outer rectangular boundary.
+ </info>
+ <counts>
+  verts 5
+  edges 4
+ </counts>
+ <vert@edge>
+  0 1
+  1 2
+  2 3
+  3 4
+  4 5
+ </vert@edge>
+ <vert_idx>
+  39
+  40
+  41
+  42
+  24
+ </vert_idx>
+ <edge_idx>
+  232
+  229
+  226
+  0
+ </edge_idx>
+ <attribute>
+  <header>
+   dimension 1
+   name Parametrisation
+   value_dim 1
+   value_count 5
+  </header>
+  <values>
+   3
    3.34
    3.51
    3.685
@@ -795,7 +901,7 @@
 </meshpart>
 <meshpart>
  <header>
-  name Parametrisation
+  name circle
   parent root
   chart 2
   type conformal
