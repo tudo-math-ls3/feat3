@@ -390,6 +390,21 @@ namespace FEAST
           Intern::ProductMatVecBanded::product_matvec_banded_generic(r, val, offsets, x, num_of_offsets, rows, columns);
         }
       }
+
+      template <typename DT_>
+      void ProductMatVec<Mem::Main>::dense_generic(DT_ * r, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
+      {
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          DT_ sum(0);
+          for (Index col(0); col < columns; ++col)
+          {
+            sum += val[row * columns + col] * x[col];
+          }
+          r[row] = sum;
+        }
+      }
+
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAST

@@ -111,6 +111,13 @@ namespace FEAST
         }
 
         template <typename DT_>
+        static void dense(DT_ * r, const DT_ alpha, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
+        {
+          dense_generic(r, alpha, y, val, x, rows, columns);
+        }
+
+
+        template <typename DT_>
         static void dv_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size);
 
         template <typename DT_, typename IT_>
@@ -130,6 +137,9 @@ namespace FEAST
 
         template <typename DT_, typename IT_>
         static void banded_generic(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
+
+        template <typename DT_>
+        static void dense_generic(DT_ * r, const DT_ alpha, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
 
         static void dv_mkl(float * r, const float a, const float * const x, const float * const y, const Index size);
         static void dv_mkl(double * r, const double a, const double * const x, const double * const y, const Index size);
@@ -161,6 +171,9 @@ namespace FEAST
 
       extern template void Axpy<Mem::Main>::banded_generic(float *, const float * const, const float, const float * const, const Index * const, const float * const, const Index, const Index, const Index);
       extern template void Axpy<Mem::Main>::banded_generic(double *, const double * const, const double, const double * const, const Index * const, const double * const, const Index, const Index, const Index);
+
+      extern template void Axpy<Mem::Main>::dense_generic(float *, const float, const float * const, const float * const, const float * const, const Index, const Index);
+      extern template void Axpy<Mem::Main>::dense_generic(double *, const double, const double * const, const double * const, const double * const, const Index, const Index);
 
       template <>
       struct Axpy<Mem::CUDA>

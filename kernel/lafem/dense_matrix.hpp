@@ -9,6 +9,10 @@
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/norm.hpp>
+#include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/product_matvec.hpp>
+#include <kernel/lafem/arch/defect.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 
 
 namespace FEAST
@@ -351,6 +355,62 @@ namespace FEAST
       DT_ norm_frobenius() const
       {
         return Arch::Norm2<Mem_>::value(this->elements(), this->used_elements());
+      }
+
+      /**
+       * \brief Calculate \f$ r \leftarrow this\cdot x \f$
+       *
+       * \param[out] r The vector that recieves the result.
+       * \param[in] x The vector to be multiplied by this matrix.
+       */
+      void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+        Arch::ProductMatVec<Mem_>::dense(r.elements(), this->elements(),
+                                         x.elements(), this->rows(), this->columns());
+      }
+
+      /**
+       * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+       *
+       * \param[out] r The vector that recieves the result.
+       * \param[in] x The vector to be multiplied by this matrix.
+       * \param[in] y The summand vector.
+       * \param[in] alpha A scalar to scale the product with.
+       */
+      void apply(
+                 DenseVector<Mem_,DT_, IT_> & r,
+                 const DenseVector<Mem_, DT_, IT_> & x,
+                 const DenseVector<Mem_, DT_, IT_> & y,
+                 const DT_ alpha = DT_(1)) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        if (y.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+        // check for special cases
+        // r <- y - A*x
+        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+        {
+          Arch::Defect<Mem_>::dense(r.elements(), y.elements(), this->elements(),
+                                    x.elements(), this->rows(), this->columns());
+        }
+        //r <- y
+        else if(Math::abs(alpha) < Math::eps<DT_>())
+          r.copy(y);
+        // r <- y + alpha*x
+        else
+        {
+          Arch::Axpy<Mem_>::dense(r.elements(), alpha, y.elements(), this->elements(),
+                                  x.elements(), this->rows(), this->columns());
+        }
       }
       ///@}
 

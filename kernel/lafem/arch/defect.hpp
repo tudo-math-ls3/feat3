@@ -83,6 +83,12 @@ namespace FEAST
           banded_generic(r, rhs, val, offsets, x, num_of_offsets, rows, columns);
         }
 
+        template <typename DT_>
+        static void dense(DT_ * r, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
+        {
+          dense_generic(r, rhs, val, x, rows, columns);
+        }
+
         template <typename DT_, typename IT_>
         static void csr_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
 
@@ -97,6 +103,9 @@ namespace FEAST
 
         template <typename DT_, typename IT_>
         static void banded_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
+
+        template <typename DT_>
+        static void dense_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
 
         static void csr_mkl(float * r, const float * const rhs, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const float * const x, const Index rows, const Index, const Index);
         static void csr_mkl(double * r, const double * const rhs, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const double * const x, const Index rows, const Index, const Index);
@@ -122,6 +131,9 @@ namespace FEAST
 
       extern template void Defect<Mem::Main>::banded_generic(float *, const float * const, const float * const, const Index * const, const float * const, const Index, const Index, const Index);
       extern template void Defect<Mem::Main>::banded_generic(double *, const double * const, const double * const, const Index * const, const double * const, const Index, const Index, const Index);
+
+      extern template void Defect<Mem::Main>::dense_generic(float *, const float * const, const float * const, const float * const, const Index, const Index);
+      extern template void Defect<Mem::Main>::dense_generic(double *, const double * const, const double * const, const double * const, const Index, const Index);
 
       template <>
       struct Defect<Mem::CUDA>
