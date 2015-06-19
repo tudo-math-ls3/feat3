@@ -597,6 +597,16 @@ namespace FEAST
     /// Default Constructor
     MeshStreamer();
 
+    /**
+     * \brief Read-From-File Constructor
+     *
+     * This constructor automatically parses the mesh file.
+     *
+     * \param[in] filename
+     * The name of the mesh file to be parsed.
+     */
+    explicit MeshStreamer(const String& filename);
+
     /// Virtual Destructor
     virtual ~MeshStreamer();
 
@@ -605,9 +615,8 @@ namespace FEAST
      *
      * This function parses the FEAST- mesh file given by "filepath" and saves the data.
      *
-     * \param[in] filepath
+     * \param[in] filename
      * A String containing the path to the mesh file.
-     *
      */
     void parse_mesh_file(String filename);
 

@@ -31,7 +31,15 @@ namespace FEAST
     CONTEXT("MeshStreamer::MeshStreamer()");
   }
 
-  // default destructor
+  MeshStreamer::MeshStreamer(const String& filename) :
+    _num_submeshes(0),
+    _chart_path(""),
+    _root_mesh_node(nullptr)
+  {
+    CONTEXT("MeshStreamer::MeshStreamer()");
+    parse_mesh_file(filename);
+  }
+
   MeshStreamer::~MeshStreamer()
   {
     CONTEXT("MeshStreamer::~MeshStreamer()");
