@@ -727,6 +727,11 @@ namespace FEAST
         void compute_target_sets_from_bottom(const MeshType& parent_mesh)
         {
           Intern::template TargetSetComputer<end_dim_, current_dim_>::bottom_to_top(_target_set_holder, parent_mesh.get_index_set_holder());
+
+          // Update num_entities information from the possibly modified _target_set_holder
+          for(int i(end_dim_); i <= current_dim_; ++i)
+            _num_entities[i] = _target_set_holder.get_num_entities(i);
+
         }
 
         /**
@@ -746,6 +751,10 @@ namespace FEAST
         void compute_target_sets_from_top(const MeshType& parent_mesh)
         {
           Intern::template TargetSetComputer<end_dim_, current_dim_>::top_to_bottom(_target_set_holder, parent_mesh.get_index_set_holder());
+
+          // Update num_entities information from the possibly modified _target_set_holder
+          for(int i(current_dim_); i <= end_dim_; ++i)
+            _num_entities[i] = _target_set_holder.get_num_entities(i);
         }
 
         /**
