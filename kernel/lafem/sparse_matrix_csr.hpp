@@ -378,16 +378,16 @@ namespace FEAST
         }
 
         IT_ ait(0);
-        Index current_row(0);
+        IT_ current_row(IT_(0));
         trow_ptr[current_row] = IT_(0);
         for (Index it(0) ; it < cother.used_elements() ; ++it)
         {
-          Index row(cother.row_indices()[it]);
+          IT_ row(cother.row_indices()[it]);
           IT_ column(cother.column_indices()[it]);
 
           if (current_row < row)
           {
-            for (Index i(current_row + 1) ; i < row ; ++i)
+            for (IT_ i(current_row + IT_(1)) ; i < row ; ++i)
             {
               trow_ptr[i] = ait;
             }
@@ -398,7 +398,7 @@ namespace FEAST
           tcol_ind[ait] = column;
           ++ait;
         }
-        for (Index i(current_row + 1) ; i < _rows() ; ++i)
+        for (IT_ i(current_row + IT_(1)) ; i < _rows() ; ++i)
         {
           trow_ptr[i] = ait;
         }
@@ -1113,8 +1113,8 @@ namespace FEAST
           std::vector<DT_> valv;
           for (Index row(0) ; row < rows() ; ++row)
           {
-            const Index end(temp.row_ptr()[row + 1]);
-            for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
+            const IT_ end(temp.row_ptr()[row + 1]);
+            for (IT_ i(temp.row_ptr()[row]) ; i < end ; ++i)
             {
               const IT_ col(temp.col_ind()[i]);
               if (row >= col)
@@ -1138,8 +1138,8 @@ namespace FEAST
 
           for (Index row(0) ; row < rows() ; ++row)
           {
-            const Index end(temp.row_ptr()[row + 1]);
-            for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
+            const IT_ end(temp.row_ptr()[row + 1]);
+            for (IT_ i(temp.row_ptr()[row]) ; i < end ; ++i)
             {
               file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << std::endl;
             }
@@ -1514,10 +1514,10 @@ namespace FEAST
 
         for (Index i(0); i < txrows; ++i)
         {
-          for (Index k(ptxrow_ptr[i]); k < ptxrow_ptr[i+1]; ++k)
+          for (IT_ k(ptxrow_ptr[i]); k < ptxrow_ptr[i+1]; ++k)
           {
-            const Index l(ptxcol_ind[k]);
-            const Index j(ptrow_ptr[l]);
+            const IT_ l(ptxcol_ind[k]);
+            const IT_ j(ptrow_ptr[l]);
             ptval[j] = ptxval[k];
             ptcol_ind[j] = IT_(i);
             ++ptrow_ptr[l];
@@ -1745,7 +1745,7 @@ namespace FEAST
       Index get_length_of_line(const Index row) const
       {
         const IT_ * prow_ptr(this->row_ptr());
-        return prow_ptr[row + 1] - prow_ptr[row];
+        return Index(prow_ptr[row + 1] - prow_ptr[row]);
       }
 
       /// \cond internal
@@ -1758,8 +1758,9 @@ namespace FEAST
         const IT_ * pcol_ind(this->col_ind());
         const DT_ * pval(this->val());
 
-        const Index start(prow_ptr[row]);
-        for (Index i(0); i < prow_ptr[row + 1] - prow_ptr[row]; ++i)
+        const Index start((Index(prow_ptr[row])));
+        const Index end((Index(prow_ptr[row + 1] - prow_ptr[row])));
+        for (Index i(0); i < end; ++i)
         {
           pval_set[i * stride] = pval[start + i];
           pcol_set[i * stride] = pcol_ind[start + i] + IT_(col_start);

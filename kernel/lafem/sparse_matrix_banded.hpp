@@ -224,9 +224,9 @@ namespace FEAST
 
         for (Index i(0); i < offsets_in.size(); ++i)
         {
-          const Index toffset(offsets_in(i));
+          const Index toffset(Index(offsets_in(i)));
 
-          if (toffset + 2 > rows_in + columns_in)
+          if (toffset + Index(2) > rows_in + columns_in)
           {
             throw InternalError(__func__, __FILE__, __LINE__, "Offset out of matrix!");
           }
@@ -523,8 +523,8 @@ namespace FEAST
 
         for (Index i(0); i < this->_scalar_index.at(4); ++i)
         {
-          const Index toffset(Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i));
-          if (row + toffset + 1 == col + trows)
+          const Index toffset(Index(Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i)));
+          if (row + toffset + Index(1) == col + trows)
           {
             return Util::MemoryPool<Mem_>::get_element(this->_elements.at(0), i * trows + row);
           }

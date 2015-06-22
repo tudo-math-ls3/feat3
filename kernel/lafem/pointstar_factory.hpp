@@ -800,7 +800,7 @@ namespace FEAST
        */
       virtual SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix_banded() const override
       {
-        const Index d(this->_d);
+        const IndexType_ d(IndexType_(this->_d));
         const IndexType_ * const pnos(this->_num_of_subintervalls.data());
         const DataType_ * const pdim(this->_dimensions.data());
 
@@ -808,7 +808,7 @@ namespace FEAST
          * Create matrix-structure
          */
         SparseMatrixBanded<Mem::Main, DataType_, IndexType_> matrix(PointstarStructureFD::value<DataType_, IndexType_>(this->_num_of_subintervalls));
-        const Index neq(matrix.rows());
+        const IndexType_ neq(IndexType_(matrix.rows()));
         DataType_ * const pval(matrix.val());
 
         /**
@@ -816,37 +816,37 @@ namespace FEAST
          */
         // calculate diagonal entries
         DataType_ diagonal_entry(0);
-        for (Index i(0); i < d; ++i)
+        for (IndexType_ i(0); i < d; ++i)
         {
           diagonal_entry += DataType_(2.0) * Math::sqr(pdim[i] / DataType_(pnos[i + 1]));
         }
 
         // Fill diagonal with entries
-        for (Index i(0); i < neq; ++i)
+        for (IndexType_ i(0); i < neq; ++i)
         {
           pval[neq * d + i] = diagonal_entry;
         }
 
         // Fill subdiagonals with entries
-        for (Index i(0), k(pnos[0] - 1); i < d; ++i, k *= pnos[i] - 1)
+        for (IndexType_ i(0), k(pnos[0] - 1); i < d; ++i, k *= pnos[i] - 1)
         {
           const DataType_ subdiagonal_entry(-Math::sqr(pdim[i] / DataType_(pnos[i + 1])));
 
-          for (Index j(0); j < neq / k / (pnos[i + 1] - 1); ++j)
+          for (IndexType_ j(0); j < neq / k / (pnos[i + 1] - 1); ++j)
           {
-            const Index k1(neq * d + k * (pnos[i + 1] - 1) * j);
-            const Index k2(neq * (i + 1));
+            const IndexType_ k1(neq * d + k * (pnos[i + 1] - 1) * j);
+            const IndexType_ k2(neq * (i + 1));
 
             if (j != 0)
             {
-              for (Index l(pnos[i] - 1); l > 0; --l)
+              for (IndexType_ l(pnos[i] - 1); l > 0; --l)
               {
                 pval[k1 + k2 - l] = DataType_(0);
                 pval[k1 - k2 - l + k] = DataType_(0);
               }
             }
 
-            for (Index l(0); l < k * (pnos[i + 1] - 2); ++l)
+            for (IndexType_ l(0); l < k * (pnos[i + 1] - 2); ++l)
             {
               pval[k1 + l + k2] = subdiagonal_entry;
               pval[k1 + l - k2 + k] = subdiagonal_entry;

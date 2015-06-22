@@ -99,7 +99,8 @@ namespace FEAST
       {
         if (trows % tC != 0)
         {
-          for (Index i(pcs[tnum_of_chunks-1] + trows - (tnum_of_chunks-1) * tC); i < pcs[tnum_of_chunks]; i+=tC)
+          const Index tcs((Index(pcs[tnum_of_chunks])));
+          for (Index i(Index(pcs[tnum_of_chunks-1]) + trows - (tnum_of_chunks-1) * tC); i < tcs; i+=tC)
           {
             Util::MemoryPool<Mem2_>::instance()->set_memory(pval     + i, DT_(0), tnum_of_chunks * tC - trows);
             Util::MemoryPool<Mem3_>::instance()->set_memory(pcol_ind + i, IT_(0), tnum_of_chunks * tC - trows);
@@ -331,7 +332,7 @@ namespace FEAST
           {
             ptcol_ind[ptcs[i/C_in] + i%C_in + k*C_in] = IT_(img_idx[j]);
           }
-          for (Index k(ptrl[i]); k < ptcl[i/C_in]; ++k)
+          for (IT_ k(ptrl[i]); k < ptcl[i/C_in]; ++k)
           {
             ptcol_ind[ptcs[i/C_in] + i%C_in + k*C_in] = IT_(0);
           }
@@ -544,7 +545,7 @@ namespace FEAST
           tcs[i+1] = tcs[i] + IT_(_C()) * tcl[i];
         }
 
-        _val_size() = tcs[_num_of_chunks()];
+        _val_size() = Index(tcs[_num_of_chunks()]);
 
         DT_ * tval = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(_val_size());
         IT_ * tcol_ind = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_val_size());
@@ -665,22 +666,23 @@ namespace FEAST
           tcs[i+1] = tcs[i] + IT_(_C()) * tcl[i];
         }
 
-        _val_size() = tcs[_num_of_chunks()];
+        _val_size() = Index(tcs[_num_of_chunks()]);
 
         DT_ * tval = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(_val_size());
         IT_ * tcol_ind = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_val_size());
 
+        const IT_ ttC((IT_(tC)));
         for (Index i(0); i < _rows(); ++i)
         {
-          for (Index j(crow_ptr[i]), k(0); j < crow_ptr[i+1]; ++j, ++k)
+          for (IT_ j(crow_ptr[i]), k(0); j < crow_ptr[i+1]; ++j, ++k)
           {
-            tcol_ind[tcs[i/_C()] + i%_C() + k*_C()] = ccol_ind[j];
-            tval    [tcs[i/_C()] + i%_C() + k*_C()] = cval[j];
+            tcol_ind[tcs[i/ttC] + i%ttC + k*ttC] = ccol_ind[j];
+            tval    [tcs[i/ttC] + i%ttC + k*ttC] = cval[j];
           }
-          for (Index k(trl[i]); k < tcl[i/_C()]; ++k)
+          for (IT_ k(trl[i]); k < tcl[i/tC]; ++k)
           {
-            tcol_ind[tcs[i/_C()] + i%_C() + k*_C()] = IT_(0);
-            tval    [tcs[i/_C()] + i%_C() + k*_C()] = DT_(0);
+            tcol_ind[tcs[i/ttC] + i%ttC + k*ttC] = IT_(0);
+            tval    [tcs[i/ttC] + i%ttC + k*ttC] = DT_(0);
           }
         }
 
@@ -760,7 +762,7 @@ namespace FEAST
           Index i(0);
           while (i < _used_elements())
           {
-            const Index row(crow_ind[i]);
+            const IT_ row(crow_ind[i]);
             IT_ counter(0);
             while (i < _used_elements() && crow_ind[i] == row)
             {
@@ -781,19 +783,21 @@ namespace FEAST
           tcs[i+1] = tcs[i] + IT_(_C()) * tcl[i];
         }
 
-        _val_size() = tcs[_num_of_chunks()];
+        _val_size() = Index(tcs[_num_of_chunks()]);
 
         DT_ * tval = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(_val_size());
         IT_ * tcol_ind = Util::MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_val_size());
 
         for (Index row(0), k(0); row < rows(); ++row)
         {
-          for (Index i(0); i < trl[row]; ++i, ++k)
+          const Index trow((Index(trl[row])));
+          for (Index i(0); i < trow; ++i, ++k)
           {
             tcol_ind[tcs[row/_C()] + row%_C() + i*_C()] = ccol_ind[k];
             tval    [tcs[row/_C()] + row%_C() + i*_C()] = cval[k];
           }
-          for (Index i(trl[row]); i < tcl[row/_C()]; ++i)
+          const Index ttcl((Index(tcl[row/_C()])));
+          for (Index i((Index(trl[row]))); i < ttcl; ++i)
           {
             tcol_ind[tcs[row/_C()] + row%_C() + i*_C()] = IT_(0);
             tval    [tcs[row/_C()] + row%_C() + i*_C()] = DT_(0);
@@ -877,7 +881,7 @@ namespace FEAST
           pcs[i+1] = pcs[i] + IT_(aC) * pcl[i];
         }
 
-        const Index aval_size(pcs[anum_of_chunks]);
+        const Index aval_size((Index(pcs[anum_of_chunks])));
 
         DenseVector<Mem::Main, DT_, IT_> aval(aval_size);
         DenseVector<Mem::Main, IT_, IT_> acol_ind(aval_size);
@@ -889,7 +893,7 @@ namespace FEAST
         {
           ta.set_line(i, pval + pcs[i/aC] + i%aC, pcol_ind + pcs[i/aC] + i%aC, 0, aC);
 
-          for (Index k(prl[i]); k < pcl[i/_C()]; ++k)
+          for (IT_ k(prl[i]); k < pcl[i/_C()]; ++k)
           {
             pcol_ind[pcs[i/aC] + i%aC + k*aC] = IT_(0);
             pval    [pcs[i/aC] + i%aC + k*aC] = DT_(0);
@@ -1048,7 +1052,8 @@ namespace FEAST
       {
         std::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
 
-        Index trows, tcols, ue(0);
+        IT_ trows;
+        Index tcols, ue(0);
         String line;
         std::getline(file, line);
         const bool general((line.find("%%MatrixMarket matrix coordinate real general") != String::npos) ? true : false);
@@ -1074,7 +1079,7 @@ namespace FEAST
           line.erase(0, begin);
           String::size_type end(line.find_first_of(" "));
           String srow(line, 0, end);
-          trows = Index(atol(srow.c_str()));
+          trows = IT_(atol(srow.c_str()));
           line.erase(0, end);
 
           begin = line.find_first_not_of(" ");
@@ -1122,14 +1127,14 @@ namespace FEAST
           }
         }
 
-        const IT_ tC(IT_(this->_C()));
-        const Index tnum_of_chunks((trows + tC - Index(1)) / tC);
+        const IT_ tC((IT_(this->_C())));
+        const Index tnum_of_chunks((trows + tC - IT_(1)) / tC);
 
         LAFEM::DenseVector<Mem::Main, IT_, IT_> tcl(tnum_of_chunks, IT_(0));
         IT_ * ptcl(tcl.elements());
         LAFEM::DenseVector<Mem::Main, IT_, IT_> tcs(tnum_of_chunks + 1);
         IT_ * ptcs(tcs.elements());
-        LAFEM::DenseVector<Mem::Main, IT_, IT_> trl(trows);
+        LAFEM::DenseVector<Mem::Main, IT_, IT_> trl((Index(trows)));
         IT_ * ptrl(trl.elements());
 
         for (IT_ i(0); i < trows; ++i)
@@ -1142,7 +1147,7 @@ namespace FEAST
         ptcs[0] = IT_(0);
         for (Index i(0); i < tnum_of_chunks; ++i)
         {
-          ptcs[i+1] = ptcs[i] + IT_(tC) * ptcl[i];
+          ptcs[i+1] = ptcs[i] + tC * ptcl[i];
         }
 
         Index tval_size = Index(ptcs[tnum_of_chunks]);
@@ -1171,9 +1176,9 @@ namespace FEAST
           ++row_idx;
         }
 
-        _init_padded_elements<Mem::Main, Mem::Main>(ptval, ptcol_ind, ptcs, trows, tnum_of_chunks, tC);
+        _init_padded_elements<Mem::Main, Mem::Main>(ptval, ptcol_ind, ptcs, Index(trows), tnum_of_chunks, tC);
 
-        this->assign(SparseMatrixELL<Mem::Main, DT_, IT_>(trows, tcols, ue, tval, tcol_ind, tcs, tcl, trl, tC));
+        this->assign(SparseMatrixELL<Mem::Main, DT_, IT_>(Index(trows), tcols, ue, tval, tcol_ind, tcs, tcl, trl, tC));
       }
 
       /**
@@ -1626,7 +1631,8 @@ namespace FEAST
 
         for (Index i(0); i < txrows; ++i)
         {
-          for (Index k(0), j(ptxcs[i/txC] + i%txC); k < ptxrl[i]; ++k, j+= txC)
+          const Index txcs((Index(ptxcs[i/txC])));
+          for (Index k(0), j(txcs + i%txC); k < ptxrl[i]; ++k, j+= txC)
           {
             ++ptrl[ptxcol_ind[j]];
           }
@@ -1652,7 +1658,7 @@ namespace FEAST
           ptcs[i+1] = ptcs[i] + IT_(tC) * ptcl[i];
         }
 
-        const Index tval_size(ptcs[tnum_of_chunks]);
+        const Index tval_size((Index(ptcs[tnum_of_chunks])));
 
         DenseVector<Mem::Main, IT_, IT_> tcol_ind(tval_size);
         DenseVector<Mem::Main, DT_, IT_> tval(tval_size);
@@ -1662,7 +1668,7 @@ namespace FEAST
 
         for (Index i(0); i < txrows; ++i)
         {
-          for (Index k(0), j(ptxcs[i/txC] + i%txC); k < ptxrl[i]; ++k, j+= txC)
+          for (Index k(0), j((Index(ptxcs[i/txC] + i%txC))); k < ptxrl[i]; ++k, j+= txC)
           {
             const IT_ row(ptxcol_ind[j]);
             ptcol_ind[ptcs[row/tC] + row%tC + ptrl[row] * tC] = IT_(i);
@@ -1809,7 +1815,7 @@ namespace FEAST
       /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
-        return this->rl()[row];
+        return Index(this->rl()[row]);
       }
 
       /// \cond internal
@@ -1819,7 +1825,7 @@ namespace FEAST
                     const Index col_start, const Index stride_in = 1) const
       {
         const Index tC(this->C());
-        const Index length(this->rl()[row]);
+        const Index length((Index(this->rl()[row])));
         const IT_ * pcol_ind(this->col_ind() + this->cs()[row/tC] + row%tC);
         const DT_ * pval    (this->val()     + this->cs()[row/tC] + row%tC);
 

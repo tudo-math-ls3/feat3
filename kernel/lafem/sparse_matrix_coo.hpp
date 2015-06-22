@@ -762,7 +762,7 @@ namespace FEAST
 
         for (Index i(0); i < arows; ++i)
         {
-          for (Index k(prow_ptr[i]); k < prow_ptr[i+1]; ++k)
+          for (IT_ k(prow_ptr[i]); k < prow_ptr[i+1]; ++k)
           {
             prow_ind[k] = IT_(i);
           }
@@ -1588,8 +1588,8 @@ namespace FEAST
 
         for (Index i(0); i < txused_elements; ++i)
         {
-          const Index l(ptxcol_ind[i]);
-          const Index j(ptrow_ptr[l]);
+          const IT_ l(ptxcol_ind[i]);
+          const IT_ j(ptrow_ptr[l]);
           ptval[j] = ptxval[i];
           ptcol_ind[j] = ptxrow_ind[i];
           ptrow_ind[j] = ptxcol_ind[i];

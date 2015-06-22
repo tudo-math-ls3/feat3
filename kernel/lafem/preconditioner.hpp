@@ -1097,7 +1097,7 @@ namespace FEAST
           const IT_ * parow(_A.row_ptr());
 
           const Index n(_LU.rows());
-          Index k;
+          IT_ k;
           // initialize LU array to A
           for (Index i(0); i < n; ++i)
           {
@@ -1276,14 +1276,14 @@ namespace FEAST
         const IT_ * pcol_ind(_LU.col_ind());
         const IT_ * pcs(_LU.cs());
         const IT_ * prl(_LU.rl());
-        const Index C(_LU.C());
-        const Index n(_LU.rows());
+        const IT_ C((IT_(_LU.C())));
+        const IT_ n((IT_(_LU.rows())));
 
-        Index col;
+        IT_ col;
 
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < n; ++i)
+        for (IT_ i(0); i < n; ++i)
         {
           // iteration over all elements on the left side of the main-diagonal
           col = pcs[i/C] + i%C;
@@ -1297,7 +1297,7 @@ namespace FEAST
 
         // __backward-insertion__
         // iteration over all rows
-        for (Index i(n); i > 0;)
+        for (IT_ i(n); i > 0;)
         {
           --i;
 
@@ -1344,9 +1344,9 @@ namespace FEAST
           while (pcol_ind[k] < i)
           {
             pval[k] /= pval[pw[pcol_ind[k]]];
-            Index m(pw[pcol_ind[k]] + C);
+            IT_ m(pw[pcol_ind[k]] + C);
             // m -> \tilde a_{kj}
-            for (Index j(k + C); j < pcs[i/C] + i%C + C*prl[i]; j += C)
+            for (IT_ j(k + C); j < pcs[i/C] + i%C + C*prl[i]; j += C)
             {
               // j -> \tilde a_{ij}
               while (m < pcs[pcol_ind[k]/C] + pcol_ind[k]%C + prl[pcol_ind[k]] * C)
@@ -1397,7 +1397,7 @@ namespace FEAST
         // auxillary-iterators
         typename std::list<PAIR_>::iterator it, it1, it2;
 
-        Index col, col2;
+        IT_ col, col2;
         int l, l2, neues_level;
 
         // fill list with non-zero entries of A
@@ -1494,11 +1494,11 @@ namespace FEAST
         DT_ * pluval    (luval.elements());
         IT_ * plucol_ind(lucol_ind.elements());
 
-        Index k1(0);
+        IT_ k1;
 
         for (Index i(0); i < n; ++i)
         {
-          k1 = 0;
+          k1 = IT_(0);
           for (it = ll[i].begin(); it != ll[i].end(); ++it, ++k1)
           {
             plucol_ind[plucs[i/C] + i%C + k1 * C] = it->second;
@@ -1541,18 +1541,19 @@ namespace FEAST
           const IT_ * pacol_ind(_A.col_ind());
           const IT_ * pacs(_A.cs());
           const IT_ * parl(_A.rl());
-          const Index C(_A.C());
+          const IT_ C((IT_(_A.C())));
 
-          const Index n(_A.rows());
+          const IT_ n((IT_(_A.rows())));
 
-          Index k, ctr;
+          IT_ k;
+          Index ctr;
 
           // iteration over all rows
-          for (Index row(0); row < n; ++row)
+          for (IT_ row(0); row < n; ++row)
           {
             k  = pacs[row/C] + row%C;
             ctr = 0;
-            for (Index j(0); j < plurl[row]; ++j)
+            for (IT_ j(0); j < plurl[row]; ++j)
             {
               pluval[plucs[row/C] + row%C + j * C] = DT_(0.0);
               while (ctr < parl[row] && pacol_ind[k] <= plucol_ind[plucs[row/C] + row%C + j * C])
@@ -1760,14 +1761,15 @@ namespace FEAST
         const DT_ * pval(_A.val());
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * prow_ptr(_A.row_ptr());
-        const Index n(_A.rows());
+        const IT_ n((IT_(_A.rows())));
 
         if(!_reverse)
         {
           // __forward-insertion__
           // iteration over all rows
-          for (Index i(0), col; i < n; ++i)
+          for (IT_ i(0); i < n; ++i)
           {
+            IT_ col;
             DT_ d(0);
             // iteration over all elements on the left side of the main-diagonal
             for (col = prow_ptr[i]; pcol_ind[col] < i; ++col)
@@ -1781,7 +1783,7 @@ namespace FEAST
         {
           // __backward-insertion__
           // iteration over all rows
-          for (Index i(n), col; i > 0;)
+          for (IT_ i(n), col; i > 0;)
           {
             --i;
             DT_ d(0);
@@ -2015,15 +2017,16 @@ namespace FEAST
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * pcs(_A.cs());
         const IT_ * prl(_A.rl());
-        const Index C(_A.C());
-        const Index n(_A.rows());
+        const IT_ C((IT_(_A.C())));
+        const IT_ n((IT_(_A.rows())));
 
         if(!_reverse)
         {
           // __forward-insertion__
           // iteration over all rows
-          for (Index i(0), col; i < n; ++i)
+          for (IT_ i(0); i < n; ++i)
           {
+            IT_ col;
             DT_ d(0);
             // iteration over all elements on the left side of the main-diagonal
             for (col = pcs[i/C] + i%C; pcol_ind[col] < i; col += C)
@@ -2037,9 +2040,10 @@ namespace FEAST
         {
           // __backward-insertion__
           // iteration over all rows
-          for (Index i(n), col; i > 0; )
+          for (IT_ i(n); i > 0; )
           {
             --i;
+            IT_ col;
             DT_ d(0);
             // iteration over all elements on the right side of the main-diagonal
             for (col = pcs[i/C] + i%C + C * (prl[i] - 1); pcol_ind[col] > i; col -= C)
@@ -2118,7 +2122,7 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        if (Math::abs(_omega - DT_(2.0)) < 1e-10)
+        if (Math::abs(_omega - DT_(2.0)) < DT_(1e-10))
         {
           throw InternalError(__func__, __FILE__, __LINE__, "omega too close to 2!");
         }
@@ -2153,8 +2157,9 @@ namespace FEAST
 
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0), col; i < n; ++i)
+        for (Index i(0); i < n; ++i)
         {
+          IT_ col;
           DT_ d(0);
           // iteration over all elements on the left side of the main-diagonal
           for (col = prow_ptr[i]; pcol_ind[col] < i; ++col)
@@ -2166,12 +2171,13 @@ namespace FEAST
 
         // __backward-insertion__
         // iteration over all rows
-        for (Index i(n), col; i > 0;)
+        for (Index i(n); i > 0;)
         {
           --i;
+          IT_ col;
           DT_ d(0);
           // iteration over all elements on the right side of the main-diagonal
-          for (col = prow_ptr[i+1]-1; pcol_ind[col] > i; --col)
+          for (col = prow_ptr[i+1] - IT_(1); pcol_ind[col] > i; --col)
           {
             d += pval[col] * pout[pcol_ind[col]];
           }
@@ -2235,7 +2241,7 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        if (Math::abs(_omega - DT_(2.0)) < 1e-10)
+        if (Math::abs(_omega - DT_(2.0)) < DT_(1e-10))
         {
           throw InternalError(__func__, __FILE__, __LINE__, "omega too close to 2!");
         }
@@ -2363,7 +2369,7 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        if (Math::abs(_omega - DT_(2.0)) < 1e-10)
+        if (Math::abs(_omega - DT_(2.0)) < DT_(1e-10))
         {
           throw InternalError(__func__, __FILE__, __LINE__, "omega too close to 2!");
         }
@@ -2395,13 +2401,14 @@ namespace FEAST
         const IT_ * pcol_ind(_A.col_ind());
         const IT_ * pcs(_A.cs());
         const IT_ * prl(_A.rl());
-        const Index C(_A.C());
-        const Index n(_A.rows());
+        const IT_ C((IT_(_A.C())));
+        const IT_ n((IT_(_A.rows())));
 
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0), col; i < n; ++i)
+        for (IT_ i(0); i < n; ++i)
         {
+          IT_ col;
           DT_ d(0);
           // iteration over all elements on the left side of the main-diagonal
           for (col = pcs[i/C] + i%C; pcol_ind[col] < i; col += C)
@@ -2413,10 +2420,10 @@ namespace FEAST
 
         // __backward-insertion__
         // iteration over all rows
-        for (Index i(n), col; i > 0;)
+        for (IT_ i(n); i > 0;)
         {
           --i;
-
+          IT_ col;
           DT_ d(0);
           // iteration over all elements on the right side of the main-diagonal
           for (col = pcs[i/C] + i%C + C * (prl[i] - 1); pcol_ind[col] > i; col -= C)
@@ -2478,7 +2485,7 @@ namespace FEAST
                                       SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
-          _m((Index) -1),
+          _m(std::numeric_limits<Index>::max()),
           _a_columnwise(_A.rows())
         {
         }
@@ -2496,7 +2503,7 @@ namespace FEAST
 
           for (Index i(0); i < n; ++i)
           {
-            for (Index l(playoutrow[i]); l < playoutrow[i + 1]; ++l)
+            for (IT_ l(playoutrow[i]); l < playoutrow[i + 1]; ++l)
             {
               _m_columns[playoutcol[l]].emplace_back(DT_(0.0), i);
             }
@@ -2512,7 +2519,7 @@ namespace FEAST
 
           for (Index i(0); i < n; ++i)
           {
-            for (Index l(prow_ptr[i]); l < prow_ptr[i + 1]; ++l)
+            for (IT_ l(prow_ptr[i]); l < prow_ptr[i + 1]; ++l)
             {
               _a_columnwise[pcol_ind[l]].emplace_back(pval[l], i);
             }
@@ -2586,8 +2593,8 @@ namespace FEAST
           {
             for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
             {
-              const Index l(it_J->second);
-              const Index j(ptrow_ptr[l]);
+              const IT_ l(it_J->second);
+              const IT_ j(ptrow_ptr[l]);
               ptval[j] = it_J->first;
               ptcol_ind[j] = i;
               ++ptrow_ptr[l];
@@ -2607,7 +2614,7 @@ namespace FEAST
         {
           const Index n(_A.rows());
 
-          if (_m != (Index) -1)
+          if (_m != std::numeric_limits<Index>::max())
           {
             const Index used_elements(n * (1 + 2 * _m) - _m * (_m + 1));
 
@@ -2623,7 +2630,7 @@ namespace FEAST
             IT_ k(0);
             for (IT_ i(0); i < IT_(n); ++i)
             {
-              for (IT_ l((_m > i) ? 0 : i - IT_(_m)); l < Math::min(n, _m + i + 1); ++l)
+              for (IT_ l((_m > i) ? 0 : i - IT_(_m)); l < Math::min(IT_(n), IT_(_m) + i + IT_(1)); ++l)
               {
                 pcol_ind[k] = l;
                 ++k;
@@ -2683,7 +2690,7 @@ namespace FEAST
 
           for (Index i(0); i < n; i++)
           {
-            for (Index c(pmrow[i]); c < pmrow[i + 1]; c++)
+            for (IT_ c(pmrow[i]); c < pmrow[i + 1]; c++)
             {
               pout[pmcol[c]] += pm[c] * pin[i];
             }
@@ -2724,7 +2731,7 @@ namespace FEAST
                                       SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
-          _m((Index) -1),
+          _m(std::numeric_limits<Index>::max()),
           _a_columnwise(_A.rows())
         {
         }
@@ -2825,8 +2832,8 @@ namespace FEAST
           {
             for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
             {
-              const Index l(it_J->second);
-              const Index j(ptrow_ptr[l]);
+              const IT_ l(it_J->second);
+              const IT_ j(ptrow_ptr[l]);
               ptval[j] = it_J->first;
               ptcol_ind[j] = i;
               ptrow_ind[j] = it_J->second;
@@ -2841,7 +2848,7 @@ namespace FEAST
         {
           const Index n(_A.rows());
 
-          if (_m != (Index) -1)
+          if (_m != std::numeric_limits<Index>::max())
           {
             const Index used_elements(n * (1 + 2 * _m) - _m * (_m + 1));
 
@@ -2859,7 +2866,7 @@ namespace FEAST
             IT_ k(0);
             for (IT_ i(0); i < IT_(n); ++i)
             {
-              for (IT_ l((_m > i) ? 0 : i - IT_(_m)); l < Math::min(n, _m + i + 1); ++l)
+              for (IT_ l((_m > i) ? 0 : i - IT_(_m)); l < Math::min(IT_(n), IT_(_m) + i + IT_(1)); ++l)
               {
                 pcol_ind[k] = l;
                 prow_ind[k] = i;
@@ -2872,7 +2879,7 @@ namespace FEAST
             {
               for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
               {
-                const Index tmp(std::min(it_J->second, IT_(_m)));
+                const IT_ tmp(std::min(it_J->second, IT_(_m)));
                 pval[prow_ptr[it_J->second] + i - it_J->second + tmp] = it_J->first;
               }
             }
@@ -2887,7 +2894,7 @@ namespace FEAST
             {
               for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
               {
-                _M(it_J->second, i, it_J->first);
+                _M(Index(it_J->second), i, it_J->first);
               }
             }
           }
@@ -2948,7 +2955,7 @@ namespace FEAST
                                       SparseLayout<Mem_, IT_, MatrixType::layout_id> && layout) :
           _A(A),
           _layout(std::move(layout)),
-          _m((Index) -1),
+          _m(std::numeric_limits<Index>::max()),
           _a_columnwise(_A.rows())
         {
         }
@@ -2959,16 +2966,16 @@ namespace FEAST
 
         void create_initial_m_columns ()
         {
-          const Index n(_A.rows());
+          const IT_ n((IT_(_A.rows())));
 
           const IT_ * playoutcol_ind(_layout.get_indices().at(0));
           const IT_ * playoutcs(_layout.get_indices().at(1));
           const IT_ * playoutrl(_layout.get_indices().at(3));
-          const Index C(_layout.get_scalar_index().at(3));
+          const IT_ C((IT_(_layout.get_scalar_index().at(3))));
 
-          for (Index i(0); i < n; ++i)
+          for (IT_ i(0); i < n; ++i)
           {
-            for (Index l(playoutcs[i/C] + i%C); l < playoutcs[i/C] + i%C + playoutrl[i] * C; l += C)
+            for (IT_ l(playoutcs[i/C] + i%C); l < playoutcs[i/C] + i%C + playoutrl[i] * C; l += C)
             {
               _m_columns[playoutcol_ind[l]].emplace_back(DT_(0.0), i);
             }
@@ -2977,16 +2984,16 @@ namespace FEAST
 
         void create_a_columnwise ()
         {
-          const Index n(_A.rows());
+          const IT_ n((IT_(_A.rows())));
           const DT_ * pval(_A.val());
           const IT_ * pacol_ind(_A.col_ind());
           const IT_ * pacs(_A.cs());
           const IT_ * parl(_A.rl());
-          const Index C(_A.C());
+          const IT_ C((IT_(_A.C())));
 
-          for (Index i(0); i < n; ++i)
+          for (IT_ i(0); i < n; ++i)
           {
-            for (Index l(pacs[i/C] + i%C); l < pacs[i/C] + i%C + parl[i] * C; l += C)
+            for (IT_ l(pacs[i/C] + i%C); l < pacs[i/C] + i%C + parl[i] * C; l += C)
             {
               _a_columnwise[pacol_ind[l]].emplace_back(pval[l], i);
             }
@@ -2995,21 +3002,21 @@ namespace FEAST
 
         void create_m_transpose ()
         {
-          const Index n(_A.rows());
-          const Index C(_A.C());
+          const IT_ n((IT_(_A.rows())));
+          const IT_ C((IT_(_A.C())));
 
           // calculate cl-array and fill rl-array
           Index num_of_chunks(Index(ceil(n / float(C))));
           DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
           DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
-          DenseVector<Mem_, IT_, IT_> mrl(n);
+          DenseVector<Mem_, IT_, IT_> mrl(_A.rows());
           IT_ * pmcl(mcl.elements());
           IT_ * pmcs(mcs.elements());
           IT_ * pmrl(mrl.elements());
 
           Index nnz(0);
 
-          for (Index i(0); i < n; ++i)
+          for (IT_ i(0); i < n; ++i)
           {
             pmrl[i] = IT_(_m_columns[i].size());
             pmcl[i/C] = Math::max(pmcl[i/C], pmrl[i]);
@@ -3030,9 +3037,9 @@ namespace FEAST
           DT_ * pmval    (mval.elements());
           IT_ * pmcol_ind(mcol_ind.elements());
 
-          for (Index i(0), k; i < n; ++i)
+          for (IT_ i(0); i < n; ++i)
           {
-            k = pmcs[i/C] + i%C;
+            IT_ k(pmcs[i/C] + i%C);
             for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J, k+=C)
             {
               pmcol_ind[k] = it_J->second;
@@ -3045,26 +3052,26 @@ namespace FEAST
             }
           }
 
-          _M = MatrixType(n, n, nnz, mval, mcol_ind, mcs, mcl, mrl, C);
+          _M = MatrixType(_A.rows(), _A.columns(), nnz, mval, mcol_ind, mcs, mcl, mrl, _A.C());
         } // function create_m_transpose
 
         void create_m()
         {
-          const Index n(_A.rows());
-          const Index C(_A.C());
+          const IT_ n((IT_(_A.rows())));
+          const IT_ C((IT_(_A.C())));
 
           // calculate cl-array and fill rl-array
           Index num_of_chunks(Index(ceil(n / float(C))));
           DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
           DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
-          DenseVector<Mem_, IT_, IT_> mrl(n, IT_(0));
+          DenseVector<Mem_, IT_, IT_> mrl(_A.rows(), IT_(0));
           IT_ * pmcl(mcl.elements());
           IT_ * pmcs(mcs.elements());
           IT_ * pmrl(mrl.elements());
 
           Index nnz(0);
 
-          for (Index i(0); i < n; ++i)
+          for (IT_ i(0); i < n; ++i)
           {
             nnz += Index(_m_columns[i].size());
             for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
@@ -3098,45 +3105,45 @@ namespace FEAST
           {
             for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
             {
-              const Index k(it_J->second);
+              const IT_ k(it_J->second);
               pmcol_ind[pmcs[k/C] + k%C + pmrl[k] * C] = i;
               pmval    [pmcs[k/C] + k%C + pmrl[k] * C] = it_J->first;
               ++pmrl[k];
             }
           }
 
-          for (Index i(0); i < n; ++i)
+          for (IT_ i(0); i < n; ++i)
           {
-            for (Index k(pmcs[i/C] + i%C + pmrl[i] * C); k < pmcs[i/C + 1]; k+=C)
+            for (IT_ k(pmcs[i/C] + i%C + pmrl[i] * C); k < pmcs[i/C + 1]; k+=C)
             {
               pmcol_ind[k] = IT_(0);
               pmval    [k] = DT_(0);
             }
           }
 
-          _M = MatrixType(n, n, nnz, mval, mcol_ind, mcs, mcl, mrl, C);
+          _M = MatrixType(_A.rows(), _A.columns(), nnz, mval, mcol_ind, mcs, mcl, mrl, _A.C());
         } // function create_m
 
         void create_m_without_new_entries ()
         {
-          const Index n(_A.rows());
-          if (_m != (Index) -1)
+          const IT_ n((IT_(_A.rows())));
+          if (_m != std::numeric_limits<Index>::max())
           {
-            const Index used_elements(n * (1 + 2 * _m) - _m * (_m + 1));
-            const Index C(_A.C());
+            const Index used_elements(_A.rows() * (1 + 2 * _m) - _m * (_m + 1));
+            const IT_ C((IT_(_A.C())));
 
             // calculate cl-array and fill rl-array
             Index num_of_chunks(Index(ceil(n / float(C))));
             DenseVector<Mem_, IT_, IT_> mcl(num_of_chunks, IT_(0));
             DenseVector<Mem_, IT_, IT_> mcs(num_of_chunks + 1);
-            DenseVector<Mem_, IT_, IT_> mrl(n);
+            DenseVector<Mem_, IT_, IT_> mrl(_A.rows());
             IT_ * pmcl(mcl.elements());
             IT_ * pmcs(mcs.elements());
             IT_ * pmrl(mrl.elements());
 
-            for (Index i(0); i < n; ++i)
+            for (IT_ i(0); i < n; ++i)
             {
-              pmrl[i] = IT_(_m + 1 + std::min(std::min(i, _m), n - i - 1));
+              pmrl[i] = IT_(_m + 1 + std::min(std::min(i, IT_(_m)), n - i - IT_(1)));
               pmcl[i/C] = Math::max(pmcl[i/C], pmrl[i]);
             }
 
@@ -3144,7 +3151,7 @@ namespace FEAST
             pmcs[0] = IT_(0);
             for (Index i(0); i < num_of_chunks; ++i)
             {
-              pmcs[i+1] = pmcs[i] + IT_(C) * pmcl[i];
+              pmcs[i+1] = pmcs[i] + C * pmcl[i];
             }
 
             Index val_size = Index(pmcs[num_of_chunks]);
@@ -3154,29 +3161,29 @@ namespace FEAST
             DT_ * pmval    (mval.elements());
             IT_ * pmcol_ind(mcol_ind.elements());
 
-            for (Index i(0); i < n; ++i)
+            for (IT_ i(0); i < n; ++i)
             {
-              for (Index l(IT_((_m > i) ? 0 : i - _m)), k(pmcs[i/C] + i%C); l < Math::min(n, _m + i + 1); ++l, k+= C)
+              for (IT_ l(IT_((_m > i) ? 0 : i - _m)), k(pmcs[i/C] + i%C); l < Math::min(n, IT_(_m) + i + 1); ++l, k+= C)
               {
                 pmcol_ind[k] = IT_(l);
               }
-              for (Index k(pmcs[i/C] + i%C + pmrl[i] * C); k < pmcs[i/C + 1]; k+=C)
+              for (IT_ k(pmcs[i/C] + i%C + pmrl[i] * C); k < pmcs[i/C + 1]; k+=C)
               {
                 pmcol_ind[k] = IT_(0);
                 pmval    [k] = DT_(0);
               }
             }
 
-            for (Index i(0); i < n; ++i)
+            for (IT_ i(0); i < n; ++i)
             {
               for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
               {
-                const Index tmp(std::min(it_J->second, IT_(_m)));
+                const IT_ tmp(std::min(it_J->second, IT_(_m)));
                 pmval[pmcs[it_J->second/C] + it_J->second%C + C * (i - it_J->second + tmp)] = it_J->first;
               }
             }
 
-            _M = MatrixType(n, n, used_elements, mval, mcol_ind, mcs, mcl, mrl, C);
+            _M = MatrixType(_A.rows(), _A.columns(), used_elements, mval, mcol_ind, mcs, mcl, mrl, _A.C());
           }
           else
           {
@@ -3185,13 +3192,13 @@ namespace FEAST
             DT_ * pmval(_M.val());
             const IT_ * pmcol_ind(_M.col_ind());
             const IT_ * pmcs(_M.cs());
-            const Index C(_M.C());
+            const IT_ C((IT_(_M.C())));
 
-            for (Index i(0); i < n; ++i)
+            for (IT_ i(0); i < n; ++i)
             {
               for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
               {
-                Index k = pmcs[it_J->second/C] + it_J->second%C;
+                IT_ k(pmcs[it_J->second/C] + it_J->second%C);
 
                 while (pmcol_ind[k] != i)
                 {
@@ -3206,8 +3213,8 @@ namespace FEAST
 
         void apply_m_transpose (VectorType & out, const VectorType & in)
         {
-          const Index n(_M.rows());
-          const Index C(_M.C());
+          const IT_ n((IT_(_M.rows())));
+          const IT_ C((IT_(_M.C())));
           const DT_ * pval(_M.val());
           const IT_ * pcol_ind(_M.col_ind());
           const IT_ * pcs(_M.cs());
@@ -3215,14 +3222,14 @@ namespace FEAST
           const DT_ * pin(in.elements());
           DT_ * pout(out.elements());
 
-          for (Index i(0); i < n; i++)
+          for (IT_ i(0); i < n; i++)
           {
             pout[i] = DT_(0.0);
           }
 
-          for (Index i(0); i < n; i++)
+          for (IT_ i(0); i < n; i++)
           {
-            for (Index c(pcs[i/C] + i%C); c < pcs[i/C] + i%C + prl[i] * C; c += C)
+            for (IT_ c(pcs[i/C] + i%C); c < pcs[i/C] + i%C + prl[i] * C; c += C)
             {
               pout[pcol_ind[c]] += pval[c] * pin[i];
             }
@@ -3446,7 +3453,7 @@ namespace FEAST
         std::vector<DT_> d(0);
 
         typename std::list<PAIR_>::iterator it_I, it_J, it_I_end, it_J_end;
-        typename std::list<std::pair<Index, Index> >::iterator it_I_sorted;
+        typename std::list<std::pair<Index, IT_> >::iterator it_I_sorted;
 
         // __create column-structure of matrix A__
         this->create_a_columnwise();
@@ -3472,12 +3479,12 @@ namespace FEAST
           // __get row-indices I of matching matrix-entries__
           for (it_J = J.begin(); it_J != J.end(); ++it_J)
           {
-            Index col = it_J->second;
+            IT_ col = it_J->second;
             it_I = I.begin();
             for (auto it_col = _a_columnwise[col].begin();
                  it_col != _a_columnwise[col].end(); ++it_col)
             {
-              Index row = it_col->second;
+              IT_ row = it_col->second;
               while (it_I != I.end() && it_I->second < row)
               {
                 ++it_I;
@@ -3493,7 +3500,7 @@ namespace FEAST
           mm_new = Index(I.size());
 
           // save sorted list of I
-          std::list<std::pair<Index, Index> > I_sorted(I.size());
+          std::list<std::pair<Index, IT_> > I_sorted(I.size());
           it_I_sorted = I_sorted.begin();
           it_I = I.begin();
           for (Index i(0); i < mm_new; ++i, ++it_I_sorted, ++it_I)
@@ -3518,7 +3525,7 @@ namespace FEAST
             it_J = ((it_J_end == J.begin()) ? J.begin() : std::next(it_J_end));
             for (Index j(nn); j < nn_new; ++j, ++it_J)
             {
-              Index col = it_J->second;
+              IT_ col = it_J->second;
               it_I_sorted = I_sorted.begin();
               for (auto it_col = _a_columnwise[col].begin();
                    it_col != _a_columnwise[col].end(); ++it_col)
@@ -3686,7 +3693,7 @@ namespace FEAST
             }
 
             // allocate memory for \f$ \rho \f$
-            std::vector<std::pair<DT_, Index> > rho(mm);
+            std::vector<std::pair<DT_, IT_> > rho(mm);
 
             // __Search indices \f$i \in I\f$ with \f$i \not\in J\f$ and \f$r_k(i) \not=0\f$ and calculate \f$\rho_i\f$__
             // notice: if iter > 1 J is not sorted
@@ -3739,7 +3746,8 @@ namespace FEAST
             {
               // search maximal value in rho
               DT_ max_val = DT_(0.0);
-              Index max_ind(0), max_sec(0);
+              Index max_ind(0);
+              IT_ max_sec(0);
 
               for (Index i(0); i < mm; ++i)
               {
@@ -3791,19 +3799,19 @@ namespace FEAST
             // calculate new indices \f$ \tilde I \f$
             for (it_J = std::next(it_J_end); it_J != J.end(); ++it_J)
             {
-              Index col = it_J->second;
+              IT_ col = it_J->second;
               it_I_sorted = I_sorted.begin();
               for (auto it_col = _a_columnwise[col].begin();
                    it_col != _a_columnwise[col].end(); ++it_col)
               {
-                Index row = it_col->second;
+                IT_ row = it_col->second;
                 while (it_I_sorted != I_sorted.end() && it_I_sorted->second < row)
                 {
                   ++it_I_sorted;
                 }
                 if (it_I_sorted == I_sorted.end() || it_I_sorted->second != row)
                 {
-                  I_sorted.emplace(it_I_sorted, -1, row);
+                  I_sorted.emplace(it_I_sorted, std::numeric_limits<Index>::max(), row);
                   it_I = std::next(it_I_end);
                   while (it_I != I.end() && it_I->second < row)
                   {
@@ -3820,7 +3828,7 @@ namespace FEAST
             // fill sorted vector sorted_I with new entries of I
             for (it_I_sorted = I_sorted.begin(); it_I_sorted != I_sorted.end(); ++it_I_sorted)
             {
-              if (it_I_sorted->first != (Index) -1)
+              if (it_I_sorted->first != std::numeric_limits<Index>::max())
               {
                 continue;
               }

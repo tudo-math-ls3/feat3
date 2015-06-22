@@ -233,7 +233,7 @@ namespace FEAST
             }
             else
             {
-              return Math::max(columns + Index(1), rows + columns - offsets[i]) - columns - Index(1);
+              return Math::max(columns + Index(1), rows + columns - Index(offsets[i])) - columns - Index(1);
             }
           }
 
@@ -251,7 +251,7 @@ namespace FEAST
             }
             else
             {
-              return Math::min(rows, columns + rows - offsets[i] - 1) - 1;
+              return Math::min(rows, columns + rows - Index(offsets[i]) - Index(1)) - Index(1);
             }
           }
 

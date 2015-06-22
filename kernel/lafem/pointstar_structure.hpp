@@ -70,14 +70,14 @@ namespace FEAST
 
         // allocate memory for vectors of matrix
         DenseVector<Mem::Main, IndexType_, IndexType_> vec_offsets(noo);
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_val(noo * size);
+        DenseVector<Mem::Main, DataType_, IndexType_> vec_val(noo * Index(size));
 
         // fill offsets-vector
         IndexType_ * const poffsets(vec_offsets.elements());
         const Index h_off((noo - 1) / 2);
 
         // save position of main-diagonal
-        poffsets[h_off] = IndexType_(size - 1);
+        poffsets[h_off] = size - IndexType_(1);
 
         for (Index i(0), k(1), m(1); i < d; ++i, k *= 2 * fe_order + 1, m *= pnos[i - 1] * fe_order + 1)
         {
@@ -94,7 +94,7 @@ namespace FEAST
         }
 
         // return the matrix
-        return SparseMatrixBanded<Mem::Main, DataType_, IndexType_>(size, size, vec_val, vec_offsets);
+        return SparseMatrixBanded<Mem::Main, DataType_, IndexType_>(Index(size), Index(size), vec_val, vec_offsets);
       }
     }; // struct PointstarStructureFE
 
@@ -134,7 +134,7 @@ namespace FEAST
         const Index num_of_offsets(2 * d + 1);
 
         // allocate memory for vectors of matrix
-        DenseVector<Mem::Main, DataType_, IndexType_> vec_val(size * num_of_offsets);
+        DenseVector<Mem::Main, DataType_, IndexType_> vec_val(Index(size) * num_of_offsets);
         DenseVector<Mem::Main, IndexType_, IndexType_> vec_offsets(num_of_offsets);
 
         // fill vec_offsets
@@ -151,7 +151,7 @@ namespace FEAST
         }
 
         // return the matrix
-        return SparseMatrixBanded<Mem::Main, DataType_, IndexType_>(size, size, vec_val, vec_offsets);
+        return SparseMatrixBanded<Mem::Main, DataType_, IndexType_>(Index(size), Index(size), vec_val, vec_offsets);
       }
     }; // struct PointstarStructureFD
 
