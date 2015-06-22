@@ -99,7 +99,7 @@ namespace FEAST
 #ifdef FEAST_INDEX_ULL
   typedef unsigned long long Index;
 #else
-  typedef unsigned int Index;
+  typedef unsigned long Index;
 #endif
 
   /**
