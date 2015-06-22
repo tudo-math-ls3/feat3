@@ -23,9 +23,9 @@ namespace FEAST
         r[idx] = a * x[idx] + y[idx];
       }
 
-      template <typename DT_>
-      __global__ void cuda_axpy_mv_csr(DT_ * r, const DT_ a, const DT_ * x, const DT_ * y, const DT_ * val, const Index * col_ind,
-                                       const Index * row_ptr, const Index count)
+      template <typename DT_, typename IT_>
+      __global__ void cuda_axpy_mv_csr(DT_ * r, const DT_ a, const DT_ * x, const DT_ * y, const DT_ * val, const IT_ * col_ind,
+                                       const IT_ * row_ptr, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
