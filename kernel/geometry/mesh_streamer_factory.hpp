@@ -275,20 +275,20 @@ namespace FEAST
 
           for(auto& it:attribute_container)
           {
-            const int value_count(it.value_count);
+            const Index value_count(it.value_count);
             const int value_dim(it.value_dim);
 
             typename AttributeSetType_::value_type new_attribute(value_count, value_dim, 0);
 
-            for(int i(0); i < value_count; ++i)
+            for(Index i(0); i < value_count; ++i)
             {
               const std::vector<double>& vals(it.values[i]);
 
-              ASSERT(vals.size() == value_dim, "Attribute value count mismatch!");
+              ASSERT(int(vals.size()) == value_dim, "Attribute value count mismatch!");
 
               // copy vertex coordinates
               for(int j(0); j < value_dim; ++j)
-                new_attribute[i][j] = DataType(vals[j]);
+                new_attribute[i][j] = DataType(vals[size_t(j)]);
             }
             attributes.push_back(new_attribute);
 
