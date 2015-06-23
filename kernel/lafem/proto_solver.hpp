@@ -5,6 +5,9 @@
 // includes, FEAST
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/umfpack.hpp>
+#include <kernel/lafem/saddle_point_matrix.hpp>
+#include <kernel/lafem/tuple_vector.hpp>
+#include <kernel/lafem/tuple_filter.hpp>
 #include <memory>
 #include <utility>
 
@@ -163,7 +166,7 @@ namespace FEAST
        *
        * \returns A string describing the solver.
        */
-      virtual String name()
+      virtual String name() const
       {
         return "SolverInterface";
       }
@@ -271,7 +274,7 @@ namespace FEAST
       {
       }
 
-      virtual String name() override
+      virtual String name() const override
       {
         return "Umfpack";
       }
@@ -326,6 +329,320 @@ namespace FEAST
       }
     }; // class UmfpackSolver
 #endif // FEAST_HAVE_UMFPACK
+
+    /**
+     * \brief Schur-Complement preconditioner type.
+     *
+     * This enumeration specifies the various preconditioner types implemented in the
+     * SchurPrecond class template.
+     */
+    enum class SchurType
+    {
+      /// diagonal Schur-Complement preconditioner
+      diagonal,
+      /// lower-diagonal Schur-Complement preconditioner
+      lower,
+      /// upper-diagonal Schur-Complement preconditioner
+      upper,
+      /// full Schur-Complement preconditioner
+      full
+    };
+
+    /**
+     * \brief Schur-Complement preconditioner declaration.
+     *
+     * This class template is only implemented for SaddlePointMatrix matrix types.
+     * See the corresponding specialisation of this class template for the actual documentation.
+     *
+     * \tparam Matrix_
+     * The matrix type. Must be an instance of the SaddlePointMatrix class template.
+     *
+     * \tparam Filter_
+     * The filter type. Must be an instance of the TupleFilter class template.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Matrix_, typename Filter_>
+    class SchurPrecond;
+
+    /**
+     * \brief Schur-Complement preconditioner implementation
+     *
+     * This class implements the Schur-Complement preconditioner, which is a special preconditioner for
+     * saddle-point systems of the form
+     * \f[\begin{bmatrix} A & B\\D & 0\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
+     *
+     * Let \f$ S \approx -DA^{-1}B\f$ be an approximation of the Schur-complement matrix, then this
+     * class supports a total of four different preconditioners for the saddle-point system above:
+     * - SchurType::diagonal: Solves the system
+     * \f[\begin{bmatrix} A & 0\\0 & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
+     *
+     * - SchurType::lower: Solves the system
+     * \f[\begin{bmatrix} A & 0\\D & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
+     *
+     * - SchurType::upper: Solves the system
+     * \f[\begin{bmatrix} A & B\\0 & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
+     *
+     * - SchurType::full: Solves the system
+     * \f[\begin{bmatrix} I & 0\\-DA^{-1} & I\end{bmatrix} \cdot \begin{bmatrix} A & B\\0 & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\f]
+     *
+     * The required solution steps of \f$ A^{-1} \f$ and \f$ S^{-1} \f$ are performed by two sub-solvers,
+     * which have to be created by the user and supplied to the constructor of this object.
+     *
+     * \author Peter Zajac
+     */
+    template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_>
+    class SchurPrecond<SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>, TupleFilter<FilterV_, FilterP_> > :
+      public SolverInterface<TupleVector<typename MatrixB_::VectorTypeL, typename MatrixD_::VectorTypeL> >
+    {
+    public:
+      /// base-class typedef
+      typedef SolverInterface<TupleVector<typename MatrixB_::VectorTypeL, typename MatrixD_::VectorTypeL> > BaseClass;
+      /// system matrix type
+      typedef SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_> MatrixType;
+      /// system filter type
+      typedef TupleFilter<FilterV_, FilterP_> FilterType;
+
+      /// our data type
+      typedef typename MatrixType::DataType DataType;
+
+      /// velocity vector type
+      typedef typename MatrixB_::VectorTypeL VectorTypeV;
+      /// pressure vector type
+      typedef typename MatrixD_::VectorTypeL VectorTypeP;
+      /// system vector type
+      typedef typename MatrixType::VectorTypeL VectorType;
+
+      /// A-block solver type
+      typedef SolverInterface<VectorTypeV> SolverA;
+      /// S-block solver type
+      typedef SolverInterface<VectorTypeP> SolverS;
+
+    private:
+      /// our system matrix
+      const MatrixType& _matrix;
+      /// our system filter
+      const FilterType& _filter;
+      /// our A-block solver
+      SolverA* _solver_a;
+      /// our S-block solver
+      SolverS* _solver_s;
+      /// our Schur-Complement type
+      SchurType _schur_type;
+      /// specifies whether to delete _solver_a
+      bool _del_a;
+      /// specifies whether to delete _solver_s
+      bool _del_s;
+      /// a temporary defec vector
+      VectorType _vec_tmp;
+
+    public:
+      /**
+       * \brief Constructs a Schur-Complement preconditioner
+       *
+       * \param[in] matrix
+       * The saddle-point system matrix.
+       *
+       * \param[in] filter
+       * The system filter.
+       *
+       * \param[in] solver_a
+       * The solver representing \f$A^{-1}\f$.
+       *
+       * \param[in] solver_s
+       * The solver representing \f$S^{-1}\f$.
+       *
+       * \param[in] type
+       * Specifies the type of the preconditioner. See this class' documentation for details.
+       *
+       * \param[in] del_a
+       * Specifies whether to delete the solver_a object upon destruction of this object.
+       *
+       * \param[in] del_s
+       * Specifies whether to delete the solver_s object upon destruction of this object.
+       */
+      explicit SchurPrecond(
+        const MatrixType& matrix, const FilterType& filter,
+        SolverA* solver_a, SolverS* solver_s,
+        SchurType type = SchurType::diagonal,
+        bool del_a = false, bool del_s = false
+        ) :
+        _matrix(matrix),
+        _filter(filter),
+        _solver_a(solver_a),
+        _solver_s(solver_s),
+        _schur_type(type),
+        _del_a(del_a),
+        _del_s(del_s)
+      {
+        ASSERT_(solver_a != nullptr);
+        ASSERT_(solver_s != nullptr);
+      }
+
+      virtual ~SchurPrecond()
+      {
+        if(_del_a && (_solver_a != nullptr))
+          delete _solver_a;
+        if(_del_s && (_solver_s != nullptr))
+          delete _solver_s;
+      }
+
+      virtual String name() const override
+      {
+        return "Schur";
+      }
+
+      virtual bool init_symbolic() override
+      {
+        if(!BaseClass::init_symbolic())
+          return false;
+        if(!_solver_a->init_symbolic())
+          return false;
+        if(!_solver_s->init_symbolic())
+          return false;
+
+        // create a temporary vector
+        if(_schur_type != SchurType::diagonal)
+          _vec_tmp = _matrix.create_vector_l();
+
+        return true;
+      }
+
+      virtual bool init_numeric() override
+      {
+        if(!BaseClass::init_numeric())
+          return false;
+        if(!_solver_a->init_numeric())
+          return false;
+        if(!_solver_s->init_numeric())
+          return false;
+        return true;
+      }
+
+      virtual void done_numeric() override
+      {
+        _solver_s->done_numeric();
+        _solver_a->done_numeric();
+        BaseClass::done_numeric();
+      }
+
+      virtual void done_symbolic() override
+      {
+        if(_schur_type != SchurType::diagonal)
+          _vec_tmp.clear();
+        _solver_s->done_symbolic();
+        _solver_a->done_symbolic();
+        BaseClass::done_symbolic();
+      }
+
+      virtual SolverStatus solve(VectorType& vec_sol, const VectorType& vec_rhs) override
+      {
+        // fetch the references
+        const MatrixB_& mat_b = _matrix.block_b();
+        const MatrixD_& mat_d = _matrix.block_d();
+        const FilterV_& fil_v = _filter.template at<Index(0)>();
+        const FilterP_& fil_p = _filter.template at<Index(1)>();
+        VectorTypeV& tmp_v = _vec_tmp.template at<Index(0)>();
+        VectorTypeP& tmp_p = _vec_tmp.template at<Index(1)>();
+        VectorTypeV& sol_v = vec_sol.template at<Index(0)>();
+        VectorTypeP& sol_p = vec_sol.template at<Index(1)>();
+        const VectorTypeV& rhs_v = vec_rhs.template at<Index(0)>();
+        const VectorTypeP& rhs_p = vec_rhs.template at<Index(1)>();
+
+        // now let's check the preconditioner type
+        switch(_schur_type)
+        {
+        case SchurType::diagonal:
+          {
+            // solve A*u_v = f_v
+            if(!status_success(_solver_a->solve(sol_v, rhs_v)))
+              return SolverStatus::aborted;
+
+            // solve S*u_p = f_p
+            if(!status_success(_solver_s->solve(sol_p, rhs_p)))
+              return SolverStatus::aborted;
+
+            // okay
+            return SolverStatus::success;
+          }
+
+        case SchurType::lower:
+          {
+            // solve A*u_v = f_v
+            if(!status_success(_solver_a->solve(sol_v, rhs_v)))
+              return SolverStatus::aborted;
+
+            // compute g_p := f_p - D*u_v
+            mat_d.apply(tmp_p, sol_v, rhs_p, -DataType(1));
+
+            // apply pressure defect filter
+            fil_p.filter_def(tmp_p);
+
+            // solve S*u_p = g_p
+            if(!status_success(_solver_s->solve(sol_p, tmp_p)))
+              return SolverStatus::aborted;
+
+            // okay
+            return SolverStatus::success;
+          }
+
+        case SchurType::upper:
+          {
+            // solve S*u_p = f_p
+            if(!status_success(_solver_s->solve(sol_p, rhs_p)))
+              return SolverStatus::aborted;
+
+            // compute g_v := f_v - B*u_p
+            mat_b.apply(tmp_v, sol_p, rhs_v, -DataType(1));
+
+            // apply velocity defect filter
+            fil_v.filter_def(tmp_v);
+
+            // solve A*u_v = g_v
+            if(!status_success(_solver_a->solve(sol_v, tmp_v)))
+              return SolverStatus::aborted;
+
+            // okay
+            return SolverStatus::success;
+          }
+
+        case SchurType::full:
+          {
+            // Note: We will use the first component of the solution vector here.
+            //       It will be overwritten by the third solution step below.
+            // solve A*u_v = f_v
+            if(!status_success(_solver_a->solve(sol_v, rhs_v)))
+              return SolverStatus::aborted;
+
+            // compute g_p := f_p - D*u_v
+            mat_d.apply(tmp_p, sol_v, rhs_p, -DataType(1));
+
+            // apply pressure defect filter
+            fil_p.filter_def(tmp_p);
+
+            // solve S*u_p = g_p
+            if(!status_success(_solver_s->solve(sol_p, tmp_p)))
+              return SolverStatus::aborted;
+
+            // compute g_v := f_v - B*u_p
+            mat_b.apply(tmp_v, sol_p, rhs_v, -DataType(1));
+
+            // apply velocity defect filter
+            fil_v.filter_def(tmp_v);
+
+            // solve A*u_v = g_v
+            if(!status_success(_solver_a->solve(sol_v, tmp_v)))
+              return SolverStatus::aborted;
+
+            // okay
+            return SolverStatus::success;
+          }
+        }
+
+        // we should never come out here...
+        return SolverStatus::aborted;
+      }
+    }; // class SchurPrecond<...>
 
     /**
      * \brief Abstract base-class for iterative solvers.
@@ -772,7 +1089,7 @@ namespace FEAST
        * A pointer to the preconditioner. May be nullptr.
        *
        * \param[in] del_precond
-       * Specifies whether the preconditioner object should be deleted upund
+       * Specifies whether the preconditioner object should be deleted upon
        * destruction of this solver object.
        */
       explicit PreconditionedIterativeSolver(String plot_name, const MatrixType& matrix, const FilterType& filter,
@@ -909,7 +1226,7 @@ namespace FEAST
       {
       }
 
-      virtual String name() override
+      virtual String name() const override
       {
         return "FixPoint";
       }
@@ -1051,7 +1368,7 @@ namespace FEAST
       {
       }
 
-      virtual String name() override
+      virtual String name() const override
       {
         return "PCG";
       }
@@ -1241,7 +1558,7 @@ namespace FEAST
           _h.at(i).resize(i+1);
       }
 
-      virtual String name() override
+      virtual String name() const override
       {
         return "FGMRES";
       }
@@ -1471,7 +1788,7 @@ namespace FEAST
       {
       }
 
-      virtual String name() override
+      virtual String name() const override
       {
         return "BiCGStab";
       }
