@@ -668,7 +668,6 @@
   147
   152
   157
-  158
  </edge_idx>
  <attribute>
   <header>
