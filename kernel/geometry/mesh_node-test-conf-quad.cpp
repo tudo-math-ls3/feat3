@@ -7,12 +7,10 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
 using namespace FEAST::Geometry::TestAux;
 
-
-typedef StandardConformalMeshNodePolicy<Shape::Quadrilateral> MeshNodePolicy;
-typedef MeshNodePolicy::RootMeshType RootMeshType;
-typedef MeshNodePolicy::MeshPartType MeshPartType;
-typedef RootMeshNode<MeshNodePolicy> RootMeshNodeType;
-typedef MeshPartNode<MeshNodePolicy> MeshPartNodeType;
+typedef ConformalMesh<Shape::Quadrilateral> RootMeshType;
+typedef MeshPart<RootMeshType> MeshPartType;
+typedef RootMeshNode<RootMeshType> RootMeshNodeType;
+typedef MeshPartNode<RootMeshType> MeshPartNodeType;
 
 /**
  * \brief Test class for the MeshNode class template.

@@ -54,17 +54,24 @@ namespace FEAST
       typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
     private:
-      MeshStreamer& _mesh_reader;
+      /// a pointer to our mesh data container
       MeshStreamer::MeshDataContainer* _mesh_data;
       /// num_entities information, might differ from the information in _mesh_data
       Index _num_entities[Shape_::dimension+1];
 
     public:
       explicit MeshStreamerFactory(MeshStreamer& mesh_reader) :
-        _mesh_reader(mesh_reader),
         _mesh_data(mesh_reader.get_mesh())
       {
         // Parse preliminary num_entities from _mesh_data
+        for(int d(0); d <= Shape_::dimension; ++d)
+          _num_entities[d] = _mesh_data->num_entities[d];
+      }
+
+      explicit MeshStreamerFactory(MeshStreamer::MeshDataContainer* mesh_data) :
+        _mesh_data(mesh_data)
+      {
+        ASSERT_(mesh_data != nullptr);
         for(int d(0); d <= Shape_::dimension; ++d)
           _num_entities[d] = _mesh_data->num_entities[d];
       }
@@ -144,23 +151,20 @@ namespace FEAST
       typedef typename MeshPartType::TargetSetHolderType TargetSetHolderType;
 
     private:
-      MeshStreamer& _mesh_reader;
-      String _name;
+      /// our mesh data container
       MeshStreamer::MeshDataContainer* _mesh_data;
       /// num_entities information, might differ from the information in _mesh_data
       Index _num_entities[Shape_::dimension+1];
 
     public:
-      explicit MeshStreamerFactory(MeshStreamer& mesh_reader, String name) :
-        _mesh_reader(mesh_reader),
-        _name(name),
+      explicit MeshStreamerFactory(MeshStreamer& mesh_reader, const String& name) :
         _mesh_data(nullptr)
       {
-        MeshStreamer::MeshNode* root(_mesh_reader.get_root_mesh_node());
+        MeshStreamer::MeshNode* root(mesh_reader.get_root_mesh_node());
         ASSERT_(root != nullptr);
 
         // try to find a sub-mesh node
-        MeshStreamer::MeshNode* sub_mesh_node(root->find_sub_mesh(name));
+        MeshStreamer::MeshNode* sub_mesh_node(root->find_meshpart(name));
         if(sub_mesh_node != nullptr)
         {
           _mesh_data = &sub_mesh_node->mesh_data;
@@ -173,6 +177,16 @@ namespace FEAST
 
         // no child with 'name' found
         throw InternalError("No sub-mesh found with name '" + name + "'");
+      }
+
+      explicit MeshStreamerFactory(MeshStreamer::MeshDataContainer* mesh_data) :
+        _mesh_data(mesh_data)
+      {
+        ASSERT_(mesh_data != nullptr);
+
+        // Parse preliminary num_entities from _mesh_data
+        for(int d(0); d <= Shape_::dimension; ++d)
+          _num_entities[d] = _mesh_data->num_entities[d];
       }
 
       virtual Index get_num_entities(int dim)

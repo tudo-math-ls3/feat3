@@ -4,8 +4,10 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_streamer_factory.hpp>
+#include <kernel/geometry/intern/dual_adaptor.hpp>
 #include <kernel/util/mesh_streamer.hpp>
 
 // includes, STL
@@ -16,61 +18,31 @@ namespace FEAST
   namespace Geometry
   {
     /// \cond internal
-    // dummy chart class; will be replaced by 'real' charts later...
-    class DummyChart
-    {
-    public:
-      template<typename A_, typename B_>
-      void adapt(A_&, const B_&) const
-      {
-      }
-    };
-
-    /// \endcond
-
-    /**
-     * \brief Standard MeshNode Policy for ConformalMesh
-     *
-     * \tparam Shape_
-     * The shape tag class for the mesh.
-     *
-     * This contains type names for meshes, partial meshes that refer to them, and charts for those meshes.
-     */
-    template<typename Shape_>
-    struct StandardConformalMeshNodePolicy
-    {
-      /// root mesh type
-      typedef ConformalMesh<Shape_> RootMeshType;
-      /// chart for the root mesh
-      typedef DummyChart RootMeshChartType;
-
-      /// Type for partial meshes refering to a root mesh
-      typedef MeshPart<RootMeshType> MeshPartType;
-      /// Type for charts of partial meshes
-      typedef DummyChart MeshPartChartType;
-
-    };
-
-    /// \cond internal
-    // helper policy template for RootMeshNode class template
-    template<typename MeshNodePolicy_>
-    struct RootMeshNodePolicy
-    {
-      typedef typename MeshNodePolicy_::RootMeshType MeshType;
-      typedef typename MeshNodePolicy_::RootMeshChartType ChartType;
-    };
-
-    // helper policy template MeshPartNode class template
-    template<typename MeshNodePolicy_>
-    struct MeshPartNodePolicy
-    {
-      typedef typename MeshNodePolicy_::MeshPartType MeshType;
-      typedef typename MeshNodePolicy_::MeshPartChartType ChartType;
-    };
-
     // forward declarations
     template<typename Policy_>
     class MeshPartNode DOXY({});
+    /// \endcond
+
+    /**
+     * \brief Adapt mode enumeration
+     */
+    enum class AdaptMode
+    {
+      none  = 0x0,
+      chart = 0x1,
+      dual  = 0x2
+    };
+
+    /// \cond internal
+    AdaptMode operator|(AdaptMode x, AdaptMode y)
+    {
+      return static_cast<AdaptMode>(int(x) | int(y));
+    }
+
+    AdaptMode operator&(AdaptMode x, AdaptMode y)
+    {
+      return static_cast<AdaptMode>(int(x) & int(y));
+    }
     /// \endcond
 
     /**
@@ -87,20 +59,23 @@ namespace FEAST
      * \author Peter Zajac
      */
     template<
-      typename Policy_,
-      typename MeshNodePolicy_>
+      typename RootMesh_,
+      typename ThisMesh_>
     class MeshNode
     {
     public:
-      /// submesh type
-      typedef typename Policy_::MeshPartType MeshPartType;
-      /// submesh node type
-      typedef MeshPartNode<Policy_> MeshPartNodeType;
-
+      /// the root mesh type
+      typedef RootMesh_ RootMeshType;
       /// mesh type of this node
-      typedef typename MeshNodePolicy_::MeshType MeshType;
-      /// mesh chart type of this node
-      typedef typename MeshNodePolicy_::ChartType MeshChartType;
+      typedef ThisMesh_ MeshType;
+      /// the mesh part type
+      typedef MeshPart<RootMeshType> MeshPartType;
+      /// the mesh part node type
+      typedef MeshPartNode<RootMeshType> MeshPartNodeType;
+      /// the mesh atlas type
+      typedef MeshAtlas<RootMeshType> MeshAtlasType;
+      /// the mesh chart type
+      typedef Atlas::ChartBase<RootMeshType> MeshChartType;
 
     protected:
       /**
@@ -201,6 +176,19 @@ namespace FEAST
       }
 
       /**
+       * \brief Returns the names of all mesh parts of this node.
+       */
+      std::deque<String> get_mesh_part_names() const
+      {
+        std::deque<String> names;
+        for(auto it = _mesh_part_nodes.begin(); it != _mesh_part_nodes.end(); ++it)
+        {
+          names.push_back((*it).first);
+        }
+        return names;
+      }
+
+      /**
        * \brief Adds a new mesh_part child node.
        *
        * \param[in] part_name
@@ -229,6 +217,28 @@ namespace FEAST
           }
         }
         return nullptr;
+      }
+
+      /**
+       * \brief Sets the chart for a particular mesh part.
+       *
+       * \param[in] part_name
+       * The name of the mesh part that the chart is to be assigned to.
+       *
+       * \param[in] chart
+       * The chart that is to be assigned. May also be \c nullptr.
+       *
+       * \returns
+       * \c true if the chart was assigned successfully or \c false if no mesh part
+       * with the specified name was found.
+       */
+      bool set_mesh_part_chart(const String& part_name, const MeshChartType* chart)
+      {
+        MeshPartNodeIterator it(_mesh_part_nodes.find(part_name));
+        if(it == _mesh_part_nodes.end())
+          return false;
+        it->second.chart = chart;
+        return true;
       }
 
       /**
@@ -331,7 +341,7 @@ namespace FEAST
           // adapt this node if a chart is given
           if(it->second.chart != nullptr)
           {
-            it->second.chart->adapt(*_mesh, *(it->second.node->_mesh));
+            it->second.chart->adapt(*_mesh, *(it->second.node->get_mesh()));
           }
         }
       }
@@ -420,140 +430,28 @@ namespace FEAST
     /* ***************************************************************************************** */
 
     /**
-     * \brief Root mesh node class template
-     *
-     * This class template is used for the root node of a mesh tree.
-     *
-     * \author Peter Zajac
-     */
-    template<typename Policy_>
-    class RootMeshNode
-      : public MeshNode<Policy_, RootMeshNodePolicy<Policy_> >
-    {
-    public:
-      /// base class typedef
-      typedef MeshNode<Policy_, RootMeshNodePolicy<Policy_> > BaseClass;
-
-      /// the mesh type of this node
-      typedef typename BaseClass::MeshType MeshType;
-
-    public:
-      /**
-       * \brief Constructor.
-       *
-       * \param[in] mesh
-       * A pointer to the mesh for this node.
-       */
-      explicit RootMeshNode(MeshType* mesh) :
-        BaseClass(mesh)
-      {
-      }
-
-      /**
-       * \brief Constructs a RootMeshNode from a streamed mesh
-       *
-       * \param[in] mesh_reader
-       * MeshStreamer that contains the information from the streamed mesh.
-       *
-       */
-      explicit RootMeshNode(MeshStreamer& mesh_reader) :
-        BaseClass(nullptr)
-      {
-        // Construct a new Geometry::Mesh using the MeshStreamer and a MeshStreamerFactory
-        MeshStreamerFactory<MeshType> my_factory(mesh_reader);
-        this->_mesh = new MeshType(my_factory);
-
-        // Generate a MeshStreamer::MeshNode, as this then contains the information about the MeshPartes and
-        // MeshParts present in the MeshStreamer
-        MeshStreamer::MeshNode* root(mesh_reader.get_root_mesh_node());
-        ASSERT_(root != nullptr);
-
-        // Add MeshPartNodes and MeshPartNodes to the new RootMeshNode by iterating over the MeshStreamer::MeshNode
-        for(auto& it:root->sub_mesh_map)
-        {
-          // Create a factory for the MeshPart
-          MeshStreamerFactory<typename Policy_::MeshPartType> mesh_part_factory(mesh_reader, it.first);
-          // Construct the MeshPart using that factory
-          typename Policy_::MeshPartType* my_mesh_part(new typename Policy_::MeshPartType(mesh_part_factory));
-          // Create the MeshPartNode using that MeshPart
-          MeshPartNode<Policy_>* my_mesh_part_node(new MeshPartNode<Policy_>(my_mesh_part));
-          // Add the new MeshPartNode to the RootMeshNode
-          this->add_mesh_part_node(it.first, my_mesh_part_node);
-        }
-      }
-
-      /**
-       * \brief Creates a MeshStreamer object for writing
-       *
-       * \todo Implement this
-       *
-       * \returns MeshStreamer containing all data to be written.
-       *
-       */
-      MeshStreamer* create_mesh_writer()
-      {
-        MeshStreamer* mesh_writer(new MeshStreamer);
-
-        return mesh_writer;
-      }
-
-      /// virtual destructor
-      virtual ~RootMeshNode()
-      {
-      }
-
-      /**
-       * \brief Refines this node and its sub-tree.
-       *
-       * \returns
-       * A pointer to a RootMeshNode containing the refined mesh tree.
-       */
-      RootMeshNode* refine() const
-      {
-        // create a refinery
-        StandardRefinery<MeshType> refinery(*this->_mesh);
-
-        // create a new root mesh node
-        RootMeshNode* fine_node = new RootMeshNode(new MeshType(refinery));
-
-        // refine our children
-        this->refine_children(*fine_node);
-
-        // okay
-        return fine_node;
-      }
-
-      /**
-       * \brief Returns the name of the class.
-       * \returns
-       * The name of the class as a String.
-       */
-      static String name()
-      {
-        return "RootMeshNode<...>";
-      }
-    }; // class RootMeshNode
-
-    /* ***************************************************************************************** */
-
-    /**
      * \brief MeshPart mesh tree node class template
      *
      * This class template implements a mesh tree node containing a MeshPart.
      *
      * \author Peter Zajac
      */
-    template<typename Policy_>
+    template<typename RootMesh_>
     class MeshPartNode
-      : public MeshNode<Policy_, MeshPartNodePolicy<Policy_>>
+      : public MeshNode<RootMesh_, MeshPart<RootMesh_>>
     {
     public:
       /// base class typedef
-      typedef MeshNode<Policy_, MeshPartNodePolicy<Policy_>> BaseClass;
-      /// policy type
-      typedef Policy_ Policy;
-      /// cell subset type
-      typedef typename Policy_::MeshPartType MeshPartType;
+      typedef  MeshNode<RootMesh_, MeshPart<RootMesh_>> BaseClass;
+
+      /// this mesh type
+      typedef typename BaseClass::MeshType MeshType;
+      /// mesh part type
+      typedef typename BaseClass::MeshPartType MeshPartType;
+      /// mesh atlas type
+      typedef typename BaseClass::MeshAtlasType MeshAtlasType;
+      /// mesh chart type
+      typedef typename BaseClass::MeshChartType MeshChartType;
 
     public:
       /**
@@ -566,6 +464,42 @@ namespace FEAST
         BaseClass(mesh_part)
       {
         CONTEXT(name() + "::MeshPartNode()");
+      }
+
+      explicit MeshPartNode(MeshStreamer::MeshNode& streamer_node, MeshAtlasType* atlas = nullptr) :
+        BaseClass(nullptr)
+      {
+        // create a factory for our mesh
+        MeshStreamerFactory<MeshPartType> my_factory(&streamer_node.mesh_data);
+
+        // create our mesh
+        this->_mesh = new MeshType(my_factory);
+
+        // now loop over all mesh parts
+        for(auto& it : streamer_node.meshpart_map)
+        {
+          // get the node of this mesh part
+          MeshStreamer::MeshNode& streamer_subnode = *it.second;
+
+          // create its node
+          MeshPartNode<RootMesh_>* my_mesh_part_node = new MeshPartNode<RootMesh_>(streamer_subnode, atlas);
+
+          // check for a chart to assign
+          MeshChartType* chart = nullptr;
+          if(atlas != nullptr)
+          {
+            String chart_name = streamer_subnode.mesh_data.chart;
+            if(!chart_name.empty())
+            {
+              chart = atlas->find_mesh_chart(chart_name);
+              if(chart == nullptr)
+                throw InternalError("Chart not found!");
+            }
+          }
+
+          // Add the new MeshPartNode to this node
+          this->add_mesh_part_node(it.first, my_mesh_part_node, chart);
+        }
       }
 
       /// virtual destructor
@@ -633,6 +567,163 @@ namespace FEAST
         }
       }
     }; // class MeshPartNode<...>
+
+    /* ***************************************************************************************** */
+
+    /**
+     * \brief Root mesh node class template
+     *
+     * This class template is used for the root node of a mesh tree.
+     *
+     * \author Peter Zajac
+     */
+    template<typename RootMesh_>
+    class RootMeshNode
+      : public MeshNode<RootMesh_, RootMesh_>
+    {
+    public:
+      /// base class typedef
+      typedef MeshNode<RootMesh_, RootMesh_> BaseClass;
+
+      /// this mesh type
+      typedef typename BaseClass::MeshType MeshType;
+      /// mesh part type
+      typedef typename BaseClass::MeshPartType MeshPartType;
+      /// mesh atlas type
+      typedef typename BaseClass::MeshAtlasType MeshAtlasType;
+      /// mesh chart type
+      typedef typename BaseClass::MeshChartType MeshChartType;
+
+    protected:
+      /// our atlas
+      MeshAtlasType* _atlas;
+
+    public:
+      /**
+       * \brief Constructor.
+       *
+       * \param[in] mesh
+       * A pointer to the mesh for this node.
+       *
+       * \param[in] atlas
+       * A pointer to the atlas for this mesh tree.
+       */
+      explicit RootMeshNode(MeshType* mesh, MeshAtlasType* atlas = nullptr) :
+        BaseClass(mesh),
+        _atlas(atlas)
+      {
+      }
+
+      /**
+       * \brief Constructs a RootMeshNode from a streamed mesh
+       *
+       * \param[in] mesh_reader
+       * MeshStreamer that contains the information from the streamed mesh.
+       *
+       */
+      explicit RootMeshNode(MeshStreamer& mesh_reader, MeshAtlasType* atlas = nullptr) :
+        BaseClass(nullptr),
+        _atlas(atlas)
+      {
+        MeshStreamer::MeshNode& streamer_node = *mesh_reader.get_root_mesh_node();
+
+        // create a factory for our mesh
+        MeshStreamerFactory<MeshType> my_factory(&streamer_node.mesh_data);
+
+        // create our mesh
+        this->_mesh = new MeshType(my_factory);
+
+        // now loop over all mesh parts
+        for(auto& it : streamer_node.meshpart_map)
+        {
+          // get the node of this mesh part
+          MeshStreamer::MeshNode& streamer_subnode = *it.second;
+
+          // create its node
+          MeshPartNode<RootMesh_>* my_mesh_part_node = new MeshPartNode<RootMesh_>(streamer_subnode, atlas);
+
+          // check for a chart to assign
+          MeshChartType* chart = nullptr;
+          if(atlas != nullptr)
+          {
+            String chart_name = streamer_subnode.mesh_data.chart;
+            if(!chart_name.empty())
+            {
+              chart = atlas->find_mesh_chart(chart_name);
+              if(chart == nullptr)
+                throw InternalError("Chart not found!");
+            }
+          }
+
+          // Add the new MeshPartNode to this node
+          this->add_mesh_part_node(it.first, my_mesh_part_node, chart);
+        }
+      }
+
+      /**
+       * \brief Creates a MeshStreamer object for writing
+       *
+       * \todo Implement this
+       *
+       * \returns MeshStreamer containing all data to be written.
+       *
+       */
+      MeshStreamer* create_mesh_writer()
+      {
+        MeshStreamer* mesh_writer(new MeshStreamer);
+
+        return mesh_writer;
+      }
+
+      /// virtual destructor
+      virtual ~RootMeshNode()
+      {
+      }
+
+      /**
+       * \brief Refines this node and its sub-tree.
+       *
+       * \returns
+       * A pointer to a RootMeshNode containing the refined mesh tree.
+       */
+      RootMeshNode* refine(AdaptMode adapt_mode = AdaptMode::chart) const
+      {
+        // create a refinery
+        StandardRefinery<MeshType> refinery(*this->_mesh);
+
+        // create a new root mesh node
+        RootMeshNode* fine_node = new RootMeshNode(new MeshType(refinery), this->_atlas);
+
+        // refine our children
+        this->refine_children(*fine_node);
+
+        // adapt by chart?
+        if((adapt_mode & AdaptMode::chart) != AdaptMode::none)
+        {
+          fine_node->adapt(true);
+        }
+
+        // adapt dual?
+        if((adapt_mode & AdaptMode::dual) != AdaptMode::none)
+        {
+          Intern::DualAdaptor<MeshType>::adapt(*fine_node->get_mesh(), *this->get_mesh());
+        }
+
+        // okay
+        return fine_node;
+      }
+
+      /**
+       * \brief Returns the name of the class.
+       * \returns
+       * The name of the class as a String.
+       */
+      static String name()
+      {
+        return "RootMeshNode<...>";
+      }
+    }; // class RootMeshNode
+
   } // namespace Geometry
 } // namespace FEAST
 

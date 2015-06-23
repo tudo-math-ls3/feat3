@@ -1,4 +1,4 @@
- <feast_mesh_file>
+ <feat_domain_file>
  <header>
   version 1
   meshparts 2
@@ -2215,4 +2215,4 @@
         1079
   </vert_idx>
  </meshpart>
- </feast_mesh_file>
+ </feat_domain_file>

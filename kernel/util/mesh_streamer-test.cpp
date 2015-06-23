@@ -28,10 +28,9 @@ public:
     stringstream ioss;
 
     // let's write an (awfully ugly) mesh file into the stream
-    ioss << "<feast_mesh_file>" << endl;
+    ioss << "<feat_domain_file>" << endl;
     ioss << "<header>  " << endl;
     ioss << " version 1" << endl;
-    ioss << " chart_file unit_quad_chart.txt" << endl;
     ioss << " meshparts 2" << endl;
     ioss << "</header>" << endl;
     ioss << "   <info>    " << endl;
@@ -140,7 +139,7 @@ public:
     ioss << "2" << endl;
     ioss << " </edge_idx>" << endl;
     ioss << "</meshpart>" << endl;
-    ioss << "</feast_mesh_file>";
+    ioss << "</feat_domain_file>";
 
     // two mesh reader objects for reading and writing the mesh data
     MeshStreamer reader, writer;
@@ -148,7 +147,7 @@ public:
     // parse the stream
     writer.parse_mesh_file(ioss);
 
-    // temporary MeshNodes to test the _insert_sub_mesh function
+    // temporary MeshNodes to test the _insert_meshpart function
     MeshStreamer::MeshNode* tempMN1 = new MeshStreamer::MeshNode();
     MeshStreamer::MeshDataContainer& tempMDC1 = tempMN1->mesh_data;
     tempMDC1.name = "tempSubmesh1";
@@ -162,20 +161,20 @@ public:
     tempMDC2.info = "super info2";
 
     // insert the temporary MeshNodes
-    writer._insert_sub_mesh(tempMN1);
-    TEST_CHECK_EQUAL(writer.get_num_submeshes(), Index(3));
-    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh1"), tempMN1);
-    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh1")->mesh_data.name, "tempSubmesh1");
-    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh1")->mesh_data.info, "super info1");
+    writer._insert_meshpart(tempMN1);
+    TEST_CHECK_EQUAL(writer.get_num_meshparts(), Index(3));
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_meshpart("tempSubmesh1"), tempMN1);
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_meshpart("tempSubmesh1")->mesh_data.name, "tempSubmesh1");
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_meshpart("tempSubmesh1")->mesh_data.info, "super info1");
 
-    writer._insert_sub_mesh(tempMN2);
-    TEST_CHECK_EQUAL(writer.get_num_submeshes(), Index(4));
-    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh2"), tempMN2);
-    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh2")->mesh_data.name, "tempSubmesh2");
-    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh2")->mesh_data.info, "super info2");
+    writer._insert_meshpart(tempMN2);
+    TEST_CHECK_EQUAL(writer.get_num_meshparts(), Index(4));
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_meshpart("tempSubmesh2"), tempMN2);
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_meshpart("tempSubmesh2")->mesh_data.name, "tempSubmesh2");
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_meshpart("tempSubmesh2")->mesh_data.info, "super info2");
 
     // remove the temporary submeshes
-    writer._delete_sub_mesh("tempSubmesh1");
+    writer._delete_meshpart("tempSubmesh1");
 
     // drop the data into an auxiliary file
     stringstream ioss2;
@@ -187,8 +186,7 @@ public:
     // now check if everything is ok
 
     // check members
-    TEST_CHECK_EQUAL(reader.get_chart_path(), "unit_quad_chart.txt");
-    TEST_CHECK_EQUAL(reader.get_num_submeshes(), Index(2));
+    TEST_CHECK_EQUAL(reader.get_num_meshparts(), Index(2));
     TEST_CHECK_EQUAL(reader.get_info(), "This file contains a simple unit-square..." );
 
     // test the get_mesh function
@@ -494,7 +492,7 @@ public:
     stringstream ioss1, ioss2, ioss3, ioss4;
 
     // ioss1: missing "</mesh>" flag
-    ioss1 << "<feast_mesh_file>" << endl;
+    ioss1 << "<feat_domain_file>" << endl;
     ioss1 << "<header>  " << endl;
     ioss1 << "  version 1" << endl;
     ioss1 << "  meshparts 0" << endl;
@@ -516,14 +514,14 @@ public:
     ioss1 << "    0.0 1.0" << endl;
     ioss1 << "    1.0 1.0" << endl;
     ioss1 << "  </coords>" << endl;
-    ioss1 << "</feast_mesh_file>" << endl;
+    ioss1 << "</feat_domain_file>" << endl;
 
     // parse the stream and check if an exception is thrown
     MeshStreamer reader1;
     TEST_CHECK_THROWS(reader1.parse_mesh_file(ioss1), SyntaxError);
 
     // ioss2: wrong number of coordinates
-    ioss2 << "<feast_mesh_file>" << endl;
+    ioss2 << "<feat_domain_file>" << endl;
     ioss2 << "<header>  " << endl;
     ioss2 << "  version 1" << endl;
     ioss2 << "  meshparts 0" << endl;
@@ -546,14 +544,14 @@ public:
     ioss2 << "    1.0 1.0 42.23" << endl;
     ioss2 << "  </coords>" << endl;
     ioss2 << "</mesh>" << endl;
-    ioss2 << "</feast_mesh_file>" << endl;
+    ioss2 << "</feat_domain_file>" << endl;
 
     // parse the stream and check if an exception is thrown
     MeshStreamer reader2;
     TEST_CHECK_THROWS(reader2.parse_mesh_file(ioss2), SyntaxError);
 
     // ioss3: missing version entry
-    ioss3 << "<feast_mesh_file>" << endl;
+    ioss3 << "<feat_domain_file>" << endl;
     ioss3 << "<header>  " << endl;
     ioss3 << "  version   " << endl;
     ioss3 << "  meshparts 0" << endl;
@@ -576,14 +574,14 @@ public:
     ioss3 << "    1.0 1.0" << endl;
     ioss3 << "  </coords>" << endl;
     ioss3 << "</mesh>" << endl;
-    ioss3 << "</feast_mesh_file>" << endl;
+    ioss3 << "</feat_domain_file>" << endl;
 
     // parse the stream and check if an exception is thrown
     MeshStreamer reader3;
     TEST_CHECK_THROWS(reader3.parse_mesh_file(ioss3), SyntaxError);
 
     // ioss4: nonsense
-    ioss4 << "<feast_mesh_file>" << endl;
+    ioss4 << "<feat_domain_file>" << endl;
     ioss4 << "<header>  " << endl;
     ioss4 << "  version 1" << endl;
     ioss4 << "  meshparts 0" << endl;
@@ -606,7 +604,7 @@ public:
     ioss4 << "    1.0 1.0" << endl;
     ioss4 << "  </coords> blubb" << endl;
     ioss4 << "</mesh>" << endl;
-    ioss4 << "</feast_mesh_file>" << endl;
+    ioss4 << "</feat_domain_file>" << endl;
 
     // parse the stream and check if an exception is thrown
     MeshStreamer reader4;
@@ -622,10 +620,9 @@ public:
     stringstream ioss;
 
     // let's write an (awfully ugly) mesh file into the stream
-    ioss << "<feast_mesh_file>" << endl;
+    ioss << "<feat_domain_file>" << endl;
     ioss << "<header>  " << endl;
     ioss << " version 1" << endl;
-    ioss << " chart_file unit_quad_chart.txt" << endl;
     ioss << " meshparts 0" << endl;
     ioss << "</header>" << endl;
     ioss << "   <info>    " << endl;
@@ -653,7 +650,7 @@ public:
     ioss << "  1.0 1.0       " << endl;
     ioss << " </coords>" << endl;
     ioss << "</mesh>" << endl;
-    ioss << "</feast_mesh_file>";
+    ioss << "</feat_domain_file>";
 
 
     // two mesh reader objects for reading and writing the mesh data
@@ -672,8 +669,7 @@ public:
     // now check if everything is ok
 
     // check members
-    TEST_CHECK_EQUAL(reader.get_chart_path(), "unit_quad_chart.txt");
-    TEST_CHECK_EQUAL(reader.get_num_submeshes(), Index(0));
+    TEST_CHECK_EQUAL(reader.get_num_meshparts(), Index(0));
     TEST_CHECK_EQUAL(reader.get_info(), "This file contains a simple unit-square..." );
 
     // test the get_mesh function

@@ -37,6 +37,9 @@ namespace FEAST
       /// Shape type
       typedef Shape_ ShapeType;
 
+      /// Coordinate type
+      typedef Coord_ CoordType;
+
       /// Vertex set type
       typedef VertexSet<num_coords_, stride_, Coord_> VertexSetType;
 

@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/shape.hpp>
+#include <kernel/util/tiny_algebra.hpp>
 
 namespace FEAST
 {
@@ -44,7 +45,8 @@ namespace FEAST
       typedef Coord_ CoordType;
 
       /// vertex type
-      typedef CoordType VertexType[stride_];
+      //typedef CoordType VertexType[stride_];
+      typedef Tiny::Vector<CoordType, num_coords, stride> VertexType;
 
       /// vertex reference type
       typedef VertexType& VertexReference;

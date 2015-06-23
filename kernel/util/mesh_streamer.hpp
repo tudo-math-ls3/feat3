@@ -7,6 +7,7 @@
 #include <kernel/util/file_error.hpp>
 
 // includes, system
+#include <deque>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -31,40 +32,63 @@ namespace FEAST
      *
      * \author Jordi Paul
      */
-    class AttributesContainer
+    class AttributeContainer
     {
       public:
-        typedef double ValueType;
+        /// Only the default floating point type is supported for values
+        typedef Real ValueType;
+        /// A value can be vector-valued and this is the type for that
         typedef std::vector<ValueType> ValueVec;
 
+        /// Unique identifier String
         String identifier;
+        /// Dimension of the values
         int value_dim;
+        /// Number of values
         Index value_count;
+        /// Container holding all vector-valued values
         std::vector<ValueVec> values;
 
-        explicit AttributesContainer() :
+        /// \brief Default constructor
+        explicit AttributeContainer() :
           identifier(""),
           value_dim(0),
           value_count(0)
         {
-          CONTEXT("AttributesContainer::AttributesContainer()");
+          CONTEXT("AttributeContainer::AttributeContainer()");
         }
 
-        explicit AttributesContainer(String identifier_, int value_dim_, Index value_count_) :
+        /**
+         * \brief Useful constructor
+         *
+         * \param[in] identifier_
+         * The identifier for this object.
+         *
+         * \param[in] value_dim_
+         * Dimension of the values.
+         *
+         * \param[in] value_count_
+         * The number of values.
+         *
+         */
+        explicit AttributeContainer(String identifier_, int value_dim_, Index value_count_) :
           identifier(identifier_),
           value_dim(value_dim_),
           value_count(value_count_)
         {
-          CONTEXT("AttributesContainer::AttributesContainer(String, Index, Index)");
+          CONTEXT("AttributeContainer::AttributeContainer(String, Index, Index)");
         }
 
         /// Default DTOR
-        ~AttributesContainer()
+        ~AttributeContainer()
         {
-          CONTEXT("AttributesContainer::~AttributesContainer()");
+          CONTEXT("AttributeContainer::~AttributeContainer()");
         }
-    };
+    }; // class AttributeContainer
 
+    /**
+     * \brief Baseclass for MeshDataContainer containing all data for MeshParts that is parsed from files
+     */
     class BaseContainer
     {
     public:
@@ -83,12 +107,11 @@ namespace FEAST
       Index attribute_count;
       /// Number of coordinates
       Index coord_per_vertex;
-
       /// parent_indices[d](i) = j means that entity i of dimension d in this container corresponds to entity j in
       // the parent
       std::vector<Index> parent_indices[4];
-
-      std::vector<AttributesContainer> attributes[4];
+      /// One set of AttributeContainers for every dimension including dim = 0
+      std::vector<AttributeContainer> attributes[4];
 
     public:
       /// Default CTOR
@@ -129,7 +152,7 @@ namespace FEAST
        * A counter that specifies the number of lines read so far.
        *
        * \returns
-       * The number of lines that has been read when the programme is done.
+       * The number of lines that has been read when the routine is done.
        */
       Index _parse_counts_chunk(Index cur_line, std::istream& ifs);
 
@@ -146,7 +169,7 @@ namespace FEAST
        * The last line that was read (and therefore the first line of the subchunk)
        *
        * \returns
-       * The number of lines that has been read when the programme is done.
+       * The number of lines that has been read when the routine is done.
        */
       Index _parse_parents_chunk(Index cur_line, std::istream& ifs, String line);
     }; // class MeshStreamer::BaseContainer
@@ -200,7 +223,7 @@ namespace FEAST
       };
 
     public:
-      /// Name of the chart file that contains an analytic description of the geometry
+      /// Name of the chart that contains an analytic description of the geometry
       String chart;
       /// Mesh data
       MeshType mesh_type;
@@ -257,15 +280,15 @@ namespace FEAST
       */
       static String convert_shape_type(const ShapeType shape_type);
 
-       /**
-      * \brief Converts a String to a ShapeType
-      *
-      * \param[in] shape_type
-      * A String to be converted to a ShapeType
-      *
-      * \returns
-      * The shape_type as a ShapeType
-      */
+      /**
+       * \brief Converts a String to a ShapeType
+       *
+       * \param[in] shape_type
+       * A String to be converted to a ShapeType
+       *
+       * \returns
+       * The shape_type as a ShapeType
+       */
       static ShapeType convert_shape_type(const String shape_type);
 
       /**
@@ -278,7 +301,7 @@ namespace FEAST
        * A counter that specifies the number of lines read so far.
        *
        * \returns
-       * The number of lines that has been read when the programme is done.
+       * The number of lines that has been read when the routine is done.
        */
       Index _parse_attribute_chunk(Index cur_line, std::istream& ifs);
 
@@ -288,16 +311,33 @@ namespace FEAST
       * \param[in] cur_line
       * A counter that specifies the number of lines read so far.
       *
-      * \param[in] submesh
+      * \param[in] is_meshpart
       * Specifies whether the data belongs to a sub-mesh (true) or the root mesh (false).
       *
       * \param[in] ifs
       * A reference to the input stream to be parsed.
       *
       * \returns
-      * The number of lines that has been read when the programme is done.
+      * The number of lines that has been read when the routine is done.
       */
-      Index _parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs);
+      Index _parse_mesh_section(Index cur_line, bool is_meshpart, std::istream& ifs);
+
+      /**
+       * \brief Parses the header of a mesh section
+       *
+       * \param[in] cur_line
+       * A counter that specifies the number of lines read so far.
+       *
+       * \param[in] is_meshpart
+       * Specifies whether the data belongs to a sub-mesh (true) or the root mesh (false).
+       *
+       * \param[in] ifs
+       * A reference to the input stream to be parsed.
+       *
+       * \returns
+       * The number of lines that has been read when the routine is done.
+       */
+      Index _parse_mesh_header_section(Index cur_line, bool is_meshpart, std::istream& ifs);
 
       /**
        * \brief Parses a given FEAST- coord file.
@@ -305,7 +345,7 @@ namespace FEAST
        * This function parses the FEAST- coord file given by "filepath" and saves the data in
        * the MeshDataContainer that is specified by the pointer "mesh".
        *
-       * \param[in] filepath
+       * \param[in] filename
        * A String containing the path to the coord file.
        *
        */
@@ -326,7 +366,7 @@ namespace FEAST
        * This function parses the FEAST- adjacency file given by "filepath" and saves the data in
        * the MeshDataContainer that is specified by the pointer "mesh".
        *
-       * \param[in] file
+       * \param[in] filename
        *
        * A String containing the path to the adjacency file.
        *
@@ -352,7 +392,7 @@ namespace FEAST
        * A reference to the input stream to be parsed.
        *
        * \returns
-       * The number of lines that has been read when the programme is done.
+       * The number of lines that has been read when the routine is done.
        */
       Index _parse_coords_chunk(Index cur_line, std::istream& ifs);
 
@@ -369,11 +409,100 @@ namespace FEAST
        * The last line that was read (and therefore the first line of the subchunk)
        *
        * \returns
-       * The number of lines that has been read when the programme is done.
+       * The number of lines that has been read when the routine is done.
        */
       Index _parse_adjacency_chunk(Index cur_line, std::istream& ifs, String line);
 
     }; // MeshDataContainer
+
+    /**
+     * \brief Container for saving chart information parsed from files
+     *
+     * As opposed to the other containers, only meta information gets parsed into this container (i.e. the name).
+     * Because charts need very different parameters (i.e. an analytic description of a circle only needs midpoint
+     * and radius, but a polygon line needs several points), everything in the data chunk gets parsed into a
+     * std::deque of Strings and passed to the factory that is used to construct the Chart objects.
+     *
+     * \author Jordi Paul
+     *
+     */
+    class ChartContainer
+    {
+      public:
+        /// Description
+        String info;
+        /// Name the chart gets referenced by, i.e. by MeshParts
+        String name;
+        /// Type as a String, i.e. circle
+        String type;
+        /// Container holding the data the streamer reads from the file and then passes to a factory
+        std::deque<String> data;
+        /// Line in the file the data section starts at
+        Index start_of_data;
+
+        /**
+         * \brief Default constructor
+         */
+        explicit ChartContainer() :
+          info(""),
+          name(""),
+          type(""),
+          data(),
+          start_of_data(0)
+        {
+        }
+
+        /**
+         * \brief Copy constructor
+         *
+         * \param[in] other
+         * The other ChartContainer to be copied.
+         */
+        ChartContainer(const ChartContainer& other) :
+          info(other.info),
+          name(other.name),
+          type(other.type),
+          data(other.data),
+          start_of_data(other.start_of_data)
+          {
+          }
+
+        /// Destructor with nothing to do
+        ~ChartContainer()
+        {
+        }
+
+        /**
+         * \brief Parses a chart section from a stream
+         *
+         * \param[in] cur_line
+         * The starting line number in the input stream.
+         *
+         * \param[in] ifs
+         * The input stream to parse from.
+         *
+         * \returns
+         * The number of lines that has been read when the routine is done.
+         *
+         */
+        Index _parse_chart_section(Index cur_line, std::istream& ifs);
+
+        /**
+         * \brief Parses a chart's header section from a stream
+         *
+         * \param[in] cur_line
+         * The starting line number in the input stream.
+         *
+         * \param[in] ifs
+         * The input stream to parse from.
+         *
+         * \returns
+         * The number of lines that has been read when the routine is done.
+         *
+         */
+        Index _parse_chart_header_section(Index cur_line, std::istream& ifs);
+
+    }; // class ChartContainer
 
     /**
      * \brief Mesh node class
@@ -386,18 +515,19 @@ namespace FEAST
     class MeshNode
     {
     public:
-      // a map of sub-mesh nodes
-      typedef std::map<String, MeshNode*, String::NoCaseLess> SubMeshMap;
+      /// a map of meshpart nodes
+      typedef std::map<String, MeshNode*, String::NoCaseLess> MeshpartMap;
 
-      // the mesh data container of this node
+      /// the mesh data container of this node
       MeshDataContainer mesh_data;
-      // the sub-mesh map of this node
-      SubMeshMap sub_mesh_map;
+      /// the sub-mesh map of this node
+      MeshpartMap meshpart_map;
 
     public:
+      /// Virtual DTOR
       virtual ~MeshNode()
       {
-        SubMeshMap::iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
+        MeshpartMap::iterator it(meshpart_map.begin()), jt(meshpart_map.end());
         for(; it != jt; ++it)
         {
           delete it->second;
@@ -407,16 +537,16 @@ namespace FEAST
       /**
        * \brief Finds a sub-mesh within this sub-tree.
        */
-      MeshNode* find_sub_mesh(String name)
+      MeshNode* find_meshpart(String name)
       {
         // perform depth-first-search
-        SubMeshMap::iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
+        MeshpartMap::iterator it(meshpart_map.begin()), jt(meshpart_map.end());
         for(; it != jt; ++it)
         {
           if(it->first.compare_no_case(name) == 0)
             return it->second;
 
-          MeshNode* node = it->second->find_sub_mesh(name);
+          MeshNode* node = it->second->find_meshpart(name);
           if(node != nullptr)
             return node;
         }
@@ -426,40 +556,47 @@ namespace FEAST
       }
 
       /**
-       * \brief returns the total number of submeshes of the subtree
+       * \brief returns the total number of meshparts in the subtree
        * which are related to this MeshNode
        */
-      Index get_num_sub_meshes_below()
+      Index get_num_meshparts_below()
       {
-        Index count(Index(sub_mesh_map.size()));
+        Index count(Index(meshpart_map.size()));
         // perform depth-first-search
-        SubMeshMap::iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
+        MeshpartMap::iterator it(meshpart_map.begin()), jt(meshpart_map.end());
         for(; it != jt; ++it)
         {
-          count += it->second->get_num_sub_meshes_below();
+          count += it->second->get_num_meshparts_below();
         }
         return count;
       }
 
       /**
-       * \brief Writes the mesh data of this mesh and all submeshes related to this mesh
+       * \brief Writes the mesh data of this mesh and all is_meshpartes related to this mesh
        *  into the output stream.
        */
-      void write(std::ostream& ofs, bool submesh) const;
+      void write(std::ostream& ofs, bool is_meshpart) const;
     };
 
   private:
-
-    // general information
-    Index _num_submeshes;
-
-    // file paths
-    String _chart_path;
-    // info
+    /// Number of charts
+    Index _num_charts;
+    /// Number of mesh parts
+    Index _num_meshparts;
+    /// Description
     String _info;
-
-    // root mesh node
+    /// root mesh node
     MeshNode* _root_mesh_node;
+    /// For error checking: Number of charts parsed
+    Index _num_parsed_charts;
+    /// For error checking: Number of meshparts parsed
+    Index _num_parsed_meshparts;
+
+  public:
+    /// All Charts this Mesh and all of its MeshParts refer to
+    std::deque<ChartContainer> charts;
+    // TODO
+    //std::deque<MeshDataContainer> discrete_charts;
 
   public:
     /// Default Constructor
@@ -477,6 +614,14 @@ namespace FEAST
 
     /// Virtual Destructor
     virtual ~MeshStreamer();
+
+    /**
+     * \brief Parses multiple files given in one String
+     *
+     * \param[in] filename
+     * String containing all filenames seperated by whitespace.
+     */
+    void parse_multiple_files(String filename);
 
     /**
      * \brief Parses a given FEAST- mesh file.
@@ -498,17 +643,12 @@ namespace FEAST
     void parse_mesh_file(std::istream& ifs);
 
     /**
-     * \brief Returns the chart path.
-     */
-    String get_chart_path() const;
-
-    /**
      * \brief Inserts mesh_node into the tree structure which depends on root
      *
      * \param[in] mesh_node
      * The MeshNode to be inserted.
      */
-    void _insert_sub_mesh(MeshStreamer::MeshNode* mesh_node);
+    void _insert_meshpart(MeshStreamer::MeshNode* mesh_node);
 
     /**
      * \brief deletes mesh_node from the tree structure
@@ -516,7 +656,7 @@ namespace FEAST
      * \param[in] mesh_node
      * The MeshNode to be deleted.
      */
-    void _delete_sub_mesh(MeshNode* mesh_node);
+    void _delete_meshpart(MeshNode* mesh_node);
 
     /**
      * \brief deletes mesh_node by name from the tree structure
@@ -524,12 +664,12 @@ namespace FEAST
      * \param[in] name
      * The name of the MeshNode to be deleted.
      */
-    void _delete_sub_mesh(String name);
+    void _delete_meshpart(String name);
 
     /**
-     * \brief Returns the number of submeshes.
+     * \brief Returns the number of is_meshpartes.
      */
-    Index get_num_submeshes() const;
+    Index get_num_meshparts() const;
 
     /**
      * \brief Returns the file's information.
@@ -571,7 +711,7 @@ namespace FEAST
 
   private:
     /// \brief Finds a MeshNode by name String
-    MeshStreamer::MeshNode* _find_sub_mesh_parent(String parent_name);
+    MeshStreamer::MeshNode* _find_meshpart_parent(String parent_name);
 
     /**
      * \brief Parses a mesh-header-data-input stream.
@@ -583,7 +723,7 @@ namespace FEAST
      * A counter that specifies the number of lines read so far.
      *
      * \returns
-     * The number of lines that has been read when the programme is done.
+     * The number of lines that has been read when the routine is done.
      */
      Index _parse_header_section(Index cur_line, std::istream& ifs);
 
@@ -611,13 +751,13 @@ namespace FEAST
      * \param[in] cur_line
      * A counter that specifies the number of lines read so far.
      *
-     * \param[in] submesh
+     * \param[in] is_meshpart
      * Specifies whether the data belongs to a sub-mesh (true) or the root mesh (false).
      *
      * \returns
-     * The number of lines that has been read when the programme is done.
+     * The number of lines that has been read when the routine is done.
      */
-    Index _parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs);
+    Index _parse_mesh_section(Index cur_line, bool is_meshpart, std::istream& ifs);
 
   }; // class MeshStreamer
 
@@ -784,7 +924,7 @@ namespace FEAST
 
     }; // MeshDataContainerUpdater<3>
   } // namespace Intern
-  /// \cond internal
+  /// \endcond
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_MESH_STREAMER_HPP

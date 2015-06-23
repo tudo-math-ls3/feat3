@@ -75,7 +75,7 @@ namespace FEAST
             // loop over all coords
             for(int j(0); j < dim_; ++j)
             {
-              vtx[Index(i)][Index(j)] = CoordType(j+1 == i ? 1 : 0);
+              vtx[Index(i)][j] = CoordType(j+1 == i ? 1 : 0);
             }
           }
         }
@@ -94,7 +94,7 @@ namespace FEAST
             // loop over all coords
             for(int j(0); j < dim_; ++j)
             {
-              vtx[Index(i)][Index(j)] = CoordType((((i >> j) & 1) << 1) - 1);
+              vtx[Index(i)][j] = CoordType((((i >> j) & 1) << 1) - 1);
             }
           }
         }

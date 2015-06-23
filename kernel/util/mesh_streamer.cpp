@@ -24,17 +24,23 @@ namespace FEAST
 
   // default constructor
   MeshStreamer::MeshStreamer() :
-    _num_submeshes(0),
-    _chart_path(""),
-    _root_mesh_node(nullptr)
+    _num_charts(0),
+    _num_meshparts(0),
+    _info(""),
+    _root_mesh_node(nullptr),
+    _num_parsed_charts(0),
+    _num_parsed_meshparts(0)
   {
     CONTEXT("MeshStreamer::MeshStreamer()");
   }
 
   MeshStreamer::MeshStreamer(const String& filename) :
-    _num_submeshes(0),
-    _chart_path(""),
-    _root_mesh_node(nullptr)
+    _num_charts(0),
+    _num_meshparts(0),
+    _info(""),
+    _root_mesh_node(nullptr),
+    _num_parsed_charts(0),
+    _num_parsed_meshparts(0)
   {
     CONTEXT("MeshStreamer::MeshStreamer()");
     parse_mesh_file(filename);
@@ -50,14 +56,39 @@ namespace FEAST
   }
 
   // returns the sub mesh parent specified by "parent_name"
-  MeshStreamer::MeshNode* MeshStreamer::_find_sub_mesh_parent(String parent_name)
+  MeshStreamer::MeshNode* MeshStreamer::_find_meshpart_parent(String parent_name)
   {
-    CONTEXT("MeshStreamer::_find_sub_mesh_parent");
+    CONTEXT("MeshStreamer::_find_meshpart_parent");
     if(parent_name == "root")
       return _root_mesh_node;
     if(_root_mesh_node != nullptr)
-      return _root_mesh_node->find_sub_mesh(parent_name);
+      return _root_mesh_node->find_meshpart(parent_name);
     return nullptr;
+  }
+
+  void MeshStreamer::parse_multiple_files(String filenames)
+  {
+    CONTEXT("MeshStreamer::parse_multiple_files(String)");
+    std::vector<String> filename_vec;
+
+    filenames.split_by_charset(filename_vec);
+
+    if(filename_vec.size() == 0)
+      throw InternalError("No files specified for parsing!");
+
+    // loop over all filenames
+    for(auto it = filename_vec.begin(); it != filename_vec.end(); ++it)
+    {
+      parse_mesh_file(*it);
+    }
+
+    // Sanity checks
+    if(_root_mesh_node == nullptr)
+      throw InternalError("No root mesh found in files!");
+    if(_num_parsed_charts != _num_charts)
+      throw InternalError("Expected "+stringify(_num_charts)+" charts, but parsed "+stringify(_num_parsed_charts));
+    if(_num_parsed_meshparts!= _num_meshparts)
+      throw InternalError("Expected "+stringify(_num_meshparts)+" meshparts, but parsed "+stringify(_num_parsed_meshparts));
   }
 
   // parses the FEAST- mesh file given by filename
@@ -106,12 +137,13 @@ namespace FEAST
 
     // auxiliary variable that counts the lines
     Index cur_line = 0;
+
     line = read_next_line(ifs,cur_line);
 
-    // first line must be "<feast_mesh_file>"
-    if(line != "<feast_mesh_file>" || ifs.eof() || !ifs.good())
+    // first line must be "<feat_domain_file>"
+    if(line != "<feat_domain_file>" || ifs.eof() || !ifs.good())
     {
-      throw SyntaxError("Unknown file format. Expected <feast_mesh_file>.");
+      throw SyntaxError("Unknown file format. Expected <feat_domain_file>.");
     }
     line = read_next_line(ifs, cur_line);
 
@@ -130,62 +162,61 @@ namespace FEAST
       line = read_next_line(ifs, cur_line);
     }
 
-    // mesh chunk
-    if(!(line == "<mesh>"))
-    {
-      throw SyntaxError("Expected <mesh> in line " + stringify(cur_line));
-    }
-
-    cur_line = _parse_mesh_section(cur_line, false, ifs);
-
-    // insert basic root mesh information
-    _root_mesh_node->mesh_data.name = "root";
-    _root_mesh_node->mesh_data.parent = "none";
-    _root_mesh_node->mesh_data.chart = "none";
-
     // loop over all lines until we reach the end of the mesh file
     while(!ifs.eof() && ifs.good())
     {
-
-      // get a line
-      line = read_next_line(ifs,cur_line);
-
-      // trim whitespaces; throw error if the current one is empty
-      if(line.trim_me().empty())
+      // mesh chunk
+      if(line == "<mesh>")
       {
-        throw SyntaxError("No empty lines allowed in line " + stringify(cur_line));
-      }
+        if(_root_mesh_node != nullptr)
+          throw InternalError("Encountered second <mesh> section in line "+stringify(cur_line)+", only one is allowed!");
+        cur_line = _parse_mesh_section(cur_line, false, ifs);
 
-      // if it is a submesh chunk
+        // insert basic root mesh information
+        _root_mesh_node->mesh_data.name = "root";
+        _root_mesh_node->mesh_data.parent = "none";
+        _root_mesh_node->mesh_data.chart = "none";
+
+        // get a line
+        line = read_next_line(ifs,cur_line);
+
+        // trim whitespaces; throw error if the current one is empty
+        if(line.trim_me().empty())
+          throw SyntaxError("No empty lines allowed in line " + stringify(cur_line));
+
+      }
+      // if it is a meshpart chunk
       else if(line == "<meshpart>")
       {
+        _num_parsed_meshparts++;
         cur_line = _parse_mesh_section(cur_line, true, ifs);
+        line = read_next_line(ifs,cur_line);
       }
 
-      // if it is a chart chunk
+      // If it is a chart chunk
       else if(line == "<chart>")
       {
-        // TODO
-        //cur_line = _parse_chart_section(cur_line, ifs);
+        _num_parsed_charts++;
+
+        // Create new ChartContainer and fill it
+        MeshStreamer::ChartContainer chart_container;
+        cur_line = chart_container._parse_chart_section(cur_line, ifs);
+        charts.push_back(chart_container);
+
+        // Get first line after the chart chunk
+        line = read_next_line(ifs,cur_line);
       }
 
       // if it is the end
-      else if(line == "</feast_mesh_file>")
-      {
+      else if(line == "</feat_domain_file>")
         return;
-      }
       else
-      {
         throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-      }
     } // end while
 
     // if the file did not end properly
-
-    if(line != "</feast_mesh_file>" && !(!ifs.eof() && ifs.good()))
-    {
-      throw SyntaxError("Reached end of file but expected </feast_mesh_file> at line " + stringify(cur_line));
-    }
+    if(line != "</feat_domain_file>" && !(!ifs.eof() && ifs.good()))
+      throw SyntaxError("Reached end of file but expected </feat_domain_file> at line " + stringify(cur_line));
 
   } // MeshStreamer::parse_mesh_file(std::istream& ifs)
 
@@ -196,67 +227,81 @@ namespace FEAST
     CONTEXT("MeshStreamer::_parse_header_section");
 
     // string the current line is saved in
-    String line;
+    String line("");
     std::vector<String> line_vec;
+    // For checking the version number
+    Index version(0);
+    // This will hold all the lines in the chart header section
+    std::map<String, String> my_data;
 
-    // get a line
+    // Get first line of the chart's header section
     line = read_next_line(ifs,cur_line);
-    line.split_by_charset(line_vec);
-    // version
-    if(line_vec[0] == "version")
-    {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing version number in line " + stringify(cur_line));
-      }
-      if(!(line_vec.at(1) == "1") )
-      {
-        throw SyntaxError("Wrong version. Version should be 1, line " + stringify(cur_line));
-      }
-    }
-    else
-    {
-      throw SyntaxError("Expected version, line " + stringify(cur_line));
-    }
 
-    line = read_next_line(ifs,cur_line);
-    line.split_by_charset(line_vec);
-    // chart file
-    if(line_vec[0] == "chart_file")
+    // Parse the whole header section into the map
+    while(!ifs.eof() && ifs.good() && !(line == "</header>"))
     {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing chart file path in line " + stringify(cur_line));
-      }
-      _chart_path = line_vec.at(1);
+      line.split_by_charset(line_vec);
+
+      if(line_vec.size() != 2)
+        throw SyntaxError("Line "+stringify(cur_line)+" does not contain exactly 2 tokens!");
+
+      // Check if the token is already present. If not, add it.
+      const auto& tmp(my_data.find(line_vec.at(0)));
+      if(tmp == my_data.end())
+        my_data.insert(std::pair<String, String>(line_vec.at(0), line_vec.at(1)));
+      else
+        throw SyntaxError("Duplicate identifier "+line_vec.at(0)+" found in line "+stringify(cur_line));
 
       line = read_next_line(ifs,cur_line);
-      line.split_by_charset(line_vec);
+
+      // Note that this can be done by using emplace, but GCC of version < 4.8.0 does not implement this
+      //const auto& tmp = my_data.emplace(line_vec.at(0), line_vec.at(1));
+      //if(!tmp.second)
+      //  throw SyntaxError("Duplicate identifier "+line_vec.at(0)+" found in line "+stringify(cur_line));
+      //line = read_next_line(ifs,cur_line);
     }
 
-    // submeshes
-    if(line_vec[0] == "meshparts")
+    // Check if the map contains the required version token
+    const auto& version_it(my_data.find("version"));
+    if(version_it == my_data.end())
+      throw SyntaxError("No version found in chart header section!");
+
+    version_it->second.parse(version);
+
+    if(version != 1)
+      throw InternalError("Only version 1 is supported at the moment, but " + version_it->second + " found!");
+    my_data.erase(version_it);
+
+    // Check if the header contains a number of meshparts in the file
+    const auto& num_is_meshpartes_it(my_data.find("meshparts"));
+    if(num_is_meshpartes_it != my_data.end())
     {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing number of meshparts in line " + stringify(cur_line));
-      }
-      (line_vec.at(1)).parse(_num_submeshes);
+      Index tmp(0);
+      num_is_meshpartes_it->second.parse(tmp);
+      _num_meshparts += tmp;
+      my_data.erase(num_is_meshpartes_it);
     }
-    else
+
+    // Check if the header contains a number of meshparts in the file
+    const auto& num_charts_it(my_data.find("charts"));
+    if(num_charts_it != my_data.end())
     {
-      throw SyntaxError("Expected number of meshparts, line " + stringify(cur_line));
+      Index tmp(0);
+      num_charts_it->second.parse(tmp);
+      _num_charts += tmp;
+      my_data.erase(num_charts_it);
     }
 
-    line = read_next_line(ifs,cur_line);
-
-    // if it is the end of the header section
-    if(!(line == "</header>"))
+    // Check if the map contains anything else; this should not happen
+    if(my_data.size() > 0)
     {
-      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+      String msg("");
+      for(auto& it:my_data)
+        msg += (it.first + " " + it.second + " ");
+
+      throw InternalError("File header section contained unrecognised entries: "+msg);
     }
 
-    // return the number of lines
     return cur_line;
 
   } // Index MeshStreamer::_parse_header_section(Index cur_line, std::istream& ifs)
@@ -289,25 +334,25 @@ namespace FEAST
   } // Index MeshStreamer::_parse_info_section(Index cur_line, std::istream& ifs)
 
   // parses the given mesh-section stream
-  Index MeshStreamer::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
+  Index MeshStreamer::_parse_mesh_section(Index cur_line, bool is_meshpart, std::istream& ifs)
   {
     CONTEXT("MeshStreamer::_parse_mesh_section");
 
     // create a new mesh node
     MeshNode* mesh_node = new MeshNode();
-    if(!submesh)
+    if(!is_meshpart)
     {
       ASSERT_(_root_mesh_node == nullptr);
       _root_mesh_node = mesh_node;
     }
 
-    cur_line = (mesh_node->mesh_data)._parse_mesh_section(cur_line, submesh, ifs);
+    cur_line = (mesh_node->mesh_data)._parse_mesh_section(cur_line, is_meshpart, ifs);
 
-    if(submesh)
+    if(is_meshpart)
     {
-      MeshNode* parent = _find_sub_mesh_parent((mesh_node->mesh_data).parent);
+      MeshNode* parent = _find_meshpart_parent((mesh_node->mesh_data).parent);
       ASSERT_(parent != nullptr);
-      parent->sub_mesh_map.insert(std::make_pair((mesh_node->mesh_data).name, mesh_node));
+      parent->meshpart_map.insert(std::make_pair((mesh_node->mesh_data).name, mesh_node));
     }
 
     // return number of lines read so far
@@ -315,47 +360,47 @@ namespace FEAST
 
   } // MeshStreamer::parse_mesh_section(Index cur_line, std::istream& ifs)
 
-  // inserts submesh into the tree structure
-  void MeshStreamer::_insert_sub_mesh(MeshNode* mesh_node)
+  // inserts is_meshpart into the tree structure
+  void MeshStreamer::_insert_meshpart(MeshNode* mesh_node)
   {
-    CONTEXT("MeshStreamer::_insert_submesh");
+    CONTEXT("MeshStreamer::_insert_is_meshpart");
 
     if((mesh_node->mesh_data).parent == "root")
     {
       ASSERT_(_root_mesh_node != nullptr);
-      _root_mesh_node->sub_mesh_map.insert(std::make_pair((mesh_node->mesh_data).name, mesh_node));
+      _root_mesh_node->meshpart_map.insert(std::make_pair((mesh_node->mesh_data).name, mesh_node));
     }
     else
     {
-      MeshNode* parent = _root_mesh_node->find_sub_mesh((mesh_node->mesh_data).parent);
+      MeshNode* parent = _root_mesh_node->find_meshpart((mesh_node->mesh_data).parent);
       ASSERT_(parent != nullptr);
-      parent->sub_mesh_map.insert(std::make_pair((mesh_node->mesh_data).name, mesh_node));
+      parent->meshpart_map.insert(std::make_pair((mesh_node->mesh_data).name, mesh_node));
     }
-    _num_submeshes += mesh_node->get_num_sub_meshes_below() + 1;
-  } // MeshStreamer::_insert_submesh(MeshNode* mesh_node)
+    _num_meshparts += mesh_node->get_num_meshparts_below() + 1;
+  } // MeshStreamer::_insert_is_meshpart(MeshNode* mesh_node)
 
-  // deletes submesh from the tree structure
-  void MeshStreamer::_delete_sub_mesh(MeshNode* mesh_node)
+  // deletes is_meshpart from the tree structure
+  void MeshStreamer::_delete_meshpart(MeshNode* mesh_node)
   {
-    CONTEXT("MeshStreamer::_delete_sub_mesh");
-    _delete_sub_mesh(mesh_node->mesh_data.name);
-  } // MeshStreamer::_delete_sub_mesh(MeshNode* mesh_node)
+    CONTEXT("MeshStreamer::_delete_meshpart");
+    _delete_meshpart(mesh_node->mesh_data.name);
+  } // MeshStreamer::_delete_meshpart(MeshNode* mesh_node)
 
-  // deletes submesh from the tree structure
-  void MeshStreamer::_delete_sub_mesh(String name)
+  // deletes is_meshpart from the tree structure
+  void MeshStreamer::_delete_meshpart(String name)
   {
-    CONTEXT("MeshStreamer::_delete_sub_mesh");
+    CONTEXT("MeshStreamer::_delete_meshpart");
     if(name == "root")
     {
       ASSERT_(_root_mesh_node != nullptr);
-      _num_submeshes = 0;
+      _num_meshparts = 0;
       delete _root_mesh_node;
     }
     else
     {
-      MeshNode* mesh_node = _root_mesh_node->find_sub_mesh(name);
+      MeshNode* mesh_node = _root_mesh_node->find_meshpart(name);
       ASSERT_(mesh_node != nullptr);
-      _num_submeshes -= (mesh_node->get_num_sub_meshes_below() + 1);
+      _num_meshparts -= (mesh_node->get_num_meshparts_below() + 1);
 
       MeshNode* parent;
       if((mesh_node->mesh_data).parent == "root")
@@ -364,35 +409,27 @@ namespace FEAST
       }
       else
       {
-        parent = _root_mesh_node->find_sub_mesh((mesh_node->mesh_data).parent);
+        parent = _root_mesh_node->find_meshpart((mesh_node->mesh_data).parent);
       }
 
-      MeshNode::SubMeshMap::iterator it(parent->sub_mesh_map.begin()), jt(parent->sub_mesh_map.end());
+      MeshNode::MeshpartMap::iterator it(parent->meshpart_map.begin()), jt(parent->meshpart_map.end());
       for(; it != jt; ++it)
       {
         if(it->first.compare_no_case(name) == 0)
         {
-          parent->sub_mesh_map.erase(it);
+          parent->meshpart_map.erase(it);
           break;
         }
       }
       delete mesh_node;
     }
-  } // MeshStreamer::_delete_sub_mesh(String name)
+  } // MeshStreamer::_delete_meshpart(String name)
 
-  // returns the chart path
-  String MeshStreamer::get_chart_path() const
+  // returns the number of is_meshpartes
+  Index MeshStreamer::get_num_meshparts() const
   {
-    CONTEXT("MeshStreamer::get_chart_path()");
-    return _chart_path;
-  }
-
-
-  // returns the number of submeshes
-  Index MeshStreamer::get_num_submeshes() const
-  {
-    CONTEXT("MeshStreamer::get_num_submeshes()");
-    return _num_submeshes;
+    CONTEXT("MeshStreamer::get_num_meshparts()");
+    return _num_meshparts;
   }
 
   // returns the global mesh information
@@ -411,7 +448,7 @@ namespace FEAST
       return nullptr;
     if(name.compare_no_case("root") == 0)
       return &_root_mesh_node->mesh_data;
-    MeshNode* node = _root_mesh_node->find_sub_mesh(name);
+    MeshNode* node = _root_mesh_node->find_meshpart(name);
     return (node != nullptr) ? &node->mesh_data : nullptr;
   }
 
@@ -436,14 +473,12 @@ namespace FEAST
     CONTEXT("MeshStreamer::write_mesh_file()");
 
     // FILE section
-    ofs << "<feast_mesh_file>" << std::endl;
+    ofs << "<feat_domain_file>" << std::endl;
 
     // HEADER section
     ofs << "<header>" << std::endl;
     ofs << " version " << "1" << std::endl;
-    if ( !_chart_path.empty() )
-      ofs << " chart_file " << _chart_path << std::endl;
-    ofs << " meshparts " << _num_submeshes << std::endl;
+    ofs << " meshparts " << _num_meshparts << std::endl;
     // END OF HEADER section
     ofs << "</header>" << std::endl;
 
@@ -460,7 +495,7 @@ namespace FEAST
     _root_mesh_node->write(ofs,false);
 
     // END OF FILE section
-    ofs << "</feast_mesh_file>";
+    ofs << "</feat_domain_file>";
   }
 
   String MeshStreamer::BaseContainer::_parse_info_section(Index& cur_line, std::istream& ifs)
@@ -721,8 +756,159 @@ namespace FEAST
     return cur_line;
   } // MeshStreamer::BaseContainer::_parse_parents_chunk
 
+  Index MeshStreamer::MeshDataContainer::_parse_mesh_header_section(Index cur_line, bool is_meshpart, std::istream& ifs)
+  {
+    // string the current line is saved in
+    String line("");
+    std::vector<String> line_vec;
+    // This will hold all the lines in the mesh header section
+    std::map<String, String> my_data;
+
+    // Get first line of the mesh's header section
+    line = read_next_line(ifs,cur_line);
+
+    // Parse the whole header section into the map
+    while(!ifs.eof() && ifs.good() && !(line == "</header>"))
+    {
+      line.split_by_charset(line_vec);
+
+      if(line_vec.size() != 2)
+        throw SyntaxError("Line "+stringify(cur_line)+" does not contain exactly 2 tokens!");
+
+      // Check if the token is already present. If not, add it.
+      const auto& tmp(my_data.find(line_vec.at(0)));
+      if(tmp == my_data.end())
+        my_data.insert(std::pair<String, String>(line_vec.at(0), line_vec.at(1)));
+      else
+        throw SyntaxError("Duplicate identifier "+line_vec.at(0)+" found in line "+stringify(cur_line));
+
+      line = read_next_line(ifs,cur_line);
+
+      // Note that this can be done by using emplace, but GCC of version < 4.8.0 does not implement this
+      //const auto& tmp = my_data.emplace(line_vec.at(0), line_vec.at(1));
+      //if(!tmp.second)
+      //  throw SyntaxError("Duplicate identifier "+line_vec.at(0)+" found in line "+stringify(cur_line));
+      //line = read_next_line(ifs,cur_line);
+    }
+
+    // Check if the map contains the required type token
+    const auto& type_it(my_data.find("type"));
+    if(type_it == my_data.end())
+        throw SyntaxError("No type information found in mesh header section!");
+    else
+    {
+      mesh_type = convert_mesh_type(type_it->second);
+
+      if(mesh_type == mt_structured)
+        slices.push_back(0);
+
+      my_data.erase(type_it);
+    }
+
+    // Check if the map contains the required shape token
+    const auto& shape_it(my_data.find("shape"));
+    if(shape_it == my_data.end())
+      throw SyntaxError("No shape information found in mesh header section!");
+    else
+    {
+      shape_type = convert_shape_type(shape_it->second);
+      my_data.erase(shape_it);
+    }
+
+    // Check if the map contains the attributes token
+    auto attributes_it(my_data.find("attribute_sets"));
+    // If the information is not there, default to 0
+    if(attributes_it == my_data.end())
+      attribute_count = 0;
+    else
+    {
+      attributes_it->second.parse(attribute_count);
+      my_data.erase(attributes_it);
+    }
+
+
+    // If this is not a meshpart, we need the number of coordinates per vertex
+    if(!is_meshpart)
+    {
+      // Check if the map contains the coords token
+      auto coords_it(my_data.find("coords"));
+      if(coords_it == my_data.end())
+        throw SyntaxError("No coords information found in mesh header section!");
+      else
+      {
+        coords_it->second.parse(coord_per_vertex);
+        my_data.erase(coords_it);
+      }
+    }
+    // If this is a meshpart, the number of coordinates per vertex is optional, but we need
+    // name and parent information, and chart information might be present
+    else
+    {
+      // Check if the map contains the coords token
+      auto coords_it(my_data.find("coords"));
+      // If the information is not there, default to 0
+      if(coords_it == my_data.end())
+        coord_per_vertex = 0;
+      else
+      {
+        coords_it->second.parse(coord_per_vertex);
+        my_data.erase(coords_it);
+      }
+
+      // Check if the map contains the chart token
+      auto chart_it(my_data.find("chart"));
+      // If this is a meshpart, we check for the chart token
+      if(chart_it != my_data.end())
+      {
+        chart = chart_it->second;
+        my_data.erase(chart_it);
+      }
+
+      // Check if the map contains the name token
+      auto name_it(my_data.find("name"));
+      if(name_it == my_data.end())
+        throw SyntaxError("No name information found in meshpart header section!");
+      else
+      {
+        name = name_it->second;
+        my_data.erase(name_it);
+      }
+
+      // Check if the map contains the parent token
+      auto parent_it(my_data.find("parent"));
+      // If this is a meshpart, we check for the parent token
+      if(parent_it == my_data.end())
+        throw SyntaxError("No parent information found in meshpart header section!");
+      else
+      {
+        parent = parent_it->second;
+        my_data.erase(parent_it);
+      }
+    } // if(!is_meshpart)
+
+    // Only Hypercube shapes are allowed for structured meshes
+    if(mesh_type == mt_structured &&
+        (shape_type == MeshDataContainer::st_tria || shape_type == MeshDataContainer::st_tetra))
+        {
+          throw SyntaxError("Unsupported shape_type for structured mesh, in line " + stringify(cur_line));
+        }
+
+    // Check if the map contains anything else; this should not happen
+    if(my_data.size() > 0)
+    {
+      String msg("");
+      for(auto& it:my_data)
+        msg += (it.first + " " + it.second + " ");
+
+      throw InternalError("File header section contained unrecognised entries: "+msg);
+    }
+
+    return cur_line;
+
+  } //MeshStreamer::MeshDataContainer::_parse_mesh_header_section(Index, std::istream&)
+
   // parses the given mesh-section stream
-  Index MeshStreamer::MeshDataContainer::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
+  Index MeshStreamer::MeshDataContainer::_parse_mesh_section(Index cur_line, bool is_meshpart, std::istream& ifs)
   {
     CONTEXT("MeshStreamer::MeshDataContainer::_parse_mesh_section");
 
@@ -733,191 +919,18 @@ namespace FEAST
     std::vector<String> line_vec;
 
     // if it is the root mesh
-    String break_line = submesh ? "</meshpart>" : "</mesh>";
+    String break_line = is_meshpart ? "</meshpart>" : "</mesh>";
 
     coord_per_vertex = 0;
 
     // get a line
     line = read_next_line(ifs,cur_line);
     if(!(line == "<header>"))
-    {
       throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-    }
 
-    line = read_next_line(ifs,cur_line);
-    line.split_by_charset(line_vec);
+    _parse_mesh_header_section(cur_line, is_meshpart, ifs);
 
-    if(submesh)
-    {
-      if(line_vec[0] == "name")
-      {
-        if(!(line_vec.size() == 2))
-        {
-          throw SyntaxError("Missing name in line " + stringify(cur_line));
-        }
-        name = line_vec.at(1);
-      }
-      else
-      {
-        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-      }
-
-      line = read_next_line(ifs,cur_line);
-      line.split_by_charset(line_vec);
-
-      if(line_vec[0] == "parent")
-      {
-        if(!(line_vec.size() == 2))
-        {
-          throw SyntaxError("Missing parent in line " + stringify(cur_line));
-        }
-        parent = line_vec.at(1);
-      }
-      else
-      {
-        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-      }
-
-      line = read_next_line(ifs,cur_line);
-      line.split_by_charset(line_vec);
-
-      if(line_vec[0] == "chart")
-      {
-        if(!(line_vec.size() == 2))
-        {
-          throw SyntaxError("Missing chart name in line " + stringify(cur_line));
-        }
-        chart = line_vec.at(1);
-
-        line = read_next_line(ifs,cur_line);
-        line.split_by_charset(line_vec);
-      }
-    }
-
-    // if it is the type
-    if(line_vec[0] == "type")
-    {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing type in line " + stringify(cur_line));
-      }
-      mesh_type = convert_mesh_type(line_vec.at(1));
-      if(mesh_type == mt_structured)
-      {
-        slices.push_back(0);
-      }
-    }
-    else
-    {
-      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-    }
-
-    line = read_next_line(ifs,cur_line);
-    line.split_by_charset(line_vec);
-
-    if(line_vec[0] == "shape")
-    {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing shape type in line " + stringify(cur_line));
-      }
-      shape_type = convert_shape_type(line_vec.at(1));
-      if(mesh_type == mt_structured &&
-          (shape_type == MeshDataContainer::st_tria || shape_type == MeshDataContainer::st_tetra))
-      {
-        throw SyntaxError("Unsupported shape_type for structured mesh, in line " + stringify(cur_line));
-      }
-    }
-    else
-    {
-      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-    }
-    line = read_next_line(ifs,cur_line);
-    line.split_by_charset(line_vec);
-
-    if(line_vec[0] == "attribute_sets")
-    {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing number of attribute sets in line " + stringify(cur_line));
-      }
-      (line_vec.at(1)).parse(attribute_count);
-      line = read_next_line(ifs,cur_line);
-      line.split_by_charset(line_vec);
-    }
-
-    if(line_vec[0] == "coord_file")
-    {
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing coordinate file path in line " + stringify(cur_line));
-      }
-      // parse the coord file
-      parse_coord_file(line_vec.at(1));
-      coordfile = true;
-      line = read_next_line(ifs,cur_line);
-      line.split_by_charset(line_vec);
-    }
-
-    if(!coordfile)
-    {
-      if(line_vec[0] == "coords")
-      {
-        if(!(line_vec.size() == 2))
-        {
-          throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
-        }
-        (line_vec.at(1)).parse(coord_per_vertex);
-        line = read_next_line(ifs,cur_line);
-        line.split_by_charset(line_vec);
-      }
-      else
-      {
-        coord_per_vertex = 0;
-      }
-    }
-    else
-    {
-      if(line_vec[0] == "coords")
-      {
-        if(!(line_vec.size() == 2))
-        {
-          throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
-        }
-        Index coord_per_vertex_cmp;
-        (line_vec.at(1)).parse(coord_per_vertex_cmp);
-        if(coord_per_vertex_cmp != coord_per_vertex)
-        {
-          throw SyntaxError("Coordinate number missmatch in line " + stringify(cur_line));
-        }
-        line = read_next_line(ifs,cur_line);
-        line.split_by_charset(line_vec);
-      }
-    }
-
-    // if it is the adjacency file path
-    if(line_vec[0] == "adj_file")
-    {
-      if(mesh_type == mt_structured)
-      {
-        throw SyntaxError("No adjacency file supported for structured mesh in line " + stringify(cur_line));
-      }
-      if(!(line_vec.size() == 2))
-      {
-        throw SyntaxError("Missing adjacency file path in line " + stringify(cur_line));
-      }
-      parse_adjacency_file(line_vec.at(1));
-
-      line = read_next_line(ifs,cur_line);
-      line.split_by_charset(line_vec);
-      adjfile = true;
-    }
-
-    if(line_vec[0] != "</header>")
-    {
-      throw SyntaxError("Unknown file format. Expected </header> in line " + stringify(cur_line));
-    }
-
+    // Get the first line after the end of the header section
     line = read_next_line(ifs,cur_line);
 
     // if it is an info sub chunk
@@ -961,13 +974,13 @@ namespace FEAST
         cur_line = _parse_adjacency_chunk(cur_line, ifs, line);
       }// adjacencies sub-chunk
 
-      // if it is a parent index chunk (of a submesh)
+      // if it is a parent index chunk (of a meshpart)
       else if((line == "<vert_idx>"||
                line == "<edge_idx>"||
                line == "<tria_idx>"||
                line == "<quad_idx>"||
                line == "<tetra_idx>"||
-               line == "<hexa_idx>") && submesh)
+               line == "<hexa_idx>") && is_meshpart)
       {
         cur_line = _parse_parents_chunk(cur_line, ifs, line);
       } // parent index sub chunk
@@ -1395,7 +1408,7 @@ namespace FEAST
       throw SyntaxError("Expected end of attribute header in line " + stringify(cur_line));
 
     // Init AttributeContainer with the parsed sizes
-    AttributesContainer my_attribute_container(my_identifier, value_dim, value_count);
+    AttributeContainer my_attribute_container(my_identifier, value_dim, value_count);
 
     line = read_next_line(ifs,cur_line);
     if(line!="<values>")
@@ -1414,8 +1427,8 @@ namespace FEAST
       else
       {
         // auxiliary variables
-        AttributesContainer::ValueType current_value;
-        AttributesContainer::ValueVec v;
+        AttributeContainer::ValueType current_value;
+        AttributeContainer::ValueVec v;
 
         // separate by " "
         line.split_by_charset(line_vec);
@@ -1722,12 +1735,12 @@ namespace FEAST
     }
   } // ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type) const
 
-  // Writes the mesh data of this mesh and all submeshes related to this mesh
+  // Writes the mesh data of this mesh and all is_meshpartes related to this mesh
   // into the output stream.
-  void MeshStreamer::MeshNode::write(std::ostream& ofs, bool submesh) const
+  void MeshStreamer::MeshNode::write(std::ostream& ofs, bool is_meshpart) const
   {
     // choose the right tag
-    if (submesh)
+    if (is_meshpart)
       ofs << "<meshpart>" << std::endl;
     else
       ofs << "<mesh>" << std::endl;
@@ -1735,7 +1748,7 @@ namespace FEAST
     // header section
     ofs << " <header>" << std::endl;
 
-    if (submesh)
+    if (is_meshpart)
     {
       ofs << "  name " << mesh_data.name << std::endl;
       ofs << "  parent " << mesh_data.parent << std::endl;
@@ -1885,8 +1898,8 @@ namespace FEAST
       }
     }
 
-    // if it is a submesh, add the parent indices
-    if (submesh)
+    // if it is a meshpart, add the parent indices
+    if (is_meshpart)
     {
       ofs << " <vert_idx>" << std::endl;
       for (Index i(0); i < mesh_data.num_entities[0]; ++i)
@@ -1992,16 +2005,124 @@ namespace FEAST
     }
 
     // choose the right tag to end the mesh section
-    if (submesh)
+    if (is_meshpart)
       ofs<<"</meshpart>"<<std::endl;
     else
       ofs<<"</mesh>"<<std::endl;
 
-    // loop through all submeshes related to this mesh and drop the data as well
-    SubMeshMap::const_iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
+    // loop through all is_meshpartes related to this mesh and drop the data as well
+    MeshpartMap::const_iterator it(meshpart_map.begin()), jt(meshpart_map.end());
     for(; it != jt; ++it)
       it->second->write(ofs, true);
 
   }// write_mesh_data
+
+  /// Parse header subsection of the chart section
+  Index MeshStreamer::ChartContainer::_parse_chart_header_section(Index cur_line, std::istream& ifs)
+  {
+    CONTEXT("MeshStreamer::ChartContainer::_parse_chart_header_section");
+
+    // string the current line is saved in
+    String line("");
+    std::vector<String> line_vec;
+
+    // This will hold all the lines in the chart header section
+    std::map<String, String> my_data;
+
+    // Get first line of the chart's header section
+    line = read_next_line(ifs,cur_line);
+
+    // Parse the whole header section into the map
+    while(!ifs.eof() && ifs.good() && !(line == "</header>"))
+    {
+      line.split_by_charset(line_vec);
+
+      if(line_vec.size() != 2)
+        throw SyntaxError("Line "+stringify(cur_line)+" does not contain exactly 2 tokens!");
+
+      // Check if the token is already present. If not, add it.
+      const auto& tmp(my_data.find(line_vec.at(0)));
+      if(tmp == my_data.end())
+        my_data.insert(std::pair<String, String>(line_vec.at(0), line_vec.at(1)));
+      else
+        throw SyntaxError("Duplicate identifier "+line_vec.at(0)+" found in line "+stringify(cur_line));
+
+      line = read_next_line(ifs,cur_line);
+
+      // Note that this can be done by using emplace, but GCC of version < 4.8.0 does not implement this
+      //const auto& tmp = my_data.emplace(line_vec.at(0), line_vec.at(1));
+      //if(!tmp.second)
+      //  throw SyntaxError("Duplicate identifier "+line_vec.at(0)+" found in line "+stringify(cur_line));
+      //line = read_next_line(ifs,cur_line);
+    }
+
+    // Check if the map contains the required name token
+    const auto& name_it(my_data.find("name"));
+    if(name_it == my_data.end())
+      throw SyntaxError("No name found in chart header section!");
+    name = name_it->second;
+    my_data.erase(name_it);
+
+    // Check if the map contains the required type token
+    const auto& type_it(my_data.find("type"));
+    if(type_it == my_data.end())
+      throw SyntaxError("No type found in chart header section!");
+    type = type_it->second;
+    my_data.erase(type_it);
+
+    // Check if the map contains anything else; this should not happen
+    if(my_data.size() > 0)
+    {
+      String msg("");
+      for(auto& it:my_data)
+        msg += (it.first + " " + it.second + " ");
+
+      throw InternalError("Chart header section contained unrecognised entries: "+msg);
+    }
+
+    return cur_line;
+
+  } // MeshStreamer::ChartContainer::_parse_chart_header_section
+
+  /// Parses chart section
+  Index MeshStreamer::ChartContainer::_parse_chart_section(Index cur_line, std::istream& ifs)
+  {
+    CONTEXT("MeshStreamer::ChartContainer::_parse_chart_section");
+
+    // string the current line is saved in
+    String line("");
+    std::vector<String> line_vec;
+
+    line = read_next_line(ifs,cur_line);
+
+    // The first line has to be the header
+    if( !(line == "<header>") )
+      throw SyntaxError("Expected <header> in line "+stringify(cur_line));
+    else
+      _parse_chart_header_section(cur_line, ifs);
+
+    line = read_next_line(ifs,cur_line);
+
+    // Optional: Info section
+    if( (line == "<info>") )
+    {
+      line = read_next_line(ifs,cur_line);
+      info = line.trim();
+      line = read_next_line(ifs,cur_line);
+      if(line != "</info>")
+        throw SyntaxError("Expected end of chart info in line "+stringify(cur_line));
+      line = read_next_line(ifs,cur_line);
+    }
+
+    start_of_data = cur_line;
+    // Parse rest of the chart section into the data deque
+    while(!ifs.eof() && ifs.good() && !(line == "</chart>"))
+    {
+      data.push_back(line.trim());
+      line = read_next_line(ifs,cur_line);
+    }
+
+    return cur_line;
+  }
 
 } //namespace FEAST

@@ -66,13 +66,13 @@ namespace FEAST
           Index num_vertices,
           int num_coords,
           int stride = 0,
-          String identifier_ = "")
+          String identifier = "")
           :
             _num_vertices(num_vertices),
             _num_coords(num_coords),
             _stride(stride > 0 ? stride : num_coords),
             _vertices(nullptr),
-            _identifier(identifier_)
+            _identifier(identifier)
             {
               CONTEXT(name() + "::MeshAttribute()");
               ASSERT_(_num_coords >= 0);
@@ -156,6 +156,9 @@ namespace FEAST
          * \brief Copy assignment operator
          *
          * This is needed for replacing one MeshAttribute by another when inserting into a \ref MeshAttributeHolder.
+         *
+         * \param[in] other
+         * Other MeshAttribute to copy from.
          */
         MeshAttribute& operator=(const MeshAttribute& other)
         {

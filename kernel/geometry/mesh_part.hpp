@@ -1091,7 +1091,7 @@ namespace FEAST
               auto& coarse_attribute =_coarse_mesh.template get_attributes<0>()[i];
 
               // Create a new empty attribute of the desired size
-              AttributeType refined_attribute(get_num_entities(0), coarse_attribute.get_num_coords());
+              AttributeType refined_attribute(get_num_entities(0), coarse_attribute.get_num_coords(), 0, coarse_attribute.get_identifier());
 
               // Refine the attribute in the coarse mesh and write the result to the new attribute
               Intern::StandardVertexRefineWrapper<ShapeType, AttributeType>

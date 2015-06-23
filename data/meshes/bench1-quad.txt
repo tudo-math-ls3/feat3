@@ -1,13 +1,47 @@
-<feast_mesh_file>
+<feat_domain_file>
 <header>
  version 1
- chart_file bench1-chart.txt
  meshparts 5
+ charts 2
 </header>
 <info>
  This is the bench1 mesh-file, which defines the standard
  mesh for the famous 2D "flow around a cylinder" benchmark.
 </info>
+<chart>
+ <header>
+  name outer
+  type polyline
+ </header>
+ <info>
+  This chart represents the outer rectangular boundary component.
+ </info>
+ <polyline>
+  img_dim 2
+  num_points 5
+  <points>
+   0 0 0
+   1 2.2 0
+   2 2.2 0.41
+   3 0 0.41
+   4 0 0
+  </points>
+ </polyline>
+</chart>
+<chart>
+ <header>
+  name circle
+  type circle
+ </header>
+ <info>
+  This chart represents the inner circular boundary component.
+ </info>
+ <circle>
+  radius 0.05
+  midpoint 0.2 0.2
+  domain 0.5 -0.5
+ </circle>
+</chart>
 <mesh>
  <header>
   type conformal
@@ -608,7 +642,7 @@
   attribute_sets 1
  </header>
  <info>
-  This meshpart defines the bottom edge of the outer rectangular boundary.
+  This meshpart defines the bottom edge of the outer rectangular boundary component.
  </info>
  <counts>
   verts 17
@@ -707,7 +741,7 @@
   attribute_sets 1
  </header>
  <info>
-  This meshpart defines the right edge of the outer rectangular boundary.
+  This meshpart defines the right edge of the outer rectangular boundary component.
  </info>
  <counts>
   verts 5
@@ -758,7 +792,7 @@
   attribute_sets 1
  </header>
  <info>
-  This meshpart defines the top edge of the outer rectangular boundary.
+  This meshpart defines the top edge of the outer rectangular boundary component.
  </info>
  <counts>
   verts 17
@@ -857,7 +891,7 @@
   attribute_sets 1
  </header>
  <info>
-  This meshpart defines the left edge of the outer rectangular boundary.
+  This meshpart defines the left edge of the outer rectangular boundary component.
  </info>
  <counts>
   verts 5
@@ -981,4 +1015,4 @@
   </values>
  </attribute>
 </meshpart>
-</feast_mesh_file>
+</feat_domain_file>

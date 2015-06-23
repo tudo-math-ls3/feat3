@@ -1,9 +1,12 @@
 <feat_domain_file>
 <header>
  version 1
- meshparts 5
- charts 2
+ meshparts 4
+ charts 1
 </header>
+<info>
+ This is the unit-square mesh consisting of a single quadrilateral cell.
+</info>
 <chart>
  <header>
   name outer
@@ -15,22 +18,11 @@
   <points>
    0 0 0
    1 1 0
-   2 1 1.25
-   3 0 1.25
+   2 1 1
+   3 0 1
    4 0 0
   </points>
  </polyline>
-</chart>
-<chart>
- <header>
-  name circle
-  type circle
- </header>
- <circle>
-  radius 0.1414213562373095
-  midpoint 0.5 0.5
-  domain 0.375 -0.625
- </circle>
 </chart>
 <mesh>
  <header>
@@ -39,63 +31,24 @@
   coords 2
  </header>
  <counts>
-  verts 16
-  edges 24
-  quads 8
+  verts 4
+  edges 4
+  quads 1
  </counts>
  <coords>
   0 0
   1 0
-  1 1.25
-  0 1.25
-  0.4 0.6
-  0.6 0.6
-  0.6 0.4
-  0.4 0.4
-  0.4 1.25
-  0.6 1.25
-  1 0.6
-  1 0.4
-  0.6 0
-  0.4 0
-  0 0.4
-  0 0.6
+  0 1
+  1 1
  </coords>
  <vert@edge>
-  8 3
-  3 15
-  4 15
-  8 4
-  4 5
-  9 5
-  9 8
-  10 2
-  2 9
-  10 5
-  5 6
-  11 6
-  11 10
-  12 1
-  1 11
-  12 6
-  6 7
-  13 7
-  13 12
-  0 13
-  14 7
-  14 0
-  7 4
-  15 14
+  0 1
+  2 3
+  0 2
+  1 3
  </vert@edge>
  <vert@quad>
-  8 3 4 15
-  4 5 8 9
-  10 2 5 9
-  5 6 10 11
-  12 1 6 11
-  6 7 12 13
-  0 13 14 7
-  7 4 14 15
+  0 1 2 3
  </vert@quad>
 </mesh>
 <meshpart>
@@ -107,37 +60,32 @@
   shape edge
   attribute_sets 1
  </header>
+ <info>
+  This meshpart defines the bottom edge of the outer square boundary component.
+ </info>
  <counts>
-  verts 4
-  edges 3
+  verts 2
+  edges 1
  </counts>
  <vert@edge>
   0 1
-  1 2
-  2 3
  </vert@edge>
  <vert_idx>
   0
-  13
-  12
   1
  </vert_idx>
  <edge_idx>
-  19
-  18
-  13
+  0
  </edge_idx>
  <attribute>
   <header>
    dimension 0
    name param
    value_dim 1
-   value_count 4
+   value_count 2
   </header>
   <values>
    0
-   0.4
-   0.6
    1
   </values>
  </attribute>
@@ -151,37 +99,32 @@
   shape edge
   attribute_sets 1
  </header>
+ <info>
+  This meshpart defines the right edge of the outer square boundary component.
+ </info>
  <counts>
-  verts 4
-  edges 3
+  verts 2
+  edges 1
  </counts>
  <vert@edge>
   0 1
-  1 2
-  2 3
  </vert@edge>
  <vert_idx>
   1
-  11
-  10
-  2
+  3
  </vert_idx>
  <edge_idx>
-  14
-  12
-  7
+  3
  </edge_idx>
  <attribute>
   <header>
    dimension 0
    name param
    value_dim 1
-   value_count 4
+   value_count 2
   </header>
   <values>
    1
-   1.32
-   1.48
    2
   </values>
  </attribute>
@@ -195,37 +138,32 @@
   shape edge
   attribute_sets 1
  </header>
+ <info>
+  This meshpart defines the top edge of the outer square boundary component.
+ </info>
  <counts>
-  verts 4
-  edges 3
+  verts 2
+  edges 1
  </counts>
  <vert@edge>
   0 1
-  1 2
-  2 3
  </vert@edge>
  <vert_idx>
-  2
-  9
-  8
   3
+  2
  </vert_idx>
  <edge_idx>
-  8
-  6
-  0
+  1
  </edge_idx>
  <attribute>
   <header>
    dimension 0
    name param
    value_dim 1
-   value_count 4
+   value_count 2
   </header>
   <values>
    2
-   2.4
-   2.6
    3
   </values>
  </attribute>
@@ -239,86 +177,33 @@
   shape edge
   attribute_sets 1
  </header>
+ <info>
+  This meshpart defines the left edge of the outer square boundary component.
+ </info>
  <counts>
-  verts 4
-  edges 3
+  verts 2
+  edges 1
  </counts>
  <vert@edge>
   0 1
-  1 2
-  2 3
  </vert@edge>
  <vert_idx>
-  3
-  15
-  14
+  2
   0
  </vert_idx>
  <edge_idx>
-  1
-  23
-  21
+  2
  </edge_idx>
  <attribute>
   <header>
    dimension 0
    name param
    value_dim 1
-   value_count 4
+   value_count 2
   </header>
   <values>
    3
-   3.52
-   3.68
    4
-  </values>
- </attribute>
-</meshpart>
-<meshpart>
- <header>
-  name circle
-  parent root
-  chart circle
-  type conformal
-  shape edge
-  attribute_sets 1
- </header>
- <counts>
-  verts 5
-  edges 4
- </counts>
- <vert@edge>
-  0 1
-  1 2
-  2 3
-  3 4
- </vert@edge>
- <vert_idx>
-  4
-  5
-  6
-  7
-  4
- </vert_idx>
- <edge_idx>
-  4
-  10
-  16
-  22
- </edge_idx>
- <attribute>
-  <header>
-   dimension 0
-   name param
-   value_dim 1
-   value_count 5
-  </header>
-  <values>
-   0
-   0.25
-   0.5
-   0.75
-   1
   </values>
  </attribute>
 </meshpart>
