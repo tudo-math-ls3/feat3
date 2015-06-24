@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/lafem/meta_element.hpp>
+#include <kernel/lafem/container.hpp>
 
 // includes, system
 #include <iostream>

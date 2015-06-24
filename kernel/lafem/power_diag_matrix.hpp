@@ -6,6 +6,7 @@
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/meta_element.hpp>
+#include <kernel/lafem/container.hpp>
 
 namespace FEAST
 {

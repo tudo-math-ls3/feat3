@@ -5,9 +5,11 @@
 // includes, FEAST
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/container.hpp>
 
 // includes, system
 #include <type_traits>
+#include <fstream>
 
 namespace FEAST
 {

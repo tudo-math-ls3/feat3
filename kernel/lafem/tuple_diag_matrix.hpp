@@ -7,6 +7,8 @@
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/meta_element.hpp>
 
+#include <fstream>
+
 namespace FEAST
 {
   namespace LAFEM
