@@ -40,11 +40,11 @@ namespace FEAST
      *
      * This class represents a sparse matrix, that stores its non zero elements in the ELL-C format.\n\n
      * Data survey: \n
-     * _elements[0]: val     - raw non zero number values, stored in ELL-C storage format \n
-     * _indices[0]:  col_ind - column index per non zero element, stored in same format as val \n
-     * _indices[1]:  cs      - starting offset of each chunk (including matrix end index)\n
-     * _indices[2]:  cl      - length of the longset row in each chunk
-     * _indices[3]:  rl      - length of each row
+     * _elements[0]: val     - raw non zero number values, stored in ELL-C storage format [val_size]\n
+     * _indices[0]:  col_ind - column index per non zero element, stored in same format as val [val_size]\n
+     * _indices[1]:  cs      - starting offset of each chunk (including matrix end index) [num_of_chunks + 1]\n
+     * _indices[2]:  cl      - length of the longset row in each chunk [num_of_chunks]\n
+     * _indices[3]:  rl      - length of each row [rows]
      *
      * _scalar_index[0]: container size \n
      * _scalar_index[1]: row count \n
