@@ -269,7 +269,7 @@ namespace FEAST
         }
 
         template<typename AttributeSetType_, typename AttributeContainerType_>
-        static void wrap(AttributeSetType_& attributes, const AttributeContainerType_ attribute_container)
+        static void wrap(AttributeSetType_& attributes, const AttributeContainerType_& attribute_container)
         {
           typedef typename AttributeSetType_::value_type::CoordType DataType;
 
@@ -277,8 +277,9 @@ namespace FEAST
           {
             const Index value_count(it.value_count);
             const int value_dim(it.value_dim);
+            const String my_name(it.name);
 
-            typename AttributeSetType_::value_type new_attribute(value_count, value_dim, 0);
+            typename AttributeSetType_::value_type new_attribute(value_count, value_dim, 0, my_name);
 
             for(Index i(0); i < value_count; ++i)
             {
@@ -290,8 +291,14 @@ namespace FEAST
               for(int j(0); j < value_dim; ++j)
                 new_attribute[i][j] = DataType(vals[size_t(j)]);
             }
-            attributes.push_back(new_attribute);
 
+            for(auto& jt:attributes)
+            {
+              if(jt.get_name() == my_name)
+                throw InternalError("Attribute set already contains an attribute set with name "+my_name);
+            }
+
+            attributes.push_back(new_attribute);
           }
 
         } // static void

@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/factory.hpp>
+#include <kernel/geometry/mesh_attribute.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_subset_refiner.hpp>
 #include <kernel/geometry/intern/standard_target_refiner.hpp>
@@ -21,10 +22,6 @@ namespace FEAST
       template<int, int>
       struct TargetSetComputer;
     }
-
-    /// Alias for MeshAttribute
-    template<typename A>
-    using MeshAttribute = VertexSetVariable<A>;
 
     /**
      * \brief Class for holding MeshAttributes for all shape dimensions
@@ -136,15 +133,15 @@ namespace FEAST
        * Dimension the number of attributes is to be computed for
        *
        */
-      virtual Index get_num_attributes(int dim) const
+      virtual int get_num_attributes(int dim) const
       {
         CONTEXT(name() + "::get_num_attributes()");
-        ASSERT(dim > 0, "dim has to be > 0");
+        ASSERT(dim >= 0, "dim has to be > 0");
         ASSERT(dim <= shape_dim, "dim has to be < shape_dim");
 
         if(dim == shape_dim)
           // If the requested dimension is mine...
-          return Index(_mesh_attributes.size());
+          return int(_mesh_attributes.size());
 
         // Otherwise recurse down
         return BaseClass::get_num_attributes(dim);
@@ -159,26 +156,81 @@ namespace FEAST
       /**
        * \brief Adds one attribute of shape dimension dim to the corresponding set
        *
-       * \param[in] attribute
+       * \param[in] attribute_
        * The Attribute to be added.
        *
        * \param[in] dim
        * Shape dimension of attribute.
        *
+       * \param[in] replace
+       * If there is an attribute present with the same identifier, should it be replaced?
+       *
        * \warning Checks whether attribute has the same number of entries as the corresponding mesh has entities of
        * dimension dim have to be performed by the caller!
        */
-      virtual void add_attribute(const AttributeType& attribute, int dim)
+      virtual bool add_attribute(const AttributeType& attribute_, int dim, bool replace = false)
       {
         ASSERT(dim >= 0, "dim has to be >= 0");
         ASSERT(dim <= shape_dim, "dim has to be <= shape_dim");
 
+        // If the requested dimension is mine...
         if(dim == shape_dim)
-          // If the requested dimension is mine...
-          _mesh_attributes.push_back(attribute);
+        {
+          for(auto it:_mesh_attributes)
+          {
+            if((it.get_identifier() == attribute_.get_identifier()))
+            {
+              if(replace)
+              {
+                it = attribute_;
+                return true;
+              }
+              else
+                return false;
+            }
+          }
+
+          _mesh_attributes.push_back(attribute_);
+          return true;
+        }
         else
           // Otherwise recurse down
-          BaseClass::add_attribute(attribute, dim);
+          return BaseClass::add_attribute(attribute_, dim, replace);
+
+      }
+
+      /**
+       * \brief Finds an Attribute by its identifier String and returns a pointer to it
+       *
+       * \param[in] identifier
+       * Identifier to match.
+       *
+       * \param[in] dim
+       * Dimension the desired attribute has.
+       *
+       * \returns A pointer to the Attribute of shape dimension dim if present.
+       *
+       * \warning Will return nullptr if no Attribute with the given identifier is found
+       *
+       */
+      virtual AttributeType* find_attribute(String identifier, int dim)
+      {
+        ASSERT(dim >= 0, "dim has to be >= 0");
+        ASSERT(dim <= shape_dim, "dim has to be <= shape_dim");
+
+        // If the requested dimension is mine...
+        if(dim == shape_dim)
+        {
+          for(auto it(_mesh_attributes.begin()); it != _mesh_attributes.end(); ++it)
+          {
+            if((it->get_identifier() == identifier))
+              return &(*it);
+          }
+          return nullptr;
+        }
+        else
+          // Otherwise recurse down
+          return BaseClass::find_attribute(identifier, dim);
 
       }
     }; // class MeshAttributeHolder<Shape_, DataType_>
@@ -193,6 +245,7 @@ namespace FEAST
     public:
       typedef Shape::Vertex ShapeType;
       static constexpr int shape_dim = ShapeType::dimension;
+      typedef MeshAttribute<DataType_> AttributeType;
       typedef std::vector<MeshAttribute<DataType_>> AttributeSetType;
 
     protected:
@@ -214,6 +267,22 @@ namespace FEAST
         CONTEXT(name() + "::~MeshAttributeHolder()");
       }
 
+      virtual AttributeType* find_attribute(String identifier, int dim)
+      {
+#if defined DEBUG
+        ASSERT(dim == 0, "dim has to be = 0");
+#else
+        (void)dim;
+#endif
+
+        for(auto it(_mesh_attributes.begin()); it != _mesh_attributes.end(); ++it)
+        {
+          if((it->get_identifier() == identifier))
+            return &(*it);
+        }
+        return nullptr;
+
+      }
       template<int dim_>
       AttributeSetType& get_mesh_attributes()
       {
@@ -230,7 +299,7 @@ namespace FEAST
         return _mesh_attributes;
       }
 
-      virtual Index get_num_attributes(int dim) const
+      virtual int get_num_attributes(int dim) const
       {
         CONTEXT(name() + "::get_num_attributes()");
 #if defined DEBUG
@@ -238,24 +307,33 @@ namespace FEAST
 #else
         (void)dim;
 #endif
-        return Index(_mesh_attributes.size());
+        return int(_mesh_attributes.size());
       }
 
-      virtual void add_attribute(const MeshAttribute<DataType_>& attribute_, int dim)
+      virtual bool add_attribute(const MeshAttribute<DataType_>& attribute_, int dim, bool replace = false)
       {
 #if defined DEBUG
         ASSERT(dim == 0, "Only attributes of shape dim 0 can be added to MeshParts of shape dim 0");
 #else
         (void)dim;
 #endif
-        _mesh_attributes.push_back(attribute_);
-      }
+        for(auto& it:_mesh_attributes)
+        {
+          if((it.get_identifier() == attribute_.get_identifier()))
+          {
+            if(replace)
+            {
+              it = attribute_;
+              return true;
+            }
+            else
+              return false;
+          }
+        }
 
-      //virtual void add_attribute(const MeshAttribute<DataType_>&& attribute_, int dim)
-      //{
-      //  ASSERT(dim == 0, "Only attributes of shape dim 0 can be added to MeshParts of shape dim 0");
-      //  _mesh_attributes.push_back(std::move(attribute_));
-      //}
+        _mesh_attributes.push_back(attribute_);
+        return true;
+      }
 
       static String name()
       {
@@ -541,6 +619,25 @@ namespace FEAST
         }
 
         /**
+         * \brief Finds an Attribute by its identifier String and returns a pointer to it
+         *
+         * \param[in] identifier
+         * Identifier to match.
+         *
+         * \param[in] dim
+         * Dimension the desired attribute has.
+         *
+         * \returns A pointer to the Attribute of shape dimension dim if present.
+         *
+         * \warning Will return nullptr if no Attribute with the given identifier is found
+         *
+         */
+        AttributeType* find_attribute(String identifier, int dim)
+        {
+          return _attribute_holder.find_attribute(identifier, dim);
+        }
+
+        /**
          * \brief Returns the AttributeSet belonging to dimension dim_
          *
          * \tparam dim_
@@ -577,21 +674,39 @@ namespace FEAST
         }
 
         /**
-         * \brief Adds one attribute to this MeshPart
+         * \brief Computes the number of Attributes of a certain dimension in this MeshPart
          *
-         * \tparam dim_
-         * Shape dimension of the Attribute to be added
+         * \param[in] dim
+         * Dimension to compute the number of attributes for.
+         *
+         * \returns The number of Attributes in the AttributeSet of dimension dim.
+         */
+        int get_num_attributes(int dim)
+        {
+          return _attribute_holder.get_num_attributes(dim);
+        }
+
+        /**
+         * \brief Copies one attribute to this MeshPart's AttributeHolder
          *
          * \param[in] attribute
          * Attribute to be added.
+         *
+         * \param[in] dim
+         * Shape dimension of the Attribute to be added
+         *
+         * \param[in] replace
+         * If there is an attribute present with the same identifier, should it be replaced?
+         *
          */
-        template<int dim_>
-        void add_attribute(const AttributeType& attribute)
+        virtual bool add_attribute(const AttributeType& attribute, int dim, bool replace = false)
         {
           CONTEXT(name() + "::add_attribute()");
           // Check if the attribute to be added has the same number of entities as the MeshPart wrt. dim_
-          ASSERT(attribute.get_num_vertices() == _target_set_holder.template get_target_set<dim_>().get_num_entities(), "Attribute/entity count mismatch!");
-          _attribute_holder.template get_mesh_attributes<dim_>().push_back(attribute);
+          if(attribute.get_num_vertices() != get_num_entities(dim))
+              throw InternalError("Attribute/entity count mismatch!");
+
+          return _attribute_holder.add_attribute(attribute, dim, replace);
         }
 
         /**

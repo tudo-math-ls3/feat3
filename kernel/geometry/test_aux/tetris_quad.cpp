@@ -232,7 +232,7 @@ namespace FEAST
         // create a MeshAttribute that holds one value for each vertex
         QuadSubMesh::AttributeType my_vertex_set(num_entities[0],1);
         // Add the attribute to mesh
-        mesh->add_attribute<0>(my_vertex_set);
+        mesh->add_attribute(my_vertex_set, 0);
 
         // set up vertex coordinates array
         Real vtx[] =
@@ -352,7 +352,7 @@ namespace FEAST
         // create a MeshAttribute that holds one value for each vertex
         QuadSubMesh::AttributeType my_vertex_set(num_entities[0],2);
         // Add the attribute to mesh
-        mesh->add_attribute<0>(my_vertex_set);
+        mesh->add_attribute(my_vertex_set, 0);
 
         // set up vertex coordinates array
         Real vtx[] =
@@ -568,7 +568,7 @@ namespace FEAST
         // create a MeshAttribute that holds one value for each vertex
         QuadSubMesh::AttributeType my_vertex_set(num_entities[0],1);
         // Add the attribute to mesh
-        mesh->add_attribute<0>(my_vertex_set);
+        mesh->add_attribute(my_vertex_set, 0);
 
         // set up vertex coordinates array
         Real vtx[] =

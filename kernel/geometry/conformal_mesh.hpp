@@ -38,7 +38,7 @@ namespace FEAST
       typedef Shape_ ShapeType;
 
       /// Vertex set type
-      typedef VertexSetFixed<num_coords_, stride_, Coord_> VertexSetType;
+      typedef VertexSet<num_coords_, stride_, Coord_> VertexSetType;
 
       /// index set holder type
       typedef IndexSetHolder<ShapeType> IndexSetHolderType;

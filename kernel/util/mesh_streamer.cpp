@@ -1361,7 +1361,7 @@ namespace FEAST
   Index MeshStreamer::MeshDataContainer::_parse_attribute_chunk(Index cur_line, std::istream& ifs)
   {
     Index dimension(~Index(0));
-    String my_name("noname");
+    String my_identifier("");
     int value_dim(0);
     Index value_count(0);
 
@@ -1395,7 +1395,7 @@ namespace FEAST
         throw SyntaxError("Missing name indentifier in line " + stringify(cur_line));
       }
 
-      (line_vec.at(1)).parse(my_name);
+      (line_vec.at(1)).parse(my_identifier);
     }
 
     line = read_next_line(ifs,cur_line);
@@ -1427,7 +1427,7 @@ namespace FEAST
       throw SyntaxError("Expected end of attribute header in line " + stringify(cur_line));
 
     // Init AttributeContainer with the parsed sizes
-    AttributesContainer my_attribute_container(my_name, value_dim, value_count);
+    AttributesContainer my_attribute_container(my_identifier, value_dim, value_count);
 
     line = read_next_line(ifs,cur_line);
     if(line!="<values>")
@@ -1988,7 +1988,7 @@ namespace FEAST
           // Write header
           ofs << "  <header>" << std::endl;
           ofs << "   dimension " << attribute_dim << std::endl;
-          ofs << "   name " << it.name << std::endl;
+          ofs << "   name " << it.identifier<< std::endl;
           ofs << "   value_dim " << it.value_dim << std::endl;
           ofs << "   value_count " << it.values.size() << std::endl;
           ofs << "  </header>" << std::endl;

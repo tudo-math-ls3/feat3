@@ -2,6 +2,7 @@
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/mesh_attribute.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/target_set.hpp>
 
@@ -46,8 +47,10 @@ public:
   {
   }
 
-  typedef ConformalMesh<Shape::Hypercube<3>> MeshType;
+  typedef double DataType;
+  typedef ConformalMesh<Shape::Hypercube<3>, 3, 3, DataType> MeshType;
   typedef MeshPart<MeshType> MeshPartType;
+  typedef MeshAttribute<DataType> MeshAttributeType;
 
   template<Index dim_>
   using TargetSetType = typename MeshPartType::TargetSet<dim_>::Type;
@@ -122,6 +125,36 @@ public:
     // Check dimension 0
     TEST_CHECK_MSG(ts_test0.get_num_entities() == ts_reference0.get_num_entities(), "num_entities mismatch for dimension 0");
     TEST_CHECK_MSG(check_target_set_consistency(ts_reference0, ts_test0), "ts_test did not contain all entities from ts_reference for dimension 0!");
+
+    // Check MeshAttribute functionality
+    // Create attributes of dimension 0
+    MeshAttributeType att_0_1(mesh_part_test.get_num_entities(0),1,1,"SomeName");
+    MeshAttributeType att_0_2(mesh_part_test.get_num_entities(0),1,1,"SomeOtherName");
+    MeshAttributeType att_0_3(mesh_part_test.get_num_entities(0),1,1,"SomeName");
+    // Change some data
+    att_0_1[1][0] = DataType(12);
+    att_0_3[1][0] = DataType(-5);
+
+    // Add attributes of dimension 0
+    TEST_CHECK(mesh_part_test.get_num_attributes() == 0);
+    TEST_CHECK(mesh_part_test.add_attribute(att_0_1,0));
+    TEST_CHECK(mesh_part_test.add_attribute(att_0_2,0));
+
+    TEST_CHECK(mesh_part_test.get_num_attributes() == 2);
+
+    // As an attribute with the same name is already present, this must return false
+    TEST_CHECK(!mesh_part_test.add_attribute(att_0_3,0));
+    // There should still be only 2 attributes in the mesh
+    TEST_CHECK_EQUAL(mesh_part_test.get_num_attributes(0),2);
+    TEST_CHECK_EQUAL((*mesh_part_test.find_attribute("SomeName",0))[1][0], DataType(12));
+    // Now we specify replace=true and it should return true
+    TEST_CHECK(mesh_part_test.add_attribute(att_0_3,0,true));
+    TEST_CHECK_EQUAL((*mesh_part_test.find_attribute("SomeName",0))[1][0], DataType(-5));
+    // There should still be only 2 attributes in the mesh
+    TEST_CHECK_EQUAL(mesh_part_test.get_num_attributes(0),2);
+
+    // Add attribute of dimension 0 as attribute of dimension 1. This should throw an InternalError.
+    TEST_CHECK_THROWS(mesh_part_test.add_attribute(att_0_2,1), InternalError);
   }
 
 } mesh_part_test;

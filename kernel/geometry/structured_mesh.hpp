@@ -38,7 +38,7 @@ namespace FEAST
       typedef Shape::Hypercube<shape_dim_> ShapeType;
 
       /// vertex set type
-      typedef VertexSetFixed<num_coords_, stride_, Coord_> VertexSetType;
+      typedef VertexSet<num_coords_, stride_, Coord_> VertexSetType;
 
       /// index set holder type
       typedef StructIndexSetHolder<shape_dim_> IndexSetHolderType;

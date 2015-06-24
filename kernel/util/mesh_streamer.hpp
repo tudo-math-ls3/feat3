@@ -37,21 +37,21 @@ namespace FEAST
         typedef double ValueType;
         typedef std::vector<ValueType> ValueVec;
 
-        String name;
+        String identifier;
         int value_dim;
         Index value_count;
         std::vector<ValueVec> values;
 
         explicit AttributesContainer() :
-          name(""),
+          identifier(""),
           value_dim(0),
           value_count(0)
         {
           CONTEXT("AttributesContainer::AttributesContainer()");
         }
 
-        explicit AttributesContainer(String name_, int value_dim_, Index value_count_) :
-          name(name_),
+        explicit AttributesContainer(String identifier_, int value_dim_, Index value_count_) :
+          identifier(identifier_),
           value_dim(value_dim_),
           value_count(value_count_)
         {
