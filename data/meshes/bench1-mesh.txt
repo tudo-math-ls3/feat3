@@ -602,7 +602,7 @@
  <header>
   name bottom
   parent root
-  chart 1
+  chart outer
   type conformal
   shape edge
   attribute_sets 1
@@ -671,8 +671,8 @@
  </edge_idx>
  <attribute>
   <header>
-   dimension 1
-   name Parametrisation
+   dimension 0
+   name param
    value_dim 1
    value_count 17
   </header>
@@ -701,7 +701,7 @@
  <header>
   name right
   parent root
-  chart 1
+  chart outer
   type conformal
   shape edge
   attribute_sets 1
@@ -734,8 +734,8 @@
  </edge_idx>
  <attribute>
   <header>
-   dimension 1
-   name Parametrisation
+   dimension 0
+   name param
    value_dim 1
    value_count 5
   </header>
@@ -752,7 +752,7 @@
  <header>
   name top
   parent root
-  chart 1
+  chart outer
   type conformal
   shape edge
   attribute_sets 1
@@ -820,8 +820,8 @@
  </edge_idx>
  <attribute>
   <header>
-   dimension 1
-   name Parametrisation
+   dimension 0
+   name param
    value_dim 1
    value_count 17
   </header>
@@ -850,7 +850,7 @@
  <header>
   name left
   parent root
-  chart 1
+  chart outer
   type conformal
   shape edge
   attribute_sets 1
@@ -867,7 +867,6 @@
   1 2
   2 3
   3 4
-  4 5
  </vert@edge>
  <vert_idx>
   39
@@ -884,8 +883,8 @@
  </edge_idx>
  <attribute>
   <header>
-   dimension 1
-   name Parametrisation
+   dimension 0
+   name param
    value_dim 1
    value_count 5
   </header>
@@ -902,7 +901,7 @@
  <header>
   name circle
   parent root
-  chart 2
+  chart circle
   type conformal
   shape edge
   attribute_sets 1
@@ -959,8 +958,8 @@
  </edge_idx>
  <attribute>
   <header>
-   dimension 1
-   name Parametrisation
+   dimension 0
+   name param
    value_dim 1
    value_count 13
   </header>
