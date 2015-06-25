@@ -59,6 +59,10 @@ namespace FEAST
       typedef IT_ IndexType;
       /// Our memory architecture type
       typedef Mem_ MemType;
+      /// Compatible L-vector type
+      typedef DenseVector<Mem_, DT_, IT_> VectorTypeL;
+      /// Compatible R-vector type
+      typedef DenseVector<Mem_, DT_, IT_> VectorTypeR;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = class DenseMatrix<Mem2_, DT2_, IT2_>;
@@ -322,6 +326,19 @@ namespace FEAST
         this->_copy_content(x);
       }
 
+      /// Returns a new compatible L-Vector.
+      VectorTypeL create_vector_l() const
+      {
+        return VectorTypeL(this->rows());
+      }
+
+      /// Returns a new compatible R-Vector.
+      VectorTypeR create_vector_r() const
+      {
+        return VectorTypeR(this->columns());
+      }
+
+      /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index /*row*/) const
       {
         return this->columns();
