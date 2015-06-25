@@ -207,12 +207,10 @@ public:
     TEST_CHECK_EQUAL(root_mesh.convert_mesh_type(root_mesh.mesh_type) , "conformal");
     TEST_CHECK_EQUAL(root_mesh.convert_shape_type(root_mesh.shape_type) , "quad");
     TEST_CHECK_EQUAL(root_mesh.coord_per_vertex , Index(2));
-    TEST_CHECK_EQUAL(root_mesh.vertex_count , Index(4));
-    TEST_CHECK_EQUAL(root_mesh.edge_count , Index(4));
-    TEST_CHECK_EQUAL(root_mesh.tria_count , Index(0));
-    TEST_CHECK_EQUAL(root_mesh.quad_count , Index(1));
-    TEST_CHECK_EQUAL(root_mesh.tetra_count , Index(0));
-    TEST_CHECK_EQUAL(root_mesh.hexa_count, Index(0));
+    TEST_CHECK_EQUAL(root_mesh.num_entities[0] , Index(4));
+    TEST_CHECK_EQUAL(root_mesh.num_entities[1] , Index(4));
+    TEST_CHECK_EQUAL(root_mesh.num_entities[2] , Index(1));
+    TEST_CHECK_EQUAL(root_mesh.num_entities[3] , Index(0));
 
     TEST_CHECK_EQUAL(root_mesh.info, "test");
 
@@ -323,12 +321,10 @@ public:
 
     TEST_CHECK_EQUAL(cellset->name, "cellset_1");
     TEST_CHECK_EQUAL(cellset->parent, "root");
-    TEST_CHECK_EQUAL(cellset->vertex_count, Index(4));
-    TEST_CHECK_EQUAL(cellset->edge_count, Index(0));
-    TEST_CHECK_EQUAL(cellset->quad_count, Index(0));
-    TEST_CHECK_EQUAL(cellset->tria_count, Index(0));
-    TEST_CHECK_EQUAL(cellset->hexa_count, Index(0));
-    TEST_CHECK_EQUAL(cellset->tetra_count, Index(0));
+    TEST_CHECK_EQUAL(cellset->num_entities[0], Index(4));
+    TEST_CHECK_EQUAL(cellset->num_entities[1], Index(0));
+    TEST_CHECK_EQUAL(cellset->num_entities[2], Index(0));
+    TEST_CHECK_EQUAL(cellset->num_entities[3], Index(0));
     TEST_CHECK_EQUAL(cellset->info, "I am a cellset!");
 
     // check parent indices of the cellset
@@ -370,12 +366,10 @@ public:
     TEST_CHECK_EQUAL(sub_mesh.chart , "");
     TEST_CHECK_EQUAL(sub_mesh.convert_mesh_type(sub_mesh.mesh_type) , "conformal");
     TEST_CHECK_EQUAL(sub_mesh.convert_shape_type(sub_mesh.shape_type) , "edge");
-    TEST_CHECK_EQUAL(sub_mesh.vertex_count , Index(5));
-    TEST_CHECK_EQUAL(sub_mesh.edge_count , Index(4));
-    TEST_CHECK_EQUAL(sub_mesh.tria_count , Index(0));
-    TEST_CHECK_EQUAL(sub_mesh.quad_count , Index(0));
-    TEST_CHECK_EQUAL(sub_mesh.tetra_count , Index(0));
-    TEST_CHECK_EQUAL(sub_mesh.hexa_count, Index(0));
+    TEST_CHECK_EQUAL(sub_mesh.num_entities[0] , Index(5));
+    TEST_CHECK_EQUAL(sub_mesh.num_entities[1] , Index(4));
+    TEST_CHECK_EQUAL(sub_mesh.num_entities[2] , Index(0));
+    TEST_CHECK_EQUAL(sub_mesh.num_entities[3] , Index(0));
     TEST_CHECK_EQUAL(sub_mesh.attributes[0][0].value_dim, Index(1));
 
     TEST_CHECK_EQUAL(sub_mesh.info, "This is a submesh that...");
@@ -698,12 +692,10 @@ public:
     TEST_CHECK_EQUAL(root_mesh.convert_mesh_type(root_mesh.mesh_type) , "structured");
     TEST_CHECK_EQUAL(root_mesh.convert_shape_type(root_mesh.shape_type) , "quad");
     TEST_CHECK_EQUAL(root_mesh.coord_per_vertex , Index(2));
-    TEST_CHECK_EQUAL(root_mesh.vertex_count , Index(4));
-    TEST_CHECK_EQUAL(root_mesh.edge_count , Index(0));
-    TEST_CHECK_EQUAL(root_mesh.tria_count , Index(0));
-    TEST_CHECK_EQUAL(root_mesh.quad_count , Index(0));
-    TEST_CHECK_EQUAL(root_mesh.tetra_count , Index(0));
-    TEST_CHECK_EQUAL(root_mesh.hexa_count, Index(0));
+    TEST_CHECK_EQUAL(root_mesh.num_entities[0] , Index(4));
+    TEST_CHECK_EQUAL(root_mesh.num_entities[1] , Index(0));
+    TEST_CHECK_EQUAL(root_mesh.num_entities[2] , Index(0));
+    TEST_CHECK_EQUAL(root_mesh.num_entities[3] , Index(0));
 
     TEST_CHECK_EQUAL(root_mesh.slices.size(), Index(2));
     TEST_CHECK_EQUAL((root_mesh.slices).at(0), Index(1));

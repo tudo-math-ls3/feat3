@@ -66,25 +66,7 @@ namespace FEAST
       {
         // Parse preliminary num_entities from _mesh_data
         for(int d(0); d <= Shape_::dimension; ++d)
-          _num_entities[d] = parse_num_entities(d);
-      }
-
-      /// \brief Parses num_entities information from _mesh_data
-      virtual Index parse_num_entities(int dim)
-      {
-        switch(dim)
-        {
-          case 0:
-            return _mesh_data->vertex_count;
-          case 1:
-            return _mesh_data->edge_count;
-          case 2:
-            return _mesh_data->tria_count + _mesh_data->quad_count;
-          case 3:
-            return _mesh_data->tetra_count + _mesh_data->hexa_count;
-          default:
-            return 0;
-        }
+          _num_entities[d] = _mesh_data->num_entities[d];
       }
 
       virtual Index get_num_entities(int dim)
@@ -184,33 +166,13 @@ namespace FEAST
           _mesh_data = &sub_mesh_node->mesh_data;
           // Parse preliminary num_entities from _mesh_data
           for(int d(0); d <= Shape_::dimension; ++d)
-            _num_entities[d] = parse_num_entities(d);
+            _num_entities[d] = _mesh_data->num_entities[d];
 
           return;
         }
 
         // no child with 'name' found
         throw InternalError("No sub-mesh found with name '" + name + "'");
-      }
-
-      /// \brief Parses num_entities information from _mesh_data
-      virtual Index parse_num_entities(int dim)
-      {
-        {
-          switch(dim)
-          {
-            case 0:
-              return _mesh_data->vertex_count;
-            case 1:
-              return _mesh_data->edge_count;
-            case 2:
-              return _mesh_data->tria_count + _mesh_data->quad_count;
-            case 3:
-              return _mesh_data->tetra_count + _mesh_data->hexa_count;
-            default:
-              return 0;
-          }
-        }
       }
 
       virtual Index get_num_entities(int dim)

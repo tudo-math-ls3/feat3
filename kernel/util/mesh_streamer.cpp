@@ -49,17 +49,6 @@ namespace FEAST
     }
   }
 
-//  // returns the parent mesh specified by "parent_name"
-//  MeshStreamer::CellSetParent* MeshStreamer::_find_cell_set_parent(String parent_name)
-//  {
-//    CONTEXT("MeshStreamer::_find_cell_set_parent");
-//    if(parent_name == "root")
-//      return _root_mesh_node;
-//    if(_root_mesh_node != nullptr)
-//      return _root_mesh_node->find_cell_set_parent(parent_name);
-//    return nullptr;
-//  }
-
   // returns the sub mesh parent specified by "parent_name"
   MeshStreamer::MeshNode* MeshStreamer::_find_sub_mesh_parent(String parent_name)
   {
@@ -500,7 +489,6 @@ namespace FEAST
     return infoline;
   } // Index MeshStreamer::BaseContainer::_parse_info_section(Index cur_line, std::istream& ifs)
 
-
   // parses a counts subchunk
   Index MeshStreamer::BaseContainer::_parse_counts_chunk(Index cur_line, std::istream& ifs)
   {
@@ -511,12 +499,8 @@ namespace FEAST
     std::vector<String> line_vec;
 
     // default setting: zero
-    vertex_count = 0;
-    edge_count = 0;
-    quad_count = 0;
-    tria_count = 0;
-    tetra_count = 0;
-    hexa_count = 0;
+    for(int i(0); i < 4; ++i)
+      num_entities[i] = Index(0);
 
     if(!(slices.size() == 0))
     {
@@ -530,16 +514,16 @@ namespace FEAST
       }
       (line_vec.at(1)).parse(temp_holder);
       slices.at(0) = temp_holder;
-      vertex_count = temp_holder+1;
+      num_entities[0] = temp_holder+1;
       for(Index Iter(2);Iter < line_vec.size();++Iter)
       {
         (line_vec.at(Iter)).parse(temp_holder);
         slices.push_back(temp_holder);
-        vertex_count = vertex_count*(temp_holder + 1);
+        num_entities[0] = num_entities[0]*(temp_holder + 1);
       }
       if(!(slices.size() == coord_per_vertex))
       {
-        throw SyntaxError("Number of slices missmatches the dimension of the mesh in line " + stringify(cur_line));
+        throw SyntaxError("Number of slices does not match the dimension of the mesh in line " + stringify(cur_line));
       }
 
       line = read_next_line(ifs,cur_line);
@@ -565,7 +549,7 @@ namespace FEAST
           {
             throw SyntaxError("Missing vertex number in line " + stringify(cur_line));
           }
-          (line_vec.at(1)).parse(vertex_count);
+          (line_vec.at(1)).parse(num_entities[0]);
         }
 
         // edge number
@@ -575,54 +559,34 @@ namespace FEAST
           {
             throw SyntaxError("Missing edge number in line " + stringify(cur_line));
           }
-          (line_vec.at(1)).parse(edge_count);
+          (line_vec.at(1)).parse(num_entities[1]);
         }
 
-        // trias number
-        else if(line_vec[0] == "trias")
+        // trias / quads number
+        else if((line_vec[0] == "trias") || (line_vec[0] == "quads") )
         {
           if(!(line_vec.size() == 2))
           {
-            throw SyntaxError("Missing triangle number in line " + stringify(cur_line));
+            throw SyntaxError("Missing triangle or quad number in line " + stringify(cur_line));
           }
-          (line_vec.at(1)).parse(tria_count);
+          (line_vec.at(1)).parse(num_entities[2]);
         }
 
-        // quad number
-        else if(line_vec[0] == "quads")
+        // tetra /hexa number
+        else if((line_vec[0] == "tetras") || (line_vec[0] == "hexas") )
         {
           if(!(line_vec.size() == 2))
           {
-            throw SyntaxError("Missing quad number in line " + stringify(cur_line));
+            throw SyntaxError("Missing tetra / hexa number in line " + stringify(cur_line));
           }
-          (line_vec.at(1)).parse(quad_count);
+          (line_vec.at(1)).parse(num_entities[3]);
         }
 
-        // tetra number
-        else if(line_vec[0] == "tetras")
-        {
-          if(!(line_vec.size() == 2))
-          {
-            throw SyntaxError("Missing tetra number in line " + stringify(cur_line));
-          }
-          (line_vec.at(1)).parse(tetra_count);
-        }
-
-        // hexa number
-        else if(line_vec[0] == "hexas")
-        {
-          if(!(line_vec.size() == 2))
-          {
-            throw SyntaxError("Missing hexa number in line " + stringify(cur_line));
-          }
-          (line_vec.at(1)).parse(hexa_count);
-        }
         // if it is the end of the counts sub chunk
         else if(line == "</counts>")
         {
           break;
         }
-
         else
         {
           throw SyntaxError("Unknown file format in line " + stringify(cur_line));
@@ -646,7 +610,7 @@ namespace FEAST
     // get the dimension of the entity
     if(line == "<vert_idx>")
     {
-     dim = 0;
+      dim = 0;
     }
     else if (line == "<edge_idx>")
     {
@@ -748,6 +712,10 @@ namespace FEAST
         idx.push_back(current_value);
       }
     }
+
+    // Sanity check
+    if(idx.size() != num_entities[dim])
+      throw InternalError("Parsed number of parents of dimension "+stringify(dim)+" does not match num_entities!");
 
     // return number of lines read so far
     return cur_line;
@@ -855,8 +823,7 @@ namespace FEAST
       }
       shape_type = convert_shape_type(line_vec.at(1));
       if(mesh_type == mt_structured &&
-         (shape_type == st_tria || shape_type == st_tetra ||
-          shape_type == st_tria_quad || shape_type == st_tetra_hexa))
+          (shape_type == MeshDataContainer::st_tria || shape_type == MeshDataContainer::st_tetra))
       {
         throw SyntaxError("Unsupported shape_type for structured mesh, in line " + stringify(cur_line));
       }
@@ -1033,6 +1000,7 @@ namespace FEAST
     for(Index i(0); i < 4; ++i)
       real_num_attributes += Index((this->attributes[i]).size());
 
+    // Sanity check
     if(real_num_attributes != this->attribute_count)
       throw InternalError("Parsed " + stringify(real_num_attributes) + " attribute sets but " + stringify(this->attribute_count) + " were specified!");
 
@@ -1132,7 +1100,7 @@ namespace FEAST
       {
         throw SyntaxError("Missing number of vertices in coordfile in line " + stringify(cur_line));
       }
-      line_vec[1].parse(vertex_count);
+      line_vec[1].parse(num_entities[0]);
     }
     else
     {
@@ -1535,6 +1503,9 @@ namespace FEAST
         (coords).push_back(v);
       }
     }
+    // Sanity check
+    if(coords.size() != num_entities[0])
+      throw InternalError("Number of coordinates parsed does not match with num_entites[0]");
     // current number of lines
     return cur_line;
   } //MeshStreamer::MeshDataContainer::_parse_coords_chunk
@@ -1644,6 +1615,8 @@ namespace FEAST
         }
       }
     }
+    if(adjacencies[0][shape_dim].size() != num_entities[shape_dim])
+      throw InternalError("Number of adjacencies for dimension "+stringify(shape_dim)+" does not match num_entities!");
     // return number of lines read so far
     return cur_line;
   } // MeshStreamer::MeshDataContainer::_parse_adjacency_chunk
@@ -1686,37 +1659,29 @@ namespace FEAST
   // converts shapetype (ShapeType to String)
   String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType shape_type_in)
   {
-    if(shape_type_in == st_vert)
+    if(shape_type_in == MeshDataContainer::st_vert)
     {
       return "vertex";
     }
-    if(shape_type_in == st_edge)
+    if(shape_type_in == MeshDataContainer::st_edge)
     {
       return "edge";
     }
-    else if(shape_type_in == st_tria)
+    else if(shape_type_in == MeshDataContainer::st_tria)
     {
       return "tria";
     }
-    else if(shape_type_in == st_quad)
+    else if(shape_type_in == MeshDataContainer::st_quad)
     {
       return "quad";
     }
-    else if(shape_type_in == st_hexa)
+    else if(shape_type_in == MeshDataContainer::st_hexa)
     {
       return "hexa";
     }
-    else if(shape_type_in == st_tetra)
+    else if(shape_type_in == MeshDataContainer::st_tetra)
     {
       return "tetra";
-    }
-    else if(shape_type_in == st_tria_quad)
-    {
-      return "tria-quad";
-    }
-    else if(shape_type_in == st_tetra_hexa)
-    {
-      return "tetra-hexa";
     }
     else
     {
@@ -1751,14 +1716,6 @@ namespace FEAST
     {
       return st_tetra;
     }
-    else if(shape_type_in == "tria-quad")
-    {
-      return st_tria_quad;
-    }
-    else if(shape_type_in == "tetra-hexa")
-    {
-      return st_tetra_hexa;
-    }
     else
     {
       throw InternalError("Unknown shapetype: "+ shape_type_in);
@@ -1777,6 +1734,7 @@ namespace FEAST
 
     // header section
     ofs << " <header>" << std::endl;
+
     if (submesh)
     {
       ofs << "  name " << mesh_data.name << std::endl;
@@ -1784,9 +1742,10 @@ namespace FEAST
       if ( !mesh_data.chart.empty() )
         ofs << "  chart " << mesh_data.chart << std::endl;
     }
+
     ofs << "  type " << mesh_data.convert_mesh_type(mesh_data.mesh_type) << std::endl;
     ofs << "  shape " << mesh_data.convert_shape_type(mesh_data.shape_type) << std::endl;
-    if(mesh_data.coord_per_vertex!=0)
+    if(mesh_data.coord_per_vertex != 0)
       ofs << "  coords " << mesh_data.coord_per_vertex << std::endl;
     if( mesh_data.attribute_count > 0)
       ofs << "  attribute_sets " << mesh_data.attribute_count << std::endl;
@@ -1804,18 +1763,30 @@ namespace FEAST
     ofs << " <counts>" << std::endl;
     if(mesh_data.mesh_type == MeshDataContainer::mt_conformal)
     {
-    if( mesh_data.vertex_count != 0)
-      ofs << "  verts " << mesh_data.vertex_count << std::endl;
-    if( mesh_data.edge_count != 0)
-      ofs << "  edges " << mesh_data.edge_count << std::endl;
-    if( mesh_data.quad_count != 0)
-      ofs << "  quads " << mesh_data.quad_count << std::endl;
-    if( mesh_data.tria_count != 0)
-      ofs << "  trias " << mesh_data.tria_count << std::endl;
-    if( mesh_data.tetra_count != 0)
-      ofs << "  tetras " << mesh_data.tetra_count << std::endl;
-    if( mesh_data.hexa_count != 0)
-      ofs << "  hexas " << mesh_data.hexa_count << std::endl;
+      if( mesh_data.num_entities[0] != 0)
+        ofs << "  verts " << mesh_data.num_entities[0] << std::endl;
+      if( mesh_data.num_entities[1] != 0)
+        ofs << "  edges " << mesh_data.num_entities[1] << std::endl;
+
+      if( mesh_data.num_entities[2] != 0)
+      {
+        if(mesh_data.shape_type == MeshDataContainer::st_quad || mesh_data.shape_type == MeshDataContainer::st_hexa)
+          ofs << "  quads " << mesh_data.num_entities[2] << std::endl;
+        else if(mesh_data.shape_type == MeshDataContainer::st_tria || mesh_data.shape_type == MeshDataContainer::st_tetra)
+          ofs << "  trias " << mesh_data.num_entities[2] << std::endl;
+        else
+          throw InternalError("Mesh of type "+stringify(mesh_data.shape_type)+" has num_entities of dim 2!");
+      }
+
+      if( mesh_data.num_entities[3] != 0)
+      {
+        if(mesh_data.shape_type == MeshDataContainer::st_tetra)
+          ofs << "  tetras " << mesh_data.num_entities[3] << std::endl;
+        else if( mesh_data.shape_type == MeshDataContainer::st_hexa)
+          ofs << "  hexas " << mesh_data.num_entities[3] << std::endl;
+        else
+          throw InternalError("Mesh of type "+stringify(mesh_data.shape_type)+" has num_entities of dim 3!");
+      }
     }
     else if( mesh_data.mesh_type == MeshDataContainer::mt_structured)
     {
@@ -1832,7 +1803,7 @@ namespace FEAST
     if(mesh_data.coord_per_vertex > 0)
     {
       ofs << " <coords>" << std::endl;
-      for (Index i(0); i < mesh_data.vertex_count ; ++i)
+      for (Index i(0); i < mesh_data.num_entities[0]; ++i)
       {
         for (Index j(0); j < mesh_data.coord_per_vertex ; ++j)
         {
@@ -1918,60 +1889,68 @@ namespace FEAST
     if (submesh)
     {
       ofs << " <vert_idx>" << std::endl;
-      for (Index i(0); i < mesh_data.vertex_count ; ++i)
+      for (Index i(0); i < mesh_data.num_entities[0]; ++i)
       {
         ofs << "  " << (mesh_data.parent_indices[0])[i] << std::endl;
       }
       ofs << " </vert_idx>" << std::endl;
 
-      if ( !(mesh_data.edge_count == 0) )
+      if ( !(mesh_data.num_entities[1]== 0) )
       {
         ofs << " <edge_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.edge_count ; ++i)
+        for (Index i(0); i < mesh_data.num_entities[1] ; ++i)
         {
           ofs << "  " << (mesh_data.parent_indices[1])[i] << std::endl;
         }
         ofs << " </edge_idx>" << std::endl;
       }
 
-      if ( !(mesh_data.tria_count == 0) )
+      if ( !(mesh_data.num_entities[2] == 0) )
       {
-        ofs << " <tria_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.tria_count ; ++i)
+        if(mesh_data.shape_type == MeshDataContainer::st_tria|| mesh_data.shape_type == MeshDataContainer::st_tetra)
         {
-          ofs << "  " << (mesh_data.parent_indices[2])[i] << std::endl;
+          ofs << " <tria_idx>" << std::endl;
+          for (Index i(0); i < mesh_data.num_entities[2]; ++i)
+          {
+            ofs << "  " << (mesh_data.parent_indices[2])[i] << std::endl;
+          }
+          ofs << " </tria_idx>" << std::endl;
         }
-        ofs << " </tria_idx>" << std::endl;
+        else if(mesh_data.shape_type == MeshDataContainer::st_quad || mesh_data.shape_type == MeshDataContainer::st_hexa)
+        {
+          ofs << " <quad_idx>" << std::endl;
+          for (Index i(0); i < mesh_data.num_entities[2]; ++i)
+          {
+            ofs << "  " << (mesh_data.parent_indices[2])[i] << std::endl;
+          }
+          ofs << " </quad_idx>" << std::endl;
+        }
+        else
+          throw InternalError("Mesh of type "+stringify(mesh_data.shape_type)+" has num_entities of dim 2!");
       }
 
-      if ( !(mesh_data.quad_count == 0) )
+      if ( !(mesh_data.num_entities[3]== 0) )
       {
-        ofs << " <quad_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.quad_count ; ++i)
+        if(mesh_data.shape_type == MeshDataContainer::st_tetra)
         {
-          ofs << "  " << (mesh_data.parent_indices[2])[i] << std::endl;
+          ofs << " <tetra_idx>" << std::endl;
+          for (Index i(0); i < mesh_data.num_entities[3]; ++i)
+          {
+            ofs << "  " << (mesh_data.parent_indices[3])[i] << std::endl;
+          }
+          ofs << " </tetra_idx>" << std::endl;
         }
-        ofs << " </quad_idx>" << std::endl;
-      }
-
-      if ( !(mesh_data.tetra_count == 0) )
-      {
-        ofs << " <tetra_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.tetra_count ; ++i)
+        else if(mesh_data.shape_type == MeshDataContainer::st_hexa)
         {
-          ofs << "  " << (mesh_data.parent_indices[3])[i] << std::endl;
+          ofs << " <hexa_idx>" << std::endl;
+          for (Index i(0); i < mesh_data.num_entities[3]; ++i)
+          {
+            ofs << "  " << (mesh_data.parent_indices[3])[i] << std::endl;
+          }
+          ofs << " </hexa_idx>" << std::endl;
         }
-        ofs << " </tetra_idx>" << std::endl;
-      }
-
-      if ( !(mesh_data.hexa_count == 0) )
-      {
-        ofs << " <hexa_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.hexa_count ; ++i)
-        {
-          ofs << "  " << (mesh_data.parent_indices[3])[i] << std::endl;
-        }
-        ofs << " </hexa_idx>" << std::endl;
+        else
+          throw InternalError("Mesh of type "+stringify(mesh_data.shape_type)+" has num_entities of dim 3!");
       }
     }
 
@@ -2007,6 +1986,7 @@ namespace FEAST
           ofs << " </attribute>" << std::endl;
         }
       }
+      // Sanity check
       if(attributes_written != mesh_data.attribute_count)
         throw InternalError("MeshDataContainer is supposed to contain " + stringify(mesh_data.attribute_count) + " attributes but " + stringify(attributes_written) + " were written");
     }
@@ -2018,10 +1998,10 @@ namespace FEAST
       ofs<<"</mesh>"<<std::endl;
 
     // loop through all submeshes related to this mesh and drop the data as well
-     SubMeshMap::const_iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
-     for(; it != jt; ++it)
-       it->second->write(ofs, true);
+    SubMeshMap::const_iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
+    for(; it != jt; ++it)
+      it->second->write(ofs, true);
 
-   }// write_mesh_data
+  }// write_mesh_data
 
 } //namespace FEAST
