@@ -2,7 +2,7 @@
 <header>
  version 1
  chart_file unit-square-chart.txt
- meshparts 1
+ meshparts 4
 </header>
 <info>
  This is the unit-square mesh consisting of a single quadrilateral cell.
@@ -36,50 +36,155 @@
 </mesh>
 <meshpart>
  <header>
-  name 1
+  name bottom
   parent root
-  chart 1
+  chart outer
   type conformal
   shape edge
   attribute_sets 1
  </header>
  <info>
-  This meshpart defines the outer square boundary component.
+  This meshpart defines the bottom edge of the outer square boundary component.
  </info>
  <counts>
-  verts 5
-  edges 4
+  verts 2
+  edges 1
  </counts>
  <vert@edge>
   0 1
-  1 2
-  2 3
-  3 4
  </vert@edge>
  <vert_idx>
   0
   1
-  3
-  2
-  0
  </vert_idx>
  <edge_idx>
   0
-  3
-  1
-  2
  </edge_idx>
  <attribute>
   <header>
-   dimension 1
-   name Parametrisation
+   dimension 0
+   name param
    value_dim 1
-   value_count 5
+   value_count 2
   </header>
   <values>
    0
    1
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
+ <header>
+  name right
+  parent root
+  chart outer
+  type conformal
+  shape edge
+  attribute_sets 1
+ </header>
+ <info>
+  This meshpart defines the right edge of the outer square boundary component.
+ </info>
+ <counts>
+  verts 2
+  edges 1
+ </counts>
+ <vert@edge>
+  0 1
+ </vert@edge>
+ <vert_idx>
+  1
+  3
+ </vert_idx>
+ <edge_idx>
+  3
+ </edge_idx>
+ <attribute>
+  <header>
+   dimension 0
+   name param
+   value_dim 1
+   value_count 2
+  </header>
+  <values>
+   1
    2
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
+ <header>
+  name top
+  parent root
+  chart outer
+  type conformal
+  shape edge
+  attribute_sets 1
+ </header>
+ <info>
+  This meshpart defines the top edge of the outer square boundary component.
+ </info>
+ <counts>
+  verts 2
+  edges 1
+ </counts>
+ <vert@edge>
+  0 1
+ </vert@edge>
+ <vert_idx>
+  3
+  2
+ </vert_idx>
+ <edge_idx>
+  1
+ </edge_idx>
+ <attribute>
+  <header>
+   dimension 0
+   name param
+   value_dim 1
+   value_count 2
+  </header>
+  <values>
+   2
+   3
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
+ <header>
+  name left
+  parent root
+  chart outer
+  type conformal
+  shape edge
+  attribute_sets 1
+ </header>
+ <info>
+  This meshpart defines the left edge of the outer square boundary component.
+ </info>
+ <counts>
+  verts 2
+  edges 1
+ </counts>
+ <vert@edge>
+  0 1
+ </vert@edge>
+ <vert_idx>
+  2
+  0
+ </vert_idx>
+ <edge_idx>
+  2
+ </edge_idx>
+ <attribute>
+  <header>
+   dimension 0
+   name param
+   value_dim 1
+   value_count 2
+  </header>
+  <values>
    3
    4
   </values>

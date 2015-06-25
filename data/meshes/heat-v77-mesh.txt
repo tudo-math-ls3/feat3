@@ -2,7 +2,7 @@
 <header>
  version 1
  chart_file heat-v77-chart.txt
- meshparts 2
+ meshparts 5
 </header>
 <mesh>
  <header>
@@ -72,77 +72,173 @@
 </mesh>
 <meshpart>
  <header>
-  name 1
+  name bottom
   parent root
-  chart 1
+  chart outer
   type conformal
   shape edge
   attribute_sets 1
  </header>
  <counts>
-  verts 13
-  edges 12
+  verts 4
+  edges 3
  </counts>
  <vert@edge>
   0 1
   1 2
   2 3
-  3 4
-  4 5
-  5 6
-  6 7
-  7 8
-  8 9
-  9 10
-  10 11
-  11 12
  </vert@edge>
  <vert_idx>
   0
   13
   12
   1
-  11
-  10
-  2
-  9
-  8
-  3
-  15
-  14
-  0
  </vert_idx>
  <edge_idx>
   19
   18
   13
-  14
-  12
-  7
-  8
-  6
-  0
-  1
-  23
-  21
  </edge_idx>
  <attribute>
   <header>
-   dimension 1
-   name Parametrisation
+   dimension 0
+   name param
    value_dim 1
-   value_count 13
+   value_count 4
   </header>
   <values>
    0
    0.4
    0.6
    1
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
+ <header>
+  name right
+  parent root
+  chart outer
+  type conformal
+  shape edge
+  attribute_sets 1
+ </header>
+ <counts>
+  verts 4
+  edges 3
+ </counts>
+ <vert@edge>
+  0 1
+  1 2
+  2 3
+ </vert@edge>
+ <vert_idx>
+  1
+  11
+  10
+  2
+ </vert_idx>
+ <edge_idx>
+  14
+  12
+  7
+ </edge_idx>
+ <attribute>
+  <header>
+   dimension 0
+   name param
+   value_dim 1
+   value_count 4
+  </header>
+  <values>
+   1
    1.32
    1.48
    2
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
+ <header>
+  name top
+  parent root
+  chart outer
+  type conformal
+  shape edge
+  attribute_sets 1
+ </header>
+ <counts>
+  verts 4
+  edges 3
+ </counts>
+ <vert@edge>
+  0 1
+  1 2
+  2 3
+ </vert@edge>
+ <vert_idx>
+  2
+  9
+  8
+  3
+ </vert_idx>
+ <edge_idx>
+  8
+  6
+  0
+ </edge_idx>
+ <attribute>
+  <header>
+   dimension 0
+   name param
+   value_dim 1
+   value_count 4
+  </header>
+  <values>
+   2
    2.4
    2.6
+   3
+  </values>
+ </attribute>
+</meshpart>
+<meshpart>
+ <header>
+  name left
+  parent root
+  chart outer
+  type conformal
+  shape edge
+  attribute_sets 1
+ </header>
+ <counts>
+  verts 4
+  edges 3
+ </counts>
+ <vert@edge>
+  0 1
+  1 2
+  2 3
+ </vert@edge>
+ <vert_idx>
+  3
+  15
+  14
+  0
+ </vert_idx>
+ <edge_idx>
+  1
+  23
+  21
+ </edge_idx>
+ <attribute>
+  <header>
+   dimension 0
+   name param
+   value_dim 1
+   value_count 4
+  </header>
+  <values>
    3
    3.52
    3.68
@@ -152,9 +248,9 @@
 </meshpart>
 <meshpart>
  <header>
-  name 2
+  name circle
   parent root
-  chart 2
+  chart circle
   type conformal
   shape edge
   attribute_sets 1
@@ -184,8 +280,8 @@
  </edge_idx>
  <attribute>
   <header>
-   dimension 1
-   name Parametrisation
+   dimension 0
+   name param
    value_dim 1
    value_count 5
   </header>

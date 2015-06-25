@@ -5,7 +5,7 @@
 </header>
 <chart>
  <header>
-  name 1
+  name outer
   type polyline
   img_dim 2
  </header>
@@ -22,7 +22,7 @@
 </chart>
 <chart>
  <header>
-  name 2
+  name circle
   type circle
  </header>
  <circle>
