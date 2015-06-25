@@ -227,24 +227,7 @@ namespace FEAST
       virtual void fill_index_sets(IndexSetHolderType*& index_set_holder)
       {
         ASSERT(index_set_holder == nullptr, "fill_index_sets: index_set_holder != nullptr!");
-        // If _mesh_data contains adjacency information, fill index_set_holder
-        if(_mesh_data->adjacencies[0][Shape_::dimension].size() > 0)
-        {
-          index_set_holder = new IndexSetHolderType(_num_entities);
-          // call wrapper
-          Intern::MeshStreamerIndexer<Shape_>::wrap(*index_set_holder, _mesh_data->adjacencies);
-
-          // build redundant index sets
-          RedundantIndexSetBuilder<Shape_>::compute(*index_set_holder);
-
-          // Set entries in num_entities. This has to be called after using the RedundantIndexSetBuilder because
-          // the information from _mesh_data might not have been complete: If the mesh file did not contain edge/face
-          // data, the number of entities of the corresponding dimension was zero.
-          Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(*index_set_holder, _num_entities);
-
-          // Update _mesh_data with the new information
-          FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(_mesh_data, *index_set_holder);
-        }
+        Intern::MeshStreamerIndexer<Shape_>::build(index_set_holder, _mesh_data, _num_entities);
       }
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
@@ -277,7 +260,7 @@ namespace FEAST
           {
             const Index value_count(it.value_count);
             const int value_dim(it.value_dim);
-            const String my_name(it.name);
+            const String my_name(it.identifier);
 
             typename AttributeSetType_::value_type new_attribute(value_count, value_dim, 0, my_name);
 
@@ -294,7 +277,7 @@ namespace FEAST
 
             for(auto& jt:attributes)
             {
-              if(jt.get_name() == my_name)
+              if(jt.get_identifier() == my_name)
                 throw InternalError("Attribute set already contains an attribute set with name "+my_name);
             }
 
@@ -321,11 +304,11 @@ namespace FEAST
         typedef std::vector< std::vector<Index> > AdjStack;
         typedef AdjStack AdjStackMatrix[4][4];
         static constexpr int num_indices = Shape::FaceTraits<Shape_, 0>::count;
+        typedef typename Shape::FaceTraits<Shape_, Shape_::dimension - 1>::ShapeType FacetType;
         typedef IndexSet<num_indices> IdxSet;
 
         static void wrap(IndexSetHolder<Shape_>& idx, AdjStackMatrix& adj)
         {
-          typedef typename Shape::FaceTraits<Shape_, Shape_::dimension - 1>::ShapeType FacetType;
           MeshStreamerIndexer<FacetType>::wrap(idx, adj);
           apply(idx.template get_index_set<Shape_::dimension, 0>(), adj[0][Shape_::dimension]);
         }
@@ -345,6 +328,36 @@ namespace FEAST
             }
           }
         }
+
+        template<typename ISH_>
+        static void build(ISH_*& index_set_holder, MeshStreamer::MeshDataContainer* mesh_data, Index* num_entities)
+        {
+          if(index_set_holder != nullptr)
+            return;
+
+          // If _mesh_data contains adjacency information, fill index_set_holder
+          if(mesh_data->adjacencies[0][Shape_::dimension].size() > 0)
+          {
+            // allocate a new index set holder
+            index_set_holder = new ISH_(num_entities);
+
+            // call wrapper
+            wrap(*index_set_holder, mesh_data->adjacencies);
+
+            // build redundant index sets
+            RedundantIndexSetBuilder<Shape_>::compute(*index_set_holder);
+
+            // Set entries in num_entities. This has to be called after using the RedundantIndexSetBuilder because
+            // the information from _mesh_data might not have been complete: If the mesh file did not contain edge/face
+            // data, the number of entities of the corresponding dimension was zero.
+            Intern::NumEntitiesExtractor<Shape_::dimension>::set_num_entities(*index_set_holder, num_entities);
+
+            // Update _mesh_data with the new information
+            FEAST::Intern::MeshDataContainerUpdater<Shape_::dimension>::update_from_ish(mesh_data, *index_set_holder);
+          }
+          else
+            MeshStreamerIndexer<FacetType>::build(index_set_holder, mesh_data, num_entities);
+        }
       };
 
       template<>
@@ -352,6 +365,11 @@ namespace FEAST
       {
         template<typename T1_, typename T2_>
         static void wrap(T1_&, T2_&)
+        {
+          // dummy
+        }
+        template<typename ISH_>
+        static void build(ISH_*&, MeshStreamer::MeshDataContainer*, const Index*)
         {
           // dummy
         }
