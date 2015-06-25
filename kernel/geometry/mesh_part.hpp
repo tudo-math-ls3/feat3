@@ -590,11 +590,11 @@ namespace FEAST
             // Compute entity counts
             Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
 
-            // Fill target sets
-            factory.fill_target_sets(_target_set_holder);
-
             // Fill index sets
             factory.fill_index_sets(_index_set_holder);
+
+            // Fill target sets
+            factory.fill_target_sets(_target_set_holder);
 
             // Fill attribute sets
             factory.fill_attribute_sets(_attribute_holder);
