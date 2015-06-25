@@ -133,7 +133,7 @@ namespace FEAST
        * Dimension the number of attributes is to be computed for
        *
        */
-      virtual int get_num_attributes(int dim) const
+      int get_num_attributes(int dim) const
       {
         CONTEXT(name() + "::get_num_attributes()");
         ASSERT(dim >= 0, "dim has to be > 0");
@@ -168,7 +168,7 @@ namespace FEAST
        * \warning Checks whether attribute has the same number of entries as the corresponding mesh has entities of
        * dimension dim have to be performed by the caller!
        */
-      virtual bool add_attribute(const AttributeType& attribute_, int dim, bool replace = false)
+      bool add_attribute(const AttributeType& attribute_, int dim, bool replace = false)
       {
         ASSERT(dim >= 0, "dim has to be >= 0");
         ASSERT(dim <= shape_dim, "dim has to be <= shape_dim");
@@ -196,7 +196,6 @@ namespace FEAST
         else
           // Otherwise recurse down
           return BaseClass::add_attribute(attribute_, dim, replace);
-
       }
 
       /**
@@ -213,7 +212,7 @@ namespace FEAST
        * \warning Will return nullptr if no Attribute with the given identifier is found
        *
        */
-      virtual AttributeType* find_attribute(String identifier, int dim)
+      AttributeType* find_attribute(String identifier, int dim)
       {
         ASSERT(dim >= 0, "dim has to be >= 0");
         ASSERT(dim <= shape_dim, "dim has to be <= shape_dim");
@@ -231,7 +230,27 @@ namespace FEAST
         else
           // Otherwise recurse down
           return BaseClass::find_attribute(identifier, dim);
+      }
 
+      /** \copydoc find_attribute() */
+      const AttributeType* find_attribute(String identifier, int dim) const
+      {
+        ASSERT(dim >= 0, "dim has to be >= 0");
+        ASSERT(dim <= shape_dim, "dim has to be <= shape_dim");
+
+        // If the requested dimension is mine...
+        if(dim == shape_dim)
+        {
+          for(auto it(_mesh_attributes.begin()); it != _mesh_attributes.end(); ++it)
+          {
+            if((it->get_identifier() == identifier))
+              return &(*it);
+          }
+          return nullptr;
+        }
+        else
+          // Otherwise recurse down
+          return BaseClass::find_attribute(identifier, dim);
       }
     }; // class MeshAttributeHolder<Shape_, DataType_>
 
@@ -267,7 +286,7 @@ namespace FEAST
         CONTEXT(name() + "::~MeshAttributeHolder()");
       }
 
-      virtual AttributeType* find_attribute(String identifier, int dim)
+      AttributeType* find_attribute(String identifier, int dim)
       {
 #if defined DEBUG
         ASSERT(dim == 0, "dim has to be = 0");
@@ -281,8 +300,24 @@ namespace FEAST
             return &(*it);
         }
         return nullptr;
-
       }
+
+      const AttributeType* find_attribute(String identifier, int dim) const
+      {
+#if defined DEBUG
+        ASSERT(dim == 0, "dim has to be = 0");
+#else
+        (void)dim;
+#endif
+
+        for(auto it(_mesh_attributes.begin()); it != _mesh_attributes.end(); ++it)
+        {
+          if((it->get_identifier() == identifier))
+            return &(*it);
+        }
+        return nullptr;
+      }
+
       template<int dim_>
       AttributeSetType& get_mesh_attributes()
       {
@@ -299,7 +334,7 @@ namespace FEAST
         return _mesh_attributes;
       }
 
-      virtual int get_num_attributes(int dim) const
+      int get_num_attributes(int dim) const
       {
         CONTEXT(name() + "::get_num_attributes()");
 #if defined DEBUG
@@ -310,7 +345,7 @@ namespace FEAST
         return int(_mesh_attributes.size());
       }
 
-      virtual bool add_attribute(const MeshAttribute<DataType_>& attribute_, int dim, bool replace = false)
+      bool add_attribute(const MeshAttribute<DataType_>& attribute_, int dim, bool replace = false)
       {
 #if defined DEBUG
         ASSERT(dim == 0, "Only attributes of shape dim 0 can be added to MeshParts of shape dim 0");
@@ -633,6 +668,12 @@ namespace FEAST
          *
          */
         AttributeType* find_attribute(String identifier, int dim)
+        {
+          return _attribute_holder.find_attribute(identifier, dim);
+        }
+
+        /** \copydoc find_attribute() */
+        const AttributeType* find_attribute(String identifier, int dim) const
         {
           return _attribute_holder.find_attribute(identifier, dim);
         }
