@@ -610,6 +610,8 @@ public:
       a.apply(r, x);
       DT_ ref_norm = r.norm2();
 
+      auto a_backup = a.clone(CloneMode::Deep);
+
       SparseMatrixCSR<Mem::Main, DT_, IT_> a_main;
       a_main.convert(a);
       Adjacency::Graph graph(Adjacency::rt_as_is, a_main);
@@ -623,6 +625,11 @@ public:
       DT_ norm = r.norm2();
       TEST_CHECK_EQUAL_WITHIN_EPS(norm, ref_norm, 1e-3);
 
+      a = a_backup.clone(CloneMode::Deep);
+      auto perm_inv = perm.inverse();
+      a.permute(perm_inv, perm);
+      a.permute(perm, perm_inv);
+      TEST_CHECK_EQUAL(a, a_backup);
     }
   }
 };
