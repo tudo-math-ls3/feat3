@@ -1659,6 +1659,9 @@ namespace FEAST
       /// Permutate matrix rows and columns according to the given Permutations
       void permute(Adjacency::Permutation & perm_row, Adjacency::Permutation & perm_col)
       {
+        ASSERT(perm_row.size() == this->rows(), "Error: Container rows " + stringify(this->rows()) + " does not match permutation size " + stringify(perm_row.size()) + " !");
+        ASSERT(perm_col.size() == this->rows(), "Error: Container columns " + stringify(this->columns()) + " does not match permutation size " + stringify(perm_col.size()) + " !");
+
         // http://de.mathworks.com/help/matlab/math/sparse-matrix-operations.html#f6-13070
         SparseMatrixCSR<Mem::Main, DT_, IT_> local;
         local.convert(*this);

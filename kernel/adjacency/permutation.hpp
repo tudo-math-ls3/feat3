@@ -168,11 +168,13 @@ namespace FEAST
        *
        * This operator applies the permutation in-situ.
        *
-       * \param[in] x
+       * \param[in,out] x
        * The array that is to be permuted.
        *
        * \param[in] invert
        * Specifies whether to apply the forward (\p false) or inverse (\p true) permutation.
+       *
+       * \warning The operator does not check, whether the referenced array x is large enough!
        */
       template<typename Tx_>
       void operator()(Tx_* x, bool invert = false) const
@@ -224,6 +226,8 @@ namespace FEAST
        *
        * \param[in] invert
        * Specifies whether to apply the forward (\p false) or inverse (\p true) permutation.
+       *
+       * \warning The operator does not check, whether the referenced arrays x and y are large enough!
        */
       template<typename Ty_, typename Tx_>
       void operator()(Ty_* y, const Tx_* x, bool invert = false) const

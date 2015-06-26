@@ -1102,6 +1102,8 @@ namespace FEAST
       /// Permutate vector according to the given Permutation
       void permute(Adjacency::Permutation & perm)
       {
+        ASSERT(perm.size() == this->size(), "Error: Container size " + stringify(this->size()) + " does not match permutation size " + stringify(perm.size()) + " !");
+
         DenseVector<Mem::Main, DT_, IT_> local;
         local.convert(*this);
         perm(local.elements());
