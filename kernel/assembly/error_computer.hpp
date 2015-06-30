@@ -348,7 +348,7 @@ namespace FEAST
             }
 
             // update result
-            result += trafo_data.jac_det * cubature_rule.get_weight(k) * dot(value, value);
+            result += trafo_data.jac_det * cubature_rule.get_weight(k) * Tiny::dot(value, value);
 
             // continue with next cubature point
           }
