@@ -75,9 +75,9 @@ namespace FEAST
 #endif
 
       /// number of row blocks (vertical size)
-      static constexpr Index num_row_blocks = RestClass::num_row_blocks + Index(1);
+      static constexpr int num_row_blocks = RestClass::num_row_blocks + 1;
       /// number of column blocks (horizontal size)
-      static constexpr Index num_col_blocks = RestClass::num_col_blocks + Index(1);
+      static constexpr int num_col_blocks = RestClass::num_col_blocks + 1;
 
     protected:
       /// the first sub-matrix
@@ -298,7 +298,7 @@ namespace FEAST
        * \returns
        * A (const) reference to the sub-matrix at position <em>(i_,j_)</em>.
        */
-      template<Index i_, Index j_>
+      template<int i_, int j_>
       typename TupleElement<i_, First_, Rest_...>::Type& at()
       {
         static_assert(i_ == j_, "invalid sub-matrix index");
@@ -306,7 +306,7 @@ namespace FEAST
       }
 
       /** \copydoc at() */
-      template<Index i_, Index j_>
+      template<int i_, int j_>
       const typename TupleElement<i_, First_, Rest_...>::Type& at() const
       {
         static_assert(i_ == j_, "invalid sub-matrix index");
@@ -334,14 +334,14 @@ namespace FEAST
         return _rest;
       }
 
-      Index row_blocks() const
+      int row_blocks() const
       {
-        return Index(num_row_blocks);
+        return num_row_blocks;
       }
 
-      Index col_blocks() const
+      int col_blocks() const
       {
-        return Index(num_col_blocks);
+        return num_col_blocks;
       }
       /// \endcond
 
@@ -595,8 +595,8 @@ namespace FEAST
       using ContainerType = class TupleDiagMatrix<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
 #endif
 
-      static constexpr Index num_row_blocks = 1;
-      static constexpr Index num_col_blocks = 1;
+      static constexpr int num_row_blocks = 1;
+      static constexpr int num_col_blocks = 1;
 
     protected:
       First_ _first;
@@ -735,7 +735,7 @@ namespace FEAST
         return TupleDiagMatrix(_first.transpose());
       }
 
-      template<Index i, Index j>
+      template<int i, int j>
       typename TupleElement<i, First_>::Type& at()
       {
         static_assert(i == 0, "invalid sub-matrix index");
@@ -743,7 +743,7 @@ namespace FEAST
         return _first;
       }
 
-      template<Index i, Index j>
+      template<int i, int j>
       const typename TupleElement<i, First_>::Type& at() const
       {
         static_assert(i == 0, "invalid sub-matrix index");
@@ -761,14 +761,14 @@ namespace FEAST
         return _first;
       }
 
-      Index row_blocks() const
+      int row_blocks() const
       {
-        return Index(1);
+        return 1;
       }
 
-      Index col_blocks() const
+      int col_blocks() const
       {
-        return Index(1);
+        return 1;
       }
 
       Index rows() const

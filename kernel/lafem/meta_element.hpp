@@ -17,11 +17,13 @@ namespace FEAST
      * \author Peter Zajac
      */
     template<
-      Index i_,
+      int i_,
       typename First_,
       typename... Rest_>
     struct TupleElement
     {
+      static_assert(i_ > 0, "invalid index");
+
       typedef typename TupleElement<i_-1, Rest_...>::Type Type;
 
       template<typename Meta_>
@@ -39,7 +41,7 @@ namespace FEAST
 
     /// \cond internal
     template<typename First_, typename... Rest_>
-    struct TupleElement<Index(0), First_, Rest_...>
+    struct TupleElement<0, First_, Rest_...>
     {
       typedef First_ Type;
 
@@ -65,9 +67,11 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<Index i_, typename SubType_>
+    template<int i_, typename SubType_>
     struct PowerElement
     {
+      static_assert(i_ > 0, "invalid index");
+
       template<typename Meta_>
       static SubType_& get(Meta_& meta)
       {
@@ -83,7 +87,7 @@ namespace FEAST
 
     /// \cond internal
     template<typename SubType_>
-    struct PowerElement<Index(0), SubType_>
+    struct PowerElement<0, SubType_>
     {
       template<typename Meta_>
       static SubType_& get(Meta_& meta)

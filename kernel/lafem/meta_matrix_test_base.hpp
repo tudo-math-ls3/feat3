@@ -60,13 +60,13 @@ namespace FEAST
      * The matrix, which is generated, has the following structure:
      *
      * \verbatim
-     S = / A  B \
-     \ D  0 /
+       S = / A  B \
+           \ D  0 /
 
-     A = / A1  0 \  B = / B1 \
-     \ 0  A2 /      \ B2 /
+       A = / A1  0 \  B = / B1 \
+           \ 0  A2 /      \ B2 /
 
-     D = ( D1 D2 )
+       D = ( D1 D2 )
      \endverbatim
      * where:
      *  - A1, A2 are of type SparseMatrixCSR
@@ -147,17 +147,17 @@ namespace FEAST
         const DenseVector<Mem::Main, DataType_, IndexType_> vec_bubble(ps_fd.vector_q2_bubble());
 
         // set system matrix
-        mat_sys.template at<Index(0),Index(0)>().template at<Index(0),Index(0)>().convert(mat_fe);
-        mat_sys.template at<Index(0),Index(0)>().template at<Index(1),Index(1)>().convert(mat_fe);
-        mat_sys.template at<Index(0),Index(1)>().template at<Index(0),Index(0)>().convert(mat_fd);
-        mat_sys.template at<Index(0),Index(1)>().template at<Index(1),Index(0)>().convert(mat_fd);
-        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(0)>().convert(mat_fd);
-        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(1)>().convert(mat_fd);
+        mat_sys.template at<0,0>().template at<0,0>().convert(mat_fe);
+        mat_sys.template at<0,0>().template at<1,1>().convert(mat_fe);
+        mat_sys.template at<0,1>().template at<0,0>().convert(mat_fd);
+        mat_sys.template at<0,1>().template at<1,0>().convert(mat_fd);
+        mat_sys.template at<1,0>().template at<0,0>().convert(mat_fd);
+        mat_sys.template at<1,0>().template at<0,1>().convert(mat_fd);
 
         // set solution vector
-        vec_sol.template at<Index(0)>().template at<Index(0)>().convert(vec_bubble); // u1
-        vec_sol.template at<Index(0)>().template at<Index(1)>().convert(vec_eigen); // u2
-        vec_sol.template at<Index(1)>().convert(vec_eigen); // p
+        vec_sol.template at<0>().template at<0>().convert(vec_bubble); // u1
+        vec_sol.template at<0>().template at<1>().convert(vec_eigen); // u2
+        vec_sol.template at<1>().convert(vec_eigen); // p
 
         // create vectors for rhs computation
         DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs1(vec_bubble.size());
@@ -172,9 +172,9 @@ namespace FEAST
         vec_rhs3.axpy(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
 
         // set rhs vector
-        vec_rhs.template at<Index(0)>().template at<Index(0)>().convert(vec_rhs1);
-        vec_rhs.template at<Index(0)>().template at<Index(1)>().convert(vec_rhs2);
-        vec_rhs.template at<Index(1)>().convert(vec_rhs3);
+        vec_rhs.template at<0>().template at<0>().convert(vec_rhs1);
+        vec_rhs.template at<0>().template at<1>().convert(vec_rhs2);
+        vec_rhs.template at<1>().convert(vec_rhs3);
       }
 
       /// generate test matrix with full velocity blocks
@@ -193,19 +193,19 @@ namespace FEAST
         const DenseVector<Mem::Main, DataType_, IndexType_> vec_bubble(ps_fd.vector_q2_bubble());
 
         // set system matrix
-        mat_sys.template at<Index(0),Index(0)>().template at<Index(0),Index(0)>().convert(mat_fe);
-        mat_sys.template at<Index(0),Index(0)>().template at<Index(1),Index(1)>().convert(mat_fe);
-        mat_sys.template at<Index(0),Index(0)>().template at<Index(0),Index(1)>().convert(mat_fd);
-        mat_sys.template at<Index(0),Index(0)>().template at<Index(1),Index(0)>().convert(mat_fd);
-        mat_sys.template at<Index(0),Index(1)>().template at<Index(0),Index(0)>().convert(mat_fd);
-        mat_sys.template at<Index(0),Index(1)>().template at<Index(1),Index(0)>().convert(mat_fd);
-        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(0)>().convert(mat_fd);
-        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(1)>().convert(mat_fd);
+        mat_sys.template at<0,0>().template at<0,0>().convert(mat_fe);
+        mat_sys.template at<0,0>().template at<1,1>().convert(mat_fe);
+        mat_sys.template at<0,0>().template at<0,1>().convert(mat_fd);
+        mat_sys.template at<0,0>().template at<1,0>().convert(mat_fd);
+        mat_sys.template at<0,1>().template at<0,0>().convert(mat_fd);
+        mat_sys.template at<0,1>().template at<1,0>().convert(mat_fd);
+        mat_sys.template at<1,0>().template at<0,0>().convert(mat_fd);
+        mat_sys.template at<1,0>().template at<0,1>().convert(mat_fd);
 
         // set solution vector
-        vec_sol.template at<Index(0)>().template at<Index(0)>().convert(vec_bubble); // u1
-        vec_sol.template at<Index(0)>().template at<Index(1)>().convert(vec_eigen); // u2
-        vec_sol.template at<Index(1)>().convert(vec_eigen); // p
+        vec_sol.template at<0>().template at<0>().convert(vec_bubble); // u1
+        vec_sol.template at<0>().template at<1>().convert(vec_eigen); // u2
+        vec_sol.template at<1>().convert(vec_eigen); // p
 
         // create vectors for rhs computation
         DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs1(vec_bubble.size());
@@ -221,9 +221,9 @@ namespace FEAST
         vec_rhs3.axpy(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
 
         // set rhs vector
-        vec_rhs.template at<Index(0)>().template at<Index(0)>().convert(vec_rhs1);
-        vec_rhs.template at<Index(0)>().template at<Index(1)>().convert(vec_rhs2);
-        vec_rhs.template at<Index(1)>().convert(vec_rhs3);
+        vec_rhs.template at<0>().template at<0>().convert(vec_rhs1);
+        vec_rhs.template at<0>().template at<1>().convert(vec_rhs2);
+        vec_rhs.template at<1>().convert(vec_rhs3);
       }
     }; // MetaVectorTestBase
   } // namespace LAFEM

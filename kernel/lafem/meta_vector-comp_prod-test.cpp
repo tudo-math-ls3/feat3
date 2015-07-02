@@ -46,33 +46,33 @@ public:
     // purpose: general test
     z.component_product(x, y);
     for(Index i(0); i < n00; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i) * fy00(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<0>()(i), fx00(i) * fy00(i), tol);
     for(Index i(0); i < n01; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), fx01(i) * fy01(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<1>()(i), fx01(i) * fy01(i), tol);
     for(Index i(0); i < n1; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), fx1(i) * fy1(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<1>()(i), fx1(i) * fy1(i), tol);
 
     // test: z <- x; z <- z * y
     // purpose: z = x
     z.copy(x);
     z.component_product(z, y);
     for(Index i(0); i < n00; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i) * fy00(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<0>()(i), fx00(i) * fy00(i), tol);
     for(Index i(0); i < n01; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), fx01(i) * fy01(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<1>()(i), fx01(i) * fy01(i), tol);
     for(Index i(0); i < n1; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), fx1(i) * fy1(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<1>()(i), fx1(i) * fy1(i), tol);
 
     // test: z <- y; z <- x * z
     // purpose: z = y
     z.copy(y);
     z.component_product(x, z);
     for(Index i(0); i < n00; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i) * fy00(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<0>()(i), fx00(i) * fy00(i), tol);
     for(Index i(0); i < n01; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), fx01(i) * fy01(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<1>()(i), fx01(i) * fy01(i), tol);
     for(Index i(0); i < n1; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), fx1(i) * fy1(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<1>()(i), fx1(i) * fy1(i), tol);
   }
 };
 

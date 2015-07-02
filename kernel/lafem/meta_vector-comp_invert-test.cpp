@@ -43,11 +43,11 @@ public:
     z.component_invert(y);
 
     for(Index i(0); i < n00; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), DataType(1) / fy00(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<0>()(i), DataType(1) / fy00(i), tol);
     for(Index i(0); i < n01; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), DataType(1) / fy01(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<1>()(i), DataType(1) / fy01(i), tol);
     for(Index i(0); i < n1; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), DataType(1) / fy1(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<1>()(i), DataType(1) / fy1(i), tol);
   }
 };
 

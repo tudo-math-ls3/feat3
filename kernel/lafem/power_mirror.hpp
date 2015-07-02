@@ -13,7 +13,7 @@ namespace FEAST
     namespace Intern
     {
       // PowerMirror helper class: this implements the actual recursion for the gather/scatter methods
-      template<Index i_>
+      template<int i_>
       struct PowerMirrorHelper
       {
         template<typename SM_, typename BV_, typename PV_>
@@ -66,7 +66,7 @@ namespace FEAST
         }
       };
       template<>
-      struct PowerMirrorHelper<Index(1)>
+      struct PowerMirrorHelper<1>
       {
         template<typename SM_, typename BV_, typename PV_>
         static void gather_prim(const SM_& sm, BV_& bv, const PV_& pv, const Index bo)
@@ -131,10 +131,13 @@ namespace FEAST
      */
     template<
       typename SubMirror_,
-      Index count_>
+      int count_>
     class PowerMirror
     {
     public:
+      // Note: the case = 1 is specialised below
+      static_assert(count_ > 1, "invalid block size");
+
       /// sub-mirror type
       typedef SubMirror_ SubMirrorType;
       /// sub-mirror mem-type
@@ -145,7 +148,7 @@ namespace FEAST
       typedef typename SubMirrorType::IndexType IndexType;
 
       /// total number of sub-mirror blocks
-      static constexpr Index num_blocks = count_;
+      static constexpr int num_blocks = count_;
 
     protected:
       /// the one and only sub-mirror object
@@ -207,17 +210,17 @@ namespace FEAST
         return count_ * _sub_mirror.size();
       }
 
-      template<Index i_>
+      template<int i_>
       SubMirrorType& at()
       {
-        static_assert(i_ < count_, "invalid sub-mirror index");
+        static_assert((0 <= i_) && (i_ < count_), "invalid sub-mirror index");
         return _sub_mirror;
       }
 
-      template<Index i_>
+      template<int i_>
       const SubMirrorType& at() const
       {
-        static_assert(i_ < count_, "invalid sub-mirror index");
+        static_assert((0 <= i_) && (i_ < count_), "invalid sub-mirror index");
         return _sub_mirror;
       }
 

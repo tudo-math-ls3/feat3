@@ -34,10 +34,12 @@ namespace FEAST
      */
     template<
       typename SubType_,
-      Index width_,
-      Index height_>
+      int width_,
+      int height_>
     class PowerFullMatrix
     {
+      static_assert((width_ > 0) && (height_ > 0), "invalid matrix dimensions");
+
       /// container-class typedef
       typedef  PowerColMatrix<PowerRowMatrix<SubType_, width_>, height_> ContClass;
 
@@ -62,9 +64,9 @@ namespace FEAST
         typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, width_, height_>;
 
       /// number of row blocks (vertical size)
-      static constexpr Index num_row_blocks = height_;
+      static constexpr int num_row_blocks = height_;
       /// number of column blocks (horizontal size)
-      static constexpr Index num_col_blocks = width_;
+      static constexpr int num_col_blocks = width_;
 
     protected:
       // the container
@@ -194,32 +196,32 @@ namespace FEAST
        * \returns
        * A (const) reference to the sub-matrix at position <em>(i_,j_)</em>.
        */
-      template<Index i_, Index j_>
+      template<int i_, int j_>
       SubMatrixType& at()
       {
-        static_assert(i_ < height_, "invalid sub-matrix index");
-        static_assert(j_ < width_, "invalid sub-matrix index");
-        return _container.template at<i_, Index(0)>().template at<Index(0),j_>();
+        static_assert((0 <= i_) && (i_ < height_), "invalid sub-matrix index");
+        static_assert((0 <= j_) && (j_ < width_), "invalid sub-matrix index");
+        return _container.template at<i_, 0>().template at<0, j_>();
       }
 
       /** \copydoc at() */
-      template<Index i_, Index j_>
+      template<int i_, int j_>
       const SubMatrixType& at() const
       {
-        static_assert(i_ < height_, "invalid sub-matrix index");
-        static_assert(j_ < width_, "invalid sub-matrix index");
-        return _container.template at<i_, Index(0)>().template at<Index(0),j_>();
+        static_assert((0 <= i_) && (i_ < height_), "invalid sub-matrix index");
+        static_assert((0 <= j_) && (j_ < width_), "invalid sub-matrix index");
+        return _container.template at<i_, 0>().template at<0, j_>();
       }
 
       /// \cond internal
-      Index row_blocks() const
+      int row_blocks() const
       {
-        return Index(num_row_blocks);
+        return num_row_blocks;
       }
 
-      Index col_blocks() const
+      int col_blocks() const
       {
-        return Index(num_col_blocks);
+        return num_col_blocks;
       }
 
       Index get_length_of_line(const Index row) const

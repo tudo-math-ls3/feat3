@@ -42,41 +42,41 @@ public:
     // purpose: general test
     z.scale(x, DataType(0.7));
     for(Index i(0); i < n00; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), DataType(0.7)*fx00(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<0>()(i), DataType(0.7)*fx00(i), tol);
     for(Index i(0); i < n01; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), DataType(0.7)*fx01(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<1>()(i), DataType(0.7)*fx01(i), tol);
     for(Index i(0); i < n1; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), DataType(0.7)*fx1(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<1>()(i), DataType(0.7)*fx1(i), tol);
 
     // test: z <- x
     // purpose: alpha = 1
     z.scale(x, DataType(1));
     for(Index i(0); i < n00; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<0>()(i), fx00(i), tol);
     for(Index i(0); i < n01; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), fx01(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<1>()(i), fx01(i), tol);
     for(Index i(0); i < n1; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), fx1(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<1>()(i), fx1(i), tol);
 
     // test: z <- -x
     // purpose: alpha = -1
     z.scale(x, -DataType(1));
     for(Index i(0); i < n00; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), -fx00(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<0>()(i), -fx00(i), tol);
     for(Index i(0); i < n01; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), -fx01(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<1>()(i), -fx01(i), tol);
     for(Index i(0); i < n1; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), -fx1(i), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<1>()(i), -fx1(i), tol);
 
     // test: z <- 0*x
     // purpose: alpha = 0
     z.scale(x, -DataType(0));
     for(Index i(0); i < n00; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), DataType(0), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<0>()(i), DataType(0), tol);
     for(Index i(0); i < n01; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(1)>()(i), DataType(0), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<0>().template at<1>()(i), DataType(0), tol);
     for(Index i(0); i < n1; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(1)>()(i), DataType(0), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<1>()(i), DataType(0), tol);
   }
 };
 

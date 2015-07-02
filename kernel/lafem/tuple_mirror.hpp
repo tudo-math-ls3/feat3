@@ -33,7 +33,7 @@ namespace FEAST
 
     public:
       /// number of mirror blocks
-      static constexpr Index num_blocks = RestClass::num_blocks + 1;
+      static constexpr int num_blocks = RestClass::num_blocks + 1;
 
       /// sub-mirror mem-type
       typedef typename First_::MemType MemType;
@@ -142,13 +142,13 @@ namespace FEAST
         return _first.size() + _rest.size();
       }
 
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_, Rest_...>::Type& at()
       {
         return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_, Rest_...>::Type const& at() const
       {
         return TupleElement<i_, First_, Rest_...>::get(*this);
@@ -256,7 +256,7 @@ namespace FEAST
 
     public:
       /// number of mirror blocks
-      static constexpr Index num_blocks = 1;
+      static constexpr int num_blocks = 1;
 
       typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
@@ -325,14 +325,14 @@ namespace FEAST
         return _first.size();
       }
 
-      template<Index i_>
+      template<int i_>
       First_& at()
       {
         static_assert(i_ == 0, "invalid sub-mirror index");
         return _first;
       }
 
-      template<Index i_>
+      template<int i_>
       const First_& at() const
       {
         static_assert(i_ == 0, "invalid sub-mirror index");

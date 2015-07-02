@@ -30,11 +30,14 @@ namespace FEAST
      */
     template<
       typename SubType_,
-      Index count_>
+      int count_>
     class PowerVector
     {
+      // Note: the case = 1 is specialised below
+      static_assert(count_ > 1, "invalid block size");
+
       // declare this class template as a friend for recursive inheritance
-      template<typename, Index>
+      template<typename, int>
       friend class PowerVector;
 
       /// base-class typedef
@@ -54,7 +57,7 @@ namespace FEAST
       using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, count_>;
 
       /// number of vector blocks
-      static constexpr Index num_blocks = count_;
+      static constexpr int num_blocks = count_;
 
     protected:
       /// the first sub-vector
@@ -186,18 +189,18 @@ namespace FEAST
        * \returns
        * A (const) reference to the sub-vector at position \p i_.
        */
-      template<Index i_>
+      template<int i_>
       SubVectorType& at()
       {
-        static_assert(i_ < count_, "invalid sub-vector index");
+        static_assert((0 <= i_) && (i_ < count_), "invalid sub-vector index");
         return PowerElement<i_, SubVectorType>::get(*this);
       }
 
       /** \copydoc at() */
-      template<Index i_>
+      template<int i_>
       const SubVectorType& at() const
       {
-        static_assert(i_ < count_, "invalid sub-vector index");
+        static_assert((0 <= i_) && (i_ < count_), "invalid sub-vector index");
         return PowerElement<i_, SubVectorType>::get(*this);
       }
 
@@ -224,9 +227,9 @@ namespace FEAST
       /// \endcond
 
       /// Returns the number of blocks in this power-vector.
-      Index blocks() const
+      int blocks() const
       {
-        return Index(num_blocks);
+        return num_blocks;
       }
 
       /// Returns the total number of scalar entries of this power-vector.
@@ -462,7 +465,7 @@ namespace FEAST
     template<typename SubType_>
     class PowerVector<SubType_, 1>
     {
-      template<typename, Index>
+      template<typename, int>
       friend class PowerVector;
 
     public:
@@ -474,7 +477,7 @@ namespace FEAST
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerVector<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, Index(1)>;
 
-      static constexpr Index num_blocks = 1;
+      static constexpr int num_blocks = 1;
 
     protected:
       SubVectorType _first;
@@ -567,14 +570,14 @@ namespace FEAST
         _first.clone(other._first);
       }
 
-      template<Index i>
+      template<int i>
       SubVectorType& at()
       {
         static_assert(i == 0, "invalid sub-vector index");
         return _first;
       }
 
-      template<Index i>
+      template<int i>
       const SubVectorType& at() const
       {
         static_assert(i == 0, "invalid sub-vector index");
@@ -591,9 +594,9 @@ namespace FEAST
         return _first;
       }
 
-      Index blocks() const
+      int blocks() const
       {
-        return Index(1);
+        return 1;
       }
 
       Index size() const

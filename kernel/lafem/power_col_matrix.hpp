@@ -30,11 +30,14 @@ namespace FEAST
      */
     template<
       typename SubType_,
-      Index blocks_>
+      int blocks_>
     class PowerColMatrix
     {
+      // Note: the case = 1 is specialised below
+      static_assert(blocks_ > 1, "invalid block size");
+
       // declare this class template as a friend for recursive inheritance
-      template<typename, Index>
+      template<typename, int>
       friend class PowerColMatrix;
 
       /// rest-class typedef
@@ -60,9 +63,9 @@ namespace FEAST
       using ContainerType = class PowerColMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, blocks_>;
 
       /// number of row blocks (vertical size)
-      static constexpr Index num_row_blocks = blocks_;
+      static constexpr int num_row_blocks = blocks_;
       /// number of column blocks (horizontal size)
-      static constexpr Index num_col_blocks = 1;
+      static constexpr int num_col_blocks = 1;
 
     protected:
       /// the last sub-matrix
@@ -269,20 +272,20 @@ namespace FEAST
        * \returns
        * A (const) reference to the sub-matrix at position <em>(i_,j_)</em>.
        */
-      template<Index i_, Index j_>
+      template<int i_, int j_>
       SubMatrixType& at()
       {
         static_assert(j_ == 0, "invalid sub-matrix index");
-        static_assert(i_ < blocks_, "invalid sub-matrix index");
+        static_assert((0 <= i_) && (i_ < blocks_), "invalid sub-matrix index");
         return PowerElement<i_, SubMatrixType>::get(*this);
       }
 
       /** \copydoc at() */
-      template<Index i_, Index j_>
+      template<int i_, int j_>
       const SubMatrixType& at() const
       {
         static_assert(j_ == 0, "invalid sub-matrix index");
-        static_assert(i_ < blocks_, "invalid sub-matrix index");
+        static_assert((0 <= i_) && (i_ < blocks_), "invalid sub-matrix index");
         return PowerElement<i_, SubMatrixType>::get(*this);
       }
 
@@ -307,14 +310,14 @@ namespace FEAST
         return _rest;
       }
 
-      Index row_blocks() const
+      int row_blocks() const
       {
-        return Index(num_row_blocks);
+        return num_row_blocks;
       }
 
-      Index col_blocks() const
+      int col_blocks() const
       {
-        return Index(num_col_blocks);
+        return num_col_blocks;
       }
       /// \endcond
 
@@ -522,7 +525,7 @@ namespace FEAST
     template<typename SubType_>
     class PowerColMatrix<SubType_, 1>
     {
-      template<typename, Index>
+      template<typename, int>
       friend class PowerColMatrix;
 
     public:
@@ -540,8 +543,8 @@ namespace FEAST
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class PowerColMatrix<typename SubType_::template ContainerType<Mem2_, DT2_, IT2_>, 1>;
 
-      static constexpr Index num_row_blocks = 1;
-      static constexpr Index num_col_blocks = 1;
+      static constexpr int num_row_blocks = 1;
+      static constexpr int num_col_blocks = 1;
 
     protected:
       SubMatrixType _first;
@@ -677,7 +680,7 @@ namespace FEAST
         return PowerColMatrix(_first.clone());
       }
 
-      template<Index i, Index j>
+      template<int i, int j>
       SubMatrixType& at()
       {
         static_assert(i == 0, "invalid sub-matrix index");
@@ -685,7 +688,7 @@ namespace FEAST
         return _first;
       }
 
-      template<Index i, Index j>
+      template<int i, int j>
       const SubMatrixType& at() const
       {
         static_assert(i == 0, "invalid sub-matrix index");
@@ -703,14 +706,14 @@ namespace FEAST
         return _first;
       }
 
-      Index row_blocks() const
+      int row_blocks() const
       {
-        return Index(1);
+        return 1;
       }
 
-      Index col_blocks() const
+      int col_blocks() const
       {
-        return Index(1);
+        return 1;
       }
 
       Index rows() const

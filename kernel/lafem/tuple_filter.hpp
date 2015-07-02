@@ -36,7 +36,7 @@ namespace FEAST
 
     public:
       /// number of vector blocks
-      static constexpr Index num_blocks = TupleFilter<Rest_...>::num_blocks + 1;
+      static constexpr int num_blocks = TupleFilter<Rest_...>::num_blocks + 1;
 
       /// sub-filter mem-type
       typedef typename First_::MemType MemType;
@@ -131,18 +131,18 @@ namespace FEAST
       }
       /// \endcond
 
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_, Rest_...>::Type& at()
       {
-        static_assert(i_ < Index(num_blocks), "invalid sub-filter index");
+        static_assert((0 <= i_) && (i_ < num_blocks), "invalid sub-filter index");
         return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
       /** \copydoc at() */
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_, Rest_...>::Type const& at() const
       {
-        static_assert(i_ < Index(num_blocks), "invalid sub-filter index");
+        static_assert((0 <= i_) && (i_ < num_blocks), "invalid sub-filter index");
         return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
@@ -187,7 +187,7 @@ namespace FEAST
       friend class TupleFilter;
 
     public:
-      static constexpr Index num_blocks = 1;
+      static constexpr int num_blocks = 1;
 
       /// sub-filter mem-type
       typedef typename First_::MemType MemType;
@@ -259,14 +259,14 @@ namespace FEAST
         return _first;
       }
 
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_>::Type& at()
       {
         static_assert(i_ == 0, "invalid sub-filter index");
         return first();
       }
 
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_>::Type const& at() const
       {
         static_assert(i_ == 0, "invalid sub-filter index");

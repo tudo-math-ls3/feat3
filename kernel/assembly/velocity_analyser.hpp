@@ -93,13 +93,13 @@ namespace FEAST
         // print L2-norms
         os << "L2-Norm...: " << scientify(vi.norm_l2) << " [";
         for(int i(0); i < dim_; ++i)
-          os << " " << scientify(vi.norm_l2_comp[Index(i)]);
+          os << " " << scientify(vi.norm_l2_comp[i]);
         os << " ]" << std::endl;
 
         // print L2-norms
         os << "H1-Norm...: " << scientify(vi.norm_h1) << " [";
         for(int i(0); i < dim_; ++i)
-          os << " " << scientify(vi.norm_h1_comp[Index(i)]);
+          os << " " << scientify(vi.norm_h1_comp[i]);
         os << " ]" << std::endl;
 
         // print divergence and vorticity norms
@@ -241,10 +241,10 @@ namespace FEAST
           space_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = space_eval.get_num_local_dofs();
+          int num_loc_dofs = space_eval.get_num_local_dofs();
 
           // loop over all quadrature points and integrate
-          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
@@ -255,12 +255,12 @@ namespace FEAST
             // compute basis function values and derivatives
             vals.format();
             ders.format();
-            for(Index i(0); i < num_loc_dofs; ++i)
+            for(int i(0); i < num_loc_dofs; ++i)
             {
-              for(Index bi(0); bi < Index(dim_); ++bi)
+              for(int bi(0); bi < dim_; ++bi)
               {
                 vals[bi] += basis_val[bi][i] * space_data.phi[i].value;
-                for(Index bj(0); bj < Index(dim_); ++bj)
+                for(int bj(0); bj < dim_; ++bj)
                 {
                   ders[bi][bj] += basis_val[bi][i] * space_data.phi[i].grad[bj];
                 }
@@ -271,7 +271,7 @@ namespace FEAST
             DataType omega = trafo_data.jac_det * cubature_rule.get_weight(k);
 
             // update info
-            for(Index i(0); i < Index(dim_); ++i)
+            for(int i(0); i < dim_; ++i)
             {
               // update L2 component norm
               info.norm_l2_comp[i] += omega * Math::sqr(vals[i]);
@@ -298,7 +298,7 @@ namespace FEAST
         }
 
         // finally, compute the rest
-        for(Index i(0); i < Index(dim_); ++i)
+        for(int i(0); i < dim_; ++i)
         {
           info.norm_l2 += info.norm_l2_comp[i];
           info.norm_h1 += info.norm_h1_comp[i];
@@ -337,7 +337,7 @@ namespace FEAST
         void gather(
           Tiny::Matrix<DT_, m_, n_, sm_, sn_>& vals,
           const DofMapping_& dof_mapping,
-          Index offset = Index(0))
+          int offset = 0)
         {
           _first_gather(vals[offset], dof_mapping);
           _rest_gather.gather(vals, dof_mapping, offset+1);
@@ -358,7 +358,7 @@ namespace FEAST
         void gather(
           Tiny::Matrix<DT_, m_, n_, sm_, sn_>& vals,
           const DofMapping_& dof_mapping,
-          Index offset = Index(0))
+          int offset = 0)
         {
           _first_gather(vals[offset], dof_mapping);
         }

@@ -35,8 +35,7 @@ namespace FEAST
 
     public:
       /// number of vector blocks
-      static constexpr Index num_blocks = TupleVector<Rest_...>::num_blocks + 1;
-
+      static constexpr int num_blocks = TupleVector<Rest_...>::num_blocks + 1;
 
       /// sub-vector mem-type
       typedef typename First_::MemType MemType;
@@ -204,18 +203,18 @@ namespace FEAST
        * \returns
        * A (const) reference to the sub-vector at position \p i_.
        */
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_, Rest_...>::Type& at()
       {
-        static_assert(i_ < Index(num_blocks), "invalid sub-vector index");
+        static_assert((0 <= i_) && (i_ < num_blocks), "invalid sub-vector index");
         return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
       /** \copydoc at() */
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_, Rest_...>::Type const& at() const
       {
-        static_assert(i_ < Index(num_blocks), "invalid sub-vector index");
+        static_assert((0 <= i_) && (i_ < num_blocks), "invalid sub-vector index");
         return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
@@ -226,9 +225,9 @@ namespace FEAST
       }
 
       /// Returns the number of blocks in this tuple-vector.
-      Index blocks() const
+      int blocks() const
       {
-        return Index(num_blocks);
+        return num_blocks;
       }
 
       /// Returns a descriptive string for this container.
@@ -377,7 +376,7 @@ namespace FEAST
       friend class TupleVector;
 
     public:
-      static constexpr Index num_blocks = 1;
+      static constexpr int num_blocks = 1;
 
       typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
@@ -494,9 +493,9 @@ namespace FEAST
       }
 
       /// Returns the number of blocks in this tuple-vector.
-      Index blocks() const
+      int blocks() const
       {
-        return Index(num_blocks);
+        return num_blocks;
       }
 
       /// Returns a descriptive string for this container.
@@ -505,14 +504,14 @@ namespace FEAST
         return String("TupleVector<") + sub_name_list() + ">";
       }
 
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_>::Type& at()
       {
         static_assert(i_ == 0, "invalid sub-vector index");
         return first();
       }
 
-      template<Index i_>
+      template<int i_>
       typename TupleElement<i_, First_>::Type const& at() const
       {
         static_assert(i_ == 0, "invalid sub-vector index");

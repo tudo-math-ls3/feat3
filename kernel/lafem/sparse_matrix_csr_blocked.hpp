@@ -56,6 +56,9 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
     class SparseMatrixCSRBlocked : public Container<Mem_, DT_, IT_>
     {
+      static_assert(BlockHeight_ > 0, "invalid block size");
+      static_assert(BlockWidth_ > 0, "invalid block size");
+
     private:
       Index & _size()
       {
@@ -595,8 +598,9 @@ namespace FEAST
         if (x.size() != this->raw_columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
-                                                                                             x.elements(), this->rows(), columns(), used_elements());
+        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+          r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+          x.elements(), this->rows(), columns(), used_elements());
       }
 
       /**
@@ -612,8 +616,9 @@ namespace FEAST
         if (x.size() != this->raw_columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
-                                                                                             x.elements(), this->rows(), columns(), used_elements());
+        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+          r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+          x.elements(), this->rows(), columns(), used_elements());
       }
 
       /**
@@ -629,8 +634,9 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
-                                                                                             x.raw_elements(), this->rows(), columns(), used_elements());
+        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+          r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+          x.raw_elements(), this->rows(), columns(), used_elements());
       }
 
       /**
@@ -646,8 +652,9 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
-                                                                                             x.raw_elements(), this->rows(), columns(), used_elements());
+        Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+          r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+          x.raw_elements(), this->rows(), columns(), used_elements());
       }
 
       /**
@@ -675,8 +682,9 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), y.elements(), this->raw_val(), this->col_ind(),
-                                                                                        this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
+          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.elements(), y.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+            x.elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -684,8 +692,9 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), alpha, x.elements(), y.elements(),
-                                                                                      this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.elements(), alpha, x.elements(), y.elements(), this->raw_val(), this->col_ind(),
+            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
       }
 
@@ -714,8 +723,9 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
-                                                                                        this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
+          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
+            this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -724,8 +734,9 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.elements(), y.raw_elements(),
-                                                                                      this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.raw_elements(), alpha, x.elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
+            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
       }
 
@@ -754,8 +765,9 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), y.elements(), this->raw_val(), this->col_ind(),
-                                                                                        this->row_ptr(), x.raw_elements(), this->rows(), this->columns(), this->used_elements());
+          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.elements(), y.elements(), this->raw_val(), this->col_ind(),  this->row_ptr(),
+            x.raw_elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -764,8 +776,9 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), alpha, x.raw_elements(), y.elements(),
-                                                                                      this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.elements(), alpha, x.raw_elements(), y.elements(), this->raw_val(), this->col_ind(),
+            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
       }
 
@@ -794,8 +807,9 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
-                                                                                        this->row_ptr(), x.raw_elements(), this->rows(), this->columns(), this->used_elements());
+          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+            x.raw_elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -803,8 +817,9 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.raw_elements(), y.raw_elements(),
-                                                                                      this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.raw_elements(), alpha, x.raw_elements(), y.raw_elements(), this->raw_val(),
+            this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
       }
       ///@}

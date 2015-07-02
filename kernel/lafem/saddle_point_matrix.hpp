@@ -26,8 +26,8 @@ namespace FEAST
       typename MatrixA_,
       typename MatrixB_,
       typename MatrixD_,
-      Index i_,
-      Index j_>
+      int i_,
+      int j_>
     struct SaddlePointMatrixElement;
 
     /**
@@ -322,18 +322,22 @@ namespace FEAST
        * \returns
        * A (const) reference to the sub-matrix at position <em>(i_,j_)</em>.
        */
-      template<Index i_, Index j_>
+      template<int i_, int j_>
       typename SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, i_, j_>::Type& at()
       {
-        static_assert((i_ < Index(1)) || (j_ < Index(1)), "sub-matrix block (1,1) does not exist in SaddlePointMatrix");
+        static_assert((0 <= i_) && (0 <= j_), "invalid sub-matrix index");
+        static_assert((i_ <= 1) && (j_ <= 1), "invalid sub-matrix index");
+        static_assert((i_ < 1) || (j_ < 1), "sub-matrix block (1,1) does not exist in SaddlePointMatrix");
         return SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, i_, j_>::get(*this);
       }
 
       /** \copydoc at() */
-      template<Index i_, Index j_>
+      template<int i_, int j_>
       const typename SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, i_, j_>::Type& at() const
       {
-        static_assert((i_ < Index(1)) || (j_ < Index(1)), "sub-matrix block (1,1) does not exist in SaddlePointMatrix");
+        static_assert((0 <= i_) && (0 <= j_), "invalid sub-matrix index");
+        static_assert((i_ <= 1) && (j_ <= 1), "invalid sub-matrix index");
+        static_assert((i_ < 1) || (j_ < 1), "sub-matrix block (1,1) does not exist in SaddlePointMatrix");
         return SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, i_, j_>::get(*this);
       }
 
@@ -544,7 +548,7 @@ namespace FEAST
 
     /// \cond internal
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_>
-    struct SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, Index(0), Index(0)>
+    struct SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, 0, 0>
     {
       typedef MatrixA_ Type;
       static Type& get(SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix)
@@ -558,7 +562,7 @@ namespace FEAST
     };
 
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_>
-    struct SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, Index(0), Index(1)>
+    struct SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, 0, 1>
     {
       typedef MatrixB_ Type;
       static Type& get(SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix)
@@ -572,7 +576,7 @@ namespace FEAST
     };
 
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_>
-    struct SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, Index(1), Index(0)>
+    struct SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, 1, 0>
     {
       typedef MatrixD_ Type;
       static Type& get(SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix)

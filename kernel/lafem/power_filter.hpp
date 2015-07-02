@@ -27,11 +27,14 @@ namespace FEAST
      */
     template<
       typename SubFilter_,
-      Index count_>
+      int count_>
     class PowerFilter
     {
+      // Note: the case = 1 is specialised below
+      static_assert(count_ > 1, "invalid block size");
+
       // declare this class template as a friend for recursive inheritance
-      template<typename,Index>
+      template<typename,int>
       friend class PowerFilter;
 
       /// base-class typedef
@@ -48,7 +51,7 @@ namespace FEAST
       typedef typename SubFilter_::IndexType IndexType;
 
       /// number of filter blocks
-      static constexpr Index num_blocks = count_;
+      static constexpr int num_blocks = count_;
 
     protected:
       /// the first sub-filter
@@ -123,17 +126,17 @@ namespace FEAST
       }
       /// \endcond
 
-      template<Index i_>
+      template<int i_>
       SubFilterType& at()
       {
-        static_assert(i_ < count_, "invalid sub-filter index");
+        static_assert((0 <= i_) && (i_ < count_), "invalid sub-filter index");
         return PowerElement<i_, SubFilterType>::get(*this);
       }
 
-      template<Index i_>
+      template<int i_>
       const SubFilterType& at() const
       {
-        static_assert(i_ < count_, "invalid sub-filter index");
+        static_assert((0 <= i_) && (i_ < count_), "invalid sub-filter index");
         return PowerElement<i_, SubFilterType>::get(*this);
       }
 
@@ -174,7 +177,7 @@ namespace FEAST
     template<typename SubFilter_>
     class PowerFilter<SubFilter_, 1>
     {
-      template<typename,Index>
+      template<typename,int>
       friend class PowerFilter;
 
     public:
@@ -183,7 +186,7 @@ namespace FEAST
       typedef typename SubFilter_::DataType DataType;
       typedef typename SubFilter_::IndexType IndexType;
 
-      static constexpr Index num_blocks = 1;
+      static constexpr int num_blocks = 1;
 
     protected:
       SubFilterType _first;
@@ -234,14 +237,14 @@ namespace FEAST
         return _first;
       }
 
-      template<Index i_>
+      template<int i_>
       SubFilterType& at()
       {
         static_assert(i_ != 0, "invalid sub-filter index");
         return _first;
       }
 
-      template<Index i_>
+      template<int i_>
       const SubFilterType& at() const
       {
         static_assert(i_ != 0, "invalid sub-filter index");

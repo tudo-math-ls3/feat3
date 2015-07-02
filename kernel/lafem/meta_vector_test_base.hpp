@@ -95,9 +95,9 @@ namespace FEAST
 
         // construct data vector
         MetaVector x;
-        x.template at<Index(0)>().template at<Index(0)>().convert(r00);
-        x.template at<Index(0)>().template at<Index(1)>().convert(r01);
-        x.template at<Index(1)>().convert(r1);
+        x.template at<0>().template at<0>().convert(r00);
+        x.template at<0>().template at<1>().convert(r01);
+        x.template at<1>().convert(r1);
         return std::move(x);
       }
 
@@ -117,9 +117,9 @@ namespace FEAST
 
         // construct data vector
         MetaVector y;
-        y.template at<Index(0)>().template at<Index(0)>().convert(r00);
-        y.template at<Index(0)>().template at<Index(1)>().convert(r01);
-        y.template at<Index(1)>().convert(r1);
+        y.template at<0>().template at<0>().convert(r00);
+        y.template at<0>().template at<1>().convert(r01);
+        y.template at<1>().convert(r1);
         return std::move(y);
       }
 
@@ -139,9 +139,9 @@ namespace FEAST
 
         // construct data vector
         MetaVector z;
-        z.template at<Index(0)>().template at<Index(0)>().convert(r00);
-        z.template at<Index(0)>().template at<Index(1)>().convert(r01);
-        z.template at<Index(1)>().convert(r1);
+        z.template at<0>().template at<0>().convert(r00);
+        z.template at<0>().template at<1>().convert(r01);
+        z.template at<1>().convert(r1);
         return std::move(z);
       }
 
@@ -149,9 +149,9 @@ namespace FEAST
       static MetaVector gen_vector_null(Index n00, Index n01, Index n1)
       {
         MetaVector x;
-        x.template at<Index(0)>().template at<Index(0)>() = ScalarVector(n00, DataType(0));
-        x.template at<Index(0)>().template at<Index(1)>() = ScalarVector(n01, DataType(0));
-        x.template at<Index(1)>() = ScalarVector(n1, DataType(0));
+        x.template at<0>().template at<0>() = ScalarVector(n00, DataType(0));
+        x.template at<0>().template at<1>() = ScalarVector(n01, DataType(0));
+        x.template at<1>() = ScalarVector(n1, DataType(0));
         return std::move(x);
       }
     }; // MetaVectorTestBase

@@ -91,13 +91,13 @@ public:
 
     // create meta-vectors
     MetaVector vec_x;
-    vec_x.template at<Index(0)>().template at<Index(0)>() = ScalarVector(n, DataType(1));
-    vec_x.template at<Index(0)>().template at<Index(1)>() = ScalarVector(n, DataType(2));
-    vec_x.template at<Index(1)>() = ScalarVector(n, DataType(3));
+    vec_x.template at<0>().template at<0>() = ScalarVector(n, DataType(1));
+    vec_x.template at<0>().template at<1>() = ScalarVector(n, DataType(2));
+    vec_x.template at<1>() = ScalarVector(n, DataType(3));
     MetaVector vec_y;
-    vec_y.template at<Index(0)>().template at<Index(0)>() = ScalarVector(n, DataType(-1));
-    vec_y.template at<Index(0)>().template at<Index(1)>() = ScalarVector(n, DataType( 1));
-    vec_y.template at<Index(1)>() = ScalarVector(n, DataType(-2));
+    vec_y.template at<0>().template at<0>() = ScalarVector(n, DataType(-1));
+    vec_y.template at<0>().template at<1>() = ScalarVector(n, DataType( 1));
+    vec_y.template at<1>() = ScalarVector(n, DataType(-2));
 
     // create reference synced vectors
     MetaVector sync_x(vec_x.clone());
@@ -105,12 +105,12 @@ public:
     for(Index i(0); i < m; ++i)
     {
       Index k(n-m+i);
-      sync_x.template at<Index(0)>().template at<Index(0)>()(k, DataType_(0));
-      sync_y.template at<Index(0)>().template at<Index(0)>()(i, DataType_(0));
-      sync_x.template at<Index(0)>().template at<Index(1)>()(k, DataType_(3));
-      sync_y.template at<Index(0)>().template at<Index(1)>()(i, DataType_(3));
-      sync_x.template at<Index(1)>()(k, DataType_(1));
-      sync_y.template at<Index(1)>()(i, DataType_(1));
+      sync_x.template at<0>().template at<0>()(k, DataType_(0));
+      sync_y.template at<0>().template at<0>()(i, DataType_(0));
+      sync_x.template at<0>().template at<1>()(k, DataType_(3));
+      sync_y.template at<0>().template at<1>()(i, DataType_(3));
+      sync_x.template at<1>()(k, DataType_(1));
+      sync_y.template at<1>()(i, DataType_(1));
     }
 
     // create two buffer-vectors
