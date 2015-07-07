@@ -189,7 +189,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Adds a new mesh_part child node.
+       * \brief Adds a new mesh-part child node.
        *
        * \param[in] part_name
        * The name of the child node.
@@ -219,6 +219,35 @@ namespace FEAST
         return nullptr;
       }
 
+      /**
+       * \brief Adds a new mesh-part child node.
+       *
+       * \param[in] part_name
+       * The name of the child node.
+       *
+       * \param[in] mesh_part
+       * A pointer to the mesh_part to be added.
+       *
+       * \param[in] chart
+       * A pointer to the chart that the subnode is to be associated with. May be \c nullptr.
+       *
+       * \returns
+       * A pointer to the newly created mesh-part node if the insertion was successful, otherwise \c nullptr.
+       */
+      MeshPartNodeType* add_mesh_part(
+        const String& part_name,
+        MeshPartType* mesh_part,
+        const MeshChartType* chart = nullptr)
+      {
+        CONTEXT(name() + "::add_mesh_part()");
+        MeshPartNodeType* part_node = new MeshPartNodeType(mesh_part);
+        if(add_mesh_part_node(part_name, part_node, chart) == nullptr)
+        {
+          delete part_node;
+          return nullptr;
+        }
+        return part_node;
+      }
       /**
        * \brief Sets the chart for a particular mesh part.
        *
@@ -521,6 +550,12 @@ namespace FEAST
       MeshPartNode* refine(const ParentType_& parent) const
       {
         CONTEXT(name() + "::refine()");
+
+        // the mesh part may be a nullptr; in this case also return a node containing a nullptr
+        if(this->_mesh == nullptr)
+        {
+          return new MeshPartNode(nullptr);
+        }
 
         // create a refinery
         StandardRefinery<MeshPartType, ParentType_> refinery(*this->_mesh, parent);
