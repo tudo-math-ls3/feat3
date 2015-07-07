@@ -96,7 +96,7 @@ int main(int /*argc*/, char** /*argv*/)
 
   //
   Geometry::ExportVTK<QuadMesh> exporter(mesh);
-  exporter.open("test.vtk");
+  exporter.open("test");
   exporter.write_vertex_scalar("test-vtx", vertex_vector.elements());
   exporter.write_cell_scalar("test-cell", cell_vector.elements());
   exporter.close();

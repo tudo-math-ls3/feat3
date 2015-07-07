@@ -522,7 +522,7 @@ namespace FEAST
           _ref_mesh->template get_index_set<ShapeType::dimension, 0>();
         int num_idx = idx.get_num_indices();
 
-        typedef Geometry::Intern::VTKHelper<ShapeType> VTKHelperType;
+        typedef Geometry::Intern::VTKShape<ShapeType> VTKHelperType;
 
         _ofs << "CELLS " << (num_cells*num_ref_cells) << " " << (Index(num_idx+1)*num_cells*num_ref_cells) << std::endl;
 

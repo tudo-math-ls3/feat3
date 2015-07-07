@@ -799,7 +799,7 @@ namespace TutorialX1
 
     // compute errors
     levels.back()->compute_errors();
-    levels.back()->write_vtk("tutorial_x1_andicore_mg.vtk");
+    levels.back()->write_vtk("tutorial_x1_andicore_mg");
 
     // clean up
     while(!levels.empty())

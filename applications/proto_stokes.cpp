@@ -681,7 +681,7 @@ int main(int /*argc*/, char** /*argv*/)
   calc_errors(*levels.back(), vec_sol_x, vec_sol_y, vec_sol_p);
 
   // write vtk
-  //write_vtk("./proto_stokes.vtk", *levels.back(), vec_sol_x, vec_sol_y, vec_sol_p);
+  //write_vtk("./proto_stokes", *levels.back(), vec_sol_x, vec_sol_y, vec_sol_p);
 
   // clear levels
   std::cout << std::endl << "Cleaning up..." << std::endl;

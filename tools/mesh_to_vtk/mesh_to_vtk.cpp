@@ -74,8 +74,8 @@ int run(MeshStreamer& my_streamer, const String& filename, const Index lvl_min, 
       continue;
 
     // Create a VTK exporter for our mesh
-    FEAST::String vtkname = get_file_title(filename) + "." + stringify(lvl) + ".vtk";
-    std::cout << "Writing file '" << vtkname << "'..." << std::endl;
+    FEAST::String vtkname = get_file_title(filename) + "." + stringify(lvl);
+    std::cout << "Writing file '" << vtkname << ".vtu'..." << std::endl;
     Geometry::ExportVTK<MeshType_> exporter(*node->get_mesh());
 
     std::vector<double> vtx_data(node->get_mesh()->get_num_entities(0), 0.0);

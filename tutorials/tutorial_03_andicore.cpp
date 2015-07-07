@@ -621,9 +621,9 @@ namespace Tutorial03
     // Finally, we also write the discrete solution to a VTK file, so that it can be admired in Paraview...
 
     // First of all, build the filename string
-    String vtk_name(String("./tutorial-03-andicore-lvl") + stringify(level) + ".vtk");
+    String vtk_name(String("./tutorial-03-andicore-lvl") + stringify(level));
 
-    std::cout << "Writing VTK file '" << vtk_name << "'..." << std::endl;
+    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
 
     // project solution and right-hand-side vectors
     VectorType vertex_sol, vertex_rhs;

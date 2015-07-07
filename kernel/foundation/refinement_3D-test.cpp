@@ -231,7 +231,7 @@ class RefinementTest3D:
       MeshControl<dim_3D>::fill_vertex_sets(m_fine, basemesh, attrs.at(0), attrs.at(1),attrs.at(2));
 
       ExportVTK<BaseMeshType> vtkexporter(basemesh);
-      vtkexporter.write("test_3mesh.vtk");
+      vtkexporter.write("test_3mesh");
 */
 /*      MeshExporter<VTK, Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_>, OT_>, OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > > exporter(m_fine, attrs);
       exporter.write("ref_test_3D_result.vtk");

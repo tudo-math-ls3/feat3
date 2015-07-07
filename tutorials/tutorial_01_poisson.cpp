@@ -427,9 +427,9 @@ namespace Tutorial01
     // Finally, we also write the discrete solution to a VTK file, so that it can be admired in Paraview...
 
     // First of all, build the filename string
-    String vtk_name(String("./tutorial-01-poisson-lvl") + stringify(level) + ".vtk");
+    String vtk_name(String("./tutorial-01-poisson-lvl") + stringify(level));
 
-    std::cout << "Writing VTK file '" << vtk_name << "'..." << std::endl;
+    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
 
     // Next, project our solution into the vertices. This is not necessary for Q1, but in case that
     // someone chose to use the Q1~ element instead of Q1, this will be necessary.
