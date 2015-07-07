@@ -1,5 +1,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/adjacency/cuthill_mckee.hpp>
 #include <iostream>
 
@@ -11,16 +12,33 @@ int main(int argc, char ** argv)
 {
     if (argc != 3 && argc != 2)
     {
-        std::cout<<"Usage: 'resort-csr csr-file [csr-file-resorted]'"<<std::endl;
-        exit(EXIT_FAILURE);
+      std::cout<<"Usage: 'resort-csr csr-file [csr-file-resorted]'"<<std::endl;
+      exit(EXIT_FAILURE);
     }
 
     String input(argv[1]);
-    String output;
-    if (argc != 2)
-      output = argv[2];
+    if (input.size() < 5)
+    {
+      std::cout<<"Input Filetype not known: " << input << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    String input_extension(input.substr(input.size() - 4, 4));
+    SparseMatrixCSR<Mem::Main, double, Index> orig;
+    if (input_extension == ".mtx")
+      orig.read_from_mtx(input);
+    else if (input_extension == ".csr")
+      orig.read_from_csr(input);
+    else if (input_extension == ".ell")
+    {
+      SparseMatrixELL<Mem::Main, double, Index> temp(FileMode::fm_ell, input);
+      orig.convert(temp);
+    }
+    else
+    {
+      std::cout<<"Input Filetype not known: " << input << std::endl;
+      exit(EXIT_FAILURE);
+    }
 
-    SparseMatrixCSR<Mem::Main, double, Index> orig(FileMode::fm_csr, input);
     Graph graph(Adjacency::rt_as_is, orig);
     Index best_radius;
     Index best_radius_index;
@@ -225,5 +243,29 @@ int main(int argc, char ** argv)
     }
 
     if (argc != 2)
-      best.write_out(FileMode::fm_csr, output);
+    {
+      String output(argv[2]);
+      if (output.size() < 5)
+      {
+        std::cout<<"Output Filetype not known: " << output << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      String output_extension(output.substr(output.size() - 4, 4));
+      if (output_extension == ".mtx")
+        best.write_out_mtx(output);
+      else if (output_extension == ".csr")
+        best.write_out_csr(output);
+      else if (output_extension == ".ell")
+      {
+        SparseMatrixELL<Mem::Main, double, Index> temp;
+        temp.convert(best);
+        temp.write_out_ell(output);
+      }
+      else
+      {
+        std::cout<<"Output Filetype not known: " << output << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    }
+
 }

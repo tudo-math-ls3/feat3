@@ -77,5 +77,5 @@ TARGET_LINK_LIBRARIES (ell2tga feast)
 ADD_EXECUTABLE(mtx2tga io/mtx_to_tga.cpp)
 TARGET_LINK_LIBRARIES (mtx2tga feast)
 
-ADD_EXECUTABLE(resort-csr io/resort_csr.cpp)
-TARGET_LINK_LIBRARIES (resort-csr feast)
+ADD_EXECUTABLE(resort-matrix io/resort_matrix.cpp)
+TARGET_LINK_LIBRARIES (resort-matrix feast)
