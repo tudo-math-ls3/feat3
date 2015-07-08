@@ -149,6 +149,28 @@ namespace FEAST
     }
 
     /**
+     * \brief Computes the integral base-10 logarithm of an integer, i.e. its number of non-zero decimal digits.
+     *
+     * \param[in] x
+     * The number whose digit count is to be computed.
+     *
+     * \returns
+     * The number of non-zero decimal digits of \p x.
+     */
+    template<typename T_>
+    inline T_ ilog10(T_ x)
+    {
+      static_assert(Type::Traits<T_>::is_int, "ilog10 can only be applied to integral types");
+      T_ i(0);
+      while(x != T_(0))
+      {
+        ++i;
+        x /= T_(10);
+      }
+      return i;
+    }
+
+    /**
      * \brief Returns the sign of a value.
      *
      * \param[in] x

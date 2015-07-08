@@ -3,8 +3,14 @@
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
-using namespace FEAST::Math;
 
+/**
+ * \brief Test class for the basic Math functions.
+ *
+ * \test Tests various math function templates in the Math namespace.
+ *
+ * \author Peter Zajac
+ */
 class BasicMathTest
   : public TaggedTest<Archs::None, Archs::None>
 {
@@ -18,34 +24,42 @@ public:
   {
     test_factorial();
     test_binomial();
+    test_ilog10();
   }
 
   void test_factorial() const
   {
     // 0! = 1 (by definition)
-    TEST_CHECK_EQUAL(factorial(0), 1);
+    TEST_CHECK_EQUAL(Math::factorial(0), 1);
     // 1! = 1
-    TEST_CHECK_EQUAL(factorial(1,0), 1);
+    TEST_CHECK_EQUAL(Math::factorial(1,0), 1);
     // 5! = 120
-    TEST_CHECK_EQUAL(factorial(5), 120);
+    TEST_CHECK_EQUAL(Math::factorial(5), 120);
     // 5*6*7 = 210
-    TEST_CHECK_EQUAL(factorial(7,5), 210);
+    TEST_CHECK_EQUAL(Math::factorial(7,5), 210);
   }
 
   void test_binomial() const
   {
-    TEST_CHECK_EQUAL(binomial(0,0), 1);
-    TEST_CHECK_EQUAL(binomial(3,0), 1);
-    TEST_CHECK_EQUAL(binomial(3,3), 1);
-    TEST_CHECK_EQUAL(binomial(5,2), 10);
-    TEST_CHECK_EQUAL(binomial(49,6), 13983816);
+    TEST_CHECK_EQUAL(Math::binomial(0,0), 1);
+    TEST_CHECK_EQUAL(Math::binomial(3,0), 1);
+    TEST_CHECK_EQUAL(Math::binomial(3,3), 1);
+    TEST_CHECK_EQUAL(Math::binomial(5,2), 10);
+    TEST_CHECK_EQUAL(Math::binomial(49,6), 13983816);
+  }
+
+  void test_ilog10() const
+  {
+    TEST_CHECK_EQUAL(Math::ilog10( 0 ), 0 );
+    TEST_CHECK_EQUAL(Math::ilog10(10u), 2u);
+    TEST_CHECK_EQUAL(Math::ilog10(-9l), 1l);
   }
 } basic_math_test;
 
 /**
  * \brief Test class for the Math functions.
  *
- * \test Tests the class templates in the MetaMath namespace.
+ * \test Tests the floating-point math function templates in the Math namespace.
  *
  * \author Peter Zajac
  */
