@@ -399,6 +399,7 @@ namespace FEAST
               os << scientify(var.second[3*j+1], _var_prec) << " ";
               os << scientify(var.second[3*j+2], _var_prec) << std::endl;
             }
+            os << "</DataArray>" << std::endl;
           }
 
           os << "</PointData>" << std::endl;
