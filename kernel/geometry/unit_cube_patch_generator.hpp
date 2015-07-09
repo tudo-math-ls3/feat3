@@ -82,7 +82,7 @@ namespace FEAST
 
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
-          target_set_holder.get_target_set<0>()[0] = Index(_k);
+          target_set_holder.template get_target_set<0>()[0] = Index(_k);
         }
       };
 
@@ -218,7 +218,7 @@ namespace FEAST
 
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
-          target_set_holder.get_target_set<0>()[0] = Index(_k);
+          target_set_holder.template get_target_set<0>()[0] = Index(_k);
         }
       };
 
@@ -256,9 +256,9 @@ namespace FEAST
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
           typedef Geometry::Intern::FaceIndexMapping<Shape::Quadrilateral, 1, 0> Fim;
-          target_set_holder.get_target_set<0>()[0] = Index(Fim::map(_k, 0));
-          target_set_holder.get_target_set<0>()[1] = Index(Fim::map(_k, 1));
-          target_set_holder.get_target_set<1>()[0] = Index(_k);
+          target_set_holder.template get_target_set<0>()[0] = Index(Fim::map(_k, 0));
+          target_set_holder.template get_target_set<0>()[1] = Index(Fim::map(_k, 1));
+          target_set_holder.template get_target_set<1>()[0] = Index(_k);
         }
       };
 
@@ -484,7 +484,7 @@ namespace FEAST
 
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
-          target_set_holder.get_target_set<0>()[0] = Index(_p);
+          target_set_holder.template get_target_set<0>()[0] = Index(_p);
         }
       };
 
@@ -522,9 +522,9 @@ namespace FEAST
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
           typedef Geometry::Intern::FaceIndexMapping<ShapeType, 1, 0> Fim;
-          target_set_holder.get_target_set<0>()[0] = Index(Fim::map(_p, 0));
-          target_set_holder.get_target_set<0>()[1] = Index(Fim::map(_p, 1));
-          target_set_holder.get_target_set<1>()[0] = Index(_p);
+          target_set_holder.template get_target_set<0>()[0] = Index(Fim::map(_p, 0));
+          target_set_holder.template get_target_set<0>()[1] = Index(Fim::map(_p, 1));
+          target_set_holder.template get_target_set<1>()[0] = Index(_p);
         }
       };
 
@@ -562,16 +562,16 @@ namespace FEAST
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
           typedef Geometry::Intern::FaceIndexMapping<ShapeType, 2, 0> Fim0;
-          target_set_holder.get_target_set<0>()[0] = Index(Fim0::map(_p, 0));
-          target_set_holder.get_target_set<0>()[1] = Index(Fim0::map(_p, 1));
-          target_set_holder.get_target_set<0>()[2] = Index(Fim0::map(_p, 2));
-          target_set_holder.get_target_set<0>()[3] = Index(Fim0::map(_p, 3));
+          target_set_holder.template get_target_set<0>()[0] = Index(Fim0::map(_p, 0));
+          target_set_holder.template get_target_set<0>()[1] = Index(Fim0::map(_p, 1));
+          target_set_holder.template get_target_set<0>()[2] = Index(Fim0::map(_p, 2));
+          target_set_holder.template get_target_set<0>()[3] = Index(Fim0::map(_p, 3));
           typedef Geometry::Intern::FaceIndexMapping<ShapeType, 2, 1> Fim1;
-          target_set_holder.get_target_set<1>()[0] = Index(Fim1::map(_p, 0));
-          target_set_holder.get_target_set<1>()[1] = Index(Fim1::map(_p, 1));
-          target_set_holder.get_target_set<1>()[2] = Index(Fim1::map(_p, 2));
-          target_set_holder.get_target_set<1>()[3] = Index(Fim1::map(_p, 3));
-          target_set_holder.get_target_set<2>()[0] = Index(_p);
+          target_set_holder.template get_target_set<1>()[0] = Index(Fim1::map(_p, 0));
+          target_set_holder.template get_target_set<1>()[1] = Index(Fim1::map(_p, 1));
+          target_set_holder.template get_target_set<1>()[2] = Index(Fim1::map(_p, 2));
+          target_set_holder.template get_target_set<1>()[3] = Index(Fim1::map(_p, 3));
+          target_set_holder.template get_target_set<2>()[0] = Index(_p);
         }
       };
 
