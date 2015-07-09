@@ -165,6 +165,10 @@ namespace FEAST
                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
+        // skip on empty mirror
+        if(_mirror_gather.empty())
+          return;
+
         Tx_ * x(buffer.elements());
         const Ty_ * y(vector.elements());
         const Index * col_idx(_mirror_gather.col_ind());
@@ -212,6 +216,10 @@ namespace FEAST
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
+        // skip on empty mirror
+        if(_mirror_gather.empty())
+          return;
+
         Tx_ * x(buffer.elements());
         const Ty_ * y(vector.elements());
         const Index * col_idx(_mirror_gather.col_ind());
@@ -255,6 +263,10 @@ namespace FEAST
                         const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
+        // skip on empty mirror
+        if(_mirror_scatter.empty())
+          return;
+
         Tx_ * x(vector.elements());
         const Ty_ * y(buffer.elements());
         const Index * col_idx(_mirror_scatter.col_ind());
@@ -307,6 +319,10 @@ namespace FEAST
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
+        // skip on empty mirror
+        if(_mirror_scatter.empty())
+          return;
+
         Tx_ * x(vector.elements());
         const Ty_ * y(buffer.elements());
         const Index * col_idx(_mirror_scatter.col_ind());

@@ -909,6 +909,16 @@ namespace FEAST
       }
 
       /**
+       * \brief Checks whether the container is empty.
+       *
+       * \returns \c true if the container is empty, otherwise \c false.
+       */
+      bool empty() const
+      {
+        return (this->size() == Index(0));
+      }
+
+      /**
        * \brief Returns a descriptive string.
        *
        * \returns A string describing the container.
