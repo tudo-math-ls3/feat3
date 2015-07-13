@@ -171,8 +171,6 @@ namespace FEAST
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_dt.push_back(DT_(0));
-        this->_elements.push_back(nullptr);
-        this->_indices.push_back(nullptr);
       }
 
       /**
@@ -996,7 +994,7 @@ namespace FEAST
         if (a.zero_element() != b.zero_element())
           return false;
 
-        if(a.size() == 0 && b.size() == 0)
+        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
           return true;
 
         IT_ * offsets_a;

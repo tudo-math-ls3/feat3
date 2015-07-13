@@ -79,7 +79,6 @@ namespace FEAST
 
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_elements.push_back(nullptr);
       }
 
       /**
@@ -469,7 +468,7 @@ namespace FEAST
         if (a.columns() != b.columns())
           return false;
 
-        if(a.size() == 0 && b.size() == 0)
+        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
           return true;
 
         bool ret(true);

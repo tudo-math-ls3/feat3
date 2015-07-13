@@ -196,9 +196,6 @@ namespace FEAST
         this->_scalar_index.push_back(Math::min<Index>(0, 1000));
         this->_scalar_index.push_back(1);
         this->_scalar_dt.push_back(DT_(0));
-        this->_elements.push_back(nullptr);
-        this->_indices.push_back(nullptr);
-        this->_indices.push_back(nullptr);
       }
 
       /**

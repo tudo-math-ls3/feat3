@@ -44,7 +44,6 @@ public:
     SparseMatrixCSR<Mem_, DT_, IT_> zero1;
     SparseMatrixCSR<Mem::Main, DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
-    TEST_CHECK_EQUAL(zero1.row_ptr(), nullptr);
 
     SparseMatrixCOO<Mem::Main, DT_, IT_> a(10, 10);
     a(1,2,7);

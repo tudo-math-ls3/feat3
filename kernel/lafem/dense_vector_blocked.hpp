@@ -70,7 +70,6 @@ namespace FEAST
         Container<Mem_, DT_, IT_> (0)
       {
         CONTEXT("When creating DenseVectorBlocked");
-        this->_elements.push_back(nullptr);
       }
 
       /**
@@ -456,7 +455,7 @@ namespace FEAST
         if (a.get_indices().size() != b.get_indices().size())
           return false;
 
-        if(a.size() == 0 && b.size() == 0)
+        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
           return true;
 
         bool ret(true);
