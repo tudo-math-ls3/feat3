@@ -155,11 +155,8 @@ namespace FEAST
           line.trim_me();
         } while (line.find("%%") == 0 || line == "");
 
-        SubMatrixType tmp_first(mode, directory + line);
-        _first = std::move(tmp_first);
-
-        RestClass tmp_rest(mode, file, directory);
-        _rest = std::move(tmp_rest);
+        _first = First_(mode, directory + line);
+        _rest = RestClass(mode, file, directory);
       }
 
       /**
@@ -246,7 +243,7 @@ namespace FEAST
         }
 
         file << "%%MatrixMarket tuplediagmatrix coordinate real general" << std::endl;
-        for (Index i(1); i <= blocks_; ++i)
+        for (Index i(1); i <= num_row_blocks; ++i)
         {
           file << filename << "_td" << i << suffix << std::endl;
         }
@@ -264,9 +261,9 @@ namespace FEAST
        * \param[in] prefix The prefix of the matrix-files.
        * \param[in] suffix The suffix of the matrix-files.
        */
-      void write_out_submatrices(FileMode mode, String directory, String prefix, String suffix, Index length = blocks_) const
+      void write_out_submatrices(FileMode mode, String directory, String prefix, String suffix, Index length = num_row_blocks) const
       {
-        _first.write_out(mode, directory + prefix + "_td" + stringify(length + 1 - blocks_) + suffix);
+        _first.write_out(mode, directory + prefix + "_td" + stringify(length + 1 - num_row_blocks) + suffix);
         _rest.write_out_submatrices(mode, directory, prefix, suffix, length);
       }
 
@@ -644,8 +641,7 @@ namespace FEAST
           line.trim_me();
         } while (line.find("%%") == 0 || line == "");
 
-        SubMatrixType tmp_first(mode, directory + line);
-        _first = std::move(tmp_first);
+        _first = First_(mode, directory + line);
       }
 
       void read_from(FileMode mode, String filename)
