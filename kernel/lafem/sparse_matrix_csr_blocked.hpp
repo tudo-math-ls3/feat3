@@ -413,6 +413,9 @@ namespace FEAST
        */
       IT_ * col_ind()
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_indices.at(0);
       }
 
@@ -420,6 +423,9 @@ namespace FEAST
       /// const version.
       IT_ const * col_ind() const
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_indices.at(0);
       }
 
@@ -430,6 +436,9 @@ namespace FEAST
        */
       Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * val()
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return (Tiny::Matrix<DT_, BlockHeight_, BlockWidth_>*)this->_elements.at(0);
       }
 
@@ -437,6 +446,9 @@ namespace FEAST
       /// const version.
       Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> const * val() const
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return (Tiny::Matrix<DT_, BlockHeight_, BlockWidth_>*)this->_elements.at(0);
       }
 
@@ -447,6 +459,9 @@ namespace FEAST
        */
       DT_ * raw_val()
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_elements.at(0);
       }
 
@@ -454,6 +469,9 @@ namespace FEAST
       /// const version.
       DT_ const * raw_val() const
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_elements.at(0);
       }
 
@@ -464,6 +482,9 @@ namespace FEAST
        */
       IT_ * row_ptr()
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_indices.at(1);
       }
 
@@ -471,6 +492,9 @@ namespace FEAST
       /// const version.
       IT_ const * row_ptr() const
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_indices.at(1);
       }
 

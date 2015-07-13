@@ -1426,6 +1426,9 @@ namespace FEAST
        */
       IT_ const * col_ind() const
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_indices.at(0);
       }
 
@@ -1436,6 +1439,9 @@ namespace FEAST
        */
       IT_ const * cs() const
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_indices.at(1);
       }
 
@@ -1446,6 +1452,9 @@ namespace FEAST
        */
       IT_ const * cl() const
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_indices.at(2);
       }
 
@@ -1456,6 +1465,9 @@ namespace FEAST
        */
       IT_ const * rl() const
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_indices.at(3);
       }
 
@@ -1466,11 +1478,17 @@ namespace FEAST
        */
       DT_ * val()
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_elements.at(0);
       }
 
       DT_ const * val() const
       {
+        if (this->size() == 0)
+          return nullptr;
+
         return this->_elements.at(0);
       }
 
