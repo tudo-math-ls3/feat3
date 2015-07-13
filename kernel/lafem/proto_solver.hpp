@@ -10,6 +10,7 @@
 #include <kernel/lafem/tuple_filter.hpp>
 #include <memory>
 #include <utility>
+#include <deque>
 
 namespace FEAST
 {
