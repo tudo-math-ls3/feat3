@@ -459,7 +459,7 @@ namespace FEAST
        */
       DT_ * raw_val()
       {
-        if (this->size() == 0)
+        if (this->_elements.size() == 0)
           return nullptr;
 
         return this->_elements.at(0);
@@ -469,7 +469,7 @@ namespace FEAST
       /// const version.
       DT_ const * raw_val() const
       {
-        if (this->size() == 0)
+        if (this->_elements.size() == 0)
           return nullptr;
 
         return this->_elements.at(0);
@@ -482,7 +482,7 @@ namespace FEAST
        */
       IT_ * row_ptr()
       {
-        if (this->size() == 0)
+        if (this->_indices.size() == 0)
           return nullptr;
 
         return this->_indices.at(1);
@@ -492,7 +492,7 @@ namespace FEAST
       /// const version.
       IT_ const * row_ptr() const
       {
-        if (this->size() == 0)
+        if (this->_indices.size() == 0)
           return nullptr;
 
         return this->_indices.at(1);

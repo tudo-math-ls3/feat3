@@ -116,6 +116,27 @@ namespace FEAST
       /**
        * \brief Constructor
        *
+       * \param[in] rows The row count of the created matrix.
+       * \param[in] columns The column count of the created matrix.
+       *
+       * Creates an empty matrix.
+       * Because SparseMatrixCSR is a read-only container, it stays empty.
+       *
+       * \note This matrix does not allocate any memory
+       */
+      explicit SparseMatrixCSR(Index rows_in, Index columns_in) :
+        Container<Mem_, DT_, IT_> (rows_in * columns_in)
+      {
+        CONTEXT("When creating SparseMatrixCSR");
+        this->_scalar_index.push_back(rows_in);
+        this->_scalar_index.push_back(columns_in);
+        this->_scalar_index.push_back(0);
+        this->_scalar_dt.push_back(DT_(0));
+      }
+
+      /**
+       * \brief Constructor
+       *
        * \param[in] layout The layout to be used.
        *
        * Creates an empty matrix with given layout.
@@ -1219,7 +1240,7 @@ namespace FEAST
        */
       IT_ * col_ind()
       {
-        if (this->size() == 0)
+        if (this->_indices.size() == 0)
           return nullptr;
 
         return this->_indices.at(0);
@@ -1227,7 +1248,7 @@ namespace FEAST
 
       IT_ const * col_ind() const
       {
-        if (this->size() == 0)
+        if (this->_indices.size() == 0)
           return nullptr;
 
         return this->_indices.at(0);
@@ -1240,7 +1261,7 @@ namespace FEAST
        */
       DT_ * val()
       {
-        if (this->size() == 0)
+        if (this->_elements.size() == 0)
           return nullptr;
 
         return this->_elements.at(0);
@@ -1248,7 +1269,7 @@ namespace FEAST
 
       DT_ const * val() const
       {
-        if (this->size() == 0)
+        if (this->_elements.size() == 0)
           return nullptr;
 
         return this->_elements.at(0);
@@ -1261,7 +1282,7 @@ namespace FEAST
        */
       IT_ * row_ptr()
       {
-        if (this->size() == 0)
+        if (this->_indices.size() == 0)
           return nullptr;
 
         return this->_indices.at(1);
@@ -1269,7 +1290,7 @@ namespace FEAST
 
       IT_ const * row_ptr() const
       {
-        if (this->size() == 0)
+        if (this->_indices.size() == 0)
           return nullptr;
 
         return this->_indices.at(1);
@@ -1610,6 +1631,12 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         Arch::ProductMatVec<Mem_>::csr(r.elements(), this->val(), this->col_ind(), this->row_ptr(),
                                               x.elements(), this->rows(), columns(), used_elements());
       }
@@ -1654,6 +1681,12 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
         if (y.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+        if (this->used_elements() == 0)
+        {
+          r.copy(y);
+          return;
+        }
 
         // check for special cases
         // r <- y - A*x

@@ -830,7 +830,7 @@ namespace FEAST
        */
       DT_ * elements()
       {
-        if (this->size() == 0)
+        if (this->_elements.size() == 0)
           return nullptr;
 
         return this->_elements.at(0);
@@ -838,7 +838,7 @@ namespace FEAST
 
       DT_ const * elements() const
       {
-        if (this->size() == 0)
+        if (this->_elements.size() == 0)
           return nullptr;
 
         return this->_elements.at(0);
