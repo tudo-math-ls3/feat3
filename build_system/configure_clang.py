@@ -79,7 +79,7 @@ def configure_clang(cpu, buildid, compiler):
     elif cpu == "athlon":
       cxxflags += " -m32 -march=athlon"
     elif cpu == "athlonxp":
-      cxxflags += " -m32 -march=athlonxp"
+      cxxflags += " -m32 -march=athlon-xp"
     elif cpu == "opteron":
       cxxflags += " -m64 -march=k8"
     elif cpu == "athlon64":
