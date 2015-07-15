@@ -53,6 +53,9 @@ namespace FEAST
       /// number of filter blocks
       static constexpr int num_blocks = count_;
 
+      /// vector type
+      typedef PowerVector<typename SubFilter_::VectorType, count_> VectorType;
+
     protected:
       /// the first sub-filter
       SubFilterType _first;
@@ -141,32 +144,28 @@ namespace FEAST
       }
 
       /** \copydoc UnitFilter::filter_rhs() */
-      template<typename SubVector_>
-      void filter_rhs(PowerVector<SubVector_, count_>& vector) const
+      void filter_rhs(VectorType& vector) const
       {
         first().filter_rhs(vector.first());
         rest().filter_rhs(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_sol() */
-      template<typename SubVector_>
-      void filter_sol(PowerVector<SubVector_, count_>& vector) const
+      void filter_sol(VectorType& vector) const
       {
         first().filter_sol(vector.first());
         rest().filter_sol(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_def() */
-      template<typename SubVector_>
-      void filter_def(PowerVector<SubVector_, count_>& vector) const
+      void filter_def(VectorType& vector) const
       {
         first().filter_def(vector.first());
         rest().filter_def(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_cor() */
-      template<typename SubVector_>
-      void filter_cor(PowerVector<SubVector_, count_>& vector) const
+      void filter_cor(VectorType& vector) const
       {
         first().filter_cor(vector.first());
         rest().filter_cor(vector.rest());
@@ -187,6 +186,8 @@ namespace FEAST
       typedef typename SubFilter_::IndexType IndexType;
 
       static constexpr int num_blocks = 1;
+
+      typedef PowerVector<typename SubFilter_::VectorType, 1> VectorType;
 
     protected:
       SubFilterType _first;
@@ -251,26 +252,22 @@ namespace FEAST
         return _first;
       }
 
-      template<typename SubVector_>
-      void filter_rhs(PowerVector<SubVector_, 1>& vector) const
+      void filter_rhs(VectorType& vector) const
       {
         first().filter_rhs(vector.first());
       }
 
-      template<typename SubVector_>
-      void filter_sol(PowerVector<SubVector_, 1>& vector) const
+      void filter_sol(VectorType& vector) const
       {
         first().filter_sol(vector.first());
       }
 
-      template<typename SubVector_>
-      void filter_def(PowerVector<SubVector_, 1>& vector) const
+      void filter_def(VectorType& vector) const
       {
         first().filter_def(vector.first());
       }
 
-      template<typename SubVector_>
-      void filter_cor(PowerVector<SubVector_, 1>& vector) const
+      void filter_cor(VectorType& vector) const
       {
         first().filter_cor(vector.first());
       }

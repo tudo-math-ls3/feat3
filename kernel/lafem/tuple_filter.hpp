@@ -53,6 +53,16 @@ namespace FEAST
       static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value,
                     "sub-filters have different index-types");
 
+      /// \compilerhack MSVC 2013 template bug workaround
+#ifdef FEAST_COMPILER_MICROSOFT
+      template <typename... RestCont_>
+      using VecTypeHelper = typename RestClass::template VecTypeHelper<RestCont_..., typename First_::VectorType>;
+      typedef VecTypeHelper<> VectorType;
+#else
+      /// corresponding vector
+      typedef TupleVector<typename First_::VectorType, typename Rest_::VectorType...> VectorType;
+#endif
+
     protected:
       /// the first sub-filter
       First_ _first;
@@ -147,32 +157,28 @@ namespace FEAST
       }
 
       /** \copydoc UnitFilter::filter_rhs() */
-      template<typename Ty_, typename... Tv_>
-      void filter_rhs(TupleVector<Ty_, Tv_...>& vector) const
+      void filter_rhs(VectorType& vector) const
       {
         first().filter_rhs(vector.first());
         rest().filter_rhs(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_sol() */
-      template<typename Ty_, typename... Tv_>
-      void filter_sol(TupleVector<Ty_, Tv_...>& vector) const
+      void filter_sol(VectorType& vector) const
       {
         first().filter_sol(vector.first());
         rest().filter_sol(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_def() */
-      template<typename Ty_, typename... Tv_>
-      void filter_def(TupleVector<Ty_, Tv_...>& vector) const
+      void filter_def(VectorType& vector) const
       {
         first().filter_def(vector.first());
         rest().filter_def(vector.rest());
       }
 
       /** \copydoc UnitFilter::filter_cor() */
-      template<typename Ty_, typename... Tv_>
-      void filter_cor(TupleVector<Ty_, Tv_...>& vector) const
+      void filter_cor(VectorType& vector) const
       {
         first().filter_cor(vector.first());
         rest().filter_cor(vector.rest());
@@ -195,6 +201,14 @@ namespace FEAST
       typedef typename First_::DataType DataType;
       /// sub-filter index-type
       typedef typename First_::IndexType IndexType;
+
+      /// \compilerhack MSVC 2013 template bug workaround
+#ifdef FEAST_COMPILER_MICROSOFT
+      template <typename... RestCont_>
+      using VecTypeHelper = class TupleVector<RestCont_..., typename First_::VectorType>;
+#endif
+
+      typedef TupleVector<typename First_::VectorType> VectorType;
 
     protected:
       /// the first sub-filter
@@ -273,68 +287,29 @@ namespace FEAST
         return first();
       }
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
       /** \copydoc UnitFilter::filter_rhs() */
-      template<typename... Tv_>
-      void filter_rhs(TupleVector<Tv_...>& vector) const
-      {
-        static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        first().filter_rhs(vector.first());
-      }
-
-      /** \copydoc UnitFilter::filter_sol() */
-      template<typename... Tv_>
-      void filter_sol(TupleVector<Tv_...>& vector) const
-      {
-        static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        first().filter_sol(vector.first());
-      }
-
-      /** \copydoc UnitFilter::filter_def() */
-      template<typename... Tv_>
-      void filter_def(TupleVector<Tv_...>& vector) const
-      {
-        static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        first().filter_def(vector.first());
-      }
-
-      /** \copydoc UnitFilter::filter_cor() */
-      template<typename... Tv_>
-      void filter_cor(TupleVector<Tv_...>& vector) const
-      {
-        static_assert(sizeof...(Tv_) == std::size_t(1), "invalid TupleVector size");
-        first().filter_cor(vector.first());
-      }
-#else // any other compiler
-      /** \copydoc UnitFilter::filter_rhs() */
-      template<typename Tv_>
-      void filter_rhs(TupleVector<Tv_>& vector) const
+      void filter_rhs(VectorType& vector) const
       {
         first().filter_rhs(vector.first());
       }
 
       /** \copydoc UnitFilter::filter_sol() */
-      template<typename Tv_>
-      void filter_sol(TupleVector<Tv_>& vector) const
+      void filter_sol(VectorType& vector) const
       {
         first().filter_sol(vector.first());
       }
 
       /** \copydoc UnitFilter::filter_def() */
-      template<typename Tv_>
-      void filter_def(TupleVector<Tv_>& vector) const
+      void filter_def(VectorType& vector) const
       {
         first().filter_def(vector.first());
       }
 
       /** \copydoc UnitFilter::filter_cor() */
-      template<typename Tv_>
-      void filter_cor(TupleVector<Tv_>& vector) const
+      void filter_cor(VectorType& vector) const
       {
         first().filter_cor(vector.first());
       }
-#endif // FEAST_COMPILER_MICROSOFT
     }; // class TupleFilter
     /// \endcond
   } // namespace LAFEM

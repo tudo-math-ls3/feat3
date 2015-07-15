@@ -26,20 +26,19 @@ namespace FEAST
       /**
        * \brief Assembles an intergral mean filter
        *
-       * \param[out] filter
-       * The filter to be assembled.
+       * \param[out] vec_prim, vec_dual
+       * The primal and dual vectors for the mean filter.
        *
        * \param[in] space
        * The finite element space for which the filter is to be assembled.
        *
        * \param[in] cubature_factory
        * A cubature factory for integration.
-       *
-       * \todo This functions needs to synchronise for parallel vectors
        */
       template<typename MemType_, typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_>
       static void assemble(
-        LAFEM::MeanFilter<MemType_, DataType_, IndexType_>& filter,
+        LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_prim,
+        LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vec_dual,
         const Space_& space, const CubatureFactory_& cubature_factory)
       {
         // allocate primal and dual vectors
@@ -56,14 +55,38 @@ namespace FEAST
         // assemble 1-function force into vector w
         Assembly::LinearFunctionalAssembler::assemble_vector(vec_w, one_force, space, cubature_factory);
 
-        // compute the dot-product to obtain domain volume
-        DataType_ vol = vec_w.dot(vec_v);
+        // convert mem types
+        vec_prim.convert(vec_v);
+        vec_dual.convert(vec_w);
+      }
+
+      /**
+       * \brief Assembles an intergral mean filter
+       *
+       * \param[out] filter
+       * The filter to be assembled.
+       *
+       * \param[in] space
+       * The finite element space for which the filter is to be assembled.
+       *
+       * \param[in] cubature_factory
+       * A cubature factory for integration.
+       *
+       * \warning This function does not work for global mean filters!
+       */
+      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_>
+      static void assemble(
+        LAFEM::MeanFilter<LAFEM::DenseVector<MemType_, DataType_, IndexType_>>& filter,
+        const Space_& space, const CubatureFactory_& cubature_factory)
+      {
+        // allocate primal and dual vectors
+        LAFEM::DenseVector<MemType_, DataType_, IndexType_> vec_prim, vec_dual;
+
+        // assemble vectors
+        assemble(vec_prim, vec_dual, space, cubature_factory);
 
         // create the filter
-        LAFEM::MeanFilter<Mem::Main, DataType_, IndexType_> mean_filter(std::move(vec_v), std::move(vec_w), vol);
-
-        // convert to correct memory architecture
-        filter.convert(mean_filter);
+        filter = LAFEM::MeanFilter<MemType_, DataType_, IndexType_>(std::move(vec_prim), std::move(vec_dual));
       }
     }; // class MeanFilterAssembler
   } // namespace Assembly

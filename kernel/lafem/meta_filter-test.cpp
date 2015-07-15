@@ -26,7 +26,7 @@ public:
   typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
   typedef UnitFilter<MemType_, DataType, IndexType> ScalarFilter1;
-  typedef MeanFilter<MemType_, DataType, IndexType> ScalarFilter2;
+  typedef MeanFilter<ScalarVector> ScalarFilter2;
   typedef PowerFilter<ScalarFilter1, 2> PowerFilter2;
   typedef TupleFilter<PowerFilter2, ScalarFilter2> MetaFilter;
 
@@ -50,7 +50,7 @@ public:
       fw[i] = DataType(i+1);
 
     // create a mean-filter
-    MeanFilter<Mem::Main, DataType, IndexType> mean_filter(std::move(mfv), std::move(mfw), DataType(((m+1)*(m+2))/2));
+    MeanFilter<DenseVector<Mem::Main, DataType, IndexType>> mean_filter(std::move(mfv), std::move(mfw), DataType(((m+1)*(m+2))/2));
 
     // create a power-filer
     PowerFilter2 power_filter;
@@ -115,6 +115,7 @@ public:
     tvz.convert(vz);
     return MetaVector(std::move(vec), std::move(tvz));
   }
+
   virtual void run() const
   {
     const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));

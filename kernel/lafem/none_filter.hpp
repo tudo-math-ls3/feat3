@@ -32,24 +32,17 @@ namespace FEAST
       /// index-type typedef
       typedef IndexType_ IndexType;
 
+      /// our supported vector type
+      typedef DenseVector<MemType, DataType, IndexType> VectorType;
+
       /// Creates and returns a (empty) deep copy of this filter.
       NoneFilter clone() const
       {
         return NoneFilter();
       }
 
-      template<typename Matrix_>
-      void filter_mat(Matrix_&) const
-      {
-      }
-
-      template<typename Matrix_>
-      void filter_offdiag_row_mat(Matrix_&) const
-      {
-      }
-
-      template<typename Matrix_>
-      void filter_offdiag_col_mat(Matrix_&) const
+      template<typename MT2_, typename DT2_, typename IT2_>
+      void convert(const NoneFilter<MT2_, DT2_, IT2_>&)
       {
       }
 
@@ -59,7 +52,7 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the right-hand-side vector to be filtered.
        */
-      void filter_rhs(DenseVector<MemType,DataType,IndexType>&) const
+      void filter_rhs(VectorType&) const
       {
       }
 
@@ -69,7 +62,7 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the solution vector to be filtered.
        */
-      void filter_sol(DenseVector<MemType,DataType,IndexType>&) const
+      void filter_sol(VectorType&) const
       {
       }
 
@@ -79,7 +72,7 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the defect vector to be filtered.
        */
-      void filter_def(DenseVector<MemType,DataType,IndexType>&) const
+      void filter_def(VectorType&) const
       {
       }
 
@@ -89,7 +82,7 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the correction vector to be filtered.
        */
-      void filter_cor(DenseVector<MemType,DataType,IndexType>&) const
+      void filter_cor(VectorType&) const
       {
       }
     }; // class NoneFilter<...>

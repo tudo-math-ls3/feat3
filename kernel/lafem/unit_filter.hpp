@@ -34,6 +34,9 @@ namespace FEAST
       /// index-type typedef
       typedef IT_ IndexType;
 
+      /// our supported vector type
+      typedef DenseVector<MemType, DataType, IndexType> VectorType;
+
     private:
       /// SparseVector, containing all entries of the unit filter
       SparseVector<Mem_, DT_, IT_> _sv;
