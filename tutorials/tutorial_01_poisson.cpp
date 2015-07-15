@@ -377,22 +377,22 @@ namespace Tutorial01
     std::cout << "Solving linear system..." << std::endl;
 
     // Create a SSOR preconditioner
-    LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner> precond(matrix);
+    auto precond = std::make_shared<LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner>>(matrix);
 
     // Create a PCG solver
-    LAFEM::PCGSolver<MatrixType, FilterType> solver(matrix, filter, &precond);
+    auto solver = std::make_shared<LAFEM::PCGSolver<MatrixType, FilterType>>(matrix, filter, precond);
 
     // Enable convergence plot
-    solver.set_plot(true);
+    solver->set_plot(true);
 
     // Initialise the solver
-    solver.init();
+    solver->init();
 
     // Correct our initial solution vector
-    solver.correct(vec_sol, vec_rhs);
+    solver->correct(vec_sol, vec_rhs);
 
     // Release the solver
-    solver.done();
+    solver->done();
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Computing L2/H1-Errors

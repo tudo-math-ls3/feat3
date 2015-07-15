@@ -288,7 +288,7 @@ namespace MatrixCond
       FilterType filter;
 
       // create CG solver
-      LAFEM::PCGSolver<Matrix_, FilterType> solver(matrix, filter, &precon);
+      LAFEM::PCGSolver<Matrix_, FilterType> solver(matrix, filter, precon);
       solver.init();
       solver.set_max_iter(pcg_maxiter);
 
@@ -349,7 +349,7 @@ namespace MatrixCond
     int calc_min_sv_spd(const MatrixType& matrix, VectorType& vec)
     {
       std::cout << "Computing minimal singular value by powering PCG(A)..." << std::endl;
-      LAFEM::PreconWrapper<MatrixType, LAFEM::JacobiPreconditioner> precon(matrix);
+      auto precon = std::make_shared<LAFEM::PreconWrapper<MatrixType, LAFEM::JacobiPreconditioner>>(matrix);
       int rtn = calc_min_sv(matrix, precon, vec);
       if(rtn > 0)
         value = DataType(1) / value;
@@ -372,7 +372,7 @@ namespace MatrixCond
       }
 
       // create a diagonal preconditioner
-      LAFEM::PreconWrapper<MatrixATA, LAFEM::DiagonalPreconditioner> precon(std::move(vdiag));
+      auto precon = std::make_shared<LAFEM::PreconWrapper<MatrixATA, LAFEM::DiagonalPreconditioner>>(std::move(vdiag));
 
       // compute minsv
       int rtn = calc_min_sv(mat_ata, precon, vec);

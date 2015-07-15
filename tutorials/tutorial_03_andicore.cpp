@@ -580,22 +580,22 @@ namespace Tutorial03
     std::cout << "Solving linear system..." << std::endl;
 
     // Create a SPAI preconditioner
-    LAFEM::PreconWrapper<MatrixType, LAFEM::SPAIPreconditioner> precond(matrix, matrix.layout());
+    auto precond = std::make_shared<LAFEM::PreconWrapper<MatrixType, LAFEM::SPAIPreconditioner>>(matrix, matrix.layout());
 
     // Create a preconditioned BiCGStab solver
-    LAFEM::BiCGStabSolver<MatrixType, FilterType> solver(matrix, filter, &precond);
+    auto solver = std::make_shared<LAFEM::BiCGStabSolver<MatrixType, FilterType>>(matrix, filter, precond);
 
     // Enable convergence plot
-    solver.set_plot(true);
+    solver->set_plot(true);
 
     // Initialise the solver
-    solver.init();
+    solver->init();
 
     // Correct our initial solution vector
-    solver.correct(vec_sol, vec_rhs);
+    solver->correct(vec_sol, vec_rhs);
 
     // And release the solver
-    solver.done();
+    solver->done();
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Computing L2/H1-Errors

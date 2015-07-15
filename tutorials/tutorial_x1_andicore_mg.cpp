@@ -455,7 +455,7 @@ namespace TutorialX1
     MatrixType mat_rest;
 
     // A pointer for our smoother or coarse mesh preconditioner
-    SmootherType* smoother;
+    std::shared_ptr<SmootherType> smoother;
 
   public:
     // The CTOR creates the mesh and the boundary from the factories, afterwards initialises
@@ -477,8 +477,6 @@ namespace TutorialX1
     // as does the DTOR
     virtual ~SystemLevel()
     {
-      if(smoother)
-        delete smoother;
     }
 
     // now things get interesting. This aux. routine does all the magic to switch from
@@ -573,15 +571,13 @@ namespace TutorialX1
     }
 
     // You guess: sets the smoother for this level
-    void set_smoother(SmootherType* new_smoother)
+    void set_smoother(std::shared_ptr<SmootherType> new_smoother)
     {
-      if(smoother != nullptr)
-        delete smoother;
       smoother = new_smoother;
     }
 
     // Returns the smoother pointer
-    SmootherType* get_smoother()
+    std::shared_ptr<SmootherType> get_smoother()
     {
       return smoother;
     }
@@ -721,7 +717,7 @@ namespace TutorialX1
 
       // create a damped Jacobi smoother
       (*it)->set_smoother(
-        new LAFEM::PreconWrapper<SystemLevel::MatrixType, LAFEM::JacobiPreconditioner>((*it)->mat_sys, 0.7)
+        std::make_shared<LAFEM::PreconWrapper<SystemLevel::MatrixType, LAFEM::JacobiPreconditioner>>((*it)->mat_sys, 0.7)
       );
     }
 
@@ -730,9 +726,8 @@ namespace TutorialX1
     // Note: We need to create the coarse grid solver on the heap because it references data which
     // is owned by our level objects. These are going to be deleted at the end of this function and,
     // if we created the solver on the stack, it would have orphaned references afterwards.
-    LAFEM::BiCGStabSolver<SystemLevel::MatrixType, SystemLevel::FilterType>* coarse_solver =
-      new LAFEM::BiCGStabSolver<SystemLevel::MatrixType, SystemLevel::FilterType>
-        (levels.front()->mat_sys, levels.front()->filter, levels.front()->smoother);
+    auto coarse_solver = std::make_shared<LAFEM::BiCGStabSolver<SystemLevel::MatrixType, SystemLevel::FilterType>>
+      (levels.front()->mat_sys, levels.front()->filter, levels.front()->smoother);
 
     // configure the coarse grid solver
     coarse_solver->set_tol_rel(1E-5);
@@ -795,7 +790,7 @@ namespace TutorialX1
 
     // release and delete our coarse-grid solver
     coarse_solver->done();
-    delete coarse_solver;
+    coarse_solver.reset();
 
     // compute errors
     levels.back()->compute_errors();

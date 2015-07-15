@@ -381,10 +381,10 @@ namespace ElementRegression
     virtual void solve_system(const MatrixType& matrix, const FilterType& filter, VectorType& vec_sol, const VectorType& vec_rhs) const
     {
       // create a SSOR preconditioner
-      LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner> precon(matrix, DataType(1));
+      auto precon = std::make_shared<LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner>>(matrix, DataType(1));
 
       // create a PCG solver
-      LAFEM::PCGSolver<MatrixType, FilterType> solver(matrix, filter, &precon);
+      LAFEM::PCGSolver<MatrixType, FilterType> solver(matrix, filter, precon);
 
       // configure solver
       solver.set_max_iter(1000);

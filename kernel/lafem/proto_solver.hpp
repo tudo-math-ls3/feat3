@@ -8,6 +8,7 @@
 #include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/tuple_filter.hpp>
+
 #include <memory>
 #include <utility>
 #include <deque>
@@ -425,15 +426,11 @@ namespace FEAST
       /// our system filter
       const FilterType& _filter;
       /// our A-block solver
-      SolverA* _solver_a;
+      std::shared_ptr<SolverA> _solver_a;
       /// our S-block solver
-      SolverS* _solver_s;
+      std::shared_ptr<SolverS> _solver_s;
       /// our Schur-Complement type
       SchurType _schur_type;
-      /// specifies whether to delete _solver_a
-      bool _del_a;
-      /// specifies whether to delete _solver_s
-      bool _del_s;
       /// a temporary defec vector
       VectorType _vec_tmp;
 
@@ -455,26 +452,16 @@ namespace FEAST
        *
        * \param[in] type
        * Specifies the type of the preconditioner. See this class' documentation for details.
-       *
-       * \param[in] del_a
-       * Specifies whether to delete the solver_a object upon destruction of this object.
-       *
-       * \param[in] del_s
-       * Specifies whether to delete the solver_s object upon destruction of this object.
        */
       explicit SchurPrecond(
         const MatrixType& matrix, const FilterType& filter,
-        SolverA* solver_a, SolverS* solver_s,
-        SchurType type = SchurType::diagonal,
-        bool del_a = false, bool del_s = false
-        ) :
+        std::shared_ptr<SolverA> solver_a, std::shared_ptr<SolverS> solver_s,
+        SchurType type = SchurType::diagonal) :
         _matrix(matrix),
         _filter(filter),
         _solver_a(solver_a),
         _solver_s(solver_s),
-        _schur_type(type),
-        _del_a(del_a),
-        _del_s(del_s)
+        _schur_type(type)
       {
         ASSERT_(solver_a != nullptr);
         ASSERT_(solver_s != nullptr);
@@ -482,10 +469,6 @@ namespace FEAST
 
       virtual ~SchurPrecond()
       {
-        if(_del_a && (_solver_a != nullptr))
-          delete _solver_a;
-        if(_del_s && (_solver_s != nullptr))
-          delete _solver_s;
       }
 
       virtual String name() const override
@@ -1070,9 +1053,7 @@ namespace FEAST
 
     protected:
       /// the pointer to the preconditioner
-      PrecondType* _precond;
-      /// specifies whether to delete the preconditioner upon destruction
-      bool _del_precond;
+      std::shared_ptr<PrecondType> _precond;
 
       /**
        * \brief Constructor
@@ -1088,24 +1069,17 @@ namespace FEAST
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be nullptr.
-       *
-       * \param[in] del_precond
-       * Specifies whether the preconditioner object should be deleted upon
-       * destruction of this solver object.
        */
       explicit PreconditionedIterativeSolver(String plot_name, const MatrixType& matrix, const FilterType& filter,
-        PrecondType* precond = nullptr, bool del_precond = false) :
+        std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass(plot_name, matrix, filter),
-        _precond(precond),
-        _del_precond(del_precond)
+        _precond(precond)
       {
       }
 
       /// virtual destructor
       virtual ~PreconditionedIterativeSolver()
       {
-        if((_precond != nullptr) && _del_precond)
-          delete _precond;
       }
 
     public:
@@ -1216,14 +1190,10 @@ namespace FEAST
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
-       *
-       * \param[in] del_precond
-       * Specifies whether the preconditioner object should be deleted upund
-       * destruction of this solver object.
        */
       explicit FixPointSolver(const MatrixType& matrix, const FilterType& filter,
-        PrecondType* precond = nullptr, bool del_precond = false) :
-        BaseClass("FixPoint", matrix, filter, precond, del_precond)
+        std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass("FixPoint", matrix, filter, precond)
       {
       }
 
@@ -1358,14 +1328,10 @@ namespace FEAST
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
-       *
-       * \param[in] del_precond
-       * Specifies whether the preconditioner object should be deleted upund
-       * destruction of this solver object.
        */
       explicit PCGSolver(const MatrixType& matrix, const FilterType& filter,
-        PrecondType* precond = nullptr, bool del_precond = false) :
-        BaseClass("PCG", matrix, filter, precond, del_precond)
+        std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass("PCG", matrix, filter, precond)
       {
       }
 
@@ -1540,14 +1506,10 @@ namespace FEAST
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
-       *
-       * \param[in] del_precond
-       * Specifies whether the preconditioner object should be deleted upund
-       * destruction of this solver object.
        */
       explicit FGMRESSolver(const MatrixType& matrix, const FilterType& filter, Index krylov_dim,
-        DataType inner_res_scale = DataType(0), PrecondType* precond = nullptr, bool del_precond = false) :
-        BaseClass("FGMRES(" + stringify(krylov_dim) + ")", matrix, filter, precond, del_precond),
+        DataType inner_res_scale = DataType(0), std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass("FGMRES(" + stringify(krylov_dim) + ")", matrix, filter, precond),
         _krylov_dim(krylov_dim),
         _inner_res_scale(inner_res_scale)
       {
@@ -1778,14 +1740,10 @@ namespace FEAST
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
-       *
-       * \param[in] del_precond
-       * Specifies whether the preconditioner object should be deleted upund
-       * destruction of this solver object.
        */
       explicit BiCGStabSolver(const MatrixType& matrix, const FilterType& filter,
-        PrecondType* precond = nullptr, bool del_precond = false) :
-        BaseClass("BiCGStab", matrix, filter, precond, del_precond)
+        std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass("BiCGStab", matrix, filter, precond)
       {
       }
 

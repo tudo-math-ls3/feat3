@@ -114,27 +114,27 @@ public:
     // test PCG-SSOR
     {
       // create a SSOR preconditioner
-      PreconWrapper<MatrixType, LAFEM::SSORPreconditioner> precon(matrix);
+      auto precon = std::make_shared<PreconWrapper<MatrixType, LAFEM::SSORPreconditioner>>(matrix);
       // create a CG solver
-      PCGSolver<MatrixType, FilterType> solver(matrix, filter, &precon);
+      PCGSolver<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("PCG-SSOR", solver, vec_sol, vec_ref, vec_rhs);
     }
 
     // test FGMRES-ILU
     {
       // create an SPAI preconditioner
-      PreconWrapper<MatrixType, SPAIPreconditioner> precon(matrix, matrix.layout());
+      auto precon = std::make_shared<PreconWrapper<MatrixType, SPAIPreconditioner>>(matrix, matrix.layout());
       // create a fix-point solver
-      FGMRESSolver<MatrixType, FilterType> solver(matrix, filter, 16, 0.0, &precon);
+      FGMRESSolver<MatrixType, FilterType> solver(matrix, filter, 16, 0.0, precon);
       test_solver("FGMRES(16)-SPAI", solver, vec_sol, vec_ref, vec_rhs);
     }
 
     // test Fix-Point-SOR
     {
       // create a SOR preconditioner
-      PreconWrapper<MatrixType, SORPreconditioner> precon(matrix, DataType(1.7));
+      auto precon = std::make_shared<PreconWrapper<MatrixType, SORPreconditioner>>(matrix, DataType(1.7));
       // create a fix-point solver
-      FixPointSolver<MatrixType, FilterType> solver(matrix, filter, &precon);
+      FixPointSolver<MatrixType, FilterType> solver(matrix, filter, precon);
       solver.set_max_iter(1000);
       test_solver("FixPoint-SOR(1.7)", solver, vec_sol, vec_ref, vec_rhs);
     }
@@ -142,9 +142,9 @@ public:
     // test BiCGStab-ILU(0)
     {
       // create a ILU(0) preconditioner
-      PreconWrapper<MatrixType, ILUPreconditioner> precon(matrix, Index(0));
+      auto precon = std::make_shared<PreconWrapper<MatrixType, ILUPreconditioner>>(matrix, Index(0));
       // create a BiCGStab solver
-      BiCGStabSolver<MatrixType, FilterType> solver(matrix, filter, &precon);
+      BiCGStabSolver<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("BiCGStab-ILU(0)", solver, vec_sol, vec_ref, vec_rhs);
     }
 
