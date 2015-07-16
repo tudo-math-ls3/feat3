@@ -136,23 +136,13 @@ namespace FEAST
       /**
        * \brief Creates and returns a copy of this vector
        *
-       * \param[in] clone_mode
+       * \param[in] mode
        * Determines the type of clone returned (shallow, weak, layout, deep)
        *
        */
-      PowerVector clone(CloneMode clone_mode) const
+      PowerVector clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return PowerVector(_first.clone(clone_mode), _rest.clone(clone_mode));
-      }
-
-      /**
-       * \brief Creates and returns a copy of this vector
-       *
-       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
-       */
-      PowerVector clone() const
-      {
-        return PowerVector(_first.clone(), _rest.clone());
+        return PowerVector(_first.clone(mode), _rest.clone(mode));
       }
 
       /**
@@ -528,23 +518,13 @@ namespace FEAST
       /**
        * \brief Creates and returns a copy of this vector
        *
-       * \param[in] clone_mode
+       * \param[in] mode
        * Determines the type of clone returned (shallow, weak, layout, deep)
        *
        */
-      PowerVector clone(CloneMode clone_mode) const
+      PowerVector clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return PowerVector(_first.clone(clone_mode));
-      }
-
-      /**
-       * \brief Creates and returns a copy of this vector
-       *
-       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
-       */
-      PowerVector clone() const
-      {
-        return PowerVector(_first.clone());
+        return PowerVector(_first.clone(mode));
       }
 
       /**

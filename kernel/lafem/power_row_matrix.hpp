@@ -255,9 +255,9 @@ namespace FEAST
       /**
        * \brief Creates and returns a deep copy of this matrix.
        */
-      PowerRowMatrix clone() const
+      PowerRowMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return PowerRowMatrix(_first.clone(), _rest.clone());
+        return PowerRowMatrix(_first.clone(mode), _rest.clone(mode));
       }
 
       /**
@@ -657,9 +657,9 @@ namespace FEAST
         _first.write_out(mode, directory + prefix + "_pr" + stringify(length) + suffix);
       }
 
-      PowerRowMatrix clone() const
+      PowerRowMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return PowerRowMatrix(_first.clone());
+        return PowerRowMatrix(_first.clone(mode));
       }
 
       template<int i, int j>

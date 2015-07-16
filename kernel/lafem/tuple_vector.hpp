@@ -127,24 +127,13 @@ namespace FEAST
       /**
        * \brief Creates and returns a copy of this vector
        *
-       * \param[in] clone_mode
+       * \param[in] mode
        * Determines the type of clone returned (shallow, weak, layout, deep)
        *
        */
-      TupleVector clone(CloneMode clone_mode) const
+      TupleVector clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return TupleVector(_first.clone(clone_mode), _rest.clone(clone_mode));
-      }
-
-      /**
-       * \brief Creates and returns a copy of this vector
-       *
-       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
-       *
-       */
-      TupleVector clone() const
-      {
-        return TupleVector(_first.clone(), _rest.clone());
+        return TupleVector(_first.clone(mode), _rest.clone(mode));
       }
 
       /**
@@ -435,23 +424,13 @@ namespace FEAST
       /**
        * \brief Creates and returns a copy of this vector
        *
-       * \param[in] clone_mode
+       * \param[in] mode
        * Determines the type of clone returned (shallow, weak, layout, deep)
        *
        */
-      TupleVector clone(CloneMode clone_mode) const
+      TupleVector clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return TupleVector(_first.clone(clone_mode));
-      }
-
-      /**
-       * \brief Creates and returns a copy of this vector
-       *
-       * As the default CloneMode of the underlying containers is unknown, this has to be seperate.
-       */
-      TupleVector clone() const
-      {
-        return TupleVector(_first.clone());
+        return TupleVector(_first.clone(mode));
       }
 
       /**

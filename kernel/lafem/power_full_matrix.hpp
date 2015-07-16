@@ -179,9 +179,9 @@ namespace FEAST
       /**
        * \brief Creates and returns a deep copy of this matrix.
        */
-      PowerFullMatrix clone() const
+      PowerFullMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return PowerFullMatrix(_container.clone());
+        return PowerFullMatrix(_container.clone(mode));
       }
 
       /**

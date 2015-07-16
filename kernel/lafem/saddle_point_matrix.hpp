@@ -269,9 +269,9 @@ namespace FEAST
       /**
        * \brief Creates and returns a deep copy of this matrix.
        */
-      SaddlePointMatrix clone() const
+      SaddlePointMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return SaddlePointMatrix(_matrix_a.clone(), _matrix_b.clone(), _matrix_d.clone());
+        return SaddlePointMatrix(_matrix_a.clone(mode), _matrix_b.clone(mode), _matrix_d.clone(mode));
       }
 
       /// Returns the sub-matrix block A.

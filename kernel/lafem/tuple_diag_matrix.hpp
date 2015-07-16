@@ -270,9 +270,9 @@ namespace FEAST
       /**
        * \brief Creates and returns a deep copy of this matrix.
        */
-      TupleDiagMatrix clone() const
+      TupleDiagMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return TupleDiagMatrix(_first.clone(), _rest.clone());
+        return TupleDiagMatrix(_first.clone(mode), _rest.clone(mode));
       }
 
       /**
@@ -721,9 +721,9 @@ namespace FEAST
         _first.write_out(mode, directory + prefix + "_td" + stringify(length) + suffix);
       }
 
-      TupleDiagMatrix clone() const
+      TupleDiagMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return TupleDiagMatrix(_first.clone());
+        return TupleDiagMatrix(_first.clone(mode));
       }
 
       TupleDiagMatrix transpose() const

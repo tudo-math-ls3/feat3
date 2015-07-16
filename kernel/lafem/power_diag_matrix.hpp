@@ -253,9 +253,9 @@ namespace FEAST
       /**
        * \brief Creates and returns a deep copy of this matrix.
        */
-      PowerDiagMatrix clone() const
+      PowerDiagMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return PowerDiagMatrix(_first.clone(), _rest.clone());
+        return PowerDiagMatrix(_first.clone(mode), _rest.clone(mode));
       }
 
       /**
@@ -700,9 +700,9 @@ namespace FEAST
         _first.write_out(mode, directory + prefix + "_pd" + stringify(length) + suffix);
       }
 
-      PowerDiagMatrix clone() const
+      PowerDiagMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
-        return PowerDiagMatrix(_first.clone());
+        return PowerDiagMatrix(_first.clone(mode));
       }
 
       PowerDiagMatrix transpose() const
