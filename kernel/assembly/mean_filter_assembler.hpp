@@ -76,7 +76,7 @@ namespace FEAST
        */
       template<typename MemType_, typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_>
       static void assemble(
-        LAFEM::MeanFilter<LAFEM::DenseVector<MemType_, DataType_, IndexType_>>& filter,
+        LAFEM::MeanFilter<MemType_, DataType_, IndexType_>& filter,
         const Space_& space, const CubatureFactory_& cubature_factory)
       {
         // allocate primal and dual vectors

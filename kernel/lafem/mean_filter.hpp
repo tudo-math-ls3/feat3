@@ -14,12 +14,12 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename Vector_>
+    template<typename Mem_, typename DT_, typename IT_>
     class MeanFilter
     {
     public:
       /// vector-type typedef
-      typedef Vector_ VectorType;
+      typedef DenseVector<Mem_, DT_, IT_> VectorType;
       /// mem-type typedef
       typedef typename VectorType::MemType MemType;
       /// data-type typedef
@@ -104,8 +104,8 @@ namespace FEAST
       }
 
       /// Conversion method
-      template<typename OtherVector_>
-      void convert(const MeanFilter<OtherVector_>& other)
+      template<typename Mem2_, typename DT2_, typename IT2_>
+      void convert(const MeanFilter<Mem2_, DT2_, IT2_>& other)
       {
         _vec_prim.convert(other.get_vec_prim());
         _vec_dual.convert(other.get_vec_dual());
