@@ -92,7 +92,7 @@ def configure_gcc(cpu, buildid, compiler):
       if platform.system() == "Darwin":
         cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
       else:
-        cxxflags += " -march=core-avx2 -avx -m64"
+        cxxflags += " -march=core-avx2 -mavx2 -m64"
     elif cpu == "itanium":
       cxxflags += " -march=itanium"
     elif cpu == "pentium4":
