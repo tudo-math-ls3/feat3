@@ -166,7 +166,7 @@ namespace FEAST
       else
       {
         // write minutes
-        oss << ":" << (micros / 60000000ll);
+        oss << (micros / 60000000ll);
       }
       if(bmillis)
       {
