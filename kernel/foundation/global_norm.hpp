@@ -5,6 +5,7 @@
 #include<kernel/foundation/comm_base.hpp>
 #include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/global_dot.hpp>
+#include<kernel/util/math.hpp>
 
 namespace FEAST
 {
@@ -23,7 +24,7 @@ namespace FEAST
           {
             ///assumes type-1 vector (full entries at inner boundaries)
             GlobalDot<Mem_>::value(r, a, a , frequencies);
-            r = typename VectorT_::DataType(std::sqrt(r));
+            r = typename VectorT_::DataType(Math::sqrt(r));
             return r;
           }
       };
@@ -45,6 +46,5 @@ namespace FEAST
       };
   }
 }
-
 
 #endif

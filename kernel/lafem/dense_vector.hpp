@@ -1002,7 +1002,7 @@ namespace FEAST
        *
        * \param[in] x The first vector.
        *
-       * \param[in] x The second vector.
+       * \param[in] y The second vector.
        *
        * \return The computed triple dot product.
        */

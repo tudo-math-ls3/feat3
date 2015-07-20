@@ -40,8 +40,26 @@ namespace FEAST
       {
         DT_ r(0);
 
-        for (Index i(0) ; i < size ; ++i)
-          r += x[i] * y[i] * z[i];
+        if (x == y)
+        {
+          for (Index i(0) ; i < size ; ++i)
+            r += x[i] * x[i] * z[i];
+        }
+        if (x == z)
+        {
+          for (Index i(0) ; i < size ; ++i)
+            r += x[i] * x[i] * y[i];
+        }
+        if (y == z)
+        {
+          for (Index i(0) ; i < size ; ++i)
+            r += x[i] * y[i] * y[i];
+        }
+        else
+        {
+          for (Index i(0) ; i < size ; ++i)
+            r += x[i] * y[i] * z[i];
+        }
 
         return r;
       }
