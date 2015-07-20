@@ -814,6 +814,18 @@ namespace FEAST
         _plot = plot;
       }
 
+      /// Sets the plot name of the solver.
+      void set_plot_name(const String& name)
+      {
+        _plot_name = name;
+      }
+
+      /// Returns the plot name of the solver.
+      String get_plot_name() const
+      {
+        return _plot_name;
+      }
+
       /// checks for convergence
       bool is_converged() const
       {
