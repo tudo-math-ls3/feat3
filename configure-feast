@@ -65,7 +65,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Debugging: valgrind, cudamemcheck")
   print ("  Precision extensions: quadmath")
   print ("  Compilation optimisations: cotire")
-  print ("  Third party source code: alglib, fparser, umfpack")
+  print ("  Third party source code: alglib, fparser, umfpack, parmetis")
   print ("")
   print ("Note that you need to provide at least a build mode, a parallelisation mode and a compiler.")
   print ("Note that you cannot combine any build id token with the guess token.")

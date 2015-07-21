@@ -414,6 +414,9 @@ icc_version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for lin
 icc_major = int(icc_version["__INTEL_COMPILER"][0:2])
 icc_minor = int(icc_version["__INTEL_COMPILER"][-2:])
 icc_minor2 = int(icc_version["__INTEL_COMPILER_UPDATE"])
+
+
+
 if (not nothirdparty):
   addition = addition + "-umfpack"
   addition = addition + "-fparser"
