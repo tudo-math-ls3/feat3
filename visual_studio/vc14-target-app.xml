@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <!-- import common properties -->
-  <Import Project="vc12-common-props.xml" />
+  <Import Project="vc14-common-props.xml" />
 
   <!-- ********************************************************************* -->
   <!-- Compiler / Linker Properties -->
@@ -44,6 +44,6 @@
   </ItemDefinitionGroup>-->
 
   <!-- import common targets -->
-  <Import Project="vc12-common-options.xml" />
+  <Import Project="vc14-common-options.xml" />
 
 </Project>

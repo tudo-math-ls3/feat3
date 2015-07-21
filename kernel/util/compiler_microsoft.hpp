@@ -16,36 +16,27 @@
 
 // detect the compiler verson and define the FEAST_COMPILER macro
 #  if (_MSC_VER >= 1800)
-#    define FEAST_COMPILER "Microsoft Visual C++ 2013 (or newer)"
+#    define FEAST_COMPILER "Microsoft Visual C++ 2015 (or newer)"
+#  elif (_MSC_VER >= 1800)
+#    define FEAST_COMPILER "Microsoft Visual C++ 2013"
 #  elif (_MSC_VER >= 1700)
 #    define FEAST_COMPILER "Microsoft Visual C++ 2012"
 #  elif (_MSC_VER >= 1600)
 #    define FEAST_COMPILER "Microsoft Visual C++ 2010"
-#  elif (_MSC_VER >= 1500)
-#    define FEAST_COMPILER "Microsoft Visual C++ 2008"
-#  elif (_MSC_VER >= 1400)
-#    define FEAST_COMPILER "Microsoft Visual C++ 2005"
-#  elif (_MSC_VER >= 1310)
-#    define FEAST_COMPILER "Microsoft Visual C++ .NET 2003"
-#  elif (_MSC_VER >= 1300)
-#    define FEAST_COMPILER "Microsoft Visual C++ .NET 2002"
-#  elif (_MSC_VER >= 1200)
-#    define FEAST_COMPILER "Microsoft Visual C++ 6"
 #  else
-  // old MS C/C++ compiler, the time before Visual Studio,
   // this compiler version won't be able to compile Feast anyway...
 #    define FEAST_COMPILER "Microsoft C/C++ compiler"
 #  endif
 
 #  define FEAST_IVDEP __pragma(loop(ivdep))
 
-#define FEAST_DISABLE_WARNINGS __pragma(warning(push, 0))
-#define FEAST_RESTORE_WARNINGS __pragma(warning(pop))
+#  define FEAST_DISABLE_WARNINGS __pragma(warning(push, 0))
+#  define FEAST_RESTORE_WARNINGS __pragma(warning(pop))
 
-#define FORCE_INLINE inline __forceinline
+#  define FORCE_INLINE __forceinline
 
 // define the noinline specifier
-#define NOINLINE __declspec(noinline)
+#  define NOINLINE __declspec(noinline)
 
 // C4061: enumerator 'identifier' in switch of enum 'enumeration' is not explicitly handled by a case label
 // This warning is emitted when a 'switch' handles one or more cases using a 'default' block.

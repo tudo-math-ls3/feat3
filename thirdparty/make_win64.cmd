@@ -3,19 +3,25 @@
 rem ===========================================================================
 rem Check for Visual Studio version
 echo Checking for Visual Studio installation...
-if "%VS120COMNTOOLS%" neq "" set VSPATH=%VS120COMNTOOLS%..\..
+if "%VS140COMNTOOLS%" neq "" (
+  echo Found Visual Studio 2015 installation
+  set VSVER=14
+) else if "%VS120COMNTOOLS%" neq "" (
+  echo Found Visual Studio 2013 installation
+  set VSVER=12
+)
 
 rem Ensure that we have a path to devenv.exe
-if "%VSPATH%" == "" goto novs
+if "%VSVER%" == "" goto novs
 
 rem Call VC batch script
-call "%VSPATH%\VC\vcvarsall.bat" amd64
+call "%%VS%VSVER%0COMNTOOLS%%..\..\VC\vcvarsall.bat" amd64
 
 rem ===========================================================================
 echo **************************************************************************
 if exist "./ALGLIB" (
-  call ./vc12_internal/make_alglib_internal.cmd dbg x64
-  call ./vc12_internal/make_alglib_internal.cmd opt x64
+  call ./vc_internal/make_alglib_vc%VSVER%.cmd dbg x64
+  call ./vc_internal/make_alglib_vc%VSVER%.cmd opt x64
 ) else (
   echo ALGLIB not found; skipping...
   echo.
@@ -24,8 +30,8 @@ if exist "./ALGLIB" (
 rem ===========================================================================
 echo **************************************************************************
 if exist "./SuiteSparse" (
-  call ./vc12_internal/make_umfpack_internal.cmd dbg x64
-  call ./vc12_internal/make_umfpack_internal.cmd opt x64
+  call ./vc_internal/make_umfpack_vc%VSVER%.cmd dbg x64
+  call ./vc_internal/make_umfpack_vc%VSVER%.cmd opt x64
 ) else (
   echo SuiteSparse not found; skipping...
   echo.

@@ -1,0 +1,70 @@
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- ********************************************************************* -->
+  <!-- Project Configurations -->
+  <!-- ********************************************************************* -->
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="dbg|Win32">
+      <Configuration>dbg</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg|x64">
+      <Configuration>dbg</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-mpi|Win32">
+      <Configuration>dbg-mpi</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-mpi|x64">
+      <Configuration>dbg-mpi</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt|Win32">
+      <Configuration>opt</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt|x64">
+      <Configuration>opt</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-mpi|Win32">
+      <Configuration>opt-mpi</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-mpi|x64">
+      <Configuration>opt-mpi</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <!-- ********************************************************************* -->
+  <!-- Configuration to Build-Mode mapping -->
+  <!-- ********************************************************************* -->
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg'">
+    <DebugMode>true</DebugMode>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-mpi'">
+    <DebugMode>true</DebugMode>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt'">
+    <DebugMode>false</DebugMode>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-mpi'">
+    <DebugMode>false</DebugMode>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+  </PropertyGroup>
+</Project>

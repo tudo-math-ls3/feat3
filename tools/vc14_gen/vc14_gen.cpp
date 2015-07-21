@@ -1,13 +1,13 @@
 /**
- * \brief FEAST Visual Studio 2013 Project File Generator
+ * \brief FEAST Visual Studio 2015 Project File Generator
  *
  * This tool can be used to generate FEAST application/tool project files for
- * Microsoft (R) Visual Studio 2013.
+ * Microsoft (R) Visual Studio 2015.
  *
  * \author Peter Zajac
  */
-#if !defined(_MSC_VER) || (_MSC_VER < 1800)
-#error This tool can only be compiled using Visual Studio 2013 or higher.
+#if !defined(_MSC_VER) || (_MSC_VER < 1900)
+#error This tool can only be compiled using Visual Studio 2015 or higher.
 #endif
 
 #include <Windows.h>
@@ -24,8 +24,8 @@
 
 using namespace std;
 
-#define KERNEL_PROJECT_PATH "./kernel/kernel.vc12.vcxproj"
-#define BUILD_MODES_PATH "./visual_studio/vc12-build-modes.xml"
+#define KERNEL_PROJECT_PATH "./kernel/kernel.vc14.vcxproj"
+#define BUILD_MODES_PATH "./visual_studio/vc14-build-modes.xml"
 
 class ArgList :
   public deque<string>
@@ -80,7 +80,7 @@ public:
     parse_build_modes();
   }
 
-  /// parses all build mode stringss from 'vc12-build-modes.xml'
+  /// parses all build mode stringss from 'vc14-build-modes.xml'
   void parse_build_modes()
   {
     cout << "Parsing build modes..." << endl;
@@ -312,7 +312,7 @@ public:
   void write_solution()
   {
     // build solution filename
-    string sln_path(project_path + "\\" + project_name + ".vc12.sln");
+    string sln_path(project_path + "\\" + project_name + ".vc14.sln");
     cout << "Writing solution file: '" << sln_path << "'..." << endl;
     ofstream ofs(sln_path, ios_base::out|ios_base::trunc);
     if(!ofs.is_open() || !ofs.good())
@@ -323,16 +323,17 @@ public:
 
     // write header
     ofs << "Microsoft Visual Studio Solution File, Format Version 12.00" << endl;
-    ofs << "# Visual Studio 2013" << endl;
+    ofs << "# Visual Studio 14" << endl;
+    ofs << "VisualStudioVersion = 14.0.23107.0" << endl;
 
     // include app project
-    ofs << "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"" << project_name << ".vc12\", \"";
-    ofs << project_name << ".vc12.vcxproj\", \"" << project_guid << "\"" << endl;
+    ofs << "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"" << project_name << ".vc14\", \"";
+    ofs << project_name << ".vc14.vcxproj\", \"" << project_guid << "\"" << endl;
     ofs << "EndProject" << endl;
 
     // include kernel project
-    ofs << "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"kernel.vc12\", \"";
-    ofs << root_path << "\\kernel\\kernel.vc12.vcxproj\", \"" << kernel_guid << "\"" << endl;
+    ofs << "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"kernel.vc14\", \"";
+    ofs << root_path << "\\kernel\\kernel.vc14.vcxproj\", \"" << kernel_guid << "\"" << endl;
     ofs << "EndProject" << endl;
 
     // write solution configurations
@@ -377,7 +378,7 @@ public:
   void write_project()
   {
     // build project filename
-    string prj_path(project_path + "\\" + project_name + ".vc12.vcxproj");
+    string prj_path(project_path + "\\" + project_name + ".vc14.vcxproj");
     cout << "Writing project file.: '" << prj_path << "'..." << endl;
     ofstream ofs(prj_path, ios_base::out|ios_base::trunc);
     if(!ofs.is_open() || !ofs.good())
@@ -401,7 +402,7 @@ public:
 
     // write common config import
     ofs << "  <!-- import common config -->" << endl;
-    ofs << "  <Import Project=\"$(FeastRootPath)\\visual_studio\\vc12-common-config.xml\" />" << endl;
+    ofs << "  <Import Project=\"$(FeastRootPath)\\visual_studio\\vc14-common-config.xml\" />" << endl;
 
     // write header inclusion list
     ofs << "  <!-- ********************************************************************* -->" << endl;
@@ -430,13 +431,13 @@ public:
     ofs << "  <!-- Final Imports -->" << endl;
     ofs << "  <!-- ********************************************************************* -->" << endl;
     ofs << "  <ItemGroup>" << endl;
-    ofs << "    <ProjectReference Include=\"$(FeastRootPath)\\kernel\\kernel.vc12.vcxproj\">" << endl;
+    ofs << "    <ProjectReference Include=\"$(FeastRootPath)\\kernel\\kernel.vc14.vcxproj\">" << endl;
     ofs << "      <Project>" << kernel_guid << "</Project>" << endl;
     ofs << "    </ProjectReference>" << endl;
     ofs << "  </ItemGroup>" << endl;
 
     // write app-target import
-    ofs << "  <Import Project=\"$(FeastRootPath)\\visual_studio\\vc12-target-app.xml\" />" << endl;
+    ofs << "  <Import Project=\"$(FeastRootPath)\\visual_studio\\vc14-target-app.xml\" />" << endl;
 
     // end-of-file
     ofs << "</Project>" << endl;
@@ -672,7 +673,7 @@ public:
 int main(int argc, char** argv)
 {
   // print header
-  cout << endl << "FEAST Visual Studio 2013 Project File Generator" << endl << endl;
+  cout << endl << "FEAST Visual Studio 2015 Project File Generator" << endl << endl;
 
   // check for usage/help
   if(argc > 1)
@@ -683,12 +684,12 @@ int main(int argc, char** argv)
       // print help message
       //       123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
       cout << "This tool can be used to generate FEAST application project files for" << endl;
-      cout << "Microsoft (R) Visual Studio 2013." << endl;
+      cout << "Microsoft (R) Visual Studio 2015." << endl;
       cout << endl;
       cout << "Important: This tool must be executed from the FEAST root directory, as it" << endl;
       cout << "           will not be able to resolve references otherwise." << endl;
       cout << endl;
-      cout << "USAGE: vc12gen.exe [-test] <path> [<name>] [options]" << endl;
+      cout << "USAGE: vc14gen.exe [-test] <path> [<name>] [options]" << endl;
       cout << endl;
       cout << "If the '-test' option is given, then <path> specifies the path to a kernel" << endl;
       cout << "test source file for which a test project is to be generated. A corresponding" << endl;

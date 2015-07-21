@@ -1,12 +1,11 @@
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- include build-mode support -->
-  <Import Project="vc12-build-modes.xml"/>
+  <Import Project="vc14-build-modes.xml"/>
 
   <!-- Set platform toolset; must be defined before the following imports -->
   <PropertyGroup Label="Configuration">
-    <!--<PlatformToolset>v120</PlatformToolset> -->
-    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
@@ -58,17 +57,17 @@
 
   <!-- set default build name -->
   <PropertyGroup Condition="'$(FeastBuildName)'==''">
-    <FeastBuildName>$(FeastAppName).vc12-$(Configuration)-$(FeastPlatform)</FeastBuildName>
+    <FeastBuildName>$(FeastAppName).vc14-$(Configuration)-$(FeastPlatform)</FeastBuildName>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
   <!-- FEAST Third-Party Library Detection -->
   <!-- ********************************************************************* -->
-  <PropertyGroup Condition="Exists('..\lib\umfpack.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\lib\umfpack.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
   <!--<PropertyGroup Condition="Exists('$(FeastLibPath)\umfpack.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">-->
     <FeastHaveUmfpack>true</FeastHaveUmfpack>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\lib\alglib.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
+  <PropertyGroup Condition="Exists('..\lib\alglib.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
   <!--<PropertyGroup Condition="Exists('$(FeastLibPath)\alglib.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">-->
     <FeastHaveAlgLib>true</FeastHaveAlgLib>
   </PropertyGroup>
@@ -135,9 +134,9 @@
     <FeastLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
       Include="mkl_intel_lp64.lib" />
     <FeastLibDep Condition="'$(FeastHaveUmfpack)'=='true'"
-      Include="umfpack.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
+      Include="umfpack.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
     <FeastLibDep Condition="'$(FeastHaveAlgLib)'=='true'"
-      Include="alglib.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
+      Include="alglib.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
   </ItemGroup>
 
   <!-- build properties from item lists -->

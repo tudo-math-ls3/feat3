@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- global project properties -->
   <PropertyGroup Label="Globals">
     <ProjectGuid>{98608C16-F806-46BE-BDB4-77BA4023DC38}</ProjectGuid>
@@ -7,7 +7,7 @@
     <FeastRootPath>$(ProjectDir)..</FeastRootPath>
   </PropertyGroup>
   <!-- import common config -->
-  <Import Project="$(FeastRootPath)\visual_studio\vc12-common-config.xml" />
+  <Import Project="$(FeastRootPath)\visual_studio\vc14-common-config.xml" />
   <!-- Kernel Source Exclusion List -->
   <ItemGroup>
     <!-- exclude all test sources -->
@@ -47,5 +47,5 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <!-- import lib target -->
-  <Import Project="$(FeastRootPath)\visual_studio\vc12-target-lib.xml" />
+  <Import Project="$(FeastRootPath)\visual_studio\vc14-target-lib.xml" />
 </Project>

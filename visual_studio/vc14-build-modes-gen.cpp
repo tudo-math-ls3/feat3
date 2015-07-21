@@ -1,12 +1,12 @@
 // ************************************************************************************************
-// This file is used to generate the file 'vc12-build-modes.xml' which is used by
+// This file is used to generate the file 'vc14-build-modes.xml' which is used by
 // the Visual Studio 2013 build system.
 //
 // WARNING:
 // DO NOT MODIFY OR COMPILE THIS FILE UNLESS YOU KNOW *EXACTLY* WHAT YOU ARE DOING !
 //
 // Note:
-// Ignoring the warning above might screw up the VS2012 build system.
+// Ignoring the warning above might screw up the VS2015 build system.
 //
 // \author Peter Zajac
 // ************************************************************************************************
@@ -57,15 +57,15 @@ int main(int argc, char* argv[])
   vector<string> platforms;
   platforms.push_back("Win32");
   platforms.push_back("x64");
-  //platforms.push_back("ARM"); // also offered by VS2013, but currently not used by FEAST
+  //platforms.push_back("ARM"); // also offered by VS2015, but currently not used by FEAST
 
   // create tag set
   vector<tag> tags;
   tags.push_back(tag("dbg","DebugMode", "opt"));
-  tags.push_back(tag("cuda", "BackendCUDA"));
-  tags.push_back(tag("mkl", "BackendMKL"));
+  //tags.push_back(tag("cuda", "BackendCUDA"));
+  //tags.push_back(tag("mkl", "BackendMKL"));
   tags.push_back(tag("mpi", "", "<SerialMode>false</SerialMode>", "<SerialMode>true</SerialMode>"));
-  tags.push_back(tag("omp", "EnableOMP"));
+  //tags.push_back(tag("omp", "EnableOMP"));
 
   // create the build-mode set
   set<string> build_modes;
@@ -83,14 +83,14 @@ int main(int argc, char* argv[])
     build_modes.insert(mode);
   }
 
-  std::ofstream ofs("vc12-build-modes.xml", std::ios_base::out|std::ios_base::trunc);
+  std::ofstream ofs("vc14-build-modes.xml", std::ios_base::out|std::ios_base::trunc);
   if(!ofs.is_open() || !ofs.good())
   {
-    cout << "ERROR: failed to open 'vc12-build-modes.xml' for writing" << endl;
+    cout << "ERROR: failed to open 'vc14-build-modes.xml' for writing" << endl;
     return 1;
   }
 
-  ofs << "<Project DefaultTargets=\"Build\" ToolsVersion=\"12.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" << endl;
+  ofs << "<Project DefaultTargets=\"Build\" ToolsVersion=\"14.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" << endl;
 
   // write project configurations
   ofs << "  <!-- ********************************************************************* -->" << endl;

@@ -29,25 +29,25 @@ if exist %OBJPATH% (
 rem Set Compiler flags
 set CXXFLAGS=%CXXFLAGS% /c /GS /Gd /TP /W3 /WX- /Zc:wchar_t /Zi /Zc:forScope /errorReport:none /EHsc /nologo
 set CXXFLAGS=%CXXFLAGS% /wd"4244"
-set CXXFLAGS=%CXXFLAGS% /I"./ALGLIB/src"
+set CXXFLAGS=%CXXFLAGS% /I"./ALGLIB/cpp/src"
 set CXXFLAGS=%CXXFLAGS% /D "NBLAS" /D "NCHOLMOD" /D "_MBCS"
 set CXXFLAGS=%CXXFLAGS% /Fd"../obj/alglib.vc12-%1-%2/alglib.vc12-%1-%2.pdb"
 set CXXFLAGS=%CXXFLAGS% /Fp"../obj/alglib.vc12-%1-%2/alglib.vc12-%1-%2.pch"
 
 echo Compiling ALGLIB Sources...
-cl %CXXFLAGS% ./ALGLIB/src/alglibinternal.cpp   /Fo"%OBJPATH%/alglibinternal.obj"
-cl %CXXFLAGS% ./ALGLIB/src/alglibmisc.cpp       /Fo"%OBJPATH%/alglibmisc.obj"
-cl %CXXFLAGS% ./ALGLIB/src/ap.cpp               /Fo"%OBJPATH%/ap.obj"
-cl %CXXFLAGS% ./ALGLIB/src/dataanalysis.cpp     /Fo"%OBJPATH%/dataanalysis.obj"
-cl %CXXFLAGS% ./ALGLIB/src/diffequations.cpp    /Fo"%OBJPATH%/diffequations.obj"
-cl %CXXFLAGS% ./ALGLIB/src/fasttransforms.cpp   /Fo"%OBJPATH%/fasttransforms.obj"
-cl %CXXFLAGS% ./ALGLIB/src/integration.cpp      /Fo"%OBJPATH%/integration.obj"
-cl %CXXFLAGS% ./ALGLIB/src/interpolation.cpp    /Fo"%OBJPATH%/interpolation.obj"
-cl %CXXFLAGS% ./ALGLIB/src/linalg.cpp           /Fo"%OBJPATH%/linalg.obj"
-cl %CXXFLAGS% ./ALGLIB/src/optimization.cpp     /Fo"%OBJPATH%/optimization.obj"
-cl %CXXFLAGS% ./ALGLIB/src/solvers.cpp          /Fo"%OBJPATH%/solvers.obj"
-cl %CXXFLAGS% ./ALGLIB/src/specialfunctions.cpp /Fo"%OBJPATH%/specialfunctions.obj"
-cl %CXXFLAGS% ./ALGLIB/src/statistics.cpp       /Fo"%OBJPATH%/statistics.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/alglibinternal.cpp   /Fo"%OBJPATH%/alglibinternal.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/alglibmisc.cpp       /Fo"%OBJPATH%/alglibmisc.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/ap.cpp               /Fo"%OBJPATH%/ap.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/dataanalysis.cpp     /Fo"%OBJPATH%/dataanalysis.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/diffequations.cpp    /Fo"%OBJPATH%/diffequations.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/fasttransforms.cpp   /Fo"%OBJPATH%/fasttransforms.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/integration.cpp      /Fo"%OBJPATH%/integration.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/interpolation.cpp    /Fo"%OBJPATH%/interpolation.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/linalg.cpp           /Fo"%OBJPATH%/linalg.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/optimization.cpp     /Fo"%OBJPATH%/optimization.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/solvers.cpp          /Fo"%OBJPATH%/solvers.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/specialfunctions.cpp /Fo"%OBJPATH%/specialfunctions.obj"
+cl %CXXFLAGS% ./ALGLIB/cpp/src/statistics.cpp       /Fo"%OBJPATH%/statistics.obj"
 
 rem ===============================================================================================
 :link
