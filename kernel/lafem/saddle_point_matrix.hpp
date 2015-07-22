@@ -378,15 +378,8 @@ namespace FEAST
        *
        * \param[in] x
        * The multiplicant vector.
-       *
-       * \compilerhack MSVC 2013 template bug workaround
        */
-#ifdef FEAST_COMPILER_MICROSOFT
-      template<typename VectorL_, typename VectorR_>
-      void apply(VectorL_& r, const VectorR_& x) const
-#else
       void apply(VectorTypeL& r, const VectorTypeR& x) const
-#endif
       {
         block_a().apply(r.template at<0>(), x.template at<0>());
         block_b().apply(r.template at<0>(), x.template at<1>(), r.template at<0>(), DataType(1));
@@ -426,15 +419,8 @@ namespace FEAST
        * \param[in] y
        * The summand vector
        * \param[in] alpha A scalar to scale the product with.
-       *
-       * \compilerhack MSVC 2013 template bug workaround
        */
-#ifdef FEAST_COMPILER_MICROSOFT
-      template<typename VectorL_, typename VectorR_>
-      void apply(VectorL_& r, const VectorR_& x, const VectorL_& y, DataType alpha = DataType(1)) const
-#else
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
-#endif
       {
         block_a().apply(r.template at<0>(), x.template at<0>(), y.template at<0>(), alpha);
         block_b().apply(r.template at<0>(), x.template at<1>(), r.template at<0>(), alpha);

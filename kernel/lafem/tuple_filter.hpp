@@ -53,15 +53,8 @@ namespace FEAST
       static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value,
                     "sub-filters have different index-types");
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
-      template <typename... RestCont_>
-      using VecTypeHelper = typename RestClass::template VecTypeHelper<RestCont_..., typename First_::VectorType>;
-      typedef VecTypeHelper<> VectorType;
-#else
       /// corresponding vector
       typedef TupleVector<typename First_::VectorType, typename Rest_::VectorType...> VectorType;
-#endif
 
     protected:
       /// the first sub-filter
@@ -202,12 +195,6 @@ namespace FEAST
       /// sub-filter index-type
       typedef typename First_::IndexType IndexType;
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
-      template <typename... RestCont_>
-      using VecTypeHelper = class TupleVector<RestCont_..., typename First_::VectorType>;
-#endif
-
       typedef TupleVector<typename First_::VectorType> VectorType;
 
     protected:
@@ -247,21 +234,11 @@ namespace FEAST
         return TupleFilter(_first.clone());
       }
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
-      template<typename... SubFilter2_>
-      void convert(const TupleFilter<SubFilter2_...>& other)
-      {
-        static_assert(sizeof...(SubFilter2_) == std::size_t(1), "invalid TupleFilter size");
-        _first.convert(other._first);
-      }
-#else
       template<typename SubFilter2_>
       void convert(const TupleFilter<SubFilter2_>& other)
       {
         _first.convert(other._first);
       }
-#endif
 
       First_& first()
       {

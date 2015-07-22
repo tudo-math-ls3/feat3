@@ -428,16 +428,9 @@ namespace FEAST
        * \param[in] other The source Vector.
        *
        * Use source vector content as content of current vector
-       *
-       * \compilerhack MSVC 2013 template bug workaround
        */
-#ifdef FEAST_COMPILER_MICROSOFT
-      template<typename SubType2_>
-      void convert(const PowerVector<SubType2_, count_>& other)
-#else
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
-#endif
       {
         CONTEXT("When converting PowerVector");
 
@@ -684,16 +677,9 @@ namespace FEAST
        * \param[in] other The source Vector.
        *
        * Use source vector content as content of current vector
-       *
-       * \compilerhack MSVC 2013 template bug workaround
        */
-#ifdef FEAST_COMPILER_MICROSOFT
-      template<typename SubType2_>
-      void convert(const PowerVector<SubType2_, Index(1)>& other)
-#else
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
-#endif
       {
         CONTEXT("When converting PowerVector");
 

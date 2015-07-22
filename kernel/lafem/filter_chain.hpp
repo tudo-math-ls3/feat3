@@ -229,21 +229,11 @@ namespace FEAST
         return FilterChain(_first.clone());
       }
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
-      template<typename... SubFilter2_>
-      void convert(const FilterChain<SubFilter2_...>& other)
-      {
-        static_assert(sizeof...(SubFilter2_) == std::size_t(1), "invalid FilterChain size");
-        _first.convert(other._first);
-      }
-#else
       template<typename SubFilter2_>
       void convert(const FilterChain<SubFilter2_>& other)
       {
         _first.convert(other._first);
       }
-#endif
 
       First_& first()
       {

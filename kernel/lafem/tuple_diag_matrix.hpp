@@ -44,24 +44,6 @@ namespace FEAST
       /// sub-matrix index type
       typedef typename First_::IndexType IndexType;
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
-      template<typename... RestVecL_>
-      using VecLHelper = typename RestClass::template VecLHelper<RestVecL_..., typename First_::VectorTypeL>;
-      typedef VecLHelper<> VectorTypeL;
-      template<typename... RestVecR_>
-      using VecRHelper = typename RestClass::template VecRHelper<RestVecR_..., typename First_::VectorTypeR>;
-      typedef VecRHelper<> VectorTypeR;
-
-      /// helper class template for ContainerType template
-      template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
-      using ContHelper = typename RestClass::template
-        ContHelper<Mem2_, DT2_, IT2_, RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_>>;
-
-      /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = ContHelper<Mem2_, DT2_, IT2_>;
-#else
       /// Compatible L-vector type
       typedef TupleVector<typename First_::VectorTypeL, typename Rest_::VectorTypeL...> VectorTypeL;
       /// Compatible R-vector type
@@ -72,7 +54,6 @@ namespace FEAST
       using ContainerType = TupleDiagMatrix<
         typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
         typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
-#endif
 
       /// number of row blocks (vertical size)
       static constexpr int num_row_blocks = RestClass::num_row_blocks + 1;
@@ -543,16 +524,9 @@ namespace FEAST
        *
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
-       *
-       * \compilerhack MSVC 2013 template bug workaround
        */
-#ifdef FEAST_COMPILER_MICROSOFT
-      template <typename First2_, typename... Rest2_>
-      friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix<First2_, Rest2_...> & b)
-#else
       template <typename Mem2_>
       friend bool operator== (const TupleDiagMatrix & a, const ContainerType<Mem2_> & b)
-#endif
       {
         CONTEXT("When comparing TupleDiagMatrices");
 
@@ -576,21 +550,8 @@ namespace FEAST
       /// Compatible R-vector type
       typedef TupleVector<typename First_::VectorTypeR> VectorTypeR;
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
-      template<typename... RestVecL_>
-      using VecLHelper = TupleVector<RestVecL_..., typename First_::VectorTypeL>;
-      template<typename... RestVecR_>
-      using VecRHelper = TupleVector<RestVecR_..., typename First_::VectorTypeR>;
-
-      template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
-      using ContHelper = class TupleDiagMatrix<RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
-      template <typename Mem2_, typename DT2_, typename IT2_, typename... Dummy_>
-      using ContainerType = class TupleDiagMatrix<typename First_::template ContainerType<Mem2_, DT2_, IT2_>, Dummy_...>;
-#else
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class TupleDiagMatrix<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
-#endif
 
       static constexpr int num_row_blocks = 1;
       static constexpr int num_col_blocks = 1;
@@ -842,19 +803,10 @@ namespace FEAST
        * \param[in] other The source Matrix.
        *
        * Use source matrix content as content of current matrix
-       *
-       * \compilerhack MSVC 2013 template bug workaround
        */
-#ifdef FEAST_COMPILER_MICROSOFT
-      template <typename First2_, typename... Rest2_>
-      void convert(const TupleDiagMatrix<First2_, Rest2_...>& other)
-      {
-        static_assert(sizeof...(Rest2_) == std::size_t(0), "invalid TupleDiagMatrix size");
-#else
       template <typename First2_>
       void convert(const TupleDiagMatrix<First2_>& other)
       {
-#endif
         CONTEXT("When converting TupleDiagMatrix");
 
         this->first().convert(other.first());
@@ -865,16 +817,9 @@ namespace FEAST
        *
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
-       *
-       * \compilerhack MSVC 2013 template bug workaround
        */
-#ifdef FEAST_COMPILER_MICROSOFT
-      template <typename First2_, typename... Rest2_>
-      friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix<First2_, Rest2_...> & b)
-#else
       template <typename Mem2_>
       friend bool operator== (const TupleDiagMatrix & a, const ContainerType<Mem2_> & b)
-#endif
       {
         CONTEXT("When comparing TupleDiagMatrices");
 

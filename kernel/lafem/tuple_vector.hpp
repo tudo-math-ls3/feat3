@@ -44,22 +44,11 @@ namespace FEAST
       /// sub-vector index-type
       typedef typename First_::IndexType IndexType;
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
-      /// helper class template for ContainerType template
-      template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
-      using ContHelper = typename RestClass::template
-        ContHelper<Mem2_, DT2_, IT2_, RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_>>;
-      /// Our 'base' class type
-      template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
-      using ContainerType = ContHelper<Mem2_, DT2_, IT2_>;
-#else
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = TupleVector<
         typename First_::template ContainerType<Mem2_, DT2_, IT2_>,
         typename Rest_::template ContainerType<Mem2_, DT2_, IT2_>...>;
-#endif
 
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
@@ -371,16 +360,8 @@ namespace FEAST
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;
 
-      /// \compilerhack MSVC 2013 template bug workaround
-#ifdef FEAST_COMPILER_MICROSOFT
-      template <typename Mem2_, typename DT2_, typename IT2_, typename... RestCont_>
-      using ContHelper = class TupleVector<RestCont_..., typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
-      template <typename Mem2_, typename DT2_, typename IT2_, typename... Dummy_>
-      using ContainerType = class TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_>, Dummy_...>;
-#else
       template <typename Mem2_, typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = class TupleVector<typename First_::template ContainerType<Mem2_, DT2_, IT2_> >;
-#endif
 
     protected:
       First_ _first;
@@ -590,19 +571,10 @@ namespace FEAST
        * \param[in] other The source Vector.
        *
        * Use source vector content as content of current vector
-       *
-       * \compilerhack MSVC 2013 template bug workaround
        */
-#ifdef FEAST_COMPILER_MICROSOFT
-      template <typename First2_, typename... Rest2_>
-      void convert(const TupleVector<First2_, Rest2_...>& other)
-      {
-        static_assert(sizeof...(Rest2_) == std::size_t(0), "invalud TupleVector size");
-#else
       template <typename First2_>
       void convert(const TupleVector<First2_>& other)
       {
-#endif
         CONTEXT("When converting TupleVector");
 
         this->first().convert(other.first());
