@@ -363,11 +363,14 @@ namespace MatrixInfo
     }
 
     // now loop again over the matrix rows
-    // we need to now the max row degree to calculate row distribution
+    // we need to know the max row degree to calculate row distribution
     for(Index i(0); i < nrows; ++i)
     {
-      float percentage(float(vnze_row[i]) / float(row_degree) * float(100));
-      row_degree_distribution_counts[Index(percentage) / Index(row_degree_distribution_counts.size())] += Index(1);
+      float percentage(float(vnze_row[i]) / float(row_degree) * float(10));
+      percentage = Math::floor(percentage);
+      percentage = Math::min(percentage, float(9));
+      std::cout<<percentage<<std::endl;
+      row_degree_distribution_counts.at(Index(percentage)) += Index(1);
     }
     // format distribution string
     for(Index i(0) ; i < Index(row_degree_distribution_counts.size()) ; ++i)
