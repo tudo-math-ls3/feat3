@@ -195,7 +195,7 @@ namespace FEAST
       explicit SparseMatrixELL(Index rows_in, Index columns_in, const Index C_in = 32) :
         Container<Mem_, DT_, IT_> (rows_in * columns_in)
       {
-        CONTEXT("When creating SparseMatrixCSR");
+        CONTEXT("When creating SparseMatrixELL");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(C_in);
