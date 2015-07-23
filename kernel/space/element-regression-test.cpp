@@ -218,7 +218,7 @@ namespace ElementRegression
 
   public:
     explicit ElementRegressionBase(String name, Index level, double h0, double h1, double h2) :
-      TestSystem::BaseTest(name + ":" + SpaceType::name() + ":" + Shape_::name() + ":" + stringify(_level)),
+      TestSystem::BaseTest(name + ":" + SpaceType::name() + ":" + Shape_::name() + ":" + stringify(level)),
       _level(level),
       cubature_factory("auto-degree:" + stringify(Math::sqr(SpaceType::local_degree+1)+1)),
       h0_ref(h0),
@@ -373,8 +373,12 @@ namespace ElementRegression
     typedef typename BaseClass::TrafoType TrafoType;
     typedef typename BaseClass::SpaceType SpaceType;
 
-    explicit ElementRegressionSystem(String name, Index level, double h0, double h1, double h2) :
-      BaseClass(name, level, h0, h1, h2)
+    /// relative solver tolerance
+    double sol_tol;
+
+    explicit ElementRegressionSystem(String name, Index level, double h0, double h1, double h2, double stol) :
+      BaseClass(name, level, h0, h1, h2),
+      sol_tol(stol)
     {
     }
 
@@ -388,7 +392,7 @@ namespace ElementRegression
 
       // configure solver
       solver.set_max_iter(1000);
-      solver.set_tol_rel(1E-8);
+      solver.set_tol_rel(sol_tol);
       //solver.set_plot(true);
 
       // initialise solver
@@ -482,8 +486,8 @@ namespace ElementRegression
     typedef typename BaseClass::RegionType RegionType;
     typedef typename BaseClass::SpaceType SpaceType;
 
-    explicit ElementRegressionL2(Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0) :
-      BaseClass("L2", level, h0, h1, h2)
+    explicit ElementRegressionL2(Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0, double stol = 1E-8) :
+      BaseClass("L2", level, h0, h1, h2, stol)
     {
     }
 
@@ -514,8 +518,8 @@ namespace ElementRegression
     typedef typename BaseClass::RegionType RegionType;
     typedef typename BaseClass::SpaceType SpaceType;
 
-    explicit ElementRegressionH1(Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0) :
-      BaseClass("H1", level, h0, h1, h2)
+    explicit ElementRegressionH1(Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0, double stol = 1E-8) :
+      BaseClass("H1", level, h0, h1, h2, stol)
     {
     }
 
@@ -814,7 +818,7 @@ namespace ElementRegression
 
   // L2-Projection Hypercube<1>
   ElementRegressionL2<Shape::Hypercube<1>, Space::Hermite3::Element, true, true, true>
-    l2_hy1_hermite3_lvl5(5, 6.183857974105e-008, 1.250686784444e-005, 2.633222452923e-003);
+    l2_hy1_hermite3_lvl5(5, 6.165546112841e-08, 1.248051929957e-05, 2.626748998399e-03, 1E-10);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -823,7 +827,7 @@ namespace ElementRegression
 
   // L2-Projection Simplex<2>
   ElementRegressionL2<Shape::Simplex<2>, Space::Argyris::Element, true, true, true>
-    l2_sx2_argyris_lvl3(3, 9.132110987091e-008, 1.598712842387e-005, 2.195620770059e-003);
+    l2_sx2_argyris_lvl3(3, 2.679004360690e-09, 3.692277739529e-07, 5.378755288880e-05, 1E-12);
 
   /* ############################################################################################# */
   /* ############################################################################################# */
