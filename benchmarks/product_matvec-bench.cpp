@@ -118,9 +118,11 @@ void run()
   Index size(sys.rows());
   std::cout<<Mem_::name()<<" "<<Algo_::name()<<" "<<SM_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<std::endl;
   std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<std::endl;
-  DenseVector<Mem_, DT_, IT_> b(size);
-  for (Index i (0) ; i < b.size() ; ++i)
-    b(i, DT_(i%100) / DT_(100));
+  DenseVector<Mem::Main, DT_, IT_> bmain(size);
+  for (Index i (0) ; i < bmain.size() ; ++i)
+    bmain(i, DT_(i%100) / DT_(100));
+  DenseVector<Mem_, DT_, IT_> b;
+  b.convert(bmain);
   DenseVector<Mem_, DT_, IT_> x(size, DT_(4711));
 
   double flops(double(sys.used_elements()));
