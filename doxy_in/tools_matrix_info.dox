@@ -38,9 +38,9 @@ The tool provides the following information:
   A matrix entry \f$a_{ij}\f$ is interpreted as zero, if \f$|a_{ij}| < \mathrm{nztol}\cdot\|A\|_{\max}\f$.
 - <b>Number of Rows</b>: self-explanatory
 - <b>Number of Columns</b>: self-explanatory
-- <b>Max Row Degre</b>: specifies the maximum number of symbolical non-zero entries per row, i.e.
+- <b>Max Row Degree</b>: specifies the maximum number of symbolical non-zero entries per row, i.e.
   \f[\max_{1\leq i\leq m}\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)\big\}\Big)\f]
-- <b>Max Column Degre</b>: specifies the maximum number of symbolical non-zero entries per column
+- <b>Max Column Degree</b>: specifies the maximum number of symbolical non-zero entries per column
 - <b>Row Degree Distribution</b>: 10 | 0 | 0 | 5 | 0 | 0 | 7 | 8 | 0 | 70
   stands for a distribution of degrees per row, where
   10% of the rows contain 0-9% of the maximum matrix row degree.
@@ -49,6 +49,7 @@ The tool provides the following information:
   Thus we have 10% intervals ascending from left to right, which contain
   the percentage of rows, which have in common this percentage of row
   entries, relative to the maximum row degree.
+- <b>Average Row Degree</b>: the sum of all row degrees divided by the number of rows.
 - <b>Max Row Bandwidth</b>: specifies the maximum row bandwith, i.e.
   \f[\max_{1\leq i\leq m}\Big\{ \underset{1\leq j\leq n}{\mathrm{argmax}}\big\{(i,j)\in\mathcal{S}(A)\big\}
 - \underset{1\leq j\leq n}{\mathrm{argmin}}\big\{(i,j)\in\mathcal{S}(A)\big\}\Big\}\f]

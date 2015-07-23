@@ -243,6 +243,7 @@ namespace MatrixInfo
     Index col_bandw = 0;
     Index col_bandw_idx = 0;
     String row_degree_distribution = "";
+    Index average_row_degree = 0;
 
     // various norms
     DataType norm_col_sum = DataType(0);
@@ -296,6 +297,8 @@ namespace MatrixInfo
     {
       // compute degree
       Index my_row_degree = row_ptr[i+1] - row_ptr[i];
+
+      average_row_degree += my_row_degree;
 
       // store row degree
       vnze_row[i] = my_row_degree;
@@ -362,6 +365,8 @@ namespace MatrixInfo
       have_struct_diag = have_struct_diag && my_struct_diag;
     }
 
+    average_row_degree /= nrows;
+
     // now loop again over the matrix rows
     // we need to know the max row degree to calculate row distribution
     for(Index i(0); i < nrows; ++i)
@@ -369,7 +374,6 @@ namespace MatrixInfo
       float percentage(float(vnze_row[i]) / float(row_degree) * float(10));
       percentage = Math::floor(percentage);
       percentage = Math::min(percentage, float(9));
-      std::cout<<percentage<<std::endl;
       row_degree_distribution_counts.at(Index(percentage)) += Index(1);
     }
     // format distribution string
@@ -511,6 +515,7 @@ namespace MatrixInfo
     std::cout << String("Max Row Degree").pad_back(pad_len, '.') << ": " << row_degree << " (max in row " << row_degree_idx << ")" << std::endl;
     std::cout << String("Max Column Degree").pad_back(pad_len, '.') << ": " << col_degree << " (max in col " << col_degree_idx << ")" << std::endl;
     std::cout << String("Row Degree Distribution").pad_back(pad_len, '.') << ": " << row_degree_distribution << std::endl;
+    std::cout << String("Average Row Degree").pad_back(pad_len, '.') << ": " << average_row_degree << std::endl;
     std::cout << String("Max Row Bandwidth").pad_back(pad_len, '.') << ": " << row_bandw << " (max in row " << row_bandw_idx << ")" << std::endl;
     std::cout << String("Max Column Bandwidth").pad_back(pad_len, '.') << ": " << col_bandw << " (max in col " << col_bandw_idx << ")" << std::endl;
     std::cout << String("Symbolical Non-Zeros").pad_back(pad_len, '.') << ": " << nnze << std::endl;
