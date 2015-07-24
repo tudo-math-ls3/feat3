@@ -60,6 +60,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("It is used to choose different tools and configurations related to the build process.")
   print ("The keywords, sorted by categories are:")
   print ("  Build Mode: debug, opt, fast, noop")
+  print ("  Thread-based Parallelisation: omp")
   print ("  Cluster Parallelisation: mpi")
   print ("  Compiler: gcc, icc, clang, pgi")
   print ("  Compiler frontends: ccache")
@@ -222,6 +223,13 @@ else:
 if "mpi" in buildid:
   remove_string(unused_tokens, "mpi")
   cmake_flags += " -DFEAT_HAVE_MPI:BOOL=TRUE"
+
+if "omp" in buildid or "openmp" in buildid:
+  remove_string(unused_tokens, "omp")
+  remove_string(unused_tokens, "openmp")
+  cmake_flags += " -DFEAT_HAVE_OMP:BOOL=TRUE"
+  if platform.system() != "Darwin":
+    ldflags += " -lomp"
 
 #evaluate extra options
 cputype = ""
@@ -508,8 +516,8 @@ if "cuda" in buildid:
 
 # at least cuda 8 needs openmp and clang/gcc/intel understand the -fopenmp flag
 # until now, clang needs the openmp library explicitly provided, which is not funny to be automated
-if "gcc" in buildid or "gnu" in buildid or "g++" in buildid or "icc" in buildid or "intel" in buildid or "icpc" in buildid:
-  cxxflags += " -fopenmp"
+#if "gcc" in buildid or "gnu" in buildid or "g++" in buildid or "icc" in buildid or "intel" in buildid or "icpc" in buildid:
+#  cxxflags += " -fopenmp"
 
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")

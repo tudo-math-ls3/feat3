@@ -30,6 +30,9 @@
 /// CPU microarchitecture being used
 #define FEAT_CPU_TYPE "${FEAT_CPU_TYPE}"
 
+/// Do we have OpenMP support enabled?
+#cmakedefine FEAT_HAVE_OMP
+
 /// Do we have CUDA support enabled?
 #cmakedefine FEAT_HAVE_CUDA
 

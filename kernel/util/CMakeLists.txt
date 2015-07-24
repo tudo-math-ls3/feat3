@@ -36,13 +36,30 @@ if(MPI_C_LINK_FLAGS)
     LINK_FLAGS "${MPI_C_LINK_FLAGS}")
 endif()
 
-if (FEAT_HAVE_MKL)
+if (FEAT_HAVE_MKL AND FEAT_HAVE_OMP)
+  if ((${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"))
+    TARGET_LINK_LIBRARIES(kernel-util -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_gnu_thread.a -Wl,--end-group -lpthread -lm -ldl)
+  elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+    TARGET_LINK_LIBRARIES(kernel-util -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_intel_thread.a -Wl,--end-group -lpthread -lm -ldl)
+  else()
+    message(WARNING "compiler ${CMAKE_CXX_COMPILER_ID} not know in mkl library selection, using serial mkl library!")
+    TARGET_LINK_LIBRARIES(kernel-util
+       -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lpthread -lm -ldl
+    )
+  endif ((${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"))
+
+  if (NOT FEAT_HAVE_MPI OR NOT "${MPI_CXX_LIBRARIES}" MATCHES ".*libpthread.*")
+    TARGET_LINK_LIBRARIES(kernel-util -lpthread)
+  endif (NOT FEAT_HAVE_MPI OR NOT "${MPI_CXX_LIBRARIES}" MATCHES ".*libpthread.*")
+endif(FEAT_HAVE_MKL AND FEAT_HAVE_OMP)
+
+if (FEAT_HAVE_MKL AND NOT FEAT_HAVE_OMP)
  TARGET_LINK_LIBRARIES(kernel-util
      -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lm -ldl)
    if (NOT FEAT_HAVE_MPI OR NOT "${MPI_CXX_LIBRARIES}" MATCHES ".*libpthread.*")
      TARGET_LINK_LIBRARIES(kernel-util -lpthread)
    endif (NOT FEAT_HAVE_MPI OR NOT "${MPI_CXX_LIBRARIES}" MATCHES ".*libpthread.*")
-endif(FEAT_HAVE_MKL)
+endif (FEAT_HAVE_MKL AND NOT FEAT_HAVE_OMP)
 
 if (FEAT_HAVE_CUDA)
   CUDA_ADD_LIBRARY(kernel-util-cuda

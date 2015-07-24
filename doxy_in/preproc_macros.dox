@@ -130,6 +130,15 @@ the MKL as a work-horse.
 This macro is defined by the build system if the FEAT kernel is linked against a MPI library.
 
 <hr>
+\subsection ppm_feat_mkl_parallel FEAT_HAVE_OMP
+This macro activates support for OpenMP, a compilerpragma based C++ extension for multithreading.
+Note, that this also activates support for the parallel version of the Intel MKL Library, if enabled separately.
+
+<hr>
+\subsection ppm_feat_have_alglib FEAT_HAVE_ALGLIB
+This macro is defined by the build system if the FEAT kernel is linked against the ALGLIB library.
+
+<hr>
 \subsection ppm_feat_have_parmetis FEAT_HAVE_PARMETIS
 This macro is defined by the build system if the FEAT kernel is linked against the ParMETIS library.
 \note If this macro is defined, then \c FEAT_HAVE_METIS is also defined.

@@ -22,6 +22,9 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
   if restrict_errors:
     cxxflags += " -diag-error-limit1"
 
+  if "omp" in buildid or "openmp" in buildid:
+    cxxflags += " -fopenmp"
+
   if system_host_compiler:
     cxxflags += " -gcc-name=" + system_host_compiler
 

@@ -22,6 +22,12 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
   if restrict_errors:
     cxxflags += " -Wfatal-errors"
 
+  if "omp" in buildid or "openmp" in buildid:
+    if platform.system() != "Darwin":
+      cxxflags += " -fopenmp=libgomp"
+    else:
+      cxxflags += " -Xpreprocessor -fopenmp"
+
   if major > 3 or (major == 3 and minor > 6):
     cxxflags += " -Wrange-loop-analysis -Wobjc-circular-container"
 
