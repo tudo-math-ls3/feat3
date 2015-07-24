@@ -66,27 +66,27 @@ public:
 
     BoundaryFactory<MeshType>my_boundary_factory(my_mesh);
     MeshPartType mesh_part_reference(my_boundary_factory);
-    MeshPartType mesh_part_test(mesh_part_reference);
+    MeshPartType mesh_part_to_test(mesh_part_reference);
 
     // Test bottom to top deduction
     // Delete parent information for all shape types except for edges
     TargetSet tmp0;
-    mesh_part_test.get_target_set<0>() = std::move(tmp0);
-    mesh_part_test.get_target_set<2>() = std::move(tmp0);
-    mesh_part_test.get_target_set<3>() = std::move(tmp0);
+    mesh_part_to_test.get_target_set<0>() = std::move(tmp0);
+    mesh_part_to_test.get_target_set<2>() = std::move(tmp0);
+    mesh_part_to_test.get_target_set<3>() = std::move(tmp0);
 
     // Get lotsa references for target sets
-    TargetSet& ts_test0 = mesh_part_test.get_target_set<0>();
+    TargetSet& ts_test0 = mesh_part_to_test.get_target_set<0>();
     TargetSet& ts_reference0 = mesh_part_reference.get_target_set<0>();
-    TargetSet& ts_test1 = mesh_part_test.get_target_set<1>();
+    TargetSet& ts_test1 = mesh_part_to_test.get_target_set<1>();
     TargetSet& ts_reference1 = mesh_part_reference.get_target_set<1>();
-    TargetSet& ts_test2 = mesh_part_test.get_target_set<2>();
+    TargetSet& ts_test2 = mesh_part_to_test.get_target_set<2>();
     TargetSet& ts_reference2 = mesh_part_reference.get_target_set<2>();
-    TargetSet& ts_test3 = mesh_part_test.get_target_set<3>();
+    TargetSet& ts_test3 = mesh_part_to_test.get_target_set<3>();
     TargetSet& ts_reference3 = mesh_part_reference.get_target_set<3>();
 
     // Deduct target sets
-    mesh_part_test.compute_target_sets_from_bottom<0>(my_mesh);
+    mesh_part_to_test.compute_target_sets_from_bottom<0>(my_mesh);
 
     // Check for dimension 0: new one should still be empty
     TEST_CHECK_MSG(ts_test0.get_num_entities() == 0, "num_entities for dimension 0 should be 0!");
@@ -105,11 +105,11 @@ public:
 
     // Test top to bottom deduction
     // Delete parent information for all shape types except for faces
-    mesh_part_test.get_target_set<0>() = std::move(tmp0);
-    mesh_part_test.get_target_set<1>() = std::move(tmp0);
-    mesh_part_test.get_target_set<3>() = std::move(tmp0);
+    mesh_part_to_test.get_target_set<0>() = std::move(tmp0);
+    mesh_part_to_test.get_target_set<1>() = std::move(tmp0);
+    mesh_part_to_test.get_target_set<3>() = std::move(tmp0);
 
-    mesh_part_test.compute_target_sets_from_top<2>(my_mesh);
+    mesh_part_to_test.compute_target_sets_from_top<2>(my_mesh);
 
     // Check dimension 3: new one should still be empty
     TEST_CHECK_MSG(ts_test3.get_num_entities() == 0, "num_entities for dimension 3 should be 3!");
@@ -128,33 +128,33 @@ public:
 
     // Check MeshAttribute functionality
     // Create attributes of dimension 0
-    MeshAttributeType att_0_1(mesh_part_test.get_num_entities(0),1,1,"SomeName");
-    MeshAttributeType att_0_2(mesh_part_test.get_num_entities(0),1,1,"SomeOtherName");
-    MeshAttributeType att_0_3(mesh_part_test.get_num_entities(0),1,1,"SomeName");
+    MeshAttributeType att_0_1(mesh_part_to_test.get_num_entities(0),1,1,"SomeName");
+    MeshAttributeType att_0_2(mesh_part_to_test.get_num_entities(0),1,1,"SomeOtherName");
+    MeshAttributeType att_0_3(mesh_part_to_test.get_num_entities(0),1,1,"SomeName");
     // Change some data
     att_0_1[1][0] = DataType(12);
     att_0_3[1][0] = DataType(-5);
 
     // Add attributes of dimension 0
-    TEST_CHECK(mesh_part_test.get_num_attributes() == 0);
-    TEST_CHECK(mesh_part_test.add_attribute(att_0_1,0));
-    TEST_CHECK(mesh_part_test.add_attribute(att_0_2,0));
+    TEST_CHECK(mesh_part_to_test.get_num_attributes() == 0);
+    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_1,0));
+    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_2,0));
 
-    TEST_CHECK(mesh_part_test.get_num_attributes() == 2);
+    TEST_CHECK(mesh_part_to_test.get_num_attributes() == 2);
 
     // As an attribute with the same name is already present, this must return false
-    TEST_CHECK(!mesh_part_test.add_attribute(att_0_3,0));
+    TEST_CHECK(!mesh_part_to_test.add_attribute(att_0_3,0));
     // There should still be only 2 attributes in the mesh
-    TEST_CHECK_EQUAL(mesh_part_test.get_num_attributes(0),2);
-    TEST_CHECK_EQUAL((*mesh_part_test.find_attribute("SomeName",0))[1][0], DataType(12));
+    TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(0),2);
+    TEST_CHECK_EQUAL((*mesh_part_to_test.find_attribute("SomeName",0))[1][0], DataType(12));
     // Now we specify replace=true and it should return true
-    TEST_CHECK(mesh_part_test.add_attribute(att_0_3,0,true));
-    TEST_CHECK_EQUAL((*mesh_part_test.find_attribute("SomeName",0))[1][0], DataType(-5));
+    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_3,0,true));
+    TEST_CHECK_EQUAL((*mesh_part_to_test.find_attribute("SomeName",0))[1][0], DataType(-5));
     // There should still be only 2 attributes in the mesh
-    TEST_CHECK_EQUAL(mesh_part_test.get_num_attributes(0),2);
+    TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(0),2);
 
     // Add attribute of dimension 0 as attribute of dimension 1. This should throw an InternalError.
-    TEST_CHECK_THROWS(mesh_part_test.add_attribute(att_0_2,1), InternalError);
+    TEST_CHECK_THROWS(mesh_part_to_test.add_attribute(att_0_2,1), InternalError);
   }
 
 } mesh_part_test;
