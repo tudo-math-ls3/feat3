@@ -19,7 +19,7 @@ ADD_SUBDIRECTORY( trafo )
 ADD_SUBDIRECTORY( util )
 
 # list of kernel source files
-ADD_LIBRARY(feast STATIC archs.cpp)
+ADD_LIBRARY(feast STATIC archs.cpp feast.cpp)
 
 # list of libraries to include in feast lib
 TARGET_LINK_LIBRARIES (feast
