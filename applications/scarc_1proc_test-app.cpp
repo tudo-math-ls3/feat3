@@ -34,7 +34,7 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/scarc/scarc_functor.hpp>
 #include <kernel/scarc/matrix_conversion.hpp>
 
@@ -158,16 +158,16 @@ void check_scarc_rich_1D(Index rank)
   Assembly::Common::ForceFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
   Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
-  Assembly::DirichletAssembler<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<1> > > > > dirichlet(space);
+  Assembly::UnitFilterAssembler<Geometry::ConformalMesh<Shape::Hypercube<1> > > dirichlet;
   auto bound_sub_set_0(HaloInterface<0, Dim1D>::convert(boundaries.at(0)));
   auto bound_sub_set_1(HaloInterface<0, Dim1D>::convert(boundaries.at(1)));
-  dirichlet.add_cell_set(bound_sub_set_0);
-  dirichlet.add_cell_set(bound_sub_set_1);
+  dirichlet.add_mesh_part(bound_sub_set_0);
+  dirichlet.add_mesh_part(bound_sub_set_1);
 
   DenseVector<Mem::Main, double> vec_sol(space.get_num_dofs(), double(0));
 
   UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
-  dirichlet.assemble(filter);
+  dirichlet.assemble(filter, space);
 
   SparseMatrixCSR<Mem::Main, double> mat_localsys;
   mat_localsys.clone(mat_sys);
@@ -363,16 +363,16 @@ void check_scarc_pcg_1D(Index rank)
   Assembly::Common::ForceFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
   Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
-  Assembly::DirichletAssembler<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<1> > > > > dirichlet(space);
+  Assembly::UnitFilterAssembler<Geometry::ConformalMesh<Shape::Hypercube<1> > > dirichlet;
   auto bound_sub_set_0(HaloInterface<0, Dim1D>::convert(boundaries.at(0)));
   auto bound_sub_set_1(HaloInterface<0, Dim1D>::convert(boundaries.at(1)));
-  dirichlet.add_cell_set(bound_sub_set_0);
-  dirichlet.add_cell_set(bound_sub_set_1);
+  dirichlet.add_mesh_part(bound_sub_set_0);
+  dirichlet.add_mesh_part(bound_sub_set_1);
 
   DenseVector<Mem::Main, double> vec_sol(space.get_num_dofs(), double(0));
 
   UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
-  dirichlet.assemble(filter);
+  dirichlet.assemble(filter, space);
 
   SparseMatrixCSR<Mem::Main, double> mat_localsys;
   mat_localsys.clone(mat_sys);

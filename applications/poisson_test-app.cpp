@@ -36,7 +36,7 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
 
 #include <kernel/scarc/solver_data.hpp>
 #include <kernel/scarc/solver_pattern.hpp>
@@ -459,12 +459,12 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
   // assemble homogeneous Dirichlet BCs
-  Assembly::DirichletAssembler<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
+  Assembly::UnitFilterAssembler<Geometry::ConformalMesh<Shape::Hypercube<2> > > dirichlet;
   std::cout << "proc " << rank << " #macro boundaries " << macro_boundaries_fine.size() << std::endl;
   for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
   {
     //std::cout << "Adding cell set on process " << rank << std::endl;
-    dirichlet.add_cell_set(*macro_boundaries_fine.at(i).get());
+    dirichlet.add_mesh_part(*macro_boundaries_fine.at(i).get());
   }
   // allocate solution vector
   DenseVector<Mem::Main, double> vec_sol(space.get_num_dofs(), double(0));
@@ -614,7 +614,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
 
   // assemble filter:
   UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
-  dirichlet.assemble(filter);
+  dirichlet.assemble(filter, space);
 
   ///filter system
   filter.filter_mat(mat_sys);

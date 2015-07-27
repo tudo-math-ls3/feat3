@@ -46,7 +46,7 @@
 
 // FEAST-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
-#include <kernel/assembly/dirichlet_assembler.hpp>         // for DirichletAssembler
+#include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
@@ -335,11 +335,11 @@ namespace Tutorial02
     std::cout << "Assembling boundary conditions..." << std::endl;
 
     // The next step is the assembly of the inhomogeneous Dirichlet boundary conditions.
-    // For this task, we require a Dirichler assembler:
-    Assembly::DirichletAssembler<SpaceType> dirichlet_asm(space);
+    // For this task, we require a Unit-Filter assembler:
+    Assembly::UnitFilterAssembler<MeshType> unit_asm;
 
     // Add the one and only boundary component to the assembler:
-    dirichlet_asm.add_cell_set(boundary);
+    unit_asm.add_mesh_part(boundary);
 
     // To assemble inhomogeneous Dirichlet boundary conditions, we need to tell the assembler the
     // function 'g' that defines the boundary values. In this tutorial, we simply pass an object
@@ -348,10 +348,10 @@ namespace Tutorial02
     PringlesFunction sol_function;
 
     // And assemble a unit-filter representing inhomogene Dirichlet BCs; This is done by calling
-    // the 'assemble' function, to which we pass our boundary value function object as the second
+    // the 'assemble' function, to which we pass our boundary value function object as the third
     // argument to the function:
-    FilterType filter(space.get_num_dofs());
-    dirichlet_asm.assemble(filter, sol_function);
+    FilterType filter;
+    unit_asm.assemble(filter, space, sol_function);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition imposition

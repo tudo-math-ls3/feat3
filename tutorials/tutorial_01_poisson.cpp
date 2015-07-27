@@ -68,7 +68,7 @@
 
 // FEAST-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
-#include <kernel/assembly/dirichlet_assembler.hpp>         // for DirichletAssembler
+#include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
@@ -334,19 +334,18 @@ namespace Tutorial01
     std::cout << "Assembling boundary conditions..." << std::endl;
 
     // The next step is the assembly of the homogeneous Dirichlet boundary conditions.
-    // For this task, we require a Dirichler assembler:
-    Assembly::DirichletAssembler<SpaceType> dirichlet_asm(space);
+    // For this task, we require a Unit-Filter assembler:
+    Assembly::UnitFilterAssembler<MeshType> unit_asm;
 
-    // Now we need to add all boundary parts to the assembler on which we want to prescribe
+    // Now we need to add all boundary mesh parts to the assembler on which we want to prescribe
     // the boundary conditions. In this tutorial, we have only one boundary object which describes
     // the whole domain's boundary, so add it:
-    dirichlet_asm.add_cell_set(boundary);
+    unit_asm.add_mesh_part(boundary);
 
     // Now, we need to assemble a unit-filter representing homogeneous Dirichlet BCs.
-    // This is done by first creating a filter of the corresponding size and then calling the 'assemble'
-    // function:
-    FilterType filter(space.get_num_dofs());
-    dirichlet_asm.assemble(filter);
+    // This is done by calling the 'assemble' function:
+    FilterType filter;
+    unit_asm.assemble(filter, space);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition imposition

@@ -4,7 +4,7 @@
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
@@ -517,6 +517,7 @@ namespace ElementRegression
 
     typedef typename BaseClass::RegionType RegionType;
     typedef typename BaseClass::SpaceType SpaceType;
+    typedef typename BaseClass::MeshType MeshType;
 
     explicit ElementRegressionH1(Index level, double h0 = 0.0, double h1 = 0.0, double h2 = 0.0, double stol = 1E-8) :
       BaseClass("H1", level, h0, h1, h2, stol)
@@ -531,9 +532,9 @@ namespace ElementRegression
 
     virtual void assemble_filter(FilterType& filter, SpaceType& space, RegionType& region) const override
     {
-      Assembly::DirichletAssembler<SpaceType> dirichlet_asm(space);
-      dirichlet_asm.add_cell_set(region);
-      dirichlet_asm.assemble(filter);
+      Assembly::UnitFilterAssembler<MeshType> dirichlet_asm;
+      dirichlet_asm.add_mesh_part(region);
+      dirichlet_asm.assemble(filter, space);
     }
 
     virtual void assemble_rhs(VectorType& vec_rhs, SpaceType& space) const override

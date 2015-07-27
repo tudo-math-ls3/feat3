@@ -36,7 +36,7 @@
 #include <kernel/assembly/linear_functional.hpp>           // for LinearOperator
 #include <kernel/assembly/bilinear_operator.hpp>           // for BilinearOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
-#include <kernel/assembly/dirichlet_assembler.hpp>         // for DirichletAssembler
+#include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
@@ -509,13 +509,13 @@ namespace TutorialX1
       Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, andicore_operator, space, cubature_factory);
 
       // In this example, we assemble homogene Dirichlet boundary conditions:
-      Assembly::DirichletAssembler<SpaceType> dirichlet_asm(space);
+      Assembly::UnitFilterAssembler<MeshType> unit_asm;
 
       // Add our only boundary component:
-      dirichlet_asm.add_cell_set(boundary);
+      unit_asm.add_mesh_part(boundary);
 
       // And assemble the filter
-      dirichlet_asm.assemble(filter);
+      unit_asm.assemble(filter, space);
 
       // apply filter onto matrix
       filter.filter_mat(mat_sys);

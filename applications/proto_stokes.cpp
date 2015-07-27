@@ -23,7 +23,7 @@ for further application development.
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functions.hpp>
-#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
@@ -342,19 +342,19 @@ public:
   void assemble_bc()
   {
     // create two Dirichlet BC assemblers
-    Assembly::DirichletAssembler<SpaceVeloType> dirichlet_x(_space_v);
-    Assembly::DirichletAssembler<SpaceVeloType> dirichlet_y(_space_v);
+    Assembly::UnitFilterAssembler<MeshType> dirichlet_x;
+    Assembly::UnitFilterAssembler<MeshType> dirichlet_y;
 
     // add our boundary cell sets
-    dirichlet_x.add_cell_set(_cell_set);
-    dirichlet_y.add_cell_set(_cell_set);
+    dirichlet_x.add_mesh_part(_cell_set);
+    dirichlet_y.add_mesh_part(_cell_set);
 
     // assemble X-velocity BC values
     FuncSolX sol_x;
-    dirichlet_x.assemble(_filter_x, sol_x);
+    dirichlet_x.assemble(_filter_x, _space_v, sol_x);
 
     // assemble Y-velocity BC values
-    dirichlet_y.assemble(_filter_y);
+    dirichlet_y.assemble(_filter_y, _space_v);
 
     // filter matrices
     _filter_x.filter_mat(_matrix_a);

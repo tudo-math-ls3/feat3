@@ -21,7 +21,7 @@
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
-#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 
@@ -852,10 +852,10 @@ class MeshControlPartitioningTest2D:
       Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
       // assemble homogeneous Dirichlet BCs
-      Assembly::DirichletAssembler<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
+      Assembly::UnitFilterAssembler<Geometry::ConformalMesh<Shape::Hypercube<2> > > dirichlet;
       for(Index i(0) ; i < finemost_macro_boundaries.size() ; ++i)
       {
-        dirichlet.add_cell_set(*finemost_macro_boundaries.at(i).get());
+        dirichlet.add_mesh_part(*finemost_macro_boundaries.at(i).get());
       }
 
       // allocate solution vector
@@ -863,7 +863,7 @@ class MeshControlPartitioningTest2D:
 
       // assemble filter:
       UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
-      dirichlet.assemble(filter);
+      dirichlet.assemble(filter, space);
 
       // filter system
       filter.filter_mat(mat_sys);

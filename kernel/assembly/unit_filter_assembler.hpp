@@ -1,12 +1,13 @@
 #pragma once
-#ifndef KERNEL_ASSEMBLY_DIRICHLET_ASSEMBLER_HPP
-#define KERNEL_ASSEMBLY_DIRICHLET_ASSEMBLER_HPP 1
+#ifndef KERNEL_ASSEMBLY_UNIT_FILTER_ASSEMBLER_HPP
+#define KERNEL_ASSEMBLY_UNIT_FILTER_ASSEMBLER_HPP 1
 
 // includes, FEAST
 #include <kernel/assembly/base.hpp>
 #include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 
 // includes, system
 #include <set>
@@ -22,34 +23,31 @@ namespace FEAST
     {
       // forward declarations
       template<int shape_dim_>
-      struct DirichletWrapper;
+      struct UnitAsmWrapper;
     } // namespace Intern
     /// \endcond
 
     /**
-     * \brief Dirichlet boundary condition assembly class template.
+     * \brief Unit-Filter assembly class template.
      *
-     * \tparam Space_
-     * The type of the trial space for which the boundary conditions are to be assembled.
+     * \tparam Mesh_
+     * The type of the mesh on which the unit filter is to be assembled.
      *
      * \author Peter Zajac
      */
-    template<typename Space_>
-    class DirichletAssembler
+    template<typename Mesh_>
+    class UnitFilterAssembler
     {
     public:
       /// space type
-      typedef Space_ SpaceType;
+      typedef Mesh_ MeshType;
 
     private:
       /// shape dimension
-      static constexpr int shape_dim = SpaceType::shape_dim;
+      static constexpr int shape_dim = MeshType::shape_dim;
 
       /// dof-index set typedef
       typedef std::set<Index> IdxSet;
-
-      /// space reference
-      const SpaceType& _space;
 
       /// dof-index set
       IdxSet _cells[shape_dim + 1];
@@ -57,30 +55,25 @@ namespace FEAST
     public:
       /**
        * \brief Constructor.
-       *
-       * \param[in] space
-       * A reference to the space for which the boundary conditions are to be assembled.
        */
-      explicit DirichletAssembler(const SpaceType& space) :
-        _space(space)
+      explicit UnitFilterAssembler()
       {
       }
 
       /// virtual destructor
-      virtual ~DirichletAssembler()
+      virtual ~UnitFilterAssembler()
       {
       }
 
       /**
-       * \brief Adds the dofs on a cell-set or submesh to the dof-set.
+       * \brief Adds the dofs on a mesh-part to the dof-set.
        *
-       * \param[in] cell_set
-       * A reference to a cell-set object.
+       * \param[in] mesh_part
+       * A reference to a mesh part object.
        */
-      template<typename CellSet_>
-      void add_cell_set(const CellSet_& cell_set)
+      void add_mesh_part(const Geometry::MeshPart<MeshType>& mesh_part)
       {
-        Intern::DirichletWrapper<shape_dim>::merge(_cells, cell_set);
+        Intern::UnitAsmWrapper<shape_dim>::merge(_cells, mesh_part);
       }
 
       /**
@@ -90,13 +83,23 @@ namespace FEAST
        *
        * \param[in,out] filter
        * A reference to the unit-filter where the entries are to be added.
+       * The filter will be allocated with the correct size if it is empty.
+       *
+       * \param[in] space
+       * The finite-element space for which the filter is to be assembled.
        */
-      template<typename MemType_, typename DataType_, typename IndexType_>
-      void assemble(LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter) const
+      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
+      void assemble(LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter, const Space_& space) const
       {
         // build index set
         std::set<Index> idx_set;
-        Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
+        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
+
+        // allocate filter if necessary
+        if(filter.size() == Index(0))
+        {
+          filter = LAFEM::UnitFilter<MemType_, DataType_, IndexType_>(space.get_num_dofs());
+        }
 
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
@@ -117,17 +120,28 @@ namespace FEAST
        * \param[in,out] filter
        * A reference to the unit-filter where the entries are to be added.
        *
+       * \param[in] space
+       * The finite-element space for which the filter is to be assembled.
+       *
        * \param[in] vector_
        * A LAFEM::DenseVector containing (among other stuff) the entries to be added.
        *
        */
-      template<typename MemType_, typename DataType_, typename IndexType_>
-      void assemble(LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter,
-      const LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vector_) const
+      template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
+      void assemble(
+        LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter,
+        const Space_ space,
+        const LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vector_) const
       {
         // build index set
         std::set<Index> idx_set;
-        Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
+        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
+
+        // allocate filter if necessary
+        if(filter.size() == Index(0))
+        {
+          filter = LAFEM::UnitFilter<MemType_, DataType_, IndexType_>(space.get_num_dofs());
+        }
 
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
@@ -148,20 +162,33 @@ namespace FEAST
        * \param[in,out] filter
        * A reference to the unit-filter where the entries are to be added.
        *
-       * \param[in] functor
-       * An object implementing the Analytic::Functor interface representing the boundary value
+       * \param[in] space
+       * The finite-element space for which the filter is to be assembled.
+       *
+       * \param[in] function
+       * An object implementing the Analytic::Function interface representing the boundary value
        * function.
        */
       template<
         typename MemType_,
         typename DataType_,
         typename IndexType_,
-        typename Functor_>
-      void assemble(LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter, const Functor_& functor) const
+        typename Space_,
+        typename Function_>
+      void assemble(
+        LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter,
+        const Space_& space,
+        const Function_& function) const
       {
         // build index-value map
         std::map<Index, DataType_> idx_map;
-        Intern::DirichletWrapper<shape_dim>::assemble(idx_map, _space, _cells, functor);
+        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_map, space, _cells, function);
+
+        // allocate filter if necessary
+        if(filter.size() == Index(0))
+        {
+          filter = LAFEM::UnitFilter<MemType_, DataType_, IndexType_>(space.get_num_dofs());
+        }
 
         // loop over all dof-indices
         typename std::map<Index, DataType_>::const_iterator it(idx_map.begin());
@@ -179,13 +206,24 @@ namespace FEAST
        *
        * \param[in,out] filter
        * A reference to the blocked unit filter where the entries are to be added.
+       *
+       * \param[in] space
+       * The finite-element space for which the filter is to be assembled.
        */
-      template<typename MemType_, typename DataType_, typename IndexType_, Index BlockSize_>
-      void assemble(LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>& filter) const
+      template<typename MemType_, typename DataType_, typename IndexType_, int BlockSize_, typename Space_>
+      void assemble(
+        LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>& filter,
+        const Space_& space) const
       {
         // build index set
         std::set<Index> idx_set;
-        Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
+        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
+
+        // allocate filter if necessary
+        if (filter.size() == Index(0))
+        {
+          filter = LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>(space.get_num_dofs());
+        }
 
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
@@ -210,14 +248,24 @@ namespace FEAST
        * \param[in] vector_
        * A LAFEM::DenseVector containing (among other stuff) the entries to be added.
        *
+       * \param[in] space
+       * The finite-element space for which the filter is to be assembled.
        */
-      template<typename MemType_, typename DataType_, typename IndexType_, Index BlockSize_>
-      void assemble(LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>& filter,
-      const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, BlockSize_>& vector_) const
+      template<typename MemType_, typename DataType_, typename IndexType_, int BlockSize_, typename Space_>
+      void assemble(
+        LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>& filter,
+        const Space_& space,
+        const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, BlockSize_>& vector_) const
       {
         // build index set
         std::set<Index> idx_set;
-        Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
+        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
+
+        // allocate filter if necessary
+        if (filter.size() == Index(0))
+        {
+          filter = LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>(space.get_num_dofs());
+        }
 
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
@@ -229,21 +277,21 @@ namespace FEAST
         }
       }
 
-    }; // class DirichletAssembler
+    }; // class UnitFilterAssembler
 
     /// \cond internal
     namespace Intern
     {
       /// Dirichlet-BC assembly helper class; this is where the magic happens
       template<int shape_dim_>
-      struct DirichletHelper
+      struct UnitAsmHelper
       {
-        template<typename CellSet_>
-        static void merge(std::set<Index>& idx, const CellSet_& cell_set)
+        template<typename MeshPart_>
+        static void merge(std::set<Index>& idx, const MeshPart_& mesh_part)
         {
           // fetch the target set for this dimension
-          const typename CellSet_::template TargetSet<shape_dim_>::Type&
-            target_set(cell_set.template get_target_set<shape_dim_>());
+          const typename MeshPart_::template TargetSet<shape_dim_>::Type&
+            target_set(mesh_part.template get_target_set<shape_dim_>());
 
           // merge
           const Index num_entities = target_set.get_num_entities();
@@ -283,12 +331,12 @@ namespace FEAST
         template<
           typename DataType_,
           typename Space_,
-          typename Functor_>
+          typename Function_>
         static void assemble(
           std::map<Index, DataType_>& idx,
           const Space_& space,
           const std::set<Index>& cells,
-          const Functor_& functor)
+          const Function_& function)
         {
           // create a node-functional object
           typedef typename Space_::template NodeFunctional<shape_dim_, DataType_>::Type NodeFunc;
@@ -313,7 +361,7 @@ namespace FEAST
           for(; it != jt; ++it)
           {
             node_func.prepare(*it);
-            node_func(node_data, functor);
+            node_func(node_data, function);
             node_func.finish();
 
             dof_assign.prepare(*it);
@@ -336,20 +384,20 @@ namespace FEAST
 
       /// Dirichlet-BC assembly wrapper; calls the helper for all shape dimensions
       template<int shape_dim_>
-      struct DirichletWrapper
+      struct UnitAsmWrapper
       {
-        template<typename CellSet_>
-        static void merge(std::set<Index>* idx, const CellSet_& cell_set)
+        template<typename MeshPart_>
+        static void merge(std::set<Index>* idx, const MeshPart_& mesh_part)
         {
-          DirichletWrapper<shape_dim_ - 1>::merge(idx, cell_set);
-          DirichletHelper<shape_dim_>::merge(idx[shape_dim_], cell_set);
+          UnitAsmWrapper<shape_dim_ - 1>::merge(idx, mesh_part);
+          UnitAsmHelper<shape_dim_>::merge(idx[shape_dim_], mesh_part);
         }
 
         template<typename Space_>
         static void assemble(std::set<Index>& idx, const Space_& space, const std::set<Index>* cells)
         {
-          DirichletWrapper<shape_dim_ - 1>::assemble(idx, space, cells);
-          DirichletHelper<shape_dim_>::assemble(idx, space, cells[shape_dim_]);
+          UnitAsmWrapper<shape_dim_ - 1>::assemble(idx, space, cells);
+          UnitAsmHelper<shape_dim_>::assemble(idx, space, cells[shape_dim_]);
         }
 
         template<
@@ -362,24 +410,24 @@ namespace FEAST
           const std::set<Index>* cells,
           const Functor_& functor)
         {
-          DirichletWrapper<shape_dim_ - 1>::assemble(idx, space, cells, functor);
-          DirichletHelper<shape_dim_>::assemble(idx, space, cells[shape_dim_], functor);
+          UnitAsmWrapper<shape_dim_ - 1>::assemble(idx, space, cells, functor);
+          UnitAsmHelper<shape_dim_>::assemble(idx, space, cells[shape_dim_], functor);
         }
       };
 
       template<>
-      struct DirichletWrapper<0>
+      struct UnitAsmWrapper<0>
       {
-        template<typename CellSet_>
-        static void merge(std::set<Index>* idx, const CellSet_& cell_set)
+        template<typename MeshPart_>
+        static void merge(std::set<Index>* idx, const MeshPart_& mesh_part)
         {
-          DirichletHelper<0>::merge(idx[0], cell_set);
+          UnitAsmHelper<0>::merge(idx[0], mesh_part);
         }
 
         template<typename Space_>
         static void assemble(std::set<Index>& idx, const Space_& space, const std::set<Index>* cells)
         {
-          DirichletHelper<0>::assemble(idx, space, cells[0]);
+          UnitAsmHelper<0>::assemble(idx, space, cells[0]);
         }
 
         template<
@@ -392,13 +440,12 @@ namespace FEAST
           const std::set<Index>* cells,
           const Functor_& functor)
         {
-          DirichletHelper<0>::assemble(idx, space, cells[0], functor);
+          UnitAsmHelper<0>::assemble(idx, space, cells[0], functor);
         }
       };
     } // namespace Intern
     /// \endcond
-
   } // namespace Assembly
 } // namespace FEAST
 
-#endif // KERNEL_ASSEMBLY_DIRICHLET_ASSEMBLER_HPP
+#endif // KERNEL_ASSEMBLY_UNIT_FILTER_ASSEMBLER_HPP

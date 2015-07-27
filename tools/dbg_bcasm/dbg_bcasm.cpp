@@ -7,7 +7,7 @@
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/common_functions.hpp>
-#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
@@ -55,8 +55,8 @@ void test_bcasm(
   VectorType vec_sol(space.get_num_dofs(), Real(1));
 
   // assemble homogene Dirichlet BCs
-  Assembly::DirichletAssembler<Space_> dirichlet(space);
-  dirichlet.add_cell_set(cell);
+  Assembly::UnitFilterAssembler<typename Space_::MeshType> dirichlet;
+  dirichlet.add_mesh_part(cell);
 
   // assemble filter:
   UnitFilterType filter(space.get_num_dofs());
@@ -64,7 +64,7 @@ void test_bcasm(
   //dirichlet.assemble(filter);
   // b) inhomogene Dirichlet BCs
   Assembly::Common::ConstantFunction bc_func(17.0);
-  dirichlet.assemble(filter, bc_func);
+  dirichlet.assemble(filter, space, bc_func);
 
   // filter system
   filter.filter_mat(mat_sys);

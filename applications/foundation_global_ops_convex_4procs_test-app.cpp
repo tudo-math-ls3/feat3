@@ -34,7 +34,6 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/assembly/dirichlet_assembler.hpp>
 
 #include <iostream>
 #include <limits>

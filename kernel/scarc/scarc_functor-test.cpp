@@ -37,7 +37,7 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/scarc/scarc_functor.hpp>
 #include <kernel/scarc/matrix_conversion.hpp>
 #include <kernel/scarc/scarc_log.hpp>
@@ -177,7 +177,7 @@ class ScaRCFunctorTest:
       ///Trafo, Space, and boundary assembler
       Trafo::Standard::Mapping<ConformalMesh<Shape::Hypercube<2> > > trafo(confmesh);
       Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
-      Assembly::DirichletAssembler<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
+      Assembly::UnitFilterAssembler<Geometry::ConformalMesh<Shape::Hypercube<2> > > dirichlet;
 
       ///convert boundaries and add to dirichlet assembler
       std::vector<std::shared_ptr<MeshPart<ConformalMesh<Shape::Hypercube<2> > > > > boundary_subsets;
@@ -185,7 +185,7 @@ class ScaRCFunctorTest:
       {
         MeshPart<ConformalMesh<Shape::Hypercube<2> > > cell_sub_set(HaloInterface<0, Dim2D>::convert(&b_i));
         boundary_subsets.push_back(std::shared_ptr<MeshPart<ConformalMesh<Shape::Hypercube<2> > > > (new MeshPart<ConformalMesh<Shape::Hypercube<2> > > (cell_sub_set)));
-        dirichlet.add_cell_set(cell_sub_set);
+        dirichlet.add_mesh_part(cell_sub_set);
       }
       ///vector mirrors
       std::vector<VectorMirror<Mem::Main, double> > mirrors;
@@ -242,7 +242,7 @@ class ScaRCFunctorTest:
       DenseVector<Mem::Main, double> vec_sol(space.get_num_dofs(), double(0));
 
       UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
-      dirichlet.assemble(filter);
+      dirichlet.assemble(filter, space);
 
       auto tags(HaloTags::value(p_i.comm_halos));
       //synching for type-0 -> type-1

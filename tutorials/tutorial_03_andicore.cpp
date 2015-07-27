@@ -60,7 +60,7 @@
 #include <kernel/assembly/linear_functional.hpp>           // NEW: for LinearOperator
 #include <kernel/assembly/bilinear_operator.hpp>           // NEW: for BilinearOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
-#include <kernel/assembly/dirichlet_assembler.hpp>         // for DirichletAssembler
+#include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
@@ -551,14 +551,14 @@ namespace Tutorial03
     std::cout << "Assembling boundary conditions..." << std::endl;
 
     // In this example, we assemble homogene Dirichlet boundary conditions:
-    Assembly::DirichletAssembler<SpaceType> dirichlet_asm(space);
+    Assembly::UnitFilterAssembler<MeshType> unit_asm;
 
     // Add our only boundary component:
-    dirichlet_asm.add_cell_set(boundary);
+    unit_asm.add_mesh_part(boundary);
 
     // And assemble the filter
-    FilterType filter(space.get_num_dofs());
-    dirichlet_asm.assemble(filter);
+    FilterType filter;
+    unit_asm.assemble(filter, space);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition imposition
