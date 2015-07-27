@@ -23,13 +23,13 @@ namespace FEAST
     template<typename Mesh_>
     class PatchHaloFactory DOXY({});
 
-    template<typename Shape_>
-    class PatchHaloFactory< MeshPart<ConformalMesh<Shape_> > > :
-      public Factory< MeshPart<ConformalMesh<Shape_> > >
+    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
+    class PatchHaloFactory< MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > > :
+      public Factory< MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > >
     {
     public:
       /// mesh type
-      typedef MeshPart<ConformalMesh<Shape_> > MeshType;
+      typedef MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > MeshType;
       /// target set holder type
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
