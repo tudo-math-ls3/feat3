@@ -26,9 +26,13 @@ SET (app_list
   scarc_test-app
   scarc_1proc_test-app
   scarc_gateway_test-app
+  poisson_dirichlet_2d
+  poisson_neumann_2d
   poisson_test-app
   poisson_ms2_test-app
   proto_stokes
+  stokes_poiseuille_2d
+  stokes_vortex_2d
   )
 
 FOREACH (app ${app_list} )
