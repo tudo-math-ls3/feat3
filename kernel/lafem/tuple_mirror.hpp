@@ -47,6 +47,9 @@ namespace FEAST
       static_assert(std::is_same<DataType, typename RestClass::DataType>::value, "sub-mirrors have different data-types");
       static_assert(std::is_same<IndexType, typename RestClass::IndexType>::value, "sub-mirrors have different index-types");
 
+      /// corresponding vector
+      typedef TupleVector<typename First_::VectorType, typename Rest_::VectorType...> VectorType;
+
     protected:
       /// the first sub-mirror
       First_ _first;
@@ -140,6 +143,22 @@ namespace FEAST
       Index size() const
       {
         return _first.size() + _rest.size();
+      }
+
+      /**
+       * \brief Creates a new buffer vector.
+       */
+      DenseVector<MemType, DataType, IndexType> create_buffer_vector() const
+      {
+        return DenseVector<MemType, DataType, IndexType>(size());
+      }
+
+      /**
+       * \brief Creates a new (local) vector.
+       */
+      VectorType create_vector() const
+      {
+        return VectorType(_first.create_vector(), _rest.create_vector());
       }
 
       template<int i_>
@@ -262,6 +281,8 @@ namespace FEAST
       typedef typename First_::DataType DataType;
       typedef typename First_::IndexType IndexType;
 
+      typedef TupleVector<typename First_::VectorType> VectorType;
+
     protected:
       First_ _first;
 
@@ -313,6 +334,16 @@ namespace FEAST
       Index size() const
       {
         return _first.size();
+      }
+
+      DenseVector<MemType, DataType, IndexType> create_buffer_vector() const
+      {
+        return DenseVector<MemType, DataType, IndexType>(size());
+      }
+
+      VectorType create_vector() const
+      {
+        return VectorType(_first.create_vector());
       }
 
       template<int i_>

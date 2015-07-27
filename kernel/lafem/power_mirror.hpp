@@ -64,6 +64,12 @@ namespace FEAST
           sm.scatter_axpy_dual(pv.first(), bv, a, bo);
           PowerMirrorHelper<i_-1>::scatter_axpy_dual(sm, pv.rest(), bv, a, bo + sm.size());
         }
+        template<typename SM_, typename PV_>
+        static void create_vector(const SM_& sm, PV_& pv)
+        {
+          pv.first() = sm.create_vector();
+          PowerMirrorHelper<i_-1>::create_vector(sm, pv.rest());
+        }
       };
       template<>
       struct PowerMirrorHelper<1>
@@ -108,6 +114,11 @@ namespace FEAST
         {
           sm.scatter_axpy_dual(pv.first(), bv, a, bo);
         }
+        template<typename SM_, typename PV_>
+        static void create_vector(const SM_& sm, PV_& pv)
+        {
+          pv.first() = sm.create_vector();
+        }
       };
     } // namespace Intern
     /// \endcond
@@ -149,6 +160,9 @@ namespace FEAST
 
       /// total number of sub-mirror blocks
       static constexpr int num_blocks = count_;
+
+      /// corresponding vector type
+      typedef PowerVector<typename SubMirrorType::VectorType, num_blocks> VectorType;
 
     protected:
       /// the one and only sub-mirror object
@@ -207,7 +221,25 @@ namespace FEAST
       /// Returns the total size of the mirror.
       Index size() const
       {
-        return count_ * _sub_mirror.size();
+        return Index(count_) * _sub_mirror.size();
+      }
+
+      /**
+       * \brief Creates a new buffer vector.
+       */
+      DenseVector<MemType, DataType, IndexType> create_buffer_vector() const
+      {
+        return DenseVector<MemType, DataType, IndexType>(size());
+      }
+
+      /**
+       * \brief Creates a new (local) vector.
+       */
+      VectorType create_vector() const
+      {
+        VectorType vector;
+        Intern::PowerMirrorHelper<count_>::create_vector(_sub_mirror, vector) ;
+        return vector;
       }
 
       template<int i_>

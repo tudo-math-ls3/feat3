@@ -32,6 +32,9 @@ namespace FEAST
       /// mirror matrix typedef
       typedef SparseMatrixCSR<Mem_, DataType_, IndexType_> MirrorMatrixType;
 
+      /// corresponding vector
+      typedef DenseVector<MemType, DataType, IndexType> VectorType;
+
     protected:
       /// gather-mirror matrix
       MirrorMatrixType _mirror_gather;
@@ -141,6 +144,22 @@ namespace FEAST
       Index size() const
       {
         return _mirror_gather.rows();
+      }
+
+      /**
+       * \brief Creates a new buffer vector.
+       */
+      DenseVector<MemType, DataType, IndexType> create_buffer_vector() const
+      {
+        return DenseVector<MemType, DataType, IndexType>(size());
+      }
+
+      /**
+       * \brief Creates a new (local) vector.
+       */
+      VectorType create_vector() const
+      {
+        return _mirror_gather.create_vector_r();
       }
 
       /**
