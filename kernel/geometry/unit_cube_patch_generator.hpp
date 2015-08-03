@@ -8,6 +8,7 @@
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 
 #include <vector>
+#include <stdexcept>
 
 namespace FEAST
 {
