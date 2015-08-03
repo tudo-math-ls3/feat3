@@ -79,6 +79,9 @@ if (CMAKE_CXX_COMPILER_ARG1)
   find_path(CMAKE_CXX_COMPILER_ARG1_PATH ${CMAKE_CXX_COMPILER_ARG1_STRIPED})
 endif (CMAKE_CXX_COMPILER_ARG1)
 
+# top lvl include dir
+INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
+
 # directories to scan recursively
 ADD_SUBDIRECTORY( thirdparty )
 ADD_SUBDIRECTORY( kernel )

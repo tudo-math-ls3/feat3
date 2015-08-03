@@ -3,9 +3,6 @@ cmake_minimum_required (VERSION 2.8)
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-# top lvl include dir
-INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
-
 #ADD_LIBRARY(kernel-space STATIC)
 #TARGET_LINK_LIBRARIES (kernel-space kernel-util)
 

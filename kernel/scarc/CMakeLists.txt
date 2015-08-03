@@ -3,14 +3,6 @@ cmake_minimum_required (VERSION 2.8)
 #enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-if (MPI_INCLUDE_PATH)
-  include_directories(${MPI_INCLUDE_PATH})
-endif()
-
-#top lvl include dir
-INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
-
-
 ADD_LIBRARY(kernel-scarc STATIC scarc_error.cpp)
 TARGET_LINK_LIBRARIES (kernel-scarc kernel-foundation kernel-util kernel-lafem)
 
