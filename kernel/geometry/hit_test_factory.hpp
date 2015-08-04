@@ -102,6 +102,17 @@ namespace FEAST
         // do nothing as the object has no index sets
       }
 
+      virtual String get_identifier() const
+      {
+        return get_parent_identifier()+"_hit_test";
+      }
+
+      virtual String get_parent_identifier() const
+      {
+        return _mesh.get_identifier();
+      }
+
+
     }; // class HitTestFactory
 
     /// \cond internal

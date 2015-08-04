@@ -21,6 +21,9 @@ namespace FEAST
     {
       template<int, int>
       struct TargetSetComputer;
+
+      template<int>
+      struct IndexSetFiller;
     }
 
     /**
@@ -544,6 +547,10 @@ namespace FEAST
         IndexSetHolderType* _index_set_holder;
         /// The target sets of the mesh.
         TargetSetHolderType _target_set_holder;
+        /// The meshpart's name
+        String _identifier;
+        /// Name String of the parent
+        String _parent_identifier;
 
       private:
         /// \brief Copy assignment operator
@@ -551,7 +558,7 @@ namespace FEAST
 
       public:
         /**
-         * \brief Constructor
+         * \brief Constructor without identifiers
          *
          * \param[in] num_entities
          * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
@@ -560,11 +567,50 @@ namespace FEAST
          * \param[in] create_topology
          * Determines if the MeshPart is to have a mesh topology.
          *
+         * \warning This sets the identifier and parent_identifier to empty Strings, so this MeshPart will in general
+         * not be useful in MeshNodes.
+         *
          */
         explicit MeshPart(const Index num_entities[], bool create_topology = false) :
           _attribute_holder(),
           _index_set_holder(nullptr),
-          _target_set_holder(num_entities)
+          _target_set_holder(num_entities),
+          _identifier(""),
+          _parent_identifier("")
+          {
+            CONTEXT(name() + "::MeshPart()");
+            for(int i(0); i <= shape_dim; ++i)
+              _num_entities[i] = num_entities[i];
+
+            if(create_topology)
+              _index_set_holder = new IndexSetHolderType(num_entities);
+          }
+
+        /**
+         * \brief Constructor without identifiers
+         *
+         * \param[in] num_entities
+         * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
+         * Must not be \c nullptr.
+         *
+         * \param[in] identifier
+         * Name for this MeshPart
+         *
+         * \param[in] parent_identifier
+         * Name of the parent mesh this MeshPart refers to
+         *
+         * \param[in] create_topology
+         * Determines if the MeshPart is to have a mesh topology.
+         *
+         *
+         */
+        explicit MeshPart(
+          const Index num_entities[], String identifier, String parent_identifier, bool create_topology = false) :
+          _attribute_holder(),
+          _index_set_holder(nullptr),
+          _target_set_holder(num_entities),
+          _identifier(identifier),
+          _parent_identifier(parent_identifier)
           {
             CONTEXT(name() + "::MeshPart()");
             for(int i(0); i <= shape_dim; ++i)
@@ -583,18 +629,20 @@ namespace FEAST
         explicit MeshPart(Factory<MeshPart>& factory) :
           _attribute_holder(),
           _index_set_holder(nullptr),
-          _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
+          _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
+          _identifier(factory.get_identifier()),
+          _parent_identifier(factory.get_parent_identifier())
           {
             CONTEXT(name() + "::MeshPart() [factory]");
 
             // Compute entity counts
             Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
 
-            // Fill index sets
-            factory.fill_index_sets(_index_set_holder);
-
             // Fill target sets
             factory.fill_target_sets(_target_set_holder);
+
+            // Fill index sets
+            factory.fill_index_sets(_index_set_holder);
 
             // Fill attribute sets
             factory.fill_attribute_sets(_attribute_holder);
@@ -609,7 +657,9 @@ namespace FEAST
         MeshPart(const MeshPart& other) :
           _attribute_holder(other.get_attribute_holder()),
           _index_set_holder(nullptr),
-          _target_set_holder(other.get_target_set_holder())
+          _target_set_holder(other.get_target_set_holder()),
+          _identifier(other.get_identifier()),
+          _parent_identifier(other.get_parent_identifier())
           {
             CONTEXT(name() + "::MeshPart() [copy]");
 
@@ -858,6 +908,7 @@ namespace FEAST
 
         /**
          * \brief Returns the name of the class.
+         *
          * \returns
          * The name of the class as a String.
          */
@@ -866,8 +917,47 @@ namespace FEAST
           return "MeshPart<...>";
         }
 
+        /// \brief Returns the name of this MeshPart
+        String get_identifier() const
+        {
+          return _identifier;
+        }
+
+        /// \brief Returns the name of the parent mesh this MeshPart refers to
+        String get_parent_identifier() const
+        {
+          return _parent_identifier;
+        }
+
         /**
-         * \brief Fills the target sets from bottom to top
+         * \brief Sets the name of this MeshPart
+         *
+         * \param[in] identifier
+         * New name of the MeshPart
+         *
+         * This is needed because adding a MeshPart to a MeshNode will change the MeshPart's name for consistency.
+         */
+        void set_identifier(String identifier)
+        {
+          _identifier = identifier;
+        }
+
+        /**
+         * \brief Sets the name of this MeshPart
+         *
+         * \param[in] identifier
+         * New name to identify the MeshPart's parent by
+         *
+         * This is needed because adding a MeshPart to a MeshNode will change the MeshPart's parent_identifier for
+         * consistency.
+         */
+        void set_parent_identifier(String parent_identifier)
+        {
+          _parent_identifier = parent_identifier;
+        }
+
+        /**
+         * \brief Deducts the target sets from bottom to top
          *
          * \tparam end_dim_
          * Dimension to stop at (meaning the lowest dimension).
@@ -875,14 +965,17 @@ namespace FEAST
          * \tparam current_dim_
          * Dimension to generate parent information for.
          *
-         * \param[in,out] parent_mesh
-         * Parent this MeshPart refers to.
+         * \param[in] parent_ish
+         * Topology of the parent this MeshPart refers to.
+         *
+         * \warning This will in general change the implied topology of the MeshPart and meant to be used in mesh
+         * preprocessing only.
          *
          */
         template<int end_dim_, int current_dim_ = ShapeType_::dimension>
-        void compute_target_sets_from_bottom(const MeshType& parent_mesh)
+        void deduct_target_sets_from_bottom(const IndexSetHolderType& parent_ish)
         {
-          Intern::template TargetSetComputer<end_dim_, current_dim_>::bottom_to_top(_target_set_holder, parent_mesh.get_index_set_holder());
+          Intern::template TargetSetComputer<end_dim_, current_dim_>::bottom_to_top(_target_set_holder, parent_ish);
 
           // Update num_entities information from the possibly modified _target_set_holder
           for(int i(end_dim_); i <= current_dim_; ++i)
@@ -891,7 +984,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Fills the target sets from top to bottom
+         * \brief Deducts the target sets from top to bottom
          *
          * \tparam end_dim_
          * Dimension to stop at (meaning the highest dimension).
@@ -899,14 +992,17 @@ namespace FEAST
          * \tparam current_dim_
          * Dimension to generate parent information for.
          *
-         * \param[in,out] parent_mesh
-         * Parent this MeshPart refers to.
+         * \param[in] parent_ish
+         * Topology of the parent this MeshPart refers to.
+         *
+         * \warning This will in general change the implied topology of the MeshPart and meant to be used in mesh
+         * preprocessing only.
          *
          */
         template<int end_dim_, int current_dim_ = 0>
-        void compute_target_sets_from_top(const MeshType& parent_mesh)
+        void deduct_target_sets_from_top(const IndexSetHolderType& parent_ish)
         {
-          Intern::template TargetSetComputer<end_dim_, current_dim_>::top_to_bottom(_target_set_holder, parent_mesh.get_index_set_holder());
+          Intern::template TargetSetComputer<end_dim_, current_dim_>::top_to_bottom(_target_set_holder, parent_ish);
 
           // Update num_entities information from the possibly modified _target_set_holder
           for(int i(current_dim_); i <= end_dim_; ++i)
@@ -916,10 +1012,21 @@ namespace FEAST
         /**
          * \brief Fills the mesh topology from parent information
          *
-         * \todo: Not implemented yet
+         * \param[in] parent_mesh
+         * Parent this MeshPart refers to.
+         *
+         * \warning This will in general change the implied topology of the MeshPart and meant to be used in mesh
+         * preprocessing only.
+         *
          */
-        virtual void compute_index_set_holder()
+        void deduct_topology(const IndexSetHolderType& parent_ish)
         {
+          if(_index_set_holder == nullptr)
+            _index_set_holder = new IndexSetHolderType(_num_entities);
+
+          Intern::IndexSetFiller<ShapeType_::dimension>::template fill_ish
+            (*_index_set_holder, _target_set_holder, parent_ish);
+
         }
 
     }; // class MeshPart<ConformalMesh<Shape_>>
@@ -986,6 +1093,20 @@ namespace FEAST
          * The target set holder whose target sets are to be filled.
          */
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) = 0;
+
+        /**
+         * \brief Returns the name of the MeshPart this factory will construct
+         *
+         * \returns The name
+         */
+        virtual String get_identifier() const = 0;
+
+        /**
+         * \brief Returns the name of the parent mesh
+         *
+         * \returns The name of the parent mesh the constructed MeshPart will refer to
+         */
+        virtual String get_parent_identifier() const = 0;
 
     }; // class Factory<MeshPart<...>>
 
@@ -1071,6 +1192,26 @@ namespace FEAST
         virtual Index get_num_entities(int dim)
         {
           return _num_entities_fine[dim];
+        }
+
+        /**
+         * \brief Returns the name of the MeshPart this factory will construct
+         *
+         * \returns The name of the coarse MeshPart
+         */
+        virtual String get_identifier() const
+        {
+          return _coarse_mesh.get_identifier();
+        }
+
+        /**
+         * \brief Returns the name of the parent mesh
+         *
+         * \returns The name of the parent mesh of the coarse MeshPart
+         */
+        virtual String get_parent_identifier() const
+        {
+          return _coarse_mesh.get_parent_identifier();
         }
 
         /**
@@ -1344,7 +1485,53 @@ namespace FEAST
         static void top_to_bottom(TargetSetHolderType& , const IndexSetHolderType&)
         {
         }
-      }; // struct TargetSetComputer<Index>
+      }; // struct TargetSetComputer<int>
+
+      template<int dim>
+      struct IndexSetFiller
+      {
+        template<typename IndexSetHolderType, typename TargetSetHolderType, typename ParentIndexSetHolderType>
+        static void fill_ish(IndexSetHolderType& ish, const TargetSetHolderType& tsh, const ParentIndexSetHolderType& parent_ish)
+        {
+          // Recurse down
+          IndexSetFiller<dim-1>::fill_ish(ish, tsh, parent_ish);
+
+          auto& index_set(ish.template get_index_set<dim, 0>());
+          auto& index_set_parent(parent_ish.template get_index_set<dim, 0>());
+
+          auto& target_set_vertex(tsh.template get_target_set<0>());
+          auto& target_set_dim(tsh.template get_target_set<dim>());
+
+          Index* inverse_target_map(new Index[index_set_parent.get_index_bound()]);
+
+          for(Index i(0); i < index_set_parent.get_index_bound(); ++i)
+            inverse_target_map[i] = target_set_vertex.get_num_entities() + Index(1);
+
+          for(Index i(0); i < target_set_vertex.get_num_entities(); ++i)
+            inverse_target_map[target_set_vertex[i]] = i;
+
+          for(Index cell(0); cell < target_set_dim.get_num_entities(); ++cell)
+          {
+            for(int i(0); i < index_set_parent.get_num_indices(); ++i)
+              index_set[cell][i] = inverse_target_map[index_set_parent[target_set_dim[cell]][i]];
+          }
+
+          delete inverse_target_map;
+
+        }
+      };
+
+      /**
+       * \brief Explicit specialisation as end of template recursion.
+       */
+      template<>
+      struct IndexSetFiller<0>
+      {
+        template<typename IndexSetHolderType, typename TargetSetHolderType, typename ParentIndexSetHolderType>
+        static void fill_ish(IndexSetHolderType& DOXY(ish), const TargetSetHolderType& DOXY(tsh), const ParentIndexSetHolderType& DOXY(parent_ish))
+        {
+        }
+      };
     } // namespace Intern
     /// \endcond
 

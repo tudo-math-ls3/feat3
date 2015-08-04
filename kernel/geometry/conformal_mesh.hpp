@@ -92,6 +92,9 @@ namespace FEAST
       /// the index sets of the mesh
       IndexSetHolderType _index_set_holder;
 
+      /// Name of the mesh
+      String _identifier;
+
     private:
       /// \brief Copy assignment operator declared but not implemented
       ConformalMesh& operator=(const ConformalMesh&);
@@ -103,10 +106,16 @@ namespace FEAST
        * \param[in] num_entities
        * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
        * Must not be \c nullptr.
+       *
+       * \param[in] identifier
+       * Name of the mesh, defaults to root
+       *
+       * Up until now, every application has just one mesh ("root"), but this might change.
        */
-      explicit ConformalMesh(const Index num_entities[]) :
+      explicit ConformalMesh(const Index num_entities[], String identifier = "root") :
         _vertex_set(num_entities[0]),
-        _index_set_holder(num_entities)
+        _index_set_holder(num_entities),
+        _identifier(identifier)
       {
         CONTEXT(name() + "::ConformalMesh(const Index[])");
         for(int i(0); i <= shape_dim; ++i)
@@ -121,10 +130,16 @@ namespace FEAST
        *
        * \param[in] factory
        * The factory that is to be used to create the mesh.
+       *
+       * \param[in] identifier
+       * Name of the mesh, defaults to root
+       *
+       * Up until now, every application has just one mesh ("root"), but this might change.
        */
-      explicit ConformalMesh(Factory<ConformalMesh>& factory) :
+      explicit ConformalMesh(Factory<ConformalMesh>& factory, String identifier = "root") :
         _vertex_set(factory.get_num_entities(0)),
-        _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
+        _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
+        _identifier(identifier)
       {
         CONTEXT(name() + "::ConformalMesh() [factory]");
 
@@ -153,7 +168,8 @@ namespace FEAST
       //ConformalMesh(const ConformalMesh<Shape_, num_coords_, stride2_, Coord2_>& other) :
       ConformalMesh(const ConformalMesh& other) :
         _vertex_set(other.get_vertex_set()),
-        _index_set_holder(other.get_index_set_holder())
+        _index_set_holder(other.get_index_set_holder()),
+        _identifier(other.get_identifier())
       {
         CONTEXT(name() + "::ConformalMesh() [copy]");
         for(int i(0); i <= shape_dim; ++i)
@@ -183,6 +199,12 @@ namespace FEAST
         ASSERT_(dim >= 0);
         ASSERT_(dim <= shape_dim);
         return _num_entities[dim];
+      }
+
+      /// \returns The name of the mesh
+      String get_identifier() const
+      {
+        return _identifier;
       }
 
       /// Returns a reference to the vertex set of the mesh.
@@ -322,6 +344,20 @@ namespace FEAST
        * The index set holder whose index sets are to be filled.
        */
       virtual void fill_index_sets(IndexSetHolderType& index_set_holder) = 0;
+
+      /**
+       * \brief Returns the name of the mesh that is being constructed
+       *
+       * \returns
+       * The name of the mesh.
+       *
+       * This always returns "root" because up until now, there is always just one real mesh. Classes inheriting from
+       * this can overwrite this method.
+       */
+      virtual String get_identifier() const
+      {
+        return "root";
+      }
     }; // class Factory<ConformalMesh<...>>
 
     /* ************************************************************************************************************* */

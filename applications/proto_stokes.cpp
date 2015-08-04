@@ -179,6 +179,18 @@ public:
   {
     // do nothing as this class does not have a topology
   }
+
+  // Unused, for interface purposes only
+  virtual String get_identifier() const
+  {
+    return "";
+  }
+
+  // Unused, for interface purposes only
+  virtual String get_parent_identifier() const
+  {
+    return "root";
+  }
 }; // class Factory<CellSubSet<...>>
 
 // A class containing all data for the discretised Stokes equation on a particular mesh level.

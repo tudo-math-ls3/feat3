@@ -62,23 +62,36 @@ namespace FEAST
       {
       }
 
+      /// \returns The name of the MeshPart
+      virtual String get_identifier() const override
+      {
+        return get_parent_identifier()+"-boundary";
+
+      }
+
+      /// \returns the name of the parent mesh
+      virtual String get_parent_identifier() const override
+      {
+        return _mesh_in.get_identifier();
+      }
+
       /// Returns the number of entities.
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         return _face_computer.get_num_entities(dim);
       }
 
       /// Fills the MeshPart's target set, except that it doesn't
-      virtual void fill_attribute_sets(typename BaseClass::AttributeHolderType& DOXY(target_set_holder))
+      virtual void fill_attribute_sets(typename BaseClass::AttributeHolderType& DOXY(target_set_holder)) override
       {
       }
       /// Fills the MeshPart's index_set_holder, except that it doesn't as there is no topology
-      virtual void fill_index_sets(typename BaseClass::IndexSetHolderType*& DOXY(index_set_holder))
+      virtual void fill_index_sets(typename BaseClass::IndexSetHolderType*& DOXY(index_set_holder)) override
       {
       }
 
       /// Fills the MeshPart's target set.
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
       {
         _face_computer.fill_target_sets(target_set_holder);
       }

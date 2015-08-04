@@ -19,7 +19,7 @@ namespace FEAST
      * \brief Mesh Atlas class template
      *
      * \tparam Mesh_
-     * The type of the mesh that is to be parameterised by this atlas.
+     * The type of the mesh that is to be parameterised by this atlas, i.e. ConformalMesh
      *
      * \author Peter Zajac
      */
@@ -140,11 +140,16 @@ namespace FEAST
       {
         for(auto& c : streamer.charts)
         {
-          MeshChartType* chart = factory.parse_chart(c.type, c.data, c.start_of_data);
+          MeshChartType* chart(nullptr);
+
+          if(c.type == "discrete")
+            chart = factory.parse_discrete_chart(c.mesh_data);
+          else
+            chart = factory.parse_chart(c.type, c.data, c.start_of_data);
+
           if(chart == nullptr)
-          {
             throw InternalError("Failed to parse chart '" + c.name + "': unknown type '" + c.type + "' ?");
-          }
+
           add_mesh_chart(c.name, chart, false);
         }
       }

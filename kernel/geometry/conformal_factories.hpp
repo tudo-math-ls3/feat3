@@ -58,6 +58,7 @@ namespace FEAST
           v_e[0][0] = 0;
           v_e[0][1] = 1;
         }
+
     };
 
     template<int stride_, typename Coord_>
@@ -270,6 +271,7 @@ namespace FEAST
             ei[2] = 2;
             ei[3] = 3;
           }
+
       }; //UnitCubeFactory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >
 
     /// \endcond

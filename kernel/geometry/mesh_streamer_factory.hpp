@@ -171,7 +171,6 @@ namespace FEAST
           // Parse preliminary num_entities from _mesh_data
           for(int d(0); d <= Shape_::dimension; ++d)
             _num_entities[d] = _mesh_data->num_entities[d];
-
           return;
         }
 
@@ -189,26 +188,36 @@ namespace FEAST
           _num_entities[d] = _mesh_data->num_entities[d];
       }
 
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         ASSERT( (dim >= 0) && (dim <= Shape_::dimension), "No num_entities for dimension!");
         return _num_entities[dim];
       }
 
-      virtual void fill_attribute_sets(AttributeHolderType& attributes)
+      virtual void fill_attribute_sets(AttributeHolderType& attributes) override
       {
         Intern::AttributeSetBuilder<Shape_::dimension>::build(attributes, _mesh_data);
       }
 
-      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder)
+      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
       {
         ASSERT(index_set_holder == nullptr, "fill_index_sets: index_set_holder != nullptr!");
         Intern::MeshStreamerIndexer<Shape_>::build(index_set_holder, _mesh_data, _num_entities);
       }
 
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
       {
         Intern::MeshStreamerTargeter<Shape_>::wrap(target_set_holder, _mesh_data->parent_indices);
+      }
+
+      virtual String get_identifier() const override
+      {
+        return _mesh_data->name;
+      }
+
+      virtual String get_parent_identifier() const override
+      {
+        return _mesh_data->parent;
       }
     }; // class MeshStreamerFactory<MeshPart<...>>
 

@@ -66,18 +66,15 @@ namespace FEAST
     return nullptr;
   }
 
-  void MeshStreamer::parse_multiple_files(String filenames)
+  void MeshStreamer::parse_multiple_files(std::deque<String>& filenames)
   {
-    CONTEXT("MeshStreamer::parse_multiple_files(String)");
-    std::vector<String> filename_vec;
+    CONTEXT("MeshStreamer::parse_multiple_files(std::deque<String>)");
 
-    filenames.split_by_charset(filename_vec);
-
-    if(filename_vec.size() == 0)
+    if(filenames.size() == 0)
       throw InternalError("No files specified for parsing!");
 
     // loop over all filenames
-    for(auto it = filename_vec.begin(); it != filename_vec.end(); ++it)
+    for(auto it = filenames.begin(); it != filenames.end(); ++it)
     {
       parse_mesh_file(*it);
     }
@@ -884,6 +881,7 @@ namespace FEAST
         parent = parent_it->second;
         my_data.erase(parent_it);
       }
+
     } // if(!is_meshpart)
 
     // Only Hypercube shapes are allowed for structured meshes
@@ -2115,11 +2113,22 @@ namespace FEAST
     }
 
     start_of_data = cur_line;
-    // Parse rest of the chart section into the data deque
-    while(!ifs.eof() && ifs.good() && !(line == "</chart>"))
+
+    if(type == "discrete")
     {
-      data.push_back(line.trim());
+      cur_line = mesh_data._parse_mesh_section(cur_line, false, ifs);
       line = read_next_line(ifs,cur_line);
+      if(line != "</chart>")
+        throw SyntaxError("Expected end of chart section in line "+stringify(cur_line));
+    }
+    else
+    {
+      // Parse rest of the chart section into the data deque
+      while(!ifs.eof() && ifs.good() && !(line == "</chart>"))
+      {
+        data.push_back(line.trim());
+        line = read_next_line(ifs,cur_line);
+      }
     }
 
     return cur_line;

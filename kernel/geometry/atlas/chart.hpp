@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/mesh_part.hpp>
+#include <kernel/util/mesh_streamer.hpp> // for MeshDataContainer
 #include <kernel/util/tiny_algebra.hpp>
 
 namespace FEAST
@@ -283,6 +284,20 @@ namespace FEAST
          * or \c nullptr if the type of the chart is unknown.
          */
         virtual ChartBase<Mesh_>* parse_chart(const String& type, const std::deque<String>& data, const Index line) = 0;
+
+        /**
+         *
+         * \brief Parses a discrete chart from a MeshStreamer::MeshDataContainer.
+         *
+         * \param[in] data
+         * The data container from MeshStreamer containing the boundary mesh. Cannot be const since it is passed non-const to a constructor later.
+         *
+         * \returns
+         * A pointer to the parsed MeshChart if parsing was successful,
+         * or \c nullptr if the type of the chart is unknown.
+         */
+        virtual ChartBase<Mesh_>* parse_discrete_chart(FEAST::MeshStreamer::MeshDataContainer& data) = 0;
+
       }; // class ChartFactory
     } // namespace Atlas
   } // namespace Geometry

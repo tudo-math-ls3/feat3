@@ -101,6 +101,18 @@ public:
     // do nothing as the class has no index sets
   }
 
+  // Unused, for interface purposes only
+  virtual String get_identifier() const
+  {
+    return "";
+  }
+
+  // Unused, for interface purposes only
+  virtual String get_parent_identifier() const
+  {
+    return "";
+  }
+
 protected:
   void _fill_lower_patch(TargetSetHolderType& target_set_holder)
   {

@@ -69,6 +69,16 @@ namespace FEAST
         // do nothing as the object has no index sets
       }
 
+      virtual String get_identifier() const
+      {
+        return _patch_set.get_identifier()+"_"+_halo_set.get_identifier()+"_patch_halo";
+      }
+
+      virtual String get_parent_identifier() const
+      {
+        return _patch_set.get_parent_identifier();
+      }
+
     }; // class PatchHaloFactory<MeshPart<...>>
 
     /// \cond internal

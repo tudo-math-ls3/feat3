@@ -233,6 +233,10 @@ namespace FEAST
       CoordStack coords;
       /// Adjacencies: Adjacency[i][j] contains which entities of dimension i lie at entities of dimension j
       AdjStack adjacencies[4][4];
+      /// Should parent information be deducted?
+      String deduct_target_sets;
+      /// Should the topology be deducted from the parent information?
+      bool deduct_topology;
 
     public:
       // default CTOR
@@ -440,6 +444,8 @@ namespace FEAST
         /// Line in the file the data section starts at
         Index start_of_data;
 
+        MeshDataContainer mesh_data;
+
         /**
          * \brief Default constructor
          */
@@ -448,7 +454,8 @@ namespace FEAST
           name(""),
           type(""),
           data(),
-          start_of_data(0)
+          start_of_data(0),
+          mesh_data()
         {
         }
 
@@ -463,7 +470,8 @@ namespace FEAST
           name(other.name),
           type(other.type),
           data(other.data),
-          start_of_data(other.start_of_data)
+          start_of_data(other.start_of_data),
+          mesh_data(other.mesh_data)
           {
           }
 
@@ -595,8 +603,6 @@ namespace FEAST
   public:
     /// All Charts this Mesh and all of its MeshParts refer to
     std::deque<ChartContainer> charts;
-    // TODO
-    //std::deque<MeshDataContainer> discrete_charts;
 
   public:
     /// Default Constructor
@@ -618,10 +624,10 @@ namespace FEAST
     /**
      * \brief Parses multiple files given in one String
      *
-     * \param[in] filename
-     * String containing all filenames seperated by whitespace.
+     * \param[in] filenames
+     * All filenames seperated by whitespace.
      */
-    void parse_multiple_files(String filename);
+    void parse_multiple_files(std::deque<String>& filenames);
 
     /**
      * \brief Parses a given FEAST- mesh file.

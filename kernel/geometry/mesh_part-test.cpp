@@ -86,7 +86,7 @@ public:
     TargetSet& ts_reference3 = mesh_part_reference.get_target_set<3>();
 
     // Deduct target sets
-    mesh_part_to_test.compute_target_sets_from_bottom<0>(my_mesh);
+    mesh_part_to_test.deduct_target_sets_from_bottom<0>(my_mesh.get_index_set_holder());
 
     // Check for dimension 0: new one should still be empty
     TEST_CHECK_MSG(ts_test0.get_num_entities() == 0, "num_entities for dimension 0 should be 0!");
@@ -109,7 +109,7 @@ public:
     mesh_part_to_test.get_target_set<1>() = std::move(tmp0);
     mesh_part_to_test.get_target_set<3>() = std::move(tmp0);
 
-    mesh_part_to_test.compute_target_sets_from_top<2>(my_mesh);
+    mesh_part_to_test.deduct_target_sets_from_top<2>(my_mesh.get_index_set_holder());
 
     // Check dimension 3: new one should still be empty
     TEST_CHECK_MSG(ts_test3.get_num_entities() == 0, "num_entities for dimension 3 should be 3!");
