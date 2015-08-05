@@ -128,9 +128,9 @@ namespace FEAST
      * - If \p bhours = \c false, then the least granular unit is a minute and the string
      *   is of the format <c>m:ss[.nnn]</c>.
      * - If \p bmillis = \c true, then the most granular unit is a millisecond and the string is
-     *   of the format <c>[h:m]m:ss.nnn</c>.
+     *   of the format <c>[h:m]:ss.nnn</c>.
      * - If \p bmillis = \c false, then the most granular unit is a second and the string is
-     *   of the format <c>[h:m]m:ss</c>.
+     *   of the format <c>[h:m]:ss</c>.
      *
      * \param[in] micros
      * The elapsed time to be formatted.
