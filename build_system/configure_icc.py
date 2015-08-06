@@ -23,8 +23,19 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
 
   if "debug" in buildid:
     cxxflags += "  -O0 -Wall -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -debug all -ftrapuv  -diag-disable 2304 -diag-disable 2305"
-  elif "opt" in buildid:
-    cxxflags += " -O3 -no-prec-div -ip -fno-alias"
+
+  elif "opt" in buildid or "fast" in buildid:
+    cxxflags += " -no-prec-div -fno-alias"
+    if major == 14:
+      cxxflags += " -ip"
+    else:
+      cxxflags += " -ipo"
+
+    if "opt" in buildid:
+      cxxflags += " -O3"
+    elif "fast" in buildid:
+      cxxflags += " -Ofast"
+
     if cpu == "unknown":
       # generate code for every simd unit, existing so far
       cxxflags += " -axCORE-AVX2"

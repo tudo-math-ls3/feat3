@@ -55,6 +55,9 @@
 /// Descriptive compiler name, as detected by cmake
 #define CMAKE_CXX_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}"
 
+/// Descriptive compiler name, as set by the configure_feast script
+#define FEAST_COMPILER_ID "${FEAST_COMPILER_ID}"
+
 /// Compiler version, as detected by cmake
 #define CMAKE_CXX_COMPILER_VERSION "${CMAKE_CXX_COMPILER_VERSION}"
 

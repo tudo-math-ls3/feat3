@@ -19,9 +19,9 @@ if (FEAST_HAVE_FPARSER)
 
   # The 'fpoptimizer.cc' can not be compiled with clang++, so we have to disable
   # it by adding the corresponding pre-processor define
-  if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  if (${FEAST_COMPILER_ID} STREQUAL "clang")
     ADD_DEFINITIONS(-DFP_NO_SUPPORT_OPTIMIZER)
-  endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  endif (${FEAST_COMPILER_ID} STREQUAL "clang")
 
   ADD_LIBRARY(thirdparty-fparser STATIC ${fparser-list})
   SET_PROPERTY(TARGET thirdparty-fparser PROPERTY COMPILE_FLAGS " -w")

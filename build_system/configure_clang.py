@@ -28,8 +28,16 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
     if major == 3 and minor > 6:
       cxxflags += " -Wrange-loop-analysis -Wobjc-circular-container"
 
-  elif "opt" in buildid:
-    cxxflags += " -O3"
+  elif "opt" in buildid or "fast" in buildid:
+    if "opt" in buildid:
+      cxxflags += " -O3"
+    elif "fast" in buildid:
+      if major == 3 and minor < 7:
+        cxxflags += " -O3"
+      else:
+        # work around for https://llvm.org/bugs/show_bug.cgi?id=13745 - math.h/math-finite-h broken in gcc 4.6 (host compiler of ubuntu 12.04)
+        cxxflags += " -Ofast -D__extern_always_inline='extern __always_inline'"
+
     if cpu == "unknown":
       cxxflags += " -mtune=generic"
       print ("Warning: cpu type not detected, using -mtune=generic instead.")

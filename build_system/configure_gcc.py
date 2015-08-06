@@ -45,10 +45,15 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -Wswitch-bool -Wsizeof-array-argument -Wbool-compare"
       cxxflags += " -Wsuggest-final-types  -Wsuggest-final-methods"
       #cxxflags += " -Wnon-virtual-dtor -Wdelete-non-virtual-dtor"
-  elif "opt" in buildid:
-    cxxflags += " -O3 -funsafe-loop-optimizations"
+  elif "opt" in buildid or "fast" in buildid:
+    cxxflags += " -funsafe-loop-optimizations"
     if major >= 5:
       cxxflags +=" -malign-data=cacheline"
+    if "opt" in buildid:
+      cxxflags += " -O3"
+    elif "fast" in buildid:
+      cxxflags += " -Ofast"
+
     if cpu == "unknown":
       cxxflags += " -mtune=generic"
       print ("Warning: cpu type not detected, using -mtune=generic instead.")

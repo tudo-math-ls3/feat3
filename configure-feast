@@ -22,7 +22,6 @@ from build_system.thirdparty_package import *
 
 #TODO help, ? und guess nicht in sys.argv[0] suchen
 #TODO scalasca
-#TODO cpu=string um cpu direkt anzugeben
 
 # output help screen
 if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.argv)):
@@ -56,7 +55,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("It is used to choose different tools and configurations related to the build process.")
   print ("With the exception of the additional backends and thirdpartylibs, you can choose one token out of each category.")
   print ("These categories are:")
-  print ("  Build Mode: debug, opt")
+  print ("  Build Mode: debug, opt, fast")
   print ("  Parallelisation: serial, mpi")
   print ("  Compiler: gcc, icc, clang")
   print ("  Compiler frontends: ccache")
@@ -182,16 +181,17 @@ else:
   generator = "Unix Makefiles"
 
 # optimisation/debug mode aka build mode selection
-if "debug" in buildid or "noop" in buildid:
+if "debug" in buildid:
   remove_string(unused_tokens, "debug")
-  remove_string(unused_tokens, "noop")
   cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=ON"
-elif "opt" in buildid or "release" in buildid:
+elif "opt" in buildid:
   remove_string(unused_tokens, "opt")
-  remove_string(unused_tokens, "release")
+  cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=OFF"
+elif "fast" in buildid:
+  remove_string(unused_tokens, "fast")
   cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=OFF"
 else:
-  print ("Error: No supported build mode (opt/debug) found in build id:")
+  print ("Error: No supported build mode (opt/debug/fast) found in build id:")
   print (buildid_string)
   sys.exit(1)
 
@@ -276,6 +276,7 @@ if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
   if "coverage" in buildid:
     remove_string(unused_tokens, "coverage")
     ldflags += " -fprofile-arcs -ftest-coverage"
+  cmake_flags += " -DFEAST_COMPILER_ID:STRING=gcc"
 elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   if not compiler:
     compiler = "icpc"
@@ -288,6 +289,7 @@ elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   os.environ["CC"] = "icc"
   os.environ["CXX"] = compiler
   cxxflags += " " + configure_icc (cputype, buildid, compiler, system_host_compiler)
+  cmake_flags += " -DFEAST_COMPILER_ID:STRING=icc"
 elif "clang" in buildid or "llvm" in buildid:
   if not compiler:
     compiler = "clang++"
@@ -299,6 +301,7 @@ elif "clang" in buildid or "llvm" in buildid:
   os.environ["CC"] = "clang"
   os.environ["CXX"] = compiler
   cxxflags += " " + configure_clang (cputype, buildid, compiler, system_host_compiler)
+  cmake_flags += " -DFEAST_COMPILER_ID:STRING=clang"
 else:
   print ("Error: No supported compiler found in build id:")
   print (buildid_string)

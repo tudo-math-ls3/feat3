@@ -52,6 +52,10 @@ The host compiler that will be used by nvcc for host code compilation.
 Descriptive compiler name, as detected by cmake.
 
 <hr>
+\subsection ppm_feast_compiler_id FEAST_COMPILER_ID
+Descriptive compiler name, as set by the configure_feast script.
+
+<hr>
 \subsection ppm_cmake_cxx_compiler_version CMAKE_CXX_COMPILER_VERSION
 Compiler version, as detected by cmake.
 
