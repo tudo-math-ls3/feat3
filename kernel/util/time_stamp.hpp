@@ -145,7 +145,7 @@ namespace FEAST
      * - For TimeFormat::m_s the string is
      *   of the format <c>mm:ss</c>.
      * - For TimeFormat::s_m the string is
-     *   of the format <c>ss.immm</c>.
+     *   of the format <c>ss.mmm</c>.
      *
      * \param[in] micros
      * The elapsed time to be formatted.
