@@ -24,8 +24,10 @@ namespace FEAST
       /**
        * \brief Generates an empty FE-style pointstar banded matrix
        *
-       * \param[in] FE_order
-       * order of the Finite Element discretisation
+       * \param[in] FE_degree
+       * Polynomial degree of the Finite Element discretisation.
+       * I.e. FE_order=1 yields the so called Q1 Matrix with three tridiagonal bands.
+       *
        * \param[in] num_of_subintervalls
        * The vector with number of subintervalls per dimension.
        *
@@ -33,7 +35,7 @@ namespace FEAST
        * The m^d x m^d FE-stye pointstar matrix.
        */
       template<typename DataType_, typename IndexType_>
-      static SparseMatrixBanded<Mem::Main, DataType_, IndexType_> value(const Index fe_order,
+      static SparseMatrixBanded<Mem::Main, DataType_, IndexType_> value(const Index fe_degree,
                                                                         const std::vector<IndexType_> & num_of_subintervalls)
       {
         const IndexType_ * const pnos(num_of_subintervalls.data());
@@ -52,12 +54,12 @@ namespace FEAST
         // calculate size of matrix and number of offsets
         IndexType_ size(1);
         Index noo(1);
-        if (fe_order > Index(0))
+        if (fe_degree > Index(0))
         {
           for (Index i(0); i < d; ++i)
           {
-            size *= pnos[i] * IndexType_(fe_order) + 1;
-            noo *=  2 * fe_order + 1;
+            size *= pnos[i] * IndexType_(fe_degree) + 1;
+            noo *=  2 * fe_degree + 1;
           }
         }
         else
@@ -79,11 +81,11 @@ namespace FEAST
         // save position of main-diagonal
         poffsets[h_off] = size - IndexType_(1);
 
-        for (Index i(0), k(1), m(1); i < d; ++i, k *= 2 * fe_order + 1, m *= pnos[i - 1] * fe_order + 1)
+        for (Index i(0), k(1), m(1); i < d; ++i, k *= 2 * fe_degree + 1, m *= pnos[i - 1] * fe_degree + 1)
         {
           Index k1((k - 1) / 2);
 
-          for (IndexType_ j(1); j <= fe_order; ++j)
+          for (IndexType_ j(1); j <= fe_degree; ++j)
           {
             for (IndexType_ l(0); l < k; ++l)
             {
