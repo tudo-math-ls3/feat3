@@ -453,8 +453,8 @@ namespace PoissonDirichlet2D
       if (rank == 0)
       {
         std::cout << "Run-Time: "
-          << TimeStamp::format_micros(time1, false) << " ["
-          << TimeStamp::format_micros(time2, false) << "]" << std::endl;
+          << TimeStamp::format_micros(time1, TimeFormat::m_s_m) << " ["
+          << TimeStamp::format_micros(time2, TimeFormat::m_s_m) << "]" << std::endl;
       }
     }
 #ifndef DEBUG

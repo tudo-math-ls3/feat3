@@ -86,18 +86,15 @@ namespace FEAST
      *
      * See TimeStamp::format_micros() for more information about the formatting options.
      *
-     * \param[in] bhours
-     * Specifies whether hours are to be printed.
-     *
-     * \param[in] bmillis
-     * Specifies whether milliseconds are to be printed.
+     * \param[in] format
+     * Specifies string formating to be used.
      *
      * \returns
      * The time elapsed between in the stop-watch as a formatted string <code>h:mm:ss.nnn</code>.
      */
-    String elapsed_string(bool bhours = true, bool bmillis = true) const
+    String elapsed_string(TimeFormat format = TimeFormat::h_m_s_m) const
     {
-      return TimeStamp::format_micros(elapsed_micros(), bhours, bmillis);
+      return TimeStamp::format_micros(elapsed_micros(), format);
     }
   }; // class StopWatch
 } // namespace FEAST

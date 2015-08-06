@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
+#include <kernel/util/exception.hpp>
 
 // includes, system
 #include <sstream>
@@ -23,6 +24,18 @@ extern "C" int __stdcall QueryPerformanceFrequency(long long int*);
 
 namespace FEAST
 {
+    /**
+     * Supported time string formating.
+     */
+    enum class TimeFormat
+    {
+      h_m_s_m, /**< <c>h:mm:ss.mmm</c> */
+      h_m_s, /**< <c>h:mm:ss</c> */
+      m_s_m, /**< <c>mm:ss.mmm</c> */
+      m_s, /**< <c>mm:ss</c> */
+      s_m, /**< <c>ss.mmm</c> */
+    };
+
   /**
    * \brief Time stamp class
    *
@@ -122,29 +135,28 @@ namespace FEAST
      * \brief Formats an elapsed time in microseconds as a string.
      *
      * This function formats the given elapsed time as a string, where the format depends
-     * on the \p bhours and \p bmillis parameters:
-     * - If \p bhours = \c true, then the least granular unit is an hour and the string is
-     *   of the format <c>h:mm:ss[.nnn]</c>.
-     * - If \p bhours = \c false, then the least granular unit is a minute and the string
-     *   is of the format <c>m:ss[.nnn]</c>.
-     * - If \p bmillis = \c true, then the most granular unit is a millisecond and the string is
-     *   of the format <c>[h:m]:ss.nnn</c>.
-     * - If \p bmillis = \c false, then the most granular unit is a second and the string is
-     *   of the format <c>[h:m]:ss</c>.
+     * on the TimeFormat parameter:
+     * - For TimeFormat::h_m_s_m the string is
+     *   of the format <c>h:mm:ss.mmm</c>.
+     * - For TimeFormat::h_m_s the string is
+     *   of the format <c>h:mm:ss</c>.
+     * - For TimeFormat::m_s_m the string is
+     *   of the format <c>mm:ss.mmm</c>.
+     * - For TimeFormat::m_s the string is
+     *   of the format <c>mm:ss</c>.
+     * - For TimeFormat::s_m the string is
+     *   of the format <c>ss.immm</c>.
      *
      * \param[in] micros
      * The elapsed time to be formatted.
      *
-     * \param[in] bhours
-     * Specifies whether hours are to be printed.
-     *
-     * \param[in] bmillis
-     * Specifies whether milliseconds are to be printed.
+     * \param[in] format
+     * Specifies string formating to be used.
      *
      * \returns
-     * The time elapsed as a formatted string <code>[h:m]m:ss[.nnn]</code>.
+     * The time elapsed as a formatted string, for example <code>h:m:ss.mmm</code>.
      */
-    static String format_micros(long long micros, bool bhours = true, bool bmillis = true)
+    static String format_micros(long long micros, TimeFormat format = TimeFormat::h_m_s_m)
     {
       // check whether the time is negative
       bool neg(false);
@@ -156,29 +168,40 @@ namespace FEAST
 
       std::ostringstream oss;
       oss << std::setfill('0');
-      if(bhours)
+
+      switch (format)
       {
-        // write hours
-        oss << (micros / 3600000000ll);
-        // write minutes
-        oss << ":" << std::setw(2) << ((micros / 60000000ll) % 60ll);
-      }
-      else
-      {
-        // write minutes
-        oss << (micros / 60000000ll);
-      }
-      if(bmillis)
-      {
-        // write seconds
-        oss << ":" << std::setw(2) << (((micros + 500) / 1000000ll) % 60ll);
-        // write milli-seconds by rounding
-        oss << "." << std::setw(3) << (((micros + 500) / 1000ll) % 1000ll);
-      }
-      else
-      {
-        // write seconds by rounding
-        oss << ":" << std::setw(2) << (((micros + 500000) / 1000000ll) % 60ll);
+        case TimeFormat::h_m_s_m:
+          oss << (micros / 3600000000ll);
+          oss << ":" << std::setw(2) << ((micros / 60000000ll) % 60ll);
+          oss << ":" << std::setw(2) << (((micros + 500) / 1000000ll) % 60ll);
+          oss << "." << std::setw(3) << (((micros + 500) / 1000ll) % 1000ll);
+          break;
+
+        case TimeFormat::h_m_s:
+          oss << (micros / 3600000000ll);
+          oss << ":" << std::setw(2) << ((micros / 60000000ll) % 60ll);
+          oss << ":" << std::setw(2) << (((micros + 500000) / 1000000ll) % 60ll);
+          break;
+
+        case TimeFormat::m_s_m:
+          oss << (micros / 60000000ll);
+          oss << ":" << std::setw(2) << (((micros + 500) / 1000000ll) % 60ll);
+          oss << "." << std::setw(3) << (((micros + 500) / 1000ll) % 1000ll);
+          break;
+
+        case TimeFormat::m_s:
+          oss << (micros / 60000000ll);
+          oss << ":" << std::setw(2) << (((micros + 500000) / 1000000ll) % 60ll);
+          break;
+
+        case TimeFormat::s_m:
+          oss << std::setw(2) << (((micros + 500) / 1000000ll));
+          oss << "." << std::setw(3) << (((micros + 500) / 1000ll) % 1000ll);
+          break;
+
+        default:
+          throw InternalError("TimeFormat not supported!");
       }
 
       // return formatted string
@@ -196,19 +219,16 @@ namespace FEAST
      * \param[in] before
      * A time stamp that represents a previous moment.
      *
-     * \param[in] bhours
-     * Specifies whether hours are to be printed.
-     *
-     * \param[in] bmillis
-     * Specifies whether milliseconds are to be printed.
+     * \param[in] format
+     * Specifies string formating to be used.
      *
      * \returns
-     * The time elapsed between the time stamps \p before and \c this as a formatted string
-     * <code>h:mm:ss.nnn</code>.
+     * The time elapsed between the time stamps \p before and \c this as a formatted string,
+     * for example <code>h:mm:ss.mm</code>.
      */
-    String elapsed_string(const TimeStamp& before, bool bhours = true, bool bmillis = true) const
+    String elapsed_string(const TimeStamp& before, TimeFormat format = TimeFormat::h_m_s_m) const
     {
-      return format_micros(elapsed_micros(before), bhours, bmillis);
+      return format_micros(elapsed_micros(before), format);
     }
 
     /**
