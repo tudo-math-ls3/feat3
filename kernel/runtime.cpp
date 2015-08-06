@@ -1,4 +1,4 @@
-#include <kernel/feast.hpp>
+#include <kernel/runtime.hpp>
 
 #include <cstdlib>
 
@@ -30,6 +30,8 @@ namespace FEAST
 #else
     (void)argc;
     (void)argv;
+    rank = 0;
+    nprocs = 1;
 #endif
   }
 

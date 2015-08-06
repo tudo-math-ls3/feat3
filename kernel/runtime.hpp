@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_FEAST_HPP
-#define KERNEL_FEAST_HPP 1
+#ifndef KERNEL_RUNTIME_HPP
+#define KERNEL_RUNTIME_HPP 1
 
 #include <kernel/base_header.hpp>
 
@@ -57,4 +57,4 @@ namespace FEAST
   int finalise();
 } // namespace FEAST
 
-#endif // KERNEL_FEAST_HPP
+#endif // KERNEL_RUNTIME_HPP
