@@ -345,6 +345,11 @@ namespace FEAST
         return String("PowerRowMatrix<") + SubMatrixType::name() + "," + stringify(blocks_) + ">";
       }
 
+      Index size() const
+      {
+        return rows() * columns();
+      }
+
       /**
        * \brief Clears this matrix.
        *
@@ -702,6 +707,11 @@ namespace FEAST
       static String name()
       {
         return String("PowerRowMatrix<") + SubMatrixType::name() + "," + stringify(1) + ">";
+      }
+
+      Index size() const
+      {
+        return rows() * columns();
       }
 
       void format(DataType value = DataType(0))

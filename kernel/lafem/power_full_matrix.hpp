@@ -270,6 +270,11 @@ namespace FEAST
         return String("PowerFullMatrix<") + SubMatrixType::name() + "," + stringify(width_) + "," + stringify(height_) + ">";
       }
 
+      Index size() const
+      {
+        return rows() * columns();
+      }
+
       void format(DataType value = DataType(0))
       {
         _container.format(value);

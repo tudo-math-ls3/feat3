@@ -347,6 +347,11 @@ namespace FEAST
         return String("TupleDiagMatrix<") + sub_name_list() + ">";
       }
 
+      Index size() const
+      {
+        return rows() * columns();
+      }
+
       /**
        * \brief Clears this matrix.
        *
@@ -753,6 +758,11 @@ namespace FEAST
       void format(DataType value = DataType(0))
       {
         first().format(value);
+      }
+
+      Index size() const
+      {
+        return rows() * columns();
       }
 
       template<typename Algo_>

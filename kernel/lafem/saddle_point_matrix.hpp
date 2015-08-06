@@ -367,6 +367,11 @@ namespace FEAST
           MatrixTypeD::name() + ">";
       }
 
+      Index size() const
+      {
+        return rows() * columns();
+      }
+
       /**
        * \brief Applies this matrix onto a vector.
        *
