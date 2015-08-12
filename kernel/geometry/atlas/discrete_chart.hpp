@@ -87,6 +87,18 @@ namespace FEAST
               delete _surface_mesh;
           }
 
+          /** \copydoc ChartBase::get_type() */
+          virtual String get_type() const override
+          {
+            return "discrete";
+          }
+
+          /** \copydoc ChartBase::write_data_container() */
+          virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+          {
+            Geometry::MeshWriter<SurfaceMeshType>::write_mesh(chart_data.mesh_data, *_surface_mesh);
+          }
+
           /**
            * \brief Parses a MeshDataContainer
            *

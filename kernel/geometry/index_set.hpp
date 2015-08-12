@@ -251,7 +251,7 @@ namespace FEAST
         CONTEXT(name() + "::operator()()");
         ASSERT_(_indices != nullptr);
         ASSERT_(i < _num_entities);
-        ASSERT_(j < Index(num_indices));
+        ASSERT_(j < num_indices);
         return _indices[i][j];
       }
 
@@ -686,7 +686,7 @@ namespace FEAST
         Index num_shapes(ish.template get_index_set<shape_dim_,0>().get_num_entities());
         // Get the type of the IndexSet to dimensions <Shape_::dimension, face_dim_>
         typename std::remove_reference<decltype( (ish.template get_index_set<shape_dim_, shape_dim_-1>()) )>::type
-          // The output IndexSet has num_shapes entities and the maximum index is the number of vertices
+          // The output IndexSet has num_shapes entities and the maximum index is the number of subshapes
           subshape_at_shape_index_set(num_shapes, vert_at_subshape_index_set.get_num_entities());
 
         // Replace the corresponding IndexSet in the IndexSetHolder by the just generated IndexSet of the right
@@ -719,15 +719,13 @@ namespace FEAST
         ish.template get_index_set<shape_dim_, shape_dim_-2>() = std::move(subshape_at_shape_index_set);
 
         // Now do it again for the edge@face IndexSet
-        // vert@face IndexSet
-        auto& vert_at_intermediate_index_set(ish.template get_index_set<shape_dim_-1,0>());
         // Number of faces
         Index num_intermediate_shapes(ish.template get_index_set<shape_dim_-1,0>().get_num_entities());
         // Get the type of the IndexSet to dimensions <Shape_::dimension-1, Shape::dimension-2>
         typename std::remove_reference<decltype( (ish.template get_index_set<shape_dim_-1, shape_dim_-2>()) )>::type
-          // The output IndexSet has num_intermediate_shapes entities and the maximum index is the number of edges
+          // The output IndexSet has num_intermediate_shapes entities and the maximum index is the number of subshapes
           subshape_at_intermediate_index_set(
-            num_intermediate_shapes, vert_at_intermediate_index_set.get_num_entities());
+            num_intermediate_shapes, vert_at_subshape_index_set.get_num_entities());
         // Replace the corresponding IndexSet in the IndexSetHolder by the just generated IndexSet of the right
         // size
         ish.template get_index_set<shape_dim_-1, shape_dim_-2>() = std::move(subshape_at_intermediate_index_set);

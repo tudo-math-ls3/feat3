@@ -84,6 +84,14 @@ namespace FEAST
         {
           CONTEXT("AttributeContainer::~AttributeContainer()");
         }
+
+        /**
+         * \brief Writes the AttributeContainer to a stream
+         *
+         * \param[out] ofs
+         * The outputstream to write to.
+         */
+        void write(std::ostream& ofs) const;
     }; // class AttributeContainer
 
     /**
@@ -233,10 +241,6 @@ namespace FEAST
       CoordStack coords;
       /// Adjacencies: Adjacency[i][j] contains which entities of dimension i lie at entities of dimension j
       AdjStack adjacencies[4][4];
-      /// Should parent information be deducted?
-      String deduct_target_sets;
-      /// Should the topology be deducted from the parent information?
-      bool deduct_topology;
 
     public:
       // default CTOR
@@ -417,6 +421,8 @@ namespace FEAST
        */
       Index _parse_adjacency_chunk(Index cur_line, std::istream& ifs, String line);
 
+      void write(std::ostream& ofs, bool is_meshpart) const;
+
     }; // MeshDataContainer
 
     /**
@@ -443,7 +449,7 @@ namespace FEAST
         std::deque<String> data;
         /// Line in the file the data section starts at
         Index start_of_data;
-
+        /// If the chart is discrete, the mesh is stored here
         MeshDataContainer mesh_data;
 
         /**
@@ -509,6 +515,15 @@ namespace FEAST
          *
          */
         Index _parse_chart_header_section(Index cur_line, std::istream& ifs);
+
+        /**
+         * \brief Writes the chart data of this container into the output stream.
+         *
+         * \param[out] ofs
+         * The output stream to write to.
+         *
+         */
+        void write(std::ostream& ofs) const;
 
     }; // class ChartContainer
 
@@ -586,7 +601,7 @@ namespace FEAST
       void write(std::ostream& ofs, bool is_meshpart) const;
     };
 
-  private:
+  public:
     /// Number of charts
     Index _num_charts;
     /// Number of mesh parts
@@ -599,8 +614,6 @@ namespace FEAST
     Index _num_parsed_charts;
     /// For error checking: Number of meshparts parsed
     Index _num_parsed_meshparts;
-
-  public:
     /// All Charts this Mesh and all of its MeshParts refer to
     std::deque<ChartContainer> charts;
 
@@ -655,6 +668,19 @@ namespace FEAST
      * The MeshNode to be inserted.
      */
     void _insert_meshpart(MeshStreamer::MeshNode* mesh_node);
+
+    /**
+     * \brief Inserts a ChartDataContainer into the tree structure
+     *
+     * \param[in] chart_data
+     * The container to be inserted.
+     *
+     */
+    void insert_chart(MeshStreamer::ChartContainer& chart_data)
+    {
+      charts.push_back(chart_data);
+      _num_charts++;
+    }
 
     /**
      * \brief deletes mesh_node from the tree structure

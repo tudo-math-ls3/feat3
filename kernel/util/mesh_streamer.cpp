@@ -461,6 +461,7 @@ namespace FEAST
     }
 
     write_mesh_file(ofs);
+
     ofs.close();
   }
 
@@ -476,6 +477,7 @@ namespace FEAST
     ofs << "<header>" << std::endl;
     ofs << " version " << "1" << std::endl;
     ofs << " meshparts " << _num_meshparts << std::endl;
+    ofs << " charts " << _num_charts << std::endl;
     // END OF HEADER section
     ofs << "</header>" << std::endl;
 
@@ -490,6 +492,11 @@ namespace FEAST
 
     // drop mesh data
     _root_mesh_node->write(ofs,false);
+
+    // Write chart data
+    for(auto& it : charts)
+      it.write(ofs);
+
 
     // END OF FILE section
     ofs << "</feat_domain_file>";
@@ -1737,6 +1744,18 @@ namespace FEAST
   // into the output stream.
   void MeshStreamer::MeshNode::write(std::ostream& ofs, bool is_meshpart) const
   {
+    mesh_data.write(ofs, is_meshpart);
+
+    // loop through all is_meshpartes related to this mesh and drop the data as well
+    MeshpartMap::const_iterator it(meshpart_map.begin()), jt(meshpart_map.end());
+    for(; it != jt; ++it)
+      it->second->write(ofs, true);
+  }
+
+  // Writes the mesh data of this mesh and all is_meshpartes related to this mesh
+  // into the output stream.
+  void MeshStreamer::MeshDataContainer::write(std::ostream& ofs, bool is_meshpart) const
+  {
     // choose the right tag
     if (is_meshpart)
       ofs << "<meshpart>" << std::endl;
@@ -1748,77 +1767,77 @@ namespace FEAST
 
     if (is_meshpart)
     {
-      ofs << "  name " << mesh_data.name << std::endl;
-      ofs << "  parent " << mesh_data.parent << std::endl;
-      if ( !mesh_data.chart.empty() )
-        ofs << "  chart " << mesh_data.chart << std::endl;
+      ofs << "  name " << name << std::endl;
+      ofs << "  parent " << parent << std::endl;
+      if ( !chart.empty() )
+        ofs << "  chart " << chart << std::endl;
     }
 
-    ofs << "  type " << mesh_data.convert_mesh_type(mesh_data.mesh_type) << std::endl;
-    ofs << "  shape " << mesh_data.convert_shape_type(mesh_data.shape_type) << std::endl;
-    if(mesh_data.coord_per_vertex != 0)
-      ofs << "  coords " << mesh_data.coord_per_vertex << std::endl;
-    if( mesh_data.attribute_count > 0)
-      ofs << "  attribute_sets " << mesh_data.attribute_count << std::endl;
+    ofs << "  type " << convert_mesh_type(mesh_type) << std::endl;
+    ofs << "  shape " << convert_shape_type(shape_type) << std::endl;
+    if(coord_per_vertex != 0)
+      ofs << "  coords " << coord_per_vertex << std::endl;
+    if( attribute_count > 0)
+      ofs << "  attribute_sets " << attribute_count << std::endl;
     ofs << " </header>" << std::endl;
 
     // info section
-    if( !mesh_data.info.empty() )
+    if( !info.empty() )
     {
       ofs << " <info>" << std::endl;
-      ofs << "  " << mesh_data.info << std::endl;
+      ofs << "  " << info << std::endl;
       ofs << " </info>" << std::endl;
     }
 
     // count section
     ofs << " <counts>" << std::endl;
-    if(mesh_data.mesh_type == MeshDataContainer::mt_conformal)
+    if(mesh_type == MeshDataContainer::mt_conformal)
     {
-      if( mesh_data.num_entities[0] != 0)
-        ofs << "  verts " << mesh_data.num_entities[0] << std::endl;
-      if( mesh_data.num_entities[1] != 0)
-        ofs << "  edges " << mesh_data.num_entities[1] << std::endl;
+      if( num_entities[0] != 0)
+        ofs << "  verts " << num_entities[0] << std::endl;
+      if( num_entities[1] != 0)
+        ofs << "  edges " << num_entities[1] << std::endl;
 
-      if( mesh_data.num_entities[2] != 0)
+      if( num_entities[2] != 0)
       {
-        if(mesh_data.shape_type == MeshDataContainer::st_quad || mesh_data.shape_type == MeshDataContainer::st_hexa)
-          ofs << "  quads " << mesh_data.num_entities[2] << std::endl;
-        else if(mesh_data.shape_type == MeshDataContainer::st_tria || mesh_data.shape_type == MeshDataContainer::st_tetra)
-          ofs << "  trias " << mesh_data.num_entities[2] << std::endl;
+        if(shape_type == MeshDataContainer::st_quad || shape_type == MeshDataContainer::st_hexa)
+          ofs << "  quads " << num_entities[2] << std::endl;
+        else if(shape_type == MeshDataContainer::st_tria || shape_type == MeshDataContainer::st_tetra)
+          ofs << "  trias " << num_entities[2] << std::endl;
         else
-          throw InternalError("Mesh of type "+stringify(mesh_data.shape_type)+" has num_entities of dim 2!");
+          throw InternalError("Mesh of type "+stringify(shape_type)+" has num_entities of dim 2!");
       }
 
-      if( mesh_data.num_entities[3] != 0)
+      if( num_entities[3] != 0)
       {
-        if(mesh_data.shape_type == MeshDataContainer::st_tetra)
-          ofs << "  tetras " << mesh_data.num_entities[3] << std::endl;
-        else if( mesh_data.shape_type == MeshDataContainer::st_hexa)
-          ofs << "  hexas " << mesh_data.num_entities[3] << std::endl;
+        if(shape_type == MeshDataContainer::st_tetra)
+          ofs << "  tetras " << num_entities[3] << std::endl;
+        else if( shape_type == MeshDataContainer::st_hexa)
+          ofs << "  hexas " << num_entities[3] << std::endl;
         else
-          throw InternalError("Mesh of type "+stringify(mesh_data.shape_type)+" has num_entities of dim 3!");
+          throw InternalError("Mesh of type "+stringify(shape_type)+" has num_entities of dim 3!");
       }
     }
-    else if( mesh_data.mesh_type == MeshDataContainer::mt_structured)
+    else if( mesh_type == MeshDataContainer::mt_structured)
     {
       ofs << "  slices";
-      for (Index i(0); i < mesh_data.slices.size() ; ++i)
+      for (Index i(0); i < slices.size() ; ++i)
       {
-        ofs << " " << mesh_data.slices.at(i);
+        ofs << " " << slices.at(i);
       }
       ofs << std::endl;
     }
     ofs << " </counts>" << std::endl;
 
     // coord section (if any)
-    if(mesh_data.coord_per_vertex > 0)
+    if(coord_per_vertex > 0)
     {
       ofs << " <coords>" << std::endl;
-      for (Index i(0); i < mesh_data.num_entities[0]; ++i)
+      for (Index i(0); i < num_entities[0]; ++i)
       {
-        for (Index j(0); j < mesh_data.coord_per_vertex ; ++j)
+        for (Index j(0); j < coord_per_vertex ; ++j)
         {
-          ofs  << "  " << scientify((mesh_data.coords[i])[j]);
+          ofs  << "  " << scientify((coords[i])[j]);
         }
         ofs << std::endl;
       }
@@ -1826,70 +1845,73 @@ namespace FEAST
     }
 
     // adjacency section
-    if(mesh_data.mesh_type == MeshDataContainer::mt_conformal)
+    if(mesh_type == MeshDataContainer::mt_conformal)
     {
-      ofs << " <vert@edge>" << std::endl;
-      for (Index i(0); i < (mesh_data.adjacencies[0][1]).size() ; ++i)
+      if (!( (adjacencies[0][1]).size() == 0 ))
       {
-        ofs << "  " << ((mesh_data.adjacencies[0][1])[i])[0];
-        ofs << " " << ((mesh_data.adjacencies[0][1])[i])[1] << std::endl;
+        ofs << " <vert@edge>" << std::endl;
+        for (Index i(0); i < (adjacencies[0][1]).size() ; ++i)
+        {
+          ofs << "  " << ((adjacencies[0][1])[i])[0];
+          ofs << " " << ((adjacencies[0][1])[i])[1] << std::endl;
+        }
+        ofs << " </vert@edge>" << std::endl;
       }
-      ofs << " </vert@edge>" << std::endl;
 
-      if (!( (mesh_data.adjacencies[0][2]).size() == 0 ))
+      if (!( (adjacencies[0][2]).size() == 0 ))
       {
-        if ( ((mesh_data.adjacencies[0][2])[0]).size() == 3 )
+        if ( ((adjacencies[0][2])[0]).size() == 3 )
         {
           ofs << " <vert@tria>" << std::endl;
-          for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
+          for (Index i(0); i < (adjacencies[0][2]).size() ; ++i)
           {
-            ofs << "  " << ((mesh_data.adjacencies[0][2])[i])[0];
-            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[1];
-            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[2] << std::endl;
+            ofs << "  " << ((adjacencies[0][2])[i])[0];
+            ofs << " " << ((adjacencies[0][2])[i])[1];
+            ofs << " " << ((adjacencies[0][2])[i])[2] << std::endl;
           }
           ofs << " </vert@tria>" << std::endl;
         }
-        else if ( ((mesh_data.adjacencies[0][2])[0]).size() == 4 )
+        else if ( ((adjacencies[0][2])[0]).size() == 4 )
         {
           ofs << " <vert@quad>" << std::endl;
-          for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
+          for (Index i(0); i < (adjacencies[0][2]).size() ; ++i)
           {
-            ofs << "  " << ((mesh_data.adjacencies[0][2])[i])[0];
-            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[1];
-            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[2];
-            ofs << " " << ((mesh_data.adjacencies[0][2])[i])[3] << std::endl;
+            ofs << "  " << ((adjacencies[0][2])[i])[0];
+            ofs << " " << ((adjacencies[0][2])[i])[1];
+            ofs << " " << ((adjacencies[0][2])[i])[2];
+            ofs << " " << ((adjacencies[0][2])[i])[3] << std::endl;
           }
           ofs << " </vert@quad>" << std::endl;
         }
       }
 
-      if (!( (mesh_data.adjacencies[0][3]).size() == 0 ))
+      if (!( (adjacencies[0][3]).size() == 0 ))
       {
-        if ( ((mesh_data.adjacencies[0][3])[0]).size() == 4 )
+        if ( ((adjacencies[0][3])[0]).size() == 4 )
         {
           ofs << " <vert@tetra>" << std::endl;
-          for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
+          for (Index i(0); i < (adjacencies[0][3]).size() ; ++i)
           {
-            ofs << "  " << ((mesh_data.adjacencies[0][3])[i])[0];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[1];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[2];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[3] << std::endl;
+            ofs << "  " << ((adjacencies[0][3])[i])[0];
+            ofs << " " << ((adjacencies[0][3])[i])[1];
+            ofs << " " << ((adjacencies[0][3])[i])[2];
+            ofs << " " << ((adjacencies[0][3])[i])[3] << std::endl;
           }
           ofs << " </vert@tetra>" << std::endl;
         }
-        else if ( ((mesh_data.adjacencies[0][3])[0]).size() == 8 )
+        else if ( ((adjacencies[0][3])[0]).size() == 8 )
         {
           ofs << " <vert@hexa>" << std::endl;
-          for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
+          for (Index i(0); i < (adjacencies[0][3]).size() ; ++i)
           {
-            ofs << "  " << ((mesh_data.adjacencies[0][3])[i])[0];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[1];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[2];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[3];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[4];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[5];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[6];
-            ofs << " " << ((mesh_data.adjacencies[0][3])[i])[7] << std::endl;
+            ofs << "  " << ((adjacencies[0][3])[i])[0];
+            ofs << " " << ((adjacencies[0][3])[i])[1];
+            ofs << " " << ((adjacencies[0][3])[i])[2];
+            ofs << " " << ((adjacencies[0][3])[i])[3];
+            ofs << " " << ((adjacencies[0][3])[i])[4];
+            ofs << " " << ((adjacencies[0][3])[i])[5];
+            ofs << " " << ((adjacencies[0][3])[i])[6];
+            ofs << " " << ((adjacencies[0][3])[i])[7] << std::endl;
           }
           ofs << " </vert@hexa>" << std::endl;
         }
@@ -1900,77 +1922,77 @@ namespace FEAST
     if (is_meshpart)
     {
       ofs << " <vert_idx>" << std::endl;
-      for (Index i(0); i < mesh_data.num_entities[0]; ++i)
+      for (Index i(0); i < num_entities[0]; ++i)
       {
-        ofs << "  " << (mesh_data.parent_indices[0])[i] << std::endl;
+        ofs << "  " << (parent_indices[0])[i] << std::endl;
       }
       ofs << " </vert_idx>" << std::endl;
 
-      if ( !(mesh_data.num_entities[1]== 0) )
+      if ( !(num_entities[1]== 0) )
       {
         ofs << " <edge_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.num_entities[1] ; ++i)
+        for (Index i(0); i < num_entities[1] ; ++i)
         {
-          ofs << "  " << (mesh_data.parent_indices[1])[i] << std::endl;
+          ofs << "  " << (parent_indices[1])[i] << std::endl;
         }
         ofs << " </edge_idx>" << std::endl;
       }
 
-      if ( !(mesh_data.num_entities[2] == 0) )
+      if ( !(num_entities[2] == 0) )
       {
-        if(mesh_data.shape_type == MeshDataContainer::st_tria|| mesh_data.shape_type == MeshDataContainer::st_tetra)
+        if(shape_type == MeshDataContainer::st_tria|| shape_type == MeshDataContainer::st_tetra)
         {
           ofs << " <tria_idx>" << std::endl;
-          for (Index i(0); i < mesh_data.num_entities[2]; ++i)
+          for (Index i(0); i < num_entities[2]; ++i)
           {
-            ofs << "  " << (mesh_data.parent_indices[2])[i] << std::endl;
+            ofs << "  " << (parent_indices[2])[i] << std::endl;
           }
           ofs << " </tria_idx>" << std::endl;
         }
-        else if(mesh_data.shape_type == MeshDataContainer::st_quad || mesh_data.shape_type == MeshDataContainer::st_hexa)
+        else if(shape_type == MeshDataContainer::st_quad || shape_type == MeshDataContainer::st_hexa)
         {
           ofs << " <quad_idx>" << std::endl;
-          for (Index i(0); i < mesh_data.num_entities[2]; ++i)
+          for (Index i(0); i < num_entities[2]; ++i)
           {
-            ofs << "  " << (mesh_data.parent_indices[2])[i] << std::endl;
+            ofs << "  " << (parent_indices[2])[i] << std::endl;
           }
           ofs << " </quad_idx>" << std::endl;
         }
         else
-          throw InternalError("Mesh of type "+stringify(mesh_data.shape_type)+" has num_entities of dim 2!");
+          throw InternalError("Mesh of type "+stringify(shape_type)+" has num_entities of dim 2!");
       }
 
-      if ( !(mesh_data.num_entities[3]== 0) )
+      if ( !(num_entities[3]== 0) )
       {
-        if(mesh_data.shape_type == MeshDataContainer::st_tetra)
+        if(shape_type == MeshDataContainer::st_tetra)
         {
           ofs << " <tetra_idx>" << std::endl;
-          for (Index i(0); i < mesh_data.num_entities[3]; ++i)
+          for (Index i(0); i < num_entities[3]; ++i)
           {
-            ofs << "  " << (mesh_data.parent_indices[3])[i] << std::endl;
+            ofs << "  " << (parent_indices[3])[i] << std::endl;
           }
           ofs << " </tetra_idx>" << std::endl;
         }
-        else if(mesh_data.shape_type == MeshDataContainer::st_hexa)
+        else if(shape_type == MeshDataContainer::st_hexa)
         {
           ofs << " <hexa_idx>" << std::endl;
-          for (Index i(0); i < mesh_data.num_entities[3]; ++i)
+          for (Index i(0); i < num_entities[3]; ++i)
           {
-            ofs << "  " << (mesh_data.parent_indices[3])[i] << std::endl;
+            ofs << "  " << (parent_indices[3])[i] << std::endl;
           }
           ofs << " </hexa_idx>" << std::endl;
         }
         else
-          throw InternalError("Mesh of type "+stringify(mesh_data.shape_type)+" has num_entities of dim 3!");
+          throw InternalError("Mesh of type "+stringify(shape_type)+" has num_entities of dim 3!");
       }
     }
 
-    if(mesh_data.attribute_count > 0)
+    if(attribute_count > 0)
     {
       Index attributes_written(0);
       for(Index attribute_dim(0); attribute_dim < 4; ++attribute_dim)
       {
-        for(auto& it:mesh_data.attributes[attribute_dim])
+        for(auto& it:attributes[attribute_dim])
         {
           attributes_written++;
           // Write one attribute
@@ -1998,8 +2020,8 @@ namespace FEAST
         }
       }
       // Sanity check
-      if(attributes_written != mesh_data.attribute_count)
-        throw InternalError("MeshDataContainer is supposed to contain " + stringify(mesh_data.attribute_count) + " attributes but " + stringify(attributes_written) + " were written");
+      if(attributes_written != attribute_count)
+        throw InternalError("MeshDataContainer is supposed to contain " + stringify(attribute_count) + " attributes but " + stringify(attributes_written) + " were written");
     }
 
     // choose the right tag to end the mesh section
@@ -2007,11 +2029,6 @@ namespace FEAST
       ofs<<"</meshpart>"<<std::endl;
     else
       ofs<<"</mesh>"<<std::endl;
-
-    // loop through all is_meshpartes related to this mesh and drop the data as well
-    MeshpartMap::const_iterator it(meshpart_map.begin()), jt(meshpart_map.end());
-    for(; it != jt; ++it)
-      it->second->write(ofs, true);
 
   }// write_mesh_data
 
@@ -2132,6 +2149,41 @@ namespace FEAST
     }
 
     return cur_line;
+  } // MeshStreamer::ChartContainer::_parse_chart_section
+
+  void MeshStreamer::ChartContainer::write(std::ostream& ofs) const
+  {
+    CONTEXT("MeshStreamer::ChartContainer::write()");
+
+    // FILE section
+    ofs << "<chart>" << std::endl;
+
+    // HEADER section
+    ofs << "<header>" << std::endl;
+    ofs << " name " << name << std::endl;
+    ofs << " type " << type << std::endl;
+    // END OF HEADER section
+    ofs << "</header>" << std::endl;
+
+    if(!info.empty())
+    {
+      // INFO section
+      ofs << "<info>" << std::endl;
+      ofs << " " << info << std::endl;
+      // END OF INFO section
+      ofs << "</info>" << std::endl;
+    }
+
+    if(type == "discrete")
+      mesh_data.write(ofs, false);
+    else
+    {
+      for(auto& it : data)
+        ofs << it << std::endl;
+    }
+    ofs << "</chart>" << std::endl;
+
+
   }
 
 } //namespace FEAST

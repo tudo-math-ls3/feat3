@@ -7,6 +7,33 @@
 #include <kernel/util/mesh_streamer.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 
+/**
+ * Mesh preprocessing tool, mainly copy-pasted from tools/mesh2vtk.
+ *
+ * Some meshes (or rather, their MeshParts) are given just by a set of points without any higher-dimensional topology.
+ * This topology can be inferred by first deducting higher-dimensional target mappings.
+ *
+ * Assume we have a 3d mesh with a MeshPart representing a 2d boundary of that mesh and that the MeshPart consists of
+ * only vertices. We can now deduct a topology of edges and faces on the MeshPart by checking which edges and faces
+ * of the original mesh are made up entirely of vertices belonging to the MeshPart.
+ * This is "from bottom target deduction".
+ *
+ * "from top target deduction" is even simpler.
+ *
+ * Having higher-dimensional entities in a MeshPart changes how it behaves under refinement. Namely, if it has edges,
+ * newly inserted vertices on these edge belong to the refined MeshPart.
+ *
+ * All of this deduction is carried out by routines in the kernel, but deciding at runtime if and when to call them
+ * is not very safe. So the assumption is that a streamed mesh has complete information OR that the user really knows
+ * what she is doing and uses the kernel routines correctly.
+ *
+ * For the cases where a mesh does NOT have complete information (i.e. the mesh file was written by some 3rd party
+ * application, or converted from another format), this preprocessing tool can do the deriving and writes a new
+ * mesh file containing everything needed.
+ *
+ * \author Jordi Paul
+ */
+
 using namespace FEAST;
 using namespace FEAST::Geometry;
 
@@ -27,144 +54,119 @@ String get_file_title(const String& filename)
     return filename.substr(p, q-p);
 }
 
-template<typename MeshType_>
-int run(MeshStreamer& my_streamer, const String& filename, const Index lvl_min, const Index lvl_max,
-const std::deque<String>& deduct_from_bottom,
-const std::deque<String>& deduct_from_top,
-const std::deque<String>& deduct_topology)
-{
-  // create atlas
-  std::cout << "Creating mesh atlas..." << std::endl;
-  MeshAtlas<MeshType_>* atlas = nullptr;
-  try
+  template<typename MeshType_>
+  int run(MeshStreamer& my_streamer, const String& filename, const Index lvl_min, const Index lvl_max,
+  const std::deque<String>& deduct_from_bottom,
+  const std::deque<String>& deduct_from_top,
+  const std::deque<String>& deduct_topology)
   {
-    atlas = new MeshAtlas<MeshType_>(my_streamer);
-  }
-  catch(std::exception& exc)
-  {
-    std::cerr << "ERROR: " << exc.what() << std::endl;
-    return 1;
-  }
-
-  // create mesh node
-  std::cout << "Creating mesh node..." << std::endl;
-  RootMeshNode<MeshType_>* node = nullptr;
-  try
-  {
-    node = new RootMeshNode<MeshType_>(my_streamer, atlas);
-
-    // Deduct TargetSets from bottom to top for specified MeshParts
-    for(auto& it : deduct_from_bottom)
+    // create atlas
+    std::cout << "Creating mesh atlas..." << std::endl;
+    MeshAtlas<MeshType_>* atlas = nullptr;
+    try
     {
-      typename RootMeshNode<MeshType_>::MeshPartType* mesh_part(node->find_mesh_part(it));
-      if(mesh_part != nullptr)
-      {
-        mesh_part->template deduct_target_sets_from_bottom<0>(node->get_mesh()->get_index_set_holder());
-        std::cout << "Deducting target sets from bottom to top for MeshPart " << mesh_part->get_identifier() << std::endl;
-      }
-      else
-      {
-        std::cerr << "ERROR: MeshPart " << it << " was not found but was specified via --deduct_from_bottom!" << std::endl;
-        return 1;
-      }
+      atlas = new MeshAtlas<MeshType_>(my_streamer);
+    }
+    catch(std::exception& exc)
+    {
+      std::cerr << "ERROR: " << exc.what() << std::endl;
+      return 1;
     }
 
-    // Deduct TargetSets from top to bottom for specified MeshParts
-    for(auto& it : deduct_from_top)
+    // create mesh node
+    std::cout << "Creating mesh node..." << std::endl;
+    RootMeshNode<MeshType_>* node = nullptr;
+    try
     {
-      typename RootMeshNode<MeshType_>::MeshPartType* mesh_part(node->find_mesh_part(it));
-      if(mesh_part != nullptr)
+      node = new RootMeshNode<MeshType_>(my_streamer, atlas);
+
+      // Deduct TargetSets from bottom to top for specified MeshParts
+      for(auto& it : deduct_from_bottom)
       {
-        mesh_part->template deduct_target_sets_from_top<MeshType_::shape_dim>
-          (node->get_mesh()->get_index_set_holder());
-        std::cout << "Deducting target sets from top to bottom for MeshPart " << mesh_part->get_identifier() << std::endl;
+        typename RootMeshNode<MeshType_>::MeshPartType* mesh_part(node->find_mesh_part(it));
+        if(mesh_part != nullptr)
+        {
+          mesh_part->template deduct_target_sets_from_bottom<0>(node->get_mesh()->get_index_set_holder());
+          std::cout << "Deducting target sets from bottom to top for MeshPart " << mesh_part->get_identifier() << std::endl;
+        }
+        else
+        {
+          std::cerr << "ERROR: MeshPart " << it << " was not found but was specified via --deduct_from_bottom!" << std::endl;
+          return 1;
+        }
       }
-      else
+
+      // Deduct TargetSets from top to bottom for specified MeshParts
+      for(auto& it : deduct_from_top)
       {
-        std::cerr << "ERROR: MeshPart " << it << " was not found but was specified via --deduct_from_top!" << std::endl;
-        return 1;
+        typename RootMeshNode<MeshType_>::MeshPartType* mesh_part(node->find_mesh_part(it));
+        if(mesh_part != nullptr)
+        {
+          mesh_part->template deduct_target_sets_from_top<MeshType_::shape_dim>
+            (node->get_mesh()->get_index_set_holder());
+          std::cout << "Deducting target sets from top to bottom for MeshPart " << mesh_part->get_identifier() << std::endl;
+        }
+        else
+        {
+          std::cerr << "ERROR: MeshPart " << it << " was not found but was specified via --deduct_from_top!" << std::endl;
+          return 1;
+        }
       }
+
+      // Deduct topology for specified MeshParts
+      for(auto& it : deduct_topology)
+      {
+        typename RootMeshNode<MeshType_>::MeshPartType* mesh_part(node->find_mesh_part(it));
+        if(mesh_part != nullptr)
+        {
+          mesh_part->deduct_topology(node->get_mesh()->get_index_set_holder());
+          std::cout << "Deducting topology for MeshPart " << mesh_part->get_identifier() << std::endl;
+        }
+        else
+        {
+          std::cerr << "ERROR: MeshPart " << it << " was not found but was specified via --deduct_topology!" << std::endl;
+          return 1;
+        }
+      }
+
+      node->adapt();
+    }
+    catch(std::exception& exc)
+    {
+      std::cerr << "ERROR: " << exc.what() << std::endl;
+      return 1;
     }
 
-    // Deduct topology for specified MeshParts
-    for(auto& it : deduct_topology)
+    // get all mesh part names
+    std::deque<String> part_names = node->get_mesh_part_names();
+
+    // refine
+    for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
-      typename RootMeshNode<MeshType_>::MeshPartType* mesh_part(node->find_mesh_part(it));
-      if(mesh_part != nullptr)
+      if(lvl > 0)
       {
-        mesh_part->deduct_topology(node->get_mesh()->get_index_set_holder());
-        std::cout << "Deducting topology for MeshPart " << mesh_part->get_identifier() << std::endl;
+        std::cout << "Refining up to level " << lvl << "..." << std::endl;
+        auto* old = node;
+        node = old->refine();
+        delete old;
       }
-      else
-      {
-        std::cerr << "ERROR: MeshPart " << it << " was not found but was specified via --deduct_topology!" << std::endl;
-        return 1;
-      }
-    }
 
-    node->adapt();
-  }
-  catch(std::exception& exc)
-  {
-    std::cerr << "ERROR: " << exc.what() << std::endl;
-    return 1;
-  }
-
-  // get all mesh part names
-  std::deque<String> part_names = node->get_mesh_part_names();
-
-  // refine
-  for(Index lvl(0); lvl <= lvl_max; ++lvl)
-  {
-    if(lvl > 0)
-    {
-      std::cout << "Refining up to level " << lvl << "..." << std::endl;
-      auto* old = node;
-      node = old->refine();
-      delete old;
-    }
-
-    if(lvl < lvl_min)
-      continue;
-
-    // Create a VTK exporter for our mesh
-    FEAST::String vtkname = get_file_title(filename) + "." + stringify(lvl);
-    std::cout << "Writing file '" << vtkname << ".vtu'..." << std::endl;
-    Geometry::ExportVTK<MeshType_> exporter(*node->get_mesh());
-
-    std::vector<double> vtx_data(node->get_mesh()->get_num_entities(0), 0.0);
-
-    // loop over all mesh parts
-    for(auto it = part_names.begin(); it != part_names.end(); ++it)
-    {
-      // get the mesh part
-      MeshPart<MeshType_>* part = node->find_mesh_part(*it);
-      if(part == nullptr)
+      if(lvl < lvl_min)
         continue;
 
-      // get the vertex target set
-      TargetSet& trg = part->template get_target_set<0>();
+      auto* mesh_writer = node->create_mesh_writer();
+      FEAST::String preprocessed_name = "preprocessed_"+get_file_title(filename) + "." + stringify(lvl)+".txt";
+      std::cout << "Writing mesh " << preprocessed_name << "..." << std::endl;
 
-      // mark all indexes vertices
-      for(Index i(0); i < trg.get_num_entities(); ++i)
-        vtx_data[trg[i]] = 1.0;
-
-      // add variable
-      exporter.add_scalar_vertex(*it, vtx_data.data());
-
-      // unmark vertices
-      for(Index i(0); i < trg.get_num_entities(); ++i)
-        vtx_data[trg[i]] = 0.0;
+      mesh_writer->write_mesh_file(preprocessed_name);
+      delete mesh_writer;
     }
 
-    exporter.write(vtkname);
+    delete node;
+    delete atlas;
+
+    return 0;
   }
-
-  delete node;
-  delete atlas;
-
-  return 0;
-}
 
 int main(int argc, char* argv[])
 {
@@ -208,7 +210,7 @@ int main(int argc, char* argv[])
 
   std::deque<String> deduct_topology;
   auto* deduct_topology_pair(args.query("deduct_topology"));
-  if(deduct_from_bottom_pair != nullptr)
+  if(deduct_topology_pair != nullptr)
     deduct_topology = deduct_topology_pair->second;
 
   Index lvl_min(0);
@@ -225,17 +227,20 @@ int main(int argc, char* argv[])
     lvl_min = 0;
   }
 
-
   // This is the list of all supported meshes that could appear in the mesh file
-  typedef Geometry::ConformalMesh<Shape::Simplex<1>> Simplex1Mesh;
-  typedef Geometry::ConformalMesh<Shape::Simplex<2>> Simplex2Mesh;
-  typedef Geometry::ConformalMesh<Shape::Simplex<3>> Simplex3Mesh;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<2>> Hypercube2Mesh;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<3>> Hypercube3Mesh;
+  typedef Geometry::ConformalMesh<Shape::Simplex<1>, 1, 1, Real> Simplex1Mesh_1d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<1>, 2, 2, Real> Simplex1Mesh_2d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<1>, 3, 3, Real> Simplex1Mesh_3d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> Simplex2Mesh_2d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 3, 3, Real> Simplex2Mesh_3d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, Real> Simplex3Mesh;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> Hypercube2Mesh_2d;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 3, 3, Real> Hypercube2Mesh_3d;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, Real> Hypercube3Mesh;
 
   // Create a MeshStreamer and read the mesh file
   MeshStreamer my_streamer;
-//  std::cout << "Parsing mesh files '" << filenames[0] << "'..." << std::endl;
+
   try
   {
     my_streamer.parse_multiple_files(filenames);
@@ -262,13 +267,49 @@ int main(int argc, char* argv[])
   String& filename(filenames[0]);
   // Call the run() method of the appropriate wrapper class
   if(shape_type == mesh_data.st_edge)
-    return run<Simplex1Mesh>(my_streamer, filename, lvl_min, lvl_max, deduct_from_bottom, deduct_from_top, deduct_topology);
+  {
+    if(mesh_data.coord_per_vertex == 1)
+      return run<Simplex1Mesh_1d>(my_streamer, filename, lvl_min, lvl_max,
+      deduct_from_bottom, deduct_from_top, deduct_topology);
+    if(mesh_data.coord_per_vertex == 2)
+      return run<Simplex1Mesh_2d>(my_streamer, filename, lvl_min, lvl_max,
+      deduct_from_bottom, deduct_from_top, deduct_topology);
+    if(mesh_data.coord_per_vertex == 3)
+      return run<Simplex1Mesh_3d>(my_streamer, filename, lvl_min, lvl_max,
+      deduct_from_bottom, deduct_from_top, deduct_topology);
+
+    std::cerr << "ERROR: Unsupported world dim " << mesh_data.coord_per_vertex << " for Simplex<1> mesh!"<< std::endl;
+    return 1;
+  }
+
   if(shape_type == mesh_data.st_tria)
-    return run<Simplex2Mesh>(my_streamer, filename, lvl_min, lvl_max, deduct_from_bottom, deduct_from_top, deduct_topology);
+  {
+    if(mesh_data.coord_per_vertex == 2)
+      return run<Simplex2Mesh_2d>(my_streamer, filename, lvl_min, lvl_max,
+      deduct_from_bottom, deduct_from_top, deduct_topology);
+    if(mesh_data.coord_per_vertex == 3)
+      return run<Simplex2Mesh_3d>(my_streamer, filename, lvl_min, lvl_max,
+      deduct_from_bottom, deduct_from_top, deduct_topology);
+    std::cerr << "ERROR: Unsupported world dim " << mesh_data.coord_per_vertex << " for Simplex<2> mesh!"<< std::endl;
+    return 1;
+  }
+
   if(shape_type == mesh_data.st_tetra)
-    return run<Simplex3Mesh>(my_streamer, filename, lvl_min, lvl_max, deduct_from_bottom, deduct_from_top, deduct_topology);
+    return run<Simplex3Mesh>(my_streamer, filename, lvl_min, lvl_max,
+    deduct_from_bottom, deduct_from_top, deduct_topology);
+
   if(shape_type == mesh_data.st_quad)
-    return run<Hypercube2Mesh>(my_streamer, filename, lvl_min, lvl_max, deduct_from_bottom, deduct_from_top, deduct_topology);
+  {
+    if(mesh_data.coord_per_vertex == 2)
+      return run<Hypercube2Mesh_2d>(my_streamer, filename, lvl_min, lvl_max,
+      deduct_from_bottom, deduct_from_top, deduct_topology);
+    if(mesh_data.coord_per_vertex == 3)
+      return run<Hypercube2Mesh_3d>(my_streamer, filename, lvl_min, lvl_max,
+      deduct_from_bottom, deduct_from_top, deduct_topology);
+
+    std::cerr << "ERROR: Unsupported world dim " << mesh_data.coord_per_vertex << " for Hypercube<2> mesh!"<< std::endl;
+    return 1;
+  }
   if(shape_type == mesh_data.st_hexa)
     return run<Hypercube3Mesh>(my_streamer, filename, lvl_min, lvl_max, deduct_from_bottom, deduct_from_top, deduct_topology);
 

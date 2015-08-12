@@ -48,7 +48,7 @@ namespace FEAST
 
       protected:
         /// the tube's midpoint
-        WorldPoint _mid_point;
+        WorldPoint _midpoint;
         /// the tube's rotation axis
         WorldPoint _rot_axis;
         /// the tube's rotation axis inverse length
@@ -79,9 +79,9 @@ namespace FEAST
           _radius(radius)
         {
           ASSERT_(radius > DataType(0));
-          _mid_point[0] = mid_x;
-          _mid_point[1] = mid_y;
-          _mid_point[2] = mid_z;
+          _midpoint[0] = mid_x;
+          _midpoint[1] = mid_y;
+          _midpoint[2] = mid_z;
           _rot_axis[0] = axis_x;
           _rot_axis[1] = axis_y;
           _rot_axis[2] = axis_z;
@@ -89,17 +89,33 @@ namespace FEAST
           _rot_scale = (DataType(1) / Math::sqr(_rot_axis.norm_euclid()));
         }
 
+        /** \copydoc ChartBase::get_type() */
+        virtual String get_type() const override
+        {
+          return "tube";
+        }
+
+        /** \copydoc ChartBase::write_data_container */
+        virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+        {
+          chart_data.data.push_back(" <tube>");
+          chart_data.data.push_back("  radius  "+stringify(scientify(_radius)));
+          chart_data.data.push_back("  midpoint "+stringify(scientify(_midpoint(0)))+" "+stringify(scientify(_midpoint(1)))+" "+stringify(scientify(_midpoint(2))));
+          chart_data.data.push_back("  axis"+stringify(scientify(_rot_axis(0)))+" "+stringify(scientify(_rot_axis(1)))+" "+stringify(scientify(_rot_axis(2))));
+          chart_data.data.push_back(" </tube>");
+        }
+
         /** \copydoc ChartBase::project() */
         void project(WorldPoint& point) const
         {
           // subtract tube midpoint
-          point -= _mid_point;
+          point -= _midpoint;
           // project point onto axis
           WorldPoint axis_point = (_rot_scale * Tiny::dot(_rot_axis, point)) * _rot_axis;
           // compute difference of point and axis point
           WorldPoint diff_point = point - axis_point;
           // compute projected point
-          point = (_mid_point + axis_point) + diff_point * (_radius / diff_point.norm_euclid());
+          point = (_midpoint + axis_point) + diff_point * (_radius / diff_point.norm_euclid());
         }
 
         static Tube<Mesh_>* parse(const std::deque<String>& data, const Index line)

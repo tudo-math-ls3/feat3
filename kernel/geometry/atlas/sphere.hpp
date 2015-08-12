@@ -47,7 +47,7 @@ namespace FEAST
 
       protected:
         /// the circle's midpoint
-        WorldPoint _mid_point;
+        WorldPoint _midpoint;
         /// the circle's radius
         DataType _radius;
 
@@ -65,18 +65,33 @@ namespace FEAST
           _radius(radius)
         {
           ASSERT_(radius > DataType(0));
-          _mid_point[0] = mid_x;
-          _mid_point[1] = mid_y;
-          _mid_point[2] = mid_z;
+          _midpoint[0] = mid_x;
+          _midpoint[1] = mid_y;
+          _midpoint[2] = mid_z;
+        }
+
+        /** \copydoc ChartBase::get_type() */
+        virtual String get_type() const override
+        {
+          return "sphere";
+        }
+
+        /** \copydoc ChartBase::write_data_container */
+        virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+        {
+          chart_data.data.push_back(" <sphere>");
+          chart_data.data.push_back("  radius  "+stringify(scientify(_radius)));
+          chart_data.data.push_back("  midpoint "+stringify(scientify(_midpoint(0)))+" "+stringify(scientify(_midpoint(1)))+" "+stringify(scientify(_midpoint(2))));
+          chart_data.data.push_back(" </sphere>");
         }
 
         /** \copydoc ChartBase::project() */
         void project(WorldPoint& point) const
         {
-          point -= _mid_point;
+          point -= _midpoint;
           DataType dist = point.norm_euclid();
           point *= (_radius / dist);
-          point += _mid_point;
+          point += _midpoint;
         }
 
         static Sphere<Mesh_>* parse(const std::deque<String>& data, const Index line)

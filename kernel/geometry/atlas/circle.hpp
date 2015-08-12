@@ -55,7 +55,7 @@ namespace FEAST
 
       protected:
         /// the circle's midpoint
-        WorldPoint _mid_point;
+        WorldPoint _midpoint;
         /// the circle's radius
         DataType _radius;
         /// domain transformation coefficients
@@ -82,17 +82,17 @@ namespace FEAST
           _trafo_b((DataType(2) * Math::pi<DataType>()) / (param_r - param_l))
         {
           ASSERT_(radius > DataType(0));
-          _mid_point[0] = mid_x;
-          _mid_point[1] = mid_y;
+          _midpoint[0] = mid_x;
+          _midpoint[1] = mid_y;
         }
 
         /** \copydoc ChartBase::project() */
         void project(WorldPoint& point) const
         {
-          point -= _mid_point;
+          point -= _midpoint;
           DataType dist = point.norm_euclid();
           point *= (_radius / dist);
-          point += _mid_point;
+          point += _midpoint;
         }
 
         /** \copydoc ChartBase::map() */
@@ -100,8 +100,27 @@ namespace FEAST
         {
           // transform paramter to interval [0, 2*pi)
           DataType x = (param[0] + _trafo_a) * _trafo_b;
-          point[0] = this->_mid_point[0] + this->_radius * Math::cos(x);
-          point[1] = this->_mid_point[1] + this->_radius * Math::sin(x);
+          point[0] = this->_midpoint[0] + this->_radius * Math::cos(x);
+          point[1] = this->_midpoint[1] + this->_radius * Math::sin(x);
+        }
+
+        /** \copydoc ChartBase::get_type() */
+        virtual String get_type() const override
+        {
+          return "circle";
+        }
+
+        /** \copydoc ChartBase::write_data_container */
+        virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+        {
+          DataType param_l(-_trafo_a);
+          DataType param_r(param_l + DataType(2) * Math::pi<DataType>() / _trafo_b);
+
+          chart_data.data.push_back(" <circle>");
+          chart_data.data.push_back("  radius  "+stringify(scientify(_radius)));
+          chart_data.data.push_back("  midpoint "+stringify(scientify(_midpoint(0)))+" "+stringify(scientify(_midpoint(1))));
+          chart_data.data.push_back("  domain "+stringify(scientify(param_l))+" "+stringify(scientify(param_r)));
+          chart_data.data.push_back(" </circle>");
         }
 
         static Circle<Mesh_>* parse(const std::deque<String>& data, const Index line)

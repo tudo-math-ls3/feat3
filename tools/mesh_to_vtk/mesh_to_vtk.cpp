@@ -139,11 +139,15 @@ int main(int argc, char* argv[])
   }
 
   // This is the list of all supported meshes that could appear in the mesh file
-  typedef Geometry::ConformalMesh<Shape::Simplex<1>> Simplex1Mesh;
-  typedef Geometry::ConformalMesh<Shape::Simplex<2>> Simplex2Mesh;
-  typedef Geometry::ConformalMesh<Shape::Simplex<3>> Simplex3Mesh;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<2>> Hypercube2Mesh;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<3>> Hypercube3Mesh;
+  typedef Geometry::ConformalMesh<Shape::Simplex<1>, 1, 1, Real> Simplex1Mesh_1d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<1>, 2, 2, Real> Simplex1Mesh_2d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<1>, 3, 3, Real> Simplex1Mesh_3d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> Simplex2Mesh_2d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 3, 3, Real> Simplex2Mesh_3d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, Real> Simplex3Mesh;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> Hypercube2Mesh_2d;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 3, 3, Real> Hypercube2Mesh_3d;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, Real> Hypercube3Mesh;
 
   // Create a MeshStreamer and read the mesh file
   MeshStreamer my_streamer;
@@ -173,13 +177,40 @@ int main(int argc, char* argv[])
 
   // Call the run() method of the appropriate wrapper class
   if(shape_type == mesh_data.st_edge)
-    return run<Simplex1Mesh>(my_streamer, filename, lvl_min, lvl_max);
+  {
+    if(mesh_data.coord_per_vertex == 1)
+      return run<Simplex1Mesh_1d>(my_streamer, filename, lvl_min, lvl_max);
+    if(mesh_data.coord_per_vertex == 2)
+      return run<Simplex1Mesh_2d>(my_streamer, filename, lvl_min, lvl_max);
+    if(mesh_data.coord_per_vertex == 3)
+      return run<Simplex1Mesh_3d>(my_streamer, filename, lvl_min, lvl_max);
+
+    std::cerr << "ERROR: Unsupported world dim " << mesh_data.coord_per_vertex << " for Simplex<1> mesh!"<< std::endl;
+    return 1;
+  }
+
   if(shape_type == mesh_data.st_tria)
-    return run<Simplex2Mesh>(my_streamer, filename, lvl_min, lvl_max);
+  {
+    if(mesh_data.coord_per_vertex == 2)
+      return run<Simplex2Mesh_2d>(my_streamer, filename, lvl_min, lvl_max);
+    if(mesh_data.coord_per_vertex == 3)
+      return run<Simplex2Mesh_3d>(my_streamer, filename, lvl_min, lvl_max);
+    std::cerr << "ERROR: Unsupported world dim " << mesh_data.coord_per_vertex << " for Simplex<2> mesh!"<< std::endl;
+    return 1;
+  }
+
   if(shape_type == mesh_data.st_tetra)
     return run<Simplex3Mesh>(my_streamer, filename, lvl_min, lvl_max);
+
   if(shape_type == mesh_data.st_quad)
-    return run<Hypercube2Mesh>(my_streamer, filename, lvl_min, lvl_max);
+  {
+    if(mesh_data.coord_per_vertex == 2)
+      return run<Hypercube2Mesh_2d>(my_streamer, filename, lvl_min, lvl_max);
+    if(mesh_data.coord_per_vertex == 3)
+      return run<Hypercube2Mesh_3d>(my_streamer, filename, lvl_min, lvl_max);
+    std::cerr << "ERROR: Unsupported world dim " << mesh_data.coord_per_vertex << " for Hypercube<2> mesh!"<< std::endl;
+    return 1;
+  }
   if(shape_type == mesh_data.st_hexa)
     return run<Hypercube3Mesh>(my_streamer, filename, lvl_min, lvl_max);
 

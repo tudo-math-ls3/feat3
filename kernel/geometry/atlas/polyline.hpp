@@ -116,6 +116,44 @@ namespace FEAST
           }
         }
 
+        /** \copydoc ChartBase::get_type() */
+        virtual String get_type() const override
+        {
+          return "polyline";
+        }
+
+        /** \copydoc ChartBase::write_data_container */
+        virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+        {
+
+          size_t num_points(_world.size());
+
+          // GCC 4.9.2 complains at link time in the img_dim line otherwise
+          int img_dim(BaseClass::world_dim);
+
+          chart_data.data.push_back(" <polyline>");
+          chart_data.data.push_back("  img_dim "+stringify(img_dim));
+          chart_data.data.push_back("  num_points "+stringify(num_points));
+          chart_data.data.push_back("  <points>");
+
+          for(size_t i(0); i < num_points; ++i)
+          {
+            String tmp("  ");
+
+            for(int j(0); j < BaseClass::param_dim; ++j)
+              tmp += " "+stringify((_param[i])[j]);
+
+            // GCC 4.9.2 does not complain here, though
+            for(int j(0); j < BaseClass::world_dim; ++j)
+              tmp += " "+stringify((_world[i])[j]);
+
+            chart_data.data.push_back(tmp);
+          }
+
+          chart_data.data.push_back("  </points>");
+          chart_data.data.push_back(" </polyline>");
+        }
+
         /// parses a 'polyline' chart
         static Polyline<Mesh_>* parse(const std::deque<String>& data, const Index line)
         {

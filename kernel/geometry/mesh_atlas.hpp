@@ -108,6 +108,11 @@ namespace FEAST
         return true;
       }
 
+      const MeshChartMap& get_mesh_chart_map() const
+      {
+        return _chart_map;
+      }
+
       /**
        * \brief Searches for a mesh chart.
        *

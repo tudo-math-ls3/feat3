@@ -62,6 +62,24 @@ namespace FEAST
          * The mesh part that describes the part to adapt.
          */
         virtual void adapt(PartType& mesh, const PartType& part) const = 0;
+
+        /**
+         * \brief Writes the type as String
+         *
+         * Needed for writing this to mesh files.
+         *
+         * \returns The class name as String.
+         */
+        virtual String get_type() const = 0;
+
+        /**
+         * \brief Writes the Chart to a data container for streaming to files etc.
+         *
+         * \param[in,out] chart_container
+         * The container that gets the data.
+         *
+         */
+        virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const = 0;
       }; // class ChartBase<...>
 
       /// \cond internal
@@ -248,6 +266,16 @@ namespace FEAST
         {
           throw InternalError("Adaption of MeshPart not possible yet");
         }
+
+        //virtual String get_type() const override
+        //{
+        //  return (this->cast()).get_type();
+        //}
+
+        //virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
+        //{
+        //  (this->cast()).write_data_container(chart_container);
+        //}
       }; // class ChartCRTP<...>
 
       /**

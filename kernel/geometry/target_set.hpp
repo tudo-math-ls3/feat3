@@ -75,6 +75,7 @@ namespace FEAST
         {
           delete [] _indices;
         }
+        _indices = nullptr;
       }
 
       /**
@@ -86,15 +87,18 @@ namespace FEAST
        */
       TargetSet& operator=(TargetSet&& other)
       {
-        _num_entities = other._num_entities;
+        if(this != &other)
+        {
+          _num_entities = other._num_entities;
 
-        if(_indices != nullptr)
-          delete[] _indices;
+          if(_indices != nullptr)
+            delete[] _indices;
 
-        _indices = other._indices;
+          _indices = other._indices;
 
-        other._num_entities = 0;
-        other._indices = nullptr;
+          other._num_entities = 0;
+          other._indices = nullptr;
+        }
         return *this;
       }
 

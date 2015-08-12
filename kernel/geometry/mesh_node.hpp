@@ -18,7 +18,18 @@ namespace FEAST
   namespace Geometry
   {
     /// \cond internal
+    namespace Intern
+    {
+      template<typename MeshType_>
+      struct TypeConverter;
+
+      template<int dim_>
+      struct AdjacenciesFiller;
+    }
     // forward declarations
+//    template<typename RootMeshType_>
+//    struct MeshWriter;
+
     template<typename Policy_>
     class MeshPartNode DOXY({});
     /// \endcond
@@ -117,8 +128,6 @@ namespace FEAST
       /// submesh node reverse-iterator type
       typedef typename MeshPartNodeContainer::reverse_iterator MeshPartNodeReverseIterator;
 
-      typedef std::map<String, String> MeshPartParents;
-
     protected:
       /// a pointer to the mesh of this node
       MeshType* _mesh;
@@ -141,10 +150,13 @@ namespace FEAST
       explicit MeshNode(MeshType* mesh) :
         _mesh(mesh),
         _mesh_part_nodes(),
-        _identifier(mesh->get_identifier()),
+        _identifier(""),
         _parent_identifier("")
       {
         CONTEXT(name() + "::MeshNode()");
+
+        if(mesh != nullptr)
+          _identifier = mesh->get_identifier();
       }
 
     public:
@@ -201,6 +213,11 @@ namespace FEAST
         return _parent_identifier;
       }
 
+      void set_parent_identifier(String parent_identifier)
+      {
+        _parent_identifier = parent_identifier;
+      }
+
       /** \copydoc get_mesh() */
       const MeshType* get_mesh() const
       {
@@ -234,6 +251,9 @@ namespace FEAST
        *
        * \returns
        * \p mesh_part_node if the insertion was successful, otherwise \c nullptr.
+       *
+       * \note Because mesh_part_node gets added to (this) with identifier part_name, the identifier and
+       * parent_identifier get overwritten with part_name and this->get_identifier() respectively.
        */
       MeshPartNodeType* add_mesh_part_node(
         const String& part_name,
@@ -245,12 +265,16 @@ namespace FEAST
         {
           if(_mesh_part_nodes.insert(std::make_pair(part_name, MeshPartNodeBin(mesh_part_node, chart))).second)
           {
+            // Set identifier in the MeshPartNode
             mesh_part_node->_identifier = part_name;
             // Keep the identifier consistent in the MeshPart itself
             mesh_part_node->get_mesh()->set_identifier(part_name);
+
+            // Set parent_identifier in the MeshPartNode
             mesh_part_node->_parent_identifier = this->get_identifier();
             // Keep the parent_identifier consistent in the MeshPart itself
-            mesh_part_node->get_mesh()->set_parent_identifier(_parent_identifier);
+            mesh_part_node->get_mesh()->set_parent_identifier(this->get_identifier());
+
             return mesh_part_node;
           }
         }
@@ -284,6 +308,9 @@ namespace FEAST
           delete part_node;
           return nullptr;
         }
+
+        part_node->set_parent_identifier(this->get_identifier());
+
         return part_node;
       }
       /**
@@ -493,6 +520,7 @@ namespace FEAST
           refined_node.add_mesh_part_node(it->first, it->second.node->refine(*_mesh), it->second.chart);
         }
       }
+
     }; // class MeshNode
 
     /* ***************************************************************************************** */
@@ -525,8 +553,8 @@ namespace FEAST
       /**
        * \brief Constructor.
        *
-       * \param[in] subset
-       * A pointer to the cell subset for this node.
+       * \param[in] mesh_part
+       * A pointer to the MeshPart for this node.
        */
       explicit MeshPartNode(MeshPartType* mesh_part) :
         BaseClass(mesh_part)
@@ -640,6 +668,7 @@ namespace FEAST
           refined_node.add_mesh_part_node(it->first, it->second.node->refine(*this->_mesh));
         }
       }
+
     }; // class MeshPartNode<...>
 
     /* ***************************************************************************************** */
@@ -742,14 +771,48 @@ namespace FEAST
       /**
        * \brief Creates a MeshStreamer object for writing
        *
-       * \todo Implement this
-       *
        * \returns MeshStreamer containing all data to be written.
        *
        */
       MeshStreamer* create_mesh_writer()
       {
         MeshStreamer* mesh_writer(new MeshStreamer);
+
+        // Write MeshStreamer part
+        // Set these to 0 because they increase when we add MeshParts/MeshCharts
+        mesh_writer->_num_charts = 0;
+        mesh_writer->_num_meshparts = 0;
+        mesh_writer->_info = "Written by MeshNode::create_mesh_writer";
+        // Create MeshStreamer::MeshNode for holding the root mesh
+        mesh_writer->_root_mesh_node = new MeshStreamer::MeshNode;
+        MeshWriter<RootMesh_>::write_mesh(mesh_writer->_root_mesh_node->mesh_data, *(this->get_mesh()));
+
+        // Add MeshStreamer::MeshNodes for holding the MeshParts
+        for(auto& it : this->_mesh_part_nodes)
+        {
+          MeshStreamer::MeshNode* mesh_part(new MeshStreamer::MeshNode);
+          MeshWriter<RootMesh_>::write_mesh_part(mesh_part->mesh_data, *(it.second.node->get_mesh()));
+
+          // Add the chart (if any)
+          auto* chart(it.second.chart);
+          if(chart != nullptr)
+          {
+            // Get chart
+            mesh_part->mesh_data.chart = it.first;
+
+            MeshStreamer::ChartContainer* chart_data(new MeshStreamer::ChartContainer);
+
+            MeshWriter<RootMesh_>::write_chart(*chart_data, it.first, *(it.second.chart));
+
+            // Insert copies to an std::vector...
+            mesh_writer->insert_chart(*chart_data);
+            // ... so we need to clean up afterwards
+            delete chart_data;
+          }
+
+          // Add the new mesh part to the MeshStreamer
+          mesh_writer->_insert_meshpart(mesh_part);
+        }
 
         return mesh_writer;
       }
@@ -803,6 +866,10 @@ namespace FEAST
       }
     }; // class RootMeshNode
 
+    namespace Intern
+    {
+
+    } // namespace Intern
   } // namespace Geometry
 } // namespace FEAST
 
