@@ -41,6 +41,31 @@ namespace FEAST
       stagnated
     };
 
+    /// \cond internal
+    std::ostream& operator<<(std::ostream& os, SolverStatus status)
+    {
+      switch(status)
+      {
+      case SolverStatus::undefined:
+        return os << "undefined";
+      case SolverStatus::progress:
+        return os << "progress";
+      case SolverStatus::success:
+        return os << "success";
+      case SolverStatus::aborted:
+        return os << "aborted";
+      case SolverStatus::diverged:
+        return os << "diverged";
+      case SolverStatus::max_iter:
+        return os << "max-iter";
+      case SolverStatus::stagnated:
+        return os << "stagnated";
+      default:
+        return os << "-unknown-";
+      }
+    }
+    /// \endcond
+
     /**
      * \brief Status success check function
      *
@@ -668,12 +693,18 @@ namespace FEAST
       DataType _div_rel;
       /// absolute divergence parameter
       DataType _div_abs;
+      /// stagnation rate
+      DataType _stag_rate;
       /// minimum number of iterations
       Index _min_iter;
       /// maximum number of iterations
       Index _max_iter;
       /// number of performed iterations
       Index _num_iter;
+      /// minimum number of stagnation iterations
+      Index _min_stag_iter;
+      /// number of consecutive stagnated iterations
+      Index _num_stag_iter;
       /// initial defect
       DataType _def_init;
       /// current defect
@@ -692,8 +723,10 @@ namespace FEAST
        * - absolute tolerance: 1/eps^2 (~1E+32 for double)
        * - relative divergence: 1/eps (~1E+16 for double)
        * - absolute divergence: 1/eps^2 (~1E+32 for double)
+       * - stagnation rate: 0.95
        * - minimum iterations: 0
        * - maximum iterations: 100
+       * - minimum stagnation iterations: 0
        * - convergence plot: false
        *
        * \param[in] name
@@ -714,9 +747,12 @@ namespace FEAST
         _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
         _div_rel(DataType(1) / Math::eps<DataType>()),
         _div_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
+        _stag_rate(DataType(0.95)),
         _min_iter(0),
         _max_iter(100),
         _num_iter(0),
+        _min_stag_iter(0),
+        _num_stag_iter(0),
         _def_init(0),
         _def_cur(0),
         _iter_digits(4),
@@ -771,6 +807,30 @@ namespace FEAST
       DataType get_div_abs() const
       {
         return _div_abs;
+      }
+
+      /// Sets the stagnation rate fot the solver.
+      void set_stag_rate(DataType rate)
+      {
+        _stag_rate = rate;
+      }
+
+      /// Returns the stagnation rate
+      DataType get_stag_rate() const
+      {
+        return _stag_rate;
+      }
+
+      /// Sets the minimum stagnate iteration count for the solver
+      void set_min_stag_iter(Index min_iter)
+      {
+        _min_stag_iter = min_iter;
+      }
+
+      /// Returns the minimum stagnation iteration count.
+      Index get_min_stag_iter() const
+      {
+        return _min_stag_iter;
       }
 
       /// Sets the minimum iteration count for the solver.
@@ -931,6 +991,7 @@ namespace FEAST
         // store new defect
         this->_def_init = this->_def_cur = vector.norm2();
         this->_num_iter = Index(0);
+        this->_num_stag_iter = Index(0);
 
         // plot?
         if(this->_plot)
@@ -969,6 +1030,10 @@ namespace FEAST
         bool calc_def = false;
         calc_def = calc_def || (this->_min_iter < this->_max_iter);
         calc_def = calc_def || this->_plot;
+        calc_def = calc_def || (this->_min_stag_iter > Index(0));
+
+        // save previous defect
+        DataType def_old = this->_def_cur;
 
         // compute new defect
         if(calc_def)
@@ -1001,6 +1066,23 @@ namespace FEAST
         // maximum number of iterations performed?
         if(this->_num_iter >= this->_max_iter)
           return SolverStatus::max_iter;
+
+        // check for stagnation?
+        if(this->_min_stag_iter > Index(0))
+        {
+          // did this iteration stagnate?
+          if(this->_def_cur >= this->_stag_rate * def_old)
+          {
+            // increment stagnation count
+            if(++this->_num_stag_iter >= this->_min_stag_iter)
+              return SolverStatus::stagnated;
+          }
+          else
+          {
+            // this iteration did not stagnate
+            this->_num_stag_iter = Index(0);
+          }
+        }
 
         // continue iterating
         return SolverStatus::progress;
