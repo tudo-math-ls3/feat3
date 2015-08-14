@@ -27,23 +27,29 @@ namespace FEAST
         StorageT_<unsigned, std::allocator<unsigned> > delta;
         for(auto& h_i : halos)
           delta.push_back(h_i->get_overlap());
+#ifdef DEBUG
         for(auto d_i : delta)
           ASSERT(d_i == delta.at(0), "Error: Divergent delta values of halos in parameter pack!");
+#endif
 
         //retrieve mesh pointers of all halos
         StorageT_<typename HT_::mesh_type_*, std::allocator<typename HT_::mesh_type_*> > meshes;
         for(auto& h_i : halos)
           meshes.push_back(h_i->get_mesh());
+#ifdef DEBUG
         for(auto m_i : meshes)
           ASSERT(m_i == meshes.at(0), "Error: Divergent mesh pointer values of halos in parameter pack!");
+#endif
         const typename HT_::mesh_type_* mesh(meshes.at(0));
 
         //retrieve other ranks of all halos
         StorageT_<typename HT_::mesh_type_::index_type_, std::allocator<typename HT_::mesh_type_::index_type_> > others;
         for(auto& h_i : halos)
           others.push_back(h_i->get_other());
+#ifdef DEBUG
         for(auto o_i : others)
           ASSERT(o_i == others.at(0), "Error: Divergent comm links of halos in parameter pack!");
+#endif
 
         //retrieve levels of all halos
         StorageT_<PolytopeLevels, std::allocator<PolytopeLevels> > pl;
