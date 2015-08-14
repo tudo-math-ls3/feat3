@@ -1005,6 +1005,10 @@ namespace FEAST
         if(!Math::isfinite(this->_def_init))
           return SolverStatus::aborted;
 
+        // check if the initial defect is zero; we test against eps^2 here
+        if(this->_def_init <= Math::sqr(Math::eps<DataType>()))
+          return SolverStatus::success;
+
         // continue iterating
         return SolverStatus::progress;
       }
