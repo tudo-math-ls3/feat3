@@ -48,6 +48,7 @@ namespace FEAST
       : public Factory< MeshPart<Mesh_> >
     {
     public:
+      /// The shape type of the mesh
       typedef typename Mesh_::ShapeType ShapeType;
       /// mesh part type
       typedef MeshPart<Mesh_> MeshType;
@@ -81,6 +82,7 @@ namespace FEAST
         Intern::HitTestCompute<HitFunc_, Mesh_, ShapeType>::wrap(_target_data, _mesh, _hit_func);
       }
 
+      /// \copydoc Factory::get_num_entities()
       virtual Index get_num_entities(int dim)
       {
         return Index(_target_data.at(std::size_t(dim)).size());

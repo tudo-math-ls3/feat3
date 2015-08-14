@@ -14,9 +14,11 @@ namespace FEAST
 {
   namespace Geometry
   {
+    /// \todo Documentation
     template<typename Mesh_>
     class UnitCubePatchGenerator;
 
+    /// \cond internal
     template<typename Coord_>
     class UnitCubePatchGenerator<ConformalMesh<Shape::Hypercube<1>, 1, 1, Coord_>>
     {
@@ -914,6 +916,7 @@ namespace FEAST
         return level;
       }
     }; // UnitCubePatchGenerator<Hypercube<3>>
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 

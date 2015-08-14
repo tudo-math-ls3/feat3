@@ -11,9 +11,11 @@ namespace FEAST
 {
   namespace Geometry
   {
+    /// \todo Documentation
     template<typename Mesh_>
     class PatchFactory;
 
+    /// \cond internal
     template<
       typename Shape_,
       int num_coords_,
@@ -91,7 +93,8 @@ namespace FEAST
           _patch_set.get_target_set_holder(),
           num_entities);
       }
-    };
+    }; // class PatchFactory<ConformalMesh<Shape_, num_coords_, stride_, Coord_> >
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 

@@ -10,9 +10,11 @@ namespace FEAST
 {
   namespace Geometry
   {
+    /// \todo Documentation
     template<typename Mesh_>
     class MacroFactory;
 
+    /// \cond internal
     template<
       typename Shape_,
       int num_coords_,
@@ -74,6 +76,7 @@ namespace FEAST
         Intern::MacroIndexWrapper<Shape_>::build(index_set_holder);
       }
     };
+    /// \cond internal
   } // namespace Geometry
 } // namespace FEAST
 

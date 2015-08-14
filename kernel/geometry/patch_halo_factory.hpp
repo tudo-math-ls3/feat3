@@ -20,9 +20,12 @@ namespace FEAST
     };
 
     /// \endcond
+
+    /// \todo Documentation
     template<typename Mesh_>
     class PatchHaloFactory DOXY({});
 
+    /// \cond internal
     template<typename Shape_, int num_coords_, int stride_, typename Coord_>
     class PatchHaloFactory< MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > > :
       public Factory< MeshPart<ConformalMesh<Shape_, num_coords_, stride_, Coord_> > >
@@ -80,6 +83,7 @@ namespace FEAST
       }
 
     }; // class PatchHaloFactory<MeshPart<...>>
+    /// \endcond
 
     /// \cond internal
     namespace Intern

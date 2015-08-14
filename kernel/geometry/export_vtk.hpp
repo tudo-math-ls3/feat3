@@ -108,7 +108,7 @@ namespace FEAST
     public:
       /// mesh type
       typedef Mesh_ MeshType;
-      // our shape type
+      /// our shape type
       typedef typename MeshType::ShapeType ShapeType;
       /// our VTK shape type
       typedef Intern::VTKShape<ShapeType> VTKShapeType;

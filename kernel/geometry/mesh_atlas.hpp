@@ -108,6 +108,11 @@ namespace FEAST
         return true;
       }
 
+      /**
+       * \brief Returns a const reference to the chart map
+       *
+       * \returns A const reference to the chart map
+       */
       const MeshChartMap& get_mesh_chart_map() const
       {
         return _chart_map;
@@ -141,6 +146,16 @@ namespace FEAST
       }
 
     protected:
+      /**
+       * \brief Parses all charts from a MeshStreamer
+       *
+       * \param[in] streamer
+       * The MeshStreamer containing the data to be parsed.
+       *
+       * \param factory
+       * The factory used to create Charts from the parsed data. Cannot be const as parsing writes data to it.
+       *
+       */
       void _parse_charts(MeshStreamer& streamer, Atlas::ChartFactory<MeshType>& factory)
       {
         for(auto& c : streamer.charts)

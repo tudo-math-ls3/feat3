@@ -36,9 +36,13 @@ namespace FEAST
     }
     /// \endcond
 
+    /**
+     * \brief Empty generic class template for MeshStreamerFactory
+     */
     template<typename Mesh_>
     class MeshStreamerFactory DOXY({});
 
+    /// \cond internal
     /**
      * \brief MeshStreamerFactory implementation for ConformalMesh
      *
@@ -164,6 +168,16 @@ namespace FEAST
       Index _num_entities[Shape_::dimension+1];
 
     public:
+      /**
+       * \brief Builds a Factory from complete streamed data.
+       *
+       * \param mesh_reader
+       * The MeshStreamer container holding the streamed data.
+       *
+       * \param[in] name
+       * The name of the container in mesh_reader that holds our data.
+       *
+       */
       explicit MeshStreamerFactory(MeshStreamer& mesh_reader, const String& name) :
         _mesh_data(nullptr)
       {
@@ -185,6 +199,13 @@ namespace FEAST
         throw InternalError("No sub-mesh found with name '" + name + "'");
       }
 
+      /**
+       * \brief Builds a Factory from streamed mesh data
+       *
+       * \param mesh_data
+       * The data container holding the streamed data.
+       *
+       */
       explicit MeshStreamerFactory(MeshStreamer::MeshDataContainer* mesh_data) :
         _mesh_data(mesh_data)
       {
@@ -227,13 +248,29 @@ namespace FEAST
         return _mesh_data->parent;
       }
     }; // class MeshStreamerFactory<MeshPart<...>>
+    /// \endcond
 
     /**
+     * \brief Wrapper class for writing to MeshStreamer:: containers
      *
+     * \tparam RootMeshType_
+     * Type of the mesh the actual data comes from.
+     *
+     * \author Jordi Paul
      */
     template<typename RootMeshType_>
     struct MeshWriter
     {
+      /**
+       * \brief Writes a MeshPart to a MeshStreamer::MeshDataContainer
+       *
+       * \param[in,out] mesh_data
+       * The data container to be filled.
+       *
+       * \param[in] mesh_part
+       * the Geometry::MeshPart to be written.
+       *
+       */
       static void write_mesh_part(MeshStreamer::MeshDataContainer& mesh_data, const MeshPart<RootMeshType_>& mesh_part)
       {
         // Fill BaseContainer stuff
@@ -270,8 +307,19 @@ namespace FEAST
         // If the MeshPart has any attributes, fill the containers
         if(mesh_part.get_num_attributes() > 0)
           write_attributes(mesh_data.attributes, mesh_part.get_attribute_holder());
-      }
 
+      } // MeshWriter::write_mesh_part
+
+      /**
+       * \brief Writes a Mesh to a MeshStreamer::MeshDataContainer
+       *
+       * \param[in,out] mesh_data
+       * The data container to be filled.
+       *
+       * \param[in] mesh
+       * the Geometry::Mesh to be written.
+       *
+       */
       static void write_mesh(MeshStreamer::MeshDataContainer& mesh_data, const RootMeshType_& mesh)
       {
         // Fill MeshStreamer::BaseContainer stuff
@@ -309,8 +357,18 @@ namespace FEAST
         }
 
         Intern::ContainerFiller<RootMeshType_::shape_dim-1>::fill_adjacencies(mesh_data.adjacencies, mesh.get_index_set_holder());
-      }
+      } // MeshWriter::write_mesh()
 
+      /**
+       * \brief Writes a Chart to a MeshStreamer::ChartContainer
+       *
+       * \param[in,out] chart_data
+       * The data container to be filled.
+       *
+       * \param[in] chart
+       * The Geometry::ChartBase-derived object to be written.
+       *
+       */
       template<typename ChartType_>
       static void write_chart(MeshStreamer::ChartContainer& chart_data, String chart_name, const ChartType_& chart)
       {
@@ -320,8 +378,18 @@ namespace FEAST
         chart_data.type = chart.get_type();
 
         chart.write_data_container(chart_data);
-      }
+      } // MeshWriter::write_chart()
 
+      /**
+       * \brief Writes a MeshAttribute to a MeshStreamer::Attributecontainer
+       *
+       * \param[in,out] attribute_data
+       * The data container to be filled.
+       *
+       * \param[in] mah
+       * The MeshPart's MeshAttributeHolder to be written.
+       *
+       */
       template<typename MeshAttributeHolderType_>
       static void write_attributes(std::vector<MeshStreamer::AttributeContainer> attribute_data[4], const MeshAttributeHolderType_& mah)
       {

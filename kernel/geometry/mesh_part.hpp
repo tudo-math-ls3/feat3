@@ -946,7 +946,7 @@ namespace FEAST
         /**
          * \brief Sets the name of this MeshPart
          *
-         * \param[in] identifier
+         * \param[in] parent_identifier
          * New name to identify the MeshPart's parent by
          *
          * This is needed because adding a MeshPart to a MeshNode will change the MeshPart's parent_identifier for
@@ -1013,8 +1013,8 @@ namespace FEAST
         /**
          * \brief Fills the mesh topology from parent information
          *
-         * \param[in] parent_mesh
-         * Parent this MeshPart refers to.
+         * \param[in] parent_ish
+         * IndexSetHolder of the parent this MeshPart refers to.
          *
          * \warning This will in general change the implied topology of the MeshPart and meant to be used in mesh
          * preprocessing only.

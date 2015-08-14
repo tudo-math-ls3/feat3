@@ -213,6 +213,15 @@ namespace FEAST
         return _parent_identifier;
       }
 
+      /**
+       * \brief Sets the parent_identifier
+       *
+       * \param[in] parent_identifier
+       * New parent identifier.
+       *
+       * This is used to keep the identifiers consistent when adding MeshNodes as children to other MeshNodes.
+       *
+       */
       void set_parent_identifier(String parent_identifier)
       {
         _parent_identifier = parent_identifier;
@@ -562,6 +571,19 @@ namespace FEAST
         CONTEXT(name() + "::MeshPartNode()");
       }
 
+      /**
+       * \brief Constructs a MeshPartNode from a MeshStreamer::MeshNode and adds all MeshParts therein
+       *
+       * \param streamer_node
+       * Container holding streamed mesh data.
+       *
+       * \param atlas
+       * MeshAtlas holding all charts.
+       *
+       * If a mesh part from the streamer node specifies a chart, it is meant to be contained in atlas and added to
+       * the (sub) MeshPartNode that gets added to (this).
+       *
+       */
       explicit MeshPartNode(MeshStreamer::MeshNode& streamer_node, MeshAtlasType* atlas = nullptr) :
         BaseClass(nullptr)
       {
@@ -725,6 +747,9 @@ namespace FEAST
        * \param[in] mesh_reader
        * MeshStreamer that contains the information from the streamed mesh.
        *
+       * \param atlas
+       * MeshAtlas to be added to the new RootMeshNode, can be nullptr.
+       *
        */
       explicit RootMeshNode(MeshStreamer& mesh_reader, MeshAtlasType* atlas = nullptr) :
         BaseClass(nullptr),
@@ -824,6 +849,9 @@ namespace FEAST
 
       /**
        * \brief Refines this node and its sub-tree.
+       *
+       * \param[in] adapt_mode
+       * Mode for adaption, defaults to chart.
        *
        * \returns
        * A pointer to a RootMeshNode containing the refined mesh tree.
