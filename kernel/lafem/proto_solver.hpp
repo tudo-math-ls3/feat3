@@ -755,7 +755,7 @@ namespace FEAST
         _num_stag_iter(0),
         _def_init(0),
         _def_cur(0),
-        _iter_digits(4),
+        _iter_digits(Math::ilog10(_max_iter)),
         _plot(false)
       {
       }
@@ -843,6 +843,7 @@ namespace FEAST
       void set_max_iter(Index max_iter)
       {
         _max_iter = max_iter;
+        _iter_digits = Math::ilog10(_max_iter);
       }
 
       /// Returns number of performed iterations
@@ -1048,7 +1049,9 @@ namespace FEAST
         {
           std::cout << this->_plot_name
             <<  ": " << stringify(this->_num_iter).pad_front(_iter_digits)
-            << " : " << scientify(this->_def_cur) << std::endl;
+            << " : " << scientify(this->_def_cur)
+            << " / " << scientify(this->_def_cur / this->_def_init)
+            << std::endl;
         }
 
         // ensure that the defect is neither NaN nor infinity
