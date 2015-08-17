@@ -118,6 +118,16 @@ namespace FEAST
       {
         return Math::sqrt(norm2sqr());
       }
+
+      void component_invert(const Vector& x, const DataType alpha = DataType(1))
+      {
+        _vector.component_invert(x, alpha);
+      }
+
+      void component_product(const Vector& x, const Vector& y)
+      {
+        _vector.component_product(*x, *y);
+      }
     };
   } // namespace Global
 } // namespace FEAST
