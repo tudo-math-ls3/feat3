@@ -134,12 +134,6 @@ namespace FEAST
       /// child submesh nodes
       MeshPartNodeContainer _mesh_part_nodes;
 
-    public:
-      /// The name of this mesh
-      String _identifier;
-      /// The parent's name
-      String _parent_identifier;
-
     protected:
       /**
        * \brief Constructor.
@@ -149,14 +143,9 @@ namespace FEAST
        */
       explicit MeshNode(MeshType* mesh) :
         _mesh(mesh),
-        _mesh_part_nodes(),
-        _identifier(""),
-        _parent_identifier("")
+        _mesh_part_nodes()
       {
         CONTEXT(name() + "::MeshNode()");
-
-        if(mesh != nullptr)
-          _identifier = mesh->get_identifier();
       }
 
     public:
@@ -198,33 +187,11 @@ namespace FEAST
        *
        * \returns The name of the mesh or meshpart contained in this node.
        */
-      String get_identifier()
+      String get_identifier() const
       {
-        return _identifier;
-      }
-
-      /**
-       * \brief Gets the parent's identifier
-       *
-       * \returns The parent's identifer
-       */
-      String get_parent_identifier()
-      {
-        return _parent_identifier;
-      }
-
-      /**
-       * \brief Sets the parent_identifier
-       *
-       * \param[in] parent_identifier
-       * New parent identifier.
-       *
-       * This is used to keep the identifiers consistent when adding MeshNodes as children to other MeshNodes.
-       *
-       */
-      void set_parent_identifier(String parent_identifier)
-      {
-        _parent_identifier = parent_identifier;
+        if(_mesh != nullptr)
+          return _mesh->get_identifier();
+        return "";
       }
 
       /** \copydoc get_mesh() */
@@ -275,14 +242,10 @@ namespace FEAST
           if(_mesh_part_nodes.insert(std::make_pair(part_name, MeshPartNodeBin(mesh_part_node, chart))).second)
           {
             // Set identifier in the MeshPartNode
-            mesh_part_node->_identifier = part_name;
-            // Keep the identifier consistent in the MeshPart itself
-            mesh_part_node->get_mesh()->set_identifier(part_name);
+            mesh_part_node->set_identifier(part_name);
 
             // Set parent_identifier in the MeshPartNode
-            mesh_part_node->_parent_identifier = this->get_identifier();
-            // Keep the parent_identifier consistent in the MeshPart itself
-            mesh_part_node->get_mesh()->set_parent_identifier(this->get_identifier());
+            mesh_part_node->set_parent_identifier(this->get_identifier());
 
             return mesh_part_node;
           }
@@ -626,6 +589,39 @@ namespace FEAST
         CONTEXT(name() + "::~MeshPartNode()");
       }
 
+      void set_identifier(const String& id)
+      {
+        if (_mesh != nullptr)
+          _mesh->set_identifier(id);
+      }
+
+      /**
+      * \brief Gets the parent's identifier
+      *
+      * \returns The parent's identifer
+      */
+      String get_parent_identifier() const
+      {
+        if(this->_mesh != nullptr)
+          return this->_mesh->get_parent_identifier();
+        return "";
+      }
+
+      /**
+      * \brief Sets the parent_identifier
+      *
+      * \param[in] parent_identifier
+      * New parent identifier.
+      *
+      * This is used to keep the identifiers consistent when adding MeshNodes as children to other MeshNodes.
+      *
+      */
+      void set_parent_identifier(String parent_identifier)
+      {
+        if(this->_mesh != nullptr)
+          this->_mesh->set_parent_identifier(parent_identifier);
+      }
+
       /**
        * \brief Refines this node and its sub-tree.
        *
@@ -737,8 +733,6 @@ namespace FEAST
         BaseClass(mesh),
         _atlas(atlas)
       {
-        this->_identifier = "root";
-        this->_parent_identifier = "";
       }
 
       /**
@@ -755,8 +749,6 @@ namespace FEAST
         BaseClass(nullptr),
         _atlas(atlas)
       {
-        this->_identifier = "root";
-        this->_parent_identifier = "";
         MeshStreamer::MeshNode& streamer_node = *mesh_reader.get_root_mesh_node();
 
         // create a factory for our mesh
