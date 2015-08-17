@@ -380,8 +380,32 @@ else (FEAST_MPI)
   SET_PROPERTY(TEST foundation_global_ops_synch_scal_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAST_MPI)
 
+if (FEAST_MPI)
+  ADD_TEST(stokes_poiseuille_2d_mpi ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target stokes_poiseuille_2d
+    --build-nocmake
+    --build-noclean
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/stokes_poiseuille_2d ${MPIEXEC_POSTFLAGS})
+  SET_PROPERTY(TEST stokes_poiseuille_2d_mpi PROPERTY LABELS "mpi")
+  SET_PROPERTY(TEST stokes_poiseuille_2d_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+else (FEAST_MPI)
+  ADD_TEST(stokes_poiseuille_2d_serial ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target stokes_poiseuille_2d
+    --build-nocmake
+    --build-noclean
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/stokes_poiseuille_2d)
+  SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY LABELS "serial")
+  SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+endif (FEAST_MPI)
+
 # add all tests to applications_tests
-ADD_CUSTOM_TARGET(applications_tests DEPENDS scarc_test-app foundation_system_test-app)
+ADD_CUSTOM_TARGET(applications_tests DEPENDS ${app_list})
 
 # build all tests through top lvl target tests
 ADD_DEPENDENCIES(tests applications_tests)
