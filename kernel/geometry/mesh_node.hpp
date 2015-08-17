@@ -591,8 +591,8 @@ namespace FEAST
 
       void set_identifier(const String& id)
       {
-        if (_mesh != nullptr)
-          _mesh->set_identifier(id);
+        if (this->_mesh != nullptr)
+          this->_mesh->set_identifier(id);
       }
 
       /**
