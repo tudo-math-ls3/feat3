@@ -245,7 +245,7 @@ namespace FEAST
        * \brief Returns the orientation of a facet.
        *
        * \note For simplices, all facets are positively oriented (i.e. the edges that make up the reference
-       * triangle), but for hypercubes this is not the case
+       * triangle), but for hypercubes this is not the case.
        *
        * \param[in] facet_index
        * The number of the facet to return the orientation for.
@@ -327,12 +327,12 @@ namespace FEAST
       }
 
       /**
-       * \brief Edge/Face orientation for Hypercubes
+       * \brief Facet orientation for Hypercubes
        *
-       * For Hypercube<1>, the facets are vertices and do not have an orientation.
-       * For Hypercube<2>, edges 0 and 3 are positively oriented.
-       * For Hypercube<3>, faces 0 to 3 are oriented like the edges of Hypercube<2>, face 4 is positively and face 5
-       * is negatively oriented.
+       * For Hypercube<1>, the facets are vertices, left is oriented negatively and right is oriented positively so
+       * that the normals are outer normals: -1 +1
+       * For Hypercube<2>, edges 0 and 3 are positively oriented: +1 -1 -1 +1
+       * For Hypercube<3>, faces 0, 3, 4 are negatively oriented: -1 +1 +1 -1 -1 +1
        *
        * \param[in] facet_index
        * The number of the facet to return the orientation for.
@@ -343,24 +343,11 @@ namespace FEAST
        */
       static int orientation(int facet_index)
       {
-        ASSERT((facet_index < FaceTraits<Hypercube<dim_>,dim_-1>::count), "facet index out of range!");
+        ASSERT((facet_index >= 0), "facet index "+stringify(facet_index)+" out of range!");
+        ASSERT((facet_index < FaceTraits<Hypercube<dim_>,dim_-1>::count), "facet index "+stringify(facet_index)+" out of range!");
 
-        switch(facet_index)
-        {
-          case 0 :
-            return 1;
-          case 1:
-          case 2:
-            return -1;
-          case 3:
-          case 4:
-            return 1;
-          case 5:
-            return -1;
-          default:
-            throw InternalError("Invalid facet index " + stringify(facet_index)+" for Hypercube<3>");
-            return 1;
-        }
+        return 1 - (( ((facet_index >> 1) ^ facet_index ^ dim_) & 1 ) << 1);
+
       }
     };
 

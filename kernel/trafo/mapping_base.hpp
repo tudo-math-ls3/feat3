@@ -47,6 +47,13 @@ namespace FEAST
         /// evaluator type
         typedef ... Type;
       };
+
+      /// Number of coefficients of the reference transformation for cells
+      /// Since all transformations are finite element functions, this is just the local number of DoFs of the
+      /// corresponding FE space (P1/Q1, P2/Q2, ...)
+      static constexpr int num_coeff = ...;
+      /// Number of coefficients of the reference transformation for faces
+      static constexpr int num_coeff_facet = ...;
 #endif // DOXYGEN
 
     private:

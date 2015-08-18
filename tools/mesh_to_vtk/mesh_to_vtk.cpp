@@ -48,7 +48,6 @@ int run(MeshStreamer& my_streamer, const String& filename, const Index lvl_min, 
   try
   {
     node = new RootMeshNode<MeshType_>(my_streamer, atlas);
-//    node->generate_meshpart_topologies();
     node->adapt();
   }
   catch(std::exception& exc)

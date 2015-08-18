@@ -91,6 +91,11 @@ namespace FEAST
 
       /**
        * \brief Returns the maximum number of dof contributions.
+       *
+       * In the case of hanging vertices, values to a dof associated with such a vertex can get distributed to
+       * adjacent dof. This is the maximum number of of such dof.
+       *
+       * As nonconforming meshes are not implemented yet, this is always 1.
        */
       int get_max_contribs() const
       {

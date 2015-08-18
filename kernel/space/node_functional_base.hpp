@@ -75,12 +75,23 @@ namespace FEAST
       int get_num_assigned_dofs() const;
 
       /**
-       * \brief Evaluation operator.
+       * \brief Evaluation operator
        *
-       * This operator evaluates an assigned dof on the current cell.
+       * This operator applies all node functionals to the AnalyticFunction function. The values of the node
+       * functionals are the coefficients of the FE interpolant of function.
        *
-       * \param[in] assign_idx
-       * The index of the assigned dofs that is to be evaluated.
+       * \tparam NodeData_
+       * Type for the FE coefficient vector.
+       *
+       * \tparam Function_
+       * Type of the AnalyticFuntion to evaluate.
+       *
+       * \param[out] node_data
+       * The coefficients of the FE interpolant of function, aka the values of the node functionals applied to the
+       * function. Tiny::Vector of some sort.
+       *
+       * \param[in] function
+       * The AnalyticFunction to apply the node functionals to.
        *
        * \returns
        * The value of the node functional applied onto the functor.

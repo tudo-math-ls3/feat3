@@ -1945,7 +1945,6 @@
   <header>
    name inner
    parent root
-   chart inner
    type conformal
    shape quad
    attribute_sets 0
@@ -2443,7 +2442,6 @@
   <header>
    name outer
    parent root
-   chart outer
    type conformal
    shape quad
    attribute_sets 0

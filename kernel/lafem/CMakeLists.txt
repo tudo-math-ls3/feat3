@@ -39,6 +39,7 @@ SET (test_list
   bicgstab-test
   bicgstab-meta-test
   cusolver-test
+  slip_filter-test
   meta_to_scalar-test
   dense_matrix-test
   dense_vector-test

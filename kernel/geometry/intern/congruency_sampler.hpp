@@ -27,7 +27,7 @@ namespace FEAST
       {
       public:
         /**
-         * \brief Compares two vertex index vectors and returns the orientation.
+         * \brief Compares two vertex index vectors and returns the orientation code.
          *
          * \param[in] src
          * A reference to the source index vector that is to be compared.
@@ -42,6 +42,17 @@ namespace FEAST
           typename Source_,
           typename Target_>
         static int compare(const Source_& src, const Target_& trg);
+
+        /**
+         * \brief Maps an orientation code to positive or negative
+         *
+         * From the orientation code of two representatives of the same vertex index vectors we can tell if they
+         * describe the same entity in the same or different orientation.
+         *
+         * \returns 1 if the orientation code belongs to two orientations of the same sign, -1 if they are of
+         * different sign or 0 if the orientation code was -1.
+         */
+        static int orientation(int orientation_code);
       };
 #endif // DOXYGEN
 
@@ -75,6 +86,15 @@ namespace FEAST
           }
           // invalid
           return -1;
+        }
+
+        static int orientation(int orientation_code)
+        {
+          if(orientation_code == 0)
+            return 1;
+          if(orientation_code == 1)
+            return -1;
+          return 0;
         }
       }; // class CongruencySampler<Simplex<1>>
 
@@ -144,6 +164,16 @@ namespace FEAST
           // invalid
           return -1;
         }
+
+        static int orientation(int orientation_code)
+        {
+          if(orientation_code == -1)
+            return 0;
+          if(orientation_code < 3)
+            return 1;
+          else
+            return -1;
+        }
       }; // class CongruencySampler<Simplex<2>>
 
       /**
@@ -176,6 +206,15 @@ namespace FEAST
           }
           // invalid
           return -1;
+        }
+
+        static int orientation(int orientation_code)
+        {
+          if(orientation_code == 0)
+            return 1;
+          if(orientation_code == 1)
+            return -1;
+          return 0;
         }
       }; // class CongruencySampler<Hypercube<1>>
 
@@ -253,6 +292,16 @@ namespace FEAST
           }
           // invalid
           return -1;
+        }
+
+        static int orientation(int orientation_code)
+        {
+          if(orientation_code == -1)
+            return 0;
+          if(orientation_code < 4)
+            return 1;
+          else
+            return -1;
         }
       }; // class CongruencySampler<Hypercube<2>>
     } // namespace Intern

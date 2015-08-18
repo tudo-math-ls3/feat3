@@ -1269,7 +1269,7 @@ namespace FEAST
           data.phi[26].ref_hess[1][2] = p2(point[0]) * d1p2(point[1]) * d1p2(point[2]);
         }
       }; // class Evaluator<...,Hypercube<3>>
-    } // namespace Lagrange1
+    } // namespace Lagrange2
   } // namespace Space
 } // namespace FEAST
 

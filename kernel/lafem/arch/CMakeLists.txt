@@ -24,6 +24,7 @@ SET (kernel-lafem-arch-list
   product_matvec_generic_banded.cpp
   scale_generic.cpp
   scale_row_col_generic.cpp
+  slip_filter_generic.cpp
   sum_generic.cpp
   unit_filter_generic.cpp
   unit_filter_blocked_generic.cpp
@@ -63,6 +64,7 @@ if (FEAST_BACKENDS_CUDA)
     product_matvec.cu
     scale.cu
     scale_row_col.cu
+    slip_filter.cu
     sum.cu
     unit_filter.cu
     unit_filter_blocked.cu
