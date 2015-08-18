@@ -463,7 +463,7 @@ namespace FEAST
         /// Shape type
         typedef ShapeType_ ShapeType;
         /// Mesh type
-        typedef ConformalMesh<ShapeType> MeshType;
+        typedef ConformalMesh<ShapeType, num_coords_, stride_, Coord_> MeshType;
         /// Index set holder type
         typedef IndexSetHolder<ShapeType> IndexSetHolderType;
         /// Target set holder type

@@ -130,7 +130,7 @@ namespace FEAST
       template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
       void assemble(
         LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter,
-        const Space_ space,
+        const Space_& space,
         const LAFEM::DenseVector<MemType_, DataType_, IndexType_>& vector_) const
       {
         // build index set
