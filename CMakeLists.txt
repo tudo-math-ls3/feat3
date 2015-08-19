@@ -50,6 +50,8 @@ if (FEAST_MPI)
     include_directories(${MPI_CXX_INCLUDE_PATH})
   endif()
 
+  ADD_DEFINITIONS( -DOMPI_SKIP_MPICXX )
+
 endif (FEAST_MPI)
 
 if (FEAST_VALGRIND)
