@@ -782,7 +782,6 @@ namespace FEAST
           // Add the new MeshPartNode to this node
           this->add_mesh_part_node(it.first, my_mesh_part_node, chart);
         }
-
       }
 
       /**
@@ -837,6 +836,53 @@ namespace FEAST
       /// virtual destructor
       virtual ~RootMeshNode()
       {
+      }
+
+      /**
+       * \brief Creates mesh-parts for all base cells of this root mesh.
+       *
+       * This function must be called for the unrefined base root mesh, if one
+       * intends to use the Assembly::BaseSplitter class for the redistribution
+       * of data in dynamic load balancing.
+       */
+      void create_base_splitting()
+      {
+        // our shape dim
+        static constexpr int shape_dim = MeshType::shape_dim;
+
+        // check mesh and size
+        if(this->_mesh == nullptr)
+          throw InternalError("No mesh assigned");
+
+        // get number of cells
+        Index num_cells = this->_mesh->get_num_entities(shape_dim);
+
+        // get index set holder
+        const auto& ish = this->_mesh->get_index_set_holder();
+
+        // create num_entities array
+        Index num_entities[shape_dim+1];
+        for(int i(0); i < shape_dim; ++i)
+        {
+          num_entities[i] = Index(0);
+        }
+        num_entities[shape_dim] = Index(1);
+
+        // loop over all cell indices
+        for(Index cell(0); cell < num_cells; ++cell)
+        {
+          // create a new mesh part
+          auto mesh_part = new MeshPartType(num_entities);
+
+          // set base-cell index
+          (mesh_part->template get_target_set<shape_dim>())[Index(0)] = cell;
+
+          // deduct target sets
+          mesh_part->template deduct_target_sets_from_top<shape_dim>(ish);
+
+          // add to this mesh node
+          this->add_mesh_part("base:" + stringify(cell), mesh_part);
+        }
       }
 
       /**

@@ -8,6 +8,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of assembly tests
 SET (test_list
+  base_splitter-test
   bilinear_operator-test
   grid_transfer-test
   grid_transfer-mass-test
