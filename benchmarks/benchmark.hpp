@@ -61,15 +61,15 @@ namespace FEAST
       std::cout<<"TOE per function call: "<<std::fixed<<mean/double(iters)<<std::endl;
       flops *= iters;
       flops /= mean;
-      flops /= 1000; // kilo
-      flops /= 1000; // mega
-      flops /= 1000; // giga
+      flops /= 1000.; // kilo
+      flops /= 1000.; // mega
+      flops /= 1000.; // giga
       std::cout<<"GFlop/s: "<<flops<<std::endl;
       bytes *= iters;
       bytes /= mean;
-      bytes /= 1024; // kilo
-      bytes /= 1024; // mega
-      bytes /= 1024; // giga
+      bytes /= 1024.; // kilo
+      bytes /= 1024.; // mega
+      bytes /= 1024.; // giga
       std::cout<<"GByte/s: "<<bytes<<std::endl;
       std::cout<<"=============================================="<<std::endl;
     }

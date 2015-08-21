@@ -1,6 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/memory_pool.hpp>
-#include <kernel/runtime.hpp>
+#include <kernel/util/runtime.hpp>
 
 #include <cstring>
 
@@ -14,7 +14,7 @@ using namespace FEAST::TestSystem;
 
 int main(int argc, char** argv)
 {
-  initialise(argc, argv);
+  Runtime::initialise(argc, argv);
 
 #ifdef FEAST_TESTING_VC
   // Do not initialise VC test system if '--no-init' is the first option;
@@ -141,7 +141,7 @@ int main(int argc, char** argv)
     FEAST::Util::MemoryPool<Mem::CUDA>::instance()->shutdown_device();
 #endif
 
-  finalise();
+  Runtime::finalise();
 
   return result;
 }

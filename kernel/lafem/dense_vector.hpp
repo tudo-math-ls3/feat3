@@ -22,6 +22,7 @@
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/lafem/arch/synch.hpp>
 #include <kernel/adjacency/permutation.hpp>
+#include <kernel/util/runtime.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -938,16 +939,25 @@ namespace FEAST
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
+        {
+          Runtime::add_flops(this->size());
           Arch::Sum<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
+        }
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+        {
+          Runtime::add_flops(this->size());
           Arch::Difference<Mem_>::value(this->elements(), y.elements(), x.elements(), this->size());
+        }
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
+        {
+          Runtime::add_flops(this->size() * 2);
           Arch::Axpy<Mem_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());
+        }
       }
 
       /**
@@ -963,6 +973,7 @@ namespace FEAST
         if (this->size() != y.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        Runtime::add_flops(this->size());
         Arch::ComponentProduct<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
       }
 
@@ -980,6 +991,7 @@ namespace FEAST
         if (this->size() != x.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        Runtime::add_flops(this->size());
         Arch::ComponentInvert<Mem_>::value(this->elements(), x.elements(), alpha, this->size());
       }
 
@@ -994,6 +1006,7 @@ namespace FEAST
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        Runtime::add_flops(this->size());
         Arch::Scale<Mem_>::value(this->elements(), x.elements(), alpha, this->size());
       }
 
@@ -1011,11 +1024,12 @@ namespace FEAST
         if (x.size() != this->size() || y.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector sizes does not match!");
 
+        Runtime::add_flops(this->size() * 2);
         return Arch::TripleDotProduct<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
       }
 
       /**
-       * \brief Calculate \f$result \leftarrow this \cdot this\f$
+       * \brief Calculate \f$result \leftarrow this \cdot x\f$
        *
        * \param[in] x The other vector.
        *
@@ -1026,6 +1040,7 @@ namespace FEAST
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        Runtime::add_flops(this->size() * 2);
         return Arch::DotProduct<Mem_>::value(this->elements(), x.elements(), this->size());
       }
 
@@ -1053,6 +1068,7 @@ namespace FEAST
        */
       DT_ norm2(const Arch::Norm2GatewayBase<Mem_, DenseVector>* gate) const
       {
+        Runtime::add_flops(this->size() * 2);
         return gate->value(*this);
       }
 
@@ -1082,6 +1098,7 @@ namespace FEAST
        */
       DT_ norm2sqr() const
       {
+        Runtime::add_flops(this->size() * 2);
         // fallback
         return Math::sqr(this->norm2());
       }

@@ -1,4 +1,4 @@
-#include <kernel/runtime.hpp>
+#include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_node.hpp>
@@ -393,7 +393,7 @@ namespace PoissonDirichlet2D
     int nprocs = 0;
 
     // initialise
-    FEAST::initialise(argc, argv, rank, nprocs);
+    FEAST::Runtime::initialise(argc, argv, rank, nprocs);
 #ifndef SERIAL
     if (rank == 0)
     {
@@ -420,7 +420,7 @@ namespace PoissonDirichlet2D
           std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
       }
       // abort
-      FEAST::abort();
+      FEAST::Runtime::abort();
     }
 
     // define our mesh type
@@ -470,17 +470,17 @@ namespace PoissonDirichlet2D
     catch (const std::exception& exc)
     {
       std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
-      FEAST::abort();
+      FEAST::Runtime::abort();
     }
     catch (...)
     {
       std::cerr << "ERROR: unknown exception" << std::endl;
-      FEAST::abort();
+      FEAST::Runtime::abort();
     }
 #endif // DEBUG
 
     // okay
-    return FEAST::finalise();
+    return FEAST::Runtime::finalise();
   }
 } // namespace PoissonDirichlet2D
 

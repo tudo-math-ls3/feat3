@@ -1,5 +1,6 @@
 // includes, FEAST
 #include <kernel/util/memory_pool.hpp>
+#include <kernel/util/runtime.hpp>
 
 #include <cublas_v2.h>
 #include "cusparse_v2.h"
@@ -198,7 +199,7 @@ DT_ MemoryPool<Mem::CUDA>::get_element(const DT_ * data, const Index index)
 template <typename DT_>
 void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index count)
 {
-  Index blocksize(256);
+  Index blocksize(Runtime::global_property().query_int("CUDA.blocksize_misc", 256));
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -235,7 +236,7 @@ void MemoryPool<Mem::CUDA>::convert(DT_ * dest, const DT_ * src, const Index cou
 template <typename DT1_, typename DT2_>
 void MemoryPool<Mem::CUDA>::convert(DT1_ * dest, const DT2_ * src, const Index count)
 {
-  Index blocksize(256);
+  Index blocksize(Runtime::global_property().query_int("CUDA.blocksize_misc", 256));
   dim3 grid;
   dim3 block;
   block.x = blocksize;

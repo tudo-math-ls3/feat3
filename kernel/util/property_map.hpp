@@ -113,7 +113,7 @@ namespace FEAST
      * \brief Queries a value.
      *
      * \param[in] key_path
-     * A path to the key whose value is to be returned.
+     * A absolute path (section.subsection.key) path to the key whose value is to be returned.
      *
      * \returns
      * A <c>pair<String,bool></c>, where the second component marks, whether an entry with the key path
@@ -126,7 +126,7 @@ namespace FEAST
      * \brief Queries a value.
      *
      * \param[in] key_path
-     * A path to the key whose value is to be returned.
+     * A absolute path (section.subsection.key) to the key whose value is to be returned.
      *
      * \param[in] default_value
      * A string that is to be returned in the case that the key was not found.
@@ -137,9 +137,17 @@ namespace FEAST
     String query(String key_path, String default_value) const;
 
     /**
-     * \brief Retrieves a value for a given key.
+     * \brief Queries an int value.
      *
-     * This function returns the value string of a key-value pair.
+     * Queries an int instead of a string value.
+     * For details, refer to 'PropertyMap::query(String key_path, String default_value) const'
+     */
+    int query_int(String key_path, int default_value) const;
+
+    /**
+     * \brief Retrieves a value for a given key from the current top-lvl section.
+     *
+     * This function returns the value string of a key-value pair in the currect top-lvl section.
      *
      * \param[in] key
      * The key of the entry whose value is to be returned.
@@ -159,6 +167,10 @@ namespace FEAST
      *
      * \returns
      * A pointer to the PropertyMap associated with \p name or \c nullptr if no section with that name exists.
+     *
+     * \note
+     * This method does not allocate new memory, thus modifications to the returend PropertyMap affect the base property map
+     * and the returned PropertyMap <b>must</b> not be deleted.
      */
     PropertyMap* get_section(String name);
 

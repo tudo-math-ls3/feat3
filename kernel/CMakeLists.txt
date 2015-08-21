@@ -17,18 +17,7 @@ ADD_SUBDIRECTORY( trafo )
 ADD_SUBDIRECTORY( util )
 
 # list of kernel source files
-ADD_LIBRARY(feast STATIC archs.cpp runtime.cpp)
-
-#link against mpi if available
-TARGET_LINK_LIBRARIES(feast ${MPI_C_LIBRARIES})
-if(MPI_C_COMPILE_FLAGS)
-  set_target_properties(feast PROPERTIES
-    COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
-endif()
-if(MPI_C_LINK_FLAGS)
-  set_target_properties(feast PROPERTIES
-    LINK_FLAGS "${MPI_C_LINK_FLAGS}")
-endif()
+ADD_LIBRARY(feast STATIC archs.cpp)
 
 # list of libraries to include in feast lib
 TARGET_LINK_LIBRARIES (feast

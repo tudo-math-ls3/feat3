@@ -23,6 +23,7 @@
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/adjacency/permutation.hpp>
+#include <kernel/util/runtime.hpp>
 
 #include <fstream>
 
@@ -1461,16 +1462,25 @@ namespace FEAST
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
+        {
+          Runtime::add_flops(this->used_elements());
           Arch::Sum<Mem_>::value(this->val(), x.val(), y.val(), this->used_elements());
+        }
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+        {
+          Runtime::add_flops(this->used_elements());
           Arch::Difference<Mem_>::value(this->val(), y.val(), x.val(), this->used_elements());
+        }
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
+        {
+          Runtime::add_flops(this->used_elements() * 2);
           Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
+        }
       }
 
       /**
@@ -1488,6 +1498,7 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
+        Runtime::add_flops(this->used_elements());
         Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->used_elements());
       }
 
@@ -1498,6 +1509,7 @@ namespace FEAST
        */
       DT_ norm_frobenius() const
       {
+        Runtime::add_flops(this->used_elements() * 2);
         return Arch::Norm2<Mem_>::value(this->val(), this->used_elements());
       }
 
@@ -1593,6 +1605,7 @@ namespace FEAST
         if (s.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        Runtime::add_flops(this->used_elements());
         Arch::ScaleRows<Mem_>::csr(this->val(), x.val(), this->col_ind(), this->row_ptr(),
                                           s.elements(), this->rows(), this->columns(), this->used_elements());
       }
@@ -1614,6 +1627,7 @@ namespace FEAST
         if (s.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        Runtime::add_flops(this->used_elements());
         Arch::ScaleCols<Mem_>::csr(this->val(), x.val(), this->col_ind(), this->row_ptr(),
                                           s.elements(), this->rows(), this->columns(), this->used_elements());
       }
@@ -1637,6 +1651,7 @@ namespace FEAST
           return;
         }
 
+        Runtime::add_flops(this->used_elements() * 2);
         Arch::ProductMatVec<Mem_>::csr(r.elements(), this->val(), this->col_ind(), this->row_ptr(),
                                               x.elements(), this->rows(), columns(), used_elements());
       }
@@ -1692,6 +1707,7 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
+          Runtime::add_flops(this->used_elements() * 3);
           Arch::Defect<Mem_>::csr(r.elements(), y.elements(), this->val(), this->col_ind(),
                                          this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
         }
@@ -1701,6 +1717,7 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
+          Runtime::add_flops(this->used_elements() * 3);
           Arch::Axpy<Mem_>::csr(r.elements(), alpha, x.elements(), y.elements(),
                                        this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }

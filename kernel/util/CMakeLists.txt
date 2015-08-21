@@ -8,7 +8,20 @@ ADD_LIBRARY(kernel-util STATIC
   exception.cpp
   mesh_streamer.cpp
   property_map.cpp
+  runtime.cpp
 )
+
+
+#link against mpi if available
+TARGET_LINK_LIBRARIES(kernel-util ${MPI_C_LIBRARIES})
+if(MPI_C_COMPILE_FLAGS)
+  set_target_properties(kernel-util PROPERTIES
+    COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
+endif()
+if(MPI_C_LINK_FLAGS)
+  set_target_properties(kernel-util PROPERTIES
+    LINK_FLAGS "${MPI_C_LINK_FLAGS}")
+endif()
 
 if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-util-cuda
