@@ -5,9 +5,18 @@
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/lafem/preconditioner.hpp>
-#include <kernel/lafem/proto_solver.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
+#include <kernel/solver/basic_vcycle.hpp>
+#include <kernel/solver/bicgstab.hpp>
+#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/pcg.hpp>
+#include <kernel/solver/ilu_precond.hpp>
+#include <kernel/solver/richardson.hpp>
+#include <kernel/solver/scale_precond.hpp>
+#include <kernel/solver/schwarz_precond.hpp>
+#include <kernel/solver/schur_precond.hpp>
+#include <kernel/solver/jacobi_precond.hpp>
 
 #include <control/domain/unit_cube_domain_control.hpp>
 #include <control/stokes_basic.hpp>
@@ -217,10 +226,10 @@ namespace StokesPoiseuille2D
     std::deque<AssemblerLevelType*> asm_levels;
     std::deque<TransferLevelType*> transfer_levels;
 
-    const std::size_t num_levels = domain_levels.size();
+    const Index num_levels = Index(domain_levels.size());
 
     // create stokes and system levels
-    for(std::size_t i(0); i < num_levels; ++i)
+    for(Index i(0); i < num_levels; ++i)
     {
       asm_levels.push_back(new AssemblerLevelType(*domain_levels.at(i)));
       system_levels.push_back(new SystemLevelType());
@@ -237,7 +246,7 @@ namespace StokesPoiseuille2D
       std::cout << "Creating gates..." << std::endl;
     }
 
-    for(std::size_t i(0); i < num_levels; ++i)
+    for(Index i(0); i < num_levels; ++i)
     {
       asm_levels.at(i)->assemble_gates(layer, *system_levels.at(i));
     }
@@ -249,7 +258,7 @@ namespace StokesPoiseuille2D
       std::cout << "Assembling system matrices..." << std::endl;
     }
 
-    for(std::size_t i(0); i < num_levels; ++i)
+    for(Index i(0); i < num_levels; ++i)
     {
       asm_levels.at(i)->assemble_system_matrix(*system_levels.at(i));
     }
@@ -264,7 +273,7 @@ namespace StokesPoiseuille2D
       std::cout << "Assembling system filters..." << std::endl;
     }
 
-    for(std::size_t i(0); i < num_levels; ++i)
+    for(Index i(0); i < num_levels; ++i)
     {
       asm_levels.at(i)->assemble_system_filter(*system_levels.at(i));
     }
@@ -276,7 +285,7 @@ namespace StokesPoiseuille2D
       std::cout << "Assembling transfer matrices..." << std::endl;
     }
 
-    for(std::size_t i(0); (i+1) < num_levels; ++i)
+    for(Index i(0); (i+1) < num_levels; ++i)
     {
       asm_levels.at(i+1)->assemble_system_transfer(*transfer_levels.at(i), *asm_levels.at(i));
     }
@@ -308,30 +317,27 @@ namespace StokesPoiseuille2D
     /* ***************************************************************************************** */
 
     // our A/S block solvers
-    std::shared_ptr<LAFEM::SolverInterface<GlobalVeloVector>> solver_a(nullptr);
-    std::shared_ptr<LAFEM::SolverInterface<GlobalPresVector>> solver_s(nullptr);
+    std::shared_ptr<Solver::SolverBase<GlobalVeloVector>> solver_a(nullptr);
+    std::shared_ptr<Solver::SolverBase<GlobalPresVector>> solver_s(nullptr);
 
     // create a multigrid cycle A-solver
     {
       auto mgv = std::make_shared<
-        LAFEM::BasicMGVCycle<
+        Solver::BasicVCycle<
           typename SystemLevelType::GlobalMatrixBlockA,
           typename SystemLevelType::GlobalVeloFilter,
           typename TransferLevelType::GlobalVeloTransferMatrix
         > > ();
 
-      // scaling factor
-      DataType omega = DataType(0.1);
-
       // create coarse grid solver
-      auto coarse_solver = std::make_shared<LAFEM::ScalePrecond<GlobalVeloVector>>(omega);
+      auto coarse_solver = Solver::new_jacobi_precond(system_levels.front()->matrix_a, system_levels.front()->filter_velo);
       mgv->set_coarse_level(system_levels.front()->matrix_a, system_levels.front()->filter_velo, coarse_solver);
 
       // push levels into MGV
       auto jt = transfer_levels.begin();
       for(auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
       {
-        auto smoother  = std::make_shared<LAFEM::ScalePrecond<GlobalVeloVector>>(omega);
+        auto smoother = Solver::new_jacobi_precond((*it)->matrix_a, (*it)->filter_velo);
         mgv->push_level((*it)->matrix_a, (*it)->filter_velo, (*jt)->prol_velo, (*jt)->rest_velo, smoother, smoother);
       }
 
@@ -342,41 +348,29 @@ namespace StokesPoiseuille2D
     // create S-solver
     {
       // create a local ILU(0) for S
-      auto loc_ilu = std::make_shared<
-        LAFEM::PreconWrapper<
-          typename SystemLevelType::LocalScalarMatrix,
-          LAFEM::ILUPreconditioner> > (*the_system_level.matrix_s, Index(0));
+      auto loc_ilu = Solver::new_ilu_precond(*the_system_level.matrix_s, *the_system_level.filter_pres, Index(0));
 
-      // make it Scharz...
-      auto glob_ilu = std::make_shared<Global::SchwarzPrecond<GlobalPresVector>>(loc_ilu);
+      // make it Schwarz...
+      auto glob_ilu = Solver::new_schwarz_precond(loc_ilu, the_system_level.filter_pres);
 
       // set our S-solver
       solver_s = glob_ilu;
     }
 
     // create a global Schur-Complement preconditioner
-    auto schur = std::make_shared<
-      Global::SchurPrecond<
-        typename SystemLevelType::LocalMatrixBlockA,
-        typename SystemLevelType::LocalMatrixBlockB,
-        typename SystemLevelType::LocalMatrixBlockD,
-        typename SystemLevelType::LocalVeloFilter,
-        typename SystemLevelType::LocalPresFilter
-      > > (
+    auto schur = Solver::new_schur_precond(
+        the_system_level.matrix_a,
         the_system_level.matrix_b,
         the_system_level.matrix_d,
         the_system_level.filter_velo,
         the_system_level.filter_pres,
         solver_a,
         solver_s,
-        LAFEM::SchurType::full
+        Solver::SchurType::full
       );
 
     // create our solver
-    //auto solver = std::make_shared<LAFEM::FixPointSolver<GlobalSystemMatrix, GlobalSystemFilter>>(matrix, filter, schur);
-    //auto solver = std::make_shared<LAFEM::BiCGStabSolver<GlobalSystemMatrix, GlobalSystemFilter>>(matrix, filter, schur);
-    auto solver = std::make_shared<LAFEM::PCGSolver<GlobalSystemMatrix, GlobalSystemFilter>>(matrix, filter, schur);
-    //auto solver = std::make_shared<LAFEM::FGMRESSolver<GlobalSystemMatrix, GlobalSystemFilter>>(matrix, filter, 8, 0.0, schur);
+    auto solver = Solver::new_pcg(matrix, filter, schur);
 
     // enable plotting
     solver->set_plot(rank == 0);
@@ -387,7 +381,7 @@ namespace StokesPoiseuille2D
     solver->init();
 
     // solve
-    solver->correct(vec_sol, vec_rhs);
+    Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
 
     // release solver
     solver->done();

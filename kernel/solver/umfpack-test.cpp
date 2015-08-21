@@ -1,20 +1,22 @@
 #include <test_system/test_system.hpp>
+
 #ifdef FEAST_HAVE_UMFPACK
-#include <kernel/lafem/umfpack.hpp>
+#include <kernel/solver/umfpack.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
+using namespace FEAST::Solver;
 using namespace FEAST::TestSystem;
 
 class UmfpackTest :
-  public TestSystem::TaggedTest<Mem::Main, double>
+  public TestSystem::FullTaggedTest<Mem::Main, double, Index>
 {
 public:
-  typedef SparseMatrixCSR<Mem::Main, double> MatrixType;
-  typedef DenseVector<Mem::Main, double> VectorType;
+  typedef SparseMatrixCSR<Mem::Main, double, Index> MatrixType;
+  typedef DenseVector<Mem::Main, double, Index> VectorType;
 
-  UmfpackTest() : TestSystem::TaggedTest<Mem::Main, double>("UmfpackTest") {}
+  UmfpackTest() : TestSystem::FullTaggedTest<Mem::Main, double, Index>("UmfpackTest") {}
 
   virtual void run() const
   {
@@ -39,9 +41,13 @@ public:
 
     {
       // create an UMFPACK solver
-      Umfpack umfpack(&mat_sys);
+      Umfpack umfpack(mat_sys);
+      // initialse
+      umfpack.init();
       // solve
-      umfpack.solve(vec_sol, vec_rhs);
+      umfpack.apply(vec_sol, vec_rhs);
+      // release
+      umfpack.done();
     }
 
     // subtract reference solution

@@ -48,9 +48,9 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
-// FEAST-LAFEM provisional solver includes
-#include <kernel/lafem/preconditioner.hpp>                 // for JacobiPreconditioner
-#include <kernel/lafem/proto_solver.hpp>                   // for BiCGStabSolver
+// FEAST-Solver includes
+#include <kernel/solver/jacobi_precond.hpp>                // for JacobiPrecond
+#include <kernel/solver/bicgstab.hpp>                      // for BiCGStab
 
 // we need std::vector as a container for our level hierarchy
 #include <vector>
@@ -432,7 +432,7 @@ namespace TutorialX1
     typedef LAFEM::UnitFilter<MemType, DataType> FilterType;
 
     // Define the smoother; this is the base-class for all solvers and preconditioners
-    typedef LAFEM::SolverInterface<VectorType> SmootherType;
+    typedef Solver::SolverBase<VectorType> SmootherType;
 
     // Define everything that is actually needed:
     MeshType mesh;
@@ -599,9 +599,7 @@ namespace TutorialX1
       for(Index i(0); i < numsteps; ++i)
       {
         // apply smoother
-        smoother->solve(vec_cor, vec_def);
-        // apply correction filter
-        filter.filter_cor(vec_cor);
+        smoother->apply(vec_cor, vec_def);
         // update solution vector
         vec_sol.axpy(vec_cor, vec_sol);
         // compute new defect vector
@@ -716,9 +714,7 @@ namespace TutorialX1
       (*it)->assemble_system(andicore_data);
 
       // create a damped Jacobi smoother
-      (*it)->set_smoother(
-        std::make_shared<LAFEM::PreconWrapper<SystemLevel::MatrixType, LAFEM::JacobiPreconditioner>>((*it)->mat_sys, 0.7)
-      );
+      (*it)->set_smoother(Solver::new_jacobi_precond((*it)->mat_sys, (*it)->filter, DataType(0.7)));
     }
 
     // now let's create a coarse-grid solver
@@ -726,20 +722,14 @@ namespace TutorialX1
     // Note: We need to create the coarse grid solver on the heap because it references data which
     // is owned by our level objects. These are going to be deleted at the end of this function and,
     // if we created the solver on the stack, it would have orphaned references afterwards.
-    auto coarse_solver = std::make_shared<LAFEM::BiCGStabSolver<SystemLevel::MatrixType, SystemLevel::FilterType>>
-      (levels.front()->mat_sys, levels.front()->filter, levels.front()->smoother);
+    auto coarse_solver = Solver::new_bicgstab(levels.front()->mat_sys, levels.front()->filter, levels.front()->smoother);
 
     // configure the coarse grid solver
     coarse_solver->set_tol_rel(1E-5);
     coarse_solver->set_max_iter(50);
 
     // let's initialise the coarse grid solver
-    if(!coarse_solver->init())
-    {
-      // this shouldn't have happened...
-      std::cerr << "ERROR: Failed to initialse coarse grid solver!" << std::endl;
-      return 1;
-    }
+    coarse_solver->init();
 
     // assemble rhs/sol on finest level
     levels.back()->assemble_rhs_sol(andicore_data);
@@ -761,8 +751,8 @@ namespace TutorialX1
       }
 
       // apply the coarse grid solver and check its status
-      LAFEM::SolverStatus cgs_status = coarse_solver->solve(levels.front()->vec_sol, levels.front()->vec_rhs);
-      if(!status_success(cgs_status))
+      Solver::Status cgs_status = coarse_solver->apply(levels.front()->vec_sol, levels.front()->vec_rhs);
+      if(!Solver::status_success(cgs_status))
       {
         std::cerr << "ERROR: Coarse grid solver broke down!" << std::endl;
         break;

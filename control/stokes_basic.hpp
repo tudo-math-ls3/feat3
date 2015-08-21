@@ -33,7 +33,6 @@
 #include <kernel/global/vector.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/filter.hpp>
-#include <kernel/global/solver.hpp>
 #include <kernel/global/mean_filter.hpp>
 
 #include <control/domain/domain_control.hpp>

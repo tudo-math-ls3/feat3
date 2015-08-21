@@ -20,8 +20,10 @@
 #include <kernel/lafem/sparse_matrix_banded.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/lafem/matrix_mirror.hpp>
-#include <kernel/lafem/proto_solver.hpp>
 #include <kernel/lafem/none_filter.hpp>
+#include <kernel/solver/jacobi_precond.hpp>
+#include <kernel/solver/diagonal_precond.hpp>
+#include <kernel/solver/pcg.hpp>
 
 #include <deque>
 #include <vector>
@@ -38,6 +40,7 @@ namespace MatrixCond
 
   typedef DenseVector<MemType, DataType, IndexType> VectorType;
   typedef SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
+  typedef NoneFilter<MemType, DataType, IndexType> FilterType;
 
   class MatrixATA
   {
@@ -278,17 +281,13 @@ namespace MatrixCond
       return true;
     }
 
-    template<typename Matrix_, typename Precond_>
-    int calc_min_sv(const Matrix_& matrix, Precond_& precon, VectorType& vec)
+    template<typename Matrix_, typename Filter_, typename Precond_>
+    int calc_min_sv(const Matrix_& matrix, const Filter_& filter, Precond_& precon, VectorType& vec)
     {
       const DataType eps_sqr = Math::sqr(Math::eps<DataType>());
 
-      // create none filter
-      typedef LAFEM::NoneFilter<MemType, DataType, IndexType> FilterType;
-      FilterType filter;
-
       // create CG solver
-      LAFEM::PCGSolver<Matrix_, FilterType> solver(matrix, filter, precon);
+      Solver::PCG<Matrix_, Filter_> solver(matrix, filter, precon);
       solver.init();
       solver.set_max_iter(pcg_maxiter);
 
@@ -301,12 +300,12 @@ namespace MatrixCond
       for(num_iter = 1; num_iter <= max_iter; ++num_iter)
       {
         // appy mat-vec product
-        LAFEM::SolverStatus status = solver.solve(vec_tmp, vec);
+        Solver::Status status = solver.apply(vec_tmp, vec);
         switch(status)
         {
-        case SolverStatus::diverged:
-        case SolverStatus::aborted:
-        case SolverStatus::undefined:
+        case Solver::Status::diverged:
+        case Solver::Status::aborted:
+        case Solver::Status::undefined:
           return -2;
         default:
           break;
@@ -346,17 +345,17 @@ namespace MatrixCond
       return -1;
     }
 
-    int calc_min_sv_spd(const MatrixType& matrix, VectorType& vec)
+    int calc_min_sv_spd(const MatrixType& matrix, const FilterType& filter, VectorType& vec)
     {
       std::cout << "Computing minimal singular value by powering PCG(A)..." << std::endl;
-      auto precon = std::make_shared<LAFEM::PreconWrapper<MatrixType, LAFEM::JacobiPreconditioner>>(matrix);
-      int rtn = calc_min_sv(matrix, precon, vec);
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      int rtn = calc_min_sv(matrix, filter, precon, vec);
       if(rtn > 0)
         value = DataType(1) / value;
       return rtn;
     }
 
-    int calc_min_sv_ata(const MatrixType& matrix, const MatrixType& transpo, VectorType& vec)
+    int calc_min_sv_ata(const MatrixType& matrix, const MatrixType& transpo, const FilterType& filter, VectorType& vec)
     {
       std::cout << "Computing minimal singular value by powering PCD(A^T*A)..." << std::endl;
 
@@ -372,10 +371,10 @@ namespace MatrixCond
       }
 
       // create a diagonal preconditioner
-      auto precon = std::make_shared<LAFEM::PreconWrapper<MatrixATA, LAFEM::DiagonalPreconditioner>>(std::move(vdiag));
+      auto precon = Solver::new_diagonal_precond(vdiag, filter);
 
       // compute minsv
-      int rtn = calc_min_sv(mat_ata, precon, vec);
+      int rtn = calc_min_sv(mat_ata, filter, precon, vec);
       if(rtn > 0)
         value = DataType(1) / Math::sqrt(value);
       return rtn;
@@ -569,6 +568,9 @@ namespace MatrixCond
     // create virtual A^T*A matrix
     MatrixATA mat_ata(matrix, transpo);
 
+    // create a dummy filter
+    FilterType filter;
+
     // compute maximal singular value
     if(max_sv.want)
     {
@@ -625,9 +627,9 @@ namespace MatrixCond
       // compute singular value by A^T*A
       int ret = 0;
       if(assume_spd)
-        ret = min_sv.calc_min_sv_spd(matrix, vec_svmin);
+        ret = min_sv.calc_min_sv_spd(matrix, filter, vec_svmin);
       else
-        ret = min_sv.calc_min_sv_ata(matrix, transpo, vec_svmin);
+        ret = min_sv.calc_min_sv_ata(matrix, transpo, filter, vec_svmin);
 
       // everything okay?
       if(ret > 0)

@@ -72,9 +72,9 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
-// FEAST-LAFEM provisional solver includes
-#include <kernel/lafem/preconditioner.hpp>                 // for NonePreconditioner
-#include <kernel/lafem/proto_solver.hpp>                   // for BiCGStabSolver
+// FEAST-Solver includes
+#include <kernel/solver/spai_precond.hpp>                  // for SPAIPrrecond
+#include <kernel/solver/bicgstab.hpp>                      // for BiCGStab
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -580,10 +580,10 @@ namespace Tutorial03
     std::cout << "Solving linear system..." << std::endl;
 
     // Create a SPAI preconditioner
-    auto precond = std::make_shared<LAFEM::PreconWrapper<MatrixType, LAFEM::SPAIPreconditioner>>(matrix, matrix.layout());
+    auto precond = Solver::new_spai_precond(matrix, filter, matrix.layout());
 
     // Create a preconditioned BiCGStab solver
-    auto solver = std::make_shared<LAFEM::BiCGStabSolver<MatrixType, FilterType>>(matrix, filter, precond);
+    auto solver = Solver::new_bicgstab(matrix, filter, precond);
 
     // Enable convergence plot
     solver->set_plot(true);
@@ -591,8 +591,8 @@ namespace Tutorial03
     // Initialise the solver
     solver->init();
 
-    // Correct our initial solution vector
-    solver->correct(vec_sol, vec_rhs);
+    // Solve our linear system
+    Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
 
     // And release the solver
     solver->done();

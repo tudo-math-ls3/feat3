@@ -3,68 +3,24 @@ cmake_minimum_required (VERSION 2.8)
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-ADD_SUBDIRECTORY( arch )
-
 # list of lafem source files
-# currently empty, but neccessary for sub library dependencies
-# TODO remove dummy as soon as possible
-SET (kernel-lafem-list
-  empty.cpp
+SET (kernel-solver-list
+  umfpack.cpp
   )
 
-ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
-TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch kernel-util kernel-adjacency)
-if (FEAST_BACKENDS_CUDA)
-  TARGET_LINK_LIBRARIES(kernel-lafem kernel-util-cuda)
-endif(FEAST_BACKENDS_CUDA)
+if (FEAST_HAVE_UMFPACK)
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/SuiteSparse_config/")
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/AMD/Include/")
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/UMFPACK/Include/")
+endif (FEAST_HAVE_UMFPACK)
 
-if (FEAST_BACKENDS_CUDA)
-  CUDA_ADD_LIBRARY(kernel-lafem-cuda
-    empty.cpp
-    cusolver.cu
-    STATIC
-  )
-  if (FEAST_HAVE_CUSOLVER)
-    #TODO replace by FindCUDA makro, once cusolve lib has been added there
-    find_library(CUDA_cusolver_LIBRARY NAMES cusolver PATHS "${CUDA_TOOLKIT_ROOT_DIR}/lib64")
-    target_link_libraries(kernel-lafem-cuda ${CUDA_cusolver_LIBRARY})
-  endif (FEAST_HAVE_CUSOLVER)
-  target_link_libraries(kernel-lafem-cuda ${CUDA_cusparse_LIBRARY})
-  TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-cuda)
-endif(FEAST_BACKENDS_CUDA)
+ADD_LIBRARY(kernel-solver STATIC ${kernel-solver-list})
+TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 
-
-# list of lafem tests
+# list of solver tests
 SET (test_list
-  bicgstab-test
-  bicgstab-meta-test
-  cusolver-test
-  meta_to_scalar-test
-  dense_matrix-test
-  dense_vector-test
-  dense_vector_blocked-test
-  meta_filter-test
-  meta_matrix-apply-test
-  meta_matrix-io-test
-  meta_mirror-test
-  meta_vector-axpy-test
-  meta_vector-comp_prod-test
-  meta_vector-comp_invert-test
-  meta_vector-dot-norm2-test
-  meta_vector-scale-test
-  pointstar_factory-test
-  richardson-test
-  sparse_matrix_conversion-test
-  sparse_matrix_banded-test
-  sparse_matrix_coo-test
-  sparse_matrix_csr-test
-  sparse_matrix_csr_blocked-test
-  sparse_matrix_ell-test
-  sparse_vector-test
-  sparse_vector_blocked-test
-  unit_filter-test
-  unit_filter_blocked-test
-  vector_mirror-test
+  basic_solver-test
+  umfpack-test
 )
 
 # create all tests
@@ -79,7 +35,7 @@ FOREACH (test ${test_list} )
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} none)
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/solver/${test} none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
   if (FEAST_VALGRIND)
     SET_PROPERTY(TEST ${test}_none PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
@@ -93,7 +49,7 @@ FOREACH (test ${test_list} )
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} main)
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/solver/${test} main)
   SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
   if (FEAST_VALGRIND)
     SET_PROPERTY(TEST ${test}_main PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
@@ -107,7 +63,7 @@ FOREACH (test ${test_list} )
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${CUDA_MEMCHECK_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} cuda cudadevicereset)
+    --test-command ${CUDA_MEMCHECK_EXE} ${FEAST_BINARY_DIR}/kernel/solver/${test} cuda cudadevicereset)
   SET_PROPERTY(TEST ${test}_cuda PROPERTY LABELS "cuda")
   if (FEAST_CUDAMEMCHECK AND FEAST_BACKENDS_CUDA)
     SET_PROPERTY(TEST ${test}_cuda PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors")
@@ -117,7 +73,7 @@ FOREACH (test ${test_list} )
 ENDFOREACH(test)
 
 # add all tests to lafem_tests
-ADD_CUSTOM_TARGET(lafem_tests DEPENDS ${test_list})
+ADD_CUSTOM_TARGET(solver_tests DEPENDS ${test_list})
 
 # build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests lafem_tests)
+ADD_DEPENDENCIES(tests solver_tests)

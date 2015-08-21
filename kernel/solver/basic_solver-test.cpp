@@ -7,10 +7,19 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/none_filter.hpp>
-#include <kernel/lafem/proto_solver.hpp>
+#include <kernel/solver/bicgstab.hpp>
+#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/pcg.hpp>
+#include <kernel/solver/richardson.hpp>
+#include <kernel/solver/ilu_precond.hpp>
+#include <kernel/solver/jacobi_precond.hpp>
+#include <kernel/solver/sor_precond.hpp>
+#include <kernel/solver/ssor_precond.hpp>
+#include <kernel/solver/spai_precond.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
+using namespace FEAST::Solver;
 using namespace FEAST::TestSystem;
 
 template<
@@ -18,7 +27,7 @@ template<
   typename MemType_,
   typename DataType_,
   typename IndexType_>
-class ProtoSolverTest :
+class BasicSolverTest :
   public FullTaggedTest<MemType_, DataType_, IndexType_>
 {
 public:
@@ -29,8 +38,8 @@ public:
   typedef NoneFilter<MemType_, DataType, IndexType> FilterType;
 
 public:
-  ProtoSolverTest() :
-    FullTaggedTest<MemType_, DataType, IndexType>("ProtoSolverTest")
+  BasicSolverTest() :
+    FullTaggedTest<MemType_, DataType, IndexType>("BasicSolverTest")
   {
   }
 
@@ -40,11 +49,10 @@ public:
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
     // initialise solver
-    bool okay = solver.init();
-    TEST_CHECK_MSG(okay, (String("Failed to initialise solver: '") + name + ("'")));
+    solver.init();
 
     // solve
-    SolverStatus status = solver.solve(vec_sol, vec_rhs);
+    Status status = solver.apply(vec_sol, vec_rhs);
     TEST_CHECK_MSG(status_success(status), (String("Failed to solve: '") + name + ("'")));
 
     // release solver
@@ -54,22 +62,6 @@ public:
     vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
     DataType d = vec_sol.norm2sqr();
     TEST_CHECK_EQUAL_WITHIN_EPS(d, DataType(0), tol);
-  }
-
-#ifdef FEAST_HAVE_UMFPACK
-  template<typename IT_>
-  void test_umfpack(const SparseMatrixCSR<Mem::Main, double, IT_>& matrix, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs) const
-  {
-    std::cout << "Testing UMFPACK..." << std::endl;
-    UmfpackSolver solver(matrix);
-    test_solver("Umfpack", solver, vec_sol, vec_ref, vec_rhs);
-  }
-#endif // FEAST_HAVE_UMFPACK
-
-  template<typename MT_>
-  void test_umfpack(const MT_&, VectorType&, const VectorType&, const VectorType&) const
-  {
-    // nothing to do
   }
 
   virtual void run() const
@@ -107,51 +99,57 @@ public:
     // test plain CG
     {
       // create a CG solver
-      PCGSolver<MatrixType, FilterType> solver(matrix, filter);
+      PCG<MatrixType, FilterType> solver(matrix, filter);
       test_solver("CG", solver, vec_sol, vec_ref, vec_rhs);
+    }
+
+    // test PCG-JAC
+    {
+      // create a Jacobi preconditioner
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      // create a CG solver
+      PCG<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs);
     }
 
     // test PCG-SSOR
     {
       // create a SSOR preconditioner
-      auto precon = std::make_shared<PreconWrapper<MatrixType, LAFEM::SSORPreconditioner>>(matrix);
+      auto precon = Solver::new_ssor_precond(matrix, filter);
       // create a CG solver
-      PCGSolver<MatrixType, FilterType> solver(matrix, filter, precon);
+      PCG<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("PCG-SSOR", solver, vec_sol, vec_ref, vec_rhs);
     }
 
     // test FGMRES-ILU
     {
       // create an SPAI preconditioner
-      auto precon = std::make_shared<PreconWrapper<MatrixType, SPAIPreconditioner>>(matrix, matrix.layout());
-      // create a fix-point solver
-      FGMRESSolver<MatrixType, FilterType> solver(matrix, filter, 16, 0.0, precon);
+      auto precon = Solver::new_spai_precond(matrix, filter, matrix.layout());
+      // create a FMGRES solver
+      FGMRES<MatrixType, FilterType> solver(matrix, filter, 16, 0.0, precon);
       test_solver("FGMRES(16)-SPAI", solver, vec_sol, vec_ref, vec_rhs);
     }
 
-    // test Fix-Point-SOR
+    // test Richardson-SOR
     {
       // create a SOR preconditioner
-      auto precon = std::make_shared<PreconWrapper<MatrixType, SORPreconditioner>>(matrix, DataType(1.7));
-      // create a fix-point solver
-      FixPointSolver<MatrixType, FilterType> solver(matrix, filter, precon);
+      auto precon = Solver::new_sor_precond(matrix, filter, DataType(1.7));
+      // create a Richardson solver
+      Richardson<MatrixType, FilterType> solver(matrix, filter, precon);
       solver.set_max_iter(1000);
-      test_solver("FixPoint-SOR(1.7)", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("Richardson-SOR(1.7)", solver, vec_sol, vec_ref, vec_rhs);
     }
 
     // test BiCGStab-ILU(0)
     {
       // create a ILU(0) preconditioner
-      auto precon = std::make_shared<PreconWrapper<MatrixType, ILUPreconditioner>>(matrix, Index(0));
+      auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
       // create a BiCGStab solver
-      BiCGStabSolver<MatrixType, FilterType> solver(matrix, filter, precon);
+      BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("BiCGStab-ILU(0)", solver, vec_sol, vec_ref, vec_rhs);
     }
-
-    // test UMFPACK
-    test_umfpack(matrix, vec_sol, vec_ref, vec_rhs);
   }
 };
 
-ProtoSolverTest<SparseMatrixCSR, Mem::Main, double, Index> proto_solver_csr_generic_double_index;
-ProtoSolverTest<SparseMatrixELL, Mem::Main, double, Index> proto_solver_ell_generic_double_index;
+BasicSolverTest<SparseMatrixCSR, Mem::Main, double, Index> basic_solver_csr_generic_double_index;
+BasicSolverTest<SparseMatrixELL, Mem::Main, double, Index> basic_solver_ell_generic_double_index;

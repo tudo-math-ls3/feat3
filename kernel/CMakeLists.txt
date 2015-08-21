@@ -12,6 +12,7 @@ ADD_SUBDIRECTORY( scarc )
 ADD_SUBDIRECTORY( geometry )
 ADD_SUBDIRECTORY( lafem )
 ADD_SUBDIRECTORY( space )
+ADD_SUBDIRECTORY( solver )
 ADD_SUBDIRECTORY( trafo )
 ADD_SUBDIRECTORY( util )
 
@@ -39,6 +40,7 @@ TARGET_LINK_LIBRARIES (feast
 # kernel-geometry
   kernel-lafem
 # kernel-space
+  kernel-solver
 # kernel-trafo
   kernel-util
 )

@@ -6,7 +6,6 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/lafem/preconditioner.hpp>
-#include <kernel/lafem/proto_solver.hpp>
 #include <kernel/assembly/mean_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
@@ -17,6 +16,13 @@
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/util/time_stamp.hpp>
+#include <kernel/solver/basic_vcycle.hpp>
+#include <kernel/solver/bicgstab.hpp>
+#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/pcg.hpp>
+#include <kernel/solver/precon_wrapper.hpp>
+#include <kernel/solver/richardson.hpp>
+#include <kernel/solver/scale_precond.hpp>
 
 #include <control/domain/unit_cube_domain_control.hpp>
 #include <control/scalar_basic.hpp>
@@ -273,7 +279,7 @@ namespace PoissonNeumann2D
 
     // create a multigrid cycle
     auto mgv = std::make_shared<
-      LAFEM::BasicMGVCycle<
+      Solver::BasicVCycle<
       typename SystemLevelType::GlobalSystemMatrix,
       typename SystemLevelType::GlobalSystemFilter,
       typename TransferLevelType::GlobalSystemTransferMatrix
@@ -283,22 +289,22 @@ namespace PoissonNeumann2D
     DataType omega = DataType(0.2);
 
     // create coarse grid solver
-    auto coarse_solver = std::make_shared<LAFEM::ScalePrecond<GlobalSystemVector>>(omega);
+    auto coarse_solver = Solver::new_scale_precond(system_levels.front()->filter_sys, omega);
     mgv->set_coarse_level(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, coarse_solver);
 
     // push levels into MGV
     auto jt = transfer_levels.begin();
     for (auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
     {
-      auto smoother = std::make_shared<LAFEM::ScalePrecond<GlobalSystemVector>>(omega);
+      auto smoother = Solver::new_scale_precond((*it)->filter_sys, omega);
       mgv->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother);
     }
 
     // create our solver
-    //auto solver = std::make_shared<LAFEM::FixPointSolver<GlobalSystemMatrix, GlobalSystemFilter>>(matrix, filter, mgv);
-    //auto solver = std::make_shared<LAFEM::BiCGStabSolver<GlobalSystemMatrix, GlobalSystemFilter>>(matrix, filter, mgv);
-    auto solver = std::make_shared<LAFEM::PCGSolver<GlobalSystemMatrix, GlobalSystemFilter>>(matrix, filter, mgv);
-    //auto solver = std::make_shared<LAFEM::FGMRESSolver<GlobalSystemMatrix, GlobalSystemFilter>>(matrix, filter, 8, 0.0, mgv);
+    auto solver = Solver::new_pcg(matrix, filter, mgv);
+    //auto solver = Solver::new_bicgstab(matrix, filter, mgv);
+    //auto solver = Solver::new_fmgres(matrix, filter, 8, 0.0, mgv);
+    //auto solver = Solver::new_richardson(matrix, filter, mgv);
 
     // enable plotting
     solver->set_plot(rank == 0);
@@ -311,7 +317,7 @@ namespace PoissonNeumann2D
     solver->init();
 
     // solve
-    solver->correct(vec_sol, vec_rhs);
+    Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
 
     // release solver
     solver->done();

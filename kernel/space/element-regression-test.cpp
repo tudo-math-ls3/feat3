@@ -15,8 +15,8 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/lafem/unit_filter.hpp>
-#include <kernel/lafem/preconditioner.hpp>
-#include <kernel/lafem/proto_solver.hpp>
+#include <kernel/solver/ssor_precond.hpp>
+#include <kernel/solver/pcg.hpp>
 #include <kernel/util/time_stamp.hpp>
 
 #include <kernel/space/argyris/element.hpp>
@@ -385,10 +385,10 @@ namespace ElementRegression
     virtual void solve_system(const MatrixType& matrix, const FilterType& filter, VectorType& vec_sol, const VectorType& vec_rhs) const
     {
       // create a SSOR preconditioner
-      auto precon = std::make_shared<LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner>>(matrix, DataType(1));
+      auto precon = Solver::new_ssor_precond(matrix, filter, DataType(1));
 
       // create a PCG solver
-      LAFEM::PCGSolver<MatrixType, FilterType> solver(matrix, filter, precon);
+      Solver::PCG<MatrixType, FilterType> solver(matrix, filter, precon);
 
       // configure solver
       solver.set_max_iter(1000);
@@ -396,11 +396,11 @@ namespace ElementRegression
       //solver.set_plot(true);
 
       // initialise solver
-      TEST_CHECK_MSG(solver.init(), "Failed to initialise CG solver!");
+      solver.init();
 
       // apply solver
-      LAFEM::SolverStatus status = solver.correct(vec_sol, vec_rhs);
-      TEST_CHECK_MSG(LAFEM::status_success(status), "Failed to solve linear system!");
+      Solver::Status status = solver.correct(vec_sol, vec_rhs);
+      TEST_CHECK_MSG(Solver::status_success(status), "Failed to solve linear system!");
 
       // release solver
       solver.done();

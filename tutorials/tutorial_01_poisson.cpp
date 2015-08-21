@@ -82,9 +82,9 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
-// FEAST-LAFEM provisional solver includes
-#include <kernel/lafem/preconditioner.hpp>                 // for SSORPreconditioner
-#include <kernel/lafem/proto_solver.hpp>                   // for PCGSolver
+// FEAST-Solver includes
+#include <kernel/solver/ssor_precond.hpp>                  // for SSORPrecond
+#include <kernel/solver/pcg.hpp>                           // for PCG
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -370,16 +370,15 @@ namespace Tutorial01
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Solver set-up
 
-    // Now we should configure our fancy ScaRC2 solver, but unfortunately, we're not that far...
-    // So we stick to a provisional PCG-SSOR solver for now...
+    // For this tutorial, we stick to a simple PCG-SSOR solver.
 
     std::cout << "Solving linear system..." << std::endl;
 
     // Create a SSOR preconditioner
-    auto precond = std::make_shared<LAFEM::PreconWrapper<MatrixType, LAFEM::SSORPreconditioner>>(matrix);
+    auto precond = Solver::new_ssor_precond(matrix, filter);
 
     // Create a PCG solver
-    auto solver = std::make_shared<LAFEM::PCGSolver<MatrixType, FilterType>>(matrix, filter, precond);
+    auto solver = Solver::new_pcg(matrix, filter, precond);
 
     // Enable convergence plot
     solver->set_plot(true);
@@ -387,8 +386,10 @@ namespace Tutorial01
     // Initialise the solver
     solver->init();
 
-    // Correct our initial solution vector
-    solver->correct(vec_sol, vec_rhs);
+    // Solve our linear system; for this, we pass our solver object as well as the initial solution
+    // vector, the right-hand-side vector, the matrix and the filter defining the linear system
+    // that we intend to solve.
+    Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
 
     // Release the solver
     solver->done();
