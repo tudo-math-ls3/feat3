@@ -205,7 +205,11 @@ namespace FEAST
         : public InstantiationPolicy<MemoryPool<Mem::CUDA>, Singleton>
     {
       private:
+        //map of allocated device memory patches
         std::map<void*, Intern::MemoryInfo> _pool;
+
+        //map of allocated pinned main memory patches
+        std::map<void*, Intern::MemoryInfo> _pinned_pool;
 
         /// default CTOR
         MemoryPool();
@@ -225,6 +229,16 @@ namespace FEAST
 
         /// release memory or decrease reference counter
         void release_memory(void * address);
+
+        /// allocate new pinned host memory
+        template <typename DT_>
+        DT_ * allocate_pinned_memory(const Index count);
+
+        /// increase pinned memory counter
+        void increase_pinned_memory(void * address);
+
+        /// release pinned memory or decrease reference counter
+        void release_pinned_memory(void * address);
 
         /// download memory chunk to host memory
         template <typename DT_>

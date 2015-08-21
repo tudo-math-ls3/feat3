@@ -117,6 +117,61 @@ void MemoryPool<Mem::CUDA>::release_memory(void * address)
 }
 
 template <typename DT_>
+DT_ * MemoryPool<Mem::CUDA>::allocate_pinned_memory(const Index count)
+{
+  DT_ * memory(nullptr);
+  if (count == 0)
+    return memory;
+
+  if (cudaErrorMemoryAllocation == cudaMallocHost((void**)&memory, count * sizeof(DT_)))
+    throw InternalError("MemoryPool<CUDA> cuda pinned allocation error (cudaErrorMemoryAllocation)");
+  if (memory == nullptr)
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA> pinned allocation error (null pointer returned)");
+  Intern::MemoryInfo mi;
+  mi.counter = 1;
+  mi.size = count * sizeof(DT_);
+  _pinned_pool.insert(std::pair<void*, Intern::MemoryInfo>(memory, mi));
+  return memory;
+}
+
+void MemoryPool<Mem::CUDA>::increase_pinned_memory(void * address)
+{
+  if (address == nullptr)
+    return;
+
+  std::map<void*, Intern::MemoryInfo>::iterator it(_pinned_pool.find(address));
+  if (it == _pool.end())
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::increase_pinned_memory: Memory address not found!");
+  else
+  {
+    it->second.counter = it->second.counter + 1;
+  }
+}
+
+void MemoryPool<Mem::CUDA>::release_pinned_memory(void * address)
+{
+  if (address == nullptr)
+    return;
+
+  std::map<void*, Intern::MemoryInfo>::iterator it(_pinned_pool.find(address));
+  if (it == _pool.end())
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::relase_pinned_memory: Memory address not found!");
+  else
+  {
+    if(it->second.counter == 1)
+    {
+      if (cudaSuccess != cudaFreeHost(address))
+        throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::release_memory: cudaFreeHost failed!");
+      _pool.erase(it);
+    }
+    else
+    {
+      it->second.counter = it->second.counter - 1;
+    }
+  }
+}
+
+template <typename DT_>
 void MemoryPool<Mem::CUDA>::download(DT_ * dest, const DT_ * const src, const Index count)
 {
   if (cudaSuccess != cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToHost))
