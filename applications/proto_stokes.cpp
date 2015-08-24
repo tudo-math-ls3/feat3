@@ -45,9 +45,9 @@ typedef Shape::Quadrilateral ShapeType;
 
 // geometry typedefs
 typedef Geometry::ConformalMesh<ShapeType> MeshType;
-typedef Geometry::MeshPart<MeshType> CellSetType;
+typedef Geometry::MeshPart<MeshType> MeshPartType;
 typedef Geometry::Factory<MeshType> MeshFactoryType;
-typedef Geometry::Factory<CellSetType> CellFactoryType;
+typedef Geometry::Factory<MeshPartType> CellFactoryType;
 
 // our standard trafo
 typedef Trafo::Standard::Mapping<MeshType> TrafoType;
@@ -149,7 +149,7 @@ typedef Assembly::StaticWrapperFunction<SolP, true, false> FuncSolP;
 // a cell factory for the coarse mesh: contains all boundary edges except for the ones
 // with a X-coordinate of 1.
 class MyCellSetFactory :
-  public Geometry::Factory<CellSetType>
+  public Geometry::Factory<MeshPartType>
 {
 public:
   virtual Index get_num_entities(int dim)
@@ -157,7 +157,7 @@ public:
     return Index(dim == 0 ? 4 : (dim == 1 ? 3 : 0));
   }
 
-  virtual void fill_target_sets(CellSetType::TargetSetHolderType& target_set_holder)
+  virtual void fill_target_sets(MeshPartType::TargetSetHolderType& target_set_holder)
   {
     Geometry::TargetSet& vt = target_set_holder.get_target_set<0>();
     vt[0] = 0;
@@ -170,12 +170,12 @@ public:
     et[2] = 2;
   }
 
-  virtual void fill_attribute_sets(CellSetType::AttributeHolderType& DOXY(attribute_holder))
+  virtual void fill_attribute_sets(MeshPartType::AttributeHolderType& DOXY(attribute_holder))
   {
     // do nothing as this class does not have any attributes
   }
 
-  virtual void fill_index_sets(CellSetType::IndexSetHolderType*& DOXY(index_set_holder))
+  virtual void fill_index_sets(MeshPartType::IndexSetHolderType*& DOXY(index_set_holder))
   {
     // do nothing as this class does not have a topology
   }
@@ -200,7 +200,7 @@ public:
   // the mesh for this level
   MeshType _mesh;
   // the cellset describing the boundary on this level
-  CellSetType _cell_set;
+  MeshPartType _cell_set;
   // a standard trafo object
   TrafoType _trafo;
   // the velocity space object
@@ -269,7 +269,7 @@ public:
   StokesLevel* refine() const
   {
     Geometry::StandardRefinery<MeshType> mesh_factory(_mesh);
-    Geometry::StandardRefinery<CellSetType, MeshType> cell_factory(_cell_set, _mesh);
+    Geometry::StandardRefinery<MeshPartType> cell_factory(_cell_set, _mesh);
     return new StokesLevel(mesh_factory, cell_factory);
   }
 
@@ -518,16 +518,16 @@ public:
 StokesLevel* build_coarse_level(std::size_t lvl)
 {
   MeshType* mesh = nullptr;
-  CellSetType* cell = nullptr;
+  MeshPartType* cell = nullptr;
 
   MeshFactoryType* mesh_factory = new Geometry::UnitCubeFactory<MeshType>();
   CellFactoryType* cell_factory = new MyCellSetFactory();
   for(std::size_t i(0); i < lvl; ++i)
   {
     MeshType* mesh2 = mesh;
-    CellSetType* cell2 = cell;
+    MeshPartType* cell2 = cell;
     mesh = new MeshType(*mesh_factory);
-    cell = new CellSetType(*cell_factory);
+    cell = new MeshPartType(*cell_factory);
     delete cell_factory;
     delete mesh_factory;
     if(cell2 != nullptr)
@@ -535,7 +535,7 @@ StokesLevel* build_coarse_level(std::size_t lvl)
     if(mesh2 != nullptr)
       delete mesh2;
     mesh_factory = new Geometry::StandardRefinery<MeshType>(*mesh);
-    cell_factory = new Geometry::StandardRefinery<CellSetType, MeshType>(*cell, *mesh);
+    cell_factory = new Geometry::StandardRefinery<MeshPartType>(*cell, *mesh);
   }
 
   StokesLevel* level = new StokesLevel(*mesh_factory, *cell_factory);

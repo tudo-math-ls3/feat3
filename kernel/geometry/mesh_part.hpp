@@ -1029,7 +1029,6 @@ namespace FEAST
             (*_index_set_holder, _target_set_holder, parent_ish);
 
         }
-
     }; // class MeshPart<ConformalMesh<Shape_>>
 
     /**
@@ -1108,7 +1107,6 @@ namespace FEAST
          * \returns The name of the parent mesh the constructed MeshPart will refer to
          */
         virtual String get_parent_identifier() const = 0;
-
     }; // class Factory<MeshPart<...>>
 
     /**
@@ -1116,15 +1114,13 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename Shape_, typename Parent_>
-    class StandardRefinery<MeshPart<Shape_>, Parent_> :
-    public Factory< MeshPart<Shape_> >
+    template<typename ParentMesh_>
+    class StandardRefinery< MeshPart<ParentMesh_> > :
+      public Factory< MeshPart<ParentMesh_> >
     {
       public:
         /// mesh type
-        typedef MeshPart<Shape_> MeshType;
-        /// parent type
-        typedef Parent_ ParentType;
+        typedef MeshPart<ParentMesh_> MeshType;
         /// shape type
         typedef typename MeshType::ShapeType ShapeType;
         /// Attribute set type
@@ -1143,7 +1139,8 @@ namespace FEAST
         /// coarse mesh reference
         const MeshType& _coarse_mesh;
         /// coarse parent reference
-        const ParentType& _parent;
+        //const ParentType& _parent;
+        const IndexSetHolderType* _parent_topology;
         /// number of entities for coarse mesh
         Index _num_entities_coarse[shape_dim + 1];
         /// number of entities for fine mesh
@@ -1159,22 +1156,46 @@ namespace FEAST
          * A reference to the coarse mesh that is to be refined.
          *
          * \param[in] parent
-         * A reference to the coarse parent.
+         * A reference to the coarse parent mesh.
          */
-        explicit StandardRefinery(const MeshType& coarse_mesh, const ParentType& parent) :
+        explicit StandardRefinery(const MeshType& coarse_mesh, const ParentMesh_& parent) :
           _coarse_mesh(coarse_mesh),
-          _parent(parent)
+          _parent_topology(parent.get_topology())
+        {
+          // get number of entities in coarse mesh
+          for(int i(0); i <= shape_dim; ++i)
           {
-            // get number of entities in coarse mesh
-            for(int i(0); i <= shape_dim; ++i)
-            {
-              _num_entities_fine[i] = _num_entities_coarse[i] = coarse_mesh.get_num_entities(i);
-              _num_entities_parent[i] = parent.get_num_entities(i);
-            }
-
-            // calculate number of entities in fine mesh
-            Intern::EntityCountWrapper<Intern::StandardRefinementTraits, ShapeType>::query(_num_entities_fine);
+            _num_entities_fine[i] = _num_entities_coarse[i] = coarse_mesh.get_num_entities(i);
+            _num_entities_parent[i] = parent.get_num_entities(i);
           }
+
+          // calculate number of entities in fine mesh
+          Intern::EntityCountWrapper<Intern::StandardRefinementTraits, ShapeType>::query(_num_entities_fine);
+        }
+
+        /**
+         * \brief Constructor.
+         *
+         * \param[in] coarse_mesh
+         * A reference to the coarse mesh that is to be refined.
+         *
+         * \param[in] parent_part
+         * A reference to the coarse parent mesh part.
+         */
+        explicit StandardRefinery(const MeshType& coarse_mesh, const MeshPart<ParentMesh_>& parent) :
+          _coarse_mesh(coarse_mesh),
+          _parent_topology(parent.get_topology())
+        {
+          // get number of entities in coarse mesh
+          for(int i(0); i <= shape_dim; ++i)
+          {
+            _num_entities_fine[i] = _num_entities_coarse[i] = coarse_mesh.get_num_entities(i);
+            _num_entities_parent[i] = parent.get_num_entities(i);
+          }
+
+          // calculate number of entities in fine mesh
+          Intern::EntityCountWrapper<Intern::StandardRefinementTraits, ShapeType>::query(_num_entities_fine);
+        }
 
         /// virtual destructor
         virtual ~StandardRefinery()
@@ -1283,7 +1304,7 @@ namespace FEAST
          if(_coarse_mesh.has_topology())
            Intern::TargetRefineWrapper<ShapeType>
              ::refine(target_set_holder, _num_entities_parent, _coarse_mesh.get_target_set_holder(),
-             *coarse_ish, *_parent.get_topology());
+             *coarse_ish, *_parent_topology);
          else
            Intern::SubSetRefineWrapper<ShapeType>
              ::refine(target_set_holder, _num_entities_parent, _coarse_mesh.get_target_set_holder());

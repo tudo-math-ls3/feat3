@@ -10,7 +10,7 @@ typedef ConformalMesh<Shape::Tetrahedron> RootMesh;
 typedef MeshPart<RootMesh> SubMesh;
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;
-typedef StandardRefinery<SubMesh, RootMesh> SubMeshRefinery;
+typedef StandardRefinery<SubMesh> SubMeshRefinery;
 
 /**
  * \brief Test class for the StandardRefinery class template.

@@ -643,7 +643,7 @@ namespace FEAST
         }
 
         // create a refinery
-        StandardRefinery<MeshPartType, ParentType_> refinery(*this->_mesh, parent);
+        StandardRefinery<MeshPartType> refinery(*this->_mesh, parent);
 
         // create a new MeshPartNode
         MeshPartNode* fine_node = new MeshPartNode(new MeshPartType(refinery));

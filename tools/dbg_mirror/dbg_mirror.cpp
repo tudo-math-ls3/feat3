@@ -210,7 +210,7 @@ int main(int /*argc*/, char** /*argv*/)
   QuadMesh mesh_0f(mesh_refinery0);
   QuadMesh mesh_1f(mesh_refinery1);
   // refine cell sets
-  Geometry::StandardRefinery<QuadCellSet, QuadMesh> cell_refinery0(cell_0, mesh_0), cell_refinery1(cell_1, mesh_1);
+  Geometry::StandardRefinery<QuadCellSet> cell_refinery0(cell_0, mesh_0), cell_refinery1(cell_1, mesh_1);
   QuadCellSet cell_0f(cell_refinery0);
   QuadCellSet cell_1f(cell_refinery1);
 

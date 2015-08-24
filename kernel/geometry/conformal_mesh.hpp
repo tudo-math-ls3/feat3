@@ -372,7 +372,7 @@ namespace FEAST
       int num_coords_,
       int stride_,
       typename CoordType_>
-    class StandardRefinery<ConformalMesh<Shape_, num_coords_, stride_, CoordType_>, Nil> :
+    class StandardRefinery<ConformalMesh<Shape_, num_coords_, stride_, CoordType_> > :
       public Factory< ConformalMesh<Shape_, num_coords_, stride_, CoordType_> >
     {
     public:

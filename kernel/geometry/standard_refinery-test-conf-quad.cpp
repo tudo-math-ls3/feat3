@@ -10,12 +10,9 @@ using namespace FEAST::Geometry;
 
 typedef ConformalMesh<Shape::Quadrilateral> RootMesh;
 typedef MeshPart<RootMesh> SubMesh;
-typedef MeshPart<RootMesh> SubSet;
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;
-typedef StandardRefinery<SubMesh,RootMesh> SubRootMeshRefinery;
-typedef StandardRefinery<SubMesh,SubMesh> SubSubMeshRefinery;
-typedef StandardRefinery<SubSet,RootMesh> SubSetRefinery;
+typedef StandardRefinery<SubMesh> SubMeshRefinery;
 
 
 /**
@@ -52,19 +49,19 @@ public:
     SubMesh* quad_submesh_coarse = TestAux::create_tetris_quad_submesh_2d();
 
     // create a cell sub-set
-    SubSet* cell_subset_coarse = TestAux::create_tetris_quad_cellsubset_2d();
+    SubMesh* cell_subset_coarse = TestAux::create_tetris_quad_cellsubset_2d();
 
     // create refineries
     RootMeshRefinery quad_mesh_refinery(*quad_mesh_coarse);
-    SubRootMeshRefinery edge_submesh_refinery(*edge_submesh_coarse, *quad_mesh_coarse);
-    SubRootMeshRefinery quad_submesh_refinery(*quad_submesh_coarse, *quad_mesh_coarse);
-    SubSetRefinery cell_subset_refinery(*cell_subset_coarse, *quad_mesh_coarse);
+    SubMeshRefinery edge_submesh_refinery(*edge_submesh_coarse, *quad_mesh_coarse);
+    SubMeshRefinery quad_submesh_refinery(*quad_submesh_coarse, *quad_mesh_coarse);
+    SubMeshRefinery cell_subset_refinery(*cell_subset_coarse, *quad_mesh_coarse);
 
     // refine the meshes
     RootMesh quad_mesh_fine(quad_mesh_refinery);
     SubMesh edge_submesh_fine(edge_submesh_refinery);
     SubMesh quad_submesh_fine(quad_submesh_refinery);
-    SubSet cell_subset_fine(cell_subset_refinery);
+    SubMesh cell_subset_fine(cell_subset_refinery);
 
     // validate refined meshes
     try

@@ -306,7 +306,7 @@ namespace FEAST
       int num_coords_,
       int stride_,
       typename Coord_>
-    class StandardRefinery<StructuredMesh<shape_dim_, num_coords_, stride_, Coord_>, Nil> :
+    class StandardRefinery<StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> > :
       public Factory< StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> >
     {
     public:

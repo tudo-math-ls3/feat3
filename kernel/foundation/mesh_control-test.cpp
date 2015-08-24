@@ -804,7 +804,7 @@ class MeshControlPartitioningTest2D:
           HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
 
         //refine
-        Geometry::StandardRefinery<MeshPart<ConformalMesh<Shape::Hypercube<2> > >, basemeshtype_> cell_refinery(cell_sub_set, fine_basemesh);
+        Geometry::StandardRefinery<MeshPart<ConformalMesh<Shape::Hypercube<2> > > > cell_refinery(cell_sub_set, fine_basemesh);
 
         //add
         finemost_cell_subsets.push_back(std::shared_ptr<MeshPart<ConformalMesh<Shape::Hypercube<2> > > >(new MeshPart<ConformalMesh<Shape::Hypercube<2> > >(cell_refinery)));
@@ -823,7 +823,7 @@ class MeshControlPartitioningTest2D:
         HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(macro_boundaries.at(i).get())), cell_sub_set);
 
         //refine
-        Geometry::StandardRefinery<MeshPart<ConformalMesh<Shape::Hypercube<2> > >, basemeshtype_> cell_refinery(cell_sub_set, macro_mesh);
+        Geometry::StandardRefinery<MeshPart<ConformalMesh<Shape::Hypercube<2> > > > cell_refinery(cell_sub_set, macro_mesh);
 
         //add
         finemost_macro_boundaries.push_back(std::shared_ptr<MeshPart<ConformalMesh<Shape::Hypercube<2> > > >(new MeshPart<ConformalMesh<Shape::Hypercube<2> > >(cell_refinery)));

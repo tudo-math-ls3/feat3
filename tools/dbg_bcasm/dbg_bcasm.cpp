@@ -125,7 +125,7 @@ int main(int /*argc*/, char** /*argv*/)
   Geometry::StandardRefinery<QuadMesh> mesh_refinery(mesh);
   QuadMesh mesh_f(mesh_refinery);
   // refine cell sets
-  Geometry::StandardRefinery<QuadCellSet, QuadMesh> cell_refinery(cell, mesh);
+  Geometry::StandardRefinery<QuadCellSet> cell_refinery(cell, mesh);
   QuadCellSet cell_f(cell_refinery);
   // create trafo
   QuadTrafo trafo_f(mesh_f);

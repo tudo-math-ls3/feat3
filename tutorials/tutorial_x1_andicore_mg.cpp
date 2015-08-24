@@ -485,7 +485,7 @@ namespace TutorialX1
     SystemLevel* refine() const
     {
       Geometry::StandardRefinery<MeshType> mesh_refinery(mesh);
-      Geometry::StandardRefinery<BoundaryType, MeshType> boundary_refinery(boundary, mesh);
+      Geometry::StandardRefinery<BoundaryType> boundary_refinery(boundary, mesh);
       SystemLevel* fine = new SystemLevel(mesh_refinery, boundary_refinery);
       fine->assemble_prolrest(*this);
       return fine;

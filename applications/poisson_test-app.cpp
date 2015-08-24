@@ -319,7 +319,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     {
       Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_basemesh_fine);
       Geometry::StandardRefinery<BaseMeshType> refinery_1(*coarse_macro_mesh_geo_fine);
-      Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> >, BaseMeshType> refinery_2(*coarse_macro_subset_geo_fine, *macro_basemesh_fine);
+      Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> > > refinery_2(*coarse_macro_subset_geo_fine, *macro_basemesh_fine);
       macro_subset_geo_fine = new CellSubSet<Shape::Hypercube<2> >(refinery_2);
       macro_mesh_geo_fine = new BaseMeshType(refinery_1);
       macro_basemesh_fine = new BaseMeshType(refinery_0);
@@ -369,7 +369,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
         //refine
         {
           Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_mesh_temp);
-          Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_mesh_temp);
+          Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> > > cell_refinery(*coarse_cell_sub_set_fine, *macro_mesh_temp);
           cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(cell_refinery);
           macro_mesh_temp = new BaseMeshType(refinery_0);
         }
@@ -406,7 +406,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
       //refine
       {
         Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_mesh_temp);
-        Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_mesh_temp);
+        Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> > > cell_refinery(*coarse_cell_sub_set_fine, *macro_mesh_temp);
         cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(cell_refinery);
         macro_mesh_temp = new BaseMeshType(refinery_0);
       }

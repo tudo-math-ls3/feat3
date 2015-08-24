@@ -38,17 +38,12 @@ namespace FEAST
      * See the specialisations of this class template for the actual standard-refinery interfaces.
      *
      * \tparam Mesh_
-     * The type of the mesh that is to be refined by the refinery.
-     *
-     * \tparam Parent_
-     * The type of the parent mesh or cell subset for a submesh or cell subset.
-     * Is set to \c Nil if the mesh to be refined is the root mesh.
+     * The type of the mesh that is to be refined by the refinery. This may be either a Mesh or
+     * a MeshPart instance.
      *
      * \author Peter Zajac
      */
-    template<
-      typename Mesh_,
-      typename Parent_ = Nil>
+    template<typename Mesh_>
 #ifndef DOXYGEN
     class StandardRefinery;
 #else

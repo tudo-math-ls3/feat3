@@ -11,7 +11,7 @@ typedef ConformalMesh<Shape::Hexahedron> HexaMesh;
 typedef MeshPart<HexaMesh> SubMesh;
 
 typedef StandardRefinery<HexaMesh> HexaMeshRefinery;
-typedef StandardRefinery<SubMesh, HexaMesh> SubMeshRefinery;
+typedef StandardRefinery<SubMesh> SubMeshRefinery;
 
 /**
  * \brief Test class for the StandardRefinery class template.
