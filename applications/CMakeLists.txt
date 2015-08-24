@@ -31,15 +31,7 @@ SET (app_list
 
 FOREACH (app ${app_list} )
   ADD_EXECUTABLE(${app} ${app}.cpp)
-  TARGET_LINK_LIBRARIES(${app} feast ${MPI_CXX_LIBRARIES})
-  if(MPI_CXX_COMPILE_FLAGS)
-    set_target_properties(${app} PROPERTIES
-      COMPILE_FLAGS "${MPI_CXX_COMPILE_FLAGS}")
-  endif()
-  if(MPI_CXX_LINK_FLAGS)
-    set_target_properties(${app} PROPERTIES
-      LINK_FLAGS "${MPI_CXX_LINK_FLAGS}")
-  endif()
+  TARGET_LINK_LIBRARIES(${app} feast)
 ENDFOREACH(app)
 
 

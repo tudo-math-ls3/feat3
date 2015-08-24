@@ -37,14 +37,14 @@ SET (test_list
 # create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} feast test_system ${MPI_LIBRARIES})
-  if(MPI_COMPILE_FLAGS)
+  TARGET_LINK_LIBRARIES(${test} feast test_system ${MPI_C_LIBRARIES})
+  if(MPI_C_COMPILE_FLAGS)
     set_target_properties(${app} PROPERTIES
-      COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
+      COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
   endif()
-  if(MPI_LINK_FLAGS)
+  if(MPI_C_LINK_FLAGS)
     set_target_properties(${app} PROPERTIES
-      LINK_FLAGS "${MPI_LINK_FLAGS}")
+      LINK_FLAGS "${MPI_C_LINK_FLAGS}")
   endif()
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"

@@ -46,8 +46,8 @@ if (FEAST_MPI)
     )
   string(REPLACE "\n" " " CMAKE_MPI_VERSION ${CMAKE_MPI_VERSION})
 
-  if (MPI_CXX_INCLUDE_PATH)
-    include_directories(${MPI_CXX_INCLUDE_PATH})
+  if (MPI_C_INCLUDE_PATH)
+    include_directories(${MPI_C_INCLUDE_PATH})
   endif()
 
   ADD_DEFINITIONS( -DOMPI_SKIP_MPICXX )
