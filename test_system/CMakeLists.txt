@@ -8,7 +8,7 @@ INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 
 ADD_LIBRARY(test_system STATIC test_system.cpp)
 
-TARGET_LINK_LIBRARIES(test_system)
+TARGET_LINK_LIBRARIES(test_system feast)
 
 #list of test_system tests
 SET ( test_list test_system-test)

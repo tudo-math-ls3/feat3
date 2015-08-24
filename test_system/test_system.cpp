@@ -1,5 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/memory_pool.hpp>
+#include <kernel/runtime.hpp>
 
 #include <cstring>
 
@@ -13,6 +14,8 @@ using namespace FEAST::TestSystem;
 
 int main(int argc, char** argv)
 {
+  initialise(argc, argv);
+
 #ifdef FEAST_TESTING_VC
   // Do not initialise VC test system if '--no-init' is the first option;
   // this way, we can attach the debugger if we run the test by hand
@@ -137,6 +140,8 @@ int main(int argc, char** argv)
     // we need to use the instance here, to ensure the device has been set up properly, if no cuda is used at all
     FEAST::Util::MemoryPool<Mem::CUDA>::instance()->shutdown_device();
 #endif
+
+  finalise();
 
   return result;
 }
