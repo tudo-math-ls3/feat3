@@ -96,18 +96,6 @@ namespace FEAST
           typedef DofAssignmentUniform<Element, shape_dim_, DataType_, DofTraits, ShapeType> Type;
         };
 
-        /** \copydoc ElementBase::NodeFunctional */
-        template<
-          typename Functor_,
-          int shape_dim_,
-          typename DataType_ = Real>
-        class NodeFunctional
-        {
-        public:
-          /// no node functionals available
-          typedef Nil Type;
-        };
-
       public:
         /**
          * \brief Constructor
