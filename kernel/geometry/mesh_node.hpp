@@ -7,6 +7,7 @@
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_streamer_factory.hpp>
+#include <kernel/geometry/macro_factory.hpp>
 #include <kernel/geometry/intern/dual_adaptor.hpp>
 #include <kernel/util/mesh_streamer.hpp>
 
@@ -847,41 +848,20 @@ namespace FEAST
        */
       void create_base_splitting()
       {
-        // our shape dim
-        static constexpr int shape_dim = MeshType::shape_dim;
-
-        // check mesh and size
+        // make sure we have a mesh
         if(this->_mesh == nullptr)
           throw InternalError("No mesh assigned");
 
         // get number of cells
-        Index num_cells = this->_mesh->get_num_entities(shape_dim);
-
-        // get index set holder
-        const auto& ish = this->_mesh->get_index_set_holder();
-
-        // create num_entities array
-        Index num_entities[shape_dim+1];
-        for(int i(0); i < shape_dim; ++i)
-        {
-          num_entities[i] = Index(0);
-        }
-        num_entities[shape_dim] = Index(1);
+        Index num_cells = this->_mesh->get_num_entities(MeshType::shape_dim);
 
         // loop over all cell indices
         for(Index cell(0); cell < num_cells; ++cell)
         {
-          // create a new mesh part
-          auto mesh_part = new MeshPartType(num_entities);
-
-          // set base-cell index
-          (mesh_part->template get_target_set<shape_dim>())[Index(0)] = cell;
-
-          // deduct target sets
-          mesh_part->template deduct_target_sets_from_top<shape_dim>(ish);
-
-          // add to this mesh node
-          this->add_mesh_part("base:" + stringify(cell), mesh_part);
+          // create a macro factory
+          MacroFactory<MeshPartType> factory(*this->_mesh, cell);
+          // create a new mesh part and add to this mesh node
+          this->add_mesh_part("_base:" + stringify(cell), new MeshPartType(factory));
         }
       }
 

@@ -132,6 +132,59 @@ namespace FEAST
           // do nothing
         }
       };
+
+      template<typename Shape_, int face_dim_ = Shape_::dimension-1>
+      struct MacroTargetWrapper
+      {
+        static void build(TargetSetHolder<Shape_>& trg, const IndexSetHolder<Shape_>& ish, const Index cell_idx)
+        {
+          // get our target set
+          TargetSet& target = trg.template get_target_set<face_dim_>();
+
+          // get our number of local faces
+          static constexpr Index num_faces = Index(Shape::FaceTraits<Shape_, face_dim_>::count);
+
+          // validate size
+          ASSERT(target.get_num_entities() == num_faces, "invalid target set size");
+
+          // get the index set
+          const IndexSet<int(num_faces)>& idx = ish.template get_index_set<Shape_::dimension, face_dim_>();
+
+          // loop over all faces
+          for(Index i(0); i < num_faces; ++i)
+          {
+            target[i] = idx(cell_idx, i);
+          }
+
+          // recurse down
+          MacroTargetWrapper<Shape_, face_dim_-1>::build(trg, ish, cell_idx);
+        }
+      };
+
+      template<typename Shape_>
+      struct MacroTargetWrapper<Shape_, 0>
+      {
+        static void build(TargetSetHolder<Shape_>& trg, const IndexSetHolder<Shape_>& ish, const Index cell_idx)
+        {
+          // get our target set
+          TargetSet& target = trg.template get_target_set<0>();
+
+          // get our number of local faces
+          static constexpr Index num_faces = Index(Shape::FaceTraits<Shape_,0>::count);
+
+          // validate size
+          ASSERT(target.get_num_entities() == num_faces, "invalid target set size");
+
+          // get the index set
+          const IndexSet<int(num_faces)>& idx = ish.template get_index_set<Shape_::dimension, 0>();
+
+          // loop over all faces
+          for(Index i(0); i < num_faces; ++i)
+          {
+            target[i] = idx(cell_idx, i);
+          }
+        }
+      };
     } // namespace Intern
     /// \endcond
   } // namespace Geometry

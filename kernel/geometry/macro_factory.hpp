@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/intern/macro_index_mapping.hpp>
 
 namespace FEAST
@@ -74,6 +75,65 @@ namespace FEAST
       virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
       {
         Intern::MacroIndexWrapper<Shape_>::build(index_set_holder);
+      }
+    };
+
+    template<typename BaseMesh_>
+    class MacroFactory<MeshPart<BaseMesh_> > :
+      public Factory<MeshPart<BaseMesh_> >
+    {
+    public:
+      /// mesh typedef
+      typedef MeshPart<BaseMesh_> MeshType;
+      typedef typename MeshType::ShapeType ShapeType;
+
+      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+      typedef typename MeshType::AttributeHolderType AttributeHolderType;
+
+    protected:
+      const BaseMesh_& _base_mesh;
+      const Index _cell_idx;
+
+    public:
+      explicit MacroFactory(const BaseMesh_& base_mesh, Index cell_idx) :
+        _base_mesh(base_mesh),
+        _cell_idx(cell_idx)
+      {
+        ASSERT(cell_idx < base_mesh.get_num_entities(ShapeType::dimension), "cell index out-of-bounds");
+      }
+
+      virtual Index get_num_entities(int dim) override
+      {
+        return Index(Intern::DynamicNumFaces<ShapeType>::value(dim));
+      }
+
+      virtual void fill_attribute_sets(AttributeHolderType&) override
+      {
+        // nothing to do here
+      }
+
+      virtual void fill_index_sets(IndexSetHolderType*&) override
+      {
+        // nothing to do here
+      }
+
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
+      {
+        // set cell index
+        target_set_holder.template get_target_set<ShapeType::dimension>()[0] = _cell_idx;
+        // fill remaining indices
+        Intern::MacroTargetWrapper<ShapeType>::build(target_set_holder, _base_mesh.get_index_set_holder(), _cell_idx);
+      }
+
+      virtual String get_identifier() const override
+      {
+        return String("_base:") + stringify(_cell_idx);
+      }
+
+      virtual String get_parent_identifier() const override
+      {
+        return _base_mesh.get_identifier();
       }
     };
     /// \cond internal

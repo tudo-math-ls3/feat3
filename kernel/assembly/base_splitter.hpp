@@ -56,7 +56,7 @@ namespace FEAST
         for(Index cell(0); ; ++cell)
         {
           // try to fetch base-cell mesh part
-          const auto* mesh_part = mesh_node.find_mesh_part("base:" + stringify(cell));
+          const auto* mesh_part = mesh_node.find_mesh_part("_base:" + stringify(cell));
           if(mesh_part == nullptr)
             break;
 
