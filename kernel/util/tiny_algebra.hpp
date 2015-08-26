@@ -369,6 +369,17 @@ namespace FEAST
       }
 
       /**
+       * \brief Normalises the vector.
+       */
+      void normalise()
+      {
+        DataType norm2(this->norm_euclid());
+        ASSERT(norm2 > Math::eps<DataType>(), "Trying to normalise a zero vector!");
+        norm2 = DataType(1)/norm2;
+        (*this) *= norm2;
+      }
+
+      /**
        * \brief Sets this vector to the result of a matrix-vector product.
        *
        * Let \e y denote \c this vector, and let \e A denote the input matrix and \e x in the input vector, then
@@ -1078,6 +1089,61 @@ namespace FEAST
         return add_vec_tensor_mult(x, t, alpha);
       }
     }; // class Matrix
+
+#ifdef DOXYGEN
+    /**
+     * \brief Computes the positively oriented orthogonal vector to the columns of a m_ x (m_-1) Matrix
+     *
+     * \tparam T_
+     * Data type.
+     *
+     * \tparam m_
+     * Number of rows of the matrix.
+     *
+     * \tparam sm_
+     * Row stride of the matrix.
+     *
+     * \tparam sn_
+     * Column stride of the matrix.
+     *
+     * \param[in] tau
+     * The m_ x (m_-1) matrix.
+     *
+     * \returns
+     * A vector that is orthogonal to the m_-1 columns of the input matrix, but not normalised.
+     *
+     * \note So far, this is only implemented for m_ = 2,3.
+     */
+    template<typename T_, int m_, int sm_, int sn_>
+    static Vector<T_, m_> orthogonal(const Matrix<T_, m_, m_-1, sm_, sn_>& tau);
+#endif
+
+    /// \cond internal
+    template<typename T_, int sm_, int sn_>
+    static Vector<T_, 2> orthogonal(const Matrix<T_, 2, 1, sm_, sn_>& tau)
+    {
+      Vector<T_, 2, sm_> nu(T_(0));
+
+      // 2d "cross" product. The sign has to be on the second component so the input is rotated in negative direction
+      nu[0] =  tau[1][0];
+      nu[1] = -tau[0][0];
+
+      return nu;
+    }
+
+    template<typename T_, int sm_, int sn_>
+    static Vector<T_, 3> orthogonal(const Matrix<T_, 3, 2, sm_, sn_>& tau)
+    {
+      Vector<T_, 3, sm_> nu(T_(0));
+
+      // 3d cross product
+      nu[0] = tau[1][0]*tau[2][1] - tau[2][0]*tau[1][1];
+      nu[1] = tau[2][0]*tau[0][1] - tau[0][0]*tau[2][1];
+      nu[2] = tau[0][0]*tau[1][1] - tau[1][0]*tau[0][1];
+
+      return nu;
+    }
+    /// \endcond
 
     /// matrix-vector-multiply operator
     template<typename T_, int m_, int n_, int sm_, int sn_, int sx_>
