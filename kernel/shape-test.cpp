@@ -21,6 +21,13 @@ public:
   {
   }
 
+  int bla(int dim, int i) const
+  {
+    int ret = 1 - ((((dim >> 1) ^ 1) ^ i) << 1);
+    std::cout << ret << std::endl;
+    return ret;
+  }
+
   virtual void run() const
   {
     // test simplex vertex counts
@@ -83,5 +90,17 @@ public:
     // 3-Hypercube: 6x 2-faces
     int hcube3_nface2 = FaceTraits<Hypercube<3>,2>::count;
     TEST_CHECK_EQUAL(hcube3_nface2, 6);
+
+    // Check reference cell facet orientations
+    // For Simplex<1>, these are -1, +1
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<1>>::orientation(0), -1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<1>>::orientation(1), 1);
+
+    // For all other simplices, all facet orientations are positive
+    for(int facet_index(0); facet_index < FaceTraits<Simplex<2>,1>::count; ++facet_index)
+      TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<2>>::orientation(facet_index), 1);
+
+    for(int facet_index(0); facet_index < FaceTraits<Simplex<3>,2>::count; ++facet_index)
+      TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::orientation(facet_index), 1);
   }
 } shape_test;
