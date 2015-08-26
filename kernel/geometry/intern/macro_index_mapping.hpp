@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/index_set.hpp>
+#include <kernel/geometry/target_set.hpp>
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 
 namespace FEAST
