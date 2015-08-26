@@ -121,7 +121,7 @@ namespace FEAST
 
       void component_invert(const Vector& x, const DataType alpha = DataType(1))
       {
-        _vector.component_invert(x, alpha);
+        _vector.component_invert(*x, alpha);
       }
 
       void component_product(const Vector& x, const Vector& y)
