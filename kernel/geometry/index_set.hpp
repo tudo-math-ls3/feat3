@@ -251,7 +251,7 @@ namespace FEAST
         CONTEXT(name() + "::operator()()");
         ASSERT_(_indices != nullptr);
         ASSERT_(i < _num_entities);
-        ASSERT_(j < num_indices);
+        ASSERT_(j < Index(num_indices));
         return _indices[i][j];
       }
 
