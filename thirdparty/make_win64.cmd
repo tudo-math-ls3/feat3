@@ -37,6 +37,16 @@ if exist "./SuiteSparse" (
   echo.
 )
 
+rem ===========================================================================
+echo **************************************************************************
+if exist "./parmetis" (
+  call ./vc_internal/make_parmetis_vc%VSVER%.cmd dbg x64
+  call ./vc_internal/make_parmetis_vc%VSVER%.cmd opt x64
+) else (
+  echo ParMETIS not found; skipping...
+  echo.
+)
+
 echo **************************************************************************
 
 rem ===========================================================================

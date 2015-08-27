@@ -64,12 +64,14 @@
   <!-- FEAST Third-Party Library Detection -->
   <!-- ********************************************************************* -->
   <PropertyGroup Condition="Exists('..\lib\umfpack.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
-  <!--<PropertyGroup Condition="Exists('$(FeastLibPath)\umfpack.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">-->
     <FeastHaveUmfpack>true</FeastHaveUmfpack>
   </PropertyGroup>
   <PropertyGroup Condition="Exists('..\lib\alglib.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
-  <!--<PropertyGroup Condition="Exists('$(FeastLibPath)\alglib.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">-->
     <FeastHaveAlgLib>true</FeastHaveAlgLib>
+  </PropertyGroup>
+    <!-- Note: ParMETIS can only be used in combination with MPI -->
+  <PropertyGroup Condition="Exists('..\lib\parmetis.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib') And '$(SerialMode)'=='false'">
+    <FeastHaveParmetis>true</FeastHaveParmetis>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
@@ -92,6 +94,8 @@
       Include="FEAST_HAVE_UMFPACK" />
     <FeastDef Condition="'$(FeastHaveAlgLib)'=='true'"
       Include="FEAST_HAVE_ALGLIB" />
+    <FeastDef Condition="'$(FeastHaveParmetis)'=='true'"
+      Include="FEAST_HAVE_PARMETIS" />
   </ItemGroup>
 
   <!-- FEAST additional include directory list -->
@@ -104,6 +108,8 @@
       Include="$(FeastRootPath)\thirdparty\ALGLIB\src;" />
     <FeastIncDir Condition="'$(FeastHaveUmfpack)'=='true'"
       Include="$(FeastRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeastRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeastRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
+    <FeastIncDir Condition="'$(FeastHaveParmetis)'=='true'"
+      Include="$(FeastRootPath)\thirdparty\parmetis\include;$(FeastRootPath)\thirdparty\parmetis\mets\include;" />
   </ItemGroup>
 
   <!-- FEAST additional library search path list -->
@@ -137,6 +143,8 @@
       Include="umfpack.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
     <FeastLibDep Condition="'$(FeastHaveAlgLib)'=='true'"
       Include="alglib.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
+    <FeastLibDep Condition="'$(FeastHaveParmetis)'=='true'"
+      Include="parmetis.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
   </ItemGroup>
 
   <!-- build properties from item lists -->
