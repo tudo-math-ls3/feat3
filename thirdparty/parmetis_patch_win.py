@@ -11,23 +11,29 @@ import sys
 
 # set GKlib paths
 gk_path = os.path.join(".","parmetis","metis","GKlib")
-gk_path1 = os.path.join(gk_path,"gk_arch.h")
-gk_path2 = os.path.join(gk_path,"gk_arch.h.backup")
+gk_path1o = os.path.join(gk_path,"gk_arch.h")
+gk_path1i = os.path.join(gk_path,"gk_arch.h.backup")
+gk_path2o = os.path.join(gk_path,"gkregex.c")
+gk_path2i = os.path.join(gk_path,"gkregex.c.backup")
 
 # check whether 'gk_arch.h' exists
-if not os.path.isfile(gk_path1):
+if not os.path.isfile(gk_path1o):
   print("ERROR: ParMETIS source not found; nothing to patch...")
   sys.exit(1)
 
-# create backup file unless it already exists
-if not os.path.isfile(gk_path2):
-  os.rename(gk_path1, gk_path2)
+# create backup files unless they already exist
+if not os.path.isfile(gk_path1i):
+  os.rename(gk_path1o, gk_path1i)
+if not os.path.isfile(gk_path2i):
+  os.rename(gk_path2o, gk_path2i)
+
+##### patch 'gk_arch.h' #####
 
 # open backup file
-fi = open(gk_path2, "rt")
+fi = open(gk_path1i, "rt")
 
 # open output file
-fo = open(gk_path1, "wt")
+fo = open(gk_path1o, "wt")
 
 # loop over all lines
 lno = 0
@@ -35,13 +41,41 @@ for line in fi:
   lno = lno + 1
   # insert macro before line 48
   if (lno == 48):
-    fo.write("#ifdef _WIN32\n  #define WIN32\n#endif\n")
+    fo.write("#if defined(_WIN32) && !defined(WIN32)\n")
+    fo.write("  #define WIN32\n")
+    fo.write("#endif\n")
   # remove lines 62-70
-  if (lno > 61) and (lno < 71):
+  if (lno > 61) and (lno < 69):
     continue
   # insert line
-  if (lno == 71):
+  if (lno == 69):
     fo.write("#define __thread __declspec(thread)\n")
+  # okay, write line
+  fo.write(line)
+
+fo.close()
+fi.close()
+
+##### patch 'gkregex.c' #####
+
+# open backup file
+fi = open(gk_path2i, "rt")
+
+# open output file
+fo = open(gk_path2o, "wt")
+
+# loop over all lines
+lno = 0
+for line in fi:
+  lno = lno + 1
+  # replace line 5089
+  if (lno == 5089):
+    fo.write("    postorder (elem, mark_opt_subexp, (void *) (intptr_t) elem->token.opr.idx);\n")
+    continue
+  # replace line 6301
+  if (lno == 6301):
+    fo.write("  int idx = (int) (intptr_t) extra;\n")
+    continue
   # okay, write line
   fo.write(line)
 

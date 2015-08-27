@@ -43,7 +43,7 @@ if exist %OBJPATH3% (
 rem Set Compiler flags
 set CXXFLAGS=%CXXFLAGS% /c /GS /Gd /W3 /WX- /Zc:wchar_t /Zi /Zc:forScope /errorReport:none /EHsc /nologo
 set CXXFLAGS=%CXXFLAGS% /wd"4028" /wd"4018" /wd"4101" /wd"4102" /wd"4244" /wd"4267" /wd"4305" /wd"4996"
-set CXXFLAGS=%CXXFLAGS% /TC /D "WIN32" /D "USE_GKREGEX"
+set CXXFLAGS=%CXXFLAGS% /TC /D "USE_GKREGEX"
 
 rem Set GKLib compiler flags
 set CXXFLAGS1=%CXXFLAGS% /I"./parmetis/metis/GKlib"
