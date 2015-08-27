@@ -245,6 +245,40 @@ namespace FEAST
       }
 
       /**
+       * \brief Adds a vector-field vertex variable given by a LAFEM::***VectorBlocked to the exporter.
+       *
+       * This functions adds a 1D, 2D or 3D vector-field variable to the exporter.
+       *
+       * \tparam VectorType_
+       * Type of the input. Only DenseVectorBlocked and SparseVectorBlocked have the right interface at the moment.
+       *
+       * \param[in] name
+       * The name of the variable to be exported.
+       *
+       * \param[in] v
+       * The vector containing the field values in the mesh vertices.
+       *
+       * \note
+       * This function creates a (deep) copy of the vector data.
+       */
+      template<typename VectorType_>
+      void add_field_vertex_blocked_vector(const String& name, const VectorType_& v)
+      {
+        std::vector<double> d(3*_num_verts);
+
+        for(Index i(0); i < _num_verts; ++i)
+        {
+          for(Index j(0); j < 3; ++j)
+            d[Index(3)*i+j] = double(0);
+
+          for(int j(0); j < v.BlockSize; ++j)
+            d[Index(3)*i+Index(j)] = v(i)[j];
+
+        }
+        _fields_vertex.push_back(std::make_pair(name, std::move(d)));
+      }
+
+      /**
        * \brief Adds a scalar cell variable to the exporter.
        *
        * \param[in] name
