@@ -854,7 +854,7 @@ namespace FEAST
           for(Index shape(0); shape < idx.get_num_entities(); ++shape)
           {
             std::vector<Index> tmp;
-            for(Index i(0); i < idx.num_indices; ++i)
+            for(Index i(0); i < Index(idx.num_indices); ++i)
               tmp.push_back(idx(shape, i));
 
             adj[0][my_dim].push_back(tmp);
