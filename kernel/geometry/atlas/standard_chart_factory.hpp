@@ -33,13 +33,13 @@ namespace FEAST
         // Boundary mesh typedefs
         private:
           /// Simplex<1> mesh in 2d
-          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 2, 2, Real>> Simplex1_2d;
+          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 2, 2, typename Mesh_::CoordType>> Simplex1_2d;
           /// Simplex<1> mesh in 3d
-          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 3, 3, Real>> Simplex1_3d;
+          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 3, 3, typename Mesh_::CoordType>> Simplex1_3d;
           /// Simplex<2> mesh in 3d
-          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<2>, 3, 3, Real>> Simplex2_3d;
+          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<2>, 3, 3, typename Mesh_::CoordType>> Simplex2_3d;
           /// Hypercube<2> mesh in 3d
-          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Hypercube<2>, 3, 3, Real>> Hypercube2_3d;
+          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Hypercube<2>, 3, 3, typename Mesh_::CoordType>> Hypercube2_3d;
 
         public:
           /** \copydoc ChartFactory::parse_chart() */
@@ -60,23 +60,23 @@ namespace FEAST
             if(data.shape_type == data.st_edge)
             {
               if(data.coord_per_vertex == 2)
-                return DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 2, 2, Real>>::parse(data);
+                return DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 2, 2, typename Mesh_::CoordType>>::parse(data);
               if(data.coord_per_vertex == 3)
-                return DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 3, 3, Real>>::parse(data);
+                return DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 3, 3, typename Mesh_::CoordType>>::parse(data);
               throw InternalError("Boundary mesh of shape dim 1 needs a word dimension of 2 or 3, but got "+stringify(data.coord_per_vertex));
             }
 
             if(data.shape_type == data.st_tria)
             {
               if(data.coord_per_vertex == 3)
-                return DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<2>, 3, 3, Real>>::parse(data);
+                return DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<2>, 3, 3, typename Mesh_::CoordType>>::parse(data);
               throw InternalError("Simplex<2> boundary mesh needs a word dimension of 3, but got "+stringify(data.coord_per_vertex));
             }
 
             if(data.shape_type == data.st_quad)
             {
               if(data.coord_per_vertex == 3)
-                return DiscreteChart<Mesh_, ConformalMesh<Shape::Hypercube<2>, 3, 3, Real>>::parse(data);
+                return DiscreteChart<Mesh_, ConformalMesh<Shape::Hypercube<2>, 3, 3, typename Mesh_::CoordType>>::parse(data);
               throw InternalError("Hypercube<2> boundary mesh needs a word dimension of 3, but got "+stringify(data.coord_per_vertex));
             }
 
