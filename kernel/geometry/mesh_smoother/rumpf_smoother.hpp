@@ -23,9 +23,7 @@ namespace FEAST
     /**
      * \brief Baseclass for a family of variational mesh optimisation algorithms.
      *
-     * That is, mesh optimisation algorithms derived from Martin Rumpf's paper
-     *
-     * M. Rumpf: A variational approach to optimal meshes, Numerische Mathematik 72 (1996), pp. 523 - 540.
+     * That is, mesh optimisation algorithms derived from Martin Rumpf's paper \cite Rum96
      *
      * \tparam FunctionalType_
      * Functional used for defining mesh quality.

@@ -18,14 +18,11 @@ namespace FEAST
     /**
      * \brief Baseclass for a family of variational mesh optimisation algorithms using levelset functions.
      *
-     * That is, for all mesh optimisation algorithms derived from Martin Rumpf's paper
+     * That is, for all mesh optimisation algorithms derived from Martin Rumpf's paper \cite Rum96
      *
-     * M. Rumpf: A variational approach to optimal meshes, Numerische Mathematik 72 (1996), pp. 523 - 540,
+     * extended by a levelset formulation for representing internal surfaces by Steffen Basting and Martin Weismann,
+     * see \cite BW13
      *
-     * extended by a levelset formulation for representing internal surfaces by Steffen Basting and Martin Weismann
-     *
-     * S. Basting and M. Weismann: A hybrid level set-front tracking finite element approach for fluid-structure
-     * interaction and two-phase flow applications, Journal of Computational Physics 255(2013), 228 - 244.
      *
      * \tparam DataType_
      * Our datatype.
