@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/lafem/forward.hpp>
+#include <kernel/lafem/base.hpp>
 
 #include <vector>
 
@@ -13,17 +14,6 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    /**
-     * Supported layout ids.
-     */
-    enum class SparseLayoutId
-    {
-      lt_csr = 0,
-        lt_coo,
-        lt_ell,
-        lt_banded
-        };
-
     /// \cond internal
     namespace Intern
     {

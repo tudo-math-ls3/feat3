@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/archs.hpp>
+#include <kernel/lafem/base.hpp>
 
 #include <vector>
 #include <limits>
@@ -107,33 +108,6 @@ namespace FEAST
       };
     } //namespace Intern
     /// \endcond
-
-    /**
-     * Supported File modes.
-     */
-    enum class FileMode
-    {
-      fm_exp = 0, /**< Exponential ascii */
-        fm_dv, /**< Binary data */
-        fm_mtx, /**< Matrix market ascii */
-        fm_ell, /**< Binary ell data */
-        fm_csr, /**< Binary csr data */
-        fm_coo, /**< Binary coo data */
-        fm_bm, /**< Binary banded data */
-        fm_dm,  /**< Binary dense matrix data */
-        fm_sv  /**< Binary sparse vector data */
-        };
-
-    /**
-     * Supported clone modes.
-     */
-    enum class CloneMode
-    {
-      Shallow = 0, /**< Share index and data arrays */
-        Layout, /**< Share index arrays, allocate new data array */
-        Weak, /**< Share index arrays, allocate new data array and copy content */
-        Deep /**< Allocate new index and data arrays and copy content */
-        };
 
     /**
      * \brief Container base class.
