@@ -613,7 +613,7 @@ LAYOUT_FILE            =
 # of the bibliography can be controlled using LATEX_BIB_STYLE. To use this
 # feature you need bibtex and perl available in the search path.
 
-CITE_BIB_FILES         =
+CITE_BIB_FILES         = @FEAST_SOURCE_DIR@/doxy_in/references.bib
 
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
@@ -1315,6 +1315,7 @@ PAPER_TYPE             = a4wide
 EXTRA_PACKAGES         = amsmath \
                          amssymb
 
+
 # The LATEX_HEADER tag can be used to specify a personal LaTeX header for
 # the generated latex document. The header should contain everything until
 # the first chapter. If it is left blank doxygen will generate a
@@ -1366,7 +1367,7 @@ LATEX_SOURCE_CODE      = NO
 # bibliography, e.g. plainnat, or ieeetr. The default style is "plain". See
 # http://en.wikipedia.org/wiki/BibTeX for more info.
 
-LATEX_BIB_STYLE        = plain
+LATEX_BIB_STYLE        = plainnat
 
 #---------------------------------------------------------------------------
 # configuration options related to the RTF output
