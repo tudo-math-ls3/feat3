@@ -123,7 +123,12 @@ namespace FEAST
 
     public:
       /// Default CTOR
-      BaseContainer()
+      BaseContainer() :
+        name(""),
+        parent(""),
+        info(""),
+        attribute_count(0),
+        coord_per_vertex(0)
       {
         CONTEXT("BaseContainer::BaseContainer()");
         for(int i(0); i < 4; ++i)
@@ -244,7 +249,10 @@ namespace FEAST
 
     public:
       // default CTOR
-      MeshDataContainer()
+      MeshDataContainer() :
+        chart(""),
+        mesh_type(mt_unknown),
+        shape_type(st_unknown)
       {
         CONTEXT("MeshDataContainer::MeshDataContainer()");
       }
