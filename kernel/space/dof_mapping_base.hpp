@@ -10,12 +10,20 @@ namespace FEAST
   namespace Space
   {
     /**
-     * \brief Finite-Element Dof-Mapping base-class template
+     * \brief Mapping from mesh cells to Dof that have support on them
      *
-     * This class acts as a base-class and interface documentation for Finite-Element Dof-Mapping implementations.
+     * This class acts as a base-class and interface documentation for Finite Element Dof mapping implementations.
+     *
+     * In FEAST, every FE basis function is associated with a mesh entity of a certain shape dimension, i.e.
+     * vertices, facets or cells. The DofMapping maps a mesh cell (meaning only the highest-dimensional entities of
+     * a mesh) to a set of basis functions with nonempty support on the closure of the cell. It does, however,
+     * not contain any information about which entities of that cell are associated with which basis function. This
+     * is done by the DofAssignment.
+     *
+     * \see DofAssignmentBase
      *
      * \tparam Space_
-     * The finite-element space that this dof-mapping is used by.
+     * The finite element space that this Dof mapping is used by.
      *
      * \author Peter Zajac
      */

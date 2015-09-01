@@ -10,7 +10,19 @@ namespace FEAST
   namespace Space
   {
     /**
-     * \brief Finite-Element Dof-Assignment base-class template.
+     * \brief Mapping of mesh entities to FE basis functions associated with them.
+     *
+     * In FEAST, every FE basis function is associated with mesh entities of exactly one shape dimension, i.e.
+     * vertices, facets or cells. The DofMapping maps a mesh cell (meaning only the highest-dimensional entities of
+     * a mesh) to a set of basis functions with nonempty support on that cell. It does, however, not contain any
+     * information about which entities of that cell are associated with which basis function. This is done by the
+     * DofAssignment.
+     *
+     * For the DofAssignment, mesh entities are open. This means i.e. the DofAssignment for an edge only knows about
+     * basis functions directly associated with the edge and NOT about basis functions associated with the vertices
+     * that represent the edge's end points.
+     *
+     * \see DofMappingBase
      *
      * \author Peter Zajac
      */
