@@ -1,15 +1,17 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_RUMPF_SMOOTHER_LVLSET_Q1HACK_HPP
-#define KERNEL_GEOMETRY_RUMPF_SMOOTHER_LVLSET_Q1HACK_HPP 1
+#ifndef KERNEL_MESHOPT_RUMPF_SMOOTHER_LVLSET_Q1HACK_HPP
+#define KERNEL_MESHOPT_RUMPF_SMOOTHER_LVLSET_Q1HACK_HPP 1
 
-#include <kernel/geometry/mesh_smoother/rumpf_smoother_lvlset.hpp>
+#include <kernel/base_header.hpp>
+#include <kernel/meshopt/rumpf_smoother_lvlset.hpp>
 
 namespace FEAST
 {
-  namespace Geometry
+  namespace Meshopt
   {
-
     /**
+     * \brief RumpfSmoother variant for using levelset information together with the Q1 hack
+     *
      * \copydoc RumpfSmootherLevelsetAnalytic
      *
      * This variant is for Q1 transformations only and uses an idea by Steffen Basting: Split every hypercube
@@ -24,13 +26,10 @@ namespace FEAST
       typename AnalyticFunctionType_,
       typename AnalyticFunctionGrad0Type_,
       typename AnalyticFunctionGrad1Type_,
-      typename DataType_,
-      typename MemType_,
       typename TrafoType_,
       typename FunctionalType_,
       typename LevelsetFunctionalType_,
-      typename SpaceType_,
-      typename H_EvalType_ = H_EvaluatorQ1Hack<TrafoType_, DataType_>
+      typename H_EvalType_ = H_EvaluatorQ1Hack<TrafoType_, typename TrafoType_::MeshType::CoordType>
     >
     class RumpfSmootherLevelsetAnalyticQ1Hack :
       public RumpfSmootherLevelsetAnalytic
@@ -38,34 +37,19 @@ namespace FEAST
         AnalyticFunctionType_,
         AnalyticFunctionGrad0Type_,
         AnalyticFunctionGrad1Type_,
-        DataType_,
-        MemType_,
         TrafoType_,
         FunctionalType_,
         LevelsetFunctionalType_,
-        SpaceType_,
         H_EvalType_
       >
     {
       public:
-        /// Our datatype
-        typedef DataType_ DataType;
-        /// Memory architecture
-        typedef MemType_ MemType;
-        /// Transformation type
+        /// Type for the transformation
         typedef TrafoType_ TrafoType;
-        /// Our functional type
+        /// Type for the Rumpf functional
         typedef FunctionalType_ FunctionalType;
-        /// Our levelset functional type
+        /// Type for the levelset part of Rumpf functional
         typedef LevelsetFunctionalType_ LevelsetFunctionalType;
-        /// ShapeType
-        typedef typename TrafoType::ShapeType ShapeType;
-        /// Mesh of said ShapeType
-        typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
-        // The functional has to use Simplex<shape_dim> and the trafo Hypercube<shape_dim>
-        //static_assert( std::is_same<ShapeType, Shape::Hypercube<ShapeType::dimension> >::value &&
-        //    std::is_same<typename FunctionalType::ShapeType, Shape::Simplex<ShapeType::dimension> >::value,
-        //    "ShapeTypes of the transformation / functional have to be Hypercube<d>/Simplex<d> for RumpfSmootherQ1Hack" );
 
         /// Baseclass
         typedef RumpfSmootherLevelsetAnalytic
@@ -73,14 +57,24 @@ namespace FEAST
           AnalyticFunctionType_,
           AnalyticFunctionGrad0Type_,
           AnalyticFunctionGrad1Type_,
-          DataType_,
-          MemType_,
           TrafoType_,
           FunctionalType_,
           LevelsetFunctionalType_,
-          SpaceType_,
           H_EvalType_
         > BaseClass;
+
+        /// Type of the underlying mesh
+        typedef typename TrafoType_::MeshType MeshType;
+        /// Data type for the vertex coordinates
+        typedef typename MeshType::CoordType CoordType;
+        /// The shape of the mesh's cells
+        typedef typename MeshType::ShapeType ShapeType;
+
+        // The functional has to use Simplex<shape_dim> and the trafo Hypercube<shape_dim>
+        //static_assert( std::is_same<ShapeType, Shape::Hypercube<ShapeType::dimension> >::value &&
+        //    std::is_same<typename FunctionalType::ShapeType, Shape::Simplex<ShapeType::dimension> >::value,
+        //    "ShapeTypes of the transformation / functional have to be Hypercube<d>/Simplex<d> for RumpfSmootherQ1Hack" );
+
 
         /// \copydoc BaseClass::RumpfSmootherLevelsetAnalytic()
         explicit RumpfSmootherLevelsetAnalyticQ1Hack(
@@ -105,9 +99,9 @@ namespace FEAST
             }
 
         /// \copydoc BaseClass::compute_functional()
-        virtual DataType compute_functional() override
+        virtual CoordType compute_functional() override
         {
-          DataType_ fval(0);
+          CoordType fval(0);
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -124,41 +118,40 @@ namespace FEAST
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <DataType_,MeshType::world_dim> h;
+          FEAST::Tiny::Vector <CoordType, MeshType::world_dim> h;
           // This will hold the levelset values at the mesh vertices for one element
-          FEAST::Tiny::Vector <DataType_, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
+          FEAST::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
 
           // Reset last levelset constraint
-          this->lvlset_constraint_last = DataType(0);
-          DataType lvlset_penalty(0);
+          this->lvlset_constraint_last = CoordType(0);
+          CoordType lvlset_penalty(0);
 
-          // Compute the functional value for each cell ...
+          // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
-            // ... and for each simplex in all permutations
-            for(Index p(0); p < n_perms; ++p)
+            h = this->_h(cell);
+            // For every permutation, compute the terms wrt. the Simplex functional on the cell defined by the
+            // vertices we pick through the permutation
+            for(int p(0); p < n_perms; ++p)
             {
-              for(Index d(0); d < MeshType::world_dim; d++)
-              {
-                h(d) = this->_h[d](cell);
-                for(Index j(0); j < 3; j++)
-                  x(d,j) = this->_coords[d](idx(cell,perm[p][j]));
-              }
+              for(int j(0); j < 3; j++)
+                x[j] = this->_coords(idx(cell,perm[p][j]));
+
               fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h);
             } // permutations
 
             // The levelset penalty has to be computed for the hypercube case
-            for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
-              lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
+              lvlset_vals(j) = this->_lvlset_vec(idx(cell,Index(j)));
 
             lvlset_penalty = this->_lvlset_functional.compute_lvlset_penalty(lvlset_vals);
             // Add local penalty term to global levelset constraint
             this->lvlset_constraint_last += lvlset_penalty;
           } // cell
 
-          fval += this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last);
+          fval += this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(this->lvlset_constraint_last);
 
           return fval;
         } // compute_functional
@@ -167,7 +160,7 @@ namespace FEAST
          * This makes the baseclass' compute_functional available, as one might want to compute the functional value
          * without the levelset contribution and now the compiler no longer complains about overloaded virtual
          */
-        //using BaseClass::compute_functional;
+        using BaseClass::compute_functional;
         /**
          * \copydoc RumpfSmootherLevelset::compute_functional()
          *
@@ -185,10 +178,10 @@ namespace FEAST
          *
          * Debug variant that saves the different contributions for each cell.
          **/
-        virtual DataType compute_functional(DataType_* func_norm, DataType_* func_det,
-        DataType_* func_rec_det, DataType* func_lvlset) override
+        virtual CoordType compute_functional(CoordType* func_norm, CoordType* func_det,
+        CoordType* func_rec_det, CoordType* func_lvlset) override
         {
-          DataType_ fval(0);
+          CoordType fval(0);
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -205,42 +198,35 @@ namespace FEAST
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <DataType_,MeshType::world_dim> h;
+          FEAST::Tiny::Vector <CoordType, MeshType::world_dim> h;
           // This will hold the levelset values at the mesh vertices for one element
-          FEAST::Tiny::Vector <DataType_, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
+          FEAST::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
 
-          DataType_ norm_A(0), det_A(0), rec_det_A(0), lvlset_penalty(0);
+          CoordType norm_A(0), det_A(0), rec_det_A(0), lvlset_penalty(0);
 
-          DataType_ func_norm_tot(0);
-          DataType_ func_det_tot(0);
-          DataType_ func_rec_det_tot(0);
+          CoordType func_norm_tot(0);
+          CoordType func_det_tot(0);
+          CoordType func_rec_det_tot(0);
 
           // Reset last levelset constraint
-          this->lvlset_constraint_last = DataType(0);
+          this->lvlset_constraint_last = CoordType(0);
 
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
-            func_norm[cell] = DataType(0);
-            func_det[cell] = DataType(0);
-            func_rec_det[cell] = DataType(0);
+            func_norm[cell] = CoordType(0);
+            func_det[cell] = CoordType(0);
+            func_rec_det[cell] = CoordType(0);
 
-            //std::cout << "cell " << cell << std::endl;
-            for(Index p(0); p < n_perms; ++p)
+            h = this->_h(cell);
+            // For every permutation, compute the terms wrt. the Simplex functional on the cell defined by the
+            // vertices we pick through the permutation
+            for(int p(0); p < n_perms; ++p)
             {
-              //std::cout << " permutation " << p << std::endl;
-              for(Index d(0); d < MeshType::world_dim; ++d)
-              {
-                h(d) = this->_h[d](cell);
-                for(Index j(0); j < 3; ++j)
-                {
-                  x(d,j) = this->_coords[d](idx(cell,perm[p][j]));
-                  //std::cout << perm[p][j] << ": " << scientify(x(d,j)) << " " ;
-                }
-                //std::cout << std::endl;
-              }
+              for(int j(0); j < 3; ++j)
+                x[j] = this->_coords(idx(cell,perm[p][j]));
 
               fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
 
@@ -253,8 +239,8 @@ namespace FEAST
             func_rec_det_tot += func_rec_det[cell];
 
             // The levelset penalty has to be computed for the hypercube case
-            for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
-              lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+              lvlset_vals(j) = this->_lvlset_vec(idx(cell,Index(j)));
 
             lvlset_penalty = this->_lvlset_functional.compute_lvlset_penalty(lvlset_vals);
             // Add local penalty term to global levelset constraint
@@ -263,11 +249,11 @@ namespace FEAST
           }
 
           // Scale levelset constraint correctly and add it to the functional value
-          fval += this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last);
+          fval += this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(this->lvlset_constraint_last);
 
           std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) <<
             ", func_rec_det = " << scientify(func_rec_det_tot) << ", func_lvlset = " <<
-            scientify(this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(this->lvlset_constraint_last)) << std::endl;
+            scientify(this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(this->lvlset_constraint_last)) << std::endl;
 
 
           return fval;
@@ -276,8 +262,6 @@ namespace FEAST
         /// \copydoc BaseClass::compute_gradient()
         virtual void compute_gradient() override
         {
-          // Total number of vertices in the mesh
-          Index nvertices(this->_mesh.get_num_entities(0));
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -285,15 +269,15 @@ namespace FEAST
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <DataType_,MeshType::world_dim> h;
+          FEAST::Tiny::Vector <CoordType, MeshType::world_dim> h;
           // This will hold the local gradient for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> grad_loc;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
           // This will hold the levelset values at the mesh vertices for one element
-          FEAST::Tiny::Vector <DataType_, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
+          FEAST::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
           // This will hold the levelset gradient values for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> lvlset_grad_vals;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> lvlset_grad_vals;
 
           // In 2d, each hypercube is split into 2 simplices and there are two possible permutations
           const int n_perms(4);
@@ -306,61 +290,72 @@ namespace FEAST
           };
 
           // Clear gradient vector
-          for(Index i(0); i < MeshType::world_dim*nvertices; ++i)
-            this->_grad[i] = DataType_(0);
+          this->_grad.format(CoordType(0));
 
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index p(0); p < n_perms; ++p)
+            h = this->_h(cell);
+            // For every permutation, compute the terms wrt. the Simplex functional on the cell defined by the
+            // vertices we pick through the permutation
+            for(int p(0); p < n_perms; ++p)
             {
-              for(Index d(0); d < MeshType::world_dim; ++d)
+              // Get local coordinates
+              for(int j(0); j < 3; ++j)
               {
-                h(d) = this->_h[d](cell);
-                // Get local coordinates
-                for(Index j(0); j < 3; ++j)
-                {
-                  x(d,j) = this->_coords[d](idx(cell,perm[p][j]));
-                  // Get levelset gradient
-                }
+                x[j] = this->_coords(idx(cell,perm[p][j]));
+                // Get levelset gradient
               }
 
               this->_functional.compute_local_grad(x, h, grad_loc);
 
               // Add local contributions to global gradient vector
-              for(Index d(0); d < MeshType::world_dim; ++d)
+              for(int j(0); j < 3; ++j)
               {
-                for(Index j(0); j < 3; ++j)
-                  this->_grad[d*nvertices + idx(cell,perm[p][j])] += this->_mu(cell)*grad_loc(d,j);
+                // Global vertex/dof index
+                Index i(idx(cell,perm[p][j]));
+                Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(this->_grad(i));
+                tmp += grad_loc[j];
+
+                this->_grad(i,tmp);
               }
+
             } // permutations
 
             grad_loc.format();
-            // The levelset penalty has to be computed for the hypercube case
-            for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
-            {
-              lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
 
-              for(Index d(0); d < MeshType::world_dim; ++d)
-                lvlset_grad_vals(d,j) = this->_lvlset_grad_vtx_vec[d](idx(cell,j));
+            // The levelset penalty has to be computed for the hypercube case
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
+            {
+              Index i(idx(cell, Index(j)));
+
+              lvlset_vals(j) = this->_lvlset_vec(i);
+
+              for(int d(0); d < MeshType::world_dim; ++d)
+                lvlset_grad_vals(j,d) = this->_lvlset_grad_vtx_vec[d](i);
 
             }
             // Add levelset penalty term, which is not weighted with lambda
             this->_lvlset_functional.add_lvlset_penalty_grad(lvlset_vals, lvlset_grad_vals, grad_loc, this->lvlset_constraint_last);
-            for(Index d(0); d < MeshType::world_dim; ++d)
+
+            // Add local contributions to global gradient vector
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              // Add local contributions to global gradient vector
-              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                this->_grad[d*nvertices + idx(cell,j)] += grad_loc(d,j);
+              // Global vertex/dof index
+              Index i(idx(cell,Index(j)));
+              Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(this->_grad(i));
+              tmp += grad_loc[j];
+
+              this->_grad(i,tmp);
             }
           }
 
-          this->_filter_grad();
+          this->_filter.filter_cor(this->_grad);
 
         } // compute_gradient
 
     }; // class RumpfSmootherLevelsetAnalytic
 
-  } // namespace Geometry
+  } // namespace Meshopt
 } // namespace FEAST
-#endif // KERNEL_GEOMETRY_RUMPF_SMOOTHER_HPP
+#endif // KERNEL_MESHOPT_RUMPF_SMOOTHER_HPP

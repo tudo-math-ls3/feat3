@@ -7,8 +7,6 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # applications to build
 SET (app_list
-  biharmonic_smoother_bdry_deform-app
-  dudv_smoother_bdry_deform-app
   foundation_system_test-app
   foundation_comm_test-app
   foundation_synch_test-app
@@ -18,7 +16,7 @@ SET (app_list
   foundation_global_ops_concave_4procs_test-app
   foundation_global_ops_synch_scal_test-app
   foundation_partitioning_4procs_test-app
-  laplace_smoother_bdry_deform-app
+  lin_smoother_bdry_deform-app
   scarc_test-app
   scarc_1proc_test-app
   scarc_gateway_test-app

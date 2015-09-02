@@ -1,19 +1,16 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_RUMPF_SMOOTHER_LVLSET_HPP
-#define KERNEL_GEOMETRY_RUMPF_SMOOTHER_LVLSET_HPP 1
+#ifndef KERNEL_MESHOPT_RUMPF_SMOOTHER_LVLSET_HPP
+#define KERNEL_MESHOPT_RUMPF_SMOOTHER_LVLSET_HPP 1
 
-#include <kernel/geometry/mesh_smoother/rumpf_smoother.hpp>
-// For projecting the levelset function to a vertex vector
-#include <kernel/assembly/discrete_projector.hpp>
+#include <kernel/base_header.hpp>
+#include <kernel/assembly/discrete_projector.hpp> // For projecting the levelset function to a vertex vector
 #include <kernel/assembly/interpolator.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional.hpp>
-// DEBUG
-#include <kernel/geometry/export_vtk.hpp>
-
+//#include <kernel/geometry/mesh_smoother/rumpf_functional.hpp>
+#include <kernel/meshopt/rumpf_smoother.hpp>
 
 namespace FEAST
 {
-  namespace Geometry
+  namespace Meshopt
   {
     /**
      * \brief Baseclass for a family of variational mesh optimisation algorithms using levelset functions.
@@ -23,21 +20,11 @@ namespace FEAST
      * extended by a levelset formulation for representing internal surfaces by Steffen Basting and Martin Weismann,
      * see \cite BW13
      *
-     *
-     * \tparam DataType_
-     * Our datatype.
-     *
-     * \tparam MemType_
-     * Memory architecture.
-     *
      * \tparam TrafoType_
      * Type of the underlying transformation.
      *
      * \tparam FunctionalType_
      * Functional used for defining mesh quality.
-     *
-     * \tparam SpaceType_
-     * Finite element space for the levelset function
      *
      * \tparam H_EvalType
      * Local meshsize evaluator
@@ -47,68 +34,69 @@ namespace FEAST
      */
     template
     <
-      typename DataType_,
-      typename MemType_,
       typename TrafoType_,
       typename FunctionalType_,
       typename LevelsetFunctionalType_,
-      typename SpaceType_,
-      typename H_EvalType_ = H_Evaluator<TrafoType_, DataType_>
+      typename H_EvalType_ = H_Evaluator<TrafoType_, typename TrafoType_::MeshType::CoordType>
     >
     class RumpfSmootherLevelset :
       public RumpfSmootherBase
       <
-        DataType_,
-        MemType_,
         TrafoType_,
         FunctionalType_,
         H_EvalType_
       >
     {
       public :
-        /// Our datatype
-        typedef DataType_ DataType;
-        /// Memory architecture
-        typedef MemType_ MemType;
         /// Type for the transformation
         typedef TrafoType_ TrafoType;
+        /// The mesh the transformation is defined on
+        typedef typename TrafoType::MeshType MeshType;
+        /// The precision of the mesh coordinates
+        typedef typename MeshType::CoordType CoordType;
+
         /// Type for the functional
         typedef FunctionalType_ FunctionalType;
         /// Type for the levelset part of the functional
         typedef LevelsetFunctionalType_ LevelsetFunctionalType;
         /// Own type for ALGLIBwrapper
-        typedef RumpfSmootherLevelset<DataType, MemType, TrafoType, FunctionalType, LevelsetFunctionalType, SpaceType_, H_EvalType_> MyType;
+        typedef RumpfSmootherLevelset<TrafoType, FunctionalType, LevelsetFunctionalType, H_EvalType_> MyType;
 
-        /// The mesh the transformation is defined on
-        typedef typename TrafoType::MeshType MeshType;
+        /// Only Mem::Main is supported atm
+        typedef Mem::Main MemType;
+        /// We always use Index for now
+        typedef Index IndexType;
+
         /// ShapeType of said mesh
         typedef typename MeshType::ShapeType ShapeType;
-        /// Type for the boundary mesh
-        typedef typename Geometry::MeshPart<MeshType> BoundaryType;
-        /// Factory for the boundary mesh
-        typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
+        /// Vector type for element sizes etc.
+        typedef LAFEM::DenseVector<MemType, CoordType, IndexType> ScalarVectorType;
+        /// Vector type for element scales etc.
+        typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType, MeshType::world_dim> VectorType;
+        /// Type for the filter enforcing boundary conditions
+        typedef LAFEM::UnitFilterBlocked<MemType, CoordType, IndexType, MeshType::world_dim> FilterType;
+        /// Finite Element space for the transformation
+        typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
+
         /// Who's my daddy?
-        typedef RumpfSmootherBase<DataType_, MemType_, TrafoType_, FunctionalType_, H_EvalType_> BaseClass;
-        /// Vector types for element sizes etc.
-        typedef LAFEM::DenseVector<MemType_, DataType_> VectorType;
+        typedef RumpfSmootherBase<TrafoType_, FunctionalType_, H_EvalType_> BaseClass;
         /// Since the functional contains a ShapeType, these have to be the same
         static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value, "ShapeTypes of the transformation / functional have to agree" );
-
-        /// Vector with the original coordinates
-        VectorType _coords_org[TrafoType_::MeshType::world_dim];
 
         /// Functional for levelset part
         LevelsetFunctionalType _lvlset_functional;
         /// FE space for the levelset function
-        SpaceType_ _lvlset_space;
+        TrafoSpace _lvlset_space;
         /// DoF vector for the levelset function
-        VectorType _lvlset_vec;
+        ScalarVectorType _lvlset_vec;
         /// DoF vector for the levelset function values in the mesh vertices
-        VectorType _lvlset_vtx_vec;
+        ScalarVectorType _lvlset_vtx_vec;
         /// DoF vector the the gradient of the levelset function
-        VectorType _lvlset_grad_vec[TrafoType_::MeshType::world_dim];
-        /// DoF vector the the gradient of the levelset function
-        VectorType _lvlset_grad_vtx_vec[TrafoType_::MeshType::world_dim];
+        ScalarVectorType _lvlset_grad_vec[MeshType::world_dim];
+        /// DoF vector the the gradient of the levelset function in the mesh vertices
+        ScalarVectorType _lvlset_grad_vtx_vec[MeshType::world_dim];
+        /// Vector with the original coordinates
+        typename BaseClass::BaseClass::VertexVectorType _coords_org;
 
         /// Align vertices/edges/faces with 0 levelset?
         bool _align_to_lvlset;
@@ -117,16 +105,16 @@ namespace FEAST
         /// Recompute h in each iteration? By default, this is disabled due to poor numerical stability.
         bool _update_h;
         /// Regularisation parameter for levelset based optimal scales
-        DataType _r_adapt_reg;
+        CoordType _r_adapt_reg;
         /// Exponent for levelset based optimal scales.
         /// The function is vol = vol(dist) = (_r_adapt_reg + dist)^_r_adapt_pow
-        DataType _r_adapt_pow;
+        CoordType _r_adapt_pow;
 
       public:
         /// Tolerance up to which the levelset constraint has to be fulfilled
-        DataType lvlset_constraint_tol;
+        CoordType lvlset_constraint_tol;
         /// Last computed levelset constraint;
-        DataType lvlset_constraint_last;
+        CoordType lvlset_constraint_last;
 
       public:
         /**
@@ -145,29 +133,25 @@ namespace FEAST
           _lvlset_space(trafo_),
           _lvlset_vec(_lvlset_space.get_num_dofs()),
           _lvlset_vtx_vec(trafo_.get_mesh().get_num_entities(0)),
+          _coords_org(trafo_.get_mesh().get_num_entities(0)),
           _align_to_lvlset(align_to_lvlset_),
           _r_adaptivity(r_adaptivity_),
           _update_h(false),
-          _r_adapt_reg(Math::pow( Math::eps<DataType_>(),DataType(0.25)) ),
-          _r_adapt_pow(DataType(0.5)),
+          _r_adapt_reg(Math::pow( Math::eps<CoordType>(),CoordType(0.25)) ),
+          _r_adapt_pow(CoordType(0.5)),
           // This tolerance is pretty arbitrary and subject to change
-          lvlset_constraint_tol( Math::pow(Math::eps<DataType_>(),DataType(0.75) ) ),
+          lvlset_constraint_tol( Math::pow(Math::eps<CoordType>(),CoordType(0.75) ) ),
           lvlset_constraint_last(0)
           {
             // This sets the levelset penalty term to 0 if we do not align
-            this->_lvlset_functional.fac_lvlset *= DataType(_align_to_lvlset);
+            this->_lvlset_functional.fac_lvlset *= CoordType(_align_to_lvlset);
 
-            for(Index d = 0; d < MeshType::world_dim; ++d)
+            for(int d(0); d < MeshType::world_dim; ++d)
             {
-              _coords_org[d]= std::move(VectorType(this->_mesh.get_num_entities(0)));
-              _lvlset_grad_vec[d]= std::move(VectorType(_lvlset_space.get_num_dofs()));
-              _lvlset_grad_vtx_vec[d]= std::move(VectorType(this->_mesh.get_num_entities(0)));
+              _lvlset_grad_vec[d] = std::move(ScalarVectorType(_lvlset_space.get_num_dofs()));
+              _lvlset_grad_vtx_vec[d] = std::move(ScalarVectorType(_lvlset_space.get_num_dofs()));
             }
-
-            //for(Index d = 0; d < MeshType::world_dim; ++d)
-            //  _grad[d]= std::move(VectorType(this->_mesh.get_num_entities(0)));
           }
-
 
         /// \copydoc ~RumpfSmoother()
         virtual ~RumpfSmootherLevelset()
@@ -202,10 +186,7 @@ namespace FEAST
           const typename MeshType::VertexSetType& vertex_set = this->_mesh.get_vertex_set();
 
           for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-          {
-            for(int d(0); d < MeshType::world_dim; ++d)
-              _coords_org[d](i,DataType(vertex_set[i][d]));
-          }
+              _coords_org(i,vertex_set[i]);
 
           this->prepare();
           this->compute_lambda();
@@ -216,9 +197,9 @@ namespace FEAST
         /// \copydoc RumpfSmoother::compute_functional()
         ///
         /// Variant containing the levelset penalty term
-        virtual DataType compute_functional() override
+        virtual CoordType compute_functional() override
         {
-          DataType_ fval(0);
+          CoordType fval(0);
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -226,28 +207,25 @@ namespace FEAST
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <DataType_, MeshType::world_dim> h;
+          FEAST::Tiny::Vector <CoordType, MeshType::world_dim> h;
           // This will hold the levelset values at the mesh vertices for one element
-          FEAST::Tiny::Vector <DataType_, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
+          FEAST::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
 
           // Reset last levelset constraint
-          this->lvlset_constraint_last = DataType(0);
+          this->lvlset_constraint_last = CoordType(0);
 
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index j = 0; j < Shape::FaceTraits<ShapeType,0>::count; j++)
+            h = this->_h(cell);
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
             {
-              lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
-              for(Index d = 0; d < MeshType::world_dim; d++)
-              {
-                // Get local coordinates
-                x(d,j) = this->_coords[d](idx(cell,j));
-                // Get local mesh size
-                h(d) = this->_h[d](cell);
-              }
+              lvlset_vals(j) = this->_lvlset_vec(idx(cell,Index(j)));
+              // Get local coordinates
+              x[j] = this->_coords(idx(cell,Index(j)));
+              // Get local mesh size
             }
 
             fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h);
@@ -256,7 +234,7 @@ namespace FEAST
           }
 
           // Scale levelset constraint correctly and add it to the functional value
-          fval += this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(lvlset_constraint_last);
+          fval += this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(lvlset_constraint_last);
           return fval;
         } // compute_functional()
 
@@ -282,9 +260,9 @@ namespace FEAST
          *
          * Debug variant that saves the different contributions for each cell.
          **/
-        virtual DataType compute_functional( DataType_* func_norm, DataType_* func_det, DataType_* func_rec_det, DataType* func_lvlset )
+        virtual CoordType compute_functional( CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det, CoordType* func_lvlset )
         {
-          DataType_ fval(0);
+          CoordType fval(0);
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -292,34 +270,31 @@ namespace FEAST
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <DataType_,MeshType::world_dim> h;
+          FEAST::Tiny::Vector <CoordType,MeshType::world_dim> h;
           // This will hold the levelset values at the mesh vertices for one element
-          FEAST::Tiny::Vector <DataType_, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
+          FEAST::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
 
-          DataType_ norm_A(0), det_A(0), rec_det_A(0), lvlset_penalty(0);
+          CoordType norm_A(0), det_A(0), rec_det_A(0), lvlset_penalty(0);
 
-          DataType_ func_norm_tot(0);
-          DataType_ func_det_tot(0);
-          DataType_ func_rec_det_tot(0);
+          CoordType func_norm_tot(0);
+          CoordType func_det_tot(0);
+          CoordType func_rec_det_tot(0);
 
           // Reset last levelset constraint
-          this->lvlset_constraint_last = DataType(0);
+          this->lvlset_constraint_last = CoordType(0);
 
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index j(0); j < Index(Shape::FaceTraits<ShapeType,0>::count); j++)
+            // Get local mesh size
+            h = this->_h(cell);
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
-              for(Index d(0); d < Index(MeshType::world_dim); d++)
-              {
-                // Get local coordinates
-                x(d,j) = this->_coords[d](idx(cell,j));
-                // Get local mesh size
-                h(d) = this->_h[d](cell);
-              }
+              lvlset_vals(j) = this->_lvlset_vec(idx(cell,Index(j)));
+              // Get local coordinates
+              x[j] = this->_coords(idx(cell,Index(j)));
             }
 
             fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
@@ -338,11 +313,11 @@ namespace FEAST
           }
 
           // Scale levelset constraint correctly and add it to the functional value
-          fval += this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(lvlset_constraint_last);
+          fval += this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(lvlset_constraint_last);
 
           std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) <<
             ", func_rec_det = " << scientify(func_rec_det_tot) << ", func_lvlset = " <<
-            scientify(this->_lvlset_functional.fac_lvlset/DataType(2)*Math::sqr(lvlset_constraint_last)) << std::endl;
+            scientify(this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(lvlset_constraint_last)) << std::endl;
 
           return fval;
         } // compute_functional(func_norm, func_det, func_rec_det, func_lvlset)
@@ -351,43 +326,40 @@ namespace FEAST
         virtual void compute_gradient() override
         {
           // Total number of cells in the mesh
-          Index nvertices(this->_mesh.get_num_entities(0));
-          // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <DataType_,MeshType::world_dim> h;
+          FEAST::Tiny::Vector <CoordType,MeshType::world_dim> h;
           // This will hold the local gradient for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> grad_loc;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
           // This will hold the levelset values at the mesh vertices for one element
-          FEAST::Tiny::Vector <DataType_, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
+          FEAST::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
           // This will hold the levelset gradient values for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> lvlset_grad_vals;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> lvlset_grad_vals;
 
           // Clear gradient vector
-          for(Index i(0); i < MeshType::world_dim*nvertices; ++i)
-            this->_grad[i] = DataType_(0);
+          this->_grad.format();
 
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index j(0); j < Index(Shape::FaceTraits<ShapeType,0>::count); ++j)
+            h = this->_h(cell);
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
+              // Global vertex/dof index
+              Index i(idx(cell, Index(j)));
               // Get levelset
-              lvlset_vals(j) = this->_lvlset_vec(idx(cell,j));
-              for(Index d(0); d < Index(MeshType::world_dim); ++d)
-              {
-                h(d) = this->_h[d](cell);
-                // Get local coordinates
-                x(d,j) = this->_coords[d](idx(cell,j));
-                // Get levelset gradient
-                lvlset_grad_vals(d,j) = this->_lvlset_grad_vtx_vec[d](idx(cell,j));
-              }
+              lvlset_vals(j) = this->_lvlset_vec(i);
+              // Get local coordinates
+              x[j] = this->_coords(i);
+              // Get levelset gradient
+              for(int d(0); d < MeshType::world_dim; ++d)
+                lvlset_grad_vals(j,d) = this->_lvlset_grad_vtx_vec[d](i);
             }
 
             // Compute local gradient and save it to grad_loc
@@ -397,57 +369,72 @@ namespace FEAST
             // Add levelset penalty term, which is not weighted with lambda
             this->_lvlset_functional.add_lvlset_penalty_grad(lvlset_vals, lvlset_grad_vals, grad_loc, lvlset_constraint_last);
 
-            for(Index d(0); d < Index(MeshType::world_dim); ++d)
+            // Add local contributions to global gradient vector
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              // Add local contributions to global gradient vector
-              for(Index j(0); j < Index(Shape::FaceTraits<ShapeType,0>::count); ++j)
-                this->_grad[d*nvertices + idx(cell,j)] += grad_loc(d,j);
+              // Global vertex/dof index
+              Index i(idx(cell,Index(j)));
+              Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(this->_grad(i));
+              tmp += grad_loc[j];
+
+              this->_grad(i,tmp);
             }
           }
 
-          this->_filter_grad();
+          this->_filter.filter_cor(this->_grad);
 
         } // compute_gradient
 
+        /**
+         * \brief Optimises the mesh using a fix point iteration wrt. h
+         *
+         * \param[in, out] total_grad_evals
+         * Total number of gradient evaluations
+         *
+         * \param[in, out] total_iterations
+         * Total number of optimiser iterations
+         *
+         * \param[out] termination_type
+         * Termination type of the optimiser
+         *
+         */
         virtual void optimise_fixpoint_h(int& total_grad_evals, int& total_iterations, int& termination_type)
         {
-          DataType diff(1);
-          DataType tol(Math::pow(Math::eps<DataType_>(),DataType(0.75) ));
+          CoordType diff(1);
+          CoordType tol(Math::pow(Math::eps<CoordType>(),CoordType(0.5) ));
 
           // coords_new = relaxation_parameter*coords + (1 - relaxation_parameter)*coords_old
-          DataType relaxation_parameter(0.9);
+          CoordType relaxation_parameter(0.9);
 
-          for(Index iter(0); iter < 1000; ++iter)
+          for(Index iter(0); iter < 100; ++iter)
           {
-            diff = DataType(0);
+            diff = CoordType(0);
             int iterations(0);
             int grad_evals(0);
             // Save old coordinates for explicit terms
-            for(Index d(0); d < MeshType::world_dim; ++d)
-              this->_coords_org[d].clone(this->_coords[d]);
+            this->_coords_org.clone(this->_coords);
 
             ALGLIBWrapper<MyType>::minimise_functional_cg(grad_evals, iterations, termination_type,*this);
 
             total_grad_evals += grad_evals;
             total_iterations += iterations;
 
-            for(Index d(0); d < MeshType::world_dim; ++d)
+            for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
             {
-              for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-                diff+= Math::sqr(this->_coords_org[d](i) - this->_coords[d](i));
+              for(int d(0); d < MeshType::world_dim; ++d)
+                diff+= Math::sqr(this->_coords_org(i)(d) - this->_coords(i)(d));
             }
-            diff = Math::sqrt(diff/DataType(this->_mesh.get_num_entities(0)));
+            diff = Math::sqrt(diff/CoordType(this->_mesh.get_num_entities(0)));
 
             // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
-            for(Index d(0); d < MeshType::world_dim; ++d)
-            {
-              this->_coords_org[d].scale(this->_coords_org[d],DataType(1)-relaxation_parameter);
-              this->_coords[d].axpy(this->_coords[d], this->_coords_org[d], relaxation_parameter);
-            }
-            // DEBUG
-            std::cout << "Fixed point iteration " << iter <<", diff = " << scientify(diff) << ", mincg iterations: " << iterations << ", grad evals: " << grad_evals << std::endl;
+            this->_coords_org.scale(this->_coords_org,CoordType(1)-relaxation_parameter);
+            this->_coords.axpy(this->_coords, this->_coords_org, relaxation_parameter);
 
             this->set_coords();
+
+            // DEBUG
+            // std::cout << "Fixed point iteration " << iter <<", diff = " << scientify(diff) << ", mincg iterations: " << iterations << ", grad evals: " << grad_evals << std::endl;
+
             if(diff <= tol)
             {
               std::cout << iter+1 << " fixed point iterations, " << total_iterations << " mincg iterations, " << total_grad_evals << " grad evals, last terminationtype was " << termination_type << std::endl;
@@ -468,8 +455,7 @@ namespace FEAST
           int termination_type(0);
 
           // Copy original coordinates if we want to start from the original grid
-          for(Index d(0); d < MeshType::world_dim; ++d)
-            this->_coords_org[d].clone(this->_coords[d]);
+          this->_coords_org.clone(this->_coords);
 
           this->prepare();
           this->compute_lambda();
@@ -478,7 +464,8 @@ namespace FEAST
           if(this->_r_adaptivity && !this->_update_h)
             optimise_fixpoint_h(total_grad_evals, total_iterations, termination_type);
           // Standard method
-          else if(!this->_align_to_lvlset)
+          else
+            if(!this->_align_to_lvlset)
           {
             ALGLIBWrapper<MyType>::minimise_functional_cg(total_grad_evals, total_iterations, termination_type,*this);
             // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
@@ -492,18 +479,18 @@ namespace FEAST
           if(this->_align_to_lvlset)
           {
             // The factor for the penalty term is increased by this factor in every iteration
-            DataType big_factor_inc(1);
+            CoordType big_factor_inc(1);
 
             int penalty_iterations(0);
             this->compute_functional();
             // Value of the levelset constraint from the previous iteration
-            DataType lvlset_constraint_previous = this->lvlset_constraint_last;
+            CoordType lvlset_constraint_previous = this->lvlset_constraint_last;
 
             // Save old levelset penalty factor for restoring later
-            DataType fac_lvlset_org(this->_lvlset_functional.fac_lvlset);
+            CoordType fac_lvlset_org(this->_lvlset_functional.fac_lvlset);
 
             // The Penalty Iteration(TM)
-            while(this->lvlset_constraint_last > this->lvlset_constraint_tol && this->_lvlset_functional.fac_lvlset < Math::sqrt(Math::Limits<DataType>::max()))
+            while(this->lvlset_constraint_last > this->lvlset_constraint_tol && this->_lvlset_functional.fac_lvlset < Math::sqrt(Math::Limits<CoordType>::max()))
             {
               int grad_evals(0);
               int iterations(0);
@@ -531,8 +518,8 @@ namespace FEAST
 
               // Increment for the penalty factor
               // Increase penalty parameter by at least factor 5, very arbitrary
-              big_factor_inc = DataType(5)*this->_lvlset_functional.fac_lvlset*
-                Math::max<DataType>(Math::sqr(lvlset_constraint_previous/this->lvlset_constraint_last), DataType(1));
+              big_factor_inc = CoordType(5)*this->_lvlset_functional.fac_lvlset*
+                Math::max<CoordType>(Math::sqr(lvlset_constraint_previous/this->lvlset_constraint_last), CoordType(1));
             }
 
             std::cout << "Rumpf Smoother penalty iterations: " << penalty_iterations <<
@@ -545,24 +532,7 @@ namespace FEAST
             // Restore original values
             this->_lvlset_functional.fac_lvlset = fac_lvlset_org;
 
-            //bdry_id_org = new int[this->_mesh.get_num_entities(0)];
-            //const DataType eps = DataType(1e-4);//Math::sqrt(Math::eps<DataType>());
-            //for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-            //{
-            //  bdry_id_org[i] = this->_bdry_id[i];
-            //  if(Math::abs(this->_lvlset_vtx_vec(i)) < eps)
-            //    this->_bdry_id[i] = -1;
-            //}
-
           }
-
-          //if(this->_align_to_lvlset)
-          //{
-          //  for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-          //    this->_bdry_id[i] = bdry_id_org[i];
-
-          //  delete(bdry_id_org);
-          //}
 
         }
 
@@ -579,8 +549,8 @@ namespace FEAST
           FEAST::Assembly::DiscreteVertexProjector::project(_lvlset_vtx_vec, _lvlset_vec, _lvlset_space);
 
           // ... do the same for its gradient
-          FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_grad_vtx_vec[0],this->_lvlset_grad_vec[0], this->_lvlset_space);
-          FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_grad_vtx_vec[1],this->_lvlset_grad_vec[1], this->_lvlset_space);
+          for(int d(0); d < MeshType::world_dim; ++d)
+            FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_grad_vtx_vec[d],this->_lvlset_grad_vec[d], this->_lvlset_space);
 
           // As the levelset might be used for r-adaptivity and it's vertex vector might have changed, re-compute
           if(this->_update_h && this->_r_adaptivity)
@@ -620,19 +590,19 @@ namespace FEAST
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <DataType_, MeshType::world_dim> h;
+          FEAST::Tiny::Vector <CoordType, MeshType::world_dim> h;
 
-          DataType sum_lambda(0);
+          CoordType sum_lambda(0);
           for(Index cell(0); cell < ncells; ++cell)
           {
-            DataType tmp(0);
+            CoordType tmp(0);
 
-            for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-              tmp += this->_lvlset_vtx_vec(idx(cell,j));
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+              tmp += this->_lvlset_vtx_vec(idx(cell,Index(j)));
 
-            tmp = tmp/DataType(Shape::FaceTraits<ShapeType,0>::count);
+            tmp = tmp/CoordType(Shape::FaceTraits<ShapeType,0>::count);
             tmp = Math::pow(this->_r_adapt_reg + Math::abs(tmp),this->_r_adapt_pow);
 
             this->_lambda(cell, tmp);
@@ -640,31 +610,13 @@ namespace FEAST
           }
 
           // Scale so that sum(lambda) = 1
-          sum_lambda = DataType(1)/sum_lambda;
-          for(Index cell(0); cell < ncells; ++cell)
-          {
-            this->_lambda(cell,sum_lambda*this->_lambda(cell));
-            // DEBUG: Set mu to lambda
-            //this->_mu(cell,this->_lambda(cell));
-          }
-
-          // DEBUG: Set mu to 1/lambda and scale such that sum(mu) = 1
-          //DataType sum_mu(0);
-          //for(Index cell(0); cell < ncells; ++cell)
-          //{
-          //  this->_mu(cell,DataType(1)/this->_lambda(cell));
-          //  sum_mu+=this->_mu(cell);
-          //}
-
-          //// Scale so that sum(mu) = 1
-          //sum_mu= DataType(1)/sum_mu;
-          //for(Index cell(0); cell < ncells; ++cell)
-          //  this->_mu(cell,sum_mu*this->_mu(cell));
+          sum_lambda = CoordType(1)/sum_lambda;
+          this->_lambda.scale(this->_lambda, sum_lambda);
 
         }
 
         /// \brief Sets parameters for compute_lambda_lvlset
-        void set_r_adapt_params(DataType reg_, DataType pow_)
+        void set_r_adapt_params(CoordType reg_, CoordType pow_)
         {
           this->_r_adapt_reg = reg_;
           this->_r_adapt_pow = pow_;
@@ -693,7 +645,7 @@ namespace FEAST
      * \tparam TrafoType_
      * Our transformation.
      *
-     * \tparam DataType_
+     * \tparam CoordType
      * Our datatype.
      *
      * \tparam MemType_
@@ -710,38 +662,30 @@ namespace FEAST
       typename AnalyticFunctionType_,
       typename AnalyticFunctionGrad0Type_,
       typename AnalyticFunctionGrad1Type_,
-      typename DataType_,
-      typename MemType_,
       typename TrafoType_,
       typename FunctionalType_,
       typename LevelsetFunctionalType_,
-      typename SpaceType_,
-      typename H_EvalType_ = H_Evaluator<TrafoType_, DataType_>
+      typename H_EvalType_ = H_Evaluator<TrafoType_, typename TrafoType_::MeshType::CoordType>
     >
     class RumpfSmootherLevelsetAnalytic :
       public RumpfSmootherLevelset
       <
-        DataType_,
-        MemType_,
         TrafoType_,
         FunctionalType_,
         LevelsetFunctionalType_,
-        SpaceType_,
         H_EvalType_
       >
     {
       public:
-        /// Transformation type
+        /// Type for the transformation
         typedef TrafoType_ TrafoType;
+
         /// Baseclass
         typedef RumpfSmootherLevelset
         <
-          DataType_,
-          MemType_,
           TrafoType_,
           FunctionalType_,
           LevelsetFunctionalType_,
-          SpaceType_,
           H_EvalType_
         > BaseClass;
 
@@ -799,6 +743,7 @@ namespace FEAST
           this->set_coords();
           // Evaluate levelset function
           Assembly::Interpolator::project(this->_lvlset_vec, _analytic_lvlset, this->_lvlset_space);
+          //TODO
           // Evaluate the gradient of the levelset function
           Assembly::Interpolator::project(this->_lvlset_grad_vec[0], _analytic_lvlset_grad0, this->_lvlset_space);
           Assembly::Interpolator::project(this->_lvlset_grad_vec[1], _analytic_lvlset_grad1, this->_lvlset_space);
@@ -808,6 +753,6 @@ namespace FEAST
         }
     }; // class RumpfSmootherLevelsetAnalytic
 
-  } // namespace Geometry
+  } // namespace Meshopt
 } // namespace FEAST
-#endif // KERNEL_GEOMETRY_RUMPF_SMOOTHER_LVLSET_HPP
+#endif // KERNEL_MESHOPT_RUMPF_SMOOTHER_LVLSET_HPP

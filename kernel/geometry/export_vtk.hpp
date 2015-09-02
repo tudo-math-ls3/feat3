@@ -129,6 +129,8 @@ namespace FEAST
       VarDeque _fields_vertex;
       /// cell variable list
       VarDeque _vars_cell;
+      /// cell field list
+      VarDeque _fields_cell;
       /// precision of variables
       int _var_prec;
 
@@ -164,6 +166,7 @@ namespace FEAST
         _vars_cell.clear();
         _vars_vertex.clear();
         _fields_vertex.clear();
+        _fields_cell.clear();
       }
 
       /**
@@ -305,6 +308,92 @@ namespace FEAST
       }
 
       /**
+       * \brief Adds a vector-field cell variable to the exporter.
+       *
+       * This functions adds a 1D, 2D or 3D vector-field variable to the exporter.
+       *
+       * \param[in] name
+       * The name of the variable to be exported.
+       *
+       * \param[in] x, y, z
+       * The three arrays of floating point values. Their lengths are assumed to correspond to the number of
+       * cells of the mesh. The first array \p x must not be \p nullptr.
+       *
+       * \note
+       * This function creates a (deep) copy of the three data arrays, so the data arrays
+       * can be deleted or overwritten after the return of this function.
+       */
+      template<typename T_>
+      void add_field_cell(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
+      {
+        ASSERT_(x != nullptr);
+        std::vector<double> d(3*_num_cells);
+
+        if(z != nullptr)
+        {
+          for(Index i(0); i < _num_cells; ++i)
+          {
+            d[3*i+0] = double(x[i]);
+            d[3*i+1] = double(y[i]);
+            d[3*i+2] = double(z[i]);
+          }
+        }
+        else if(y != nullptr)
+        {
+          for(Index i(0); i < _num_cells; ++i)
+          {
+            d[3*i+0] = double(x[i]);
+            d[3*i+1] = double(y[i]);
+            d[3*i+2] = 0.0;
+          }
+        }
+        else
+        {
+          for(Index i(0); i < _num_cells; ++i)
+          {
+            d[3*i+0] = double(x[i]);
+            d[3*i+1] = 0.0;
+            d[3*i+2] = 0.0;
+          }
+        }
+        _fields_cell.push_back(std::make_pair(name, std::move(d)));
+      }
+
+      /**
+       * \brief Adds a vector-field cell variable given by a LAFEM::***VectorBlocked to the exporter.
+       *
+       * This functions adds a 1D, 2D or 3D vector-field variable to the exporter.
+       *
+       * \tparam VectorType_
+       * Type of the input. Only DenseVectorBlocked and SparseVectorBlocked have the right interface at the moment.
+       *
+       * \param[in] name
+       * The name of the variable to be exported.
+       *
+       * \param[in] v
+       * The vector containing the field values in the mesh cell.
+       *
+       * \note
+       * This function creates a (deep) copy of the vector data.
+       */
+      template<typename VectorType_>
+      void add_field_cell_blocked_vector(const String& name, const VectorType_& v)
+      {
+        std::vector<double> d(3*_num_cells);
+
+        for(Index i(0); i < _num_cells; ++i)
+        {
+          for(Index j(0); j < 3; ++j)
+            d[Index(3)*i+j] = double(0);
+
+          for(int j(0); j < v.BlockSize; ++j)
+            d[Index(3)*i+Index(j)] = v(i)[j];
+
+        }
+        _fields_cell.push_back(std::make_pair(name, std::move(d)));
+      }
+
+      /**
        * \brief Writes out the data to a serial XML-VTU file.
        *
        * \param[in] filename
@@ -440,18 +529,39 @@ namespace FEAST
         }
 
         // write cell data
-        if(!_vars_cell.empty())
+        if(!_vars_cell.empty() || !_fields_cell.empty())
         {
           os << "<CellData>" << std::endl;
-          for(Index i(0); i < Index(_vars_cell.size()); ++i)
+          if(!_vars_cell.empty())
           {
-            const auto& var(_vars_cell[i]);
-            os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">" << std::endl;
-            for(Index j(0); j < _num_cells; ++j)
+            for(Index i(0); i < Index(_vars_cell.size()); ++i)
             {
-              os << scientify(var.second[j], _var_prec) << std::endl;
+              const auto& var(_vars_cell[i]);
+              os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">" << std::endl;
+              for(Index j(0); j < _num_cells; ++j)
+              {
+                os << scientify(var.second[j], _var_prec) << std::endl;
+              }
+              os << "</DataArray>" << std::endl;
             }
-            os << "</DataArray>" << std::endl;
+          }
+
+          if(!_fields_cell.empty())
+          {
+            // write cell fields
+            for(Index i(0); i < Index(_fields_cell.size()); ++i)
+            {
+              const auto& var(_fields_cell[i]);
+              os << "<DataArray type=\"Float64\" Name=\"" << var.first;
+              os <<"\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
+              for(Index j(0); j < _num_cells; ++j)
+              {
+                os << scientify(var.second[3*j+0], _var_prec) << " ";
+                os << scientify(var.second[3*j+1], _var_prec) << " ";
+                os << scientify(var.second[3*j+2], _var_prec) << std::endl;
+              }
+              os << "</DataArray>" << std::endl;
+            }
           }
           os << "</CellData>" << std::endl;
         }

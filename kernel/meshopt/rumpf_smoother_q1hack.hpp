@@ -1,12 +1,13 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_RUMPF_SMOOTHER_Q1HACK_HPP
-#define KERNEL_GEOMETRY_RUMPF_SMOOTHER_Q1HACK_HPP 1
+#ifndef KERNEL_MESHOPT_RUMPF_SMOOTHER_Q1HACK_HPP
+#define KERNEL_MESHOPT_RUMPF_SMOOTHER_Q1HACK_HPP 1
 
-#include <kernel/geometry/mesh_smoother/rumpf_smoother.hpp>
+#include <kernel/base_header.hpp>
+#include <kernel/meshopt/rumpf_smoother.hpp>
 
 namespace FEAST
 {
-  namespace Geometry
+  namespace Meshopt
   {
     /**
      * \copydoc RumpfSmoother
@@ -20,83 +21,108 @@ namespace FEAST
      **/
     template
     <
-      typename DataType_,
-      typename MemType_,
       typename TrafoType_,
       typename FunctionalType_
     >
     class RumpfSmootherQ1Hack :
       public RumpfSmootherBase
       <
-        DataType_,
-        MemType_,
         TrafoType_,
         FunctionalType_,
-        H_EvaluatorQ1Hack<TrafoType_, DataType_>
+        H_EvaluatorQ1Hack<TrafoType_, typename TrafoType_::MeshType::CoordType>
       >
     {
       public:
-        /// Our datatype
-        typedef DataType_ DataType;
-        /// Memory architecture
-        typedef MemType_ MemType;
-        /// Transformation type
+        /// Type for the transformation
         typedef TrafoType_ TrafoType;
-        /// Our functional type
+        /// The mesh the transformation is defined on
+        typedef typename TrafoType::MeshType MeshType;
+        /// The precision of the mesh coordinates
+        typedef typename MeshType::CoordType CoordType;
+        /// Type for the functional
         typedef FunctionalType_ FunctionalType;
         /// Meshsize evaluator
-        typedef H_EvaluatorQ1Hack<TrafoType_, DataType_> H_EvalType;
-        /// ShapeType
-        typedef typename TrafoType::ShapeType ShapeType;
-        /// Mesh of said ShapeType
-        typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
+        typedef H_EvaluatorQ1Hack<TrafoType, CoordType> H_EvalType;
+
+        /// Only Mem::Main is supported atm
+        typedef Mem::Main MemType;
+        /// We always use Index for now
+        typedef Index IndexType;
+
         /// Who's my daddy?
-        typedef RumpfSmootherBase<DataType_, MemType_, TrafoType, FunctionalType_, H_EvalType > BaseClass;
+        typedef RumpfSmootherBase<TrafoType_, FunctionalType_, H_EvalType> BaseClass;
         /// And who am I?
-        typedef RumpfSmootherQ1Hack<DataType_, MemType_, TrafoType_, FunctionalType_> MyType;
-        /// Since the functional contains a ShapeType, these have to be the same
-        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value, "ShapeTypes of the transformation and functional have to agree" );
+        typedef RumpfSmootherQ1Hack<TrafoType_, FunctionalType_> MyType;
+
+        /// ShapeType of said mesh
+        typedef typename MeshType::ShapeType ShapeType;
+
+        /// Vector type for element sizes etc.
+        typedef LAFEM::DenseVector<MemType, CoordType, IndexType> ScalarVectorType;
+        /// Vector type for element scales etc.
+        typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType, MeshType::world_dim> VectorType;
+        /// Type for the filter enforcing boundary conditions
+        typedef LAFEM::UnitFilterBlocked<MemType, CoordType, IndexType, MeshType::world_dim> FilterType;
+        /// Finite Element space for the transformation
+        typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
+        // Since the functional contains a ShapeType, these have to be the same
+        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
+        "ShapeTypes of the transformation / functional have to agree" );
+
+        /// The FE space for the transformation, needed for filtering
+        //TrafoSpace _trafo_space;
+        ///// The filter enforcing boundary conditions
+        //FilterType _filter;
+
         /// \copydoc RumpfSmoother()
-        explicit RumpfSmootherQ1Hack( const TrafoType& trafo_, FunctionalType& functional_)
-          : BaseClass(trafo_, functional_)
+        explicit RumpfSmootherQ1Hack(TrafoType_& trafo_, FunctionalType_& functional_)
+          : BaseClass(trafo_, functional_)// , _trafo_space(trafo_)//, _filter()
           {
+            // this->_dirichlet_asm.assemble(_filter,_trafo_space);
+          }
+
+        /// \copydoc RumpfSmoother()
+        explicit RumpfSmootherQ1Hack(TrafoType_& trafo_, FunctionalType_& functional_, FilterType& filter_)
+          : BaseClass(trafo_, functional_, filter_)//, _trafo_space(trafo_), _filter()
+          {
+            //this->_dirichlet_asm.assemble(_filter,_trafo_space);
           }
 
         /// \copydoc BaseClass::compute_functional()
-        virtual DataType compute_functional()
+        virtual CoordType compute_functional()
         {
-          DataType_ fval(0);
+          CoordType fval(0);
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
           // In 2d, each hypercube is split into 2 simplices and there are two possible permutations
           const int n_perms(4);
-          const Index perm[4][3] =
+          const int perm[4][3] =
           {
-            {Index(0), Index(1), Index(2)},
-            {Index(1), Index(3), Index(2)},
-            {Index(0), Index(3), Index(2)},
-            {Index(0), Index(1), Index(3)}
+            {0, 1, 2},
+            {1, 3, 2},
+            {0, 3, 2},
+            {0, 1, 3}
           };
           // Index set for local/global numbering
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, 3> x;
+          FEAST::Tiny::Matrix <CoordType, 3, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector<DataType_, MeshType::world_dim> h;
+          FEAST::Tiny::Vector<CoordType, MeshType::world_dim> h;
 
           // Compute the functional value for each cell...
           for(Index cell(0); cell < ncells; ++cell)
           {
+            h = this->_h(cell);
             // ... and for each simplex in all permutations
-            for(Index p(0); p < n_perms; ++p)
+            for(int p(0); p < n_perms; ++p)
             {
-              for(Index d(0); d < MeshType::world_dim; d++)
+              for(int d(0); d < MeshType::world_dim; d++)
               {
-                h(d) = this->_h[d](cell);
-                for(Index j(0); j < 3; j++)
-                  x(d,j) = this->_coords[d](idx(cell,perm[p][j]));
+                for(int j(0); j < 3; j++)
+                  x[j] = this->_coords(idx(cell,Index(perm[p][j])));
               }
               fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h);
             }
@@ -105,57 +131,52 @@ namespace FEAST
           return fval;
         } // compute_functional
 
-        /// \copydoc BaseClass::compute_functional(DataType_*, DataType_*, DataType_*)
-        virtual DataType compute_functional( DataType_* func_norm, DataType_* func_det, DataType_* func_rec_det )
+        /// \copydoc BaseClass::compute_functional(CoordType*, CoordType*, CoordType*)
+        virtual CoordType compute_functional( CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det )
         {
-          DataType_ fval(0);
+          CoordType fval(0);
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
           // In 2d, each hypercube is split into 2 simplices and there are two possible permutations
           const int n_perms(4);
-          const Index perm[4][3] =
+          const int perm[4][3] =
           {
-            {Index(0), Index(1), Index(2)},
-            {Index(1), Index(3), Index(2)},
-            {Index(0), Index(3), Index(2)},
-            {Index(0), Index(1), Index(3)}
+            {0, 1, 2},
+            {1, 3, 2},
+            {0, 3, 2},
+            {0, 1, 3}
           };
           // Index set for local/global numbering
           auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, 3> x;
+          FEAST::Tiny::Matrix <CoordType, 3, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector<DataType_, MeshType::world_dim> h;
+          FEAST::Tiny::Vector<CoordType, MeshType::world_dim> h;
 
-          DataType_ norm_A(0), det_A(0), rec_det_A(0);
+          CoordType norm_A(0), det_A(0), rec_det_A(0);
 
-          DataType_ func_norm_tot(0);
-          DataType_ func_det_tot(0);
-          DataType_ func_rec_det_tot(0);
+          CoordType func_norm_tot(0);
+          CoordType func_det_tot(0);
+          CoordType func_rec_det_tot(0);
 
           // Compute the functional value for each cell...
           for(Index cell(0); cell < ncells; ++cell)
           {
-            func_norm[cell] = DataType(0);
-            func_det[cell] = DataType(0);
-            func_rec_det[cell] = DataType(0);
+            func_norm[cell] = CoordType(0);
+            func_det[cell] = CoordType(0);
+            func_rec_det[cell] = CoordType(0);
 
-            //std::cout << "cell " << cell << std::endl;
+            h = this->_h(cell);
             // ... and for each simplex in all permutations
-            for(Index p(0); p < n_perms; ++p)
+            for(int p(0); p < n_perms; ++p)
             {
               //std::cout << " permutation " << p << std::endl;
-              for(Index d(0); d < MeshType::world_dim; ++d)
+              for(int d(0); d < MeshType::world_dim; ++d)
               {
-                h(d) = this->_h[d](cell);
-                for(Index j(0); j < 3; ++j)
-                {
-                  x(d,j) = this->_coords[d](idx(cell,perm[p][j]));
-                  //std::cout << perm[p][j] << ": " << scientify(x(d,j)) << " " ;
-                }
-                //std::cout << std::endl;
+                for(int j(0); j < 3; ++j)
+                  x[j] = this->_coords(idx(cell,Index(perm[p][j])));
               }
               fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
 
@@ -178,8 +199,6 @@ namespace FEAST
         /// \copydoc BaseClass::compute_gradient()
         virtual void compute_gradient()
         {
-          // Total number of vertices in the mesh
-          Index nvertices(this->_mesh.get_num_entities(0));
           // Total number of cells in the mesh
           Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
 
@@ -188,50 +207,49 @@ namespace FEAST
 
           // In 2d, each hypercube is split into 2 simplices and there are two possible permutations
           const int n_perms(4);
-          const Index perm[4][3] =
+          const int perm[4][3] =
           {
-            {Index(0), Index(1), Index(2)},
-            {Index(1), Index(3), Index(2)},
-            {Index(0), Index(3), Index(2)},
-            {Index(0), Index(1), Index(3)}
+            {0, 1, 2},
+            {1, 3, 2},
+            {0, 3, 2},
+            {0, 1, 3}
           };
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, 3> x;
+          FEAST::Tiny::Matrix<CoordType, 3, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector<DataType_, MeshType::world_dim> h;
+          FEAST::Tiny::Vector<CoordType, MeshType::world_dim> h;
           // This will hold the local gradient for one element for passing to other routines
-          FEAST::Tiny::Matrix<DataType_, MeshType::world_dim, 3 > grad_loc;
+          FEAST::Tiny::Matrix<CoordType, 3, MeshType::world_dim> grad_loc;
 
           // Clear gradient vector
-          for(Index i(0); i < MeshType::world_dim*nvertices; ++i)
-            this->_grad[i] = DataType_(0);
+          this->_grad.format();
 
           // Compute the functional value for each cell...
           for(Index cell(0); cell < ncells; ++cell)
           {
+            h = this->_h(cell);
             // ... and for each simplex in all permutations
-            for(Index p(0); p < n_perms; ++p)
+            for(int p(0); p < n_perms; ++p)
             {
-              for(Index d(0); d < MeshType::world_dim; ++d)
-              {
-                h(d) = this->_h[d](cell);
-                // Get local coordinates
-                for(Index j(0); j < 3; ++j)
-                  x(d,j) = this->_coords[d](idx(cell,perm[p][j]));
-              }
+              // Get local coordinates
+              for(int j(0); j < 3; ++j)
+                x[j] = this->_coords(idx(cell,Index(perm[p][j])));
 
               this->_functional.compute_local_grad(x, h, grad_loc);
 
-              for(Index d(0); d < MeshType::world_dim; ++d)
+              // Add local contributions to global gradient vector
+              for(int j(0); j < 3; ++j)
               {
-                // Add local contributions to global gradient vector
-                for(Index j(0); j < 3; ++j)
-                  this->_grad[d*nvertices + idx(cell,perm[p][j])] += this->_mu(cell)*grad_loc(d,j);
+                Index i(idx(cell,Index(perm[p][j])));
+                Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(this->_grad(i));
+                tmp += this->_mu(cell)*grad_loc[j];
+
+                this->_grad(i,tmp);
               }
             }
           }
 
-          this->_filter_grad();
+          this->_filter.filter_cor(this->_grad);
 
         } // compute_gradient
 
@@ -250,6 +268,6 @@ namespace FEAST
 
     }; // class RumpfSmootherQ1Hack
 
-  } // namespace Geometry
+  } // namespace Meshopt
 } // namespace FEAST
-#endif // KERNEL_GEOMETRY_RUMPF_SMOOTHER_HPP
+#endif // KERNEL_MESHOPT_RUMPF_SMOOTHER_HPP

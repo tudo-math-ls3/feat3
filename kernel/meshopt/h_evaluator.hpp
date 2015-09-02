@@ -1,10 +1,13 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_H_EVALUATOR_HPP
-#define KERNEL_GEOMETRY_H_EVALUATOR_HPP 1
+#ifndef KERNEL_MESHOPT_H_EVALUATOR_HPP
+#define KERNEL_MESHOPT_H_EVALUATOR_HPP 1
+#include <kernel/base_header.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/trafo/standard/mapping.hpp>
 
 namespace FEAST
 {
-  namespace Geometry
+  namespace Meshopt
   {
     /**
      * \brief Computes local mesh size h
@@ -124,7 +127,7 @@ namespace FEAST
       static void compute_grad_det(Tgrad_& grad, const Tx_& x);
 
       /**
-       * \brief Computes the gradient of sum of the local transformation's determinants
+       * \brief Computes the gradient of sum of all cell's local transformation determinants
        *
        * This is the sum of all local gradients and needed to correctly calculate the gradient of the optimal local
        * scales h.
@@ -286,8 +289,7 @@ namespace FEAST
         template<typename Tx_>
         static DataType compute_det(Tx_& x)
         {
-          return DataType(0.5000000000e0 * x(0,3) * x(1,2) + 0.5000000000e0 * x(0,1) * x(1,3) - 0.5000000000e0 * x(0,0) * x(1,2) - 0.5000000000e0 * x(0,1) * x(1,0) - 0.5000000000e0 * x(0,2) * x(1,3) + 0.5000000000e0 * x(0,2) * x(1,0) - 0.5000000000e0 * x(0,3) * x(1,1) + 0.5000000000e0 * x(0,0) * x(1,1));
-
+          return (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(0,1) * x(1,0) + x(0,1) * x(2,0) + x(1,0) * x(3,1) - x(1,1) * x(3,0) - x(2,0) * x(3,1) + x(2,1) * x(3,0)) / DataType(2);
         }
       public:
         /**
@@ -315,11 +317,10 @@ namespace FEAST
 
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d(0); d < MeshType::world_dim; ++d)
-            {
-              h_[0](cell,const1*Math::pow(lambda_(cell)*sum_det,exponent));
-              h_[1](cell,const2*Math::pow(lambda_(cell)*sum_det,exponent));
-            }
+            Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp(DataType(0));
+            tmp(0) = const1*Math::pow(lambda_(cell)*sum_det,exponent);
+            tmp(1) = const2*Math::pow(lambda_(cell)*sum_det,exponent);
+            h_(cell, tmp);
           }
         } // compute_h
 
@@ -332,7 +333,7 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
           auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
@@ -340,12 +341,10 @@ namespace FEAST
           DataType sum_det(0);
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d(0); d < MeshType::world_dim; ++d)
-            {
-              // Get local coordinates
-              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                x(d,j) = coords_[d](idx(cell,j));
-            }
+            // Get local coordinates
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+              x[j] = coords_(idx(cell,Index(j)));
+
             sum_det += compute_det(x);
           }
           return sum_det;
@@ -404,7 +403,7 @@ namespace FEAST
         template<typename Tx_>
         static DataType compute_det(Tx_& x)
         {
-          return DataType(0.5000000000e0 * x(0,3) * x(1,2) + 0.5000000000e0 * x(0,1) * x(1,3) - 0.5000000000e0 * x(0,0) * x(1,2) - 0.5000000000e0 * x(0,1) * x(1,0) - 0.5000000000e0 * x(0,2) * x(1,3) + 0.5000000000e0 * x(0,2) * x(1,0) - 0.5000000000e0 * x(0,3) * x(1,1) + 0.5000000000e0 * x(0,0) * x(1,1));
+          return (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(0,1) * x(1,0) + x(0,1) * x(2,0) + x(1,0) * x(3,1) - x(1,1) * x(3,0) - x(2,0) * x(3,1) + x(2,1) * x(3,0)) / DataType(2);
         }
 
         /**
@@ -413,14 +412,14 @@ namespace FEAST
         template<typename Tgrad_, typename Tx_>
         static void compute_grad_det(Tgrad_& grad, const Tx_& x)
         {
-          grad(0,0) = x(1,1) / DataType(0.2e1) - x(1,2) / DataType(0.2e1);
-          grad(0,1) = x(1,3) / DataType(0.2e1) - x(1,0) / DataType(0.2e1);
-          grad(0,2) = -x(1,3) / DataType(0.2e1) + x(1,0) / DataType(0.2e1);
-          grad(0,3) = -x(1,1) / DataType(0.2e1) + x(1,2) / DataType(0.2e1);
-          grad(1,0) = -x(0,1) / DataType(0.2e1) + x(0,2) / DataType(0.2e1);
-          grad(1,1) = x(0,0) / DataType(0.2e1) - x(0,3) / DataType(0.2e1);
-          grad(1,2) = -x(0,0) / DataType(0.2e1) + x(0,3) / DataType(0.2e1);
-          grad(1,3) = -x(0,2) / DataType(0.2e1) + x(0,1) / DataType(0.2e1);
+          grad(0,0) = ( x(1,1) - x(2,1)) / DataType(2);
+          grad(0,1) = (-x(1,0) + x(2,0)) / DataType(2);
+          grad(1,0) = (-x(0,1) + x(3,1)) / DataType(2);
+          grad(1,1) = ( x(0,0) - x(3,0)) / DataType(2);
+          grad(2,0) = ( x(0,1) - x(3,1)) / DataType(2);
+          grad(2,1) = (-x(0,0) + x(3,0)) / DataType(2);
+          grad(3,0) = (-x(1,1) + x(2,1)) / DataType(2);
+          grad(3,1) = ( x(1,0) - x(2,0)) / DataType(2);
         }
 
       public:
@@ -432,17 +431,17 @@ namespace FEAST
         {
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
-          // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
-
           DataType_ sum_det = compute_sum_det(coords_, trafo_);
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d(0); d < MeshType::world_dim; ++d)
+            Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp;
+            for(int d(0); d < MeshType::world_dim; ++d)
               // For hypercubes, h is half the refence cell's edge length
-              h_[d](cell,DataType(0.5)*Math::pow(lambda_(cell)*sum_det,exponent));
+              tmp(d) = DataType(0.5)*Math::pow(lambda_(cell)*sum_det,exponent);
+
+            h_(cell,tmp);
           }
         }
 
@@ -455,7 +454,7 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
           auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
@@ -463,12 +462,10 @@ namespace FEAST
           DataType sum_det(0);
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d(0); d < MeshType::world_dim; ++d)
-            {
-              // Get local coordinates
-              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                x(d,j) = coords_[d](idx(cell,j));
-            }
+            // Get local coordinates
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+              x[j] = coords_(idx(cell,Index(j)));
+
             sum_det += compute_det(x);
           }
           return sum_det;
@@ -483,41 +480,34 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix<DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
           auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
 
-          FEAST::Tiny::Matrix<DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count>
+          FEAST::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
             local_grad(DataType_(0));
 
-          for(Index d(0); d < MeshType::world_dim; ++d)
-            grad_[d].format();
+          grad_.format();
 
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d(0); d < MeshType::world_dim; ++d)
-            {
-              // Get local coordinates
-              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                x(d,j) = coords_[d](idx(cell,j));
-            }
+            // Get local coordinates
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+              x[j] = coords_(idx(cell,Index(j)));
 
             compute_grad_det(local_grad, x);
 
-            for(Index d(0); d < MeshType::world_dim; ++d)
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-              {
-                DataType tmp = grad_[d](idx(cell,j)) + local_grad(d,j);
-                grad_[d](idx(cell,j), tmp);
-              }
+              Index i(idx(cell, Index(j)));
+              grad_(i, grad_(i) + local_grad[j]);
             }
 
           }
         } // compute_grad_sum_det
 
-    };
+    }; // H_Evaluator<Hypercube<2>>
 
     /**
      * \brief Computes local mesh size h for Rumpf smoothers
@@ -570,7 +560,7 @@ namespace FEAST
         template<typename Tx_>
         static DataType compute_det(Tx_& x)
         {
-          return DataType(0.2e1 / 0.3e1 * sqrt(0.3e1) * (x(0,0) * x(1,1) - x(0,0) * x(1,2) - x(0,1) * x(1,0) + x(0,1) * x(1,2) + x(0,2) * x(1,0) - x(0,2) * x(1,1)) );
+          return DataType(2) / Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1));
         }
 
         /**
@@ -579,12 +569,14 @@ namespace FEAST
         template<typename Tgrad_, typename Tx_>
         static void compute_grad_det(Tgrad_& grad, const Tx_& x)
         {
-          grad(0,0) = DataType_(0.2e1) / DataType_(0.3e1) * Math::sqrt(DataType_(0.3e1)) * (x(1,1) - x(1,2));
-          grad(0,1) = DataType_(0.2e1) / DataType_(0.3e1) * (-x(1,0) + x(1,2)) * Math::sqrt(DataType_(0.3e1));
-          grad(1,0) = DataType_(0.2e1) / DataType_(0.3e1) * Math::sqrt(DataType_(0.3e1)) * (-x(0,1) + x(0,2));
-          grad(1,1) = DataType_(0.2e1) / DataType_(0.3e1) * Math::sqrt(DataType_(0.3e1)) * (x(0,0) - x(0,2));
-          grad(0,2) = DataType_(0.2e1) / DataType_(0.3e1) * Math::sqrt(DataType_(0.3e1)) * (x(1,0) - x(1,1));
-          grad(1,2) = DataType_(0.2e1) / DataType_(0.3e1) * (-x(0,0) + x(0,1)) * Math::sqrt(DataType_(0.3e1));
+          DataType fac(DataType(2) / Math::sqrt(DataType(3)));
+
+          grad(0,0) = fac * ( x(1,1) - x(2,1));
+          grad(0,1) = fac * (-x(1,0) + x(2,0));
+          grad(1,0) = fac * (-x(0,1) + x(2,1));
+          grad(1,1) = fac * ( x(0,0) - x(2,0));
+          grad(2,0) = fac * ( x(0,1) - x(1,1));
+          grad(2,1) = fac * (-x(0,0) + x(1,0));
         }
 
       public:
@@ -604,8 +596,8 @@ namespace FEAST
 
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d(0); d < MeshType::world_dim; ++d)
-              h_[d](cell,Math::pow(lambda_(cell)*sum_det,exponent));
+            Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp(Math::pow(lambda_(cell)*sum_det,exponent));
+            h_(cell, tmp);
           }
         }
 
@@ -618,7 +610,7 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
           auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
@@ -626,12 +618,10 @@ namespace FEAST
           DataType sum_det(0);
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d(0); d < MeshType::world_dim; ++d)
-            {
-              // Get local coordinates
-              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                x(d,j) = coords_[d](idx(cell,j));
-            }
+            // Get local coordinates
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+              x[j] = coords_(idx(cell,Index(j)));
+
             sum_det += compute_det(x);
           }
           return sum_det;
@@ -646,42 +636,35 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix<DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAST::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
           auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
 
-          FEAST::Tiny::Matrix<DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count>
+          FEAST::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
             local_grad(DataType_(0));
 
-          for(Index d(0); d < MeshType::world_dim; ++d)
-            grad_[d].format();
+          grad_.format();
 
           for(Index cell(0); cell < ncells; ++cell)
           {
-            for(Index d(0); d < MeshType::world_dim; ++d)
-            {
-              // Get local coordinates
-              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-                x(d,j) = coords_[d](idx(cell,j));
-            }
+            // Get local coordinates
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+              x[j] = coords_(idx(cell,Index(j)));
 
             compute_grad_det(local_grad, x);
 
-            for(Index d(0); d < MeshType::world_dim; ++d)
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              for(Index j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-              {
-                DataType tmp = grad_[d](idx(cell,j)) + local_grad(d,j);
-                grad_[d](idx(cell,j), tmp);
-              }
+              Index i(idx(cell, Index(j)));
+              grad_(i, grad_(i) + local_grad[j]);
             }
 
           }
         } // compute_grad_sum_det
 
-    };
+    }; // H_Evaluator<Simplex<2>>
     /// \endcond
-  } // namespace Geometry
+  } // namespace Meshopt
 } // namespace FEAST
-#endif // KERNEL_GEOMETRY_H_EVALUATOR_HPP
+#endif // KERNEL_MESHOPT_H_EVALUATOR_HPP

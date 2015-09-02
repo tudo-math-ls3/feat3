@@ -1,15 +1,15 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_2D_Q1HACK_HPP
-#define KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_2D_Q1HACK_HPP 1
+#ifndef KERNEL_MESHOPT_RUMPF_FUNCTIONALS_Q1HACK_HPP
+#define KERNEL_MESHOPT_RUMPF_FUNCTIONALS_Q1HACK_HPP 1
 
 
-#include <kernel/geometry/mesh_smoother/rumpf_functional.hpp>
+#include <kernel/meshopt/rumpf_functional.hpp>
 // For HeavisideReg
 #include <kernel/assembly/common_functions.hpp>
 
 namespace FEAST
 {
-  namespace Geometry
+  namespace Meshopt
   {
     /// \cond internal
 
@@ -41,7 +41,7 @@ namespace FEAST
 
     }; // class RumpfFunctionalQ1Hack
     /// \endcond
-  } // namespace Geometry
+  } // namespace Meshopt
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_LVLSET_2D_Q1HACK_HPP
+#endif // KERNEL_MESHOPT_RUMPF_FUNCTIONALS_Q1HACK_HPP

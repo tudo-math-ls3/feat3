@@ -1,13 +1,15 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_HPP
-#define KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_HPP 1
+#ifndef KERNEL_MESHOPT_RUMPF_FUNCTIONAL_HPP
+#define KERNEL_MESHOPT_RUMPF_FUNCTIONAL_HPP 1
 
 namespace FEAST
 {
-  namespace Geometry
+  namespace Meshopt
   {
     /**
      * \brief Base class template for Rumpf functionals
+     *
+     * For a detailed description, \see RumpfFunctional
      *
      * \tparam DataType_
      * Our data type
@@ -65,11 +67,12 @@ namespace FEAST
           {
           }
 
-        /// Destructor
+        /// \brief Virtual destructor
         virtual ~RumpfFunctionalBase()
         {
         }
 
+        /// \brief Print basic information
         virtual void print()
         {
           std::cout << "RumpfFunctionalBase characteristics: " << std::endl;
@@ -80,7 +83,7 @@ namespace FEAST
     };
 
     /**
-     * \brief Base class template for Rumpf functionals
+     * \brief Functionals for measuring and optimising mesh quality
      *
      * \tparam DataType_
      * Our data type
@@ -90,7 +93,9 @@ namespace FEAST
      *
      * The actual implementation has to be supplied by the specialisations in ShapeType_.
      *
-     **/
+     * A RumpfFunctional computes the cell local contribution to the local functional value and its gradient.
+     *
+     */
 #ifndef DOXYGEN
     template<typename DataType_, typename ShapeType_>
     class RumpfFunctional;
@@ -433,7 +438,8 @@ namespace FEAST
     // visible to doxygen. The actual functionality has to be supplied by the implementation.
 #else
     template<typename DataType_, typename ShapeType_>
-    class RumpfFunctionalConc{
+    class RumpfFunctionalConc
+    {
       /**
        * \brief Adds the gradient h part to the local gradient
        *
@@ -477,7 +483,7 @@ namespace FEAST
     template<typename DataType_, typename ShapeType_>
     class RumpfFunctionalLevelsetMonitor;
 
-  }
+  } // namespace Meshopt
 
-}
-#endif // KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_HPP
+} // namespace FEAST
+#endif // KERNEL_MESHOPT_RUMPF_FUNCTIONAL_HPP

@@ -5,7 +5,6 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # include test_aux subdirectory
 ADD_SUBDIRECTORY( test_aux )
-ADD_SUBDIRECTORY( mesh_smoother )
 
 # list of geometry source files and depenencies
 #ADD_LIBRARY(kernel-geometry STATIC)

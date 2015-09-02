@@ -1,14 +1,16 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_MESH_SMOOTHER_HPP
-#define KERNEL_GEOMETRY_MESH_SMOOTHER_HPP 1
+#ifndef KERNEL_MESHOPT_MESH_SMOOTHER_HPP
+#define KERNEL_MESHOPT_MESH_SMOOTHER_HPP 1
 
+#include <kernel/base_header.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
+#include <kernel/space/lagrange1/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/lafem/dense_vector.hpp>
 
 namespace FEAST
 {
-  namespace Geometry
+  namespace Meshopt
   {
 
     /**
@@ -17,53 +19,36 @@ namespace FEAST
      * This abstract class is the baseclass for all mesh optimisation algorithms, which can be direct, variational
      * or something entirely different.
      *
-     * \tparam DataType_
-     * Our datatype.
-     *
-     * \tparam MemType_
-     * Memory architecture.
-     *
      * \tparam TrafoType_
      * Type of the underlying transformation.
      *
      * \author Jordi Paul
      *
      */
-    template<typename DataType_, typename MemType_, typename TrafoType_>
+    template<typename MeshType_>
     class MeshSmoother
     {
       public:
+        typedef MeshType_ MeshType;
         /// Our datatype
-        typedef DataType_ DataType;
-        /// Memory architecture
-        typedef MemType_ MemType;
-        /// Type for the transformation
-        typedef TrafoType_ TrafoType;
-        /// The mesh the transformation is defined on
-        typedef typename TrafoType::MeshType MeshType;
-        /// ShapeType of said mesh
+        typedef typename MeshType::CoordType CoordType;
+        /// The shape type
         typedef typename MeshType::ShapeType ShapeType;
         /// Type for the vectors to hold coordinates etc.
-        typedef LAFEM::DenseVector<MemType, DataType> VectorType;
-
-        /// Coordinates of the vertices, as they get changed in the optimisation process
-        VectorType _coords[MeshType::world_dim];
+        typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, MeshType::world_dim> VertexVectorType;
 
       public:
-        /// The underlying transformation
-        const TrafoType& _trafo;
         /// The mesh for the underlying transformation
         MeshType& _mesh;
+        /// Coordinates, used for setting new boundary values etc.
+        VertexVectorType _coords;
 
       public:
         /// Constructor
-        explicit MeshSmoother(const TrafoType& trafo_) :
-          _trafo (trafo_),
-          _mesh ( const_cast<MeshType&>(_trafo.get_mesh()) )
+        explicit MeshSmoother(MeshType& mesh_) :
+          _mesh(mesh_),
+          _coords(mesh_.get_num_entities(0), CoordType(0))
           {
-            for(int d = 0; d < MeshType::world_dim; ++d)
-              _coords[d]= std::move(VectorType(_mesh.get_num_entities(0)));
-
           }
 
         virtual ~MeshSmoother()
@@ -82,10 +67,7 @@ namespace FEAST
           const typename MeshType::VertexSetType& vertex_set = _mesh.get_vertex_set();
 
           for(Index i(0); i < _mesh.get_num_entities(0); ++i)
-          {
-            for(int d(0); d < MeshType::world_dim; ++d)
-              _coords[d](i,DataType(vertex_set[i][d]));
-          }
+            _coords(i, vertex_set[i]);
         }
 
         /// \brief Sets the coordinates in the underlying mesh to _coords.
@@ -94,10 +76,7 @@ namespace FEAST
           typename MeshType::VertexSetType& vertex_set = _mesh.get_vertex_set();
 
           for(Index i(0); i < _mesh.get_num_entities(0); ++i)
-          {
-            for(int d(0); d < MeshType::world_dim; ++d)
-              vertex_set[i][d] = _coords[d](i);
-          }
+            vertex_set[i] = _coords(i);
         }
 
         /// \brief Optimises the mesh according to the criteria implemented in the mesh smoother.
@@ -108,7 +87,32 @@ namespace FEAST
 
     }; // class MeshSmoother
 
+    /// \cond internal
+    namespace Intern
+    {
+      /**
+       * \brief Information about the FE space the transformation belongs to
+       *
+       * \tparam Trafo_
+       * The transformation
+       */
+      template<typename Trafo_>
+      struct TrafoFE
+      {
+#ifdef DOXYGEN
+        /// Finite Element space the trafo belongs to
+        typedef ... Space;
+#endif
+      };
 
-  } // namespace Geometry
+      template<typename Mesh_>
+      struct TrafoFE<Trafo::Standard::Mapping<Mesh_>>
+      {
+        typedef Space::Lagrange1::Element<Trafo::Standard::Mapping<Mesh_>> Space;
+      };
+    }
+    /// \endcond
+
+  } // namespace Meshopt
 } // namespace FEAST
-#endif // KERNEL_GEOMETRY_MESH_SMOOTHER_HPP
+#endif // KERNEL_MESHOPT_MESH_SMOOTHER_HPP

@@ -1,13 +1,14 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_LVLSET
-#define KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_LVLSET 1
+#ifndef KERNEL_MESHOPT_RUMPF_FUNCTIONALS_LVLSET
+#define KERNEL_MESHOPT_RUMPF_FUNCTIONALS_LVLSET 1
 
-// For HeavisideReg
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/base_header.hpp>
+#include <kernel/assembly/common_functions.hpp> // For HeavisideReg
+#include <kernel/geometry/intern/face_index_mapping.hpp>
 
 namespace FEAST
 {
-  namespace Geometry
+  namespace Meshopt
   {
     /// \cond internal
 
@@ -35,20 +36,23 @@ namespace FEAST
       public:
         /**
          * \brief Constructor
-         **/
+         */
         RumpfFunctionalLevelset() :
           fac_lvlset(DataType(1))
           {
           }
 
-        RumpfFunctionalLevelset(const RumpfFunctionalLevelset& other) :
-          fac_lvlset(other.fac_lvlset)
-          {
-          }
+        ///**
+        // * \brief Copy constructor
+        // */
+        //RumpfFunctionalLevelset(const RumpfFunctionalLevelset& other) :
+        //  fac_lvlset(other.fac_lvlset)
+        //  {
+        //  }
 
         /**
          * \brief Destructor
-         **/
+         */
         ~RumpfFunctionalLevelset()
         {
         }
@@ -64,8 +68,8 @@ namespace FEAST
           for(int edge(0); edge < Shape::FaceTraits<ShapeType,1>::count; ++edge)
           {
             // These are the indices of the vertices on edge
-            Index i(Index(FimType::map(edge,0)));
-            Index j(Index(FimType::map(edge,1)));
+            int i(FimType::map(edge,0));
+            int j(FimType::map(edge,1));
 
             penalty += FEAST::Assembly::Common::template HeavisideRegStatic<DataType>::eval(-heaviside_reg_fac()
                 * lvlset_vals(i) * lvlset_vals(j));
@@ -98,18 +102,18 @@ namespace FEAST
             for(int edge(0); edge < Shape::FaceTraits<ShapeType,1>::count; ++edge)
             {
               // These are the indices of the vertices on edge
-              Index i(Index(FimType::map(edge,0)));
-              Index j(Index(FimType::map(edge,1)));
+              int i(FimType::map(edge,0));
+              int j(FimType::map(edge,1));
 
               auto lvlset_prod = -heaviside_reg_fac() * lvlset_vals(i) * lvlset_vals(j);
               // Derivative of the heaviside function
               auto heaviside_der = FEAST::Assembly::Common::template HeavisideRegStatic<DataType>::der_x(lvlset_prod);
-              for(Index d(0); d < ShapeType::dimension; ++d)
+              for(int d(0); d < ShapeType::dimension; ++d)
               {
-                grad(d,i) -= heaviside_reg_fac() * fac_lvlset * lvlset_constraint_last *
-                  (heaviside_der * lvlset_grad_vals(d,i) * lvlset_vals(j));
-                grad(d,j) -= heaviside_reg_fac() * fac_lvlset * lvlset_constraint_last *
-                  (heaviside_der * lvlset_grad_vals(d,j) * lvlset_vals(i));
+                grad(i,d) -= heaviside_reg_fac() * fac_lvlset * lvlset_constraint_last *
+                  (heaviside_der * lvlset_grad_vals(i,d) * lvlset_vals(j));
+                grad(j,d) -= heaviside_reg_fac() * fac_lvlset * lvlset_constraint_last *
+                  (heaviside_der * lvlset_grad_vals(j,d) * lvlset_vals(i));
               }
             }
 
@@ -132,7 +136,7 @@ namespace FEAST
 
     }; // class RumpfFunctionalLevelset
     /// \endcond
-  } // namespace Geometry
+  } // namespace Meshopt
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_LVLSET
+#endif // KERNEL_MESHOPT_RUMPF_FUNCTIONALS_LVLSET

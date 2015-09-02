@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Worksheet>
-<Version major="16" minor="0"/>
+<Version major="2015" minor="0"/>
 <Label-Scheme value="2" prefix=""/>
-<View-Properties presentation="false"></View-Properties>
-<MapleNet-Properties elisiondigitsbefore="100" labelling="true" indentamount="4" elisiontermsthreshold="10000" ansi="false" errorbreak="1" useclientjvm="true" echo="0" imaginaryunit="I" labelwidth="20" contextmenusize="automatic" plotdriver="opengl" elisiondigitsafter="100" plotoutput="terminal" helpbrowser="standard" rtablesize="10" elisiontermsbefore="100" elisiondigitsthreshold="10000" typesetting="extended" plotdevice="inline" verboseproc="1" showassumed="1" errorcursor="false" longdelim="true" plotoptions="" quiet="false" elisiontermsafter="100" screenwidth="79" preplot="" prettyprint="3" displayprecision="-1" screenpixelheight="1080" warnlevel="3" screenheight="25" latexwidth="6.0" postplot="" prompt="&gt; " ShowLabels="true"/>
-<Styles><Font name="Ordered List 1" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<View-Properties presentation="false" autoexpanding_sections="true" UserProfileName="Maple Default Profile" NumericFormat-ApplyInteger="true" NumericFormat-ApplyRational="true" NumericFormat-ApplyExponent="false">
+</View-Properties>
+<MapleNet-Properties elisiondigitsbefore="100" labelling="true" indentamount="4" elisiontermsthreshold="10000" ansi="false" errorbreak="1" useclientjvm="true" echo="0" imaginaryunit="I" labelwidth="20" unitattributes="&quot;fontweight&quot; = &quot;bold&quot;" contextmenusize="automatic" plotdriver="opengl" elisiondigitsafter="100" plotoutput="terminal" helpbrowser="standard" rtablesize="10" elisiontermsbefore="100" elisiondigitsthreshold="10000" typesetting="extended" plotdevice="inline" verboseproc="1" showassumed="1" quiet="false" errorcursor="false" longdelim="true" plotoptions="" elisiontermsafter="100" screenwidth="79" preplot="" prettyprint="3" displayprecision="-1" screenpixelheight="1080" warnlevel="3" screenheight="25" latexwidth="8.0" postplot="" prompt="&gt; " ShowLabels="true"/>
+<Styles>
+<Font name="Ordered List 1" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
 <Font name="Annotation Text" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
 <Font name="Ordered List 2" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
 <Font name="Ordered List 3" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
@@ -42,6 +44,7 @@
 <Font name="Heading 2" background="[255,255,255]" bold="true" executable="false" family="Times New Roma" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="16" subscript="false" superscript="false" underline="false" placeholder="false"/>
 <Font name="HyperlinkWarning" background="[255,255,255]" bold="false" executable="false" family="Courier New" foreground="[0,0,255]" italic="false" opaque="false" readonly="true" size="12" subscript="false" superscript="false" underline="true" placeholder="false"/>
 <Font name="Dictionary Hyperlink" background="[255,255,255]" bold="false" executable="false" family="Times New Roma" foreground="[147,0,15]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="true" placeholder="false"/>
+<Font name="Atomic Variable" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[175,0,175]" italic="true" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
 <Font name="Caption Text" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
 <Font name="List Item" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
 <Layout name="Ordered List 1" alignment="left" bullet="numeric" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="3" spacebelow="3" linebreak="space" pagebreak-before="false" initial="-1" bulletsuffix=""/>
@@ -80,16 +83,14 @@
 <Highlighter-style name="Highlighter 3" pen-color="[51,255,0]" pen-height="24.0" pen-width="24.0" pen-opacity="0.8"/>
 <Highlighter-style name="Highlighter 5" pen-color="[255,255,0]" pen-height="48.0" pen-width="48.0" pen-opacity="0.8"/>
 </Styles>
+<Startup-Code startupcode=""/>
 <Task-table>
-    <Task-category name="&lt;default&gt;">
-    </Task-category>
+    <Task-category name="&lt;default&gt;"/>
 </Task-table>
 <Annotation-table>
-    <Annotation-category name="&lt;default&gt;">
-    </Annotation-category>
+    <Annotation-category name="&lt;default&gt;"/>
 </Annotation-table>
-<Task>
-</Task>
+<Task/>
 <Group labelreference="L3">
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal">with(LinearAlgebra);with(CodeGeneration);</Text-field>
@@ -100,15 +101,15 @@
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"># Space dimension
 d := 2;
 # Number of basis functions for the local transformation
-nphi := 2^d; xmat := Matrix(d,nphi,symbol=x);
+nphi := 2^d; xmat := Matrix(nphi,d,symbol=x);
 # h will hold the local vector of optimal scales
 hvec := Vector(d,symbol=h);
 # xi is the vector of coordinates on the Rumpf reference element
 xivec := Vector(d,symbol=xi);
 # Vertex coordinates of the Rumpf reference element
-xref:=Matrix([[-1,1,-1,1],[-1,-1,1,1]]);
+xref:=Matrix([[-1,-1],[1,-1],[-1,1],[1,1]]);
 # Vertex coordinates of the Rumpf reference element on the optimal scale
-xh := Matrix([ [-h[1],h[1],-h[1],h[1]],[ -h[2],-h[2],h[2],h[2]]]);</Text-field>
+xh := Matrix([ [-h[1],-h[2]],[h[1],-h[2]],[ -h[1],h[2]],[h[1],h[2]]]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L5">
@@ -124,7 +125,7 @@ phi[4](xi) := 1/4*(1 + xi[1] + ( 1 + xi[1])*xi[2]);</Text-field>
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"># R is the transformation from the Rumpf reference element to the physical element defined by x
 for j from 1 to d do
-  R[j](x,xi):= simplify(eval(add(phi[i]( xi )*xmat[j,i],i=1..nphi),xi=Vector([ xi[1]/h[1], xi[2]/h[2] ])));
+  R[j](x,xi):= simplify(eval(add(phi[i]( xi )*xmat[i,j],i=1..nphi),xi=Vector([ xi[1]/h[1], xi[2]/h[2] ])));
 end do;</Text-field>
 </Input>
 </Group>
@@ -143,7 +144,7 @@ gradR(x,xi);</Text-field>
 </Group>
 <Group labelreference="L10">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">exponent_det := 2;
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">exponent_det := 1;
 integrand_det := simplify(Determinant(gradR(x,xi)))^exponent_det;
 # Integrate det over the Rumpf reference cell
 # Divide by the ratio (Rumpf reference cell's volume)/(vanilla reference cell's volume)
@@ -175,7 +176,7 @@ for i from 1 to d do
     # Just for checking what happens if we integrate over the vanilla reference cell
     # rec_det_A := rec_det_A + eval(eval((1./(integrand_det + sqrt(fac_reg^2+integrand_det^2))),xi[1]=(-1)^i),xi[2]=(-1)^j);
     # This is the right thing
-    rec_det_A := rec_det_A + 0.25*eval(eval(integrand_rec_det,xi[1]=h[1]*(-1)^i),xi[2]=h[2]*(-1)^j);
+    rec_det_A := rec_det_A + 1/4*eval(eval(integrand_rec_det,xi[1]=h[1]*(-1)^i),xi[2]=h[2]*(-1)^j);
   end do
 end do;
 #rec_det_A := (rec_det_A*1*1);
@@ -201,10 +202,10 @@ norm_A := ((int(int(integrand_norm,xi[1]=-h[1]..h[1]),xi[2]=-h[2]..h[2]))/(h[1]*
 </Group>
 <Group labelreference="L136" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_rumpf := Matrix(d,nphi);
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">grad_rumpf := Matrix(nphi,d);
 for i from 1 to d do
    for j from 1 to nphi do
-      grad_rumpf[i,j] := diff(rumpf,x[i,j]);
+      grad_rumpf[j,i] := diff(rumpf,x[j,i]);
    end do
 end do;</Text-field>
 </Input>
@@ -220,7 +221,7 @@ writeto(&quot;maple_q1.txt&quot;);</Text-field>
 </Group>
 <Group labelreference="L94">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C((det_A),resultname=det_, declare=[fac_reg::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C((det_A),resultname=det_, declare=[fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L98" drawlabel="true">
@@ -235,7 +236,7 @@ writeto(&quot;maple_q1.txt&quot;);</Text-field>
 </Group>
 <Group labelreference="L90" drawlabel="true">
 <Input>
-<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_rumpf,resultname=grad, declare=[fac_reg::numeric, x::numeric, h::numeric]);</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(grad_rumpf,resultname=grad, declare=[fac_det::numeric, fac_rec_det::numeric, fac_norm::numeric, fac_reg::numeric, h::numeric, x::numeric]);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L14" drawlabel="true">
@@ -340,6 +341,21 @@ eval(eval(eval(diff( norm_A,x[1,1] ),h[1]=1),h[2]=1),x=xref);</Text-field>
 </Input>
 </Group>
 <Group labelreference="L156" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L163" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(eval(det_A, [h[1]=1.,h[2]=1.]),declare=[x::numeric]);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L164" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">C(eval(2*grad_rumpf, [fac_norm = 0, fac_det=1, fac_rec_det=0, h[1]=1, h[2]=1]), resultname=grad);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L165" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
 <Input>
 <Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
 </Input>

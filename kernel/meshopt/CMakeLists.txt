@@ -9,9 +9,13 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 # ADD_LIBRARY(kernel-control STATIC)
 # TARGET_LINK_LIBRARIES (kernel-control kernel-util)
 
-# list of mesh smoother tests
+# list of meshopt tests
+SET (test_list
+    linear_variational_smoother-test
+    )
 if (FEAST_HAVE_ALGLIB)
-  SET (test_list
+SET (test_list
+    ${test_list}
     rumpf_smoother-test
   )
 endif (FEAST_HAVE_ALGLIB)
@@ -27,7 +31,7 @@ FOREACH (test ${test_list} )
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/geometry/mesh_smoother/${test} none)
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/meshopt/${test} none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
   if (FEAST_VALGRIND)
     SET_PROPERTY(TEST ${test}_none PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
@@ -35,8 +39,8 @@ FOREACH (test ${test_list} )
   endif (FEAST_VALGRIND)
 ENDFOREACH(test)
 
-# add all tests to mesh_smoother_tests
-ADD_CUSTOM_TARGET(mesh_smoother_tests DEPENDS ${test_list})
+# add all tests to meshopt_tests
+ADD_CUSTOM_TARGET(meshopt_tests DEPENDS ${test_list})
 
 # build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests mesh_smoother_tests)
+ADD_DEPENDENCIES(tests meshopt_tests)

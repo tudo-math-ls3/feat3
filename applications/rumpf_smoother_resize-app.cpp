@@ -1,17 +1,15 @@
-#include <iostream>
-#include <string>
-#include <kernel/archs.hpp>
+#include <kernel/base_header.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
-#include <kernel/geometry/reference_cell_factory.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_smoother.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_smoother_q1hack.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1_d2.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1hack.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_p1.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_p1_d2.hpp>
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/reference_cell_factory.hpp>
+#include <kernel/meshopt/rumpf_smoother.hpp>
+#include <kernel/meshopt/rumpf_smoother_q1hack.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1hack.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
 
 using namespace FEAST;
 
@@ -20,61 +18,35 @@ using namespace FEAST;
 template<typename ShapeType_>
 struct helperclass;
 
-// Specialisation for hypercubes
-template<int shape_dim_>
-struct helperclass< FEAST::Shape::Hypercube<shape_dim_> >
-{
-  // Sets coordinates so we deal the the reference element
-  template<typename VectorType_, typename DataType_>
-  static void set_coords(VectorType_& coords_, const DataType_& scaling)
-  {
-    for(Index i(0); i < Index(1 << shape_dim_); ++i)
-    {
-      for(Index d(0); d < Index(shape_dim_); ++d)
-        coords_[d](i, (DataType_(((i >> d) & 1) << 1) - DataType_(1)) * scaling );
-    }
-  }
-
-  // Prints the ShapeType
-  static std::string print_typename()
-  {
-    return "Hypercube<" + stringify(shape_dim_) +">";
-  }
-};
-
-// Specialisation for 2d simplices
-template<>
-struct helperclass< FEAST::Shape::Simplex<2> >
-{
-  // \brief Sets coordinates so we deal the the Rumpf reference element
-  template<typename VectorType_, typename DataType_>
-  static void set_coords(VectorType_& coords_, const DataType_& scaling)
-  {
-    coords_[0](0, DataType_(0));
-    coords_[1](0, DataType_(0));
-
-    coords_[0](1, DataType_(1) * scaling);
-    coords_[1](1, DataType_(0));
-
-    coords_[0](2, DataType_(0.5) * scaling);
-    coords_[1](2, DataType_(0.5)*Math::sqrt(DataType_(3))*scaling);
-  }
-  // Prints the ShapeType
-  static std::string print_typename()
-  {
-    return "Simplex<2>";
-  }
-};
-
 /// \endcond
 
 /**
- * \brief Wrapper struct as functions do not seem to agree with template template parameters
+ * \brief This application demonstrates the usage of some of the RumpfSmoother classes to resize reference cells
+ *
+ * This is excellent for error checking in smoothers and functionals, as a correct implementation should resize
+ * a Rumpf reference cell to the desired volume and achieve a global minimum of the functional value.
+ *
+ * \note Because an application of the (nonlinear) Rumpf smoother requires operations similar to a matrix assembly,
+ * Rumpf smoothers are implemented for Mem::Main only.
+ *
+ * \author Jordi Paul
+ *
+ * \tparam DT_
+ * The precision of the mesh etc.
+ *
+ * \tparam ShapeType
+ * The shape of the mesh's cells
+ *
+ * \tparam FunctionalType
+ * The Rumpf functional variant to use
+ *
+ * \tparam RumpfSmootherType_
+ * The Rumpf smoother variant to use
+ *
  **/
 template
 <
-  typename DataType_,
-  typename MemType_,
+  typename DT_,
   typename ShapeType_,
   template<typename, typename> class FunctionalType_,
   template<typename ... > class RumpfSmootherType_
@@ -86,33 +58,41 @@ template
    **/
   static void run()
   {
-    typedef DataType_ DataType;
-    typedef MemType_ MemType;
+    /// Precision for meshes etc, everything else uses the same data type
+    typedef DT_ DataType;
+    /// Rumpf Smoothers are implemented for Mem::Main only
+    typedef Mem::Main MemType;
+    /// So we use Index
+    typedef Index IndexType;
+    /// Shape of the mesh cells
     typedef ShapeType_ ShapeType;
-
+    /// The complete mesh type
     typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension,ShapeType::dimension, DataType> MeshType;
+    /// The corresponding transformation
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-
+    /// Our functional type
     typedef FunctionalType_<DataType, ShapeType> FunctionalType;
-    typedef RumpfSmootherType_<DataType_, MemType, TrafoType, FunctionalType> RumpfSmootherType;
-    typedef DataType_ DataType;
+    /// The Rumpf smoother
+    typedef RumpfSmootherType_<TrafoType, FunctionalType> RumpfSmootherType;
 
-
-    // Mesh and trafo
+    // Create a single reference cell of the shape type
     Geometry::ReferenceCellFactory<ShapeType, DataType> mesh_factory;
+    // Create the mesh
     MeshType mesh(mesh_factory);
+    // Create the transformation
     TrafoType trafo(mesh);
 
+    // Parameters for the Rumpf functional
     DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(0e0));
-
+    // Create the functional with these parameters
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
+    // Create empty unit filter so we can create a smoother with no boundary conditions
+    LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> filter;
 
-    // The smoother in all its template glory
-    RumpfSmootherType rumpflpumpfl(trafo, my_functional);
-
-    // Set bdry_id to 0 again so the mesh smoother can resize the single element
-    for(Index i(0); i < mesh.get_num_entities(0); ++i)
-      rumpflpumpfl._bdry_id[i] = 0;
+    // Create the smoother
+    RumpfSmootherType rumpflpumpfl(trafo, my_functional, filter);
+    // Print information
+    rumpflpumpfl.print();
 
     // Set initial coordinates by scaling the original Rumpf reference cell by ...
     DataType scaling(5);
@@ -122,77 +102,130 @@ template
     rumpflpumpfl.set_coords();
     rumpflpumpfl.init();
 
-    rumpflpumpfl.print();
-
     // Set target edge lengths
+    Tiny::Vector<DataType, MeshType::world_dim> tmp;
+    tmp(0) =  DataType(4*4)/Math::sqrt(DataType(3));
+    tmp(1) =  DataType(4*4)/(Math::sqrt(DataType(2))*Math::sqrt(Math::sqrt(DataType(3))));
+
     //rumpflpumpfl._h[0](0, DataType(4));
     //rumpflpumpfl._h[1](0, DataType(4));
-    rumpflpumpfl._h[0](0, DataType(4*4)/Math::sqrt(DataType(3)));
-    rumpflpumpfl._h[1](0, DataType(4*4)/(Math::sqrt(DataType(2))*Math::sqrt(Math::sqrt(DataType(3)))));
+    rumpflpumpfl._h(0,tmp);
 
-    DataType fval(0);
+    // Arrays for saving the contributions of the different Rumpf functional parts
     DataType* func_norm(new DataType[mesh.get_num_entities(2)]);
     DataType* func_det(new DataType[mesh.get_num_entities(2)]);
-    DataType* func_det2(new DataType[mesh.get_num_entities(2)]);
+    DataType* func_rec_det(new DataType[mesh.get_num_entities(2)]);
 
-    // Evaluates the levelset function and its gradient
-    rumpflpumpfl.prepare();
     // Compute initial functional value
-    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_det2);
+    DataType fval(0);
+    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
     std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
+
     // Compute initial functional gradient
     rumpflpumpfl.compute_gradient();
 
     std::string filename;
-    filename = "pre_" + helperclass<ShapeType>::print_typename() + ".vtk";
+    // Write initial state to file
+    filename = "pre_" + helperclass<ShapeType>::print_typename();
+    Geometry::ExportVTK<MeshType> writer_initial_pre(mesh);
+    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_initial_pre.add_scalar_cell("norm_A", func_norm);
+    writer_initial_pre.add_scalar_cell("det_A", func_det);
+    writer_initial_pre.add_scalar_cell("rec_det_A", func_rec_det);
+    writer_initial_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_pre.write(filename);
 
-    Geometry::ExportVTK<MeshType> writer_pre(mesh);
-    writer_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-    writer_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
-    writer_pre.add_scalar_cell("norm_A", func_norm);
-    writer_pre.add_scalar_cell("det_A", func_det);
-    writer_pre.add_scalar_cell("det2_A", func_det2);
-    writer_pre.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
-    writer_pre.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
-    writer_pre.write(filename);
-
+    // Smooth the mesh
     rumpflpumpfl.optimise();
-    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_det2);
+
+    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
     std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
 
+    // Call prepare() again because the mesh changed due to the optimisation and it was not called again after the
+    // last iteration
     rumpflpumpfl.prepare();
     rumpflpumpfl.compute_gradient();
 
-    filename = "post_" + helperclass<ShapeType>::print_typename() + ".vtk";
+    // Write optimised initial mesh
+    filename = "post_" + helperclass<ShapeType>::print_typename();
+    Geometry::ExportVTK<MeshType> writer_initial_post(mesh);
+    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_initial_post.add_scalar_cell("norm_A", func_norm);
+    writer_initial_post.add_scalar_cell("det_A", func_det);
+    writer_initial_post.add_scalar_cell("rec_det_A", func_rec_det);
+    writer_initial_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_post.write(filename);
 
-    Geometry::ExportVTK<MeshType> writer_post(mesh);
-    writer_post.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-    writer_post.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh.get_num_entities(0)]);
-    writer_post.add_scalar_cell("norm_A", func_norm);
-    writer_post.add_scalar_cell("det_A", func_det);
-    writer_post.add_scalar_cell("det2_A", func_det2);
-    writer_post.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
-    writer_post.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
-    writer_post.write(filename);
   }
 };
 
-template<typename A, typename B, typename C, typename D>
-using MySmoother = Geometry::RumpfSmoother<A, B, C, D>;
+// Template aliases to easier switch between variants
 
-template<typename A, typename B, typename C, typename D>
-using MySmootherQ1Hack = Geometry::RumpfSmootherQ1Hack<A, B, C, D>;
-
+// Vanilla Rumpf smoother
 template<typename A, typename B>
-using MyFunctional= Geometry::RumpfFunctional<A, B>;
+using MySmoother = Meshopt::RumpfSmoother<A, B>;
 
+// Using the Q1 hack
 template<typename A, typename B>
-using MyFunctionalQ1Hack = Geometry::RumpfFunctionalQ1Hack<A, B, Geometry::RumpfFunctional_D2>;
+using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
+
+// For the Q1 hack, the functional is a bit more complicated
+template<typename A, typename B>
+using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
+
 int main()
 {
-  typedef Mem::Main MemType;
-
-  ResizeApp<double, MemType, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack>::run();
-
+  ResizeApp<double, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack>::run();
   return 0;
 }
+
+/// \brief Specialisation for hypercubes
+template<int shape_dim_>
+struct helperclass< FEAST::Shape::Hypercube<shape_dim_> >
+{
+  /// \brief Sets coordinates so we deal the the reference element
+  template<typename VectorType_, typename DataType_>
+  static void set_coords(VectorType_& coords_, const DataType_& scaling)
+  {
+    for(Index i(0); i < Index(1 << shape_dim_); ++i)
+    {
+      Tiny::Vector<DataType_, VectorType_::BlockSize, VectorType_::BlockSize> tmp;
+      for(int d(0); d < shape_dim_; ++d)
+        tmp(d) = (DataType_(((i >> d) & 1) << 1) - DataType_(1)) * scaling ;
+
+      coords_(i, tmp);
+    }
+  }
+
+  // Prints the ShapeType
+  static std::string print_typename()
+  {
+    return "Hypercube<" + stringify(shape_dim_) +">";
+  }
+};
+
+/// \brief Specialisation for 2d simplices
+template<>
+struct helperclass< FEAST::Shape::Simplex<2> >
+{
+  /// \brief Sets coordinates so we deal the the Rumpf reference element
+  template<typename VectorType_, typename DataType_>
+  static void set_coords(VectorType_& coords_, const DataType_& scaling)
+  {
+    Tiny::Vector<DataType_, 2, 2> tmp(0);
+    coords_(0, tmp);
+
+    tmp(0) = scaling;
+    coords_(1, tmp);
+
+    tmp(0) = DataType_(0.5) * scaling;
+    tmp(1) = DataType_(0.5)*Math::sqrt(DataType_(3))*scaling;
+    coords_(2, tmp);
+  }
+
+  // Prints the ShapeType
+  static std::string print_typename()
+  {
+    return "Simplex<2>";
+  }
+};

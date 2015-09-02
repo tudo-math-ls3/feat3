@@ -1,22 +1,22 @@
-#include <iostream>
+#include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
-#include <kernel/util/math.hpp>
+#include <kernel/assembly/common_functions.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
-#include <kernel/geometry/mesh_node.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_smoother.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_smoother_q1hack.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_p1.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_p1_d2.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1_d2.hpp>
-#include <kernel/geometry/mesh_smoother/rumpf_functional_2d_q1hack.hpp>
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/mesh_streamer_factory.hpp>
+#include <kernel/meshopt/rumpf_smoother.hpp>
+#include <kernel/meshopt/rumpf_smoother_q1hack.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1hack.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/util/mesh_streamer.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/tiny_algebra.hpp>
-#include <kernel/assembly/common_functions.hpp>
 
 using namespace FEAST;
 
@@ -34,24 +34,60 @@ using namespace FEAST;
     my_point.v[1] = DataType(0.5) - DataType(0.1875)*Math::sin(DataType(2)*Math::pi<DataType>()*DataType(time));
   }
 
-using namespace FEAST::Geometry;
-
+/**
+ * \brief This application demonstrates the usage of some of the RumpfSmoother classes for boundary deformations
+ *
+ * \note Because an application of the (nonlinear) Rumpf smoother requires operations similar to a matrix assembly,
+ * Rumpf smoothers are implemented for Mem::Main only.
+ *
+ * In this application, a mesh with two excentric screws is read from a mesh. The screws rotate with different
+ * angular velocities, so large mesh deformations occur.
+ *
+ * \author Jordi Paul
+ *
+ * \tparam DT_
+ * The precision of the mesh etc.
+ *
+ * \tparam MeshType
+ * The mesh type, has to be known because we stream the mesh from a file
+ *
+ * \tparam FunctionalType
+ * The Rumpf functional variant to use
+ *
+ * \tparam RumpfSmootherType_
+ * The Rumpf smoother variant to use
+ *
+ **/
 /**
  * \brief Wrapper struct as functions do not seem to agree with template template parameters
  **/
 template
 <
-  typename DataType_,
-  typename MemType_,
+  typename DT_,
   typename MeshType_,
-  template<typename ... > class RumpfSmootherType_,
-  template<typename, typename> class FunctionalType_
-  > struct RumpfSmootherExcentricApp
+  template<typename, typename> class FunctionalType_,
+  template<typename ... > class RumpfSmootherType_
+ >
+  struct RumpfSmootherExcentricApp
 {
-  typedef DataType_ DataType;
-  typedef MemType_ MemType;
+  /// Precision for meshes etc, everything else uses the same data type
+  typedef DT_ DataType;
+  /// Rumpf Smoothers are implemented for Mem::Main only
+  typedef Mem::Main MemType;
+  /// So we use Index
+  typedef Index IndexType;
+  /// The type of the mesh
   typedef MeshType_ MeshType;
+  /// Shape of the mesh cells
   typedef typename MeshType::ShapeType ShapeType;
+  /// The corresponding transformation
+  typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+  /// Our functional type
+  typedef FunctionalType_<DataType, ShapeType> FunctionalType;
+  /// The Rumpf smoother
+  typedef RumpfSmootherType_<TrafoType, FunctionalType> RumpfSmootherType;
+  /// Type for points in the mesh
+  typedef Tiny::Vector<DataType,2,2> ImgPointType;
 
   /**
    * \brief Routine that does the actual work
@@ -62,17 +98,14 @@ template
    * \param[in] level
    * Number of refines.
    */
-  static int run(MeshStreamer& my_streamer, const Index lvl_max)
+  static int run(MeshStreamer& my_streamer, Index lvl_max, DT_ deltat)
   {
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    typedef FunctionalType_<DataType, ShapeType> FunctionalType;
-
-    // create atlas
+    // Read mesh from the MeshStreamer and create the MeshAtlas
     std::cout << "Creating mesh atlas..." << std::endl;
-    MeshAtlas<MeshType_>* atlas = nullptr;
+    Geometry::MeshAtlas<MeshType_>* atlas = nullptr;
     try
     {
-      atlas = new MeshAtlas<MeshType_>(my_streamer);
+      atlas = new Geometry::MeshAtlas<MeshType_>(my_streamer);
     }
     catch(std::exception& exc)
     {
@@ -80,12 +113,12 @@ template
       return 1;
     }
 
-    // create mesh node
+    // Create mesh node
     std::cout << "Creating mesh node..." << std::endl;
-    RootMeshNode<MeshType_>* rmn = nullptr;
+    Geometry::RootMeshNode<MeshType_>* rmn = nullptr;
     try
     {
-      rmn = new RootMeshNode<MeshType_>(my_streamer, atlas);
+      rmn = new Geometry::RootMeshNode<MeshType_>(my_streamer, atlas);
       rmn ->adapt();
     }
     catch(std::exception& exc)
@@ -93,9 +126,6 @@ template
       std::cerr << "ERROR: " << exc.what() << std::endl;
       return 1;
     }
-
-    // get all mesh part names
-    //std::deque<String> part_names = node->get_mesh_part_names();
 
     // refine
     for(Index lvl(1); lvl <= lvl_max; ++lvl)
@@ -109,31 +139,22 @@ template
     MeshType* mesh = rmn->get_mesh();
     TrafoType trafo(*mesh);
 
-    auto& screw_1_indices = rmn->find_mesh_part("inner")->template get_target_set<0>();
-    auto& screw_2_indices = rmn->find_mesh_part("outer")->template get_target_set<0>();
-
-    typedef Tiny::Vector<DataType,2,2> ImgPointType;
-
-    DataType excentricity_screw_1(DataType(0.2833));
-
+    // This is the centre reference point
     ImgPointType x_0(DataType(0));
 
+    // This is the centre point of the rotation of the inner screw
     ImgPointType x_1(DataType(0));
+    DataType excentricity_screw_1(DataType(0.2833));
     x_1.v[0] = -excentricity_screw_1;
+    // The indices for the inner screw
+    auto& screw_1_indices = rmn->find_mesh_part("inner")->template get_target_set<0>();
 
+    // This is the centre point of the rotation of the outer screw
     ImgPointType x_2(DataType(0));
+    // The indices for the outer screw
+    auto& screw_2_indices = rmn->find_mesh_part("outer")->template get_target_set<0>();
 
-    typedef RumpfSmootherType_
-    <
-      DataType,
-      MemType,
-      TrafoType,
-      FunctionalType
-    > RumpfSmootherType;
-
-    DataType deltat(DataType(1e-4));
-    DataType pi(Math::pi<DataType>());
-
+    // Parameters for the Rumpf functional
     DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
@@ -142,83 +163,89 @@ template
 
     // Print lotsa information
     std::cout << __func__ << " at refinement level " << lvl_max << std::endl;
-    std::cout << "deltat = " << scientify(deltat) << std::endl;
 
     rumpflpumpfl.init();
     rumpflpumpfl.print();
 
-    DataType* func_norm(new DataType[mesh->get_num_entities(2)]);
-    DataType* func_det(new DataType[mesh->get_num_entities(2)]);
-    DataType* func_rec_det(new DataType[mesh->get_num_entities(2)]);
+    // Arrays for saving the contributions of the different Rumpf functional parts
+    DataType* func_norm(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
+    DataType* func_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
+    DataType* func_rec_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
 
-    // Evaluates the levelset function and its gradient
-    rumpflpumpfl.prepare();
     // Compute initial functional value
     DataType fval(0);
-
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-    std::cout << "fval pre optimisation = " << scientify(fval) << " cell size quality indicator: " << scientify(rumpflpumpfl.cell_size_quality()) << std::endl;
+    std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
+
     // Compute initial functional gradient
     rumpflpumpfl.compute_gradient();
 
-    // Filename for vtk files
-    std::string filename;
+    // Write initial state to file
+    Geometry::ExportVTK<MeshType> writer_initial_pre(*mesh);
+    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_initial_pre.add_scalar_cell("norm_A", func_norm);
+    writer_initial_pre.add_scalar_cell("det_A", func_det);
+    writer_initial_pre.add_scalar_cell("rec_det_A", func_rec_det);
+    writer_initial_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_pre.write("pre_initial");
 
-    Geometry::ExportVTK<MeshType> writer_pre_initial(*mesh);
-    writer_pre_initial.add_scalar_cell("norm", func_norm);
-    writer_pre_initial.add_scalar_cell("det", func_det);
-    writer_pre_initial.add_scalar_cell("rec_det", func_rec_det);
-    writer_pre_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-    writer_pre_initial.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
-    writer_pre_initial.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
-    writer_pre_initial.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-    writer_pre_initial.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh->get_num_entities(0)]);
-    writer_pre_initial.write("pre_initial.vtk");
-
+    // Smooth the mesh
     rumpflpumpfl.optimise();
 
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-    std::cout << "fval post optimisation = " << scientify(fval) << " cell size quality indicator: " << scientify(rumpflpumpfl.cell_size_quality()) << std::endl;
+    std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
 
-    Geometry::ExportVTK<MeshType> writer_post_initial(*mesh);
-    writer_post_initial.add_scalar_cell("norm", func_norm);
-    writer_post_initial.add_scalar_cell("det", func_det);
-    writer_post_initial.add_scalar_cell("rec_det", func_rec_det);
-    writer_post_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-    writer_post_initial.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
-    writer_post_initial.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
-    writer_post_initial.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-    writer_post_initial.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh->get_num_entities(0)]);
-    writer_post_initial.write("post_initial.vtk");
+    // Call prepare() again because the mesh changed due to the optimisation and it was not called again after the
+    // last iteration
+    rumpflpumpfl.prepare();
+    rumpflpumpfl.compute_gradient();
 
+    // Write optimised initial mesh
+    Geometry::ExportVTK<MeshType> writer_initial_post(*mesh);
+    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_initial_post.add_scalar_cell("norm_A", func_norm);
+    writer_initial_post.add_scalar_cell("det_A", func_det);
+    writer_initial_post.add_scalar_cell("rec_det_A", func_rec_det);
+    writer_initial_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_post.write("post_initial");
+
+    // For saving the old coordinates
+    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim>
+      coords_old(mesh->get_num_entities(0),DataType(0));
+    // For computing the mesh velocity
+    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim>
+      mesh_velocity(mesh->get_num_entities(0), DataType(0));
+
+    // Initial time
     DataType time(0);
+    // Timestep size
+    std::cout << "deltat = " << scientify(deltat) << std::endl;
+
+    // Counter for timesteps
     Index n(0);
+    // Filename for writing .vtu output
+    std::string filename;
 
-    DataType* mesh_velocity(new DataType[mesh->get_num_entities(0)]);
-
-    // Old mesh coordinates for computing the mesh velocity
-    LAFEM::DenseVector<MemType, DataType_> coords_old[MeshType::world_dim];
-    for(Index d = 0; d < MeshType::world_dim; ++d)
-      coords_old[d]= std::move(LAFEM::DenseVector<MemType, DataType>(mesh->get_num_entities(0)));
-
+    // This is the absolute turning angle of the screws
     DataType alpha(0);
+    // Need some pi for all the angles
+    DataType pi(Math::pi<DataType>());
 
     while(time < DataType(1))
     {
       std::cout << "timestep " << n << std::endl;
       time+= deltat;
+
       // Save old vertex coordinates
-      for(Index d(0); d < MeshType::world_dim; ++d)
-      {
-        for(Index i(0); i < mesh->get_num_entities(0); ++i)
-          coords_old[d](i, rumpflpumpfl._coords[d](i));
-      }
+      coords_old.clone(rumpflpumpfl._coords);
 
       DataType alpha_old = alpha;
       alpha = -DataType(2)*pi*time;
 
       DataType delta_alpha = alpha - alpha_old;
 
+      // Update boundary of the inner screw
+      // This is the 2x2 matrix representing the turning by the angle delta_alpha of the inner screw
       Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
 
       rot(0,0) = Math::cos(delta_alpha);
@@ -226,100 +253,107 @@ template
       rot(1,0) = -rot(0,1);
       rot(1,1) = rot(0,0);
 
+      // This is the old centre point
       ImgPointType x_1_old(x_1);
 
+      // This is the new centre point
       x_1.v[0] = x_0.v[0] - excentricity_screw_1*Math::cos(alpha);
       x_1.v[1] = x_0.v[1] - excentricity_screw_1*Math::sin(alpha);
 
-      // Boundary update case
       ImgPointType tmp(DataType(0));
       ImgPointType tmp2(DataType(0));
       for(Index i(0); i < screw_1_indices.get_num_entities(); ++i)
       {
+        // Index of boundary vertex i in the mesh
         Index j(screw_1_indices[i]);
-        tmp.v[0] = (rumpflpumpfl._coords[0](j) - x_1_old.v[0]);
-        tmp.v[1] = (rumpflpumpfl._coords[1](j) - x_1_old.v[1]);
-
+        // Translate the point to the centre of rotation
+        tmp = rumpflpumpfl._coords(j) - x_1_old;
+        // Rotate
         tmp2.set_vec_mat_mult(tmp, rot);
-
-        rumpflpumpfl._coords[0](j, tmp2.v[0] + x_1.v[0]);
-        rumpflpumpfl._coords[1](j, tmp2.v[1] + x_1.v[1]);
+        // Translate the point by the new centre of rotation
+        rumpflpumpfl._coords(j, x_1 + tmp2);
       }
 
+      // The outer screw has 7 teeth as opposed to the inner screw with 6, and it rotates at 6/7 of the speed
       rot(0,0) = Math::cos(delta_alpha*DataType(6)/DataType(7));
       rot(0,1) = - Math::sin(delta_alpha*DataType(6)/DataType(7));
       rot(1,0) = -rot(0,1);
       rot(1,1) = rot(0,0);
 
+      // The outer screw rotates centrically, so x_2 remains the same at all times
+
       for(Index i(0); i < screw_2_indices.get_num_entities(); ++i)
       {
+        // Index of boundary vertex i in the mesh
         Index j(screw_2_indices[i]);
-        tmp.v[0] = (rumpflpumpfl._coords[0](j) - x_2.v[0]);
-        tmp.v[1] = (rumpflpumpfl._coords[1](j) - x_2.v[1]);
+        tmp = rumpflpumpfl._coords(j) - x_2;
 
         tmp2.set_vec_mat_mult(tmp, rot);
 
-        rumpflpumpfl._coords[0](j, tmp2.v[0] + x_2.v[0]);
-        rumpflpumpfl._coords[1](j, tmp2.v[1] + x_2.v[1]);
+        rumpflpumpfl._coords(j, x_2 + tmp2);
       }
 
+      // Write new boundary to mesh
       rumpflpumpfl.set_coords();
 
-      fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-      std::cout << "fval pre optimisation = " << scientify(fval) << " cell size quality indicator: " << scientify(rumpflpumpfl.cell_size_quality()) << std::endl;
-      rumpflpumpfl.compute_gradient();
-
-      filename = "pre_" + stringify(n) + ".vtk";
+      // Write pre-optimisation mesh
+      filename = "pre_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_pre(*mesh);
-      writer_pre.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-      writer_pre.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
-      writer_pre.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
-      writer_pre.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-      writer_pre.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh->get_num_entities(0)]);
+
+      rumpflpumpfl.prepare();
+      fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
+      rumpflpumpfl.compute_gradient();
+      std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
+
       writer_pre.add_scalar_cell("norm", func_norm);
       writer_pre.add_scalar_cell("det", func_det);
       writer_pre.add_scalar_cell("rec_det", func_rec_det);
+      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+      writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+      writer_pre.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_pre.write(filename);
 
+      // Optimise the mesh
       rumpflpumpfl.optimise();
 
+      // Compute max. mesh velocity
       DataType max_mesh_velocity(-1e10);
       DataType ideltat = DataType(1)/deltat;
-      // Compute grid velocity
+
       for(Index i(0); i < mesh->get_num_entities(0); ++i)
       {
-        mesh_velocity[i] = DataType(0);
-        for(Index d(0); d < MeshType::world_dim; ++d)
-          mesh_velocity[i] += Math::sqr(ideltat*(coords_old[d](i) - rumpflpumpfl._coords[d](i)));
+        mesh_velocity(i, ideltat*(rumpflpumpfl._coords(i) - coords_old(i)));
 
-        mesh_velocity[i] = Math::sqrt(mesh_velocity[i]);
-        if(mesh_velocity[i] > max_mesh_velocity)
-          max_mesh_velocity = mesh_velocity[i];
+        DataType my_mesh_velocity(mesh_velocity(i).norm_euclid());
+
+        if(my_mesh_velocity > max_mesh_velocity)
+          max_mesh_velocity = my_mesh_velocity;
       }
       std::cout << "max mesh velocity = " << scientify(max_mesh_velocity) << std::endl;
 
-      fval = rumpflpumpfl.compute_functional(func_norm,func_det,func_rec_det);
-      rumpflpumpfl.compute_gradient();
-      std::cout << "fval post optimisation = " << scientify(fval) << " cell size quality indicator: " << scientify(rumpflpumpfl.cell_size_quality()) << std::endl;
-
-      filename = "post_" + stringify(n) + ".vtk";
+      // Write post-optimisation mesh
+      filename = "post_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_post(*mesh);
-      writer_post.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-      writer_post.add_scalar_cell("h_0", rumpflpumpfl._h[0].elements() );
-      writer_post.add_scalar_cell("h_1", rumpflpumpfl._h[1].elements() );
-      writer_post.add_scalar_vertex("grad_0", &rumpflpumpfl._grad[0]);
-      writer_post.add_scalar_vertex("grad_1", &rumpflpumpfl._grad[mesh->get_num_entities(0)]);
+
+      fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
+      rumpflpumpfl.prepare();
+      rumpflpumpfl.compute_gradient();
+      std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
+
       writer_post.add_scalar_cell("norm", func_norm);
       writer_post.add_scalar_cell("det", func_det);
       writer_post.add_scalar_cell("rec_det", func_rec_det);
-      writer_post.add_scalar_vertex("mesh_velocity", mesh_velocity);
+      writer_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+      writer_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+      writer_post.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
+      std::cout << "Writing " << filename << std::endl;
       writer_post.write(filename);
 
       n++;
     }
-    delete mesh_velocity;
 
+    // Clean up
     delete func_norm;
     delete func_det;
     delete func_rec_det;
@@ -332,16 +366,16 @@ template
 }; // struct LevelsetApp
 
 template<typename A, typename B>
-using MyFunctional= Geometry::RumpfFunctional_D2<A, B>;
+using MyFunctional= Meshopt::RumpfFunctional_D2<A, B>;
 
 template<typename A, typename B>
-using MyFunctionalQ1Hack = Geometry::RumpfFunctionalQ1Hack<A, B, Geometry::RumpfFunctional_D2>;
+using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional_D2>;
 
-template<typename A, typename B, typename C, typename D>
-using MySmoother = Geometry::RumpfSmoother<A, B, C, D>;
+template<typename A, typename B>
+using MySmoother = Meshopt::RumpfSmoother<A, B>;
 
-template<typename A, typename B, typename C, typename D>
-using MySmootherQ1Hack = Geometry::RumpfSmootherQ1Hack<A, B, C, D>;
+template<typename A, typename B>
+using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
 
 
 /**
@@ -410,21 +444,21 @@ int main(int argc, char* argv[])
 
   ASSERT(mesh_type == mesh_data.mt_conformal, "This application only works for conformal meshes!");
 
+  typedef double DataType;
+
+  DataType deltat(DataType(1e-4));
+
   // This is the list of all supported meshes that could appear in the mesh file
-  typedef Geometry::ConformalMesh<Shape::Simplex<1>, 1, 1, Real> Simplex1Mesh_1d;
-  typedef Geometry::ConformalMesh<Shape::Simplex<1>, 2, 2, Real> Simplex1Mesh_2d;
-  typedef Geometry::ConformalMesh<Shape::Simplex<1>, 3, 3, Real> Simplex1Mesh_3d;
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> Simplex2Mesh_2d;
-  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 3, 3, Real> Simplex2Mesh_3d;
-  typedef Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, Real> Simplex3Mesh;
   typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> Hypercube2Mesh_2d;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 3, 3, Real> Hypercube2Mesh_3d;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, Real> Hypercube3Mesh;
+
   // Call the run() method of the appropriate wrapper class
   if(shape_type == mesh_data.st_tria)
-    return RumpfSmootherExcentricApp<double, Mem::Main, Simplex2Mesh_2d, MySmoother, RumpfFunctional_D2>::run(my_streamer, lvl_max);
+    return RumpfSmootherExcentricApp<DataType, Simplex2Mesh_2d, MyFunctional, MySmoother>::
+      run(my_streamer, lvl_max, deltat);
   if(shape_type == mesh_data.st_quad)
-    return RumpfSmootherExcentricApp<double, Mem::Main, Hypercube2Mesh_2d, MySmoother, MyFunctional>::run(my_streamer, lvl_max);
+    return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctional, MySmoother>::
+      run(my_streamer, lvl_max, deltat);
 
   // If no MeshType from the list was in the file, return 1
   return 1;
