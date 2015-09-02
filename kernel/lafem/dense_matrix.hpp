@@ -243,7 +243,7 @@ namespace FEAST
 
         ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
         ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
-        Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
+        Util::MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0) + row * this->columns() + col, value);
       }
 
       /**

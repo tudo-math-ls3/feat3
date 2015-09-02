@@ -1,7 +1,9 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 #include <cstdlib>
+#include <fstream>
 
 #ifdef FEAST_MPI
 #include <mpi.h>
@@ -85,7 +87,14 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
   if (const char* c_file_path = std::getenv("FEAST_INI_FILE"))
   {
     String property_file(c_file_path);
-    _global_property_map.parse(property_file, true);
+    if (std::ifstream(property_file).good())
+    {
+      _global_property_map.parse(property_file, true);
+    }
+    else
+    {
+      std::cout<<"Warning: feast ini file " << property_file << " not found!"<<std::endl;
+    }
   }
 
   _initialised = true;

@@ -61,7 +61,7 @@ namespace FEAST
             val1 + (j - 1) * Index(BlockSize_), Index(BlockSize_));
             --j;
           }
-          Util::MemoryPool<Mem_>::set_memory(key + j, swap_key);
+          Util::MemoryPool<Mem_>::instance()->instance()->set_memory(key + j, swap_key);
           Util::MemoryPool<Mem_>::upload(val1 + j * Index(BlockSize_), swap1.v, Index(BlockSize));
         }
       }
@@ -334,7 +334,7 @@ namespace FEAST
           Util::MemoryPool<Mem_>::instance()->template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
           _allocated_elements() = alloc_increment();
           Util::MemoryPool<Mem_>::upload(this->_elements.at(0), val.v, Index(BlockSize_));
-          Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0), IT_(index));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(0), IT_(index));
           _used_elements() = 1;
         }
 
@@ -343,7 +343,7 @@ namespace FEAST
         {
           Util::MemoryPool<Mem_>::upload(this->_elements.at(0) + _used_elements() * Index(BlockSize_), val.v,
           Index(BlockSize_));
-          Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
           ++_used_elements();
         }
 
@@ -370,7 +370,7 @@ namespace FEAST
 
           Util::MemoryPool<Mem_>::upload(this->_elements.at(0) + used_elements() * Index(BlockSize_), val.v,
           Index(BlockSize_));
-          Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(0) + _used_elements(), IT_(index));
 
           ++_used_elements();
           this->_elements_size.at(0) = allocated_elements() * Index(BlockSize_);
@@ -398,7 +398,7 @@ namespace FEAST
           {
             if (Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i - 1) == Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i))
             {
-              Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + i - 1, std::numeric_limits<IT_>::max());
+              Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(0) + i - 1, std::numeric_limits<IT_>::max());
             }
           }
 

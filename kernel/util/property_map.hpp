@@ -137,14 +137,6 @@ namespace FEAST
     String query(String key_path, String default_value) const;
 
     /**
-     * \brief Queries an int value.
-     *
-     * Queries an int instead of a string value.
-     * For details, refer to 'PropertyMap::query(String key_path, String default_value) const'
-     */
-    int query_int(String key_path, int default_value) const;
-
-    /**
      * \brief Retrieves a value for a given key from the current top-lvl section.
      *
      * This function returns the value string of a key-value pair in the currect top-lvl section.

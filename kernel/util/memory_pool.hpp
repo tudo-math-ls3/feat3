@@ -156,7 +156,7 @@ namespace FEAST
 
         /// set memory to specific value
         template <typename DT_>
-        static void set_memory(DT_ * address, const DT_ val, const Index count = 1)
+        void set_memory(DT_ * address, const DT_ val, const Index count = 1)
         {
           for (Index i(0) ; i < count ; ++i)
           {
@@ -176,7 +176,7 @@ namespace FEAST
 
         /// Copy memory area from src to dest
         template <typename DT_>
-        static void convert(DT_ * dest, const DT_ * src, const Index count)
+        void convert(DT_ * dest, const DT_ * src, const Index count)
         {
           if (dest == src)
             return;
@@ -186,7 +186,7 @@ namespace FEAST
 
         /// Convert datatype DT2_ from src into DT1_ in dest
         template <typename DT1_, typename DT2_>
-        static void convert(DT1_ * dest, const DT2_ * src, const Index count)
+        void convert(DT1_ * dest, const DT2_ * src, const Index count)
         {
           for (Index i(0) ; i < count ; ++i)
           {
@@ -254,7 +254,7 @@ namespace FEAST
 
         /// set memory to specific value
         template <typename DT_>
-        static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
+        void set_memory(DT_ * address, const DT_ val, const Index count = 1);
 
         /// Copy memory area from src to dest
         template <typename DT_>
@@ -262,11 +262,11 @@ namespace FEAST
 
         /// Copy memory area from src to dest
         template <typename DT_>
-        static void convert(DT_ * dest, const DT_ * src, const Index count);
+        void convert(DT_ * dest, const DT_ * src, const Index count);
 
         /// Convert datatype DT2_ from src into DT1_ in dest
         template <typename DT1_, typename DT2_>
-        static void convert(DT1_ * dest, const DT2_ * src, const Index count);
+        void convert(DT1_ * dest, const DT2_ * src, const Index count);
 
         static void synchronize();
 
@@ -280,6 +280,13 @@ namespace FEAST
          *
         **/
         static void shutdown_device();
+
+        // cuda threading grid blocksizes
+        Index blocksize_misc;
+        Index blocksize_reduction;
+        Index blocksize_spmv;
+        Index blocksize_axpy;
+
     };
   } // namespace Util
 } // namespace FEAST

@@ -256,7 +256,7 @@ namespace FEAST
           {
             const Index tsize(this->_elements_size.at(i));
             this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(tsize));
-            Util::MemoryPool<Mem_>::convert(this->_elements.at(i), other.get_elements().at(i), tsize);
+            Util::MemoryPool<Mem_>::instance()->convert(this->_elements.at(i), other.get_elements().at(i), tsize);
           }
         }
         else
@@ -286,7 +286,7 @@ namespace FEAST
               Util::MemoryPool<Mem2_>::template download<DT2_>(pother, other.get_elements().at(i), tsize);
             }
 
-            Util::MemoryPool<Mem::Main>::convert(pthis, pother, tsize);
+            Util::MemoryPool<Mem::Main>::instance()->convert(pthis, pother, tsize);
 
             if (! std::is_same<Mem_, Mem::Main>::value)
             {
@@ -308,7 +308,7 @@ namespace FEAST
           {
             const Index tsize(this->_indices_size.at(i));
             this->_indices.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(tsize));
-            Util::MemoryPool<Mem_>::convert(this->_indices.at(i), other.get_indices().at(i), tsize);
+            Util::MemoryPool<Mem_>::instance()->convert(this->_indices.at(i), other.get_indices().at(i), tsize);
           }
         }
         else
@@ -340,7 +340,7 @@ namespace FEAST
               Util::MemoryPool<Mem2_>::template download<IT2_>(pother, other.get_indices().at(i), tsize);
             }
 
-            Util::MemoryPool<Mem::Main>::convert(pthis, pother, tsize);
+            Util::MemoryPool<Mem::Main>::instance()->convert(pthis, pother, tsize);
 
             if (! std::is_same<Mem_, Mem::Main>::value)
             {

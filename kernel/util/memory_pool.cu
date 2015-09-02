@@ -1,11 +1,13 @@
 // includes, FEAST
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/util/runtime.hpp>
+#include <kernel/util/property_map.hpp>
+
+#include <cstdio>
+#include <fstream>
 
 #include <cublas_v2.h>
 #include "cusparse_v2.h"
-
-#include <cstdio>
 
 namespace FEAST
 {
@@ -47,6 +49,12 @@ MemoryPool<Mem::CUDA>::MemoryPool()
     throw InternalError(__func__, __FILE__, __LINE__, "cublasCreate failed!");
   if (CUSPARSE_STATUS_SUCCESS != cusparseCreate(&Intern::cusparse_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseCreate failed!");
+
+  // read in initial settings from Runtime
+  blocksize_misc = atoi(Runtime::global_property().query("CUDA.blocksize_misc", "256").c_str());
+  blocksize_reduction = atoi(Runtime::global_property().query("CUDA.blocksize_reduction", "256").c_str());
+  blocksize_spmv = atoi(Runtime::global_property().query("CUDA.blocksize_spmv", "256").c_str());
+  blocksize_axpy = atoi(Runtime::global_property().query("CUDA.blocksize_axpy", "256").c_str());
 }
 
 MemoryPool<Mem::CUDA>::~MemoryPool()
@@ -199,7 +207,7 @@ DT_ MemoryPool<Mem::CUDA>::get_element(const DT_ * data, const Index index)
 template <typename DT_>
 void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index count)
 {
-  Index blocksize(Runtime::global_property().query_int("CUDA.blocksize_misc", 256));
+  Index blocksize = this->blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -236,7 +244,7 @@ void MemoryPool<Mem::CUDA>::convert(DT_ * dest, const DT_ * src, const Index cou
 template <typename DT1_, typename DT2_>
 void MemoryPool<Mem::CUDA>::convert(DT1_ * dest, const DT2_ * src, const Index count)
 {
-  Index blocksize(Runtime::global_property().query_int("CUDA.blocksize_misc", 256));
+  Index blocksize = this->blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;

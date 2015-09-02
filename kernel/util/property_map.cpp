@@ -146,11 +146,6 @@ namespace FEAST
     return default_value;
   }
 
-  int PropertyMap::query_int(String key_path, int default_value) const
-  {
-    return atoi(query(key_path, stringify(default_value)).c_str());
-  }
-
   std::pair<String, bool> PropertyMap::get_entry(String key) const
   {
     CONTEXT("PropertyMap::get_entry()");

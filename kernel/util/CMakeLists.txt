@@ -30,7 +30,7 @@ if (FEAST_BACKENDS_CUDA)
     STATIC
   )
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-util-cuda)
-  TARGET_LINK_LIBRARIES(kernel-util-cuda kernel-util)
+  TARGET_LINK_LIBRARIES(kernel-util kernel-util-cuda)
   target_link_libraries(kernel-util-cuda ${CUDA_cusparse_LIBRARY})
 endif(FEAST_BACKENDS_CUDA)
 

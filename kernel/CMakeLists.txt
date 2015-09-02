@@ -34,10 +34,6 @@ TARGET_LINK_LIBRARIES (feast
   kernel-util
 )
 
-if (FEAST_BACKENDS_CUDA)
-  TARGET_LINK_LIBRARIES(feast kernel-util-cuda)
-endif(FEAST_BACKENDS_CUDA)
-
 if (FEAST_HAVE_ALGLIB)
   TARGET_LINK_LIBRARIES (feast thirdparty-alglib)
 endif(FEAST_HAVE_ALGLIB)

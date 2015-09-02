@@ -82,9 +82,9 @@ namespace FEAST
             Util::MemoryPool<Mem_>::copy(val2 + j, val2 + j - 1, 1);
             --j;
           }
-          Util::MemoryPool<Mem_>::set_memory(key + j, swap_key);
-          Util::MemoryPool<Mem_>::set_memory(val1 + j, swap1);
-          Util::MemoryPool<Mem_>::set_memory(val2 + j, swap2);
+          Util::MemoryPool<Mem_>::instance()->set_memory(key + j, swap_key);
+          Util::MemoryPool<Mem_>::instance()->set_memory(val1 + j, swap1);
+          Util::MemoryPool<Mem_>::instance()->set_memory(val2 + j, swap2);
         }
       }
 
@@ -112,15 +112,15 @@ namespace FEAST
         {
         swap_key = Util::MemoryPool<Mem_>::get_element(key, i);
         Util::MemoryPool<Mem_>::copy(key + i, key + i + gap, 1);
-        Util::MemoryPool<Mem_>::set_memory(key + i + gap, swap_key);
+        Util::MemoryPool<Mem_>::instance()->set_memory(key + i + gap, swap_key);
 
         swap1 = Util::MemoryPool<Mem_>::get_element(val1, i);
         Util::MemoryPool<Mem_>::copy(val1 + i, val1 + i + gap, 1);
-        Util::MemoryPool<Mem_>::set_memory(val1 + i + gap, swap1);
+        Util::MemoryPool<Mem_>::instance()->set_memory(val1 + i + gap, swap1);
 
         swap2 = Util::MemoryPool<Mem_>::get_element(val2, i);
         Util::MemoryPool<Mem_>::copy(val2 + i, val2 + i + gap, 1);
-        Util::MemoryPool<Mem_>::set_memory(val2 + i + gap, swap2);
+        Util::MemoryPool<Mem_>::instance()->set_memory(val2 + i + gap, swap2);
 
         swapped = true;
         }
@@ -1142,9 +1142,9 @@ namespace FEAST
           this->_indices_size.push_back(alloc_increment());
           Util::MemoryPool<Mem_>::instance()->template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
 
-          Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0), value);
-          Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0), IT_(row));
-          Util::MemoryPool<Mem_>::set_memory(this->_indices.at(1), IT_(col));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value);
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(0), IT_(row));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(1), IT_(col));
 
           _used_elements() = 1;
           _allocated_elements() = alloc_increment();
@@ -1154,9 +1154,9 @@ namespace FEAST
         //append element
         if (_used_elements() < _allocated_elements())
         {
-          Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0) + _used_elements(), value);
-          Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(row));
-          Util::MemoryPool<Mem_>::set_memory(this->_indices.at(1) + _used_elements(), IT_(col));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0) + _used_elements(), value);
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(0) + _used_elements(), IT_(row));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(1) + _used_elements(), IT_(col));
 
           ++_used_elements();
         }
@@ -1184,9 +1184,9 @@ namespace FEAST
           this->_indices.at(0) = rows_new;
           this->_indices.at(1) = cols_new;
 
-          Util::MemoryPool<Mem_>::set_memory(this->_elements.at(0) + _used_elements(), value);
-          Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(row));
-          Util::MemoryPool<Mem_>::set_memory(this->_indices.at(1) + _used_elements(), IT_(col));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0) + _used_elements(), value);
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(0) + _used_elements(), IT_(row));
+          Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(1) + _used_elements(), IT_(col));
 
           ++_used_elements();
           this->_elements_size.at(0) = _allocated_elements();
@@ -1222,7 +1222,7 @@ namespace FEAST
             {
               if (Util::MemoryPool<Mem_>::get_element(this->_indices.at(1), i - 1) == Util::MemoryPool<Mem_>::get_element(this->_indices.at(1), i))
               {
-                Util::MemoryPool<Mem_>::set_memory(this->_indices.at(0) + i - 1, std::numeric_limits<IT_>::max());
+                Util::MemoryPool<Mem_>::instance()->set_memory(this->_indices.at(0) + i - 1, std::numeric_limits<IT_>::max());
               }
             }
             row_start += offset;

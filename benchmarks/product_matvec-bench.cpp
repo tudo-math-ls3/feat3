@@ -5,6 +5,7 @@
 #include <kernel/lafem/pointstar_structure.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <benchmarks/benchmark.hpp>
+#include <kernel/util/runtime.hpp>
 
 #include <iostream>
 
@@ -139,8 +140,9 @@ void run()
   std::cout<<"control norm: "<<x.norm2()<<std::endl;
 }
 
-int main(int /*argc*/, char ** /*argv*/)
+int main(int argc, char ** argv)
 {
+  Runtime::initialise(argc, argv);
 #ifdef FEAST_BACKENDS_CUDA
   run<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, Index> >();
   run<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned int> >();
@@ -160,4 +162,5 @@ int main(int /*argc*/, char ** /*argv*/)
 #endif
   run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, unsigned int> >();
+  Runtime::finalise();
 }

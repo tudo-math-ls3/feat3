@@ -3,6 +3,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <benchmarks/benchmark.hpp>
+#include <kernel/util/runtime.hpp>
 
 #include <iostream>
 
@@ -69,8 +70,9 @@ void run()
   run_bench<Mem_>(func, flops, bytes);
 }
 
-int main(int /*argc*/, char ** /*argv*/)
+int main(int argc, char ** argv)
 {
+  Runtime::initialise(argc, argv);
 #ifdef FEAST_BACKENDS_CUDA
   run<Algo::CUDA, DenseVector<Mem::CUDA, double, Index> >();
 #endif
@@ -78,4 +80,5 @@ int main(int /*argc*/, char ** /*argv*/)
 #ifdef FEAST_BACKENDS_MKL
   run<Algo::MKL, DenseVector<Mem::Main, double, Index> >();
 #endif
+  Runtime::finalise();
 }
