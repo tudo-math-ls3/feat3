@@ -2,9 +2,7 @@
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_node.hpp>
-#include <kernel/geometry/unit_cube_patch_generator.hpp>
 #include <kernel/geometry/export_vtk.hpp>
-#include <kernel/geometry/domain_control.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/lafem/preconditioner.hpp>
@@ -20,6 +18,7 @@
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/util/time_stamp.hpp>
 
+#include <control/domain/unit_cube_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 
 namespace PoissonNeumann2D
@@ -148,7 +147,7 @@ namespace PoissonNeumann2D
   };
 
   template<typename MeshType_>
-  void run(const int rank, const int nprocs, SimpleArgParser& args, Geometry::DomainControl<MeshType_>& domain)
+  void run(const int rank, const int nprocs, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
     typedef MeshType_ MeshType;
@@ -161,6 +160,9 @@ namespace PoissonNeumann2D
     // choose our desired analytical solution
     Assembly::Common::CosineWaveFunction sol_func;
 
+    // define our domain type
+    typedef Control::Domain::DomainControl<MeshType_> DomainControlType;
+
     // define our system level
     typedef Control::ScalarMeanFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
 
@@ -172,11 +174,12 @@ namespace PoissonNeumann2D
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
     // define our assembler level
-    typedef Geometry::DomainLevel<MeshType> DomainLevelType;
+    typedef typename DomainControlType::LevelType DomainLevelType;
     typedef PoissonNeumannAssemblerLevel<SpaceType> AssemblerLevelType;
 
     // get our domain level and layer
-    const Geometry::DomainLayer<MeshType>& layer = *domain.get_layers().back();
+    typedef typename DomainControlType::LayerType DomainLayerType;
+    const DomainLayerType& layer = *domain.get_layers().back();
     const std::deque<DomainLevelType*>& domain_levels = domain.get_levels();
 
     std::deque<SystemLevelType*> system_levels;
@@ -422,7 +425,7 @@ namespace PoissonNeumann2D
       TimeStamp stamp1;
 
       // let's create our domain
-      Geometry::UnitCubeDomainControl<MeshType> domain(rank, nprocs, lvl_max, lvl_min);
+      Control::Domain::UnitCubeDomainControl<MeshType> domain(rank, nprocs, lvl_max, lvl_min);
 
       // plot our levels
       if (rank == 0)

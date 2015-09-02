@@ -2,7 +2,6 @@
 #ifndef CONTROL_STOKES_BASIC_HPP
 #define CONTROL_STOKES_BASIC_HPP 1
 
-#include <kernel/geometry/domain_control.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/power_vector.hpp>
@@ -36,6 +35,8 @@
 #include <kernel/global/filter.hpp>
 #include <kernel/global/solver.hpp>
 #include <kernel/global/mean_filter.hpp>
+
+#include <control/domain/domain_control.hpp>
 
 namespace FEAST
 {
@@ -231,8 +232,8 @@ namespace FEAST
       typedef SpacePres_ SpacePresType;
       typedef typename SpaceVelo_::TrafoType TrafoType;
       typedef typename TrafoType::MeshType MeshType;
-      typedef Geometry::DomainLevel<MeshType> DomainLevelType;
-      typedef Geometry::DomainLayer<MeshType> DomainLayerType;
+      typedef Control::Domain::DomainLevel<MeshType> DomainLevelType;
+      typedef Control::Domain::DomainLayer<MeshType> DomainLayerType;
 
     public:
       DomainLevelType& domain_level;

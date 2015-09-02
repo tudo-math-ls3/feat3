@@ -11,6 +11,7 @@
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/velocity_analyser.hpp>
 
+#include <control/domain/unit_cube_domain_control.hpp>
 #include <control/stokes_basic.hpp>
 
 namespace StokesDriCav2D
@@ -179,7 +180,7 @@ namespace StokesDriCav2D
   };
 
   template<typename MeshType_>
-  void run(const int rank, const int nprocs, SimpleArgParser& args, Geometry::DomainControl<MeshType_>& domain)
+  void run(const int rank, const int nprocs, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
     typedef MeshType_ MeshType;
@@ -190,6 +191,9 @@ namespace StokesDriCav2D
     typedef Mem::Main MemType;
     typedef double DataType;
     typedef Index IndexType;
+
+    // define our domain type
+    typedef Control::Domain::DomainControl<MeshType_> DomainControlType;
 
     // define our system level
     typedef Control::StokesUnitVeloMeanPresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
@@ -203,11 +207,12 @@ namespace StokesDriCav2D
     typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
 
     // define our assembler level
-    typedef Geometry::DomainLevel<MeshType> DomainLevelType;
+    typedef typename DomainControlType::LevelType DomainLevelType;
     typedef StokesUnitSquareDriCavAssemblerLevel<SpaceVeloType, SpacePresType> AssemblerLevelType;
 
     // get our domain level and layer
-    const Geometry::DomainLayer<MeshType>& layer = *domain.get_layers().back();
+    typedef typename DomainControlType::LayerType DomainLayerType;
+    const DomainLayerType& layer = *domain.get_layers().back();
     const std::deque<DomainLevelType*>& domain_levels = domain.get_levels();
 
     std::deque<SystemLevelType*> system_levels;
@@ -486,7 +491,7 @@ namespace StokesDriCav2D
       TimeStamp stamp1;
 
       // let's create our domain
-      Geometry::UnitCubeDomainControl<MeshType> domain(rank, nprocs, lvl_max, lvl_min);
+      Control::Domain::UnitCubeDomainControl<MeshType> domain(rank, nprocs, lvl_max, lvl_min);
 
       // plot our levels
       if(rank == 0)

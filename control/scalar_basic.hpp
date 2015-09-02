@@ -3,7 +3,6 @@
 #define CONTROL_SCALAR_BASIC_HPP 1
 
 #include <kernel/cubature/dynamic_factory.hpp>
-#include <kernel/geometry/domain_control.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/unit_filter.hpp>
@@ -18,6 +17,8 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
+
+#include <control/domain/domain_control.hpp>
 
 namespace FEAST
 {
@@ -168,8 +169,8 @@ namespace FEAST
       typedef Space_ SpaceType;
       typedef typename SpaceType::TrafoType TrafoType;
       typedef typename TrafoType::MeshType MeshType;
-      typedef Geometry::DomainLevel<MeshType> DomainLevelType;
-      typedef Geometry::DomainLayer<MeshType> DomainLayerType;
+      typedef Control::Domain::DomainLevel<MeshType> DomainLevelType;
+      typedef Control::Domain::DomainLayer<MeshType> DomainLayerType;
 
     public:
       DomainLevelType& domain_level;
