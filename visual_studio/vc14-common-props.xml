@@ -109,7 +109,7 @@
     <FeastIncDir Condition="'$(FeastHaveUmfpack)'=='true'"
       Include="$(FeastRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeastRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeastRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
     <FeastIncDir Condition="'$(FeastHaveParmetis)'=='true'"
-      Include="$(FeastRootPath)\thirdparty\parmetis\include;$(FeastRootPath)\thirdparty\parmetis\mets\include;" />
+      Include="$(FeastRootPath)\thirdparty\parmetis\include;$(FeastRootPath)\thirdparty\parmetis\metis\include;" />
   </ItemGroup>
 
   <!-- FEAST additional library search path list -->
