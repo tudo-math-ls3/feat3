@@ -301,7 +301,7 @@ namespace FEAST
        *
        * \author Jordi Paul
        */
-      template<Index ir, Index ic>
+      template<int ir, int ic>
       class DuDvOperator :
         public BilinearOperator
       {
@@ -393,7 +393,7 @@ namespace FEAST
        *
        * \author Jordi Paul
        */
-      template<Index dimension_>
+      template<int dimension_>
       class DuDvOperatorBlocked :
         public BilinearOperator
       {
@@ -471,10 +471,10 @@ namespace FEAST
           OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
             OperatorValueType r(DataType(0));
-            for(Index i(0); i < Index(OperatorValueType::m); ++i)
+            for(int i(0); i < OperatorValueType::m; ++i)
             {
               r(i,i) = dot(phi.grad, psi.grad) + phi.grad[i]*psi.grad[i];
-              for(Index j(0); j < i; ++j)
+              for(int j(0); j < i; ++j)
               {
                 r(i,j) = phi.grad[i] * psi.grad[j];
                 r(j,i) = phi.grad[j] * psi.grad[i];
