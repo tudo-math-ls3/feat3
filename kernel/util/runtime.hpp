@@ -21,25 +21,10 @@ namespace FEAST
       /// signals, if finalise was called
       static bool _finished;
 
-      /// global flop counter
-      static Index _flops;
-
     public:
 
     /// Returns global property map, containing initial FEAST configuration, read in from feast.ini file
     static PropertyMap & global_property();
-
-    /// Add an amount of flops to the global flop counter
-    static void add_flops(Index flops);
-
-    /// Retrieve current global flop counter
-    static Index get_flops();
-
-    /// Retrieve formated flops per second string
-    static String get_formated_flops(double seconds);
-
-    /// Reset global flop counter
-    static void reset_flops();
 
     /**
      * \brief FEAST initialisation

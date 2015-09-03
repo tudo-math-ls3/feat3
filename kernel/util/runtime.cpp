@@ -15,37 +15,11 @@ using namespace FEAST;
 PropertyMap Runtime::_global_property_map;
 bool Runtime::_initialised = false;
 bool Runtime::_finished = false;
-Index Runtime::_flops = Index(0);
 
 PropertyMap & Runtime::global_property()
 {
   ASSERT(_initialised == true, "global_property_map not _initialised! Call initialise first");
   return _global_property_map;
-}
-
-void Runtime::add_flops(Index flops)
-{
-  _flops += flops;
-}
-
-Index Runtime::get_flops()
-{
-  return _flops;
-}
-
-String Runtime::get_formated_flops(double seconds)
-{
-  double flops((double)_flops);
-  flops /= seconds;
-  flops /= 1000.; // kilo
-  flops /= 1000.; // mega
-  flops /= 1000.; // giga
-  return stringify(flops) + " GFlop/s";
-}
-
-void Runtime::reset_flops()
-{
-  _flops = Index(0);
 }
 
 void Runtime::initialise(int& argc, char**& argv)

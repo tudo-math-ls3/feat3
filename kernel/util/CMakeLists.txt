@@ -9,6 +9,7 @@ ADD_LIBRARY(kernel-util STATIC
   mesh_streamer.cpp
   property_map.cpp
   runtime.cpp
+  statistics.cpp
 )
 
 
