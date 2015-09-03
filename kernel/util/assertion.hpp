@@ -91,6 +91,7 @@ namespace FEAST
  */
 #if defined (FEAST_STDC_ASSERT)
 // define as standard C assert
+/// \compilerhack microsoft compiler complains about its own flaws
 #  if defined(FEAST_COMPILER_MICROSOFT)
 //   Note: The MSC assert macro has a "bug": the __LINE__ macro, which is internally used by the
 //         "assert" macro, is of type 'long', whereas the function receiving the value of

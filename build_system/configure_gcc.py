@@ -10,21 +10,18 @@ def configure_gcc(cpu, buildid, compiler):
   minor2 = int(version["__GNUC_PATCHLEVEL__"])
   print ("Detected gcc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
-  if major < 4  or (major == 4 and minor < 7):
-    print ("Error: GNU Compiler version less then 4.7 is not supported, please update your compiler!")
+  if major < 4  or (major == 4 and minor < 9):
+    print ("Error: GNU Compiler version less then 4.9 is not supported, please update your compiler or choose another one!")
     sys.exit(1)
 
-  cxxflags = "-pipe -std=c++11 -ggdb"
-
-  if (major == 4  and minor >= 9) or major > 4:
-    cxxflags += " -fdiagnostics-color=always"
+  cxxflags = "-pipe -std=c++11 -ggdb -fdiagnostics-color=always"
 
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
 
   # For 'quadmath', we need to enable extended numeric literals, as otherwise the g++ will
   # not recognise the 'q' suffix for __float128 constants when compiling with --std=c++11 starting from gcc version 4.8.
-  if ((major >= 4 and minor >= 8) or major > 4) and "quadmath" in buildid:
+  if "quadmath" in buildid:
     cxxflags += " -fext-numeric-literals"
 
   if "debug" in buildid:
@@ -37,7 +34,6 @@ def configure_gcc(cpu, buildid, compiler):
       #cxxflags += " -fsanitize=address"
       #sanitziers need these libraries
       cxxflags += " -lpthread -ldl"
-    if (major >= 4 and minor >= 9) or major > 4:
       cxxflags += " -fsanitize=undefined"
     if major >= 5:
       cxxflags += " -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=bounds"
