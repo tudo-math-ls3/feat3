@@ -4,6 +4,7 @@
 #include <kernel/lafem/arch/dot_product.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 // includes, CUDA
 #include <cublas_v2.h>

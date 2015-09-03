@@ -3,6 +3,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 namespace FEAST
 {
@@ -89,7 +90,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_, typename IT_>
 void ScaleRows<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -111,7 +112,7 @@ template void ScaleRows<Mem::CUDA>::csr(double *, const double * const, const un
 template <typename DT_, typename IT_>
 void ScaleCols<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -135,7 +136,7 @@ template <typename DT_, typename IT_>
 void ScaleRows<Mem::CUDA>::ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const cs,
                                            const IT_ * const cl, const IT_ * const rl, const DT_ * const x, const Index C, const Index rows)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -158,7 +159,7 @@ template <typename DT_, typename IT_>
 void ScaleCols<Mem::CUDA>::ell(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const cs,
                                            const IT_ * const cl, const IT_ * const rl, const DT_ * const x, const Index C, const Index rows)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;

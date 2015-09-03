@@ -3,6 +3,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/unit_filter.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 /// \cond internal
 namespace FEAST
@@ -40,7 +41,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_, typename IT_>
 void UnitFilter<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -63,7 +64,7 @@ template void UnitFilter<Mem::CUDA>::filter_rhs(double *, const double * const, 
 template <typename DT_, typename IT_>
 void UnitFilter<Mem::CUDA>::filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;

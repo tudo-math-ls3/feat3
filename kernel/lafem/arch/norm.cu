@@ -3,6 +3,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 // includes, CUDA
 #include <cublas_v2.h>

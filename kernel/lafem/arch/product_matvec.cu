@@ -3,6 +3,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 #include "cusparse_v2.h"
 
@@ -194,7 +195,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_>
 void ProductMatVec<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_spmv;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -232,7 +233,7 @@ template void ProductMatVec<Mem::CUDA>::csr(double *, const double * const, cons
 template <typename DT_, typename IT_>
 void ProductMatVec<Mem::CUDA>::ell(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_spmv;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -254,7 +255,7 @@ template void ProductMatVec<Mem::CUDA>::ell(double *, const double * const, cons
 template <typename DT_, typename IT_>
 void ProductMatVec<Mem::CUDA>::banded(DT_ * r, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_spmv;
   dim3 grid;
   dim3 block;
   block.x = blocksize;

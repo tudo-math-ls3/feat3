@@ -3,6 +3,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/unit_filter_blocked.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 /// \cond internal
 namespace FEAST
@@ -18,7 +19,7 @@ namespace FEAST
         if (idx >= ue)
           return;
 
-	Index block_size = Index(BlockSize_);
+        Index block_size = Index(BlockSize_);
         for(Index j(0) ; j < block_size; ++j)
           v[block_size* sv_indices[idx] + j] = sv_elements[block_size * idx + j];
       }
@@ -30,7 +31,7 @@ namespace FEAST
         if (idx >= ue)
           return;
 
-	Index block_size = Index(BlockSize_);
+        Index block_size = Index(BlockSize_);
         for(Index j(0) ; j < block_size; ++j)
           v[block_size * sv_indices[idx] + j] = DT_(0);
       }
@@ -46,7 +47,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_, typename IT_, int BlockSize_>
 void UnitFilterBlocked<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -81,7 +82,7 @@ template void UnitFilterBlocked<Mem::CUDA>::filter_rhs<double, unsigned int, 4>(
 template <typename DT_, typename IT_, int BlockSize_>
 void UnitFilterBlocked<Mem::CUDA>::filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;

@@ -3,6 +3,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/slip_filter.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 /// \cond internal
 namespace FEAST
@@ -18,8 +19,8 @@ namespace FEAST
         if (idx >= ue)
           return;
 
-	Index block_size = Index(BlockSize_);
-	DT_ sp(DT_(0));
+        Index block_size = Index(BlockSize_);
+        DT_ sp(DT_(0));
 
         for(Index j(0) ; j < block_size; ++j)
           sp += v[block_size* sv_indices[idx] + j]*sv_elements[block_size * idx + j];
@@ -35,8 +36,8 @@ namespace FEAST
         if (idx >= ue)
           return;
 
-	Index block_size = Index(BlockSize_);
-	DT_ sp(DT_(0));
+        Index block_size = Index(BlockSize_);
+        DT_ sp(DT_(0));
 
         for(Index j(0) ; j < block_size; ++j)
           sp += v[block_size* sv_indices[idx] + j]*sv_elements[block_size * idx + j];
@@ -56,7 +57,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_, typename IT_, int BlockSize_>
 void SlipFilter<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -83,7 +84,7 @@ template void SlipFilter<Mem::CUDA>::filter_rhs<double, unsigned int, 3>(double 
 template <typename DT_, typename IT_, int BlockSize_>
 void SlipFilter<Mem::CUDA>::filter_def(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;

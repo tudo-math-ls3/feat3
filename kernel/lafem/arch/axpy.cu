@@ -7,6 +7,7 @@
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/sum.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 namespace FEAST
 {
@@ -105,7 +106,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_>
 void Axpy<Mem::CUDA>::dv(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -126,7 +127,7 @@ template void Axpy<Mem::CUDA>::dv(double *, const double, const double * const, 
 template <typename DT_>
 void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns, const Index used_elements)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -156,7 +157,7 @@ template void Axpy<Mem::CUDA>::csr(double *, const double, const double * const,
 template <typename DT_, typename IT_>
 void Axpy<Mem::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
 {
-  Index blocksize(256);
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
