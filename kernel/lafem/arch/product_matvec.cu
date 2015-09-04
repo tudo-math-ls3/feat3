@@ -62,7 +62,7 @@ namespace FEAST
 
       template <typename DT_, typename IT_>
       __global__ void cuda_product_matvec_ell(DT_ * r, const DT_ * x, const DT_ * val, const IT_ * col_ind,
-                                              const IT_ * cs, const IT_ * cl, const Index rows, const Index C)
+                                              const IT_ * cs, const IT_ * cl, const Index C, const Index rows)
       {
         const Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= rows)
@@ -239,7 +239,7 @@ void ProductMatVec<Mem::CUDA>::ell(DT_ * r, const DT_ * const val, const IT_ * c
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_product_matvec_ell<<<grid, block>>>(r, x, val, col_ind, cs, cl, rows, C);
+  FEAST::LAFEM::Intern::cuda_product_matvec_ell<<<grid, block>>>(r, x, val, col_ind, cs, cl, C, rows);
 #ifdef FEAST_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());

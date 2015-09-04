@@ -39,7 +39,7 @@ public:
 
 public:
   BasicSolverTest() :
-    FullTaggedTest<MemType_, DataType, IndexType>("BasicSolverTest")
+    FullTaggedTest<MemType_, DataType, IndexType>("BasicSolverTest-" + MatrixType::name())
   {
   }
 

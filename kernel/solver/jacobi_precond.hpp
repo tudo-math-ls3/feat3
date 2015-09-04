@@ -139,11 +139,7 @@ namespace FEAST
       {
         static void extract_diag(typename MT_::VectorTypeL& diag, const MT_& matrix)
         {
-          const Index n = matrix.rows();
-          for(Index i(0); i < n; ++i)
-          {
-            diag(i, matrix(i, i));
-          }
+          matrix.extract_diag(diag);
         }
       };
 

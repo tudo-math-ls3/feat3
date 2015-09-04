@@ -941,6 +941,29 @@ namespace FEAST
       }
       ///@}
 
+
+      /// \copydoc extract_diag()
+      void extract_diag(VectorTypeL & diag) const
+      {
+        ASSERT(diag.size() == rows(), "Error: diag size does not match matrix row count!");
+        ASSERT(rows() == columns(), "Error: matrix is not square!");
+
+        /// \todo Replace by Arch::kernels
+        const Index n = rows();
+        for(Index i(0); i < n; ++i)
+        {
+          diag(i, (*this)(i, i));
+        }
+      }
+
+      /// extract main diagonal vector from matrix
+      VectorTypeL extract_diag() const
+      {
+        VectorTypeL diag = create_vector_l();
+        extract_diag(diag);
+        return diag;
+      }
+
       /**
        * \brief SparseMatrixCSRBlocked comparison operator
        *

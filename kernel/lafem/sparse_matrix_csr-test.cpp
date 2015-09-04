@@ -648,3 +648,63 @@ SparseMatrixCSRPermuteTest<Mem::CUDA, double, unsigned long> cuda_sm_csr_permute
 SparseMatrixCSRPermuteTest<Mem::CUDA, float, unsigned int> cuda_sm_csr_permute_test_float_uint;
 SparseMatrixCSRPermuteTest<Mem::CUDA, double, unsigned int> cuda_sm_csr_permute_test_double_uint;
 #endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSRDiagTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixCSRDiagTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRDiagTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(2) ; size < 3e2 ; size*=2)
+    {
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(DT_(col % 100) / DT_(2)));
+          else if((row == col+1) || (row+1 == col))
+            a_local(row, col, DT_(-1));
+        }
+      }
+
+      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local);
+
+      auto ref = a.create_vector_l();
+      auto ref_local = a_local.create_vector_l();
+      for (Index i(0) ; i < a_local.rows() ; ++i)
+      {
+        ref_local(i, a_local(i, i));
+      }
+      ref.convert(ref_local);
+
+      auto diag = a.extract_diag();
+      TEST_CHECK_EQUAL(diag, ref);
+    }
+  }
+};
+
+SparseMatrixCSRDiagTest<Mem::Main, float, unsigned int> sm_csr_diag_test_float_uint;
+SparseMatrixCSRDiagTest<Mem::Main, double, unsigned int> sm_csr_diag_test_double_uint;
+SparseMatrixCSRDiagTest<Mem::Main, float, unsigned long> sm_csr_diag_test_float_ulong;
+SparseMatrixCSRDiagTest<Mem::Main, double, unsigned long> sm_csr_diag_test_double_ulong;
+#ifdef FEAST_HAVE_QUADMATH
+SparseMatrixCSRDiagTest<Mem::Main, __float128, unsigned int> sm_csr_diag_test_float128_uint;
+SparseMatrixCSRDiagTest<Mem::Main, __float128, unsigned long> sm_csr_diag_test_float128_ulong;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixCSRDiagTest<Mem::CUDA, float, unsigned int> cuda_sm_csr_diag_test_float_uint;
+SparseMatrixCSRDiagTest<Mem::CUDA, double, unsigned int> cuda_sm_csr_diag_test_double_uint;
+SparseMatrixCSRDiagTest<Mem::CUDA, float, unsigned long> cuda_sm_csr_diag_test_float_ulong;
+SparseMatrixCSRDiagTest<Mem::CUDA, double, unsigned long> cuda_sm_csr_diag_test_double_ulong;
+#endif

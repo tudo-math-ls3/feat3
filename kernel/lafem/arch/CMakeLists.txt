@@ -16,6 +16,7 @@ SET (kernel-lafem-arch-list
   defect_generic.cpp
   defect_generic_ell.cpp
   defect_generic_banded.cpp
+  diagonal_generic.cpp
   difference_generic.cpp
   dot_product_generic.cpp
   norm_generic.cpp
@@ -59,6 +60,7 @@ if (FEAST_BACKENDS_CUDA)
     component_product.cu
     defect.cu
     difference.cu
+    diagonal.cu
     dot_product.cu
     norm.cu
     product_matvec.cu

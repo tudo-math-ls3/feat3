@@ -19,6 +19,7 @@
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/arch/norm.hpp>
+#include <kernel/lafem/arch/diagonal.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/time_stamp.hpp>
@@ -1916,6 +1917,23 @@ namespace FEAST
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
       ///@}
+
+      /// \copydoc extract_diag()
+      void extract_diag(VectorTypeL & diag) const
+      {
+        ASSERT(diag.size() == rows(), "Error: diag size does not match matrix row count!");
+        ASSERT(rows() == columns(), "Error: matrix is not square!");
+
+        Arch::Diagonal<Mem_>::ell(diag.elements(), val(), col_ind(), cs(), cl(), C(), rows());
+      }
+
+      /// extract main diagonal vector from matrix
+      VectorTypeL extract_diag() const
+      {
+        VectorTypeL diag = create_vector_l();
+        extract_diag(diag);
+        return diag;
+      }
 
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const

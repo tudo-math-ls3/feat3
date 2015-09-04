@@ -21,6 +21,7 @@
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/arch/norm.hpp>
+#include <kernel/lafem/arch/diagonal.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/adjacency/permutation.hpp>
 #include <kernel/util/statistics.hpp>
@@ -1768,6 +1769,23 @@ namespace FEAST
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
       ///@}
+
+      /// \copydoc extract_diag()
+      void extract_diag(VectorTypeL & diag) const
+      {
+        ASSERT(diag.size() == rows(), "Error: diag size does not match matrix row count!");
+        ASSERT(rows() == columns(), "Error: matrix is not square!");
+
+        Arch::Diagonal<Mem_>::csr(diag.elements(), val(), col_ind(), row_ptr(), rows());
+      }
+
+      /// extract main diagonal vector from matrix
+      VectorTypeL extract_diag() const
+      {
+        VectorTypeL diag = create_vector_l();
+        extract_diag(diag);
+        return diag;
+      }
 
       /// Permutate matrix rows and columns according to the given Permutations
       void permute(Adjacency::Permutation & perm_row, Adjacency::Permutation & perm_col)

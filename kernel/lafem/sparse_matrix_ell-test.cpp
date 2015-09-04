@@ -505,3 +505,63 @@ SparseMatrixELLTranspositionTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_tr
 SparseMatrixELLTranspositionTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_transposition_test_float_ulong;
 SparseMatrixELLTranspositionTest<Mem::CUDA, double, unsigned long> cuda_sm_ell_transposition_test_double_ulong;
 #endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixELLDiagTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixELLDiagTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLDiagTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(2) ; size < 3e2 ; size*=2)
+    {
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(DT_(col % 100) / DT_(2)));
+          else if((row == col+1) || (row+1 == col))
+            a_local(row, col, DT_(-1));
+        }
+      }
+
+      SparseMatrixELL<Mem_, DT_, IT_> a(a_local);
+
+      auto ref = a.create_vector_l();
+      auto ref_local = a_local.create_vector_l();
+      for (Index i(0) ; i < a_local.rows() ; ++i)
+      {
+        ref_local(i, a_local(i, i));
+      }
+      ref.convert(ref_local);
+
+      auto diag = a.extract_diag();
+      TEST_CHECK_EQUAL(diag, ref);
+    }
+  }
+};
+
+SparseMatrixELLDiagTest<Mem::Main, float, unsigned int> sm_ell_diag_test_float_uint;
+SparseMatrixELLDiagTest<Mem::Main, double, unsigned int> sm_ell_diag_test_double_uint;
+SparseMatrixELLDiagTest<Mem::Main, float, unsigned long> sm_ell_diag_test_float_ulong;
+SparseMatrixELLDiagTest<Mem::Main, double, unsigned long> sm_ell_diag_test_double_ulong;
+#ifdef FEAST_HAVE_QUADMATH
+SparseMatrixELLDiagTest<Mem::Main, __float128, unsigned int> sm_ell_diag_test_float128_uint;
+SparseMatrixELLDiagTest<Mem::Main, __float128, unsigned long> sm_ell_diag_test_float128_ulong;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixELLDiagTest<Mem::CUDA, float, unsigned int> cuda_sm_ell_diag_test_float_uint;
+SparseMatrixELLDiagTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_diag_test_double_uint;
+SparseMatrixELLDiagTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_diag_test_float_ulong;
+SparseMatrixELLDiagTest<Mem::CUDA, double, unsigned long> cuda_sm_ell_diag_test_double_ulong;
+#endif
