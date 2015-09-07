@@ -13,23 +13,11 @@ TARGET_LINK_LIBRARIES(basis-dump feast)
 ADD_EXECUTABLE(cub-list cub_list/cub_list.cpp)
 TARGET_LINK_LIBRARIES(cub-list feast)
 
-ADD_EXECUTABLE(dbg-bcasm dbg_bcasm/dbg_bcasm.cpp)
-TARGET_LINK_LIBRARIES(dbg-bcasm feast)
-
 ADD_EXECUTABLE(dbg-fe-asm-1 dbg_fe_asm_1/dbg_fe_asm_1.cpp)
 TARGET_LINK_LIBRARIES(dbg-fe-asm-1 feast)
 
 ADD_EXECUTABLE(dbg-fe-asm-2 dbg_fe_asm_2/dbg_fe_asm_2.cpp)
 TARGET_LINK_LIBRARIES(dbg-fe-asm-2 feast)
-
-ADD_EXECUTABLE(dbg-mirror dbg_mirror/dbg_mirror.cpp)
-TARGET_LINK_LIBRARIES(dbg-mirror feast)
-
-ADD_EXECUTABLE(dbg-nodefunc dbg_nodefunc/dbg_nodefunc.cpp)
-TARGET_LINK_LIBRARIES(dbg-nodefunc feast)
-
-ADD_EXECUTABLE(dbg-patch dbg_patch/dbg_patch.cpp)
-TARGET_LINK_LIBRARIES(dbg-patch feast)
 
 ADD_EXECUTABLE(matrix-cond matrix_cond/matrix_cond.cpp)
 TARGET_LINK_LIBRARIES(matrix-cond feast)
