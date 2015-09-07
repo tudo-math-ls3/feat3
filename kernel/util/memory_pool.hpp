@@ -281,10 +281,16 @@ namespace FEAST
         **/
         static void shutdown_device();
 
-        // cuda threading grid blocksizes
+        /// cuda threading grid blocksize for miscellaneous ops
         Index blocksize_misc;
+
+        /// cuda threading grid blocksize for reduction type ops
         Index blocksize_reduction;
+
+        /// cuda threading grid blocksize for blas-2 type ops
         Index blocksize_spmv;
+
+        /// cuda threading grid blocksize for blas-1 type ops
         Index blocksize_axpy;
 
     };

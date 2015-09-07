@@ -21,6 +21,7 @@
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/util/statistics.hpp>
+#include <kernel/util/time_stamp.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -1590,6 +1591,9 @@ namespace FEAST
         if (x.C() != this->C())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix chunk size do not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
@@ -1612,6 +1616,9 @@ namespace FEAST
           Statistics::add_flops(this->used_elements());
           Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->val_size());
         }
+
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1631,8 +1638,14 @@ namespace FEAST
         if (x.C() != this->C())
           throw InternalError(__func__, __FILE__, __LINE__, "Chunk size does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements());
         Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->val_size());
+
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1642,8 +1655,16 @@ namespace FEAST
        */
       DT_ norm_frobenius() const
       {
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements() * 2);
-        return Arch::Norm2<Mem_>::value(this->val(), this->val_size());
+        DT_ result = Arch::Norm2<Mem_>::value(this->val(), this->val_size());
+
+        ts_stop.stamp();
+        Statistics::add_time_norm(ts_stop.elapsed(ts_start));
+
+        return result;
       }
 
       /**
@@ -1753,9 +1774,15 @@ namespace FEAST
         if (s.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements());
         Arch::ScaleRows<Mem_>::ell(this->val(), x.val(), this->col_ind(), this->cs(),
                                           this->cl(), this->rl(), s.elements(), this->C(), rows());
+
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1775,9 +1802,15 @@ namespace FEAST
         if (s.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements());
         Arch::ScaleCols<Mem_>::ell(this->val(), x.val(), this->col_ind(), this->cs(),
                                           this->cl(), this->rl(), s.elements(), this->C(), rows());
+
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
 
@@ -1800,9 +1833,15 @@ namespace FEAST
           return;
         }
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements() * 2);
         Arch::ProductMatVec<Mem_>::ell(r.elements(), this->val(), this->col_ind(), this->cs(), this->cl(),
                                               x.elements(), this->C(), this->rows());
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1851,6 +1890,9 @@ namespace FEAST
           return;
         }
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         // check for special cases
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
@@ -1869,6 +1911,9 @@ namespace FEAST
           Arch::Axpy<Mem_>::ell(r.elements(), alpha, x.elements(), y.elements(), this->val(),
                                        this->col_ind(), this->cs(), this->cl(), this->C(), this->rows());
         }
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
       ///@}
 

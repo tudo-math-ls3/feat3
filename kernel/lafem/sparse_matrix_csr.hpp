@@ -24,6 +24,7 @@
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/adjacency/permutation.hpp>
 #include <kernel/util/statistics.hpp>
+#include <kernel/util/time_stamp.hpp>
 
 #include <fstream>
 
@@ -1459,6 +1460,9 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
@@ -1481,6 +1485,9 @@ namespace FEAST
           Statistics::add_flops(this->used_elements() * 2);
           Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
         }
+
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1498,8 +1505,14 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements());
         Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->used_elements());
+
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1509,8 +1522,16 @@ namespace FEAST
        */
       DT_ norm_frobenius() const
       {
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements() * 2);
-        return Arch::Norm2<Mem_>::value(this->val(), this->used_elements());
+        DT_ result = Arch::Norm2<Mem_>::value(this->val(), this->used_elements());
+
+        ts_stop.stamp();
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
       }
 
       /**
@@ -1605,9 +1626,15 @@ namespace FEAST
         if (s.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements());
         Arch::ScaleRows<Mem_>::csr(this->val(), x.val(), this->col_ind(), this->row_ptr(),
                                           s.elements(), this->rows(), this->columns(), this->used_elements());
+
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1627,9 +1654,15 @@ namespace FEAST
         if (s.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements());
         Arch::ScaleCols<Mem_>::csr(this->val(), x.val(), this->col_ind(), this->row_ptr(),
                                           s.elements(), this->rows(), this->columns(), this->used_elements());
+
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1651,9 +1684,15 @@ namespace FEAST
           return;
         }
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         Statistics::add_flops(this->used_elements() * 2);
         Arch::ProductMatVec<Mem_>::csr(r.elements(), this->val(), this->col_ind(), this->row_ptr(),
                                               x.elements(), this->rows(), columns(), used_elements());
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -1703,6 +1742,9 @@ namespace FEAST
           return;
         }
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         // check for special cases
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
@@ -1721,6 +1763,9 @@ namespace FEAST
           Arch::Axpy<Mem_>::csr(r.elements(), alpha, x.elements(), y.elements(),
                                        this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
       ///@}
 
