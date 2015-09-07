@@ -20,6 +20,8 @@
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/util/tiny_algebra.hpp>
+#include <kernel/util/statistics.hpp>
+#include <kernel/util/time_stamp.hpp>
 
 #include <fstream>
 
@@ -566,19 +568,34 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
+        {
+          Statistics::add_flops(this->raw_used_elements());
           Arch::Sum<Mem_>::value(this->raw_val(), x.raw_val(), y.raw_val(), this->raw_used_elements());
+        }
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+        {
+          Statistics::add_flops(this->raw_used_elements());
           Arch::Difference<Mem_>::value(this->raw_val(), y.raw_val(), x.raw_val(), this->raw_used_elements());
+        }
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
+        {
+          Statistics::add_flops(this->raw_used_elements() * 2);
           Arch::Axpy<Mem_>::dv(this->raw_val(), alpha, x.raw_val(), y.raw_val(), this->raw_used_elements());
+        }
+
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -596,7 +613,12 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+        Statistics::add_flops(this->raw_used_elements());
         Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->raw_used_elements());
+        ts_stop.stamp();
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -606,7 +628,13 @@ namespace FEAST
        */
       DT_ norm_frobenius() const
       {
-        return Arch::Norm2<Mem_>::value(this->raw_val(), this->raw_used_elements());
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+        Statistics::add_flops(this->raw_used_elements() * 2);
+        DT_ result = Arch::Norm2<Mem_>::value(this->raw_val(), this->raw_used_elements());
+        ts_stop.stamp();
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+        return result;
       }
 
       /**
@@ -622,9 +650,16 @@ namespace FEAST
         if (x.size() != this->raw_columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
+        Statistics::add_flops(this->raw_used_elements() * 2);
         Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
           r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
           x.elements(), this->rows(), columns(), used_elements());
+
+        ts_stop.stamp();
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -640,9 +675,17 @@ namespace FEAST
         if (x.size() != this->raw_columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
+        Statistics::add_flops(this->raw_used_elements() * 2);
+
         Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
           r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
           x.elements(), this->rows(), columns(), used_elements());
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -658,9 +701,17 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
+        Statistics::add_flops(this->raw_used_elements() * 2);
+
         Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
           r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
           x.raw_elements(), this->rows(), columns(), used_elements());
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -676,9 +727,17 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
+        Statistics::add_flops(this->raw_used_elements() * 2);
+
         Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
           r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
           x.raw_elements(), this->rows(), columns(), used_elements());
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -702,10 +761,15 @@ namespace FEAST
         if (y.size() != this->raw_rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         // check for special cases
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
+          Statistics::add_flops(this->raw_used_elements() * 3);
+
           Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.elements(), y.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
             x.elements(), this->rows(), this->columns(), this->used_elements());
@@ -716,10 +780,15 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
+          Statistics::add_flops(this->raw_used_elements() * 3);
+
           Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.elements(), alpha, x.elements(), y.elements(), this->raw_val(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -743,10 +812,14 @@ namespace FEAST
         if (y.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         // check for special cases
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
+          Statistics::add_flops(this->raw_used_elements() * 3);
           Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
             this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
@@ -758,10 +831,14 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
+          Statistics::add_flops(this->raw_used_elements() * 3);
           Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.raw_elements(), alpha, x.elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -785,10 +862,14 @@ namespace FEAST
         if (y.size() != this->raw_rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         // check for special cases
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
+          Statistics::add_flops(this->raw_used_elements() * 3);
           Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.elements(), y.elements(), this->raw_val(), this->col_ind(),  this->row_ptr(),
             x.raw_elements(), this->rows(), this->columns(), this->used_elements());
@@ -800,10 +881,14 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
+          Statistics::add_flops(this->raw_used_elements() * 3);
           Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.elements(), alpha, x.raw_elements(), y.elements(), this->raw_val(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -827,10 +912,14 @@ namespace FEAST
         if (y.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
+        TimeStamp ts_start, ts_stop;
+        ts_start.stamp();
+
         // check for special cases
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
+          Statistics::add_flops(this->raw_used_elements() * 3);
           Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
             x.raw_elements(), this->rows(), this->columns(), this->used_elements());
@@ -841,10 +930,14 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
+          Statistics::add_flops(this->raw_used_elements() * 3);
           Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
             r.raw_elements(), alpha, x.raw_elements(), y.raw_elements(), this->raw_val(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
+
+        ts_stop.stamp();
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
       ///@}
 

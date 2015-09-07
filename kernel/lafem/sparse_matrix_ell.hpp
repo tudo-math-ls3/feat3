@@ -1662,7 +1662,7 @@ namespace FEAST
         DT_ result = Arch::Norm2<Mem_>::value(this->val(), this->val_size());
 
         ts_stop.stamp();
-        Statistics::add_time_norm(ts_stop.elapsed(ts_start));
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
       }
