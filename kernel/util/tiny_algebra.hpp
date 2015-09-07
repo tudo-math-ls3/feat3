@@ -1115,12 +1115,12 @@ namespace FEAST
      * \note So far, this is only implemented for m_ = 2,3.
      */
     template<typename T_, int m_, int sm_, int sn_>
-    static Vector<T_, m_> orthogonal(const Matrix<T_, m_, m_-1, sm_, sn_>& tau);
+    Vector<T_, m_> orthogonal(const Matrix<T_, m_, m_-1, sm_, sn_>& tau);
 #endif
 
     /// \cond internal
     template<typename T_, int sm_, int sn_>
-    static Vector<T_, 2> orthogonal(const Matrix<T_, 2, 1, sm_, sn_>& tau)
+    Vector<T_, 2> orthogonal(const Matrix<T_, 2, 1, sm_, sn_>& tau)
     {
       Vector<T_, 2, sm_> nu(T_(0));
 
@@ -1132,7 +1132,7 @@ namespace FEAST
     }
 
     template<typename T_, int sm_, int sn_>
-    static Vector<T_, 3> orthogonal(const Matrix<T_, 3, 2, sm_, sn_>& tau)
+    Vector<T_, 3> orthogonal(const Matrix<T_, 3, 2, sm_, sn_>& tau)
     {
       Vector<T_, 3, sm_> nu(T_(0));
 
