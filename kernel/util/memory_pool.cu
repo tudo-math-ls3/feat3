@@ -49,12 +49,6 @@ MemoryPool<Mem::CUDA>::MemoryPool()
     throw InternalError(__func__, __FILE__, __LINE__, "cublasCreate failed!");
   if (CUSPARSE_STATUS_SUCCESS != cusparseCreate(&Intern::cusparse_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseCreate failed!");
-
-  // read in initial settings from Runtime
-  blocksize_misc = atoi(Runtime::global_property().query("CUDA.blocksize_misc", "256").c_str());
-  blocksize_reduction = atoi(Runtime::global_property().query("CUDA.blocksize_reduction", "256").c_str());
-  blocksize_spmv = atoi(Runtime::global_property().query("CUDA.blocksize_spmv", "256").c_str());
-  blocksize_axpy = atoi(Runtime::global_property().query("CUDA.blocksize_axpy", "256").c_str());
 }
 
 MemoryPool<Mem::CUDA>::~MemoryPool()

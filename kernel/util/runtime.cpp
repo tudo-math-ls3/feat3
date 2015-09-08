@@ -71,6 +71,14 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
     }
   }
 
+#ifdef FEAST_BACKENDS_CUDA
+  // read in initial settings from Runtime and store them in MemoryPool<CUDA>
+  Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc = (Index)atoi(Runtime::global_property().query("CUDA.blocksize_misc", "256").c_str());
+  Util::MemoryPool<Mem::CUDA>::instance()->blocksize_reduction = (Index)atoi(Runtime::global_property().query("CUDA.blocksize_reduction", "256").c_str());
+  Util::MemoryPool<Mem::CUDA>::instance()->blocksize_spmv = (Index)atoi(Runtime::global_property().query("CUDA.blocksize_spmv", "256").c_str());
+  Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy = (Index)atoi(Runtime::global_property().query("CUDA.blocksize_axpy", "256").c_str());
+#endif
+
   _initialised = true;
 }
 
