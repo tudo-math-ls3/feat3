@@ -14,9 +14,6 @@ SET (kernel-lafem-list
 
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch kernel-util kernel-adjacency)
-if (FEAST_BACKENDS_CUDA)
-  TARGET_LINK_LIBRARIES(kernel-lafem kernel-util-cuda)
-endif(FEAST_BACKENDS_CUDA)
 
 if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-lafem-cuda
