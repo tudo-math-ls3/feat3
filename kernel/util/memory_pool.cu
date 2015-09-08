@@ -49,6 +49,14 @@ MemoryPool<Mem::CUDA>::MemoryPool()
     throw InternalError(__func__, __FILE__, __LINE__, "cublasCreate failed!");
   if (CUSPARSE_STATUS_SUCCESS != cusparseCreate(&Intern::cusparse_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseCreate failed!");
+
+  blocksize_misc = 256;
+
+  blocksize_reduction = 256;
+
+  blocksize_spmv = 256;
+
+  blocksize_axpy = 256;
 }
 
 MemoryPool<Mem::CUDA>::~MemoryPool()

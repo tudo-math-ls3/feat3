@@ -70,7 +70,7 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
       std::cout<<"Warning: feast ini file " << property_file << " not found!"<<std::endl;
     }
   }
-
+/*
 #ifdef FEAST_BACKENDS_CUDA
   // read in initial settings from Runtime and store them in MemoryPool<CUDA>
   Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc = (Index)atoi(_global_property_map.query("CUDA.blocksize_misc", "256").c_str());
@@ -78,7 +78,7 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
   Util::MemoryPool<Mem::CUDA>::instance()->blocksize_spmv = (Index)atoi(_global_property_map.query("CUDA.blocksize_spmv", "256").c_str());
   Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy = (Index)atoi(_global_property_map.query("CUDA.blocksize_axpy", "256").c_str());
 #endif
-
+*/
   _initialised = true;
 }
 
