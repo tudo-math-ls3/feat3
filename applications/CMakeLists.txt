@@ -23,7 +23,6 @@ SET (app_list
   poisson_neumann_2d
   poisson_test-app
   poisson_ms2_test-app
-  proto_stokes
   stokes_dricav_2d
   stokes_poiseuille_2d
   stokes_vortex_2d
