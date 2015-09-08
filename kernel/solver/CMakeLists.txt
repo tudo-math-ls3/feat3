@@ -17,9 +17,24 @@ endif (FEAST_HAVE_UMFPACK)
 ADD_LIBRARY(kernel-solver STATIC ${kernel-solver-list})
 TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 
+if (FEAST_BACKENDS_CUDA)
+  CUDA_ADD_LIBRARY(kernel-solver-cuda
+    cusolver.cu
+    STATIC
+  )
+  if (FEAST_HAVE_CUSOLVER)
+    #TODO replace by FindCUDA makro, once cusolve lib has been added there
+    find_library(CUDA_cusolver_LIBRARY NAMES cusolver PATHS "${CUDA_TOOLKIT_ROOT_DIR}/lib64")
+    target_link_libraries(kernel-solver-cuda ${CUDA_cusolver_LIBRARY})
+  endif (FEAST_HAVE_CUSOLVER)
+  target_link_libraries(kernel-solver-cuda ${CUDA_cusparse_LIBRARY})
+  TARGET_LINK_LIBRARIES(kernel-solver kernel-solver-cuda)
+endif(FEAST_BACKENDS_CUDA)
+
 # list of solver tests
 SET (test_list
   basic_solver-test
+  cusolver-test
   umfpack-test
 )
 

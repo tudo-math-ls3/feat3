@@ -3,6 +3,7 @@
 #define KERNEL_SOLVER_UMFPACK_HPP 1
 
 // includes, FEAST
+#include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 

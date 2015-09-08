@@ -1,10 +1,11 @@
 #include <test_system/test_system.hpp>
 #ifdef FEAST_HAVE_CUSOLVER
 #include <kernel/lafem/pointstar_factory.hpp>
-#include <kernel/lafem/cusolver.hpp>
+#include <kernel/solver/cusolver.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
+using namespace FEAST::Solver;
 using namespace FEAST::TestSystem;
 
 class CuSolverLUTest :
@@ -41,7 +42,8 @@ public:
     vec_sol.convert(mat_sys.create_vector_r());
     vec_sol.format();
 
-    CuSolverLU::solve(vec_sol, mat_sys, vec_rhs);
+    CuSolverLU lusolver(mat_sys);
+    lusolver.apply(vec_sol, vec_rhs);
 
     // subtract reference solution
     vec_sol.axpy(vec_ref, vec_sol, -1.0);
@@ -89,7 +91,8 @@ public:
     vec_sol.convert(mat_sys.create_vector_r());
     vec_sol.format();
 
-    CuSolverQR::solve(vec_sol, mat_sys, vec_rhs);
+    CuSolverQR qrsolver(mat_sys);
+    qrsolver.apply(vec_sol, vec_rhs);
 
     // subtract reference solution
     vec_sol.axpy(vec_ref, vec_sol, -1.0);
