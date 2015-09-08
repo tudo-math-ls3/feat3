@@ -27,6 +27,7 @@
 
 // Misc. FEAST includes
 #include <kernel/util/string.hpp>                          // for String
+#include <kernel/util/runtime.hpp>                         // for Runtime
 
 // FEAST-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
@@ -236,7 +237,7 @@ namespace Tutorial02
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   // Here's our main function
-  int main(Index level)
+  void main(Index level)
   {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Create Mesh and Boundary
@@ -433,13 +434,15 @@ namespace Tutorial02
 
     // That's it for today.
     std::cout << "Finished!" << std::endl;
-    return 0;
   } // int main(...)
 } // namespace Tutorial02
 
 // Here's our main function
 int main(int argc, char* argv[])
 {
+  // Initialise the runtime
+  Runtime::initialise(argc, argv);
+
   // Print a welcome message
   std::cout << "Welcome to FEAST's tutorial #02: Laplace" << std::endl;
 
@@ -456,12 +459,15 @@ int main(int argc, char* argv[])
       // failed to parse
       std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << std::endl;
       std::cerr << "Note: The last argument must be a positive integer." << std::endl;
-      return 1;
+      Runtime::abort();
     }
     // parse successful
     level = Index(ilevel);
   }
 
   // call the tutorial's main function
-  return Tutorial02::main(level);
+  Tutorial02::main(level);
+
+  // Finalise the runtime
+  return Runtime::finalise();
 }

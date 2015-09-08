@@ -15,6 +15,7 @@
 
 // Misc. FEAST includes
 #include <kernel/util/string.hpp>                          // for String
+#include <kernel/util/runtime.hpp>                         // for Runtime
 
 // FEAST-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
@@ -672,7 +673,7 @@ namespace TutorialX1
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   // Here's our tutorial's main function
-  int main(Index lvl_max, Index lvl_min)
+  void main(Index lvl_max, Index lvl_min)
   {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Initial data setup
@@ -792,15 +793,15 @@ namespace TutorialX1
       delete levels.back();
       levels.pop_back();
     }
-
-    // That's it for today.
-    return 0;
   }
 } // namespace TutorialX1
 
 // Here's our main function
 int main(int argc, char* argv[])
 {
+  // Initialise runtime
+  Runtime::initialise(argc, argv);
+
   // Print a welcome message
   std::cout << "Welcome to FEAST's tutorial #X1: Andicore-MG" << std::endl;
 
@@ -817,7 +818,7 @@ int main(int argc, char* argv[])
       // failed to parse
       std::cerr << "ERROR: Failed to parse '" << argv[1] << "' as maximum refinement level." << std::endl;
       std::cerr << "Note: The first argument must be a positive integer." << std::endl;
-      return 1;
+      Runtime::abort();
     }
     // parse successful
     level_max = Index(ilevel);
@@ -831,7 +832,7 @@ int main(int argc, char* argv[])
       // failed to parse
       std::cerr << "ERROR: Failed to parse '" << argv[2] << "' as minimum refinement level." << std::endl;
       std::cerr << "Note: The second argument must be a positive integer." << std::endl;
-      return 1;
+      Runtime::abort();
     }
     // parse successful
     level_min = Index(ilevel);
@@ -839,7 +840,7 @@ int main(int argc, char* argv[])
     {
       // minimum level greater than maximum level
       std::cerr << "ERROR: Minimum level " << level_min << " is greather than the maximum level " << level_max << std::endl;
-      return 1;
+      Runtime::abort();
     }
   }
 
@@ -848,5 +849,8 @@ int main(int argc, char* argv[])
   std::cout << "Level-Max: " << level_max << std::endl;
 
   // call the tutorial's main function
-  return TutorialX1::main(level_max, level_min);
+  TutorialX1::main(level_max, level_min);
+
+  // Finalise runtime
+  return Runtime::finalise();
 }

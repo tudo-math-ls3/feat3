@@ -47,6 +47,7 @@
 
 // Misc. FEAST includes
 #include <kernel/util/string.hpp>                          // for String
+#include <kernel/util/runtime.hpp>                         // for Runtime
 
 // FEAST-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
@@ -117,7 +118,7 @@ namespace Tutorial01
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   // Here's our tutorial's main function
-  int main(Index level)
+  void main(Index level)
   {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Geometry typedefs
@@ -460,13 +461,15 @@ namespace Tutorial01
 
     // That's all, folks.
     std::cout << "Finished!" << std::endl;
-    return 0;
   } // int main(...)
 } // namespace Tutorial01
 
 // Here's our main function
 int main(int argc, char* argv[])
 {
+  // Before we can do anything else, we first need to initialise the FEAST runtime environment:
+  Runtime::initialise(argc, argv);
+
   // Print a welcome message
   std::cout << "Welcome to FEAST's tutorial #01: Poisson" << std::endl;
 
@@ -475,7 +478,7 @@ int main(int argc, char* argv[])
   // and such.
   Index level(3);
 
-  // First of all, let's see if we have command line parameters: This tutorial supports passing
+  // Now let's see if we have command line parameters: This tutorial supports passing
   // the refinement level as a command line parameter, to investigate the behaviour of the L2/H1
   // errors of the discrete solution.
   if(argc > 1)
@@ -487,7 +490,8 @@ int main(int argc, char* argv[])
       // Failed to parse
       std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << std::endl;
       std::cerr << "Note: The last argument must be a positive integer." << std::endl;
-      return 1;
+      // Abort our runtime environment
+      Runtime::abort();
     }
     // If parsing was successful, use the given information and notify the user
     level = Index(ilevel);
@@ -500,5 +504,9 @@ int main(int argc, char* argv[])
   }
 
   // call the tutorial's main function
-  return Tutorial01::main(level);
+  Tutorial01::main(level);
+
+  // And finally, finalise our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
+  // so we can simply return this as the result of our main function to indicate a successful run.
+  return Runtime::finalise();
 }
