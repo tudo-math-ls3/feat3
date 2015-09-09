@@ -143,7 +143,7 @@ public:
     TEST_CHECK_NOT_EQUAL(clone1, a);
     TEST_CHECK_NOT_EQUAL((void*)clone1.elements(), (void*)a.elements());
     DenseVector<Mem_, DT_, IT_> clone2 = clone1.clone(CloneMode::Layout);
-    Util::MemoryPool<Mem_>::instance()->set_memory(clone2.elements(), DT_(4713), clone2.size());
+    Util::MemoryPool<Mem_>::set_memory(clone2.elements(), DT_(4713), clone2.size());
     TEST_CHECK_NOT_EQUAL(clone2(7), clone1(7));
     TEST_CHECK_NOT_EQUAL((void*)clone2.elements(), (void*)clone1.elements());
     DenseVector<Mem_, DT_, IT_> clone3 = clone1.clone(CloneMode::Weak);

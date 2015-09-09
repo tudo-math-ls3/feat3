@@ -2,12 +2,6 @@
 #ifndef KERNEL_UTIL_INSTANTIATION_POLICY_HPP
 #define KERNEL_UTIL_INSTANTIATION_POLICY_HPP 1
 
-// define nullptr, as nvcc is not c++11 ready
-#ifdef  __CUDACC__
-  #define nullptr 0
-#endif
-
-
 // includes, FEAST
 #include <kernel/base_header.hpp>
 

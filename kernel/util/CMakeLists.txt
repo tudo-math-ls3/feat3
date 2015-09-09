@@ -6,6 +6,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # list of util source files
 ADD_LIBRARY(kernel-util STATIC
   exception.cpp
+  memory_pool.cpp
   mesh_streamer.cpp
   property_map.cpp
   runtime.cpp
@@ -31,8 +32,8 @@ if (FEAST_BACKENDS_CUDA)
     STATIC
   )
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-util-cuda)
-  TARGET_LINK_LIBRARIES(kernel-util kernel-util-cuda)
   target_link_libraries(kernel-util-cuda ${CUDA_cusparse_LIBRARY})
+  TARGET_LINK_LIBRARIES(kernel-util kernel-util-cuda)
 endif(FEAST_BACKENDS_CUDA)
 
 # list of util tests

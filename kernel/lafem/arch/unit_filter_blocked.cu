@@ -47,7 +47,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_, typename IT_, int BlockSize_>
 void UnitFilterBlocked<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc;
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -82,7 +82,7 @@ template void UnitFilterBlocked<Mem::CUDA>::filter_rhs<double, unsigned int, 4>(
 template <typename DT_, typename IT_, int BlockSize_>
 void UnitFilterBlocked<Mem::CUDA>::filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
 {
-  Index blocksize = Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc;
+  Index blocksize = Util::MemoryPool<Mem::CUDA>::blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;

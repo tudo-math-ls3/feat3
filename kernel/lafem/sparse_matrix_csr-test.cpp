@@ -170,24 +170,24 @@ public:
     // new clone testing
     auto clone1 = b.clone(CloneMode::Deep);
     TEST_CHECK_EQUAL(clone1, b);
-    Util::MemoryPool<Mem_>::instance()->set_memory(clone1.val() + 1, DT_(132));
+    Util::MemoryPool<Mem_>::set_memory(clone1.val() + 1, DT_(132));
     TEST_CHECK_NOT_EQUAL(clone1, b);
     TEST_CHECK_NOT_EQUAL((void*)clone1.val(), (void*)b.val());
     TEST_CHECK_NOT_EQUAL((void*)clone1.row_ptr(), (void*)b.row_ptr());
     auto clone2 = clone1.clone(CloneMode::Layout);
-    Util::MemoryPool<Mem_>::instance()->set_memory(clone2.val(), DT_(4713), clone2.used_elements());
+    Util::MemoryPool<Mem_>::set_memory(clone2.val(), DT_(4713), clone2.used_elements());
     TEST_CHECK_NOT_EQUAL(clone2(5, 5), clone1(5, 5));
     TEST_CHECK_NOT_EQUAL((void*)clone2.val(), (void*)clone1.val());
     TEST_CHECK_EQUAL((void*)clone2.row_ptr(), (void*)clone1.row_ptr());
     auto clone3 = clone1.clone(CloneMode::Weak);
     TEST_CHECK_EQUAL(clone3, clone1);
-    Util::MemoryPool<Mem_>::instance()->set_memory(clone3.val() + 1, DT_(133));
+    Util::MemoryPool<Mem_>::set_memory(clone3.val() + 1, DT_(133));
     TEST_CHECK_NOT_EQUAL(clone3, clone1);
     TEST_CHECK_NOT_EQUAL((void*)clone3.val(), (void*)clone1.val());
     TEST_CHECK_EQUAL((void*)clone3.row_ptr(), (void*)clone1.row_ptr());
     auto clone4 = clone1.clone(CloneMode::Shallow);
     TEST_CHECK_EQUAL(clone4, clone1);
-    Util::MemoryPool<Mem_>::instance()->set_memory(clone4.val() + 1, DT_(134));
+    Util::MemoryPool<Mem_>::set_memory(clone4.val() + 1, DT_(134));
     TEST_CHECK_EQUAL(clone4, clone1);
     TEST_CHECK_EQUAL((void*)clone4.val(), (void*)clone1.val());
     TEST_CHECK_EQUAL((void*)clone4.row_ptr(), (void*)clone1.row_ptr());

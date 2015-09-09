@@ -43,23 +43,23 @@ namespace FEAST
 using namespace FEAST;
 using namespace FEAST::Util;
 
-MemoryPool<Mem::CUDA>::MemoryPool()
+// static member initialisation
+std::map<void*, Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pool;
+std::map<void*, Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pinned_pool;
+Index MemoryPool<Mem::CUDA>::blocksize_misc = 256;
+Index MemoryPool<Mem::CUDA>::blocksize_reduction = 256;
+Index MemoryPool<Mem::CUDA>::blocksize_spmv = 256;
+Index MemoryPool<Mem::CUDA>::blocksize_axpy = 256;
+
+void MemoryPool<Mem::CUDA>::initialise()
 {
   if (CUBLAS_STATUS_SUCCESS != cublasCreate(&Intern::cublas_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasCreate failed!");
   if (CUSPARSE_STATUS_SUCCESS != cusparseCreate(&Intern::cusparse_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseCreate failed!");
-
-  blocksize_misc = 256;
-
-  blocksize_reduction = 256;
-
-  blocksize_spmv = 256;
-
-  blocksize_axpy = 256;
 }
 
-MemoryPool<Mem::CUDA>::~MemoryPool()
+void MemoryPool<Mem::CUDA>::finalise()
 {
   if (_pool.size() > 0)
   {
@@ -209,7 +209,7 @@ DT_ MemoryPool<Mem::CUDA>::get_element(const DT_ * data, const Index index)
 template <typename DT_>
 void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index count)
 {
-  Index blocksize = this->blocksize_misc;
+  Index blocksize = blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -246,7 +246,7 @@ void MemoryPool<Mem::CUDA>::convert(DT_ * dest, const DT_ * src, const Index cou
 template <typename DT1_, typename DT2_>
 void MemoryPool<Mem::CUDA>::convert(DT1_ * dest, const DT2_ * src, const Index count)
 {
-  Index blocksize = this->blocksize_misc;
+  Index blocksize = blocksize_misc;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -281,6 +281,17 @@ void MemoryPool<Mem::CUDA>::shutdown_device()
     throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
   if (cudaSuccess != cudaDeviceReset())
     throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
+}
+
+void MemoryPool<Mem::CUDA>::set_blocksize(Index misc, Index reduction, Index spmv, Index axpy)
+{
+  blocksize_misc = misc;
+
+  blocksize_reduction = reduction;
+
+  blocksize_spmv = spmv;
+
+  blocksize_axpy = axpy;
 }
 
 template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);

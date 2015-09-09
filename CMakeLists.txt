@@ -14,7 +14,7 @@ ENABLE_TESTING()
 
 if (FEAST_BACKENDS_CUDA)
   FIND_PACKAGE(CUDA)
-  set(CUDA_NVCC_FLAGS "-g -lineinfo -arch=${FEAST_CUDA_ARCH} -O3 --restrict --use_fast_math --compiler-options -Wall;-g")
+  set(CUDA_NVCC_FLAGS "-g -lineinfo -arch=${FEAST_CUDA_ARCH} -O3 --restrict --use_fast_math --compiler-options -Wall;-g;-std=c++11")
   if (FEAST_CUDA_VERBOSE)
     set(CUDA_VERBOSE_BUILD ON)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} " -v -Xptxas=-v")

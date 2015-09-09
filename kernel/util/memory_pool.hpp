@@ -5,7 +5,6 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/util/instantiation_policy.hpp>
 #include <kernel/archs.hpp>
 
 #include <map>
@@ -31,10 +30,7 @@ namespace FEAST
     /// \endcond
 
     template <typename Mem_>
-    class MemoryPool
-        : public InstantiationPolicy<MemoryPool<Mem_>, Singleton>
-    {
-    };
+    class MemoryPool;
 
     /**
      * \brief Memory managment.
@@ -45,19 +41,20 @@ namespace FEAST
      */
     template <>
     class MemoryPool<Mem::Main>
-        : public InstantiationPolicy<MemoryPool<Mem::Main>, Singleton>
     {
       private:
         /// Map of all memory chunks in use.
-        std::map<void*, Intern::MemoryInfo> _pool;
+        static std::map<void*, Intern::MemoryInfo> _pool;
 
-        /// default CTOR
-        MemoryPool()
+      public:
+
+        /// Setup memory pools
+        static void initialise()
         {
         }
 
-      public:
-        ~MemoryPool()
+        /// Shutdown memory pool and clean up allocated memory pools
+        static void finalise()
         {
           if (_pool.size() > 0)
           {
@@ -66,12 +63,9 @@ namespace FEAST
           }
         }
 
-        /// pointer to MemoryPool singleton
-        friend MemoryPool* InstantiationPolicy<MemoryPool<Mem::Main>, Singleton>::instance();
-
         /// allocate new memory
         template <typename DT_>
-        DT_ * allocate_memory(const Index count)
+        static DT_ * allocate_memory(const Index count)
         {
           DT_ * memory(nullptr);
           if (count == 0)
@@ -90,7 +84,7 @@ namespace FEAST
         }
 
         /// increase memory counter
-        void increase_memory(void * address)
+        static void increase_memory(void * address)
         {
           if (address == nullptr)
             return;
@@ -105,7 +99,7 @@ namespace FEAST
         }
 
         /// release memory or decrease reference counter
-        void release_memory(void * address)
+        static void release_memory(void * address)
         {
           if (address == nullptr)
             return;
@@ -156,7 +150,7 @@ namespace FEAST
 
         /// set memory to specific value
         template <typename DT_>
-        void set_memory(DT_ * address, const DT_ val, const Index count = 1)
+        static void set_memory(DT_ * address, const DT_ val, const Index count = 1)
         {
           for (Index i(0) ; i < count ; ++i)
           {
@@ -176,7 +170,7 @@ namespace FEAST
 
         /// Copy memory area from src to dest
         template <typename DT_>
-        void convert(DT_ * dest, const DT_ * src, const Index count)
+        static void convert(DT_ * dest, const DT_ * src, const Index count)
         {
           if (dest == src)
             return;
@@ -186,7 +180,7 @@ namespace FEAST
 
         /// Convert datatype DT2_ from src into DT1_ in dest
         template <typename DT1_, typename DT2_>
-        void convert(DT1_ * dest, const DT2_ * src, const Index count)
+        static void convert(DT1_ * dest, const DT2_ * src, const Index count)
         {
           for (Index i(0) ; i < count ; ++i)
           {
@@ -202,43 +196,40 @@ namespace FEAST
 
     template <>
     class MemoryPool<Mem::CUDA>
-        : public InstantiationPolicy<MemoryPool<Mem::CUDA>, Singleton>
     {
       private:
         //map of allocated device memory patches
-        std::map<void*, Intern::MemoryInfo> _pool;
+        static std::map<void*, Intern::MemoryInfo> _pool;
 
         //map of allocated pinned main memory patches
-        std::map<void*, Intern::MemoryInfo> _pinned_pool;
-
-        /// default CTOR
-        MemoryPool();
+        static std::map<void*, Intern::MemoryInfo> _pinned_pool;
 
       public:
-        ~MemoryPool();
+        /// Setup memory pools
+        static void initialise();
 
-        /// pointer to MemoryPool singleton
-        friend MemoryPool* InstantiationPolicy<MemoryPool<Mem::CUDA>, Singleton>::instance();
+        /// Shutdown memory pool and clean up allocated memory pools
+        static void finalise();
 
         /// allocate new memory
         template <typename DT_>
-        DT_ * allocate_memory(const Index count);
+        static DT_ * allocate_memory(const Index count);
 
         /// increase memory counter
-        void increase_memory(void * address);
+        static void increase_memory(void * address);
 
         /// release memory or decrease reference counter
-        void release_memory(void * address);
+        static void release_memory(void * address);
 
         /// allocate new pinned host memory
         template <typename DT_>
-        DT_ * allocate_pinned_memory(const Index count);
+        static DT_ * allocate_pinned_memory(const Index count);
 
         /// increase pinned memory counter
-        void increase_pinned_memory(void * address);
+        static void increase_pinned_memory(void * address);
 
         /// release pinned memory or decrease reference counter
-        void release_pinned_memory(void * address);
+        static void release_pinned_memory(void * address);
 
         /// download memory chunk to host memory
         template <typename DT_>
@@ -254,7 +245,7 @@ namespace FEAST
 
         /// set memory to specific value
         template <typename DT_>
-        void set_memory(DT_ * address, const DT_ val, const Index count = 1);
+        static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
 
         /// Copy memory area from src to dest
         template <typename DT_>
@@ -262,11 +253,11 @@ namespace FEAST
 
         /// Copy memory area from src to dest
         template <typename DT_>
-        void convert(DT_ * dest, const DT_ * src, const Index count);
+        static void convert(DT_ * dest, const DT_ * src, const Index count);
 
         /// Convert datatype DT2_ from src into DT1_ in dest
         template <typename DT1_, typename DT2_>
-        void convert(DT1_ * dest, const DT2_ * src, const Index count);
+        static void convert(DT1_ * dest, const DT2_ * src, const Index count);
 
         static void synchronize();
 
@@ -281,18 +272,19 @@ namespace FEAST
         **/
         static void shutdown_device();
 
+        static void set_blocksize(Index misc, Index reduction, Index spmv, Index axpy);
+
         /// cuda threading grid blocksize for miscellaneous ops
-        Index blocksize_misc;
+        static Index blocksize_misc;
 
         /// cuda threading grid blocksize for reduction type ops
-        Index blocksize_reduction;
+        static Index blocksize_reduction;
 
         /// cuda threading grid blocksize for blas-2 type ops
-        Index blocksize_spmv;
+        static Index blocksize_spmv;
 
         /// cuda threading grid blocksize for blas-1 type ops
-        Index blocksize_axpy;
-
+        static Index blocksize_axpy;
     };
   } // namespace Util
 } // namespace FEAST

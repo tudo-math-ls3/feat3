@@ -134,9 +134,9 @@ namespace FEAST
         this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
-          Util::MemoryPool<Mem_>::instance()->increase_memory(i);
+          Util::MemoryPool<Mem_>::increase_memory(i);
 
-        this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(raw_used_elements()));
+        this->_elements.push_back(Util::MemoryPool<Mem_>::template allocate_memory<DT_>(raw_used_elements()));
         this->_elements_size.push_back(raw_used_elements());
       }
 
@@ -211,9 +211,9 @@ namespace FEAST
         this->_indices_size.push_back(row_ptr_in.size());
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          Util::MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+          Util::MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          Util::MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+          Util::MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -286,9 +286,9 @@ namespace FEAST
         CONTEXT("When assigning SparseMatrixCSRBlocked");
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          Util::MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          Util::MemoryPool<Mem_>::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          Util::MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+          Util::MemoryPool<Mem_>::release_memory(this->_indices.at(i));
 
         this->_elements.clear();
         this->_indices.clear();
@@ -303,9 +303,9 @@ namespace FEAST
         this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
-          Util::MemoryPool<Mem_>::instance()->increase_memory(i);
+          Util::MemoryPool<Mem_>::increase_memory(i);
 
-        this->_elements.push_back(Util::MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(raw_used_elements()));
+        this->_elements.push_back(Util::MemoryPool<Mem_>::template allocate_memory<DT_>(raw_used_elements()));
         this->_elements_size.push_back(raw_used_elements());
 
         return *this;
@@ -1005,11 +1005,11 @@ namespace FEAST
         else
         {
           col_ind_a = new IT_[a.used_elements()];
-          Util::MemoryPool<Mem_>::instance()->template download<IT_>(col_ind_a, a.col_ind(), a.used_elements());
+          Util::MemoryPool<Mem_>::template download<IT_>(col_ind_a, a.col_ind(), a.used_elements());
           val_a = new DT_[a.raw_used_elements()];
-          Util::MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.raw_val(), a.raw_used_elements());
+          Util::MemoryPool<Mem_>::template download<DT_>(val_a, a.raw_val(), a.raw_used_elements());
           row_ptr_a = new IT_[a.rows() + 1];
-          Util::MemoryPool<Mem_>::instance()->template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
+          Util::MemoryPool<Mem_>::template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
         }
         if(std::is_same<Mem::Main, Mem2_>::value)
         {
@@ -1020,11 +1020,11 @@ namespace FEAST
         else
         {
           col_ind_b = new IT_[b.used_elements()];
-          Util::MemoryPool<Mem2_>::instance()->template download<IT_>(col_ind_b, b.col_ind(), b.used_elements());
+          Util::MemoryPool<Mem2_>::template download<IT_>(col_ind_b, b.col_ind(), b.used_elements());
           val_b = new DT_[b.raw_used_elements()];
-          Util::MemoryPool<Mem2_>::instance()->template download<DT_>(val_b, b.raw_val(), b.raw_used_elements());
+          Util::MemoryPool<Mem2_>::template download<DT_>(val_b, b.raw_val(), b.raw_used_elements());
           row_ptr_b = new IT_[b.rows() + 1];
-          Util::MemoryPool<Mem2_>::instance()->template download<IT_>(row_ptr_b, b.row_ptr(), b.rows() + 1);
+          Util::MemoryPool<Mem2_>::template download<IT_>(row_ptr_b, b.row_ptr(), b.rows() + 1);
         }
 
         for (Index i(0) ; i < a.used_elements() ; ++i)

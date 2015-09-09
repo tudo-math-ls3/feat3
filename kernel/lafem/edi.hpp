@@ -46,7 +46,7 @@ namespace FEAST
       {
         //if (_armed)
         {
-          Util::MemoryPool<Mem_>::instance()->set_memory(_address, _value);
+          Util::MemoryPool<Mem_>::set_memory(_address, _value);
         }
       }
 

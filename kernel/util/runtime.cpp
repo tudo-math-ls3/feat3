@@ -70,15 +70,19 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
       std::cout<<"Warning: feast ini file " << property_file << " not found!"<<std::endl;
     }
   }
-/*
+
+  Util::MemoryPool<Mem::Main>::initialise();
+
 #ifdef FEAST_BACKENDS_CUDA
+  Util::MemoryPool<Mem::CUDA>::initialise();
   // read in initial settings from Runtime and store them in MemoryPool<CUDA>
-  Util::MemoryPool<Mem::CUDA>::instance()->blocksize_misc = (Index)atoi(_global_property_map.query("CUDA.blocksize_misc", "256").c_str());
-  Util::MemoryPool<Mem::CUDA>::instance()->blocksize_reduction = (Index)atoi(_global_property_map.query("CUDA.blocksize_reduction", "256").c_str());
-  Util::MemoryPool<Mem::CUDA>::instance()->blocksize_spmv = (Index)atoi(_global_property_map.query("CUDA.blocksize_spmv", "256").c_str());
-  Util::MemoryPool<Mem::CUDA>::instance()->blocksize_axpy = (Index)atoi(_global_property_map.query("CUDA.blocksize_axpy", "256").c_str());
+  Index misc = (Index)atoi(_global_property_map.query("CUDA.blocksize_misc", "256").c_str());
+  Index reduction = (Index)atoi(_global_property_map.query("CUDA.blocksize_reduction", "256").c_str());
+  Index spmv = (Index)atoi(_global_property_map.query("CUDA.blocksize_spmv", "256").c_str());
+  Index axpy = (Index)atoi(_global_property_map.query("CUDA.blocksize_axpy", "256").c_str());
+  Util::MemoryPool<Mem::CUDA>::set_blocksize(misc, reduction, spmv, axpy);
 #endif
-*/
+
   _initialised = true;
 }
 
@@ -106,6 +110,12 @@ int Runtime::finalise()
   // finalise MPI
   ::MPI_Finalize();
 #endif
+
+  Util::MemoryPool<Mem::Main>::finalise();
+#ifdef FEAST_BACKENDS_CUDA
+  Util::MemoryPool<Mem::CUDA>::finalise();
+#endif
+
 
   _finished = true;
 
