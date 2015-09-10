@@ -36,6 +36,7 @@ SET (test_list
   basic_solver-test
   cusolver-test
   umfpack-test
+  vanka-test
 )
 
 # create all tests

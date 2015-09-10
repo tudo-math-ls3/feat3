@@ -40,10 +40,9 @@ namespace FEAST
     {
       static_assert((width_ > 0) && (height_ > 0), "invalid matrix dimensions");
 
-      /// container-class typedef
-      typedef  PowerColMatrix<PowerRowMatrix<SubType_, width_>, height_> ContClass;
-
     public:
+      /// container-class typedef
+      typedef PowerColMatrix<PowerRowMatrix<SubType_, width_>, height_> ContClass;
       /// sub-matrix type
       typedef SubType_ SubMatrixType;
       /// sub-matrix memory type
@@ -233,6 +232,16 @@ namespace FEAST
                     const Index col_start, const Index stride = 1) const
       {
         _container.set_line(row, pval_set, pcol_set, col_start, stride);
+      }
+
+      ContClass& get_container()
+      {
+        return _container;
+      }
+
+      const ContClass& get_container() const
+      {
+        return _container;
       }
       /// \endcond
 
