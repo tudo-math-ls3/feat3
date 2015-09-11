@@ -67,7 +67,7 @@ namespace FEAST
       {
         this->_row_gate = row_gate;
         this->_col_gate = col_gate;
-        this->_matrix.convert(other._matrix);
+        this->_matrix.convert(*other);
       }
 
       Matrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const

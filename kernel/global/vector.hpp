@@ -57,7 +57,7 @@ namespace FEAST
       void convert(GateType* gate, const Global::Vector<OtherLocalVector_>& other)
       {
         this->_gate = gate;
-        this->_vector.convert(other._vector);
+        this->_vector.convert(*other);
       }
 
       void sync_0()

@@ -42,7 +42,7 @@ namespace FEAST
       template<typename OtherLocalFilter_>
       void convert(const Global::Filter<OtherLocalFilter_>& other)
       {
-        this->_filter.convert(other._filter);
+        this->_filter.convert(*other);
       }
 
       void filter_rhs(VectorType& vector) const
