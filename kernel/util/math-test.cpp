@@ -238,3 +238,92 @@ MathTest<double> math_test_double;
 #ifdef FEAST_HAVE_QUADMATH
 MathTest<__float128> math_test_float128;
 #endif // FEAST_HAVE_QUADMATH
+
+
+/**
+* \brief Test class for the Math functions.
+*
+* \test Tests the floating-point math function templates in the Math namespace.
+*
+* \author Peter Zajac
+*/
+template<typename DT_, typename IT_>
+class MatrixInvertTest :
+  public FullTaggedTest<Archs::None, DT_, IT_>
+{
+public:
+  MatrixInvertTest() :
+    FullTaggedTest<Archs::None, DT_, IT_>("MatrixInvertTest")
+  {
+  }
+
+  static void init_lehmer_mat(IT_ n, IT_ s, DT_ a[])
+  {
+    for(IT_ i(0) ; i < n ; ++i)
+    {
+      for(IT_ j(0) ; j < n ; ++j)
+      {
+        a[i * s + j] = DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1);
+      }
+    }
+  }
+
+  static void init_lehmer_inv(IT_ n, IT_ s, DT_ a[])
+  {
+    for(IT_ i(0); i < n*s; ++i)
+    {
+      a[i] = DT_(0);
+    }
+    a[0] = DT_(4) / DT_(3);
+    DT_ b = a[1] = -DT_(2) / DT_(3);
+    for(IT_ i(1) ; i < n - 1 ; ++i)
+    {
+      a[i * (s + 1) - 1] = b;
+      a[i * (s + 1)    ] = DT_(4*Math::cub(i+1)) / DT_(4*Math::sqr(i+1) - 1);
+      a[i * (s + 1) + 1] = b = -DT_((i+2)*(i+1)) / DT_(2*i + 3);
+    }
+    a[(n - 1) * (s + 1) - 1] = b;
+    a[(n - 1) * (s + 1)    ] = DT_(n*n) / DT_(2*n - 1);
+  }
+
+  void test_lehmer() const
+  {
+    static constexpr IT_ n = 5;
+    static constexpr IT_ s = n + 2;
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // matrix and inverse
+    DT_ a[n*s];
+    DT_ b[n*s];
+    init_lehmer_mat(n, s, a);
+    init_lehmer_inv(n, s ,b);
+    IT_ p[3*n];
+
+    // invert A
+    Math::invert_matrix(n, s, a, p);
+
+    //
+    DT_ def = DT_(0);
+    for(IT_ i(0); i < n; ++i)
+    {
+      for(IT_ j(0); j < n; ++j)
+      {
+        def += Math::sqr(a[i*s+j] - b[i*s+j]);
+      }
+    }
+    def = Math::sqrt(def / DT_(n*n));
+
+    TEST_CHECK_EQUAL_WITHIN_EPS(def, DT_(0), eps);
+  }
+
+  virtual void run() const override
+  {
+    // test lehmer matrix
+    test_lehmer();
+  }
+};
+
+MatrixInvertTest<double, unsigned short> matrix_invert_test_double_ushort;
+#ifdef FEAST_HAVE_QUADMATH
+MatrixInvertTest<__float128, int> matrix_invert_test_float128_int;
+#endif // FEAST_HAVE_QUADMATH

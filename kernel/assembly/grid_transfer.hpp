@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/assembly/asm_traits.hpp>
-#include <kernel/util/linear_algebra.hpp>
+#include <kernel/util/math.hpp>
 
 namespace FEAST
 {
@@ -138,13 +138,13 @@ namespace FEAST
         Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, FineSpaceEvaluator::max_local_dofs> mass;
 
         // allocate local matrix data for interlevel-mesh mass matrix
-        Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, CoarseSpaceEvaluator::max_local_dofs> lmd;
+        Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, CoarseSpaceEvaluator::max_local_dofs> lmd, lid;
 
         // allocate local vector data for weight vector
         Tiny::Vector<DataType, FineSpaceEvaluator::max_local_dofs> lvd;
 
         // pivaot array for factorisation
-        int pivot[FineSpaceEvaluator::max_local_dofs];
+        int pivot[3*FineSpaceEvaluator::max_local_dofs];
 
         // calculate child count
         const Index num_children = fine_trafo_eval.get_num_cells() / coarse_trafo_eval.get_num_cells();
@@ -226,20 +226,17 @@ namespace FEAST
             fine_space_eval.finish();
             fine_trafo_eval.finish();
 
-            // factorise fine mesh mass matrix
-            LinAlg::mat_factorise(fine_num_loc_dofs, fine_num_loc_dofs,
-              FineSpaceEvaluator::max_local_dofs, &mass.v[0][0], pivot);
+            // invert fine mesh mass matrix
+            Math::invert_matrix(fine_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
 
-            // solve M*X = N
-            LinAlg::mat_solve_mat<false>(fine_num_loc_dofs, coarse_num_loc_dofs,
-              CoarseSpaceEvaluator::max_local_dofs, &lmd.v[0][0],
-              FineSpaceEvaluator::max_local_dofs, &mass.v[0][0], pivot);
+            // compute X := M^{-1}*N
+            lid.set_mat_mat_mult(mass, lmd);
 
             // prepare fine mesh dof-mapping
             fine_dof_mapping.prepare(fcell);
 
             // incorporate local matrix
-            scatter_maxpy(lmd, fine_dof_mapping, coarse_dof_mapping);
+            scatter_maxpy(lid, fine_dof_mapping, coarse_dof_mapping);
 
             // update weights
             lvd.format(DataType(1));

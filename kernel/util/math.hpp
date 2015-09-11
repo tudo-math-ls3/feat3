@@ -844,6 +844,136 @@ namespace FEAST
     }
 
     /**
+     * \brief Inverts a matrix.
+     *
+     * This function inverts a dense n x n matrix by means of totally pivoted Gaussian elimination.
+     *
+     * \cite NumericalRecipes, chapter 2.1, page 39
+     *
+     * \attention This function silently assumes that the input matrix is regular!
+     *
+     * \warning This function does not check whether the input arguments are valid to avoid
+     * dependencies to other header files!
+     *
+     * \param[in] n
+     * The dimension of the matrix to be inverted.
+     *
+     * \param[in] stride
+     * The stride of the matrix. Must be >= n.
+     *
+     * \param[in] a
+     * On entry, the matrix to be inverted. On exit, the inverse matrix.
+     *
+     * \param[in] p
+     * A temporary pivot array of length at least <b>3*n</b>.
+     */
+    template<typename DT_, typename IT_>
+    void invert_matrix(
+      const IT_ n,
+      const IT_ stride,
+      DT_ a[],
+      IT_ p[])
+    {
+      // The integer arrays ipiv, indxr, and indxc are used for bookkeeping on the pivoting.
+      IT_* ipiv  = &p[  0];
+      IT_* indxc = &p[  n];
+      IT_* indxr = &p[2*n];
+      for (IT_ j(0); j < n; ++j)
+      {
+        ipiv[j] = 0;
+      }
+
+      // This is the main loop over the columns to be reduced.
+      for(IT_ i(0), icol(0), irow(0); i < n; ++i)
+      {
+        DT_ big(DT_(0));
+
+        // This is the outer loop of the search for a pivot element.
+        for (IT_ j(0); j < n; ++j)
+        {
+          if (ipiv[j] != IT_(1))
+          {
+            for (IT_ k(0); k < n; ++k)
+            {
+              if (ipiv[k] == IT_(0))
+              {
+                DT_ a_jk = Math::abs(a[j*stride+k]);
+                if(a_jk >= big)
+                {
+                  big = a_jk;
+                  irow = j;
+                  icol = k;
+                }
+              }
+            }
+          }
+        }
+        ++(ipiv[icol]);
+
+        // We now have the pivot element, so we interchange rows, if needed,
+        // to put the pivot element on the diagonal. The columns are not
+        // physically interchanged, only relabeled: indxc[i], the column of
+        // the ith pivot element, is the ith column that is reduced, while
+        // indxr[i] is the row in which that pivot element was originally
+        // located. If indxr[i] ?= indxc[i] there is an implied column
+        // interchange. With this form of bookkeeping, the solution b's will
+        // end up in the correct order, and the inverse matrix will be
+        // scrambled by columns.
+        if (irow != icol)
+        {
+          for (IT_ j(0); j < n; ++j)
+          {
+            DT_ tmp = a[irow*stride+j];
+            a[irow*stride+j] = a[icol*stride+j];
+            a[icol*stride+j] = tmp;
+          }
+        }
+
+        // We are now ready to divide the pivot row by the pivot element, located at irow and icol.
+        indxr[i] = irow;
+        indxc[i] = icol;
+        DT_ pivinv = DT_(1) / a[icol*stride+icol];
+        a[icol*stride+icol] = DT_(1);
+        for(IT_ j(0); j < n; ++j)
+        {
+          a[icol*stride+j] *= pivinv;
+        }
+        // Next, we reduce the rows except for the pivot one, of course.
+        for (IT_ j(0); j < n; ++j)
+        {
+          if (j != icol)
+          {
+            DT_ dum(a[j*stride+icol]);
+            a[j*stride+icol] = DT_(0);
+            for (IT_ k(0); k < n; ++k)
+            {
+              a[j*stride+k] -= a[icol*stride+k]*dum;
+            }
+          }
+        }
+      }
+
+      // This is the end of the main loop over columns of the reduction. It
+      // only remains to unscram- ble the solution in view of the column
+      // interchanges. We do this by interchanging pairs of columns in the
+      // reverse order that the permutation was built up.
+      for (IT_ j(n); j > IT_(0);)
+      {
+        --j;
+        if (indxr[j] != indxc[j])
+        {
+          for (IT_ k(0); k < n; ++k)
+          {
+            DT_ tmp = a[k*stride+indxr[j]];
+            a[k*stride+indxr[j]] = a[k*stride+indxc[j]];
+            a[k*stride+indxc[j]] = tmp;
+          }
+        }
+      }
+      // And we are done.
+    }
+
+    /**
      * \brief Math Limits class template
      *
      * This class is an extended version of the <c>std::numeric_limits</c> class template, from which

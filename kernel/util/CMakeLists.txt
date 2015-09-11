@@ -40,7 +40,6 @@ endif(FEAST_BACKENDS_CUDA)
 SET (test_list
   assertion-test
   binary_stream-test
-  linear_algebra-test
   math-test
   mesh_streamer-test
   meta_math-test

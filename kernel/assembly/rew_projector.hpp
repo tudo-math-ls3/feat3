@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/assembly/asm_traits.hpp>
-#include <kernel/util/linear_algebra.hpp>
+#include <kernel/util/math.hpp>
 
 namespace FEAST
 {
@@ -117,10 +117,10 @@ namespace FEAST
         typename AsmTraits::LocalMatrixType mass;
 
         // pivot array for factorisation
-        int pivot[mass.n];
+        int pivot[3*mass.n];
 
         // create local vector data
-        typename AsmTraits::LocalVectorType lvad;
+        typename AsmTraits::LocalVectorType lvad, lxad;
 
         // create local weight data
         typename AsmTraits::LocalVectorType lwad;
@@ -206,15 +206,15 @@ namespace FEAST
           trafo_eval.finish();
 
           // try to factorise the local mass matrix
-          LinAlg::mat_factorise(num_loc_dofs, num_loc_dofs, mass.n, &mass.v[0][0], pivot);
+          Math::invert_matrix(num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
 
           // solve M*x=f
-          LinAlg::mat_solve_vec<false>(num_loc_dofs, &lvad.v[0], mass.n, &mass.v[0][0], pivot);
+          lxad.set_mat_vec_mult(mass, lvad);
 
           // choose weight
           if(weight_type == wt_volume)
           {
-            lvad *= volume;
+            lxad *= volume;
             lwad.format(volume);
           }
 
@@ -222,7 +222,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local vector and weights
-          scatter_axpy(lvad, dof_mapping);
+          scatter_axpy(lxad, dof_mapping);
           weight_scatter_axpy(lwad, dof_mapping);
 
           // finish dof-mapping

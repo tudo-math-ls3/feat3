@@ -1,5 +1,4 @@
 #include <kernel/util/tiny_algebra.hpp>
-#include <kernel/util/linear_algebra.hpp>
 #include <test_system/test_system.hpp>
 
 using namespace FEAST;
@@ -74,10 +73,19 @@ public:
 
     // invert matrix and subtract analytic inverse
     c.set_inverse(a);
-    c -= b;
+
+    // compute norm
+    DataType_ def = DataType_(0);
+    for(int i(0); i < n_; ++i)
+    {
+      for(int j(0); j < n_; ++j)
+      {
+        def = Math::max(def, Math::abs(c[i][j] - b[i][j]));
+      }
+    }
 
     // check norm of error
-    TEST_CHECK_EQUAL_WITHIN_EPS(LinAlg::mat_norm_max(n_, n_, n_, &c.v[0][0]), DataType_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(def, DataType_(0), tol);
   }
 
   template<int n_>
