@@ -28,6 +28,7 @@ namespace FEAST
       };
     }
     /// \endcond
+  } // namespace Util
 
     template <typename Mem_>
     class MemoryPool;
@@ -44,7 +45,7 @@ namespace FEAST
     {
       private:
         /// Map of all memory chunks in use.
-        static std::map<void*, Intern::MemoryInfo> _pool;
+        static std::map<void*, Util::Intern::MemoryInfo> _pool;
 
       public:
 
@@ -75,10 +76,10 @@ namespace FEAST
           if (memory == nullptr)
             throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
 
-          Intern::MemoryInfo mi;
+          Util::Intern::MemoryInfo mi;
           mi.counter = 1;
           mi.size = count * sizeof(DT_);
-          _pool.insert(std::pair<void*, Intern::MemoryInfo>(memory, mi));
+          _pool.insert(std::pair<void*, Util::Intern::MemoryInfo>(memory, mi));
 
           return memory;
         }
@@ -89,7 +90,7 @@ namespace FEAST
           if (address == nullptr)
             return;
 
-          std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
+          std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pool.find(address));
           if (it == _pool.end())
             throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::increase_memory: Memory address not found!");
           else
@@ -104,7 +105,7 @@ namespace FEAST
           if (address == nullptr)
             return;
 
-          std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
+          std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pool.find(address));
           if (it == _pool.end())
             throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::release_memory: Memory address not found!");
           else
@@ -199,10 +200,10 @@ namespace FEAST
     {
       private:
         //map of allocated device memory patches
-        static std::map<void*, Intern::MemoryInfo> _pool;
+        static std::map<void*, Util::Intern::MemoryInfo> _pool;
 
         //map of allocated pinned main memory patches
-        static std::map<void*, Intern::MemoryInfo> _pinned_pool;
+        static std::map<void*, Util::Intern::MemoryInfo> _pinned_pool;
 
       public:
         /// Setup memory pools
@@ -286,7 +287,6 @@ namespace FEAST
         /// cuda threading grid blocksize for blas-1 type ops
         static Index blocksize_axpy;
     };
-  } // namespace Util
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_MEMORY_POOL_HPP

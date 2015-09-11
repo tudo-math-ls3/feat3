@@ -41,11 +41,10 @@ namespace FEAST
 
 
 using namespace FEAST;
-using namespace FEAST::Util;
 
 // static member initialisation
-std::map<void*, Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pool;
-std::map<void*, Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pinned_pool;
+std::map<void*, Util::Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pool;
+std::map<void*, Util::Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pinned_pool;
 Index MemoryPool<Mem::CUDA>::blocksize_misc = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_reduction = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_spmv = 256;
@@ -53,9 +52,9 @@ Index MemoryPool<Mem::CUDA>::blocksize_axpy = 256;
 
 void MemoryPool<Mem::CUDA>::initialise()
 {
-  if (CUBLAS_STATUS_SUCCESS != cublasCreate(&Intern::cublas_handle))
+  if (CUBLAS_STATUS_SUCCESS != cublasCreate(&Util::Intern::cublas_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasCreate failed!");
-  if (CUSPARSE_STATUS_SUCCESS != cusparseCreate(&Intern::cusparse_handle))
+  if (CUSPARSE_STATUS_SUCCESS != cusparseCreate(&Util::Intern::cusparse_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseCreate failed!");
 }
 
@@ -83,10 +82,10 @@ DT_ * MemoryPool<Mem::CUDA>::allocate_memory(const Index count)
     throw InternalError("MemoryPool<CUDA> cuda allocation error (cudaErrorMemoryAllocation)");
   if (memory == nullptr)
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA> allocation error (null pointer returned)");
-  Intern::MemoryInfo mi;
+  Util::Intern::MemoryInfo mi;
   mi.counter = 1;
   mi.size = count * sizeof(DT_);
-  _pool.insert(std::pair<void*, Intern::MemoryInfo>(memory, mi));
+  _pool.insert(std::pair<void*, Util::Intern::MemoryInfo>(memory, mi));
   return memory;
 }
 
@@ -95,7 +94,7 @@ void MemoryPool<Mem::CUDA>::increase_memory(void * address)
   if (address == nullptr)
     return;
 
-  std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
+  std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::increase_memory: Memory address not found!");
   else
@@ -109,7 +108,7 @@ void MemoryPool<Mem::CUDA>::release_memory(void * address)
   if (address == nullptr)
     return;
 
-  std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
+  std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::relase_memory: Memory address not found!");
   else
@@ -138,10 +137,10 @@ DT_ * MemoryPool<Mem::CUDA>::allocate_pinned_memory(const Index count)
     throw InternalError("MemoryPool<CUDA> cuda pinned allocation error (cudaErrorMemoryAllocation)");
   if (memory == nullptr)
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA> pinned allocation error (null pointer returned)");
-  Intern::MemoryInfo mi;
+  Util::Intern::MemoryInfo mi;
   mi.counter = 1;
   mi.size = count * sizeof(DT_);
-  _pinned_pool.insert(std::pair<void*, Intern::MemoryInfo>(memory, mi));
+  _pinned_pool.insert(std::pair<void*, Util::Intern::MemoryInfo>(memory, mi));
   return memory;
 }
 
@@ -150,7 +149,7 @@ void MemoryPool<Mem::CUDA>::increase_pinned_memory(void * address)
   if (address == nullptr)
     return;
 
-  std::map<void*, Intern::MemoryInfo>::iterator it(_pinned_pool.find(address));
+  std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pinned_pool.find(address));
   if (it == _pool.end())
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::increase_pinned_memory: Memory address not found!");
   else
@@ -164,7 +163,7 @@ void MemoryPool<Mem::CUDA>::release_pinned_memory(void * address)
   if (address == nullptr)
     return;
 
-  std::map<void*, Intern::MemoryInfo>::iterator it(_pinned_pool.find(address));
+  std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pinned_pool.find(address));
   if (it == _pool.end())
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::relase_pinned_memory: Memory address not found!");
   else
@@ -272,9 +271,9 @@ void MemoryPool<Mem::CUDA>::reset_device()
 
 void MemoryPool<Mem::CUDA>::shutdown_device()
 {
-  if (CUBLAS_STATUS_SUCCESS != cublasDestroy(Intern::cublas_handle))
+  if (CUBLAS_STATUS_SUCCESS != cublasDestroy(Util::Intern::cublas_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasDestroy failed!");
-  if (CUSPARSE_STATUS_SUCCESS != cusparseDestroy(Intern::cusparse_handle))
+  if (CUSPARSE_STATUS_SUCCESS != cusparseDestroy(Util::Intern::cusparse_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseDestroy failed!");
 
   if (cudaSuccess != cudaDeviceSynchronize())

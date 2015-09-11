@@ -66,7 +66,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_, typename IT_>
 void Diagonal<Mem::CUDA>::csr(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
 {
-  Index blocksize = Util::MemoryPool<Mem::CUDA>::blocksize_axpy;
+  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;
@@ -90,7 +90,7 @@ template <typename DT_, typename IT_>
 void Diagonal<Mem::CUDA>::ell(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,
     const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
 {
-  Index blocksize = Util::MemoryPool<Mem::CUDA>::blocksize_axpy;
+  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;

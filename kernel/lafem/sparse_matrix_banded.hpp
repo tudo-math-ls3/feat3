@@ -190,9 +190,9 @@ namespace FEAST
         this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
-          Util::MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool<Mem_>::increase_memory(i);
 
-        this->_elements.push_back(Util::MemoryPool<Mem_>::template allocate_memory<DT_>(rows() * num_of_offsets()));
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(rows() * num_of_offsets()));
         this->_elements_size.push_back(rows() * num_of_offsets());
       }
 
@@ -244,9 +244,9 @@ namespace FEAST
         this->_indices_size.push_back(offsets_in.size());
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          Util::MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
+          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          Util::MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -411,9 +411,9 @@ namespace FEAST
         CONTEXT("When assigning SparseMatrixBanded");
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          Util::MemoryPool<Mem_>::release_memory(this->_elements.at(i));
+          MemoryPool<Mem_>::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          Util::MemoryPool<Mem_>::release_memory(this->_indices.at(i));
+          MemoryPool<Mem_>::release_memory(this->_indices.at(i));
 
         this->_elements.clear();
         this->_indices.clear();
@@ -428,9 +428,9 @@ namespace FEAST
         this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
-          Util::MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool<Mem_>::increase_memory(i);
 
-        this->_elements.push_back(Util::MemoryPool<Mem_>::template allocate_memory<DT_>(rows() * num_of_offsets()));
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(rows() * num_of_offsets()));
         this->_elements_size.push_back(rows() * num_of_offsets());
 
         return *this;
@@ -523,10 +523,10 @@ namespace FEAST
 
         for (Index i(0); i < this->_scalar_index.at(4); ++i)
         {
-          const Index toffset(Index(Util::MemoryPool<Mem_>::get_element(this->_indices.at(0), i)));
+          const Index toffset(Index(MemoryPool<Mem_>::get_element(this->_indices.at(0), i)));
           if (row + toffset + Index(1) == col + trows)
           {
-            return Util::MemoryPool<Mem_>::get_element(this->_elements.at(0), i * trows + row);
+            return MemoryPool<Mem_>::get_element(this->_elements.at(0), i * trows + row);
           }
         }
         return zero_element();
@@ -1010,9 +1010,9 @@ namespace FEAST
         else
         {
           offsets_a = new IT_[a.num_of_offsets()];
-          Util::MemoryPool<Mem_>::template download<IT_>(offsets_a, a.offsets(), a.num_of_offsets());
+          MemoryPool<Mem_>::template download<IT_>(offsets_a, a.offsets(), a.num_of_offsets());
           val_a = new DT_[a.num_of_offsets() * a.rows()];
-          Util::MemoryPool<Mem_>::template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
+          MemoryPool<Mem_>::template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
         }
         if(std::is_same<Mem::Main, Mem2_>::value)
         {
@@ -1022,9 +1022,9 @@ namespace FEAST
         else
         {
           offsets_b = new IT_[b.num_of_offsets()];
-          Util::MemoryPool<Mem2_>::template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
+          MemoryPool<Mem2_>::template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
           val_b = new DT_[b.num_of_offsets() * b.rows()];
-          Util::MemoryPool<Mem2_>::template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
+          MemoryPool<Mem2_>::template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
         }
 
         bool ret(true);

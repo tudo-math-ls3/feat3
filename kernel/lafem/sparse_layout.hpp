@@ -88,7 +88,7 @@ namespace FEAST
         _scalar_index(scalar_index)
       {
         for(auto i : this->_indices)
-          Util::MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool<Mem_>::increase_memory(i);
       }
 
       /// move constructor
@@ -103,7 +103,7 @@ namespace FEAST
       virtual ~SparseLayout()
       {
         for(auto i : this->_indices)
-          Util::MemoryPool<Mem_>::release_memory(i);
+          MemoryPool<Mem_>::release_memory(i);
       }
 
       /// move operator=

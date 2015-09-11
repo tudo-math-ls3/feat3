@@ -27,12 +27,12 @@ namespace FEAST
       Index iters(1);
       //warup
       func();
-      Util::MemoryPool<Mem_>::synchronize();
+      MemoryPool<Mem_>::synchronize();
 
       TimeStamp at, bt;
       at.stamp();
       func();
-      Util::MemoryPool<Mem_>::synchronize();
+      MemoryPool<Mem_>::synchronize();
       bt.stamp();
       double test_run_time(bt.elapsed(at));
       std::cout<<"test time: "<<test_run_time<<std::endl;
@@ -48,7 +48,7 @@ namespace FEAST
         {
           func();
         }
-        Util::MemoryPool<Mem_>::synchronize();
+        MemoryPool<Mem_>::synchronize();
         bt.stamp();
         times.push_back(bt.elapsed(at));
       }

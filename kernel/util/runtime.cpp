@@ -71,16 +71,16 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
     }
   }
 
-  Util::MemoryPool<Mem::Main>::initialise();
+  MemoryPool<Mem::Main>::initialise();
 
 #ifdef FEAST_BACKENDS_CUDA
-  Util::MemoryPool<Mem::CUDA>::initialise();
+  MemoryPool<Mem::CUDA>::initialise();
   // read in initial settings from Runtime and store them in MemoryPool<CUDA>
   Index misc = (Index)atoi(_global_property_map.query("CUDA.blocksize_misc", "256").c_str());
   Index reduction = (Index)atoi(_global_property_map.query("CUDA.blocksize_reduction", "256").c_str());
   Index spmv = (Index)atoi(_global_property_map.query("CUDA.blocksize_spmv", "256").c_str());
   Index axpy = (Index)atoi(_global_property_map.query("CUDA.blocksize_axpy", "256").c_str());
-  Util::MemoryPool<Mem::CUDA>::set_blocksize(misc, reduction, spmv, axpy);
+  MemoryPool<Mem::CUDA>::set_blocksize(misc, reduction, spmv, axpy);
 #endif
 
   _initialised = true;
@@ -111,9 +111,9 @@ int Runtime::finalise()
   ::MPI_Finalize();
 #endif
 
-  Util::MemoryPool<Mem::Main>::finalise();
+  MemoryPool<Mem::Main>::finalise();
 #ifdef FEAST_BACKENDS_CUDA
-  Util::MemoryPool<Mem::CUDA>::finalise();
+  MemoryPool<Mem::CUDA>::finalise();
 #endif
 
 

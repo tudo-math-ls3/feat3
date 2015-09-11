@@ -31,7 +31,7 @@ using namespace FEAST::LAFEM::Arch;
 template <typename DT_>
 void Scale<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
 {
-  Index blocksize = Util::MemoryPool<Mem::CUDA>::blocksize_axpy;
+  Index blocksize = MemoryPool<Mem::CUDA>::blocksize_axpy;
   dim3 grid;
   dim3 block;
   block.x = blocksize;

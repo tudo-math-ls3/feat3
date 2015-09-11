@@ -105,8 +105,8 @@ namespace FEAST
           const Index tcs((Index(pcs[tnum_of_chunks])));
           for (Index i(Index(pcs[tnum_of_chunks-1]) + trows - (tnum_of_chunks-1) * tC); i < tcs; i+=tC)
           {
-            Util::MemoryPool<Mem2_>::set_memory(pval     + i, DT_(0), tnum_of_chunks * tC - trows);
-            Util::MemoryPool<Mem3_>::set_memory(pcol_ind + i, IT_(0), tnum_of_chunks * tC - trows);
+            MemoryPool<Mem2_>::set_memory(pval     + i, DT_(0), tnum_of_chunks * tC - trows);
+            MemoryPool<Mem3_>::set_memory(pcol_ind + i, IT_(0), tnum_of_chunks * tC - trows);
           }
         }
       }
@@ -225,12 +225,12 @@ namespace FEAST
         this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
-          Util::MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool<Mem_>::increase_memory(i);
 
-        this->_elements.push_back(Util::MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
         this->_elements_size.push_back(_val_size());
 
-        Util::MemoryPool<Mem_>::set_memory(val(), DT_(0), _val_size());
+        MemoryPool<Mem_>::set_memory(val(), DT_(0), _val_size());
       }
 
       /**
@@ -302,9 +302,9 @@ namespace FEAST
         this->_indices_size.push_back(rl_in.size());
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          Util::MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
+          MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          Util::MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+          MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
       }
 
       /**
@@ -521,9 +521,9 @@ namespace FEAST
         cother.convert(other);
         this->_scalar_dt.push_back(cother.zero_element());
 
-        IT_ * tcl = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks());
-        Util::MemoryPool<Mem::Main>::set_memory(tcl, IT_(0), _num_of_chunks());
-        IT_ * trl = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_rows());
+        IT_ * tcl = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks());
+        MemoryPool<Mem::Main>::set_memory(tcl, IT_(0), _num_of_chunks());
+        IT_ * trl = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_rows());
 
         const DT_ * cval(cother.val());
         const IT_ * coffsets(cother.offsets());
@@ -565,7 +565,7 @@ namespace FEAST
           }
         }
 
-        IT_ * tcs = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks() + 1);
+        IT_ * tcs = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks() + 1);
 
         tcs[0] = IT_(0);
         for (Index i(0); i < _num_of_chunks(); ++i)
@@ -575,8 +575,8 @@ namespace FEAST
 
         _val_size() = Index(tcs[_num_of_chunks()]);
 
-        DT_ * tval = Util::MemoryPool<Mem::Main>::template allocate_memory<DT_>(_val_size());
-        IT_ * tcol_ind = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_val_size());
+        DT_ * tval = MemoryPool<Mem::Main>::template allocate_memory<DT_>(_val_size());
+        IT_ * tcol_ind = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_val_size());
 
         for (Index i(k + 1); i > 0;)
         {
@@ -625,22 +625,22 @@ namespace FEAST
         }
         else
         {
-          this->_elements.push_back(Util::MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_val_size()));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks() + 1));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks()));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_rows()));
+          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_val_size()));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks() + 1));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks()));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_rows()));
 
-          Util::MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, _val_size());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tcol_ind, _val_size());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), tcs, _num_of_chunks() + 1);
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(2), tcl, _num_of_chunks());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(3), trl, _rows());
-          Util::MemoryPool<Mem::Main>::release_memory(tval);
-          Util::MemoryPool<Mem::Main>::release_memory(tcol_ind);
-          Util::MemoryPool<Mem::Main>::release_memory(tcs);
-          Util::MemoryPool<Mem::Main>::release_memory(tcl);
-          Util::MemoryPool<Mem::Main>::release_memory(trl);
+          MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, _val_size());
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tcol_ind, _val_size());
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), tcs, _num_of_chunks() + 1);
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(2), tcl, _num_of_chunks());
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(3), trl, _rows());
+          MemoryPool<Mem::Main>::release_memory(tval);
+          MemoryPool<Mem::Main>::release_memory(tcol_ind);
+          MemoryPool<Mem::Main>::release_memory(tcs);
+          MemoryPool<Mem::Main>::release_memory(tcl);
+          MemoryPool<Mem::Main>::release_memory(trl);
         }
       }
 
@@ -671,9 +671,9 @@ namespace FEAST
         cother.convert(other);
         this->_scalar_dt.push_back(cother.zero_element());
 
-        IT_ * tcl = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks());
-        Util::MemoryPool<Mem::Main>::set_memory(tcl, IT_(0), _num_of_chunks());
-        IT_ * trl = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_rows());
+        IT_ * tcl = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks());
+        MemoryPool<Mem::Main>::set_memory(tcl, IT_(0), _num_of_chunks());
+        IT_ * trl = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_rows());
 
         const IT_ * const crow_ptr(cother.row_ptr());
         const IT_ * const ccol_ind(cother.col_ind());
@@ -686,7 +686,7 @@ namespace FEAST
             tcl[i/_C()] = crow_ptr[i+1] - crow_ptr[i];
         }
 
-        IT_ * tcs = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks() + 1);
+        IT_ * tcs = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks() + 1);
 
         tcs[0] = IT_(0);
         for (Index i(0); i < _num_of_chunks(); ++i)
@@ -696,8 +696,8 @@ namespace FEAST
 
         _val_size() = Index(tcs[_num_of_chunks()]);
 
-        DT_ * tval = Util::MemoryPool<Mem::Main>::template allocate_memory<DT_>(_val_size());
-        IT_ * tcol_ind = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_val_size());
+        DT_ * tval = MemoryPool<Mem::Main>::template allocate_memory<DT_>(_val_size());
+        IT_ * tcol_ind = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_val_size());
 
         const IT_ ttC((IT_(tC)));
         for (Index i(0); i < _rows(); ++i)
@@ -731,22 +731,22 @@ namespace FEAST
         }
         else
         {
-          this->_elements.push_back(Util::MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_val_size()));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks() + 1));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks()));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_rows()));
+          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_val_size()));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks() + 1));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks()));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_rows()));
 
-          Util::MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, _val_size());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tcol_ind, _val_size());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), tcs, _num_of_chunks() + 1);
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(2), tcl, _num_of_chunks());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(3), trl, _rows());
-          Util::MemoryPool<Mem::Main>::release_memory(tval);
-          Util::MemoryPool<Mem::Main>::release_memory(tcol_ind);
-          Util::MemoryPool<Mem::Main>::release_memory(tcs);
-          Util::MemoryPool<Mem::Main>::release_memory(tcl);
-          Util::MemoryPool<Mem::Main>::release_memory(trl);
+          MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, _val_size());
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tcol_ind, _val_size());
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), tcs, _num_of_chunks() + 1);
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(2), tcl, _num_of_chunks());
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(3), trl, _rows());
+          MemoryPool<Mem::Main>::release_memory(tval);
+          MemoryPool<Mem::Main>::release_memory(tcol_ind);
+          MemoryPool<Mem::Main>::release_memory(tcs);
+          MemoryPool<Mem::Main>::release_memory(tcl);
+          MemoryPool<Mem::Main>::release_memory(trl);
         }
       }
 
@@ -777,10 +777,10 @@ namespace FEAST
         cother.convert(other);
         this->_scalar_dt.push_back(cother.zero_element());
 
-        IT_ * tcl = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks());
-        Util::MemoryPool<Mem::Main>::set_memory(tcl, IT_(0), _num_of_chunks());
-        IT_ * trl = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_rows());
-        Util::MemoryPool<Mem::Main>::set_memory(trl, IT_(0), _rows());
+        IT_ * tcl = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks());
+        MemoryPool<Mem::Main>::set_memory(tcl, IT_(0), _num_of_chunks());
+        IT_ * trl = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_rows());
+        MemoryPool<Mem::Main>::set_memory(trl, IT_(0), _rows());
 
         const IT_ * const crow_ind(cother.row_indices());
         const IT_ * const ccol_ind(cother.column_indices());
@@ -803,7 +803,7 @@ namespace FEAST
           }
         }
 
-        IT_ * tcs = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks() + 1);
+        IT_ * tcs = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_num_of_chunks() + 1);
 
         tcs[0] = IT_(0);
         for (Index i(0); i < _num_of_chunks(); ++i)
@@ -813,8 +813,8 @@ namespace FEAST
 
         _val_size() = Index(tcs[_num_of_chunks()]);
 
-        DT_ * tval = Util::MemoryPool<Mem::Main>::template allocate_memory<DT_>(_val_size());
-        IT_ * tcol_ind = Util::MemoryPool<Mem::Main>::template allocate_memory<IT_>(_val_size());
+        DT_ * tval = MemoryPool<Mem::Main>::template allocate_memory<DT_>(_val_size());
+        IT_ * tcol_ind = MemoryPool<Mem::Main>::template allocate_memory<IT_>(_val_size());
 
         for (Index row(0), k(0); row < rows(); ++row)
         {
@@ -849,22 +849,22 @@ namespace FEAST
         }
         else
         {
-          this->_elements.push_back(Util::MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_val_size()));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks() + 1));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks()));
-          this->_indices.push_back(Util::MemoryPool<Mem_>::template allocate_memory<IT_>(_rows()));
+          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_val_size()));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks() + 1));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_num_of_chunks()));
+          this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_rows()));
 
-          Util::MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, _val_size());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tcol_ind, _val_size());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), tcs, _num_of_chunks() + 1);
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(2), tcl, _num_of_chunks());
-          Util::MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(3), trl, _rows());
-          Util::MemoryPool<Mem::Main>::release_memory(tval);
-          Util::MemoryPool<Mem::Main>::release_memory(tcol_ind);
-          Util::MemoryPool<Mem::Main>::release_memory(tcs);
-          Util::MemoryPool<Mem::Main>::release_memory(tcl);
-          Util::MemoryPool<Mem::Main>::release_memory(trl);
+          MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, _val_size());
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tcol_ind, _val_size());
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), tcs, _num_of_chunks() + 1);
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(2), tcl, _num_of_chunks());
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(3), trl, _rows());
+          MemoryPool<Mem::Main>::release_memory(tval);
+          MemoryPool<Mem::Main>::release_memory(tcol_ind);
+          MemoryPool<Mem::Main>::release_memory(tcs);
+          MemoryPool<Mem::Main>::release_memory(tcl);
+          MemoryPool<Mem::Main>::release_memory(trl);
         }
       }
 
@@ -946,9 +946,9 @@ namespace FEAST
         CONTEXT("When assigning SparseMatrixELL");
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
-          Util::MemoryPool<Mem_>::release_memory(this->_elements.at(i));
+          MemoryPool<Mem_>::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
-          Util::MemoryPool<Mem_>::release_memory(this->_indices.at(i));
+          MemoryPool<Mem_>::release_memory(this->_indices.at(i));
 
         this->_elements.clear();
         this->_indices.clear();
@@ -963,9 +963,9 @@ namespace FEAST
         this->_scalar_dt.push_back(DT_(0));
 
         for (auto i : this->_indices)
-          Util::MemoryPool<Mem_>::increase_memory(i);
+          MemoryPool<Mem_>::increase_memory(i);
 
-        this->_elements.push_back(Util::MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_val_size()));
         this->_elements_size.push_back(_val_size());
 
         return *this;
@@ -1367,12 +1367,12 @@ namespace FEAST
         ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix ell column size " + stringify(columns()) + " !");
 
         const Index nchunk(Index(floor(row / float(C()))));
-        Index start(Index(Util::MemoryPool<Mem_>::get_element(cs(), nchunk)));
-        Index max(Index(Util::MemoryPool<Mem_>::get_element(rl(), row)));
-        for (Index i(start + row - nchunk * C()), j(0) ; j < max && Index(Util::MemoryPool<Mem_>::get_element(col_ind(), i)) <= col ; i += C(), ++j)
+        Index start(Index(MemoryPool<Mem_>::get_element(cs(), nchunk)));
+        Index max(Index(MemoryPool<Mem_>::get_element(rl(), row)));
+        for (Index i(start + row - nchunk * C()), j(0) ; j < max && Index(MemoryPool<Mem_>::get_element(col_ind(), i)) <= col ; i += C(), ++j)
         {
-          if (Index(Util::MemoryPool<Mem_>::get_element(col_ind(), i)) == col)
-            return Util::MemoryPool<Mem_>::get_element(val(), i);
+          if (Index(MemoryPool<Mem_>::get_element(col_ind(), i)) == col)
+            return MemoryPool<Mem_>::get_element(val(), i);
         }
         return zero_element();
       }

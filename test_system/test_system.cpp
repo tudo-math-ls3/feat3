@@ -138,7 +138,7 @@ int main(int argc, char** argv)
 #ifdef FEAST_BACKENDS_CUDA
   if (cudadevicereset)
     // we need to use the instance here, to ensure the device has been set up properly, if no cuda is used at all
-    FEAST::Util::MemoryPool<Mem::CUDA>::shutdown_device();
+    FEAST::MemoryPool<Mem::CUDA>::shutdown_device();
 #endif
 
   Runtime::finalise();
