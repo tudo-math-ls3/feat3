@@ -12,6 +12,7 @@ namespace FEAST
     void cuda_set_device(const int device);
     void * cuda_malloc_host(const Index bytes);
     void cuda_free_host(void * address);
+    void cuda_check_last_error();
   }
 }
 

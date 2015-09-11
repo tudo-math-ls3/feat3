@@ -29,7 +29,7 @@ namespace FEAST
 #endif
 
       Index iters(1);
-      //warup
+      //warmup
       func();
       MemoryPool<Mem_>::synchronize();
 

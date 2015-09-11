@@ -47,6 +47,7 @@ SET (test_list
   sparse_matrix_ell-test
   sparse_vector-test
   sparse_vector_blocked-test
+  tuning-test
   unit_filter-test
   unit_filter_blocked-test
   vector_mirror-test
