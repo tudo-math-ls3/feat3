@@ -310,7 +310,7 @@ namespace PoissonDirichlet2D
     // create our solver
     auto solver = Solver::new_pcg(matrix, filter, mgv);
     //auto solver = Solver::new_bicgstab(matrix, filter, mgv);
-    //auto solver = Solver::new_fmgres(matrix, filter, 8, 0.0, mgv);
+    //auto solver = Solver::new_fgmres(matrix, filter, 8, 0.0, mgv);
     //auto solver = Solver::new_richardson(matrix, filter, mgv);
 
     // enable plotting

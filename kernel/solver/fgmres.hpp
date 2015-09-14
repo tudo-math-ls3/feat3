@@ -292,7 +292,7 @@ namespace FEAST
      * A shared pointer to a new FGMRES object.
      */
     template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fmgres(
+    inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
       const Matrix_& matrix, const Filter_& filter, Index krylov_dim,
       typename Matrix_::DataType inner_res_scale = typename Matrix_::DataType(0),
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
