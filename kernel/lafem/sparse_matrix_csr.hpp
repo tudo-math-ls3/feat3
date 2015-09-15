@@ -1790,6 +1790,9 @@ namespace FEAST
       /// Permutate matrix rows and columns according to the given Permutations
       void permute(Adjacency::Permutation & perm_row, Adjacency::Permutation & perm_col)
       {
+        if (perm_row.size() == 0 && perm_col.size() == 0)
+          return;
+
         ASSERT(perm_row.size() == this->rows(), "Error: Container rows " + stringify(this->rows()) + " does not match permutation size " + stringify(perm_row.size()) + " !");
         ASSERT(perm_col.size() == this->columns(), "Error: Container columns " + stringify(this->columns()) + " does not match permutation size " + stringify(perm_col.size()) + " !");
 
