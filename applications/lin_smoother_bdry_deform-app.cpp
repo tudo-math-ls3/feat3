@@ -2,7 +2,6 @@
 #include <kernel/util/math.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
-#include <kernel/meshopt/biharmonic_smoother.hpp>
 #include <kernel/meshopt/dudv_smoother.hpp>
 #include <kernel/meshopt/laplace_smoother.hpp>
 #include <kernel/geometry/export_vtk.hpp>
@@ -28,7 +27,6 @@ using namespace FEAST;
  * Possible smoother variants are:
  * LaplaceSmoother
  * DuDvSmoother
- * BiharmonicSmoother (implementation quite nonsensical at the moment, \see BiharmonicSmoother)
  *
  **/
 template
