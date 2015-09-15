@@ -11,6 +11,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
+#include<time.h>
 
 namespace FEAST
 {
@@ -39,9 +40,12 @@ namespace FEAST
 
         ST_<Foundation::Request, std::allocator<Foundation::Request> > recvrequests(vec_mirrors.size());
         ST_<Foundation::Request, std::allocator<Foundation::Request> > sendrequests(vec_mirrors.size());
+        ST_<Foundation::Request, std::allocator<Foundation::Request> > presendrequests(vec_mirrors.size());
 
         ST_<Foundation::Status, std::allocator<Foundation::Status> > recvstatus;
         ST_<Foundation::Status, std::allocator<Foundation::Status> > sendstatus;
+        ST_<Foundation::Status, std::allocator<Foundation::Status> > prerecvstatus;
+        ST_<Foundation::Status, std::allocator<Foundation::Status> > presendstatus;
 
         for(Index i(0) ; i < vec_mirrors.size() ; ++i)
         {
@@ -53,6 +57,37 @@ namespace FEAST
           send_buf.push_back(sendbuf_mat.serialise());
         }
 
+        std::vector<Index> recv_msg_size(vec_mirrors.size());
+        for(Index i(0); i < vec_mirrors.size();i++)
+        {
+          Foundation::Status ss;
+
+          presendstatus.push_back(ss);
+          Index send_size(send_buf.at(i).size());
+          Foundation::Comm::isend(&send_size,
+                      Index(1),
+                      other_ranks.at(i),
+                      presendrequests.at(i),
+                      tags.at(i),
+                      communicator
+              );
+        }
+        for(Index i(0) ; i < vec_mirrors.size() ; ++i)
+        {
+
+          Foundation::Status rs;
+
+          prerecvstatus.push_back(rs);
+
+          Foundation::Comm::recv(&recv_msg_size.at(i),
+                      Index(1),
+                      other_ranks.at(i),
+                      prerecvstatus.at(i),
+                      tags.at(i),
+                      communicator
+              );
+        }
+
         for(Index i(0) ; i < vec_mirrors.size() ; ++i)
         {
 
@@ -60,16 +95,15 @@ namespace FEAST
 
           recvstatus.push_back(rs);
 
-          recv_buf.push_back(std::vector<char>(send_buf.at(i).size()));
+          recv_buf.push_back(std::vector<char>(recv_msg_size.at(i)));
 
           Foundation::Comm::irecv(recv_buf.at(i).data(),
-                      Index(recv_buf.at(i).size()),
+                      Index(recv_msg_size.at(i)),
                       other_ranks.at(i),
                       recvrequests.at(i),
                       tags.at(i),
                       communicator
               );
-
         }
 
         for(Index i(0) ; i < vec_mirrors.size() ; ++i)
@@ -118,8 +152,9 @@ namespace FEAST
 
         for(Index i(0) ; i < sendrequests.size() ; ++i)
         {
-          Foundation::Status ws;
+          Foundation::Status ws,ws2;
           Foundation::Comm::wait(sendrequests.at(i), ws);
+          Foundation::Comm::wait(presendrequests.at(i), ws2);
         }
 
         delete[] recvflags;
@@ -127,6 +162,7 @@ namespace FEAST
 
         return result;
       }
+
 #else
     template<typename Mem_>
     struct MatrixConversion
