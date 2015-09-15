@@ -24,8 +24,6 @@ namespace FEAST
     /**
      * \brief Baseclass for a family of variational mesh optimisation algorithms.
      *
-     * That is, mesh optimisation algorithms derived from Martin Rumpf's paper \cite Rum96
-     *
      * \tparam TrafoType_
      * Type of the underlying transformation.
      *
@@ -35,9 +33,40 @@ namespace FEAST
      * \tparam H_EvalType
      * Local meshsize evaluator. \see H_Evaluator
      *
+     * Mesh optimisation algorithms derived from Martin Rumpf's paper \cite Rum96.
+     *
      * \note The evaluation of the nonlinear functional requires operations that are essentially similar to an
      * assembly of an operator into a matrix. This is implemented for Mem::Main only. This in turn means that this
-     * family of mesh optimisation algorithms is implemented for Mem::main only.
+     * family of mesh optimisation algorithms is implemented for Mem::Main only.
+     *
+     * Assume we have a regular, conforming mesh \f$ \mathcal{T} \f$ and each cell \f$ K \in \mathcal{T} \f$ can
+     * be expressed as the image of an (optimal) reference cell \f$ \hat{K} \f$ such that
+     * \f[
+     *   \forall K \in \mathcal{T}: \exists R_K : \hat{K} \to K: \forall \hat{x} \in \hat{K}: \det \nabla
+     *   R_K(\hat{x}) \neq 0,
+     * \f]
+     * which ensures that the mapping is nonsingular and that the orientation of the reference cell is preserved. We
+     * are now looking for a deformation \f$ \Phi: \mathcal{T} \to \Phi(\mathcal{T})\f$ such that
+     * \f$ \Phi(\mathcal{T} \f$ is optimal in the sense that it minimises a functional of the form
+     *
+     * \f[
+     *   \mathcal{F}(\Phi) = \int_\Omega \mathcal{L}(\Phi,x) dx = \sum_{K \in \mathcal{T}} \mu_K \int_K
+     *   \mathcal{L}_K(\Phi,x) dx.
+     * \f]
+     *
+     * Under the assumptions of frame indifference and translation invariance it can be shown that
+     * \f[
+     *   \forall K \in \mathcal{T}: \exists L_K \in SO_d \times K: \mathcal{L}_K: \mathcal{L}(\Phi,\cdot) =
+     *   L_K(\nabla \Phi, \cdot) = L_K(\nabla R_K, \cdot)
+     * \f]
+     * and that the local functional is of the form
+     * \f[
+     *    F(\nabla R_K(\Phi))  := \int_K L(\nabla R_K (\Phi)(x)) dx = \mu_K L( \| \nabla R_T(\Phi) \|_F^2,
+     *    \| \mathrm{cof} \nabla R_T(\Phi) \|_F^2, \det \nabla R_T(\Phi) )
+     * \f]
+     *
+     * In the code, \f$ F \f$ is called the RumpfFunctional.
+     *
      *
      * \author Jordi Paul
      *
@@ -254,8 +283,11 @@ namespace FEAST
          *
          **/
         virtual CoordType compute_functional() = 0;
+
         /**
          * \brief Computes the gradient of the functional with regard to the nodal coordinates.
+         *
+         * Usually, prepare() should be called before calling this.
          *
          */
         virtual void compute_gradient() = 0;
@@ -316,9 +348,7 @@ namespace FEAST
 
     }; // class RumpfSmootherBase
 
-    /**
-     * \copydoc Geometry::RumpfSmootherBase
-     */
+    /// \copydoc Meshopt::RumpfSmootherBase
     template
     <
       typename TrafoType_,
@@ -364,7 +394,7 @@ namespace FEAST
 
       public:
         /**
-         * \copydoc RumpfSmootherBase(TrafoType_&, FunctionalType_&)
+         * \copydoc RumpfSmootherBase(TrafoType_&,FunctionalType_&)
          *
          */
         explicit RumpfSmoother(TrafoType_& trafo_, FunctionalType_& functional_)
@@ -373,7 +403,7 @@ namespace FEAST
           }
 
         /**
-         * \copydoc RumpfSmootherBase(TrafoType_&, FunctionalType_&, FilterType&)
+         * \copydoc RumpfSmootherBase(TrafoType_&,FunctionalType_&,FilterType&)
          *
          */
         explicit RumpfSmoother(TrafoType_& trafo_, FunctionalType_& functional_, FilterType& filter_)
@@ -431,7 +461,7 @@ namespace FEAST
          *
          * Debug variant that saves the different contributions for each cell.
          **/
-        virtual CoordType compute_functional( CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det )
+        virtual CoordType compute_functional(CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det)
         {
           CoordType fval(0);
           // Total number of cells in the mesh
@@ -475,7 +505,7 @@ namespace FEAST
           return fval;
         } // compute_functional
 
-        /// \copydoc RumpfFunctionalBase::compute_gradient()
+        /// \copydoc BaseClass::compute_gradient()
         virtual void compute_gradient()
         {
           // Total number of cells in the mesh

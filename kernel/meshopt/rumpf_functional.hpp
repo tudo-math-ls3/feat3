@@ -94,6 +94,12 @@ namespace FEAST
      * The actual implementation has to be supplied by the specialisations in ShapeType_.
      *
      * A RumpfFunctional computes the cell local contribution to the local functional value and its gradient.
+     * The basic archetype is of the form
+     *
+     * \f[
+     *   L( \nabla R_K ) = \int_K fac\_norm (\| \nabla R_K \|^2_F - d)^2 + fac\_det (\det \nabla R_K)^p
+     *   + \frac{fac\_rec\_det}{\det \nabla R_K + \sqrt(\mathrm{fac\_reg}^2 + (\det \nabla R_K)^2)}
+     * \f]
      *
      */
 #ifndef DOXYGEN
@@ -130,7 +136,7 @@ namespace FEAST
        * \f$ f(d) = c_s d^p + \frac{1}{d + \sqrt{ \mathrm{fac_reg}^2 + d^2}} \f$
        * We want to have \f$ f'(1) = 0 \Leftrightarrow c_s = \frac{1}{d \sqrt{ \mathrm{fac_reg}^2 + d^2} +
        * \mathrm{fac_reg}^2 + d^2} \f$ for \f$ p = 1 \f$ or
-       * \f$ c_s = \frac{1}{2d (d \sqrt{ \mathrm{fac_reg}^2 + d^2} + \mathrm{fac_reg}^2 + d^2)} \f$ for \f$ d = 1 \f$ for p = 2.
+       * \f$ c_s = \frac{1}{2d (d \sqrt{ \mathrm{fac\_reg}^2 + d^2} + \mathrm{fac\_reg}^2 + d^2)} \f$ for \f$ d = 1 \f$ for p = 2.
        *
        **/
       RumpfFunctional(
@@ -149,7 +155,7 @@ namespace FEAST
        * Type for the local mesh size
        *
        * \param[in] x
-       * (world_dim \f$ \times \f$ (number of vertices per cell)) - matrix that holds the local coordinates that
+       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
        * define the cell \f$ K \f$.
        *
        * \param[in] h
@@ -159,11 +165,9 @@ namespace FEAST
        * Local contribution to functional value
        *
        * Computes the local functional value for one cell defined by the coordinates x with regard
-       * to the reference cell which depends on the shape type. The functional value is a function of these quantities,
-       * in this case
-       * \f$ f( det(A), \| A \|^2_F) = fac_norm (\| A \|^2_F - 2)^2 + fac_det det(A) + fac_rec_det \frac{1}{det(A) + \sqrt(\mathrm{fac_reg}^2 + det^2(A))} \f$
+       * to the reference cell which depends on the shape type.
        *
-       **/
+       */
       template<typename Tx_, typename Th_>
       DataType_ compute_local_functional(const Tx_& x, const Th_& h);
 
@@ -230,7 +234,7 @@ namespace FEAST
        * Type for the local mesh size
        *
        * \param[in] x
-       * (world_dim \f$ \times \f$ (number of vertices per cell)) - matrix that holds the local coordinates that
+       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
        * define the cell \f$ K \f$.
        *
        * \param[in] h
@@ -259,7 +263,7 @@ namespace FEAST
        * Type for the local mesh size h
        *
        * \param[in] x
-       * (world_dim \f$ \times \f$ (number of vertices per cell)) - matrix that holds the local coordinates that
+       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
        * define the cell \f$ K \f$.
        *
        * \param[in] h
@@ -288,14 +292,14 @@ namespace FEAST
        * Type for the local gradient matrix grad
        *
        * \param[in] x
-       * (world_dim \f$ \times \f$ (number of vertices per cell)) - matrix that holds the local coordinates that
+       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local coordinates that
        * define the cell \f$ K \f$.
        *
        * \param[in] h
        * (world_dim) - vector that holds the dimensions of the target reference cell
        *
        * \param[in] grad
-       * (world_dim \f$ \times \f$ (number of vertices per cell)) - matrix that holds the local contribution to the
+       * (number of vertices per cell) \f$ \times \f$ (world_dim) - matrix that holds the local contribution to the
        * global functional gradient
        *
        * \returns
@@ -401,6 +405,7 @@ namespace FEAST
     template<typename DataType_, typename ShapeType_, template<typename, typename> class BaseClass_>
     class RumpfFunctionalQ1Hack;
 
+    /// \cond internal
     /**
      * \brief Class template for Rumpf functionals with squared det and 1/det terms
      *
@@ -415,6 +420,7 @@ namespace FEAST
      **/
     template<typename DataType_, typename ShapeType_>
     class RumpfFunctional_D2;
+    /// \endcond
 
     /**
      * \brief Class template for Rumpf functionals aware of a concentration function
@@ -445,6 +451,27 @@ namespace FEAST
        *
        * Due to the chain rule, the derivatives of h wrt. the vertex coordinates x have been computed and
        * contribute to the local gradient.
+       *
+       * The optimal scales \f$ h \f$ depend on the concentration \f$ c \f$ by the relation
+       * \f[
+       *   \forall K_k \in \mathcal{T}_h: h_k = \left( \frac{c (K_k)}{\sum_{l=1}^N c(K_l) \sum_{l=1}^N
+       *   \mathrm{det} \nabla R_{T,l}(\phi)} \right)^{\frac{1}{d}}
+       * \f]
+       *
+       * The concentration function in turn indirectly depends on the vertex locations
+       * \f$ \{ x_i : i=1, \dots, n \} \f$ via
+       * \f[ c(K_k) = (\alpha + \sum_{x_j \in K_k} \varphi(x_j))^\beta, \f]
+       * so that we have to take this dependency into account for the full gradient. Define
+       * \f[
+       *   s_d := \sum_{l=1}^N \mathrm{det} \nabla R_{T,l}(\Phi), s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
+       * \f]
+       * So for each \f$ x_j \f$ we arrive at
+       * \f{align*}
+       *   \frac{\partial h(K_k)}{\partial x_j} & = \frac{1}{d} \left( \frac{c(K_k)}{s_d s_c} \right)^
+       *   {\frac{1}{d}-1} \left[ c(K_k) ( \frac{\partial s_d}{\partial x_j} s_c + s_d
+       *   \frac{\partial s_c}{\partial x_j} ) + \frac{\partial c(K_k)}{\partial x_j} s_d s_c \right]
+       *   (s_d s_c)^{-2}
+       * \f}
        *
        * \tparam Tgrad_
        * Type of the local gradient, i.e. Tiny::Matrix
@@ -477,8 +504,10 @@ namespace FEAST
     };
 #endif
 
+    /// \cond internal
     template<typename DataType_, typename ShapeType_>
     class RumpfFunctionalConc_D2;
+    /// \endcond
 
   } // namespace Meshopt
 

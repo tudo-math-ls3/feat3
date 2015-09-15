@@ -598,7 +598,8 @@ namespace FEAST
 
           for(Index cell(0); cell < ncells; ++cell)
           {
-            Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp(Math::pow(lambda_(cell)*sum_det,exponent));
+            Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim>
+              tmp(Math::pow(lambda_(cell)*sum_det,exponent));
             h_(cell, tmp);
           }
         }

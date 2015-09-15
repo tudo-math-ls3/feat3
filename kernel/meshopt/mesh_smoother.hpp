@@ -10,6 +10,13 @@
 
 namespace FEAST
 {
+  /**
+   * \brief Namespace for everything mesh optimiser / mesh smoother related
+   *
+   * Because mesh smoothers in general need part of Geometry (i.e. meshes), Trafo, Space (because FE knowledge is
+   * required), Assembly to assemble systems of equations, and LAFEM to solve these equations.
+   *
+   */
   namespace Meshopt
   {
 

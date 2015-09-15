@@ -338,7 +338,6 @@ namespace FEAST
 
           CoordType exponent = CoordType(1)/CoordType(MeshType::world_dim) - CoordType(1);
 
-
           for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); ++cell)
           {
             grad_loc.format();
@@ -429,7 +428,7 @@ namespace FEAST
 
         } // compute_grad_conc()
 
-        /// \copydoc RumpfSmoother::compute_gradient()
+        /// \copydoc RumpfSmootherBase::compute_gradient()
         virtual void compute_gradient() override
         {
           // Clear gradient vector

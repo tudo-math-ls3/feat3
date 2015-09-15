@@ -9,5 +9,6 @@ The FEAST library consists of several different subsystems, which together make 
 The subsystems are in detail:
 \secreflist
 \refitem lafem_design LAFEM
+\refitem meshopt_design Meshopt
 \endsecreflist
 **/

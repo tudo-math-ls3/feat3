@@ -331,7 +331,7 @@ namespace FEAST
           return fval;
         } // compute_functional(func_norm, func_det, func_rec_det, func_lvlset)
 
-        /// \copydoc RumpfSmoother::compute_gradient()
+        /// \copydoc RumpfSmootherBase::compute_gradient()
         virtual void compute_gradient() override
         {
           // Total number of cells in the mesh
