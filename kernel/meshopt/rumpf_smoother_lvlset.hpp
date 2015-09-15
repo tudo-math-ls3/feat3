@@ -3,9 +3,8 @@
 #define KERNEL_MESHOPT_RUMPF_SMOOTHER_LVLSET_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/assembly/discrete_projector.hpp> // For projecting the levelset function to a vertex vector
+#include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/interpolator.hpp>
-//#include <kernel/geometry/mesh_smoother/rumpf_functional.hpp>
 #include <kernel/meshopt/rumpf_smoother.hpp>
 
 namespace FEAST
@@ -118,7 +117,16 @@ namespace FEAST
 
       public:
         /**
-         * \copydoc FEAST::Geometry::RumpfSmoother::RumpfSmoother()
+         * \copydoc RumpfSmoother(TrafoType_&, FunctionalType_&)
+         *
+         * \param[in] trafo_
+         * Reference to the underlying transformation
+         *
+         * \param[in] functional_
+         * Reference to the functional used
+         *
+         * \param[in] lvlset_functional_
+         * The local functional expressing the levelset dependence of the combined functional
          *
          * \param[in] align_to_lvlset_
          * Align vertices/edges/faces with 0 levelset?
@@ -127,9 +135,10 @@ namespace FEAST
          * Use levelset-based r_adaptivity?
          *
          **/
-        explicit RumpfSmootherLevelset( TrafoType& trafo_, FunctionalType& functional_, LevelsetFunctionalType& lvlset_functional, bool align_to_lvlset_, bool r_adaptivity_)
+        explicit RumpfSmootherLevelset(TrafoType_& trafo_, FunctionalType_& functional_,
+        LevelsetFunctionalType_& lvlset_functional_, bool align_to_lvlset_, bool r_adaptivity_)
           : BaseClass(trafo_, functional_),
-          _lvlset_functional(lvlset_functional),
+          _lvlset_functional(lvlset_functional_),
           _lvlset_space(trafo_),
           _lvlset_vec(_lvlset_space.get_num_dofs()),
           _lvlset_vtx_vec(trafo_.get_mesh().get_num_entities(0)),
@@ -510,11 +519,11 @@ namespace FEAST
               this->set_coords();
 
               // DEBUG
-              std::cout << "Rumpf Smoother penalty iteration: " << penalty_iterations << ", last constraint: "
-              << this->lvlset_constraint_last << ", penalty factor: " << this->_lvlset_functional.fac_lvlset <<
-              ", fval = " << scientify(this->compute_functional()) <<
-              ", " << iterations << " mincg iterations, " << grad_evals <<
-              " grad evals, terminationtype was " << termination_type << std::endl;
+              //std::cout << "Rumpf Smoother penalty iteration: " << penalty_iterations << ", last constraint: "
+              //<< this->lvlset_constraint_last << ", penalty factor: " << this->_lvlset_functional.fac_lvlset <<
+              //", fval = " << scientify(this->compute_functional()) <<
+              //", " << iterations << " mincg iterations, " << grad_evals <<
+              //" grad evals, terminationtype was " << termination_type << std::endl;
 
               // Increment for the penalty factor
               // Increase penalty parameter by at least factor 5, very arbitrary
@@ -539,8 +548,8 @@ namespace FEAST
         /**
          * \copydoc RumpfSmoother::prepare()
          *
-         * In this case, it evaluates the levelset function on the current mesh and evaluates it in the current mesh's
-         * vertices.
+         * In this case, it evaluates the levelset function on the current mesh and evaluates it in the current
+         * mesh's vertices.
          *
          **/
         virtual void prepare() override
@@ -695,15 +704,10 @@ namespace FEAST
         AnalyticFunctionGrad0Type_& _analytic_lvlset_grad0;
         /// 2nd component of its gradient
         AnalyticFunctionGrad1Type_& _analytic_lvlset_grad1;
+
       public:
         /**
          * \copydoc RumpfSmootherLevelset()
-         *
-         * \param[in] align_to_lvlset_
-         * Align vertices/edges/faces with 0 levelset?
-         *
-         * \param[in] r_adaptivity_
-         * Use levelset-based r_adaptivity?
          *
          * \param[in] analytic_function_
          * The analytic function representing the levelset function
@@ -716,7 +720,7 @@ namespace FEAST
          *
          **/
         explicit RumpfSmootherLevelsetAnalytic(
-          TrafoType& trafo_,
+          TrafoType_& trafo_,
           FunctionalType_& functional_,
           LevelsetFunctionalType_& lvlset_functional_,
           bool align_to_lvlset_,
@@ -743,7 +747,6 @@ namespace FEAST
           this->set_coords();
           // Evaluate levelset function
           Assembly::Interpolator::project(this->_lvlset_vec, _analytic_lvlset, this->_lvlset_space);
-          //TODO
           // Evaluate the gradient of the levelset function
           Assembly::Interpolator::project(this->_lvlset_grad_vec[0], _analytic_lvlset_grad0, this->_lvlset_space);
           Assembly::Interpolator::project(this->_lvlset_grad_vec[1], _analytic_lvlset_grad1, this->_lvlset_space);

@@ -66,6 +66,8 @@ namespace FEAST
        * \param[in] trafo_
        * The underlying transformation for accessing mesh information
        *
+       * \returns The sum of all local transformation's determinants
+       *
        **/
       template<typename Tcoords_>
       static DataType_ compute_sum_det(const Tcoords_& coords_, const TrafoType& trafo_);

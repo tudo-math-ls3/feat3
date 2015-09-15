@@ -106,7 +106,7 @@ namespace FEAST
         /**
          * \brief Minimal constructor
          *
-         * \param[in] trafo
+         * \param[in] trafo_
          * The transformation
          *
          * \note Because no boundary information is provided, Dirichlet conditions are enforced on the outer
@@ -169,6 +169,8 @@ namespace FEAST
           auto solver = Intern::LMSSolverParameters<Mem_>::solver(solver_matrix, _filter);
           // Initialise the solver
           solver->init();
+          // Set a tighter relative convergence criterion than the default
+          solver->set_tol_rel(Math::pow<DataType>(Math::eps<DataType>(), DataType(0.75)));
 
           for(int d(0); d < MeshType::world_dim; ++d)
           {

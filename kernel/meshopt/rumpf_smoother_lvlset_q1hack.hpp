@@ -78,9 +78,9 @@ namespace FEAST
 
         /// \copydoc BaseClass::RumpfSmootherLevelsetAnalytic()
         explicit RumpfSmootherLevelsetAnalyticQ1Hack(
-          TrafoType& trafo_,
-          FunctionalType& functional_,
-          LevelsetFunctionalType& lvlset_functional_,
+          TrafoType_& trafo_,
+          FunctionalType_& functional_,
+          LevelsetFunctionalType_& lvlset_functional_,
           bool align_to_lvlset_,
           bool r_adaptivity_,
           AnalyticFunctionType_& analytic_function_,
@@ -354,8 +354,8 @@ namespace FEAST
 
         } // compute_gradient
 
-    }; // class RumpfSmootherLevelsetAnalytic
+    }; // class RumpfSmootherLevelsetAnalyticQ1Hack
 
   } // namespace Meshopt
 } // namespace FEAST
-#endif // KERNEL_MESHOPT_RUMPF_SMOOTHER_HPP
+#endif // KERNEL_MESHOPT_RUMPF_SMOOTHER_LVLSET_Q1HACK_HPP

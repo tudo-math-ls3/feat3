@@ -29,6 +29,7 @@ namespace FEAST
     class MeshSmoother
     {
       public:
+        /// Type of the mesh to optimise
         typedef MeshType_ MeshType;
         /// Our datatype
         typedef typename MeshType::CoordType CoordType;
@@ -44,13 +45,14 @@ namespace FEAST
         VertexVectorType _coords;
 
       public:
-        /// Constructor
+        /// \brief Constructor
         explicit MeshSmoother(MeshType& mesh_) :
           _mesh(mesh_),
           _coords(mesh_.get_num_entities(0), CoordType(0))
           {
           }
 
+        /// \brief Virtual destructor
         virtual ~MeshSmoother()
         {
         }

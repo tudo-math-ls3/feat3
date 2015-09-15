@@ -4,7 +4,6 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/meshopt/rumpf_smoother_lvlset.hpp>
-#include <kernel/lafem/dense_vector_blocked.hpp>
 
 namespace FEAST
 {
@@ -77,17 +76,6 @@ namespace FEAST
         typedef FunctionalType_ FunctionalType;
         /// Type for the levelset part of the functional
         typedef LevelsetFunctionalType_ LevelsetFunctionalType;
-        /// Own type for ALGLIBwrapper
-        //typedef RumpfSmootherLevelsetConcAnalytic
-        //<
-        //  AnalyticFunctionType_,
-        //  AnalyticFunctionGrad0Type_,
-        //  AnalyticFunctionGrad1Type_,
-        //  TrafoType,
-        //  FunctionalType,
-        //  LevelsetFunctionalType,
-        //  H_EvalType_
-        //> MyType;
 
         /// Only Mem::Main is supported atm
         typedef Mem::Main MemType;
@@ -130,34 +118,22 @@ namespace FEAST
         LAFEM::DenseVectorBlocked<MemType, CoordType, Index, MeshType::world_dim*Shape::FaceTraits<ShapeType,0>::count> _grad_h;
 
         /**
-         * \copydoc RumpfSmootherLevelset()
+         * \copydoc RumpfSmootherLevelsetAnalytic()
          *
-         * \param[in] align_to_lvlset_
-         * Align vertices/edges/faces with 0 levelset?
-         *
-         * \param[in] r_adaptivity_
-         * Use levelset-based r_adaptivity?
-         *
-         * \param[in] analytic_function_
-         * The analytic function representing the levelset function
-         *
-         * \param[in] analytic_function_grad0_
-         * The first component of the gradient
-         *
-         * \param[in] analytic_function_grad1_
-         * The second component of the gradient
+         * \note Because the dependence of \f$ h \f$ on the vertex coordinates is taken into account here, \c
+         * _update_h is set to \c true.
          *
          **/
         explicit RumpfSmootherLevelsetConcAnalytic(
-          TrafoType& trafo_,
+          TrafoType_& trafo_,
           FunctionalType_& functional_,
-          LevelsetFunctionalType_& levelset_functional_,
+          LevelsetFunctionalType_& lvlset_functional_,
           bool align_to_lvlset_,
           bool r_adaptivity_,
           AnalyticFunctionType_& analytic_function_,
           AnalyticFunctionGrad0Type_& analytic_function_grad0_,
           AnalyticFunctionGrad1Type_& analytic_function_grad1_)
-          : BaseClass(trafo_, functional_, levelset_functional_, align_to_lvlset_, r_adaptivity_,
+          : BaseClass(trafo_, functional_, lvlset_functional_, align_to_lvlset_, r_adaptivity_,
           analytic_function_, analytic_function_grad0_, analytic_function_grad1_),
           _conc(trafo_.get_mesh().get_num_entities(ShapeType::dimension)),
           _sum_conc(CoordType(0)),
@@ -202,7 +178,10 @@ namespace FEAST
         /**
          * \brief Computes the mesh concentration function for each cell
          *
-         * Computes conc(cell) for all cells and sum_conc
+         * This means it computes
+         * \f[
+         *   \forall K \in \mathcal{T}_h: \underbrace{c(K)}_{ =: \mathtt{conc(cell)}} ~ \mathrm{and} ~ \underbrace{\sum_{K \in \mathcal{T}_h} c(K)}_{\mathtt{\_sum\_conc}}
+         * \f]
          **/
         void compute_conc()
         {
@@ -269,7 +248,7 @@ namespace FEAST
          * \tparam Tgradl_
          * Type for the local gradient of the levelset values wrt. the vertices, i.e. Tiny::Matrix
          *
-         * \param[out] grad_loc
+         * \param[out] grad_loc_
          * The gradient of the concentration wrt. the vertices
          *
          * \param[in] lvlset_vals_
@@ -380,31 +359,12 @@ namespace FEAST
               for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
               {
                 Index i(idx(cell, Index(j)));
-                // Old version
-                //tmp(d*Shape::FaceTraits<ShapeType,0>::count + i) =
-                //  DataType(1)/DataType(MeshType::world_dim)*Math::pow(_conc(cell)/_sum_conc*sum_det,exponent)
-                //  *( _conc(cell)/_sum_conc*grad_sum_det[d](idx(cell,i)) +
-                //      ( grad_loc(d,i)*this->_sum_conc + this->_conc(cell)*this->_grad_conc[d](idx(cell,i)))
-                //      / Math::sqr(this->_sum_conc)*sum_det);
-                //
-                // Fixed old version
-                //tmp(d*Shape::FaceTraits<ShapeType,0>::count + i) =
-                //  DataType(1)/DataType(MeshType::world_dim)*Math::pow(_conc(cell)/_sum_conc*sum_det,exponent)
-                //  *( _conc(cell)*(grad_sum_det[d](idx(cell,i))*_sum_conc + sum_det*_grad_conc[d](idx(cell,i)) )
-                //        + grad_loc(d,i) * sum_det *_sum_conc)
-                //      / Math::sqr(_sum_conc*sum_det);
-                // New version
-                //tmp(j*MeshType::world_dim + d) =
-                //  CoordType(1)/CoordType(MeshType::world_dim)*Math::pow(_conc(cell)/_sum_conc*sum_det,exponent)
-                //  *( _conc(cell)/_sum_conc*grad_sum_det(i)(d) +
-                //      ( grad_loc(j,d)*this->_sum_conc + this->_conc(cell)*this->_grad_conc(i)(d))
-                //      / Math::sqr(this->_sum_conc)*sum_det);
-                // Fixed new version
+
                 tmp(j*MeshType::world_dim +d) =
                   CoordType(1)/CoordType(MeshType::world_dim)*Math::pow(_conc(cell)/_sum_conc*sum_det,exponent)
                   *( _conc(cell)*(grad_sum_det(i)(d)*_sum_conc + sum_det*_grad_conc(i)(d) )
-                        + grad_loc(d,j) * sum_det *_sum_conc)
-                      / Math::sqr(_sum_conc*sum_det);
+                      + grad_loc(d,j) * sum_det *_sum_conc)
+                  / Math::sqr(_sum_conc*sum_det);
               }
             }
             _grad_h(cell, tmp + _grad_h(cell));
@@ -417,10 +377,9 @@ namespace FEAST
          * \brief Computes the gradient of the sum of all mesh concentrations
          *
          * \f[
-         *   \mathrm{grad_conc}(k,i) = \frac{\partial}{\partial x_j} {\sum_{l=1}^N c(K_l),
-         * \f[
+         *   \mathrm{grad\_conc}(k,i) = \frac{\partial}{\partial x_j} \sum_{l=1}^N c(K_l),
+         * \f]
          * where \f$ i \f$ is the global index of the local vertex \f$ j \f$.
-         *
          *
          **/
         void compute_grad_conc()
@@ -537,6 +496,6 @@ namespace FEAST
         } // compute_gradient
   }; // class RumpfSmootherLevelsetConcAnalytic
 
-  } // namespace Meshopt
+} // namespace Meshopt
 } // namespace FEAST
 #endif // KERNEL_MESHOPT_RUMPF_SMOOTHER_CONC_HPP

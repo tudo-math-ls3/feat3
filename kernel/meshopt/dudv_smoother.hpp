@@ -108,7 +108,7 @@ namespace FEAST
         /**
          * \brief Minimal constructor
          *
-         * \param[in] trafo
+         * \param[in] trafo_
          * The transformation
          *
          * \note Because no boundary information is provided, Dirichlet conditions are enforced on the outer
@@ -173,6 +173,11 @@ namespace FEAST
           auto solver = Intern::DuDvMSSolverParameters<Mem_>::solver(solver_matrix, _filter);
           // Initialise the solver
           solver->init();
+          // Uncomment this to see the convergence behaviour
+          //solver->set_plot(true);
+
+          // Set a tighter relative convergence criterion than the default
+          solver->set_tol_rel(Math::pow<DataType>(Math::eps<DataType>(), DataType(0.75)));
 
           // Solve the system and correct coords_blocked
           solver->correct(sol, _vec_rhs);

@@ -30,10 +30,14 @@ namespace FEAST
      * Type of the underlying transformation.
      *
      * \tparam FunctionalType_
-     * Functional used for defining mesh quality.
+     * Functional used for defining mesh quality. \see RumpfFunctional
      *
      * \tparam H_EvalType
-     * Local meshsize evaluator. \see Geometry::H_Evaluator
+     * Local meshsize evaluator. \see H_Evaluator
+     *
+     * \note The evaluation of the nonlinear functional requires operations that are essentially similar to an
+     * assembly of an operator into a matrix. This is implemented for Mem::Main only. This in turn means that this
+     * family of mesh optimisation algorithms is implemented for Mem::main only.
      *
      * \author Jordi Paul
      *
@@ -167,8 +171,11 @@ namespace FEAST
          * \param[in] functional_
          * Reference to the functional used
          *
+         * \param[in] filter_
+         * The preconstructed filter
+         *
          */
-        explicit RumpfSmootherBase(TrafoType& trafo_, FunctionalType& functional_, FilterType& filter_)
+        explicit RumpfSmootherBase(TrafoType_& trafo_, FunctionalType_& functional_, FilterType& filter_)
           : BaseClass(trafo_.get_mesh()),
           _trafo(trafo_),
           _trafo_space(trafo_),
@@ -187,9 +194,15 @@ namespace FEAST
          *
          * In a truly optimal mesh (consisting ONLY of Rumpf reference cells of the right size), every cell's volume is
          * exactly lambda(cell). This is especially the goal for r-adaptivity.
-         * So in an optimal mesh, size(cell)/lambda(cell) = 1, so we compute the Euclidean norm of this vector, scaled
-         * by the number of cells so it is independant of the refinement level. Not sure if the scaling part is
-         * sensible, though.
+         * So in an optimal mesh,
+         * \f[
+         *   \forall K \in \mathcal{T}_h: \frac{|K|}{\lambda(K)} = 1,
+         * \f]
+         * so we compute the Euclidean norm of the vector \f$(v)_i = \frac{1}{N}(1 -  \frac{|K_i|}{\lambda(K_i)} \f$.
+         * This is scaled by the number of cells so it is independant of the refinement level. Not sure if the
+         * scaling part is sensible, though.
+         *
+         * \returns The relative cell size quality indicator.
          *
          **/
         CoordType cell_size_quality()
@@ -233,7 +246,18 @@ namespace FEAST
         {
         }
 
+        /**
+         * \brief Computes the functional value on the current mesh.
+         *
+         * \returns
+         * The functional value
+         *
+         **/
         virtual CoordType compute_functional() = 0;
+        /**
+         * \brief Computes the gradient of the functional with regard to the nodal coordinates.
+         *
+         */
         virtual void compute_gradient() = 0;
 
       protected:
@@ -251,7 +275,6 @@ namespace FEAST
         virtual void compute_lambda()
         {
           compute_lambda_current();
-          //compute_lambda_uniform();
         }
 
         /// \brief Computes the uniformly distributed weights _lambda.
@@ -336,40 +359,24 @@ namespace FEAST
         typedef LAFEM::UnitFilterBlocked<MemType, CoordType, IndexType, MeshType::world_dim> FilterType;
         /// Finite Element space for the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
-        // Since the functional contains a ShapeType, these have to be the same
-        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
-        "ShapeTypes of the transformation / functional have to agree" );
-
+        /// Since the functional contains a ShapeType, these have to be the same
+        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,"ShapeTypes of the transformation / functional have to agree" );
 
       public:
         /**
-         * \brief Constructor
-         *
-         * \param[in] trafo_
-         * Reference to the underlying transformation
-         *
-         * \param[in] functional_
-         * Reference to the functional used
+         * \copydoc RumpfSmootherBase(TrafoType_&, FunctionalType_&)
          *
          */
-        explicit RumpfSmoother(TrafoType& trafo_, FunctionalType& functional_)
+        explicit RumpfSmoother(TrafoType_& trafo_, FunctionalType_& functional_)
           : BaseClass(trafo_, functional_)
           {
           }
 
         /**
-         * \brief Constructor with filter
-         *
-         * This constructor takes a filter, so that boundary conditions can be specified.
-         *
-         * \param[in] trafo_
-         * Reference to the underlying transformation
-         *
-         * \param[in] functional_
-         * Reference to the functional used
+         * \copydoc RumpfSmootherBase(TrafoType_&, FunctionalType_&, FilterType&)
          *
          */
-        explicit RumpfSmoother(TrafoType& trafo_, FunctionalType& functional_, FilterType& filter_)
+        explicit RumpfSmoother(TrafoType_& trafo_, FunctionalType_& functional_, FilterType& filter_)
           : BaseClass(trafo_, functional_, filter_)
           {
           }
@@ -379,13 +386,7 @@ namespace FEAST
         {
         };
 
-        /**
-         * \brief Computes the functional value on the current mesh.
-         *
-         * \returns
-         * The functional value
-         *
-         **/
+        /// \copydoc RumpfSmootherBase::compute_functional()
         virtual CoordType compute_functional()
         {
           CoordType fval(0);
@@ -474,7 +475,7 @@ namespace FEAST
           return fval;
         } // compute_functional
 
-        /// \brief Computes the gradient of the functional with regard to the nodal coordinates.
+        /// \copydoc RumpfFunctionalBase::compute_gradient()
         virtual void compute_gradient()
         {
           // Total number of cells in the mesh
@@ -518,7 +519,6 @@ namespace FEAST
 
         } // compute_gradient
 
-
         /// \copydoc MeshSmoother::optimise()
         virtual void optimise()
         {
@@ -547,14 +547,8 @@ namespace FEAST
     /**
      * \brief Wrapper struct for calling and passing data to ALGLIB.
      *
-     * \tparam TrafoType_
-     * Type of the transformation that the mesh smoother involved is defined for
-     *
-     * \tparam CoordType_
-     * Our data type
-     *
-     * \tparam MemType_
-     * Memory architecture
+     * \tparam RumpfSmootherType_
+     * The type of the RumpfSmoother used, needed for safe downcasting.
      *
      * \author Jordi Paul
      *
@@ -564,12 +558,21 @@ namespace FEAST
     {
       /// Datatype from the RumpfSmoother
       typedef typename RumpfSmootherType_::CoordType CoordType;
+
       /**
        * \brief Minimises the functional using ALGLIB's nonlinear CG
        *
+       * \param[out] grad_eval_count
+       * The number of gradient evaluations is returned here
+       *
+       * \param[out] iteration_count
+       * The number of optimiser iterations is returned here
+       *
+       * \param[out] termination_type
+       * The termination type of the optimiser is returned here
+       *
        * \param[in] my_smoother
        * Mesh smoother providing data and routines for evaluating the functional and its gradient.
-       *
        *
        */
       static void minimise_functional_cg(int& grad_eval_count, int& iteration_count, int& termination_type,

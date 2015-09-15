@@ -16,6 +16,15 @@ namespace FEAST
      * into simplices and evaluate the Rumpf functional for the P1 transformation of those. Do this for every
      * possible way of splitting the hypercube into simplices.
      *
+     * \verbatim
+        Hypercube:    Splitting 1:   Splitting 2
+         2-----3       2-----3        2-----3
+         |     |       | \   |        |   / |
+         |     |       |   \ |        | /   |
+         0-----1       0-----1        0-----1
+     * \endverbatim
+     * Splitting 1 gives permutations 1 and 2, splitting 2 gives permutations 3 and 4.
+     *
      * \author Jordi Paul
      *
      **/
@@ -49,9 +58,9 @@ namespace FEAST
         /// We always use Index for now
         typedef Index IndexType;
 
-        /// Who's my daddy?
+        /// Our base class
         typedef RumpfSmootherBase<TrafoType_, FunctionalType_, H_EvalType> BaseClass;
-        /// And who am I?
+        /// Own type for passing to ALGLIB
         typedef RumpfSmootherQ1Hack<TrafoType_, FunctionalType_> MyType;
 
         /// ShapeType of said mesh
@@ -65,27 +74,20 @@ namespace FEAST
         typedef LAFEM::UnitFilterBlocked<MemType, CoordType, IndexType, MeshType::world_dim> FilterType;
         /// Finite Element space for the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
-        // Since the functional contains a ShapeType, these have to be the same
-        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
-        "ShapeTypes of the transformation / functional have to agree" );
+        /// Since the functional contains a ShapeType, these have to be the same
+        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value, "ShapeTypes of the transformation / functional have to agree" );
 
-        /// The FE space for the transformation, needed for filtering
-        //TrafoSpace _trafo_space;
-        ///// The filter enforcing boundary conditions
-        //FilterType _filter;
 
-        /// \copydoc RumpfSmoother()
+        /// \copydoc RumpfSmootherBase()
         explicit RumpfSmootherQ1Hack(TrafoType_& trafo_, FunctionalType_& functional_)
-          : BaseClass(trafo_, functional_)// , _trafo_space(trafo_)//, _filter()
+          : BaseClass(trafo_, functional_)
           {
-            // this->_dirichlet_asm.assemble(_filter,_trafo_space);
           }
 
-        /// \copydoc RumpfSmoother()
+        /// \copydoc RumpfSmootherBase(TrafoType_&, FunctionalType_&, FilterType&)
         explicit RumpfSmootherQ1Hack(TrafoType_& trafo_, FunctionalType_& functional_, FilterType& filter_)
-          : BaseClass(trafo_, functional_, filter_)//, _trafo_space(trafo_), _filter()
+          : BaseClass(trafo_, functional_, filter_)
           {
-            //this->_dirichlet_asm.assemble(_filter,_trafo_space);
           }
 
         /// \copydoc BaseClass::compute_functional()
@@ -131,7 +133,10 @@ namespace FEAST
           return fval;
         } // compute_functional
 
-        /// \copydoc BaseClass::compute_functional(CoordType*, CoordType*, CoordType*)
+        /**
+         * \copydoc RumpfSmoother::compute_functional(CoordType*, CoordType*, CoordType*)
+         *
+         */
         virtual CoordType compute_functional( CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det )
         {
           CoordType fval(0);
