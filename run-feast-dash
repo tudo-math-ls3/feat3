@@ -400,9 +400,15 @@ shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse_config", True)
 #    else:
 #      print("Warning: Could not delete thirparty file: " + i)
 
+icc_version = get_output("icpc -dM -E - ")
+icc_version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in icc_version]))
+icc_major = int(icc_version["__INTEL_COMPILER"][0:2])
+icc_minor = int(icc_version["__INTEL_COMPILER"][-2:])
+icc_minor2 = int(icc_version["__INTEL_COMPILER_UPDATE"])
 if (not nothirdparty):
-  addition = addition + "-alglib"
   addition = addition + "-umfpack"
+  if icc_major >= 15:
+    addition = addition + "-alglib"
 
 if (not nomkl):
   addition = addition + "-mkl"
@@ -410,10 +416,10 @@ if (not nomkl):
 quadmath_add = ""
 gcc_version = get_output("/usr/bin/g++ -dM -E -")
 gcc_version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in gcc_version]))
-major = int(gcc_version["__GNUC__"])
-minor = int(gcc_version["__GNUC_MINOR__"])
-minor2 = int(gcc_version["__GNUC_PATCHLEVEL__"])
-if major > 4 or (major == 4 and minor > 5):
+gcc_major = int(gcc_version["__GNUC__"])
+gcc_minor = int(gcc_version["__GNUC_MINOR__"])
+gcc_minor2 = int(gcc_version["__GNUC_PATCHLEVEL__"])
+if gcc_major > 4 or (gcc_major == 4 and gcc_minor > 5):
   quadmath_add = "-quadmath"
 
 #iterate over all branches, that are queued for testing
