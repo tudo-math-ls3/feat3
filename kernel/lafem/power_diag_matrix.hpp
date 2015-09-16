@@ -513,8 +513,8 @@ namespace FEAST
        *
        * Use source matrix content as content of current matrix
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+      template <typename SubType2_>
+      void convert(const PowerDiagMatrix<SubType2_, blocks_> & other)
       {
         CONTEXT("When converting PowerDiagMatrix");
 
@@ -830,8 +830,8 @@ namespace FEAST
        *
        * Use source matrix content as content of current matrix
        */
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+      template <typename SubType2_>
+      void convert(const PowerDiagMatrix<SubType2_, 1> & other)
       {
         CONTEXT("When converting PowerDiagMatrix");
 

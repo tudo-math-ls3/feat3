@@ -301,8 +301,8 @@ namespace FEAST
         _container.apply(r, x, y, alpha);
       }
 
-      template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
+      template <typename SubType2_>
+      void convert(const PowerFullMatrix<SubType2_, width_, height_> & other)
       {
         CONTEXT("When converting PowerFullMatrix");
         _container.convert(other._container);
