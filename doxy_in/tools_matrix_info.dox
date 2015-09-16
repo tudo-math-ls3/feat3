@@ -25,8 +25,8 @@ where
   - <c>bm</c>: binary banded format.
 
 Furthermore, the following options are available:
-- <b><c>\--nztol <tol></c></b>\n
-Specifies the relative tolerance for non-zero entries, where <c><tol></c> is a small non-negative floating point number.
+- <b><c>\--nztol tol </c></b>\n
+Specifies the relative tolerance for non-zero entries, where <c>tol</c> is a small non-negative floating point number.
 If not specified, \f$\sqrt{\varepsilon}\approx \frac{3}{2} 10^{-8}\f$ is used.
 
 In the following, for the given input matrix \f$A\in \mathbb{R}^{m\times n}\f$, let \f$\mathcal{S}(A) \subseteq \{1,\dots,m\}\times\{1,\dots,n\}\f$

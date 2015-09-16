@@ -85,7 +85,7 @@ Path to the used nvcc compiler.
 The CXXFLAGS of the nvcc compiler.
 
 <hr>
-\sebusectoin ppm_cuda_version CUDA_VERSION
+\subsection ppm_cuda_version CUDA_VERSION
 Version of the cuda SDK.
 
 <hr>
