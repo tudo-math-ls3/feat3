@@ -137,7 +137,7 @@ namespace FEAST
           analytic_function_, analytic_function_grad0_, analytic_function_grad1_),
           _conc(trafo_.get_mesh().get_num_entities(ShapeType::dimension)),
           _sum_conc(CoordType(0)),
-          _grad_conc(this->_mesh.get_num_entities(ShapeType::dimension), CoordType(0)),
+          _grad_conc(this->_mesh.get_num_entities(0), CoordType(0)),
           _grad_h(this->_mesh.get_num_entities(ShapeType::dimension),CoordType(0))
           {
             this->_update_h = true;
@@ -362,7 +362,7 @@ namespace FEAST
                 tmp(j*MeshType::world_dim +d) =
                   CoordType(1)/CoordType(MeshType::world_dim)*Math::pow(_conc(cell)/_sum_conc*sum_det,exponent)
                   *( _conc(cell)*(grad_sum_det(i)(d)*_sum_conc + sum_det*_grad_conc(i)(d) )
-                      + grad_loc(d,j) * sum_det *_sum_conc)
+                      + grad_loc(j,d) * sum_det *_sum_conc)
                   / Math::sqr(_sum_conc*sum_det);
               }
             }

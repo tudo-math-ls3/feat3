@@ -493,7 +493,7 @@ template<typename A, typename B, typename C, typename D, typename E, typename F>
 using MySmootherQ1Hack = Meshopt::RumpfSmootherLevelsetAnalyticQ1Hack<A, B, C, D, E, F>;
 
 template<typename A, typename B>
-using MyFunctional= Meshopt::RumpfFunctionalConc<A, B>;
+using MyFunctional= Meshopt::RumpfFunctionalConc_D2<A, B>;
 
 template<typename A, typename B>
 using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctionalConc>;
@@ -504,7 +504,7 @@ int main()
   typedef double DataType;
 
   // Refinement level
-  Index level(6);
+  Index level(5);
   // Timestep size
   DataType deltat(DataType(0.025));
 
