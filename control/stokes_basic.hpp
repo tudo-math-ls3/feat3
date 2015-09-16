@@ -46,7 +46,7 @@ namespace FEAST
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      template<typename,typename,typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
+      template<typename, typename, typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
     struct StokesBasicSystemLevel
     {
       // basic types
@@ -69,15 +69,19 @@ namespace FEAST
       typedef LAFEM::TupleVector<LocalVeloVector, LocalPresVector> LocalSystemVector;
 
       // define mirror types
-      typedef LAFEM::VectorMirror<MemType, DataType, IndexType> ScalarMirror;
+      typedef LAFEM::VectorMirror<Mem::Main, DataType, IndexType> ScalarMirror;
       typedef LAFEM::PowerMirror<ScalarMirror, dim> VeloMirror;
       typedef ScalarMirror PresMirror;
       typedef LAFEM::TupleMirror<VeloMirror, PresMirror> SystemMirror;
 
       // define gates
-      typedef Global::FoundationGate<LocalVeloVector, VeloMirror> VeloGate;
-      typedef Global::FoundationGate<LocalPresVector, PresMirror> PresGate;
-      typedef Global::FoundationGate<LocalSystemVector, SystemMirror> SystemGate;
+      typedef Global::PowerFoundationGate<LocalVeloVector, LAFEM::VectorMirror, LAFEM::PowerMirror, dim> VeloGate;
+      typedef Global::FoundationGate<LocalPresVector, LAFEM::VectorMirror> PresGate;
+      typedef Global::BasetupleFoundationGate<LocalSystemVector,
+                                              LAFEM::VectorMirror,
+                                              LAFEM::PowerMirror,
+                                              LAFEM::TupleMirror,
+                                              dim> SystemGate;
 
       // define global vector types
       typedef Global::Vector<LocalVeloVector> GlobalVeloVector;
@@ -105,7 +109,6 @@ namespace FEAST
       GlobalMatrixBlockD matrix_d;
       GlobalScalarMatrix matrix_s;
 
-    public:
       StokesBasicSystemLevel() :
         matrix_sys(&gate_sys, &gate_sys),
         matrix_a(&gate_velo, &gate_velo),
@@ -117,6 +120,20 @@ namespace FEAST
 
       virtual ~StokesBasicSystemLevel()
       {
+      }
+
+      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      void convert(const StokesBasicSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      {
+        gate_velo.convert(other.gate_velo);
+        gate_pres.convert(other.gate_pres);
+        gate_sys.convert(other.gate_sys);
+
+        matrix_sys.convert(&gate_sys, &gate_sys, other.matrix_sys);
+        matrix_a.convert(&gate_velo, &gate_velo, other.matrix_a);
+        matrix_b.convert(&gate_velo, &gate_pres, other.matrix_b);
+        matrix_d.convert(&gate_pres, &gate_velo, other.matrix_d);
+        matrix_s.convert(&gate_pres, &gate_pres, other.matrix_s);
       }
     }; // struct StokesBasicSystemLevel<...>
 
@@ -146,6 +163,15 @@ namespace FEAST
       GlobalSystemFilter filter_sys;
       GlobalVeloFilter filter_velo;
       GlobalPresFilter filter_pres;
+
+      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      void convert(const StokesUnitVeloNonePresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      {
+        BaseClass::convert(other);
+        filter_sys.convert(other.filter_sys);
+        filter_velo.convert(other.filter_velo);
+        filter_pres.convert(other.filter_pres);
+      }
     }; // struct StokesUnitVeloNonePresSystemLevel<...>
 
 
@@ -176,6 +202,15 @@ namespace FEAST
       GlobalSystemFilter filter_sys;
       GlobalVeloFilter filter_velo;
       GlobalPresFilter filter_pres;
+
+      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      void convert(const StokesUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      {
+        BaseClass::convert(other);
+        filter_sys.convert(other.filter_sys);
+        filter_velo.convert(other.filter_velo);
+        filter_pres.convert(other.filter_pres);
+      }
     }; // struct StokesUnitVeloNonePresSystemLevel<...>
 
     template<typename SystemLevel_>
@@ -195,29 +230,38 @@ namespace FEAST
       typedef Global::Matrix<LocalPresTransferMatrix> GlobalPresTransferMatrix;
       typedef Global::Matrix<LocalSystemTransferMatrix> GlobalSystemTransferMatrix;
 
-      // system levels
-      SystemLevel_& level_coarse;
-      SystemLevel_& level_fine;
-
       // (global) transfer matrices
       GlobalVeloTransferMatrix prol_velo, rest_velo;
       GlobalPresTransferMatrix prol_pres, rest_pres;
       GlobalSystemTransferMatrix prol_sys, rest_sys;
 
+      explicit StokesBasicTransferLevel()
+      {
+      }
+
       explicit StokesBasicTransferLevel(SystemLevel_& lvl_coarse, SystemLevel_& lvl_fine) :
-        level_coarse(lvl_coarse),
-        level_fine(lvl_fine),
-        prol_velo(&level_fine.gate_velo, &level_coarse.gate_velo),
-        rest_velo(&level_coarse.gate_velo, &level_fine.gate_velo),
-        prol_pres(&level_fine.gate_pres, &level_coarse.gate_pres),
-        rest_pres(&level_coarse.gate_pres, &level_fine.gate_pres),
-        prol_sys(&level_fine.gate_sys, &level_coarse.gate_sys),
-        rest_sys(&level_coarse.gate_sys, &level_fine.gate_sys)
+        prol_velo(&lvl_fine.gate_velo, &lvl_coarse.gate_velo),
+        rest_velo(&lvl_coarse.gate_velo, &lvl_fine.gate_velo),
+        prol_pres(&lvl_fine.gate_pres, &lvl_coarse.gate_pres),
+        rest_pres(&lvl_coarse.gate_pres, &lvl_fine.gate_pres),
+        prol_sys(&lvl_fine.gate_sys, &lvl_coarse.gate_sys),
+        rest_sys(&lvl_coarse.gate_sys, &lvl_fine.gate_sys)
       {
       }
 
       virtual ~StokesBasicTransferLevel()
       {
+      }
+
+      template <typename SL_>
+      void convert(SystemLevel_ & lvl_coarse, SystemLevel_ & lvl_fine, const StokesBasicTransferLevel<SL_> & other)
+      {
+        prol_velo.convert(&lvl_fine.gate_velo, &lvl_coarse.gate_velo, other.prol_velo);
+        rest_velo.convert(&lvl_coarse.gate_velo, &lvl_fine.gate_velo, other.rest_velo);
+        prol_pres.convert(&lvl_fine.gate_pres, &lvl_coarse.gate_pres, other.prol_pres);
+        rest_pres.convert(&lvl_coarse.gate_pres, &lvl_fine.gate_pres, other.rest_pres);
+        prol_sys.convert(&lvl_fine.gate_sys, &lvl_coarse.gate_sys, other.prol_sys);
+        rest_sys.convert(&lvl_coarse.gate_sys, &lvl_fine.gate_sys, other.rest_sys);
       }
     }; // struct StokesBasicTransferLevel<...>
 

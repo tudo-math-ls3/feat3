@@ -229,6 +229,15 @@ namespace StokesPoiseuille2D
 
     const Index num_levels = Index(domain_levels.size());
 
+    //Lin-Solve phase related typedefs
+    //Main-CSR or CUDA-ELL
+    typedef Mem::CUDA MemTypeSolve;
+    typedef Control::StokesUnitVeloNonePresSystemLevel<dim, MemTypeSolve, DataType, IndexType, LAFEM::SparseMatrixELL> SystemLevelTypeSolve;
+    typedef Control::StokesBasicTransferLevel<SystemLevelTypeSolve> TransferLevelTypeSolve;
+
+    std::deque<SystemLevelTypeSolve*> system_levels_solve;
+    std::deque<TransferLevelTypeSolve*> transfer_levels_solve;
+
     // create stokes and system levels
     for(Index i(0); i < num_levels; ++i)
     {
@@ -293,7 +302,7 @@ namespace StokesPoiseuille2D
 
     /* ***************************************************************************************** */
 
-    // get our global system types
+    // get our assembled system types
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
     typedef typename SystemLevelType::GlobalSystemMatrix GlobalSystemMatrix;
     typedef typename SystemLevelType::GlobalSystemFilter GlobalSystemFilter;
@@ -309,34 +318,63 @@ namespace StokesPoiseuille2D
     GlobalSystemVector vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
     GlobalSystemVector vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
 
-    // get our global matrix and filter
-    GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
-    GlobalSystemFilter& filter = the_system_level.filter_sys;
+    ////////////////// solver type conversion ////////////////////////
+
+    // get our global solver system types
+    typedef typename SystemLevelTypeSolve::GlobalSystemVector GlobalSystemVectorSolve;
+    typedef typename SystemLevelTypeSolve::GlobalSystemMatrix GlobalSystemMatrixSolve;
+    typedef typename SystemLevelTypeSolve::GlobalSystemFilter GlobalSystemFilterSolve;
+    typedef typename SystemLevelTypeSolve::GlobalVeloVector GlobalVeloVectorSolve;
+    typedef typename SystemLevelTypeSolve::GlobalPresVector GlobalPresVectorSolve;
+    //convert system and transfer levels
+    for (Index i(0); i < num_levels; ++i)
+    {
+      //system levels must be converted first, because transfer levels use their converted gates
+      system_levels_solve.push_back(new SystemLevelTypeSolve());
+      system_levels_solve.back()->convert(*system_levels.at(i));
+      if (i > 0)
+      {
+        transfer_levels_solve.push_back(new TransferLevelTypeSolve());
+        transfer_levels_solve.back()->template convert(*system_levels_solve.at(i-1), *system_levels_solve.at(i), *transfer_levels.at(i-1));
+      }
+    }
+
+    SystemLevelTypeSolve& the_system_level_solve = *system_levels_solve.back();
+
+    // get our global solve matrix and filter
+    GlobalSystemMatrixSolve& matrix_solve = the_system_level_solve.matrix_sys;
+    GlobalSystemFilterSolve& filter_solve = the_system_level_solve.filter_sys;
+
+    //convert rhs and sol vectors
+    GlobalSystemVectorSolve vec_rhs_solve;
+    vec_rhs_solve.convert(&system_levels_solve.back()->gate_sys, vec_rhs);
+    GlobalSystemVectorSolve vec_sol_solve;
+    vec_sol_solve.convert(&system_levels_solve.back()->gate_sys, vec_sol);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
     // our A/S block solvers
-    std::shared_ptr<Solver::SolverBase<GlobalVeloVector>> solver_a(nullptr);
-    std::shared_ptr<Solver::SolverBase<GlobalPresVector>> solver_s(nullptr);
+    std::shared_ptr<Solver::SolverBase<GlobalVeloVectorSolve>> solver_a(nullptr);
+    std::shared_ptr<Solver::SolverBase<GlobalPresVectorSolve>> solver_s(nullptr);
 
     // create a multigrid cycle A-solver
     {
       auto mgv = std::make_shared<
         Solver::BasicVCycle<
-          typename SystemLevelType::GlobalMatrixBlockA,
-          typename SystemLevelType::GlobalVeloFilter,
-          typename TransferLevelType::GlobalVeloTransferMatrix
+          typename SystemLevelTypeSolve::GlobalMatrixBlockA,
+          typename SystemLevelTypeSolve::GlobalVeloFilter,
+          typename TransferLevelTypeSolve::GlobalVeloTransferMatrix
         > > ();
 
       // create coarse grid solver
-      auto coarse_solver = Solver::new_jacobi_precond(system_levels.front()->matrix_a, system_levels.front()->filter_velo);
-      mgv->set_coarse_level(system_levels.front()->matrix_a, system_levels.front()->filter_velo, coarse_solver);
+      auto coarse_solver = Solver::new_jacobi_precond(system_levels_solve.front()->matrix_a, system_levels_solve.front()->filter_velo);
+      mgv->set_coarse_level(system_levels_solve.front()->matrix_a, system_levels_solve.front()->filter_velo, coarse_solver);
 
       // push levels into MGV
-      auto jt = transfer_levels.begin();
-      for(auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
+      auto jt = transfer_levels_solve.begin();
+      for(auto it = ++system_levels_solve.begin(); it != system_levels_solve.end(); ++it, ++jt)
       {
         auto smoother = Solver::new_jacobi_precond((*it)->matrix_a, (*it)->filter_velo);
         mgv->push_level((*it)->matrix_a, (*it)->filter_velo, (*jt)->prol_velo, (*jt)->rest_velo, smoother, smoother);
@@ -349,10 +387,13 @@ namespace StokesPoiseuille2D
     // create S-solver
     {
       // create a local ILU(0) for S
-      auto loc_ilu = Solver::new_ilu_precond(*the_system_level.matrix_s, *the_system_level.filter_pres, Index(0));
+      //auto loc_ilu = Solver::new_ilu_precond(*the_system_level_solve.matrix_s, *the_system_level_solve.filter_pres, Index(0));
+      auto loc_jac = Solver::new_jacobi_precond(*the_system_level_solve.matrix_s, *the_system_level_solve.filter_pres, 0.7);
+      auto loc_pcg = Solver::new_pcg(*the_system_level_solve.matrix_s, *the_system_level_solve.filter_pres, loc_jac);
 
       // make it Schwarz...
-      auto glob_ilu = Solver::new_schwarz_precond(loc_ilu, the_system_level.filter_pres);
+      //auto glob_ilu = Solver::new_schwarz_precond(loc_ilu, the_system_level_solve.filter_pres);
+      auto glob_ilu = Solver::new_schwarz_precond(loc_pcg, the_system_level_solve.filter_pres);
 
       // set our S-solver
       solver_s = glob_ilu;
@@ -360,18 +401,18 @@ namespace StokesPoiseuille2D
 
     // create a global Schur-Complement preconditioner
     auto schur = Solver::new_schur_precond(
-        the_system_level.matrix_a,
-        the_system_level.matrix_b,
-        the_system_level.matrix_d,
-        the_system_level.filter_velo,
-        the_system_level.filter_pres,
+        the_system_level_solve.matrix_a,
+        the_system_level_solve.matrix_b,
+        the_system_level_solve.matrix_d,
+        the_system_level_solve.filter_velo,
+        the_system_level_solve.filter_pres,
         solver_a,
         solver_s,
         Solver::SchurType::full
       );
 
     // create our solver
-    auto solver = Solver::new_pcg(matrix, filter, schur);
+    auto solver = Solver::new_pcg(matrix_solve, filter_solve, schur);
 
     // enable plotting
     solver->set_plot(rank == 0);
@@ -382,10 +423,13 @@ namespace StokesPoiseuille2D
     solver->init();
 
     // solve
-    Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
+    Solver::solve(*solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
 
     // release solver
     solver->done();
+
+    // download solution
+    vec_sol.convert(&system_levels.back()->gate_sys, vec_sol_solve);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */

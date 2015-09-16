@@ -200,6 +200,15 @@ namespace PoissonDirichlet2D
 
     const Index num_levels = domain_levels.size();
 
+    //Lin-Solve phase related typedefs
+    //Main-CSR or CUDA-ELL
+    typedef Mem::CUDA MemTypeSolve;
+    typedef Control::ScalarUnitFilterSystemLevel<MemTypeSolve, DataType, IndexType, LAFEM::SparseMatrixELL> SystemLevelTypeSolve;
+    typedef Control::ScalarBasicTransferLevel<SystemLevelTypeSolve> TransferLevelTypeSolve;
+
+    std::deque<SystemLevelTypeSolve*> system_levels_solve;
+    std::deque<TransferLevelTypeSolve*> transfer_levels_solve;
+
     // create stokes and system levels
     for (Index i(0); i < num_levels; ++i)
     {
@@ -261,10 +270,8 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    // get our global system types
+    // get our assembled vector type
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
-    typedef typename SystemLevelType::GlobalSystemMatrix GlobalSystemMatrix;
-    typedef typename SystemLevelType::GlobalSystemFilter GlobalSystemFilter;
 
     // fetch our finest levels
     DomainLevelType& the_domain_level = *domain_levels.back();
@@ -275,9 +282,35 @@ namespace PoissonDirichlet2D
     GlobalSystemVector vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level, sol_func);
     GlobalSystemVector vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
 
-    // get our global matrix and filter
-    GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
-    GlobalSystemFilter& filter = the_system_level.filter_sys;
+    ////////////////// solver type conversion ////////////////////////
+
+    // get our global solver system types
+    typedef typename SystemLevelTypeSolve::GlobalSystemVector GlobalSystemVectorSolve;
+    typedef typename SystemLevelTypeSolve::GlobalSystemMatrix GlobalSystemMatrixSolve;
+    typedef typename SystemLevelTypeSolve::GlobalSystemFilter GlobalSystemFilterSolve;
+
+    //convert system and transfer levels
+    for (Index i(0); i < num_levels; ++i)
+    {
+      //system levels must be converted first, because transfer levels use their converted gates
+      system_levels_solve.push_back(new SystemLevelTypeSolve());
+      system_levels_solve.back()->convert(*system_levels.at(i));
+      if (i > 0)
+      {
+        transfer_levels_solve.push_back(new TransferLevelTypeSolve());
+        transfer_levels_solve.back()->template convert(*system_levels_solve.at(i-1), *system_levels_solve.at(i), *transfer_levels.at(i-1));
+      }
+    }
+
+    // get our global solve matrix and filter
+    GlobalSystemMatrixSolve& matrix_solve = (*system_levels_solve.back()).matrix_sys;
+    GlobalSystemFilterSolve& filter_solve = (*system_levels_solve.back()).filter_sys;
+
+    //convert rhs and sol vectors
+    GlobalSystemVectorSolve vec_rhs_solve;
+    vec_rhs_solve.convert(&system_levels_solve.back()->gate_sys, vec_rhs);
+    GlobalSystemVectorSolve vec_sol_solve;
+    vec_sol_solve.convert(&system_levels_solve.back()->gate_sys, vec_sol);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -286,32 +319,32 @@ namespace PoissonDirichlet2D
     // create a multigrid cycle
     auto mgv = std::make_shared<
       Solver::BasicVCycle<
-      typename SystemLevelType::GlobalSystemMatrix,
-      typename SystemLevelType::GlobalSystemFilter,
-      typename TransferLevelType::GlobalSystemTransferMatrix
+      GlobalSystemMatrixSolve,
+      GlobalSystemFilterSolve,
+      typename TransferLevelTypeSolve::GlobalSystemTransferMatrix
       > >();
 
     // scaling factor
     DataType omega = DataType(0.2);
 
     // create coarse grid solver
-    auto coarse_solver = Solver::new_scale_precond(system_levels.front()->filter_sys, omega);
-    mgv->set_coarse_level(system_levels.front()->matrix_sys, system_levels.front()->filter_sys, coarse_solver);
+    auto coarse_solver = Solver::new_scale_precond(system_levels_solve.front()->filter_sys, omega);
+    mgv->set_coarse_level(system_levels_solve.front()->matrix_sys, system_levels_solve.front()->filter_sys, coarse_solver);
 
     // push levels into MGV
-    auto jt = transfer_levels.begin();
-    for (auto it = ++system_levels.begin(); it != system_levels.end(); ++it, ++jt)
+    auto jt = transfer_levels_solve.begin();
+    for (auto it = ++system_levels_solve.begin(); it != system_levels_solve.end(); ++it, ++jt)
     {
       auto smoother = Solver::new_scale_precond((*it)->filter_sys, omega);
       mgv->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother);
     }
 
     // create our solver
-    //auto solver = Control::SolverFactory::create_scalar_solver(system_levels, transfer_levels, Runtime::global_property(), "linsolver");
-    auto solver = Solver::new_pcg(matrix, filter, mgv);
-    //auto solver = Solver::new_bicgstab(matrix, filter, mgv);
-    //auto solver = Solver::new_fgmres(matrix, filter, 8, 0.0, mgv);
-    //auto solver = Solver::new_richardson(matrix, filter, 1.0, mgv);
+    //auto solver = Control::SolverFactory::create_scalar_solver(system_levels_solver, transfer_levels_solver, Runtime::global_property(), "linsolver");
+    auto solver = Solver::new_pcg(matrix_solve, filter_solve, mgv);
+    //auto solver = Solver::new_bicgstab(matrix_solve, filter_solve, mgv);
+    //auto solver = Solver::new_fgmres(matrix_solve, filter_solve, 8, 0.0, mgv);
+    //auto solver = Solver::new_richardson(matrix_solve, filter_solve, 1.0, mgv);
 
     // enable plotting
     solver->set_plot(rank == 0);
@@ -330,7 +363,7 @@ namespace PoissonDirichlet2D
     TimeStamp at;
 
     // solve
-    Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
+    Solver::solve(*solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
     TimeStamp bt;
 
     if (rank == 0 && args.check("statistics") >= 0)
@@ -344,6 +377,9 @@ namespace PoissonDirichlet2D
 
     // release solver
     solver->done();
+
+    // download solution
+    vec_sol.convert(&system_levels.back()->gate_sys, vec_sol_solve);
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -400,6 +436,17 @@ namespace PoissonDirichlet2D
     {
       delete asm_levels.back();
       asm_levels.pop_back();
+    }
+
+    while (!transfer_levels_solve.empty())
+    {
+      delete transfer_levels_solve.back();
+      transfer_levels_solve.pop_back();
+    }
+    while (!system_levels_solve.empty())
+    {
+      delete system_levels_solve.back();
+      system_levels_solve.pop_back();
     }
   }
 

@@ -43,7 +43,7 @@ namespace FEAST
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      template<typename,typename,typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
+      template<typename, typename, typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
     class ScalarBasicSystemLevel
     {
     public:
@@ -62,10 +62,10 @@ namespace FEAST
       typedef typename LocalSystemMatrix::VectorTypeR LocalSystemVector;
 
       /// define system mirror type
-      typedef LAFEM::VectorMirror<MemType, DataType, IndexType> SystemMirror;
+      typedef LAFEM::VectorMirror<Mem::Main, DataType, IndexType> SystemMirror;
 
       /// define system gate
-      typedef Global::FoundationGate<LocalSystemVector, SystemMirror> SystemGate;
+      typedef Global::FoundationGate<LocalSystemVector, LAFEM::VectorMirror> SystemGate;
 
       /// define global system vector type
       typedef Global::Vector<LocalSystemVector> GlobalSystemVector;
@@ -81,7 +81,6 @@ namespace FEAST
       /// our global system matrix
       GlobalSystemMatrix matrix_sys;
 
-    public:
       ScalarBasicSystemLevel() :
         matrix_sys(&gate_sys, &gate_sys)
       {
@@ -89,6 +88,13 @@ namespace FEAST
 
       virtual ~ScalarBasicSystemLevel()
       {
+      }
+
+      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      void convert(const ScalarBasicSystemLevel<M_, D_, I_, SM_> & other)
+      {
+        gate_sys.convert(other.gate_sys);
+        matrix_sys.convert(&gate_sys, &gate_sys, other.matrix_sys);
       }
     }; // class ScalarBasicSystemLevel<...>
 
@@ -112,7 +118,6 @@ namespace FEAST
       /// our global system filter
       GlobalSystemFilter filter_sys;
 
-    public:
       ScalarUnitFilterSystemLevel() :
         BaseClass()
       {
@@ -122,6 +127,13 @@ namespace FEAST
       std::size_t bytes() const
       {
         return this->matrix_sys.bytes () + filter_sys.bytes();
+      }
+
+      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      void convert(const ScalarUnitFilterSystemLevel<M_, D_, I_, SM_> & other)
+      {
+        BaseClass::convert(other);
+        filter_sys.convert(other.filter_sys);
       }
     }; // class ScalarUnitFilterSystemLevel<...>
 
@@ -145,7 +157,6 @@ namespace FEAST
       /// our global system filter
       GlobalSystemFilter filter_sys;
 
-    public:
       ScalarMeanFilterSystemLevel() :
         BaseClass()
       {
@@ -155,6 +166,13 @@ namespace FEAST
       std::size_t bytes() const
       {
         return this->matrix_sys.bytes () + filter_sys.bytes();
+      }
+
+      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      void convert(const ScalarMeanFilterSystemLevel<M_, D_, I_, SM_> & other)
+      {
+        BaseClass::convert(other);
+        filter_sys.convert(other.filter_sys);
       }
     }; // class ScalarMeanFilterSystemLevel<...>
 
@@ -168,19 +186,16 @@ namespace FEAST
       /// our global transfer matrix type
       typedef Global::Matrix<LocalSystemTransferMatrix> GlobalSystemTransferMatrix;
 
-      /// our two neighbour system levels
-      SystemLevel_& level_coarse;
-      SystemLevel_& level_fine;
-
       /// our global transfer matrices
       GlobalSystemTransferMatrix prol_sys, rest_sys;
 
-    public:
+      ScalarBasicTransferLevel()
+      {
+      }
+
       explicit ScalarBasicTransferLevel(SystemLevel_& lvl_coarse, SystemLevel_& lvl_fine) :
-        level_coarse(lvl_coarse),
-        level_fine(lvl_fine),
-        prol_sys(&level_fine.gate_sys, &level_coarse.gate_sys),
-        rest_sys(&level_coarse.gate_sys, &level_fine.gate_sys)
+        prol_sys(&lvl_fine.gate_sys, &lvl_coarse.gate_sys),
+        rest_sys(&lvl_coarse.gate_sys, &lvl_fine.gate_sys)
       {
       }
 
@@ -192,6 +207,14 @@ namespace FEAST
       std::size_t bytes() const
       {
         return prol_sys.bytes() + rest_sys.bytes();
+      }
+
+      // teuflisch aufpassen, dass die schon konvertierten SystemLevel übergeben werden
+      template <typename SL_, typename SM_>
+      void convert(SystemLevel_ & lvl_coarse , SystemLevel_ & lvl_fine, const ScalarBasicTransferLevel<SL_, SM_> & other)
+      {
+        prol_sys.convert(&lvl_fine.gate_sys, &lvl_coarse.gate_sys, other.prol_sys);
+        rest_sys.convert(&lvl_coarse.gate_sys, &lvl_fine.gate_sys, other.rest_sys);
       }
     };
 
@@ -205,14 +228,12 @@ namespace FEAST
       typedef Control::Domain::DomainLevel<MeshType> DomainLevelType;
       typedef Control::Domain::DomainLayer<MeshType> DomainLayerType;
 
-    public:
       DomainLevelType& domain_level;
       MeshType& mesh;
       TrafoType trafo;
       SpaceType space;
       Cubature::DynamicFactory cubature;
 
-    public:
       explicit ScalarBasicAssemblerLevel(DomainLevelType& dom_lvl) :
         domain_level(dom_lvl),
         mesh(domain_level.get_mesh()),
