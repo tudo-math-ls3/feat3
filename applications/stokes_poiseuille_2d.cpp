@@ -476,6 +476,17 @@ namespace StokesPoiseuille2D
       delete asm_levels.back();
       asm_levels.pop_back();
     }
+
+    while(!transfer_levels_solve.empty())
+    {
+      delete transfer_levels_solve.back();
+      transfer_levels_solve.pop_back();
+    }
+    while(!system_levels_solve.empty())
+    {
+      delete system_levels_solve.back();
+      system_levels_solve.pop_back();
+    }
   }
 
   int main(int argc, char* argv[])
