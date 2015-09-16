@@ -77,16 +77,10 @@ namespace FEAST
         /// Since the functional contains a ShapeType, these have to be the same
         static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value, "ShapeTypes of the transformation / functional have to agree" );
 
-
-        /// \copydoc RumpfSmootherBase()
-        explicit RumpfSmootherQ1Hack(TrafoType_& trafo_, FunctionalType_& functional_)
-          : BaseClass(trafo_, functional_)
-          {
-          }
-
         /// \copydoc RumpfSmootherBase(TrafoType_&, FunctionalType_&, FilterType&)
-        explicit RumpfSmootherQ1Hack(TrafoType_& trafo_, FunctionalType_& functional_, FilterType& filter_)
-          : BaseClass(trafo_, functional_, filter_)
+        explicit RumpfSmootherQ1Hack(Geometry::RootMeshNode<MeshType>* rmn_,
+        std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_, FunctionalType_& functional_)
+          : BaseClass(rmn_, dirichlet_list_, slip_list_, functional_)
           {
           }
 
@@ -95,7 +89,7 @@ namespace FEAST
         {
           CoordType fval(0);
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // In 2d, each hypercube is split into 2 simplices and there are two possible permutations
           const int n_perms(4);
@@ -107,7 +101,7 @@ namespace FEAST
             {0, 1, 3}
           };
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, 3, MeshType::world_dim> x;
@@ -141,7 +135,7 @@ namespace FEAST
         {
           CoordType fval(0);
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // In 2d, each hypercube is split into 2 simplices and there are two possible permutations
           const int n_perms(4);
@@ -153,7 +147,7 @@ namespace FEAST
             {0, 1, 3}
           };
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, 3, MeshType::world_dim> x;
@@ -205,10 +199,10 @@ namespace FEAST
         virtual void compute_gradient()
         {
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // In 2d, each hypercube is split into 2 simplices and there are two possible permutations
           const int n_perms(4);

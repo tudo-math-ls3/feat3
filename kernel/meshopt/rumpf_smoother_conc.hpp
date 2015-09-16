@@ -124,25 +124,44 @@ namespace FEAST
          * _update_h is set to \c true.
          *
          **/
-        explicit RumpfSmootherLevelsetConcAnalytic(
-          TrafoType_& trafo_,
-          FunctionalType_& functional_,
-          LevelsetFunctionalType_& lvlset_functional_,
-          bool align_to_lvlset_,
-          bool r_adaptivity_,
+        explicit RumpfSmootherLevelsetConcAnalytic(Geometry::RootMeshNode<MeshType>* rmn_,
+        std::deque<String>& dirichlet_list_, std::deque<String> slip_list_,
+          FunctionalType_& functional_, LevelsetFunctionalType_& lvlset_functional_,
+          bool align_to_lvlset_, bool r_adaptivity_,
           AnalyticFunctionType_& analytic_function_,
-          AnalyticFunctionGrad0Type_& analytic_function_grad0_,
-          AnalyticFunctionGrad1Type_& analytic_function_grad1_)
-          : BaseClass(trafo_, functional_, lvlset_functional_, align_to_lvlset_, r_adaptivity_,
+          AnalyticFunctionGrad0Type_& analytic_function_grad0_, AnalyticFunctionGrad1Type_& analytic_function_grad1_)
+          : BaseClass(rmn_, dirichlet_list_, slip_list_, functional_, lvlset_functional_,
+          align_to_lvlset_, r_adaptivity_,
           analytic_function_, analytic_function_grad0_, analytic_function_grad1_),
-          _conc(trafo_.get_mesh().get_num_entities(ShapeType::dimension)),
+          _conc(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _sum_conc(CoordType(0)),
-          _grad_conc(this->_mesh.get_num_entities(0), CoordType(0)),
-          _grad_h(this->_mesh.get_num_entities(ShapeType::dimension),CoordType(0))
+          _grad_conc(rmn_->get_mesh()->get_num_entities(0), CoordType(0)),
+          _grad_h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension),CoordType(0))
           {
             this->_update_h = true;
           }
 
+        /// \copydoc BaseClass::init()
+        virtual void init() override
+        {
+          // Write any potential changes to the mesh
+          this->set_coords();
+
+          // Assemble the homogeneous filter
+          this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
+
+          // Call prepare to evaluate the levelset function
+          prepare();
+
+          // Compute element weights
+          this->compute_mu();
+          // Compute desired element size distribution
+          this->compute_lambda();
+          // Compute target scales
+          this->compute_h();
+          // Compute their gradient wrt. the vertex coordinates
+          compute_grad_h();
+        }
         /**
          * \copydoc RumpfSmootherLevelset::prepare()
          *
@@ -152,7 +171,18 @@ namespace FEAST
          **/
         virtual void prepare() override
         {
+          //// Evaluate the gradient of the levelset function
+          //Assembly::Interpolator::project(this->_lvlset_grad_vec[0], this->_analytic_lvlset_grad0, this->_lvlset_space);
+          //Assembly::Interpolator::project(this->_lvlset_grad_vec[1], this->_analytic_lvlset_grad1, this->_lvlset_space);
+          //BaseClass::prepare();
+
+          //if(this->_r_adaptivity)
+          //{
+          //  compute_grad_h();
+          //}
+
           this->set_coords();
+          //this->_slip_asm.assemble(this->filter.at<1>(), this->_trafo_space);
           // Evaluate levelset function
           Assembly::Interpolator::project(this->_lvlset_vec, this->_analytic_lvlset, this->_lvlset_space);
 
@@ -186,9 +216,9 @@ namespace FEAST
         void compute_conc()
         {
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           _sum_conc = CoordType(0);
           for(Index cell(0); cell < ncells; ++cell)
@@ -284,7 +314,7 @@ namespace FEAST
         virtual void compute_lambda() override
         {
           compute_conc();
-          for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); ++cell)
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
             this->_lambda(cell, this->_conc(cell)/this->_sum_conc);
           }
@@ -319,13 +349,13 @@ namespace FEAST
         void compute_grad_h()
         {
           _grad_h.format();
-          VectorType grad_sum_det(this->_mesh.get_num_entities(0), CoordType(0));
+          VectorType grad_sum_det(this->get_mesh()->get_num_entities(0), CoordType(0));
           CoordType sum_det = H_EvalType_::compute_sum_det(this->_coords, this->_trafo);
           H_EvalType_::compute_grad_sum_det(grad_sum_det, this->_coords, this->_trafo);
           compute_grad_conc();
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
           // This will hold the levelset values at the mesh vertices for one element
           FEAST::Tiny::Vector<CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
           // This will hold the levelset gradient values for one element for passing to other routines
@@ -338,7 +368,7 @@ namespace FEAST
 
           CoordType exponent = CoordType(1)/CoordType(MeshType::world_dim) - CoordType(1);
 
-          for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); ++cell)
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
             grad_loc.format();
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
@@ -387,7 +417,7 @@ namespace FEAST
           _grad_conc.format();
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -401,7 +431,7 @@ namespace FEAST
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> lvlset_grad_vals;
 
           // Compute the functional value for each cell
-          for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); ++cell)
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
             // Collect levelset and levelset grad values
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
@@ -435,10 +465,10 @@ namespace FEAST
           this->_grad.format();
 
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;

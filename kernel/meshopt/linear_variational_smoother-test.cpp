@@ -48,32 +48,40 @@ class LinearVariationalSmootherTest
     virtual void run() const
     {
       Geometry::RefineFactory<MeshType, Geometry::UnitCubeFactory> mesh_factory(level);
-      MeshType mesh(mesh_factory);
-      TrafoType trafo(mesh);
+      MeshType* mesh(new MeshType(mesh_factory));
 
       typedef typename MeshType::VertexSetType::VertexType VertexType;
-      VertexType* coords_org(new VertexType[mesh.get_num_entities(0)]);
+      VertexType* coords_org(new VertexType[mesh->get_num_entities(0)]);
 
-      auto& vtx = mesh.get_vertex_set();
+      auto& vtx = mesh->get_vertex_set();
 
       // Back up original coordinates and scale the mesh's vertices.
-      for(Index i(0); i < mesh.get_num_entities(0); ++i)
+      for(Index i(0); i < mesh->get_num_entities(0); ++i)
       {
         coords_org[i] = vtx[i];
         vtx[i] = DT_(0.75)*vtx[i];
       }
 
       // Get the boundary so we can set the smoother's _coords field to the original values
-      Geometry::BoundaryFactory<MeshType> boundary_factory(mesh);
-      Geometry::MeshPart<MeshType> boundary(boundary_factory);
+      Geometry::BoundaryFactory<MeshType> boundary_factory(*mesh);
+      Geometry::MeshPart<MeshType>* boundary(new Geometry::MeshPart<MeshType>(boundary_factory));
+
+      // Create a basic RootMeshNode from this mesh
+      Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
+      // Add the boundary to the RootMeshNode
+      rmn->add_mesh_part("boundary", boundary, nullptr);
+      // Boundary stuff: Dirichlet boundary conditions on the outer boundary
+      std::deque<String> dirichlet_list;
+      dirichlet_list.push_back("boundary");
+      std::deque<String> slip_list;
 
       // Create the smoother
-      SmootherType my_smoother(trafo);
+      SmootherType my_smoother(rmn, dirichlet_list, slip_list);
 
       // Set _coords to the original values on the boundary
-      for(Index i(0); i < boundary.get_num_entities(0); ++i)
+      for(Index i(0); i < boundary->get_num_entities(0); ++i)
       {
-        Index j(boundary.template get_target_set<0>()[i]);
+        Index j(boundary->template get_target_set<0>()[i]);
         my_smoother._coords(j, coords_org[j]);
       }
 
@@ -83,7 +91,7 @@ class LinearVariationalSmootherTest
       // Check results
       const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
 
-      for(Index i(0); i < mesh.get_num_entities(0); ++i)
+      for(Index i(0); i < mesh->get_num_entities(0); ++i)
       {
         for(int d(0); d < MeshType::world_dim; ++d)
           TEST_CHECK_EQUAL_WITHIN_EPS(my_smoother._coords(i)(d), coords_org[i][d], tol);
@@ -91,9 +99,9 @@ class LinearVariationalSmootherTest
 
       // Clean up
       delete[] coords_org;
+      delete rmn;
 
-    }
-
+    } // run()
 
 };
 

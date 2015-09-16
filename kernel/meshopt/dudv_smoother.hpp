@@ -7,19 +7,20 @@
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/common_operators.hpp>            // for DuDvOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
+#include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
+#include <kernel/lafem/filter_chain.hpp>
 #include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
+#include <kernel/lafem/slip_filter.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/meshopt/mesh_smoother.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/ssor_precond.hpp>
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/trafo/standard/mapping.hpp>
-
 
 namespace FEAST
 {
@@ -80,8 +81,12 @@ namespace FEAST
         /// Type of the system matrix for the solver
         typedef typename Intern::DuDvMSSolverParameters<Mem_>::template
           SolverMatrixType<DT_, IT_, MeshType::world_dim> SolverMatrixType;
-        /// Filter for our system
-        typedef LAFEM::UnitFilterBlocked<Mem_, DT_, IT_, MeshType::world_dim> FilterType;
+        /// Filter for Dirichlet boundary conditions
+        typedef LAFEM::UnitFilterBlocked<Mem_, DT_, IT_, MeshType::world_dim> DirichletFilterType;
+        /// Filter for slip boundary conditions
+        typedef LAFEM::SlipFilter<Mem_, DT_, IT_, MeshType::world_dim> SlipFilterType;
+        /// Combined filter
+        typedef LAFEM::FilterChain<SlipFilterType, DirichletFilterType> FilterType;
 
         /// Finite Element space for the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
@@ -92,6 +97,8 @@ namespace FEAST
 
       protected:
         /// Transformation
+        TrafoType _trafo;
+        /// FE space the transformation is from
         TrafoSpace _trafo_space;
         /// System matrix
         MatrixType _sys_matrix;
@@ -101,12 +108,24 @@ namespace FEAST
         Cubature::DynamicFactory _cubature_factory;
         /// Filter for the mesh problem
         FilterType _filter;
-        /// Assembler for the boundary values for the mesh problem
+        /// Assembler for the Dirchlet boundary values for the mesh problem
         Assembly::UnitFilterAssembler<MeshType> _dirichlet_asm;
+        /// Assembler for the slip boundary values for the mesh problem
+        Assembly::SlipFilterAssembler<MeshType> _slip_asm;
+        /// List of boundary identifiers for enforcing Dirichlet boundary conditions
+        std::deque<String> _dirichlet_list;
+        /// List of boundary identifiers for enforcing slip boundary conditions
+        std::deque<String> _slip_list;
 
       public:
         /**
-         * \brief Minimal constructor
+         * \brief Constructor
+         *
+         * \param[in] rmn_
+         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
+         *
+         * \param[in] dirichlet_list_
+         * List of boundary identifiers for enforcing Dirichlet boundary conditions, can be empty
          *
          * \param[in] trafo_
          * The transformation
@@ -114,40 +133,56 @@ namespace FEAST
          * \note Because no boundary information is provided, Dirichlet conditions are enforced on the outer
          * boundary.
          */
-        explicit DuDvSmoother(TrafoType& trafo_) :
-          BaseClass(trafo_.get_mesh()),
-          _trafo_space(trafo_),
+        explicit DuDvSmoother(Geometry::RootMeshNode<MeshType>* rmn_,
+        std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_) :
+          BaseClass(rmn_),
+          _trafo(*(rmn_->get_mesh())),
+          _trafo_space(_trafo),
           _sys_matrix(),
-          _vec_rhs(trafo_.get_mesh().get_num_entities(0),DataType(0)),
+          _vec_rhs(rmn_->get_mesh()->get_num_entities(0),DataType(0)),
           _cubature_factory("auto-degree:"+stringify(int(_local_degree))),
           _filter(),
-          _dirichlet_asm()
+          _dirichlet_asm(),
+          _slip_asm(*(rmn_->get_mesh())),
+          _dirichlet_list(dirichlet_list_),
+          _slip_list(slip_list_)
           {
-            /// Type for the boundary mesh
-            typedef typename Geometry::MeshPart<MeshType> BoundaryType;
-            /// Factory for the boundary mesh
-            typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
+            // Add all specified mesh parts to the Dirichlet filter assember
+            for(auto& it : this->_dirichlet_list)
+            {
+              auto* mpp = this->_mesh_node->find_mesh_part(it);
+              if(mpp != nullptr)
+                _dirichlet_asm.add_mesh_part(*mpp);
+            }
 
-            // Get the boundary set
-            BoundaryFactoryType boundary_factory(this->_mesh);
-            BoundaryType boundary(boundary_factory);
-
-            _dirichlet_asm.add_mesh_part(boundary);
-
-            Assembly::SymbolicMatrixAssembler<>::assemble1(_sys_matrix, _trafo_space);
+            // Add all specified mesh parts to the slip filter assember
+            for(auto& it : this->_slip_list)
+            {
+              auto* mpp = this->_mesh_node->find_mesh_part(it);
+              if(mpp != nullptr)
+                _slip_asm.add_mesh_part(*mpp);
+            }
 
           }
 
+        /// \brief Virtual destructor
         virtual ~DuDvSmoother()
         {
         }
 
-        /// \brief Initialises parts of the MeshSmoother not set in in the constructor
+        /**
+         * \brief Performs one-time initialisations
+         *
+         * This is not done in the constructor for the case that the system matrix gets overwritten by a derived
+         * class, so the unused system matrix of THIS class is not assembled symbolically
+         */
         virtual void init() override
         {
-          BaseClass::init();
+          // Assemble the homogeneous slip filter
+          _slip_asm.assemble(_filter.template at<0>(), _trafo_space);
+          // Symbolically assemble the system matrix
+          Assembly::SymbolicMatrixAssembler<>::assemble1(_sys_matrix, _trafo_space);
         }
-
 
         /// \brief Optimises the mesh according to the criteria implemented in the mesh smoother.
         virtual void optimise() override
@@ -163,7 +198,7 @@ namespace FEAST
           solver_matrix.convert(_sys_matrix);
 
           // Assemble Dirichlet boundary conditions from sol, as this->_coords contains the new boundary coordinates
-          _dirichlet_asm.assemble(_filter, _trafo_space, sol);
+          _dirichlet_asm.assemble(_filter.template at<1>(), _trafo_space, sol);
 
           _vec_rhs.format();
 
@@ -197,6 +232,13 @@ namespace FEAST
         /// \copydoc MeshSmoother::prepare()
         virtual void prepare() override
         {
+          // Adapt all slip boundaries
+          for(auto& it : _slip_list)
+            this->_mesh_node->adapt_by_name(it);
+
+          // Assemble homogeneous slip boundary conditions, as the outer normal could have changed
+          _slip_asm.assemble(_filter.template at<0>(), _trafo_space);
+
           _sys_matrix.format();
 
           Assembly::Common::DuDvOperatorBlocked<MeshType::world_dim> my_operator;
@@ -207,6 +249,9 @@ namespace FEAST
             _trafo_space,            // the finite element space in use
             _cubature_factory  // the cubature factory to be used for integration
             );
+
+          // Assemble homogeneous slip boundary conditions, as the outer normal could have changed
+          _slip_asm.assemble(_filter.template at<0>(), _trafo_space);
 
           return;
         }

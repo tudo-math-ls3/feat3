@@ -3,8 +3,12 @@
 #define KERNEL_MESHOPT_RUMPF_SMOOTHER_HPP 1
 
 #include <kernel/base_header.hpp>
+#include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
+#include <kernel/geometry/mesh_node.hpp>
+#include <kernel/lafem/filter_chain.hpp>
+#include <kernel/lafem/slip_filter.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/meshopt/h_evaluator.hpp>
 #include <kernel/meshopt/mesh_smoother.hpp>
@@ -108,16 +112,21 @@ namespace FEAST
         /// Vector type for coordinate vectors etc.
         typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType, MeshType::world_dim> VectorType;
         /// Filter for Dirichlet boundary conditions
-        typedef LAFEM::UnitFilterBlocked<MemType, CoordType, IndexType, MeshType::world_dim> FilterType;
+        typedef LAFEM::UnitFilterBlocked<MemType, CoordType, IndexType, MeshType::world_dim> DirichletFilterType;
+        /// Filter for slip boundary conditions
+        typedef LAFEM::SlipFilter<MemType, CoordType, IndexType, MeshType::world_dim> SlipFilterType;
+        /// Combined filter
+        typedef LAFEM::FilterChain<SlipFilterType, DirichletFilterType> FilterType;
 
         /// Finite Element space for the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
-        /// Since the functional contains a ShapeType, these have to be the same
+
+        // Since the functional contains a ShapeType, these have to be the same
         static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
         "ShapeTypes of the transformation / functional have to agree" );
 
         /// The transformation defining the physical mesh
-        TrafoType& _trafo;
+        TrafoType _trafo;
         /// The FE space for the transformation, needed for filtering
         TrafoSpace _trafo_space;
         /// The filter enforcing boundary conditions
@@ -127,13 +136,14 @@ namespace FEAST
         VectorType _grad;
         /// The functional for determining mesh quality
         FunctionalType& _functional;
+
         /// Assembler for Dirichlet boundary conditions
         Assembly::UnitFilterAssembler<MeshType> _dirichlet_asm;
+        /// Assembler for slip boundary conditions
+        Assembly::SlipFilterAssembler<MeshType> _slip_asm;
 
         // This is public for debugging purposes
       public:
-        /// Functional value before mesh optimisation.
-        CoordType initial_functional_value;
         /// Weights for the local contributions to the global functional value.
         ScalarVectorType _mu;
         /// Weights for local mesh size
@@ -141,6 +151,10 @@ namespace FEAST
         ScalarVectorType _lambda;
         /// Size parameters for the local reference element.
         VectorType _h;
+        /// List of boundary identifiers to enforce Dirichlet boundary conditions at
+        std::deque<String> _dirichlet_list;
+        /// List of boundary identifiers to enforce slip boundary conditions at
+        std::deque<String> _slip_list;
 
       public:
         /**
@@ -154,69 +168,96 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * Because no other information is given, Dirichlet boundary conditions are enforced on the whole boundary.
+         * \param[in] rmn_
+         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
          *
-         * \param[in] trafo_
-         * Reference to the underlying transformation
+         * \param[in] dirichlet_list_
+         * List of boundary identifiers for enforcing Dirichlet boundary conditions, can be empty
+         *
+         * \param[in] slip_list_
+         * List of boundary identifiers for enforcing slip boundary conditions, can be empty
          *
          * \param[in] functional_
          * Reference to the functional used
          *
          */
-        explicit RumpfSmootherBase(TrafoType_& trafo_, FunctionalType_& functional_)
-          : BaseClass(trafo_.get_mesh()),
-          _trafo(trafo_),
-          _trafo_space(trafo_),
+        explicit RumpfSmootherBase(Geometry::RootMeshNode<MeshType>* rmn_,
+        std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_,
+         FunctionalType_& functional_)
+          : BaseClass(rmn_),
+          _trafo(*(rmn_->get_mesh())),
+          _trafo_space(_trafo),
           _filter(),
-          _grad(trafo_.get_mesh().get_num_entities(0)),
+          _grad(rmn_->get_mesh()->get_num_entities(0)),
           _functional(functional_),
           _dirichlet_asm(),
-          _mu(trafo_.get_mesh().get_num_entities(ShapeType::dimension),CoordType(1)/CoordType(trafo_.get_mesh().get_num_entities(ShapeType::dimension))),
-          _lambda(trafo_.get_mesh().get_num_entities(ShapeType::dimension)),
-          _h(trafo_.get_mesh().get_num_entities(ShapeType::dimension))
+          _slip_asm(*(rmn_->get_mesh())),
+          _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
+          _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
+          _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
+          _dirichlet_list(dirichlet_list_),
+          _slip_list(slip_list_)
           {
-            /// Type for the boundary mesh
-            typedef typename Geometry::MeshPart<MeshType> BoundaryType;
-            /// Factory for the boundary mesh
-            typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
+            // Add all specified mesh parts to the Dirichlet filter assember
+            for(auto& it : this->_dirichlet_list)
+            {
+              auto* mpp = this->_mesh_node->find_mesh_part(it);
+              if(mpp != nullptr)
+                _dirichlet_asm.add_mesh_part(*mpp);
+            }
 
-            // Get the boundary set
-            BoundaryFactoryType boundary_factory(this->_mesh);
-            BoundaryType boundary(boundary_factory);
-            Geometry::TargetSet boundary_set = boundary.template get_target_set<0>();
+            // Assemble the homogeneous filter
+            _dirichlet_asm.assemble(_filter.template at<1>(), _trafo_space);
 
-            _dirichlet_asm.add_mesh_part(boundary);
-            _dirichlet_asm.assemble(_filter,_trafo_space);
+            // Add all specified mesh parts to the slip filter assember
+            for(auto& it : this->_slip_list)
+            {
+              auto* mpp = this->_mesh_node->find_mesh_part(it);
+              if(mpp != nullptr)
+                _slip_asm.add_mesh_part(*mpp);
+            }
+
 
           }
+
+        /// \brief Destructor
+        virtual ~RumpfSmootherBase()
+        {
+        };
+
         /**
-         * \brief Constructor with filter
+         * \brief Performs one-time initialisations
          *
-         * This constructor takes a filter, so that boundary conditions can be specified.
-         *
-         * \param[in] trafo_
-         * Reference to the underlying transformation
-         *
-         * \param[in] functional_
-         * Reference to the functional used
-         *
-         * \param[in] filter_
-         * The preconstructed filter
+         * These are not done in the constructor as compute_lambda() etc. could be overwritten in a derived class,
+         * potentially using uninitialised members.
          *
          */
-        explicit RumpfSmootherBase(TrafoType_& trafo_, FunctionalType_& functional_, FilterType& filter_)
-          : BaseClass(trafo_.get_mesh()),
-          _trafo(trafo_),
-          _trafo_space(trafo_),
-          _filter(std::move(filter_)),
-          _grad(trafo_.get_mesh().get_num_entities(0)),
-          _functional(functional_),
-          _dirichlet_asm(),
-          _mu(trafo_.get_mesh().get_num_entities(ShapeType::dimension),CoordType(1)/CoordType(trafo_.get_mesh().get_num_entities(ShapeType::dimension))),
-          _lambda(trafo_.get_mesh().get_num_entities(ShapeType::dimension)),
-          _h(trafo_.get_mesh().get_num_entities(ShapeType::dimension))
-          {
-          }
+        virtual void init() override
+        {
+          // Write any potential changes to the mesh
+          this->set_coords();
+          // Assemble the homogeneous filter
+          this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
+
+          // Compute desired element size distribution
+          this->compute_lambda();
+          // Compute target scales
+          this->compute_h();
+          // Compute element weights
+          this->compute_mu();
+        }
+
+        /**
+         * \brief Prepares the functional for evaluation.
+         *
+         * Needs to be called whenever any data like the mesh, the levelset function etc. changed.
+         *
+         **/
+        virtual void prepare() override
+        {
+          // The slip filter contains the outer unit normal, so reassemble it
+          _slip_asm.assemble(_filter.template at<0>(), _trafo_space);
+        }
 
         /**
          * \brief Computes a quality indicator concerning the cell sizes
@@ -237,42 +278,17 @@ namespace FEAST
         CoordType cell_size_quality()
         {
           typename LAFEM::DenseVector<Mem::Main, CoordType, Index> tmp(
-            this->_mesh.get_num_entities(ShapeType::dimension));
+            this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           CoordType my_vol(0);
 
-          for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); ++cell)
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
             my_vol = this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
             tmp(cell, Math::abs(CoordType(1) - my_vol/this->_lambda(cell)));
           }
 
-          return tmp.norm2()/Math::sqrt(CoordType(this->_mesh.get_num_entities(ShapeType::dimension)));
-        }
-
-        /// \brief Destructor
-        virtual ~RumpfSmootherBase()
-        {
-        };
-
-        /// \brief Initialises member variables required for the first application of the smoother
-        virtual void init()
-        {
-          BaseClass::init();
-          compute_lambda();
-          compute_h();
-          compute_mu();
-          initial_functional_value = compute_functional();
-        }
-
-        /**
-         * \brief Prepares the functional for evaluation.
-         *
-         * Needs to be called whenever any data like the mesh, the levelset function etc. changed.
-         *
-         **/
-        virtual void prepare()
-        {
+          return tmp.norm2()/Math::sqrt(CoordType(this->get_mesh()->get_num_entities(ShapeType::dimension)));
         }
 
         /**
@@ -292,8 +308,6 @@ namespace FEAST
          */
         virtual void compute_gradient() = 0;
 
-      protected:
-
         /**
          * \brief Computes the volume of the optimal reference for each cell and saves it to _h.
          *
@@ -312,11 +326,11 @@ namespace FEAST
         /// \brief Computes the uniformly distributed weights _lambda.
         virtual void compute_lambda_current()
         {
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // As this uses the transformation, it is always carried out in Mem::Main
           typename LAFEM::DenseVector<Mem::Main, CoordType, Index> tmp(
-            this->_mesh.get_num_entities(ShapeType::dimension));
+            this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           CoordType sum_lambda(0);
           for(Index cell(0); cell < ncells; ++cell)
@@ -334,7 +348,7 @@ namespace FEAST
         /// \brief Computes the uniformly distributed weights _lambda.
         virtual void compute_lambda_uniform()
         {
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           _lambda.format(CoordType(1)/CoordType(ncells));
         }
@@ -342,7 +356,7 @@ namespace FEAST
         /// \brief Computes the weights mu
         virtual void compute_mu()
         {
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
           _mu.format(CoordType(1)/CoordType(ncells));
         }
 
@@ -385,29 +399,26 @@ namespace FEAST
         typedef LAFEM::DenseVector<MemType, CoordType, IndexType> ScalarVectorType;
         /// Vector type for element scales etc.
         typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType, MeshType::world_dim> VectorType;
-        /// Type for the filter enforcing boundary conditions
-        typedef LAFEM::UnitFilterBlocked<MemType, CoordType, IndexType, MeshType::world_dim> FilterType;
+        /// Filter for Dirichlet boundary conditions
+        typedef LAFEM::UnitFilterBlocked<MemType, CoordType, IndexType, MeshType::world_dim> DirichletFilterType;
+        /// Filter for slip boundary conditions
+        typedef LAFEM::SlipFilter<MemType, CoordType, IndexType, MeshType::world_dim> SlipFilterType;
+        /// Combined filter
+        typedef LAFEM::FilterChain<SlipFilterType, DirichletFilterType> FilterType;
         /// Finite Element space for the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
-        /// Since the functional contains a ShapeType, these have to be the same
+        // Since the functional contains a ShapeType, these have to be the same
         static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,"ShapeTypes of the transformation / functional have to agree" );
 
       public:
         /**
-         * \copydoc RumpfSmootherBase(TrafoType_&,FunctionalType_&)
+         * \copydoc RumpfSmootherBase(Geometry::RootMeshNode<MeshType>*,std::deque<String>&,std::deque<String>&,TrafoType_&,FunctionalType_&)
          *
          */
-        explicit RumpfSmoother(TrafoType_& trafo_, FunctionalType_& functional_)
-          : BaseClass(trafo_, functional_)
-          {
-          }
-
-        /**
-         * \copydoc RumpfSmootherBase(TrafoType_&,FunctionalType_&,FilterType&)
-         *
-         */
-        explicit RumpfSmoother(TrafoType_& trafo_, FunctionalType_& functional_, FilterType& filter_)
-          : BaseClass(trafo_, functional_, filter_)
+        explicit RumpfSmoother(Geometry::RootMeshNode<MeshType>* rmn_,
+        std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_,
+        FunctionalType_& functional_)
+          : BaseClass(rmn_, dirichlet_list_, slip_list_, functional_)
           {
           }
 
@@ -416,15 +427,16 @@ namespace FEAST
         {
         };
 
+
         /// \copydoc RumpfSmootherBase::compute_functional()
         virtual CoordType compute_functional()
         {
           CoordType fval(0);
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -465,10 +477,10 @@ namespace FEAST
         {
           CoordType fval(0);
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -509,10 +521,10 @@ namespace FEAST
         virtual void compute_gradient()
         {
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -562,16 +574,6 @@ namespace FEAST
           std::cout << total_iterations << " mincg iterations, " << total_grad_evals << " grad evals, terminationtype was " << termination_type << std::endl;
         }
 
-        /**
-         * \brief Prepares the functional for evaluation.
-         *
-         * Needs to be called whenever any data like the mesh, the levelset function etc. changed.
-         *
-         **/
-        virtual void prepare()
-        {
-        }
-
     }; // class RumpfSmoother
 
     /**
@@ -610,7 +612,7 @@ namespace FEAST
       {
 
         const int world_dim(RumpfSmootherType_::MeshType::world_dim);
-        const Index num_vert(my_smoother._mesh.get_num_entities(0));
+        const Index num_vert(my_smoother.get_mesh()->get_num_entities(0));
 
         // Array for the coordinates for passing to ALGLIB's optimiser
         alglib::real_1d_array x;
@@ -648,7 +650,7 @@ namespace FEAST
         //alglib::mincgoptimize(state, ALGLIBWrapper::functional, nullptr, &my_smoother);
         //alglib::mincgresults(state, x, rep);
 
-        //std::cout << "mincg: terminationtype " << rep.terminationtype << ", " << rep.iterationscount << " its, " << rep.nfev << " grad evals" << std::endl;
+        std::cout << "mincg: terminationtype " << rep.terminationtype << ", " << rep.iterationscount << " its, " << rep.nfev << " grad evals" << std::endl;
 
         // Warning: ae_int_t to int conversions
         iteration_count = int(rep.iterationscount);
@@ -729,7 +731,7 @@ namespace FEAST
         RumpfSmootherType_* my_smoother = reinterpret_cast<RumpfSmootherType_*> (ptr);
 
         const int world_dim(RumpfSmootherType_::MeshType::world_dim);
-        const Index num_vert(my_smoother->_mesh.get_num_entities(0));
+        const Index num_vert(my_smoother->get_mesh()->get_num_entities(0));
 
         // Copy back the vertex coordinates, needed for computing the gradient on the modified mesh
         for(Index j(0); j < num_vert; ++j)

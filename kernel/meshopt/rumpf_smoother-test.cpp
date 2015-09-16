@@ -64,20 +64,21 @@ class RumpfSmootherTest_2d
 
     virtual void run() const
     {
-      // Mesh and trafo
+      // Mesh
       Geometry::ReferenceCellFactory<ShapeType, DataType> mesh_factory;
-      MeshType mesh(mesh_factory);
-      TrafoType trafo(mesh);
+      MeshType* mesh(new MeshType(mesh_factory));
+      Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
+
+      // As we set no boundary conditions, these lists remain empty
+      std::deque<String> dirichlet_list;
+      std::deque<String> slip_list;
 
       // In 2d, the cofactor matrix is not used
       DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
       FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
-      // Create empty unit filter of the correct size so we can create a smoother with no boundary conditions
-      LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> filter(mesh.get_num_entities(0));
-
       // Create the smoother
-      RumpfSmootherType rumpflpumpfl(trafo, my_functional, filter);
+      RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
 
       // It is possible to scale the reference element, but we do not want that here
       DataType scaling(1);
@@ -85,7 +86,6 @@ class RumpfSmootherTest_2d
       helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, scaling);
 
       // Since we changed the internal _coords, they have to be copied back to the mesh
-      rumpflpumpfl.set_coords();
       rumpflpumpfl.init();
 
       // Compute initial functional value
@@ -97,6 +97,8 @@ class RumpfSmootherTest_2d
 
       const DataType eps = Math::pow(Math::eps<DataType>(),DataType(0.8));
       TEST_CHECK_EQUAL_WITHIN_EPS(fval_pre, fval_post, eps);
+
+      delete rmn;
 
     }
 };
@@ -125,20 +127,8 @@ using MyFunctionalQ1Hack_D2 = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::Rump
 
 RumpfSmootherTest_2d<float, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack> test_q1hack_f_1;
 RumpfSmootherTest_2d<double, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack> test_q1hack_d_1;
-
-/// \compilerhack
-// The MSVC CTP_Nov2013 contains a bug that causes the compiler to skip template aliases when generating its
-// COMDATs (compiler generated decorated function names) so it cannot distinguish between these function names and
-// the ones above. The bug has been fixed in the regular version of the compiler (which we cannot use due to missing
-// C++11 features), but not in the CTP_Nov2013 version.
-//
-// See http://blogs.msdn.com/b/vcblog/archive/2014/08/04/bugs-fixed-in-visual-studio-2013-update-3.aspx
-//
-// Compiler hack to be removed once the new (Visual Studio 201{>13}) compiler is deployed.
-//#ifndef FEAST_COMPILER_MICROSOFT
 RumpfSmootherTest_2d<double, Shape::Hypercube<2>, MyFunctionalQ1Hack_D2, MySmootherQ1Hack> test_q1hack_d_2;
 RumpfSmootherTest_2d<float, Shape::Hypercube<2>, MyFunctionalQ1Hack_D2, MySmootherQ1Hack> test_q1hack_f_2;
-//#endif
 
 /// \brief Specialisation for hypercubes
 template<int shape_dim_>

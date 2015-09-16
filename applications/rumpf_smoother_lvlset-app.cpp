@@ -1,6 +1,9 @@
 #include <kernel/base_header.hpp>
+#ifdef FEAST_HAVE_ALGLIB
+#include <kernel/assembly/common_functions.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/export_vtk.hpp>
 #include <kernel/meshopt/rumpf_smoother_conc.hpp>
 #include <kernel/meshopt/rumpf_smoother_lvlset.hpp>
 #include <kernel/meshopt/rumpf_smoother_lvlset_q1hack.hpp>
@@ -14,11 +17,8 @@
 #include <kernel/meshopt/rumpf_functionals/conc_2d_p1_d2.hpp>
 #include <kernel/meshopt/rumpf_functionals/conc_2d_q1_d1.hpp>
 #include <kernel/meshopt/rumpf_functionals/conc_2d_q1_d2.hpp>
-#include <kernel/geometry/export_vtk.hpp>
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/util/simple_arg_parser.hpp>
 
-//#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_monitor_2d_q1.hpp>
-//#include <kernel/geometry/mesh_smoother/rumpf_functional_lvlset_monitor_2d_p1.hpp>
 using namespace FEAST;
 
 namespace FEAST
@@ -235,37 +235,79 @@ namespace FEAST
 template
 <
   typename DT_,
-  typename ShapeType_,
+  typename MeshType_,
   template<typename ... > class RumpfSmootherType_,
   template<typename, typename> class FunctionalType_,
   template<typename, typename> class LevelsetFunctionalType_
-> struct LevelsetApp
+  > struct LevelsetApp
 {
-  /**
-   * \brief Runs mesh smoother stuff
-   *
-   **/
-  static void run(Index level, DT_ deltat)
-  {
-    /// Precision for meshes etc, everything else uses the same data type
-    typedef DT_ DataType;
-    /// Rumpf Smoothers are implemented for Mem::Main only
-    typedef Mem::Main MemType;
-    /// So we use Index
-    typedef Index IndexType;
-    /// Shape of the mesh cells
-    typedef ShapeType_ ShapeType;
-    /// The full mesh type
-    typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension,ShapeType::dimension, DataType> MeshType;
-    /// The transformation
-    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-    /// The Rumpf functional variant
-    typedef FunctionalType_<DataType, ShapeType> FunctionalType;
-    /// The levelset part of the Rumpf functional
-    typedef LevelsetFunctionalType_<DataType, ShapeType> LevelsetFunctionalType;
+  /// Precision for meshes etc, everything else uses the same data type
+  typedef DT_ DataType;
+  /// Rumpf Smoothers are implemented for Mem::Main only
+  typedef Mem::Main MemType;
+  /// So we use Index
+  typedef Index IndexType;
+  /// The type of the mesh
+  typedef MeshType_ MeshType;
+  /// Shape of the mesh cells
+  typedef typename MeshType::ShapeType ShapeType;
+  /// The corresponding transformation
+  typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+  /// The Rumpf functional variant
+  typedef FunctionalType_<DataType, ShapeType> FunctionalType;
+  /// The levelset part of the Rumpf functional
+  typedef LevelsetFunctionalType_<DataType, ShapeType> LevelsetFunctionalType;
+  /// Type for points in the mesh
+  typedef Tiny::Vector<DataType,2,2> ImgPointType;
 
-    /// Type for points in the domain
-    typedef Tiny::Vector<DataType,2,2> ImgPointType;
+  /**
+   * \brief Routine that does the actual work
+   *
+   * \param[in] my_streamer
+   * MeshStreamer that contains the data from the mesh file.
+   *
+   * \param[in] level
+   * Number of refines.
+   */
+  static int run(MeshStreamer& my_streamer, Index level, DT_ deltat)
+  {
+    // Read mesh from the MeshStreamer and create the MeshAtlas
+    std::cout << "Creating mesh atlas..." << std::endl;
+    Geometry::MeshAtlas<MeshType_>* atlas = nullptr;
+    try
+    {
+      atlas = new Geometry::MeshAtlas<MeshType_>(my_streamer);
+    }
+    catch(std::exception& exc)
+    {
+      std::cerr << "ERROR: " << exc.what() << std::endl;
+      return 1;
+    }
+
+    // Create mesh node
+    std::cout << "Creating mesh node..." << std::endl;
+    Geometry::RootMeshNode<MeshType_>* rmn = nullptr;
+    try
+    {
+      rmn = new Geometry::RootMeshNode<MeshType_>(my_streamer, atlas);
+      rmn ->adapt();
+    }
+    catch(std::exception& exc)
+    {
+      std::cerr << "ERROR: " << exc.what() << std::endl;
+      return 1;
+    }
+
+    // refine
+    for(Index lvl(1); lvl <= level; ++lvl)
+    {
+      std::cout << "Refining up to level " << lvl << "..." << std::endl;
+      auto* old = rmn;
+      rmn = old->refine();
+      delete old;
+    }
+
+    MeshType* mesh = rmn->get_mesh();
 
     typedef Assembly::Common::DistanceFunctionSD<ImgPointType> AnalyticFunctionType;
     typedef Assembly::Common::DistanceFunctionSD_grad<ImgPointType, 0> AnalyticFunctionGrad0Type;
@@ -302,13 +344,6 @@ template
       LevelsetFunctionalType
     > RumpfSmootherType;
 
-    // Factory to build a unit cube mesh
-    Geometry::RefineFactory<MeshType,Geometry::UnitCubeFactory> mesh_factory(level);
-    // Create the mesh
-    MeshType mesh(mesh_factory);
-    // Create the transformation
-    TrafoType trafo(mesh);
-
     // Parameters for the funcitional
     DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
     // Create the functional
@@ -320,9 +355,18 @@ template
     // Create levelset part of the functional
     LevelsetFunctionalType my_levelset_functional;
 
+    std::deque<String> slip_list;
+    slip_list.push_back("left");
+    slip_list.push_back("right");
+
+    std::deque<String> dirichlet_list;
+    dirichlet_list.push_back("bottom");
+    dirichlet_list.push_back("top");
+
     // The smoother in all its template glory
-    RumpfSmootherType rumpflpumpfl(trafo, my_functional, my_levelset_functional, align_to_lvlset, r_adaptivity,
-    analytic_lvlset, analytic_lvlset_grad0, analytic_lvlset_grad1);
+    RumpfSmootherType rumpflpumpfl(rmn, slip_list, dirichlet_list, my_functional, my_levelset_functional,
+    align_to_lvlset, r_adaptivity, analytic_lvlset, analytic_lvlset_grad0, analytic_lvlset_grad1);
+    rumpflpumpfl.init();
 
     //rumpflpumpfl._update_h = true;
 
@@ -333,13 +377,11 @@ template
     std::cout << __func__ << " at refinement level " << level << std::endl;
     rumpflpumpfl.print();
 
-    rumpflpumpfl.init();
-
     // Arrays for saving the contributions of the different Rumpf functional parts
-    DataType* func_norm(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
-    DataType* func_det(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
-    DataType* func_rec_det(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
-    DataType* func_lvlset(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
+    DataType* func_norm(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
+    DataType* func_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
+    DataType* func_rec_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
+    DataType* func_lvlset(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
 
     // Evaluates the levelset function and its gradient
     rumpflpumpfl.prepare();
@@ -354,16 +396,14 @@ template
     std::string filename;
 
     // Write initial state to file
-    Geometry::ExportVTK<MeshType> writer_pre_initial(mesh);
-    writer_pre_initial.add_scalar_cell("norm", func_norm);
-    writer_pre_initial.add_scalar_cell("det", func_det);
-    writer_pre_initial.add_scalar_cell("rec_det", func_rec_det);
+    Geometry::ExportVTK<MeshType> writer_pre_initial(*mesh);
     writer_pre_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-    writer_pre_initial.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
     writer_pre_initial.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-    writer_pre_initial.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_pre_initial.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
     writer_pre_initial.add_field_vertex("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements(), rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+    writer_pre_initial.add_field_cell("fval", func_norm, func_det, func_rec_det);
     writer_pre_initial.add_scalar_cell("levelset_constraint", func_lvlset );
+    writer_pre_initial.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_pre_initial.write("pre_initial");
 
     // Optimise the mesh
@@ -378,27 +418,25 @@ template
     rumpflpumpfl.compute_gradient();
 
     // Write optimised initial mesh
-    Geometry::ExportVTK<MeshType> writer_post_initial(mesh);
-    writer_post_initial.add_scalar_cell("norm", func_norm);
-    writer_post_initial.add_scalar_cell("det", func_det);
-    writer_post_initial.add_scalar_cell("rec_det", func_rec_det);
+    Geometry::ExportVTK<MeshType> writer_post_initial(*mesh);
     writer_post_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
     writer_post_initial.add_field_cell_blocked_vector("h", rumpflpumpfl._h );
-    writer_post_initial.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_post_initial.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
     writer_post_initial.add_field_vertex("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements(), rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+    writer_post_initial.add_field_cell("fval", func_norm, func_det, func_rec_det);
     writer_post_initial.add_scalar_cell("levelset_constraint", func_lvlset );
+    writer_post_initial.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_post_initial.write("post_initial");
 
     DataType time(0);
     Index n(0);
 
     // Old mesh coordinates for computing the mesh velocity
-    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim> coords_old(mesh.get_num_entities(0),DataType(0));
-    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim> mesh_velocity(mesh.get_num_entities(0), DataType(0));
+    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim> coords_old(mesh->get_num_entities(0),DataType(0));
+    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim> mesh_velocity(mesh->get_num_entities(0), DataType(0));
 
     std::cout << "deltat = " << scientify(deltat) << std::endl;
-    while(time < DataType(1))
+    while(time < DataType(deltat))
     {
       std::cout << "timestep " << n << std::endl;
       time+= deltat;
@@ -421,18 +459,15 @@ template
 
       // Write pre-optimisation mesh
       filename = "pre_" + stringify(n);
-      Geometry::ExportVTK<MeshType> writer_pre(mesh);
-
-      writer_pre.add_scalar_cell("norm", func_norm);
-      writer_pre.add_scalar_cell("det", func_det);
-      writer_pre.add_scalar_cell("rec_det", func_rec_det);
+      Geometry::ExportVTK<MeshType> writer_pre(*mesh);
       writer_pre.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
       writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
       writer_pre.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
       writer_pre.add_field_vertex("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements(),
       rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+      writer_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
       writer_pre.add_scalar_cell("levelset_constraint", func_lvlset );
+      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
       writer_pre.write(filename);
 
       // Optimise the mesh
@@ -441,7 +476,7 @@ template
       // Compute grid velocity
       DataType max_mesh_velocity(-1e10);
       DataType ideltat = DataType(1)/deltat;
-      for(Index i(0); i < mesh.get_num_entities(0); ++i)
+      for(Index i(0); i < mesh->get_num_entities(0); ++i)
       {
         mesh_velocity(i, ideltat*(rumpflpumpfl._coords(i) - coords_old(i)));
 
@@ -459,7 +494,7 @@ template
       << scientify(rumpflpumpfl.cell_size_quality()) << std::endl;
 
       filename = "post_" + stringify(n);
-      Geometry::ExportVTK<MeshType> writer_post(mesh);
+      Geometry::ExportVTK<MeshType> writer_post(*mesh);
       writer_post.add_scalar_cell("norm", func_norm);
       writer_post.add_scalar_cell("det", func_det);
       writer_post.add_scalar_cell("rec_det", func_rec_det);
@@ -477,10 +512,15 @@ template
     } // time loop
 
     // Clean up
-    delete func_norm;
-    delete func_det;
-    delete func_rec_det;
-    delete func_lvlset;
+    delete rmn;
+    if(atlas != nullptr)
+      delete atlas;
+    delete[] func_norm;
+    delete[] func_det;
+    delete[] func_rec_det;
+    delete[] func_lvlset;
+
+    return 0;
 
   }
 
@@ -498,16 +538,90 @@ using MyFunctional= Meshopt::RumpfFunctionalConc_D2<A, B>;
 template<typename A, typename B>
 using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctionalConc>;
 
-int main()
+/**
+ * \cond internal
+ *
+ * RumpfSmootherLevelset demo application
+ *
+ */
+int main(int argc, char* argv[])
 {
+  // Creata a parser for command line arguments.
+  SimpleArgParser args(argc, argv);
+
+  if( args.check("help") > -1 || args.num_args()==1)
+  {
+    std::cout << "Rumpf Smoother Application for Levelset usage: " << std::endl;
+    std::cout << "Required arguments: --filename [String]: Path to a FEAST mesh file." << std::endl;
+    std::cout << "Optional arguments: --level [unsigned int]: Number of refines, defaults to 0." << std::endl;
+    exit(1);
+  }
+  // Specify supported command line switches
+  args.support("level");
+  args.support("filename");
+  args.support("help");
+  // Refinement level
+  Index lvl_max(0);
+  // Input file name, required
+  FEAST::String filename;
+  // Get unsupported command line arguments
+  std::deque<std::pair<int,String> > unsupported = args.query_unsupported();
+  if( !unsupported.empty() )
+  {
+    // print all unsupported options to cerr
+    for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
+  }
+
+  // Check and parse --filename
+  if(args.check("filename") != 1 )
+    throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --filename");
+  else
+  {
+    args.parse("filename", filename);
+    std::cout << "Reading mesh from file " << filename << std::endl;
+  }
+
+  // Check and parse --level
+  if(args.check("level") != 1)
+    std::cout << "No refinement level specified, defaulting to 0." << std::endl;
+  else
+  {
+    args.parse("level", lvl_max);
+    std::cout << "Refinement level " << lvl_max << std::endl;
+  }
+
+  // Create a MeshStreamer and read the mesh file
+  MeshStreamer my_streamer;
+  my_streamer.parse_mesh_file(filename);
+
+  // This is the raw mesh data my_streamer read from filename
+  auto& mesh_data = my_streamer.get_root_mesh_node()->mesh_data;
+  // Marker int for the MeshType
+  int mesh_type = mesh_data.mesh_type;
+  // Marker int for the ShapeType
+  int shape_type = mesh_data.shape_type;
+
+  ASSERT(mesh_type == mesh_data.mt_conformal, "This application only works for conformal meshes!");
 
   typedef double DataType;
 
-  // Refinement level
-  Index level(5);
-  // Timestep size
-  DataType deltat(DataType(0.025));
+  DataType deltat(DataType(1e-2));
 
-  LevelsetApp<DataType, Shape::Hypercube<2>, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::run(level, deltat);
-  return 0;
+  // This is the list of all supported meshes that could appear in the mesh file
+  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> Simplex2Mesh_2d;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> Hypercube2Mesh_2d;
+
+  // Call the run() method of the appropriate wrapper class
+  if(shape_type == mesh_data.st_tria)
+    return LevelsetApp<DataType, Simplex2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
+      run(my_streamer, lvl_max, deltat);
+  if(shape_type == mesh_data.st_quad)
+    return LevelsetApp<DataType, Hypercube2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
+      run(my_streamer, lvl_max, deltat);
+
+  // If no MeshType from the list was in the file, return 1
+  return 1;
 }
+/// \endcond
+#endif

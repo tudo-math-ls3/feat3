@@ -3,7 +3,7 @@
 #define KERNEL_MESHOPT_MESH_SMOOTHER_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/mesh_node.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
@@ -47,46 +47,57 @@ namespace FEAST
 
       public:
         /// The mesh for the underlying transformation
-        MeshType& _mesh;
+        Geometry::RootMeshNode<MeshType>* _mesh_node;
         /// Coordinates, used for setting new boundary values etc.
         VertexVectorType _coords;
 
       public:
         /// \brief Constructor
-        explicit MeshSmoother(MeshType& mesh_) :
-          _mesh(mesh_),
-          _coords(mesh_.get_num_entities(0), CoordType(0))
+        explicit MeshSmoother(Geometry::RootMeshNode<MeshType>* mesh_node_) :
+          _mesh_node(mesh_node_),
+          _coords(mesh_node_->get_mesh()->get_num_entities(0), CoordType(0))
           {
+            get_coords();
           }
 
         /// \brief Virtual destructor
         virtual ~MeshSmoother()
         {
+          // Just set it to nullptr since we did not allocate the memory for this
+          _mesh_node = nullptr;
         }
 
-        /// \brief Initialises parts of the MeshSmoother not set in in the constructor
-        virtual void init()
+        /// \returns The root mesh
+        MeshType* get_mesh()
         {
-          get_coords();
+          return _mesh_node->get_mesh();
         }
 
         /// \brief Gets the coordinates from the underlying mesh and saves them in _coords.
         virtual void get_coords()
         {
-          const typename MeshType::VertexSetType& vertex_set = _mesh.get_vertex_set();
+          const typename MeshType::VertexSetType& vertex_set = get_mesh()->get_vertex_set();
 
-          for(Index i(0); i < _mesh.get_num_entities(0); ++i)
+          for(Index i(0); i < get_mesh()->get_num_entities(0); ++i)
             _coords(i, vertex_set[i]);
         }
 
         /// \brief Sets the coordinates in the underlying mesh to _coords.
         virtual void set_coords()
         {
-          typename MeshType::VertexSetType& vertex_set = _mesh.get_vertex_set();
+          typename MeshType::VertexSetType& vertex_set = get_mesh()->get_vertex_set();
 
-          for(Index i(0); i < _mesh.get_num_entities(0); ++i)
+          for(Index i(0); i < get_mesh()->get_num_entities(0); ++i)
             vertex_set[i] = _coords(i);
         }
+
+        /**
+         * \brief Performs one-time initialisations
+         *
+         * Because of the whole class inheritance hierarchy, some one time initialisations cannot be performed in the
+         * constructors.
+         */
+        virtual void init() = 0;
 
         /// \brief Optimises the mesh according to the criteria implemented in the mesh smoother.
         virtual void optimise() = 0;

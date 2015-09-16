@@ -119,9 +119,6 @@ namespace FEAST
         /**
          * \copydoc RumpfSmoother(TrafoType_&, FunctionalType_&)
          *
-         * \param[in] trafo_
-         * Reference to the underlying transformation
-         *
          * \param[in] functional_
          * Reference to the functional used
          *
@@ -135,14 +132,16 @@ namespace FEAST
          * Use levelset-based r_adaptivity?
          *
          **/
-        explicit RumpfSmootherLevelset(TrafoType_& trafo_, FunctionalType_& functional_,
-        LevelsetFunctionalType_& lvlset_functional_, bool align_to_lvlset_, bool r_adaptivity_)
-          : BaseClass(trafo_, functional_),
+        explicit RumpfSmootherLevelset(Geometry::RootMeshNode<MeshType>* rmn_,
+        std::deque<String>& slip_list_, std::deque<String>& dirichlet_list_,
+        FunctionalType_& functional_, LevelsetFunctionalType_& lvlset_functional_,
+        bool align_to_lvlset_, bool r_adaptivity_)
+          : BaseClass(rmn_, slip_list_, dirichlet_list_, functional_),
           _lvlset_functional(lvlset_functional_),
-          _lvlset_space(trafo_),
+          _lvlset_space(BaseClass::_trafo),
           _lvlset_vec(_lvlset_space.get_num_dofs()),
-          _lvlset_vtx_vec(trafo_.get_mesh().get_num_entities(0)),
-          _coords_org(trafo_.get_mesh().get_num_entities(0)),
+          _lvlset_vtx_vec(rmn_->get_mesh()->get_num_entities(0)),
+          _coords_org(rmn_->get_mesh()->get_num_entities(0)),
           _align_to_lvlset(align_to_lvlset_),
           _r_adaptivity(r_adaptivity_),
           _update_h(false),
@@ -167,6 +166,38 @@ namespace FEAST
         {
         };
 
+        /**
+         * \brief Performs one-time initialisations
+         *
+         * These are not done in the constructor as compute_lambda() etc. could be overwritten in a derived class,
+         * potentially using uninitialised members.
+         *
+         */
+        virtual void init() override
+        {
+          // Write any potential changes to the mesh
+          this->set_coords();
+
+          //// Save original coordinates
+          //const typename MeshType::VertexSetType& vertex_set = this->get_mesh()->get_vertex_set();
+
+          //for(Index i(0); i < this->get_mesh()->get_num_entities(0); ++i)
+          //  _coords_org(i,vertex_set[i]);
+
+          // Assemble the homogeneous filter
+          this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
+
+          // Call prepare to evaluate the levelset function
+          prepare();
+
+          // Compute desired element size distribution
+          this->compute_lambda();
+          // Compute target scales
+          this->compute_h();
+          // Compute element weights
+          this->compute_mu();
+        }
+
         /// \copydoc RumpfSmoother::print()
         virtual void print() override
         {
@@ -186,23 +217,6 @@ namespace FEAST
           this->_functional.print();
         }
 
-        /// \brief Initialises member variables required for the first application of the smoother
-        virtual void init() override
-        {
-          BaseClass::init();
-
-          // Save original coordinates
-          const typename MeshType::VertexSetType& vertex_set = this->_mesh.get_vertex_set();
-
-          for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
-              _coords_org(i,vertex_set[i]);
-
-          this->prepare();
-          this->compute_lambda();
-          this->compute_h();
-          this->initial_functional_value = compute_functional();
-        }
-
         /// \copydoc RumpfSmoother::compute_functional()
         ///
         /// Variant containing the levelset penalty term
@@ -210,10 +224,10 @@ namespace FEAST
         {
           CoordType fval(0);
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -273,10 +287,10 @@ namespace FEAST
         {
           CoordType fval(0);
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -335,10 +349,10 @@ namespace FEAST
         virtual void compute_gradient() override
         {
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -415,7 +429,7 @@ namespace FEAST
           // coords_new = relaxation_parameter*coords + (1 - relaxation_parameter)*coords_old
           CoordType relaxation_parameter(0.9);
 
-          for(Index iter(0); iter < 100; ++iter)
+          for(Index iter(0); iter < 10; ++iter)
           {
             diff = CoordType(0);
             int iterations(0);
@@ -428,12 +442,12 @@ namespace FEAST
             total_grad_evals += grad_evals;
             total_iterations += iterations;
 
-            for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
+            for(Index i(0); i < this->get_mesh()->get_num_entities(0); ++i)
             {
               for(int d(0); d < MeshType::world_dim; ++d)
                 diff+= Math::sqr(this->_coords_org(i)(d) - this->_coords(i)(d));
             }
-            diff = Math::sqrt(diff/CoordType(this->_mesh.get_num_entities(0)));
+            diff = Math::sqrt(diff/CoordType(this->get_mesh()->get_num_entities(0)));
 
             // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
             this->_coords_org.scale(this->_coords_org,CoordType(1)-relaxation_parameter);
@@ -442,7 +456,7 @@ namespace FEAST
             this->set_coords();
 
             // DEBUG
-            // std::cout << "Fixed point iteration " << iter <<", diff = " << scientify(diff) << ", mincg iterations: " << iterations << ", grad evals: " << grad_evals << std::endl;
+            std::cout << "Fixed point iteration " << iter <<", diff = " << scientify(diff) << ", mincg iterations: " << iterations << ", grad evals: " << grad_evals << std::endl;
 
             if(diff <= tol)
             {
@@ -462,9 +476,6 @@ namespace FEAST
           int total_grad_evals(0);
           int total_iterations(0);
           int termination_type(0);
-
-          // Copy original coordinates if we want to start from the original grid
-          this->_coords_org.clone(this->_coords);
 
           this->prepare();
           this->compute_lambda();
@@ -554,6 +565,8 @@ namespace FEAST
          **/
         virtual void prepare() override
         {
+          BaseClass::prepare();
+
           // Project the levelset function to a grid vector on the new grid and...
           FEAST::Assembly::DiscreteVertexProjector::project(_lvlset_vtx_vec, _lvlset_vec, _lvlset_space);
 
@@ -565,11 +578,6 @@ namespace FEAST
           if(this->_update_h && this->_r_adaptivity)
           {
             this->compute_lambda();
-
-            // DEBUG
-            //for(Index cell(0); cell < this->_mesh.get_num_entities(ShapeType::dimension); cell++ )
-            //  this->_mu(cell,this->_lambda(cell));
-
             this->compute_h();
           }
         }
@@ -594,9 +602,9 @@ namespace FEAST
         virtual void compute_lambda_lvlset()
         {
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -688,6 +696,8 @@ namespace FEAST
       public:
         /// Type for the transformation
         typedef TrafoType_ TrafoType;
+        /// Type for the underlying mesh
+        typedef typename TrafoType_::MeshType MeshType;
 
         /// Baseclass
         typedef RumpfSmootherLevelset
@@ -719,21 +729,24 @@ namespace FEAST
          * The second component of the gradient
          *
          **/
-        explicit RumpfSmootherLevelsetAnalytic(
-          TrafoType_& trafo_,
-          FunctionalType_& functional_,
-          LevelsetFunctionalType_& lvlset_functional_,
-          bool align_to_lvlset_,
-          bool r_adaptivity_,
+        explicit RumpfSmootherLevelsetAnalytic( Geometry::RootMeshNode<MeshType>* rmn_,
+          std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_,
+          FunctionalType_& functional_, LevelsetFunctionalType_& lvlset_functional_,
+          bool align_to_lvlset_, bool r_adaptivity_,
           AnalyticFunctionType_& analytic_function_,
-          AnalyticFunctionGrad0Type_& analytic_function_grad0_,
-          AnalyticFunctionGrad1Type_& analytic_function_grad1_)
-          : BaseClass(trafo_, functional_, lvlset_functional_, align_to_lvlset_, r_adaptivity_),
+          AnalyticFunctionGrad0Type_& analytic_function_grad0_, AnalyticFunctionGrad1Type_& analytic_function_grad1_)
+          : BaseClass(rmn_, dirichlet_list_, slip_list_, functional_, lvlset_functional_,
+          align_to_lvlset_, r_adaptivity_),
           _analytic_lvlset(analytic_function_),
           _analytic_lvlset_grad0(analytic_function_grad0_),
           _analytic_lvlset_grad1(analytic_function_grad1_)
           {
           }
+
+        /// \brief Virtual destructor
+        virtual ~RumpfSmootherLevelsetAnalytic()
+        {
+        }
 
         /**
          * \copydoc RumpfSmootherLevelset::prepare()
@@ -752,7 +765,6 @@ namespace FEAST
           Assembly::Interpolator::project(this->_lvlset_grad_vec[1], _analytic_lvlset_grad1, this->_lvlset_space);
           // BaseClass::prepare handles projection to grid vectors etc.
           BaseClass::prepare();
-
         }
     }; // class RumpfSmootherLevelsetAnalytic
 

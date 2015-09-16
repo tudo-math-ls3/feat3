@@ -77,24 +77,17 @@ namespace FEAST
 
 
         /// \copydoc BaseClass::RumpfSmootherLevelsetAnalytic()
-        explicit RumpfSmootherLevelsetAnalyticQ1Hack(
-          TrafoType_& trafo_,
-          FunctionalType_& functional_,
-          LevelsetFunctionalType_& lvlset_functional_,
-          bool align_to_lvlset_,
-          bool r_adaptivity_,
+        explicit RumpfSmootherLevelsetAnalyticQ1Hack(Geometry::RootMeshNode<MeshType>* rmn_,
+        std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_,
+          TrafoType_& trafo_, FunctionalType_& functional_, LevelsetFunctionalType_& lvlset_functional_,
+          bool align_to_lvlset_, bool r_adaptivity_,
           AnalyticFunctionType_& analytic_function_,
           AnalyticFunctionGrad0Type_& analytic_function_grad0_,
           AnalyticFunctionGrad1Type_& analytic_function_grad1_)
-          : BaseClass(
-            trafo_,
-            functional_,
-            lvlset_functional_,
-            align_to_lvlset_,
-            r_adaptivity_ ,
-            analytic_function_,
-            analytic_function_grad0_,
-            analytic_function_grad1_)
+          : BaseClass(rmn_, dirichlet_list_, slip_list_,
+            trafo_, functional_, lvlset_functional_,
+            align_to_lvlset_, r_adaptivity_ ,
+            analytic_function_, analytic_function_grad0_, analytic_function_grad1_)
             {
             }
 

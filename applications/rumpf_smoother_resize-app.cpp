@@ -1,6 +1,5 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/math.hpp>
-#include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/reference_cell_factory.hpp>
 #include <kernel/meshopt/rumpf_smoother.hpp>
@@ -60,10 +59,10 @@ template
   {
     /// Precision for meshes etc, everything else uses the same data type
     typedef DT_ DataType;
-    /// Rumpf Smoothers are implemented for Mem::Main only
-    typedef Mem::Main MemType;
-    /// So we use Index
-    typedef Index IndexType;
+    // Rumpf Smoothers are implemented for Mem::Main only
+    //typedef Mem::Main MemType;
+    // So we use Index
+    //typedef Index IndexType;
     /// Shape of the mesh cells
     typedef ShapeType_ ShapeType;
     /// The complete mesh type
@@ -78,9 +77,9 @@ template
     // Create a single reference cell of the shape type
     Geometry::ReferenceCellFactory<ShapeType, DataType> mesh_factory;
     // Create the mesh
-    MeshType mesh(mesh_factory);
-    // Create the transformation
-    TrafoType trafo(mesh);
+    MeshType* mesh(new MeshType(mesh_factory));
+
+    Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
 
     // Parameters for the Rumpf functional
     DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(0e0));
@@ -88,11 +87,12 @@ template
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
     // This is the correct scaling for the Q1Hack with _D2 functional
     //my_functional._fac_rec_det = DataType(1);
-    // Create empty unit filter of the correct size so we can create a smoother with no boundary conditions
-    LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> filter(mesh.get_num_entities(0));
 
+    // As we set no boundary conditions, these lists remain empty
+    std::deque<String> dirichlet_list;
+    std::deque<String> slip_list;
     // Create the smoother
-    RumpfSmootherType rumpflpumpfl(trafo, my_functional, filter);
+    RumpfSmootherType rumpflpumpfl(rmn, slip_list, dirichlet_list, my_functional);
     // Print information
     rumpflpumpfl.print();
 
@@ -101,8 +101,8 @@ template
     helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, target_scaling);
 
     // Since we changed the internal _coords, they have to be copied back to the mesh
-    rumpflpumpfl.set_coords();
     rumpflpumpfl.init();
+
     // This is the correct scaling for the Q1Hack with _D2 functional
     //Tiny::Vector<DataType, MeshType::world_dim> tmp;
     //tmp(0) = target_scaling*DataType(4)/Math::sqrt(DataType(3));
@@ -117,9 +117,9 @@ template
     rumpflpumpfl.set_coords();
 
     // Arrays for saving the contributions of the different Rumpf functional parts
-    DataType* func_norm(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
-    DataType* func_det(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
-    DataType* func_rec_det(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
+    DataType* func_norm(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
+    DataType* func_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
+    DataType* func_rec_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
 
     // Compute initial functional value
     DataType fval(0);
@@ -132,12 +132,10 @@ template
     std::string filename;
     // Write initial state to file
     filename = "pre_" + helperclass<ShapeType>::print_typename();
-    Geometry::ExportVTK<MeshType> writer_initial_pre(mesh);
-    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-    writer_initial_pre.add_scalar_cell("norm_A", func_norm);
-    writer_initial_pre.add_scalar_cell("det_A", func_det);
-    writer_initial_pre.add_scalar_cell("rec_det_A", func_rec_det);
+    Geometry::ExportVTK<MeshType> writer_initial_pre(*mesh);
     writer_initial_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
+    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_initial_pre.write(filename);
 
     // Smooth the mesh
@@ -153,15 +151,20 @@ template
 
     // Write optimised initial mesh
     filename = "post_" + helperclass<ShapeType>::print_typename();
-    Geometry::ExportVTK<MeshType> writer_initial_post(mesh);
-    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-    writer_initial_post.add_scalar_cell("norm_A", func_norm);
-    writer_initial_post.add_scalar_cell("det_A", func_det);
-    writer_initial_post.add_scalar_cell("rec_det_A", func_rec_det);
+    Geometry::ExportVTK<MeshType> writer_initial_post(*mesh);
     writer_initial_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
+    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_initial_post.write(filename);
 
+    // Clean up
+    delete rmn;
+    delete[] func_norm;
+    delete[] func_det;
+    delete[] func_rec_det;
+
   }
+
 };
 
 // Template aliases to easier switch between variants
@@ -171,7 +174,7 @@ template<typename A, typename B>
 using MySmoother = Meshopt::RumpfSmoother<A, B>;
 
 template<typename A, typename B>
-using MyFunctional = Meshopt::RumpfFunctional_D2<A, B>;
+using MyFunctional = Meshopt::RumpfFunctional<A, B>;
 
 // Using the Q1 hack
 template<typename A, typename B>
@@ -179,11 +182,11 @@ using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
 
 // For the Q1 hack, the functional is a bit more complicated
 template<typename A, typename B>
-using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, MyFunctional>;
+using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
 
 int main()
 {
-  ResizeApp<double, Shape::Hypercube<2>, MyFunctional, MySmoother>::run();
+  ResizeApp<double, Shape::Simplex<2>, MyFunctional, MySmoother>::run();
   return 0;
 }
 
@@ -208,7 +211,7 @@ struct helperclass< FEAST::Shape::Hypercube<shape_dim_> >
   // Prints the ShapeType
   static std::string print_typename()
   {
-    return "Hypercube<" + stringify(shape_dim_) +">";
+    return "Hypercube_" + stringify(shape_dim_);
   }
 };
 
@@ -234,6 +237,6 @@ struct helperclass< FEAST::Shape::Simplex<2> >
   // Prints the ShapeType
   static std::string print_typename()
   {
-    return "Simplex<2>";
+    return "Simplex_2";
   }
 };

@@ -137,7 +137,11 @@ template
     }
 
     MeshType* mesh = rmn->get_mesh();
-    TrafoType trafo(*mesh);
+
+    std::deque<String> dirichlet_list;
+    std::deque<String> slip_list;
+    slip_list.push_back("inner");
+    slip_list.push_back("outer");
 
     // This is the centre reference point
     ImgPointType x_0(DataType(0));
@@ -159,12 +163,12 @@ template
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     // The smoother in all its template glory
-    RumpfSmootherType rumpflpumpfl(trafo, my_functional);
+    RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
+    rumpflpumpfl.init();
 
     // Print lotsa information
     std::cout << __func__ << " at refinement level " << lvl_max << std::endl;
 
-    rumpflpumpfl.init();
     rumpflpumpfl.print();
 
     // Arrays for saving the contributions of the different Rumpf functional parts
@@ -182,31 +186,27 @@ template
 
     // Write initial state to file
     Geometry::ExportVTK<MeshType> writer_initial_pre(*mesh);
-    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-    writer_initial_pre.add_scalar_cell("norm_A", func_norm);
-    writer_initial_pre.add_scalar_cell("det_A", func_det);
-    writer_initial_pre.add_scalar_cell("rec_det_A", func_rec_det);
     writer_initial_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
+    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_initial_pre.write("pre_initial");
 
     // Smooth the mesh
     rumpflpumpfl.optimise();
 
-    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-    std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
-
     // Call prepare() again because the mesh changed due to the optimisation and it was not called again after the
     // last iteration
     rumpflpumpfl.prepare();
+    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
     rumpflpumpfl.compute_gradient();
+
+    std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
 
     // Write optimised initial mesh
     Geometry::ExportVTK<MeshType> writer_initial_post(*mesh);
-    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-    writer_initial_post.add_scalar_cell("norm_A", func_norm);
-    writer_initial_post.add_scalar_cell("det_A", func_det);
-    writer_initial_post.add_scalar_cell("rec_det_A", func_rec_det);
     writer_initial_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
+    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_initial_post.write("post_initial");
 
     // For saving the old coordinates
@@ -296,26 +296,28 @@ template
       // Write new boundary to mesh
       rumpflpumpfl.set_coords();
 
-      // Write pre-optimisation mesh
-      filename = "pre_" + stringify(n);
-      Geometry::ExportVTK<MeshType> writer_pre(*mesh);
-
       rumpflpumpfl.prepare();
       fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
       rumpflpumpfl.compute_gradient();
       std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
 
-      writer_pre.add_scalar_cell("norm", func_norm);
-      writer_pre.add_scalar_cell("det", func_det);
-      writer_pre.add_scalar_cell("rec_det", func_rec_det);
-      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+      // Write pre-optimisation mesh
+      filename = "pre_" + stringify(n);
+      Geometry::ExportVTK<MeshType> writer_pre(*mesh);
       writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+      writer_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
+      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
       writer_pre.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_pre.write(filename);
 
       // Optimise the mesh
       rumpflpumpfl.optimise();
+
+      rumpflpumpfl.prepare();
+      fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
+      rumpflpumpfl.compute_gradient();
+      std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
 
       // Compute max. mesh velocity
       DataType max_mesh_velocity(-1e10);
@@ -335,18 +337,10 @@ template
       // Write post-optimisation mesh
       filename = "post_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_post(*mesh);
-
-      fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-      rumpflpumpfl.prepare();
-      rumpflpumpfl.compute_gradient();
-      std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
-
-      writer_post.add_scalar_cell("norm", func_norm);
-      writer_post.add_scalar_cell("det", func_det);
-      writer_post.add_scalar_cell("rec_det", func_rec_det);
-      writer_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-      writer_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-      writer_post.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
+      writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+      writer_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
+      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+      writer_pre.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_post.write(filename);
 
@@ -354,9 +348,13 @@ template
     }
 
     // Clean up
-    delete func_norm;
-    delete func_det;
-    delete func_rec_det;
+    delete rmn;
+    if(atlas != nullptr)
+      delete atlas;
+
+    delete[] func_norm;
+    delete[] func_det;
+    delete[] func_rec_det;
 
     return 0;
 

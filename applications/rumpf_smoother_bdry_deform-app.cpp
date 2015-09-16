@@ -68,38 +68,45 @@ template
     // For hypercubes, we need the UnitStarCubeFactory so elements do not degenerate to triangles at the boundary
     Geometry::RefineFactory<MeshType,Geometry::UnitStarCubeFactory> mesh_factory(level);
     // Create the mesh
-    MeshType mesh(mesh_factory);
-    // Create the transformation
-    TrafoType trafo(mesh);
+    MeshType* mesh(new MeshType(mesh_factory));
+
+    // Create a basic RootMeshNode from this mesh
+    Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
+
+    // Create a MeshPart for all of the outer boundary
+    typedef typename Geometry::MeshPart<MeshType> BoundaryType;
+    typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
+    BoundaryFactoryType boundary_factory(*mesh);
+    BoundaryType* boundary(new BoundaryType(boundary_factory));
+
+    Geometry::TargetSet& boundary_set = boundary->template get_target_set<0>();
+
+    // Add the boundary to the RootMeshNode
+    rmn->add_mesh_part("boundary", boundary, nullptr);
+    // Boundary stuff: Dirichlet boundary conditions on the outer boundary
+    std::deque<String> dirichlet_list;
+    dirichlet_list.push_back("boundary");
+    std::deque<String> slip_list;
+
     // Parameters for the Rumpf functional
     DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(1e-8));
     // Create the functional
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     // Create the smoother
-    RumpfSmootherType rumpflpumpfl(trafo, my_functional);
-    // Call init before tinkering with the boundary coordinates
+    RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
     rumpflpumpfl.init();
-    // Print information
-    rumpflpumpfl.print();
-
-    // Create a MeshPart for all of the outer boundary
-    typedef typename Geometry::MeshPart<MeshType> BoundaryType;
-    typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
-    BoundaryFactoryType boundary_factory(mesh);
-    BoundaryType boundary(boundary_factory);
-    Geometry::TargetSet boundary_set = boundary.template get_target_set<0>();
 
     // The domain is [0,1] x [0,1], so translate every vertex by (0.5, 0.5)
     // Note that we modify the _coords member of the smoother, which means that we modify boundary conditions but
     // not the acutal mesh. This is done by calling set_coords
     Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> translation(DataType(0.5));
 
-    for(Index i(0); i < mesh.get_num_entities(0); ++i)
+    for(Index i(0); i < mesh->get_num_entities(0); ++i)
       rumpflpumpfl._coords(i, rumpflpumpfl._coords(i) - translation);
 
     // Now normalise all boundary vertices
-    for(Index i(0); i < boundary.get_num_entities(0); ++i)
+    for(Index i(0); i < boundary->get_num_entities(0); ++i)
     {
       Index j = boundary_set[i];
       Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp(rumpflpumpfl._coords(j));
@@ -111,9 +118,9 @@ template
     rumpflpumpfl.set_coords();
 
     // Arrays for saving the contributions of the different Rumpf functional parts
-    DataType* func_norm(new DataType[mesh.get_num_entities(2)]);
-    DataType* func_det(new DataType[mesh.get_num_entities(2)]);
-    DataType* func_rec_det(new DataType[mesh.get_num_entities(2)]);
+    DataType* func_norm(new DataType[mesh->get_num_entities(2)]);
+    DataType* func_det(new DataType[mesh->get_num_entities(2)]);
+    DataType* func_rec_det(new DataType[mesh->get_num_entities(2)]);
 
     // Compute initial functional value
     DataType fval(0);
@@ -124,12 +131,10 @@ template
     rumpflpumpfl.compute_gradient();
 
     // Write initial state to file
-    Geometry::ExportVTK<MeshType> writer_initial_pre(mesh);
-    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-    writer_initial_pre.add_scalar_cell("norm_A", func_norm);
-    writer_initial_pre.add_scalar_cell("det_A", func_det);
-    writer_initial_pre.add_scalar_cell("rec_det_A", func_rec_det);
+    Geometry::ExportVTK<MeshType> writer_initial_pre(*mesh);
     writer_initial_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
+    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_initial_pre.write("pre_initial");
 
     // Smooth the mesh
@@ -144,19 +149,18 @@ template
     rumpflpumpfl.compute_gradient();
 
     // Write optimised initial mesh
-    Geometry::ExportVTK<MeshType> writer_initial_post(mesh);
-    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-    writer_initial_post.add_scalar_cell("norm_A", func_norm);
-    writer_initial_post.add_scalar_cell("det_A", func_det);
-    writer_initial_post.add_scalar_cell("rec_det_A", func_rec_det);
+    Geometry::ExportVTK<MeshType> writer_initial_post(*mesh);
     writer_initial_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+    writer_initial_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
+    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_initial_post.write("post_initial");
 
     // For saving the old coordinates
-    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim> coords_old(mesh.get_num_entities(0),DataType(0));
+    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim>
+      coords_old(mesh->get_num_entities(0), DataType(0));
     // For computing the mesh velocity
-    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim> mesh_velocity(mesh.get_num_entities(0), DataType(0));
-
+    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim>
+      mesh_velocity(mesh->get_num_entities(0), DataType(0));
 
     // Initial time
     DataType time(0);
@@ -178,7 +182,7 @@ template
       coords_old.clone(rumpflpumpfl._coords);
 
       // Update the boundary
-      for(Index i(0); i < boundary.get_num_entities(0); ++i)
+      for(Index i(0); i < boundary->get_num_entities(0); ++i)
       {
         Index j = boundary_set[i];
         Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp0(rumpflpumpfl._coords(j));
@@ -202,13 +206,11 @@ template
       std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
 
       // Write pre-optimisation mesh
-      filename = "pre_" + stringify(n) + ".vtk";
-      Geometry::ExportVTK<MeshType> writer_pre(mesh);
-      writer_pre.add_scalar_cell("norm", func_norm);
-      writer_pre.add_scalar_cell("det", func_det);
-      writer_pre.add_scalar_cell("rec_det", func_rec_det);
-      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+      filename = "pre_" + stringify(n);
+      Geometry::ExportVTK<MeshType> writer_pre(*mesh);
       writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+      writer_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
+      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
       writer_pre.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_pre.write(filename);
@@ -220,7 +222,7 @@ template
       DataType max_mesh_velocity(-1e10);
       DataType ideltat = DataType(1)/deltat;
 
-      for(Index i(0); i < mesh.get_num_entities(0); ++i)
+      for(Index i(0); i < mesh->get_num_entities(0); ++i)
       {
         mesh_velocity(i, ideltat*(rumpflpumpfl._coords(i) - coords_old(i)));
 
@@ -238,13 +240,11 @@ template
       std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
 
       // Write post-optimisation mesh
-      filename = "post_" + stringify(n) + ".vtk";
-      Geometry::ExportVTK<MeshType> writer_post(mesh);
-      writer_post.add_scalar_cell("norm", func_norm);
-      writer_post.add_scalar_cell("det", func_det);
-      writer_post.add_scalar_cell("rec_det", func_rec_det);
-      writer_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+      filename = "post_" + stringify(n);
+      Geometry::ExportVTK<MeshType> writer_post(*mesh);
       writer_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+      writer_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
+      writer_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
       writer_post.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_post.write(filename);
@@ -253,9 +253,10 @@ template
     }
 
     // Clean up
-    delete func_norm;
-    delete func_det;
-    delete func_rec_det;
+    delete rmn;
+    delete[] func_norm;
+    delete[] func_det;
+    delete[] func_rec_det;
 
   }
 }; // struct BdryDeformApp

@@ -18,7 +18,6 @@
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/ssor_precond.hpp>
-#include <kernel/trafo/standard/mapping.hpp>
 
 namespace FEAST
 {
@@ -90,6 +89,8 @@ namespace FEAST
 
       protected:
         /// Transformation
+         TrafoType _trafo;
+        /// FE space the transformation is from
         TrafoSpace _trafo_space;
         /// System matrix
         MatrixType _sys_matrix;
@@ -101,10 +102,18 @@ namespace FEAST
         FilterType _filter;
         /// Assembler for the boundary values for the mesh problem
         Assembly::UnitFilterAssembler<MeshType> _dirichlet_asm;
+        /// List of boundary identifiers for enforcing Dirichlet boundary conditions
+        std::deque<String>& _dirichlet_list;
 
       public:
         /**
-         * \brief Minimal constructor
+         * \brief Constructor
+         *
+         * \param[in] rmn_
+         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
+         *
+         * \param[in] dirichlet_list_
+         * List of boundary identifiers for enforcing Dirichlet boundary conditions, can be empty
          *
          * \param[in] trafo_
          * The transformation
@@ -112,27 +121,25 @@ namespace FEAST
          * \note Because no boundary information is provided, Dirichlet conditions are enforced on the outer
          * boundary.
          */
-        explicit LaplaceSmoother(TrafoType& trafo_) :
-          BaseClass(trafo_.get_mesh()),
-          _trafo_space(trafo_),
+        explicit LaplaceSmoother(Geometry::RootMeshNode<MeshType>* rmn_,
+        std::deque<String>& dirichlet_list_, std::deque<String>& DOXY(slip_list_)) :
+          BaseClass(rmn_),
+          _trafo(*(rmn_->get_mesh())),
+          _trafo_space(_trafo),
           _sys_matrix(),
-          _vec_rhs(trafo_.get_mesh().get_num_entities(0),DataType(0)),
+          _vec_rhs(rmn_->get_mesh()->get_num_entities(0),DataType(0)),
           _cubature_factory("auto-degree:"+stringify(int(_local_degree))),
           _filter(),
-          _dirichlet_asm()
+          _dirichlet_asm(),
+          _dirichlet_list(dirichlet_list_)
           {
-            /// Type for the boundary mesh
-            typedef typename Geometry::MeshPart<MeshType> BoundaryType;
-            /// Factory for the boundary mesh
-            typedef typename Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
-
-            // Get the boundary set
-            BoundaryFactoryType boundary_factory(this->_mesh);
-            BoundaryType boundary(boundary_factory);
-
-            _dirichlet_asm.add_mesh_part(boundary);
-
-            Assembly::SymbolicMatrixAssembler<>::assemble1(_sys_matrix, _trafo_space);
+            // Add all boundaries specified to the dirichlet assembler
+            for(auto& it : this->_dirichlet_list)
+            {
+              auto* mpp = this->_mesh_node->find_mesh_part(it);
+              if(mpp != nullptr)
+                _dirichlet_asm.add_mesh_part(*mpp);
+            }
 
           }
 
@@ -141,10 +148,15 @@ namespace FEAST
         {
         }
 
-        /// \brief Initialises parts of the MeshSmoother not set in in the constructor
+        /**
+         * \brief Performs one-time initialisations
+         *
+         * This is not done in the constructor for the case that the system matrix gets overwritten by a derived
+         * class, so the unused system matrix of THIS class is not assembled symbolically
+         */
         virtual void init() override
         {
-          BaseClass::init();
+          // Symbolically assemble the system matrix
           Assembly::SymbolicMatrixAssembler<>::assemble1(_sys_matrix, _trafo_space);
         }
 
@@ -158,7 +170,7 @@ namespace FEAST
           solver_matrix.convert(_sys_matrix);
 
           // Create solution vector for the solver
-          typename SolverMatrixType::VectorTypeR sol(this->_mesh.get_num_entities(0));
+          typename SolverMatrixType::VectorTypeR sol(this->get_mesh()->get_num_entities(0));
           // Some preconditioners/solvers do not care about filtered matrices (SSOR, PCG), but other do (UMFPACK) or
           // might (ILU)
           // Assemble bogus homogeneous filter so we can filter the matrix
@@ -175,7 +187,7 @@ namespace FEAST
           for(int d(0); d < MeshType::world_dim; ++d)
           {
             // Copy the d-th component of _coords to sol
-            for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
+            for(Index i(0); i < this->get_mesh()->get_num_entities(0); ++i)
               sol(i, this->_coords(i)(d));
 
             // Assemble Dirichlet boundary conditions from sol, as this->_coords contains the new boundary
@@ -193,7 +205,7 @@ namespace FEAST
             sol_backcopy.convert(sol);
 
             // Copy solution to _coords
-            for(Index i(0); i < this->_mesh.get_num_entities(0); ++i)
+            for(Index i(0); i < this->get_mesh()->get_num_entities(0); ++i)
             {
               Tiny::Vector<CoordType, MeshType::world_dim> tmp(this->_coords(i));
               tmp(d) = sol_backcopy(i);
