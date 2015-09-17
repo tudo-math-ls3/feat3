@@ -302,12 +302,8 @@ namespace StokesPoiseuille2D
 
     /* ***************************************************************************************** */
 
-    // get our assembled system types
+    // get our assembled vector type
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
-    typedef typename SystemLevelType::GlobalSystemMatrix GlobalSystemMatrix;
-    typedef typename SystemLevelType::GlobalSystemFilter GlobalSystemFilter;
-    typedef typename SystemLevelType::GlobalVeloVector GlobalVeloVector;
-    typedef typename SystemLevelType::GlobalPresVector GlobalPresVector;
 
     // fetch our finest levels
     DomainLevelType& the_domain_level = *domain_levels.back();
