@@ -73,8 +73,11 @@ class RumpfSmootherTest_2d
       DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
       FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
-      // The smoother in all its template glory
-      RumpfSmootherType rumpflpumpfl(trafo, my_functional);
+      // Create empty unit filter of the correct size so we can create a smoother with no boundary conditions
+      LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> filter(mesh.get_num_entities(0));
+
+      // Create the smoother
+      RumpfSmootherType rumpflpumpfl(trafo, my_functional, filter);
 
       // It is possible to scale the reference element, but we do not want that here
       DataType scaling(1);

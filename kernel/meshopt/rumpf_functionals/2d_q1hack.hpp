@@ -2,10 +2,7 @@
 #ifndef KERNEL_MESHOPT_RUMPF_FUNCTIONALS_Q1HACK_HPP
 #define KERNEL_MESHOPT_RUMPF_FUNCTIONALS_Q1HACK_HPP 1
 
-
-#include <kernel/meshopt/rumpf_functional.hpp>
-// For HeavisideReg
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/base_header.hpp>
 
 namespace FEAST
 {

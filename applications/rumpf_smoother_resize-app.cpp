@@ -86,8 +86,10 @@ template
     DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(0e0));
     // Create the functional with these parameters
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
-    // Create empty unit filter so we can create a smoother with no boundary conditions
-    LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> filter;
+    // This is the correct scaling for the Q1Hack with _D2 functional
+    //my_functional._fac_rec_det = DataType(1);
+    // Create empty unit filter of the correct size so we can create a smoother with no boundary conditions
+    LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> filter(mesh.get_num_entities(0));
 
     // Create the smoother
     RumpfSmootherType rumpflpumpfl(trafo, my_functional, filter);
@@ -95,26 +97,29 @@ template
     rumpflpumpfl.print();
 
     // Set initial coordinates by scaling the original Rumpf reference cell by ...
-    DataType scaling(5);
-    helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, scaling);
+    DataType target_scaling(6);
+    helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, target_scaling);
 
     // Since we changed the internal _coords, they have to be copied back to the mesh
     rumpflpumpfl.set_coords();
     rumpflpumpfl.init();
+    // This is the correct scaling for the Q1Hack with _D2 functional
+    //Tiny::Vector<DataType, MeshType::world_dim> tmp;
+    //tmp(0) = target_scaling*DataType(4)/Math::sqrt(DataType(3));
+    //tmp(1) = target_scaling*DataType(2)*Math::sqrt(DataType(2))*Math::pow(DataType(2)/DataType(3), DataType(1)/DataType(4));
+    //rumpflpumpfl._h(0, tmp);
 
-    // Set target edge lengths
-    Tiny::Vector<DataType, MeshType::world_dim> tmp;
-    tmp(0) =  DataType(4*4)/Math::sqrt(DataType(3));
-    tmp(1) =  DataType(4*4)/(Math::sqrt(DataType(2))*Math::sqrt(Math::sqrt(DataType(3))));
+    DataType scaling(2.5);
+    // This transforms the unit element to the Rumpf reference element
+    helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, scaling);
 
-    //rumpflpumpfl._h[0](0, DataType(4));
-    //rumpflpumpfl._h[1](0, DataType(4));
-    rumpflpumpfl._h(0,tmp);
+    // Since we changed the internal _coords, they have to be copied back to the mesh
+    rumpflpumpfl.set_coords();
 
     // Arrays for saving the contributions of the different Rumpf functional parts
-    DataType* func_norm(new DataType[mesh.get_num_entities(2)]);
-    DataType* func_det(new DataType[mesh.get_num_entities(2)]);
-    DataType* func_rec_det(new DataType[mesh.get_num_entities(2)]);
+    DataType* func_norm(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
+    DataType* func_det(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
+    DataType* func_rec_det(new DataType[mesh.get_num_entities(MeshType::shape_dim)]);
 
     // Compute initial functional value
     DataType fval(0);
@@ -165,17 +170,20 @@ template
 template<typename A, typename B>
 using MySmoother = Meshopt::RumpfSmoother<A, B>;
 
+template<typename A, typename B>
+using MyFunctional = Meshopt::RumpfFunctional_D2<A, B>;
+
 // Using the Q1 hack
 template<typename A, typename B>
 using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
 
 // For the Q1 hack, the functional is a bit more complicated
 template<typename A, typename B>
-using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
+using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, MyFunctional>;
 
 int main()
 {
-  ResizeApp<double, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack>::run();
+  ResizeApp<double, Shape::Hypercube<2>, MyFunctional, MySmoother>::run();
   return 0;
 }
 
