@@ -313,6 +313,12 @@ namespace FEAST
     CHECK_INTERNAL(!((a)==(b)), this->_id + "\n" +  "Expected '" #a "' that is'" + FEAST::stringify(a) + "' to equal not '" + FEAST::stringify(b) + "'")\
   } while (false)
 
+/// checks if a <= x <= b
+#define TEST_CHECK_IN_RANGE(x, a, b) \
+  do { \
+    CHECK_INTERNAL(((a) <= (x)) && ((x) <= (b)), this->_id + "\n" +  "Expected '" #x "' that is'" + FEAST::stringify(x) + "' to be in range [" + FEAST::stringify(a) + "," + FEAST::stringify(b) + "]")\
+  } while (false)
+
 /// checks if stringify(a) == stringify(b)
 #define TEST_CHECK_STRINGIFY_EQUAL(a, b) \
   do { \
