@@ -65,7 +65,7 @@ namespace FEAST
       typedef LAFEM::VectorMirror<Mem::Main, DataType, IndexType> SystemMirror;
 
       /// define system gate
-      typedef Global::FoundationGate<LocalSystemVector, LAFEM::VectorMirror> SystemGate;
+      typedef Global::FoundationGate<LocalSystemVector, SystemMirror> SystemGate;
 
       /// define global system vector type
       typedef Global::Vector<LocalSystemVector> GlobalSystemVector;
