@@ -164,11 +164,9 @@ namespace FEAST
       /// corresponding vector type
       typedef PowerVector<typename SubMirrorType::VectorType, num_blocks> VectorType;
 
-    protected:
       /// the one and only sub-mirror object
       SubMirrorType _sub_mirror;
 
-    public:
       /// default ctor
       PowerMirror()
       {

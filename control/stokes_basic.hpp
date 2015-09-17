@@ -69,19 +69,15 @@ namespace FEAST
       typedef LAFEM::TupleVector<LocalVeloVector, LocalPresVector> LocalSystemVector;
 
       // define mirror types
-      typedef LAFEM::VectorMirror<Mem::Main, DataType, IndexType> ScalarMirror;
+      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> ScalarMirror;
       typedef LAFEM::PowerMirror<ScalarMirror, dim> VeloMirror;
       typedef ScalarMirror PresMirror;
       typedef LAFEM::TupleMirror<VeloMirror, PresMirror> SystemMirror;
 
       // define gates
-      typedef Global::PowerFoundationGate<LocalVeloVector, LAFEM::VectorMirror, LAFEM::PowerMirror, dim> VeloGate;
-      typedef Global::FoundationGate<LocalPresVector, LAFEM::VectorMirror> PresGate;
-      typedef Global::BasetupleFoundationGate<LocalSystemVector,
-                                              LAFEM::VectorMirror,
-                                              LAFEM::PowerMirror,
-                                              LAFEM::TupleMirror,
-                                              dim> SystemGate;
+      typedef Global::FoundationGate<LocalVeloVector, VeloMirror> VeloGate;
+      typedef Global::FoundationGate<LocalPresVector, PresMirror> PresGate;
+      typedef Global::FoundationGate<LocalSystemVector, SystemMirror> SystemGate;
 
       // define global vector types
       typedef Global::Vector<LocalVeloVector> GlobalVeloVector;
