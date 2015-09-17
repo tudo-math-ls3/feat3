@@ -232,6 +232,27 @@ namespace FEAST
         }
       }
 
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void gather_prim(
+                       LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_buffer,
+                       const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_vector,
+                       const Index buffer_offset = Index(0)) const
+      {
+        LAFEM::DenseVector<Mem::Main, Tx_, Ix_> buffer;
+        buffer.convert(cuda_buffer);
+
+        LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
+        vector.convert(cuda_vector);
+
+        gather_prim(buffer, vector, buffer_offset);
+
+        cuda_buffer.convert(buffer);
+      }
+
       /**
        * \brief Performs a gather-axpy-operation on a primal vector.
        *
@@ -281,6 +302,28 @@ namespace FEAST
           }
           x[buffer_offset + row] += alpha*sum;
         }
+      }
+
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void gather_axpy_prim(
+                            LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_buffer,
+                            const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_vector,
+                            const Tx_ alpha = Tx_(1),
+                            const Index buffer_offset = Index(0)) const
+      {
+        LAFEM::DenseVector<Mem::Main, Tx_, Ix_> buffer;
+        buffer.convert(cuda_buffer);
+
+        LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
+        vector.convert(cuda_vector);
+
+        gather_axpy_prim(buffer, vector, alpha, buffer_offset);
+
+        cuda_buffer.convert(buffer);
       }
 
       /**
@@ -336,6 +379,27 @@ namespace FEAST
           }
           x[row] = sum;
         }
+      }
+
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void scatter_prim(
+                        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_vector,
+                        const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_buffer,
+                        const Index buffer_offset = Index(0)) const
+      {
+        LAFEM::DenseVector<Mem::Main, Tx_, Ix_> buffer;
+        buffer.convert(cuda_buffer);
+
+        LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
+        vector.convert(cuda_vector);
+
+        scatter_prim(buffer, vector, buffer_offset);
+
+        cuda_buffer.convert(buffer);
       }
 
       /**
@@ -397,6 +461,28 @@ namespace FEAST
         }
       }
 
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void scatter_axpy_prim(
+                             LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_vector,
+                             const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_buffer,
+                             const Tx_ alpha = Tx_(1),
+                             const Index buffer_offset = Index(0)) const
+      {
+        LAFEM::DenseVector<Mem::Main, Tx_, Ix_> buffer;
+        buffer.convert(cuda_buffer);
+
+        LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
+        vector.convert(cuda_vector);
+
+        scatter_axpy_prim(buffer, vector, alpha, buffer_offset);
+
+        cuda_buffer.convert(buffer);
+      }
+
       /**
        * \brief Performs a gather-operation on a dual vector.
        *
@@ -410,13 +496,15 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
+        typename Mx_,
         typename Tx_,
         typename Ix_,
+        typename My_,
         typename Ty_,
         typename Iy_>
       void gather_dual(
-                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                       const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& vector,
+                       LAFEM::DenseVector<Mx_, Tx_, Ix_>& buffer,
+                       const LAFEM::DenseVector<My_, Ty_, Iy_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
         this->gather_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, buffer_offset);
@@ -438,13 +526,15 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
+        typename Mx_,
         typename Tx_,
         typename Ix_,
+        typename My_,
         typename Ty_,
         typename Iy_>
       void gather_axpy_dual(
-                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                            const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& vector,
+                            LAFEM::DenseVector<Mx_, Tx_, Ix_>& buffer,
+                            const LAFEM::DenseVector<My_, Ty_, Iy_>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
@@ -464,13 +554,15 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
+        typename Mx_,
         typename Tx_,
         typename Ix_,
+        typename My_,
         typename Ty_,
         typename Iy_>
       void scatter_dual(
-                        LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& vector,
-                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
+                        LAFEM::DenseVector<Mx_, Tx_, Ix_>& vector,
+                        const LAFEM::DenseVector<My_, Ty_, Iy_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
         this->scatter_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, buffer_offset);
@@ -492,13 +584,15 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
+        typename Mx_,
         typename Tx_,
         typename Ix_,
+        typename My_,
         typename Ty_,
         typename Iy_>
       void scatter_axpy_dual(
-                             LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& vector,
-                             const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
+                             LAFEM::DenseVector<Mx_, Tx_, Ix_>& vector,
+                             const LAFEM::DenseVector<My_, Ty_, Iy_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
