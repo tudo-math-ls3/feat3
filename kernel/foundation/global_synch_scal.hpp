@@ -18,11 +18,6 @@ namespace FEAST
       template <typename Mem_>
       struct GlobalSynchScal0
       {
-      };
-
-      template <>
-      struct GlobalSynchScal0<Mem::Main>
-      {
         public:
 #ifndef SERIAL
           template<typename DT_>

@@ -58,13 +58,11 @@ namespace FEAST
       /// corresponding vector
       typedef DenseVector<MemType, DataType, IndexType> VectorType;
 
-    protected:
       /// gather-mirror matrix
       MirrorMatrixType _mirror_gather;
       /// scatter-mirror matrix
       MirrorMatrixType _mirror_scatter;
 
-    public:
       /// default constructor
       VectorMirror() :
         _mirror_gather(),
@@ -399,7 +397,7 @@ namespace FEAST
 
         scatter_prim(buffer, vector, buffer_offset);
 
-        cuda_buffer.convert(buffer);
+        cuda_vector.convert(vector);
       }
 
       /**
@@ -480,7 +478,7 @@ namespace FEAST
 
         scatter_axpy_prim(buffer, vector, alpha, buffer_offset);
 
-        cuda_buffer.convert(buffer);
+        cuda_vector.convert(vector);
       }
 
       /**

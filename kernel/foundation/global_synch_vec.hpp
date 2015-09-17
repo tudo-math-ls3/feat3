@@ -16,11 +16,6 @@ namespace FEAST
       template <typename Mem_>
       struct GlobalSynchVec0
       {
-      };
-
-      template <>
-      struct GlobalSynchVec0<Mem::Main>
-      {
         public:
 
 #ifndef SERIAL
@@ -139,11 +134,6 @@ namespace FEAST
 
       template <typename Mem_>
       struct GlobalSynchVec1
-      {
-      };
-
-      template <>
-      struct GlobalSynchVec1<Mem::Main>
       {
         public:
 

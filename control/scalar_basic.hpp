@@ -62,7 +62,7 @@ namespace FEAST
       typedef typename LocalSystemMatrix::VectorTypeR LocalSystemVector;
 
       /// define system mirror type
-      typedef LAFEM::VectorMirror<Mem::Main, DataType, IndexType> SystemMirror;
+      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
 
       /// define system gate
       typedef Global::FoundationGate<LocalSystemVector, SystemMirror> SystemGate;
