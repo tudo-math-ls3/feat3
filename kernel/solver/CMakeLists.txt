@@ -78,7 +78,7 @@ FOREACH (test ${test_list} )
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${CUDA_MEMCHECK_EXE} ${FEAST_BINARY_DIR}/kernel/solver/${test} cuda cudadevicereset)
+    --test-command ${CUDA_MEMCHECK_EXE} ${FEAST_BINARY_DIR}/kernel/solver/${test} cuda --cudadevicereset)
   SET_PROPERTY(TEST ${test}_cuda PROPERTY LABELS "cuda")
   if (FEAST_CUDAMEMCHECK AND FEAST_BACKENDS_CUDA)
     SET_PROPERTY(TEST ${test}_cuda PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors")

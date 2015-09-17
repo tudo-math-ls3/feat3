@@ -44,12 +44,16 @@ int main(int argc, char** argv)
         continue;
       }
 #ifdef FEAST_BACKENDS_CUDA
-      if (0 == strcmp(argv[i], "cudadevicereset"))
+      if (0 == strcmp(argv[i], "--cudadevicereset"))
       {
         cudadevicereset = true;
         continue;
       }
 #endif
+
+      //discard any unused parameters, marked by "--"
+      if (strlen(argv[i]) > 1 && argv[i][0] == '-' && argv[i][0] == '-')
+        continue;
 
       labels.push_back(argv[i]);
     }
