@@ -28,6 +28,7 @@ namespace FEAST
       typedef typename LocalVector_::DataType DataType;
       typedef typename LocalVector_::IndexType IndexType;
       typedef LAFEM::DenseVector<MemType, DataType, IndexType> BufferVectorType;
+      typedef Mirror_ MirrorType;
 
     public:
       /// communication ranks and tags
@@ -46,6 +47,42 @@ namespace FEAST
 
       virtual ~FoundationGate()
       {
+      }
+
+      template<typename LVT2_, typename MT2_>
+      void convert(const FoundationGate<LVT2_, MT2_>& other)
+      {
+        this->_ranks.clear();
+        this->_ctags.clear();
+        this->_mirrors.clear();
+        this->_send_bufs.clear();
+        this->_recv_bufs.clear();
+
+        this->_ranks = other._ranks;
+        this->_ctags = other._ctags;
+
+        for(auto& other_mirrors_i : other._mirrors)
+        {
+          MirrorType mirrors_i;
+          mirrors_i.convert(other_mirrors_i);
+          this->_mirrors.push_back(std::move(mirrors_i));
+        }
+
+        for(auto& other_send_bufs_i : other._send_bufs)
+        {
+          BufferVectorType send_bufs_i;
+          send_bufs_i.convert(other_send_bufs_i);
+          this->_send_bufs.push_back(std::move(send_bufs_i));
+        }
+
+        for(auto& other_recv_bufs_i : other._recv_bufs)
+        {
+          BufferVectorType recv_bufs_i;
+          recv_bufs_i.convert(other_recv_bufs_i);
+          this->_recv_bufs.push_back(std::move(recv_bufs_i));
+        }
+
+        this->_freqs.convert(other._freqs);
       }
 
       void push(Index rank, Index ctag, Mirror_&& mirror)
