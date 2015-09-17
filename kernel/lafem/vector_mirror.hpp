@@ -209,12 +209,17 @@ namespace FEAST
         if(_mirror_gather.empty())
           return;
 
+        //temp-->
+        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> tmp_mirror_gather;
+        tmp_mirror_gather.convert(_mirror_gather);
+        //<--temp
+
         Tx_ * x(buffer.elements());
         const Ty_ * y(vector.elements());
-        const IndexType_ * col_idx(_mirror_gather.col_ind());
-        const DataType_* val(_mirror_gather.val());
-        const IndexType_ * row_ptr(_mirror_gather.row_ptr());
-        Index num_rows(_mirror_gather.rows());
+        const Index * col_idx(tmp_mirror_gather.col_ind());
+        const DataType_* val(tmp_mirror_gather.val());
+        const Index * row_ptr(tmp_mirror_gather.row_ptr());
+        Index num_rows(tmp_mirror_gather.rows());
 
         ASSERT_(num_rows + buffer_offset <= buffer.size());
 
@@ -281,12 +286,17 @@ namespace FEAST
         if(_mirror_gather.empty())
           return;
 
+        //temp-->
+        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> tmp_mirror_gather;
+        tmp_mirror_gather.convert(_mirror_gather);
+        //<--temp
+
         Tx_ * x(buffer.elements());
         const Ty_ * y(vector.elements());
-        const IndexType_ * col_idx(_mirror_gather.col_ind());
-        const DataType_* val(_mirror_gather.val());
-        const IndexType_* row_ptr(_mirror_gather.row_ptr());
-        Index num_rows(_mirror_gather.rows());
+        const Index * col_idx(tmp_mirror_gather.col_ind());
+        const DataType_* val(tmp_mirror_gather.val());
+        const Index * row_ptr(tmp_mirror_gather.row_ptr());
+        Index num_rows(tmp_mirror_gather.rows());
 
         ASSERT_(num_rows + buffer_offset <= buffer.size());
 
@@ -350,13 +360,18 @@ namespace FEAST
         if(_mirror_scatter.empty())
           return;
 
+        //temp-->
+        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> tmp_mirror_scatter;
+        tmp_mirror_scatter.convert(_mirror_scatter);
+        //<--temp
+
         Tx_ * x(vector.elements());
         const Ty_ * y(buffer.elements());
-        const IndexType_ * col_idx(_mirror_scatter.col_ind());
-        const DataType_* val(_mirror_scatter.val());
-        const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
-        const Index num_rows(_mirror_scatter.rows());
-        const Index num_cols(_mirror_scatter.columns());
+        const Index * col_idx(tmp_mirror_scatter.col_ind());
+        const DataType_* val(tmp_mirror_scatter.val());
+        const Index * row_ptr(tmp_mirror_scatter.row_ptr());
+        const Index num_rows(tmp_mirror_scatter.rows());
+        const Index num_cols(tmp_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
 #ifndef DEBUG
@@ -395,7 +410,7 @@ namespace FEAST
         LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
         vector.convert(cuda_vector);
 
-        scatter_prim(buffer, vector, buffer_offset);
+        scatter_prim(vector, buffer, buffer_offset);
 
         cuda_vector.convert(vector);
       }
@@ -430,13 +445,18 @@ namespace FEAST
         if(_mirror_scatter.empty())
           return;
 
+        //temp-->
+        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> tmp_mirror_scatter;
+        tmp_mirror_scatter.convert(_mirror_scatter);
+        //<--temp
+
         Tx_ * x(vector.elements());
         const Ty_ * y(buffer.elements());
-        const IndexType_ * col_idx(_mirror_scatter.col_ind());
-        const DataType_* val(_mirror_scatter.val());
-        const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
-        const Index num_rows(_mirror_scatter.rows());
-        const Index num_cols(_mirror_scatter.columns());
+        const Index * col_idx(tmp_mirror_scatter.col_ind());
+        const DataType_* val(tmp_mirror_scatter.val());
+        const Index * row_ptr(tmp_mirror_scatter.row_ptr());
+        const Index num_rows(tmp_mirror_scatter.rows());
+        const Index num_cols(tmp_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
 #ifndef DEBUG
@@ -476,7 +496,7 @@ namespace FEAST
         LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
         vector.convert(cuda_vector);
 
-        scatter_axpy_prim(buffer, vector, alpha, buffer_offset);
+        scatter_axpy_prim(vector, buffer, alpha, buffer_offset);
 
         cuda_vector.convert(vector);
       }
