@@ -81,6 +81,7 @@ namespace FEAST
       /// our global system matrix
       GlobalSystemMatrix matrix_sys;
 
+      /// CTOR
       ScalarBasicSystemLevel() :
         matrix_sys(&gate_sys, &gate_sys)
       {
@@ -118,6 +119,7 @@ namespace FEAST
       /// our global system filter
       GlobalSystemFilter filter_sys;
 
+      /// CTOR
       ScalarUnitFilterSystemLevel() :
         BaseClass()
       {
@@ -129,6 +131,13 @@ namespace FEAST
         return this->matrix_sys.bytes () + filter_sys.bytes();
       }
 
+      /**
+       *
+       * \brief Conversion method
+       *
+       * Use source ScalarBasicTransferLevel content as content of current ScalarBasicTransferLevel.
+       *
+       */
       template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
       void convert(const ScalarUnitFilterSystemLevel<M_, D_, I_, SM_> & other)
       {
@@ -157,6 +166,7 @@ namespace FEAST
       /// our global system filter
       GlobalSystemFilter filter_sys;
 
+      /// CTOR
       ScalarMeanFilterSystemLevel() :
         BaseClass()
       {
@@ -168,6 +178,13 @@ namespace FEAST
         return this->matrix_sys.bytes () + filter_sys.bytes();
       }
 
+      /**
+       *
+       * \brief Conversion method
+       *
+       * Use source ScalarBasicTransferLevel content as content of current ScalarBasicTransferLevel.
+       *
+       */
       template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
       void convert(const ScalarMeanFilterSystemLevel<M_, D_, I_, SM_> & other)
       {
@@ -187,12 +204,16 @@ namespace FEAST
       typedef Global::Matrix<LocalSystemTransferMatrix> GlobalSystemTransferMatrix;
 
       /// our global transfer matrices
-      GlobalSystemTransferMatrix prol_sys, rest_sys;
+      GlobalSystemTransferMatrix prol_sys;
+
+      /// \copydoc ScalarBasicTransferLevel::prol_sys
+      GlobalSystemTransferMatrix rest_sys;
 
       ScalarBasicTransferLevel()
       {
       }
 
+      /// CTOR
       explicit ScalarBasicTransferLevel(SystemLevel_& lvl_coarse, SystemLevel_& lvl_fine) :
         prol_sys(&lvl_fine.gate_sys, &lvl_coarse.gate_sys),
         rest_sys(&lvl_coarse.gate_sys, &lvl_fine.gate_sys)
@@ -209,14 +230,23 @@ namespace FEAST
         return prol_sys.bytes() + rest_sys.bytes();
       }
 
-      // teuflisch aufpassen, dass die schon konvertierten SystemLevel übergeben werden
+      /**
+       *
+       * \brief Conversion method
+       *
+       * Use source ScalarBasicTransferLevel content as content of current ScalarBasicTransferLevel.
+       *
+       * \warning The provided SystemLevels must already be converted to the matching
+       * configuration, as they contain the used gateways.
+       *
+       */
       template <typename SL_, typename SM_>
       void convert(SystemLevel_ & lvl_coarse , SystemLevel_ & lvl_fine, const ScalarBasicTransferLevel<SL_, SM_> & other)
       {
         prol_sys.convert(&lvl_fine.gate_sys, &lvl_coarse.gate_sys, other.prol_sys);
         rest_sys.convert(&lvl_coarse.gate_sys, &lvl_fine.gate_sys, other.rest_sys);
       }
-    };
+    }; // class ScalarBasicTransferLevel<...>
 
     template<typename Space_>
     class ScalarBasicAssemblerLevel
