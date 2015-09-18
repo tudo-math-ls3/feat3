@@ -289,6 +289,13 @@ namespace PoissonDirichlet2D
     typedef typename SystemLevelTypeSolve::GlobalSystemMatrix GlobalSystemMatrixSolve;
     typedef typename SystemLevelTypeSolve::GlobalSystemFilter GlobalSystemFilterSolve;
 
+    if (rank == 0)
+    {
+      std::cout << "Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() <<
+        ", Mem:" << MemType::name() << " to " << SystemLevelTypeSolve::LocalScalarMatrix::name() << ", Mem:" <<
+        MemTypeSolve::name() << "..." << std::endl;
+    }
+
     //convert system and transfer levels
     for (Index i(0); i < num_levels; ++i)
     {

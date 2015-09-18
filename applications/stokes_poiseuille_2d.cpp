@@ -322,6 +322,14 @@ namespace StokesPoiseuille2D
     typedef typename SystemLevelTypeSolve::GlobalSystemFilter GlobalSystemFilterSolve;
     typedef typename SystemLevelTypeSolve::GlobalVeloVector GlobalVeloVectorSolve;
     typedef typename SystemLevelTypeSolve::GlobalPresVector GlobalPresVectorSolve;
+
+    if (rank == 0)
+    {
+      std::cout << "Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() <<
+        ", Mem:" << MemType::name() << " to " << SystemLevelTypeSolve::LocalScalarMatrix::name() << ", Mem:" <<
+        MemTypeSolve::name() << "..." << std::endl;
+    }
+
     //convert system and transfer levels
     for (Index i(0); i < num_levels; ++i)
     {
