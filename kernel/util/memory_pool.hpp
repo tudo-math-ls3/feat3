@@ -209,12 +209,14 @@ namespace FEAST
             return;
           }
 
+#ifdef FEAST_BACKENDS_CUDA
           it = _pinned_pool.find(address);
           if (it != _pinned_pool.end())
           {
             it->second.counter = it->second.counter + 1;
             return;
           }
+#endif
 
           throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::increase_memory: Memory address not found!");
         }
@@ -240,6 +242,7 @@ namespace FEAST
             return;
           }
 
+#ifdef FEAST_BACKENDS_CUDA
           it = _pinned_pool.find(address);
           if (it != _pinned_pool.end())
           {
@@ -254,6 +257,7 @@ namespace FEAST
             }
             return;
           }
+#endif
 
           throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::release_memory: Memory address not found!");
         }
