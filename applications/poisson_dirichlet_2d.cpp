@@ -305,7 +305,7 @@ namespace PoissonDirichlet2D
       if (i > 0)
       {
         transfer_levels_solve.push_back(new TransferLevelTypeSolve());
-        transfer_levels_solve.back()->template convert(*system_levels_solve.at(i-1), *system_levels_solve.at(i), *transfer_levels.at(i-1));
+        transfer_levels_solve.back()->convert(*system_levels_solve.at(i-1), *system_levels_solve.at(i), *transfer_levels.at(i-1));
       }
     }
 
