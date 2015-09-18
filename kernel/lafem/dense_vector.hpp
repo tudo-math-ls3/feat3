@@ -140,16 +140,33 @@ namespace FEAST
        * \brief Constructor
        *
        * \param[in] size The size of the created vector.
+       * \param[in] pinned_allocation True if the memory should be allocated in a pinned manner.
        *
        * Creates a vector with a given size.
        */
-      explicit DenseVector(Index size_in) :
+      explicit DenseVector(Index size_in, bool pinned_allocation = false) :
         Container<Mem_, DT_, IT_>(size_in)
       {
         CONTEXT("When creating DenseVector");
 
+        ASSERT(! (pinned_allocation && (typeid(Mem::CUDA) == typeid(Mem_))), "Error: You cannot create CUDA DV with pinned_allocation enabled!");
+
         this->_scalar_index.push_back(0);
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
+
+#ifdef FEAST_BACKENDS_CUDA
+        if (pinned_allocation)
+        {
+          this->_elements.push_back(MemoryPool<Mem_>::template allocate_pinned_memory<DT_>(size_in));
+        }
+        else
+        {
+#else
+        {
+          (void)pinned_allocation;
+#endif
+          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
+        }
+
         this->_elements_size.push_back(size_in);
       }
 

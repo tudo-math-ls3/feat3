@@ -44,6 +44,14 @@ public:
     DenseVector<Mem::Main, DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
 
+    if (typeid(Mem::CUDA) != typeid(Mem_))
+    {
+      DenseVector<Mem_, DT_, IT_> pinned(10, true);
+      pinned(5, DT_(42));
+      TEST_CHECK_EQUAL(pinned(5), DT_(42));
+    }
+
+
     DenseVector<Mem_, DT_, IT_> a(10, DT_(7));
     TEST_CHECK_EQUAL(a.bytes_allocated(), 10 * sizeof(DT_) + 2 * sizeof(Index));
     DenseVector<Mem_, DT_, IT_> b(10, DT_(5));

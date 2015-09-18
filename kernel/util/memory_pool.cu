@@ -44,7 +44,6 @@ using namespace FEAST;
 
 // static member initialisation
 std::map<void*, Util::Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pool;
-std::map<void*, Util::Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pinned_pool;
 Index MemoryPool<Mem::CUDA>::blocksize_misc = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_reduction = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_spmv = 256;
@@ -137,25 +136,7 @@ DT_ * MemoryPool<Mem::CUDA>::allocate_pinned_memory(const Index count)
     throw InternalError("MemoryPool<CUDA> cuda pinned allocation error (cudaErrorMemoryAllocation)");
   if (memory == nullptr)
     throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA> pinned allocation error (null pointer returned)");
-  Util::Intern::MemoryInfo mi;
-  mi.counter = 1;
-  mi.size = count * sizeof(DT_);
-  _pinned_pool.insert(std::pair<void*, Util::Intern::MemoryInfo>(memory, mi));
   return memory;
-}
-
-void MemoryPool<Mem::CUDA>::increase_pinned_memory(void * address)
-{
-  if (address == nullptr)
-    return;
-
-  std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pinned_pool.find(address));
-  if (it == _pool.end())
-    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::increase_pinned_memory: Memory address not found!");
-  else
-  {
-    it->second.counter = it->second.counter + 1;
-  }
 }
 
 void MemoryPool<Mem::CUDA>::release_pinned_memory(void * address)
@@ -163,22 +144,8 @@ void MemoryPool<Mem::CUDA>::release_pinned_memory(void * address)
   if (address == nullptr)
     return;
 
-  std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pinned_pool.find(address));
-  if (it == _pool.end())
-    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::relase_pinned_memory: Memory address not found!");
-  else
-  {
-    if(it->second.counter == 1)
-    {
-      if (cudaSuccess != cudaFreeHost(address))
-        throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::release_memory: cudaFreeHost failed!");
-      _pool.erase(it);
-    }
-    else
-    {
-      it->second.counter = it->second.counter - 1;
-    }
-  }
+  if (cudaSuccess != cudaFreeHost(address))
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::release_pinned_memory: cudaFreeHost failed!");
 }
 
 template <typename DT_>
@@ -297,6 +264,11 @@ template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(const Index);
 template unsigned int * MemoryPool<Mem::CUDA>::allocate_memory<unsigned int>(const Index);
 template unsigned long * MemoryPool<Mem::CUDA>::allocate_memory<unsigned long>(const Index);
+
+template float * MemoryPool<Mem::CUDA>::allocate_pinned_memory<float>(const Index);
+template double * MemoryPool<Mem::CUDA>::allocate_pinned_memory<double>(const Index);
+template unsigned int * MemoryPool<Mem::CUDA>::allocate_pinned_memory<unsigned int>(const Index);
+template unsigned long * MemoryPool<Mem::CUDA>::allocate_pinned_memory<unsigned long>(const Index);
 
 template void MemoryPool<Mem::CUDA>::download<float>(float *, const float * const, const Index);
 template void MemoryPool<Mem::CUDA>::download<double>(double *, const double * const, const Index);

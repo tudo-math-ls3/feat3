@@ -33,6 +33,93 @@ namespace FEAST
     template <typename Mem_>
     class MemoryPool;
 
+    template <>
+    class MemoryPool<Mem::CUDA>
+    {
+      private:
+        /// Map of allocated device memory patches
+        static std::map<void*, Util::Intern::MemoryInfo> _pool;
+
+      public:
+        /// Setup memory pools
+        static void initialise();
+
+        /// Shutdown memory pool and clean up allocated memory pools
+        static void finalise();
+
+        /// allocate new memory
+        template <typename DT_>
+        static DT_ * allocate_memory(const Index count);
+
+        /// increase memory counter
+        static void increase_memory(void * address);
+
+        /// release memory or decrease reference counter
+        static void release_memory(void * address);
+
+        /// \internal Internal: allocate new pinned host memory
+        template <typename DT_>
+        static DT_ * allocate_pinned_memory(const Index count);
+
+        /// \internal Internal: release pinned memory or decrease reference counter
+        static void release_pinned_memory(void * address);
+
+        /// download memory chunk to host memory
+        template <typename DT_>
+        static void download(DT_ * dest, const DT_ * const src, const Index count);
+
+        /// upload memory chunk from host memory to device memory
+        template <typename DT_>
+        static void upload(DT_ * dest, const DT_ * const src, const Index count);
+
+        /// recieve element
+        template <typename DT_>
+        static DT_ get_element(const DT_ * data, const Index index);
+
+        /// set memory to specific value
+        template <typename DT_>
+        static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
+
+        /// Copy memory area from src to dest
+        template <typename DT_>
+        static void copy(DT_ * dest, const DT_ * src, const Index count);
+
+        /// Copy memory area from src to dest
+        template <typename DT_>
+        static void convert(DT_ * dest, const DT_ * src, const Index count);
+
+        /// Convert datatype DT2_ from src into DT1_ in dest
+        template <typename DT1_, typename DT2_>
+        static void convert(DT1_ * dest, const DT2_ * src, const Index count);
+
+        static void synchronize();
+
+        static void reset_device();
+
+        /**
+         * Explicitly shut down cuda device
+         *
+         * This is necessary as the last user defined line of code, if cuda-memcheck is used with leak checking.
+         * This includes a call to cudaResetDevice().
+         *
+        **/
+        static void shutdown_device();
+
+        static void set_blocksize(Index misc, Index reduction, Index spmv, Index axpy);
+
+        /// cuda threading grid blocksize for miscellaneous ops
+        static Index blocksize_misc;
+
+        /// cuda threading grid blocksize for reduction type ops
+        static Index blocksize_reduction;
+
+        /// cuda threading grid blocksize for blas-2 type ops
+        static Index blocksize_spmv;
+
+        /// cuda threading grid blocksize for blas-1 type ops
+        static Index blocksize_axpy;
+    };
+
     /**
      * \brief Memory managment.
      *
@@ -47,6 +134,9 @@ namespace FEAST
         /// Map of all memory chunks in use.
         static std::map<void*, Util::Intern::MemoryInfo> _pool;
 
+        /// Map of allocated pinned main memory patches
+        static std::map<void*, Util::Intern::MemoryInfo> _pinned_pool;
+
       public:
 
         /// Setup memory pools
@@ -57,7 +147,7 @@ namespace FEAST
         /// Shutdown memory pool and clean up allocated memory pools
         static void finalise()
         {
-          if (_pool.size() > 0)
+          if (_pool.size() > 0 || _pinned_pool.size() > 0)
           {
             std::cout << stderr << " Error: MemoryPool<CPU> still contains memory chunks on deconstructor call" << std::endl;
             std::exit(1);
@@ -84,6 +174,28 @@ namespace FEAST
           return memory;
         }
 
+#ifdef FEAST_BACKENDS_CUDA
+        /// allocate new pinned memory
+        template <typename DT_>
+        static DT_ * allocate_pinned_memory(const Index count)
+        {
+          DT_ * memory(nullptr);
+          if (count == 0)
+            return memory;
+
+          memory = (DT_*) MemoryPool<Mem::CUDA>::template allocate_pinned_memory<DT_>(count);
+          if (memory == nullptr)
+            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
+
+          Util::Intern::MemoryInfo mi;
+          mi.counter = 1;
+          mi.size = count * sizeof(DT_);
+          _pinned_pool.insert(std::pair<void*, Util::Intern::MemoryInfo>(memory, mi));
+
+          return memory;
+        }
+#endif
+
         /// increase memory counter
         static void increase_memory(void * address)
         {
@@ -91,12 +203,20 @@ namespace FEAST
             return;
 
           std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pool.find(address));
-          if (it == _pool.end())
-            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::increase_memory: Memory address not found!");
-          else
+          if (it != _pool.end())
           {
             it->second.counter = it->second.counter + 1;
+            return;
           }
+
+          it = _pinned_pool.find(address);
+          if (it != _pinned_pool.end())
+          {
+            it->second.counter = it->second.counter + 1;
+            return;
+          }
+
+          throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::increase_memory: Memory address not found!");
         }
 
         /// release memory or decrease reference counter
@@ -106,9 +226,7 @@ namespace FEAST
             return;
 
           std::map<void*, Util::Intern::MemoryInfo>::iterator it(_pool.find(address));
-          if (it == _pool.end())
-            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::release_memory: Memory address not found!");
-          else
+          if (it != _pool.end())
           {
             if(it->second.counter == 1)
             {
@@ -119,7 +237,25 @@ namespace FEAST
             {
               it->second.counter = it->second.counter - 1;
             }
+            return;
           }
+
+          it = _pinned_pool.find(address);
+          if (it != _pinned_pool.end())
+          {
+            if(it->second.counter == 1)
+            {
+              MemoryPool<Mem::CUDA>::release_pinned_memory(address);
+              _pinned_pool.erase(it);
+            }
+            else
+            {
+              it->second.counter = it->second.counter - 1;
+            }
+            return;
+          }
+
+          throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::release_memory: Memory address not found!");
         }
 
         /// download memory chunk to host memory
@@ -192,101 +328,8 @@ namespace FEAST
         static void synchronize()
         {
         }
-
     };
 
-    template <>
-    class MemoryPool<Mem::CUDA>
-    {
-      private:
-        //map of allocated device memory patches
-        static std::map<void*, Util::Intern::MemoryInfo> _pool;
-
-        //map of allocated pinned main memory patches
-        static std::map<void*, Util::Intern::MemoryInfo> _pinned_pool;
-
-      public:
-        /// Setup memory pools
-        static void initialise();
-
-        /// Shutdown memory pool and clean up allocated memory pools
-        static void finalise();
-
-        /// allocate new memory
-        template <typename DT_>
-        static DT_ * allocate_memory(const Index count);
-
-        /// increase memory counter
-        static void increase_memory(void * address);
-
-        /// release memory or decrease reference counter
-        static void release_memory(void * address);
-
-        /// allocate new pinned host memory
-        template <typename DT_>
-        static DT_ * allocate_pinned_memory(const Index count);
-
-        /// increase pinned memory counter
-        static void increase_pinned_memory(void * address);
-
-        /// release pinned memory or decrease reference counter
-        static void release_pinned_memory(void * address);
-
-        /// download memory chunk to host memory
-        template <typename DT_>
-        static void download(DT_ * dest, const DT_ * const src, const Index count);
-
-        /// upload memory chunk from host memory to device memory
-        template <typename DT_>
-        static void upload(DT_ * dest, const DT_ * const src, const Index count);
-
-        /// recieve element
-        template <typename DT_>
-        static DT_ get_element(const DT_ * data, const Index index);
-
-        /// set memory to specific value
-        template <typename DT_>
-        static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
-
-        /// Copy memory area from src to dest
-        template <typename DT_>
-        static void copy(DT_ * dest, const DT_ * src, const Index count);
-
-        /// Copy memory area from src to dest
-        template <typename DT_>
-        static void convert(DT_ * dest, const DT_ * src, const Index count);
-
-        /// Convert datatype DT2_ from src into DT1_ in dest
-        template <typename DT1_, typename DT2_>
-        static void convert(DT1_ * dest, const DT2_ * src, const Index count);
-
-        static void synchronize();
-
-        static void reset_device();
-
-        /**
-         * Explicitly shut down cuda device
-         *
-         * This is necessary as the last user defined line of code, if cuda-memcheck is used with leak checking.
-         * This includes a call to cudaResetDevice().
-         *
-        **/
-        static void shutdown_device();
-
-        static void set_blocksize(Index misc, Index reduction, Index spmv, Index axpy);
-
-        /// cuda threading grid blocksize for miscellaneous ops
-        static Index blocksize_misc;
-
-        /// cuda threading grid blocksize for reduction type ops
-        static Index blocksize_reduction;
-
-        /// cuda threading grid blocksize for blas-2 type ops
-        static Index blocksize_spmv;
-
-        /// cuda threading grid blocksize for blas-1 type ops
-        static Index blocksize_axpy;
-    };
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_MEMORY_POOL_HPP
