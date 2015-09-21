@@ -41,8 +41,8 @@ namespace FEAST
 
       };
 
-      /*template <>
-      struct Axpy<Mem::CUDA>
+      template <>
+      struct GatherPrim<Mem::CUDA>
       {
         template <typename DT_>
         static void dv_csr(DT_* b,
@@ -52,7 +52,7 @@ namespace FEAST
                            const Index* row_ptr,
                            const Index size,
                            const Index offset);
-      };*/
+      };
 
 
     } // namespace Arch

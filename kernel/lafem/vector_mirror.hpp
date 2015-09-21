@@ -226,16 +226,6 @@ namespace FEAST
 
         Arch::GatherPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
 
-        // loop over all gather-matrix rows
-        /*for (Index row(0) ; row < num_rows ; ++row)
-        {
-          Tx_ sum(Tx_(0));
-          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
-          {
-            sum += Tx_(val[i]) * Tx_(y[col_idx[i]]);
-          }
-          x[buffer_offset + row] = sum;
-        }*/
       }
 
       template<
@@ -248,7 +238,7 @@ namespace FEAST
                        const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_vector,
                        const Index buffer_offset = Index(0)) const
       {
-        LAFEM::DenseVector<Mem::Main, Tx_, Ix_> buffer;
+        /*LAFEM::DenseVector<Mem::Main, Tx_, Ix_> buffer;
         buffer.convert(cuda_buffer);
 
         LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
@@ -256,7 +246,22 @@ namespace FEAST
 
         gather_prim(buffer, vector, buffer_offset);
 
-        cuda_buffer.convert(buffer);
+        cuda_buffer.convert(buffer);*/
+
+        // skip on empty mirror
+        if(_mirror_gather.empty())
+          return;
+
+        Tx_ * x(cuda_buffer.elements());
+        const Ty_ * y(cuda_vector.elements());
+        const Index * col_idx(_mirror_gather.col_ind());
+        const DataType_* val(_mirror_gather.val());
+        const Index * row_ptr(_mirror_gather.row_ptr());
+        Index num_rows(_mirror_gather.rows());
+
+        ASSERT_(num_rows + buffer_offset <= cuda_buffer.size());
+
+        Arch::GatherPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
       }
 
       /**
