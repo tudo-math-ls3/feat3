@@ -126,29 +126,6 @@ void MemoryPool<Mem::CUDA>::release_memory(void * address)
 }
 
 template <typename DT_>
-DT_ * MemoryPool<Mem::CUDA>::allocate_pinned_memory(const Index count)
-{
-  DT_ * memory(nullptr);
-  if (count == 0)
-    return memory;
-
-  if (cudaErrorMemoryAllocation == cudaMallocHost((void**)&memory, count * sizeof(DT_)))
-    throw InternalError("MemoryPool<CUDA> cuda pinned allocation error (cudaErrorMemoryAllocation)");
-  if (memory == nullptr)
-    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA> pinned allocation error (null pointer returned)");
-  return memory;
-}
-
-void MemoryPool<Mem::CUDA>::release_pinned_memory(void * address)
-{
-  if (address == nullptr)
-    return;
-
-  if (cudaSuccess != cudaFreeHost(address))
-    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::release_pinned_memory: cudaFreeHost failed!");
-}
-
-template <typename DT_>
 void MemoryPool<Mem::CUDA>::download(DT_ * dest, const DT_ * const src, const Index count)
 {
   if (cudaSuccess != cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToHost))
@@ -264,11 +241,6 @@ template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(const Index);
 template unsigned int * MemoryPool<Mem::CUDA>::allocate_memory<unsigned int>(const Index);
 template unsigned long * MemoryPool<Mem::CUDA>::allocate_memory<unsigned long>(const Index);
-
-template float * MemoryPool<Mem::CUDA>::allocate_pinned_memory<float>(const Index);
-template double * MemoryPool<Mem::CUDA>::allocate_pinned_memory<double>(const Index);
-template unsigned int * MemoryPool<Mem::CUDA>::allocate_pinned_memory<unsigned int>(const Index);
-template unsigned long * MemoryPool<Mem::CUDA>::allocate_pinned_memory<unsigned long>(const Index);
 
 template void MemoryPool<Mem::CUDA>::download<float>(float *, const float * const, const Index);
 template void MemoryPool<Mem::CUDA>::download<double>(double *, const double * const, const Index);

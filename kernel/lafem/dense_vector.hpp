@@ -142,6 +142,8 @@ namespace FEAST
        * \param[in] size The size of the created vector.
        * \param[in] pinned_allocation True if the memory should be allocated in a pinned manner.
        *
+       * \warning Pinned memory allocation is only possible in main memory.
+       *
        * Creates a vector with a given size.
        */
       explicit DenseVector(Index size_in, bool pinned_allocation = false) :
@@ -153,17 +155,12 @@ namespace FEAST
 
         this->_scalar_index.push_back(0);
 
-#ifdef FEAST_BACKENDS_CUDA
         if (pinned_allocation)
         {
-          this->_elements.push_back(MemoryPool<Mem_>::template allocate_pinned_memory<DT_>(size_in));
+          this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size_in));
         }
         else
         {
-#else
-        {
-          (void)pinned_allocation;
-#endif
           this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
         }
 

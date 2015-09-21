@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/archs.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 #include <map>
 #include <cstring>
@@ -183,9 +184,7 @@ namespace FEAST
           if (count == 0)
             return memory;
 
-          memory = (DT_*) MemoryPool<Mem::CUDA>::template allocate_pinned_memory<DT_>(count);
-          if (memory == nullptr)
-            throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
+          memory = (DT_*)Util::cuda_malloc_host(count * sizeof(DT_));
 
           Util::Intern::MemoryInfo mi;
           mi.counter = 1;
@@ -248,7 +247,7 @@ namespace FEAST
           {
             if(it->second.counter == 1)
             {
-              MemoryPool<Mem::CUDA>::release_pinned_memory(address);
+              Util::cuda_free_host(address);
               _pinned_pool.erase(it);
             }
             else
