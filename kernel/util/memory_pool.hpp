@@ -58,13 +58,6 @@ namespace FEAST
         /// release memory or decrease reference counter
         static void release_memory(void * address);
 
-        /// \internal Internal: allocate new pinned host memory
-        template <typename DT_>
-        static DT_ * allocate_pinned_memory(const Index count);
-
-        /// \internal Internal: release pinned memory or decrease reference counter
-        static void release_pinned_memory(void * address);
-
         /// download memory chunk to host memory
         template <typename DT_>
         static void download(DT_ * dest, const DT_ * const src, const Index count);
