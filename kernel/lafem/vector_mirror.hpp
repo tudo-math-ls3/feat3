@@ -8,6 +8,7 @@
 #include <kernel/lafem/sparse_vector.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/arch/gather_prim.hpp>
 
 namespace FEAST
 {
@@ -223,8 +224,10 @@ namespace FEAST
 
         ASSERT_(num_rows + buffer_offset <= buffer.size());
 
+        Arch::GatherPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
+
         // loop over all gather-matrix rows
-        for (Index row(0) ; row < num_rows ; ++row)
+        /*for (Index row(0) ; row < num_rows ; ++row)
         {
           Tx_ sum(Tx_(0));
           for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
@@ -232,7 +235,7 @@ namespace FEAST
             sum += Tx_(val[i]) * Tx_(y[col_idx[i]]);
           }
           x[buffer_offset + row] = sum;
-        }
+        }*/
       }
 
       template<
