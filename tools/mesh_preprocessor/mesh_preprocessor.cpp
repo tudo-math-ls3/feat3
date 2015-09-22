@@ -163,7 +163,8 @@ String get_file_title(const String& filename)
     }
 
     delete node;
-    delete atlas;
+    if(atlas != nullptr)
+      delete atlas;
 
     return 0;
   }

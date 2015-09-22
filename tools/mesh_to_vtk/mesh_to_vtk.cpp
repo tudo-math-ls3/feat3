@@ -107,7 +107,8 @@ int run(MeshStreamer& my_streamer, const String& filename, const Index lvl_min, 
   }
 
   delete node;
-  delete atlas;
+  if(atlas != nullptr)
+    delete atlas;
 
   return 0;
 }
