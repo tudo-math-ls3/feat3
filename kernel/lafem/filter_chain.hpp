@@ -287,6 +287,7 @@ namespace FEAST
         first().filter_cor(vector);
       }
     }; // class FilterChain
+    /// \endcond
   } // namespace LAFEM
 } // namespace FEAST
 

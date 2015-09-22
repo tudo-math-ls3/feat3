@@ -136,7 +136,7 @@ namespace FEAST
         return _base_mesh.get_identifier();
       }
     };
-    /// \cond internal
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 
