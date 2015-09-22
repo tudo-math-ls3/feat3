@@ -18,6 +18,7 @@ namespace FEAST
 {
   namespace Geometry
   {
+    // forward declarations
     /// \cond internal
     namespace Intern
     {
@@ -27,9 +28,6 @@ namespace FEAST
       template<int dim_>
       struct AdjacenciesFiller;
     }
-    // forward declarations
-//    template<typename RootMeshType_>
-//    struct MeshWriter;
 
     template<typename Policy_>
     class MeshPartNode DOXY({});
@@ -101,7 +99,6 @@ namespace FEAST
         /// Chart belonging to node
         const MeshChartType* chart;
 
-
       public:
         /**
          * \brief Constructor
@@ -150,7 +147,11 @@ namespace FEAST
       }
 
     public:
-      /// virtual destructor
+      /**
+       * \brief Virtual destructor
+       *
+       * \note _mesh gets deleted because passing it to the MeshNode's constructor passes ownership to it.
+       */
       virtual ~MeshNode()
       {
         CONTEXT(name() + "::~MeshNode()");
@@ -834,7 +835,12 @@ namespace FEAST
         return mesh_writer;
       }
 
-      /// virtual destructor
+      /**
+       * \brief Virtual destructor
+       *
+       * \note _atlas does not get deleted because it is not owned by the RootMeshNode, as several MeshNodes may refer
+       * to the same atlas.
+       */
       virtual ~RootMeshNode()
       {
       }
