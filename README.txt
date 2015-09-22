@@ -4,7 +4,7 @@ FEAST README
 FEAST depends on:
 cmake 2.8 or greater
 python 2.6 or greater
-gcc 4.9+ or icc 14+ or clang 3.6+
+gcc 4.8+ or icc 14+ or clang 3.6+
 
 Additionally you will need a proper c++ compiler and buildsystem.
 In most cases, this might be g++ and gnumake.

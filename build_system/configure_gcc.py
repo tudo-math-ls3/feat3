@@ -10,11 +10,14 @@ def configure_gcc(cpu, buildid, compiler):
   minor2 = int(version["__GNUC_PATCHLEVEL__"])
   print ("Detected gcc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
-  if major < 4  or (major == 4 and minor < 9):
-    print ("Error: GNU Compiler version less then 4.9 is not supported, please update your compiler or choose another one!")
+  if major < 4  or (major == 4 and minor < 8):
+    print ("Error: GNU Compiler version less then 4.8 is not supported, please update your compiler or choose another one!")
     sys.exit(1)
 
-  cxxflags = "-pipe -std=c++11 -ggdb -fdiagnostics-color=always"
+  cxxflags = "-pipe -std=c++11 -ggdb"
+
+  if (major == 4 and minor >= 9) or major > 4:
+    cxxflags += " -fdiagnostics-color=always"
 
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
@@ -33,7 +36,8 @@ def configure_gcc(cpu, buildid, compiler):
     #if major >= 4 and minor >= 8 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
       #cxxflags += " -fsanitize=address"
       #sanitziers need these libraries
-      cxxflags += " -lpthread -ldl"
+    cxxflags += " -lpthread -ldl"
+    if (major >= 4 and minor >= 9) or major > 4:
       cxxflags += " -fsanitize=undefined"
     if major >= 5:
       cxxflags += " -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=bounds"
