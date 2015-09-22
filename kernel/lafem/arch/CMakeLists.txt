@@ -23,6 +23,7 @@ SET (kernel-lafem-arch-list
   product_matvec_generic_banded.cpp
   scale_generic.cpp
   scale_row_col_generic.cpp
+  scatter_axpy_prim_generic.cpp
   scatter_prim_generic.cpp
   slip_filter_generic.cpp
   sum_generic.cpp
@@ -70,6 +71,7 @@ if (FEAST_BACKENDS_CUDA)
     scale.cu
     scale_row_col.cu
     scatter_prim.cu
+    scatter_axpy_prim.cu
     slip_filter.cu
     sum.cu
     unit_filter.cu
