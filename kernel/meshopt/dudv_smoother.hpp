@@ -248,9 +248,6 @@ namespace FEAST
             _cubature_factory  // the cubature factory to be used for integration
             );
 
-          // Assemble homogeneous slip boundary conditions, as the outer normal could have changed
-          _slip_asm.assemble(_filter.template at<0>(), _trafo_space);
-
           return;
         }
 

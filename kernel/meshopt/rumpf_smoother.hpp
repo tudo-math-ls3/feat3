@@ -255,8 +255,10 @@ namespace FEAST
          **/
         virtual void prepare() override
         {
+          // Adapt all slip boundaries
           for(auto& it : _slip_list)
             this->_mesh_node->adapt_by_name(it);
+
           // The slip filter contains the outer unit normal, so reassemble it
           _slip_asm.assemble(_filter.template at<0>(), _trafo_space);
         }
@@ -415,22 +417,6 @@ namespace FEAST
         "ShapeTypes of the transformation / functional have to agree" );
 
       public:
-        /*
-         * \brief Constructor
-         *
-         * \param[in] rmn_
-         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
-         *
-         * \param[in] dirichlet_list_
-         * List of boundary identifiers for enforcing Dirichlet boundary conditions, can be empty
-         *
-         * \param[in] slip_list_
-         * List of boundary identifiers for enforcing slip boundary conditions, can be empty
-         *
-         * \param[in] functional_
-         * Reference to the functional used
-         *
-         */
         /**
          * \copydoc RumpfSmootherBase()
          *

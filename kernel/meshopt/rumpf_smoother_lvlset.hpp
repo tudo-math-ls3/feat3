@@ -558,6 +558,11 @@ namespace FEAST
         virtual void prepare() override
         {
           this->set_coords();
+
+          // Adapt all slip boundaries
+          for(auto& it : this->_slip_list)
+            this->_mesh_node->adapt_by_name(it);
+
           // The slip filter contains the outer unit normal, so reassemble it
           this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
 
@@ -752,6 +757,11 @@ namespace FEAST
         virtual void prepare() override
         {
           this->set_coords();
+
+          // Adapt all slip boundaries
+          for(auto& it : this->_slip_list)
+            this->_mesh_node->adapt_by_name(it);
+
           // The slip filter contains the outer unit normal, so reassemble it
           this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
 

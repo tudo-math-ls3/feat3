@@ -80,6 +80,12 @@ template
   typedef MeshType_ MeshType;
   /// Shape of the mesh cells
   typedef typename MeshType::ShapeType ShapeType;
+  /// Shape of mesh facets
+  typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension - 1>::ShapeType FacetShapeType;
+  /// Type of a surface mesh of facets
+  typedef typename Geometry::ConformalMesh
+  <FacetShapeType, MeshType::world_dim, MeshType::world_dim, typename MeshType::CoordType> SurfaceMeshType;
+
   /// The corresponding transformation
   typedef Trafo::Standard::Mapping<MeshType> TrafoType;
   /// Our functional type
@@ -87,7 +93,7 @@ template
   /// The Rumpf smoother
   typedef RumpfSmootherType_<TrafoType, FunctionalType> RumpfSmootherType;
   /// Type for points in the mesh
-  typedef Tiny::Vector<DataType,2,2> ImgPointType;
+  typedef Tiny::Vector<DataType, MeshType::world_dim> ImgPointType;
 
   /**
    * \brief Routine that does the actual work
@@ -140,23 +146,23 @@ template
 
     std::deque<String> dirichlet_list;
     std::deque<String> slip_list;
-    slip_list.push_back("inner");
     slip_list.push_back("outer");
+    slip_list.push_back("inner");
 
     // This is the centre reference point
     ImgPointType x_0(DataType(0));
 
     // This is the centre point of the rotation of the inner screw
     ImgPointType x_1(DataType(0));
-    DataType excentricity_screw_1(DataType(0.2833));
-    x_1.v[0] = -excentricity_screw_1;
+    DataType excentricity_inner(DataType(0.2833));
+    x_1.v[0] = -excentricity_inner;
     // The indices for the inner screw
-    auto& screw_1_indices = rmn->find_mesh_part("inner")->template get_target_set<0>();
+    auto& inner_indices = rmn->find_mesh_part("inner")->template get_target_set<0>();
 
     // This is the centre point of the rotation of the outer screw
     ImgPointType x_2(DataType(0));
     // The indices for the outer screw
-    auto& screw_2_indices = rmn->find_mesh_part("outer")->template get_target_set<0>();
+    auto& outer_indices = rmn->find_mesh_part("outer")->template get_target_set<0>();
 
     // Parameters for the Rumpf functional
     DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
@@ -257,21 +263,36 @@ template
       ImgPointType x_1_old(x_1);
 
       // This is the new centre point
-      x_1.v[0] = x_0.v[0] - excentricity_screw_1*Math::cos(alpha);
-      x_1.v[1] = x_0.v[1] - excentricity_screw_1*Math::sin(alpha);
+      x_1.v[0] = x_0.v[0] - excentricity_inner*Math::cos(alpha);
+      x_1.v[1] = x_0.v[1] - excentricity_inner*Math::sin(alpha);
 
       ImgPointType tmp(DataType(0));
       ImgPointType tmp2(DataType(0));
-      for(Index i(0); i < screw_1_indices.get_num_entities(); ++i)
+      for(Index i(0); i < inner_indices.get_num_entities(); ++i)
       {
         // Index of boundary vertex i in the mesh
-        Index j(screw_1_indices[i]);
+        Index j(inner_indices[i]);
         // Translate the point to the centre of rotation
         tmp = rumpflpumpfl._coords(j) - x_1_old;
         // Rotate
         tmp2.set_vec_mat_mult(tmp, rot);
         // Translate the point by the new centre of rotation
         rumpflpumpfl._coords(j, x_1 + tmp2);
+      }
+
+      // Rotate the mesh in the discrete chart. This has to use an evil downcast for now
+      auto* inner_chart = reinterpret_cast< Geometry::Atlas::DiscreteChart<MeshType, SurfaceMeshType>*>
+        (atlas->find_mesh_chart("inner"));
+
+      auto& vtx_inner = inner_chart->_surface_mesh->get_vertex_set();
+
+      for(Index i(0); i < inner_chart->_surface_mesh->get_num_entities(0); ++i)
+      {
+        tmp = vtx_inner[i] - x_1_old;
+        // Rotate
+        tmp2.set_vec_mat_mult(tmp, rot);
+        // Translate the point by the new centre of rotation
+        vtx_inner[i] = x_1 + tmp2;
       }
 
       // The outer screw has 7 teeth as opposed to the inner screw with 6, and it rotates at 6/7 of the speed
@@ -282,15 +303,29 @@ template
 
       // The outer screw rotates centrically, so x_2 remains the same at all times
 
-      for(Index i(0); i < screw_2_indices.get_num_entities(); ++i)
+      for(Index i(0); i < outer_indices.get_num_entities(); ++i)
       {
         // Index of boundary vertex i in the mesh
-        Index j(screw_2_indices[i]);
+        Index j(outer_indices[i]);
         tmp = rumpflpumpfl._coords(j) - x_2;
 
         tmp2.set_vec_mat_mult(tmp, rot);
 
         rumpflpumpfl._coords(j, x_2 + tmp2);
+      }
+
+      // Rotate the mesh in the discrete chart. This has to use an evil downcast for now
+      auto* outer_chart = reinterpret_cast<Geometry::Atlas::DiscreteChart<MeshType, SurfaceMeshType>*>
+        (atlas->find_mesh_chart("outer"));
+
+      auto& vtx_outer = outer_chart->_surface_mesh->get_vertex_set();
+
+      for(Index i(0); i < outer_chart->_surface_mesh->get_num_entities(0); ++i)
+      {
+        tmp = vtx_outer[i] - x_2;
+        // Rotate
+        tmp2.set_vec_mat_mult(tmp, rot);
+        vtx_outer[i] = x_2 + tmp2;
       }
 
       // Write new boundary to mesh
@@ -444,7 +479,7 @@ int main(int argc, char* argv[])
 
   typedef double DataType;
 
-  DataType deltat(DataType(1e-4));
+  DataType deltat(DataType(2.5e-4));
 
   // This is the list of all supported meshes that could appear in the mesh file
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> Simplex2Mesh_2d;

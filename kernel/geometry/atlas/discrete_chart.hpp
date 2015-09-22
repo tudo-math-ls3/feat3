@@ -54,7 +54,7 @@ namespace FEAST
           typedef typename BaseClass::CoordType DataType;
           typedef typename BaseClass::WorldPoint WorldPoint;
 
-        protected:
+        public:
           /// Pointer to the surface mesh object
           SurfaceMeshType* _surface_mesh;
 
