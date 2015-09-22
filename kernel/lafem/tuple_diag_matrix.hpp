@@ -364,6 +364,13 @@ namespace FEAST
         rest().format(value);
       }
 
+      /// extract main diagonal vector from matrix
+      void extract_diag(VectorTypeL& diag) const
+      {
+        first().extract_diag(diag.first());
+        rest().extract_diag(diag.rest());
+      }
+
       /**
        * \brief Applies this matrix onto a vector.
        *
@@ -376,14 +383,12 @@ namespace FEAST
        * \param[in] x
        * The multiplicant vector.
        */
-      template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
-        first().template apply<Algo_>(r.first(), x.first());
-        rest().template apply<Algo_>(r.rest(), x.rest());
+        first().apply(r.first(), x.first());
+        rest().apply(r.rest(), x.rest());
       }
 
-      template<typename Algo_>
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x) const
       {
         if (r.size() != this->rows())
@@ -397,8 +402,8 @@ namespace FEAST
         DenseVector<MemType, DataType, IndexType> x_first(x, first().columns(), 0);
         DenseVector<MemType, DataType, IndexType> x_rest(x, rest().columns(), first().columns());
 
-        first().template apply<Algo_>(r_first, x_first);
-        rest().template apply<Algo_>(r_rest, x_rest);
+        first().apply(r_first, x_first);
+        rest().apply(r_rest, x_rest);
       }
 
       /**
@@ -417,14 +422,12 @@ namespace FEAST
        * The summand vector
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_>
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
-        first().template apply<Algo_>(r.first(), x.first(), y.first(), alpha);
-        rest().template apply<Algo_>(r.rest(), x.rest(), y.rest(), alpha);
+        first().apply(r.first(), x.first(), y.first(), alpha);
+        rest().apply(r.rest(), x.rest(), y.rest(), alpha);
       }
 
-      template<typename Algo_>
       void apply(DenseVector<MemType, DataType, IndexType>& r, const DenseVector<MemType, DataType, IndexType>& x,
                  const DenseVector<MemType, DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
@@ -444,8 +447,8 @@ namespace FEAST
         DenseVector<MemType, DataType, IndexType> y_first(y, first().rows(), 0);
         DenseVector<MemType, DataType, IndexType> y_rest(y, rest().rows(), first().rows());
 
-        first().template apply<Algo_>(r_first, x_first, y_first, alpha);
-        rest().template apply<Algo_>(r_rest, x_rest, y_rest, alpha);
+        first().apply(r_first, x_first, y_first, alpha);
+        rest().apply(r_rest, x_rest, y_rest, alpha);
       }
 
       /// Returns a new compatible L-Vector.
@@ -460,18 +463,16 @@ namespace FEAST
         return VectorTypeR(first().create_vector_r(), rest().create_vector_r());
       }
 
-      template<typename Algo_>
       void scale_rows(const TupleDiagMatrix& a, const VectorTypeL& w)
       {
-        first().template scale_rows<Algo_>(a.first(), w.first());
-        rest().template scale_rows<Algo_>(a.rest(), w.rest());
+        first().scale_rows(a.first(), w.first());
+        rest().scale_rows(a.rest(), w.rest());
       }
 
-      template<typename Algo_>
       void scale_cols(const TupleDiagMatrix& a, const VectorTypeL& w)
       {
-        first().template scale_cols<Algo_>(a.first(), w.first());
-        rest().template scale_cols<Algo_>(a.rest(), w.rest());
+        first().scale_cols(a.first(), w.first());
+        rest().scale_cols(a.rest(), w.rest());
       }
 
       /// Returns the number of NNZ-elements of the selected row
@@ -765,16 +766,19 @@ namespace FEAST
         return rows() * columns();
       }
 
-      template<typename Algo_>
-      void apply(VectorTypeL& r, const VectorTypeR& x) const
+      void extract_diag(VectorTypeL& diag) const
       {
-        first().template apply<Algo_>(r.first(), x.first());
+        first().extract_diag(diag.first());
       }
 
-      template<typename Algo_>
+      void apply(VectorTypeL& r, const VectorTypeR& x) const
+      {
+        first().apply(r.first(), x.first());
+      }
+
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
-        first().template apply<Algo_>(r.first(), x.first(), y.first(), alpha);
+        first().apply(r.first(), x.first(), y.first(), alpha);
       }
 
       /// Returns a new compatible L-Vector.
@@ -789,16 +793,14 @@ namespace FEAST
         return VectorTypeR(first().create_vector_r());
       }
 
-      template<typename Algo_>
       void scale_rows(const TupleDiagMatrix& a, const VectorTypeL& w)
       {
-        first().template scale_rows<Algo_>(a.first(), w.first());
+        first().scale_rows(a.first(), w.first());
       }
 
-      template<typename Algo_>
       void scale_cols(const TupleDiagMatrix& a, const VectorTypeL& w)
       {
-        first().template scale_cols<Algo_>(a.first(), w.first());
+        first().scale_cols(a.first(), w.first());
       }
 
       /// Returns the number of NNZ-elements of the selected row

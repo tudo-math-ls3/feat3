@@ -15,6 +15,15 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    /// \cond internal
+    namespace Intern
+    {
+      // helper class for extract_diag function of PowerFullMatrix
+      template<int n_>
+      struct ExtDiagPFM;
+    }
+    /// \endcond
+
     /**
      * \brief Power-Full-Matrix meta class template
      *
@@ -289,6 +298,13 @@ namespace FEAST
         _container.format(value);
       }
 
+      /// extract main diagonal vector from matrix
+      void extract_diag(VectorTypeL& diag) const
+      {
+        static_assert(width_ == height_, "cannot extract diagonal from rectangular matrix");
+        Intern::ExtDiagPFM<width_>::extract_diag(*this, diag);
+      }
+
       void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
         _container.apply(r, x);
@@ -331,6 +347,38 @@ namespace FEAST
         return a._container == b._container;
       }
     }; // class PowerFullMatrix
+
+    /// \cond internal
+    namespace Intern
+    {
+      // JacobiHelper specialisation for PowerFullMatrix
+      template<int n_>
+      struct ExtDiagPFM
+      {
+        static_assert(n_ > 1, "invalid block size");
+        template<typename SMT_, int m_>
+        static void extract_diag(
+          const PowerFullMatrix<SMT_, m_, m_>& matrix,
+          PowerVector<typename SMT_::VectorTypeL, m_>& diag)
+        {
+          ExtDiagPFM<n_-1>::extract_diag(matrix, diag);
+          matrix.template at<n_-1,n_-1>().extract_diag(diag.template at<n_-1>());
+        }
+      };
+
+      template<>
+      struct ExtDiagPFM<1>
+      {
+        template<typename SMT_, int m_>
+        static void extract_diag(
+          const PowerFullMatrix<SMT_, m_, m_>& matrix,
+          PowerVector<typename SMT_::VectorTypeL, m_>& diag)
+        {
+          matrix.template at<0,0>().extract_diag(diag.template at<0>());
+        }
+      };
+    } // namespace Intern
+    /// \endcond
   } // namespace LAFEM
 } // namespace FEAST
 

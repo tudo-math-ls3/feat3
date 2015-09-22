@@ -18,14 +18,6 @@ namespace FEAST
 {
   namespace Solver
   {
-    /// \cond internal
-    namespace Intern
-    {
-      template<typename MT_>
-      struct JacobiHelper;
-    } // namespace Intern
-    /// \endcond
-
     /**
      * \brief Jacobi preconditioner implementation
      *
@@ -89,11 +81,8 @@ namespace FEAST
 
       virtual void init_numeric() override
       {
-        // Note: extraction and inversion of the main diagonal is split up into
-        // two steps, as it would not be possible to support Global::Matrix otherwise.
-
         // extract matrix diagonal
-        Intern::JacobiHelper<MatrixType>::extract_diag(_inv_diag, _matrix);
+        _matrix.extract_diag(_inv_diag);
 
         // invert diagonal elements
         _inv_diag.component_invert(_inv_diag, _omega);
@@ -129,103 +118,6 @@ namespace FEAST
     {
       return std::make_shared<JacobiPrecond<Matrix_, Filter_>>(matrix, filter, omega);
     }
-
-    /// \cond internal
-    namespace Intern
-    {
-      // generic JacobiHelper implemenation for scalar matrices
-      template<typename MT_>
-      struct JacobiHelper
-      {
-        static void extract_diag(typename MT_::VectorTypeL& diag, const MT_& matrix)
-        {
-          matrix.extract_diag(diag);
-        }
-      };
-
-      // JacobiHelper specialisation for PowerDiagMatrix
-      template<typename SMT_, int n_>
-      struct JacobiHelper< LAFEM::PowerDiagMatrix<SMT_, n_> >
-      {
-        static_assert(n_ > 1, "invalid block size");
-        typedef LAFEM::PowerDiagMatrix<SMT_, n_> MT;
-        static void extract_diag(typename MT::VectorTypeL& diag, const MT& matrix)
-        {
-          JacobiHelper<SMT_>::extract_diag(diag.first(), matrix.first());
-          JacobiHelper<LAFEM::PowerDiagMatrix<SMT_, n_-1>>::extract_diag(diag.rest(), matrix.rest());
-        }
-      };
-
-      template<typename SMT_>
-      struct JacobiHelper< LAFEM::PowerDiagMatrix<SMT_, 1> >
-      {
-        typedef LAFEM::PowerDiagMatrix<SMT_, 1> MT;
-        static void extract_diag(typename MT::VectorTypeL& diag, const MT& matrix)
-        {
-          JacobiHelper<SMT_>::extract_diag(diag.first(), matrix.first());
-        }
-      };
-
-      // JacobiHelper specialisation for PowerFullMatrix
-      template<typename SMT_, int n_>
-      struct JacobiHelper< LAFEM::PowerFullMatrix<SMT_, n_, n_> >
-      {
-        static_assert(n_ > 1, "invalid block size");
-        template<typename MT_>
-        static void extract_diag(typename MT_::VectorTypeL& diag, const MT_& matrix)
-        {
-          JacobiHelper<LAFEM::PowerFullMatrix<SMT_, n_-1, n_-1>>::extract_diag(diag, matrix);
-          JacobiHelper<SMT_>::extract_diag(diag.template at<n_-1>(), matrix.template at<n_-1,n_-1>());
-        }
-      };
-
-      template<typename SMT_>
-      struct JacobiHelper< LAFEM::PowerFullMatrix<SMT_, 1, 1> >
-      {
-        template<typename MT_>
-        static void extract_diag(typename MT_::VectorTypeL& diag, const MT_& matrix)
-        {
-          JacobiHelper<SMT_>::extract_diag(diag.template at<0>(), matrix.template at<0,0>());
-        }
-      };
-
-      // JacobiHelper specialisation for TupleDiagMatrix
-      template<typename First_, typename... Rest_>
-      struct JacobiHelper< LAFEM::TupleDiagMatrix<First_, Rest_...> >
-      {
-        typedef LAFEM::TupleDiagMatrix<First_, Rest_...> MT;
-        static void extract_diag(typename MT::VectorTypeL& diag, const MT& matrix)
-        {
-          JacobiHelper<First_>::extract_diag(diag.first(), matrix.first());
-          JacobiHelper<LAFEM::TupleDiagMatrix<Rest_...>>::extract_diag(diag.rest(), matrix.rest());
-        }
-      };
-
-      template<typename First_>
-      struct JacobiHelper< LAFEM::TupleDiagMatrix<First_> >
-      {
-        typedef LAFEM::TupleDiagMatrix<First_> MT;
-        static void extract_diag(typename MT::VectorTypeL& diag, const MT& matrix)
-        {
-          JacobiHelper<First_>::extract_diag(diag.first(), matrix.first());
-        }
-      };
-
-      // JacobiHelper specialisation for Global::Matrix
-      template<typename LocalMatrix_>
-      struct JacobiHelper< Global::Matrix<LocalMatrix_> >
-      {
-        typedef Global::Matrix<LocalMatrix_> MT;
-        static void extract_diag(typename MT::VectorTypeL& diag, const MT& matrix)
-        {
-          // extract local diagonal
-          JacobiHelper<LocalMatrix_>::extract_diag(*diag, *matrix);
-          // synchronise to convert from type-0 to type-1
-          diag.sync_0();
-        }
-      };
-    } // namespace Intern
-    /// \endcond
   } // namespace Solver
 } // namespace FEAST
 

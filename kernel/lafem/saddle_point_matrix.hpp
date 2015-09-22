@@ -372,6 +372,13 @@ namespace FEAST
         return rows() * columns();
       }
 
+      /// extract main diagonal vector from matrix
+      void extract_diag(VectorTypeL& diag) const
+      {
+        _matrix_a.extract_diag(diag.first());
+        diag.rest().format();
+      }
+
       /**
        * \brief Applies this matrix onto a vector.
        *

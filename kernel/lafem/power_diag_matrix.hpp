@@ -368,6 +368,13 @@ namespace FEAST
         rest().format(value);
       }
 
+      /// extract main diagonal vector from matrix
+      void extract_diag(VectorTypeL& diag) const
+      {
+        first().extract_diag(diag.first());
+        rest().extract_diag(diag.rest());
+      }
+
       /**
        * \brief Applies this matrix onto a vector.
        *
@@ -765,6 +772,11 @@ namespace FEAST
       void format(DataType value = DataType(0))
       {
         first().format(value);
+      }
+
+      void extract_diag(VectorTypeL& diag) const
+      {
+        first().extract_diag(diag.first());
       }
 
       void apply(VectorTypeL& r, const VectorTypeR& x) const

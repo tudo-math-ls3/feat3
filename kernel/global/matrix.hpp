@@ -85,6 +85,15 @@ namespace FEAST
         return VectorTypeR(_col_gate, _matrix.create_vector_r());
       }
 
+      void extract_diag(VectorTypeL& diag, bool sync = true) const
+      {
+        _matrix.extract_diag(*diag);
+        if(sync)
+        {
+          diag.sync_0();
+        }
+      }
+
       void apply(VectorTypeL& r, const VectorTypeR& x) const
       {
         _matrix.apply(*r, *x);
