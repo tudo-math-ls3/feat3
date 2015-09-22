@@ -117,7 +117,7 @@ namespace FEAST
 
       public:
         /**
-         * \copydoc RumpfSmoother(TrafoType_&, FunctionalType_&)
+         * \copydoc BaseClass::RumpfSmootherBase()
          *
          * \param[in] functional_
          * Reference to the functional used
@@ -177,12 +177,6 @@ namespace FEAST
         {
           // Write any potential changes to the mesh
           this->set_coords();
-
-          //// Save original coordinates
-          //const typename MeshType::VertexSetType& vertex_set = this->get_mesh()->get_vertex_set();
-
-          //for(Index i(0); i < this->get_mesh()->get_num_entities(0); ++i)
-          //  _coords_org(i,vertex_set[i]);
 
           // Assemble the homogeneous filter
           this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
@@ -478,8 +472,6 @@ namespace FEAST
           int termination_type(0);
 
           this->prepare();
-          this->compute_lambda();
-          this->compute_h();
 
           if(this->_r_adaptivity && !this->_update_h)
             optimise_fixpoint_h(total_grad_evals, total_iterations, termination_type);
@@ -565,7 +557,9 @@ namespace FEAST
          **/
         virtual void prepare() override
         {
-          BaseClass::prepare();
+          this->set_coords();
+          // The slip filter contains the outer unit normal, so reassemble it
+          this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
 
           // Project the levelset function to a grid vector on the new grid and...
           FEAST::Assembly::DiscreteVertexProjector::project(_lvlset_vtx_vec, _lvlset_vec, _lvlset_space);
@@ -717,7 +711,7 @@ namespace FEAST
 
       public:
         /**
-         * \copydoc RumpfSmootherLevelset()
+         * \copydoc BaseClass::RumpfSmootherLevelset()
          *
          * \param[in] analytic_function_
          * The analytic function representing the levelset function
@@ -758,13 +752,30 @@ namespace FEAST
         virtual void prepare() override
         {
           this->set_coords();
+          // The slip filter contains the outer unit normal, so reassemble it
+          this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
+
           // Evaluate levelset function
           Assembly::Interpolator::project(this->_lvlset_vec, _analytic_lvlset, this->_lvlset_space);
           // Evaluate the gradient of the levelset function
           Assembly::Interpolator::project(this->_lvlset_grad_vec[0], _analytic_lvlset_grad0, this->_lvlset_space);
           Assembly::Interpolator::project(this->_lvlset_grad_vec[1], _analytic_lvlset_grad1, this->_lvlset_space);
-          // BaseClass::prepare handles projection to grid vectors etc.
-          BaseClass::prepare();
+
+          // Project the levelset function to a grid vector on the new grid and...
+          FEAST::Assembly::DiscreteVertexProjector::project(
+            this->_lvlset_vtx_vec, this->_lvlset_vec, this->_lvlset_space);
+
+          // ... do the same for its gradient
+          for(int d(0); d < MeshType::world_dim; ++d)
+            FEAST::Assembly::DiscreteVertexProjector::project(
+              this->_lvlset_grad_vtx_vec[d],this->_lvlset_grad_vec[d], this->_lvlset_space);
+
+          // As the levelset might be used for r-adaptivity and it's vertex vector might have changed, re-compute
+          if(this->_update_h && this->_r_adaptivity)
+          {
+            this->compute_lambda();
+            this->compute_h();
+          }
         }
     }; // class RumpfSmootherLevelsetAnalytic
 

@@ -77,6 +77,7 @@ class LinearVariationalSmootherTest
 
       // Create the smoother
       SmootherType my_smoother(rmn, dirichlet_list, slip_list);
+      my_smoother.init();
 
       // Set _coords to the original values on the boundary
       for(Index i(0); i < boundary->get_num_entities(0); ++i)

@@ -115,11 +115,12 @@ namespace FEAST
          * \param[in] dirichlet_list_
          * List of boundary identifiers for enforcing Dirichlet boundary conditions, can be empty
          *
-         * \param[in] trafo_
-         * The transformation
+         * \param[in] slip_list_
+         * List of boundary identifiers for enforcing slip boundary conditions, can be empty
          *
-         * \note Because no boundary information is provided, Dirichlet conditions are enforced on the outer
-         * boundary.
+         * \note As the components are decoupled, slip BCs are not supported and slip_list_ is here just for
+         * interface compatibility
+         *
          */
         explicit LaplaceSmoother(Geometry::RootMeshNode<MeshType>* rmn_,
         std::deque<String>& dirichlet_list_, std::deque<String>& DOXY(slip_list_)) :

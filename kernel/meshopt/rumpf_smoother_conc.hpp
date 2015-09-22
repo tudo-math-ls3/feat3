@@ -118,7 +118,7 @@ namespace FEAST
         LAFEM::DenseVectorBlocked<MemType, CoordType, Index, MeshType::world_dim*Shape::FaceTraits<ShapeType,0>::count> _grad_h;
 
         /**
-         * \copydoc RumpfSmootherLevelsetAnalytic()
+         * \copydoc BaseClass::RumpfSmootherLevelsetAnalytic()
          *
          * \note Because the dependence of \f$ h \f$ on the vertex coordinates is taken into account here, \c
          * _update_h is set to \c true.
@@ -162,6 +162,7 @@ namespace FEAST
           // Compute their gradient wrt. the vertex coordinates
           compute_grad_h();
         }
+
         /**
          * \copydoc RumpfSmootherLevelset::prepare()
          *
@@ -171,18 +172,8 @@ namespace FEAST
          **/
         virtual void prepare() override
         {
-          //// Evaluate the gradient of the levelset function
-          //Assembly::Interpolator::project(this->_lvlset_grad_vec[0], this->_analytic_lvlset_grad0, this->_lvlset_space);
-          //Assembly::Interpolator::project(this->_lvlset_grad_vec[1], this->_analytic_lvlset_grad1, this->_lvlset_space);
-          //BaseClass::prepare();
-
-          //if(this->_r_adaptivity)
-          //{
-          //  compute_grad_h();
-          //}
-
           this->set_coords();
-          //this->_slip_asm.assemble(this->filter.at<1>(), this->_trafo_space);
+          this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
           // Evaluate levelset function
           Assembly::Interpolator::project(this->_lvlset_vec, this->_analytic_lvlset, this->_lvlset_space);
 

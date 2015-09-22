@@ -52,7 +52,13 @@ namespace FEAST
         VertexVectorType _coords;
 
       public:
-        /// \brief Constructor
+        /**
+         * \brief Constructor
+         *
+         * \param[in] mesh_node_
+         * The RootMeshNode this mesh optimiser will refer to.
+         *
+         */
         explicit MeshSmoother(Geometry::RootMeshNode<MeshType>* mesh_node_) :
           _mesh_node(mesh_node_),
           _coords(mesh_node_->get_mesh()->get_num_entities(0), CoordType(0))

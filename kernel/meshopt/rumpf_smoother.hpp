@@ -121,8 +121,8 @@ namespace FEAST
         /// Finite Element space for the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
 
-        // Since the functional contains a ShapeType, these have to be the same
-        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
+        /// Since the functional contains a ShapeType, these have to be the same
+        static_assert(std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
         "ShapeTypes of the transformation / functional have to agree" );
 
         /// The transformation defining the physical mesh
@@ -407,12 +407,30 @@ namespace FEAST
         typedef LAFEM::FilterChain<SlipFilterType, DirichletFilterType> FilterType;
         /// Finite Element space for the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
-        // Since the functional contains a ShapeType, these have to be the same
-        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,"ShapeTypes of the transformation / functional have to agree" );
+
+        /// Since the functional contains a ShapeType, these have to be the same
+        static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
+        "ShapeTypes of the transformation / functional have to agree" );
 
       public:
+        /*
+         * \brief Constructor
+         *
+         * \param[in] rmn_
+         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
+         *
+         * \param[in] dirichlet_list_
+         * List of boundary identifiers for enforcing Dirichlet boundary conditions, can be empty
+         *
+         * \param[in] slip_list_
+         * List of boundary identifiers for enforcing slip boundary conditions, can be empty
+         *
+         * \param[in] functional_
+         * Reference to the functional used
+         *
+         */
         /**
-         * \copydoc RumpfSmootherBase(Geometry::RootMeshNode<MeshType>*,std::deque<String>&,std::deque<String>&,TrafoType_&,FunctionalType_&)
+         * \copydoc RumpfSmootherBase()
          *
          */
         explicit RumpfSmoother(Geometry::RootMeshNode<MeshType>* rmn_,

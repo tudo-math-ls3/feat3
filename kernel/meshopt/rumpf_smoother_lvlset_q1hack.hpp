@@ -70,22 +70,21 @@ namespace FEAST
         /// The shape of the mesh's cells
         typedef typename MeshType::ShapeType ShapeType;
 
-        // The functional has to use Simplex<shape_dim> and the trafo Hypercube<shape_dim>
-        //static_assert( std::is_same<ShapeType, Shape::Hypercube<ShapeType::dimension> >::value &&
-        //    std::is_same<typename FunctionalType::ShapeType, Shape::Simplex<ShapeType::dimension> >::value,
-        //    "ShapeTypes of the transformation / functional have to be Hypercube<d>/Simplex<d> for RumpfSmootherQ1Hack" );
+        /// The functional has to use Simplex<shape_dim> and the trafo Hypercube<shape_dim>
+        static_assert( std::is_same<ShapeType, Shape::Hypercube<ShapeType::dimension> >::value &&
+            std::is_same<typename FunctionalType::ShapeType, Shape::Simplex<ShapeType::dimension> >::value,
+            "ShapeTypes of the transformation / functional have to be Hypercube<d>/Simplex<d> for RumpfSmootherQ1Hack" );
 
 
         /// \copydoc BaseClass::RumpfSmootherLevelsetAnalytic()
         explicit RumpfSmootherLevelsetAnalyticQ1Hack(Geometry::RootMeshNode<MeshType>* rmn_,
         std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_,
-          TrafoType_& trafo_, FunctionalType_& functional_, LevelsetFunctionalType_& lvlset_functional_,
+          FunctionalType_& functional_, LevelsetFunctionalType_& lvlset_functional_,
           bool align_to_lvlset_, bool r_adaptivity_,
           AnalyticFunctionType_& analytic_function_,
           AnalyticFunctionGrad0Type_& analytic_function_grad0_,
           AnalyticFunctionGrad1Type_& analytic_function_grad1_)
-          : BaseClass(rmn_, dirichlet_list_, slip_list_,
-            trafo_, functional_, lvlset_functional_,
+          : BaseClass(rmn_, dirichlet_list_, slip_list_, functional_, lvlset_functional_,
             align_to_lvlset_, r_adaptivity_ ,
             analytic_function_, analytic_function_grad0_, analytic_function_grad1_)
             {

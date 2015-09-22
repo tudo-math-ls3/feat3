@@ -77,7 +77,7 @@ namespace FEAST
         /// Since the functional contains a ShapeType, these have to be the same
         static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value, "ShapeTypes of the transformation / functional have to agree" );
 
-        /// \copydoc RumpfSmootherBase(TrafoType_&, FunctionalType_&, FilterType&)
+        /// \copydoc RumpfSmootherBase()
         explicit RumpfSmootherQ1Hack(Geometry::RootMeshNode<MeshType>* rmn_,
         std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_, FunctionalType_& functional_)
           : BaseClass(rmn_, dirichlet_list_, slip_list_, functional_)
