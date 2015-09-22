@@ -20,13 +20,13 @@ namespace FEAST
 
 #ifndef SERIAL
           ///TODO implement version with active queue of requests
-          template<typename TargetVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
+          template<typename TargetVectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
           static void exec(
                            TargetVectorT_& target,
                            const StorageT_<VectorMirrorT_, std::allocator<VectorMirrorT_> >& mirrors,
                            StorageT_<Index, std::allocator<Index> >& other_ranks,
-                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& sendbufs,
-                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& recvbufs,
+                           StorageT_<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType>, std::allocator<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType> > >& sendbufs,
+                           StorageT_<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType>, std::allocator<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType> > >& recvbufs,
                            const StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                            )
@@ -139,14 +139,14 @@ namespace FEAST
 
 #ifndef SERIAL
           ///TODO start all recvs in one sweep first
-          template<typename TargetVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
+          template<typename TargetVectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
           static void exec(
                            TargetVectorT_& target,
                            const StorageT_<VectorMirrorT_, std::allocator<VectorMirrorT_> >& mirrors,
                            const TargetVectorT_& frequencies,
                            StorageT_<Index, std::allocator<Index> > other_ranks,
-                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& sendbufs,
-                           StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >& recvbufs,
+                           StorageT_<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType>, std::allocator<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType> > >& sendbufs,
+                           StorageT_<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType>, std::allocator<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType> > >& recvbufs,
                            const StorageT_<Index, std::allocator<Index> >& tags,
                            Communicator communicator = Communicator(MPI_COMM_WORLD)
                            )

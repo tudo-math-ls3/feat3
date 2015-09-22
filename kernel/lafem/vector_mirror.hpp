@@ -9,6 +9,7 @@
 #include <kernel/lafem/sparse_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/arch/gather_prim.hpp>
+#include <kernel/lafem/arch/scatter_prim.hpp>
 
 namespace FEAST
 {
@@ -38,6 +39,7 @@ namespace FEAST
      * coefficients.
      *
      * \author Peter Zajac
+     * \author Markus Geveler
      */
     template<
       typename Mem_,
@@ -234,23 +236,14 @@ namespace FEAST
         typename Ty_,
         typename Iy_>
       void gather_prim(
-                       LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_buffer,
+                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                        const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_vector,
                        const Index buffer_offset = Index(0)) const
       {
-        /*LAFEM::DenseVector<Mem::Main, Tx_, Ix_> buffer;
-        buffer.convert(cuda_buffer);
-
-        LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
-        vector.convert(cuda_vector);
-
-        gather_prim(buffer, vector, buffer_offset);
-
-        cuda_buffer.convert(buffer);*/
-
-        // skip on empty mirror
         if(_mirror_gather.empty())
           return;
+
+        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_> cuda_buffer(buffer.size());
 
         Tx_ * x(cuda_buffer.elements());
         const Ty_ * y(cuda_vector.elements());
@@ -262,6 +255,9 @@ namespace FEAST
         ASSERT_(num_rows + buffer_offset <= cuda_buffer.size());
 
         Arch::GatherPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
+
+        //download
+        buffer.convert(cuda_buffer);
       }
 
       /**
@@ -326,20 +322,16 @@ namespace FEAST
         typename Ty_,
         typename Iy_>
       void gather_axpy_prim(
-                            LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_buffer,
+                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                             const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
-        LAFEM::DenseVector<Mem::Main, Tx_, Ix_> buffer;
-        buffer.convert(cuda_buffer);
-
+        ///TODO
         LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
         vector.convert(cuda_vector);
 
         gather_axpy_prim(buffer, vector, alpha, buffer_offset);
-
-        cuda_buffer.convert(buffer);
       }
 
       /**
@@ -386,8 +378,10 @@ namespace FEAST
         (void)num_cols;
 #endif
 
+        Arch::ScatterPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
+
         // loop over all scatter-matrix rows
-        for (Index row(0) ; row < num_rows ; ++row)
+        /*for (Index row(0) ; row < num_rows ; ++row)
         {
           // skip empty rows
           if(row_ptr[row] >= row_ptr[row + 1])
@@ -399,7 +393,7 @@ namespace FEAST
             sum += Tx_(val[i]) * Tx_(y[buffer_offset + col_idx[i]]);
           }
           x[row] = sum;
-        }
+        }*/
       }
 
       template<
@@ -409,18 +403,41 @@ namespace FEAST
         typename Iy_>
       void scatter_prim(
                         LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_vector,
-                        const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_buffer,
+                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
-        LAFEM::DenseVector<Mem::Main, Tx_, Ix_> buffer;
-        buffer.convert(cuda_buffer);
+        // skip on empty mirror
+        if(_mirror_scatter.empty())
+          return;
 
-        LAFEM::DenseVector<Mem::Main, Ty_, Iy_> vector;
-        vector.convert(cuda_vector);
+        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_buffer(buffer.size());
 
-        scatter_prim(vector, buffer, buffer_offset);
+        Tx_ * x(cuda_vector.elements());
+        const Ty_ * y(cuda_buffer.elements());
+        const Index * col_idx(_mirror_scatter.col_ind());
+        const DataType_* val(_mirror_scatter.val());
+        const Index * row_ptr(_mirror_scatter.row_ptr());
+        const Index num_rows(_mirror_scatter.rows());
+        const Index num_cols(_mirror_scatter.columns());
 
-        cuda_vector.convert(vector);
+        ASSERT_(num_cols + buffer_offset <= buffer.size());
+
+        Arch::ScatterPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
+
+        // loop over all scatter-matrix rows
+        /*for (Index row(0) ; row < num_rows ; ++row)
+        {
+          // skip empty rows
+          if(row_ptr[row] >= row_ptr[row + 1])
+            continue;
+
+          Tx_ sum(Tx_(0));
+          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
+          {
+            sum += Tx_(val[i]) * Tx_(y[buffer_offset + col_idx[i]]);
+          }
+          x[row] = sum;
+        }*/
       }
 
       /**
