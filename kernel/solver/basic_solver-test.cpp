@@ -135,7 +135,7 @@ public:
       // create a SOR preconditioner
       auto precon = Solver::new_sor_precond(matrix, filter, DataType(1.7));
       // create a Richardson solver
-      Richardson<MatrixType, FilterType> solver(matrix, filter, precon);
+      Richardson<MatrixType, FilterType> solver(matrix, filter, DataType(1.0), precon);
       solver.set_max_iter(1000);
       test_solver("Richardson-SOR(1.7)", solver, vec_sol, vec_ref, vec_rhs);
     }

@@ -53,14 +53,14 @@ namespace FEAST
        * \param[in] filter
        * A reference to the system filter.
        *
-       * \param[in] precond
-       * A pointer to the preconditioner. May be \c nullptr.
-       *
        * \param[in] omega
        * The damping parameter for the solver.
+       *
+       * \param[in] precond
+       * A pointer to the preconditioner. May be \c nullptr.
        */
       explicit Richardson(const MatrixType& matrix, const FilterType& filter,
-        std::shared_ptr<PrecondType> precond = nullptr, DataType omega = DataType(1)) :
+        DataType omega = DataType(1), std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("Richardson", matrix, filter, precond),
         _omega(omega)
       {
@@ -153,23 +153,42 @@ namespace FEAST
      * \param[in] filter
      * The system filter.
      *
-     * \param[in] precond
-     * The preconditioner. May be \c nullptr.
-     *
      * \param[in] omega
      * The damping parameter for the solver.
+     *
+     * \param[in] precond
+     * The preconditioner. May be \c nullptr.
      *
      * \returns
      * A shared pointer to a new Richardson object.
      */
+     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
       const Matrix_& matrix, const Filter_& filter,
-      std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr,
       typename Matrix_::DataType omega = typename Matrix_::DataType(1))
     {
-      return std::make_shared<Richardson<Matrix_, Filter_>>(matrix, filter, precond, omega);
+      return std::make_shared<Richardson<Matrix_, Filter_>>(matrix, filter, omega, nullptr);
     }
+    template<typename Matrix_, typename Filter_, typename Precond_>
+    inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
+      const Matrix_& matrix, const Filter_& filter,
+      typename Matrix_::DataType omega,
+      std::shared_ptr<Precond_> precond)
+    {
+      return std::make_shared<Richardson<Matrix_, Filter_>>(matrix, filter, omega, precond);
+    }
+#else
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
+      const Matrix_& matrix, const Filter_& filter,
+      typename Matrix_::DataType omega = typename Matrix_::DataType(1),
+      std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
+    {
+      return std::make_shared<Richardson<Matrix_, Filter_>>(matrix, filter, omega, precond);
+    }
+#endif
   } // namespace Solver
 } // namespace FEAST
 

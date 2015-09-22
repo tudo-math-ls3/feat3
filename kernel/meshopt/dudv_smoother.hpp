@@ -225,7 +225,7 @@ namespace FEAST
         template<typename Matrix_, typename Filter_>
         static std::shared_ptr<Solver::IterativeSolver<Matrix_, Filter_>> solver(Matrix_& matrix, Filter_& filter)
         {
-          auto my_solver = Solver::new_pcg<Matrix_, Filter_>(matrix, filter, nullptr);
+          auto my_solver = Solver::new_pcg<Matrix_, Filter_>(matrix, filter);
           return my_solver;
         }
       };

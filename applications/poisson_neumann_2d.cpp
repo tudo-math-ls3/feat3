@@ -304,7 +304,7 @@ namespace PoissonNeumann2D
     auto solver = Solver::new_pcg(matrix, filter, mgv);
     //auto solver = Solver::new_bicgstab(matrix, filter, mgv);
     //auto solver = Solver::new_fgmres(matrix, filter, 8, 0.0, mgv);
-    //auto solver = Solver::new_richardson(matrix, filter, mgv);
+    //auto solver = Solver::new_richardson(matrix, filter, 1.0, mgv);
 
     // enable plotting
     solver->set_plot(rank == 0);

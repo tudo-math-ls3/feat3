@@ -217,7 +217,7 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
   auto vanka = Solver::new_vanka(matrix, filter, vtype, 1.0, 10);
 
   // create richardson
-  auto solver = Solver::new_richardson(matrix, filter, vanka);
+  auto solver = Solver::new_richardson(matrix, filter, 1.0, vanka);
   //auto solver = Solver::new_fgmres(matrix, filter, 16, 0.0, vanka);
 
   solver->set_max_iter(1);

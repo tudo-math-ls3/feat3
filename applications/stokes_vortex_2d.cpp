@@ -484,7 +484,7 @@ namespace StokesVortex2D
       );
 
     // create our solver
-    auto solver = Solver::new_richardson(matrix, filter, schur);
+    auto solver = Solver::new_richardson(matrix, filter, DataType(1), schur);
 
     // enable plotting
     solver->set_plot(rank == 0);

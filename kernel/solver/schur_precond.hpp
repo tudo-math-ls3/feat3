@@ -543,6 +543,20 @@ namespace FEAST
      * \returns
      * A shared pointer to a new SchurPrecond object.
      */
+     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+    template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_, typename SolverA_, typename SolverS_>
+    inline std::shared_ptr<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>> new_schur_precond(
+      const MatrixA_& matrix_a, const MatrixB_& matrix_b, const MatrixD_& matrix_d,
+      const FilterV_& filter_v, const FilterP_& filter_p,
+      std::shared_ptr<SolverA_> solver_a,
+      std::shared_ptr<SolverS_> solver_s,
+      SchurType type = SchurType::diagonal)
+    {
+      return std::make_shared<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
+        (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type);
+    }
+#else
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_>
     inline std::shared_ptr<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>> new_schur_precond(
       const MatrixA_& matrix_a, const MatrixB_& matrix_b, const MatrixD_& matrix_d,
@@ -554,6 +568,7 @@ namespace FEAST
       return std::make_shared<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
         (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type);
     }
+#endif
   } // namespace Solver
 } // namespace FEAST
 

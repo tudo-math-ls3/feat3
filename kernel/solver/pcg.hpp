@@ -188,6 +188,22 @@ namespace FEAST
      * \returns
      * A shared pointer to a new PCG object.
      */
+     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<PCG<Matrix_, Filter_>> new_pcg(
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<PCG<Matrix_, Filter_>>(matrix, filter, nullptr);
+    }
+    template<typename Matrix_, typename Filter_, typename Precond_>
+    inline std::shared_ptr<PCG<Matrix_, Filter_>> new_pcg(
+      const Matrix_& matrix, const Filter_& filter,
+      std::shared_ptr<Precond_> precond)
+    {
+      return std::make_shared<PCG<Matrix_, Filter_>>(matrix, filter, precond);
+    }
+#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PCG<Matrix_, Filter_>> new_pcg(
       const Matrix_& matrix, const Filter_& filter,
@@ -195,6 +211,7 @@ namespace FEAST
     {
       return std::make_shared<PCG<Matrix_, Filter_>>(matrix, filter, precond);
     }
+#endif
   } // namespace Solver
 } // namespace FEAST
 

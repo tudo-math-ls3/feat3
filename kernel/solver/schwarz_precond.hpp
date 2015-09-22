@@ -119,6 +119,17 @@ namespace FEAST
      * \returns
      * A shared pointer to a new SchwarzPrecond object.
      */
+     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+    template<typename LocalFilter_, typename LocalSolver_>
+    inline std::shared_ptr<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType>, Global::Filter<LocalFilter_>>> new_schwarz_precond(
+      std::shared_ptr<LocalSolver_> local_solver,
+      Global::Filter<LocalFilter_>& filter)
+    {
+      return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType>, Global::Filter<LocalFilter_>>>
+        (local_solver, filter);
+    }
+#else
     template<typename LocalFilter_>
     inline std::shared_ptr<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType>, Global::Filter<LocalFilter_>>> new_schwarz_precond(
       std::shared_ptr<SolverBase<typename LocalFilter_::VectorType>> local_solver,
@@ -127,6 +138,7 @@ namespace FEAST
       return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType>, Global::Filter<LocalFilter_>>>
         (local_solver, filter);
     }
+#endif
   } // namespace Solver
 } // namespace FEAST
 
