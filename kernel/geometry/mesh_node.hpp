@@ -447,7 +447,7 @@ namespace FEAST
         // adapt this node
         if(it->second.chart != nullptr)
         {
-          it->second.chart->adapt(*_mesh, *(it->second.node->_mesh));
+          it->second.chart->adapt(*_mesh, *(it->second.node->get_mesh()));
           return true;
         }
 

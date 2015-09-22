@@ -436,7 +436,7 @@ template
     LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim> mesh_velocity(mesh->get_num_entities(0), DataType(0));
 
     std::cout << "deltat = " << scientify(deltat) << std::endl;
-    while(time < DataType(deltat))
+    while(time < DataType(1))
     {
       std::cout << "timestep " << n << std::endl;
       time+= deltat;
@@ -533,7 +533,7 @@ template<typename A, typename B, typename C, typename D, typename E, typename F>
 using MySmootherQ1Hack = Meshopt::RumpfSmootherLevelsetAnalyticQ1Hack<A, B, C, D, E, F>;
 
 template<typename A, typename B>
-using MyFunctional= Meshopt::RumpfFunctionalConc_D2<A, B>;
+using MyFunctional= Meshopt::RumpfFunctionalConc<A, B>;
 
 template<typename A, typename B>
 using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctionalConc>;

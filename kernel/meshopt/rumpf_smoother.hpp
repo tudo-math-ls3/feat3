@@ -255,6 +255,8 @@ namespace FEAST
          **/
         virtual void prepare() override
         {
+          for(auto& it : _slip_list)
+            this->_mesh_node->adapt_by_name(it);
           // The slip filter contains the outer unit normal, so reassemble it
           _slip_asm.assemble(_filter.template at<0>(), _trafo_space);
         }
