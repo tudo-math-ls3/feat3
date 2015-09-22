@@ -179,8 +179,10 @@ class SlipFilterAssemblyTest
 
       typedef Tiny::Vector<DT_, world_dim> ValueType;
       typedef DenseVectorBlocked<MemType_, DT_, IT_, world_dim> VectorType;
+      typedef DenseVectorBlocked<Mem::Main, DT_, IT_, world_dim> CheckVectorType;
 
       typedef SlipFilter<MemType_, DT_, IT_, world_dim> FilterType;
+      typedef SlipFilter<Mem::Main, DT_, IT_, world_dim> CheckFilterType;
 
       typedef Trafo::Standard::Mapping<MeshType> TrafoType;
       // The SlipFilter is implemented for Lagrange 1 only
@@ -337,16 +339,16 @@ class SlipFilterAssemblyTest
       Assembly::Interpolator::project(comp1, func1, my_space);
 
       // Paste the components into a blocked vector and keep a copy for checking
-      VectorType vec(my_space.get_num_dofs(), DT_(0));
-      VectorType vec_org(my_space.get_num_dofs(), DT_(0));
+      CheckVectorType vec_org(my_space.get_num_dofs(), DT_(0));
       for(Index i(0); i < my_space.get_num_dofs(); ++i)
       {
         ValueType tmp(DT_(0));
         tmp(0) = comp0(i);
         tmp(1) = comp1(i);
-        vec(i, tmp);
         vec_org(i, tmp);
       }
+      VectorType vec(my_space.get_num_dofs(), DT_(0));
+      vec.clone(vec_org);
 
       // The assembler
       Assembly::SlipFilterAssembler<MeshType>slip_filter_assembler(my_trafo.get_mesh()) ;
@@ -360,21 +362,30 @@ class SlipFilterAssemblyTest
 
       // Check results
       const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+
+      // Download the filtered vector if necessary
+      CheckVectorType check_vec;
+      check_vec.convert(vec);
+
+      // Download the filter if necessary
+      CheckFilterType check_filter;
+      check_filter.convert(my_filter);
+
       // First check all filtered entries if they are really orthogonal to the normal vector saved in the filter
-      for(Index i(0); i < my_filter.used_elements(); ++i)
+      for(Index i(0); i < check_filter.used_elements(); ++i)
       {
-        Index j(my_filter.get_indices()[i]);
-        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(vec(j),my_filter.get_nu()(j)), DT_(0), tol);
+        Index j(check_filter.get_indices()[i]);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_nu()(j)), DT_(0), tol);
         // If this was ok, replace with the original value so we can check the whole vector without bothering with
         // identifying the filtered values below
-        vec(j, vec_org(j));
+        check_vec(j, vec_org(j));
       }
 
       // Now check all values in the vector to make sure the filter did not touch the rest
       for(Index i(0); i < my_space.get_num_dofs(); ++i)
       {
         for(int d(0); d < world_dim; ++d)
-          TEST_CHECK_EQUAL(vec(i)(d), vec_org(i)(d));
+          TEST_CHECK_EQUAL(check_vec(i)(d), vec_org(i)(d));
       }
 
       // Clean up
@@ -395,7 +406,10 @@ class SlipFilterAssemblyTest
       typedef Tiny::Vector<DT_, world_dim> ValueType;
       typedef DenseVectorBlocked<MemType_, DT_, IT_, world_dim> VectorType;
 
+      typedef DenseVectorBlocked<Mem::Main, DT_, IT_, world_dim> CheckVectorType;
+
       typedef SlipFilter<MemType_, DT_, IT_, world_dim> FilterType;
+      typedef SlipFilter<Mem::Main, DT_, IT_, world_dim> CheckFilterType;
 
       typedef Trafo::Standard::Mapping<MeshType> TrafoType;
       // The SlipFilter is implemented for Lagrange 1 only
@@ -435,7 +449,7 @@ class SlipFilterAssemblyTest
 
       // Paste the components into a blocked vector and keep a copy for checking
       VectorType vec(my_space.get_num_dofs(), DT_(0));
-      VectorType vec_org(my_space.get_num_dofs(), DT_(0));
+      CheckVectorType vec_org(my_space.get_num_dofs(), DT_(0));
       for(Index i(0); i < my_space.get_num_dofs(); ++i)
       {
         ValueType tmp(DT_(0));
@@ -443,8 +457,9 @@ class SlipFilterAssemblyTest
         tmp(1) = comp1(i);
         tmp(2) = comp2(i);
         vec(i, tmp);
-        vec_org(i, tmp);
       }
+      vec_org.clone(vec);
+
 
       // The assembler
       Assembly::SlipFilterAssembler<MeshType>slip_filter_assembler(my_trafo.get_mesh()) ;
@@ -459,23 +474,33 @@ class SlipFilterAssemblyTest
       // Apply the filter
       my_filter.filter_sol(vec);
 
+
       // Check results
       const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+
+      // Download the filter if necessary
+      CheckFilterType check_filter;
+      check_filter.convert(my_filter);
+
+      // Download the filtered vector if necessary
+      CheckVectorType check_vec;
+      check_vec.convert(vec);
+
       // First check all filtered entries if they are really orthogonal to the normal vector saved in the filter
-      for(Index i(0); i < my_filter.used_elements(); ++i)
+      for(Index i(0); i < check_filter.used_elements(); ++i)
       {
-        Index j(my_filter.get_indices()[i]);
-        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(vec(j),my_filter.get_nu()(j)), DT_(0), tol);
+        Index j(check_filter.get_indices()[i]);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_nu()(j)), DT_(0), tol);
         // If this was ok, replace with the original value so we can check the whole vector without bothering with
         // identifying the filtered values below
-        vec(j, vec_org(j));
+        check_vec(j, vec_org(j));
       }
 
       // Now check all values in the vector to make sure the filter did not touch the rest
       for(Index i(0); i < my_space.get_num_dofs(); ++i)
       {
         for(int d(0); d < world_dim; ++d)
-          TEST_CHECK_EQUAL(vec(i)(d), vec_org(i)(d));
+          TEST_CHECK_EQUAL(check_vec(i)(d), vec_org(i)(d));
       }
 
       // Clean up
@@ -491,4 +516,8 @@ class SlipFilterAssemblyTest
 };
 
 SlipFilterAssemblyTest<Mem::Main, float, Index> sfat_f;
-SlipFilterAssemblyTest<Mem::Main, double, Index> sfat_d;
+SlipFilterAssemblyTest<Mem::Main, double, unsigned int> sfat_d;
+#ifdef FEAST_BACKENDS_CUDA
+SlipFilterAssemblyTest<Mem::CUDA, float, unsigned int> sfat_f_cuda;
+SlipFilterAssemblyTest<Mem::CUDA, double, Index> sfat_d_cuda;
+#endif

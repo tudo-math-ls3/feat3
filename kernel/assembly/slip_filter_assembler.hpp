@@ -321,16 +321,22 @@ namespace FEAST
           if(filter.get_nu().size() == Index(0))
             filter = LAFEM::SlipFilter<MemType_, DataType_, IndexType_, world_dim>(space.get_trafo().get_mesh().get_num_entities(0), space.get_num_dofs());
 
+          LAFEM::SlipFilter<Mem::Main, DataType_, IndexType_, world_dim> buffer;
+          buffer.convert(filter);
+
           // Compute orientations if necessary
           if(recompute)
             OuterNormalComputer<Trafo_>::compute_orientations(_orientation, _facets, space.get_trafo().get_mesh());
 
           // Compute the weighted outer unit normal field
           OuterNormalComputer<Trafo_>::compute_outer_unit_normal(
-            filter.get_nu(), _facets, _orientation, space.get_trafo());
+            buffer.get_nu(), _facets, _orientation, space.get_trafo());
 
           // Generate the filter vector. For the Lagrange 1 with standard trafo case, this is just a clone operation
-          filter.get_filter_vector().clone(filter.get_nu());
+          buffer.get_filter_vector().clone(buffer.get_nu());
+
+          // Upload assembled result
+          filter.convert(buffer);
         }
     }; // class SlipFilterAssembler
 

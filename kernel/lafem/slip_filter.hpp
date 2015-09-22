@@ -82,9 +82,9 @@ namespace FEAST
 
         private:
           /// This will contain the pointwise outer unit normal in all vertices
-          SparseVectorBlocked<MemType, DataType, IndexType, BlockSize> _nu;
+          SparseVectorBlocked<Mem_, DT_, IT_, BlockSize_> _nu;
           /// This will contain the data for filtering
-          SparseVectorBlocked<MemType, DataType, IndexType, BlockSize> _sv;
+          SparseVectorBlocked<Mem_, DT_, IT_, BlockSize_> _sv;
 
         public:
           /// default constructor
@@ -233,7 +233,7 @@ namespace FEAST
           /// \returns The index array.
           const IT_* get_indices() const
           {
-            return _sv.indices;
+            return _sv.indices();
           }
 
           /// \returns The value array.

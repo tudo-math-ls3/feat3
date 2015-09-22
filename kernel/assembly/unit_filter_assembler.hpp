@@ -87,6 +87,10 @@ namespace FEAST
        *
        * \param[in] space
        * The finite-element space for which the filter is to be assembled.
+       *
+       * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
+       * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
+       *
        */
       template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
       void assemble(LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter, const Space_& space) const
@@ -101,14 +105,21 @@ namespace FEAST
           filter = LAFEM::UnitFilter<MemType_, DataType_, IndexType_>(space.get_num_dofs());
         }
 
+        // Create buffer filter for assembly
+        LAFEM::UnitFilter<Mem::Main, DataType_, IndexType_> buffer;
+        buffer.convert(filter);
+
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
         typename std::set<Index>::const_iterator jt(idx_set.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index
-          filter.add(IndexType_(*it), DataType_(0));
+          buffer.add(IndexType_(*it), DataType_(0));
         }
+
+        // Upload assembled result to the filter
+        filter.convert(buffer);
       }
 
       /**
@@ -125,6 +136,9 @@ namespace FEAST
        *
        * \param[in] vector_
        * A LAFEM::DenseVector containing (among other stuff) the entries to be added.
+       *
+       * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
+       * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
        *
        */
       template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
@@ -143,14 +157,21 @@ namespace FEAST
           filter = LAFEM::UnitFilter<MemType_, DataType_, IndexType_>(space.get_num_dofs());
         }
 
+        // Create buffer filter for assembly
+        LAFEM::UnitFilter<Mem::Main, DataType_, IndexType_> buffer;
+        buffer.convert(filter);
+
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
         typename std::set<Index>::const_iterator jt(idx_set.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index
-          filter.add(IndexType_(*it), vector_(IndexType_(*it)));
+          buffer.add(IndexType_(*it), vector_(IndexType_(*it)));
         }
+
+        // Upload assembled result to the filter
+        filter.convert(buffer);
       }
 
       /**
@@ -168,6 +189,10 @@ namespace FEAST
        * \param[in] function
        * An object implementing the Analytic::Function interface representing the boundary value
        * function.
+       *
+       * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
+       * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
+       *
        */
       template<
         typename MemType_,
@@ -190,14 +215,21 @@ namespace FEAST
           filter = LAFEM::UnitFilter<MemType_, DataType_, IndexType_>(space.get_num_dofs());
         }
 
+        // Create buffer filter for assembly
+        LAFEM::UnitFilter<Mem::Main, DataType_, IndexType_> buffer;
+        buffer.convert(filter);
+
         // loop over all dof-indices
         typename std::map<Index, DataType_>::const_iterator it(idx_map.begin());
         typename std::map<Index, DataType_>::const_iterator jt(idx_map.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index
-          filter.add(IndexType_(it->first), it->second);
+          buffer.add(IndexType_(it->first), it->second);
         }
+
+        // Upload assembled result to the filter
+        filter.convert(buffer);
       }
       /**
        * \brief Builds a homogeneous blocked unit filter.
@@ -209,6 +241,10 @@ namespace FEAST
        *
        * \param[in] space
        * The finite-element space for which the filter is to be assembled.
+       *
+       * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
+       * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
+       *
        */
       template<typename MemType_, typename DataType_, typename IndexType_, int BlockSize_, typename Space_>
       void assemble(
@@ -225,6 +261,10 @@ namespace FEAST
           filter = LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>(space.get_num_dofs());
         }
 
+        // Create buffer filter for assembly
+        LAFEM::UnitFilterBlocked<Mem::Main, DataType_, IndexType_, BlockSize_> buffer;
+        buffer.convert(filter);
+
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
         typename std::set<Index>::const_iterator jt(idx_set.end());
@@ -232,8 +272,11 @@ namespace FEAST
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index
-          filter.add(IndexType_(*it), tmp);
+          buffer.add(IndexType_(*it), tmp);
         }
+
+        // Upload assembled result to the filter
+        filter.convert(buffer);
       }
 
       /**
@@ -250,6 +293,10 @@ namespace FEAST
        *
        * \param[in] space
        * The finite-element space for which the filter is to be assembled.
+       *
+       * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
+       * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
+       *
        */
       template<typename MemType_, typename DataType_, typename IndexType_, int BlockSize_, typename Space_>
       void assemble(
@@ -267,14 +314,21 @@ namespace FEAST
           filter = LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>(space.get_num_dofs());
         }
 
+        // Create buffer filter for assembly
+        LAFEM::UnitFilterBlocked<Mem::Main, DataType_, IndexType_, BlockSize_> buffer;
+        buffer.convert(filter);
+
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
         typename std::set<Index>::const_iterator jt(idx_set.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index
-          filter.add(IndexType_(*it), vector_(IndexType_(*it)));
+          buffer.add(IndexType_(*it), vector_(IndexType_(*it)));
         }
+
+        // Upload assembled result to the filter
+        filter.convert(buffer);
       }
 
     }; // class UnitFilterAssembler
