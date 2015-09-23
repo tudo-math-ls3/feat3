@@ -29,8 +29,8 @@ namespace FEAST
 
         /**
          * \brief Constructor
-         **/
-        RumpfFunctional_D2(
+         */
+        explicit RumpfFunctional_D2(
           const DataType fac_norm_,
           const DataType fac_det_,
           const DataType fac_cof_,
@@ -42,6 +42,25 @@ namespace FEAST
           fac_reg_)
           {
           }
+
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfFunctional_D2<"+ShapeType::name()+">";
+        }
+
+        /**
+         * \brief Prints object parameters
+         */
+        void print()
+        {
+          std::cout << name() << std::endl;
+          BaseClass::print();
+        }
 
         /**
          * \brief Computes value the Rumpf functional on one element.

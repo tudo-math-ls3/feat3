@@ -29,8 +29,8 @@ namespace FEAST
 
         /**
          * \brief Constructor
-         **/
-        RumpfFunctional(
+         */
+        explicit RumpfFunctional(
           const DataType fac_norm_,
           const DataType fac_det_,
           const DataType fac_cof_,
@@ -44,8 +44,27 @@ namespace FEAST
           }
 
         /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfFunctional<"+ShapeType::name()+">";
+        }
+
+        /**
+         * \brief Prints object parameters
+         */
+        void print()
+        {
+          std::cout << name() << std::endl;
+          BaseClass::print();
+        }
+
+        /**
          *  \brief Computes value the Rumpf functional on one element.
-         **/
+         */
         template<typename Tx_, typename Th_>
         DataType compute_local_functional(const Tx_& x, const Th_& h)
         {

@@ -167,6 +167,38 @@ namespace FEAST
         };
 
         /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfSmootherLevelset<"+MeshType::name()+">";
+        }
+
+        /**
+         * \brief Prints some characteristics of the RumpfSmoother object
+         */
+        virtual void print() override
+        {
+          std::cout << name() << std::endl;
+
+          BaseClass::print();
+
+          std::cout << "Align to levelset:   " << _align_to_lvlset;
+          if(_align_to_lvlset)
+            std::cout << ", levelset constraint tolerance: " << scientify(lvlset_constraint_tol);
+          std::cout << std::endl;
+
+          std::cout << "Use r-adaptivity:    " << _r_adaptivity;
+          if(_r_adaptivity)
+            std::cout << ", update h in each iteration: " << _update_h;
+            std::cout << ", r_adapt_reg = " << scientify(_r_adapt_reg)
+            << ", r_adapt_pow = " << scientify(_r_adapt_pow);
+          std::cout << std::endl;
+        }
+
+        /**
          * \brief Performs one-time initialisations
          *
          * These are not done in the constructor as compute_lambda() etc. could be overwritten in a derived class,
@@ -190,25 +222,6 @@ namespace FEAST
           this->compute_h();
           // Compute element weights
           this->compute_mu();
-        }
-
-        /// \copydoc RumpfSmoother::print()
-        virtual void print() override
-        {
-          std::cout << "RumpfSmootherLevelset characteristics: " << std::endl;
-
-          std::cout << "Align to levelset:   " << _align_to_lvlset;
-          if(_align_to_lvlset)
-            std::cout << ", levelset constraint tolerance: " << scientify(lvlset_constraint_tol);
-          std::cout << std::endl;
-
-          std::cout << "Use r-adaptivity:    " << _r_adaptivity;
-          if(_r_adaptivity)
-            std::cout << ", update h in each iteration: " << _update_h;
-            std::cout << ", r_adapt_reg = " << scientify(_r_adapt_reg)
-            << ", r_adapt_pow = " << scientify(_r_adapt_pow);
-          std::cout << std::endl;
-          this->_functional.print();
         }
 
         /// \copydoc RumpfSmoother::compute_functional()
@@ -745,6 +758,26 @@ namespace FEAST
         /// \brief Virtual destructor
         virtual ~RumpfSmootherLevelsetAnalytic()
         {
+        }
+
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfSmootherLevelsetAnalytic<"+MeshType::name()+">";
+        }
+
+        /**
+         * \brief Prints some characteristics of the RumpfSmoother object
+         */
+        virtual void print() override
+        {
+          std::cout << name() << std::endl;
+
+          BaseClass::print();
         }
 
         /**

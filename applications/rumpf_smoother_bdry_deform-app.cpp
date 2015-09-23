@@ -96,6 +96,7 @@ template
     // Create the smoother
     RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
     rumpflpumpfl.init();
+    rumpflpumpfl.print();
 
     // The domain is [0,1] x [0,1], so translate every vertex by (0.5, 0.5)
     // Note that we modify the _coords member of the smoother, which means that we modify boundary conditions but

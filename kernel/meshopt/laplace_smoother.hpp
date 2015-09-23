@@ -150,6 +150,16 @@ namespace FEAST
         }
 
         /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "LaplaceSmoother<"+MeshType::name()+">";
+        }
+
+        /**
          * \brief Performs one-time initialisations
          *
          * This is not done in the constructor for the case that the system matrix gets overwritten by a derived

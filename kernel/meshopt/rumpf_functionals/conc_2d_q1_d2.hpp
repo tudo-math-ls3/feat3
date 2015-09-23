@@ -29,8 +29,8 @@ namespace FEAST
       public:
         /**
          * \brief Constructor
-         **/
-        RumpfFunctionalConc_D2(
+         */
+        explicit RumpfFunctionalConc_D2(
           const DataType fac_norm_,
           const DataType fac_det_,
           const DataType fac_cof_,
@@ -40,8 +40,27 @@ namespace FEAST
           }
 
         /**
-         * \brief
-         **/
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfFunctionalConc<"+ShapeType::name()+">";
+        }
+
+        /**
+         * \brief Prints object parameters
+         */
+        void print()
+        {
+          std::cout << name() << std::endl;
+          BaseClass::print();
+        }
+
+        /**
+         * \brief Adds the part coming from the chain rule involving h to the local gradient
+         */
         template<typename Tgrad_, typename Tx_, typename Th_, typename Tgradh_>
         void add_grad_h_part(Tgrad_& grad, const Tx_& x, const Th_& h, const Tgradh_& grad_h)
         {

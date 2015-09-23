@@ -44,6 +44,16 @@ namespace FEAST
           }
 
         /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfFunctional_D2<"+ShapeType::name()+">";
+        }
+
+        /**
          * \brief Computes value the Rumpf functional on one element.
          **/
         template<typename Tx_, typename Th_>

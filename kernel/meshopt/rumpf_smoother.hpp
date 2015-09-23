@@ -158,14 +158,6 @@ namespace FEAST
 
       public:
         /**
-         * \brief Prints some characteristics of the RumpfSmoother object
-         **/
-        virtual void print()
-        {
-          _functional.print();
-        }
-
-        /**
          * \brief Constructor
          *
          * \param[in] rmn_
@@ -217,13 +209,46 @@ namespace FEAST
                 _slip_asm.add_mesh_part(*mpp);
             }
 
-
           }
 
         /// \brief Destructor
         virtual ~RumpfSmootherBase()
         {
         };
+
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfSmootherBase<"+MeshType::name()+">";
+        }
+
+        /**
+         * \brief Prints some characteristics of the RumpfSmoother object
+         **/
+        virtual void print()
+        {
+          if(this->_dirichlet_list.size() > 0)
+          {
+            std::cout << "Dirichlet boundaries:";
+            for(auto& it : this->_dirichlet_list)
+              std::cout << " " << it;
+            std::cout << std::endl;
+          }
+
+          if(this->_slip_list.size() > 0)
+          {
+            std::cout << "Slip boundaries:";
+            for(auto& it : this->_slip_list)
+              std::cout << " " << it;
+            std::cout << std::endl;
+          }
+
+          _functional.print();
+        }
 
         /**
          * \brief Performs one-time initialisations
@@ -388,9 +413,6 @@ namespace FEAST
         /// The precision of the mesh coordinates
         typedef typename MeshType::CoordType CoordType;
 
-        typedef H_EvalType_ H_EvalType;
-
-
         /// Only Mem::Main is supported atm
         typedef Mem::Main MemType;
         /// We always use the precision of the mesh
@@ -436,9 +458,27 @@ namespace FEAST
         {
         };
 
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfSmoother<"+MeshType::name()+">";
+        }
+
+        /**
+         * \brief Prints some characteristics of the RumpfSmoother object
+         */
+        virtual void print() override
+        {
+          std::cout << name() << std::endl;
+          BaseClass::print();
+        }
 
         /// \copydoc RumpfSmootherBase::compute_functional()
-        virtual CoordType compute_functional()
+        virtual CoordType compute_functional() override
         {
           CoordType fval(0);
           // Total number of cells in the mesh
@@ -527,7 +567,7 @@ namespace FEAST
         } // compute_functional
 
         /// \copydoc BaseClass::compute_gradient()
-        virtual void compute_gradient()
+        virtual void compute_gradient() override
         {
           // Total number of cells in the mesh
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
@@ -571,7 +611,7 @@ namespace FEAST
         } // compute_gradient
 
         /// \copydoc MeshSmoother::optimise()
-        virtual void optimise()
+        virtual void optimise() override
         {
           int total_grad_evals(0);
           int total_iterations(0);

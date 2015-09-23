@@ -84,8 +84,32 @@ namespace FEAST
           {
           }
 
+        /// \brief Virtual destructor
+        virtual ~RumpfSmootherQ1Hack()
+        {
+        }
+
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfSmootherQ1Hack<"+MeshType::name()+">";
+        }
+
+        /**
+         * \brief Prints some characteristics of the RumpfSmoother object
+         */
+        virtual void print() override
+        {
+          std::cout << name() << std::endl;
+          BaseClass::print();
+        }
+
         /// \copydoc BaseClass::compute_functional()
-        virtual CoordType compute_functional()
+        virtual CoordType compute_functional() override
         {
           CoordType fval(0);
           // Total number of cells in the mesh
@@ -206,7 +230,7 @@ namespace FEAST
 
         /// \brief Computes the gradient of the functional with regard to the nodal coordinates.
         /// \copydoc BaseClass::compute_gradient()
-        virtual void compute_gradient()
+        virtual void compute_gradient() override
         {
           // Total number of cells in the mesh
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
@@ -267,7 +291,7 @@ namespace FEAST
         } // compute_gradient
 
         /// \copydoc MeshSmoother::optimise()
-        virtual void optimise()
+        virtual void optimise() override
         {
           int total_grad_evals(0);
           int total_iterations(0);

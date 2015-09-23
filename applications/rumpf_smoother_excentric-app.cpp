@@ -165,16 +165,13 @@ template
     auto& outer_indices = rmn->find_mesh_part("outer")->template get_target_set<0>();
 
     // Parameters for the Rumpf functional
-    DataType fac_norm = DataType(1e-0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    DataType fac_norm = DataType(1e-3),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
+    my_functional.print();
 
     // The smoother in all its template glory
     RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
     rumpflpumpfl.init();
-
-    // Print lotsa information
-    std::cout << __func__ << " at refinement level " << lvl_max << std::endl;
-
     rumpflpumpfl.print();
 
     // Arrays for saving the contributions of the different Rumpf functional parts
@@ -490,7 +487,7 @@ int main(int argc, char* argv[])
     return RumpfSmootherExcentricApp<DataType, Simplex2Mesh_2d, MyFunctional, MySmoother>::
       run(my_streamer, lvl_max, deltat);
   if(shape_type == mesh_data.st_quad)
-    return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctionalQ1Hack, MySmootherQ1Hack>::
+    return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctional, MySmoother>::
       run(my_streamer, lvl_max, deltat);
 
   // If no MeshType from the list was in the file, return 1

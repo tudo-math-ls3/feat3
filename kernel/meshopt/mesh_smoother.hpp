@@ -73,6 +73,16 @@ namespace FEAST
           _mesh_node = nullptr;
         }
 
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "MeshSmoother<"+MeshType_::name()+">";
+        }
+
         /// \returns The root mesh
         MeshType* get_mesh()
         {

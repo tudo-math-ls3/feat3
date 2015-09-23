@@ -541,13 +541,10 @@ template
     RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional, my_levelset_functional,
     align_to_lvlset, r_adaptivity, analytic_lvlset, analytic_lvlset_grad0, analytic_lvlset_grad1);
 
-    rumpflpumpfl.init();
-
     // Set the r-adaptivity parameters
     rumpflpumpfl.set_r_adapt_params(r_adapt_reg,r_adapt_pow);
 
-    // Print lotsa information
-    std::cout << __func__ << " at refinement level " << level << std::endl;
+    rumpflpumpfl.init();
     rumpflpumpfl.print();
 
     // Arrays for saving the contributions of the different Rumpf functional parts

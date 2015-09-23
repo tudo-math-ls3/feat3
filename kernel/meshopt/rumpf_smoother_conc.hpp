@@ -141,6 +141,31 @@ namespace FEAST
             this->_update_h = true;
           }
 
+        /// \brief Virtual destructor
+        virtual ~RumpfSmootherLevelsetConcAnalytic()
+        {
+        }
+
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfSmootherLevelsetConcAnalytic<"+MeshType::name()+">";
+        }
+
+        /**
+         * \brief Prints some characteristics of the RumpfSmoother object
+         */
+        virtual void print() override
+        {
+          std::cout << name() << std::endl;
+
+          BaseClass::print();
+        }
+
         /// \copydoc BaseClass::init()
         virtual void init() override
         {

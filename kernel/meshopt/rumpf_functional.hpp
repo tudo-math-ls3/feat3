@@ -72,10 +72,19 @@ namespace FEAST
         {
         }
 
-        /// \brief Print basic information
-        virtual void print()
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
         {
-          std::cout << "RumpfFunctionalBase characteristics: " << std::endl;
+          return "RumpfFunctionalBase";
+        }
+
+        /// \brief Print basic information
+        void print()
+        {
           std::cout << "fac_norm = " << scientify(_fac_norm) << ", fac_det = " << scientify(_fac_det) << ", fac_rec_det = " << scientify(_fac_rec_det) << std::endl;
           std::cout << "fac_cof =  " << scientify(_fac_cof) << ", fac_reg = " << scientify(_fac_reg) << std::endl;
         }

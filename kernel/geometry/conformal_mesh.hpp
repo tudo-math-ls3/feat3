@@ -285,7 +285,7 @@ namespace FEAST
        */
       static String name()
       {
-        return "ConformalMesh<...>";
+        return "ConformalMesh<"+Shape_::name()+","+stringify(num_coords_)+">";
       }
     }; // class ConformalMesh<...>
 

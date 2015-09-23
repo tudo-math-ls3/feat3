@@ -37,18 +37,29 @@ namespace FEAST
         /**
          * \brief Constructor
          */
-        RumpfFunctionalLevelset() :
+        explicit RumpfFunctionalLevelset() :
           fac_lvlset(DataType(1))
           {
           }
 
-        ///**
-        // * \brief Copy constructor
-        // */
-        //RumpfFunctionalLevelset(const RumpfFunctionalLevelset& other) :
-        //  fac_lvlset(other.fac_lvlset)
-        //  {
-        //  }
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfFunctionalLevelset<"+ShapeType::name()+">";
+        }
+
+        /**
+         * \brief Prints object parameters
+         */
+        void print()
+        {
+          std::cout << name() << std::endl;
+          std::cout << "fac_lvlset = " << scientify(fac_lvlset) << std::endl;
+        }
 
         /**
          * \brief Destructor

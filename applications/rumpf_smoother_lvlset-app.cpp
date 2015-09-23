@@ -374,7 +374,6 @@ template
     rumpflpumpfl.set_r_adapt_params(r_adapt_reg,r_adapt_pow);
 
     // Print lotsa information
-    std::cout << __func__ << " at refinement level " << level << std::endl;
     rumpflpumpfl.print();
 
     // Arrays for saving the contributions of the different Rumpf functional parts

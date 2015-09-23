@@ -27,14 +27,34 @@ namespace FEAST
 
         /**
          * \brief Constructor
-         **/
-        RumpfFunctionalQ1Hack( DataType fac_norm_, DataType fac_det_, DataType fac_cof_, DataType fac_reg_) :
-          BaseClass( fac_norm_,
+         */
+        explicit RumpfFunctionalQ1Hack(DataType fac_norm_, DataType fac_det_, DataType fac_cof_, DataType fac_reg_) :
+          BaseClass(fac_norm_,
           fac_det_,
           fac_cof_,
           fac_reg_)
           {
           }
+
+        /**
+         * \brief The class name
+         *
+         * \returns String with the class name
+         */
+        static String name()
+        {
+          return "RumpfFunctionalQ1Hack<"+ShapeType::name()+", "+BaseClass::name()+">";
+        }
+
+        /**
+         * \brief Prints object parameters
+         */
+        void print()
+        {
+          std::cout << name() << std::endl;
+          BaseClass::print();
+        }
+
 
     }; // class RumpfFunctionalQ1Hack
     /// \endcond
