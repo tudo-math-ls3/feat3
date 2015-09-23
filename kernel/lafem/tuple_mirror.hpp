@@ -148,7 +148,7 @@ namespace FEAST
       /**
        * \brief Creates a new buffer vector.
        */
-      DenseVector<MemType, DataType, IndexType> create_buffer_vector() const
+      DenseVector<Mem::Main, DataType, IndexType> create_buffer_vector() const
       {
         return DenseVector<MemType, DataType, IndexType>(size());
       }
@@ -176,7 +176,7 @@ namespace FEAST
       /** \copydoc VectorMirror::gather_prim() */
       template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void gather_prim(
-                       LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                        const LAFEM::TupleVector<Ty_,Tv_...>& vector,
                        const Index buffer_offset = Index(0)) const
       {
@@ -187,7 +187,7 @@ namespace FEAST
       /** \copydoc VectorMirror::gather_axpy_prim() */
       template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void gather_axpy_prim(
-                            LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                             const LAFEM::TupleVector<Ty_,Tv_...>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
@@ -200,7 +200,7 @@ namespace FEAST
       template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void scatter_prim(
                         LAFEM::TupleVector<Ty_, Tv_...>& vector,
-                        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                        const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
         _first.scatter_prim(vector.first(), buffer, buffer_offset);
@@ -211,7 +211,7 @@ namespace FEAST
       template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void scatter_axpy_prim(
                              LAFEM::TupleVector<Ty_, Tv_...>& vector,
-                             const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                             const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
@@ -222,7 +222,7 @@ namespace FEAST
       /** \copydoc VectorMirror::gather_dual() */
       template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void gather_dual(
-                       LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                        const LAFEM::TupleVector<Ty_, Tv_...>& vector,
                        const Index buffer_offset = Index(0)) const
       {
@@ -233,7 +233,7 @@ namespace FEAST
       /** \copydoc VectorMirror::gather_axpy_dual() */
       template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void gather_axpy_dual(
-                            LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                             const LAFEM::TupleVector<Ty_, Tv_...>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
@@ -246,7 +246,7 @@ namespace FEAST
       template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void scatter_dual(
                         LAFEM::TupleVector<Ty_, Tv_...>& vector,
-                        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                        const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
         _first.scatter_dual(vector.first(), buffer, buffer_offset);
@@ -257,7 +257,7 @@ namespace FEAST
       template<typename Tx_, typename Ix_, typename Ty_, typename... Tv_>
       void scatter_axpy_dual(
                              LAFEM::TupleVector<Ty_, Tv_...>& vector,
-                             const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                             const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
@@ -382,7 +382,7 @@ namespace FEAST
       template<typename Tx_, typename Ix_, typename Tv_>
       void scatter_prim(
                         LAFEM::TupleVector<Tv_>& vector,
-                        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                        const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
         _first.scatter_prim(vector.first(), buffer, buffer_offset);
@@ -391,7 +391,7 @@ namespace FEAST
       template<typename Tx_, typename Ix_, typename Tv_>
       void scatter_axpy_prim(
                              LAFEM::TupleVector<Tv_>& vector,
-                             const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                             const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
@@ -400,7 +400,7 @@ namespace FEAST
 
       template<typename Tx_, typename Ix_, typename Tv_>
       void gather_dual(
-                       LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                        const LAFEM::TupleVector<Tv_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
@@ -409,7 +409,7 @@ namespace FEAST
 
       template<typename Tx_, typename Ix_, typename Tv_>
       void gather_axpy_dual(
-                            LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                             const LAFEM::TupleVector<Tv_>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
@@ -420,7 +420,7 @@ namespace FEAST
       template<typename Tx_, typename Ix_, typename Tv_>
       void scatter_dual(
                         LAFEM::TupleVector<Tv_>& vector,
-                        const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                        const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
         _first.scatter_dual(vector.first(), buffer, buffer_offset);
@@ -429,7 +429,7 @@ namespace FEAST
       template<typename Tx_, typename Ix_, typename Tv_>
       void scatter_axpy_dual(
                              LAFEM::TupleVector<Tv_>& vector,
-                             const LAFEM::DenseVector<MemType, Tx_, Ix_>& buffer,
+                             const LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
