@@ -175,9 +175,9 @@ namespace FEAST
       /**
        * \brief Creates a new buffer vector.
        */
-      DenseVector<MemType, DataType, IndexType> create_buffer_vector() const
+      DenseVector<Mem::Main, DataType, IndexType> create_buffer_vector() const
       {
-        return DenseVector<MemType, DataType, IndexType>(size());
+        return DenseVector<Mem::Main, DataType, IndexType>(size());
       }
 
       /**
@@ -537,14 +537,13 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Mx_,
         typename Tx_,
         typename Ix_,
         typename My_,
         typename Ty_,
         typename Iy_>
       void gather_dual(
-                       LAFEM::DenseVector<Mx_, Tx_, Ix_>& buffer,
+                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                        const LAFEM::DenseVector<My_, Ty_, Iy_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
@@ -567,14 +566,13 @@ namespace FEAST
        * The offset within the buffer vector.
        */
       template<
-        typename Mx_,
         typename Tx_,
         typename Ix_,
         typename My_,
         typename Ty_,
         typename Iy_>
       void gather_axpy_dual(
-                            LAFEM::DenseVector<Mx_, Tx_, Ix_>& buffer,
+                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
                             const LAFEM::DenseVector<My_, Ty_, Iy_>& vector,
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
@@ -598,12 +596,11 @@ namespace FEAST
         typename Mx_,
         typename Tx_,
         typename Ix_,
-        typename My_,
         typename Ty_,
         typename Iy_>
       void scatter_dual(
                         LAFEM::DenseVector<Mx_, Tx_, Ix_>& vector,
-                        const LAFEM::DenseVector<My_, Ty_, Iy_>& buffer,
+                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
         this->scatter_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, buffer_offset);
@@ -628,12 +625,11 @@ namespace FEAST
         typename Mx_,
         typename Tx_,
         typename Ix_,
-        typename My_,
         typename Ty_,
         typename Iy_>
       void scatter_axpy_dual(
                              LAFEM::DenseVector<Mx_, Tx_, Ix_>& vector,
-                             const LAFEM::DenseVector<My_, Ty_, Iy_>& buffer,
+                             const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
                              const Tx_ alpha = Tx_(1),
                              const Index buffer_offset = Index(0)) const
       {
