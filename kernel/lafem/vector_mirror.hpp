@@ -200,7 +200,7 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      template<
+      /*template<
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -230,36 +230,30 @@ namespace FEAST
 
         Arch::GatherPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
 
-      }
-
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
+      }*/
       void gather_prim(
-                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                       const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_vector,
+                       LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+                       const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& mem_vector,
                        const Index buffer_offset = Index(0)) const
       {
         if(_mirror_gather.empty())
           return;
 
-        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_> cuda_buffer(buffer.size());
+        LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
 
-        Tx_ * x(cuda_buffer.elements());
-        const Ty_ * y(cuda_vector.elements());
-        const Index * col_idx(_mirror_gather.col_ind());
+        DataType_ * x(mem_buffer.elements());
+        const DataType_ * y(mem_vector.elements());
+        const IndexType_ * col_idx(_mirror_gather.col_ind());
         const DataType_* val(_mirror_gather.val());
-        const Index * row_ptr(_mirror_gather.row_ptr());
+        const IndexType_* row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
-        ASSERT_(num_rows + buffer_offset <= cuda_buffer.size());
+        ASSERT_(num_rows + buffer_offset <= mem_buffer.size());
 
-        Arch::GatherPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
+        Arch::GatherPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
 
         //download
-        buffer.copy(cuda_buffer);
+        buffer.copy(mem_buffer);
       }
 
       /**
@@ -522,7 +516,7 @@ namespace FEAST
                        const LAFEM::DenseVector<My_, Ty_, Iy_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
-        this->gather_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, buffer_offset);
+        this->gather_prim(buffer, vector, buffer_offset);
       }
 
       /**
