@@ -202,8 +202,13 @@ namespace PoissonDirichlet2D
 
     //Lin-Solve phase related typedefs
     //Main-CSR or CUDA-ELL
+#ifdef FEAST_BACKENDS_CUDA
     typedef Mem::CUDA MemTypeSolve;
     typedef Control::ScalarUnitFilterSystemLevel<MemTypeSolve, DataType, IndexType, LAFEM::SparseMatrixELL> SystemLevelTypeSolve;
+#else
+    typedef Mem::Main MemTypeSolve;
+    typedef Control::ScalarUnitFilterSystemLevel<MemTypeSolve, DataType, IndexType, LAFEM::SparseMatrixCSR> SystemLevelTypeSolve;
+#endif
     typedef Control::ScalarBasicTransferLevel<SystemLevelTypeSolve> TransferLevelTypeSolve;
 
     std::deque<SystemLevelTypeSolve*> system_levels_solve;
