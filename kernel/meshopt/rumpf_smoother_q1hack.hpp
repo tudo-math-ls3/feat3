@@ -100,6 +100,10 @@ namespace FEAST
             {0, 3, 2},
             {0, 1, 3}
           };
+
+          // Scale everything with this to be consistent
+          CoordType scal(CoordType(1)/CoordType(n_perms));
+
           // Index set for local/global numbering
           auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
@@ -124,7 +128,7 @@ namespace FEAST
             }
           }
 
-          return fval;
+          return scal*fval;
         } // compute_functional
 
         /**
@@ -146,6 +150,10 @@ namespace FEAST
             {0, 3, 2},
             {0, 1, 3}
           };
+
+          // Scale everything with this to be consistent
+          CoordType scal(CoordType(1)/CoordType(n_perms));
+
           // Index set for local/global numbering
           auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
@@ -179,14 +187,16 @@ namespace FEAST
               }
               fval += this->_mu(cell)*this->_functional.compute_local_functional(x,h, norm_A, det_A, rec_det_A);
 
-              func_norm[cell] += this->_mu(cell) * norm_A;
-              func_det[cell] += this->_mu(cell) * det_A;
-              func_rec_det[cell] += this->_mu(cell) * rec_det_A;
+              func_norm[cell] += scal*this->_mu(cell) * norm_A;
+              func_det[cell] += scal*this->_mu(cell) * det_A;
+              func_rec_det[cell] += scal*this->_mu(cell) * rec_det_A;
             }
             func_norm_tot += func_norm[cell];
             func_det_tot += func_det[cell];
             func_rec_det_tot += func_rec_det[cell];
           }
+
+          fval *= scal;
 
           std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) <<
             ", func_rec_det = " << scientify(func_rec_det_tot) << std::endl;
@@ -213,6 +223,10 @@ namespace FEAST
             {0, 3, 2},
             {0, 1, 3}
           };
+
+          // Scale everything with this to be consistent
+          CoordType scal(CoordType(1)/CoordType(n_perms));
+
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix<CoordType, 3, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
@@ -241,7 +255,7 @@ namespace FEAST
               {
                 Index i(idx(cell,Index(perm[p][j])));
                 Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(this->_grad(i));
-                tmp += this->_mu(cell)*grad_loc[j];
+                tmp += (scal*this->_mu(cell))*grad_loc[j];
 
                 this->_grad(i,tmp);
               }

@@ -145,9 +145,9 @@ template
     MeshType* mesh = rmn->get_mesh();
 
     std::deque<String> dirichlet_list;
+    dirichlet_list.push_back("inner");
     std::deque<String> slip_list;
     slip_list.push_back("outer");
-    slip_list.push_back("inner");
 
     // This is the centre reference point
     ImgPointType x_0(DataType(0));
@@ -399,10 +399,10 @@ template
 }; // struct LevelsetApp
 
 template<typename A, typename B>
-using MyFunctional= Meshopt::RumpfFunctional_D2<A, B>;
+using MyFunctional= Meshopt::RumpfFunctional<A, B>;
 
 template<typename A, typename B>
-using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional_D2>;
+using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
 
 template<typename A, typename B>
 using MySmoother = Meshopt::RumpfSmoother<A, B>;
@@ -479,7 +479,7 @@ int main(int argc, char* argv[])
 
   typedef double DataType;
 
-  DataType deltat(DataType(2.5e-4));
+  DataType deltat(DataType(1e-4));
 
   // This is the list of all supported meshes that could appear in the mesh file
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> Simplex2Mesh_2d;
@@ -490,7 +490,7 @@ int main(int argc, char* argv[])
     return RumpfSmootherExcentricApp<DataType, Simplex2Mesh_2d, MyFunctional, MySmoother>::
       run(my_streamer, lvl_max, deltat);
   if(shape_type == mesh_data.st_quad)
-    return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctional, MySmoother>::
+    return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctionalQ1Hack, MySmootherQ1Hack>::
       run(my_streamer, lvl_max, deltat);
 
   // If no MeshType from the list was in the file, return 1

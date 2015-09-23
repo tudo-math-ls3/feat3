@@ -25,13 +25,11 @@ struct helperclass;
 /**
  * \brief Test for Rumpf smoothers and functionals
  *
- * When the input mesh consists of a single Rumpf reference element, the mesh optimiser is supposed not to change it,
- * as:
- * 1) The functional value is minimal for the reference element and
- * 2) the functional gradient evaluates to zero meaning that
- * 3) the optimiser stops after one evaluation of the gradient.
+ * The input mesh consists of a single Rumpf reference cell of some target scaling. This is then rescaled and the
+ * mesh optimiser is supposed to scale it back to the original scaling.
  *
- * This means the functional value pre and post optimisation should be the same.
+ * If the resulting cell is optimal in the defined sense, the Frobenius norm term should be zero and the determinant
+ * should be 1 (mind the scaling from fac_det etc. in the functional!).
  *
  * \author Jordi Paul
  **/
@@ -74,29 +72,55 @@ class RumpfSmootherTest_2d
       std::deque<String> slip_list;
 
       // In 2d, the cofactor matrix is not used
-      DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
+      DataType fac_norm = DataType(1e0),fac_det = DataType(2),fac_cof = DataType(0), fac_reg(DataType(1e-8));
       FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
       // Create the smoother
       RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
 
-      // It is possible to scale the reference element, but we do not want that here
-      DataType scaling(1);
       // This transforms the unit element to the Rumpf reference element
-      helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, scaling);
-
-      // Since we changed the internal _coords, they have to be copied back to the mesh
+      DataType target_scale(DataType(1.1));
+      helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, target_scale);
+      // init() sets the coordinates in the mesh and computes h
       rumpflpumpfl.init();
 
+      // Now we rescale the Rumpf reference element again, so the optimiser has some work to do
+      DataType scaling(DataType(2.75));
+      helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, scaling);
+      rumpflpumpfl.set_coords();
+
+      DataType func_norm(0), func_det(0), func_rec_det(0);
       // Compute initial functional value
       DataType fval_pre = rumpflpumpfl.compute_functional();
       // Optimise the mesh
       rumpflpumpfl.optimise();
       // Compute new functional value
-      DataType fval_post = rumpflpumpfl.compute_functional();
+      DataType fval_post = rumpflpumpfl.compute_functional(&func_norm, &func_det, &func_rec_det);
 
-      const DataType eps = Math::pow(Math::eps<DataType>(),DataType(0.8));
-      TEST_CHECK_EQUAL_WITHIN_EPS(fval_pre, fval_post, eps);
+      const DataType eps = Math::pow(Math::eps<DataType>(),DataType(0.5));
+
+      // Only check func_norm and func_det. Because of the different factors fac_rec_det depending on the
+      // functionals, func_rec_det is not the same in every case. If func_det==1, we have the correct volume anyway.
+      TEST_CHECK(fval_pre > fval_post);
+      TEST_CHECK_EQUAL_WITHIN_EPS(func_norm, DataType(0), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(func_det, my_functional._fac_det*DataType(1), eps);
+
+      // Now do the negative test: Change the functional in a nonsensical manner. Calling the optimiser should NOT
+      // give the correctly scaled element
+      my_functional._fac_rec_det = DataType(0.6676);
+
+      // Compute initial functional value
+      fval_pre = rumpflpumpfl.compute_functional();
+      // Optimise the mesh
+      rumpflpumpfl.optimise();
+      // Compute new functional value
+      fval_post = rumpflpumpfl.compute_functional(&func_norm, &func_det, &func_rec_det);
+
+      // With the new functional, the functional value should still have decreased
+      TEST_CHECK(fval_pre > fval_post);
+      // These differences should all be greater than eps
+      TEST_CHECK(Math::abs(func_norm - DataType(0)) > eps);
+      TEST_CHECK(Math::abs(func_det - my_functional._fac_det*DataType(1)) > eps);
 
       delete rmn;
 
@@ -109,15 +133,10 @@ using MySmoother = Meshopt::RumpfSmoother<A, B>;
 template<typename A, typename B>
 using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
 
-RumpfSmootherTest_2d<float, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MySmoother> test_hc_f_1;
-RumpfSmootherTest_2d<float, Shape::Hypercube<2>, Meshopt::RumpfFunctional_D2, MySmoother> test_hc_f_2;
-RumpfSmootherTest_2d<float, Shape::Simplex<2>, Meshopt::RumpfFunctional, MySmoother> test_s_f_1;
-RumpfSmootherTest_2d<float, Shape::Simplex<2>, Meshopt::RumpfFunctional_D2, MySmoother> test_s_f_2;
-
-RumpfSmootherTest_2d<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MySmoother> test_hc_d_1;
-RumpfSmootherTest_2d<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional_D2, MySmoother> test_hc_d_2;
-RumpfSmootherTest_2d<double, Shape::Simplex<2>, Meshopt::RumpfFunctional, MySmoother> test_s_d_1;
-RumpfSmootherTest_2d<double, Shape::Simplex<2>, Meshopt::RumpfFunctional_D2, MySmoother> test_s_d_2;
+RumpfSmootherTest_2d<float, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MySmoother> test_hc_1;
+RumpfSmootherTest_2d<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional_D2, MySmoother> test_hc_2;
+RumpfSmootherTest_2d<double, Shape::Simplex<2>, Meshopt::RumpfFunctional, MySmoother> test_s_1;
+RumpfSmootherTest_2d<float, Shape::Simplex<2>, Meshopt::RumpfFunctional_D2, MySmoother> test_s_2;
 
 template<typename A, typename B>
 using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
@@ -126,9 +145,7 @@ template<typename A, typename B>
 using MyFunctionalQ1Hack_D2 = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional_D2>;
 
 RumpfSmootherTest_2d<float, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack> test_q1hack_f_1;
-RumpfSmootherTest_2d<double, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack> test_q1hack_d_1;
 RumpfSmootherTest_2d<double, Shape::Hypercube<2>, MyFunctionalQ1Hack_D2, MySmootherQ1Hack> test_q1hack_d_2;
-RumpfSmootherTest_2d<float, Shape::Hypercube<2>, MyFunctionalQ1Hack_D2, MySmootherQ1Hack> test_q1hack_f_2;
 
 /// \brief Specialisation for hypercubes
 template<int shape_dim_>

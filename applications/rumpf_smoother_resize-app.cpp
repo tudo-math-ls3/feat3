@@ -82,11 +82,9 @@ template
     Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
 
     // Parameters for the Rumpf functional
-    DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(0e0));
+    DataType fac_norm = DataType(1e0),fac_det = DataType(1),fac_cof = DataType(0), fac_reg(DataType(0e0));
     // Create the functional with these parameters
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
-    // This is the correct scaling for the Q1Hack with _D2 functional
-    //my_functional._fac_rec_det = DataType(1);
 
     // As we set no boundary conditions, these lists remain empty
     std::deque<String> dirichlet_list;
@@ -97,23 +95,14 @@ template
     rumpflpumpfl.print();
 
     // Set initial coordinates by scaling the original Rumpf reference cell by ...
-    DataType target_scaling(6);
+    DataType target_scaling(DataType(2.5));
     helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, target_scaling);
-
-    // Since we changed the internal _coords, they have to be copied back to the mesh
+    // init() sets the coordinates in the mesh and computes h
     rumpflpumpfl.init();
 
-    // This is the correct scaling for the Q1Hack with _D2 functional
-    //Tiny::Vector<DataType, MeshType::world_dim> tmp;
-    //tmp(0) = target_scaling*DataType(4)/Math::sqrt(DataType(3));
-    //tmp(1) = target_scaling*DataType(2)*Math::sqrt(DataType(2))*Math::pow(DataType(2)/DataType(3), DataType(1)/DataType(4));
-    //rumpflpumpfl._h(0, tmp);
-
-    DataType scaling(2.5);
     // This transforms the unit element to the Rumpf reference element
+    DataType scaling(DataType(5.5));
     helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, scaling);
-
-    // Since we changed the internal _coords, they have to be copied back to the mesh
     rumpflpumpfl.set_coords();
 
     // Arrays for saving the contributions of the different Rumpf functional parts
@@ -182,11 +171,11 @@ using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
 
 // For the Q1 hack, the functional is a bit more complicated
 template<typename A, typename B>
-using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
+using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional_D2>;
 
 int main()
 {
-  ResizeApp<double, Shape::Simplex<2>, MyFunctional, MySmoother>::run();
+  ResizeApp<double, Shape::Hypercube<2>, MyFunctional, MySmoother>::run();
   return 0;
 }
 

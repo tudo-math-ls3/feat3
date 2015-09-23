@@ -315,7 +315,7 @@ namespace FEAST
           // For given lambda = volume(cell), how do we need to chose h such that the det + 1/det part of the
           // functional has a local minimum for two Rumpf reference simplices of scale h?
           // Lengthy computation with maple says that this is the right constant.
-          DataType_ const2 = DataType(2)/(Math::sqrt(DataType(2)*Math::sqrt(DataType(3))));
+          DataType_ const2 = Math::sqrt(const1);
 
           for(Index cell(0); cell < ncells; ++cell)
           {

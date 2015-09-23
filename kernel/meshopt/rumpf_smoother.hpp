@@ -388,6 +388,9 @@ namespace FEAST
         /// The precision of the mesh coordinates
         typedef typename MeshType::CoordType CoordType;
 
+        typedef H_EvalType_ H_EvalType;
+
+
         /// Only Mem::Main is supported atm
         typedef Mem::Main MemType;
         /// We always use the precision of the mesh
