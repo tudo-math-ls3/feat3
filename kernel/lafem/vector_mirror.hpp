@@ -271,7 +271,7 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      template<
+      /*template<
         typename Tx_,
         typename Ix_,
         typename Ty_,
@@ -301,37 +301,33 @@ namespace FEAST
         ASSERT_(num_rows + buffer_offset <= buffer.size());
 
         Arch::GatherAxpyPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
-      }
+      }*/
 
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
       void gather_axpy_prim(
-                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                            const LAFEM::DenseVector<Mem::CUDA, Ty_, Iy_>& cuda_vector,
-                            const Tx_ alpha = Tx_(1),
+                            LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+                            const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& mem_vector,
+                            const DataType_ alpha = DataType_(1),
                             const Index buffer_offset = Index(0)) const
       {
         // skip on empty mirror
         if(_mirror_gather.empty())
           return;
 
-        DenseVector<Mem::CUDA, Tx_, Ix_> cuda_buffer(buffer.size());
+        DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
 
-        Tx_ * x(cuda_buffer.elements());
-        const Ty_ * y(cuda_vector.elements());
-        const Index * col_idx(_mirror_gather.col_ind());
+        DataType_ * x(mem_buffer.elements());
+        const DataType_ * y(mem_vector.elements());
+        const IndexType_ * col_idx(_mirror_gather.col_ind());
         const DataType_* val(_mirror_gather.val());
-        const Index * row_ptr(_mirror_gather.row_ptr());
+        const IndexType_ * row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
         ASSERT_(num_rows + buffer_offset <= buffer.size());
 
-        Arch::GatherAxpyPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
+        Arch::GatherAxpyPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
 
-        buffer.copy(cuda_buffer);
+        //download
+        buffer.copy(mem_buffer);
       }
 
       /**
@@ -546,7 +542,7 @@ namespace FEAST
                             const Tx_ alpha = Tx_(1),
                             const Index buffer_offset = Index(0)) const
       {
-        this->gather_axpy_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, alpha, buffer_offset);
+        this->gather_axpy_prim(buffer, vector, alpha, buffer_offset);
       }
 
       /**
