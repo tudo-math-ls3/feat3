@@ -19,13 +19,13 @@ namespace FEAST
           return;
 
           // skip empty rows
-          if(row_ptr[idx] >= row_ptr[idx + 1])
+          if(row_ptr[idx] == row_ptr[idx + 1])
             return;
 
-          DT_ sum(DT_(0));
+          DT_ sum(0);
           for (Index i(row_ptr[idx]) ; i < row_ptr[idx + 1] ; ++i)
           {
-            sum += DT_(val[i]) * DT_(b[offset + col_ind[i]]);
+            sum += val[i] * (b[offset + col_ind[i]]);
           }
           v[idx] += alpha * sum;
       }

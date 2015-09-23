@@ -24,13 +24,13 @@ namespace FEAST
         for (Index row(0) ; row < size ; ++row)
         {
           // skip empty rows
-          if(row_ptr[row] >= row_ptr[row + 1])
+          if(row_ptr[row] == row_ptr[row + 1])
             continue;
 
-          DT_ sum(DT_(0));
+          DT_ sum(0);
           for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
           {
-            sum += DT_(val[i]) * DT_(b[offset + col_ind[i]]);
+            sum += val[i] * (b[offset + col_ind[i]]);
           }
           v[row] += alpha * sum;
         }

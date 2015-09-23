@@ -18,11 +18,10 @@ namespace FEAST
         if (idx >= size)
           return;
 
-        // loop over all gather-matrix rows
-        DT_ sum(DT_(0));
+        DT_ sum(0);
         for (Index i(row_ptr[idx]) ; i < row_ptr[idx + 1] ; ++i)
         {
-          sum += DT_(val[i]) * DT_(v[col_ind[i]]);
+          sum += val[i] * v[col_ind[i]];
         }
         b[offset + idx] += alpha * sum;
       }
