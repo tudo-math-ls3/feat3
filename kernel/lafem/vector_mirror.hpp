@@ -200,37 +200,6 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      /*template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
-      void gather_prim(
-                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                       const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& vector,
-                       const Index buffer_offset = Index(0)) const
-      {
-        // skip on empty mirror
-        if(_mirror_gather.empty())
-          return;
-
-        //temp-->
-        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> tmp_mirror_gather;
-        tmp_mirror_gather.convert(_mirror_gather);
-        //<--temp
-
-        Tx_ * x(buffer.elements());
-        const Ty_ * y(vector.elements());
-        const Index * col_idx(tmp_mirror_gather.col_ind());
-        const DataType_* val(tmp_mirror_gather.val());
-        const Index * row_ptr(tmp_mirror_gather.row_ptr());
-        Index num_rows(tmp_mirror_gather.rows());
-
-        ASSERT_(num_rows + buffer_offset <= buffer.size());
-
-        Arch::GatherPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
-
-      }*/
       void gather_prim(
                        LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
                        const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& mem_vector,
@@ -271,38 +240,6 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      /*template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
-      void gather_axpy_prim(
-                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                            const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& vector,
-                            const Tx_ alpha = Tx_(1),
-                            const Index buffer_offset = Index(0)) const
-      {
-        // skip on empty mirror
-        if(_mirror_gather.empty())
-          return;
-
-        //temp-->
-        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> tmp_mirror_gather;
-        tmp_mirror_gather.convert(_mirror_gather);
-        //<--temp
-
-        Tx_ * x(buffer.elements());
-        const Ty_ * y(vector.elements());
-        const Index * col_idx(tmp_mirror_gather.col_ind());
-        const DataType_* val(tmp_mirror_gather.val());
-        const Index * row_ptr(tmp_mirror_gather.row_ptr());
-        Index num_rows(tmp_mirror_gather.rows());
-
-        ASSERT_(num_rows + buffer_offset <= buffer.size());
-
-        Arch::GatherAxpyPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
-      }*/
-
       void gather_axpy_prim(
                             LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
                             const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& mem_vector,
@@ -314,6 +251,7 @@ namespace FEAST
           return;
 
         DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
+        mem_buffer.copy(buffer);
 
         DataType_ * x(mem_buffer.elements());
         const DataType_ * y(mem_vector.elements());
@@ -342,69 +280,29 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
       void scatter_prim(
-                        LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& vector,
-                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
+                        LAFEM::DenseVector<Mem_, DataType_, IndexType_>& mem_vector,
+                        const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
         // skip on empty mirror
         if(_mirror_scatter.empty())
           return;
 
-        //temp-->
-        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> tmp_mirror_scatter;
-        tmp_mirror_scatter.convert(_mirror_scatter);
-        //<--temp
+        LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
+        mem_buffer.copy(buffer);
 
-        Tx_ * x(vector.elements());
-        const Ty_ * y(buffer.elements());
-        const Index * col_idx(tmp_mirror_scatter.col_ind());
-        const DataType_* val(tmp_mirror_scatter.val());
-        const Index * row_ptr(tmp_mirror_scatter.row_ptr());
-        const Index num_rows(tmp_mirror_scatter.rows());
-        const Index num_cols(tmp_mirror_scatter.columns());
-
-        ASSERT_(num_cols + buffer_offset <= buffer.size());
-#ifndef DEBUG
-        (void)num_cols;
-#endif
-
-        Arch::ScatterPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
-      }
-
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
-      void scatter_prim(
-                        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_vector,
-                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
-                        const Index buffer_offset = Index(0)) const
-      {
-        // skip on empty mirror
-        if(_mirror_scatter.empty())
-          return;
-
-        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_> cuda_buffer(buffer.size());
-        cuda_buffer.copy(buffer);
-
-        Tx_ * x(cuda_vector.elements());
-        const Ty_ * y(cuda_buffer.elements());
-        const Index * col_idx(_mirror_scatter.col_ind());
+        DataType_ * x(mem_vector.elements());
+        const DataType_ * y(mem_buffer.elements());
+        const IndexType_ * col_idx(_mirror_scatter.col_ind());
         const DataType_* val(_mirror_scatter.val());
-        const Index * row_ptr(_mirror_scatter.row_ptr());
+        const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
 
-        Arch::ScatterPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
+        Arch::ScatterPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
       }
 
       /**
@@ -422,71 +320,30 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
       void scatter_axpy_prim(
-                             LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& vector,
-                             const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
-                             const Tx_ alpha = Tx_(1),
+                             LAFEM::DenseVector<Mem_, DataType_, IndexType_>& mem_vector,
+                             const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+                             const DataType_ alpha = DataType_(1),
                              const Index buffer_offset = Index(0)) const
       {
         // skip on empty mirror
         if(_mirror_scatter.empty())
           return;
 
-        //temp-->
-        SparseMatrixCSR<Mem::Main, DataType_, IndexType_> tmp_mirror_scatter;
-        tmp_mirror_scatter.convert(_mirror_scatter);
-        //<--temp
+        LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
+        mem_buffer.copy(buffer);
 
-        Tx_ * x(vector.elements());
-        const Ty_ * y(buffer.elements());
-        const Index * col_idx(tmp_mirror_scatter.col_ind());
-        const DataType_* val(tmp_mirror_scatter.val());
-        const Index * row_ptr(tmp_mirror_scatter.row_ptr());
-        const Index num_rows(tmp_mirror_scatter.rows());
-        const Index num_cols(tmp_mirror_scatter.columns());
-
-        ASSERT_(num_cols + buffer_offset <= buffer.size());
-#ifndef DEBUG
-        (void)num_cols;
-#endif
-
-        Arch::ScatterAxpyPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
-      }
-
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
-      void scatter_axpy_prim(
-                             LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_>& cuda_vector,
-                             const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
-                             const Tx_ alpha = Tx_(1),
-                             const Index buffer_offset = Index(0)) const
-      {
-        // skip on empty mirror
-        if(_mirror_scatter.empty())
-          return;
-
-        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_> cuda_buffer(buffer.size());
-        cuda_buffer.copy(buffer);
-
-        Tx_ * x(cuda_vector.elements());
-        const Ty_ * y(cuda_buffer.elements());
-        const Index * col_idx(_mirror_scatter.col_ind());
+        DataType_ * x(mem_vector.elements());
+        const DataType_ * y(mem_buffer.elements());
+        const IndexType_ * col_idx(_mirror_scatter.col_ind());
         const DataType_* val(_mirror_scatter.val());
-        const Index * row_ptr(_mirror_scatter.row_ptr());
+        const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
 
-        Arch::ScatterAxpyPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
+        Arch::ScatterAxpyPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
       }
 
       /**
@@ -501,15 +358,9 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename My_,
-        typename Ty_,
-        typename Iy_>
       void gather_dual(
-                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                       const LAFEM::DenseVector<My_, Ty_, Iy_>& vector,
+                       LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+                       const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& vector,
                        const Index buffer_offset = Index(0)) const
       {
         this->gather_prim(buffer, vector, buffer_offset);
@@ -530,16 +381,10 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      template<
-        typename Tx_,
-        typename Ix_,
-        typename My_,
-        typename Ty_,
-        typename Iy_>
       void gather_axpy_dual(
-                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
-                            const LAFEM::DenseVector<My_, Ty_, Iy_>& vector,
-                            const Tx_ alpha = Tx_(1),
+                            LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+                            const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& vector,
+                            const DataType_ alpha = DataType_(1),
                             const Index buffer_offset = Index(0)) const
       {
         this->gather_axpy_prim(buffer, vector, alpha, buffer_offset);
@@ -557,18 +402,12 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      template<
-        typename Mx_,
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
       void scatter_dual(
-                        LAFEM::DenseVector<Mx_, Tx_, Ix_>& vector,
-                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
+                        LAFEM::DenseVector<Mem_, DataType_, IndexType_>& vector,
+                        const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
                         const Index buffer_offset = Index(0)) const
       {
-        this->scatter_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, buffer_offset);
+        this->scatter_prim(vector, buffer, buffer_offset);
       }
 
       /**
@@ -586,19 +425,13 @@ namespace FEAST
        * \param[in] buffer_offset
        * The offset within the buffer vector.
        */
-      template<
-        typename Mx_,
-        typename Tx_,
-        typename Ix_,
-        typename Ty_,
-        typename Iy_>
       void scatter_axpy_dual(
-                             LAFEM::DenseVector<Mx_, Tx_, Ix_>& vector,
-                             const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
-                             const Tx_ alpha = Tx_(1),
+                             LAFEM::DenseVector<Mem_, DataType_, IndexType_>& vector,
+                             const LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>& buffer,
+                             const DataType_ alpha = DataType_(1),
                              const Index buffer_offset = Index(0)) const
       {
-        this->scatter_axpy_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, alpha, buffer_offset);
+        this->scatter_axpy_prim(vector, buffer, alpha, buffer_offset);
       }
 
       /// \copydoc gather_prim()
