@@ -259,7 +259,7 @@ namespace FEAST
         Arch::GatherPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
 
         //download
-        buffer.convert(cuda_buffer);
+        buffer.copy(cuda_buffer);
       }
 
       /**
