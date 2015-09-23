@@ -177,7 +177,7 @@ namespace FEAST
        */
       DenseVector<Mem::Main, DataType, IndexType> create_buffer_vector() const
       {
-        return DenseVector<Mem::Main, DataType, IndexType>(size());
+        return DenseVector<Mem::Main, DataType, IndexType>(size(), true);
       }
 
       /**

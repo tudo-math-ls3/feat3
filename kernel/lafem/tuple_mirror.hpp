@@ -150,7 +150,7 @@ namespace FEAST
        */
       DenseVector<Mem::Main, DataType, IndexType> create_buffer_vector() const
       {
-        return DenseVector<MemType, DataType, IndexType>(size());
+        return DenseVector<Mem::Main, DataType, IndexType>(size(), true);
       }
 
       /**
@@ -336,9 +336,9 @@ namespace FEAST
         return _first.size();
       }
 
-      DenseVector<MemType, DataType, IndexType> create_buffer_vector() const
+      DenseVector<Mem::Main, DataType, IndexType> create_buffer_vector() const
       {
-        return DenseVector<MemType, DataType, IndexType>(size());
+        return DenseVector<Mem::Main, DataType, IndexType>(size(), true);
       }
 
       VectorType create_vector() const
