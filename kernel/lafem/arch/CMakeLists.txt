@@ -16,6 +16,7 @@ SET (kernel-lafem-arch-list
   diagonal_generic.cpp
   difference_generic.cpp
   dot_product_generic.cpp
+  gather_axpy_prim_generic.cpp
   gather_prim_generic.cpp
   norm_generic.cpp
   product_matvec_generic.cpp
@@ -65,6 +66,7 @@ if (FEAST_BACKENDS_CUDA)
     difference.cu
     diagonal.cu
     dot_product.cu
+    gather_axpy_prim.cu
     gather_prim.cu
     norm.cu
     product_matvec.cu
