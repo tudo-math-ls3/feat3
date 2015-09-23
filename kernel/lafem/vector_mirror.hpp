@@ -307,16 +307,6 @@ namespace FEAST
         ASSERT_(num_rows + buffer_offset <= buffer.size());
 
         Arch::GatherAxpyPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
-        // loop over all gather-matrix rows
-        /*for (Index row(0) ; row < num_rows ; ++row)
-        {
-          Tx_ sum(Tx_(0));
-          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
-          {
-            sum += Tx_(val[i]) * Tx_(y[col_idx[i]]);
-          }
-          x[buffer_offset + row] += alpha*sum;
-        }*/
       }
 
       template<
@@ -345,7 +335,7 @@ namespace FEAST
 
         ASSERT_(num_rows + buffer_offset <= buffer.size());
 
-        Arch::GatherAxpyPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
+        Arch::GatherAxpyPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
 
         buffer.copy(cuda_buffer);
       }
@@ -395,21 +385,6 @@ namespace FEAST
 #endif
 
         Arch::ScatterPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
-
-        // loop over all scatter-matrix rows
-        /*for (Index row(0) ; row < num_rows ; ++row)
-        {
-          // skip empty rows
-          if(row_ptr[row] >= row_ptr[row + 1])
-            continue;
-
-          Tx_ sum(Tx_(0));
-          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
-          {
-            sum += Tx_(val[i]) * Tx_(y[buffer_offset + col_idx[i]]);
-          }
-          x[row] = sum;
-        }*/
       }
 
       template<
@@ -426,7 +401,7 @@ namespace FEAST
         if(_mirror_scatter.empty())
           return;
 
-        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_> cuda_buffer;
+        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_> cuda_buffer(buffer.size());
         cuda_buffer.copy(buffer);
 
         Tx_ * x(cuda_vector.elements());
@@ -508,7 +483,7 @@ namespace FEAST
         if(_mirror_scatter.empty())
           return;
 
-        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_> cuda_buffer;
+        LAFEM::DenseVector<Mem::CUDA, Tx_, Ix_> cuda_buffer(buffer.size());
         cuda_buffer.copy(buffer);
 
         Tx_ * x(cuda_vector.elements());
@@ -521,7 +496,7 @@ namespace FEAST
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
 
-        Arch::ScatterAxpyPrim<Mem::Main>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
+        Arch::ScatterAxpyPrim<Mem::CUDA>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
       }
 
       /**
