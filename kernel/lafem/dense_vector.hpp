@@ -955,8 +955,7 @@ namespace FEAST
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         // check for special cases
         // r <- x + y
@@ -981,7 +980,7 @@ namespace FEAST
           Arch::Axpy<Mem_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());
         }
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -998,13 +997,12 @@ namespace FEAST
         if (this->size() != y.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->size());
         Arch::ComponentProduct<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1022,13 +1020,12 @@ namespace FEAST
         if (this->size() != x.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->size());
         Arch::ComponentInvert<Mem_>::value(this->elements(), x.elements(), alpha, this->size());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1043,13 +1040,12 @@ namespace FEAST
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->size());
         Arch::Scale<Mem_>::value(this->elements(), x.elements(), alpha, this->size());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1067,13 +1063,12 @@ namespace FEAST
         if (x.size() != this->size() || y.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector sizes does not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->size() * 2);
         DataType result = Arch::TripleDotProduct<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
@@ -1091,13 +1086,12 @@ namespace FEAST
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->size() * 2);
         DataType result = Arch::DotProduct<Mem_>::value(this->elements(), x.elements(), this->size());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
@@ -1137,12 +1131,11 @@ namespace FEAST
        */
       DT_ norm2() const
       {
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         DT_ result = Arch::Norm2<Mem_>::value(this->elements(), this->size());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;

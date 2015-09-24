@@ -1461,8 +1461,7 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         // check for special cases
         // r <- x + y
@@ -1487,7 +1486,7 @@ namespace FEAST
           Arch::Axpy<Mem_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
         }
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1506,13 +1505,12 @@ namespace FEAST
         if (x.used_elements() != this->used_elements())
           throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements());
         Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->used_elements());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1523,13 +1521,12 @@ namespace FEAST
        */
       DT_ norm_frobenius() const
       {
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements() * 2);
         DT_ result = Arch::Norm2<Mem_>::value(this->val(), this->used_elements());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
@@ -1627,14 +1624,13 @@ namespace FEAST
         if (s.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements());
         Arch::ScaleRows<Mem_>::csr(this->val(), x.val(), this->col_ind(), this->row_ptr(),
                                           s.elements(), this->rows(), this->columns(), this->used_elements());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1655,14 +1651,13 @@ namespace FEAST
         if (s.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements());
         Arch::ScaleCols<Mem_>::csr(this->val(), x.val(), this->col_ind(), this->row_ptr(),
                                           s.elements(), this->rows(), this->columns(), this->used_elements());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1685,14 +1680,13 @@ namespace FEAST
           return;
         }
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements() * 2);
         Arch::ProductMatVec<Mem_>::csr(r.elements(), this->val(), this->col_ind(), this->row_ptr(),
                                               x.elements(), this->rows(), columns(), used_elements());
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
 
@@ -1743,8 +1737,7 @@ namespace FEAST
           return;
         }
 
-        TimeStamp ts_start, ts_stop;
-        ts_start.stamp();
+        TimeStamp ts_start;
 
         // check for special cases
         // r <- y - A*x
@@ -1765,7 +1758,7 @@ namespace FEAST
                                        this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
 
-        ts_stop.stamp();
+        TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
       ///@}
