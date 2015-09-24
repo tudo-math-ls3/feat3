@@ -6,6 +6,8 @@
 #include<mpi.h>
 #include<memory>
 #include<kernel/foundation/base.hpp>
+#include<kernel/util/time_stamp.hpp>
+#include<kernel/util/statistics.hpp>
 
 namespace FEAST
 {
@@ -294,13 +296,19 @@ namespace FEAST
 
           static inline void wait(Request& r, Status& s)
           {
+            TimeStamp ts_start;
             MPI_Wait(&(r.mpi_request()), &(s.mpi_status()));
+            TimeStamp ts_stop;
+            Statistics::add_time_mpi_wait(ts_stop.elapsed(ts_start));
           }
 
           template<template<typename, typename> class ST_>
           static inline void waitall(RequestSeq<ST_>& r, StatusSeq<ST_>& s)
           {
+            TimeStamp ts_start;
             MPI_Waitall(r.size(), r.mpi_requests(), s.mpi_statuses());
+            TimeStamp ts_stop;
+            Statistics::add_time_mpi_wait(ts_stop.elapsed(ts_start));
           }
 
           static inline void test(Request& r, int& flag, Status& s)
@@ -310,7 +318,10 @@ namespace FEAST
 
           static inline void barrier(Communicator communicator = Communicator(MPI_COMM_WORLD))
           {
+            TimeStamp ts_start;
             MPI_Barrier(communicator.mpi_comm());
+            TimeStamp ts_stop;
+            Statistics::add_time_mpi_wait(ts_stop.elapsed(ts_start));
           }
 
           template<typename DataType_>
