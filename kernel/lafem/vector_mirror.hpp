@@ -209,6 +209,7 @@ namespace FEAST
           return;
 
         LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
+        mem_buffer.copy(buffer); ///TODO necessary to satisfy mirror tests but should not be!
 
         DataType_ * x(mem_buffer.elements());
         const DataType_ * y(mem_vector.elements());
@@ -251,7 +252,7 @@ namespace FEAST
           return;
 
         DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
-        mem_buffer.copy(buffer);
+        mem_buffer.copy(buffer);///TODO necessary to satisfy mirror tests but should not be!
 
         DataType_ * x(mem_buffer.elements());
         const DataType_ * y(mem_vector.elements());
