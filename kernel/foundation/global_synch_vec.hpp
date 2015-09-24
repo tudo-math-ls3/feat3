@@ -5,6 +5,8 @@
 #include<kernel/foundation/comm_base.hpp>
 #include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/environment.hpp>
+#include<kernel/util/time_stamp.hpp>
+#include<kernel/util/statistics.hpp>
 
 namespace FEAST
 {
@@ -36,6 +38,8 @@ namespace FEAST
           {
             if(mirrors.size() == 0)
               return;
+
+            TimeStamp ts_start;
 
             ///assumes type-0 vector (entry fractions at inner boundaries)
 
@@ -113,6 +117,9 @@ namespace FEAST
 
             delete[] recvflags;
             delete[] taskflags;
+
+            TimeStamp ts_stop;
+            Statistics::add_time_mpi_execute(ts_stop.elapsed(ts_start));
           }
 #else
           template<typename TargetVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
@@ -156,6 +163,8 @@ namespace FEAST
           {
             if(mirrors.size() == 0)
               return;
+
+            TimeStamp ts_start;
 
             ///assumes type-1 vector (full entries at inner boundaries)
 
@@ -238,6 +247,9 @@ namespace FEAST
 
             delete[] recvflags;
             delete[] taskflags;
+
+            TimeStamp ts_stop;
+            Statistics::add_time_mpi_execute(ts_stop.elapsed(ts_start));
           }
 #else
           template<typename TargetVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>

@@ -59,12 +59,12 @@ namespace FEAST
       static void add_time_mpi_execute(double seconds);
       static void add_time_mpi_wait(double seconds);
 
-      static double add_time_reduction();
-      static double add_time_spmv();
-      static double add_time_axpy();
-      static double add_time_precon();
-      static double add_time_mpi_execute();
-      static double add_time_mpi_wait();
+      static double get_time_reduction();
+      static double get_time_spmv();
+      static double get_time_axpy();
+      static double get_time_precon();
+      static double get_time_mpi_execute();
+      static double get_time_mpi_wait();
 
       /// Retrieve formated time consumption overview in percent
       static String get_formated_times();

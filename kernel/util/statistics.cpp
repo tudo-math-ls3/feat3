@@ -62,27 +62,27 @@ void Statistics::add_time_mpi_wait(double seconds)
   _time_mpi_wait += seconds;
 }
 
-double Statistics::add_time_reduction()
+double Statistics::get_time_reduction()
 {
   return _time_reduction;
 }
-double Statistics::add_time_spmv()
+double Statistics::get_time_spmv()
 {
   return _time_spmv;
 }
-double Statistics::add_time_axpy()
+double Statistics::get_time_axpy()
 {
   return _time_axpy;
 }
-double Statistics::add_time_precon()
+double Statistics::get_time_precon()
 {
   return _time_precon;
 }
-double Statistics::add_time_mpi_execute()
+double Statistics::get_time_mpi_execute()
 {
   return _time_mpi_execute;
 }
-double Statistics::add_time_mpi_wait()
+double Statistics::get_time_mpi_wait()
 {
   return _time_mpi_wait;
 }
@@ -101,7 +101,7 @@ String Statistics::get_formated_times(double total_time)
 
   double measured_time = _time_reduction + _time_spmv + _time_axpy + _time_precon + _time_mpi_execute + _time_mpi_wait;
   if (measured_time > total_time)
-    throw InternalError("Accumulated op time is greater as the provided total execution time!");
+    throw InternalError("Accumulated op time (" + stringify(measured_time) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
 
   result += "\n";
   result += "Reductions: " + stringify(_time_reduction / total_time * 100.) + "%\n";
