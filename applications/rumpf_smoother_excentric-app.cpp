@@ -105,6 +105,19 @@ template
    */
   static int run(MeshStreamer& my_streamer, Index lvl_max, DT_ deltat)
   {
+    // Filename for writing .vtu output
+    String filename("");
+    DataType fval(0);
+
+    // Parameters for the Rumpf functional
+    DataType fac_norm = DataType(1e-2),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
+
+    std::deque<String> dirichlet_list;
+    std::deque<String> slip_list;
+    slip_list.push_back("inner");
+    slip_list.push_back("outer");
+
     // Read mesh from the MeshStreamer and create the MeshAtlas
     std::cout << "Creating mesh atlas..." << std::endl;
     Geometry::MeshAtlas<MeshType_>* atlas = nullptr;
@@ -136,17 +149,54 @@ template
     for(Index lvl(1); lvl <= lvl_max; ++lvl)
     {
       std::cout << "Refining up to level " << lvl << "..." << std::endl;
+      // Arrays for saving the contributions of the different Rumpf functional parts
+      DataType* func_norm(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
+      DataType* func_det(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
+      DataType* func_rec_det(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
+
+      RumpfSmootherType refinement_smoother(rmn, dirichlet_list, slip_list, my_functional);
+      refinement_smoother.init();
+      refinement_smoother.prepare();
+
+      fval = refinement_smoother.compute_functional(func_norm, func_det, func_rec_det);
+      std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
+
+      // Compute initial functional gradient
+      refinement_smoother.compute_gradient();
+
+      // Write initial state to file
+      filename = "refinement_pre_"+stringify(lvl);
+      Geometry::ExportVTK<MeshType> writer_refinement_pre(*(rmn->get_mesh()));
+      writer_refinement_pre.add_field_cell_blocked_vector("h", refinement_smoother._h);
+      writer_refinement_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
+      writer_refinement_pre.add_field_vertex_blocked_vector("grad", refinement_smoother._grad);
+      writer_refinement_pre.write(filename);
+
+      refinement_smoother.optimise();
+
+      fval = refinement_smoother.compute_functional(func_norm, func_det, func_rec_det);
+      std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
+
+      // Compute initial functional gradient
+      refinement_smoother.compute_gradient();
+      filename = "refinement_post_"+stringify(lvl);
+      Geometry::ExportVTK<MeshType> writer_refinement_post(*(rmn->get_mesh()));
+      writer_refinement_post.add_field_cell_blocked_vector("h", refinement_smoother._h);
+      writer_refinement_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
+      writer_refinement_post.add_field_vertex_blocked_vector("grad", refinement_smoother._grad);
+      writer_refinement_post.write(filename);
+
       auto* old = rmn;
       rmn = old->refine();
       delete old;
+
+      delete[] func_norm;
+      delete[] func_det;
+      delete[] func_rec_det;
+
     }
 
-    MeshType* mesh = rmn->get_mesh();
-
-    std::deque<String> dirichlet_list;
-    std::deque<String> slip_list;
-    slip_list.push_back("inner");
-    slip_list.push_back("outer");
+    auto* mesh = rmn->get_mesh();
 
     // This is the centre reference point
     ImgPointType x_0(DataType(0));
@@ -163,15 +213,11 @@ template
     // The indices for the outer screw
     auto& outer_indices = rmn->find_mesh_part("outer")->template get_target_set<0>();
 
-    // Parameters for the Rumpf functional
-    DataType fac_norm = DataType(1e-3), fac_det = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(1e-8));
-    FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
-    my_functional.print();
-
     // The smoother in all its template glory
     RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
     rumpflpumpfl.init();
     rumpflpumpfl.print();
+    rumpflpumpfl.prepare();
 
     // Arrays for saving the contributions of the different Rumpf functional parts
     DataType* func_norm(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
@@ -179,7 +225,6 @@ template
     DataType* func_rec_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
 
     // Compute initial functional value
-    DataType fval(0);
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
     std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
 
@@ -225,8 +270,6 @@ template
 
     // Counter for timesteps
     Index n(0);
-    // Filename for writing .vtu output
-    std::string filename;
 
     // This is the absolute turning angle of the screws
     DataType alpha(0);
@@ -368,10 +411,10 @@ template
       // Write post-optimisation mesh
       filename = "post_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_post(*mesh);
-      writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-      writer_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-      writer_pre.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
+      writer_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
+      writer_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
+      writer_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+      writer_post.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_post.write(filename);
 
@@ -395,7 +438,7 @@ template
 }; // struct LevelsetApp
 
 template<typename A, typename B>
-using MyFunctional= Meshopt::RumpfFunctional<A, B>;
+using MyFunctional= Meshopt::RumpfFunctional_D2<A, B>;
 
 template<typename A, typename B>
 using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;

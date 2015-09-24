@@ -280,12 +280,16 @@ namespace FEAST
          **/
         virtual void prepare() override
         {
+          this->set_coords();
+
           // Adapt all slip boundaries
           for(auto& it : _slip_list)
             this->_mesh_node->adapt_by_name(it);
 
           // The slip filter contains the outer unit normal, so reassemble it
           _slip_asm.assemble(_filter.template at<0>(), _trafo_space);
+
+          this->get_coords();
         }
 
         /**
@@ -619,7 +623,7 @@ namespace FEAST
 
           ALGLIBWrapper<RumpfSmoother<TrafoType_, FunctionalType_, H_EvalType_>>::minimise_functional_cg(total_grad_evals, total_iterations, termination_type,*this);
           // Important: Copy back the coordinates the mesh optimiser changed to the original mesh.
-          this->set_coords();
+          this->prepare();
           std::cout << total_iterations << " mincg iterations, " << total_grad_evals << " grad evals, terminationtype was " << termination_type << std::endl;
         }
 
