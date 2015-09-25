@@ -187,7 +187,7 @@ namespace StokesPoiseuille2D
   }; // class StokesUnitSquarePoiseuilleAssemblerLevel<...>
 
 
-  template<typename MeshType_>
+  template<typename MeshType_, typename TargetMatrixSolve_>
   void run(const int rank, const int nprocs, SimpleArgParser& args, Control::Domain::DomainControl<MeshType_>& domain)
   {
     // define our mesh type
@@ -197,8 +197,8 @@ namespace StokesPoiseuille2D
 
     // define our arch types
     typedef Mem::Main MemType;
-    typedef double DataType;
-    typedef Index IndexType;
+    typedef typename TargetMatrixSolve_::DataType DataType;
+    typedef typename TargetMatrixSolve_::IndexType IndexType;
 
     // define our domain type
     typedef Control::Domain::DomainControl<MeshType_> DomainControlType;
@@ -231,13 +231,8 @@ namespace StokesPoiseuille2D
 
     //Lin-Solve phase related typedefs
     //Main-CSR or CUDA-ELL
-#ifdef FEAST_BACKENDS_CUDA
-    typedef Mem::CUDA MemTypeSolve;
-    typedef Control::StokesUnitVeloNonePresSystemLevel<dim, MemTypeSolve, DataType, IndexType, LAFEM::SparseMatrixELL> SystemLevelTypeSolve;
-#else
-    typedef Mem::Main MemTypeSolve;
-    typedef Control::StokesUnitVeloNonePresSystemLevel<dim, MemTypeSolve, DataType, IndexType, LAFEM::SparseMatrixCSR> SystemLevelTypeSolve;
-#endif
+    typedef typename TargetMatrixSolve_::MemType MemTypeSolve;
+    typedef Control::StokesUnitVeloNonePresSystemLevel<dim, MemTypeSolve, DataType, IndexType, TargetMatrixSolve_> SystemLevelTypeSolve;
     typedef Control::StokesBasicTransferLevel<SystemLevelTypeSolve> TransferLevelTypeSolve;
 
     std::deque<SystemLevelTypeSolve*> system_levels_solve;
@@ -519,6 +514,7 @@ namespace StokesPoiseuille2D
     args.support("level");
     args.support("no-err");
     args.support("vtk");
+    args.support("mem");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -542,6 +538,9 @@ namespace StokesPoiseuille2D
     int lvl_min = -1;
     args.parse("level", lvl_max, lvl_min);
 
+    FEAST::String mem_string = "main";
+    args.parse("mem", mem_string);
+
 #ifndef DEBUG
     try
 #endif
@@ -560,7 +559,14 @@ namespace StokesPoiseuille2D
       }
 
       // run our application
-      run(rank, nprocs, args, domain);
+      if (mem_string == "main")
+      {
+        run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(rank, nprocs, args, domain);
+      }
+      else if(mem_string == "cuda")
+      {
+        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(rank, nprocs, args, domain);
+      }
 
       TimeStamp stamp2;
 

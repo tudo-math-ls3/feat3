@@ -46,9 +46,13 @@ namespace FEAST
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      template<typename, typename, typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
     struct StokesBasicSystemLevel
     {
+      static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType missmatch!");
+      static_assert(std::is_same<DataType_, typename ScalarMatrix_::DataType>::value, "DataType missmatch!");
+      static_assert(std::is_same<IndexType_, typename ScalarMatrix_::IndexType>::value, "IndexType missmatch!");
+
       // basic types
       static constexpr int dim = dim_;
       typedef MemType_ MemType;
@@ -56,7 +60,7 @@ namespace FEAST
       typedef IndexType_ IndexType;
 
       // define local matrix types
-      typedef ScalarMatrix_<MemType, DataType, IndexType> LocalScalarMatrix;
+      typedef ScalarMatrix_ LocalScalarMatrix;
       typedef LAFEM::PowerDiagMatrix<LocalScalarMatrix, dim> LocalMatrixBlockA;
       typedef LAFEM::PowerColMatrix<LocalScalarMatrix, dim> LocalMatrixBlockB;
       typedef LAFEM::PowerRowMatrix<LocalScalarMatrix, dim> LocalMatrixBlockD;
@@ -118,7 +122,7 @@ namespace FEAST
       {
       }
 
-      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      template<typename M_, typename D_, typename I_, typename SM_>
       void convert(const StokesBasicSystemLevel<dim_, M_, D_, I_, SM_> & other)
       {
         gate_velo.convert(other.gate_velo);
@@ -138,7 +142,7 @@ namespace FEAST
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      template<typename,typename,typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
     struct StokesUnitVeloNonePresSystemLevel :
       public StokesBasicSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_>
     {
@@ -160,7 +164,7 @@ namespace FEAST
       GlobalVeloFilter filter_velo;
       GlobalPresFilter filter_pres;
 
-      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      template<typename M_, typename D_, typename I_, typename SM_>
       void convert(const StokesUnitVeloNonePresSystemLevel<dim_, M_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
@@ -176,7 +180,7 @@ namespace FEAST
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      template<typename,typename,typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
     struct StokesUnitVeloMeanPresSystemLevel :
       public StokesBasicSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_>
     {
@@ -199,7 +203,7 @@ namespace FEAST
       GlobalVeloFilter filter_velo;
       GlobalPresFilter filter_pres;
 
-      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      template<typename M_, typename D_, typename I_, typename SM_>
       void convert(const StokesUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);

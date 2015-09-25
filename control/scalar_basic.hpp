@@ -43,20 +43,24 @@ namespace FEAST
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      template<typename, typename, typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
     class ScalarBasicSystemLevel
     {
     public:
+      static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType missmatch!");
+      static_assert(std::is_same<DataType_, typename ScalarMatrix_::DataType>::value, "DataType missmatch!");
+      static_assert(std::is_same<IndexType_, typename ScalarMatrix_::IndexType>::value, "IndexType missmatch!");
+
       // basic types
       typedef MemType_ MemType;
       typedef DataType_ DataType;
       typedef IndexType_ IndexType;
 
       /// define local scalar matrix type
-      typedef ScalarMatrix_<MemType, DataType, IndexType> LocalScalarMatrix;
+      typedef ScalarMatrix_ LocalScalarMatrix;
 
       /// define local system matrix type
-      typedef ScalarMatrix_<MemType, DataType, IndexType> LocalSystemMatrix;
+      typedef ScalarMatrix_ LocalSystemMatrix;
 
       /// define local system vector type
       typedef typename LocalSystemMatrix::VectorTypeR LocalSystemVector;
@@ -91,7 +95,7 @@ namespace FEAST
       {
       }
 
-      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      template<typename M_, typename D_, typename I_, typename SM_>
       void convert(const ScalarBasicSystemLevel<M_, D_, I_, SM_> & other)
       {
         gate_sys.convert(other.gate_sys);
@@ -103,7 +107,7 @@ namespace FEAST
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      template<typename, typename, typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
     class ScalarUnitFilterSystemLevel :
       public ScalarBasicSystemLevel<MemType_, DataType_, IndexType_, ScalarMatrix_>
     {
@@ -138,7 +142,7 @@ namespace FEAST
        * Use source ScalarBasicTransferLevel content as content of current ScalarBasicTransferLevel.
        *
        */
-      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      template<typename M_, typename D_, typename I_, typename SM_>
       void convert(const ScalarUnitFilterSystemLevel<M_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
@@ -150,7 +154,7 @@ namespace FEAST
       typename MemType_ = Mem::Main,
       typename DataType_ = Real,
       typename IndexType_ = Index,
-      template<typename, typename, typename> class ScalarMatrix_ = LAFEM::SparseMatrixCSR>
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
     class ScalarMeanFilterSystemLevel :
       public ScalarBasicSystemLevel<MemType_, DataType_, IndexType_, ScalarMatrix_>
     {
@@ -185,7 +189,7 @@ namespace FEAST
        * Use source ScalarBasicTransferLevel content as content of current ScalarBasicTransferLevel.
        *
        */
-      template<typename M_, typename D_, typename I_, template<typename, typename, typename> class SM_>
+      template<typename M_, typename D_, typename I_, typename SM_>
       void convert(const ScalarMeanFilterSystemLevel<M_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
