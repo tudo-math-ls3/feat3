@@ -20,8 +20,7 @@ namespace FEAST
      * This namespace encapsulates all classes related to the implementation of the second-order
      * H1-nonconforming Crouzeix-Raviart Finite Element space.
      *
-     * \see M. Crouzeix, P.-A. Raviart: Conforming and nonconforming finite element methods
-     * for solving the stationary Stokes equations I; RAIRO, Volume 7, Number 3 (1973), pp. 33-76
+     * \see \cite CR73
      */
     namespace CrouzeixRaviart
     {

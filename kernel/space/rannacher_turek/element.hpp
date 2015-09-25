@@ -20,9 +20,7 @@ namespace FEAST
      * This namespace encapsulates all classes related to the implementation of the H1-non-conforming
      * Rannacher-Turek Finite Element spaces, also known as Q1~, in several variants.
      *
-     * \see <b>R. Rannacher, S. Turek</b>:<i>Simple Nonconforming Quadrilateral Stokes Elements</i>;\n
-     * Numerical Methods for Partial Differential Equations, Volume 8 (1992), pp. 97-111
-     * \see http://www.mathematik.tu-dortmund.de/lsiii/cms/papers/RannacherTurek1990.pdf
+     * \see \cite RT92
      */
     namespace RannacherTurek
     {
