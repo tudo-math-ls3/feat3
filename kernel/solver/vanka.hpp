@@ -713,7 +713,7 @@ namespace FEAST
      * - Surprisingly, additive variants seem to converge \e faster than their multiplicative
      *   counterparts in many cases (at least for linear Stokes equations).
      *
-     * \see \cite{Vanka86}
+     * \see \cite Vanka86
      *
      * \todo Find out how to use Vanka for Global::Matrix systems...
      *
