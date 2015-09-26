@@ -37,56 +37,6 @@ void Statistics::reset_flops()
   _flops = Index(0);
 }
 
-void Statistics::add_time_reduction(double seconds)
-{
-  _time_reduction += seconds;
-}
-void Statistics::add_time_spmv(double seconds)
-{
-  _time_spmv += seconds;
-}
-void Statistics::add_time_axpy(double seconds)
-{
-  _time_axpy += seconds;
-}
-void Statistics::add_time_precon(double seconds)
-{
-  _time_precon += seconds;
-}
-void Statistics::add_time_mpi_execute(double seconds)
-{
-  _time_mpi_execute += seconds;
-}
-void Statistics::add_time_mpi_wait(double seconds)
-{
-  _time_mpi_wait += seconds;
-}
-
-double Statistics::get_time_reduction()
-{
-  return _time_reduction;
-}
-double Statistics::get_time_spmv()
-{
-  return _time_spmv;
-}
-double Statistics::get_time_axpy()
-{
-  return _time_axpy;
-}
-double Statistics::get_time_precon()
-{
-  return _time_precon;
-}
-double Statistics::get_time_mpi_execute()
-{
-  return _time_mpi_execute;
-}
-double Statistics::get_time_mpi_wait()
-{
-  return _time_mpi_wait;
-}
-
 String Statistics::get_formated_times()
 {
   double total_time = _time_reduction + _time_spmv + _time_axpy + _time_precon + _time_mpi_execute + _time_mpi_wait;

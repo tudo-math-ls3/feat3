@@ -52,19 +52,55 @@ namespace FEAST
       /// Reset global flop counter
       static void reset_flops();
 
-      static void add_time_reduction(double seconds);
-      static void add_time_spmv(double seconds);
-      static void add_time_axpy(double seconds);
-      static void add_time_precon(double seconds);
-      static void add_time_mpi_execute(double seconds);
-      static void add_time_mpi_wait(double seconds);
+      inline static void add_time_reduction(double seconds)
+      {
+        _time_reduction += seconds;
+      }
+      inline static void add_time_spmv(double seconds)
+      {
+        _time_spmv += seconds;
+      }
+      inline static void add_time_axpy(double seconds)
+      {
+        _time_axpy += seconds;
+      }
+      inline static void add_time_precon(double seconds)
+      {
+        _time_precon += seconds;
+      }
+      inline static void add_time_mpi_execute(double seconds)
+      {
+        _time_mpi_execute += seconds;
+      }
+      inline static void add_time_mpi_wait(double seconds)
+      {
+        _time_mpi_wait += seconds;
+      }
 
-      static double get_time_reduction();
-      static double get_time_spmv();
-      static double get_time_axpy();
-      static double get_time_precon();
-      static double get_time_mpi_execute();
-      static double get_time_mpi_wait();
+      inline static double get_time_reduction()
+      {
+        return _time_reduction;
+      }
+      inline static double get_time_spmv()
+      {
+        return _time_spmv;
+      }
+      inline static double get_time_axpy()
+      {
+        return _time_axpy;
+      }
+      inline static double get_time_precon()
+      {
+        return _time_precon;
+      }
+      inline static double get_time_mpi_execute()
+      {
+        return _time_mpi_execute;
+      }
+      inline static double get_time_mpi_wait()
+      {
+        return _time_mpi_wait;
+      }
 
       /// Retrieve formated time consumption overview in percent
       static String get_formated_times();
