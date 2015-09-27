@@ -1,5 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/util/random.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -241,12 +242,12 @@ MathTest<__float128> math_test_float128;
 
 
 /**
-* \brief Test class for the Math functions.
-*
-* \test Tests the floating-point math function templates in the Math namespace.
-*
-* \author Peter Zajac
-*/
+ * \brief Test class for the invert_matrix function.
+ *
+ * \test Tests the matrix inversion on a set of random matrices.
+ *
+ * \author Peter Zajac
+ */
 template<typename DT_, typename IT_>
 class MatrixInvertTest :
   public FullTaggedTest<Archs::None, DT_, IT_>
@@ -257,73 +258,88 @@ public:
   {
   }
 
-  static void init_lehmer_mat(IT_ n, IT_ s, DT_ a[])
-  {
-    for(IT_ i(0) ; i < n ; ++i)
-    {
-      for(IT_ j(0) ; j < n ; ++j)
-      {
-        a[i * s + j] = DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1);
-      }
-    }
-  }
-
-  static void init_lehmer_inv(IT_ n, IT_ s, DT_ a[])
-  {
-    for(IT_ i(0); i < n*s; ++i)
-    {
-      a[i] = DT_(0);
-    }
-    a[0] = DT_(4) / DT_(3);
-    DT_ b = a[1] = -DT_(2) / DT_(3);
-    for(IT_ i(1) ; i < n - 1 ; ++i)
-    {
-      a[i * (s + 1) - 1] = b;
-      a[i * (s + 1)    ] = DT_(4*Math::cub(i+1)) / DT_(4*Math::sqr(i+1) - 1);
-      a[i * (s + 1) + 1] = b = -DT_((i+2)*(i+1)) / DT_(2*i + 3);
-    }
-    a[(n - 1) * (s + 1) - 1] = b;
-    a[(n - 1) * (s + 1)    ] = DT_(n*n) / DT_(2*n - 1);
-  }
-
-  void test_lehmer() const
-  {
-    static constexpr IT_ n = 5;
-    static constexpr IT_ s = n + 2;
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
-
-    // matrix and inverse
-    DT_ a[n*s];
-    DT_ b[n*s];
-    init_lehmer_mat(n, s, a);
-    init_lehmer_inv(n, s ,b);
-    IT_ p[3*n];
-
-    // invert A
-    Math::invert_matrix(n, s, a, p);
-
-    //
-    DT_ def = DT_(0);
-    for(IT_ i(0); i < n; ++i)
-    {
-      for(IT_ j(0); j < n; ++j)
-      {
-        def += Math::sqr(a[i*s+j] - b[i*s+j]);
-      }
-    }
-    def = Math::sqrt(def / DT_(n*n));
-
-    TEST_CHECK_EQUAL_WITHIN_EPS(def, DT_(0), eps);
-  }
-
   virtual void run() const override
   {
-    // test lehmer matrix
-    test_lehmer();
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create an RNG
+    Random rng;
+
+    // choose minimum and maximum system size
+    static constexpr IT_ n_min = 1;
+    static constexpr IT_ n_max = 9;
+    static constexpr IT_ k_max = 5;
+    static constexpr IT_ nnze = n_max*(n_max+k_max);
+
+    // create four matrices
+    DT_ a[nnze], b[nnze];
+    // create a pivot array
+    IT_ p[n_max];
+
+    // loop over all n
+    for(IT_ n(n_min); n <= n_max; ++n)
+    {
+      // for each dimension, we loop several times, eventually increasing the stride
+      for(IT_ k(0); k <= k_max; ++k)
+      {
+        // compute stride
+        const IT_ s = n + (k / 2);
+
+        // generate a random matrix with values in range [-1,+1]
+        for(IT_ i(0); i < s*n; ++i)
+        {
+          a[i] = b[i] = rng(-DT_(1), DT_(1));
+        }
+
+        // Note:
+        // There is no guarantee that the generated matrix is actually regular.
+        // However, for our RNG implementation and the ranges chosen here, it seems
+        // that all generated matrices are fit for inversion.
+
+        // invert our matrix
+        const DT_ det = Math::invert_matrix(n, s, b, p);
+
+        // compute xl := ||I - A^{-1}*A||, xr := ||I - A*A^{-1}||
+        DT_ xl(0), xr(0);
+        for(IT_ i(0); i < n; ++i)
+        {
+          for(IT_ j(0); j < n; ++j)
+          {
+            DT_ yr(i == j ? DT_(1) : DT_(0));
+            DT_ yl(yr);
+            for(IT_ l(0); l < n; ++l)
+            {
+              yl -= b[i*s+l] * a[l*s+j];
+              yr -= a[i*s+l] * b[l*s+j];
+            }
+            xl = Math::max(xl, Math::abs(yl));
+            xr = Math::max(xr, Math::abs(yr));
+          }
+        }
+
+        // print some numbers to the console
+        std::cout << n << "/" << k << ": ";
+        std::cout << scientify(Math::abs(det)) << " : ";
+        std::cout << scientify(xl) << " / " << scientify(xr) << std::endl;
+
+        // make sure the determinant is not bogus
+        TEST_CHECK(Math::isfinite(det));
+
+        // only check result if matrix determinant is normal
+        if(!Math::isnormal(det))
+        {
+          std::cerr << "WARNING: matrix determinant is not normal!" << std::endl;;
+          continue;
+        }
+
+        TEST_CHECK_EQUAL_WITHIN_EPS(xl, DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(xr, DT_(0), tol);
+      }
+    }
   }
 };
 
-MatrixInvertTest<double, unsigned short> matrix_invert_test_double_ushort;
+MatrixInvertTest<double, unsigned int> matrix_invert_test_double_ushort;
 #ifdef FEAST_HAVE_QUADMATH
 MatrixInvertTest<__float128, int> matrix_invert_test_float128_int;
 #endif // FEAST_HAVE_QUADMATH

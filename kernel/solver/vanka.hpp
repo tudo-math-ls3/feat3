@@ -1196,16 +1196,10 @@ namespace FEAST
           vanka_d.gather_full(block_data, loc_pidx, loc_vidx, np, nv, n, ao.first, IndexType(0));
 
           // invert local matrix block
-          Math::invert_matrix(n, n, block_data, pivot.data());
-
-          // make sure the matrix inversion did not fail
-          for(IndexType i(0); i < block_size; ++i)
+          DataType det = Math::invert_matrix(n, n, block_data, pivot.data());
+          if(!Math::isnormal(det))
           {
-            // make sure we have a finite value
-            if(!Math::isfinite(block_data[i]))
-            {
-              throw VankaFactorError();
-            }
+            throw VankaFactorError();
           }
 
           // increment block data offset
@@ -1405,8 +1399,8 @@ namespace FEAST
             // invert a_ii
             loc_a[i] = DataType(1) / loc_a[i];
 
-            // make sure we have a finite value
-            if(!Math::isfinite(loc_a[i]))
+            // make sure we have a normal value
+            if(!Math::isnormal(loc_a[i]))
             {
               throw VankaFactorError();
             }
@@ -1435,23 +1429,10 @@ namespace FEAST
           }
 
           // invert local matrix S
-          if(np == IndexType(1))
+          DataType det = Math::invert_matrix(np, np, loc_s, pivot.data());
+          if(!Math::isnormal(det))
           {
-            loc_s[0] = DataType(1) / loc_s[0];
-          }
-          else
-          {
-            Math::invert_matrix(np, np, loc_s, pivot.data());
-          }
-
-          // ensure that S^{-1} is not bogus
-          for(IndexType i(0); i < np*np; ++i)
-          {
-            // make sure we have a finite value
-            if(!Math::isfinite(loc_s[i]))
-            {
-              throw VankaFactorError();
-            }
+            throw VankaFactorError();
           }
 
           // increment block data offset

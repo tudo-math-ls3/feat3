@@ -144,7 +144,7 @@ namespace FEAST
         Tiny::Vector<DataType, FineSpaceEvaluator::max_local_dofs> lvd;
 
         // pivaot array for factorisation
-        int pivot[3*FineSpaceEvaluator::max_local_dofs];
+        int pivot[FineSpaceEvaluator::max_local_dofs];
 
         // calculate child count
         const Index num_children = fine_trafo_eval.get_num_cells() / coarse_trafo_eval.get_num_cells();
@@ -227,7 +227,11 @@ namespace FEAST
             fine_trafo_eval.finish();
 
             // invert fine mesh mass matrix
-            Math::invert_matrix(fine_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
+            DataType det = Math::invert_matrix(fine_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
+            if(!Math::isnormal(det))
+            {
+              throw InternalError("Local Mass Matrix inversion failed!");
+            }
 
             // compute X := M^{-1}*N
             lid.set_mat_mat_mult(mass, lmd);

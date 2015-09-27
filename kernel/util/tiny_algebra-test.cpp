@@ -38,6 +38,12 @@ private:
   template<int n_, int sm_, int sn_>
   static void _init_lehmer_inv(Matrix<DataType_, n_, n_, sm_, sn_>& a)
   {
+    if(n_ == 1)
+    {
+      a(0,0) = DataType_(1);
+      return;
+    }
+
     DataType_ b;
     a = DataType_(0);
     a(0,0) = DataType_(4) / DataType_(3);
@@ -107,7 +113,10 @@ public:
       DataType_(5) / DataType_(12),
       DataType_(35) / DataType_(192),
       DataType_(21) / DataType_(320),
-      DataType_(77) / DataType_(3840)
+      DataType_(77) / DataType_(3840),
+      DataType_(143) / DataType_(26880),
+      DataType_(143) / DataType_(114688),
+      DataType_(2431) / DataType_(9289728)
     };
 
     // check determinat
@@ -117,22 +126,26 @@ public:
   virtual void run() const
   {
     // test matrix inversion
-    test_mat_inv_lehmer<2>();
-    test_mat_inv_lehmer<3>();
-    test_mat_inv_lehmer<4>();
-    test_mat_inv_lehmer<5>();
-    test_mat_inv_lehmer<6>();
-    test_mat_inv_lehmer<7>();
-    test_mat_inv_lehmer<8>();
-    test_mat_inv_lehmer<9>();
+    test_mat_inv_lehmer<1>(); // specialised
+    test_mat_inv_lehmer<2>(); // specialised
+    test_mat_inv_lehmer<3>(); // specialised
+    test_mat_inv_lehmer<4>(); // specialised
+    test_mat_inv_lehmer<5>(); // specialised
+    test_mat_inv_lehmer<6>(); // specialised
+    test_mat_inv_lehmer<7>(); // generic
+    test_mat_inv_lehmer<8>(); // generic
+    test_mat_inv_lehmer<9>(); // generic
 
-    // test matrix determinant calculaation
-    test_mat_det_lehmer<1>();
-    test_mat_det_lehmer<2>();
-    test_mat_det_lehmer<3>();
-    test_mat_det_lehmer<4>();
-    test_mat_det_lehmer<5>();
-    test_mat_det_lehmer<6>();
+    // test matrix determinant calculation
+    test_mat_det_lehmer<1>(); // specialised
+    test_mat_det_lehmer<2>(); // specialised
+    test_mat_det_lehmer<3>(); // specialised
+    test_mat_det_lehmer<4>(); // specialised
+    test_mat_det_lehmer<5>(); // specialised
+    test_mat_det_lehmer<6>(); // specialised
+    test_mat_det_lehmer<7>(); // generic
+    test_mat_det_lehmer<8>(); // generic
+    test_mat_det_lehmer<9>(); // generic
   }
 };
 

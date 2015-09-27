@@ -1516,6 +1516,34 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
+      // generic square matrix inversion:
+      template<int n_>
+      struct DetHelper<n_,n_>
+      {
+        template<typename T_, int sm_, int sn_>
+        static T_ compute(const T_ (&a)[sm_][sn_])
+        {
+          // create temporary copy of a and a pivot array
+          T_ b[n_*n_];
+          int p[n_];
+
+          // copy matrix a to b
+          for (int i(0); i < n_; ++i)
+          {
+            for (int j(0); j < n_; ++j)
+            {
+              b[i*n_+j] = a[i][j];
+            }
+          }
+
+          // perform matrix inversion which returns the determinant
+          const T_ det = Math::invert_matrix(n_, n_, b, p);
+
+          // if the returned value is not normal, we can assume that the matrix is singular
+          return Math::isnormal(det) ? det : T_(0);
+        }
+      };
+
       template<>
       struct DetHelper<1,1>
       {
@@ -2148,7 +2176,6 @@ namespace FEAST
       };
 
       // generic square matrix inversion:
-      // \author Christoph Lohmann
       template<int n_>
       struct InverseHelper<n_, n_>
       {
@@ -2165,7 +2192,7 @@ namespace FEAST
           }
 
           // create pivot array
-          int p[3*n_];
+          int p[n_];
 
           // perform matrix inversion
           Math::invert_matrix(n_, snb_, &b[0][0], p);

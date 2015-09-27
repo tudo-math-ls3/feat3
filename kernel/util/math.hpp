@@ -761,6 +761,33 @@ namespace FEAST
 #endif // FEAST_HAVE_QUADMATH
 
     /**
+     * \brief Checks whether a value is normal.
+     *
+     * A value is \e normal if it is neither infinity, NaN, zero or subnormal.
+     *
+     * \note There exists no generic implementation for this function.
+     *
+     * \param[in] x The value to be checked for normalty.
+     *
+     * \returns \c true if \p x is normal, otherwise \c false.
+     */
+    template<typename T_>
+    inline bool isnormal(T_ x);
+
+    WRAP_STD_MATH1BRET(isnormal);
+
+#ifdef FEAST_HAVE_QUADMATH
+    inline bool isnormal(__float128 x)
+    {
+      // check whether the value is finite
+      if(::finiteq(x) == 0)
+        return false;
+      // check whether the value is not below minimal normal value
+      return !(::fabsq(x) < FLT128_MIN);
+    }
+#endif // FEAST_HAVE_QUADMATH
+
+    /**
      * \brief Calculates the (partial) factorial.
      *
      * This function calculates the coefficient
@@ -844,133 +871,179 @@ namespace FEAST
     }
 
     /**
-     * \brief Inverts a matrix.
+     * \brief Inverts a matrix and returns its determinant.
      *
-     * This function inverts a dense n x n matrix by means of totally pivoted Gaussian elimination.
+     * This function inverts a dense n x n matrix by means of partially pivoted Gaussian elimination
+     * and returns its determinant.
      *
-     * \cite NumericalRecipes, chapter 2.1, page 39
+     * \attention
+     * This function does not check whether the input matrix is regular, therefore one should
+     * always check whether the determinant returned by this function is \e normal by using
+     * the Math::isnormal() function. If the returned determinant is not normal, i.e. if
+     * Math::isnormal returns \c false, then the matrix inversion most failed and the output
+     * matrix \p a most probably contains garbage!
      *
-     * \attention This function silently assumes that the input matrix is regular!
-     *
-     * \warning This function does not check whether the input arguments are valid to avoid
-     * dependencies to other header files!
+     * \note
+     * This function returns zero if any of the input parameters are invalid.
      *
      * \param[in] n
-     * The dimension of the matrix to be inverted.
+     * The dimension of the matrix to be inverted. Must be > 0.
      *
      * \param[in] stride
      * The stride of the matrix. Must be >= n.
      *
      * \param[in] a
-     * On entry, the matrix to be inverted. On exit, the inverse matrix.
+     * On entry, the matrix to be inverted. On exit, the inverse matrix. Must not be \c nullptr.
      *
      * \param[in] p
-     * A temporary pivot array of length at least <b>3*n</b>.
+     * A temporary pivot array of length at least <b>n</b>. Must not be \c nullptr.
+     *
+     * \returns
+     * The determinant of the input matrix \p a.
+     *
+     * <b>Implementational Details:</b>\n
+     * This functions implements the 'classical' column-pivoted Gauss-Jordan
+     * elimination algorithm, which computes the inverse of a matrix by
+     * transforming the system
+     *
+     *            \f[ [~A~|~I~] \rightarrow [~I~|~A^{-1}~] \f]
+     *
+     * There are three major modifications in contrast to the original
+     * widely known algorithm:
+     *
+     * First, this algorithm works in-situ, i.e. it successively replaces
+     * columns of the left-hand-side input matrix by the corresponding
+     * columns of the right-hand-side identity matrix during the column
+     * elimination process.
+     *
+     * Second, this algorithm eliminates whole columns of the left-hand-side
+     * matrix, whereas the original algorithm only eliminates all entries
+     * below the pivot element. Due to this fact, no backward substitution
+     * is necessary after the primary elimination process.
+     *
+     * Third, this algorithm does not physically swap rows during the
+     * pivoting step, but simply \e remembers the pivoted positions in
+     * a temporary pivot array \e p, which is initialised to identity.
+     * So in the k-th iteration of the primary elimination loop:
+     *
+     * - p[k] contains the index of the row which is currently being
+     *   used for elimination of column k
+     * - p[j] for j < k contains the indices of all columns which have
+     *   already been eliminated, i.e. the corresponding columns already
+     *   contain the entries of the right-hand-side matrix
+     * - p[j] for j > k contains the indices of all columns which have
+     *   not yet been eliminated, i.e. the corresponding columns still
+     *   hold the entries of the left-hand-side matrix and are therefore
+     *   candidates for future pivoting steps.
+     *
+     * \author Peter Zajac
      */
     template<typename DT_, typename IT_>
-    void invert_matrix(
-      const IT_ n,
-      const IT_ stride,
-      DT_ a[],
-      IT_ p[])
+    DT_ invert_matrix(const IT_ n, const IT_ stride, DT_ a[], IT_ p[])
     {
-      // The integer arrays ipiv, indxr, and indxc are used for bookkeeping on the pivoting.
-      IT_* ipiv  = &p[  0];
-      IT_* indxc = &p[  n];
-      IT_* indxr = &p[2*n];
-      for (IT_ j(0); j < n; ++j)
+      // make sure that the parameters are valid
+      if((n <= IT_(0)) || (stride < n) || (a == nullptr) || (p == nullptr))
+        return DT_(0);
+
+      // invert 1x1 explicitly
+      if(n == IT_(1))
       {
-        ipiv[j] = 0;
+        DT_ det = a[0];
+        a[0] = DT_(1) / det;
+        return det;
       }
 
-      // This is the main loop over the columns to be reduced.
-      for(IT_ i(0), icol(0), irow(0); i < n; ++i)
+      // initialise identity permutation
+      for(IT_ i(0); i < n; ++i)
       {
-        DT_ big(DT_(0));
+        p[i] = i;
+      }
 
-        // This is the outer loop of the search for a pivot element.
-        for (IT_ j(0); j < n; ++j)
+      // initialise determinant to 1
+      DT_ det = DT_(1);
+
+      // primary column elimination loop
+      for(IT_ k(0); k < n; ++k)
+      {
+        // step 1: find a pivot for the elimination of column k
         {
-          if (ipiv[j] != IT_(1))
+          // for this, we only check the rows p[j] with j >= k, as all
+          // rows p[j] with j < k have already been eliminated and are
+          // therefore not candidates for pivoting
+          DT_ pivot = Math::abs(a[p[k]*stride + p[k]]);
+          IT_ i = k;
+
+          // loop over all unprocessed rows
+          for(IT_ j(k+1); j < n; ++j)
           {
-            for (IT_ k(0); k < n; ++k)
+            // get our matrix value and check whether it can be a pivot
+            DT_ abs_val = Math::abs(a[p[j]*stride + p[j]]);
+            if(abs_val > pivot)
             {
-              if (ipiv[k] == IT_(0))
-              {
-                DT_ a_jk = Math::abs(a[j*stride+k]);
-                if(a_jk >= big)
-                {
-                  big = a_jk;
-                  irow = j;
-                  icol = k;
-                }
-              }
+              pivot = abs_val;
+              i = j;
             }
           }
-        }
-        ++(ipiv[icol]);
 
-        // We now have the pivot element, so we interchange rows, if needed,
-        // to put the pivot element on the diagonal. The columns are not
-        // physically interchanged, only relabeled: indxc[i], the column of
-        // the ith pivot element, is the ith column that is reduced, while
-        // indxr[i] is the row in which that pivot element was originally
-        // located. If indxr[i] ?= indxc[i] there is an implied column
-        // interchange. With this form of bookkeeping, the solution b's will
-        // end up in the correct order, and the inverse matrix will be
-        // scrambled by columns.
-        if (irow != icol)
-        {
-          for (IT_ j(0); j < n; ++j)
+          // do we have to swap rows i and k?
+          if(i > k)
           {
-            DT_ tmp = a[irow*stride+j];
-            a[irow*stride+j] = a[icol*stride+j];
-            a[icol*stride+j] = tmp;
+            // swap rows "virtually" by exchanging their permutation positions
+            IT_ t = p[k];
+            p[k] = p[i];
+            p[i] = t;
           }
         }
 
-        // We are now ready to divide the pivot row by the pivot element, located at irow and icol.
-        indxr[i] = irow;
-        indxc[i] = icol;
-        DT_ pivinv = DT_(1) / a[icol*stride+icol];
-        a[icol*stride+icol] = DT_(1);
-        for(IT_ j(0); j < n; ++j)
+        // compute pivot row offset
+        const IT_ pk_off = p[k]*stride;
+
+        // step 2: process pivot row
         {
-          a[icol*stride+j] *= pivinv;
-        }
-        // Next, we reduce the rows except for the pivot one, of course.
-        for (IT_ j(0); j < n; ++j)
-        {
-          if (j != icol)
+          // update determinant by multiplying with the pivot element
+          det *= a[pk_off + p[k]];
+
+          // get our inverted pivot element
+          const DT_ pivot = DT_(1) / a[pk_off + p[k]];
+
+          // replace column entry by unit column entry
+          a[pk_off + p[k]] = DT_(1);
+
+          // divide the whole row by the inverted pivot
+          for(IT_ j(0); j < n; ++j)
           {
-            DT_ dum(a[j*stride+icol]);
-            a[j*stride+icol] = DT_(0);
-            for (IT_ k(0); k < n; ++k)
-            {
-              a[j*stride+k] -= a[icol*stride+k]*dum;
-            }
+            a[pk_off+j] *= pivot;
           }
         }
-      }
 
-      // This is the end of the main loop over columns of the reduction. It
-      // only remains to unscram- ble the solution in view of the column
-      // interchanges. We do this by interchanging pairs of columns in the
-      // reverse order that the permutation was built up.
-      for (IT_ j(n); j > IT_(0);)
-      {
-        --j;
-        if (indxr[j] != indxc[j])
+        // step 3: eliminate pivot column
+
+        // loop over all rows of the matrix
+        for(IT_ i(0); i < n; ++i)
         {
-          for (IT_ k(0); k < n; ++k)
+          // skip the pivot row
+          if(i == p[k])
+            continue;
+
+          // compute row and pivot offsets
+          const IT_ row_off = i*stride;
+
+          // fetch elimination factor
+          const DT_ factor =  a[row_off + p[k]];
+
+          // replace by unit column entry
+          a[row_off + p[k]] = DT_(0);
+
+          // process the row
+          for(IT_ j(0); j < n; ++j)
           {
-            DT_ tmp = a[k*stride+indxr[j]];
-            a[k*stride+indxr[j]] = a[k*stride+indxc[j]];
-            a[k*stride+indxc[j]] = tmp;
+            a[row_off + j] -= a[pk_off + j] * factor;
           }
         }
       }
-      // And we are done.
+
+      // return determinant
+      return det;
     }
 
     /**
