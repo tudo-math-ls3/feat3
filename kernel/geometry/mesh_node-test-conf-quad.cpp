@@ -1,5 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/geometry/test_aux/tetris_quad.hpp>
+#include <kernel/geometry/test_aux/validate_neighbours.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 
 using namespace FEAST;
@@ -126,6 +127,10 @@ public:
 
       // validate refined quad-edge cell subset
       validate_refined_tetris_quad_edge_cellsubset_2d(*subsetnode_quad_edge_f->get_mesh());
+
+      // validate neighbour information
+      validate_neighbours(*(root_node_f->get_mesh()));
+
     }
     catch(const String& msg)
     {

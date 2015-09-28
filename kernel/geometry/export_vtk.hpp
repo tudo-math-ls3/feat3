@@ -592,10 +592,10 @@ namespace FEAST
         os << "<DataArray type=\"UInt32\" Name=\"connectivity\">" << std::endl;
         for(Index i(0); i < _num_cells; ++i)
         {
-          os << idx[i][VTKShapeType::map(0)];
+          os << idx(i, Index(VTKShapeType::map(0)));
           for(int j(1); j < verts_per_cell; ++j)
           {
-            os << " " << idx[i][VTKShapeType::map(j)];
+            os << " " << idx(i, Index(VTKShapeType::map(j)));
           }
           os << std::endl;
         }

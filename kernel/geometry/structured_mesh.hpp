@@ -16,6 +16,7 @@ namespace FEAST
      *
      * \todo detailed documentation
      * \todo define index set type
+     * \todo Implement neighbours lookup
      *
      * \tparam shape_dim_
      * The dimension of the shape (Hypercube) to be used for the mesh.
@@ -152,7 +153,7 @@ namespace FEAST
           _num_slices[i] = other.get_num_slices(i);
         }
 
-        // calculate number of enitites
+        // calculate number of entities
         Intern::StructNumEntitiesWrapper<shape_dim_>::compute(_num_entities, _num_slices);
       }
 
