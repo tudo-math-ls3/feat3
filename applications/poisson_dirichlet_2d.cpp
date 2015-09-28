@@ -527,9 +527,15 @@ namespace PoissonDirichlet2D
       {
         run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(rank, nprocs, args, domain);
       }
+#ifdef FEAST_BACKENDS_CUDA
       else if(mem_string == "cuda")
       {
         run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(rank, nprocs, args, domain);
+      }
+#endif
+      else
+      {
+        throw InternalError("Memory type " + mem_string + " not known!");
       }
 
       TimeStamp stamp2;
