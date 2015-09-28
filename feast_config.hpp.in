@@ -43,6 +43,9 @@
 /// Do we have ALGLIB support enabled?
 #cmakedefine FEAST_HAVE_ALGLIB
 
+/// Do we have fparser support enabled?
+#cmakedefine FEAST_HAVE_FPARSER
+
 /// Do we have UMFPACK support enabled?
 #cmakedefine FEAST_HAVE_UMFPACK
 

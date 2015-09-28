@@ -66,7 +66,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Instrumentation: scalasca (not implemented yet)")
   print ("  Debugging: valgrind, cudamemcheck")
   print ("  Precision extensions: quadmath")
-  print ("  Third party source code: alglib, umfpack")
+  print ("  Third party source code: alglib, fparser, umfpack")
   print ("")
   print ("Note that cudamemcheck is only active if cuda is activated, too.")
   print ("Note that you need to provide at least a build mode, a parallelisation mode and a compiler.")

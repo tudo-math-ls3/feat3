@@ -69,6 +69,9 @@
   <PropertyGroup Condition="Exists('..\lib\alglib.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
     <FeastHaveAlgLib>true</FeastHaveAlgLib>
   </PropertyGroup>
+  <PropertyGroup Condition="Exists('..\lib\fparser.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
+    <FeastHaveFParser>true</FeastHaveFParser>
+  </PropertyGroup>
     <!-- Note: ParMETIS can only be used in combination with MPI -->
   <PropertyGroup Condition="Exists('..\lib\parmetis.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib') And '$(SerialMode)'=='false'">
     <FeastHaveParmetis>true</FeastHaveParmetis>
@@ -94,6 +97,8 @@
       Include="FEAST_HAVE_UMFPACK" />
     <FeastDef Condition="'$(FeastHaveAlgLib)'=='true'"
       Include="FEAST_HAVE_ALGLIB" />
+    <FeastDef Condition="'$(FeastHaveFParser)'=='true'"
+      Include="FEAST_HAVE_FPARSER" />
     <FeastDef Condition="'$(FeastHaveParmetis)'=='true'"
       Include="FEAST_HAVE_PARMETIS" />
   </ItemGroup>
@@ -108,6 +113,8 @@
       Include="$(FeastRootPath)\thirdparty\ALGLIB\src;" />
     <FeastIncDir Condition="'$(FeastHaveUmfpack)'=='true'"
       Include="$(FeastRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeastRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeastRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
+    <FeastIncDir Condition="'$(FeastHaveFParser)'=='true'"
+      Include="$(FeastRootPath)\thirdparty\fparser;" />
     <FeastIncDir Condition="'$(FeastHaveParmetis)'=='true'"
       Include="$(FeastRootPath)\thirdparty\parmetis\include;$(FeastRootPath)\thirdparty\parmetis\metis\include;" />
   </ItemGroup>
@@ -143,6 +150,8 @@
       Include="umfpack.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
     <FeastLibDep Condition="'$(FeastHaveAlgLib)'=='true'"
       Include="alglib.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
+    <FeastLibDep Condition="'$(FeastHaveFParser)'=='true'"
+      Include="fparser.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
     <FeastLibDep Condition="'$(FeastHaveParmetis)'=='true'"
       Include="parmetis.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
   </ItemGroup>

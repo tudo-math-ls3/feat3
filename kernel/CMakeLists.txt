@@ -39,6 +39,10 @@ if (FEAST_HAVE_ALGLIB)
   TARGET_LINK_LIBRARIES (feast thirdparty-alglib)
 endif(FEAST_HAVE_ALGLIB)
 
+if (FEAST_HAVE_FPARSER)
+  TARGET_LINK_LIBRARIES (feast thirdparty-fparser)
+endif(FEAST_HAVE_FPARSER)
+
 if (FEAST_HAVE_UMFPACK)
   TARGET_LINK_LIBRARIES (feast thirdparty-umfpack)
 endif(FEAST_HAVE_UMFPACK)

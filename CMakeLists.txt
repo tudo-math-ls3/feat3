@@ -61,6 +61,10 @@ if (FEAST_VALGRIND)
   #--keep-stacktraces=alloc-and-free
 endif (FEAST_VALGRIND)
 
+if (FEAST_HAVE_FPARSER)
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/fparser/")
+endif(FEAST_HAVE_FPARSER)
+
 
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)

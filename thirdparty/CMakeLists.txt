@@ -10,6 +10,20 @@ if (FEAST_HAVE_ALGLIB)
   SET_PROPERTY(TARGET thirdparty-alglib PROPERTY COMPILE_FLAGS " -w")
 endif (FEAST_HAVE_ALGLIB)
 
+if (FEAST_HAVE_FPARSER)
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/fparser/")
+  file(GLOB fparser-list "${FEAST_SOURCE_DIR}/thirdparty/fparser/*.cc")
+
+  # The 'fpoptimizer.cc' can not be compiled with clang++, so we have to disable
+  # it by adding the corresponding pre-processor define
+  if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+    ADD_DEFINITIONS(-DFP_NO_SUPPORT_OPTIMIZER)
+  endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+
+  ADD_LIBRARY(thirdparty-fparser STATIC ${fparser-list})
+  SET_PROPERTY(TARGET thirdparty-fparser PROPERTY COMPILE_FLAGS " -w")
+endif (FEAST_HAVE_FPARSER)
+
 if (FEAST_HAVE_UMFPACK)
   INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/SuiteSparse_config/")
   INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/AMD/Include/")

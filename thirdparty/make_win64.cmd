@@ -47,6 +47,16 @@ if exist "./parmetis" (
   echo.
 )
 
+rem ===========================================================================
+echo **************************************************************************
+if exist "./fparser" (
+  call ./vc_internal/make_fparser_vc%VSVER%.cmd dbg x64
+  call ./vc_internal/make_fparser_vc%VSVER%.cmd opt x64
+) else (
+  echo fparser not found; skipping...
+  echo.
+)
+
 echo **************************************************************************
 
 rem ===========================================================================
