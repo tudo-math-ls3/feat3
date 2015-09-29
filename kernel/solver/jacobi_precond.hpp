@@ -69,6 +69,12 @@ namespace FEAST
       {
       }
 
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "Jacobi";
+      }
+
       virtual void init_symbolic() override
       {
         _inv_diag = _matrix.create_vector_r();

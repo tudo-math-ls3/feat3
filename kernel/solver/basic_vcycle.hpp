@@ -115,6 +115,12 @@ namespace FEAST
       {
       }
 
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "VCycle";
+      }
+
       /// destructor
       virtual ~BasicVCycle()
       {

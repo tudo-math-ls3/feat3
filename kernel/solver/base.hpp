@@ -237,10 +237,7 @@ namespace FEAST
        *
        * \returns A string describing the solver.
        */
-      virtual String name() const
-      {
-        return "SolverBase";
-      }
+      virtual String name() const = 0;
 
       /**
        * \brief Solver application method

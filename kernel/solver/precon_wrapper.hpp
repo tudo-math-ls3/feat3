@@ -62,6 +62,12 @@ namespace FEAST
       {
       }
 
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return _precond.name();
+      }
+
       /// Applies the preconditioner.
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {

@@ -44,6 +44,12 @@ namespace FEAST
       {
       }
 
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "Diagonal";
+      }
+
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
         vec_cor.component_product(_diag, vec_def);

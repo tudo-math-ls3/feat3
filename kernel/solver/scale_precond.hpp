@@ -40,6 +40,12 @@ namespace FEAST
       {
       }
 
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "Scale";
+      }
+
       /** \copydoc SolverBase::apply() */
       virtual Status apply(Vector_& vec_cor, const Vector_& vec_def) override
       {

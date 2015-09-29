@@ -69,6 +69,12 @@ namespace FEAST
       {
       }
 
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "Schwarz";
+      }
+
       virtual void init_symbolic() override
       {
         _local_solver->init_symbolic();
