@@ -438,17 +438,28 @@ namespace FEAST
       }
 
       /**
-       * \brief Computes the euclid norm of the vector.
+       * \brief Computes the squared euclid norm of the vector.
        *
        * \returns
-       * The euclid norm of the vector.
+       * The squared euclid norm of the vector.
        */
-      ValueType norm_euclid() const
+      ValueType norm_euclid_sqr() const
       {
         DataType r(DataType(0));
         for(int i(0); i < n_; ++i)
           r += Math::sqr(v[i]);
-        return Math::sqrt(r);
+        return r;
+      }
+
+      /**
+      * \brief Computes the euclid norm of the vector.
+      *
+      * \returns
+      * The euclid norm of the vector.
+      */
+      ValueType norm_euclid() const
+      {
+        return Math::sqrt(norm_euclid_sqr());
       }
     }; // class Vector
 
@@ -752,6 +763,27 @@ namespace FEAST
           }
         }
         return r / DataType(2);
+      }
+
+      /**
+       * \brief Returns the Frobenius norm of the matrix.
+       *
+       * This function computes and returns
+       * \f[ \Big(\sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\Big)^{\frac{1}{2}} \f]
+       *
+       * \returns The Frobenius norm of the matrix.
+       */
+      DataType norm_frobenius() const
+      {
+        DataType r(0);
+        for(int i(0); i < m_; ++i)
+        {
+          for(int j(0); j < n_; ++j)
+          {
+            r += Math::sqr(v[i][j]);
+          }
+        }
+        return Math::sqrt(r);
       }
 
       /**
@@ -1178,6 +1210,20 @@ namespace FEAST
     inline Matrix<T_, m_, n_> operator*(const Matrix<T_, m_, l_, sma_, sna_>& a, const Matrix<T_, l_, n_, smb_, snb_>& b)
     {
       return Matrix<T_, m_, n_>().set_mat_mat_mult(a, b);
+    }
+
+    /// matrix addition operator
+    template<typename T_, int m_, int n_,int sma_, int sna_, int smb_, int snb_>
+    inline Matrix<T_, m_, n_> operator+(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
+    {
+      return Matrix<T_, m_, n_>(a) += b;
+    }
+
+    /// matrix subtraction operator
+    template<typename T_, int m_, int n_,int sma_, int sna_, int smb_, int snb_>
+    inline Matrix<T_, m_, n_> operator-(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
+    {
+      return Matrix<T_, m_, n_>(a) -= b;
     }
 
     /**
