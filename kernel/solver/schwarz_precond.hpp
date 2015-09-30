@@ -46,6 +46,8 @@ namespace FEAST
       typedef Global::Vector<LocalVector_> GlobalVectorType;
       /// our global filter type
       typedef Global::Filter<LocalFilter_> GlobalFilterType;
+      /// base-class typedef
+      typedef SolverBase<Global::Vector<LocalVector_>> BaseClass;
 
       /// the local solver interface
       typedef SolverBase<LocalVector_> LocalSolverType;
@@ -83,6 +85,12 @@ namespace FEAST
       virtual void init_numeric() override
       {
         _local_solver->init_numeric();
+      }
+
+      virtual void init_branch(String root = "") override
+      {
+        BaseClass::init_branch(root);
+        _local_solver->init_branch(root + "::" + this->name());
       }
 
       virtual void done_numeric() override

@@ -159,7 +159,13 @@ namespace FEAST
     template<typename Vector_>
     class SolverBase
     {
+    private:
+
+      /// Description of this solvers branch, with itself at the leaf.
+      String _branch;
+
     public:
+
       /// virtual destructor
       virtual ~SolverBase()
       {
@@ -182,6 +188,12 @@ namespace FEAST
        */
       virtual void init_numeric()
       {
+      }
+
+      /// Initialise solver branch description
+      virtual void init_branch(String root = "")
+      {
+        _branch = root + "::" + name();
       }
 
       /**
@@ -209,12 +221,14 @@ namespace FEAST
          \verbatim
          this->init_symbolic();
          this->init_numeric();
+         this->init_branch();
          \endverbatim
        */
       virtual void init()
       {
         init_symbolic();
         init_numeric();
+        init_branch();
       }
 
       /**
@@ -238,6 +252,11 @@ namespace FEAST
        * \returns A string describing the solver.
        */
       virtual String name() const = 0;
+
+      String get_solver_branch()
+      {
+        return _branch;
+      }
 
       /**
        * \brief Solver application method

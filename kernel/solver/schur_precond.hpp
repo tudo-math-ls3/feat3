@@ -177,6 +177,13 @@ namespace FEAST
         _solver_s->init_numeric();
       }
 
+      virtual void init_branch(String root = "") override
+      {
+        BaseClass::init_branch(root);
+        _solver_a->init_branch(root + "::" + this->name());
+        _solver_s->init_branch(root + "::" + this->name());
+      }
+
       virtual void done_numeric() override
       {
         _solver_s->done_numeric();
@@ -400,6 +407,13 @@ namespace FEAST
         BaseClass::init_numeric();
         _solver_a->init_numeric();
         _solver_s->init_numeric();
+      }
+
+      virtual void init_branch(String root = "") override
+      {
+        BaseClass::init_branch(root);
+        _solver_a->init_branch(root + "::" + this->name());
+        _solver_s->init_branch(root + "::" + this->name());
       }
 
       virtual void done_numeric() override

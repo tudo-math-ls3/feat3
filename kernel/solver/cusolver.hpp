@@ -52,6 +52,12 @@ namespace FEAST
           {
           }
 
+        /// Returns the name of the solver.
+        virtual String name() const override
+        {
+          return "CuSolverLU";
+        }
+
         /**
          * \brief Solves a linear system with the factorised system matrix.
          *
@@ -96,6 +102,12 @@ namespace FEAST
         explicit CuSolverQR(const LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> & system_matrix) :
           _system_matrix(system_matrix)
         {
+        }
+
+        /// Returns the name of the solver.
+        virtual String name() const override
+        {
+          return "CuSolverQR";
         }
 
         virtual Status apply(LAFEM::DenseVector<Mem::CUDA, double, unsigned int> & x, const LAFEM::DenseVector<Mem::CUDA, double, unsigned int> & b) override

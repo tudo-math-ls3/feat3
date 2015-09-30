@@ -67,6 +67,12 @@ namespace FEAST
       /// virtual destructor
       virtual ~Umfpack();
 
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "UMFPACK";
+      }
+
       virtual void init_symbolic() override;
       virtual void done_symbolic() override;
       virtual void init_numeric() override;

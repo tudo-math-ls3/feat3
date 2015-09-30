@@ -268,6 +268,37 @@ namespace FEAST
         }
       }
 
+      virtual void init_branch(String root = "") override
+      {
+        BaseClass::init_branch(root);
+
+        // loop over all level
+        for(auto it = system_levels.begin(); it != system_levels.end(); ++it)
+        {
+          if(it == system_levels.begin())
+          {
+            if((*it)->coarse_solver)
+            {
+              (*it)->coarse_solver->init_branch(root + "::" + this->name());
+            }
+          }
+          else
+          {
+            if((*it)->pre_smoother)
+            {
+              (*it)->pre_smoother->init_branch(root + "::" + this->name());
+            }
+            if((*it)->post_smoother)
+            {
+              if((*it)->post_smoother != (*it)->pre_smoother)
+              {
+                (*it)->post_smoother->init_branch(root + "::" + this->name());
+              }
+            }
+          }
+        }
+      }
+
       virtual void done_numeric() override
       {
         // loop over all level
