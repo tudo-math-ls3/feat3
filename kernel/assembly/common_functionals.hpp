@@ -30,7 +30,7 @@ namespace FEAST
       {
       public:
         /// ensure that the function can compute values
-        static_assert(Function_::can_value != 0, "function can't compute values");
+        static_assert(Function_::can_value, "function can't compute values");
 
         /// function config tag
         struct FunctionConfig :
@@ -156,7 +156,7 @@ namespace FEAST
       {
       public:
         /// ensure that the function can compute hessian matrices
-        static_assert(Function_::can_hess != 0, "function can't compute hessians");
+        static_assert(Function_::can_hess, "function can't compute hessians");
 
         /// function config tag
         struct FunctionConfig :
