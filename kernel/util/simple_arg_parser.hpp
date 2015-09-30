@@ -9,7 +9,6 @@
 // includes, system
 #include <deque>
 #include <map>
-#include <set>
 #include <utility>
 
 namespace FEAST
@@ -144,7 +143,7 @@ namespace FEAST
     /// option-parameter map
     std::map<String, std::pair<int, std::deque<String> > > _opts;
     /// supported option set
-    std::set<String> _supported;
+    std::map<String, String> _supported;
 
   public:
     /**
@@ -219,14 +218,55 @@ namespace FEAST
      * This function adds an option name to the set of supported options, which
      * is used by the #query_unsupported() function.
      *
+     * \param[in] option
+     * The name of the option that is to be added.
+     *
+     * \param[in] description
+     * A descriptive string that describes the meaning of the option and its parameters.
+     * This is used for the generation of a commented option list; see the documentation
+     * of the #get_supported_help() function for details and remarks about this help string.
+     *
      * \note
      * This function has no effect on the #check(), #query() and #parse() functions, i.e.
      * you can use these functions to query options independently of whether they have
      * been added to the set of supported options or not.
      */
-    void support(const String& option)
+    void support(const String& option, const String& description = String())
     {
-      _supported.insert(option);
+      _supported.emplace(option, description);
+    }
+
+    /**
+     * \brief Returns a string of all supported options and their help strings.
+     *
+     * This function returns a new-line separated string of all options and their
+     * descriptions, which have been added to the parser using the #support() function.
+     *
+     * Each option is listed in the form
+       \verbatim
+       --option description
+       \endverbatim
+     *
+     * Recommendations:
+     * - If your option has no parameters, your description string should begin with
+     *   a new-line character, so that the description starts in the next line.
+     * - Parameters should be enclosed in angle-brackets and their names should be
+     *   referenced in the description, e.g. choosing <c>option="level"</c> and
+     *   <c>description="\<n\>\nSets the refinement level to \<n\>\n"</c>
+     *   leads to the output
+         \verbatim
+         --level <n>
+         Sets the refinement level to <n>.
+         \endverbatim
+     */
+    String get_supported_help() const
+    {
+      String s;
+      for(auto it = _supported.begin(); it != _supported.end(); ++it)
+      {
+        s += "--" + it->first + " " + it->second + "\n";
+      }
+      return s;
     }
 
     /**
