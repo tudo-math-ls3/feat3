@@ -113,6 +113,11 @@ for i in range(1, len(sys.argv)):
   if len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--":
     extra_options.append(sys.argv[i])
 
+# check for cmake binary
+if not is_found ("cmake"):
+  print("Error: no cmake binary found!")
+  sys.exit()
+
 # guess a fitting configuration and search for available compilers
 if len(sys.argv) == 1 or "guess" in sys.argv:
   buildid_string = "opt"
@@ -126,6 +131,9 @@ if len(sys.argv) == 1 or "guess" in sys.argv:
     buildid_string += "-icc"
   elif is_found("clang++"):
     buildid_string += "-clang"
+  else:
+    print("Error: no comptabile compiler found nor provided!")
+    sys.exit()
 
   if is_found("nvcc"):
     buildid_string += "-cuda"
