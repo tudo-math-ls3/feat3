@@ -364,12 +364,20 @@ namespace FEAST
         // get the number of levels
         const int nl = int(system_levels.size());
 
+        // insert -1 to signal new starting v cycle
+        Statistics::add_solver_toe(this->_branch, double(-1));
+
+        // array containing toe for each processed level
+        std::vector<double> toes((size_t)nl, double(0));
+
         // copy RHS vector
         system_levels.back()->vec_rhs.copy(vec_def);
 
         // restriction loop
         for(int i(nl-1); i > 0; --i)
         {
+          TimeStamp at;
+
           // get our level and the coarse level
           SystemLevel& lvl = *system_levels.at(std::size_t(i));
           SystemLevel& lvl_c = *system_levels.at(std::size_t(i-1));
@@ -405,11 +413,16 @@ namespace FEAST
           // filter coarse fefect
           lvl_c.filter.filter_def(lvl_c.vec_rhs);
 
+          TimeStamp bt;
+          toes.at((size_t)i)= bt.elapsed(at);
+
           // descent to prior level
         }
 
         // process the coarse grid level
         {
+          TimeStamp at;
+
           SystemLevel& lvl = *system_levels.front();
 
           // if the have a coarse grid solver, apply it
@@ -426,11 +439,16 @@ namespace FEAST
             // apply the correction filter
             lvl.filter.filter_cor(lvl.vec_sol);
           }
+
+          TimeStamp bt;
+          toes.at(0) = bt.elapsed(at);
         }
 
         // prolongation loop
         for(int i(1); i < nl; ++i)
         {
+          TimeStamp at;
+
           // get our level and the coarse level
           SystemLevel& lvl = *system_levels.at(std::size_t(i));
           SystemLevel& lvl_c = *system_levels.at(std::size_t(i-1));
@@ -467,11 +485,19 @@ namespace FEAST
             lvl.vec_sol.axpy(lvl.vec_cor, lvl.vec_sol);
           }
 
+          TimeStamp bt;
+          toes.at((size_t)i) += bt.elapsed(at);
+
           // ascend to next level
         }
 
         // copy sol vector
         vec_cor.copy(system_levels.back()->vec_sol);
+
+        for (int i(0) ; i < nl ; ++i)
+        {
+          Statistics::add_solver_toe(this->_branch, toes.at((size_t)i));
+        }
 
         // okay
         return Status::success;

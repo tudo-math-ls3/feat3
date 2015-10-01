@@ -140,6 +140,8 @@ namespace FEAST
         // start iterating
         while(status == Status::progress)
         {
+          TimeStamp at;
+
           // compute A*d
           matrix.apply(vec_tmp, vec_dir);
           filter.filter_def(vec_tmp);
@@ -156,11 +158,19 @@ namespace FEAST
           // compute defect norm
           status = this->_set_new_defect(vec_def, vec_sol);
           if(status != Status::progress)
+          {
+            TimeStamp bt;
+            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
             return status;
+          }
 
           // apply preconditioner
           if(!this->_apply_precond(vec_tmp, vec_def, filter))
+          {
+            TimeStamp bt;
+            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
             return Status::aborted;
+          }
           //filter.filter_cor(vec_tmp);
 
           // compute new gamma
@@ -172,6 +182,9 @@ namespace FEAST
 
           // update direction vector
           vec_dir.axpy(vec_dir, vec_tmp, beta);
+
+          TimeStamp bt;
+          Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
         }
 
         // we should never reach this point...

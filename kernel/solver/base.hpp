@@ -159,7 +159,7 @@ namespace FEAST
     template<typename Vector_>
     class SolverBase
     {
-    private:
+    protected:
 
       /// Description of this solvers branch, with itself at the leaf.
       String _branch;

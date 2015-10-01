@@ -154,6 +154,7 @@ namespace FEAST
         //bool early_exit = 0;
         bool restarted = false;
 
+        /// \todo Instrument iteration timings, beware the inner/outer loop twist
         while(status == Status::progress)
         {
           if (restarted == false)

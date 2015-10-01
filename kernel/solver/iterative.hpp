@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/solver/base.hpp>
+#include <kernel/util/statistics.hpp>
 
 namespace FEAST
 {
@@ -317,6 +318,11 @@ namespace FEAST
       {
         // store new defect
         this->_def_init = this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
+        // insert special toe to signal new start of solver
+        Statistics::add_solver_toe(this->_branch, double(-1));
+        //insert -1 as first defect, to signalize a new starting solver iteration run
+        Statistics::add_solver_defect(this->_branch, double(-1));
+        Statistics::add_solver_defect(this->_branch, this->_def_init);
         this->_num_iter = Index(0);
         this->_num_stag_iter = Index(0);
 
@@ -372,6 +378,8 @@ namespace FEAST
         // compute new defect
         if(calc_def)
           this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
+
+        Statistics::add_solver_defect(this->_branch, this->_def_cur);
 
         // plot?
         if(this->_plot)

@@ -118,6 +118,8 @@ namespace FEAST
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& vec_rhs)
       {
+        TimeStamp at;
+
         VectorType& vec_def(this->_vec_def);
         VectorType& vec_cor(this->_vec_cor);
         const MatrixType& matrix(this->_system_matrix);
@@ -131,7 +133,11 @@ namespace FEAST
         {
           // apply preconditioner
           if(!this->_apply_precond(vec_cor, vec_def, filter))
+          {
+            TimeStamp bt;
+            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
             return Status::aborted;
+          }
           //filter.filter_cor(vec_cor);
 
           // update solution vector
@@ -143,6 +149,9 @@ namespace FEAST
 
           // compute new defect norm
           status = this->_set_new_defect(vec_def, vec_sol);
+
+          TimeStamp bt;
+          Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
         }
 
         // return our status

@@ -154,6 +154,8 @@ namespace FEAST
         // outer GMRES loop
         while(status == Status::progress)
         {
+          TimeStamp at;
+
           _q.clear();
           _s.clear();
           _c.clear();
@@ -168,7 +170,11 @@ namespace FEAST
           {
             // apply preconditioner
             if(!this->_apply_precond(this->_vec_z.at(i), this->_vec_v.at(i), filter))
+            {
+              TimeStamp bt;
+              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return Status::aborted;
+            }
             //filter.filter_cor(this->_vec_z.at(i));
 
             // v[i+1] := A*z[i]
@@ -268,6 +274,9 @@ namespace FEAST
 
           // set the current defect
           status = this->_set_new_defect(this->_vec_v.at(0), vec_sol);
+
+          TimeStamp bt;
+          Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
         }
 
         // finished

@@ -170,7 +170,7 @@ namespace PoissonDirichlet2D
     typedef Index IndexType;
 
     // choose our desired analytical solution
-    Analytic::Common::SineBubbleFunction<2> sol_func;
+    Analytic::Common::ExpBubbleFunction<2> sol_func;
 
     // define our domain type
     typedef Control::Domain::DomainControl<MeshType_> DomainControlType;
@@ -324,6 +324,7 @@ namespace PoissonDirichlet2D
 
     // solve
     Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
+    std::cout<<Statistics::get_formated_solvers()<<std::endl;
 
     // release solver
     solver->done();
