@@ -748,6 +748,14 @@ namespace FEAST
       return true;
     }
 
+    // This one is really required, as otherwise some compilers choose the
+    // generic template instead of the overload for std::string above...
+    bool parse(String& s) const
+    {
+      s.assign(*this);
+      return true;
+    }
+
 #ifndef __CUDACC__
 #ifdef FEAST_HAVE_QUADMATH
     bool parse(__float128& x) const
