@@ -1,16 +1,17 @@
 import os
 import subprocess
 
+def is_found(name):
+  try:
+    with open(os.devnull, "w") as fp:
+      subprocess.Popen([name], stdout=fp, stderr=subprocess.STDOUT).communicate()
+  except OSError as e:
+    if e.errno == os.errno.ENOENT:
+      return False
+  return True
 
 def find_exe(name):
-  path = get_output("which " + name)
-  if len(path) > 0:
-    return path[0]
-  else:
-    return ""
-
-def is_found(name):
-  return find_exe(name) != ""
+  return get_output("which " + name)[0]
 
 def remove_string(array, string):
   while array.count(string) > 0:
