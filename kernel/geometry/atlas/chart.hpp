@@ -101,23 +101,7 @@ namespace FEAST
           template<typename CT_, typename MT_, typename PT_>
           static bool adapt(const CT_& chart, MT_& mesh, const PT_& part)
           {
-            // a world point in the mesh
-            typedef typename CT_::WorldPoint WorldPoint;
-            // vertex set type of our mesh
-            typedef typename MT_::VertexSetType VertexSetType;
-
-            // Get the vertex set of the mesh
-            VertexSetType& vtx = mesh.get_vertex_set();
-
-            // Get the vertex target set of the part
-            const TargetSet& vidx = part.template get_target_set<0>();
-
-            // loop over all vertices in the mesh part
-            Index num_vtx = vidx.get_num_entities();
-            for(Index i(0); i < num_vtx; ++i)
-            {
-              chart.project(reinterpret_cast<WorldPoint&>(vtx[vidx[i]]));
-            }
+            chart.project(mesh, part);
 
             // okay
             return true;

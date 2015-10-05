@@ -144,8 +144,8 @@ template
     MeshType* mesh = rmn->get_mesh();
 
     std::deque<String> dirichlet_list;
-    dirichlet_list.push_back("inner");
     std::deque<String> slip_list;
+    slip_list.push_back("inner");
     slip_list.push_back("outer");
 
     // This is the centre reference point
@@ -164,7 +164,7 @@ template
     auto& outer_indices = rmn->find_mesh_part("outer")->template get_target_set<0>();
 
     // Parameters for the Rumpf functional
-    DataType fac_norm = DataType(1e-3),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    DataType fac_norm = DataType(1e-3), fac_det = DataType(1e0), fac_cof = DataType(0), fac_reg(DataType(1e-8));
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
     my_functional.print();
 

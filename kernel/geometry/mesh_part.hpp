@@ -648,6 +648,7 @@ namespace FEAST
 
             // Fill attribute sets
             factory.fill_attribute_sets(_attribute_holder);
+
           }
 
         /**

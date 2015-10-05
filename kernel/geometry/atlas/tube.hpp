@@ -118,6 +118,17 @@ namespace FEAST
           point = (_midpoint + axis_point) + diff_point * (_radius / diff_point.norm_euclid());
         }
 
+        void project(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
+        {
+          auto& vtx = mesh.get_vertex_set();
+          const auto& target_vtx = meshpart.template get_target_set<0>();
+
+          for(Index i(0); i < meshpart.get_num_entities(0); ++i)
+          {
+            project(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
+          }
+        }
+
         static Tube<Mesh_>* parse(const std::deque<String>& data, const Index line)
         {
           bool have_midpoint(false), have_axis(false), have_radius(false);

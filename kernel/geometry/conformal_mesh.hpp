@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/factory.hpp>
+#include <kernel/geometry/intern/facet_neighbours.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
 
@@ -118,7 +119,7 @@ namespace FEAST
       explicit ConformalMesh(const Index num_entities[], String identifier = "root") :
         _vertex_set(num_entities[0]),
         _index_set_holder(num_entities),
-        _neighbours(num_entities[shape_dim-1]),
+        _neighbours(num_entities[shape_dim]),
         _identifier(identifier)
       {
         CONTEXT(name() + "::ConformalMesh(const Index[])");
@@ -143,7 +144,7 @@ namespace FEAST
       explicit ConformalMesh(Factory<ConformalMesh>& factory, String identifier = "root") :
         _vertex_set(factory.get_num_entities(0)),
         _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
-        _neighbours(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities[shape_dim-1]),
+        _neighbours(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities[shape_dim]),
         _identifier(identifier)
       {
         CONTEXT(name() + "::ConformalMesh() [factory]");
@@ -215,6 +216,22 @@ namespace FEAST
       String get_identifier() const
       {
         return _identifier;
+      }
+
+      void fill_neighbours()
+      {
+        // Facet at cell index set
+        auto& facet_idx = get_index_set<shape_dim, shape_dim -1>();
+
+        ASSERT(get_num_entities(shape_dim-1) == facet_idx.get_index_bound(),
+        "mesh num_entities / index_set num_entities mismatch: " +stringify(get_num_entities(shape_dim-1))+
+        " / "+stringify(facet_idx.get_num_entities()));
+
+        if(_neighbours.get_num_indices() == Index(0))
+          _neighbours = std::move(typename IndexSet<shape_dim, shape_dim-1>::Type(get_num_entities(shape_dim)));
+
+        Intern::FacetNeighbours::compute(_neighbours, facet_idx);
+
       }
 
       /// \returns A reference to the facet neighbour relations
@@ -299,71 +316,6 @@ namespace FEAST
         return &_index_set_holder;
       }
       /// \endcond
-
-      /**
-       * \brief Fills the neighbour relations array
-       */
-      void fill_neighbours()
-      {
-        // Facet at cell index set
-        auto& facet_idx = get_index_set<shape_dim, shape_dim -1>();
-        ASSERT(get_num_entities(shape_dim-1) == facet_idx.get_index_bound(),
-        "mesh num_entities / index_set num_entities mismatch: " +stringify(get_num_entities(shape_dim-1))+
-        " / "+stringify(facet_idx.get_num_entities()));
-
-        Index num_cells(get_num_entities(shape_dim));
-        Index num_facets(get_num_entities(shape_dim-1));
-
-        // A facet is shared by exactly 2 cells if it is interiour, and is present in exactly one cell if it is at
-        // the boundary
-        typedef Index SharedBy[2];
-        SharedBy* shared_by(new SharedBy[num_facets]);
-
-        // ~Index(0) is the marker for "no neighbour"
-        for(Index l(0); l < num_facets; ++l)
-        {
-          shared_by[l][0] = ~Index(0);
-          shared_by[l][1] = ~Index(0);
-        }
-
-        // For each facet, find the cells sharing it
-        for(Index k(0); k < num_cells; ++k)
-        {
-          for(int j(0); j < facet_idx.num_indices; ++j)
-          {
-            // Index of the facet
-            Index l(facet_idx[k][Index(j)]);
-
-            if(shared_by[l][0] == ~Index(0))
-              shared_by[l][0] = k;
-            else if(shared_by[l][1] == ~Index(0))
-              shared_by[l][1] = k;
-            else
-              throw InternalError("Facet "+stringify(l)+" is shared by cells "+stringify(shared_by[l][0])+", "+stringify(shared_by[l][1])+" and again by "+stringify(k));
-          }
-        }
-
-        // For every cell and for every facet of that cell, the neighbour at a face is the OTHER cell sharing it
-        // (if any)
-        for(Index k(0); k < num_cells; ++k)
-        {
-          for(int j(0); j < facet_idx.num_indices; ++j)
-          {
-            // Index of the facet
-            Index l(facet_idx[k][Index(j)]);
-
-            if(shared_by[l][0] == k)
-              _neighbours[k][j] = shared_by[l][1];
-            else if(shared_by[l][1] == k)
-              _neighbours[k][j] = shared_by[l][0];
-            else
-              throw InternalError("Facet "+stringify(l)+" found at cell "+stringify(k)+" but is shared by cells "+stringify(shared_by[l][0])+", "+stringify(shared_by[l][1]));
-          }
-        }
-
-        delete[] shared_by;
-
-      }
 
       /**
        * \brief Returns the name of the class.

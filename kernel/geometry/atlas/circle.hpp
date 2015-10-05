@@ -95,6 +95,17 @@ namespace FEAST
           point += _midpoint;
         }
 
+        void project(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
+        {
+          auto& vtx = mesh.get_vertex_set();
+          const auto& target_vtx = meshpart.template get_target_set<0>();
+
+          for(Index i(0); i < meshpart.get_num_entities(0); ++i)
+          {
+            project(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
+          }
+        }
+
         /** \copydoc ChartBase::map() */
         void map(WorldPoint& point, const ParamPoint& param) const
         {

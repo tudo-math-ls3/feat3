@@ -17,6 +17,11 @@ namespace FEAST
   {
     namespace Atlas
     {
+      namespace Intern
+      {
+        template<typename Mesh_, int shape_dim>
+        struct DiscreteChartHelper;
+      }
       /**
        * \brief Standard Chart factory class template.
        *
@@ -32,14 +37,9 @@ namespace FEAST
       {
         // Boundary mesh typedefs
         private:
-          /// Simplex<1> mesh in 2d
-          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 2, 2, typename Mesh_::CoordType>> Simplex1_2d;
-          /// Simplex<1> mesh in 3d
-          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 3, 3, typename Mesh_::CoordType>> Simplex1_3d;
-          /// Simplex<2> mesh in 3d
-          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<2>, 3, 3, typename Mesh_::CoordType>> Simplex2_3d;
-          /// Hypercube<2> mesh in 3d
-          typedef DiscreteChart<Mesh_, ConformalMesh<Shape::Hypercube<2>, 3, 3, typename Mesh_::CoordType>> Hypercube2_3d;
+          //static constexpr int shape_dim = Mesh_::shape_dim;
+          //static constexpr int world_dim = Mesh_::world_dim;
+
 
         public:
           /** \copydoc ChartFactory::parse_chart() */
@@ -57,33 +57,44 @@ namespace FEAST
 
           virtual ChartBase<Mesh_>* parse_discrete_chart(FEAST::MeshStreamer::MeshDataContainer& data) override
           {
-            if(data.shape_type == data.st_edge)
-            {
-              if(data.coord_per_vertex == 2)
-                return DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 2, 2, typename Mesh_::CoordType>>::parse(data);
-              if(data.coord_per_vertex == 3)
-                return DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<1>, 3, 3, typename Mesh_::CoordType>>::parse(data);
-              throw InternalError("Boundary mesh of shape dim 1 needs a word dimension of 2 or 3, but got "+stringify(data.coord_per_vertex));
-            }
-
-            if(data.shape_type == data.st_tria)
-            {
-              if(data.coord_per_vertex == 3)
-                return DiscreteChart<Mesh_, ConformalMesh<Shape::Simplex<2>, 3, 3, typename Mesh_::CoordType>>::parse(data);
-              throw InternalError("Simplex<2> boundary mesh needs a word dimension of 3, but got "+stringify(data.coord_per_vertex));
-            }
-
-            if(data.shape_type == data.st_quad)
-            {
-              if(data.coord_per_vertex == 3)
-                return DiscreteChart<Mesh_, ConformalMesh<Shape::Hypercube<2>, 3, 3, typename Mesh_::CoordType>>::parse(data);
-              throw InternalError("Hypercube<2> boundary mesh needs a word dimension of 3, but got "+stringify(data.coord_per_vertex));
-            }
-
-            throw InternalError("Boundary mesh needs a shape type of Simplex<1,2> or Hypercube<1,2>, but got "+stringify(data.shape_type));
+            return Intern::DiscreteChartHelper<Mesh_, Mesh_::shape_dim>::parse(data);
           }
 
       }; // class StandardChartFactory<...>
+
+      /// \cond internal
+      namespace Intern
+      {
+        template<typename Mesh_, int shape_dim = Mesh_::shape_dim>
+        struct DiscreteChartHelper
+        {
+          typedef typename Mesh_::VertexSetType VertexSetType;
+          static constexpr int stride = VertexSetType::stride;
+
+          typedef typename Shape::FaceTraits<Shape::Simplex<shape_dim>, shape_dim-1>::ShapeType SurfaceShapeType;
+          typedef DiscreteChart
+          <
+            Mesh_,
+            ConformalMesh<SurfaceShapeType, Mesh_::world_dim, stride, typename Mesh_::CoordType>
+          > ChartType;
+
+          static ChartBase<Mesh_>* parse(FEAST::MeshStreamer::MeshDataContainer& data)
+          {
+            return ChartType::parse(data);
+          }
+        };
+
+        template<typename Mesh_>
+        struct DiscreteChartHelper<Mesh_, 1>
+        {
+          static ChartBase<Mesh_>* parse(FEAST::MeshStreamer::MeshDataContainer& DOXY(data))
+          {
+            return nullptr;
+          }
+        };
+      } // namespace Intern
+      /// \endcond
+
     } // namespace Atlas
   } // namespace Geometry
 } // namespace FEAST
