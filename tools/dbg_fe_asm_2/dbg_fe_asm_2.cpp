@@ -2,7 +2,7 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
-#include <kernel/space/rannacher_turek/element.hpp>
+#include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
@@ -20,7 +20,7 @@ typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
 typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 typedef Space::Lagrange2::Element<QuadTrafo> QuadSpaceQ2;
-typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
+typedef Space::CroRavRanTur::Element<QuadTrafo> QuadSpaceQ1T;
 
 
 template<typename Space_>

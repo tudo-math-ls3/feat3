@@ -62,7 +62,6 @@
 // FEAST-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
 //#include <kernel/space/lagrange2/element.hpp>            // the Lagrange-2 Element (aka "Q2")
-//#include <kernel/space/rannacher_turek/element.hpp>      // the Rannacher-Turek Element (aka "Q1~")
 
 // FEAST-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
@@ -194,9 +193,6 @@ namespace Tutorial01
 
     // Use the Lagrange-2 element (aka "Q2"):
     //typedef Space::Lagrange2::Element<TrafoType> SpaceType;
-
-    // Use the Rannacher-Turek element (aka "Q1~"):
-    //typedef Space::RannacherTurek::Element<TrafoType> SpaceType;
 
     std::cout << "Creating Space..." << std::endl;
 

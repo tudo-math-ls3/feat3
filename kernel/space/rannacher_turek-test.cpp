@@ -1,6 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/space/rannacher_turek/element.hpp>
+#include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/util/math.hpp>
@@ -27,7 +27,7 @@ class RannacherTurekTest
 
   typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
-  typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceStdNonPar;
+  typedef Space::CroRavRanTur::Element<QuadTrafo> QuadSpaceStdNonPar;
 
   typedef Cubature::Rule<ShapeType, DataType_, DataType_, Tiny::Vector<DataType_, 2> > CubatureRule;
 

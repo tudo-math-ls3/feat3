@@ -4,7 +4,7 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
-#include <kernel/space/rannacher_turek/element.hpp>
+#include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/util/random.hpp>
 
 using namespace FEAST;
@@ -54,7 +54,7 @@ public:
       // test various spaces
       test_space<Space::Lagrange1::Element<TrafoType>>(trafo, *root_mesh_node);
       test_space<Space::Lagrange2::Element<TrafoType>>(trafo, *root_mesh_node);
-      test_space<Space::RannacherTurek::Element<TrafoType>>(trafo, *root_mesh_node);
+      test_space<Space::CroRavRanTur::Element<TrafoType>>(trafo, *root_mesh_node);
     }
 
     // delete root mesh node

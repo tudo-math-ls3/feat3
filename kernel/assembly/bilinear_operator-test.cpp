@@ -11,15 +11,12 @@
 #include <kernel/space/bogner_fox_schmit/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/space/rannacher_turek/element.hpp>
+#include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/math.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
-
-template<typename Trafo_>
-using MyRT = Space::RannacherTurek::Element<Trafo_, Space::RannacherTurek::Variant::StdNonPar>;
 
 template<typename Trafo_>
 using MyP0 = Space::Discontinuous::Element<Trafo_, Space::Discontinuous::Variant::StdPolyP<0>>;
@@ -59,7 +56,7 @@ public:
 
     // RT has degree 1, BFC has degree 3, so the integration for the Laplace operator has only to be exact to
     // degree 1 + 3 - 2 = 2
-    test_apply2<MyRT, Space::BognerFoxSchmit::Element, Shape::Hypercube<2>, Assembly::Common::LaplaceOperator, 2>(3, 2);
+    test_apply2<Space::CroRavRanTur::Element, Space::BognerFoxSchmit::Element, Shape::Hypercube<2>, Assembly::Common::LaplaceOperator, 2>(3, 2);
     // degree 0 + 1 = 1
     test_apply2<MyP0, Space::Lagrange1::Element, Shape::Simplex<3>, Assembly::Common::IdentityOperator, 3>(1, 1);
   }

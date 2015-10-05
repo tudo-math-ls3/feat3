@@ -6,7 +6,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
-#include <kernel/space/rannacher_turek/element.hpp>
+#include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/math.hpp>
 
@@ -35,7 +35,7 @@ class RewProjectorTest :
 
   typedef Space::Discontinuous::Element<QuadTrafo> QuadSpaceQ0;
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
-  typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceRT;
+  typedef Space::CroRavRanTur::Element<QuadTrafo> QuadSpaceRT;
 
 public:
   RewProjectorTest() :

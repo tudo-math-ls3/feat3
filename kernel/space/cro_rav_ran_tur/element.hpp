@@ -1,31 +1,55 @@
 #pragma once
-#ifndef KERNEL_SPACE_CROUZEIX_RAVIART_ELEMENT_HPP
-#define KERNEL_SPACE_CROUZEIX_RAVIART_ELEMENT_HPP 1
+#ifndef KERNEL_SPACE_CRO_RAV_RAN_TUR_ELEMENT_HPP
+#define KERNEL_SPACE_CRO_RAV_RAN_TUR_ELEMENT_HPP 1
 
 // includes, FEAST
 #include <kernel/space/element_base.hpp>
 #include <kernel/space/dof_assignment_base.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
-#include <kernel/space/crouzeix_raviart/dof_traits.hpp>
-#include <kernel/space/crouzeix_raviart/evaluator.hpp>
-#include <kernel/space/crouzeix_raviart/node_functional.hpp>
+#include <kernel/space/cro_rav_ran_tur/dof_traits.hpp>
+#include <kernel/space/cro_rav_ran_tur/evaluator.hpp>
+#include <kernel/space/cro_rav_ran_tur/node_functional.hpp>
 
 namespace FEAST
 {
   namespace Space
   {
     /**
-     * \brief Crouzeix-Raviart Element namespace
-     *
-     * This namespace encapsulates all classes related to the implementation of the second-order
-     * H1-nonconforming Crouzeix-Raviart Finite Element space.
-     *
-     * \see \cite CR73
+     * \brief Crouzeix-Raviart / Rannacher-Turek element namespace
      */
-    namespace CrouzeixRaviart
+    namespace CroRavRanTur
     {
+      /// \cond internal
+      namespace Intern
+      {
+        template<typename Shape_>
+        struct LocalDegree;
+
+        template<int dim_>
+        struct LocalDegree<Shape::Simplex<dim_>>
+        {
+          static constexpr int value = 1;
+        };
+
+        template<int dim_>
+        struct LocalDegree<Shape::Hypercube<dim_>>
+        {
+          static constexpr int value = 2;
+        };
+      } // namespace Intern
+      /// \endcond
+
       /**
-       * \brief Crouzeix-Raviart Finite-Element space class template
+       * \brief Crouzeix-Raviart / Rannacher-Turek element class template
+       *
+       * This class template implemements the second-order H1-non-conforming finite element spaces
+       * known as the Crouzeix-Raviart (Simplex shapes) and Rannacher-Turek (Hypercube shapes).
+       *
+       * \note
+       * In the case of Hypercube meshes, this class implements the non-parameteric integral-mean
+       * based implementation, which is known to be the most stable of all variants.
+       *
+       * \see \cite CR73, \cite RT92
        *
        * \tparam Trafo_
        * The transformation that is to be used by this space.
@@ -50,7 +74,7 @@ namespace FEAST
         static constexpr bool have_node_func = true;
 
         /** \copydoc ElementBase::local_degree */
-        static constexpr int local_degree = 1;
+        static constexpr int local_degree = Intern::LocalDegree<ShapeType>::value;
 
         /** \copydoc ElementBase::Evaluator */
         template<
@@ -70,7 +94,7 @@ namespace FEAST
 
         public:
           /// space evaluator type
-          typedef CrouzeixRaviart::Evaluator<Element, TrafoEvaluator_, Traits> Type;
+          typedef CroRavRanTur::Evaluator<Element, TrafoEvaluator_, Traits> Type;
         };
 
         /** \copydoc ElementBase::DofMappingType */
@@ -99,7 +123,7 @@ namespace FEAST
 
         public:
           /// node functional type
-          typedef CrouzeixRaviart::NodeFunctional<Element, codim, DataType_> Type;
+          typedef CroRavRanTur::NodeFunctional<Element, ShapeType, codim, DataType_> Type;
         };
 
       public:
@@ -123,17 +147,17 @@ namespace FEAST
         Index get_num_dofs() const
         {
           // number of DOFs = number of facets in the mesh
-          return this->get_mesh().get_num_entities(ShapeType::dimension-1);
+          return this->get_mesh().get_num_entities(ShapeType::dimension - 1);
         }
 
         /** \copydoc ElementBase::name() */
         static String name()
         {
-          return "CrouzeixRaviart";
+          return "CroRavRanTur";
         }
       }; // class Element
-    } // namespace CrouzeixRaviart
+    } // namespace CroRavRanTur
   } // namespace Space
 } // namespace FEAST
 
-#endif // KERNEL_SPACE_CROUZEIX_RAVIART_ELEMENT_HPP
+#endif // KERNEL_SPACE_CRO_RAV_RAN_TUR_ELEMENT_HPP

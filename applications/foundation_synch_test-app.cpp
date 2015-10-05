@@ -15,7 +15,6 @@
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>
 
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 

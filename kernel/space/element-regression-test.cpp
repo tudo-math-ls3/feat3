@@ -21,12 +21,11 @@
 
 #include <kernel/space/argyris/element.hpp>
 #include <kernel/space/bogner_fox_schmit/element.hpp>
-#include <kernel/space/crouzeix_raviart/element.hpp>
+#include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/hermite3/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
-#include <kernel/space/rannacher_turek/element.hpp>
 
 namespace ElementRegression
 {
@@ -648,20 +647,23 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
-  // Ranancher-Turek element (aka Q1~)
-
-  // Interpolation Hypercube<2>
-  ElementRegressionInterpol<Shape::Hypercube<2>, Space::RannacherTurek::Element, true, true, false, Space::RannacherTurek::Variant::StdNonPar>
-    int_hy2_rannacher_turek_lvl4(4, 2.500068277725e-003, 1.783313801003e-001);
-
-  /* ********************************************************************************************* */
-  /* ********************************************************************************************* */
-  /* ********************************************************************************************* */
-  // Crouzeix-Raviart element
+  // Crouzeix-Raviart / Ranancher-Turek element (aka Q1~)
 
   // Interpolation Simplex<2>
-  ElementRegressionInterpol<Shape::Simplex<2>, Space::CrouzeixRaviart::Element, true, true, false>
-    int_sx2_crouzeix_raviart_lvl4(4, 8.995898938549e-004, 1.100847779732e-001);
+  ElementRegressionInterpol<Shape::Simplex<2>, Space::CroRavRanTur::Element, true, true, false>
+    int_sx2_cro_rav_ran_tur_lvl4(4, 8.995898938549e-004, 1.100847779732e-001);
+
+  // Interpolation Simplex<3>
+  ElementRegressionInterpol<Shape::Simplex<3>, Space::CroRavRanTur::Element, true, true, false>
+    int_sx3_cro_rav_ran_tur_lvl3(3, 2.591997712518e-03, 1.802627337373e-01);
+
+  // Interpolation Hypercube<2>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Space::CroRavRanTur::Element, true, true, false>
+    int_hy2_cro_rav_ran_tur_lvl4(4, 2.500068277725e-003, 1.783313801003e-001);
+
+  // Interpolation Hypercube<3>
+  ElementRegressionInterpol<Shape::Hypercube<3>, Space::CroRavRanTur::Element, true, true, false>
+    int_hy3_cro_rav_ran_tur_lvl3(3, 9.695321463303e-03, 3.754039401847e-01);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -788,20 +790,23 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
-  // Ranancher-Turek element (aka Q1~)
-
-  // L2-Projection Hypercube<2>
-  ElementRegressionL2<Shape::Hypercube<2>, Space::RannacherTurek::Element, true, true, false, Space::RannacherTurek::Variant::StdNonPar>
-    l2_hy2_rannacher_turek_lvl4(4, 1.911701836636e-003, 1.786971993692e-001);
-
-  /* ********************************************************************************************* */
-  /* ********************************************************************************************* */
-  /* ********************************************************************************************* */
-  // Crouzeix-Raviart element
+  // Crouzeix-Raviart / Ranancher-Turek element (aka Q1~)
 
   // L2-Projection Simplex<2>
-  ElementRegressionL2<Shape::Simplex<2>, Space::CrouzeixRaviart::Element, true, true, false>
-    l2_sx2_crouzeix_raviart_lvl4(4, 5.736744214046e-004, 1.076734893721e-001);
+  ElementRegressionL2<Shape::Simplex<2>, Space::CroRavRanTur::Element, true, true, false>
+    l2_sx2_cro_rav_ran_tur_lvl4(4, 5.736744214046e-004, 1.076734893721e-001);
+
+  // L2-Projection Simplex<3>
+  ElementRegressionL2<Shape::Simplex<3>, Space::CroRavRanTur::Element, true, true, false>
+    l2_sx3_cro_rav_ran_tur_lvl3(3, 1.622994978130e-03, 1.762087029397e-01);
+
+  // L2-Projection Hypercube<2>
+  ElementRegressionL2<Shape::Hypercube<2>, Space::CroRavRanTur::Element, true, true, false>
+    l2_hy2_cro_rav_ran_tur_lvl4(4, 1.911701836636e-003, 1.786971993692e-001);
+
+  // L2-Projection Hypercube<3>
+  ElementRegressionL2<Shape::Hypercube<3>, Space::CroRavRanTur::Element, true, true, false>
+    l2_hy3_cro_rav_ran_tur_lvl3(3, 8.597313274081e-03, 3.763482837158e-01);
 
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
@@ -884,19 +889,22 @@ namespace ElementRegression
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
   /* ********************************************************************************************* */
-  // Ranancher-Turek element (aka Q1~)
-
-  // H1-Projection Hypercube<2>
-  ElementRegressionH1<Shape::Hypercube<2>, Space::RannacherTurek::Element, true, true, false, Space::RannacherTurek::Variant::StdNonPar>
-    h1_hy2_rannacher_turek_lvl4(4, 1.940017656827e-003, 1.787395012244e-001);
-
-  /* ********************************************************************************************* */
-  /* ********************************************************************************************* */
-  /* ********************************************************************************************* */
-  // Crouzeix-Raviart element
+  // Crouzeix-Raviart / Ranancher-Turek element (aka Q1~)
 
   // H1-Projection Simplex<2>
-  ElementRegressionH1<Shape::Simplex<2>, Space::CrouzeixRaviart::Element, true, true, false>
-    h1_sx2_crouzeix_raviart_lvl4(4, 2.028469318821e-003, 1.463272513514e-001);
+  ElementRegressionH1<Shape::Simplex<2>, Space::CroRavRanTur::Element, true, true, false>
+    h1_sx2_cro_rav_ran_tur_lvl4(4, 2.028469318821e-003, 1.463272513514e-001);
+
+  // H1-Projection Simplex<3>
+  ElementRegressionH1<Shape::Simplex<3>, Space::CroRavRanTur::Element, true, true, false>
+    h1_sx3_cro_rav_ran_tur_lvl3(3, 4.140192950164e-03, 2.035307577330e-01);
+
+  // H1-Projection Hypercube<2>
+  ElementRegressionH1<Shape::Hypercube<2>, Space::CroRavRanTur::Element, true, true, false>
+    h1_hy2_cro_rav_ran_tur_lvl4(4, 1.940017656827e-003, 1.787395012244e-001);
+
+  // H1-Projection Hypercube<3>
+  ElementRegressionH1<Shape::Hypercube<3>, Space::CroRavRanTur::Element, true, true, false>
+    h1_hy3_cro_rav_ran_tur_lvl3(3, 9.861506213730e-03, 3.794627973897e-01);
 
 } // namespace ElementRegression
