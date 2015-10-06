@@ -3,8 +3,8 @@
 #define KERNEL_ASSEMBLY_COMMON_FUNCTIONALS_HPP 1
 
 // includes, FEAST
+#include <kernel/analytic/function.hpp>
 #include <kernel/assembly/linear_functional.hpp>
-#include <kernel/assembly/analytic_function.hpp>
 
 namespace FEAST
 {
@@ -32,16 +32,13 @@ namespace FEAST
         /// ensure that the function can compute values
         static_assert(Function_::can_value, "function can't compute values");
 
-        /// function config tag
-        struct FunctionConfig :
-          public Trafo::AnalyticConfigBase
-        {
-          /// we need function values
-          static constexpr bool need_value = true;
-        };
-
         /// trafo config tag
-        typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
+        struct TrafoConfig :
+          public Trafo::ConfigBase
+        {
+          /// we need image point coordinates
+          static constexpr bool need_img_point = true;
+        };
 
         /// test space config tag
         struct TestConfig :
@@ -74,10 +71,12 @@ namespace FEAST
           typedef typename AsmTraits_::TestBasisData TestBasisData;
 
         protected:
+          /// declare our analytic eval traits
+          typedef Analytic::EvalTraits<DataType, Function_> AnalyticEvalTraits;
           /// the function evaluator
-          typename Function_::template Evaluator<typename AsmTraits_::AnalyticEvalTraits> _func_eval;
+          typename Function_::template Evaluator<AnalyticEvalTraits> _func_eval;
           /// the function value in the current point
-          DataType _func_value;
+          typename AnalyticEvalTraits::ValueType _func_value;
 
         public:
           /// constructor
@@ -87,24 +86,11 @@ namespace FEAST
           {
           }
 
-          /** \copydoc LinearFunctional::Evaluator::prepare() */
-          void prepare(const TrafoEvaluator& trafo_eval)
-          {
-            // prepare function evaluator
-            _func_eval.prepare(trafo_eval);
-          }
-
-          void finish()
-          {
-            // finish function evaluator
-            _func_eval.finish();
-          }
-
           /** \copydoc LinearFunctional::Evaluator::set_point() */
           void set_point(const TrafoData& tau)
           {
             // evaluate function value
-            _func_value = _func_eval.value(tau);
+            _func_eval.value(_func_value, tau.img_point);
           }
 
           // copy pasted since Doxygen does not like the operator part in
@@ -158,16 +144,13 @@ namespace FEAST
         /// ensure that the function can compute hessian matrices
         static_assert(Function_::can_hess, "function can't compute hessians");
 
-        /// function config tag
-        struct FunctionConfig :
-          public Trafo::AnalyticConfigBase
-        {
-          /// we need function hessians
-          static constexpr bool need_hess = true;
-        };
-
         /// trafo config tag
-        typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
+        struct TrafoConfig :
+          public Trafo::ConfigBase
+        {
+          /// we need image point coordinates
+          static constexpr bool need_img_point = true;
+        };
 
         /// test space config tag
         struct TestConfig :
@@ -200,37 +183,30 @@ namespace FEAST
           typedef typename AsmTraits_::TestBasisData TestBasisData;
 
         protected:
+          /// declare our analytic eval traits
+          typedef Analytic::EvalTraits<DataType, Function_> AnalyticEvalTraits;
           /// the function evaluator
-          typename Function_::template Evaluator<typename AsmTraits_::AnalyticEvalTraits> _func_eval;
+          typename Function_::template Evaluator<AnalyticEvalTraits> _func_eval;
           /// the function laplacian in the current point
-          DataType _func_value;
+          typename AnalyticEvalTraits::ValueType _func_laplace;
 
         public:
           /// constructor
           explicit Evaluator(const LaplaceFunctional<Function_>& functional) :
             _func_eval(functional._function),
-            _func_value(DataType(0))
+            _func_laplace(DataType(0))
           {
-          }
-
-          /** \copydoc LinearFunctional::Evaluator::prepare() */
-          void prepare(const TrafoEvaluator& trafo_eval)
-          {
-            // prepare function evaluator
-            _func_eval.prepare(trafo_eval);
-          }
-
-          void finish()
-          {
-            // finish function evaluator
-            _func_eval.finish();
           }
 
           /** \copydoc LinearFunctional::Evaluator::set_point() */
           void set_point(const TrafoData& tau)
           {
-            // evaluate function hessian trace
-            _func_value = - _func_eval.hessian(tau).trace();
+            // evaluate function hessian
+            typename AnalyticEvalTraits::HessianType hess;
+            _func_eval.hessian(hess, tau.img_point);
+
+            // compute the hessian's trace (=laplacian)
+            _func_laplace = - hess.trace();
           }
 
           // copy pasted since Doxygen does not like the operator part in
@@ -248,7 +224,7 @@ namespace FEAST
            **/
           DataType operator()(const TestBasisData& psi) const
           {
-            return _func_value * psi.value;
+            return _func_laplace * psi.value;
           }
         }; // class LaplaceFunctional::Evaluator<...>
 

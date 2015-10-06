@@ -66,6 +66,9 @@
 // FEAST-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
+// FEAST-Analytic includs
+#include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
+
 // FEAST-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
@@ -75,7 +78,6 @@
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/common_functionals.hpp>          // for ForceFunctional
-#include <kernel/assembly/common_functions.hpp>            // for SineBubbleFunction
 
 // FEAST-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
@@ -297,17 +299,16 @@ namespace Tutorial01
     // right-hand-side is the solution multiplied by 2*pi^2. We exploit this by we'll simply
     // using our solution function for the right-hand-side assembly and pass
     // the constant factor as a multiplier for our assembly method. More general linear form
-    // asemblies are covered in later tutorials.
+    // assemblies are covered in later tutorials.
 
-    // The sine-bubble function is pre-defined as a 'common function' in the assembly
-    // "common_functions.hpp" header, so we'll use it here.
-    typedef Assembly::Common::SineBubbleFunction SolFunction;
-    SolFunction sol_function;
+    // The sine-bubble function is pre-defined as a 'common function' in the "analytic/common.hpp"
+    // header, so we'll use it here.
+    Analytic::Common::SineBubbleFunction<2> sol_function;
 
     // Next, we need a linear functional that can be applied onto test functions.
     // We utilise the Common::ForceFunctional class template to convert our
     // sine-bubble function into a functional.
-    Assembly::Common::ForceFunctional<SolFunction> force_functional(sol_function);
+    Assembly::Common::ForceFunctional<decltype(sol_function)> force_functional(sol_function);
 
     // Now we can call the LinearFunctionalAssembler class to assemble our linear
     // functional into a vector.

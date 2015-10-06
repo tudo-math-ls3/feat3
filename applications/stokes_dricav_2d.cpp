@@ -86,7 +86,7 @@ namespace StokesDriCav2D
         unit_asm.add_mesh_part(*mesh_part);
       }
 
-      Assembly::StaticWrapperFunction<VeloFuncX> velo_x_func;
+      Analytic::StaticWrapperFunction<2, VeloFuncX> velo_x_func;
 
       // finally, assemble the filters
       unit_asm.assemble(fil_loc_v.template at<0>(), this->space_velo, velo_x_func);
@@ -161,7 +161,7 @@ namespace StokesDriCav2D
       typedef typename SystemLevel_::DataType DataType;
 
       // define reference solution functions
-      Assembly::Common::ConstantFunction zero_func;
+      Analytic::Common::ConstantFunction<2> zero_func;
 
       // compute local errors
       auto vi = Assembly::VelocityAnalyser::compute((*vec_sol).template at<0>(), this->space_velo, this->cubature);

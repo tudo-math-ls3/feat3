@@ -19,7 +19,7 @@
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/util/time_stamp.hpp>
 
 #include <iomanip>
@@ -139,7 +139,7 @@ public:
       unit_asm.add_mesh_part(*mesh_node.find_mesh_part("bnd:2"));
 
       // finally, assemble the filters
-      Assembly::StaticWrapperFunction<VeloFuncX> inflow_func;
+      Analytic::StaticWrapperFunction<2, VeloFuncX> inflow_func;
       unit_asm.assemble(filter.template at<0>().template at<0>(), space_v, inflow_func);
       unit_asm.assemble(filter.template at<0>().template at<1>(), space_v);
     }
@@ -273,7 +273,7 @@ public:
       unit_asm.add_mesh_part(*mesh_node.find_mesh_part("bnd:2"));
 
       // finally, assemble the filters
-      Assembly::StaticWrapperFunction<VeloFuncX> inflow_func;
+      Analytic::StaticWrapperFunction<2, VeloFuncX> inflow_func;
       unit_asm.assemble(filter.template at<0>().template at<0>(), space_v, inflow_func);
       unit_asm.assemble(filter.template at<0>().template at<1>(), space_v);
     }

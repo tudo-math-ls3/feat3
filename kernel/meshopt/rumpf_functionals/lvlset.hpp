@@ -3,7 +3,7 @@
 #define KERNEL_MESHOPT_RUMPF_FUNCTIONALS_LVLSET 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/assembly/common_functions.hpp> // For HeavisideReg
+#include <kernel/analytic/common.hpp> // For HeavisideReg
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 
 namespace FEAST
@@ -82,7 +82,7 @@ namespace FEAST
             int i(FimType::map(edge,0));
             int j(FimType::map(edge,1));
 
-            penalty += FEAST::Assembly::Common::template HeavisideRegStatic<DataType>::eval(-heaviside_reg_fac()
+            penalty += FEAST::Analytic::Common::template HeavisideRegStatic<DataType>::eval(-heaviside_reg_fac()
                 * lvlset_vals(i) * lvlset_vals(j));
           }
 
@@ -92,7 +92,7 @@ namespace FEAST
              for(Index i(0); i < Index(4); ++i)
              {
              for(Index j(0); j < i; ++j)
-             penalty += FEAST::Assembly::Common::template HeavisideRegStatic<DataType>::eval(-heaviside_reg_fac*lvlset_vals(i)*lvlset_vals(j));
+             penalty += FEAST::Analytic::Common::template HeavisideRegStatic<DataType>::eval(-heaviside_reg_fac*lvlset_vals(i)*lvlset_vals(j));
              }
              */
 
@@ -118,7 +118,7 @@ namespace FEAST
 
               auto lvlset_prod = -heaviside_reg_fac() * lvlset_vals(i) * lvlset_vals(j);
               // Derivative of the heaviside function
-              auto heaviside_der = FEAST::Assembly::Common::template HeavisideRegStatic<DataType>::der_x(lvlset_prod);
+              auto heaviside_der = FEAST::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(lvlset_prod);
               for(int d(0); d < ShapeType::dimension; ++d)
               {
                 grad(i,d) -= heaviside_reg_fac() * fac_lvlset * lvlset_constraint_last *
@@ -137,7 +137,7 @@ namespace FEAST
             {
             auto lvlset_prod = -heaviside_reg_fac*lvlset_vals(i)*lvlset_vals(j);
             // Derivative of the heaviside function
-            auto heaviside_der = FEAST::Assembly::Common::template HeavisideRegStatic<DataType>::der_x(lvlset_prod);
+            auto heaviside_der = FEAST::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(lvlset_prod);
             for(Index d(0); d < 2; ++d)
             grad(d,i) -= heaviside_reg_fac*fac_lvlset*Math::sqr(lvlset_constraint_last) * (heaviside_der * lvlset_grad_vals(d,i) * lvlset_vals(j));
             }

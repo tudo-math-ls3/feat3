@@ -31,7 +31,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>

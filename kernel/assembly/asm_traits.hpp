@@ -166,16 +166,6 @@ namespace FEAST
       /// trafo image dimension
       static constexpr int image_dim = TrafoEvaluator::image_dim;
 
-      /// analytic function evaluator traits
-      typedef Trafo::AnalyticEvalTraits<TrafoEvaluator, TrafoEvalData> AnalyticEvalTraits;
-
-      /// value type
-      typedef typename AnalyticEvalTraits::ValueType ValueType;
-      /// gradient type
-      typedef typename AnalyticEvalTraits::GradientType GradientType;
-      /// hessian type
-      typedef typename AnalyticEvalTraits::HessianType HessianType;
-
       /// local vector type
       typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> LocalVectorType;
       typedef LocalVectorType LocalTestVectorType;
@@ -308,16 +298,6 @@ namespace FEAST
       static constexpr int domain_dim = TrafoEvaluator::domain_dim;
       /// trafo image dimension
       static constexpr int image_dim = TrafoEvaluator::image_dim;
-
-      /// analytic function evaluator traits
-      typedef Trafo::AnalyticEvalTraits<TrafoEvaluator, TrafoEvalData> AnalyticEvalTraits;
-
-      /// value type
-      typedef typename AnalyticEvalTraits::ValueType ValueType;
-      /// gradient type
-      typedef typename AnalyticEvalTraits::GradientType GradientType;
-      /// hessian type
-      typedef typename AnalyticEvalTraits::HessianType HessianType;
 
       /// local vector type
       typedef Tiny::Vector<DataType, TestEvaluator::max_local_dofs> LocalTestVectorType;
@@ -465,16 +445,6 @@ namespace FEAST
       static constexpr int domain_dim = TrafoEvaluator::domain_dim;
       /// trafo image dimension
       static constexpr int image_dim = TrafoEvaluator::image_dim;
-
-      /// analytic function evaluator traits
-      typedef Trafo::AnalyticEvalTraits<TrafoEvaluator, TrafoEvalData> AnalyticEvalTraits;
-
-      /// value type
-      typedef typename AnalyticEvalTraits::ValueType ValueType;
-      /// gradient type
-      typedef typename AnalyticEvalTraits::GradientType GradientType;
-      /// hessian type
-      typedef typename AnalyticEvalTraits::HessianType HessianType;
 
       /// local vector type
       typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> FunctionalValueType;

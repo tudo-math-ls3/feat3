@@ -97,7 +97,7 @@ namespace StokesPoiseuille2D
       }
 
       // our inflow BC function
-      Assembly::StaticWrapperFunction<VeloFuncX> inflow_func;
+      Analytic::StaticWrapperFunction<2, VeloFuncX> inflow_func;
 
       // finally, assemble the filters
       unit_asm.assemble(fil_loc_v.template at<0>(), this->space_velo, inflow_func);
@@ -146,9 +146,9 @@ namespace StokesPoiseuille2D
       typedef typename SystemLevel_::DataType DataType;
 
       // define reference solution functions
-      Assembly::StaticWrapperFunction<VeloFuncX, true, true> velo_x_func;
-      Assembly::StaticWrapperFunction<VeloFuncY, true, true> velo_y_func;
-      Assembly::StaticWrapperFunction<PresFunc> pres_func;
+      Analytic::StaticWrapperFunction<2, VeloFuncX, true, true> velo_x_func;
+      Analytic::StaticWrapperFunction<2, VeloFuncY, true, true> velo_y_func;
+      Analytic::StaticWrapperFunction<2, PresFunc> pres_func;
 
       // fetch our vector components
       const auto& vx = (*vec_sol).template at<0>().template at<0>();

@@ -3,6 +3,7 @@
 #define KERNEL_ASSEMBLY_ERROR_COMPUTER_HPP 1
 
 // includes, FEAST
+#include <kernel/analytic/function.hpp>
 #include <kernel/assembly/asm_traits.hpp>
 
 namespace FEAST
@@ -94,8 +95,11 @@ namespace FEAST
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
+        // define our analytic evaluation traits
+        typedef Analytic::EvalTraits<DataType, Function_> AnalyticEvalTraits;
+
         // create a function evaluator
-        typename FunctionType::template Evaluator<typename AsmTraits::AnalyticEvalTraits> func_eval(function);
+        typename FunctionType::template Evaluator<AnalyticEvalTraits> func_eval(function);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -142,9 +146,6 @@ namespace FEAST
           // prepare space evaluator
           space_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
-          func_eval.prepare(trafo_eval);
-
           // fetch number of local dofs
           int num_loc_dofs = space_eval.get_num_local_dofs();
 
@@ -158,7 +159,8 @@ namespace FEAST
             space_eval(space_data, trafo_data);
 
             // evaluate function value
-            typename AsmTraits::ValueType value(func_eval.value(trafo_data));
+            typename AnalyticEvalTraits::ValueType value(DataType(0));
+            func_eval.value(value, trafo_data.img_point);
 
             // test function loop
             for(int i(0); i < num_loc_dofs; ++i)
@@ -174,13 +176,9 @@ namespace FEAST
             // continue with next cubature point
           }
 
-          // finish functor evaluator
-          func_eval.finish();
-
           // finish evaluators
           space_eval.finish();
           trafo_eval.finish();
-
 
           // continue with next cell
         }
@@ -273,8 +271,11 @@ namespace FEAST
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
+        // define our analytic evaluation traits
+        typedef Analytic::EvalTraits<DataType, Function_> AnalyticEvalTraits;
+
         // create a function evaluator
-        typename FunctionType::template Evaluator<typename AsmTraits::AnalyticEvalTraits> func_eval(function);
+        typename FunctionType::template Evaluator<AnalyticEvalTraits> func_eval(function);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -321,9 +322,6 @@ namespace FEAST
           // prepare space evaluator
           space_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
-          func_eval.prepare(trafo_eval);
-
           // fetch number of local dofs
           int num_loc_dofs = space_eval.get_num_local_dofs();
 
@@ -337,7 +335,8 @@ namespace FEAST
             space_eval(space_data, trafo_data);
 
             // evaluate function gradient
-            typename AsmTraits::GradientType value(func_eval.gradient(trafo_data));
+            typename AnalyticEvalTraits::GradientType value(DataType(0));
+            func_eval.gradient(value, trafo_data.img_point);
 
             // test function loop
             for(int i(0); i < num_loc_dofs; ++i)
@@ -352,9 +351,6 @@ namespace FEAST
 
             // continue with next cubature point
           }
-
-          // finish functor evaluator
-          func_eval.finish();
 
           // finish evaluators
           space_eval.finish();
@@ -452,8 +448,11 @@ namespace FEAST
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
+        // define our analytic evaluation traits
+        typedef Analytic::EvalTraits<DataType, Function_> AnalyticEvalTraits;
+
         // create a function evaluator
-        typename FunctionType::template Evaluator<typename AsmTraits::AnalyticEvalTraits> func_eval(function);
+        typename FunctionType::template Evaluator<AnalyticEvalTraits> func_eval(function);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -500,9 +499,6 @@ namespace FEAST
           // prepare space evaluator
           space_eval.prepare(trafo_eval);
 
-          // prepare functor evaluator
-          func_eval.prepare(trafo_eval);
-
           // fetch number of local dofs
           int num_loc_dofs = space_eval.get_num_local_dofs();
 
@@ -516,7 +512,8 @@ namespace FEAST
             space_eval(space_data, trafo_data);
 
             // evaluate functor
-            typename AsmTraits::HessianType value(func_eval.hessian(trafo_data));
+            typename AnalyticEvalTraits::HessianType value(DataType(0));
+            func_eval.hessian(value, trafo_data.img_point);
 
             // test function loop
             for(int i(0); i < num_loc_dofs; ++i)
@@ -531,9 +528,6 @@ namespace FEAST
 
             // continue with next cubature point
           }
-
-          // finish functor evaluator
-          func_eval.finish();
 
           // finish evaluators
           space_eval.finish();

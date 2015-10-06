@@ -26,15 +26,6 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/space/lagrange1/element.hpp>
-#include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/common_functionals.hpp>
-#include <kernel/assembly/common_functions.hpp>
-#include <kernel/assembly/mirror_assembler.hpp>
-#include <kernel/assembly/symbolic_assembler.hpp>
-#include <kernel/assembly/bilinear_operator_assembler.hpp>
-#include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/scarc/scarc_functor.hpp>
 #include <kernel/scarc/matrix_conversion.hpp>
 

@@ -68,63 +68,6 @@ namespace FEAST
     }; // class StandardEvalPolicy<...>
 
     /**
-     * \brief Base class for analytic function config tags
-     *
-     * This class is the configuration tag class for the Assemly::AnalyticFunction interface.
-     *
-     * \author Peter Zajac
-     */
-    struct AnalyticConfigBase
-    {
-      /// specifies whether function values are required
-      static constexpr bool need_value = false;
-      /// specifies whether function gradients are required
-      static constexpr bool need_grad = false;
-      /// specifies whether function hessians are required
-      static constexpr bool need_hess = false;
-    };
-
-    /**
-     * \brief Analytic evaluation traits class template
-     *
-     * This class template can be used as an EvalTraits tag class for the Assembly::AnalyticFunction::Evaluator
-     * class template and its actual implementations.
-     *
-     * \tparam TrafoEvaluator_
-     * The trafo evaluator in use.
-     *
-     * \tparam TrafoEvalData_
-     * The trafo evaluation data in use.
-     *
-     * \author Peter Zajac
-     */
-    template<
-      typename TrafoEvaluator_,
-      typename TrafoEvalData_>
-    struct AnalyticEvalTraits :
-      public TrafoEvaluator_::EvalTraits
-    {
-      /// trafo evaluator type
-      typedef TrafoEvaluator_ TrafoEvaluator;
-      /// trafo data type
-      typedef TrafoEvalData_ TrafoData;
-      /// trafo evaluation traits (i.e. our base-class)
-      typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
-      /// data type
-      typedef typename TrafoEvalTraits::DataType DataType;
-      /// trafo domain dimension
-      static constexpr int domain_dim = TrafoEvaluator::domain_dim;
-      /// trafo image dimension
-      static constexpr int image_dim = TrafoEvaluator::image_dim;
-      /// function value type
-      typedef DataType ValueType;
-      /// gradient type
-      typedef Tiny::Vector<DataType, image_dim> GradientType;
-      /// hessian type
-      typedef Tiny::Matrix<DataType, image_dim, image_dim> HessianType;
-    }; // class AnalyticEvalTraits
-
-    /**
      * \brief Base class for trafo config tags
      *
      * \author Peter Zajac

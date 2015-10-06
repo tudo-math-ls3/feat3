@@ -36,6 +36,12 @@ namespace FEAST
         typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
         static constexpr int max_assigned_dofs = 6;
 
+        template<typename Function_>
+        struct Value
+        {
+          typedef typename Analytic::EvalTraits<DataType_, Function_>::ValueType Type;
+        };
+
       protected:
         typedef typename Space_::TrafoType TrafoType;
         typedef typename Space_::ShapeType ShapeType;
@@ -43,13 +49,14 @@ namespace FEAST
         typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
         typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
 
-        struct FunctionConfig :
-          public Trafo::AnalyticConfigBase
+        struct TrafoConfig :
+          public Trafo::ConfigBase
         {
-          static constexpr bool need_value = true;
-          static constexpr bool need_grad = true;
-          static constexpr bool need_hess = true;
+          static constexpr bool need_img_point = true;
         };
+
+        // declare trafo evaluation data
+        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
 
         TrafoEvalType _trafo_eval;
 
@@ -77,25 +84,19 @@ namespace FEAST
           return max_assigned_dofs;
         }
 
-        template<
-          typename NodeData_,
-          typename Function_>
+        template<typename NodeData_, typename Function_>
         void operator()(NodeData_& node_data, const Function_& function) const
         {
-          // fetch the function's trafo config
-          typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
+          static_assert(std::is_base_of<Analytic::Function, Function_>::value, "invalid function object");
+          static_assert(Function_::can_value, "function cannot compute values");
+          static_assert(Function_::can_grad, "function cannot compute gradients");
+          static_assert(Function_::can_hess, "function cannot compute hessians");
 
-          // declare trafo evaluation data
-          typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
-
-          // declare evaluation traits
-          typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
+          // declare our evaluation traits
+          typedef Analytic::EvalTraits<DataType_, Function_> FuncEvalTraits;
 
           // declare function evaluator
-          typename Function_::template Evaluator<AnalyticEvalTraits> func_eval(function);
-
-          // prepare function evaluator
-          func_eval.prepare(_trafo_eval);
+          typename Function_::template Evaluator<FuncEvalTraits> func_eval(function);
 
           // compute trafo data
           DomainPointType dom_point;
@@ -103,9 +104,12 @@ namespace FEAST
           _trafo_eval(trafo_data, dom_point);
 
           // evaluate function
-          typename AnalyticEvalTraits::ValueType func_value   = func_eval.value(trafo_data);
-          typename AnalyticEvalTraits::GradientType func_grad = func_eval.gradient(trafo_data);
-          typename AnalyticEvalTraits::HessianType func_hess  = func_eval.hessian(trafo_data);
+          typename FuncEvalTraits::ValueType func_value;
+          typename FuncEvalTraits::GradientType func_grad;
+          typename FuncEvalTraits::HessianType func_hess;
+          func_eval.value(func_value, trafo_data.img_point);
+          func_eval.gradient(func_grad, trafo_data.img_point);
+          func_eval.hessian(func_hess, trafo_data.img_point);
 
           // set node functional values
           node_data[0] = func_value;
@@ -114,9 +118,6 @@ namespace FEAST
           node_data[3] = func_hess[0][0];
           node_data[4] = func_hess[1][1];
           node_data[5] = func_hess[0][1];
-
-          // finish function evaluator
-          func_eval.finish();
         }
       };
 
@@ -130,25 +131,29 @@ namespace FEAST
         typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
         static constexpr int max_assigned_dofs = 1;
 
+        template<typename Function_>
+        struct Value
+        {
+          typedef typename Analytic::EvalTraits<DataType_, Function_>::ValueType Type;
+        };
+
       protected:
         typedef typename Space_::TrafoType TrafoType;
         typedef typename Space_::ShapeType ShapeType;
         typedef typename TrafoType::template Evaluator<Shape::Simplex<1>, DataType_>::Type TrafoEvalType;
         typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
+        typedef typename TrafoEvalTraits::DataType DataType;
         typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
 
-        struct FunctionConfig :
-          public Trafo::AnalyticConfigBase
-        {
-          static constexpr bool need_grad = true;
-        };
-
-        template<typename FuncTrafoConfig_>
         struct TrafoConfig :
-          public FuncTrafoConfig_
+          public Trafo::ConfigBase
         {
+          static constexpr bool need_img_point = true;
           static constexpr bool need_jac_mat = true;
         };
+
+        // declare trafo evaluation data
+        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
 
         TrafoEvalType _trafo_eval;
 
@@ -176,25 +181,17 @@ namespace FEAST
           return max_assigned_dofs;
         }
 
-        template<
-          typename NodeData_,
-          typename Function_>
+        template<typename NodeData_, typename Function_>
         void operator()(NodeData_& node_data, const Function_& function) const
         {
-          // fetch the function's trafo config
-          typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig FunctionTrafoConfig;
+          static_assert(std::is_base_of<Analytic::Function, Function_>::value, "invalid function object");
+          static_assert(Function_::can_grad, "function cannot compute gradients");
 
-          // declare trafo evaluation data
-          typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig<FunctionTrafoConfig>>::EvalDataType TrafoEvalData;
-
-          // declare evaluation traits
-          typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
+          // declare our evaluation traits
+          typedef Analytic::EvalTraits<DataType_, Function_> FuncEvalTraits;
 
           // declare function evaluator
-          typename Function_::template Evaluator<AnalyticEvalTraits> func_eval(function);
-
-          // prepare function evaluator
-          func_eval.prepare(_trafo_eval);
+          typename Function_::template Evaluator<FuncEvalTraits> func_eval(function);
 
           DomainPointType dom_point(DataType_(0.5));
           TrafoEvalData trafo_data;
@@ -209,13 +206,11 @@ namespace FEAST
           dny *= dnl;
 
           // evaluate function gradient
-          typename AnalyticEvalTraits::GradientType func_grad = func_eval.gradient(trafo_data);
+          typename FuncEvalTraits::GradientType func_grad;
+          func_eval.gradient(func_grad, trafo_data.img_point);
 
           // set edge normal derivative
           node_data[0] = dnx * func_grad[0] + dny * func_grad[1];
-
-          // finish function evaluator
-          func_eval.finish();
         }
       };
     } // namespace Argyris

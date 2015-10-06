@@ -24,6 +24,8 @@ namespace FEAST
       typedef Mesh_ MeshType;
       /// shape type
       typedef typename MeshType::ShapeType ShapeType;
+      /// our image/world dimension
+      static constexpr int world_dim = Mesh_::world_dim;
 
       // Note:
       // The following block serves as an element interface documentation and is therefore only

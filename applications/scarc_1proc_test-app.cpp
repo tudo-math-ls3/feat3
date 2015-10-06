@@ -29,7 +29,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
@@ -154,8 +154,8 @@ void check_scarc_rich_1D(Index rank)
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
-  Assembly::Common::ConstantFunction rhs_func(1.0);
-  Assembly::Common::ForceFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
+  Analytic::Common::ConstantFunction<1> rhs_func(1.0);
+  Assembly::Common::ForceFunctional<Analytic::Common::ConstantFunction<1>> rhs_functional(rhs_func);
   Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
   Assembly::UnitFilterAssembler<Geometry::ConformalMesh<Shape::Hypercube<1> > > dirichlet;
@@ -359,8 +359,8 @@ void check_scarc_pcg_1D(Index rank)
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
-  Assembly::Common::ConstantFunction rhs_func(1.0);
-  Assembly::Common::ForceFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
+  Analytic::Common::ConstantFunction<1> rhs_func(1.0);
+  Assembly::Common::ForceFunctional<Analytic::Common::ConstantFunction<1>> rhs_functional(rhs_func);
   Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
   Assembly::UnitFilterAssembler<Geometry::ConformalMesh<Shape::Hypercube<1> > > dirichlet;

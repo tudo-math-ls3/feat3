@@ -9,7 +9,7 @@
 #include <kernel/assembly/mean_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
@@ -164,7 +164,7 @@ namespace PoissonNeumann2D
     typedef Index IndexType;
 
     // choose our desired analytical solution
-    Assembly::Common::CosineWaveFunction sol_func;
+    Analytic::Common::CosineWaveFunction<2> sol_func;
 
     // define our domain type
     typedef Control::Domain::DomainControl<MeshType_> DomainControlType;

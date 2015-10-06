@@ -1,9 +1,9 @@
 #pragma once
-#ifndef KERNEL_ASSEMBLY_COMMON_FUNCTIONS_HPP
-#define KERNEL_ASSEMBLY_COMMON_FUNCTIONS_HPP 1
+#ifndef KERNEL_ANALYTIC_COMMON_HPP
+#define KERNEL_ANALYTIC_COMMON_HPP 1
 
 // includes, FEAST
-#include <kernel/assembly/analytic_function.hpp>
+#include <kernel/analytic/static_wrapper.hpp>
 #include <kernel/util/math.hpp>
 
 // includes, system
@@ -12,7 +12,7 @@
 
 namespace FEAST
 {
-  namespace Assembly
+  namespace Analytic
   {
     /**
      * \brief Assembly Common namespace
@@ -366,7 +366,8 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      typedef StaticWrapperFunction<SineBubbleStatic, true, true, true> SineBubbleFunction;
+      template<int dim_>
+      using SineBubbleFunction = StaticWrapperFunction<dim_, SineBubbleStatic, true, true, true>;
 
       /**
        * \brief Cosine-Tensor Static function
@@ -556,7 +557,8 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      typedef StaticWrapperFunction<CosineWaveStatic, true, true, true> CosineWaveFunction;
+      template<int dim_>
+      using CosineWaveFunction = StaticWrapperFunction<dim_, CosineWaveStatic, true, true, true>;
 
       /**
        * \brief Exponential-Bubble scalar Static function
@@ -610,7 +612,8 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      typedef StaticWrapperFunction<ExpBubbleStatic, true, true, true> ExpBubbleFunction;
+      template<int dim_>
+      using ExpBubbleFunction = StaticWrapperFunction<dim_, ExpBubbleStatic, true, true, true>;
 
       /**
        * \brief Q2-bubble scalar Static function
@@ -664,8 +667,8 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      typedef StaticWrapperFunction<Q2BubbleStatic, true, true, true> Q2BubbleFunction;
-
+      template<int dim_>
+      using Q2BubbleFunction = StaticWrapperFunction<dim_, Q2BubbleStatic, true, true, true>;
       /**
        * \brief Constant Analytic function
        *
@@ -675,34 +678,28 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
+      template<int dim_, typename DataType_ = Real>
       class ConstantFunction :
-        public AnalyticFunction
+        public Analytic::Function
       {
       public:
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Scalar ImageType;
+
         static constexpr bool can_value = true;
         static constexpr bool can_grad = true;
         static constexpr bool can_hess = true;
 
-        /** \copydoc AnalyticFunction::ConfigTraits */
-        template<typename Config_>
-        struct ConfigTraits
-        {
-          /// Transformation config
-          typedef Trafo::ConfigBase TrafoConfig;
-        };
-
         /** \copydoc AnalyticFunction::Evaluator */
         template<typename EvalTraits_>
         class Evaluator :
-          public AnalyticFunction::Evaluator<EvalTraits_>
+          public Analytic::Function::Evaluator<EvalTraits_>
         {
         public:
-          /// trafo evaluator data
-          typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-          /// trafo data type
-          typedef typename EvalTraits_::TrafoData TrafoData;
           /// coefficient data type
           typedef typename EvalTraits_::DataType DataType;
+          /// point type
+          typedef typename EvalTraits_::PointType PointType;
           /// value type
           typedef typename EvalTraits_::ValueType ValueType;
           /// gradient type
@@ -712,43 +709,43 @@ namespace FEAST
 
         private:
           /// Function that is being evaluated
-          const ConstantFunction& _function;
+          const DataType _value;
 
         public:
           /// Constructor
           explicit Evaluator(const ConstantFunction& function) :
-            _function(function)
+            _value(DataType(function._value))
           {
           }
 
-          ValueType value(const TrafoData&) const
+
+          void value(ValueType& val, const PointType& DOXY(point))
           {
-            return ValueType(_function._value);
+            val = _value;
           }
 
-          GradientType gradient(const TrafoData&) const
+          void gradient(GradientType& grad, const PointType& DOXY(point))
           {
-            return GradientType(DataType(0));
+            grad = DataType(0);
           }
 
-          HessianType hessian(const TrafoData&) const
+          void hessian(HessianType& hess, const PointType& DOXY(point))
           {
-            return HessianType(DataType(0));
+            hess = DataType(0);
           }
         }; // class ConstantFunction::Evaluator<...>
 
       private:
         /// Value of the constant function
-        Real _value;
+        DataType_ _value;
 
       public:
         /// Constructor, value defaults to 0
-        explicit ConstantFunction(Real value = Real(0)) :
+        explicit ConstantFunction(DataType_ value = DataType_(0)) :
           _value(value)
         {
         }
       }; // class ConstantFunction
-
 
       /**
        * \brief Analytic distance function
@@ -766,121 +763,102 @@ namespace FEAST
        *
        * \author Jordi Paul
        */
-      template<typename ImgPointType_>
+      template<int dim_, typename DataType_>
       class DistanceFunction :
-        public AnalyticFunction
+        public Analytic::Function
       {
       public:
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Scalar ImageType;
         static constexpr bool can_value = true;
         static constexpr bool can_grad = true;
         static constexpr bool can_hess = true;
 
-        /** \copydoc AnalyticFunction::ConfigTraits */
-        template<typename Config_>
-        struct ConfigTraits
-        {
-          /**
-           * \brief Trafo configuration tag class
-           *
-           * \see Trafo::ConfigBase
-           */
-          struct TrafoConfig :
-            public Trafo::ConfigBase
-          {
-            static constexpr bool need_img_point = true;
-          };
-        };
+        typedef Tiny::Vector<DataType_, dim_> PointType;
 
         /** \copydoc AnalyticFunction::Evaluator */
         template<typename EvalTraits_>
         class Evaluator :
-          public AnalyticFunction::Evaluator<EvalTraits_>
+          public Analytic::Function::Evaluator<EvalTraits_>
         {
         public:
-          /// trafo evaluator data
-          typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-          /// trafo data type
-          typedef typename EvalTraits_::TrafoData TrafoData;
           /// coefficient data type
           typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
           /// value type
           typedef typename EvalTraits_::ValueType ValueType;
           /// gradient type
           typedef typename EvalTraits_::GradientType GradientType;
           /// hessian type
           typedef typename EvalTraits_::HessianType HessianType;
-          /// type for the points the analytic function is evaluated at
-          typedef typename EvalTraits_::ImagePointType ImgPointType;
 
         private:
-          /// Function to evaluate
-          const DistanceFunction& _function;
+          /// our origin
+          const PointType _origin;
 
         public:
           /// Constructor
           explicit Evaluator(const DistanceFunction& function) :
-            _function(function)
+            _origin(function._origin)
           {
           }
 
-          ValueType value(const TrafoData& tau) const
+          void value(ValueType& val, const PointType& point) const
           {
-            ImgPointType tmp (tau.img_point - _function._point);
-            return tmp.norm_euclid();
+            val = (point - _origin).norm_euclid();
           }
 
-          GradientType gradient(const TrafoData& tau) const
+          void gradient(GradientType& grad, const PointType& point) const
           {
-            GradientType grad(DataType(0));
-            DataType norm(value(tau));
+            DataType norm (DataType(0));
+            this->value(norm, point);
 
-            if(norm <= Math::eps<DataType>())
-              return grad;
-
-            for(Index d(0); d < TrafoData::image_dim; ++d)
-              grad(d,tau.img_point[d] - _function._point(d));
-
-            return grad/norm;
-          }
-
-          HessianType hessian(const TrafoData& tau) const
-          {
-            HessianType hess(DataType(0));
-            DataType norm(value(tau));
-            if(norm <= Math::eps<DataType>())
-              return hess;
-
-            norm = DataType(1)/norm;
-            DataType denom = Math::sqr(norm)*norm;
-
-            for(Index i(0); i < TrafoData::image_dim; ++i)
+            grad.format();
+            if(norm > Math::eps<DataType>())
             {
-              hess(i,i, DataType(1)*norm);
-              for(Index j(0); j < TrafoData::image_dim; ++i)
-                hess(i,j,
-                ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
+              grad = (DataType(1) / norm) * (point - _origin);
             }
+          }
 
+          void hessian(HessianType& hess, const PointType& point) const
+          {
+            DataType norm (DataType(0));
+            this->value(norm, point);
 
-            return hess;
+            hess.format();
+            if(norm > Math::eps<DataType>())
+            {
+              norm = DataType(1)/norm;
+              DataType denom = Math::sqr(norm)*norm;
+
+              for(Index i(0); i < dim_; ++i)
+              {
+                hess[i][i] = norm;
+                for(Index j(0); j < dim_; ++i)
+                {
+                  hess[i][j] = ((point[i] - _origin[i]) * (point[j] - _origin[j]))*denom;
+                }
+              }
+            }
           }
         }; // class DistanceFunction::Evaluator<...>
 
       public:
         /// Point to calculate the distance from
-        ImgPointType_ _point;
+        PointType _origin;
 
       public:
         /// Constructor
-        explicit DistanceFunction(const ImgPointType_ x0_) :
-          _point(x0_)
+        explicit DistanceFunction(const PointType origin) :
+          _origin(origin)
         {
         }
 
         /// Sets _point to x0_
-        void set_point(const ImgPointType_ x0_)
+        void set_point(const PointType origin)
         {
-          _point = x0_;
+          _origin = origin;
         }
       }; // class DistanceFunction
 
@@ -900,128 +878,109 @@ namespace FEAST
        *
        * \author Jordi Paul
        */
-      template<typename ImgPointType_>
+      template<int dim_, typename DataType_>
       class DistanceFunctionSD :
-        public AnalyticFunction
+        public Analytic::Function
       {
       public:
-        /// Datatype for the point coordinates
-        typedef typename ImgPointType_::DataType DataType;
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Scalar ImageType;
 
         static constexpr bool can_value = true;
         static constexpr bool can_grad = true;
         static constexpr bool can_hess = true;
 
-        /** \copydoc AnalyticFunction::ConfigTraits */
-        template<typename Config_>
-        struct ConfigTraits
-        {
-          /**
-           * \brief Trafo configuration tag class
-           *
-           * \see Trafo::ConfigBase
-           */
-          struct TrafoConfig :
-            public Trafo::ConfigBase
-          {
-            static constexpr bool need_img_point = true;
-          };
-        };
+        typedef Tiny::Vector<DataType_, dim_> PointType;
 
         /** \copydoc AnalyticFunction::Evaluator */
         template<typename EvalTraits_>
         class Evaluator :
-          public AnalyticFunction::Evaluator<EvalTraits_>
+          public Analytic::Function::Evaluator<EvalTraits_>
         {
         public:
-          /// trafo evaluator data
-          typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-          /// trafo data type
-          typedef typename EvalTraits_::TrafoData TrafoData;
           /// coefficient data type
           typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
           /// value type
           typedef typename EvalTraits_::ValueType ValueType;
           /// gradient type
           typedef typename EvalTraits_::GradientType GradientType;
           /// hessian type
           typedef typename EvalTraits_::HessianType HessianType;
-          /// type for the points the analytic function is evaluated at
-          typedef typename EvalTraits_::ImagePointType ImgPointType;
 
         private:
-          /// Function to evaluate
-          const DistanceFunctionSD& _function;
+          /// our origin
+          const PointType _origin;
+          /// displacement and scaling factor
+          const DataType _a, _b;
 
         public:
           /// Constructor
           explicit Evaluator(const DistanceFunctionSD& function) :
-            _function(function)
+            _origin(function._origin),
+            _a(function._a),
+            _b(function._b)
           {
           }
 
-          ValueType value(const TrafoData& tau) const
+          void value(ValueType& val, const PointType& point) const
           {
-            ImgPointType tmp (tau.img_point - _function._point);
-            return _function._a + _function._b*tmp.norm_euclid();
+            val = _a + _b*(point - _origin).norm_euclid();
           }
 
-          GradientType gradient(const TrafoData& tau) const
+          void gradient(GradientType& grad, const PointType& point) const
           {
-            GradientType grad(DataType(0));
-            DataType norm(value(tau));
+            DataType norm (DataType(0));
+            this->value(norm, point);
             if(norm <= Math::eps<DataType>())
-              return grad;
+              return;
 
-            for(Index d(0); d < TrafoData::image_dim; ++d)
-              grad(d,tau.img_point[d] - _function._point(d));
-
-            return _function._b*grad/norm;
+            grad = (_b / norm) * (point - _origin);
           }
 
-          HessianType hessian(const TrafoData& tau) const
+          void hessian(HessianType& hess, const PointType& point) const
           {
-            HessianType hess(DataType(0));
-            DataType norm(value(tau));
+            DataType norm (DataType(0));
+            this->value(norm, point);
             if(norm <= Math::eps<DataType>())
-              return hess;
+              return;
 
             norm = DataType(1)/norm;
-            DataType denom = Math::sqr(_function._b)*Math::sqr(norm)*norm;
+            DataType denom = Math::sqr(_b)*Math::sqr(norm)*norm;
 
-            for(Index i(0); i < TrafoData::image_dim; ++i)
+            for(Index i(0); i < dim_; ++i)
             {
-              hess(i,i, DataType(1)*norm);
-              for(Index j(0); j < TrafoData::image_dim; ++i)
-                hess(i,j,
-                ((tau.img_point[i] - _function._point(i)) * (tau.img_point[j] - _function._point(j)) )*denom);
+              hess[i][i] = norm;
+              for(Index j(0); j < dim_; ++i)
+              {
+                hess[i][j] = ((point[i] - _origin[i]) * (point[j] - _origin[j]))*denom;
+              }
             }
-
-            return hess;
           }
         }; // class DistanceFunctionSD::Evaluator<...>
 
       private:
         /// The point to which the distance to is calculated
-        ImgPointType_ _point;
+        PointType _origin;
         /// Displacement of the function
-        DataType _a;
+        DataType_ _a;
         /// Scaling factor
-        DataType _b;
+        DataType_ _b;
 
       public:
         /// Constructor
-        explicit DistanceFunctionSD(const ImgPointType_& x0_, const DataType a_, const DataType b_) :
-          _point(x0_),
+        explicit DistanceFunctionSD(const PointType& origin, const DataType_ a_, const DataType_ b_) :
+          _origin(origin),
           _a(a_),
           _b(b_)
         {
         }
 
         /// Sets _point to x0_
-        void set_point(const ImgPointType_& x0_)
+        void set_point(const PointType& origin)
         {
-          _point = x0_;
+          _origin = origin;
         }
       }; // class DistanceFunctionSD
 
@@ -1033,7 +992,7 @@ namespace FEAST
        *
        * This class supports function values and gradients for all dimensions.
        *
-       * \tparam component
+       * \tparam component_
        * Index of the coordinate axis/plane.
        *
        * \tparam ImgPointType_
@@ -1041,101 +1000,86 @@ namespace FEAST
        *
        * \author Jordi Paul
        */
-      template<int component, typename ImgPointType_>
+      template<int component_, int dim_, typename DataType_>
       class PlaneDistanceFunctionSD :
-        public AnalyticFunction
+        public Analytic::Function
       {
       public:
-        /// Datatype for the point coordinates
-        typedef typename ImgPointType_::DataType DataType;
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Scalar ImageType;
 
         static constexpr bool can_value = true;
         static constexpr bool can_grad = true;
 
-        /** \copydoc AnalyticFunction::ConfigTraits */
-        template<typename Config_>
-        struct ConfigTraits
-        {
-          /**
-           * \brief Trafo configuration tag class
-           *
-           * \see Trafo::ConfigBase
-           */
-          struct TrafoConfig :
-            public Trafo::ConfigBase
-          {
-            static constexpr bool need_img_point = true;
-          };
-        };
+        typedef Tiny::Vector<DataType_, dim_> PointType;
 
         /** \copydoc AnalyticFunction::Evaluator */
         template<typename EvalTraits_>
         class Evaluator :
-          public AnalyticFunction::Evaluator<EvalTraits_>
+          public Analytic::Function::Evaluator<EvalTraits_>
         {
         public:
-          /// trafo evaluator data
-          typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-          /// trafo data type
-          typedef typename EvalTraits_::TrafoData TrafoData;
           /// coefficient data type
           typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
           /// value type
           typedef typename EvalTraits_::ValueType ValueType;
           /// gradient type
           typedef typename EvalTraits_::GradientType GradientType;
           /// hessian type
           typedef typename EvalTraits_::HessianType HessianType;
-          /// type for the points the analytic function is evaluated at
-          typedef typename EvalTraits_::ImagePointType ImgPointType;
 
         private:
-          /// Function to evaluate
-          const PlaneDistanceFunctionSD& _function;
+          /// our origin
+          const PointType _origin;
+          /// our scaling
+          const DataType_ _b;
 
         public:
           /// Constructor
           explicit Evaluator(const PlaneDistanceFunctionSD& function) :
-            _function(function)
+            _origin(function._origin),
+            _b(function._b)
           {
           }
 
-          ValueType value(const TrafoData& tau) const
+          void value(ValueType& val, const PointType& point) const
           {
-            ImgPointType tmp (tau.img_point - _function._point);
-            return  _function._b*tmp(component);
+            val = _b * (point[component_] - _origin[component_]);
           }
 
-          GradientType gradient(const TrafoData& tau) const
+          void gradient(GradientType& grad, const PointType& point) const
           {
-            GradientType grad(DataType(0));
-            DataType norm(value(tau));
+            grad.format();
+            DataType norm (DataType(0));
+            this->value(norm, point);
 
             if(norm > Math::eps<DataType>())
-              grad(component,_function._b);
-
-            return grad;
+            {
+              grad[component_] = _b;
+            }
           }
         }; // class PlaneDistanceFunctionSD::Evaluator<...>
 
       private:
         /// The point to which the distance to is calculated
-        ImgPointType_ _point;
+        PointType _origin;
         /// Scaling factor
-        DataType _b;
+        DataType_ _b;
 
       public:
         /// Constructor
-        explicit PlaneDistanceFunctionSD(const ImgPointType_ x0_, const DataType b_) :
-          _point(x0_),
+        explicit PlaneDistanceFunctionSD(const PointType origin, const DataType_ b_) :
+          _origin(origin),
           _b(b_)
         {
         }
 
         /// Sets _point to x0_
-        void set_point(const ImgPointType_ x0_)
+        void set_point(const PointType origin)
         {
-          _point = x0_;
+          _origin = origin;
         }
       }; // class PlaneDistanceFunctionSD
 
@@ -1159,110 +1103,110 @@ namespace FEAST
        */
       template<typename AnalyticFunctionType1, typename AnalyticFunctionType2>
       class MinOfTwoFunctions :
-        public AnalyticFunction
+        public Analytic::Function
       {
-        private:
-          /// The first AnalyticFunction
-          const AnalyticFunctionType1& _f1;
-          /// The second AnalyticFunction
-          const AnalyticFunctionType2& _f2;
+      public:
+        /// ensure that the two functions have the same dimension
+        static_assert(AnalyticFunctionType1::domain_dim == AnalyticFunctionType2::domain_dim, "domain dimension mismatch");
 
-        public:
-          /// Can compute function values if both AnalyticFunctions can do that
-          static constexpr bool can_value = (AnalyticFunctionType1::can_value && AnalyticFunctionType2::can_value);
-          /// Can compute the function gradient if both AnalyticFunctions can do that
-          static constexpr bool can_grad = (AnalyticFunctionType1::can_grad && AnalyticFunctionType2::can_grad);
-          /// Can compute the function hessian if both AnalyticFunctions can do that
-          static constexpr bool can_hess = (AnalyticFunctionType1::can_hess && AnalyticFunctionType2::can_hess);
+        /// ensure that both functions are scalar
+        static_assert(std::is_same<typename AnalyticFunctionType1::ImageType, Analytic::Image::Scalar>::value, "invalid image type");
+        static_assert(std::is_same<typename AnalyticFunctionType2::ImageType, Analytic::Image::Scalar>::value, "invalid image type");
 
-          /** \copydoc AnalyticFunction::ConfigTraits */
-          template<typename Config_>
-          struct ConfigTraits
-          {
-            /// TrafoConfig of the first AnalyticFunction
-            typedef typename AnalyticFunctionType1::template ConfigTraits<Config_>::TrafoConfig TrafoConfig1;
-            /// TrafoConfig of the second AnalyticFunction
-            typedef typename AnalyticFunctionType2::template ConfigTraits<Config_>::TrafoConfig TrafoConfig2;
+        /// our domain dimension
+        static constexpr int domain_dim = AnalyticFunctionType1::domain_dim;
+        /// our image type
+        typedef Analytic::Image::Scalar ImageType;
 
-            /**
-             * \brief Trafo configuration tag class
-             *
-             * \see Trafo::ConfigBase
-             *
-             * A quantity (i.e. the Jacobian matrix) is needed if any of the functions needs it.
-             */
-            typedef Trafo::ConfigOr<TrafoConfig1, TrafoConfig2> TrafoConfig;
-          };
+        /// Can compute function values if both AnalyticFunctions can do that
+        static constexpr bool can_value = (AnalyticFunctionType1::can_value && AnalyticFunctionType2::can_value);
+        /// Can compute the function gradient if both AnalyticFunctions can do that
+        static constexpr bool can_grad = (AnalyticFunctionType1::can_grad && AnalyticFunctionType2::can_grad);
+        /// Can compute the function hessian if both AnalyticFunctions can do that
+        static constexpr bool can_hess = (AnalyticFunctionType1::can_hess && AnalyticFunctionType2::can_hess);
 
-          /** \copydoc AnalyticFunction::Evaluator */
-          template<typename EvalTraits_>
-          class Evaluator :
-            public AnalyticFunction::Evaluator<EvalTraits_>
+      public:
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
         {
-          public:
-            /// trafo evaluator data
-            typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-            /// trafo data type
-            typedef typename EvalTraits_::TrafoData TrafoData;
-            /// coefficient data type
-            typedef typename EvalTraits_::DataType DataType;
-            /// value type
-            typedef typename EvalTraits_::ValueType ValueType;
-            /// gradient type
-            typedef typename EvalTraits_::GradientType GradientType;
-            /// hessian type
-            typedef typename EvalTraits_::HessianType HessianType;
-            /// type for the points the analytic function is evaluated at
-            typedef typename EvalTraits_::ImagePointType ImgPointType;
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
 
-          private:
-            /// Function to evaluate
-            const MinOfTwoFunctions& _function;
-            /// Evaluator for the first AnalyticFunction
-            typename AnalyticFunctionType1::template Evaluator<EvalTraits_> _f1_eval;
-            /// Evaluator for the second AnalyticFunction
-            typename AnalyticFunctionType2::template Evaluator<EvalTraits_> _f2_eval;
-
-          public:
-            /// Constructor
-            explicit Evaluator(const MinOfTwoFunctions& function) :
-              _function(function),
-              _f1_eval(function._f1),
-              _f2_eval(function._f2)
-              {
-              }
-
-            ValueType value(const TrafoData& tau) const
-            {
-              return Math::min(_f1_eval.value(tau),_f2_eval.value(tau));
-            }
-
-            GradientType gradient(const TrafoData& tau) const
-            {
-              ValueType fval1 = _f1_eval.value(tau);
-              ValueType fval2 = _f2_eval.value(tau);
-              if(Math::abs(fval1-fval2) < Math::eps<DataType>) return GradientType(0);
-              return fval1 < fval2 ? _f1_eval.gradient(tau) : _f2_eval.gradient(tau);
-            }
-
-            HessianType hessian(const TrafoData& tau) const
-            {
-              ValueType fval1 = _f1_eval.value(tau);
-              ValueType fval2 = _f2_eval.value(tau);
-              if(Math::abs(fval1 - fval2) < Math::eps<DataType>) return HessianType(0);
-              return fval1 < fval2 ? _f1_eval.hessian(tau) : _f2_eval.hessian(tau);
-            }
-
-        }; // class MinOfTwoFunctions::Evaluator<...>
+        private:
+          /// Evaluator for the first AnalyticFunction
+          typename AnalyticFunctionType1::template Evaluator<EvalTraits_> _f1_eval;
+          /// Evaluator for the second AnalyticFunction
+          typename AnalyticFunctionType2::template Evaluator<EvalTraits_> _f2_eval;
 
         public:
           /// Constructor
-          explicit MinOfTwoFunctions(const AnalyticFunctionType1& f1_, const AnalyticFunctionType2& f2_) :
-            _f1(f1_),
-            _f2(f2_)
+          explicit Evaluator(const MinOfTwoFunctions& function) :
+            _f1_eval(function._f1),
+            _f2_eval(function._f2)
             {
             }
 
+          void value(ValueType& val, const PointType& point) const
+          {
+            ValueType val1, val2;
+            _f1_eval.value(val1, point);
+            _f2_eval.value(val2, point);
+            val = Math::min(val1, val2);
+          }
+
+          void gradient(GradientType& grad, const PointType& point) const
+          {
+            ValueType val1, val2;
+            _f1_eval.value(val1, point);
+            _f2_eval.value(val2, point);
+
+            if(Math::abs(val1-val2) < Math::eps<DataType>())
+              grad.format();
+            else if(val1 < val2)
+              _f1_eval.gradient(grad, point);
+            else
+              _f2_eval.gradient(grad, point);
+          }
+
+          void hessian(HessianType& hess, const PointType& point) const
+          {
+            ValueType val1, val2;
+            _f1_eval.value(val1, point);
+            _f2_eval.value(val2, point);
+
+            if(Math::abs(val1-val2) < Math::eps<DataType>())
+              hess.format();
+            else if(val1 < val2)
+              _f1_eval.hessian(hess, point);
+            else
+              _f2_eval.hessian(hess, point);
+          }
+        }; // class MinOfTwoFunctions::Evaluator<...>
+
+      private:
+        /// The first AnalyticFunction
+        const AnalyticFunctionType1& _f1;
+        /// The second AnalyticFunction
+        const AnalyticFunctionType2& _f2;
+
+      public:
+        /// Constructor
+        explicit MinOfTwoFunctions(const AnalyticFunctionType1& f1_, const AnalyticFunctionType2& f2_) :
+          _f1(f1_),
+          _f2(f2_)
+        {
+        }
       }; // class MinOfTwoFunctions
 
       /**
@@ -1316,7 +1260,8 @@ namespace FEAST
        *
        * \author Jordi Paul
        */
-      typedef StaticWrapperFunction<HeavisideStatic, true, false, false> HeavisideFunction;
+      template<int dim_>
+      using HeavisideFunction = StaticWrapperFunction<dim_, HeavisideStatic, true, false, false>;
 
       /**
        * \brief Regularised Heaviside static function
@@ -1489,7 +1434,8 @@ namespace FEAST
        *
        * \author Jordi Paul
        */
-      typedef StaticWrapperFunction<HeavisideRegStatic, true, true, true> HeavisideRegFunction;
+      template<int dim_>
+      using HeavisideRefFunction = StaticWrapperFunction<dim_, HeavisideRegStatic, true, false, false>;
 
       /**
        * \brief 1D Polynomial function class template
@@ -1504,9 +1450,13 @@ namespace FEAST
        */
       template<typename DataType_>
       class PolynomialFunction1D :
-        public Assembly::AnalyticFunction
+        public Analytic::Function
       {
       public:
+        /// this is a 1D function
+        static constexpr int domain_dim = 1;
+        /// this is a scalar function
+        typedef Analytic::Image::Scalar ImageType;
         /// we provide function values
         static constexpr bool can_value = true;
         /// we provide function gradients
@@ -1514,84 +1464,71 @@ namespace FEAST
         /// we provide function hessians
         static constexpr bool can_hess = true;
 
-        /** \copydoc AnalyticFunction::ConfigTraits */
-        template<typename Config_>
-        struct ConfigTraits
-        {
-          /**
-           * \brief Trafo configuration tag class
-           *
-           * \see Trafo::ConfigBase
-           **/
-          struct TrafoConfig :
-            public Trafo::ConfigBase
-          {
-            static constexpr bool need_img_point = true;
-          };
-        };
-
         /** \copydoc AnalyticFunction::Evaluator */
         template<typename EvalTraits_>
         class Evaluator :
-          public Assembly::AnalyticFunction::Evaluator<EvalTraits_>
+          public Analytic::Function::Evaluator<EvalTraits_>
         {
         public:
-          typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-          typedef typename EvalTraits_::TrafoData TrafoData;
-          //typedef typename EvalTraits_::DataType DataType;
+          typedef typename EvalTraits_::DataType DataType;
+          typedef typename EvalTraits_::PointType PointType;
           typedef typename EvalTraits_::ValueType ValueType;
           typedef typename EvalTraits_::GradientType GradientType;
           typedef typename EvalTraits_::HessianType HessianType;
 
         private:
-          /// The polynomial function
-          const PolynomialFunction1D& _function;
+          /// our polynomial coefficients
+          std::vector<DataType> _coeff;
 
         public:
           /// Constructor
-          explicit Evaluator(const PolynomialFunction1D& function) :
-            _function(function)
+          explicit Evaluator(const PolynomialFunction1D& function)
           {
+            for(auto it = function._coeff.begin(); it != function._coeff.end(); ++it)
+              _coeff.push_back(DataType(*it));
           }
 
-          ValueType value(const TrafoData& tau) const
+          void value(ValueType& val, const PointType& point) const
           {
             // evaluate polynomial via horner scheme
-            DataType_ x = DataType_(tau.img_point[0]);
-            DataType_ y = DataType_(0);
-            for(std::size_t k(_function._coeff.size()); k > std::size_t(0); )
-              y = x * y + _function._coeff[--k];
-            return ValueType(y);
+            DataType x = point[0];
+            DataType y = DataType(0);
+            for(std::size_t k(_coeff.size()); k > std::size_t(0); )
+              y = x * y + _coeff[--k];
+
+            val = y;
           }
 
-          GradientType gradient(const TrafoData& tau) const
+          void gradient(GradientType& grad, const PointType& point) const
           {
-            std::size_t k = _function._coeff.size();
+            grad.format();
+            std::size_t k = _coeff.size();
             if(k <= std::size_t(0))
-              return GradientType(DataType_(0));
+              return;
 
             // evaluate polynomial via horner scheme
-            DataType_ x = DataType_(tau.img_point[0]);
-            DataType_ y = DataType_(0);
+            DataType x = point[0];
+            DataType y = DataType(0);
             for( ; (--k) > std::size_t(0); )
-              y = x * y + (_function._coeff[k] * DataType_(k));
+              y = x * y + (_coeff[k] * DataType(k));
 
-            return GradientType(y);
+            grad[0] = y;
           }
 
-          HessianType hessian(const TrafoData& tau) const
+          void hessian(HessianType& hess, const PointType& point) const
           {
-            std::size_t k = _function._coeff.size();
+            hess.format();
+            std::size_t k = _coeff.size();
             if(k <= std::size_t(1))
-              return HessianType(DataType_(0));
+              return;
 
             // evaluate polynomial via horner scheme
-            DataType_ x = DataType_(tau.img_point[0]);
-            DataType_ y = DataType_(0);
+            DataType x = point[0];
+            DataType y = DataType(0);
             for( ; (--k) > std::size_t(1); )
-              y = x * y + (_function._coeff[k] * DataType_(k*(k-1)));
+              y = x * y + (_coeff[k] * DataType(k*(k-1)));
 
-            return HessianType(y);
+            hess[0][0] = y;
           }
         }; // class PolynomialFunction1D::Evaluator
 
@@ -1643,7 +1580,7 @@ namespace FEAST
         }
       }; // class PolynomialFunction1D
     } // namespace Common
-  } // namespace Assembly
+  } // namespace Analytic
 } // namespace FEAST
 
-#endif // KERNEL_ASSEMBLY_COMMON_FUNCTIONS_HPP
+#endif // KERNEL_ANALYTIC_COMMON_HPP

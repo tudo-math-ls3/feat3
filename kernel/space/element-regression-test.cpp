@@ -1,6 +1,6 @@
 #include <test_system/test_system.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/assembly/common_functionals.hpp>
-#include <kernel/assembly/common_functions.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
@@ -208,7 +208,7 @@ namespace ElementRegression
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Element_<TrafoType, ElArgs_...> SpaceType;
 
-    typedef Assembly::Common::SineBubbleFunction SolFunction;
+    typedef Analytic::Common::SineBubbleFunction<Shape_::dimension> SolFunction;
 
     Index _level;
     Cubature::DynamicFactory cubature_factory;

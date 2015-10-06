@@ -1,7 +1,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/geometry/mesh_streamer_factory.hpp>
@@ -331,11 +331,11 @@ class SlipFilterAssemblyTest
 
       // Create the analytic function component wise
       LAFEM::DenseVector<MemType_, DT_, IT_>comp0(my_space.get_num_dofs());
-      Assembly::Common::CosineWaveFunction func0;
+      Analytic::Common::CosineWaveFunction<2> func0;
       Assembly::Interpolator::project(comp0, func0, my_space);
 
       LAFEM::DenseVector<MemType_, DT_, IT_>comp1(my_space.get_num_dofs());
-      Assembly::Common::SineBubbleFunction func1;
+      Analytic::Common::SineBubbleFunction<2> func1;
       Assembly::Interpolator::project(comp1, func1, my_space);
 
       // Paste the components into a blocked vector and keep a copy for checking
@@ -436,15 +436,15 @@ class SlipFilterAssemblyTest
 
       // Create the analytic function component wise
       LAFEM::DenseVector<MemType_, DT_, IT_>comp0(my_space.get_num_dofs());
-      Assembly::Common::ConstantFunction func0(-DT_(0.5));
+      Analytic::Common::ConstantFunction<3> func0(-DT_(0.5));
       Assembly::Interpolator::project(comp0, func0, my_space);
 
       LAFEM::DenseVector<MemType_, DT_, IT_>comp1(my_space.get_num_dofs());
-      Assembly::Common::SineBubbleFunction func1;
+      Analytic::Common::SineBubbleFunction<3> func1;
       Assembly::Interpolator::project(comp1, func1, my_space);
 
       LAFEM::DenseVector<MemType_, DT_, IT_>comp2(my_space.get_num_dofs());
-      Assembly::Common::CosineWaveFunction func2;
+      Analytic::Common::CosineWaveFunction<3> func2;
       Assembly::Interpolator::project(comp2, func2, my_space);
 
       // Paste the components into a blocked vector and keep a copy for checking

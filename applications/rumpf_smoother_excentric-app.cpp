@@ -1,6 +1,5 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
-#include <kernel/assembly/common_functions.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>

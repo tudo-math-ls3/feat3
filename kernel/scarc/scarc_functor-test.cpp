@@ -32,7 +32,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
@@ -235,8 +235,8 @@ class ScaRCFunctorTest:
       auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mbufs, fbuf));
 
       DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
-      Assembly::Common::ConstantFunction rhs_func(1.0);
-      Assembly::Common::ForceFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
+      Analytic::Common::ConstantFunction<2> rhs_func(1.0);
+      Assembly::Common::ForceFunctional<Analytic::Common::ConstantFunction<2>> rhs_functional(rhs_func);
       Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
       DenseVector<Mem::Main, double> vec_sol(space.get_num_dofs(), double(0));

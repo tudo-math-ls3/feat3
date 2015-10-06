@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/space/base.hpp>
+#include <kernel/analytic/function.hpp>
 
 namespace FEAST
 {

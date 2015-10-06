@@ -211,8 +211,8 @@ namespace StokesVortex2D
       typename SystemLevel_::LocalScalarVector& vec_fy = (*vec_rhs).template at<0>().template at<1>();
 
       // assemble the two forces
-      Assembly::StaticWrapperFunction<ForceFuncX> force_x;
-      Assembly::StaticWrapperFunction<ForceFuncY> force_y;
+      Analytic::StaticWrapperFunction<2, ForceFuncX> force_x;
+      Analytic::StaticWrapperFunction<2, ForceFuncY> force_y;
       Assembly::Common::ForceFunctional<decltype(force_x)> force_func_x(force_x);
       Assembly::Common::ForceFunctional<decltype(force_y)> force_func_y(force_y);
       Assembly::LinearFunctionalAssembler::assemble_vector(vec_fx, force_func_x, this->space_velo, this->cubature);
@@ -241,9 +241,9 @@ namespace StokesVortex2D
       typedef typename SystemLevel_::DataType DataType;
 
       // define reference solution functions
-      Assembly::StaticWrapperFunction<VeloFuncX, true, true> velo_x_func;
-      Assembly::StaticWrapperFunction<VeloFuncY, true, true> velo_y_func;
-      Assembly::StaticWrapperFunction<PresFunc> pres_func;
+      Analytic::StaticWrapperFunction<2, VeloFuncX, true, true> velo_x_func;
+      Analytic::StaticWrapperFunction<2, VeloFuncY, true, true> velo_y_func;
+      Analytic::StaticWrapperFunction<2, PresFunc> pres_func;
 
       // fetch our vector components
       const auto& vx = (*vec_sol).template at<0>().template at<0>();

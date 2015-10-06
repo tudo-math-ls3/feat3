@@ -45,6 +45,9 @@
 // FEAST-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
+// FEAST-Analytic includes
+#include <kernel/analytic/function.hpp>                    // NEW: for Analytic::Function
+
 // FEAST-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
@@ -53,7 +56,6 @@
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
-#include <kernel/assembly/analytic_function.hpp>           // NEW: for AnalyticFunction
 
 // FEAST-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
@@ -81,20 +83,29 @@ namespace Tutorial02
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  // As a first step, we want to implement an 'AnalyticFunction' class, which will represent both our
+  // As a first step, we want to implement an 'Analytic Function' class, which will represent both our
   // analytical solution 'u' (for post-processing) as well as the boundary condition function 'g'.
   // For this, we derive our own solution function:
   class PringlesFunction :
-    public Assembly::AnalyticFunction
+    public Analytic::Function
   {
   public:
-    // For analytic functions, we first need to provide information about what this function is
-    // capable of computing. An object of this class will not only be responsible for computing the
-    // function values of our function 'u', but also its derivatives -- namely its gradient and its
-    // hessian.
-    // To inform the assembler about what computations we can perform, we define an enumeration,
-    // which is just a C++ trick to get compile-time constants.
-    // See the documentation of the Assembly::AnalyticFunction class for the names of these constants.
+    // For analytic functions, we first need to provide information abou the domain and the image
+    // sets. The domain of any analytic function in our context is the R^n, so the only thing we
+    // have to specify is the domain dimension, which equals 2 as we are solving a 2D PDE:
+    static constexpr int domain_dim = 2;
+
+    // Moreover, we need to classify the image set of the function. Here, we have the choice
+    // between two variants: either we have a 'scalar' function, i.e. a function that maps into
+    // R, or we have a vector field. In our case, this function is a scalar one, so we specify
+    // the following typedef:
+    typedef Analytic::Image::Scalar ImageType;
+
+    // Next, we need to specify what this function implementation is capable of computing. An object
+    // of this class will not only be responsible for computing the function values of our function
+    // 'u', but also its derivatives -- namely its gradient and its hessian.
+    // To inform the assembler about what computations we can perform, we specify the following
+    // the bool values, which specify whether the corresponding information can be computed:
 
     // We are capable of computing the function values of 'u'.
     static constexpr bool can_value = true;
@@ -105,131 +116,74 @@ namespace Tutorial02
     // tutorial.
     static constexpr bool can_hess = true;
 
-    // For the computation of these values, gradients and hessians we require some data from the
-    // underlying transformation, namely the real point coordinates. These wishes are managed by
-    // so-called 'configurations'. The following class template receives a configuration telling
-    // us what the assembler expects us to provide. We're not interested in that class for now,
-    // so we simply pass this argument to the base-class version.
-
-    // In our case, we always need the same configuration:
-    template<typename AnalyticConfig_>
-    struct ConfigTraits :
-      public Assembly::AnalyticFunction::ConfigTraits<AnalyticConfig_>
-    {
-      // This config traits class needs to contain a struct named 'TrafoConfig', which collects
-      // our wishes for the transformation. We derive our trafo-config class from the basic version:
-      // Define the required trafo configuration:
-      struct TrafoConfig :
-        public Trafo::ConfigBase
-      {
-        // At this point we express our wishes. The only thing that we require from the
-        // transformation are the 'real' point coordinates (i.e. 'x' and 'y'), so that we may
-        // evaluate our analytic function 'u' and/or its derivatives in these coordinates.
-        static constexpr bool need_img_point = true;
-      };
-    }; // class PringlesFunction::ConfigTraits<...>
-
-    // Up to now, we have only declared our capabilities and expressed our wishes to the assembler,
-    // but we still need to implement our analytical function formula somewhere. For this purpose,
-    // we need to implement a so-called 'Evaluator'. The Evaluator is a nested class template,
-    // whose template parameter is a so-called 'evaluation traits' class containing various useful
-    // typedefs that we will require in a moment.
+    // Up to now, we have only declared our capabilities to the assembler, but we still need to
+    // implement our analytical function formula somewhere. For this purpose, we need to implement
+    // a so-called 'Evaluator'. The Evaluator is a nested class template, whose template parameter
+    // is a so-called 'evaluation traits' class containing various useful typedefs that we will
+    // require in a moment.
 
     // Declare our evaluator and derive it from the base-class version.
-    template<typename EvalTraits_>
+    template<typename Traits_>
     class Evaluator :
-      public Assembly::AnalyticFunction::Evaluator<EvalTraits_>
+      public Analytic::Function::Evaluator<Traits_>
     {
     public:
-      // First off, we require a mandatory constructor that takes a const reference to our
+      // We will 'extract' the required data types from the traits class:
+
+      // First, it contains a typedef for the currently used data-type, which will coincide with
+      // our global DataType typedef.
+      typedef typename Traits_::DataType DataType;
+
+      // Moreover, we have a typedef that specifies the type of the point in which we need
+      // to evaluate our function. This is always an instance of the Tiny::Vector class template.
+      typedef typename Traits_::PointType PointType;
+
+      // The next thing is the function-value type, which coincides with 'DataType' for scalar functions:
+      typedef typename Traits_::ValueType ValueType;
+
+      // Then we have the function-gradient type, which is a Tiny::Vector.
+      typedef typename Traits_::GradientType GradientType;
+
+      // And finally, the function-hessian type, which is a Tiny::Matrix.
+      typedef typename Traits_::HessianType HessianType;
+
+      // Now we require a *mandatory* constructor that takes a const reference to our
       // analytic function object as its one and only parameter:
       explicit Evaluator(const PringlesFunction&)
       {
       }
 
-      // The evaluation traits class 'EvalTraits_' contains a handful of typedefs which we require.
-      // The first type is the trafo-evaluator, which defines the mapping from the reference cell
-      // to the real cell.
-      typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-
-      // Next comes the trafo data, which contains all required data from the transformation
-      // in the current cubature point. This includes, e.g., the coordinates of the current point,
-      // the jacobian matrix, the hessian and other useful stuff that we're not interested in
-      // for this simple function.
-      typedef typename EvalTraits_::TrafoData TrafoData;
-
-      // Moreover, it contains a typedef for the currently used data-type, which will coincide with
-      // our global DataType typedef.
-      typedef typename EvalTraits_::DataType DataType;
-
-      // The next thing is the function-value type, which coincides with 'DataType' for scalar functions:
-      typedef typename EvalTraits_::ValueType ValueType;
-
-      // Then we have the function-gradient type, which is a Tiny::Vector.
-      typedef typename EvalTraits_::GradientType GradientType;
-
-      // And finally, the function-hessian type, which is a Tiny::Matrix.
-      typedef typename EvalTraits_::HessianType HessianType;
-
-      // Each evaluator is equipped with a 'prepare'-'finish' function pair, which is called by
-      // the assembler for each cell during the assembly process.
-
-      // We first provide our prepare function. This function is called by the assembler each
-      // time it starts assembling on a new cell of the mesh, so the evaluator has the chance
-      // to pre-compute data required for its evaluation.
-      // The only parameter to this function is a const reference to the trafo-evaluator:
-      void prepare(const TrafoEvaluator& /* trafo_eval */)
-      {
-        // Our function does not require any initialisation...
-      }
-
-      // Moreover, once the assembler is finished with one particular cell of the mesh, it calls
-      // the evaluator's finish function, giving it the chance to clean up any auxiliary data
-      // created by the prepare function:
-      void finish()
-      {
-        // We did not initialise anything, so we don't have to clean up either...
-      }
-
       // At the beginning of our PringlesFunction class definition, we told the assembler that we are
       // capable of computing function values, so we have to provide a function for this job.
-      // This function is called 'value'; its only parameter is a const reference to the trafo data
-      // object and its return type is the function value type:
-      ValueType value(const TrafoData& tau) const
+      // This function is called 'value'; its first parameter is a reference to the 'value'
+      // object that we have to fill and its second parameter is the point in which we evaluate:
+      void value(ValueType& value, const PointType& point) const
       {
-        // The 'tau' parameter contains the coordinates of our evaluation point. These are stored
-        // in the member named 'img_point', which is simply a tuple of scalar coordinates.
         // We can now return the value of our function
         //  u(x,y) = (x - 1/2)^2 - (y - 1/2)^2
-        return Math::sqr(tau.img_point[0] - DataType(0.5)) - Math::sqr(tau.img_point[1] - DataType(0.5));
+        value = Math::sqr(point[0] - DataType(0.5)) - Math::sqr(point[1] - DataType(0.5));
       }
 
       // The next function that we need to supply is the gradient evaluation function:
-      GradientType gradient(const TrafoData& tau) const
+      void gradient(GradientType& grad, const PointType& point) const
       {
-        // create an auxiliary gradient:
-        GradientType grad;
-        // Set the X-derivative of our function: dx u(x,y) = 2*x - 1
-        grad(0) =  DataType(2) * tau.img_point[0] - DataType(1);
-        // Set the Y-derivative of our function: dy u(x,y) = -2*y + 1
-        grad(1) = -DataType(2) * tau.img_point[1] + DataType(1);
-        // and return the gradient:
-        return grad;
+        // Set the X-derivative of our function:
+        // dx u(x,y) =  2*x - 1
+        grad[0] =  DataType(2) * point[0] - DataType(1);
+        // Set the Y-derivative of our function:
+        // dy u(x,y) = -2*y + 1
+        grad[1] = -DataType(2) * point[1] + DataType(1);
       }
 
       // And finally, one evaluation function for the hessian:
-      HessianType hessian(const TrafoData& /*tau*/) const
+      void hessian(HessianType& hess, const PointType& /*point*/) const
       {
-        // create an auxiliary hessian:
-        HessianType hess;
         // The mixed derivatives dx dy u are zero
-        hess(0,1) = hess(1,0) = DataType(0);
+        hess[0][1] = hess[1][0] = DataType(0);
         // The second XX-derivate: dxx u(x,y) =  2
-        hess(0,0) =  DataType(2);
+        hess[0][0] =  DataType(2);
         // The second YY-derivate: dyy u(x,y) = -2
-        hess(1,1) = -DataType(2);
-        // and return the hessian:
-        return hess;
+        hess[1][1] = -DataType(2);
       }
     }; // class PringlesFunction::Evaluator<...>
   }; // class PringlesFunction

@@ -6,8 +6,8 @@
 #include <kernel/lafem/mean_filter.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/interpolator.hpp>
-#include <kernel/assembly/common_functions.hpp>
 #include <kernel/assembly/common_functionals.hpp>
+#include <kernel/analytic/common.hpp>
 
 namespace FEAST
 {
@@ -46,8 +46,8 @@ namespace FEAST
         LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> vec_w(space.get_num_dofs(), DataType_(0));
 
         // create a constant 1-function and its corresponding force functional
-        Assembly::Common::ConstantFunction one_func(Real(1));
-        Assembly::Common::ForceFunctional<Assembly::Common::ConstantFunction> one_force(one_func);
+        Analytic::Common::ConstantFunction<Space_::shape_dim> one_func(Real(1));
+        Assembly::Common::ForceFunctional<decltype(one_func)> one_force(one_func);
 
         // interpolate 1-function into vector v
         Assembly::Interpolator::project(vec_v, one_func, space);

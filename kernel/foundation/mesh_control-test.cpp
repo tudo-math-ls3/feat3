@@ -24,6 +24,7 @@
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
+#include <kernel/analytic/common.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -598,7 +599,7 @@ public:
   }
 };
 
-typedef Assembly::StaticWrapperFunction<RhsFunc> RhsFunction;
+typedef Analytic::StaticWrapperFunction<2, RhsFunc> RhsFunction;
 
 template<typename Tag_, typename IndexType_, typename MatrixType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlPartitioningTest2D:

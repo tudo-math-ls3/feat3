@@ -1,5 +1,5 @@
 #include <test_system/test_system.hpp>
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/assembly/rew_projector.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
@@ -86,7 +86,7 @@ public:
     Space_ space(trafo);
 
     // define functor
-    Assembly::Common::SineBubbleFunction function;
+    Analytic::Common::SineBubbleFunction<2> function;
 
     // define a cubature factory
     Cubature::DynamicFactory cubature_factory(cubature_name);

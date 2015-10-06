@@ -1,6 +1,6 @@
 #include <kernel/base_header.hpp>
 #ifdef FEAST_HAVE_ALGLIB
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
@@ -21,12 +21,6 @@
 
 using namespace FEAST;
 
-namespace FEAST
-{
-  namespace Assembly
-  {
-    namespace Common
-    {
       /**
        * @brief Class Template for the gradient of DistanceFunctionSD
        *
@@ -37,60 +31,34 @@ namespace FEAST
        * Component of the gradient
        *
        **/
-      template<typename ImgPointType_, int component>
+      template<int component, int dim_, typename DataType_>
       class DistanceFunctionSD_grad :
-        public AnalyticFunction
+        public Analytic::Function
       {
-        public:
-          /// Datatype from the point
-          typedef typename ImgPointType_::DataType DataType;
-          /** \copydoc AnalyticFunction::FunctionCapabilities */
-          enum FunctionCapabilities
-          {
-            can_value = 1,
-            can_grad = 0,
-            can_hess = 0
-          };
+      public:
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Scalar ImageType;
 
-          /** \copydoc AnalyticFunction::ConfigTraits */
-          template<typename Config_>
-          struct ConfigTraits
-          {
-            /**
-             * \brief Trafo configuration tag class
-             *
-             * \see Trafo::ConfigBase
-             */
-            struct TrafoConfig :
-              public Trafo::ConfigBase
-            {
-              enum
-              {
-                need_img_point = 1
-              };
-            };
-          };
+        static constexpr bool can_value = true;
 
-          /** \copydoc AnalyticFunction::Evaluator */
-          template<typename EvalTraits_>
-          class Evaluator :
-            public AnalyticFunction::Evaluator<EvalTraits_>
+        typedef Tiny::Vector<DataType_, dim_> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
         {
           public:
-            /// trafo evaluator data
-            typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-            /// trafo data type
-            typedef typename EvalTraits_::TrafoData TrafoData;
             /// coefficient data type
             typedef typename EvalTraits_::DataType DataType;
+            /// evaluation point type
+            typedef typename EvalTraits_::PointType PointType;
             /// value type
             typedef typename EvalTraits_::ValueType ValueType;
             /// gradient type
             typedef typename EvalTraits_::GradientType GradientType;
             /// hessian type
             typedef typename EvalTraits_::HessianType HessianType;
-            /// type for the points the analytic function is evaluated at
-            typedef typename EvalTraits_::ImagePointType ImgPointType;
 
           private:
             /// Function to evaluate
@@ -103,32 +71,27 @@ namespace FEAST
               {
               }
 
-            ValueType value(const TrafoData& tau) const
+            void value(ValueType& value, const PointType& point) const
             {
-              ImgPointType tmp (tau.img_point - _function._point);
-              DataType norm = tmp.norm_euclid();
+              DataType norm = (point - _function._point).norm_euclid();
               if(norm <= Math::eps<DataType>())
-              {
-                return DataType(0);
-              }
+                value = DataType(0);
               else
-              {
-                return _function._b*( tau.img_point[component] - _function._point(component))/norm;
-              }
+                value = (_function._b / norm) * (point[component] - _function._point[component]);
             }
         }; // class DistanceFunctionSD::Evaluator<...>
 
         private:
           /// The point to which the distance to is calculated
-          ImgPointType_& _point;
+          PointType& _point;
           /// Displacement of the function
-          DataType _a;
+          DataType_ _a;
           /// Scaling factor
-          DataType _b;
+          DataType_ _b;
 
         public:
           /// Constructor
-          explicit DistanceFunctionSD_grad(ImgPointType_& x0_, const DataType a_, const DataType b_) :
+          explicit DistanceFunctionSD_grad(PointType& x0_, const DataType_ a_, const DataType_ b_) :
             _point(x0_),
             _a(a_),
             _b(b_)
@@ -137,60 +100,35 @@ namespace FEAST
 
       }; // class DistanceFunctionSD_grad
 
-      template<int component, int derivative_component, typename ImgPointType_>
+      template<int component, int derivative_component, int dim_, typename DataType_>
       class PlaneDistanceFunctionSD_grad :
-        public AnalyticFunction
+        public Analytic::Function
       {
-        public:
-          /// Datatype from the point
-          typedef typename ImgPointType_::DataType DataType;
-          /** \copydoc AnalyticFunction::FunctionCapabilities */
-          enum FunctionCapabilities
-          {
-            can_value = 1,
-            can_grad = 0,
-            can_hess = 0
-          };
+      public:
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Scalar ImageType;
 
-          /** \copydoc AnalyticFunction::ConfigTraits */
-          template<typename Config_>
-          struct ConfigTraits
-          {
-            /**
-             * \brief Trafo configuration tag class
-             *
-             * \see Trafo::ConfigBase
-             */
-            struct TrafoConfig :
-              public Trafo::ConfigBase
-            {
-              enum
-              {
-                need_img_point = 1
-              };
-            };
-          };
+        static constexpr bool can_value = true;
+
+        typedef Tiny::Vector<DataType_, dim_> PointType;
+
 
           /** \copydoc AnalyticFunction::Evaluator */
           template<typename EvalTraits_>
           class Evaluator :
-            public AnalyticFunction::Evaluator<EvalTraits_>
+            public Analytic::Function::Evaluator<EvalTraits_>
         {
           public:
-            /// trafo evaluator data
-            typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-            /// trafo data type
-            typedef typename EvalTraits_::TrafoData TrafoData;
             /// coefficient data type
             typedef typename EvalTraits_::DataType DataType;
+            /// evaluation point type
+            typedef typename EvalTraits_::PointType PointType;
             /// value type
             typedef typename EvalTraits_::ValueType ValueType;
             /// gradient type
             typedef typename EvalTraits_::GradientType GradientType;
             /// hessian type
             typedef typename EvalTraits_::HessianType HessianType;
-            /// type for the points the analytic function is evaluated at
-            typedef typename EvalTraits_::ImagePointType ImgPointType;
 
           private:
             /// Function to evaluate
@@ -203,31 +141,31 @@ namespace FEAST
               {
               }
 
-            ValueType value(const TrafoData& DOXY(tau)) const
+
+            void value(ValueType& value, const PointType&) const
             {
-              return _function._b*ValueType(component == derivative_component);
+              if(component == derivative_component)
+                value = _function._b;
+              else
+                value = DataType(0);
             }
         }; // class PlaneDistanceFunctionSD::Evaluator<...>
 
         private:
           /// The point to which the distance to is calculated
-          ImgPointType_& _point;
+          PointType& _point;
           /// Scaling factor
-          DataType _b;
+          DataType_ _b;
 
         public:
           /// Constructor
-          explicit PlaneDistanceFunctionSD_grad(ImgPointType_& x0_, const DataType b_) :
+          explicit PlaneDistanceFunctionSD_grad(PointType& x0_, const DataType_ b_) :
             _point(x0_),
             _b(b_)
             {
             }
 
       }; // class DistanceFunctionSD_grad
-
-    } // namespace Common
-  } // namespace Assembly
-} // namespace FEAST
 
 /**
  * \brief Wrapper struct as functions do not seem to agree with template template parameters
@@ -309,9 +247,9 @@ template
 
     MeshType* mesh = rmn->get_mesh();
 
-    typedef Assembly::Common::DistanceFunctionSD<ImgPointType> AnalyticFunctionType;
-    typedef Assembly::Common::DistanceFunctionSD_grad<ImgPointType, 0> AnalyticFunctionGrad0Type;
-    typedef Assembly::Common::DistanceFunctionSD_grad<ImgPointType, 1> AnalyticFunctionGrad1Type;
+    typedef Analytic::Common::DistanceFunctionSD<2, DataType> AnalyticFunctionType;
+    typedef DistanceFunctionSD_grad<0, 2, DataType> AnalyticFunctionGrad0Type;
+    typedef DistanceFunctionSD_grad<1, 2, DataType> AnalyticFunctionGrad1Type;
     ImgPointType x0(DataType(0));
     x0.v[0] = DataType(0.25) *(DataType(2) + Math::cos(DataType(0)));
     x0.v[1] = DataType(0.25) *(DataType(2) + Math::sin(DataType(0)));

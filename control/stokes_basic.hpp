@@ -20,12 +20,12 @@
 #include <kernel/lafem/power_diag_matrix.hpp>
 #include <kernel/lafem/power_col_matrix.hpp>
 #include <kernel/lafem/power_row_matrix.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/common_functions.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/discrete_projector.hpp>

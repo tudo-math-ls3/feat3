@@ -3,7 +3,9 @@
 #define KERNEL_ASSEMBLY_REW_PROJECTOR_HPP 1
 
 // includes, FEAST
+#include <kernel/analytic/function.hpp>
 #include <kernel/assembly/asm_traits.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/math.hpp>
 
 namespace FEAST
@@ -67,18 +69,19 @@ namespace FEAST
        * The weighting type to be used.
        */
       template<
-        typename Vector_,
+        typename DT_,
+        typename IT_,
         typename Function_,
         typename Space_,
         typename CubatureFactory_>
       static void project(
-        Vector_& vector,
+        LAFEM::DenseVector<Mem::Main, DT_, IT_>& vector,
         const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         WeightType weight_type = wt_volume)
       {
-        typedef Vector_ VectorType;
+        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
         typedef Function_ FunctionType;
         typedef Space_ SpaceType;
         typedef typename SpaceType::TrafoType TrafoType;
@@ -86,7 +89,7 @@ namespace FEAST
         static_assert(Function_::can_value, "analytic function can't compute function values");
 
         // define assembly traits
-        typedef AsmTraits1<typename Vector_::DataType, SpaceType, AsmTrafoConfig, AsmSpaceConfig> AsmTraits;
+        typedef AsmTraits1<DT_, SpaceType, AsmTrafoConfig, AsmSpaceConfig> AsmTraits;
         typedef typename AsmTraits::DataType DataType;
 
         // define the cubature rule
@@ -104,8 +107,11 @@ namespace FEAST
         // create a dof-mapping
         typename AsmTraits::DofMapping dof_mapping(space);
 
-        // create a functor evaluator
-        typename FunctionType::template Evaluator<typename AsmTraits::AnalyticEvalTraits> func_eval(function);
+        // define our analytic evaluation traits
+        typedef Analytic::EvalTraits<DataType, Function_> AnalyticEvalTraits;
+
+        // create a function evaluator
+        typename FunctionType::template Evaluator<AnalyticEvalTraits> func_eval(function);
 
         // create trafo evaluation data
         typename AsmTraits::TrafoEvalData trafo_data;
@@ -117,7 +123,7 @@ namespace FEAST
         typename AsmTraits::LocalMatrixType mass;
 
         // pivot array for factorisation
-        int pivot[3*mass.n];
+        int pivot[mass.n];
 
         // create local vector data
         typename AsmTraits::LocalVectorType lvad, lxad;
@@ -129,10 +135,10 @@ namespace FEAST
         const Index num_dofs(space.get_num_dofs());
 
         // create a clear output vector
-        vector = Vector_(num_dofs, DataType(0));
+        vector = VectorType(num_dofs, DataType(0));
 
         // allocate weight vector
-        Vector_ weight(num_dofs, DataType(0));
+        VectorType weight(num_dofs, DataType(0));
 
         // create vector scatter-axpy
         LAFEM::ScatterAxpy<VectorType> scatter_axpy(vector);
@@ -152,9 +158,6 @@ namespace FEAST
 
           // prepare space evaluator
           space_eval.prepare(trafo_eval);
-
-          // prepare functor evaluator
-          func_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
           int num_loc_dofs(space_eval.get_num_local_dofs());
@@ -176,7 +179,8 @@ namespace FEAST
             space_eval(space_data, trafo_data);
 
             // compute function value
-            DataType fv(func_eval.value(trafo_data));
+            DataType fv(DataType(0));
+            func_eval.value(fv, trafo_data.img_point);
 
             // pre-compute integration weight
             DataType omega(trafo_data.jac_det * cubature_rule.get_weight(k));
@@ -197,9 +201,6 @@ namespace FEAST
               }
             }
           }
-
-          // finish functor evaluator
-          func_eval.finish();
 
           // finish evaluators
           space_eval.finish();
@@ -239,6 +240,25 @@ namespace FEAST
         }
 
         // okay
+      }
+
+      template<
+        typename Mem_,
+        typename DT_,
+        typename IT_,
+        typename Function_,
+        typename Space_,
+        typename CubatureFactory_>
+      static void project(
+        LAFEM::DenseVector<Mem_, DT_, IT_>& vector,
+        const Function_& function,
+        const Space_& space,
+        const CubatureFactory_& cubature_factory,
+        WeightType weight_type = wt_volume)
+      {
+        LAFEM::DenseVector<Mem::Main, DT_, IT_> vec;
+        project(vec, function, space, cubature_factory, weight_type);
+        vector.convert(vec);
       }
     }; // class RewProjector
   } // namespace Assembly

@@ -109,6 +109,11 @@
 // FEAST-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
+// FEAST-Analytic includes
+#include <kernel/analytic/common.hpp>                      // for SineBubbleFunction, ConstantFunction
+#include <kernel/analytic/parsed_function.hpp>             // NEW: for ParsedFunction
+#include <kernel/analytic/auto_derive.hpp>                 // NEW: for AutoDerive
+
 // FEAST-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
@@ -117,9 +122,7 @@
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
-#include <kernel/assembly/common_functions.hpp>            // for SineBubbleFunction
 #include <kernel/assembly/common_functionals.hpp>          // NEW: for LaplaceFunctional
-#include <kernel/assembly/parsed_function.hpp>             // NEW: for ParsedFunction
 
 // FEAST-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
@@ -384,9 +387,16 @@ namespace Tutorial04
     // three instances of the ParsedFunction class template, which we will pass on
     // to our assembly functions lateron. The only template parameter is the dimension
     // of the function to be parsed, which is 2 in our case:
-    Assembly::ParsedFunction<2> sol_function;
-    Assembly::ParsedFunction<2> rhs_function;
-    Assembly::ParsedFunction<2> dbc_function;
+    Analytic::ParsedFunction<2> rhs_function; // right-hand-side
+    Analytic::ParsedFunction<2> dbc_function; // boundary conditions
+
+    // In the case of the reference solution function, we also require the computation of
+    // derivates for the assembly of the right-hand-side (if 'f' is not given explicitly)
+    // and for the computation of errors in the post-processing step.
+    // Unfortunately, the ParsedFunction cannot compute the derivatives by itself, so
+    // we need to put it into an 'AutoDerive' function wrapper - this one will add
+    // the numeric computation of derivatives to our ParsedFunction automagically.
+    Analytic::AutoDerive<Analytic::ParsedFunction<2>> sol_function;
 
     // We have three ParsedFunction object, but we still need to supply them with
     // our (or the caller's) function formulae:
@@ -459,9 +469,11 @@ namespace Tutorial04
 
 #else
     // Without the fparser library, we use the sine-bubble as a solution.
-    Assembly::Common::SineBubbleFunction sol_function;
-    Assembly::Common::ConstantFunction dbc_function(0.0);
-    Assembly::Common::ConstantFunction rhs_function(0.0);
+    Analytic::Common::SineBubbleFunction<2> sol_function;
+    // The following two functions will not be used and are therefore just 'dummies',
+    // which are only declared here to avoid even more #ifdef's in the following code.
+    Analytic::Common::ConstantFunction<2> dbc_function(0.0);
+    Analytic::Common::ConstantFunction<2> rhs_function(0.0);
     bool have_u = true;
     bool have_f = false;
     bool have_g = false;

@@ -17,7 +17,7 @@
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
-#include <kernel/assembly/common_functions.hpp>
+#include <kernel/analytic/common.hpp>
 #include <kernel/util/time_stamp.hpp>
 
 using namespace FEAST;
@@ -181,7 +181,7 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
 
 
     // finally, assemble the filters
-    Assembly::StaticWrapperFunction<VeloFuncX> inflow_func;
+    Analytic::StaticWrapperFunction<2, VeloFuncX> inflow_func;
     unit_asm.assemble(filter.at<0>().at<0>(), space_v, inflow_func);
     unit_asm.assemble(filter.at<0>().at<1>(), space_v);
   }

@@ -33,6 +33,9 @@
 // FEAST-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
+// FEAST-Analytic includs
+#include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
+
 // FEAST-Assembly includes
 #include <kernel/assembly/linear_functional.hpp>           // for LinearOperator
 #include <kernel/assembly/bilinear_operator.hpp>           // for BilinearOperator
@@ -41,7 +44,6 @@
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
-#include <kernel/assembly/common_functions.hpp>            // for SineBubbleFunction
 #include <kernel/assembly/grid_transfer.hpp>               // for GridTransfer
 
 // FEAST-LAFEM includes
@@ -265,45 +267,24 @@ namespace TutorialX1
 
     // In analogy to the bilinear operator, we first need to provide a configuration for the trafo
     // and one for the test space (there exists no trial space for functionals).
-    // In this case, we may require some data from the transformation, as the solution function
-    // will require it. So the first task is to find out what the solution function needs from
-    // the transformation. For this, however, we first have to tell the solution function what we
-    // need from it -- see the 'ConfigTraits' class template of the 'PringlesFunction' class
-    // of the 'tutorial_02_laplace' example code.
-
-    // So we define a 'configuration' for our analytic solution function, which derives from the
-    // basic configuration for analytic functions defined in 'kernel/trafo/base.hpp':
-    struct AnalyticConfig :
-      public Trafo::AnalyticConfigBase
+    // We will need to evaluate our solution function and for this, we must tell the trafo
+    // that we require image point coordinates, so let's state this by deriving our TrafoConfig
+    // from the 'Trafo::ConfigBase' and then expressing our wishes:
+    struct TrafoConfig :
+      public Trafo::ConfigBase
     {
-      // Yet another dummy enum
-      enum
-      {
-        // We need solution function values for the reaction term
-        need_value = 1,
-        // We need solution gradients for the convection term
-        need_grad = 1,
-        // We need solution hessians for the diffusion term
-        need_hess = 1
-      };
-    }; // struct AnalyticConfig
-
-    // The trafo requirements of this functional are identical to the ones requested by the
-    // analytical solution function, so we simply make a typedef for its trafo configuration.
-    typedef typename SolFunction_::template ConfigTraits<AnalyticConfig>::TrafoConfig TrafoConfig;
+      // We (more precise: our solution function) need image point coordinates
+      static constexpr bool need_img_point = true;
+    };
 
     // Now for the test-space configuration. For a linear functional, we usually require test
     // function values for the evaluation, so build a corresponding test-space config:
     struct TestConfig :
       public Space::ConfigBase
     {
-      // You guess: another dummy enum
-      enum
-      {
-        // Give us test function values
-        need_value = 1
-      };
-    }; // struct TestConfig
+      // Give us test function values
+      static constexpr bool need_value = true;
+    };
 
     // In analogy to operators, functionals are evaluated using 'evaluator' class templates as well,
     // so let's declare one of those and derive it from the base-class evaluator:
@@ -315,14 +296,30 @@ namespace TutorialX1
       // As usual, a reference to our data object:
       const AndicoreData& _data;
 
+      // The 'AsmTraits_' class template, which is passed to this evaluator template by the
+      // assembler, is the same as the one passed on for bilinear operators, so we can again
+      // query our required types from it. As functionals do not operate on trial basis functions,
+      // we only require the trafo data and the test basis data types:
+      typedef typename AsmTraits_::TrafoData TrafoData;
+      typedef typename AsmTraits_::TestBasisData TestBasisData;
+
+      // Moreover, we need another type that we have not used before: the 'trafo evaluator', which
+      // is again an evaluator class similar to the one we are currently building up.
+      typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
+
+      // Finally, we also need the DataType typedef.
+      typedef typename AsmTraits_::DataType DataType;
+
       // Now comes the interesting part:
       // We want to evaluate the analytical solution, and for this, we need to get its corresponding
       // evaluator, which is again a class template similar to the one that you are currently reading,
       // see the 'PringlesFunction' from the 'tutorial_02_laplace' example.
       // However, its template parameter is *not* our assembly traits type 'AsmTraits_', but another
-      // type called 'analytic evaluation traits', which can be queried from our assembly traits.
-      // For convenience, we'll make a typedef of this traits class:
-      typedef typename AsmTraits_::AnalyticEvalTraits AnalyticEvalTraits;
+      // type called 'analytic evaluation traits', which we need to provide here.
+      // Luckily, there is another template class in te 'Analytic' namespace which takes care
+      // of all the necessary typedefing. The only two template parameters are the data type which
+      // we want to use internally and the function class itself:
+      typedef Analytic::EvalTraits<DataType, SolFunction_> AnalyticEvalTraits;
 
       // With that type, we can now define the type of the solution function evaluator:
       typedef typename SolFunction_::template Evaluator<AnalyticEvalTraits> SolEvaluator;
@@ -344,32 +341,10 @@ namespace TutorialX1
       {
       }
 
-      // The 'AsmTraits_' class template, which is passed to this evaluator template by the
-      // assembler, is the same as the one passed on for bilinear operators, so we can again
-      // query our required types from it. As functionals do not operate on trial basis functions,
-      // we only require the trafo data and the test basis data types:
-      typedef typename AsmTraits_::TrafoData TrafoData;
-      typedef typename AsmTraits_::TestBasisData TestBasisData;
-
-      // Moreover, we need another type that we have not used before: the 'trafo evaluator', which
-      // is again an evaluator class similar to the one we are currently building up.
-      typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
-
       // Each type of evaluator has a 'prepare' and a 'finish' member function which are called
-      // for each cell of the mesh that the assembler iterates over.  Although uur functional
-      // itself does not require this initialisation, the evaluator of our analytical solution
-      // may do, so we have to manually call it here:
-      void prepare(const TrafoEvaluator& trafo_eval)
-      {
-        // prepare the analytical solution evaluator:
-        _sol_eval.prepare(trafo_eval);
-      }
-
-      // Also, the solution function evaluator may wish to finish itself...
-      void finish()
-      {
-        _sol_eval.finish();
-      }
+      // for each cell of the mesh that the assembler iterates over. However, as this simple
+      // functional does not require any type of additional initialisation, we do not need to
+      // implement these function, as our base-class provides empty implementations for us.
 
       // Now we come to learn a new function, which is present in all bilinear operator and
       // linear functional evaluator classes. The next function is called for each cubature point
@@ -382,15 +357,30 @@ namespace TutorialX1
         // 2. the convection :  dot(b,grad(u)) * psi
         // 3. the reaction   :      c *    u   * psi
 
-        // At this point, we can already combine these terms to pre-compute the value of our force
+        // For this task, we need to call the 'value', 'gradient' and 'hessian' functions of the
+        // solution function evalutuar (see the PringlesFunction in Tutorial 02), so we first need
+        // to create the objects where the functions can write their values to.
+        // We do this by using the types defined in the AnalyticEvalTraits class which we have
+        // defined above:
+        typename AnalyticEvalTraits::ValueType value(DataType(0));   // function value
+        typename AnalyticEvalTraits::GradientType grad(DataType(0)); // function gradient
+        typename AnalyticEvalTraits::HessianType hess(DataType(0));  // function hessian
+
+        // Now we call the solution function's evaluator to compute these values. For this, we
+        // provide the value object as well as the image point from our trafo data as parameters:
+        _sol_eval.value   (value, tau.img_point);
+        _sol_eval.gradient(grad , tau.img_point);
+        _sol_eval.hessian (hess , tau.img_point);
+
+        // Finally, we can combine these terms to pre-compute the value of our force
         // functional, so that we just need to multiply by 'psi' lateron:
         _force_value =
           // First, the diffusion. This is the matrix-dot product of 'A' and the hessian of 'u':
-          - dot(_data.a, _sol_eval.hessian(tau))
+          - dot(_data.a, hess)
           // Next, the convection. This is the vector-dot-product of 'b' and the gradient of 'u':
-          + dot(_data.b, _sol_eval.gradient(tau))
+          + dot(_data.b, grad)
           // Finally, the reaction. This is a simple product:
-          + _data.c * _sol_eval.value(tau);
+          + _data.c * value;
       }
 
       // Once again, we implement our evaluation operator, which is quite similar to the one
@@ -527,7 +517,7 @@ namespace TutorialX1
       vec_rhs.format();
 
       // The next task is the assembly of the right-hand-side vector.
-      typedef Assembly::Common::SineBubbleFunction SolFunction;
+      typedef Analytic::Common::SineBubbleFunction<2> SolFunction;
       SolFunction sol_function;
 
       // Create a cubature factory
@@ -639,8 +629,7 @@ namespace TutorialX1
     // Note: this makes only sense on the finest level.
     void compute_errors() const
     {
-      typedef Assembly::Common::SineBubbleFunction SolFunction;
-      SolFunction sol_function;
+      Analytic::Common::SineBubbleFunction<2> sol_function;
 
       Cubature::DynamicFactory cubature_factory("auto-degree:5");
 
