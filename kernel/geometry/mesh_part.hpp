@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/factory.hpp>
+#include <kernel/geometry/index_calculator.hpp>
 #include <kernel/geometry/mesh_attribute.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_subset_refiner.hpp>
@@ -1027,6 +1028,9 @@ namespace FEAST
 
           Intern::IndexSetFiller<ShapeType_::dimension>::template fill_ish
             (*_index_set_holder, _target_set_holder, parent_ish);
+
+          // build redundant index sets
+          RedundantIndexSetBuilder<ShapeType_>::compute(*_index_set_holder);
 
         }
     }; // class MeshPart<ConformalMesh<Shape_>>
