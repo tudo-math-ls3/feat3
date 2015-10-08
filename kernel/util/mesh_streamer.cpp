@@ -68,7 +68,7 @@ namespace FEAST
 
   void MeshStreamer::parse_multiple_files(std::deque<String>& filenames)
   {
-    CONTEXT("MeshStreamer::parse_multiple_files(std::deque<String>)");
+    CONTEXT("MeshStreamer::parse_multiple_files(std::deque<String>&)");
 
     if(filenames.size() == 0)
       throw InternalError("No files specified for parsing!");
