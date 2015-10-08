@@ -657,6 +657,44 @@ namespace FEAST
     /// \endcond
 
     /**
+     * \brief Returns the maximum positive finite (full-precision) value for a data type.
+     *
+     * The return value of this function coincides with <c>std::numeric_limits<T_>::max()</c>.
+     */
+    template<typename T_>
+    inline T_ huge()
+    {
+      return std::numeric_limits<T_>::max();
+    }
+
+    /**
+     * \brief Returns the minimum positive finite (full-precision) value for a data type.
+     *
+     * The return value of this function coincides with <c>std::numeric_limits<T_>::min()</c>.
+     */
+    template<typename T_>
+    inline T_ tiny()
+    {
+      return std::numeric_limits<T_>::min();
+    }
+
+    /// \cond internal
+#ifdef FEAST_HAVE_QUADMATH
+    template<>
+    inline __float128 huge<__float128>()
+    {
+      return FLT128_MAX;
+    }
+
+    template<>
+    inline __float128 tiny<__float128>()
+    {
+      return FLT128_MIN;
+    }
+#endif // FEAST_HAVE_QUADMATH
+    /// \endcond
+
+    /**
      * \brief Returns the arcsine of a value.
      *
      * \param[in] x The value to calculate the arcsine from.
