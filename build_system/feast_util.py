@@ -1,17 +1,12 @@
 import os
 import subprocess
+from distutils import spawn
 
 def is_found(name):
-  try:
-    with open(os.devnull, "w") as fp:
-      subprocess.Popen([name], stdout=fp, stderr=subprocess.STDOUT).communicate()
-  except OSError as e:
-    if e.errno == os.errno.ENOENT:
-      return False
-  return True
+  return spawn.find_executable(name) != None
 
 def find_exe(name):
-  return get_output("which " + name)[0]
+  return spawn.find_executable(name)
 
 def remove_string(array, string):
   while array.count(string) > 0:
