@@ -157,11 +157,11 @@ namespace Tutorial02
       // capable of computing function values, so we have to provide a function for this job.
       // This function is called 'value'; its first parameter is a reference to the 'value'
       // object that we have to fill and its second parameter is the point in which we evaluate:
-      void value(ValueType& value, const PointType& point) const
+      void value(ValueType& val, const PointType& point) const
       {
         // We can now return the value of our function
         //  u(x,y) = (x - 1/2)^2 - (y - 1/2)^2
-        value = Math::sqr(point[0] - DataType(0.5)) - Math::sqr(point[1] - DataType(0.5));
+        val = Math::sqr(point[0] - DataType(0.5)) - Math::sqr(point[1] - DataType(0.5));
       }
 
       // The next function that we need to supply is the gradient evaluation function:

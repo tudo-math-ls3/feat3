@@ -71,13 +71,13 @@ using namespace FEAST;
               {
               }
 
-            void value(ValueType& value, const PointType& point) const
+            void value(ValueType& val, const PointType& point) const
             {
               DataType norm = (point - _function._point).norm_euclid();
               if(norm <= Math::eps<DataType>())
-                value = DataType(0);
+                val = DataType(0);
               else
-                value = (_function._b / norm) * (point[component] - _function._point[component]);
+                val = (_function._b / norm) * (point[component] - _function._point[component]);
             }
         }; // class DistanceFunctionSD::Evaluator<...>
 
@@ -142,12 +142,12 @@ using namespace FEAST;
               }
 
 
-            void value(ValueType& value, const PointType&) const
+            void value(ValueType& val, const PointType&) const
             {
               if(component == derivative_component)
-                value = _function._b;
+                val = _function._b;
               else
-                value = DataType(0);
+                val = DataType(0);
             }
         }; // class PlaneDistanceFunctionSD::Evaluator<...>
 
