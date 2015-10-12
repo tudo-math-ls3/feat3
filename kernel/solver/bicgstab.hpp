@@ -26,18 +26,22 @@ namespace FEAST
       typename Matrix_,
       typename Filter_>
     class BiCGStab :
-      public PreconditionedIterativeSolver<Matrix_, Filter_>
+      public PreconditionedIterativeSolver<typename Matrix_::VectorTypeR>
     {
     public:
       typedef Matrix_ MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeR VectorType;
       typedef typename MatrixType::DataType DataType;
-      typedef PreconditionedIterativeSolver<MatrixType, FilterType> BaseClass;
+      typedef PreconditionedIterativeSolver<VectorType> BaseClass;
 
       typedef SolverBase<VectorType> PrecondType;
 
     protected:
+      /// the matrix for the solver
+      const MatrixType& _system_matrix;
+      /// the filter for the solver
+      const FilterType& _system_filter;
       /// temporary vectors
       VectorType _vec_r;
       VectorType _vec_r_tilde;
@@ -65,7 +69,9 @@ namespace FEAST
       */
       explicit BiCGStab(const MatrixType& matrix, const FilterType& filter,
         std::shared_ptr<PrecondType> precond = nullptr) :
-        BaseClass("BiCGStab", matrix, filter, precond)
+        BaseClass("BiCGStab", precond),
+        _system_matrix(matrix),
+        _system_filter(filter)
       {
       }
 
@@ -162,7 +168,7 @@ namespace FEAST
           }
 
           // apply preconditioner
-          if(!this->_apply_precond(vec_r_tilde_0, vec_r))
+          if(!this->_apply_precond(vec_r_tilde_0, vec_r, fil_sys))
             return Status::aborted;
           //fil_sys.filter_cor(vec_r_tilde_0);
 
@@ -177,7 +183,7 @@ namespace FEAST
             mat_sys.apply(vec_v, vec_p_tilde);
             fil_sys.filter_def(vec_v);
             // apply preconditioner
-            if(!this->_apply_precond(vec_v_tilde, vec_v))
+            if(!this->_apply_precond(vec_v_tilde, vec_v, fil_sys))
               return Status::aborted;
             //fil_sys.filter_cor(vec_v_tilde);
 
@@ -219,7 +225,7 @@ namespace FEAST
             fil_sys.filter_def(vec_t);
 
             // apply preconditioner
-            if(!this->_apply_precond(vec_t_tilde, vec_t))
+            if(!this->_apply_precond(vec_t_tilde, vec_t, fil_sys))
               return Status::aborted;
             //fil_sys.filter_cor(vec_t_tilde);
 

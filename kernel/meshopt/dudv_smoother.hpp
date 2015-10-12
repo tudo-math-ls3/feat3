@@ -273,7 +273,7 @@ namespace FEAST
         using SolverMatrixType = LAFEM::SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockSize_>;
 
         template<typename Matrix_, typename Filter_>
-        static std::shared_ptr<Solver::IterativeSolver<Matrix_, Filter_>> solver(Matrix_& matrix, Filter_& filter)
+        static std::shared_ptr<Solver::IterativeSolver<typename Matrix_::VectorTypeR>> solver(Matrix_& matrix, Filter_& filter)
         {
           auto my_solver = Solver::new_pcg<Matrix_, Filter_>(matrix, filter);
           return my_solver;
@@ -295,7 +295,7 @@ namespace FEAST
         using SolverMatrixType = LAFEM::SparseMatrixCSRBlocked<Mem::CUDA, DT_, IT_, BlockSize_, BlockSize_>;
 
         template<typename Matrix_, typename Filter_>
-        static std::shared_ptr<Solver::IterativeSolver<Matrix_, Filter_>> solver(Matrix_& matrix, Filter_& filter)
+        static std::shared_ptr<Solver::IterativeSolvertypename Matrix_::VectorTypeR>> solver(Matrix_& matrix, Filter_& filter)
         {
           auto precond = Solver::new_jacobi_precond(matrix, filter);
           auto my_solver = Solver::new_pcg<Matrix_, Filter_>(matrix, filter, precond);

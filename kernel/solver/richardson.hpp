@@ -24,18 +24,22 @@ namespace FEAST
      */
     template<typename Matrix_, typename Filter_>
     class Richardson :
-      public PreconditionedIterativeSolver<Matrix_, Filter_>
+      public PreconditionedIterativeSolver<typename Matrix_::VectorTypeR>
     {
     public:
       typedef Matrix_ MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeR VectorType;
       typedef typename MatrixType::DataType DataType;
-      typedef PreconditionedIterativeSolver<MatrixType, FilterType> BaseClass;
+      typedef PreconditionedIterativeSolver<VectorType> BaseClass;
 
       typedef SolverBase<VectorType> PrecondType;
 
     protected:
+      /// the matrix for the solver
+      const MatrixType& _system_matrix;
+      /// the filter for the solver
+      const FilterType& _system_filter;
       /// damping parameter
       DataType _omega;
       /// defect vector
@@ -61,7 +65,9 @@ namespace FEAST
        */
       explicit Richardson(const MatrixType& matrix, const FilterType& filter,
         DataType omega = DataType(1), std::shared_ptr<PrecondType> precond = nullptr) :
-        BaseClass("Richardson", matrix, filter, precond),
+        BaseClass("Richardson", precond),
+        _system_matrix(matrix),
+        _system_filter(filter),
         _omega(omega)
       {
       }
@@ -124,7 +130,7 @@ namespace FEAST
         while(status == Status::progress)
         {
           // apply preconditioner
-          if(!this->_apply_precond(vec_cor, vec_def))
+          if(!this->_apply_precond(vec_cor, vec_def, filter))
             return Status::aborted;
           //filter.filter_cor(vec_cor);
 

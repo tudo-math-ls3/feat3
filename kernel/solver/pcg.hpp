@@ -26,18 +26,22 @@ namespace FEAST
       typename Matrix_,
       typename Filter_>
     class PCG :
-      public PreconditionedIterativeSolver<Matrix_, Filter_>
+      public PreconditionedIterativeSolver<typename Matrix_::VectorTypeR>
     {
     public:
       typedef Matrix_ MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeR VectorType;
       typedef typename MatrixType::DataType DataType;
-      typedef PreconditionedIterativeSolver<MatrixType, FilterType> BaseClass;
+      typedef PreconditionedIterativeSolver<VectorType> BaseClass;
 
       typedef SolverBase<VectorType> PrecondType;
 
     protected:
+      /// the matrix for the solver
+      const MatrixType& _system_matrix;
+      /// the filter for the solver
+      const FilterType& _system_filter;
       /// defect vector
       VectorType _vec_def;
       /// descend direction vector
@@ -60,7 +64,9 @@ namespace FEAST
        */
       explicit PCG(const MatrixType& matrix, const FilterType& filter,
         std::shared_ptr<PrecondType> precond = nullptr) :
-        BaseClass("PCG", matrix, filter, precond)
+        BaseClass("PCG", precond),
+        _system_matrix(matrix),
+        _system_filter(filter)
       {
       }
 
@@ -124,7 +130,7 @@ namespace FEAST
           return status;
 
         // apply preconditioner to defect vector
-        if(!this->_apply_precond(vec_dir, vec_def))
+        if(!this->_apply_precond(vec_dir, vec_def, filter))
           return Status::aborted;
         //filter.filter_cor(vec_dir);
 
@@ -153,7 +159,7 @@ namespace FEAST
             return status;
 
           // apply preconditioner
-          if(!this->_apply_precond(vec_tmp, vec_def))
+          if(!this->_apply_precond(vec_tmp, vec_def, filter))
             return Status::aborted;
           //filter.filter_cor(vec_tmp);
 

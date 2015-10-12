@@ -33,18 +33,22 @@ namespace FEAST
       typename Matrix_,
       typename Filter_>
     class FGMRES :
-      public PreconditionedIterativeSolver<Matrix_, Filter_>
+      public PreconditionedIterativeSolver<typename Matrix_::VectorTypeR>
     {
     public:
       typedef Matrix_ MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeR VectorType;
       typedef typename MatrixType::DataType DataType;
-      typedef PreconditionedIterativeSolver<MatrixType, FilterType> BaseClass;
+      typedef PreconditionedIterativeSolver<VectorType> BaseClass;
 
       typedef SolverBase<VectorType> PrecondType;
 
     protected:
+      /// the matrix for the solver
+      const MatrixType& _system_matrix;
+      /// the filter for the solver
+      const FilterType& _system_filter;
       /// krylov dimension
       Index _krylov_dim;
       /// inner pseudo-residual scaling factor
@@ -78,7 +82,9 @@ namespace FEAST
        */
       explicit FGMRES(const MatrixType& matrix, const FilterType& filter, Index krylov_dim,
         DataType inner_res_scale = DataType(0), std::shared_ptr<PrecondType> precond = nullptr) :
-        BaseClass("FGMRES(" + stringify(krylov_dim) + ")", matrix, filter, precond),
+        BaseClass("FGMRES(" + stringify(krylov_dim) + ")", precond),
+        _system_matrix(matrix),
+        _system_filter(filter),
         _krylov_dim(krylov_dim),
         _inner_res_scale(inner_res_scale)
       {
@@ -161,7 +167,7 @@ namespace FEAST
           while(i < this->_krylov_dim)
           {
             // apply preconditioner
-            if(!this->_apply_precond(this->_vec_z.at(i), this->_vec_v.at(i)))
+            if(!this->_apply_precond(this->_vec_z.at(i), this->_vec_v.at(i), filter))
               return Status::aborted;
             //filter.filter_cor(this->_vec_z.at(i));
 

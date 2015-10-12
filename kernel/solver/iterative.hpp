@@ -15,30 +15,21 @@ namespace FEAST
      * This class template acts as an abstract base class for iterative solvers.
      * It also implements various auxiliary features for convergence control.
      *
-     * \tparam Matrix_
-     * The matrix class to be used by the solver.
-     *
-     * \tparam Filter_
-     * The filter class to be used by the solver.
+     * \tparam Vector_
+     * The class of the vector that is passed to the solver in the \c solve() method.
      *
      * \author Peter Zajac
      */
-    template<typename Matrix_, typename Filter_>
+    template<typename Vector_>
     class IterativeSolver :
-      public SolverBase<typename Matrix_::VectorTypeR>
+      public SolverBase<Vector_>
     {
     public:
-      typedef Matrix_ MatrixType;
-      typedef Filter_ FilterType;
-      typedef typename Matrix_::VectorTypeR VectorType;
-      typedef typename MatrixType::DataType DataType;
+      typedef Vector_ VectorType;
+      typedef typename VectorType::DataType DataType;
       typedef SolverBase<VectorType> BaseClass;
 
     protected:
-      /// the matrix for the solver
-      const MatrixType& _system_matrix;
-      /// the filter for the solver
-      const FilterType& _system_filter;
       /// name of the solver in plots
       String _plot_name;
       /// relative tolerance parameter
@@ -87,17 +78,9 @@ namespace FEAST
        *
        * \param[in] plot_name
        * Specifies the name of the iterative solver. This is used as a prefix for the convergence plot.
-       *
-       * \param[in] matrix
-       * A reference to the system matrix.
-       *
-       * \param[in] filter
-       * A reference to the system filter.
        */
-      explicit IterativeSolver(String plot_name, const MatrixType& matrix, const FilterType& filter) :
+      explicit IterativeSolver(String plot_name) :
         BaseClass(),
-        _system_matrix(matrix),
-        _system_filter(filter),
         _plot_name(plot_name),
         _tol_rel(Math::sqrt(Math::eps<DataType>())),
         _tol_abs(DataType(1) / Math::sqr(Math::eps<DataType>())),
@@ -291,9 +274,6 @@ namespace FEAST
        * vector \p vec_sol as the initial solution vector for the iterative solution process instead of
        * ignoring its contents upon entry and starting with the null vector.
        *
-       * \note The default implementation creates a temporary vector, computes the defect, calls
-       * the apply() method to obtain a correction vector and updates the solution vector with it.
-       *
        * \param[in,out] vec_sol
        * The vector that contains the initial solution upon entry and receives the solution
        * of the linear system upon exit.
@@ -304,34 +284,7 @@ namespace FEAST
        * \returns
        * A Status code that represents the status of the solution step.
        */
-      virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs)
-      {
-        // create a defect and a correction vector
-        auto vec_def = vec_rhs.clone(LAFEM::CloneMode::Layout);
-        auto vec_cor = vec_sol.clone(LAFEM::CloneMode::Layout);
-
-        // compute defect
-        this->_system_matrix.apply(vec_def, vec_sol, vec_rhs, -DataType(1));
-
-        // apply defect filter
-        this->_system_filter.filter_def(vec_def);
-
-        // apply solver
-        Status status = this->apply(vec_cor, vec_def);
-
-        // apply correction if successful
-        if(status_success(status))
-        {
-          // apply correction filter
-          //this->_system_filter.filter_cor(vec_cor);
-
-          // update solution vector
-          vec_sol.axpy(vec_cor, vec_sol);
-        }
-
-        // return status
-        return status;
-      }
+      virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) = 0;
 
     protected:
       /**
@@ -480,7 +433,7 @@ namespace FEAST
       typename Matrix_,
       typename Filter_>
       inline Status solve(
-        IterativeSolver<Matrix_, Filter_>& solver,
+        IterativeSolver<Vector_>& solver,
         Vector_& vec_sol,
         const Vector_& vec_rhs,
         const Matrix_& DOXY(matrix),
@@ -505,16 +458,14 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename Matrix_, typename Filter_>
+    template<typename Vector_>
     class PreconditionedIterativeSolver :
-      public IterativeSolver<Matrix_, Filter_>
+      public IterativeSolver<Vector_>
     {
     public:
-      typedef Matrix_ MatrixType;
-      typedef Filter_ FilterType;
-      typedef typename MatrixType::VectorTypeR VectorType;
-      typedef typename MatrixType::DataType DataType;
-      typedef IterativeSolver<MatrixType, FilterType> BaseClass;
+      typedef Vector_ VectorType;
+      typedef typename VectorType::DataType DataType;
+      typedef IterativeSolver<VectorType> BaseClass;
 
       /// the interface for the preconditioner
       typedef SolverBase<VectorType> PrecondType;
@@ -529,18 +480,11 @@ namespace FEAST
        * \param[in] plot_name
        * The name of the solver.
        *
-       * \param[in] matrix
-       * A reference to the system matrix.
-       *
-       * \param[in] filter
-       * A reference to the system filter.
-       *
        * \param[in] precond
        * A pointer to the preconditioner. May be nullptr.
        */
-      explicit PreconditionedIterativeSolver(String plot_name, const MatrixType& matrix,
-        const FilterType& filter, std::shared_ptr<PrecondType> precond = nullptr) :
-        BaseClass(plot_name, matrix, filter),
+      explicit PreconditionedIterativeSolver(String plot_name, std::shared_ptr<PrecondType> precond = nullptr) :
+        BaseClass(plot_name),
         _precond(precond)
       {
       }
@@ -593,10 +537,14 @@ namespace FEAST
        * \param[in] vec_def
        * A reference to the vector that is to be preconditioned.
        *
+       * \param[in] filter
+       * A reference to the system filter. This filter is only used if no preconditioner is present.
+       *
        * \returns
        * \c true, if the preconditioner application was successful, otherwise \c false.
        */
-      bool _apply_precond(VectorType& vec_cor, const VectorType& vec_def)
+      template<typename Filter_>
+      bool _apply_precond(VectorType& vec_cor, const VectorType& vec_def, const Filter_& filter)
       {
         if(this->_precond)
         {
@@ -605,7 +553,7 @@ namespace FEAST
         else
         {
           vec_cor.copy(vec_def);
-          this->_system_filter.filter_cor(vec_cor);
+          filter.filter_cor(vec_cor);
           return true;
         }
       }
