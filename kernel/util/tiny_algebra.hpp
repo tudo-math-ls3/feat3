@@ -751,7 +751,7 @@ namespace FEAST
        *
        * \returns The Hessian norm square of the matrix.
        */
-      DataType hessian_sqr_norm() const
+      DataType norm_hessian_sqr() const
       {
         DataType r(0);
         for(int i(0); i < m_; ++i)

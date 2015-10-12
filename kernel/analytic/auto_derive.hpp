@@ -289,7 +289,7 @@ namespace FEAST
         template<int m_, int n_, int sm_, int sn_>
         static DataType def_norm_sqr(const Tiny::Matrix<DataType, m_, n_, sm_, sn_>& x)
         {
-          return x.hessian_sqr_norm();
+          return x.norm_hessian_sqr();
         }
 
         template<int l_, int m_, int n_, int sl_, int sm_, int sn_>

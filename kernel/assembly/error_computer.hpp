@@ -524,7 +524,7 @@ namespace FEAST
             }
 
             // update result
-            result += trafo_data.jac_det * cubature_rule.get_weight(k) * value.hessian_sqr_norm();
+            result += trafo_data.jac_det * cubature_rule.get_weight(k) * value.norm_hessian_sqr();
 
             // continue with next cubature point
           }
