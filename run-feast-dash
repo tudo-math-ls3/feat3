@@ -410,7 +410,8 @@ gcc_minor2 = int(gcc_version["__GNUC_PATCHLEVEL__"])
 if gcc_major > 4 or (gcc_major == 4 and gcc_minor > 5):
   quadmath_add = "-quadmath"
 
-#iterate over all branches, that are queued for testing
+#extract valid branch names
+branch_names = []
 branches = BranchQueue.select()
 for branch in branches:
   if branch.status != 0:
@@ -420,12 +421,21 @@ for branch in branches:
   found_branch = False
   for s in raw_branches[:]:
     if "remotes/origin/"+branch in s:
-      found_branch = True
-      break
+      branch_names.append(branch)
 
-  if found_branch == False:
-    continue
+random.shuffle(branch_names)
 
+#move master/develop to the front of the branch queue
+if branch_names.count("develop") > 0:
+  branch_names.remove("develop")
+  branch_names.insert(0, "develop")
+
+if branch_names.count("master") > 0:
+  branch_names.remove("master")
+  branch_names.insert(0, "master")
+
+#iterate over all branches, that are queued for testing
+for branch in branch_names:
   run_test("guess", branch, myDB, extra_opts)
 
   if (not nomemcheck):
