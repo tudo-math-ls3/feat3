@@ -68,10 +68,10 @@ namespace FEAST
           if (stat.defect.at(i) == double(-1))
             result += "------\n";
           else
-            result += stringify(stat.defect.at(i)) + "\n";
+            result += scientify(stat.defect.at(i)) + "\n";
         }
 
-        result +="Iteration Timings:\n";
+        result +="Iteration Timings [s]:\n";
         for (Index i(0) ; i < stat.toe.size() ; ++i)
         {
           if (i == 0 && stat.toe.at(i) == double(-1))
@@ -79,7 +79,7 @@ namespace FEAST
           if (stat.toe.at(i) == double(-1))
             result += "------\n";
           else
-            result += stringify(stat.toe.at(i)) + "\n";
+            result += scientify(stat.toe.at(i)) + "\n";
         }
 
         return result;
@@ -166,6 +166,7 @@ namespace FEAST
         return _time_mpi_wait;
       }
 
+      /// add toe statistics entry for specific solver (branch name)
       inline static void add_solver_toe(String solver, double seconds)
       {
         auto it = _solver_statistics.find(solver);
@@ -182,6 +183,7 @@ namespace FEAST
         }
       }
 
+      /// add defect norm statistics entry for specific solver (branch name)
       inline static void add_solver_defect(String solver, double defect)
       {
         auto it = _solver_statistics.find(solver);
@@ -197,6 +199,7 @@ namespace FEAST
         }
       }
 
+      ///reset solver statistics (toe / defect norm)
       inline static void reset_solver_statistics()
       {
         _solver_statistics.clear();
@@ -230,7 +233,11 @@ namespace FEAST
         return result;
       }
 
-      /// \copydoc get_formated_solvers()
+      /**
+       * \copydoc get_formated_solvers()
+       *
+       * \param[in] branch The solver (as complete branch name) that shall be used as the tree's root.
+       */
       static String get_formated_solver(String branch)
       {
         auto it = _solver_statistics.find(branch);
@@ -265,7 +272,7 @@ namespace FEAST
         result += "Precon Kernels: " + stringify(_time_precon / total_time * 100.) + "%\n";
         result += "MPI Execution: " + stringify(_time_mpi_execute / total_time * 100.) + "%\n";
         result += "MPI Wait: " + stringify(_time_mpi_wait / total_time * 100.) + "%\n";
-        result += "Non-Flop: " + stringify( (total_time - measured_time) / total_time * 100.) + "%";
+        result += "Not covered: " + stringify( (total_time - measured_time) / total_time * 100.) + "%";
         return result;
       }
 

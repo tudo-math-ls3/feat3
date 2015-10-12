@@ -247,12 +247,27 @@ namespace FEAST
       }
 
       /**
+       * \brief Returns a descriptive string of the complete solver tree.
+       *
+       * Create and format a string describing the complete solver tree,
+       * placing the called object at the root.
+       *
+       * \note This method makes some simplifications, e.g. stating only one smoother
+       * for the complete FEAST::Solver::BasicVCycle.
+       */
+      virtual String get_formated_solver_tree()
+      {
+        return this->name();
+      }
+
+      /**
        * \brief Returns a descriptive string.
        *
        * \returns A string describing the solver.
        */
       virtual String name() const = 0;
 
+      /// Returns the solvers name with its complete branch in the solver tree.
       String get_solver_branch()
       {
         return _branch;

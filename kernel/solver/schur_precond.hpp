@@ -203,6 +203,16 @@ namespace FEAST
         BaseClass::done_symbolic();
       }
 
+      virtual String get_formated_solver_tree() override
+      {
+        String result;
+        result += this->name();
+        result += " ( ";
+        result += "S: " + _solver_s->get_formated_solver_tree() + " /  A: " + _solver_a->get_formated_solver_tree();
+        result += " ) ";
+        return result;
+      }
+
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
         // fetch the references
@@ -437,6 +447,16 @@ namespace FEAST
         _solver_s->done_symbolic();
         _solver_a->done_symbolic();
         BaseClass::done_symbolic();
+      }
+
+      virtual String get_formated_solver_tree() override
+      {
+        String result;
+        result += this->name();
+        result += " ( ";
+        result += "S: " + _solver_s->get_formated_solver_tree() + " /  A: " + _solver_a->get_formated_solver_tree();
+        result += " ) ";
+        return result;
       }
 
       virtual Status apply(GlobalVectorType& vec_cor, const GlobalVectorType& vec_def) override
