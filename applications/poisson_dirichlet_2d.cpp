@@ -322,9 +322,24 @@ namespace PoissonDirichlet2D
     // initialise
     solver->init();
 
+    Statistics::reset_flops();
+    Statistics::reset_times();
+    Statistics::reset_solver_statistics();
+
+    TimeStamp at;
+
     // solve
     Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
-    std::cout<<Statistics::get_formated_solvers()<<std::endl;
+    TimeStamp bt;
+
+    if (rank == 0 && args.check("statistics") >= 0)
+    {
+      String flops = Statistics::get_formated_flops(bt.elapsed(at));
+      std::cout<<"\nComplete solver TOE: "<<bt.elapsed(at)<<std::endl;
+      std::cout<<flops<<std::endl;
+      std::cout<<Statistics::get_formated_times(bt.elapsed(at))<<std::endl;
+      std::cout<<Statistics::get_formated_solvers()<<std::endl;
+    }
 
     // release solver
     solver->done();
@@ -408,6 +423,7 @@ namespace PoissonDirichlet2D
     args.support("level");
     args.support("no-err");
     args.support("vtk");
+    args.support("statistics");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
