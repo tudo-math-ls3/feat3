@@ -1,7 +1,5 @@
 // includes, FEAST
 #include <kernel/util/memory_pool.hpp>
-#include <kernel/util/runtime.hpp>
-#include <kernel/util/property_map.hpp>
 
 #include <cstdio>
 #include <fstream>

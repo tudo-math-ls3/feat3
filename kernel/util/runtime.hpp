@@ -24,7 +24,7 @@ namespace FEAST
     public:
 
     /// Returns global property map, containing initial FEAST configuration, read in from feast.ini file
-    static PropertyMap & global_property();
+    static PropertyMap * global_property();
 
     /**
      * \brief FEAST initialisation

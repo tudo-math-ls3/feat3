@@ -307,6 +307,7 @@ namespace PoissonDirichlet2D
     }
 
     // create our solver
+    //auto solver = Control::SolverFactory::create_scalar_solver(system_levels, transfer_levels, Runtime::global_property(), "linsolver");
     auto solver = Solver::new_pcg(matrix, filter, mgv);
     //auto solver = Solver::new_bicgstab(matrix, filter, mgv);
     //auto solver = Solver::new_fgmres(matrix, filter, 8, 0.0, mgv);

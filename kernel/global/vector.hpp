@@ -24,6 +24,7 @@ namespace FEAST
       typedef typename LocalVector_::MemType MemType;
       typedef typename LocalVector_::DataType DataType;
       typedef typename LocalVector_::IndexType IndexType;
+      typedef LocalVector_ LocalVectorType;
 
     protected:
       GateType* _gate;

@@ -1,0 +1,99 @@
+/**
+\page solver_configuration Solver configuration via PropertyMaps
+
+The FEAST::Control::SolverFactory::create_scalar_solver method creates a FEAST::Solver::SolverBase object based on a
+given PropertyMap.
+
+A solver configuration consists of 1+ sections, describing the solver tree.
+The tree's root section name is passed to the create_scalar_solver method.
+All other sections are optional and only required, if the root section references them, e.g. by precon or solver key statements.
+
+Example:
+\verbatim
+[solver]
+type = pcg
+precon = jacobiprecon
+
+[jacobiprecon]
+type = jac
+\endverbatim
+
+yields a classical pcg-jac setup with the solver tree root section 'solver' and an additional jacobi preconditioner section.
+
+\note The section names are user defined and must only match to the corresponding precon/solver key statements. The internal type identification relies only on the type key statement.
+
+\warning Do not create circles e.g. cg-richardson-cg, as they will crash your application.
+
+The supported solver/precon types are (with a list of supported keys, in addition to the mandatory type key):
+- pcg (precon, max_iter, min_iter, tol_rel, plot)
+- bicgstab (precon, max_iter, min_iter, tol_rel, plot)
+- fgmres (precon, max_iter, min_iter, tol_rel, plot, krylov_dim)
+- mgv (smoother, coarse)
+- ilu
+- jac (omega)
+- ssor (omega)
+- scale (omega)
+- schwarz (solver)
+
+The supported keys semantics:
+- precon: Reference to another section, which shall be used as a preconditioner.
+- max_iter: The maximum amount of iterations for the given solver.
+- min_iter: The minimum amount of iterations for the given solver.
+- tol_rel: Relative convergence criterium.
+- plot: 1/0 - plot / do not plot convergence progression.
+- krylov_dim: Maximum krylov subspace dimension.
+- smoother: Reference to another section, which shall be used as the pre/post smoother.
+- coarse: Reference to another section, which shall be used as a coarse grid solver.
+- omega: Damping/Scaling multiplicator.
+- solver: Local solver section for the schwarz preconditioner.
+
+Advanced example:
+
+\verbatim
+[anothersolver]
+{
+type = fgmres
+precon = mgv
+krylov_dim = 5
+max_iter = 1000
+tol_rel = 1e-8
+plot = 1
+
+  [mgv]
+  type = mgv
+  smoother = rich
+  coarse = pcg
+}
+
+[rich]
+type = richardson
+max_iter = 4
+min_iter = 4
+precon = jac
+
+[jac]
+type = jac
+omega = 0.7
+
+[pcg]
+type = pcg
+max_iter = 1000
+tol_rel = 1e-8
+precon = schwarz-ilu
+
+[schwarz-ilu]
+type = schwarz
+solver = ilu0
+
+[ilu0]
+type = ilu
+\endverbatim
+
+This creates a fgmres, preconditioned with one mg-v cycle.
+Each cycle uses 4 jac pre/post smoother steps and a coarse grid pcg
+solver with schwarz-ilu preconditioner.
+
+\note The referenced precon/solver sections may lie in the parent solver's section or in global scope.
+
+
+ **/

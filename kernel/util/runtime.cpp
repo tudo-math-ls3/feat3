@@ -16,10 +16,10 @@ PropertyMap Runtime::_global_property_map;
 bool Runtime::_initialised = false;
 bool Runtime::_finished = false;
 
-PropertyMap & Runtime::global_property()
+PropertyMap * Runtime::global_property()
 {
   ASSERT(_initialised == true, "global_property_map not _initialised! Call initialise first");
-  return _global_property_map;
+  return &_global_property_map;
 }
 
 void Runtime::initialise(int& argc, char**& argv)
