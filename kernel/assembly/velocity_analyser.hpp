@@ -31,43 +31,43 @@ namespace FEAST
     struct VelocityInfo
     {
       /**
-       * \brief Velocity field L2-norm
+       * \brief Velocity field H0-norm
        *
-       * This entry contains the L2-norm of the velocity field:
-       * \f[ \|u\|_{\mathcal{L}^2} = \Big(\int_\Omega \sum_{i=1}^d (u_i)^2\Big)^{\frac{1}{2}}\f]
+       * This entry contains the H0-norm of the velocity field:
+       * \f[ \|u\|_{\mathcal{H}^0} = \Big(\int_\Omega \sum_{i=1}^d (u_i)^2\Big)^{\frac{1}{2}}\f]
        */
-      DataType_ norm_l2;
+      DataType_ norm_h0;
 
       /**
        * \brief Velocity field H1-semi-norm
        *
        * This entry contains the H1-semi-norm of the velocity field:
-       * \f[ |u|_{\mathcal{H}^^2} = \Big(\int_\Omega \sum_{i=1}^d (\nabla u_i)^2\Big)^{\frac{1}{2}}\f]
+       * \f[ |u|_{\mathcal{H}^1} = \Big(\int_\Omega \sum_{i=1}^d (\nabla u_i)^2\Big)^{\frac{1}{2}}\f]
        */
       DataType_ norm_h1;
 
       /**
-       * \brief Velocity field divergence L2-norm
+       * \brief Velocity field divergence H0-norm
        *
-       * This entry contains the L2-norm of the divergence of the velocity field:
-       * \f[ \| \nabla \dot u\|_{\mathcal{L}^2} = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\f]
+       * This entry contains the H0-norm of the divergence of the velocity field:
+       * \f[ \| \nabla \cdot u\|_{\mathcal{H}^0} = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\f]
        */
       DataType_ divergence;
 
       /**
-       * \brief Velocity field vorticity L2-norm
+       * \brief Velocity field vorticity H0-norm
        *
-       * This entry contains the L2-norm of the vorticity of the velocity field:
-       * \f[ \| \nabla \times u\|_{\mathcal{L}^2} \f]
+       * This entry contains the H0-norm of the curl of the velocity field:
+       * \f[ \| \nabla \times u\|_{\mathcal{H}^0} \f]
        */
       DataType_ vorticity;
 
       /**
-       * \brief Velocity field components L2-norm
+       * \brief Velocity field components H0-norm
        *
-       * This entry contains the L2-norms of all components of the velocity field.
+       * This entry contains the H0-norms of all components of the velocity field.
        */
-      Tiny::Vector<DataType_, dim_> norm_l2_comp;
+      Tiny::Vector<DataType_, dim_> norm_h0_comp;
 
       /**
        * \brief Velocity field components H1-semi-norm
@@ -78,11 +78,11 @@ namespace FEAST
 
       /// default CTOR
       VelocityInfo() :
-        norm_l2(DataType_(0)),
+        norm_h0(DataType_(0)),
         norm_h1(DataType_(0)),
         divergence(DataType_(0)),
         vorticity(DataType_(0)),
-        norm_l2_comp(DataType_(0)),
+        norm_h0_comp(DataType_(0)),
         norm_h1_comp(DataType_(0))
       {
       }
@@ -90,13 +90,13 @@ namespace FEAST
       /// prints the info to an output stream
       friend std::ostream& operator<<(std::ostream& os, const VelocityInfo& vi)
       {
-        // print L2-norms
-        os << "L2-Norm...: " << scientify(vi.norm_l2) << " [";
+        // print H0-norms
+        os << "H0-Norm...: " << scientify(vi.norm_h0) << " [";
         for(int i(0); i < dim_; ++i)
-          os << " " << scientify(vi.norm_l2_comp[i]);
+          os << " " << scientify(vi.norm_h0_comp[i]);
         os << " ]" << std::endl;
 
-        // print L2-norms
+        // print H1-norms
         os << "H1-Norm...: " << scientify(vi.norm_h1) << " [";
         for(int i(0); i < dim_; ++i)
           os << " " << scientify(vi.norm_h1_comp[i]);
@@ -273,8 +273,8 @@ namespace FEAST
             // update info
             for(int i(0); i < dim_; ++i)
             {
-              // update L2 component norm
-              info.norm_l2_comp[i] += omega * Math::sqr(vals[i]);
+              // update H0 component norm
+              info.norm_h0_comp[i] += omega * Math::sqr(vals[i]);
 
               // update H1 component norm
               info.norm_h1_comp[i] += omega * Tiny::dot(ders[i], ders[i]);
@@ -300,14 +300,14 @@ namespace FEAST
         // finally, compute the rest
         for(int i(0); i < dim_; ++i)
         {
-          info.norm_l2 += info.norm_l2_comp[i];
+          info.norm_h0 += info.norm_h0_comp[i];
           info.norm_h1 += info.norm_h1_comp[i];
-          info.norm_l2_comp[i] = Math::sqrt(info.norm_l2_comp[i]);
+          info.norm_h0_comp[i] = Math::sqrt(info.norm_h0_comp[i]);
           info.norm_h1_comp[i] = Math::sqrt(info.norm_h1_comp[i]);
         }
 
         // take the roots
-        info.norm_l2 = Math::sqrt(info.norm_l2);
+        info.norm_h0 = Math::sqrt(info.norm_h0);
         info.norm_h1 = Math::sqrt(info.norm_h1);
         info.divergence = Math::sqrt(info.divergence);
         info.vorticity  = Math::sqrt(info.vorticity);

@@ -165,25 +165,25 @@ namespace StokesDriCav2D
 
       // compute local errors
       auto vi = Assembly::VelocityAnalyser::compute((*vec_sol).template at<0>(), this->space_velo, this->cubature);
-      DataType vp_l2 = Assembly::ScalarErrorComputer<0>::compute(
+      DataType vp_h0 = Assembly::ScalarErrorComputer<0>::compute(
         (*vec_sol).template at<1>(), zero_func, this->space_pres, this->cubature).norm_h0;
 
       // synhronise all local errors
-      vi.norm_l2 = sys_level.gate_sys.norm2(vi.norm_l2);
+      vi.norm_h0 = sys_level.gate_sys.norm2(vi.norm_h0);
       vi.norm_h1 = sys_level.gate_sys.norm2(vi.norm_h1);
       vi.divergence = sys_level.gate_sys.norm2(vi.divergence);
       vi.vorticity = sys_level.gate_sys.norm2(vi.vorticity);
-      vi.norm_l2_comp[0] = sys_level.gate_sys.norm2(vi.norm_l2_comp[0]);
-      vi.norm_l2_comp[1] = sys_level.gate_sys.norm2(vi.norm_l2_comp[1]);
+      vi.norm_h0_comp[0] = sys_level.gate_sys.norm2(vi.norm_h0_comp[0]);
+      vi.norm_h0_comp[1] = sys_level.gate_sys.norm2(vi.norm_h0_comp[1]);
       vi.norm_h1_comp[0] = sys_level.gate_sys.norm2(vi.norm_h1_comp[0]);
       vi.norm_h1_comp[1] = sys_level.gate_sys.norm2(vi.norm_h1_comp[1]);
-      vp_l2 = sys_level.gate_sys.norm2(vp_l2);
+      vp_h0 = sys_level.gate_sys.norm2(vp_h0);
 
       // print errors
       if (plot)
       {
         std::cout << vi;
-        std::cout << "Pressure..: " << scientify(vp_l2, 12) << std::endl;
+        std::cout << "Pressure..: " << scientify(vp_h0, 12) << std::endl;
       }
     }
   };
