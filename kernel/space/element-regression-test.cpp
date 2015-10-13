@@ -40,66 +40,6 @@ namespace ElementRegression
   typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
   typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
 
-  template<bool>
-  struct H0Error
-  {
-    template<typename Vector_, typename Function_, typename Space_, typename Cubature_>
-    static double compute(const Vector_&, const Function_&, const Space_&, Cubature_&)
-    {
-      return 0.0;
-    }
-  };
-
-  template<bool>
-  struct H1Error
-  {
-    template<typename Vector_, typename Function_, typename Space_, typename Cubature_>
-    static double compute(const Vector_&, const Function_&, const Space_&, Cubature_&)
-    {
-      return 0.0;
-    }
-  };
-
-  template<bool>
-  struct H2Error
-  {
-    template<typename Vector_, typename Function_, typename Space_, typename Cubature_>
-    static double compute(const Vector_&, const Function_&, const Space_&, Cubature_&)
-    {
-      return 0.0;
-    }
-  };
-
-  template<>
-  struct H0Error<true>
-  {
-    template<typename Vector_, typename Function_, typename Space_, typename Cubature_>
-    static double compute(const Vector_& vector, const Function_& function, const Space_& space, Cubature_& cubature)
-    {
-      return double(Assembly::ScalarErrorComputerL2::compute(vector, function, space, cubature));
-    }
-  };
-
-  template<>
-  struct H1Error<true>
-  {
-    template<typename Vector_, typename Function_, typename Space_, typename Cubature_>
-    static double compute(const Vector_& vector, const Function_& function, const Space_& space, Cubature_& cubature)
-    {
-      return double(Assembly::ScalarErrorComputerH1::compute(vector, function, space, cubature));
-    }
-  };
-
-  template<>
-  struct H2Error<true>
-  {
-    template<typename Vector_, typename Function_, typename Space_, typename Cubature_>
-    static double compute(const Vector_& vector, const Function_& function, const Space_& space, Cubature_& cubature)
-    {
-      return double(Assembly::ScalarErrorComputerH2::compute(vector, function, space, cubature));
-    }
-  };
-
   template<typename Shape_>
   struct MeshGen;
 
@@ -343,13 +283,15 @@ namespace ElementRegression
       VectorType vector(space.get_num_dofs());
       Assembly::Interpolator::project(vector, this->sol_func, space);
 
-      // error vector
-      Tiny::Vector<double, 3> err;
+      // compute errors
+      auto sei = Assembly::ScalarErrorComputer< (h2_ ? 2 : (h1_ ? 1 : 0)) >::compute
+        (vector, this->sol_func, space, this->cubature_factory);
 
-      // compute H0/H1/H2-errors
-      err[0] = H0Error<h0_>::compute(vector, this->sol_func, space, this->cubature_factory);
-      err[1] = H1Error<h1_>::compute(vector, this->sol_func, space, this->cubature_factory);
-      err[2] = H2Error<h2_>::compute(vector, this->sol_func, space, this->cubature_factory);
+      // convert error info into Tiny::Vector
+      Tiny::Vector<double, 3> err;
+      err[0] = (h0_ ? sei.norm_h0 : 0.0);
+      err[1] = (h1_ ? sei.norm_h1 : 0.0);
+      err[2] = (h2_ ? sei.norm_h2 : 0.0);
 
       // return error vector
       return err;
@@ -453,13 +395,15 @@ namespace ElementRegression
       // solve the system
       this->solve_system(matrix, filter, vec_sol, vec_rhs);
 
-      // error vector
-      Tiny::Vector<double, 3> err;
+      // compute errors
+      auto sei = Assembly::ScalarErrorComputer< (h2_ ? 2 : (h1_ ? 1 : 0)) >::compute
+        (vec_sol, this->sol_func, space, this->cubature_factory);
 
-      // compute H0/H1/H2-errors
-      err[0] = H0Error<h0_>::compute(vec_sol, this->sol_func, space, this->cubature_factory);
-      err[1] = H1Error<h1_>::compute(vec_sol, this->sol_func, space, this->cubature_factory);
-      err[2] = H2Error<h2_>::compute(vec_sol, this->sol_func, space, this->cubature_factory);
+      // convert error info into Tiny::Vector
+      Tiny::Vector<double, 3> err;
+      err[0] = (h0_ ? sei.norm_h0 : 0.0);
+      err[1] = (h1_ ? sei.norm_h1 : 0.0);
+      err[2] = (h2_ ? sei.norm_h2 : 0.0);
 
       // return error vector
       return err;

@@ -165,7 +165,8 @@ namespace StokesDriCav2D
 
       // compute local errors
       auto vi = Assembly::VelocityAnalyser::compute((*vec_sol).template at<0>(), this->space_velo, this->cubature);
-      DataType vp_l2 = Assembly::ScalarErrorComputerL2::compute((*vec_sol).template at<1>(), zero_func, this->space_pres, this->cubature);
+      DataType vp_l2 = Assembly::ScalarErrorComputer<0>::compute(
+        (*vec_sol).template at<1>(), zero_func, this->space_pres, this->cubature).norm_h0;
 
       // synhronise all local errors
       vi.norm_l2 = sys_level.gate_sys.norm2(vi.norm_l2);

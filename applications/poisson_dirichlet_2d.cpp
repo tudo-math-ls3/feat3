@@ -142,19 +142,18 @@ namespace PoissonDirichlet2D
     {
       typedef typename SystemLevel_::DataType DataType;
 
-      // compute local errors
-      DataType l2 = Assembly::ScalarErrorComputerL2::compute(*vec_sol, sol_func, this->space, this->cubature);
-      DataType h1 = Assembly::ScalarErrorComputerH1::compute(*vec_sol, sol_func, this->space, this->cubature);
+      // Compute and print the H0-/H1-errors
+      Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
+        *vec_sol, sol_func, this->space, this->cubature);
 
       // synhronise all local errors
-      l2 = sys_level.gate_sys.norm2(l2);
-      h1 = sys_level.gate_sys.norm2(h1);
+      errors.norm_h0 = sys_level.gate_sys.norm2(errors.norm_h0);
+      errors.norm_h1 = sys_level.gate_sys.norm2(errors.norm_h1);
 
       // print errors
       if (plot)
       {
-        std::cout << "L2-Error: " << scientify(l2, 12) << std::endl;
-        std::cout << "H1-Error: " << scientify(h1, 12) << std::endl;
+        std::cout << errors << std::endl;
       }
     }
   };

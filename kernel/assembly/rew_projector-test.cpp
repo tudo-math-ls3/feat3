@@ -96,9 +96,7 @@ public:
     Assembly::RewProjector::project(vector, function, space, cubature_factory);
 
     // compute L2-Error
-    return //std::make_pair(
-      Assembly::ScalarErrorComputerL2::compute(vector, function, space, cubature_factory)/*,
-      Assembly::ScalarErrorComputerH1::compute(vector, function, space, cubature_factory))*/;
+    return Assembly::ScalarErrorComputer<0>::compute(vector, function, space, cubature_factory).norm_h0;
   }
 
 };

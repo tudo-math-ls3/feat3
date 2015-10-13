@@ -61,7 +61,7 @@
 
 // FEAST-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
-//#include <kernel/space/lagrange2/element.hpp>            // the Lagrange-2 Element (aka "Q2")
+#include <kernel/space/lagrange2/element.hpp>            // the Lagrange-2 Element (aka "Q2")
 
 // FEAST-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
@@ -191,10 +191,10 @@ namespace Tutorial01
     // All finite element spaces are parameterised (templated) by the transformation type.
 
     // Use the Lagrange-1 element (aka "Q1"):
-    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+    //typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
     // Use the Lagrange-2 element (aka "Q2"):
-    //typedef Space::Lagrange2::Element<TrafoType> SpaceType;
+    typedef Space::Lagrange2::Element<TrafoType> SpaceType;
 
     std::cout << "Creating Space..." << std::endl;
 
@@ -401,23 +401,26 @@ namespace Tutorial01
 
     std::cout << "Computing errors against reference solution..." << std::endl;
 
-    // The classes responsible for this are the 'ScalarErrorComputerXY' assembly classes.
+    // The class responsible for this is the 'ScalarErrorComputer' assembly class template.
+    // The one and only template parameter is the maximum desired error derivative norm, i.e.
+    // setting the parameter to
+    //   = 0 will compute only the H0- (aka L2-) error
+    //   = 1 will compute both the H0- and H1-errors
+    //   = 2 will compute the H0-, H1- and H2-errors
+
     // We have already created the 'sine_bubble' object representing our analytical solution for
     // the assembly of the right-hand-side vector, so we may reuse it for the computation now:
 
-    DataType l2_error = Assembly::ScalarErrorComputerL2::compute(
+    Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
       vec_sol,          // the coefficient vector of the discrete solution
       sol_function,     // the analytic function object, declared for RHS assembly
       space,            // the finite element space
       cubature_factory  // and the cubature factory used for integration
       );
 
-    // In analogy, compute the H1-error:
-    DataType h1_error = Assembly::ScalarErrorComputerH1::compute(vec_sol, sol_function, space, cubature_factory);
-
-    // Print the errors to cout
-    std::cout << "L2-Error: " << scientify(l2_error, 12) << std::endl;
-    std::cout << "H1-Error: " << scientify(h1_error, 12) << std::endl;
+    // The returned ScalarErrorInfo object contains all computed error norms,
+    // so we may print the errors by simply pushing the object to cout:
+    std::cout << errors << std::endl;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file

@@ -348,18 +348,11 @@ namespace Tutorial02
 
     std::cout << "Computing errors against reference solution..." << std::endl;
 
-    // We have already created an object representing our solution function for the assembly of the
-    // boundary conditions, so we may re-use it for the error computation now.
+    // Compute and print the H0-/H1-errors
+    Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
+      vec_sol, sol_function, space, cubature_factory);
 
-    // Compute the L2-error:
-    DataType l2_error = Assembly::ScalarErrorComputerL2::compute(vec_sol, sol_function, space, cubature_factory);
-
-    // Compute the H1-error:
-    DataType h1_error = Assembly::ScalarErrorComputerH1::compute(vec_sol, sol_function, space, cubature_factory);
-
-    // And prints the errors to cout
-    std::cout << "L2-Error: " << scientify(l2_error, 12) << std::endl;
-    std::cout << "H1-Error: " << scientify(h1_error, 12) << std::endl;
+    std::cout << errors << std::endl;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file

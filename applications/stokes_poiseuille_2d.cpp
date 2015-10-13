@@ -156,31 +156,32 @@ namespace StokesPoiseuille2D
       const auto& vp = (*vec_sol).template at<1>();
 
       // compute local errors
-      DataType vx_l2 = Assembly::ScalarErrorComputerL2::compute(vx, velo_x_func, this->space_velo, this->cubature);
-      DataType vy_l2 = Assembly::ScalarErrorComputerL2::compute(vy, velo_y_func, this->space_velo, this->cubature);
-      DataType vx_h1 = Assembly::ScalarErrorComputerH1::compute(vx, velo_x_func, this->space_velo, this->cubature);
-      DataType vy_h1 = Assembly::ScalarErrorComputerH1::compute(vy, velo_y_func, this->space_velo, this->cubature);
-      DataType vp_l2 = Assembly::ScalarErrorComputerL2::compute(vp, pres_func, this->space_pres, this->cubature);
+      Assembly::ScalarErrorInfo<DataType> vxerr = Assembly::ScalarErrorComputer<1>::compute(
+        vx, velo_x_func, this->space_velo, this->cubature);
+      Assembly::ScalarErrorInfo<DataType> vyerr = Assembly::ScalarErrorComputer<1>::compute(
+        vy, velo_y_func, this->space_velo, this->cubature);
+      Assembly::ScalarErrorInfo<DataType> vperr = Assembly::ScalarErrorComputer<0>::compute(
+        vp, pres_func, this->space_pres, this->cubature);
 
       // synhronise all local errors
-      vx_l2 = sys_level.gate_sys.norm2(vx_l2);
-      vy_l2 = sys_level.gate_sys.norm2(vy_l2);
-      vx_h1 = sys_level.gate_sys.norm2(vx_h1);
-      vy_h1 = sys_level.gate_sys.norm2(vy_h1);
-      vp_l2 = sys_level.gate_sys.norm2(vp_l2);
+      vxerr.norm_h0 = sys_level.gate_sys.norm2(vxerr.norm_h0);
+      vyerr.norm_h0 = sys_level.gate_sys.norm2(vyerr.norm_h0);
+      vxerr.norm_h1 = sys_level.gate_sys.norm2(vxerr.norm_h1);
+      vyerr.norm_h1 = sys_level.gate_sys.norm2(vyerr.norm_h1);
+      vperr.norm_h0 = sys_level.gate_sys.norm2(vperr.norm_h0);
 
       // compute field errors
-      DataType vv_l2 = Math::sqrt(Math::sqr(vx_l2) + Math::sqr(vy_l2));
-      DataType vv_h1 = Math::sqrt(Math::sqr(vx_h1) + Math::sqr(vy_h1));
+      DataType vv_h0 = Math::sqrt(Math::sqr(vxerr.norm_h0) + Math::sqr(vyerr.norm_h0));
+      DataType vv_h1 = Math::sqrt(Math::sqr(vxerr.norm_h1) + Math::sqr(vyerr.norm_h1));
 
       // print errors
       if (plot)
       {
-        std::cout << "Velocity L2-Error: " << scientify(vv_l2, 12) << " [ ";
-        std::cout << scientify(vx_l2, 12) << " , " << scientify(vy_l2, 12) << " ]" << std::endl;
+        std::cout << "Velocity H0-Error: " << scientify(vv_h0, 12) << " [ ";
+        std::cout << scientify(vxerr.norm_h0, 12) << " , " << scientify(vyerr.norm_h0, 12) << " ]" << std::endl;
         std::cout << "Velocity H1-Error: " << scientify(vv_h1, 12) << " [ ";
-        std::cout << scientify(vx_h1, 12) << " , " << scientify(vy_h1, 12) << " ]" << std::endl;
-        std::cout << "Pressure L2-Error: " << scientify(vp_l2, 12) << std::endl;
+        std::cout << scientify(vxerr.norm_h1, 12) << " , " << scientify(vyerr.norm_h1, 12) << " ]" << std::endl;
+        std::cout << "Pressure H0-Error: " << scientify(vperr.norm_h0, 12) << std::endl;
       }
     }
   }; // class StokesUnitSquarePoiseuilleAssemblerLevel<...>
