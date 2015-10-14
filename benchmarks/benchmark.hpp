@@ -24,6 +24,10 @@ namespace FEAST
     template <typename Mem_>
     void run_bench(std::function<void (void)> func, double flops, double bytes)
     {
+#ifdef FEAST_DEBUG_MODE
+      throw InternalError("You are running a benchmark in DEBUG mode!");
+#endif
+
       Index iters(1);
       //warup
       func();
