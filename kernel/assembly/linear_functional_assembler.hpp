@@ -88,7 +88,7 @@ namespace FEAST
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create matrix scatter-axpy
-        LAFEM::ScatterAxpy<VectorType> scatter_axpy(vector);
+        typename VectorType::ScatterAxpy scatter_axpy(vector);
 
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)

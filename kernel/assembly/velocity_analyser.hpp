@@ -325,7 +325,7 @@ namespace FEAST
       {
         typedef MultiGather<LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>, dim_-1> > RestClass;
 
-        LAFEM::GatherAxpy<LAFEM::DenseVector<Mem::Main, DT_, IT_> > _first_gather;
+        typename LAFEM::DenseVector<Mem::Main, DT_, IT_>::GatherAxpy _first_gather;
         RestClass _rest_gather;
 
         MultiGather(const LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>, dim_>& vector) :
@@ -347,7 +347,7 @@ namespace FEAST
       template<typename DT_, typename IT_>
       struct MultiGather<LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>, 1> >
       {
-        LAFEM::GatherAxpy<LAFEM::DenseVector<Mem::Main, DT_, IT_>> _first_gather;
+        typename LAFEM::DenseVector<Mem::Main, DT_, IT_>::GatherAxpy _first_gather;
 
         MultiGather(const LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DT_, IT_>, 1>& vector) :
           _first_gather(vector.first())

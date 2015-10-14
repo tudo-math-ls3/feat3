@@ -60,6 +60,239 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_ = Index>
     class SparseMatrixCSR : public Container<Mem_, DT_, IT_>
     {
+    public:
+      /**
+       * \brief Scatter-Axpy operation for SparseMatrixCSR
+       *
+       * \author Peter Zajac
+       */
+      class ScatterAxpy
+      {
+      public:
+        typedef LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> MatrixType;
+        typedef Mem::Main MemType;
+        typedef DT_ DataType;
+        typedef IT_ IndexType;
+
+      private:
+#ifdef DEBUG
+        const IT_ _deadcode;
+#endif
+        Index _num_rows;
+        Index _num_cols;
+        IT_* _row_ptr;
+        IT_* _col_idx;
+        IT_* _col_ptr;
+        DT_ *_data;
+
+      public:
+        explicit ScatterAxpy(MatrixType& matrix) :
+#ifdef DEBUG
+          _deadcode(~IT_(0)),
+#endif
+          _num_rows(matrix.rows()),
+          _num_cols(matrix.columns()),
+          _row_ptr(matrix.row_ptr()),
+          _col_idx(matrix.col_ind()),
+          _col_ptr(nullptr),
+          _data(matrix.val())
+        {
+          // allocate column-pointer array
+          _col_ptr = new IT_[matrix.columns()];
+#ifdef DEBUG
+          for(Index i(0); i < _num_cols; ++i)
+          {
+            _col_ptr[i] = _deadcode;
+          }
+#endif
+        }
+
+        virtual ~ScatterAxpy()
+        {
+          if(_col_ptr != nullptr)
+          {
+            delete [] _col_ptr;
+          }
+        }
+
+        template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
+        void operator()(const LocalMatrix_& loc_mat, const RowMapping_& row_map,
+                        const ColMapping_& col_map, DT_ alpha = DT_(1))
+        {
+          // loop over all local row entries
+          for(int i(0); i < row_map.get_num_local_dofs(); ++i)
+          {
+            // loop over all row entry contributations
+            for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
+            {
+              // fetch row entry weight and pre-multiply by alpha
+              DT_ iw = alpha * DT_(row_map.get_weight(i, ic));
+
+              // fetch row index
+              Index ix = row_map.get_index(i, ic);
+
+              // build column pointer for this row entry contribution
+              for(IT_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+              {
+                _col_ptr[_col_idx[k]] = k;
+              }
+
+              // loop over all local column entries
+              for(int j(0); j < col_map.get_num_local_dofs(); ++j)
+              {
+                // loop over all column entry contributions
+                for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
+                {
+                  // fetch trial function dof weight
+                  DT_ jw = DT_(col_map.get_weight(j, jc));
+
+                  // fetch column index
+                  Index jx = col_map.get_index(j, jc);
+
+#ifdef DEBUG
+                  // ensure that the column pointer is valid for this index
+                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
+#endif
+
+                  // incorporate data into global matrix
+                  _data[_col_ptr[jx]] += (iw * jw) * loc_mat[i][j];
+
+                  // continue with next column contribution
+                }
+                // continue with next column entry
+              }
+
+#ifdef DEBUG
+              // reformat column-pointer array
+              for(IT_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+              {
+                _col_ptr[_col_idx[k]] = _deadcode;
+              }
+#endif
+              // continue with next row contribution
+            }
+            // continue with next row entry
+          }
+        }
+      }; // class ScatterAxpy
+
+      /**
+       * \brief Gather-Axpy operation for SparseMatrixCSR
+       *
+       * \author Peter Zajac
+       */
+      class GatherAxpy
+      {
+      public:
+        typedef LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> MatrixType;
+        typedef Mem::Main MemType;
+        typedef DT_ DataType;
+        typedef IT_ IndexType;
+
+      private:
+#ifdef DEBUG
+        const IT_ _deadcode;
+#endif
+        Index _num_rows;
+        Index _num_cols;
+        const IT_* _row_ptr;
+        const IT_* _col_idx;
+        IT_* _col_ptr;
+        const DT_ *_data;
+
+      public:
+        explicit GatherAxpy(const MatrixType& matrix) :
+#ifdef DEBUG
+          _deadcode(~IT_(0)),
+#endif
+          _num_rows(matrix.rows()),
+          _num_cols(matrix.columns()),
+          _row_ptr(matrix.row_ptr()),
+          _col_idx(matrix.col_ind()),
+          _col_ptr(nullptr),
+          _data(matrix.val())
+        {
+          // allocate column-pointer array
+          _col_ptr = new IT_[matrix.columns()];
+#ifdef DEBUG
+          for(Index i(0); i < _num_cols; ++i)
+          {
+            _col_ptr[i] = _deadcode;
+          }
+#endif
+        }
+
+        virtual ~GatherAxpy()
+        {
+          if(_col_ptr != nullptr)
+          {
+            delete [] _col_ptr;
+          }
+        }
+
+        template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
+        void operator()(LocalMatrix_& loc_mat, const RowMapping_& row_map,
+                        const ColMapping_& col_map, DT_ alpha = DT_(1))
+        {
+          // loop over all local row entries
+          for(int i(0); i < row_map.get_num_local_dofs(); ++i)
+          {
+            // loop over all row entry contributations
+            for(int ic(0); ic < row_map.get_num_contribs(i); ++ic)
+            {
+              // fetch row index
+              Index ix = row_map.get_index(i, ic);
+
+              // build column pointer for this row entry contribution
+              for(IT_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+              {
+                _col_ptr[_col_idx[k]] = k;
+              }
+
+              // loop over all local column entries
+              for(int j(0); j < col_map.get_num_local_dofs(); ++j)
+              {
+                // clear  accumulation entry
+                DT_ dx(DT_(0));
+
+                // loop over all column entry contributions
+                for(int jc(0); jc < col_map.get_num_contribs(j); ++jc)
+                {
+                  // fetch column index
+                  Index jx = col_map.get_index(j, jc);
+
+#ifdef DEBUG
+                  // ensure that the column pointer is valid for this index
+                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
+#endif
+
+                  // update accumulator
+                  dx += DT_(col_map.get_weight(j, jc)) * _data[_col_ptr[jx]];
+
+                  // continue with next column contribution
+                }
+
+                // update local matrix data
+                loc_mat[i][j] += (alpha * DT_(row_map.get_weight(i, ic))) * dx;
+
+                // continue with next column entry
+              }
+
+#ifdef DEBUG
+              // reformat column-pointer array
+              for(IT_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+              {
+                _col_ptr[_col_idx[k]] = _deadcode;
+              }
+#endif
+
+              // continue with next row contribution
+            }
+            // continue with next row entry
+          }
+        }
+      }; // class GatherAxpy
+
     private:
       Index & _size()
       {

@@ -111,8 +111,8 @@ namespace FEAST
         typedef typename Intern::CubatureTraits<FineTrafoEvaluator>::RuleType CubatureRuleType;
 
         // create matrix scatter-axpy
-        LAFEM::ScatterAxpy<Matrix_> scatter_maxpy(matrix);
-        LAFEM::ScatterAxpy<Vector_> scatter_vaxpy(vector);
+        typename Matrix_::ScatterAxpy scatter_maxpy(matrix);
+        typename Vector_::ScatterAxpy scatter_vaxpy(vector);
 
         // create DOF-mappings
         FineDofMapping fine_dof_mapping(fine_space);

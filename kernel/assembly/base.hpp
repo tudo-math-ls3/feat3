@@ -5,7 +5,6 @@
 // includes, FEAST
 #include <kernel/space/eval_data.hpp>
 #include <kernel/trafo/eval_data.hpp>
-#include <kernel/lafem/gather_scatter.hpp>
 
 namespace FEAST
 {

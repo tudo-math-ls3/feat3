@@ -141,10 +141,10 @@ namespace FEAST
         VectorType weight(num_dofs, DataType(0));
 
         // create vector scatter-axpy
-        LAFEM::ScatterAxpy<VectorType> scatter_axpy(vector);
+        typename VectorType::ScatterAxpy scatter_axpy(vector);
 
         // create weight scatter-axpy
-        LAFEM::ScatterAxpy<VectorType> weight_scatter_axpy(weight);
+        typename VectorType::ScatterAxpy weight_scatter_axpy(weight);
 
         // format local weight vector
         if(weight_type == wt_arithmetic)

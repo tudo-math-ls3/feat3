@@ -55,6 +55,104 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_ = Index>
     class DenseVector : public Container<Mem_, DT_, IT_>, public VectorBase
     {
+    public:
+      /**
+       * \brief Scatter-Axpy operation for DenseVector
+       *
+       * \author Peter Zajac
+       */
+      class ScatterAxpy
+      {
+      public:
+        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
+        typedef Mem::Main MemType;
+        typedef DT_ DataType;
+        typedef IT_ IndexType;
+
+      private:
+        Index _num_entries;
+        DT_* _data;
+
+      public:
+        explicit ScatterAxpy(VectorType& vector) :
+          _num_entries(vector.size()),
+          _data(vector.elements())
+        {
+        }
+
+        template<typename LocalVector_, typename Mapping_>
+        void operator()(const LocalVector_& loc_vec, const Mapping_& mapping, DT_ alpha = DT_(1))
+        {
+          // loop over all local entries
+          for(int i(0); i < mapping.get_num_local_dofs(); ++i)
+          {
+            // pre-multiply local entry by alpha
+            DT_ dx(alpha * loc_vec[i]);
+
+            // loop over all entry contributions
+            for(int ic(0); ic < mapping.get_num_contribs(i); ++ic)
+            {
+              // get dof index
+              Index dof_idx = mapping.get_index(i, ic);
+              ASSERT_(dof_idx < _num_entries);
+
+              // update vector data
+              _data[dof_idx] += DT_(mapping.get_weight(i, ic)) * dx;
+            }
+          }
+        }
+      }; // class ScatterAxpy
+
+      /**
+       * \brief Gather-Axpy operation for DenseVector
+       *
+       * \author Peter Zajac
+       */
+      class GatherAxpy
+      {
+      public:
+        typedef LAFEM::DenseVector<Mem::Main, DT_, IT_> VectorType;
+        typedef Mem::Main MemType;
+        typedef DT_ DataType;
+        typedef IT_ IndexType;
+
+      private:
+        Index _num_entries;
+        const DT_* _data;
+
+      public:
+        explicit GatherAxpy(const VectorType& vector) :
+          _num_entries(vector.size()),
+          _data(vector.elements())
+        {
+        }
+
+        template<typename LocalVector_, typename Mapping_>
+        void operator()(LocalVector_& loc_vec, const Mapping_& mapping, DT_ alpha = DT_(1))
+        {
+          // loop over all local entries
+          for(int i(0); i < mapping.get_num_local_dofs(); ++i)
+          {
+            // clear accumulation entry
+            DT_ dx(DT_(0));
+
+            // loop over all entry contributions
+            for(int ic(0); ic < mapping.get_num_contribs(i); ++ic)
+            {
+              // get dof index
+              Index dof_idx = mapping.get_index(i, ic);
+              ASSERT_(dof_idx < _num_entries);
+
+              // update accumulator
+              dx += DT_(mapping.get_weight(i, ic)) * _data[dof_idx];
+            }
+
+            // update local vector data
+            loc_vec[i] += alpha * dx;
+          }
+        }
+      }; // class GatherAxpy
+
     private:
       Index & _size()
       {

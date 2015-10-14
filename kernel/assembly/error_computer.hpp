@@ -365,7 +365,7 @@ namespace FEAST
         typename AsmTraits::LocalVectorType lvad;
 
         // create matrix scatter-axpy
-        LAFEM::GatherAxpy<VectorType> gather_axpy(vector);
+        typename VectorType::GatherAxpy gather_axpy(vector);
 
         // initialise result
         ScalarErrorInfo<DataType> result;

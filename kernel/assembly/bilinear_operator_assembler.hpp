@@ -105,7 +105,7 @@ namespace FEAST
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create matrix scatter-axpy
-        LAFEM::ScatterAxpy<MatrixType> scatter_axpy(matrix);
+        typename MatrixType::ScatterAxpy scatter_axpy(matrix);
 
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
@@ -257,7 +257,7 @@ namespace FEAST
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create matrix scatter-axpy
-        LAFEM::ScatterAxpy<MatrixType> scatter_axpy(matrix);
+        typename MatrixType::ScatterAxpy scatter_axpy(matrix);
 
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
@@ -420,7 +420,7 @@ namespace FEAST
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create matrix scatter-axpy
-        LAFEM::ScatterAxpy<MatrixType> scatter_axpy(matrix);
+        typename MatrixType::ScatterAxpy scatter_axpy(matrix);
 
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
@@ -581,9 +581,9 @@ namespace FEAST
           typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
           // create vector scatter axpy for adding to the global return vector
-          LAFEM::ScatterAxpy<VectorType> scatter_axpy(ret);
+          typename VectorType::ScatterAxpy scatter_axpy(ret);
           // create vector gather axpy for picking the local values from the global vector
-          LAFEM::GatherAxpy<VectorType> gather_axpy(coeff_vector);
+          typename VectorType::GatherAxpy gather_axpy(coeff_vector);
 
           // loop over all cells of the mesh
           for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
@@ -757,9 +757,9 @@ namespace FEAST
           typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
           // create vector scatter axpy for adding to the global return vector
-          LAFEM::ScatterAxpy<VectorType> scatter_axpy(ret);
+          typename VectorType::ScatterAxpy scatter_axpy(ret);
           // create vector gather axpy for picking the local values from the global vector
-          LAFEM::GatherAxpy<VectorType> gather_axpy(coeff_vector);
+          typename VectorType::GatherAxpy gather_axpy(coeff_vector);
 
           // loop over all cells of the mesh
           for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)

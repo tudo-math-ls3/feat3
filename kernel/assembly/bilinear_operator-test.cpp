@@ -263,7 +263,7 @@ public:
 
     // create local matrix data
     Tiny::Matrix<DataType_,4,4> lmd1, lmd2;
-    LAFEM::GatherAxpy<MatrixType_> gather1(matrix_1), gather2(matrix_2);
+    typename MatrixType_::GatherAxpy gather1(matrix_1), gather2(matrix_2);
 
     // some constants
     static const DataType_ zero = DataType_(0);
@@ -481,7 +481,7 @@ public:
 
     // create local matrix data
     Tiny::Matrix<DataType_,4,4> lmd1, lmd2;
-    LAFEM::GatherAxpy<MatrixType> gather1(matrix_1), gather2(matrix_2);
+    typename MatrixType::GatherAxpy gather1(matrix_1), gather2(matrix_2);
 
     // some constants
     static const DataType_ zero = DataType_(0);

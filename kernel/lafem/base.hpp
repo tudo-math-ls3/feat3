@@ -20,22 +20,21 @@ namespace FEAST
    */
   namespace LAFEM
   {
-
     /**
      * Supported File modes.
      */
     enum class FileMode
     {
       fm_exp = 0, /**< Exponential ascii */
-        fm_dv, /**< Binary data */
-        fm_mtx, /**< Matrix market ascii */
-        fm_ell, /**< Binary ell data */
-        fm_csr, /**< Binary csr data */
-        fm_coo, /**< Binary coo data */
-        fm_bm, /**< Binary banded data */
-        fm_dm,  /**< Binary dense matrix data */
-        fm_sv  /**< Binary sparse vector data */
-        };
+      fm_dv, /**< Binary data */
+      fm_mtx, /**< Matrix market ascii */
+      fm_ell, /**< Binary ell data */
+      fm_csr, /**< Binary csr data */
+      fm_coo, /**< Binary coo data */
+      fm_bm, /**< Binary banded data */
+      fm_dm,  /**< Binary dense matrix data */
+      fm_sv  /**< Binary sparse vector data */
+    };
 
     /**
      * Supported clone modes.
@@ -43,10 +42,10 @@ namespace FEAST
     enum class CloneMode
     {
       Shallow = 0, /**< Share index and data arrays */
-        Layout, /**< Share index arrays, allocate new data array */
-        Weak, /**< Share index arrays, allocate new data array and copy content */
-        Deep /**< Allocate new index and data arrays and copy content */
-        };
+      Layout, /**< Share index arrays, allocate new data array */
+      Weak, /**< Share index arrays, allocate new data array and copy content */
+      Deep /**< Allocate new index and data arrays and copy content */
+    };
 
     /**
      * Supported layout ids.
@@ -54,12 +53,10 @@ namespace FEAST
     enum class SparseLayoutId
     {
       lt_csr = 0,
-        lt_coo,
-        lt_ell,
-        lt_banded
-        };
-
-
+      lt_coo,
+      lt_ell,
+      lt_banded
+    };
   } // namespace LAFEM
 } // namespace FEAST
 
