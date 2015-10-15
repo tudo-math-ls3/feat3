@@ -9,7 +9,6 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # list of trafo tests
 SET (test_list
   standard_trafo-test
-  standard_trafo_volume-test
 )
 
 # create all tests
