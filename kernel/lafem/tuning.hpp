@@ -10,7 +10,19 @@
 #include <kernel/util/cuda_util.hpp>
 
 #include <iostream>
-#include <functional>
+
+#ifdef FEAST_COMPILER_MICROSOFT
+// Microsoft's STL implementation is not safe for /Wall "by design", see:
+// https://connect.microsoft.com/VisualStudio/feedback/details/1217660/warning-c4265-when-using-functional-header
+// We do not disable the warning C4265 globally in the compiler detection header, as
+// the warning is kind of useful, so we need to use a few pragmas around the include:
+#  pragma warning(push, 0)
+#  pragma warning(disable:4265)
+#  include <functional>
+#  pragma warning(pop)
+#else
+#  include <functional>
+#endif // FEAST_COMPILER_MICROSOFT
 
 namespace FEAST
 {
