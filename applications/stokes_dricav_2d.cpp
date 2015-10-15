@@ -183,7 +183,7 @@ namespace StokesDriCav2D
       if (plot)
       {
         std::cout << vi;
-        std::cout << "Pressure..: " << scientify(vp_h0, 12) << std::endl;
+        std::cout << "Pressure..: " << vp_h0 << std::endl;
       }
     }
   };
