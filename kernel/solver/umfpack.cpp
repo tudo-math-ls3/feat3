@@ -258,6 +258,157 @@ namespace FEAST
       // check status code
       return (status == UMFPACK_OK) ? Status::success :  Status::aborted;
     }
+
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+
+    UmfpackMean::UmfpackMean(const MatrixType& system_matrix, const VectorType& weight_vector) :
+      BaseClass(),
+      _system_matrix(system_matrix),
+      _weight_vector(weight_vector),
+      _umfpack(_solver_matrix)
+    {
+    }
+
+    void UmfpackMean::init_symbolic()
+    {
+      // get the number of rows/columns
+      const Index n = _weight_vector.size();
+      if((n != _system_matrix.rows()) || (n != _system_matrix.columns()))
+        throw InvalidMatrixStructureException("system matrix/weight vector dimension mismatch");
+
+      // get the number of non-zeroes
+      const Index nnze = _system_matrix.used_elements();
+
+      // allocate our solver matrix
+      _solver_matrix = MatrixType(n+1, n+1, nnze + 2*n);
+
+      // get our input matrix arrays
+      const Index* irow_ptr = _system_matrix.row_ptr();
+      const Index* icol_idx = _system_matrix.col_ind();
+
+      // get our output matrix arrays
+      Index* orow_ptr = _solver_matrix.row_ptr();
+      Index* ocol_idx = _solver_matrix.col_ind();
+
+      // assemble the solver matrix structure
+      orow_ptr[0] = Index(0);
+      for(Index i(0); i < n; ++i)
+      {
+        Index op = orow_ptr[i];
+        // copy input matrix row pattern
+        for(Index ip(irow_ptr[i]); ip < irow_ptr[i+1]; ++ip, ++op)
+        {
+          ocol_idx[op] = icol_idx[ip];
+        }
+        // append a single entry in the last column
+        ocol_idx[op] = n;
+        // set next row pointer
+        orow_ptr[i+1] = ++op;
+      }
+
+      // append an (almost) dense row (length n of n+1)
+      Index op(orow_ptr[n]);
+      for(Index j(0); j < n; ++j, ++op)
+      {
+        ocol_idx[op] = j;
+      }
+      // set last row pointer
+      orow_ptr[n+1] = op;
+
+      // Okay, solver matrix structure assembly complete
+
+      // create temporary vectors
+      _vec_x = _solver_matrix.create_vector_r();
+      _vec_b = _solver_matrix.create_vector_r();
+
+      // initialise umfpack
+      _umfpack.init_symbolic();
+    }
+
+    void UmfpackMean::done_symbolic()
+    {
+      _umfpack.done_symbolic();
+      _vec_b.clear();
+      _vec_x.clear();
+      _solver_matrix.clear();
+    }
+
+    void UmfpackMean::init_numeric()
+    {
+      const Index n = _system_matrix.rows();
+
+      // get input matrix arrays
+      const Index* irow_ptr = _system_matrix.row_ptr();
+      const double* idata = _system_matrix.val();
+
+      // get input vector array
+      const double* weight = _weight_vector.elements();
+
+      // get output matrix arrays
+      const Index* orow_ptr = _solver_matrix.row_ptr();
+      double* odata = _solver_matrix.val();
+
+      // loop over all input matrix rows
+      for(Index i(0); i < n; ++i)
+      {
+        Index op(orow_ptr[i]);
+        // copy input matrix row data
+        for(Index ip(irow_ptr[i]); ip < irow_ptr[i+1]; ++ip, ++op)
+        {
+          odata[op] = idata[ip];
+        }
+        // copy weight vector entry as last column entry
+        odata[op] = weight[i];
+      }
+
+      // copy weight vector into last row
+      Index op(orow_ptr[n]);
+      for(Index j(0); j < n; ++j, ++op)
+      {
+        odata[op] = weight[j];
+      }
+
+      // okay, solver matrix data assembly completer
+
+      // initialise umfpack
+      _umfpack.init_numeric();
+    }
+
+    void UmfpackMean::done_numeric()
+    {
+      _umfpack.done_numeric();
+    }
+
+    Status UmfpackMean::apply(VectorType& vec_sol, const VectorType& vec_rhs)
+    {
+      const Index n = vec_sol.size();
+
+      // copy RHS vector
+      const double* vr = vec_rhs.elements();
+      double* vb = _vec_b.elements();
+      for(Index i(0); i < n; ++i)
+      {
+        vb[i] = vr[i];
+      }
+      vb[n] = 0.0;
+
+      // solve system
+      Status status = _umfpack.apply(_vec_x, _vec_b);
+
+      // copy sol vector
+      const double* vx = _vec_x.elements();
+      double* vs = vec_sol.elements();
+      for(Index i(0); i < n; ++i)
+      {
+        vs[i] = vx[i];
+      }
+
+      // okay
+      return status;
+    }
+
   } // namespace Solver
 } // namespace FEAST
 #else
