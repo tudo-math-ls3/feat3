@@ -140,6 +140,36 @@ namespace FEAST
       /**
        * \brief Constructor
        *
+       * \param[in] rows The row count of the created matrix.
+       * \param[in] columns The column count of the created matrix.
+       * \param[in] used_elements The amount of non zero elements of the created matrix.
+       *
+       * Creates an empty (but allocated) matrix.
+       *
+       * \note The allocated memory will not be initialised.
+       */
+      explicit SparseMatrixCSR(Index rows_in, Index columns_in, Index used_elements_in) :
+        Container<Mem_, DT_, IT_> (rows_in * columns_in)
+      {
+        CONTEXT("When creating SparseMatrixCSR");
+        this->_scalar_index.push_back(rows_in);
+        this->_scalar_index.push_back(columns_in);
+        this->_scalar_index.push_back(used_elements_in);
+        this->_scalar_dt.push_back(DT_(0));
+
+        this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_used_elements()));
+        this->_indices_size.push_back(_used_elements());
+
+        this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_rows() + 1));
+        this->_indices_size.push_back(_used_elements());
+
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_used_elements()));
+        this->_elements_size.push_back(_used_elements());
+      }
+
+      /**
+       * \brief Constructor
+       *
        * \param[in] layout The layout to be used.
        *
        * Creates an empty matrix with given layout.
