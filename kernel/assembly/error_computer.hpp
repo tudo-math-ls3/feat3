@@ -185,7 +185,7 @@ namespace FEAST
       /// The computed H2-error.
       DataType_ norm_h2;
 
-      /// standard construct
+      /// standard constructor
       ScalarErrorInfo() :
         have_h0(false),
         have_h1(false),
@@ -196,7 +196,7 @@ namespace FEAST
       {
       }
 
-      // conversion constructor
+      /// conversion constructor
       template<typename DT2_>
       ScalarErrorInfo(const ScalarErrorInfo<DT2_>& other) :
         have_h0(other.have_h0),
@@ -208,7 +208,7 @@ namespace FEAST
       {
       }
 
-      // conversion assignment operator
+      /// conversion assignment operator
       template<typename DT2_>
       ScalarErrorInfo& operator=(const ScalarErrorInfo<DT2_>& other)
       {
@@ -260,6 +260,7 @@ namespace FEAST
       static_assert(max_norm_ >= 0, "invalid max_norm_ parameter");
 
     private:
+      /// \cond internal
       /**
        * \brief Trafo configuration tag class
        *
@@ -282,6 +283,7 @@ namespace FEAST
         static constexpr bool need_grad  = (max_norm_ >= 1);
         static constexpr bool need_hess  = (max_norm_ >= 2);
       };
+      /// \endcond
 
     public:
       /**
@@ -323,15 +325,15 @@ namespace FEAST
         static_assert(Function_::can_grad || (max_norm_ < 1), "function gradients are required for H1-Error");
         static_assert(Function_::can_hess || (max_norm_ < 2), "function hessians are required for H2-Error");
 
-        /// vector type
+        // vector type
         typedef Vector_ VectorType;
-        /// analytic function type
+        // analytic function type
         typedef Function_ FunctionType;
-        /// space type
+        // space type
         typedef Space_ SpaceType;
-        /// assembly traits
+        // assembly traits
         typedef AsmTraits1<typename Vector_::DataType, SpaceType, TrafoConfig, SpaceConfig> AsmTraits;
-        /// data type
+        // data type
         typedef typename AsmTraits::DataType DataType;
 
         // create the cubature rule
