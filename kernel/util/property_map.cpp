@@ -5,7 +5,8 @@
 
 namespace FEAST
 {
-  PropertyMap::PropertyMap()
+  PropertyMap::PropertyMap(PropertyMap* parent) :
+    _parent(parent)
   {
     CONTEXT("PropertyMap::PropertyMap()");
   }
@@ -53,14 +54,14 @@ namespace FEAST
     // try to find the entry
     SectionMap::iterator it(_sections.find(name));
 
-    // if it has not been found
+    // if it has been found
     if(it != _sections.end())
     {
       return (*it).second;
     }
 
-    // if it was found, create a new section
-    PropertyMap* sub_section = new PropertyMap();
+    // if it was not found, create a new section
+    PropertyMap* sub_section = new PropertyMap(this);
     _sections.insert(std::make_pair(name, sub_section));
     return sub_section;
   }
@@ -91,59 +92,90 @@ namespace FEAST
     return false;
   }
 
+  PropertyMap* PropertyMap::query_section(String path)
+  {
+    // We're too lazy to copy-&-paste the code below, so we'll do some casting...
+    return const_cast<PropertyMap*>(static_cast<const PropertyMap*>(this)->query_section(path));
+  }
+
+  const PropertyMap* PropertyMap::query_section(String path) const
+  {
+    // first of all, trim the input of leading and trailing slashes
+    path.trim_me("/");
+
+    // we need to split up the input path into:
+    // the leading section name
+    String sec_name(path);
+    // the remainder of the path
+    String rem_path("");
+
+    // try to find the first slash inside our path
+    std::size_t p = path.find('/');
+    if(p != path.npos)
+    {
+      // split our path at the separator
+      sec_name = path.substr(0, p).trim();
+      rem_path = path.substr(p+1).trim();
+    }
+
+    // try to find the leading section
+    const PropertyMap* lead = nullptr;
+    if(sec_name == "!")
+      lead = this->get_root();
+    else if(sec_name == "~")
+      lead = this->get_parent();
+    else
+      lead = this->get_sub_section(sec_name);
+
+    // do we have a remaining path?
+    if(rem_path.empty())
+      return lead;
+    else if(lead != nullptr)
+      return lead->query_section(rem_path);
+    else
+      return nullptr;
+  }
+
   std::pair<String, bool> PropertyMap::query(String key_path) const
   {
-    // try to find a dot within the path
-    size_t off = key_path.find('.');
-    if(off != key_path.npos)
+    // first of all, trim the input of leadin and trailing slashes
+    key_path.trim_me("/");
+
+    // try to find the last slash inside our path
+    std::size_t p = key_path.rfind('/');
+
+    // no path separator found?
+    if(p == key_path.npos)
     {
-      // separate the first substring and interpret it as a section name
-      const PropertyMap* sec(get_section(key_path.substr(0, off)));
-      if(sec != nullptr)
-      {
-        // search subsection
-        return sec->query(key_path.substr(off + 1));
-      }
-    }
-    else
-    {
-      // no dot found; interpret key path as key name
+      // interpret the path as a simple name then
       return get_entry(key_path);
     }
 
-    // value not found
-    return std::make_pair("", false);
+    // okay, split the input path at the slash; this gives us
+    // the leading section path
+    String sec_path = key_path.substr(0, p).trim();
+    // the key name
+    String key_name = key_path.substr(p+1).trim();
+
+    // try to query the section
+    const PropertyMap* sec = query_section(sec_path);
+
+    // no luck finding the section?
+    if(sec == nullptr)
+      return std::make_pair(String(), false);
+    else
+      return sec->get_entry(key_name);
   }
 
   String PropertyMap::query(String key_path, String default_value) const
   {
     CONTEXT("PropertyMap::query()");
 
-    // try to find a dot within the path
-    size_t off = key_path.find('.');
-    if(off != key_path.npos)
-    {
-      // separate the first substring and interpret it as a section name
-      const PropertyMap* sec(get_section(key_path.substr(0, off)));
-      if(sec != nullptr)
-      {
-        // search subsection
-        return sec->query(key_path.substr(off + 1), default_value);
-      }
-    }
-    else
-    {
-      // no dot found; interpret key path as key name
-      EntryMap::const_iterator iter(_values.find(key_path));
-      if(iter != _values.end())
-      {
-        // key found; return its value
-        return iter->second;
-      }
-    }
+    // use the other query function to search for the value
+    std::pair<String, bool> sb = this->query(key_path);
 
-    // value not found
-    return default_value;
+    // if the key was found, return its value, otherwise return default value
+    return sb.second ? sb.first : default_value;
   }
 
   std::pair<String, bool> PropertyMap::get_entry(String key) const
@@ -158,9 +190,9 @@ namespace FEAST
     return std::make_pair(iter->second, true);
   }
 
-  const PropertyMap* PropertyMap::get_section(String name) const
+  const PropertyMap* PropertyMap::get_sub_section(String name) const
   {
-    CONTEXT("PropertyMap::get_section() [const]");
+    CONTEXT("PropertyMap::get_sub_section() [const]");
     SectionMap::const_iterator iter(_sections.find(name));
     if(iter == _sections.end())
     {
@@ -169,9 +201,9 @@ namespace FEAST
     return iter->second;
   }
 
-  PropertyMap* PropertyMap::get_section(String name)
+  PropertyMap* PropertyMap::get_sub_section(String name)
   {
-    CONTEXT("PropertyMap::get_section()");
+    CONTEXT("PropertyMap::get_sub_section()");
     SectionMap::iterator iter(_sections.find(name));
     if(iter == _sections.end())
     {

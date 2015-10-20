@@ -16,6 +16,26 @@ namespace FEAST
    *
    * \see \ref ini_format
    *
+   * <b>Path Specification:</b>\n
+   * Some functions of this class, namely the #query() and
+   * #query_section() functions, use \e paths for their search. Paths allow to search for
+   * sections and key-value pairs (either relatively or absolutely) within the whole
+   * property map tree instead of only within the current property map represented by
+   * the ProperyMap object itself.
+   *
+   * For this, three characters are reserved as special characters in the path:
+   * - The forward slash \c / represents a path separator (just as in file-system paths).
+   * - The exclamation mark \c ! represents the root section.
+   * - The tilde \c ~ represents the parent section (as the double-dot <c>..</c> in file-system paths).
+   *
+   * Examples:
+   * - <c>SecName/KeyName</c>: searches for a key named \c KeyName inside a sub-section named \c SecName
+   *   within the current section.
+   * - <c>!/SecName/KeyName</c>: searches for key named \c KeyName inside a sub-section named \c SecName
+   *   within the root section; independent of which section is represented by the current section.
+   * - <c>~/KeyName</c>: searches for a key named \c KeyName inside the parent section of the
+   *   current section.
+   *
    * \author Constantin Christof
    * \author Peter Zajac
    */
@@ -37,6 +57,9 @@ namespace FEAST
     typedef SectionMap::const_iterator ConstSectionIterator;
 
   protected:
+    /// pointer to the parent node
+    PropertyMap* _parent;
+
     /// a map storing the key-value-pairs
     EntryMap _values;
 
@@ -45,7 +68,7 @@ namespace FEAST
 
   public:
     /// Default Constructor
-    PropertyMap();
+    explicit PropertyMap(PropertyMap* parent = nullptr);
 
     /// Virtual Destructor
     virtual ~PropertyMap();
@@ -110,10 +133,13 @@ namespace FEAST
     bool erase_section(String name);
 
     /**
-     * \brief Queries a value.
+     * \brief Queries a value by its key path.
+     *
+     * \note
+     * See the documentation of this class for details about paths.
      *
      * \param[in] key_path
-     * A absolute path (section.subsection.key) path to the key whose value is to be returned.
+     * A path to the key whose value is to be returned.
      *
      * \returns
      * A <c>pair<String,bool></c>, where the second component marks, whether an entry with the key path
@@ -123,10 +149,13 @@ namespace FEAST
     std::pair<String, bool> query(String key_path) const;
 
     /**
-     * \brief Queries a value.
+     * \brief Queries a value by its key path.
+     *
+     * \note
+     * See the documentation of this class for details about paths.
      *
      * \param[in] key_path
-     * A absolute path (section.subsection.key) to the key whose value is to be returned.
+     * A path to the key whose value is to be returned.
      *
      * \param[in] default_value
      * A string that is to be returned in the case that the key was not found.
@@ -137,9 +166,28 @@ namespace FEAST
     String query(String key_path, String default_value) const;
 
     /**
-     * \brief Retrieves a value for a given key from the current top-lvl section.
+     * \brief Queries a section by its section path.
      *
-     * This function returns the value string of a key-value pair in the currect top-lvl section.
+     * \note
+     * See the documentation of this class for details about paths.
+     *
+     * \param[in] sec_path
+     * A path to the section that is to be found.
+     *
+     * \returns
+     * A (const) pointer to the section represented by \p path or \c nullptr if no such section was found.
+     */
+    PropertyMap* query_section(String sec_path);
+
+    /** \copydoc query_section() */
+    const PropertyMap* query_section(String sec_path) const;
+
+    /**
+     * \brief Retrieves a value by its key.
+     *
+     * \note
+     * This function only searches the current section represented by \c this for the key.
+     * If you want to search whole paths, use the #query() function instead.
      *
      * \param[in] key
      * The key of the entry whose value is to be returned.
@@ -152,7 +200,11 @@ namespace FEAST
     std::pair<String, bool> get_entry(String key) const;
 
     /**
-     * \brief Returns a sub-section.
+     * \brief Retrieves a sub-section by its name.
+     *
+     * \note
+     * This function only search the current section represented by \c this for the sub-section.
+     * If you want to search whole paths, use the #query_section() function instead.
      *
      * \param[in] name
      * The name of the sub-section which is to be returned.
@@ -161,13 +213,44 @@ namespace FEAST
      * A pointer to the PropertyMap associated with \p name or \c nullptr if no section with that name exists.
      *
      * \note
-     * This method does not allocate new memory, thus modifications to the returend PropertyMap affect the base property map
-     * and the returned PropertyMap <b>must</b> not be deleted.
+     * This method does not allocate new memory, thus modifications to the returned PropertyMap affect the base
+     * property map and the returned PropertyMap <b>must</b> not be deleted.
      */
-    PropertyMap* get_section(String name);
+    PropertyMap* get_sub_section(String name);
 
     /** \copydoc get_section() */
-    const PropertyMap* get_section(String name) const;
+    const PropertyMap* get_sub_section(String name) const;
+
+    /**
+     * \brief Returns a pointer to the parent section.
+     *
+     * \returns
+     * A pointer to the parent section or \c nullptr if this section has no parent.
+     */
+    PropertyMap* get_parent()
+    {
+      return _parent;
+    }
+
+    /** \copydoc get_parent() */
+    const PropertyMap* get_parent() const
+    {
+      return _parent;
+    }
+
+    /**
+     * \brief Returns a pointer to the root section.
+     */
+    PropertyMap* get_root()
+    {
+      return (_parent != nullptr) ? _parent->get_root() : this;
+    }
+
+    /** \copydoc get_root() */
+    const PropertyMap* get_root() const
+    {
+      return (_parent != nullptr) ? _parent->get_root() : this;
+    }
 
     /**
      * \brief Returns a reference to the entry map.

@@ -64,23 +64,35 @@ public:
     TEST_CHECK_EQUAL(parsec.get_entry("key2").first, "...but then it was overwritten");
 
     // okay, we survived the root section, so let's go for YourSection
-    PropertyMap* yoursec = parsec.get_section("YourSection");
+    PropertyMap* yoursec = parsec.get_sub_section("YourSection");
     TEST_CHECK(yoursec != nullptr);
 
     // let's go for pi
-    PropertyMap* consec = yoursec->get_section("CONSTANTS");
+    PropertyMap* consec = yoursec->get_sub_section("CONSTANTS");
     TEST_CHECK(consec != nullptr);
     TEST_CHECK_EQUAL(consec->get_entry("pI").first, "3.141592653589793238462643383279...");
 
     // we're back in the root section; try MySection now
-    PropertyMap* mysec = parsec.get_section("MySeCtIoN");
+    PropertyMap* mysec = parsec.get_sub_section("MySeCtIoN");
     TEST_CHECK(mysec != nullptr);
     TEST_CHECK_EQUAL(mysec->get_entry("Key3").first, "This entry makes use of line continuation.");
 
-    // test the query functions now
+    // test the query_section function
+    PropertyMap* consec2 = yoursec->query_section("Constants"); // child
+    TEST_CHECK_EQUAL(consec2, consec);
+    PropertyMap* yoursec2 = consec->query_section("/~"); // parent
+    TEST_CHECK_EQUAL(yoursec2, yoursec);
+    PropertyMap* rootsec2 = yoursec->query_section("!/"); // root
+    TEST_CHECK_EQUAL(rootsec2, &parsec);
+    PropertyMap* consec3 = mysec->query_section("!/MySection/~//YourSection/Constants//");
+    TEST_CHECK_EQUAL(consec3, consec);
+
+    // test the query function
     TEST_CHECK_EQUAL(parsec.query("E", ""), "m*c^2");
-    TEST_CHECK_EQUAL(parsec.query("YourSection.sqrt4", ""), "2");
-    TEST_CHECK_EQUAL(parsec.query("M.B", "test"), "test"); // does not exist
+    TEST_CHECK_EQUAL(parsec.query("YourSection/sqrt4", ""), "2");
+    TEST_CHECK_EQUAL(parsec.query("M/B", "test"), "test"); // does not exist
+    TEST_CHECK_EQUAL(consec->query("~/sqrt4", ""), "2");
+    TEST_CHECK_EQUAL(mysec->query("!/E", ""), "m*c^2");
 
     // okay, test passed
   } // test_0
@@ -240,25 +252,25 @@ public:
     TEST_CHECK_EQUAL(parsec1.get_entry("KEY42").first, "23");
 
     // okay, we survived the root section, so let's go for Section1
-    PropertyMap* sec1 = parsec1.get_section("Section1");
+    PropertyMap* sec1 = parsec1.get_sub_section("Section1");
     TEST_CHECK(sec1 != nullptr);
 
     // let's go for pi in the first subsection
-    PropertyMap* subsec1 = sec1->get_section("Subsection1");
+    PropertyMap* subsec1 = sec1->get_sub_section("Subsection1");
     TEST_CHECK(subsec1 != nullptr);
     TEST_CHECK_EQUAL(subsec1->get_entry("pI").first, "3.141592653589793238462643383279...");
 
     // an now for the other one
-    PropertyMap* subsec2 = sec1->get_section("Subsection2");
+    PropertyMap* subsec2 = sec1->get_sub_section("Subsection2");
     TEST_CHECK(subsec2 != nullptr);
     TEST_CHECK_EQUAL(subsec2->get_entry("pi").first, "circa 3");
 
     // let's check if the Section 2 and 3 are there
-    PropertyMap* sec2 = parsec1.get_section("SECTION2");
+    PropertyMap* sec2 = parsec1.get_sub_section("SECTION2");
     TEST_CHECK(sec2 != nullptr);
     TEST_CHECK_EQUAL(sec2->get_entry("Key3").first, "something else");
 
-    PropertyMap* sec3 = parsec1.get_section("SECTION3");
+    PropertyMap* sec3 = parsec1.get_sub_section("SECTION3");
     TEST_CHECK(sec3 != nullptr);
     TEST_CHECK_EQUAL(sec3->get_entry("Key3").first, "no idea");
 
