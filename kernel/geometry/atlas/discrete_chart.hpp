@@ -18,12 +18,22 @@ namespace FEAST
       /// \cond internal
       namespace Intern
       {
+        /**
+         * \brief Coefficient / facet numbering permutation
+         *
+         * For Simplex<d>, d != 1, facet i lies opposite of the local vertex i and nothing needs to be done
+         */
         template<int shape_dim>
         inline int coeffperm(int i)
         {
           return i;
         }
 
+        /**
+         * \brief Coefficient / facet numbering permutation
+         *
+         * For Simplex<1>, facet i is the local vertex i, so the coefficients need to be permuted
+         */
         template<>
         inline int coeffperm<1>(int i)
         {
@@ -67,9 +77,13 @@ namespace FEAST
         public ChartCRTP<DiscreteChart<Mesh_, SurfaceMesh_>, Mesh_, DiscreteChartTraits<SurfaceMesh_>>
       {
         public:
+          /// The type for the mesh defining the discrete surface
           typedef SurfaceMesh_ SurfaceMeshType;
+          /// The CRTP base class
           typedef ChartCRTP<DiscreteChart<Mesh_, SurfaceMesh_>, Mesh_, DiscreteChartTraits<SurfaceMesh_>> BaseClass;
-          typedef typename BaseClass::CoordType DataType;
+          /// Floating point type for coordinates
+          typedef typename BaseClass::CoordType CoordType;
+          /// Vector type for world points
           typedef typename BaseClass::WorldPoint WorldPoint;
 
         public:
@@ -114,20 +128,28 @@ namespace FEAST
             return "discrete";
           }
 
+          /**
+           * \brief Descriptive String
+           *
+           * \returns The class name as String
+           */
           static String name()
           {
             return "DiscreteChart<"+Mesh_::name()+", "+SurfaceMesh_::name()+">";
           }
 
           /** \copydoc ChartBase::write_data_container() */
-          virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+          virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
           {
             CONTEXT(name()+"::write_data_container()");
-            Geometry::MeshWriter<SurfaceMeshType>::write_mesh(chart_data.mesh_data, *_surface_mesh);
+            Geometry::MeshWriter<SurfaceMeshType>::write_mesh(chart_container.mesh_data, *_surface_mesh);
           }
 
           /**
            * \brief Parses a MeshDataContainer
+           *
+           * \param[in] data
+           * The MeshStreamer::MeshDataContainer holding the data
            *
            * \returns
            * A new object of type DiscreteChart containing the mesh data from the container
@@ -143,27 +165,34 @@ namespace FEAST
             return new DiscreteChart(surface_mesh);
           }
 
-          /** \copydoc ChartBase::project()
+          /**
+           * \brief Projects a single point to the surface given by the discrete chart
            *
-           * \warning Dumb, inefficient and imprecise routine for testing purposes.
+           * \warning Dumb and inefficient: This just moves the point to the nearest point of the surface mesh. This
+           * means it is somewhat likely that different points get moved together and for every single point, and the
+           * complexity is O(# surface_mesh_vertices) FOR EVERY SINGLE POINT PROJECTED.
            *
-           * \todo: Implement something better
+           * If possible, use project(Mesh_&, MeshPart&) version.
+           *
+           * \param[in,out] point
+           * The point that gets projected.
+           *
            */
           void project(WorldPoint& point) const
           {
             CONTEXT(name()+"::project(WorldPoint&)");
             Index min_index(0);
-            DataType min_dist(Math::Limits<DataType>::max());
+            CoordType min_dist(Math::Limits<CoordType>::max());
 
             typename SurfaceMesh_::VertexSetType& vtx(_surface_mesh->get_vertex_set());
-            DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.5)));
+            CoordType tol(Math::pow(Math::eps<CoordType>(), CoordType(0.5)));
 
             for(Index i(0); i < _surface_mesh->get_num_entities(0); ++i)
             {
               typename SurfaceMeshType::VertexSetType::VertexType tmp(point);
               tmp -= vtx[i];
 
-              DataType current_dist(tmp.norm_euclid());
+              CoordType current_dist(tmp.norm_euclid());
 
               if(current_dist <= tol)
               {
@@ -238,24 +267,12 @@ namespace FEAST
 
             Geometry::Intern::FacetNeighbours::compute(neigh_mp, facet_idx_mp);
 
-            //for(Index facet(0); facet < num_facets; ++facet)
-            //{
-            //  std::cout << "MeshPart facet " << facet << " consists of: " << std::endl;
-            //  std::cout << "Subfacets ";
-            //  for(int i(0); i < facet_idx_mp.num_indices; ++i)
-            //    std::cout << " " << facet_idx_mp(facet, Index(i));
-            //  std::cout << std::endl << "Neighbours ";
-            //  for(int i(0); i < neigh_mp.num_indices; ++i)
-            //    std::cout << " " << neigh_mp(facet, Index(i));
-            //  std::cout << std::endl;
-            //}
-
             // The mesh's vertex set, since we modify the coordinates by projection
             auto& vtx(mesh.get_vertex_set());
 
             // When a point is found, this will hold the coefficients of its image under the projection wrt. the
             // standard P1/Q1 transformation
-            Tiny::Vector<DataType, SurfaceMesh_::shape_dim+1> coeffs(DataType(0));
+            Tiny::Vector<CoordType, SurfaceMesh_::shape_dim+1> coeffs(CoordType(0));
 
             // For every vertex, we need to know if it was already projected
             bool* vert_todo(new bool[num_verts]);
@@ -292,19 +309,12 @@ namespace FEAST
               // initially
               Index facet_sm(guesses[current_facet]);
 
-              //std::cout << "Finding vertices in facet " << current_facet << " with neighbours";
-              //for(int l(0); l < neigh_mp.num_indices; ++l)
-              //{
-              //  std::cout << " " << neigh_mp(current_facet, Index(l));
-              //}
-              //std::cout << std::endl;
-
               facet_stack.pop_front();
               facet_todo[current_facet] = false;
 
               // We want to orthogonally project a point, so we need to figure out an acceptable distance for this
               // projection. Otherwise, it might happen that we project to the far side of the domain
-              DataType acceptable_distance(DataType(1));
+              CoordType acceptable_distance(CoordType(1));
 
               // Compute acceptable distance. Because we do not have the transformation available, we cannot compute
               // i.e. the volume of the facet to deduce an acceptable distance from that. So instead, we pick a
@@ -313,10 +323,9 @@ namespace FEAST
               {
                 Index i0(idx_mp(current_facet, Index(0)));
                 Index i_mp(idx_mp(current_facet, Index(j+1)));
-                //std::cout << "edgelength " << ((vtx[i_mp] - vtx[i0]).norm_euclid()) << std::endl;
                 acceptable_distance *= ((vtx[i_mp] - vtx[i0]).norm_euclid());
               }
-              acceptable_distance = Math::pow(acceptable_distance, DataType(1)/DataType(idx_mp.num_indices));
+              acceptable_distance = Math::pow(acceptable_distance, CoordType(1)/CoordType(idx_mp.num_indices));
 
               // Find all vertices in the current facet
               for(int j(0); j < idx_mp.num_indices; ++j)
@@ -328,10 +337,6 @@ namespace FEAST
                 {
                   vert_todo[i_mp] = false;
                   const auto& x(vtx[ts_verts[i_mp]]);
-                  //std::cout << "searching for vertex " << i_mp << " (";
-                  //for(int d(0); d < SurfaceMesh_::world_dim; ++d)
-                  //  std::cout << " " << x[d];
-                  //std::cout << " ), acceptable distance = " << scientify(acceptable_distance) << std::endl;
 
                   // Find the facet in the SurfaceMesh we project to and compute the coefficients
                   facet_sm = find_cell(coeffs, x, guesses[current_facet], acceptable_distance,
@@ -341,25 +346,10 @@ namespace FEAST
 
                   // This is the index of the local vertex j in the real mesh
                   Index i_parent(ts_verts[i_mp]);
-                  //std::cout << "SurfaceMesh vertices: ";
-                  //for(int i(0); i < SurfaceMesh_::shape_dim+1; ++i)
-                  //{
-                  //  Index i_sm(idx_sm(facet_sm, Index(i)));
-                  //  std::cout << std::endl << "(";
-                  //  for(int d(0); d < SurfaceMesh_::world_dim; ++d)
-                  //    std::cout << " " << vtx_sm[i_sm](d);
-                  //  std::cout << " ) ";
-                  //}
-                  //std::cout << std::endl;
-                  //std::cout << "Projecting " << ts_verts[i_mp] << ": (";
-                  //for(int i(0); i < SurfaceMesh_::world_dim; ++i)
-                  //  std::cout << " " << vtx[i_parent](i);
-                  //std::cout << " ) to (" ;
-
                   // Clear the old vertex coordinates so we can just add onto that
-                  vtx[i_parent].format(DataType(0));
+                  vtx[i_parent].format(CoordType(0));
                   // Evaluate the surface mesh trafo for the computed coefficients
-                  DataType coeff0(DataType(1));
+                  CoordType coeff0(CoordType(1));
                   for(int i(0); i < SurfaceMesh_::shape_dim; ++i)
                   {
                     // Index of the local vertex i in the SurfaceMesh
@@ -369,18 +359,8 @@ namespace FEAST
                   }
                   vtx[i_parent] += coeff0*vtx_sm[idx_sm(facet_sm, Index(0))];
 
-                  //for(int i(0); i < SurfaceMesh_::world_dim; ++i)
-                  //  std::cout << " " << vtx[i_parent](i);
-                  //std::cout << " )" << std::endl;
-
-                  //std::cout << "coeffs = ( " << coeff0;
-                  //for(int i(0); i < SurfaceMesh_::shape_dim; ++i)
-                  //  std::cout << " " << coeffs[i];
-                  //std::cout << " )" << std::endl;
                 } // vert_todo[i_mp]
               } // vertices in current facet
-
-              // std::cout << "Adding to facet search stack:";
 
               // Now add all neighbours that are still on the todo list to the search stack
               for(int l(0); l < neigh_mp.num_indices; ++l)
@@ -388,15 +368,13 @@ namespace FEAST
                 Index k(neigh_mp(current_facet, Index(l)));
                 if(k != ~Index(0) && facet_todo[k])
                 {
-                  //std::cout << " " << k;
                   facet_todo[k] = false;
                   facet_stack.push_back(k);
                   // The last vertex was found in facet_sm, and since k is a neighbour of current, it cannot be too
                   // far off
                   guesses[k] = facet_sm;
                 }
-              }
-              //std::cout << std::endl;
+              } // adding neighbours
 
             } // search stack
 
@@ -443,27 +421,22 @@ namespace FEAST
            * For every subfacet, we need to know if it was already traversed by adding the neighbour across said
            * facet to the search stack. If the surface is concave, it might happen that facet A says "go to my
            * neighbour, B", and then B says "go to my neighbour, A". It's then clear that the wanted point lies on
-           * the facet between A and B.
+           * the facet between A and B (c.f. determine_success()).
            *
+           * \see determine_success
            * \returns The index of the cell in which x was found
            */
           template<int world_dim, int sc_, int sx_>
           Index find_cell(
-            Tiny::Vector<DataType, SurfaceMesh_::shape_dim+1, sc_>& coeffs,
-            const Tiny::Vector<DataType, world_dim, sx_>& x,
-            Index guess, DataType acceptable_distance, const SurfaceMesh_* mesh, bool* traversed) const
+            Tiny::Vector<CoordType, SurfaceMesh_::shape_dim+1, sc_>& coeffs,
+            const Tiny::Vector<CoordType, world_dim, sx_>& x,
+            Index guess, CoordType acceptable_distance, const SurfaceMesh_* mesh, bool* traversed) const
           {
             CONTEXT(name()+"::find_cell()");
 
             // Clear traversed information
             for(Index facet(0); facet < mesh->get_num_entities(SurfaceMesh_::shape_dim-1); ++facet)
               traversed[facet] = false;
-
-            //std::cout << "find_cell guess: " << guess;
-            //std::cout << ", search for x = (";
-            //for(int j(0); j< world_dim; ++j)
-            //  std::cout << " " << x[j];
-            //std::cout << " ), acceptable distance =  " << scientify(acceptable_distance) << std::endl;
 
             Index num_cells(mesh->get_num_entities(SurfaceMeshType::shape_dim));
             // We need to recall which cells we already treated
@@ -487,7 +460,7 @@ namespace FEAST
 
             // This will contain all vertices making up a cell in the mesh. Since the mesh is of shape
             // Simplex<shape_dim>, there are shape_dim+1 vertices.
-            Tiny::Matrix<DataType, num_vert_loc, world_dim> coords(DataType(0));
+            Tiny::Matrix<CoordType, num_vert_loc, world_dim> coords(CoordType(0));
 
             // This is the search stack
             std::deque<Index> cell_stack;
@@ -502,7 +475,6 @@ namespace FEAST
             {
               // Get new cell
               current = cell_stack.front();
-              //std::cout << "facet " << current;
               cell_stack.pop_front();
               cell_marker[current] = true;
 
@@ -511,10 +483,6 @@ namespace FEAST
               {
                 Index i(idx(current, Index(j)));
                 coords[j] = vtx[i];
-                //std::cout << "(";
-                //for(int d(0); d < SurfaceMesh_::world_dim; ++d)
-                //  std::cout << " " << scientify(coords[j](d));
-                //std::cout << " )" <<std::endl;
               }
 
               // Compute the coefficients of the inverse coordinate transformation. The last coefficient is the
@@ -523,19 +491,8 @@ namespace FEAST
 
               // From the coefficients, we can compute the barycentric coordinates (as the surface mesh is of Simplex
               // shape) so we get an idea about in which direction we need to search first
-              Tiny::Vector<DataType, SurfaceMesh_::shape_dim+1> bary(DataType(1));
-              DataType ortho_dist = compute_bary_and_dist(bary, coeffs);
-
-              //std::cout << "facet " << current << " bary = (";
-              //for(int j(0); j < SurfaceMesh_::shape_dim+1; ++j)
-              //  std::cout << " " << bary(j);
-              //std::cout << " ), ortho_dist = " << scientify(ortho_dist) <<
-              //  " neigh = ( " <<
-              //  neigh(current, Index(0)) << " " <<
-              //  neigh(current, Index(1)) << " )" <<
-              //  " facets = ( " <<
-              //  facet_idx(current, Index(0)) << " " << facet_idx(current, Index(1)) << " )" <<
-              //  std::endl;
+              Tiny::Vector<CoordType, SurfaceMesh_::shape_dim+1> bary(CoordType(1));
+              CoordType ortho_dist = compute_bary_and_dist(bary, coeffs);
 
               // From all this, we can now determine if there is an orthogonal projection of x onto this facet. For
               // this, we need to know the traversed information as well and the neighbour information of the current
@@ -614,6 +571,9 @@ namespace FEAST
            * \param[in] coeffs
            * The coefficients for the mapping from the reference cell to the real cell
            *
+           * \returns
+           * The absolute value of the last coefficient, which is the absolute distance.
+           *
            * Assume we have a non-degenerate \c Simplex<s> called \f$ S \f$ in \f$ \mathbb{R}^d \f$ defined by
            * vertices \f$ x^j \in \mathbb{R}^d, j = 0, \dots, s \f$. Assume for now that \f$ s = d \f$.
            *
@@ -636,14 +596,14 @@ namespace FEAST
            * coordinates very handy for finding out in which direction of a given simplex a point lies.
            *
            * This routine assumes that \f$ s = d-1 \f$, where \f$ d = 2, 3 \f$ and that the last coefficient is
-           * actually the signed distance of the point \f$ x \$ to which the coefficients belong to the hyperplane
+           * actually the signed distance of the point \f$ x \f$ to which the coefficients belong to the hyperplane
            * defined by \f$ S \f$.
            *
            */
           template<typename DT_, int n_, int sn_, int sb_>
           static DT_ compute_bary_and_dist(Tiny::Vector<DT_, n_, sb_>& bary, const Tiny::Vector<DT_, n_, sn_>& coeffs)
           {
-            bary(Intern::coeffperm<n_-1>(0)) = DataType(1);
+            bary(Intern::coeffperm<n_-1>(0)) = CoordType(1);
             for(int j(0); j < n_-1; ++j)
             {
               bary(Intern::coeffperm<n_-1>(0)) -= coeffs(j);
@@ -652,6 +612,70 @@ namespace FEAST
             return Math::abs(coeffs(n_-1));
           }
 
+          /**
+           * \brief Determines the success of the point search
+           *
+           * \tparam DT_
+           * Floating point type for coordinates
+           *
+           * \tparam n_
+           * Number of barycentric coordinates, meaning shape_dim+1
+           *
+           * \tparam sn_
+           * Stride for the vector of barycentric coordinates
+           *
+           * \tparam IdxType_
+           * Type of the IndexSet of appropriate size
+           *
+           * \param[in] ortho_dist
+           * Orthogonal distance of the point to the appropriate plane
+           *
+           * \param[in] acceptable_distance
+           * Tolerance for ortho_dist
+           *
+           * \param[in] bary
+           * Barycentric coordinates of the point in the current cell
+           *
+           * \param[in] facet_idx
+           * Facet at current cell information
+           *
+           * \param[in] traversed
+           * Marker which facets have been traversed so far
+           *
+           * \returns
+           * True if bary and traversed indicate that the point can be projected to the current cell.
+           *
+           * After the barycentric coordinates of a point wrt. a cell have been computed, we have to determine if the
+           * point lies in that cell. This is definitely the case if
+           * \f[
+           *   \forall j=0, \dots, s: \lambda_j \in [0, 1] \wedge\mathrm{ortho_dist} = 0.
+           * \f]
+           *
+           * If the first condition holds, the second is violated but \f$ \mathrm{ortho_dist} <
+           * \mathrm{acceptable_distance} \f$, the search was successful as well.
+           *
+           * Because we are dealing with floats, we add some tolerance either way. The remaining problem is a concave
+           * surface like this:
+           *
+           \verbatim
+
+           x
+           (exteriour)
+           *--------------
+           |            (1)
+           | (0)       (interiour)
+           |
+
+           \endverbatim
+           *
+           * The barycentric coordinates of edge 0 will point into direction of edge 1 and vice versa. For this, we
+           * keep the \c traversed information: If we first compute the barycentric coordinates wrt. edge (0), it will
+           * mark the facet * (which is just a vertex in this case) as traversed. If we later computed the barycentric
+           * coordinates of x wrt. edge (1), the coordinate belonging to vertex * will be negative, pointing us back
+           * to edge (0). But * has been marked as traversed, so setting that negative barycentric coordinate to zero
+           * means (if not other barycentric coordinate was lower than 0) we project to that facet, in this case: * .
+           *
+           */
           template<typename DT_, int n_, int sn_, typename IdxType_>
           static bool determine_success(DT_ ortho_dist, DT_ acceptable_distance,
           Tiny::Vector<DT_, n_, sn_>& bary, const IdxType_& facet_idx, bool* traversed)
@@ -669,7 +693,7 @@ namespace FEAST
               {
                 if(traversed[facet])
                 {
-                  bary(l) = DataType(0);
+                  bary(l) = CoordType(0);
                 }
                 else
                 {

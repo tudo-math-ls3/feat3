@@ -224,10 +224,27 @@ namespace FEAST
         typedef Tiny::Vector<CoordType, param_dim> ParamPoint;
 
       protected:
+        /**
+         * \brief Casts \c this to its true type
+         *
+         * \returns A Derived_ reference to \c this
+         */
         Derived_& cast() {return static_cast<Derived_&>(*this);}
+
+        /// \copydoc cast()
         const Derived_& cast() const {return static_cast<const Derived_&>(*this);}
 
       public:
+        /**
+         * \brief Adapts a whole MeshPart
+         *
+         * \param[in] mesh
+         * Mesh to be adapted
+         *
+         * \param[in] part
+         * MeshPart identifying the region to be adapted
+         *
+         */
         virtual void adapt(MeshType& mesh, const PartType& part) const override
         {
           // ensure that the mesh world dimension is compatible
@@ -246,6 +263,20 @@ namespace FEAST
           throw InternalError("No adaption possible");
         }
 
+        /**
+         * \brief Adapts a whole MeshPart referring to another MeshPart
+         *
+         * \param[in] mesh
+         * Mesh to be adapted
+         *
+         * \param[in] part
+         * MeshPart identifying the region to be adapted
+         *
+         * \todo: Implement this
+         *
+         * There is currently no code that uses MeshParts referring to other MeshParts instead of a RootMesh.
+         *
+         */
         virtual void adapt(PartType&, const PartType&) const override
         {
           throw InternalError("Adaption of MeshPart not possible yet");
