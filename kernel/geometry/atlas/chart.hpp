@@ -266,10 +266,10 @@ namespace FEAST
         /**
          * \brief Adapts a whole MeshPart referring to another MeshPart
          *
-         * \param[in] mesh
-         * Mesh to be adapted
+         * \param[in] parent_meshpart
+         * MeshPart to be adapted
          *
-         * \param[in] part
+         * \param[in] meshpart
          * MeshPart identifying the region to be adapted
          *
          * \todo: Implement this
@@ -277,7 +277,7 @@ namespace FEAST
          * There is currently no code that uses MeshParts referring to other MeshParts instead of a RootMesh.
          *
          */
-        virtual void adapt(PartType&, const PartType&) const override
+        virtual void adapt(PartType& DOXY(parent_meshpart), const PartType& DOXY(meshpart)) const override
         {
           throw InternalError("Adaption of MeshPart not possible yet");
         }

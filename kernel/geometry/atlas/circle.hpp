@@ -48,9 +48,13 @@ namespace FEAST
         public ChartCRTP<Circle<Mesh_>, Mesh_, CircleTraits>
       {
       public:
+        /// The CRTP base class
         typedef ChartCRTP<Circle<Mesh_>, Mesh_, CircleTraits> BaseClass;
+        /// Floating point type
         typedef typename BaseClass::CoordType DataType;
+        /// Vector type for world points, aka image points
         typedef typename BaseClass::WorldPoint WorldPoint;
+        /// Vector type for parametrisation points, aka domain points
         typedef typename BaseClass::ParamPoint ParamPoint;
 
       protected:
@@ -58,8 +62,10 @@ namespace FEAST
         WorldPoint _midpoint;
         /// the circle's radius
         DataType _radius;
-        /// domain transformation coefficients
-        DataType _trafo_a, _trafo_b;
+        /// Left parametrisation domain boundary
+        DataType _trafo_a;
+        /// Right parametrisation domain boundary
+        DataType _trafo_b;
 
       public:
         /**
@@ -86,7 +92,13 @@ namespace FEAST
           _midpoint[1] = mid_y;
         }
 
-        /** \copydoc ChartBase::project() */
+        /**
+         * \brief Projects a single world point
+         *
+         * \param[in,out] point
+         * The world point to be projected
+         *
+         */
         void project(WorldPoint& point) const
         {
           point -= _midpoint;
@@ -95,6 +107,16 @@ namespace FEAST
           point += _midpoint;
         }
 
+        /**
+         * \brief Projects all mesh points identified by a meshpart
+         *
+         * \param[in,out] mesh
+         * The mesh whose points will be projected
+         *
+         * \param[in] meshpart
+         * The MeshPart identifying the point to be projected
+         *
+         */
         void project(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
         {
           auto& vtx = mesh.get_vertex_set();
@@ -106,7 +128,16 @@ namespace FEAST
           }
         }
 
-        /** \copydoc ChartBase::map() */
+        /**
+         * \brief Maps a single parameter point
+         *
+         * \param[out] point
+         * The image of the parameter point under the chart mapping
+         *
+         * \param[in] param
+         * The parameter point to be projected
+         *
+         */
         void map(WorldPoint& point, const ParamPoint& param) const
         {
           // transform paramter to interval [0, 2*pi)
@@ -122,18 +153,30 @@ namespace FEAST
         }
 
         /** \copydoc ChartBase::write_data_container */
-        virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+        virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
         {
           DataType param_l(-_trafo_a);
           DataType param_r(param_l + DataType(2) * Math::pi<DataType>() / _trafo_b);
 
-          chart_data.data.push_back(" <circle>");
-          chart_data.data.push_back("  radius  "+stringify(scientify(_radius)));
-          chart_data.data.push_back("  midpoint "+stringify(scientify(_midpoint(0)))+" "+stringify(scientify(_midpoint(1))));
-          chart_data.data.push_back("  domain "+stringify(scientify(param_l))+" "+stringify(scientify(param_r)));
-          chart_data.data.push_back(" </circle>");
+          chart_container.data.push_back(" <circle>");
+          chart_container.data.push_back("  radius  "+stringify(scientify(_radius)));
+          chart_container.data.push_back("  midpoint "+stringify(scientify(_midpoint(0)))+" "+stringify(scientify(_midpoint(1))));
+          chart_container.data.push_back("  domain "+stringify(scientify(param_l))+" "+stringify(scientify(param_r)));
+          chart_container.data.push_back(" </circle>");
         }
 
+        /**
+         * \brief Builds a Circle<Mesh> object from parsed data
+         *
+         * \param[in] data
+         * Parameters for the object in the form of Strings
+         *
+         * \param[in] line
+         * The line in which the circle data started in the original file
+         *
+         * \returns
+         * A pointer to the new object.
+         */
         static Circle<Mesh_>* parse(const std::deque<String>& data, const Index line)
         {
           bool have_midpoint(false), have_radius(false), have_domain(false);

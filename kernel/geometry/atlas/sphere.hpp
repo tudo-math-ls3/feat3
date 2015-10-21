@@ -40,15 +40,19 @@ namespace FEAST
         public ChartCRTP<Sphere<Mesh_>, Mesh_, SphereTraits>
       {
       public:
+        /// CRTP base class
         typedef ChartCRTP<Sphere<Mesh_>, Mesh_, SphereTraits> BaseClass;
+        /// Floating point type
         typedef typename BaseClass::CoordType DataType;
+        /// Vector type for world points, aka image points
         typedef typename BaseClass::WorldPoint WorldPoint;
+        /// Vector type for parameter points, aka domain points
         typedef typename BaseClass::ParamPoint ParamPoint;
 
       protected:
-        /// the circle's midpoint
+        /// the sphere's midpoint
         WorldPoint _midpoint;
-        /// the circle's radius
+        /// the sphere's radius
         DataType _radius;
 
       public:
@@ -56,7 +60,7 @@ namespace FEAST
          * \brief Constructor
          *
          * \param[in] mid_x, mid_y, mid_z
-         * The coordinates of the sphere  midpoint.
+         * The coordinates of the sphere midpoint.
          *
          * \param[in] radius
          * The radius of the sphere. Must be positive.
@@ -85,7 +89,13 @@ namespace FEAST
           chart_data.data.push_back(" </sphere>");
         }
 
-        /** \copydoc ChartBase::project() */
+        /**
+         * \brief Projects a single world point
+         *
+         * \param[in,out] point
+         * The world point to be projected
+         *
+         */
         void project(WorldPoint& point) const
         {
           point -= _midpoint;
@@ -94,6 +104,16 @@ namespace FEAST
           point += _midpoint;
         }
 
+        /**
+         * \brief Projects all mesh points identified by a meshpart
+         *
+         * \param[in,out] mesh
+         * The mesh whose points will be projected
+         *
+         * \param[in] meshpart
+         * The MeshPart identifying the point to be projected
+         *
+         */
         void project(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
         {
           auto& vtx = mesh.get_vertex_set();
@@ -105,6 +125,18 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief Builds a Sphere<Mesh> object from parsed data
+         *
+         * \param[in] data
+         * Parameters for the object in the form of Strings
+         *
+         * \param[in] line
+         * The line in which the sphere data started in the original file
+         *
+         * \returns
+         * A pointer to the new object.
+         */
         static Sphere<Mesh_>* parse(const std::deque<String>& data, const Index line)
         {
           bool have_midpoint(false), have_radius(false);
@@ -165,7 +197,7 @@ namespace FEAST
           if(!have_radius)
             throw  InternalError("Sphere chart has no radius!");
 
-          // okay, create tube
+          // okay, create sphere
           return new Sphere<Mesh_>(mid_x, mid_y, mid_z, radius);
         }
       };
