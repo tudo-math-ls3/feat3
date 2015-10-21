@@ -15,12 +15,6 @@ namespace FEAST
      * \tparam AnalyticFunctionType_
      * Analytic function providing level set information
      *
-     * \tparam AnalyticFunctionGrad0Type_
-     * 1st component function of the AnalyticFunction's gradient
-     *
-     * \tparam AnalyticFunctionGrad0Type_
-     * 2nd component function of the AnalyticFunction's gradient
-     *
      * \tparam SpaceType_
      * FE space for the levelset function
      *
@@ -45,8 +39,6 @@ namespace FEAST
     template
     <
       typename AnalyticFunctionType_,
-      typename AnalyticFunctionGrad0Type_,
-      typename AnalyticFunctionGrad1Type_,
       typename TrafoType_,
       typename FunctionalType_,
       typename LevelsetFunctionalType_,
@@ -56,8 +48,6 @@ namespace FEAST
       public RumpfSmootherLevelsetAnalytic
       <
         AnalyticFunctionType_,
-        AnalyticFunctionGrad0Type_,
-        AnalyticFunctionGrad1Type_,
         TrafoType_,
         FunctionalType_,
         LevelsetFunctionalType_,
@@ -97,8 +87,6 @@ namespace FEAST
         typedef RumpfSmootherLevelsetAnalytic
         <
           AnalyticFunctionType_,
-          AnalyticFunctionGrad0Type_,
-          AnalyticFunctionGrad1Type_,
           TrafoType_,
           FunctionalType_,
           LevelsetFunctionalType_,
@@ -128,11 +116,9 @@ namespace FEAST
         std::deque<String>& dirichlet_list_, std::deque<String> slip_list_,
           FunctionalType_& functional_, LevelsetFunctionalType_& lvlset_functional_,
           bool align_to_lvlset_, bool r_adaptivity_,
-          AnalyticFunctionType_& analytic_function_,
-          AnalyticFunctionGrad0Type_& analytic_function_grad0_, AnalyticFunctionGrad1Type_& analytic_function_grad1_)
+          AnalyticFunctionType_& analytic_function_)
           : BaseClass(rmn_, dirichlet_list_, slip_list_, functional_, lvlset_functional_,
-          align_to_lvlset_, r_adaptivity_,
-          analytic_function_, analytic_function_grad0_, analytic_function_grad1_),
+          align_to_lvlset_, r_adaptivity_, analytic_function_),
           _conc(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _sum_conc(CoordType(0)),
           _grad_conc(rmn_->get_mesh()->get_num_entities(0), CoordType(0)),
@@ -210,14 +196,14 @@ namespace FEAST
           Assembly::Interpolator::project(this->_lvlset_vec, this->_analytic_lvlset, this->_lvlset_space);
 
           // Evaluate the gradient of the levelset function
-          Assembly::Interpolator::project(this->_lvlset_grad_vec[0], this->_analytic_lvlset_grad0, this->_lvlset_space);
-          Assembly::Interpolator::project(this->_lvlset_grad_vec[1], this->_analytic_lvlset_grad1, this->_lvlset_space);
+          Assembly::Interpolator::project(this->_lvlset_grad_vec, this->_analytic_lvlset_grad, this->_lvlset_space);
           // Project the levelset function to a grid vector on the new grid and...
-          FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_vtx_vec, this->_lvlset_vec, this->_lvlset_space);
+           FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_vtx_vec, this->_lvlset_vec, this->_lvlset_space);
 
           // ... do the same for its gradient
-          FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_grad_vtx_vec[0],this->_lvlset_grad_vec[0], this->_lvlset_space);
-          FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_grad_vtx_vec[1],this->_lvlset_grad_vec[1], this->_lvlset_space);
+          // TODO
+          // FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_grad_vtx_vec,this->_lvlset_grad_vec, this->_lvlset_space);
+          this->_lvlset_grad_vtx_vec.clone(this->_lvlset_grad_vec);
 
           // As the levelset might be used for r-adaptivity and it's vertex vector might have changed, re-compute
           if(this->_r_adaptivity)
@@ -360,15 +346,14 @@ namespace FEAST
          *   s_d := \sum_{l=1}^N \mathrm{det} \nabla R_{T,l}(\Phi), s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
          * \f]
          * So for each \f$ x_j \f$ we arrive at
-
-         * \f{align*}
-         *   \frac{\partial h(K_k)}{\partial x_j} & = \frac{1}{d} \left( \frac{c(K_k)}{s_d s_c} \right)^
+         * \f[
+         *   \frac{\partial h(K_k)}{\partial x_j} = \frac{1}{d} \left( \frac{c(K_k)}{s_d s_c} \right)^
          *   {\frac{1}{d}-1} \left[ c(K_k) ( \frac{\partial s_d}{\partial x_j} s_c + s_d
          *   \frac{\partial s_c}{\partial x_j} ) + \frac{\partial c(K_k)}{\partial x_j} s_d s_c \right]
          *   (s_d s_c)^{-2}
-         * \f}
+         * \f]
          *
-         **/
+         */
         void compute_grad_h()
         {
           _grad_h.format();
@@ -399,9 +384,8 @@ namespace FEAST
               Index i(idx(cell, Index(j)));
               // Get levelset
               lvlset_vals(j) = this->_lvlset_vec(i);
-              for(int d(0); d < MeshType::world_dim; ++d)
-                // Get levelset gradient
-                lvlset_grad_vals(j,d) = this->_lvlset_grad_vtx_vec[d](i);
+              // Get levelset gradient
+              lvlset_grad_vals[j] = this->_lvlset_grad_vtx_vec(i);
             }
 
             compute_grad_conc_local(grad_loc, lvlset_vals, lvlset_grad_vals);
@@ -463,9 +447,8 @@ namespace FEAST
               Index i(idx(cell, Index(j)));
               // Get levelset
               lvlset_vals(j) = this->_lvlset_vec(i);
-              for(int d(0); d < MeshType::world_dim; ++d)
-                // Get levelset gradient
-                lvlset_grad_vals(j,d) = this->_lvlset_grad_vtx_vec[d](i);
+              // Get levelset gradient
+              lvlset_grad_vals[j] = this->_lvlset_grad_vtx_vec(i);
             }
 
             // Compute gradient of the concentration on this cell
@@ -518,11 +501,8 @@ namespace FEAST
               lvlset_vals(j) = this->_lvlset_vec(i);
               // Get local coordinates
               x[j] = this->_coords(i);
-              for(int d(0); d < MeshType::world_dim; ++d)
-              {
-                // Get levelset gradient
-                lvlset_grad_vals[j](d) = this->_lvlset_grad_vtx_vec[d](i);
-              }
+              // Get levelset gradient
+              lvlset_grad_vals[j] = this->_lvlset_grad_vtx_vec(i);
             }
 
             // Compute local gradient and save it to grad_loc
@@ -546,8 +526,8 @@ namespace FEAST
           this->_filter.filter_cor(this->_grad);
 
         } // compute_gradient
-  }; // class RumpfSmootherLevelsetConcAnalytic
+    }; // class RumpfSmootherLevelsetConcAnalytic
 
-} // namespace Meshopt
+  } // namespace Meshopt
 } // namespace FEAST
 #endif // KERNEL_MESHOPT_RUMPF_SMOOTHER_CONC_HPP

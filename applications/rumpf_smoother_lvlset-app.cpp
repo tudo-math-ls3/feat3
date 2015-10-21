@@ -21,152 +21,6 @@
 
 using namespace FEAST;
 
-      /**
-       * @brief Class Template for the gradient of DistanceFunctionSD
-       *
-       * \tparam ImgPointType_
-       * Type for the point in the DistanceFunction
-       *
-       * \tparam component
-       * Component of the gradient
-       *
-       **/
-      template<int component, int dim_, typename DataType_>
-      class DistanceFunctionSD_grad :
-        public Analytic::Function
-      {
-      public:
-        static constexpr int domain_dim = dim_;
-        typedef Analytic::Image::Scalar ImageType;
-
-        static constexpr bool can_value = true;
-
-        typedef Tiny::Vector<DataType_, dim_> PointType;
-
-        /** \copydoc AnalyticFunction::Evaluator */
-        template<typename EvalTraits_>
-        class Evaluator :
-          public Analytic::Function::Evaluator<EvalTraits_>
-        {
-          public:
-            /// coefficient data type
-            typedef typename EvalTraits_::DataType DataType;
-            /// evaluation point type
-            typedef typename EvalTraits_::PointType PointType;
-            /// value type
-            typedef typename EvalTraits_::ValueType ValueType;
-            /// gradient type
-            typedef typename EvalTraits_::GradientType GradientType;
-            /// hessian type
-            typedef typename EvalTraits_::HessianType HessianType;
-
-          private:
-            /// Function to evaluate
-            const DistanceFunctionSD_grad& _function;
-
-          public:
-            /// Constructor
-            explicit Evaluator(const DistanceFunctionSD_grad& function) :
-              _function(function)
-              {
-              }
-
-            void value(ValueType& val, const PointType& point) const
-            {
-              DataType norm = (point - _function._point).norm_euclid();
-              if(norm <= Math::eps<DataType>())
-                val = DataType(0);
-              else
-                val = (_function._b / norm) * (point[component] - _function._point[component]);
-            }
-        }; // class DistanceFunctionSD::Evaluator<...>
-
-        private:
-          /// The point to which the distance to is calculated
-          PointType& _point;
-          /// Displacement of the function
-          DataType_ _a;
-          /// Scaling factor
-          DataType_ _b;
-
-        public:
-          /// Constructor
-          explicit DistanceFunctionSD_grad(PointType& x0_, const DataType_ a_, const DataType_ b_) :
-            _point(x0_),
-            _a(a_),
-            _b(b_)
-            {
-            }
-
-      }; // class DistanceFunctionSD_grad
-
-      template<int component, int derivative_component, int dim_, typename DataType_>
-      class PlaneDistanceFunctionSD_grad :
-        public Analytic::Function
-      {
-      public:
-        static constexpr int domain_dim = dim_;
-        typedef Analytic::Image::Scalar ImageType;
-
-        static constexpr bool can_value = true;
-
-        typedef Tiny::Vector<DataType_, dim_> PointType;
-
-
-          /** \copydoc AnalyticFunction::Evaluator */
-          template<typename EvalTraits_>
-          class Evaluator :
-            public Analytic::Function::Evaluator<EvalTraits_>
-        {
-          public:
-            /// coefficient data type
-            typedef typename EvalTraits_::DataType DataType;
-            /// evaluation point type
-            typedef typename EvalTraits_::PointType PointType;
-            /// value type
-            typedef typename EvalTraits_::ValueType ValueType;
-            /// gradient type
-            typedef typename EvalTraits_::GradientType GradientType;
-            /// hessian type
-            typedef typename EvalTraits_::HessianType HessianType;
-
-          private:
-            /// Function to evaluate
-            const PlaneDistanceFunctionSD_grad& _function;
-
-          public:
-            /// Constructor
-            explicit Evaluator(const PlaneDistanceFunctionSD_grad& function) :
-              _function(function)
-              {
-              }
-
-
-            void value(ValueType& val, const PointType&) const
-            {
-              if(component == derivative_component)
-                val = _function._b;
-              else
-                val = DataType(0);
-            }
-        }; // class PlaneDistanceFunctionSD::Evaluator<...>
-
-        private:
-          /// The point to which the distance to is calculated
-          PointType& _point;
-          /// Scaling factor
-          DataType_ _b;
-
-        public:
-          /// Constructor
-          explicit PlaneDistanceFunctionSD_grad(PointType& x0_, const DataType_ b_) :
-            _point(x0_),
-            _b(b_)
-            {
-            }
-
-      }; // class DistanceFunctionSD_grad
-
 /**
  * \brief Wrapper struct as functions do not seem to agree with template template parameters
  **/
@@ -248,16 +102,12 @@ template
     MeshType* mesh = rmn->get_mesh();
 
     typedef Analytic::Common::DistanceFunctionSD<2, DataType> AnalyticFunctionType;
-    typedef DistanceFunctionSD_grad<0, 2, DataType> AnalyticFunctionGrad0Type;
-    typedef DistanceFunctionSD_grad<1, 2, DataType> AnalyticFunctionGrad1Type;
     ImgPointType x0(DataType(0));
     x0.v[0] = DataType(0.25) *(DataType(2) + Math::cos(DataType(0)));
     x0.v[1] = DataType(0.25) *(DataType(2) + Math::sin(DataType(0)));
     DataType displacement(0.15);
     DataType scaling(-1);
     AnalyticFunctionType analytic_lvlset(x0, displacement, scaling);
-    AnalyticFunctionGrad0Type analytic_lvlset_grad0(x0, displacement, scaling);
-    AnalyticFunctionGrad1Type analytic_lvlset_grad1(x0, displacement, scaling);
 
     //const int plane = 0;
     //typedef Assembly::Common::PlaneDistanceFunctionSD<plane, ImgPointType> AnalyticFunctionType;
@@ -275,8 +125,6 @@ template
     typedef RumpfSmootherType_
     <
       AnalyticFunctionType,
-      AnalyticFunctionGrad0Type,
-      AnalyticFunctionGrad1Type,
       TrafoType,
       FunctionalType,
       LevelsetFunctionalType
@@ -303,7 +151,7 @@ template
 
     // The smoother in all its template glory
     RumpfSmootherType rumpflpumpfl(rmn, slip_list, dirichlet_list, my_functional, my_levelset_functional,
-    align_to_lvlset, r_adaptivity, analytic_lvlset, analytic_lvlset_grad0, analytic_lvlset_grad1);
+    align_to_lvlset, r_adaptivity, analytic_lvlset);
     rumpflpumpfl.init();
 
     //rumpflpumpfl._update_h = true;
@@ -337,7 +185,7 @@ template
     writer_pre_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
     writer_pre_initial.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
     writer_pre_initial.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-    writer_pre_initial.add_field_vertex("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements(), rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+    writer_pre_initial.add_field_vertex_blocked_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
     writer_pre_initial.add_field_cell("fval", func_norm, func_det, func_rec_det);
     writer_pre_initial.add_scalar_cell("levelset_constraint", func_lvlset );
     writer_pre_initial.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
@@ -359,7 +207,7 @@ template
     writer_post_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
     writer_post_initial.add_field_cell_blocked_vector("h", rumpflpumpfl._h );
     writer_post_initial.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-    writer_post_initial.add_field_vertex("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements(), rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+    writer_post_initial.add_field_vertex_blocked_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
     writer_post_initial.add_field_cell("fval", func_norm, func_det, func_rec_det);
     writer_post_initial.add_scalar_cell("levelset_constraint", func_lvlset );
     writer_post_initial.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
@@ -400,8 +248,7 @@ template
       writer_pre.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
       writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
       writer_pre.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-      writer_pre.add_field_vertex("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements(),
-      rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+      writer_pre.add_field_vertex_blocked_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
       writer_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
       writer_pre.add_scalar_cell("levelset_constraint", func_lvlset );
       writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
@@ -439,8 +286,7 @@ template
       writer_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h );
       writer_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
       writer_post.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-      writer_post.add_field_vertex("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec[0].elements(),
-      rumpflpumpfl._lvlset_grad_vtx_vec[1].elements());
+      writer_post.add_field_vertex_blocked_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
       writer_post.add_scalar_cell("levelset_constraint", func_lvlset );
       writer_post.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       writer_post.write(filename);
@@ -463,17 +309,17 @@ template
 
 }; // struct LevelsetApp
 
-template<typename A, typename B, typename C, typename D, typename E, typename F>
-using MySmoother = Meshopt::RumpfSmootherLevelsetConcAnalytic<A, B, C, D, E, F>;
+template<typename A, typename B, typename C, typename D>
+using MySmoother = Meshopt::RumpfSmootherLevelsetConcAnalytic<A, B, C, D>;
 
-template<typename A, typename B, typename C, typename D, typename E, typename F>
-using MySmootherQ1Hack = Meshopt::RumpfSmootherLevelsetAnalyticQ1Hack<A, B, C, D, E, F>;
+template<typename A, typename B, typename C, typename D>
+using MySmootherQ1Hack = Meshopt::RumpfSmootherLevelsetAnalyticQ1Hack<A, B, C, D>;
 
 template<typename A, typename B>
 using MyFunctional= Meshopt::RumpfFunctionalConc<A, B>;
 
 template<typename A, typename B>
-using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctionalConc>;
+using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
 
 /**
  * \cond internal
@@ -554,7 +400,7 @@ int main(int argc, char* argv[])
     return LevelsetApp<DataType, Simplex2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
       run(my_streamer, lvl_max, deltat);
   if(shape_type == mesh_data.st_quad)
-    return LevelsetApp<DataType, Hypercube2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
+    return LevelsetApp<DataType, Hypercube2Mesh_2d, MySmootherQ1Hack, MyFunctionalQ1Hack, Meshopt::RumpfFunctionalLevelset>::
       run(my_streamer, lvl_max, deltat);
 
   // If no MeshType from the list was in the file, return 1

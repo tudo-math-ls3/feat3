@@ -24,8 +24,6 @@ namespace FEAST
     template
     <
       typename AnalyticFunctionType_,
-      typename AnalyticFunctionGrad0Type_,
-      typename AnalyticFunctionGrad1Type_,
       typename TrafoType_,
       typename FunctionalType_,
       typename LevelsetFunctionalType_,
@@ -35,8 +33,6 @@ namespace FEAST
       public RumpfSmootherLevelsetAnalytic
       <
         AnalyticFunctionType_,
-        AnalyticFunctionGrad0Type_,
-        AnalyticFunctionGrad1Type_,
         TrafoType_,
         FunctionalType_,
         LevelsetFunctionalType_,
@@ -55,8 +51,6 @@ namespace FEAST
         typedef RumpfSmootherLevelsetAnalytic
         <
           AnalyticFunctionType_,
-          AnalyticFunctionGrad0Type_,
-          AnalyticFunctionGrad1Type_,
           TrafoType_,
           FunctionalType_,
           LevelsetFunctionalType_,
@@ -70,23 +64,18 @@ namespace FEAST
         /// The shape of the mesh's cells
         typedef typename MeshType::ShapeType ShapeType;
 
-        /// The functional has to use Simplex<shape_dim> and the trafo Hypercube<shape_dim>
-        static_assert( std::is_same<ShapeType, Shape::Hypercube<ShapeType::dimension> >::value &&
-            std::is_same<typename FunctionalType::ShapeType, Shape::Simplex<ShapeType::dimension> >::value,
-            "ShapeTypes of the transformation / functional have to be Hypercube<d>/Simplex<d> for RumpfSmootherQ1Hack" );
-
+        /// The everyone has to use Hypercube<shape_dim>
+        static_assert( std::is_same<ShapeType, Shape::Hypercube<ShapeType::dimension> >::value,
+            "ShapeType of the transformation has to be Hypercube<d> for RumpfSmootherQ1Hack" );
 
         /// \copydoc BaseClass::RumpfSmootherLevelsetAnalytic()
         explicit RumpfSmootherLevelsetAnalyticQ1Hack(Geometry::RootMeshNode<MeshType>* rmn_,
         std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_,
           FunctionalType_& functional_, LevelsetFunctionalType_& lvlset_functional_,
           bool align_to_lvlset_, bool r_adaptivity_,
-          AnalyticFunctionType_& analytic_function_,
-          AnalyticFunctionGrad0Type_& analytic_function_grad0_,
-          AnalyticFunctionGrad1Type_& analytic_function_grad1_)
+          AnalyticFunctionType_& analytic_function_)
           : BaseClass(rmn_, dirichlet_list_, slip_list_, functional_, lvlset_functional_,
-            align_to_lvlset_, r_adaptivity_ ,
-            analytic_function_, analytic_function_grad0_, analytic_function_grad1_)
+            align_to_lvlset_, r_adaptivity_, analytic_function_)
             {
             }
 
@@ -120,7 +109,7 @@ namespace FEAST
         {
           CoordType fval(0);
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // In 2d, each hypercube is split into 2 simplices and there are two possible permutations
           const int n_perms(4);
@@ -132,7 +121,7 @@ namespace FEAST
             {Index(0), Index(1), Index(3)}
           };
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -200,7 +189,7 @@ namespace FEAST
         {
           CoordType fval(0);
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // In 2d, each hypercube is split into 2 simplices and there are two possible permutations
           const int n_perms(4);
@@ -212,7 +201,7 @@ namespace FEAST
             {Index(0), Index(1), Index(3)}
           };
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -280,10 +269,10 @@ namespace FEAST
         virtual void compute_gradient() override
         {
           // Total number of cells in the mesh
-          Index ncells(this->_mesh.get_num_entities(ShapeType::dimension));
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           // Index set for local/global numbering
-          auto& idx = this->_mesh.template get_index_set<ShapeType::dimension,0>();
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
           FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -347,10 +336,7 @@ namespace FEAST
               Index i(idx(cell, Index(j)));
 
               lvlset_vals(j) = this->_lvlset_vec(i);
-
-              for(int d(0); d < MeshType::world_dim; ++d)
-                lvlset_grad_vals(j,d) = this->_lvlset_grad_vtx_vec[d](i);
-
+              lvlset_grad_vals[j] = this->_lvlset_grad_vtx_vec(i);
             }
             // Add levelset penalty term, which is not weighted with lambda
             this->_lvlset_functional.add_lvlset_penalty_grad(lvlset_vals, lvlset_grad_vals, grad_loc, this->lvlset_constraint_last);
