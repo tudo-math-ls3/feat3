@@ -101,7 +101,13 @@ namespace FEAST
           }
           catch (const FEAST::InternalError & e)
           {
-            continue;
+            //did we get at least one valid configuration?
+            if (best_toe < std::numeric_limits<double>::max())
+              //then break, as we have reached the maximum blocksize already (blocksize loop is counting upwards)
+              break;
+            else
+              //no: we have to increase the blocksize for the first valid configuration
+              continue;
           }
           if (toe < best_toe)
           {
@@ -110,7 +116,10 @@ namespace FEAST
           }
         }
 
-        MemoryPool<Mem::CUDA>::blocksize_spmv = best_blocksize;
+        if (best_toe < std::numeric_limits<double>::max())
+          MemoryPool<Mem::CUDA>::blocksize_spmv = best_blocksize;
+        else
+          throw InternalError(__func__, __FILE__, __LINE__, "no valid spmv configuration found!");
 
         ///// AXPY
         best_toe = std::numeric_limits<double>::max();
@@ -128,7 +137,13 @@ namespace FEAST
           }
           catch (const FEAST::InternalError & e)
           {
-            continue;
+            //did we get at least one valid configuration?
+            if (best_toe < std::numeric_limits<double>::max())
+              //then break, as we have reached the maximum blocksize already (blocksize loop is counting upwards)
+              break;
+            else
+              //no: we have to increase the blocksize for the first valid configuration
+              continue;
           }
           if (toe < best_toe)
           {
@@ -137,7 +152,10 @@ namespace FEAST
           }
         }
 
-        MemoryPool<Mem::CUDA>::blocksize_axpy = best_blocksize;
+        if (best_toe < std::numeric_limits<double>::max())
+          MemoryPool<Mem::CUDA>::blocksize_axpy = best_blocksize;
+        else
+          throw InternalError(__func__, __FILE__, __LINE__, "no valid axpy configuration found!");
       }
     };
   } // namespace LAFEM
