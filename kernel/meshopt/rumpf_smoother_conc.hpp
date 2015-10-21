@@ -194,16 +194,16 @@ namespace FEAST
 
           // Evaluate levelset function
           Assembly::Interpolator::project(this->_lvlset_vec, this->_analytic_lvlset, this->_lvlset_space);
-
           // Evaluate the gradient of the levelset function
           Assembly::Interpolator::project(this->_lvlset_grad_vec, this->_analytic_lvlset_grad, this->_lvlset_space);
+
           // Project the levelset function to a grid vector on the new grid and...
-           FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_vtx_vec, this->_lvlset_vec, this->_lvlset_space);
+          FEAST::Assembly::AnalyticVertexProjector::project(
+            this->_lvlset_vtx_vec, this->_analytic_lvlset, this->_trafo);
 
           // ... do the same for its gradient
-          // TODO
-          // FEAST::Assembly::DiscreteVertexProjector::project(this->_lvlset_grad_vtx_vec,this->_lvlset_grad_vec, this->_lvlset_space);
-          this->_lvlset_grad_vtx_vec.clone(this->_lvlset_grad_vec);
+          FEAST::Assembly::AnalyticVertexProjector::project(
+            this->_lvlset_grad_vtx_vec,this->_analytic_lvlset_grad, this->_trafo);
 
           // As the levelset might be used for r-adaptivity and it's vertex vector might have changed, re-compute
           if(this->_r_adaptivity)

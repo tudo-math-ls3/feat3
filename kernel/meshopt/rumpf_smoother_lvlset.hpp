@@ -5,6 +5,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/analytic/auto_derive.hpp>
 #include <kernel/analytic/wrappers.hpp>
+#include <kernel/assembly/analytic_projector.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/meshopt/rumpf_smoother.hpp>
@@ -579,11 +580,9 @@ namespace FEAST
           // Project the levelset function to a grid vector on the new grid and...
           FEAST::Assembly::DiscreteVertexProjector::project(_lvlset_vtx_vec, _lvlset_vec, _lvlset_space);
 
-          // TODO
           // ... do the same for its gradient
-          //FEAST::Assembly::DiscreteVertexProjector::project(
-          //  this->_lvlset_grad_vtx_vec,this->_lvlset_grad_vec, this->_lvlset_space);
-          this->_lvlset_grad_vtx_vec.clone(this->_lvlset_grad_vec);
+          FEAST::Assembly::DiscreteVertexProjector::project(
+            this->_lvlset_grad_vtx_vec, this->_lvlset_grad_vec, this->_lvlset_space);
 
           // As the levelset might be used for r-adaptivity and it's vertex vector might have changed, re-compute
           if(this->_update_h && this->_r_adaptivity)
@@ -658,12 +657,6 @@ namespace FEAST
      * \tparam AnalyticFunctionType_
      * Analytic function providing level set information
      *
-     * \tparam AnalyticFunctionGrad0Type_
-     * 1st component function of the AnalyticFunction's gradient
-     *
-     * \tparam AnalyticFunctionGrad0Type_
-     * 2nd component function of the AnalyticFunction's gradient
-     *
      * \tparam SpaceType_
      * FE space for the levelset function
      *
@@ -729,13 +722,7 @@ namespace FEAST
          * \param[in] analytic_function_
          * The analytic function representing the levelset function
          *
-         * \param[in] analytic_function_grad0_
-         * The first component of the gradient
-         *
-         * \param[in] analytic_function_grad1_
-         * The second component of the gradient
-         *
-         **/
+         */
         explicit RumpfSmootherLevelsetAnalytic( Geometry::RootMeshNode<MeshType>* rmn_,
           std::deque<String>& dirichlet_list_, std::deque<String>& slip_list_,
           FunctionalType_& functional_, LevelsetFunctionalType_& lvlset_functional_,
@@ -779,7 +766,7 @@ namespace FEAST
          * In this case, it evaluates the analytic levelset function on the current mesh and then evaluates it in the
          * current mesh's vertices.
          *
-         **/
+         */
         virtual void prepare() override
         {
           this->set_coords();
@@ -797,14 +784,10 @@ namespace FEAST
           Assembly::Interpolator::project(this->_lvlset_grad_vec, _analytic_lvlset_grad, this->_lvlset_space);
 
           // Project the levelset function to a grid vector on the new grid and...
-          FEAST::Assembly::DiscreteVertexProjector::project(
-            this->_lvlset_vtx_vec, this->_lvlset_vec, this->_lvlset_space);
+          FEAST::Assembly::AnalyticVertexProjector::project( this->_lvlset_vtx_vec, _analytic_lvlset, this->_trafo);
 
           // ... do the same for its gradient
-          // TODO
-          //  FEAST::Assembly::DiscreteVertexProjector::project(
-          //    this->_lvlset_grad_vtx_vec,this->_lvlset_grad_vec, this->_lvlset_space);
-          this->_lvlset_grad_vtx_vec.clone(this->_lvlset_grad_vec);
+          FEAST::Assembly::AnalyticVertexProjector::project( this->_lvlset_grad_vtx_vec, _analytic_lvlset_grad, this->_trafo);
 
           // As the levelset might be used for r-adaptivity and it's vertex vector might have changed, re-compute
           if(this->_update_h && this->_r_adaptivity)
