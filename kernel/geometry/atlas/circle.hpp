@@ -159,9 +159,9 @@ namespace FEAST
           DataType param_r(param_l + DataType(2) * Math::pi<DataType>() / _trafo_b);
 
           chart_container.data.push_back(" <circle>");
-          chart_container.data.push_back("  radius  "+stringify(scientify(_radius)));
-          chart_container.data.push_back("  midpoint "+stringify(scientify(_midpoint(0)))+" "+stringify(scientify(_midpoint(1))));
-          chart_container.data.push_back("  domain "+stringify(scientify(param_l))+" "+stringify(scientify(param_r)));
+          chart_container.data.push_back("  radius  "+stringify_fp_sci(_radius));
+          chart_container.data.push_back("  midpoint "+stringify_fp_sci(_midpoint(0))+" "+stringify_fp_sci(_midpoint(1)));
+          chart_container.data.push_back("  domain "+stringify_fp_sci(param_l)+" "+stringify_fp_sci(param_r));
           chart_container.data.push_back(" </circle>");
         }
 

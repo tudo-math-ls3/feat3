@@ -222,8 +222,8 @@ namespace FEAST
 
           fval *= scal;
 
-          std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) <<
-            ", func_rec_det = " << scientify(func_rec_det_tot) << std::endl;
+          std::cout << "func_norm = " << stringify_fp_sci(func_norm_tot) << ", func_det = " << stringify_fp_sci(func_det_tot) <<
+            ", func_rec_det = " << stringify_fp_sci(func_rec_det_tot) << std::endl;
 
           return fval;
         } // compute_functional

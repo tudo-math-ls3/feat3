@@ -722,7 +722,7 @@ namespace TutorialX1
 
     // compute initial defect
     DataType def_init = levels.back()->compute_defect();
-    std::cout << "Iteration   0 | Defect: " << scientify(def_init) << std::endl;
+    std::cout << "Iteration   0 | Defect: " << stringify_fp_sci(def_init) << std::endl;
 
     // the main multigrid loop
     for(Index iter(1); iter <= 20; ++iter)
@@ -757,7 +757,7 @@ namespace TutorialX1
 
       // compute new defect
       DataType def = levels.back()->compute_defect();
-      std::cout << "Iteration " << stringify(iter).pad_front(3) << " | Defect: " << scientify(def) << std::endl;
+      std::cout << "Iteration " << stringify(iter).pad_front(3) << " | Defect: " << stringify_fp_sci(def) << std::endl;
 
       // check for relative stopping criterion
       if(def < 1E-8 * def_init)

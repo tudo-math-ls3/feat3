@@ -1837,7 +1837,7 @@ namespace FEAST
       {
         for (Index j(0); j < coord_per_vertex ; ++j)
         {
-          ofs  << "  " << scientify((coords[i])[j]);
+          ofs  << "  " << stringify_fp_sci((coords[i])[j]);
         }
         ofs << std::endl;
       }

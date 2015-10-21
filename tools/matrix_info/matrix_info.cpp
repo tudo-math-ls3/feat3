@@ -509,7 +509,7 @@ namespace MatrixInfo
     }
 
     // print some basic information
-    std::cout << String("Non-Zero Tolerance").pad_back(pad_len, '.') << ": " << scientify(nz_tol) << std::endl;
+    std::cout << String("Non-Zero Tolerance").pad_back(pad_len, '.') << ": " << stringify_fp_sci(nz_tol) << std::endl;
     std::cout << String("Number of Rows").pad_back(pad_len, '.') << ": " << nrows << std::endl;
     std::cout << String("Number of Columns").pad_back(pad_len, '.') << ": " << ncols << std::endl;
     std::cout << String("Max Row Degree").pad_back(pad_len, '.') << ": " << row_degree << " (max in row " << row_degree_idx << ")" << std::endl;
@@ -546,20 +546,20 @@ namespace MatrixInfo
     if(row_dom_idx >= nmin)
       std::cout << "-NA-" << std::endl;
     else
-      std::cout << scientify(row_dom) << " (in row " << row_dom_idx << ")" << std::endl;
+      std::cout << stringify_fp_sci(row_dom) << " (in row " << row_dom_idx << ")" << std::endl;
     std::cout << String("Col-Diag Dominance Factor").pad_back(pad_len, '.') << ": ";
     if(col_dom_idx >= nmin)
       std::cout << "-NA-" << std::endl;
     else
-      std::cout << scientify(col_dom) << " (in col " << col_dom_idx << ")" << std::endl;
+      std::cout << stringify_fp_sci(col_dom) << " (in col " << col_dom_idx << ")" << std::endl;
 
     // plot norms
-    std::cout << String("Frobenius Norm").pad_back(pad_len, '.') << ": " << scientify(norm_frobenius) << std::endl;
-    std::cout << String("Col-Sum Norm").pad_back(pad_len, '.') << ": " << scientify(norm_col_sum)
+    std::cout << String("Frobenius Norm").pad_back(pad_len, '.') << ": " << stringify_fp_sci(norm_frobenius) << std::endl;
+    std::cout << String("Col-Sum Norm").pad_back(pad_len, '.') << ": " << stringify_fp_sci(norm_col_sum)
       << " (max in col " << norm_col_sum_idx << ")" << std::endl;
-    std::cout << String("Row-Sum Norm").pad_back(pad_len, '.') << ": " << scientify(norm_row_sum)
+    std::cout << String("Row-Sum Norm").pad_back(pad_len, '.') << ": " << stringify_fp_sci(norm_row_sum)
       << " (max in row " << norm_row_sum_idx << ")" << std::endl;
-    std::cout << String("Maximum Norm").pad_back(pad_len, '.') << ": " << scientify(norm_max)
+    std::cout << String("Maximum Norm").pad_back(pad_len, '.') << ": " << stringify_fp_sci(norm_max)
       << " (max in row " << norm_max_row_idx << ", col " << norm_max_col_idx << ")" << std::endl;
 
     // okay

@@ -129,7 +129,7 @@ template
     DataType time(0);
     // Timestep size
     DataType deltat(DataType(1e-3));
-    std::cout << "deltat = " << scientify(deltat) << std::endl;
+    std::cout << "deltat = " << stringify_fp_sci(deltat) << std::endl;
 
     // Counter for timesteps
     Index n(0);
@@ -185,7 +185,7 @@ template
         if(my_mesh_velocity > max_mesh_velocity)
           max_mesh_velocity = my_mesh_velocity;
       }
-      std::cout << "max mesh velocity = " << scientify(max_mesh_velocity) << std::endl;
+      std::cout << "max mesh velocity = " << stringify_fp_sci(max_mesh_velocity) << std::endl;
 
       // Write post-optimisation mesh
       filename = "post_" + stringify(n);

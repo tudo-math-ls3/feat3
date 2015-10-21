@@ -225,11 +225,11 @@ namespace FEAST
       {
         // print errors
         if(sei.have_h0)
-          os << "H0-Error: " << scientify(sei.norm_h0) << std::endl;
+          os << "H0-Error: " << stringify_fp_sci(sei.norm_h0) << std::endl;
         if(sei.have_h1)
-          os << "H1-Error: " << scientify(sei.norm_h1) << std::endl;
+          os << "H1-Error: " << stringify_fp_sci(sei.norm_h1) << std::endl;
         if(sei.have_h2)
-          os << "H2-Error: " << scientify(sei.norm_h2) << std::endl;
+          os << "H2-Error: " << stringify_fp_sci(sei.norm_h2) << std::endl;
         return os;
       }
     }; // struct ScalarErrorInfo

@@ -186,14 +186,14 @@ namespace FEAST
 
           std::cout << "Align to levelset:   " << _align_to_lvlset;
           if(_align_to_lvlset)
-            std::cout << ", levelset constraint tolerance: " << scientify(lvlset_constraint_tol);
+            std::cout << ", levelset constraint tolerance: " << stringify_fp_sci(lvlset_constraint_tol);
           std::cout << std::endl;
 
           std::cout << "Use r-adaptivity:    " << _r_adaptivity;
           if(_r_adaptivity)
             std::cout << ", update h in each iteration: " << _update_h;
-            std::cout << ", r_adapt_reg = " << scientify(_r_adapt_reg)
-            << ", r_adapt_pow = " << scientify(_r_adapt_pow);
+            std::cout << ", r_adapt_reg = " << stringify_fp_sci(_r_adapt_reg)
+            << ", r_adapt_pow = " << stringify_fp_sci(_r_adapt_pow);
           std::cout << std::endl;
         }
 
@@ -344,9 +344,9 @@ namespace FEAST
           // Scale levelset constraint correctly and add it to the functional value
           fval += this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(lvlset_constraint_last);
 
-          std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) <<
-            ", func_rec_det = " << scientify(func_rec_det_tot) << ", func_lvlset = " <<
-            scientify(this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(lvlset_constraint_last)) << std::endl;
+          std::cout << "func_norm = " << stringify_fp_sci(func_norm_tot) << ", func_det = " << stringify_fp_sci(func_det_tot) <<
+            ", func_rec_det = " << stringify_fp_sci(func_rec_det_tot) << ", func_lvlset = " <<
+            stringify_fp_sci(this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(lvlset_constraint_last)) << std::endl;
 
           return fval;
         } // compute_functional(func_norm, func_det, func_rec_det, func_lvlset)
@@ -461,7 +461,7 @@ namespace FEAST
             this->set_coords();
 
             // DEBUG
-            std::cout << "Fixed point iteration " << iter <<", diff = " << scientify(diff) << ", mincg iterations: " << iterations << ", grad evals: " << grad_evals << std::endl;
+            std::cout << "Fixed point iteration " << iter <<", diff = " << stringify_fp_sci(diff) << ", mincg iterations: " << iterations << ", grad evals: " << grad_evals << std::endl;
 
             if(diff <= tol)
             {
@@ -535,7 +535,7 @@ namespace FEAST
               // DEBUG
               //std::cout << "Rumpf Smoother penalty iteration: " << penalty_iterations << ", last constraint: "
               //<< this->lvlset_constraint_last << ", penalty factor: " << this->_lvlset_functional.fac_lvlset <<
-              //", fval = " << scientify(this->compute_functional()) <<
+              //", fval = " << stringify_fp_sci(this->compute_functional()) <<
               //", " << iterations << " mincg iterations, " << grad_evals <<
               //" grad evals, terminationtype was " << termination_type << std::endl;
 
@@ -548,7 +548,7 @@ namespace FEAST
             std::cout << "Rumpf Smoother penalty iterations: " << penalty_iterations <<
               ", last constraint: " << this->lvlset_constraint_last <<
               ", penalty factor: " << this->_lvlset_functional.fac_lvlset <<
-              ", fval = " << scientify(this->compute_functional()) <<
+              ", fval = " << stringify_fp_sci(this->compute_functional()) <<
               ", " << total_iterations << " mincg iterations, " << total_grad_evals <<
               " grad evals, terminationtype was " << termination_type << std::endl;
 

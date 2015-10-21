@@ -68,7 +68,7 @@ namespace FEAST
           if (stat.defect.at(i) == double(-1))
             result += "------\n";
           else
-            result += scientify(stat.defect.at(i)) + "\n";
+            result += stringify_fp_sci(stat.defect.at(i)) + "\n";
         }
 
         result +="Iteration Timings [s]:\n";
@@ -79,7 +79,7 @@ namespace FEAST
           if (stat.toe.at(i) == double(-1))
             result += "------\n";
           else
-            result += scientify(stat.toe.at(i)) + "\n";
+            result += stringify_fp_sci(stat.toe.at(i)) + "\n";
         }
 
         return result;

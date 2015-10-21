@@ -319,8 +319,8 @@ public:
 
         // print some numbers to the console
         std::cout << n << "/" << k << ": ";
-        std::cout << scientify(Math::abs(det)) << " : ";
-        std::cout << scientify(xl) << " / " << scientify(xr) << std::endl;
+        std::cout << stringify_fp_sci(Math::abs(det)) << " : ";
+        std::cout << stringify_fp_sci(xl) << " / " << stringify_fp_sci(xr) << std::endl;
 
         // make sure the determinant is not bogus
         TEST_CHECK(Math::isfinite(det));

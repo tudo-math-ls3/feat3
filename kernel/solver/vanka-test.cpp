@@ -192,7 +192,7 @@ public:
     case Solver::VankaType::block_diag_add:  std::cout << "BDA: "; break;
     case Solver::VankaType::block_full_add:  std::cout << "BFA: "; break;
     }
-    std::cout << scientify(def0) << " > " << scientify(def1);
+    std::cout << stringify_fp_sci(def0) << " > " << stringify_fp_sci(def1);
     std::cout << " : " << std::fixed << std::setprecision(5) << (def1/def0);
     std::cout << " | " << stamp2.elapsed_string(stamp1, TimeFormat::s_m);
     std::cout << std::endl;
@@ -329,7 +329,7 @@ public:
     case Solver::VankaType::block_diag_add:  std::cout << "BDA: "; break;
     case Solver::VankaType::block_full_add:  std::cout << "BFA: "; break;
     }
-    std::cout << scientify(def0) << " > " << scientify(def1);
+    std::cout << stringify_fp_sci(def0) << " > " << stringify_fp_sci(def1);
     std::cout << " : " << std::fixed << std::setprecision(5) << (def1/def0);
     std::cout << " | " << stamp2.elapsed_string(stamp1, TimeFormat::s_m);
     std::cout << std::endl;

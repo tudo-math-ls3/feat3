@@ -143,7 +143,7 @@ namespace FEAST
        *
        * \param[in] var_prec
        * Specifies the precision of the variable entries. If set to 0, the runtime's default precision is used.
-       * See the \p precision parameter of the #scientify() function for details.
+       * See the \p precision parameter of the #stringify_fp_sci() function for details.
        */
       explicit ExportVTK(const MeshType& mesh, int var_prec = 0) :
         _mesh(mesh),
@@ -506,7 +506,7 @@ namespace FEAST
             os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">" << std::endl;
             for(Index j(0); j < _num_verts; ++j)
             {
-              os << scientify(var.second[j], _var_prec) << std::endl;
+              os << stringify_fp_sci(var.second[j], _var_prec) << std::endl;
             }
             os << "</DataArray>" << std::endl;
           }
@@ -518,9 +518,9 @@ namespace FEAST
             os <<"\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
             for(Index j(0); j < _num_verts; ++j)
             {
-              os << scientify(var.second[3*j+0], _var_prec) << " ";
-              os << scientify(var.second[3*j+1], _var_prec) << " ";
-              os << scientify(var.second[3*j+2], _var_prec) << std::endl;
+              os << stringify_fp_sci(var.second[3*j+0], _var_prec) << " ";
+              os << stringify_fp_sci(var.second[3*j+1], _var_prec) << " ";
+              os << stringify_fp_sci(var.second[3*j+2], _var_prec) << std::endl;
             }
             os << "</DataArray>" << std::endl;
           }
@@ -540,7 +540,7 @@ namespace FEAST
               os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">" << std::endl;
               for(Index j(0); j < _num_cells; ++j)
               {
-                os << scientify(var.second[j], _var_prec) << std::endl;
+                os << stringify_fp_sci(var.second[j], _var_prec) << std::endl;
               }
               os << "</DataArray>" << std::endl;
             }
@@ -556,9 +556,9 @@ namespace FEAST
               os <<"\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
               for(Index j(0); j < _num_cells; ++j)
               {
-                os << scientify(var.second[3*j+0], _var_prec) << " ";
-                os << scientify(var.second[3*j+1], _var_prec) << " ";
-                os << scientify(var.second[3*j+2], _var_prec) << std::endl;
+                os << stringify_fp_sci(var.second[3*j+0], _var_prec) << " ";
+                os << stringify_fp_sci(var.second[3*j+1], _var_prec) << " ";
+                os << stringify_fp_sci(var.second[3*j+2], _var_prec) << std::endl;
               }
               os << "</DataArray>" << std::endl;
             }

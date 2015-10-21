@@ -126,7 +126,7 @@ template
     // Compute initial functional value
     DataType fval(0);
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-    std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
+    std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
 
     // Compute initial functional gradient
     rumpflpumpfl.compute_gradient();
@@ -142,7 +142,7 @@ template
     rumpflpumpfl.optimise();
 
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-    std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
+    std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
 
     // Call prepare() again because the mesh changed due to the optimisation and it was not called again after the
     // last iteration
@@ -167,7 +167,7 @@ template
     DataType time(0);
     // Timestep size
     DataType deltat(DataType(1e-3));
-    std::cout << "deltat = " << scientify(deltat) << std::endl;
+    std::cout << "deltat = " << stringify_fp_sci(deltat) << std::endl;
 
     // Counter for timesteps
     Index n(0);
@@ -204,7 +204,7 @@ template
       rumpflpumpfl.prepare();
       fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
       rumpflpumpfl.compute_gradient();
-      std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
+      std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
 
       // Write pre-optimisation mesh
       filename = "pre_" + stringify(n);
@@ -232,13 +232,13 @@ template
         if(my_mesh_velocity > max_mesh_velocity)
           max_mesh_velocity = my_mesh_velocity;
       }
-      std::cout << "max mesh velocity = " << scientify(max_mesh_velocity) << std::endl;
+      std::cout << "max mesh velocity = " << stringify_fp_sci(max_mesh_velocity) << std::endl;
 
       // Compute post optimisation functional value and gradient
       rumpflpumpfl.prepare();
       fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
       rumpflpumpfl.compute_gradient();
-      std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
+      std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
 
       // Write post-optimisation mesh
       filename = "post_" + stringify(n);

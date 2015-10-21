@@ -85,8 +85,8 @@ namespace FEAST
         /// \brief Print basic information
         void print()
         {
-          std::cout << "fac_norm = " << scientify(_fac_norm) << ", fac_det = " << scientify(_fac_det) << ", fac_rec_det = " << scientify(_fac_rec_det) << std::endl;
-          std::cout << "fac_cof =  " << scientify(_fac_cof) << ", fac_reg = " << scientify(_fac_reg) << std::endl;
+          std::cout << "fac_norm = " << stringify_fp_sci(_fac_norm) << ", fac_det = " << stringify_fp_sci(_fac_det) << ", fac_rec_det = " << stringify_fp_sci(_fac_rec_det) << std::endl;
+          std::cout << "fac_cof =  " << stringify_fp_sci(_fac_cof) << ", fac_reg = " << stringify_fp_sci(_fac_reg) << std::endl;
         }
 
     };

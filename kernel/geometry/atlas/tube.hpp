@@ -99,9 +99,9 @@ namespace FEAST
         virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
         {
           chart_data.data.push_back(" <tube>");
-          chart_data.data.push_back("  radius  "+stringify(scientify(_radius)));
-          chart_data.data.push_back("  midpoint "+stringify(scientify(_midpoint(0)))+" "+stringify(scientify(_midpoint(1)))+" "+stringify(scientify(_midpoint(2))));
-          chart_data.data.push_back("  axis"+stringify(scientify(_rot_axis(0)))+" "+stringify(scientify(_rot_axis(1)))+" "+stringify(scientify(_rot_axis(2))));
+          chart_data.data.push_back("  radius  "+stringify(stringify_fp_sci(_radius)));
+          chart_data.data.push_back("  midpoint "+stringify(stringify_fp_sci(_midpoint(0)))+" "+stringify(stringify_fp_sci(_midpoint(1)))+" "+stringify(stringify_fp_sci(_midpoint(2))));
+          chart_data.data.push_back("  axis"+stringify(stringify_fp_sci(_rot_axis(0)))+" "+stringify(stringify_fp_sci(_rot_axis(1)))+" "+stringify(stringify_fp_sci(_rot_axis(2))));
           chart_data.data.push_back(" </tube>");
         }
 

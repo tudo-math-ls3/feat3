@@ -257,9 +257,9 @@ namespace FEAST
           // Scale levelset constraint correctly and add it to the functional value
           fval += this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(this->lvlset_constraint_last);
 
-          std::cout << "func_norm = " << scientify(func_norm_tot) << ", func_det = " << scientify(func_det_tot) <<
-            ", func_rec_det = " << scientify(func_rec_det_tot) << ", func_lvlset = " <<
-            scientify(this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(this->lvlset_constraint_last)) << std::endl;
+          std::cout << "func_norm = " << stringify_fp_sci(func_norm_tot) << ", func_det = " << stringify_fp_sci(func_det_tot) <<
+            ", func_rec_det = " << stringify_fp_sci(func_rec_det_tot) << ", func_lvlset = " <<
+            stringify_fp_sci(this->_lvlset_functional.fac_lvlset/CoordType(2)*Math::sqr(this->lvlset_constraint_last)) << std::endl;
 
 
           return fval;

@@ -91,20 +91,20 @@ namespace FEAST
       friend std::ostream& operator<<(std::ostream& os, const VelocityInfo& vi)
       {
         // print H0-norms
-        os << "H0-Norm...: " << scientify(vi.norm_h0) << " [";
+        os << "H0-Norm...: " << stringify_fp_sci(vi.norm_h0) << " [";
         for(int i(0); i < dim_; ++i)
-          os << " " << scientify(vi.norm_h0_comp[i]);
+          os << " " << stringify_fp_sci(vi.norm_h0_comp[i]);
         os << " ]" << std::endl;
 
         // print H1-norms
-        os << "H1-Norm...: " << scientify(vi.norm_h1) << " [";
+        os << "H1-Norm...: " << stringify_fp_sci(vi.norm_h1) << " [";
         for(int i(0); i < dim_; ++i)
-          os << " " << scientify(vi.norm_h1_comp[i]);
+          os << " " << stringify_fp_sci(vi.norm_h1_comp[i]);
         os << " ]" << std::endl;
 
         // print divergence and vorticity norms
-        os << "Divergence: " << scientify(vi.divergence) << std::endl;
-        os << "Vorticity.: " << scientify(vi.vorticity) << std::endl;
+        os << "Divergence: " << stringify_fp_sci(vi.divergence) << std::endl;
+        os << "Vorticity.: " << stringify_fp_sci(vi.vorticity) << std::endl;
 
         return os;
       }

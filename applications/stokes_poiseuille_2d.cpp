@@ -177,11 +177,11 @@ namespace StokesPoiseuille2D
       // print errors
       if (plot)
       {
-        std::cout << "Velocity H0-Error: " << scientify(vv_h0, 12) << " [ ";
-        std::cout << scientify(vxerr.norm_h0, 12) << " , " << scientify(vyerr.norm_h0, 12) << " ]" << std::endl;
-        std::cout << "Velocity H1-Error: " << scientify(vv_h1, 12) << " [ ";
-        std::cout << scientify(vxerr.norm_h1, 12) << " , " << scientify(vyerr.norm_h1, 12) << " ]" << std::endl;
-        std::cout << "Pressure H0-Error: " << scientify(vperr.norm_h0, 12) << std::endl;
+        std::cout << "Velocity H0-Error: " << stringify_fp_sci(vv_h0, 12) << " [ ";
+        std::cout << stringify_fp_sci(vxerr.norm_h0, 12) << " , " << stringify_fp_sci(vyerr.norm_h0, 12) << " ]" << std::endl;
+        std::cout << "Velocity H1-Error: " << stringify_fp_sci(vv_h1, 12) << " [ ";
+        std::cout << stringify_fp_sci(vxerr.norm_h1, 12) << " , " << stringify_fp_sci(vyerr.norm_h1, 12) << " ]" << std::endl;
+        std::cout << "Pressure H0-Error: " << stringify_fp_sci(vperr.norm_h0, 12) << std::endl;
       }
     }
   }; // class StokesUnitSquarePoiseuilleAssemblerLevel<...>

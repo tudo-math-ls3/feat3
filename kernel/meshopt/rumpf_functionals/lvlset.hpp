@@ -58,7 +58,7 @@ namespace FEAST
         void print()
         {
           std::cout << name() << std::endl;
-          std::cout << "fac_lvlset = " << scientify(fac_lvlset) << std::endl;
+          std::cout << "fac_lvlset = " << stringify_fp_sci(fac_lvlset) << std::endl;
         }
 
         /**

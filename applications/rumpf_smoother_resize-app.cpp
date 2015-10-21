@@ -113,7 +113,7 @@ template
     // Compute initial functional value
     DataType fval(0);
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-    std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
+    std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
 
     // Compute initial functional gradient
     rumpflpumpfl.compute_gradient();
@@ -131,7 +131,7 @@ template
     rumpflpumpfl.optimise();
 
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-    std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
+    std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
 
     // Call prepare() again because the mesh changed due to the optimisation and it was not called again after the
     // last iteration

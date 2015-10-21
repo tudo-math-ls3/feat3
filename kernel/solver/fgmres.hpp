@@ -245,7 +245,7 @@ namespace FEAST
               {
                 std::cout << this->_plot_name
                   <<  "* " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-                  << " : " << scientify(this->_def_cur) << std::endl;
+                  << " : " << stringify_fp_sci(this->_def_cur) << std::endl;
               }
             }
           }

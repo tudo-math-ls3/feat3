@@ -72,7 +72,7 @@ public:
 
       // check norm of w
       TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DataType_(0), tol);
-      //std::cout << m << ": " << scientify(lambda_min,10) << " , " << scientify(w(0)/ev(0),10) << std::endl;
+      //std::cout << m << ": " << stringify_fp_sci(lambda_min,10) << " , " << stringify_fp_sci(w(0)/ev(0),10) << std::endl;
     }
   }
 };

@@ -193,7 +193,7 @@ template
     // Compute initial functional value
     DataType fval(0);
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det, func_lvlset);
-    std::cout << "fval pre optimisation = " << scientify(fval) << " cell size quality indicator: " << scientify(rumpflpumpfl.cell_size_quality()) << std::endl;
+    std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << " cell size quality indicator: " << stringify_fp_sci(rumpflpumpfl.cell_size_quality()) << std::endl;
     // Compute initial functional gradient
     rumpflpumpfl.compute_gradient();
 
@@ -215,7 +215,7 @@ template
     rumpflpumpfl.optimise();
 
     fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det, func_lvlset);
-    std::cout << "fval post optimisation = " << scientify(fval) << " cell size quality indicator: " << scientify(rumpflpumpfl.cell_size_quality()) << std::endl;
+    std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << " cell size quality indicator: " << stringify_fp_sci(rumpflpumpfl.cell_size_quality()) << std::endl;
 
     // Call prepare() again because the mesh changed due to the optimisation and it was not called again after the
     // last iteration
@@ -262,8 +262,8 @@ template
       rumpflpumpfl.prepare();
       fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det, func_lvlset);
       rumpflpumpfl.compute_gradient();
-      std::cout << "fval pre optimisation = " << scientify(fval) << " cell size quality indicator: " <<
-        scientify(rumpflpumpfl.cell_size_quality()) << std::endl;
+      std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << " cell size quality indicator: " <<
+        stringify_fp_sci(rumpflpumpfl.cell_size_quality()) << std::endl;
 
       // Write pre-optimisation mesh
       filename = "pre_" + stringify(n);
@@ -292,13 +292,13 @@ template
         if(my_mesh_velocity > max_mesh_velocity)
           max_mesh_velocity = my_mesh_velocity;
       }
-      std::cout << "max mesh velocity = " << scientify(max_mesh_velocity) << std::endl;
+      std::cout << "max mesh velocity = " << stringify_fp_sci(max_mesh_velocity) << std::endl;
 
       rumpflpumpfl.prepare();
       fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det, func_lvlset);
       rumpflpumpfl.compute_gradient();
-      std::cout << "fval post optimisation = " << scientify(fval) << " cell size quality indicator: "
-      << scientify(rumpflpumpfl.cell_size_quality()) << std::endl;
+      std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << " cell size quality indicator: "
+      << stringify_fp_sci(rumpflpumpfl.cell_size_quality()) << std::endl;
 
       // Write post-optimisation mesh
       filename = "post_" + stringify(n);

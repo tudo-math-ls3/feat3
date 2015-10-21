@@ -331,7 +331,7 @@ namespace FEAST
         {
           std::cout << this->_plot_name
             <<  ": " << stringify(0).pad_front(_iter_digits)
-            << " : " << scientify(this->_def_init) << std::endl;
+            << " : " << stringify_fp_sci(this->_def_init) << std::endl;
         }
 
         // ensure that the defect is neither NaN nor infinity
@@ -386,8 +386,8 @@ namespace FEAST
         {
           std::cout << this->_plot_name
             <<  ": " << stringify(this->_num_iter).pad_front(_iter_digits)
-            << " : " << scientify(this->_def_cur)
-            << " / " << scientify(this->_def_cur / this->_def_init)
+            << " : " << stringify_fp_sci(this->_def_cur)
+            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
             << std::endl;
         }
 

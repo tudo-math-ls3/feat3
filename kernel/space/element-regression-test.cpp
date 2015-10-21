@@ -196,15 +196,15 @@ namespace ElementRegression
 
         // plot errors
         std::cout << i << ":";
-        if(h0_) std::cout << " " << scientify(errs[i][0], 12);
-        if(h1_) std::cout << " " << scientify(errs[i][1], 12);
-        if(h2_) std::cout << " " << scientify(errs[i][2], 12);
+        if(h0_) std::cout << " " << stringify_fp_sci(errs[i][0], 12);
+        if(h1_) std::cout << " " << stringify_fp_sci(errs[i][1], 12);
+        if(h2_) std::cout << " " << stringify_fp_sci(errs[i][2], 12);
         std::cout << " |";
         if(i > nl_min)
         {
-          if(h0_) std::cout << " " << scientify(errs[i-1][0] / errs[i][0], 12);
-          if(h1_) std::cout << " " << scientify(errs[i-1][1] / errs[i][1], 12);
-          if(h2_) std::cout << " " << scientify(errs[i-1][2] / errs[i][2], 12);
+          if(h0_) std::cout << " " << stringify_fp_sci(errs[i-1][0] / errs[i][0], 12);
+          if(h1_) std::cout << " " << stringify_fp_sci(errs[i-1][1] / errs[i][1], 12);
+          if(h2_) std::cout << " " << stringify_fp_sci(errs[i-1][2] / errs[i][2], 12);
         }
         std::cout << std::endl;
       }
@@ -222,17 +222,17 @@ namespace ElementRegression
       // check h0-error
       if(h0_)
       {
-        //std::cout << "H0-Error: " << scientify(err[0], 12) << std::endl;
+        //std::cout << "H0-Error: " << stringify_fp_sci(err[0], 12) << std::endl;
         TEST_CHECK_EQUAL_WITHIN_EPS(err[0], h0_ref, eps*h0_ref);
       }
       if(h1_)
       {
-        //std::cout << "H1-Error: " << scientify(err[1], 12) << std::endl;
+        //std::cout << "H1-Error: " << stringify_fp_sci(err[1], 12) << std::endl;
         TEST_CHECK_EQUAL_WITHIN_EPS(err[1], h1_ref, eps*h1_ref);
       }
       if(h2_)
       {
-        //std::cout << "H2-Error: " << scientify(err[2], 12) << std::endl;
+        //std::cout << "H2-Error: " << stringify_fp_sci(err[2], 12) << std::endl;
         TEST_CHECK_EQUAL_WITHIN_EPS(err[2], h2_ref, eps*h2_ref);
       }
     }

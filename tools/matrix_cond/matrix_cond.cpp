@@ -193,10 +193,10 @@ namespace MatrixCond
         // print new norm
         if(plot)
         {
-          std::cout << "SV-Max Iter " << stringify(num_iter).pad_front(6) << ": " << scientify(value);
+          std::cout << "SV-Max Iter " << stringify(num_iter).pad_front(6) << ": " << stringify_fp_sci(value);
           // avoid division by zero
           if(eps_sqr*Math::abs(value-sv_old) < value)
-            std::cout << " [" << scientify(Math::abs(value-sv_old)/value) << "]";
+            std::cout << " [" << stringify_fp_sci(Math::abs(value-sv_old)/value) << "]";
           std::cout << std::endl;
         }
         // check tolerance
@@ -320,15 +320,15 @@ namespace MatrixCond
         // print new norm
         if(plot)
         {
-          std::cout << "SV-Min Iter " << stringify(num_iter).pad_front(6) << ": " << scientify(value);
+          std::cout << "SV-Min Iter " << stringify(num_iter).pad_front(6) << ": " << stringify_fp_sci(value);
           // avoid division by zero
           if(eps_sqr*Math::abs(value-sv_old) < value)
-            std::cout << " [" << scientify(Math::abs(value-sv_old)/value) << "]";
+            std::cout << " [" << stringify_fp_sci(Math::abs(value-sv_old)/value) << "]";
           // get PCG statistics
           {
             Index cgit = solver.get_num_iter();
             DataType def1 = solver.get_def_final();
-            std::cout <<  " {" << stringify(cgit).pad_front(5) << " : "  << scientify(def1) << "}";
+            std::cout <<  " {" << stringify(cgit).pad_front(5) << " : "  << stringify_fp_sci(def1) << "}";
           }
           std::cout << std::endl;
         }
@@ -662,11 +662,11 @@ namespace MatrixCond
       std::cout << "Min SV PCG Iter...: " << min_sv.pcg_numiter << std::endl;
     }
     if(max_sv.have)
-      std::cout << "Max Singular Value: " << scientify(max_sv.value) << std::endl;
+      std::cout << "Max Singular Value: " << stringify_fp_sci(max_sv.value) << std::endl;
     if(min_sv.have)
-      std::cout << "Min Singular Value: " << scientify(min_sv.value) << std::endl;
+      std::cout << "Min Singular Value: " << stringify_fp_sci(min_sv.value) << std::endl;
     if(max_sv.have && min_sv.have)
-      std::cout << "Spectral Condition: " << scientify(max_sv.value / min_sv.value) << std::endl;
+      std::cout << "Spectral Condition: " << stringify_fp_sci(max_sv.value / min_sv.value) << std::endl;
 
     // okay
     return 0;

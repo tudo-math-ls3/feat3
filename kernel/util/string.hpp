@@ -928,6 +928,10 @@ namespace FEAST
    * The data type of the value to be printed. Is silently assumed to be a standard floating-point datatype,
    * i.e. either \c float, \c double or <c>long double</c>.
    *
+   * \note
+   * There exists an overload of this function for the \c __float128 data type if FEAST is
+   * configured and build with support for the \c quadmath library.
+   *
    * \param[in] value
    * The floating-point value that is to be printed.
    *
@@ -939,13 +943,16 @@ namespace FEAST
    * The width that is to be used, i.e. the total number of characters to be printed.\n
    * If set to 0, the default (compiler-dependent) width will be used.
    *
+   * \param[in] sign
+   * Specifies whether non-negative numbers are to be prefixed by '+'.
+   *
    * \returns
    * A String containing the value of \p value in scientific notation.
    *
    * \author Peter Zajac
    */
   template<typename DataType_>
-  inline String scientify(DataType_ value, int precision = 0, int width = 0)
+  inline String stringify_fp_sci(DataType_ value, int precision = 0, int width = 0, bool sign = false)
   {
     std::ostringstream oss;
     oss << std::scientific;
@@ -953,15 +960,64 @@ namespace FEAST
       oss << std::setprecision(precision);
     if(width > 0)
       oss << std::setw(width);
+    if(sign)
+      oss << std::showpos;
+    oss << value;
+    return oss.str();
+  }
+
+  /**
+   * \brief Prints a floating point value to a string in fixed-point notation.
+   *
+   * \tparam DataType_
+   * The data type of the value to be printed. Is silently assumed to be a standard floating-point datatype,
+   * i.e. either \c float, \c double or <c>long double</c>.
+   *
+   * \note
+   * There exists an overload of this function for the \c __float128 data type if FEAST is
+   * configured and build with support for the \c quadmath library.
+   *
+   * \param[in] value
+   * The floating-point value that is to be printed.
+   *
+   * \param[in] precision
+   * The precision that is to be used, i.e. the number of mantissa digits to be printed.\n
+   * If set to 0, the default (compiler-dependent) precision will be used.
+   *
+   * \param[in] width
+   * The width that is to be used, i.e. the total number of characters to be printed.\n
+   * If set to 0, the default (compiler-dependent) width will be used.
+   *
+   * \param[in] sign
+   * Specifies whether non-negative numbers are to be prefixed by '+'.
+   *
+   * \returns
+   * A String containing the value of \p value in fixed-point notation.
+   *
+   * \author Peter Zajac
+   */
+  template<typename DataType_>
+  inline String stringify_fp_fix(DataType_ value, int precision = 0, int width = 0, bool sign = false)
+  {
+    std::ostringstream oss;
+    oss << std::fixed;
+    if(precision > 0)
+      oss << std::setprecision(precision);
+    if(width > 0)
+      oss << std::setw(width);
+    if(sign)
+      oss << std::showpos;
     oss << value;
     return oss.str();
   }
 
 #ifndef __CUDACC__
 #ifdef FEAST_HAVE_QUADMATH
-  inline String scientify(__float128 value, int precision = 0, int width = 0)
+  inline String stringify_fp_sci(__float128 value, int precision = 0, int width = 0, bool sign = false)
   {
     String format("%");
+    if(sign)
+      format.append("+");
     if(width > 0)
       format.append(stringify(width));
     if(precision > 0)
@@ -970,6 +1026,29 @@ namespace FEAST
       format.append(stringify(precision));
     }
     format.append("Qe");
+    // get buffer length
+    int len = ::quadmath_snprintf(nullptr, 0, format.c_str(), value);
+    // allocate buffer
+    std::vector<char> buffer(len+16);
+    // print to buffer
+    quadmath_snprintf(buffer.data(), buffer.size(), format.c_str(), value);
+    // convert buffer to string
+    return String(buffer.data());
+  }
+
+  inline String stringify_fp_fix(__float128 value, int precision = 0, int width = 0, bool sign = false)
+  {
+    String format("%");
+    if(sign)
+      format.append("+");
+    if(width > 0)
+      format.append(stringify(width));
+    if(precision > 0)
+    {
+      format.append(".");
+      format.append(stringify(precision));
+    }
+    format.append("Qf");
     // get buffer length
     int len = ::quadmath_snprintf(nullptr, 0, format.c_str(), value);
     // allocate buffer
