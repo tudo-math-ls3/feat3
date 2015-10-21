@@ -931,8 +931,9 @@ namespace FEAST
 
           void gradient(GradientType& grad, const PointType& point) const
           {
-            DataType norm (DataType(0));
-            this->value(norm, point);
+            grad.format();
+            DataType norm ((point - _origin).norm_euclid());
+
             if(norm <= Math::eps<DataType>())
               return;
 
