@@ -103,7 +103,7 @@ namespace FEAST
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorType lvad;
+        typename Tiny::Vector<ValueType, AsmTraits::SpaceEvaluator::max_local_dofs> lvad;
 
         // create a vector gather-axpy
         typename VectorIn_::GatherAxpy gather_axpy(coeff);

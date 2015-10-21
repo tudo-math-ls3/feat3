@@ -40,7 +40,6 @@ namespace FEAST
         // our mesh and shape types
         typedef Trafo_ TrafoType;
         typedef typename TrafoType::MeshType MeshType;
-        typedef typename MeshType::ShapeType ShapeType;
 
         // get our data and value types
         typedef typename VectorOut_::DataType DataType;
