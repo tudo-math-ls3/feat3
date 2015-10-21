@@ -5,6 +5,8 @@
 // includes, FEAST
 #include <kernel/assembly/asm_traits.hpp>
 
+#include <vector>
+
 namespace FEAST
 {
   namespace Assembly
@@ -62,6 +64,9 @@ namespace FEAST
         typedef AsmTraits1<typename VectorOut_::DataType, Space_, Trafo::ConfigBase, SpaceConfig> AsmTraits;
         typedef typename AsmTraits::DataType DataType;
 
+        // get our value type
+        typedef typename VectorOut_::ValueType ValueType;
+
         // define the reference cell type
         typedef Shape::ReferenceCell<ShapeType> RefCell;
 
@@ -80,11 +85,7 @@ namespace FEAST
         vector = VectorOut_(num_verts, DataType(0));
 
         // allocate an auxiliary count array
-        int* aux = new int[num_verts];
-        for(Index i(0); i < num_verts; ++i)
-        {
-          aux[i] = 0;
-        }
+        std::vector<int> aux(num_verts, 0);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -149,13 +150,13 @@ namespace FEAST
             space_eval(space_data, trafo_data);
 
             // compute function value
-            DataType value(DataType(0));
+            ValueType value(DataType(0));
 
             // basis function loop
             for(int i(0); i < num_loc_dofs; ++i)
             {
               // evaluate fe function
-              value += lvad(i) * space_data.phi[i].value;
+              value += lvad[i] * space_data.phi[i].value;
               // continue with next basis function
             }
 
@@ -183,12 +184,9 @@ namespace FEAST
         {
           if(aux[i] > 1)
           {
-            vector(i, vector(i) / DataType(aux[i]));
+            vector(i, (DataType(1)  / DataType(aux[i])) * vector(i));
           }
         }
-
-        // release auxiliary array
-        delete [] aux;
       }
     }; // class DiscreteVertexProjector<...>
 
@@ -204,6 +202,11 @@ namespace FEAST
     {
     private:
       /// \cond internal
+      struct TrafoConfig :
+        public Trafo::ConfigBase
+      {
+        static constexpr bool need_jac_det = true;
+      };
       struct SpaceConfig :
         public Space::ConfigBase
       {
@@ -212,6 +215,31 @@ namespace FEAST
       /// \endcond
 
     public:
+      /**
+       * \brief Projects a discrete function into the cells using the barycentre cubature rule.
+       *
+       * \param[out] vector
+       * A reference to a vector object that shall receive the cell interpolation of the discrete function.
+       *
+       * \param[in] coeff
+       * A reference to the coefficient vector of the finite-element function.
+       *
+       * \param[in] space
+       * A reference to the finite-element space.
+       */
+      template<
+        typename VectorOut_,
+        typename VectorIn_,
+        typename Space_>
+      static void project(
+        VectorOut_& vector,
+        const VectorIn_& coeff,
+        const Space_& space)
+      {
+        Cubature::DynamicFactory cubature_factory("barycentre");
+        project(vector, coeff, space, cubature_factory);
+      }
+
       /**
        * \brief Projects a discrete function into the cells.
        *
@@ -244,8 +272,11 @@ namespace FEAST
         typedef typename MeshType::ShapeType ShapeType;
 
         // define assembly traits
-        typedef AsmTraits1<typename VectorOut_::DataType, SpaceType, Trafo::ConfigBase, SpaceConfig> AsmTraits;
+        typedef AsmTraits1<typename VectorOut_::DataType, SpaceType, TrafoConfig, SpaceConfig> AsmTraits;
         typedef typename AsmTraits::DataType DataType;
+
+        // get our value type
+        typedef typename VectorOut_::ValueType ValueType;
 
         // define the cubature rule
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -318,13 +349,13 @@ namespace FEAST
             // compute basis function data
             space_eval(space_data, trafo_data);
 
-            DataType v(DataType(0));
+            ValueType val(DataType(0));
 
             // basis function loop
             for(int i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functor and integrate
-              v += lvad(i) * space_data.phi[i].value;
+              val += lvad[i] * space_data.phi[i].value;
               // continue with next basis function
             }
 
@@ -335,13 +366,13 @@ namespace FEAST
             area += weight;
 
             // update cell value
-            value += v * weight;
+            value += weight * val;
 
             // continue with next vertex
           }
 
           // set contribution
-          vector(cell, value / area);
+          vector(cell, (DataType(1) / area) * value);
 
           // finish evaluators
           space_eval.finish();
