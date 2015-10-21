@@ -218,6 +218,8 @@ namespace FEAST
       typedef IT_ IndexType;
       /// Our memory architecture type
       typedef Mem_ MemType;
+      /// Our value type
+      typedef DT_ ValueType;
       /// Our 'base' class type
       template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = class DenseVector<Mem2_, DT2_, IT2_>;
