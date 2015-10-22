@@ -41,9 +41,13 @@ namespace FEAST
         public ChartCRTP<Tube<Mesh_>, Mesh_, TubeTraits>
       {
       public:
+        /// CRTP base class
         typedef ChartCRTP<Tube<Mesh_>, Mesh_, TubeTraits> BaseClass;
+        /// Floating point type for coordinates
         typedef typename BaseClass::CoordType DataType;
+        /// Vector type for world points aka. image points
         typedef typename BaseClass::WorldPoint WorldPoint;
+        /// Vector type for parameter points aka. domain points
         typedef typename BaseClass::ParamPoint ParamPoint;
 
       protected:
@@ -55,8 +59,6 @@ namespace FEAST
         DataType _rot_scale;
         /// the tube's radius
         DataType _radius;
-        /// trafo coefficients
-        DataType _trafo_x0, _trafo_x1, _trafo_y0, _trafo_y1;
 
       public:
         /**
@@ -96,16 +98,22 @@ namespace FEAST
         }
 
         /** \copydoc ChartBase::write_data_container */
-        virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+        virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
         {
-          chart_data.data.push_back(" <tube>");
-          chart_data.data.push_back("  radius  "+stringify(stringify_fp_sci(_radius)));
-          chart_data.data.push_back("  midpoint "+stringify(stringify_fp_sci(_midpoint(0)))+" "+stringify(stringify_fp_sci(_midpoint(1)))+" "+stringify(stringify_fp_sci(_midpoint(2))));
-          chart_data.data.push_back("  axis"+stringify(stringify_fp_sci(_rot_axis(0)))+" "+stringify(stringify_fp_sci(_rot_axis(1)))+" "+stringify(stringify_fp_sci(_rot_axis(2))));
-          chart_data.data.push_back(" </tube>");
+          chart_container.data.push_back(" <tube>");
+          chart_container.data.push_back("  radius  "+stringify_fp_sci(_radius));
+          chart_container.data.push_back("  midpoint "+stringify_fp_sci(_midpoint(0))+" "+stringify_fp_sci(_midpoint(1))+" "+stringify_fp_sci(_midpoint(2)));
+          chart_container.data.push_back("  axis"+stringify_fp_sci(_rot_axis(0))+" "+stringify_fp_sci(_rot_axis(1))+" "+stringify_fp_sci(_rot_axis(2)));
+          chart_container.data.push_back(" </tube>");
         }
 
-        /** \copydoc ChartBase::project() */
+        /**
+         * \brief Projects a single world point
+         *
+         * \param[in,out] point
+         * The world point to be projected
+         *
+         */
         void project(WorldPoint& point) const
         {
           // subtract tube midpoint
@@ -118,6 +126,16 @@ namespace FEAST
           point = (_midpoint + axis_point) + diff_point * (_radius / diff_point.norm_euclid());
         }
 
+        /**
+         * \brief Projects all mesh points identified by a meshpart
+         *
+         * \param[in,out] mesh
+         * The mesh whose points will be projected
+         *
+         * \param[in] meshpart
+         * The MeshPart identifying the point to be projected
+         *
+         */
         void project(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
         {
           auto& vtx = mesh.get_vertex_set();
@@ -129,6 +147,18 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief Builds a Tube<Mesh> object from parsed data
+         *
+         * \param[in] data
+         * Parameters for the object in the form of Strings
+         *
+         * \param[in] line
+         * The line in which the tube data started in the original file
+         *
+         * \returns
+         * A pointer to the new object.
+         */
         static Tube<Mesh_>* parse(const std::deque<String>& data, const Index line)
         {
           bool have_midpoint(false), have_axis(false), have_radius(false);

@@ -17,11 +17,14 @@ namespace FEAST
   {
     namespace Atlas
     {
+      /// \cond internal
       namespace Intern
       {
         template<typename Mesh_, int shape_dim>
         struct DiscreteChartHelper;
       }
+      /// \endcond
+
       /**
        * \brief Standard Chart factory class template.
        *
@@ -35,12 +38,6 @@ namespace FEAST
       class StandardChartFactory:
         public ChartFactory<Mesh_>
       {
-        // Boundary mesh typedefs
-        private:
-          //static constexpr int shape_dim = Mesh_::shape_dim;
-          //static constexpr int world_dim = Mesh_::world_dim;
-
-
         public:
           /** \copydoc ChartFactory::parse_chart() */
           virtual ChartBase<Mesh_>* parse_chart(const String& type, const std::deque<String>& data, const Index line) override
@@ -55,6 +52,15 @@ namespace FEAST
             return nullptr;
           }
 
+          /**
+           * \brief Parse a DiscreteChart form a streamed mesh
+           *
+           * \param[in] data
+           * The container holding the mesh data
+           *
+           * \returns
+           * A ChartBase<Mesh_> pointer to the new DiscreteChart object
+           */
           virtual ChartBase<Mesh_>* parse_discrete_chart(FEAST::MeshStreamer::MeshDataContainer& data) override
           {
             return Intern::DiscreteChartHelper<Mesh_, Mesh_::shape_dim>::parse(data);
@@ -65,6 +71,12 @@ namespace FEAST
       /// \cond internal
       namespace Intern
       {
+        /**
+         * \brief Helper struct for parsing DiscreteCharts
+         *
+         * This is needed because a mesh of shape_dim = 1 cannot have a DiscreteChart (as the boundary consists only
+         * of 0-dimensional entities). This is the generic version that actually parses a chart.
+         */
         template<typename Mesh_, int shape_dim = Mesh_::shape_dim>
         struct DiscreteChartHelper
         {
@@ -84,6 +96,12 @@ namespace FEAST
           }
         };
 
+        /**
+         * \brief Helper struct for parsing DiscreteCharts
+         *
+         * This is needed because a mesh of shape_dim = 1 cannot have a DiscreteChart (as the boundary consists only
+         * of 0-dimensional entities), so this just returns a nullptr.
+         */
         template<typename Mesh_>
         struct DiscreteChartHelper<Mesh_, 1>
         {

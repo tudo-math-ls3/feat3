@@ -84,6 +84,8 @@ namespace FEAST
        * \param[in] other
        * Other target set that gets moved to this.
        *
+       * \returns
+       * A reference to the object other was moved to.
        */
       TargetSet& operator=(TargetSet&& other)
       {
@@ -109,7 +111,9 @@ namespace FEAST
         return _num_entities;
       }
 
-      /// Returns the target index array.
+      /**
+       * \returns A pointer to the target index array.
+       */
       Index* get_indices()
       {
         return _indices;

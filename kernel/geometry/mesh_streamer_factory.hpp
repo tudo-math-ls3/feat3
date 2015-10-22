@@ -368,6 +368,9 @@ namespace FEAST
        * \param[in] chart
        * The Geometry::ChartBase-derived object to be written.
        *
+       * \param[in] chart_name
+       * Name the chart should have in the file.
+       *
        */
       template<typename ChartType_>
       static void write_chart(MeshStreamer::ChartContainer& chart_data, String chart_name, const ChartType_& chart)

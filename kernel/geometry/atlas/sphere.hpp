@@ -81,12 +81,12 @@ namespace FEAST
         }
 
         /** \copydoc ChartBase::write_data_container */
-        virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+        virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
         {
-          chart_data.data.push_back(" <sphere>");
-          chart_data.data.push_back("  radius  "+stringify(stringify_fp_sci(_radius)));
-          chart_data.data.push_back("  midpoint "+stringify(stringify_fp_sci(_midpoint(0)))+" "+stringify(stringify_fp_sci(_midpoint(1)))+" "+stringify(stringify_fp_sci(_midpoint(2))));
-          chart_data.data.push_back(" </sphere>");
+          chart_container.data.push_back(" <sphere>");
+          chart_container.data.push_back("  radius  "+stringify_fp_sci(_radius));
+          chart_container.data.push_back("  midpoint "+stringify_fp_sci(_midpoint(0))+" "+stringify_fp_sci(_midpoint(1))+" "+stringify_fp_sci(_midpoint(2)));
+          chart_container.data.push_back(" </sphere>");
         }
 
         /**

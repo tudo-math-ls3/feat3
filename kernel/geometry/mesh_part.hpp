@@ -108,6 +108,8 @@ namespace FEAST
        * \tparam dim_
        * Shape dim of the mesh entity the attribute set retrieved refers to
        *
+       * \returns
+       * A reference to the AttributeSet to dimension dim_.
        */
       template<int dim_>
       AttributeSetType& get_mesh_attributes()
@@ -136,6 +138,8 @@ namespace FEAST
        * \param[in] dim
        * Dimension the number of attributes is to be computed for
        *
+       * \returns
+       * The number of attributes of dimension dim.
        */
       int get_num_attributes(int dim) const
       {
@@ -168,6 +172,10 @@ namespace FEAST
        *
        * \param[in] replace
        * If there is an attribute present with the same identifier, should it be replaced?
+       *
+       * \returns
+       * True if the attribute was successfully added, meaning no attribute with the appropriate identifier was
+       * present, or it was present and replace was set to true, or false otherwise
        *
        * \warning Checks whether attribute has the same number of entries as the corresponding mesh has entities of
        * dimension dim have to be performed by the caller!
@@ -736,6 +744,8 @@ namespace FEAST
          *
          * \tparam dim_
          * Shape dimension we want to have the attribute set for
+         *
+         * \returns A reference to the AttributeSet belonging to dimension dim_
          */
         template<int dim_>
         typename AttributeSet<dim_, AttributeDataType>::Type& get_attributes()
@@ -791,6 +801,10 @@ namespace FEAST
          *
          * \param[in] replace
          * If there is an attribute present with the same identifier, should it be replaced?
+         *
+         * \returns
+         * True if the attribute was successfully added, meaning no attribute with the appropriate identifier was
+         * present, or it was present and replace was set to true, or false otherwise.
          *
          */
         virtual bool add_attribute(const AttributeType& attribute, int dim, bool replace = false)
@@ -1184,7 +1198,7 @@ namespace FEAST
          * \param[in] coarse_mesh
          * A reference to the coarse mesh that is to be refined.
          *
-         * \param[in] parent_part
+         * \param[in] parent
          * A reference to the coarse parent mesh part.
          */
         explicit StandardRefinery(const MeshType& coarse_mesh, const MeshPart<ParentMesh_>& parent) :

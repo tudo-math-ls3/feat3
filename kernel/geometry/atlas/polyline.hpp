@@ -41,15 +41,19 @@ namespace FEAST
         public ChartCRTP<Polyline<Mesh_>, Mesh_, PolylineTraits>
       {
       public:
+        /// The CRTP base class
         typedef ChartCRTP<Polyline<Mesh_>, Mesh_, PolylineTraits> BaseClass;
+        /// Floating point type for coordinates
         typedef typename BaseClass::CoordType DataType;
+        /// Vector type for world points aka. image points
         typedef typename BaseClass::WorldPoint WorldPoint;
+        /// Vector type for parameter points aka. domain points
         typedef typename BaseClass::ParamPoint ParamPoint;
 
       protected:
-        /// our world point
+        /// The world points making up the polygon line
         std::deque<WorldPoint> _world;
-        /// our parameters
+        /// The parameter values for these world points
         std::deque<ParamPoint> _param;
 
       public:
@@ -76,7 +80,16 @@ namespace FEAST
           ASSERT_(_param.size() > std::size_t(1));
         }
 
-        /** \copydoc ChartBase::map() */
+        /**
+         * \brief Maps a single parameter point
+         *
+         * \param[out] point
+         * The image of the parameter point under the chart mapping
+         *
+         * \param[in] param
+         * The parameter point to be mapped
+         *
+         */
         void map(WorldPoint& point, const ParamPoint& param) const
         {
           // get our point coord
@@ -123,7 +136,7 @@ namespace FEAST
         }
 
         /** \copydoc ChartBase::write_data_container */
-        virtual void write_data_container(MeshStreamer::ChartContainer& chart_data) const override
+        virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
         {
 
           size_t num_points(_world.size());
@@ -131,10 +144,10 @@ namespace FEAST
           // GCC 4.9.2 complains at link time in the img_dim line otherwise
           int img_dim(BaseClass::world_dim);
 
-          chart_data.data.push_back(" <polyline>");
-          chart_data.data.push_back("  img_dim "+stringify(img_dim));
-          chart_data.data.push_back("  num_points "+stringify(num_points));
-          chart_data.data.push_back("  <points>");
+          chart_container.data.push_back(" <polyline>");
+          chart_container.data.push_back("  img_dim "+stringify(img_dim));
+          chart_container.data.push_back("  num_points "+stringify(num_points));
+          chart_container.data.push_back("  <points>");
 
           for(size_t i(0); i < num_points; ++i)
           {
@@ -147,14 +160,25 @@ namespace FEAST
             for(int j(0); j < BaseClass::world_dim; ++j)
               tmp += " "+stringify((_world[i])[j]);
 
-            chart_data.data.push_back(tmp);
+            chart_container.data.push_back(tmp);
           }
 
-          chart_data.data.push_back("  </points>");
-          chart_data.data.push_back(" </polyline>");
+          chart_container.data.push_back("  </points>");
+          chart_container.data.push_back(" </polyline>");
         }
 
-        /// parses a 'polyline' chart
+        /**
+         * \brief Builds a Polyline<Mesh> object from parsed data
+         *
+         * \param[in] data
+         * Parameters for the object in the form of Strings
+         *
+         * \param[in] line
+         * The line in which the polyline data started in the original file
+         *
+         * \returns
+         * A pointer to the new object.
+         */
         static Polyline<Mesh_>* parse(const std::deque<String>& data, const Index line)
         {
           bool have_img_dim(false), have_num_points(false);
@@ -245,7 +269,9 @@ namespace FEAST
         }
 
       protected:
-        /// parses the 'points' section of a 2D 'polyline' chart
+        /**
+         * \brief Parses the 'points' section of a 2D 'polyline' chart
+         */
         static Polyline<Mesh_>* _parse_polyline2d_points(std::deque<String>& lines, const Index line, const int num_points)
         {
           // get front line

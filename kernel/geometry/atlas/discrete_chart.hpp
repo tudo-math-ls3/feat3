@@ -325,7 +325,7 @@ namespace FEAST
                 Index i_mp(idx_mp(current_facet, Index(j+1)));
                 acceptable_distance *= ((vtx[i_mp] - vtx[i0]).norm_euclid());
               }
-              acceptable_distance = Math::pow(acceptable_distance, CoordType(1)/CoordType(idx_mp.num_indices));
+              acceptable_distance = Math::pow(acceptable_distance, CoordType(1)/CoordType(idx_mp.num_indices) - CoordType(1));
 
               // Find all vertices in the current facet
               for(int j(0); j < idx_mp.num_indices; ++j)

@@ -85,6 +85,10 @@ namespace FEAST
        *
        * \param[in] replace
        * Specifies whether to replace an old chart with the same name if it already exists.
+       *
+       * \returns
+       * True if the MeshChart was successfully inserted, meaning a chart of that identifier was either not present
+       * yet, or it was present and replace was set to true.
        */
       bool add_mesh_chart(const String& name, MeshChartType* chart, bool replace = false)
       {

@@ -135,12 +135,12 @@ namespace FEAST
          * The image of the parameter point under the chart mapping
          *
          * \param[in] param
-         * The parameter point to be projected
+         * The parameter point to be mapped
          *
          */
         void map(WorldPoint& point, const ParamPoint& param) const
         {
-          // transform paramter to interval [0, 2*pi)
+          // transform parameter to interval [0, 2*pi)
           DataType x = (param[0] + _trafo_a) * _trafo_b;
           point[0] = this->_midpoint[0] + this->_radius * Math::cos(x);
           point[1] = this->_midpoint[1] + this->_radius * Math::sin(x);
