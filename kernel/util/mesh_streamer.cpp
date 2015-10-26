@@ -66,7 +66,7 @@ namespace FEAST
     return nullptr;
   }
 
-  void MeshStreamer::parse_multiple_files(std::deque<String>& filenames)
+  void MeshStreamer::parse_multiple_files(const std::deque<String>& filenames)
   {
     CONTEXT("MeshStreamer::parse_multiple_files(std::deque<String>&)");
 

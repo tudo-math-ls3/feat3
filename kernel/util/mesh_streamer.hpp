@@ -646,9 +646,9 @@ namespace FEAST
      * \brief Parses multiple files given in one String
      *
      * \param[in] filenames
-     * All filenames seperated by whitespace.
+     * A deque of all filenames.
      */
-    void parse_multiple_files(std::deque<String>& filenames);
+    void parse_multiple_files(const std::deque<String>& filenames);
 
     /**
      * \brief Parses a given FEAST- mesh file.
