@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
 #include <kernel/lafem/arch/unit_filter_blocked.hpp>
@@ -256,14 +256,14 @@ namespace FEAST
 #endif
       /// \cond internal
       template<int BlockWidth_>
-      void filter_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
+      void filter_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
         if(_sv.size() != matrix.rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
 
         const Index* row_ptr(matrix.row_ptr());
         const Index* col_idx(matrix.col_ind());
-        typename SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_>::ValueType* v(matrix.val());
+        typename SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_>::ValueType* v(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
@@ -282,7 +282,7 @@ namespace FEAST
       }
 
       template<int BlockWidth_>
-      void filter_offdiag_row_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
+      void filter_offdiag_row_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
         if(_sv.size() != matrix.rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
@@ -302,7 +302,7 @@ namespace FEAST
       }
 
       template<int BlockWidth_>
-      void filter_offdiag_col_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> &) const
+      void filter_offdiag_col_mat(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> &) const
       {
         // nothing to do here
       }

@@ -9,7 +9,7 @@
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/power_diag_matrix.hpp>
 #include <kernel/lafem/power_full_matrix.hpp>
 #include <kernel/lafem/power_row_matrix.hpp>

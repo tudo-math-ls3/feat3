@@ -1,7 +1,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
-#include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -18,19 +18,19 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class SparseMatrixCSRBlockedTest
+class SparseMatrixBCSRTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRBlockedTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRBlockedTest")
+  SparseMatrixBCSRTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRTest")
   {
   }
 
   virtual void run() const
   {
-    SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> a;
-    SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> b;
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> a;
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> b;
     TEST_CHECK_EQUAL(b, a);
 
     DenseVector<Mem_, DT_, IT_> dv1(12);
@@ -43,12 +43,12 @@ public:
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
 
     TEST_CHECK_EQUAL(c(1,0)(0,0), DT_(0));
     TEST_CHECK_EQUAL(c(1,1)(1,1), DT_(11));
 
-    SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> d;
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> d;
     d.convert(c);
     TEST_CHECK_EQUAL(d.rows(), c.rows());
     TEST_CHECK_EQUAL(d.columns(), c.columns());
@@ -56,7 +56,7 @@ public:
     TEST_CHECK_EQUAL(d, c);
     TEST_CHECK_EQUAL((void*)d.raw_val(), (void*)c.raw_val());
     TEST_CHECK_EQUAL((void*)d.row_ptr(), (void*)c.row_ptr());
-    SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> e;
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> e;
     e.clone(c);
     TEST_CHECK_EQUAL(e, c);
     TEST_CHECK_NOT_EQUAL((void*)e.raw_val(), (void*)c.raw_val());
@@ -70,7 +70,7 @@ public:
     TEST_CHECK_EQUAL((void*)e.raw_val(), (void*)c.raw_val());
     TEST_CHECK_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
 
-    SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> f(c.layout());
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> f(c.layout());
     TEST_CHECK_EQUAL(f.rows(), c.rows());
     TEST_CHECK_EQUAL(f.columns(), c.columns());
     TEST_CHECK_EQUAL(f.used_elements(), c.used_elements());
@@ -78,15 +78,15 @@ public:
     TEST_CHECK_EQUAL((void*)f.row_ptr(), (void*)c.row_ptr());
   }
 };
-SparseMatrixCSRBlockedTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_csr_blocked_test_float_ulong;
-SparseMatrixCSRBlockedTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_csr_blocked_test_double_ulong;
-SparseMatrixCSRBlockedTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_csr_blocked_test_float_uint;
-SparseMatrixCSRBlockedTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_csr_blocked_test_double_uint;
+SparseMatrixBCSRTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_test_float_ulong;
+SparseMatrixBCSRTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_test_double_ulong;
+SparseMatrixBCSRTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_test_float_uint;
+SparseMatrixBCSRTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_test_double_uint;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixCSRBlockedTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_csr_blocked_test_float_ulong;
-SparseMatrixCSRBlockedTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_csr_blocked_test_double_ulong;
-SparseMatrixCSRBlockedTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_csr_blocked_test_float_uint;
-SparseMatrixCSRBlockedTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_csr_blocked_test_double_uint;
+SparseMatrixBCSRTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_test_float_ulong;
+SparseMatrixBCSRTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_test_double_ulong;
+SparseMatrixBCSRTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_test_float_uint;
+SparseMatrixBCSRTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_test_double_uint;
 #endif
 
 /**
@@ -100,12 +100,12 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class SparseMatrixCSRBlockedApplyTest
+class SparseMatrixBCSRApplyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixCSRBlockedApplyTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRBlockedApplyTest")
+  SparseMatrixBCSRApplyTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRApplyTest")
   {
   }
 
@@ -121,7 +121,7 @@ public:
     dv3(0, IT_(0));
     dv3(1, IT_(1));
     dv3(2, IT_(2));
-    SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
 
     DenseVector<Mem_, DT_, IT_> x(c.raw_columns());
     DenseVector<Mem_, DT_, IT_> y(c.raw_rows());
@@ -193,7 +193,7 @@ public:
     TEST_CHECK_EQUAL(r, ref);
   }
 };
-SparseMatrixCSRBlockedApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_csr_blocked_apply_test_float_ulong;
-SparseMatrixCSRBlockedApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_csr_blocked_apply_test_double_ulong;
-SparseMatrixCSRBlockedApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_csr_blocked_apply_test_float_uint;
-SparseMatrixCSRBlockedApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_csr_blocked_apply_test_double_uint;
+SparseMatrixBCSRApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_apply_test_float_ulong;
+SparseMatrixBCSRApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_apply_test_double_ulong;
+SparseMatrixBCSRApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_apply_test_float_uint;
+SparseMatrixBCSRApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_apply_test_double_uint;

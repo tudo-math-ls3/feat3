@@ -2,7 +2,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
-#include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
 
 using namespace FEAST;
@@ -139,7 +139,7 @@ template
 class UnitFilterBlockedMatrixTest
   : public FullTaggedTest<MemType_, DT_, IT_>
 {
-  typedef SparseMatrixCSRBlocked<MemType_, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
+  typedef SparseMatrixBCSR<MemType_, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
   typedef typename MatrixType::VectorTypeL VectorTypeR;
   typedef typename MatrixType::ValueType ValueType;
   typedef DenseVector<MemType_, DT_, IT_> VectorType;

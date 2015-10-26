@@ -11,7 +11,7 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
-#include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/lafem/arch/sum.hpp>
@@ -887,7 +887,7 @@ namespace FEAST
        * Use source matrix content as content of current matrix
        */
       template <typename Mem2_, typename DT2_, typename IT2_, int BlockHeight_, int BlockWidth_>
-      void convert(const SparseMatrixCSRBlocked<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
+      void convert(const SparseMatrixBCSR<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
       {
         CONTEXT("When converting SparseMatrixCSR");
 
@@ -898,7 +898,7 @@ namespace FEAST
         this->_scalar_index.push_back(other.raw_columns());
         this->_scalar_index.push_back(other.raw_used_elements());
 
-        SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> cother;
+        SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> cother;
         cother.convert(other);
         this->_scalar_dt.push_back(cother.zero_element());
 

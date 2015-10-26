@@ -13,7 +13,7 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/filter_chain.hpp>
-#include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/slip_filter.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/meshopt/mesh_smoother.hpp>
@@ -76,7 +76,7 @@ namespace FEAST
         typedef MeshSmoother<MeshType> BaseClass;
 
         /// Type of the system matrix for the assembly
-        typedef LAFEM::SparseMatrixCSRBlocked<Mem::Main, CoordType, Index, MeshType::world_dim, MeshType::world_dim>
+        typedef LAFEM::SparseMatrixBCSR<Mem::Main, CoordType, Index, MeshType::world_dim, MeshType::world_dim>
           MatrixType;
         /// Type of the system matrix for the solver
         typedef typename Intern::DuDvMSSolverParameters<Mem_>::template
@@ -270,7 +270,7 @@ namespace FEAST
       struct DuDvMSSolverParameters<Mem::Main>
       {
         template<typename DT_, typename IT_, int BlockSize_>
-        using SolverMatrixType = LAFEM::SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockSize_>;
+        using SolverMatrixType = LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockSize_, BlockSize_>;
 
         template<typename Matrix_, typename Filter_>
         static std::shared_ptr<Solver::IterativeSolver<typename Matrix_::VectorTypeR>> solver(Matrix_& matrix, Filter_& filter)
@@ -292,7 +292,7 @@ namespace FEAST
       struct DuDvMSSolverParameters<Mem::CUDA>
       {
         template<typename DT_, typename IT_, int BlockSize_>
-        using SolverMatrixType = LAFEM::SparseMatrixCSRBlocked<Mem::CUDA, DT_, IT_, BlockSize_, BlockSize_>;
+        using SolverMatrixType = LAFEM::SparseMatrixBCSR<Mem::CUDA, DT_, IT_, BlockSize_, BlockSize_>;
 
         template<typename Matrix_, typename Filter_>
         static std::shared_ptr<Solver::IterativeSolver<typename Matrix_::VectorTypeR>> solver(Matrix_& matrix, Filter_& filter)

@@ -29,7 +29,7 @@ namespace FEAST
     class SparseMatrixCSR;
 
     template <typename Mem_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-    class SparseMatrixCSRBlocked;
+    class SparseMatrixBCSR;
 
     template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixCOO;

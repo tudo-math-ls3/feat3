@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_LAFEM_SPARSE_MATRIX_CSR_BLOCKED_HPP
-#define KERNEL_LAFEM_SPARSE_MATRIX_CSR_BLOCKED_HPP 1
+#ifndef KERNEL_LAFEM_SPARSE_MATRIX_BCSR_HPP
+#define KERNEL_LAFEM_SPARSE_MATRIX_BCSR_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -24,7 +24,6 @@
 #include <kernel/util/time_stamp.hpp>
 
 #include <fstream>
-
 
 namespace FEAST
 {
@@ -56,14 +55,14 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-    class SparseMatrixCSRBlocked : public Container<Mem_, DT_, IT_>
+    class SparseMatrixBCSR : public Container<Mem_, DT_, IT_>
     {
       static_assert(BlockHeight_ > 0, "invalid block size");
       static_assert(BlockWidth_ > 0, "invalid block size");
 
     public:
       /**
-       * \brief Scatter-Axpy operation for SparseMatrixCSRBlocked
+       * \brief Scatter-Axpy operation for SparseMatrixBCSR
        *
        * Apart from the MatrixType and usage of DataTypeBlocked c&p from SparseMatrixCSR.
        *
@@ -72,7 +71,7 @@ namespace FEAST
       class ScatterAxpy
       {
       public:
-        typedef LAFEM::SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
+        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
         typedef Mem::Main MemType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
@@ -226,10 +225,10 @@ namespace FEAST
        *
        * Creates an empty non dimensional matrix.
        */
-      explicit SparseMatrixCSRBlocked() :
+      explicit SparseMatrixBCSR() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating SparseMatrixCSRBlocked");
+        CONTEXT("When creating SparseMatrixBCSR");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -243,10 +242,10 @@ namespace FEAST
        *
        * Creates an empty matrix with given layout.
        */
-      explicit SparseMatrixCSRBlocked(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
+      explicit SparseMatrixBCSR(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
         Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
       {
-        CONTEXT("When creating SparseMatrixCSRBlocked");
+        CONTEXT("When creating SparseMatrixBCSR");
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
@@ -266,7 +265,7 @@ namespace FEAST
        *
        * Creates a CSR blocked matrix based on a given adjacency graph representing the sparsity pattern.
        */
-      explicit SparseMatrixCSRBlocked(const Adjacency::Graph & graph) :
+      explicit SparseMatrixBCSR(const Adjacency::Graph & graph) :
         Container<Mem_, DT_, IT_>(0)
       {
         CONTEXT("When creating SparseMatrixCSR");
@@ -296,7 +295,7 @@ namespace FEAST
           pcol_idx[i] = IT_(img_idx[i]);
 
         // build the matrix
-        this->assign(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
+        this->assign(SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
       }
 
       /**
@@ -311,11 +310,11 @@ namespace FEAST
        *
        * Creates a matrix with given dimensions and content.
        */
-      explicit SparseMatrixCSRBlocked(const Index rows_in, const Index columns_in,
+      explicit SparseMatrixBCSR(const Index rows_in, const Index columns_in,
                                       DenseVector<Mem_, IT_, IT_> & col_ind_in, DenseVector<Mem_, DT_, IT_> & val_in, DenseVector<Mem_, IT_, IT_> & row_ptr_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        CONTEXT("When creating SparseMatrixCSRBlocked");
+        CONTEXT("When creating SparseMatrixBCSR");
         ASSERT(val_in.size() % (BlockHeight_ * BlockWidth_) == 0, "Error: " + stringify(val_in.size()) + " not multiple of container blocksize!");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
@@ -342,10 +341,10 @@ namespace FEAST
        *
        * Moves a given matrix to this matrix.
        */
-      SparseMatrixCSRBlocked(SparseMatrixCSRBlocked && other) :
-        Container<Mem_, DT_, IT_>(std::forward<SparseMatrixCSRBlocked>(other))
+      SparseMatrixBCSR(SparseMatrixBCSR && other) :
+        Container<Mem_, DT_, IT_>(std::forward<SparseMatrixBCSR>(other))
       {
-        CONTEXT("When moving SparseMatrixCSRBlocked");
+        CONTEXT("When moving SparseMatrixBCSR");
       }
 
       /**
@@ -355,26 +354,26 @@ namespace FEAST
        *
        * Moves another matrix to the target matrix.
        */
-      SparseMatrixCSRBlocked & operator= (SparseMatrixCSRBlocked && other)
+      SparseMatrixBCSR & operator= (SparseMatrixBCSR && other)
       {
-        CONTEXT("When moving SparseMatrixCSRBlocked");
+        CONTEXT("When moving SparseMatrixBCSR");
 
-        this->move(std::forward<SparseMatrixCSRBlocked>(other));
+        this->move(std::forward<SparseMatrixBCSR>(other));
 
         return *this;
       }
 
-      InsertWeakClone( SparseMatrixCSRBlocked );
+      InsertWeakClone( SparseMatrixBCSR );
 
       /** \brief Shallow copy operation
        *
        * Create a shallow copy of itself.
        *
        */
-      SparseMatrixCSRBlocked shared() const
+      SparseMatrixBCSR shared() const
       {
-        CONTEXT("When sharing SparseMatrixCSRBlocked");
-        SparseMatrixCSRBlocked r;
+        CONTEXT("When sharing SparseMatrixBCSR");
+        SparseMatrixBCSR r;
         r.assign(*this);
         return r;
       }
@@ -387,9 +386,9 @@ namespace FEAST
        * Use source matrix content as content of current matrix
        */
       template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const SparseMatrixCSRBlocked<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
+      void convert(const SparseMatrixBCSR<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
       {
-        CONTEXT("When converting SparseMatrixCSRBlocked");
+        CONTEXT("When converting SparseMatrixBCSR");
         this->assign(other);
       }
 
@@ -400,9 +399,9 @@ namespace FEAST
        *
        * Assigns a new matrix layout, discarding all old data
        */
-      SparseMatrixCSRBlocked & operator= (const SparseLayout<Mem_, IT_, layout_id> & layout_in)
+      SparseMatrixBCSR & operator= (const SparseLayout<Mem_, IT_, layout_id> & layout_in)
       {
-        CONTEXT("When assigning SparseMatrixCSRBlocked");
+        CONTEXT("When assigning SparseMatrixBCSR");
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
           MemoryPool<Mem_>::release_memory(this->_elements.at(i));
@@ -440,7 +439,7 @@ namespace FEAST
        */
       Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> operator()(Index row, Index col) const
       {
-        CONTEXT("When retrieving SparseMatrixCSRBlocked element");
+        CONTEXT("When retrieving SparseMatrixBCSR element");
 
         ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(rows()) + " !");
         ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(columns()) + " !");
@@ -636,7 +635,7 @@ namespace FEAST
        */
       static String name()
       {
-        return "SparseMatrixCSRBlocked";
+        return "SparseMatrixBCSR";
       }
 
       /**
@@ -644,7 +643,7 @@ namespace FEAST
        *
        * \param[in] x The Matrix to be copied.
        */
-      void copy(const SparseMatrixCSRBlocked & x)
+      void copy(const SparseMatrixBCSR & x)
       {
         this->_copy_content(x);
       }
@@ -655,7 +654,7 @@ namespace FEAST
        * \param[in] x The Matrix to be copied.
        */
       template <typename Mem2_>
-      void copy(const SparseMatrixCSRBlocked<Mem2_, DT_, IT_, BlockHeight_, BlockWidth_> & x)
+      void copy(const SparseMatrixBCSR<Mem2_, DT_, IT_, BlockHeight_, BlockWidth_> & x)
       {
         this->_copy_content(x);
       }
@@ -670,8 +669,8 @@ namespace FEAST
        * \param[in] alpha A scalar to multiply x with.
        */
       void axpy(
-                const SparseMatrixCSRBlocked & x,
-                const SparseMatrixCSRBlocked & y,
+                const SparseMatrixBCSR & x,
+                const SparseMatrixBCSR & y,
                 const DT_ alpha = DT_(1))
       {
         if (x.rows() != y.rows())
@@ -722,7 +721,7 @@ namespace FEAST
        * \param[in] x The matrix to be scaled.
        * \param[in] alpha A scalar to scale x with.
        */
-      void scale(const SparseMatrixCSRBlocked & x, const DT_ alpha)
+      void scale(const SparseMatrixBCSR & x, const DT_ alpha)
       {
         if (x.rows() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
@@ -1073,15 +1072,15 @@ namespace FEAST
       }
 
       /**
-       * \brief SparseMatrixCSRBlocked comparison operator
+       * \brief SparseMatrixBCSR comparison operator
        *
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        */
       template <typename Mem2_>
-      friend bool operator== (const SparseMatrixCSRBlocked & a, const SparseMatrixCSRBlocked<Mem2_, DT_, IT_, BlockHeight_, BlockWidth_> & b)
+      friend bool operator== (const SparseMatrixBCSR & a, const SparseMatrixBCSR<Mem2_, DT_, IT_, BlockHeight_, BlockWidth_> & b)
       {
-        CONTEXT("When comparing SparseMatrixCSRBlockeds");
+        CONTEXT("When comparing SparseMatrixBCSRs");
 
         if (a.rows() != b.rows())
           return false;
@@ -1183,12 +1182,12 @@ namespace FEAST
       }
 
       /**
-       * \brief SparseMatrixCSRBlocked streaming operator
+       * \brief SparseMatrixBCSR streaming operator
        *
        * \param[in] lhs The target stream.
        * \param[in] b The matrix to be streamed.
        */
-      friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixCSRBlocked & b)
+      friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixBCSR & b)
       {
         lhs << "[" << std::endl;
         for (Index i(0) ; i < b.rows() ; ++i)
@@ -1226,4 +1225,4 @@ namespace FEAST
   } // namespace LAFEM
 } // namespace FEAST
 
-#endif // KERNEL_LAFEM_SPARSE_MATRIX_CSR_BLOCKED_HPP
+#endif // KERNEL_LAFEM_SPARSE_MATRIX_BCSR_HPP

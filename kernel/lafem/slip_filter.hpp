@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
 #include <kernel/lafem/arch/slip_filter.hpp>
@@ -60,321 +60,231 @@ namespace FEAST
      * \author Jordi Paul
      */
     template<
-    typename Mem_,
-    typename DT_,
-    typename IT_,
-    int BlockSize_>
-      class SlipFilter
-      {
-        public:
-          /// mem-type typedef
-          typedef Mem_ MemType;
-          /// data-type typedef
-          typedef DT_ DataType;
-          /// index-type typedef
-          typedef IT_ IndexType;
-          /// The block size
-          static constexpr int BlockSize = BlockSize_;
-          /// Value type
-          typedef Tiny::Vector<DataType, BlockSize> ValueType;
+      typename Mem_,
+      typename DT_,
+      typename IT_,
+      int BlockSize_>
+    class SlipFilter
+    {
+      public:
+        /// mem-type typedef
+        typedef Mem_ MemType;
+        /// data-type typedef
+        typedef DT_ DataType;
+        /// index-type typedef
+        typedef IT_ IndexType;
+        /// The block size
+        static constexpr int BlockSize = BlockSize_;
+        /// Value type
+        typedef Tiny::Vector<DataType, BlockSize> ValueType;
 
-          static_assert(BlockSize > 1, "BlockSize has to be >= 2 in SlipFilter!");
+        static_assert(BlockSize > 1, "BlockSize has to be >= 2 in SlipFilter!");
 
-        private:
-          /// This will contain the pointwise outer unit normal in all vertices
-          SparseVectorBlocked<Mem_, DT_, IT_, BlockSize_> _nu;
-          /// This will contain the data for filtering
-          SparseVectorBlocked<Mem_, DT_, IT_, BlockSize_> _sv;
+      private:
+        /// This will contain the pointwise outer unit normal in all vertices
+        SparseVectorBlocked<Mem_, DT_, IT_, BlockSize_> _nu;
+        /// This will contain the data for filtering
+        SparseVectorBlocked<Mem_, DT_, IT_, BlockSize_> _sv;
 
-        public:
-          /// default constructor
-          SlipFilter() :
-            _nu(),
-            _sv()
-            {
-            }
-
-          /**
-           * \brief Constructor.
-           *
-           * \param[in] num_vertices
-           * Number of vertices in the mesh to save the outer unit normal field at.
-           *
-           * \param[in] num_dofs
-           * Number of DoFs that will be filtered.
-           *
-           */
-          explicit SlipFilter(Index num_vertices, Index num_dofs) :
-            _nu(num_vertices),
-            _sv(num_dofs)
-            {
-            }
-
-          ///**
-          // * \brief Constructor.
-          // *
-          // * \param[in] size The size of the created filter.
-          // * \param[in] values DenseVector containing element values
-          // * \param[in] indices DenseVector containing element indices
-          // */
-          //explicit SlipFilter(Index size_in,
-          //                           DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & values,
-          //                           DenseVectorBlocked<Mem_, IT_, IT_, BlockSize_> & indices) :
-          //  _nu(),
-          //  _sv(size_in, values, indices)
-          //{
-          //  if (values.size() != indices.size())
-          //    throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
-          //}
-
-          /// move-ctor
-          SlipFilter(SlipFilter && other) :
-            _nu(std::move(other._nu)),
-            _sv(std::move(other._sv))
-            {
-            }
-
-          /// move-assignment operator
-          SlipFilter & operator=(SlipFilter && other)
-          {
-            if(this != &other)
-            {
-              _sv = std::forward<decltype(other._sv)>(other._sv);
-              _nu = std::forward<decltype(other._nu)>(other._nu);
-            }
-            return *this;
-          }
-
-          /// virtual destructor
-          virtual ~SlipFilter()
+      public:
+        /// default constructor
+        SlipFilter() :
+          _nu(),
+          _sv()
           {
           }
 
-          /// \returns A deep copy of itself
-          SlipFilter clone() const
-          {
-            SlipFilter other;
-            other.clone(*this);
-            return std::move(other);
-          }
-
-          /// \brief Clones data from another UnitFilter
-          void clone(const SlipFilter & other)
-          {
-            _nu.clone(other.get_nu());
-            _sv.clone(other.get_filter_vector());
-          }
-
-          /// \brief Converts data from another UnitFilter
-          template<typename Mem2_, typename DT2_, typename IT2_, int BS_>
-          void convert(const SlipFilter<Mem2_, DT2_, IT2_, BS_>& other)
-          {
-            _nu.convert(other.get_nu());
-            _sv.convert(other.get_filter_vector());
-          }
-
-          /// \brief Clears the underlying data (namely the SparseVector)
-          void clear()
-          {
-            _nu.clear();
-            _sv.clear();
-          }
-
-          /// \cond internal
-          SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector()
-          {
-            return _sv;
-          }
-          const SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector() const
-          {
-            return _sv;
-          }
-
-          SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_nu()
-          {
-            return _nu;
-          }
-          const SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_nu() const
-          {
-            return _nu;
-          }
-          /// \endcond
-
-          /**
-           * \brief Adds one element to the filter
-           *
-           * \param[in] idx Index where to add
-           * \param[in] val Value to add
-           *
-           **/
-          void add(IndexType idx, ValueType val)
-          {
-            _sv(idx, val);
-          }
-
-          /// \returns The total size of the filter.
-          Index size() const
-          {
-            return _sv.size();
-          }
-
-          /// \returns The number of entries in the filter.
-          Index used_elements() const
-          {
-            return _sv.used_elements();
-          }
-
-          /// \returns The index array.
-          IT_* get_indices()
-          {
-            return _sv.indices();
-          }
-
-          /// \returns The index array.
-          const IT_* get_indices() const
-          {
-            return _sv.indices();
-          }
-
-          /// \returns The value array.
-          ValueType* get_values()
-          {
-            return _sv.elements();
-          }
-
-          /// \returns The value array.
-          const ValueType* get_values() const
-          {
-            return _sv.elements();
-          }
-
-#ifdef DOXYGEN
-          // The following documentation block is visible to Doxygen only. The actual implementation is matrix type
-          // specific and provided below.
-
-          /**
-           * \brief Applies the filter onto a system matrix.
-           *
-           * \tparam BlockWidth_
-           * The input matrix' block width
-           *
-           * \param[in,out] matrix
-           * A reference to the matrix to be filtered.
-           *
-           * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
-           * blocksize.
-           *
-           */
-          void filter_mat(MatrixType & matrix) const
+        /**
+         * \brief Constructor.
+         *
+         * \param[in] num_vertices
+         * Number of vertices in the mesh to save the outer unit normal field at.
+         *
+         * \param[in] num_dofs
+         * Number of DoFs that will be filtered.
+         *
+         */
+        explicit SlipFilter(Index num_vertices, Index num_dofs) :
+          _nu(num_vertices),
+          _sv(num_dofs)
           {
           }
 
-          /**
-           * \brief Filter the non-diagonal row entries
-           *
-           * \tparam BlockWidth_
-           * The input matrix' block width
-           *
-           * \param[in,out] matrix
-           * A reference to the matrix to be filtered.
-           *
-           * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
-           * blocksize.
-           *
-           */
-          void filter_offdiag_row_mat(MatrixType & matrix) const
+        /// move-ctor
+        SlipFilter(SlipFilter && other) :
+          _nu(std::move(other._nu)),
+          _sv(std::move(other._sv))
           {
           }
 
-          /**
-           * \brief Filter the non-diagonal column entries
-           *
-           * \tparam BlockWidth_
-           * The input matrix' block width
-           *
-           * \param[in,out] matrix
-           * A reference to the matrix to be filtered.
-           *
-           * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
-           * blocksize.
-           *
-           */
-          void filter_offdiag_col_mat(MatrixType & matrix) const
+        /// move-assignment operator
+        SlipFilter & operator=(SlipFilter && other)
+        {
+          if(this != &other)
           {
+            _sv = std::forward<decltype(other._sv)>(other._sv);
+            _nu = std::forward<decltype(other._nu)>(other._nu);
           }
+          return *this;
+        }
 
-#endif
-          ///// \cond internal
-          //template<int BlockWidth_>
-          //void filter_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
-          //{
-          //}
+        /// virtual destructor
+        virtual ~SlipFilter()
+        {
+        }
 
-          //template<int BlockWidth_>
-          //void filter_offdiag_row_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
-          //{
-          //}
+        /// \returns A deep copy of itself
+        SlipFilter clone() const
+        {
+          SlipFilter other;
+          other.clone(*this);
+          return std::move(other);
+        }
 
-          //template<int BlockWidth_>
-          //void filter_offdiag_col_mat(SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockSize_, BlockWidth_> &) const
-          //{
-          //}
-          ///// \endcond
+        /// \brief Clones data from another UnitFilter
+        void clone(const SlipFilter & other)
+        {
+          _nu.clone(other.get_nu());
+          _sv.clone(other.get_filter_vector());
+        }
 
-          /**
-           * \brief Applies the filter onto the right-hand-side vector.
-           *
-           * \param[in,out] vector
-           * A reference to the right-hand-side vector to be filtered.
-           */
-          void filter_rhs(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
-          {
-            if(_sv.size() != vector.size())
-              throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-            if(_sv.used_elements() > Index(0))
-              Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
-                (vector.raw_elements(), _sv.raw_elements(), _sv.indices(), _sv.used_elements());
-          }
+        /// \brief Converts data from another UnitFilter
+        template<typename Mem2_, typename DT2_, typename IT2_, int BS_>
+        void convert(const SlipFilter<Mem2_, DT2_, IT2_, BS_>& other)
+        {
+          _nu.convert(other.get_nu());
+          _sv.convert(other.get_filter_vector());
+        }
 
-          /**
-           * \brief Applies the filter onto the solution vector.
-           *
-           * \param[in,out] vector
-           * A reference to the solution vector to be filtered.
-           */
-          void filter_sol(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
-          {
-            // same as rhs
-            filter_rhs(vector);
-          }
+        /// \brief Clears the underlying data (namely the SparseVector)
+        void clear()
+        {
+          _nu.clear();
+          _sv.clear();
+        }
 
-          /**
-           * \brief Applies the filter onto a defect vector.
-           *
-           * \param[in,out] vector
-           * A reference to the defect vector to be filtered.
-           */
-          void filter_def(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
-          {
-            if(_sv.size() != vector.size())
-              throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-            if(_sv.used_elements() > Index(0))
-              Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
-                (vector.raw_elements(), _sv.raw_elements(), _sv.indices(), _sv.used_elements() );
-          }
+        /// \cond internal
+        SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector()
+        {
+          return _sv;
+        }
+        const SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_filter_vector() const
+        {
+          return _sv;
+        }
 
-          /**
-           * \brief Applies the filter onto a correction vector.
-           *
-           * \param[in,out] vector
-           * A reference to the correction vector to be filtered.
-           */
-          void filter_cor(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
-          {
-            // same as def
-            filter_def(vector);
-          }
-      }; // class SlipFilter<...>
+        SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_nu()
+        {
+          return _nu;
+        }
+        const SparseVectorBlocked<Mem_, DT_, IT_, BlockSize>& get_nu() const
+        {
+          return _nu;
+        }
+        /// \endcond
+
+        /**
+         * \brief Adds one element to the filter
+         *
+         * \param[in] idx Index where to add
+         * \param[in] val Value to add
+         *
+         **/
+        void add(IndexType idx, ValueType val)
+        {
+          _sv(idx, val);
+        }
+
+        /// \returns The total size of the filter.
+        Index size() const
+        {
+          return _sv.size();
+        }
+
+        /// \returns The number of entries in the filter.
+        Index used_elements() const
+        {
+          return _sv.used_elements();
+        }
+
+        /// \returns The index array.
+        IT_* get_indices()
+        {
+          return _sv.indices();
+        }
+
+        /// \returns The index array.
+        const IT_* get_indices() const
+        {
+          return _sv.indices();
+        }
+
+        /// \returns The value array.
+        ValueType* get_values()
+        {
+          return _sv.elements();
+        }
+
+        /// \returns The value array.
+        const ValueType* get_values() const
+        {
+          return _sv.elements();
+        }
+
+        /**
+         * \brief Applies the filter onto the right-hand-side vector.
+         *
+         * \param[in,out] vector
+         * A reference to the right-hand-side vector to be filtered.
+         */
+        void filter_rhs(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
+        {
+          if(_sv.size() != vector.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if(_sv.used_elements() > Index(0))
+            Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
+              (vector.raw_elements(), _sv.raw_elements(), _sv.indices(), _sv.used_elements());
+        }
+
+        /**
+         * \brief Applies the filter onto the solution vector.
+         *
+         * \param[in,out] vector
+         * A reference to the solution vector to be filtered.
+         */
+        void filter_sol(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
+        {
+          // same as rhs
+          filter_rhs(vector);
+        }
+
+        /**
+         * \brief Applies the filter onto a defect vector.
+         *
+         * \param[in,out] vector
+         * A reference to the defect vector to be filtered.
+         */
+        void filter_def(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
+        {
+          if(_sv.size() != vector.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if(_sv.used_elements() > Index(0))
+            Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
+              (vector.raw_elements(), _sv.raw_elements(), _sv.indices(), _sv.used_elements() );
+        }
+
+        /**
+         * \brief Applies the filter onto a correction vector.
+         *
+         * \param[in,out] vector
+         * A reference to the correction vector to be filtered.
+         */
+        void filter_cor(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
+        {
+          // same as def
+          filter_def(vector);
+        }
+    }; // class SlipFilter<...>
   } // namespace LAFEM
 } // namespace FEAST
 
