@@ -66,7 +66,7 @@ template
   typename MeshType_,
   template<typename, typename> class FunctionalType_,
   template<typename ... > class RumpfSmootherType_
- >
+  >
   struct RumpfSmootherExcentricApp
 {
   /// Precision for meshes etc, everything else uses the same data type
@@ -110,13 +110,13 @@ template
     DataType fval(0);
 
     // Parameters for the Rumpf functional
-    DataType fac_norm = DataType(1e-2),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     std::deque<String> dirichlet_list;
     std::deque<String> slip_list;
-    slip_list.push_back("inner");
     slip_list.push_back("outer");
+    slip_list.push_back("inner");
 
     // Read mesh from the MeshStreamer and create the MeshAtlas
     std::cout << "Creating mesh atlas..." << std::endl;
@@ -156,10 +156,12 @@ template
 
       RumpfSmootherType refinement_smoother(rmn, dirichlet_list, slip_list, my_functional);
       refinement_smoother.init();
+      refinement_smoother.compute_lambda_uniform();
+      refinement_smoother.compute_h();
       refinement_smoother.prepare();
 
       fval = refinement_smoother.compute_functional(func_norm, func_det, func_rec_det);
-      std::cout << "fval pre optimisation = " << scientify(fval) << std::endl;
+      std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
 
       // Compute initial functional gradient
       refinement_smoother.compute_gradient();
@@ -175,7 +177,7 @@ template
       refinement_smoother.optimise();
 
       fval = refinement_smoother.compute_functional(func_norm, func_det, func_rec_det);
-      std::cout << "fval post optimisation = " << scientify(fval) << std::endl;
+      std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
 
       // Compute initial functional gradient
       refinement_smoother.compute_gradient();
@@ -202,20 +204,22 @@ template
     ImgPointType x_0(DataType(0));
 
     // This is the centre point of the rotation of the inner screw
-    ImgPointType x_1(DataType(0));
+    ImgPointType x_inner(DataType(0));
     DataType excentricity_inner(DataType(0.2833));
-    x_1.v[0] = -excentricity_inner;
+    x_inner.v[0] = -excentricity_inner;
     // The indices for the inner screw
     auto& inner_indices = rmn->find_mesh_part("inner")->template get_target_set<0>();
 
     // This is the centre point of the rotation of the outer screw
-    ImgPointType x_2(DataType(0));
+    ImgPointType x_outer(DataType(0));
     // The indices for the outer screw
     auto& outer_indices = rmn->find_mesh_part("outer")->template get_target_set<0>();
 
     // The smoother in all its template glory
     RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
     rumpflpumpfl.init();
+    rumpflpumpfl.compute_lambda_uniform();
+    rumpflpumpfl.compute_h();
     rumpflpumpfl.print();
     rumpflpumpfl.prepare();
 
@@ -284,6 +288,9 @@ template
       // Save old vertex coordinates
       coords_old.clone(rumpflpumpfl._coords);
 
+      // Compute new target scales
+      //rumpflpumpfl.compute_h_uniform();
+
       DataType alpha_old = alpha;
       alpha = -DataType(2)*pi*time;
 
@@ -293,17 +300,10 @@ template
       // This is the 2x2 matrix representing the turning by the angle delta_alpha of the inner screw
       Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
 
-      rot(0,0) = Math::cos(delta_alpha);
-      rot(0,1) = - Math::sin(delta_alpha);
+      rot(0,0) = Math::cos(delta_alpha*DataType(7)/DataType(6));
+      rot(0,1) = - Math::sin(delta_alpha*DataType(7)/DataType(6));
       rot(1,0) = -rot(0,1);
       rot(1,1) = rot(0,0);
-
-      // This is the old centre point
-      ImgPointType x_1_old(x_1);
-
-      // This is the new centre point
-      x_1.v[0] = x_0.v[0] - excentricity_inner*Math::cos(alpha);
-      x_1.v[1] = x_0.v[1] - excentricity_inner*Math::sin(alpha);
 
       ImgPointType tmp(DataType(0));
       ImgPointType tmp2(DataType(0));
@@ -312,11 +312,11 @@ template
         // Index of boundary vertex i in the mesh
         Index j(inner_indices[i]);
         // Translate the point to the centre of rotation
-        tmp = rumpflpumpfl._coords(j) - x_1_old;
+        tmp = rumpflpumpfl._coords(j) - x_inner;
         // Rotate
         tmp2.set_vec_mat_mult(tmp, rot);
         // Translate the point by the new centre of rotation
-        rumpflpumpfl._coords(j, x_1 + tmp2);
+        rumpflpumpfl._coords(j, x_inner + tmp2);
       }
 
       // Rotate the mesh in the discrete chart. This has to use an evil downcast for now
@@ -327,30 +327,34 @@ template
 
       for(Index i(0); i < inner_chart->_surface_mesh->get_num_entities(0); ++i)
       {
-        tmp = vtx_inner[i] - x_1_old;
+        tmp = vtx_inner[i] - x_inner;
         // Rotate
         tmp2.set_vec_mat_mult(tmp, rot);
         // Translate the point by the new centre of rotation
-        vtx_inner[i] = x_1 + tmp2;
+        vtx_inner[i] = x_inner + tmp2;
       }
 
+      //filename = "chart_inner_" + stringify(n);
+      //Geometry::ExportVTK<SurfaceMeshType> writer_chart_inner(*(inner_chart->_surface_mesh));
+      //writer_chart_inner.write(filename);
+
       // The outer screw has 7 teeth as opposed to the inner screw with 6, and it rotates at 6/7 of the speed
-      rot(0,0) = Math::cos(delta_alpha*DataType(6)/DataType(7));
-      rot(0,1) = - Math::sin(delta_alpha*DataType(6)/DataType(7));
+      rot(0,0) = Math::cos(delta_alpha);
+      rot(0,1) = - Math::sin(delta_alpha);
       rot(1,0) = -rot(0,1);
       rot(1,1) = rot(0,0);
 
-      // The outer screw rotates centrically, so x_2 remains the same at all times
+      // The outer screw rotates centrically, so x_outer remains the same at all times
 
       for(Index i(0); i < outer_indices.get_num_entities(); ++i)
       {
         // Index of boundary vertex i in the mesh
         Index j(outer_indices[i]);
-        tmp = rumpflpumpfl._coords(j) - x_2;
+        tmp = rumpflpumpfl._coords(j) - x_outer;
 
         tmp2.set_vec_mat_mult(tmp, rot);
 
-        rumpflpumpfl._coords(j, x_2 + tmp2);
+        rumpflpumpfl._coords(j, x_outer + tmp2);
       }
 
       // Rotate the mesh in the discrete chart. This has to use an evil downcast for now
@@ -361,11 +365,15 @@ template
 
       for(Index i(0); i < outer_chart->_surface_mesh->get_num_entities(0); ++i)
       {
-        tmp = vtx_outer[i] - x_2;
+        tmp = vtx_outer[i] - x_outer;
         // Rotate
         tmp2.set_vec_mat_mult(tmp, rot);
-        vtx_outer[i] = x_2 + tmp2;
+        vtx_outer[i] = x_outer + tmp2;
       }
+
+      //filename = "chart_outer_" + stringify(n);
+      //Geometry::ExportVTK<SurfaceMeshType> writer_chart_outer(*(outer_chart->_surface_mesh));
+      //writer_chart_outer.write(filename);
 
       // Write new boundary to mesh
       rumpflpumpfl.set_coords();
@@ -441,7 +449,7 @@ template<typename A, typename B>
 using MyFunctional= Meshopt::RumpfFunctional_D2<A, B>;
 
 template<typename A, typename B>
-using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
+using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional_D2>;
 
 template<typename A, typename B>
 using MySmoother = Meshopt::RumpfSmoother<A, B>;
@@ -466,16 +474,21 @@ int main(int argc, char* argv[])
     std::cout << "Rumpf Smoother Application for Excentric Screws usage: " << std::endl;
     std::cout << "Required arguments: --filename [String]: Path to a FEAST mesh file." << std::endl;
     std::cout << "Optional arguments: --level [unsigned int]: Number of refines, defaults to 0." << std::endl;
+    std::cout << "                    --q1hack: Use Q1Hack functionals for hypercube meshes." << std::endl;
     exit(1);
   }
   // Specify supported command line switches
   args.support("level");
   args.support("filename");
   args.support("help");
+  args.support("q1hack");
   // Refinement level
   Index lvl_max(0);
+  // Switch for the Q1Hack
+  bool use_q1hack(false);
+
   // Input file name, required
-  FEAST::String filename;
+  String filename;
   // Get unsupported command line arguments
   std::deque<std::pair<int,String> > unsupported = args.query_unsupported();
   if( !unsupported.empty() )
@@ -487,7 +500,10 @@ int main(int argc, char* argv[])
 
   // Check and parse --filename
   if(args.check("filename") != 1 )
+  {
+    std::cout << "You need to specify a mesh file with --filename.";
     throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --filename");
+  }
   else
   {
     args.parse("filename", filename);
@@ -501,6 +517,17 @@ int main(int argc, char* argv[])
   {
     args.parse("level", lvl_max);
     std::cout << "Refinement level " << lvl_max << std::endl;
+  }
+
+  // Check and parse --q1hack
+  if(args.check("q1hack") != 0)
+  {
+    std::cout << "Not using the Q1Hack for hypercube meshes." << std::endl;
+  }
+  else
+  {
+    use_q1hack = true;
+    std::cout << "Using the Q1Hack for hypercube meshes." << std::endl;
   }
 
   // Create a MeshStreamer and read the mesh file
@@ -521,16 +548,27 @@ int main(int argc, char* argv[])
   DataType deltat(DataType(1e-4));
 
   // This is the list of all supported meshes that could appear in the mesh file
-  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> Simplex2Mesh_2d;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> Hypercube2Mesh_2d;
+  typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, DataType> Simplex2Mesh_2d;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, DataType> Hypercube2Mesh_2d;
 
   // Call the run() method of the appropriate wrapper class
   if(shape_type == mesh_data.st_tria)
     return RumpfSmootherExcentricApp<DataType, Simplex2Mesh_2d, MyFunctional, MySmoother>::
       run(my_streamer, lvl_max, deltat);
+
   if(shape_type == mesh_data.st_quad)
-    return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctional, MySmoother>::
-      run(my_streamer, lvl_max, deltat);
+  {
+    if(use_q1hack)
+    {
+      return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctionalQ1Hack, MySmootherQ1Hack>::
+        run(my_streamer, lvl_max, deltat);
+    }
+    else
+    {
+      return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctional, MySmoother>::
+        run(my_streamer, lvl_max, deltat);
+    }
+  }
 
   // If no MeshType from the list was in the file, return 1
   return 1;
