@@ -5,13 +5,7 @@
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/mesh_streamer_factory.hpp>
-#include <kernel/meshopt/rumpf_smoother.hpp>
-#include <kernel/meshopt/rumpf_smoother_q1hack.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1hack.hpp>
+#include <kernel/meshopt/dudv_smoother.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/mesh_streamer.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
@@ -34,47 +28,25 @@ using namespace FEAST;
   }
 
 /**
- * \brief This application demonstrates the usage of some of the RumpfSmoother classes for boundary deformations
- *
- * \note Because an application of the (nonlinear) Rumpf smoother requires operations similar to a matrix assembly,
- * Rumpf smoothers are implemented for Mem::Main only.
- *
- * In this application, a mesh with two excentric screws is read from a mesh. The screws rotate with different
- * angular velocities, so large mesh deformations occur.
- *
- * \author Jordi Paul
- *
- * \tparam DT_
- * The precision of the mesh etc.
- *
- * \tparam MeshType
- * The mesh type, has to be known because we stream the mesh from a file
- *
- * \tparam FunctionalType
- * The Rumpf functional variant to use
- *
- * \tparam RumpfSmootherType_
- * The Rumpf smoother variant to use
- *
- **/
+ */
 /**
  * \brief Wrapper struct as functions do not seem to agree with template template parameters
- **/
+ */
 template
 <
+  typename Mem_,
   typename DT_,
-  typename MeshType_,
-  template<typename, typename> class FunctionalType_,
-  template<typename ... > class RumpfSmootherType_
+  typename IT_,
+  typename MeshType_
   >
-  struct RumpfSmootherExcentricApp
+  struct DuDvSmootherExcentricApp
 {
   /// Precision for meshes etc, everything else uses the same data type
   typedef DT_ DataType;
-  /// Rumpf Smoothers are implemented for Mem::Main only
-  typedef Mem::Main MemType;
+  /// Memory architecture for solvers
+  typedef Mem_ MemType;
   /// So we use Index
-  typedef Index IndexType;
+  typedef IT_ IndexType;
   /// The type of the mesh
   typedef MeshType_ MeshType;
   /// Shape of the mesh cells
@@ -87,10 +59,8 @@ template
 
   /// The corresponding transformation
   typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-  /// Our functional type
-  typedef FunctionalType_<DataType, ShapeType> FunctionalType;
-  /// The Rumpf smoother
-  typedef RumpfSmootherType_<TrafoType, FunctionalType> RumpfSmootherType;
+  /// The smoother
+  typedef Meshopt::DuDvSmoother<Mem_, DT_, IT_, TrafoType> SmootherType;
   /// Type for points in the mesh
   typedef Tiny::Vector<DataType, MeshType::world_dim> ImgPointType;
 
@@ -107,16 +77,11 @@ template
   {
     // Filename for writing .vtu output
     String filename("");
-    DataType fval(0);
-
-    // Parameters for the Rumpf functional
-    DataType fac_norm = DataType(1e-2),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
-    FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     std::deque<String> dirichlet_list;
+    dirichlet_list.push_back("outer");
+    dirichlet_list.push_back("inner");
     std::deque<String> slip_list;
-    slip_list.push_back("outer");
-    slip_list.push_back("inner");
 
     // Read mesh from the MeshStreamer and create the MeshAtlas
     std::cout << "Creating mesh atlas..." << std::endl;
@@ -149,52 +114,26 @@ template
     for(Index lvl(1); lvl <= lvl_max; ++lvl)
     {
       std::cout << "Refining up to level " << lvl << "..." << std::endl;
-      // Arrays for saving the contributions of the different Rumpf functional parts
-      DataType* func_norm(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
-      DataType* func_det(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
-      DataType* func_rec_det(new DataType[rmn->get_mesh()->get_num_entities(MeshType::shape_dim)]);
 
-      RumpfSmootherType refinement_smoother(rmn, dirichlet_list, slip_list, my_functional);
+      SmootherType refinement_smoother(rmn, dirichlet_list, slip_list);
       refinement_smoother.init();
-      refinement_smoother.compute_lambda_uniform();
-      refinement_smoother.compute_h();
       refinement_smoother.prepare();
-
-      fval = refinement_smoother.compute_functional(func_norm, func_det, func_rec_det);
-      std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
-
-      // Compute initial functional gradient
-      refinement_smoother.compute_gradient();
 
       // Write initial state to file
       filename = "refinement_pre_"+stringify(lvl);
       Geometry::ExportVTK<MeshType> writer_refinement_pre(*(rmn->get_mesh()));
-      writer_refinement_pre.add_field_cell_blocked_vector("h", refinement_smoother._h);
-      writer_refinement_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_refinement_pre.add_field_vertex_blocked_vector("grad", refinement_smoother._grad);
       writer_refinement_pre.write(filename);
 
       refinement_smoother.optimise();
 
-      fval = refinement_smoother.compute_functional(func_norm, func_det, func_rec_det);
-      std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
-
       // Compute initial functional gradient
-      refinement_smoother.compute_gradient();
       filename = "refinement_post_"+stringify(lvl);
       Geometry::ExportVTK<MeshType> writer_refinement_post(*(rmn->get_mesh()));
-      writer_refinement_post.add_field_cell_blocked_vector("h", refinement_smoother._h);
-      writer_refinement_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_refinement_post.add_field_vertex_blocked_vector("grad", refinement_smoother._grad);
       writer_refinement_post.write(filename);
 
       auto* old = rmn;
       rmn = old->refine();
       delete old;
-
-      delete[] func_norm;
-      delete[] func_det;
-      delete[] func_rec_det;
 
     }
 
@@ -216,48 +155,19 @@ template
     auto& outer_indices = rmn->find_mesh_part("outer")->template get_target_set<0>();
 
     // The smoother in all its template glory
-    RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
-    rumpflpumpfl.init();
-    rumpflpumpfl.compute_lambda_uniform();
-    rumpflpumpfl.compute_h();
-    rumpflpumpfl.print();
-    rumpflpumpfl.prepare();
-
-    // Arrays for saving the contributions of the different Rumpf functional parts
-    DataType* func_norm(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
-    DataType* func_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
-    DataType* func_rec_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
-
-    // Compute initial functional value
-    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-    std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
-
-    // Compute initial functional gradient
-    rumpflpumpfl.compute_gradient();
+    SmootherType mr_dudv(rmn, dirichlet_list, slip_list);
+    mr_dudv.init();
+    mr_dudv.prepare();
 
     // Write initial state to file
     Geometry::ExportVTK<MeshType> writer_initial_pre(*mesh);
-    writer_initial_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-    writer_initial_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
-    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_initial_pre.write("pre_initial");
 
     // Smooth the mesh
-    rumpflpumpfl.optimise();
-
-    // Call prepare() again because the mesh changed due to the optimisation and it was not called again after the
-    // last iteration
-    rumpflpumpfl.prepare();
-    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-    rumpflpumpfl.compute_gradient();
-
-    std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
+    mr_dudv.optimise();
 
     // Write optimised initial mesh
     Geometry::ExportVTK<MeshType> writer_initial_post(*mesh);
-    writer_initial_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-    writer_initial_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
-    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
     writer_initial_post.write("post_initial");
 
     // For saving the old coordinates
@@ -286,10 +196,10 @@ template
       time+= deltat;
 
       // Save old vertex coordinates
-      coords_old.clone(rumpflpumpfl._coords);
+      coords_old.clone(mr_dudv._coords);
 
       // Compute new target scales
-      //rumpflpumpfl.compute_h_uniform();
+      //mr_dudv.compute_h_uniform();
 
       DataType alpha_old = alpha;
       alpha = -DataType(2)*pi*time;
@@ -312,11 +222,11 @@ template
         // Index of boundary vertex i in the mesh
         Index j(inner_indices[i]);
         // Translate the point to the centre of rotation
-        tmp = rumpflpumpfl._coords(j) - x_inner;
+        tmp = mr_dudv._coords(j) - x_inner;
         // Rotate
         tmp2.set_vec_mat_mult(tmp, rot);
         // Translate the point by the new centre of rotation
-        rumpflpumpfl._coords(j, x_inner + tmp2);
+        mr_dudv._coords(j, x_inner + tmp2);
       }
 
       // Rotate the mesh in the discrete chart. This has to use an evil downcast for now
@@ -350,11 +260,11 @@ template
       {
         // Index of boundary vertex i in the mesh
         Index j(outer_indices[i]);
-        tmp = rumpflpumpfl._coords(j) - x_outer;
+        tmp = mr_dudv._coords(j) - x_outer;
 
         tmp2.set_vec_mat_mult(tmp, rot);
 
-        rumpflpumpfl._coords(j, x_outer + tmp2);
+        mr_dudv._coords(j, x_outer + tmp2);
       }
 
       // Rotate the mesh in the discrete chart. This has to use an evil downcast for now
@@ -376,30 +286,17 @@ template
       //writer_chart_outer.write(filename);
 
       // Write new boundary to mesh
-      rumpflpumpfl.set_coords();
-
-      rumpflpumpfl.prepare();
-      fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-      rumpflpumpfl.compute_gradient();
-      std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
+      //mr_dudv.set_coords();
 
       // Write pre-optimisation mesh
       filename = "pre_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_pre(*mesh);
-      writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-      writer_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
       writer_pre.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_pre.write(filename);
 
       // Optimise the mesh
-      rumpflpumpfl.optimise();
-
-      rumpflpumpfl.prepare();
-      fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
-      rumpflpumpfl.compute_gradient();
-      std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
+      mr_dudv.optimise();
 
       // Compute max. mesh velocity
       DataType max_mesh_velocity(-1e10);
@@ -407,7 +304,7 @@ template
 
       for(Index i(0); i < mesh->get_num_entities(0); ++i)
       {
-        mesh_velocity(i, ideltat*(rumpflpumpfl._coords(i) - coords_old(i)));
+        mesh_velocity(i, ideltat*(mr_dudv._coords(i) - coords_old(i)));
 
         DataType my_mesh_velocity(mesh_velocity(i).norm_euclid());
 
@@ -419,9 +316,6 @@ template
       // Write post-optimisation mesh
       filename = "post_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_post(*mesh);
-      writer_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-      writer_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
       writer_post.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_post.write(filename);
@@ -434,29 +328,12 @@ template
     if(atlas != nullptr)
       delete atlas;
 
-    delete[] func_norm;
-    delete[] func_det;
-    delete[] func_rec_det;
-
     return 0;
 
   }
 
 
 }; // struct LevelsetApp
-
-template<typename A, typename B>
-using MyFunctional= Meshopt::RumpfFunctional_D2<A, B>;
-
-template<typename A, typename B>
-using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional_D2>;
-
-template<typename A, typename B>
-using MySmoother = Meshopt::RumpfSmoother<A, B>;
-
-template<typename A, typename B>
-using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
-
 
 /**
  * \cond internal
@@ -471,21 +348,17 @@ int main(int argc, char* argv[])
 
   if( args.check("help") > -1 || args.num_args()==1)
   {
-    std::cout << "Rumpf Smoother Application for Excentric Screws usage: " << std::endl;
+    std::cout << "Du:Dv Smoother Application for Excentric Screws usage: " << std::endl;
     std::cout << "Required arguments: --filename [String]: Path to a FEAST mesh file." << std::endl;
     std::cout << "Optional arguments: --level [unsigned int]: Number of refines, defaults to 0." << std::endl;
-    std::cout << "                    --q1hack: Use Q1Hack functionals for hypercube meshes." << std::endl;
     exit(1);
   }
   // Specify supported command line switches
   args.support("level");
   args.support("filename");
   args.support("help");
-  args.support("q1hack");
   // Refinement level
   Index lvl_max(0);
-  // Switch for the Q1Hack
-  bool use_q1hack(false);
 
   // Input file name, required
   String filename;
@@ -519,17 +392,6 @@ int main(int argc, char* argv[])
     std::cout << "Refinement level " << lvl_max << std::endl;
   }
 
-  // Check and parse --q1hack
-  if(args.check("q1hack") != 0)
-  {
-    std::cout << "Not using the Q1Hack for hypercube meshes." << std::endl;
-  }
-  else
-  {
-    use_q1hack = true;
-    std::cout << "Using the Q1Hack for hypercube meshes." << std::endl;
-  }
-
   // Create a MeshStreamer and read the mesh file
   MeshStreamer my_streamer;
   my_streamer.parse_mesh_file(filename);
@@ -543,7 +405,9 @@ int main(int argc, char* argv[])
 
   ASSERT(mesh_type == mesh_data.mt_conformal, "This application only works for conformal meshes!");
 
+  typedef Mem::Main MemType;
   typedef double DataType;
+  typedef Index IndexType;
 
   DataType deltat(DataType(1e-4));
 
@@ -553,21 +417,15 @@ int main(int argc, char* argv[])
 
   // Call the run() method of the appropriate wrapper class
   if(shape_type == mesh_data.st_tria)
-    return RumpfSmootherExcentricApp<DataType, Simplex2Mesh_2d, MyFunctional, MySmoother>::
+  {
+    return DuDvSmootherExcentricApp<MemType, DataType, IndexType, Simplex2Mesh_2d>::
       run(my_streamer, lvl_max, deltat);
+  }
 
   if(shape_type == mesh_data.st_quad)
   {
-    if(use_q1hack)
-    {
-      return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctionalQ1Hack, MySmootherQ1Hack>::
+      return DuDvSmootherExcentricApp<MemType, DataType, IndexType, Hypercube2Mesh_2d>::
         run(my_streamer, lvl_max, deltat);
-    }
-    else
-    {
-      return RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctional, MySmoother>::
-        run(my_streamer, lvl_max, deltat);
-    }
   }
 
   // If no MeshType from the list was in the file, return 1

@@ -7,6 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # applications to build
 SET (app_list
+  dudv_smoother_excentric-app
   foundation_system_test-app
   foundation_comm_test-app
   foundation_synch_test-app

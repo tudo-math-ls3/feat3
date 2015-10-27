@@ -234,6 +234,10 @@ namespace FEAST
           // Copy back the coordinates to the underlying mesh
           this->set_coords();
 
+          // Adapt all slip boundaries
+          for(auto& it : _slip_list)
+            this->_mesh_node->adapt_by_name(it);
+
           return;
         }
 
