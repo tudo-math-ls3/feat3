@@ -190,9 +190,9 @@ namespace FEAST
 
         Tx_ * x(buffer.elements());
         const Ty_ * y(vector.elements());
-        const Index * col_idx(_mirror_gather.col_ind());
+        const IndexType_ * col_idx(_mirror_gather.col_ind());
         const DataType_* val(_mirror_gather.val());
-        const Index * row_ptr(_mirror_gather.row_ptr());
+        const IndexType_ * row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
         ASSERT_(num_rows + buffer_offset <= buffer.size());
@@ -241,9 +241,9 @@ namespace FEAST
 
         Tx_ * x(buffer.elements());
         const Ty_ * y(vector.elements());
-        const Index * col_idx(_mirror_gather.col_ind());
+        const IndexType_ * col_idx(_mirror_gather.col_ind());
         const DataType_* val(_mirror_gather.val());
-        const Index * row_ptr(_mirror_gather.row_ptr());
+        const IndexType_* row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
         ASSERT_(num_rows + buffer_offset <= buffer.size());
@@ -288,9 +288,9 @@ namespace FEAST
 
         Tx_ * x(vector.elements());
         const Ty_ * y(buffer.elements());
-        const Index * col_idx(_mirror_scatter.col_ind());
+        const IndexType_ * col_idx(_mirror_scatter.col_ind());
         const DataType_* val(_mirror_scatter.val());
-        const Index * row_ptr(_mirror_scatter.row_ptr());
+        const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 
@@ -344,9 +344,9 @@ namespace FEAST
 
         Tx_ * x(vector.elements());
         const Ty_ * y(buffer.elements());
-        const Index * col_idx(_mirror_scatter.col_ind());
+        const IndexType_ * col_idx(_mirror_scatter.col_ind());
         const DataType_* val(_mirror_scatter.val());
-        const Index * row_ptr(_mirror_scatter.row_ptr());
+        const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 

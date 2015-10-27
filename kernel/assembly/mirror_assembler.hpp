@@ -221,9 +221,10 @@ namespace FEAST
       template<
         typename MemType_,
         typename DataType_,
+        typename IndexType_,
         typename Space_,
         typename CellSet_>
-      static void assemble_mirror(LAFEM::VectorMirror<MemType_, DataType_>& vec_mirror,
+      static void assemble_mirror(LAFEM::VectorMirror<MemType_, DataType_, IndexType_>& vec_mirror,
         const Space_& space, const CellSet_& cell_set)
       {
         assemble_mirror(vec_mirror, assemble_mirror_graph(space, cell_set));
