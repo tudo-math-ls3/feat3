@@ -929,6 +929,68 @@ namespace FEAST
       }
 
       /**
+       * \brief Adds the outer product of two vectors onto the matrix.
+       *
+       * This function performs:
+       * \f[ a_{ij} \leftarrow a_{ij} + \alpha x_i y_j \f]
+       *
+       * \param[in] x
+       * The left multiplicant vector of size \p m_.
+       *
+       * \param[in] y
+       * The right multiplicant vector of size \p n_.
+       *
+       * \param[in] alpha
+       * The scaling factor for the outer product.
+       *
+       * \returns \c *this
+       */
+      template<int snx_, int sny_>
+      Matrix& add_outer_product(
+        const Vector<T_, m_, snx_>& x,
+        const Vector<T_, n_, sny_>& y,
+        const DataType alpha = DataType(1))
+      {
+        for(int i(0); i < m_; ++i)
+        {
+          for(int j(0); j < n_; ++j)
+          {
+            v[i][j] += alpha * x[i] * y[j];
+          }
+        }
+        return *this;
+      }
+
+      /**
+       * \brief Sets this matrix to the outer product of two vectors.
+       *
+       * This function performs:
+       * \f[ a_{ij} \leftarrow x_i y_j \f]
+       *
+       * \param[in] x
+       * The left multiplicant vector of size \p m_.
+       *
+       * \param[in] y
+       * The right multiplicant vector of size \p n_.
+       *
+       * \returns \c *this
+       */
+      template<int snx_, int sny_>
+      Matrix& set_outer_product(
+        const Vector<T_, m_, snx_>& x,
+        const Vector<T_, n_, sny_>& y)
+      {
+        for(int i(0); i < m_; ++i)
+        {
+          for(int j(0); j < n_; ++j)
+          {
+            v[i][j] = x[i] * y[j];
+          }
+        }
+        return *this;
+      }
+
+      /**
        * \brief Adds the algebraic matrix-product of two other matrices onto this matrix.
        *
        * Let \e C denote \c this matrix, and let \e A denote the left m-by-l matrix and \e B the right l-by-n matrix,
@@ -961,7 +1023,7 @@ namespace FEAST
             {
               r += a.v[i][k] * b.v[k][j];
             }
-            operator()(i,j) += alpha * r;
+            v[i][j] += alpha * r;
           }
         }
         return *this;
@@ -1031,7 +1093,7 @@ namespace FEAST
               }
               r += b(p,i)*t;
             }
-            operator()(i,j) += alpha * r;
+            v[i][j] += alpha * r;
           }
         }
         return *this;
@@ -1104,7 +1166,7 @@ namespace FEAST
             {
               r += x(k) * t(k,i,j);
             }
-            operator()(i,j) += alpha * r;
+            v[i][j] += alpha * r;
           }
         }
         return *this;
