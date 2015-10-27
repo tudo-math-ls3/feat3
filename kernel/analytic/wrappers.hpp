@@ -265,6 +265,96 @@ namespace FEAST
       {
       }
     };
+
+    /**
+     * \brief Analytic Scalar Function Curl wrapper
+     *
+     * This class template represents the curl of a scalar function.
+     *
+     * \tparam Function_
+     * The function whose curl is to be wrapped.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Function_>
+    class ScalarCurl :
+      public Analytic::Function
+    {
+    public:
+      // ensure that the input function is scalar
+      static_assert(Function_::ImageType::is_scalar, "only scalar functions are supported; use Curl for vector fields");
+
+      /// our domain dimension is the same as the input function's
+      static constexpr int domain_dim = Function_::domain_dim;
+
+      /// this is a vector-valued function
+      typedef Image::Vector<domain_dim> ImageType;
+
+      static constexpr bool can_value = Function_::can_grad;
+      static constexpr bool can_grad = Function_::can_hess;
+      static constexpr bool can_hess = false;
+
+      template<typename Traits_>
+      class Evaluator :
+        public Analytic::Function::Evaluator<Traits_>
+      {
+      public:
+        typedef typename Traits_::DataType DataType;
+        typedef typename Traits_::PointType PointType;
+        typedef typename Traits_::ValueType ValueType;
+        typedef typename Traits_::GradientType GradientType;
+        typedef typename Traits_::HessianType HessianType;
+
+      private:
+        typedef EvalTraits<DataType, Function_> FuncEvalTraits;
+        /// our original function evaluator
+        typename Function_::template Evaluator<FuncEvalTraits> _func_eval;
+
+        /// 2D vector curl operator
+        template<typename T_, int s_, int sn_>
+        static void compute(Tiny::Vector<T_, 2, s_>& curl, const Tiny::Vector<T_, 2, sn_>& grad)
+        {
+          curl[0] = -grad[1];
+          curl[1] = +grad[0];
+        }
+
+        template<typename T_, int sa_, int sb_, int sm_, int sn_>
+        static void compute(Tiny::Matrix<T_, 2, 2, sa_, sb_>& curl, const Tiny::Matrix<T_, 2, 2, sm_, sn_>& grad)
+        {
+          curl[0] = -grad[1];
+          curl[1] = +grad[0];
+        }
+
+      public:
+        explicit Evaluator(const ScalarCurl& function) :
+          _func_eval(function._function)
+        {
+        }
+
+        void value(ValueType& val, const PointType& point)
+        {
+          typename FuncEvalTraits::GradientType grad;
+          _func_eval.gradient(grad, point);
+          compute(val, grad);
+        }
+
+        void gradient(GradientType& grad, const PointType& point)
+        {
+          typename FuncEvalTraits::HessianType hess;
+          _func_eval.hessian(hess, point);
+          compute(grad, hess);
+        }
+      };
+
+    private:
+      const Function_& _function;
+
+    public:
+      explicit ScalarCurl(const Function_& function) :
+        _function(function)
+      {
+      }
+    };
   } // namespace Analytic
 } // namespace FEAST
 
