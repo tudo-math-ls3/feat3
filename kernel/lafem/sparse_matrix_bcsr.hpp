@@ -29,6 +29,24 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename Mem_, typename DT_, typename IT_, int size_>
+      struct BCSRVectorHelper
+      {
+        static_assert(size_ > 1, "invalid block size");
+        typedef DenseVectorBlocked<Mem_, DT_, IT_, size_> VectorType;
+      };
+
+      template<typename Mem_, typename DT_, typename IT_>
+      struct BCSRVectorHelper<Mem_, DT_, IT_, 1>
+      {
+        typedef DenseVector<Mem_, DT_, IT_> VectorType;
+      };
+    } // namespace Intern
+    /// \endcond
+
     /**
      * \brief CSR based blocked sparse matrix.
      *
@@ -61,6 +79,27 @@ namespace FEAST
       static_assert(BlockWidth_ > 0, "invalid block size");
 
     public:
+      /// Our memory architecture type
+      typedef Mem_ MemType;
+      /// Our datatype
+      typedef DT_ DataType;
+      /// Our indextype
+      typedef IT_ IndexType;
+      /// Our block height
+      static constexpr int BlockHeight = BlockHeight_;
+      /// Our block width
+      static constexpr int BlockWidth = BlockWidth_;
+      /// Value type, meaning the type of each block
+      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
+
+      /// Our used layout type
+      static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_csr;
+
+      /// Compatible L-vector type
+      typedef typename Intern::BCSRVectorHelper<Mem_, DT_, IT_, BlockHeight_>::VectorType VectorTypeL;
+      /// Compatible R-vector type
+      typedef typename Intern::BCSRVectorHelper<Mem_, DT_, IT_, BlockWidth_>::VectorType VectorTypeR;
+
       /**
        * \brief Scatter-Axpy operation for SparseMatrixBCSR
        *
@@ -75,7 +114,7 @@ namespace FEAST
         typedef Mem::Main MemType;
         typedef DT_ DataType;
         typedef IT_ IndexType;
-        typedef Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> DataTypeBlocked;
+        typedef Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> ValueType;
 
       private:
 #ifdef DEBUG
@@ -86,7 +125,7 @@ namespace FEAST
         IT_* _row_ptr;
         IT_* _col_idx;
         IT_* _col_ptr;
-        DataTypeBlocked *_data;
+        ValueType *_data;
 
       public:
         explicit ScatterAxpy(MatrixType& matrix) :
@@ -201,24 +240,6 @@ namespace FEAST
       }
 
     public:
-      /// Our datatype
-      typedef DT_ DataType;
-      /// Our indextype
-      typedef IT_ IndexType;
-      /// Our memory architecture type
-      typedef Mem_ MemType;
-      /// Our block height
-      static constexpr int BlockHeight = BlockHeight_;
-      /// Our block width
-      static constexpr int BlockWidth = BlockWidth_;
-      /// Our used layout type
-      static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_csr;
-      /// Value type, meaning the type of each block
-      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
-      /// Compatible L-vector type
-      typedef DenseVectorBlocked<Mem_, DT_, IT_, BlockHeight> VectorTypeL;
-      /// Compatible R-vector type
-      typedef DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth> VectorTypeR;
 
       /**
        * \brief Constructor

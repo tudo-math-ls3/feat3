@@ -27,8 +27,29 @@ public:
   {
   }
 
+  void test_vector_types() const
+  {
+    // define a hand-full of sparse matrix BCSR
+    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> bcsr_3x3;
+    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 1> bcsr_3x1;
+    SparseMatrixBCSR<Mem_, DT_, IT_, 1, 3> bcsr_1x3;
+    SparseMatrixBCSR<Mem_, DT_, IT_, 1, 1> bcsr_1x1;
+
+    // now create the left/right vectors
+    TEST_CHECK_EQUAL(bcsr_3x3.create_vector_l().name(), "DenseVectorBlocked");
+    TEST_CHECK_EQUAL(bcsr_3x3.create_vector_r().name(), "DenseVectorBlocked");
+    TEST_CHECK_EQUAL(bcsr_3x1.create_vector_l().name(), "DenseVectorBlocked");
+    TEST_CHECK_EQUAL(bcsr_3x1.create_vector_r().name(), "DenseVector");
+    TEST_CHECK_EQUAL(bcsr_1x3.create_vector_l().name(), "DenseVector");
+    TEST_CHECK_EQUAL(bcsr_1x3.create_vector_r().name(), "DenseVectorBlocked");
+    TEST_CHECK_EQUAL(bcsr_1x1.create_vector_l().name(), "DenseVector");
+    TEST_CHECK_EQUAL(bcsr_1x1.create_vector_r().name(), "DenseVector");
+  }
+
   virtual void run() const
   {
+    test_vector_types();
+
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> a;
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> b;
     TEST_CHECK_EQUAL(b, a);
