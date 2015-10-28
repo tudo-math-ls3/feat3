@@ -229,6 +229,11 @@ namespace FEAST
             }
           }
 
+          // Print solver summary
+          std::cout << "Component " << d << ": " << solver->get_plot_name() << ": " << st << ", "
+          << solver->get_num_iter() << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial())
+          << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
+
           // Release the solver
           solver->done();
 
