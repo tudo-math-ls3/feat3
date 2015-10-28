@@ -110,7 +110,7 @@ template
     DataType fval(0);
 
     // Parameters for the Rumpf functional
-    DataType fac_norm = DataType(1e-2),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    DataType fac_norm = DataType(1e-1),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
 
     std::deque<String> dirichlet_list;
@@ -156,8 +156,8 @@ template
 
       RumpfSmootherType refinement_smoother(rmn, dirichlet_list, slip_list, my_functional);
       refinement_smoother.init();
-      refinement_smoother.compute_lambda_uniform();
-      refinement_smoother.compute_h();
+      //refinement_smoother.compute_lambda_uniform();
+      //refinement_smoother.compute_h();
       refinement_smoother.prepare();
 
       fval = refinement_smoother.compute_functional(func_norm, func_det, func_rec_det);
@@ -218,8 +218,8 @@ template
     // The smoother in all its template glory
     RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
     rumpflpumpfl.init();
-    rumpflpumpfl.compute_lambda_uniform();
-    rumpflpumpfl.compute_h();
+    //rumpflpumpfl.compute_lambda_uniform();
+    //rumpflpumpfl.compute_h();
     rumpflpumpfl.print();
     rumpflpumpfl.prepare();
 
@@ -370,6 +370,49 @@ template
         tmp2.set_vec_mat_mult(tmp, rot);
         vtx_outer[i] = x_outer + tmp2;
       }
+
+      const auto& idx = mesh->template get_index_set<ShapeType::dimension, 0>();
+      const auto& vtx = mesh->get_vertex_set();
+
+      typename LAFEM::DenseVector<Mem::Main, DataType, Index> tmp_lambda(mesh->get_num_entities(ShapeType::dimension));
+      DataType sum_lambda(0);
+
+      for(Index cell(0); cell < mesh->get_num_entities(ShapeType::dimension); ++cell)
+      {
+        // Compute midpoint of current cell
+        ImgPointType midpoint(DataType(0));
+        for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+        {
+          Index i(idx(cell, Index(j)));
+          midpoint += vtx[i];
+        }
+        midpoint *= (DataType(1))/DataType(Shape::FaceTraits<ShapeType,0>::count);
+
+        DataType dist_inner(Math::Limits<DataType>::max());
+        for(Index j(0); j < inner_indices.get_num_entities(); ++j)
+        {
+          Index i(inner_indices[j]);
+          DataType my_dist = (midpoint - vtx[i]).norm_euclid();
+          if(my_dist < dist_inner)
+            dist_inner = my_dist;
+        }
+
+        DataType dist_outer(Math::Limits<DataType>::max());
+        for(Index j(0); j < outer_indices.get_num_entities(); ++j)
+        {
+          Index i(outer_indices[j]);
+          DataType my_dist = (midpoint - vtx[i]).norm_euclid();
+          if(my_dist < dist_outer)
+            dist_outer = my_dist;
+        }
+
+        tmp_lambda(cell, dist_inner+dist_outer);
+        sum_lambda+=tmp_lambda(cell);
+
+      }
+      tmp_lambda.scale(tmp_lambda, DataType(1)/sum_lambda);
+      rumpflpumpfl._lambda.convert(tmp_lambda);
+      rumpflpumpfl.compute_h();
 
       //filename = "chart_outer_" + stringify(n);
       //Geometry::ExportVTK<SurfaceMeshType> writer_chart_outer(*(outer_chart->_surface_mesh));

@@ -221,9 +221,15 @@ namespace FEAST
 
           // Set a tighter relative convergence criterion than the default
           solver->set_tol_rel(Math::pow<DataType>(Math::eps<DataType>(), DataType(0.75)));
+          solver->set_max_iter(10000);
 
           // Solve the system and correct coords_blocked
-          solver->correct(sol, _vec_rhs);
+          auto st = solver->correct(sol, _vec_rhs);
+
+          // Print solver summary
+          std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter()
+          << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial()) << " / "
+          << stringify_fp_sci(solver->get_def_final()) << std::endl;
 
           // Release the solver
           solver->done();

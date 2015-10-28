@@ -28,6 +28,7 @@ using namespace FEAST;
   }
 
 /**
+ * Application that shows the limitation of linear variational mesh optimisers, like the Du:Dv smoother
  */
 /**
  * \brief Wrapper struct as functions do not seem to agree with template template parameters
@@ -79,8 +80,8 @@ template
     String filename("");
 
     std::deque<String> dirichlet_list;
-    dirichlet_list.push_back("outer");
     dirichlet_list.push_back("inner");
+    dirichlet_list.push_back("outer");
     std::deque<String> slip_list;
 
     // Read mesh from the MeshStreamer and create the MeshAtlas
@@ -173,6 +174,9 @@ template
     // For saving the old coordinates
     LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim>
       coords_old(mesh->get_num_entities(0),DataType(0));
+    // For writing out the pre optimisation mesh
+    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim>
+      coords_intermediate(mesh->get_num_entities(0),DataType(0));
     // For computing the mesh velocity
     LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim>
       mesh_velocity(mesh->get_num_entities(0), DataType(0));
@@ -229,6 +233,7 @@ template
         mr_dudv._coords(j, x_inner + tmp2);
       }
 
+
       // Rotate the mesh in the discrete chart. This has to use an evil downcast for now
       auto* inner_chart = reinterpret_cast< Geometry::Atlas::DiscreteChart<MeshType, SurfaceMeshType>*>
         (atlas->find_mesh_chart("inner"));
@@ -284,9 +289,11 @@ template
       //filename = "chart_outer_" + stringify(n);
       //Geometry::ExportVTK<SurfaceMeshType> writer_chart_outer(*(outer_chart->_surface_mesh));
       //writer_chart_outer.write(filename);
+      //
+      coords_intermediate.clone(mr_dudv._coords);
 
       // Write new boundary to mesh
-      //mr_dudv.set_coords();
+      mr_dudv.set_coords();
 
       // Write pre-optimisation mesh
       filename = "pre_" + stringify(n);
@@ -294,6 +301,9 @@ template
       writer_pre.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_pre.write(filename);
+
+      mr_dudv._coords.clone(coords_intermediate);
+      mr_dudv.set_coords();
 
       // Optimise the mesh
       mr_dudv.optimise();
@@ -409,7 +419,7 @@ int main(int argc, char* argv[])
   typedef double DataType;
   typedef Index IndexType;
 
-  DataType deltat(DataType(1e-4));
+  DataType deltat(DataType(1e-3));
 
   // This is the list of all supported meshes that could appear in the mesh file
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, DataType> Simplex2Mesh_2d;
