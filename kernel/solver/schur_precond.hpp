@@ -102,6 +102,8 @@ namespace FEAST
       std::shared_ptr<SolverS> _solver_s;
       /// our Schur-Complement type
       SchurType _schur_type;
+      /// auto-initialise of S-solver
+      const bool _auto_init_s;
       /// a temporary defec vector
       VectorTypeV _vec_tmp_v;
       VectorTypeP _vec_tmp_p;
@@ -124,6 +126,11 @@ namespace FEAST
        *
        * \param[in] type
        * Specifies the type of the preconditioner. See this class' documentation for details.
+       *
+       * \param[in] auto_init_s
+       * Specifies whether this solver object should call the init/done functions of the \p solver_s
+       * object. If set to \c false, then the caller is responsible for the initialisation and
+       * finalisation of the S-block solver object.
        */
       explicit SchurPrecond(
         const MatrixA_& matrix_a,
@@ -133,7 +140,8 @@ namespace FEAST
         const FilterP_& filter_p,
         std::shared_ptr<SolverA> solver_a,
         std::shared_ptr<SolverS> solver_s,
-        SchurType type = SchurType::diagonal) :
+        SchurType type = SchurType::diagonal,
+        bool auto_init_s = true) :
         _matrix_a(matrix_a),
         _matrix_b(matrix_b),
         _matrix_d(matrix_d),
@@ -141,7 +149,8 @@ namespace FEAST
         _filter_p(filter_p),
         _solver_a(solver_a),
         _solver_s(solver_s),
-        _schur_type(type)
+        _schur_type(type),
+        _auto_init_s(auto_init_s)
       {
         ASSERT_(solver_a != nullptr);
         ASSERT_(solver_s != nullptr);
@@ -160,7 +169,10 @@ namespace FEAST
       {
         BaseClass::init_symbolic();
         _solver_a->init_symbolic();
-        _solver_s->init_symbolic();
+        if(_auto_init_s)
+        {
+          _solver_s->init_symbolic();
+        }
 
         // create a temporary vector
         if(_schur_type != SchurType::diagonal)
@@ -174,7 +186,10 @@ namespace FEAST
       {
         BaseClass::init_numeric();
         _solver_a->init_numeric();
-        _solver_s->init_numeric();
+        if(_auto_init_s)
+        {
+          _solver_s->init_numeric();
+        }
       }
 
       virtual void init_branch(String root = "") override
@@ -186,7 +201,10 @@ namespace FEAST
 
       virtual void done_numeric() override
       {
-        _solver_s->done_numeric();
+        if(_auto_init_s)
+        {
+          _solver_s->done_numeric();
+        }
         _solver_a->done_numeric();
         BaseClass::done_numeric();
       }
@@ -198,7 +216,10 @@ namespace FEAST
           _vec_tmp_p.clear();
           _vec_tmp_v.clear();
         }
-        _solver_s->done_symbolic();
+        if(_auto_init_s)
+        {
+          _solver_s->done_symbolic();
+        }
         _solver_a->done_symbolic();
         BaseClass::done_symbolic();
       }
@@ -574,6 +595,9 @@ namespace FEAST
      * \param[in] type
      * Specifies the type of the preconditioner.
      *
+     * \param[in] auto_init_s
+     * Specifies whether to automatically initialise the S-matrix solver.
+     *
      * \returns
      * A shared pointer to a new SchurPrecond object.
      */
@@ -585,10 +609,11 @@ namespace FEAST
       const FilterV_& filter_v, const FilterP_& filter_p,
       std::shared_ptr<SolverA_> solver_a,
       std::shared_ptr<SolverS_> solver_s,
-      SchurType type = SchurType::diagonal)
+      SchurType type = SchurType::diagonal,
+      bool auto_init_s = true)
     {
       return std::make_shared<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
-        (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type);
+        (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type, auto_init_s);
     }
 #else
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_>
@@ -597,10 +622,11 @@ namespace FEAST
       const FilterV_& filter_v, const FilterP_& filter_p,
       std::shared_ptr<SolverBase<typename MatrixB_::VectorTypeL>> solver_a,
       std::shared_ptr<SolverBase<typename MatrixD_::VectorTypeL>> solver_s,
-      SchurType type = SchurType::diagonal)
+      SchurType type = SchurType::diagonal,
+      bool auto_init_s = true)
     {
       return std::make_shared<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
-        (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type);
+        (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type, auto_init_s);
     }
 #endif
   } // namespace Solver
