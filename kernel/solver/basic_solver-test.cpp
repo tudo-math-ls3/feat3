@@ -2,6 +2,7 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
+#include <kernel/lafem/pointstar_structure.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -153,3 +154,100 @@ public:
 
 BasicSolverTest<SparseMatrixCSR, Mem::Main, double, Index> basic_solver_csr_generic_double_index;
 BasicSolverTest<SparseMatrixELL, Mem::Main, double, Index> basic_solver_ell_generic_double_index;
+
+template<
+  template<typename,typename,typename> class ScalarMatrix_,
+  typename MemType_,
+  typename DataType_,
+  typename IndexType_>
+class BandedSolverTest :
+  public FullTaggedTest<MemType_, DataType_, IndexType_>
+{
+public:
+  typedef DataType_ DataType;
+  typedef IndexType_ IndexType;
+  typedef ScalarMatrix_<MemType_, DataType, IndexType> MatrixType;
+  typedef typename MatrixType::VectorTypeR VectorType;
+  typedef NoneFilter<MemType_, DataType, IndexType> FilterType;
+
+public:
+  BandedSolverTest() :
+    FullTaggedTest<MemType_, DataType, IndexType>("BandedSolverTest-" + MatrixType::name())
+  {
+  }
+
+  template<typename Solver_>
+  void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs) const
+  {
+    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
+
+    // initialise solver
+    solver.init();
+
+    // solve
+    Status status = solver.apply(vec_sol, vec_rhs);
+    TEST_CHECK_MSG(status_success(status), (String("Failed to solve: '") + name + ("'")));
+
+    // release solver
+    solver.done();
+
+    // check against reference solution
+    vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
+    DataType d = vec_sol.norm2sqr();
+    TEST_CHECK_EQUAL_WITHIN_EPS(d, DataType(0), tol);
+  }
+
+  virtual void run() const
+  {
+    // create band matrix from pointstar structure fe
+    std::vector<IndexType> num_of_nodes;
+    num_of_nodes.push_back(13);
+    num_of_nodes.push_back(13);
+    SparseMatrixBanded<Mem::Main, DataType, IndexType> bm(PointstarStructureFE::template value<DataType>(1, num_of_nodes));
+    for (Index i(0) ; i < bm.get_elements_size().at(0) ; ++i)
+      bm.val()[i] = DataType_(-1);
+    for (Index i(4 * bm.rows()) ; i < 5 * bm.rows() ; ++i)
+      bm.val()[i] = DataType_(4);
+
+    // create a Q2 bubble vector
+    DenseVector<Mem::Main, DataType, IndexType> q2b_vec(bm.rows());
+    for (Index i (0) ; i < q2b_vec.size() ; ++i)
+      q2b_vec(i, DataType(i%10) / DataType(100));
+
+    // create a NoneFilter
+    FilterType filter;
+
+    // convert to system matrix type
+    MatrixType matrix;
+    matrix.convert(bm);
+
+    // convert bubble vector
+    VectorType vec_ref;
+    vec_ref.convert(q2b_vec);
+
+    // compute rhs vector
+    VectorType vec_rhs(vec_ref.clone(CloneMode::Layout));
+    matrix.apply(vec_rhs, vec_ref);
+
+    // initialise sol vector
+    VectorType vec_sol(vec_ref.clone(CloneMode::Layout));
+
+    // test plain PCG
+    {
+      // create a PCG solver
+      PCG<MatrixType, FilterType> solver(matrix, filter);
+      test_solver("PCG", solver, vec_sol, vec_ref, vec_rhs);
+    }
+
+    // test PCG-JAC
+    {
+      // create a Jacobi preconditioner
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      // create a CG solver
+      PCG<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs);
+    }
+  }
+};
+
+BandedSolverTest<SparseMatrixBanded, Mem::Main, double, Index> banded_solver_csr_generic_double_index;
