@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/assembly/base.hpp>
+#include <kernel/analytic/function.hpp>
 #include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -90,7 +91,6 @@ namespace FEAST
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
        * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
-       *
        */
       template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
       void assemble(LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter, const Space_& space) const
@@ -139,7 +139,6 @@ namespace FEAST
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
        * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
-       *
        */
       template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
       void assemble(
@@ -178,7 +177,7 @@ namespace FEAST
        * \brief Builds an (inhomogeneous) unit-filter.
        *
        * This function assembles a unit-filter implementing Dirichlet boundary conditions based on
-       * a functor.
+       * a function.
        *
        * \param[in,out] filter
        * A reference to the unit-filter where the entries are to be added.
@@ -187,12 +186,11 @@ namespace FEAST
        * The finite-element space for which the filter is to be assembled.
        *
        * \param[in] function
-       * An object implementing the Analytic::Function interface representing the boundary value
+       * An object implementing the Analytic::Function interface representing the scalar boundary value
        * function.
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
        * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
-       *
        */
       template<
         typename MemType_,
@@ -205,6 +203,10 @@ namespace FEAST
         const Space_& space,
         const Function_& function) const
       {
+        // ensure that the function is scalar
+        typedef typename Function_::ImageType FuncImageType;
+        static_assert(FuncImageType::is_scalar, "only scalar functions are supported");
+
         // build index-value map
         std::map<Index, DataType_> idx_map;
         Intern::UnitAsmWrapper<shape_dim>::assemble(idx_map, space, _cells, function);
@@ -231,6 +233,7 @@ namespace FEAST
         // Upload assembled result to the filter
         filter.convert(buffer);
       }
+
       /**
        * \brief Builds a homogeneous blocked unit filter.
        *
@@ -244,7 +247,6 @@ namespace FEAST
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
        * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
-       *
        */
       template<typename MemType_, typename DataType_, typename IndexType_, int BlockSize_, typename Space_>
       void assemble(
@@ -273,6 +275,65 @@ namespace FEAST
         {
           // store the dof-index
           buffer.add(IndexType_(*it), tmp);
+        }
+
+        // Upload assembled result to the filter
+        filter.convert(buffer);
+      }
+
+      /**
+       * \brief Builds an inhomogeneous blocked unit filter.
+       *
+       * This function assembles a blocked unit filter implementing the inhomogeneous Dirichlet boundary conditions.
+       *
+       * \param[in,out] filter
+       * A reference to the blocked unit filter where the entries are to be added.
+       *
+       * \param[in] space
+       * The finite-element space for which the filter is to be assembled.
+       *
+       * \param[in] function
+       * An object implementing the Analytic::Function interface representing the vector-valued boundary value
+       * function.
+       *
+       * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
+       * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
+       */
+      template<typename MemType_, typename DataType_, typename IndexType_, int BlockSize_, typename Space_, typename Function_>
+      void assemble(
+        LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>& filter,
+        const Space_& space,
+        const Function_& function) const
+      {
+        // ensure that the function is a vector field of correct dimension
+        typedef typename Function_::ImageType FuncImageType;
+        static_assert(FuncImageType::is_vector, "only vector fields are supported");
+        static_assert(FuncImageType::image_dim == BlockSize_, "invalid filter block size");
+
+        // get the value type of the function
+        typedef typename Analytic::EvalTraits<DataType_, Function_>::ValueType ValueType;
+
+        // build index-value map
+        std::map<Index, ValueType> idx_map;
+        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_map, space, _cells, function);
+
+        // allocate filter if necessary
+        if (filter.size() == Index(0))
+        {
+          filter = LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>(space.get_num_dofs());
+        }
+
+        // Create buffer filter for assembly
+        LAFEM::UnitFilterBlocked<Mem::Main, DataType_, IndexType_, BlockSize_> buffer;
+        buffer.convert(filter);
+
+        // loop over all dof-indices
+        auto it(idx_map.begin());
+        auto jt(idx_map.end());
+        for(Index i(0); it != jt; ++it, ++i)
+        {
+          // store the dof-index
+          buffer.add(IndexType_(it->first), it->second);
         }
 
         // Upload assembled result to the filter
@@ -381,7 +442,7 @@ namespace FEAST
           }
         }
 
-        /// functor-based assembly
+        /// function-based assembly
         template<
           typename DataType_,
           typename Space_,
@@ -434,6 +495,64 @@ namespace FEAST
             dof_assign.finish();
           }
         }
+
+        /// function-based assembly
+        template<
+          typename DataType_,
+          int dim_,
+          int s_,
+          typename Space_,
+          typename Function_>
+        static void assemble(
+          std::map<Index, Tiny::Vector<DataType_, dim_, s_>>& idx,
+          const Space_& space,
+          const std::set<Index>& cells,
+          const Function_& function)
+        {
+          // create a node-functional object
+          typedef typename Space_::template NodeFunctional<shape_dim_, DataType_>::Type NodeFunc;
+
+          // check for empty node functional set
+          static constexpr Index max_dofs = NodeFunc::max_assigned_dofs;
+          if(max_dofs <= 0)
+            return;
+
+          // create node functional
+          NodeFunc node_func(space);
+
+          // create a dof-assignment object
+          typename Space_::template DofAssignment<shape_dim_, DataType_>::Type dof_assign(space);
+
+          typedef Tiny::Vector<DataType_, dim_, s_> ValueType;
+
+          // create node data; avoid zero-length vectors
+          Tiny::Vector<ValueType, max_dofs+1> node_data;
+
+          // loop over all target indices
+          std::set<Index>::const_iterator it(cells.begin());
+          std::set<Index>::const_iterator jt(cells.end());
+          for(; it != jt; ++it)
+          {
+            node_func.prepare(*it);
+            node_func(node_data, function);
+            node_func.finish();
+
+            dof_assign.prepare(*it);
+
+            const int num_assign(dof_assign.get_num_assigned_dofs());
+            for(int j(0); j < num_assign; ++j)
+            {
+              const int num_contribs(dof_assign.get_num_contribs(j));
+              for(int k(0); k < num_contribs; ++k)
+              {
+                Index index(dof_assign.get_index(j, k));
+                DataType_ weight(dof_assign.get_weight(j, k));
+                idx.insert(std::make_pair(index, (weight*node_data[j])));
+              }
+            }
+            dof_assign.finish();
+          }
+        }
       };
 
       /// Dirichlet-BC assembly wrapper; calls the helper for all shape dimensions
@@ -457,15 +576,15 @@ namespace FEAST
         template<
           typename DataType_,
           typename Space_,
-          typename Functor_>
+          typename Function_>
         static void assemble(
           std::map<Index, DataType_>& idx,
           const Space_& space,
           const std::set<Index>* cells,
-          const Functor_& functor)
+          const Function_& function)
         {
-          UnitAsmWrapper<shape_dim_ - 1>::assemble(idx, space, cells, functor);
-          UnitAsmHelper<shape_dim_>::assemble(idx, space, cells[shape_dim_], functor);
+          UnitAsmWrapper<shape_dim_ - 1>::assemble(idx, space, cells, function);
+          UnitAsmHelper<shape_dim_>::assemble(idx, space, cells[shape_dim_], function);
         }
       };
 
@@ -487,14 +606,14 @@ namespace FEAST
         template<
           typename DataType_,
           typename Space_,
-          typename Functor_>
+          typename Function_>
         static void assemble(
           std::map<Index, DataType_>& idx,
           const Space_& space,
           const std::set<Index>* cells,
-          const Functor_& functor)
+          const Function_& function)
         {
-          UnitAsmHelper<0>::assemble(idx, space, cells[0], functor);
+          UnitAsmHelper<0>::assemble(idx, space, cells[0], function);
         }
       };
     } // namespace Intern
