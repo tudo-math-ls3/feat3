@@ -49,17 +49,17 @@ class SlipFilterVectorTest
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
-    const Index nn(100);
+    const IT_ nn(100);
     FilterType my_filter(nn, nn);
 
-    Index jj[8];
+    IT_ jj[8];
 
-    for(Index i(0); i < 8; ++i)
-      jj[i] = i*(Index(3) + i);
+    for(IT_ i(0); i < IT_(8); ++i)
+      jj[i] = i*(IT_(3) + i);
 
-    for(Index i(0); i < 8; ++i)
+    for(IT_ i(0); i < IT_(8); ++i)
     {
-      Index j = jj[i];
+      IT_ j = jj[i];
 
       ValueType tmp(Math::sqrt(DT_(j+1)));
       tmp(0) = tmp(0)*DT_(Math::pow(-DT_(0.5), DT_(i)));
@@ -72,7 +72,7 @@ class SlipFilterVectorTest
 
     VectorType my_vector(nn, DT_(-2));
 
-    Index j(0);
+    IT_ j(0);
     // 0: Set element to 0
     ValueType tmp0(DT_(0));
     my_vector(j, ValueType(0));
@@ -106,9 +106,8 @@ class SlipFilterVectorTest
     // Filter vector
     my_filter.filter_def(my_vector);
 
-
     // Check results
-    for(Index i(0); i < nn; ++i)
+    for(IT_ i(0); i < nn; ++i)
     {
       // Check if we have a filtered entry
       bool filtered(false);
@@ -134,14 +133,18 @@ class SlipFilterVectorTest
 };
 
 SlipFilterVectorTest<Mem::Main, float, Index, 2> component_filter_test_generic_fi_2;
-SlipFilterVectorTest<Mem::Main, double, Index, 2> component_filter_test_generic_di_2;
-SlipFilterVectorTest<Mem::Main, float, Index, 3> component_filter_test_generic_fi_3;
+SlipFilterVectorTest<Mem::Main, double, unsigned int, 2> component_filter_test_generic_di_2;
+SlipFilterVectorTest<Mem::Main, float, unsigned int, 3> component_filter_test_generic_fi_3;
 SlipFilterVectorTest<Mem::Main, double, Index, 3> component_filter_test_generic_di_3;
+#ifdef FEAST_HAVE_QUADMATH
+SlipFilterVectorTest<Mem::Main, __float128, unsigned int, 2> component_filter_test_generic_q_2;
+SlipFilterVectorTest<Mem::Main, __float128, Index, 3> component_filter_test_generic_q_3;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
-SlipFilterVectorTest<Mem::CUDA, float, Index, 2> component_filter_test_cuda_fi_2;
+SlipFilterVectorTest<Mem::CUDA, float, unsigned int, 2> component_filter_test_cuda_fi_2;
 SlipFilterVectorTest<Mem::CUDA, float, Index, 3> component_filter_test_cuda_fi_3;
 SlipFilterVectorTest<Mem::CUDA, double, Index, 2> component_filter_test_cuda_di_2;
-SlipFilterVectorTest<Mem::CUDA, double, Index, 3> component_filter_test_cuda_di_3;
+SlipFilterVectorTest<Mem::CUDA, double, unsigned int, 3> component_filter_test_cuda_di_3;
 #endif
 
 /**
@@ -171,6 +174,7 @@ class SlipFilterAssemblyTest
     /**
      * Runs a test in 2d.
      */
+    template<template<typename> class SpaceType_>
     void run_2d() const
     {
       static constexpr int world_dim = 2;
@@ -185,8 +189,7 @@ class SlipFilterAssemblyTest
       typedef SlipFilter<Mem::Main, DT_, IT_, world_dim> CheckFilterType;
 
       typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-      // The SlipFilter is implemented for Lagrange 1 only
-      typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+      typedef SpaceType_<TrafoType> SpaceType;
 
       std::stringstream ioss;
 
@@ -301,7 +304,7 @@ class SlipFilterAssemblyTest
 
       // Create a FEAST::MeshStreamer and parse the stream
       MeshStreamer my_streamer;
-      //my_streamer.parse_mesh_file("/home/user/jpaul/feast/data/meshes/unit-circle-tria.txt");
+
       my_streamer.parse_mesh_file(ioss);
 
       // Create a Factory
@@ -317,7 +320,7 @@ class SlipFilterAssemblyTest
       node->adapt();
 
       // Refine the MeshNode so the MeshParts get refined, too.
-      Index lvl_max(4);
+      Index lvl_max(0);
       for(Index lvl(0); lvl <= lvl_max; ++lvl)
       {
         auto* old = node;
@@ -351,7 +354,7 @@ class SlipFilterAssemblyTest
       vec.clone(vec_org);
 
       // The assembler
-      Assembly::SlipFilterAssembler<MeshType>slip_filter_assembler(my_trafo.get_mesh()) ;
+      Assembly::SlipFilterAssembler<MeshType>slip_filter_assembler(my_trafo.get_mesh());
 
       FilterType my_filter;
       slip_filter_assembler.add_mesh_part(*(node->find_mesh_part("outer")));
@@ -375,7 +378,8 @@ class SlipFilterAssemblyTest
       for(Index i(0); i < check_filter.used_elements(); ++i)
       {
         Index j(check_filter.get_indices()[i]);
-        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_nu()(j)), DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(check_filter.get_filter_vector()(j).norm_euclid(), DT_(1), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_filter_vector()(j)), DT_(0), tol);
         // If this was ok, replace with the original value so we can check the whole vector without bothering with
         // identifying the filtered values below
         check_vec(j, vec_org(j));
@@ -388,6 +392,7 @@ class SlipFilterAssemblyTest
           TEST_CHECK_EQUAL(check_vec(i)(d), vec_org(i)(d));
       }
 
+
       // Clean up
       delete node;
       delete my_atlas;
@@ -397,6 +402,7 @@ class SlipFilterAssemblyTest
      * Runs the test in 3d. Creates a unit cube Hypercube<3> mesh, adds 3 of its faces to the filter and filters
      * an interpolation of an analytic function.
      */
+    template<template<typename> class SpaceType_>
     void run_3d() const
     {
       static constexpr int world_dim = 3;
@@ -412,8 +418,8 @@ class SlipFilterAssemblyTest
       typedef SlipFilter<Mem::Main, DT_, IT_, world_dim> CheckFilterType;
 
       typedef Trafo::Standard::Mapping<MeshType> TrafoType;
-      // The SlipFilter is implemented for Lagrange 1 only
-      typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+      // The SlipFilter is implemented for Lagrange 1/2 only
+      typedef SpaceType_<TrafoType> SpaceType;
 
       // This is for creating the mesh and its MeshParts
       Geometry::RootMeshNode<MeshType>* node = nullptr;
@@ -474,7 +480,6 @@ class SlipFilterAssemblyTest
       // Apply the filter
       my_filter.filter_sol(vec);
 
-
       // Check results
       const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
 
@@ -490,7 +495,8 @@ class SlipFilterAssemblyTest
       for(Index i(0); i < check_filter.used_elements(); ++i)
       {
         Index j(check_filter.get_indices()[i]);
-        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_nu()(j)), DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(check_filter.get_filter_vector()(j).norm_euclid(), DT_(1), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_filter_vector()(j)), DT_(0), tol);
         // If this was ok, replace with the original value so we can check the whole vector without bothering with
         // identifying the filtered values below
         check_vec(j, vec_org(j));
@@ -509,14 +515,20 @@ class SlipFilterAssemblyTest
 
     void run() const override
     {
-      run_2d();
-      run_3d();
+      // The SlipFilter is implemented for Lagrange 1/2 only
+      run_2d<Space::Lagrange1::Element>();
+      run_2d<Space::Lagrange2::Element>();
+      run_3d<Space::Lagrange1::Element>();
+      run_3d<Space::Lagrange2::Element>();
     }
 
 };
 
 SlipFilterAssemblyTest<Mem::Main, float, Index> sfat_f;
 SlipFilterAssemblyTest<Mem::Main, double, unsigned int> sfat_d;
+#ifdef FEAST_HAVE_QUADMATH
+SlipFilterAssemblyTest<Mem::Main, __float128, Index> sfat_q;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 SlipFilterAssemblyTest<Mem::CUDA, float, unsigned int> sfat_f_cuda;
 SlipFilterAssemblyTest<Mem::CUDA, double, Index> sfat_d_cuda;

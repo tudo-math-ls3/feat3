@@ -90,6 +90,8 @@ namespace FEAST
       typedef Mem_ MemType;
       /// Our size of a single block
       static constexpr int BlockSize = BlockSize_;
+      /// Our value type
+      typedef Tiny::Vector<DT_, BlockSize_> ValueType;
 
       /**
        * \brief Constructor

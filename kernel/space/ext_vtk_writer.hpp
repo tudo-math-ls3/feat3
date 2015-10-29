@@ -206,6 +206,89 @@ namespace FEAST
        * \param[in] data
        * An array representing the coefficient vector of the finite element function.
        */
+      template<typename Space_, typename VectorType_>
+      void write_values_blocked(String name, const Space_& space, const VectorType_& v)
+      {
+        typedef Space_ SpaceType;
+        typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
+        static_assert(SpaceEval::can_value != 0, "space cannot evalute basis function values!");
+        typedef typename SpaceType::DofMappingType DofMappingType;
+        typedef typename SpaceEval::template ConfigTraits<SpaceValueConfig>::EvalDataType SpaceData;
+        typedef typename SpaceEval::template ConfigTraits<SpaceValueConfig>::TrafoConfig TrafoValueConfig;
+        typedef typename TrafoEval::template ConfigTraits<TrafoValueConfig>::EvalDataType TrafoData;
+        typedef typename VectorType_::ValueType ValueType;
+        Tiny::Vector<ValueType, SpaceEval::max_local_dofs> loc_vec;
+
+        DofMappingType dof_map(space);
+        TrafoEval trafo_eval(_trafo);
+        SpaceEval space_eval(space);
+        TrafoData trafo_data;
+        SpaceData space_data;
+
+        // write basic info
+        _ofs << "VECTORS " << name << " double" << std::endl;
+
+        // loop over all cells
+        for(Index cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
+        {
+          // gather local vector
+          dof_map.prepare(cell);
+          for(int i(0); i < dof_map.get_num_local_dofs(); ++i)
+          {
+            ValueType dx(0);
+            for(int j(0); j < dof_map.get_num_contribs(i); ++j)
+              dx += dof_map.get_weight(i,j) * v(dof_map.get_index(i,j));
+            loc_vec[i] = dx;
+          }
+          dof_map.finish();
+
+          // prepare evaluators
+          trafo_eval.prepare(cell);
+          space_eval.prepare(trafo_eval);
+
+          // loop over all points
+          for(Index pt(0); pt < _ref_mesh->get_num_entities(0); ++pt)
+          {
+            // get domain point
+            typename TrafoEval::DomainPointType dom_point;
+            get_dom_point(dom_point, pt);
+
+            // evaluate trafo and space
+            trafo_eval(trafo_data, dom_point);
+            space_eval(space_data, trafo_data);
+
+            // compute value
+            ValueType value(0);
+            for(int i(0); i < space_eval.get_num_local_dofs(); ++i)
+              value += space_data.phi[i].value * loc_vec[i];
+
+            // write value
+            for(int d(0); d < ValueType::n; ++d)
+              _ofs << " " << value(d);
+
+            for(int d(ValueType::n); d < 3; ++d)
+              _ofs << " 0.0";
+            _ofs << std::endl;
+          }
+
+          // finish evaluators
+          space_eval.finish();
+          trafo_eval.finish();
+        }
+      }
+
+      /**
+       * \brief Writes a finite element function to the VTK file.
+       *
+       * \param[in] name
+       * The name of the variable for the VTK file.
+       *
+       * \param[in] space
+       * A reference to the finite element space.
+       *
+       * \param[in] data
+       * An array representing the coefficient vector of the finite element function.
+       */
       template<typename Space_, typename T_>
       void write_values(String name, const Space_& space, const T_* data)
       {
