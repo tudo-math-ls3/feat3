@@ -52,6 +52,21 @@ namespace FEAST
     class DenseVectorBlocked : public Container<Mem_, DT_, IT_>, public VectorBase
     {
     public:
+      /// Our datatype
+      typedef DT_ DataType;
+      /// Our indextype
+      typedef IT_ IndexType;
+      /// Our memory architecture type
+      typedef Mem_ MemType;
+      /// Our size of a single block
+      static constexpr int BlockSize = BlockSize_;
+      /// Our value type
+      typedef Tiny::Vector<DT_, BlockSize_> ValueType;
+
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = class DenseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_>;
+
       /**
        * \brief Scatter-Axpy operation for DenseVectorBlocked
        *
@@ -141,17 +156,6 @@ namespace FEAST
       }; // class GatherAxpy
 
     public:
-      /// Our datatype
-      typedef DT_ DataType;
-      /// Our indextype
-      typedef IT_ IndexType;
-      /// Our memory architecture type
-      typedef Mem_ MemType;
-      /// Our size of a single block
-      static constexpr int BlockSize = BlockSize_;
-      /// Our value type
-      typedef Tiny::Vector<DT_, BlockSize_> ValueType;
-
       /**
        * \brief Constructor
        *

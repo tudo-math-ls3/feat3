@@ -95,6 +95,10 @@ namespace FEAST
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_csr;
 
+      /// Our 'base' class type
+      template <typename Mem2_, typename DT2_ = DT_, typename IT2_ = IT_>
+      using ContainerType = class SparseMatrixBCSR<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_>;
+
       /// Compatible L-vector type
       typedef typename Intern::BCSRVectorHelper<Mem_, DT_, IT_, BlockHeight_>::VectorType VectorTypeL;
       /// Compatible R-vector type

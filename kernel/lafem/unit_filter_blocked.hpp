@@ -53,6 +53,9 @@ namespace FEAST
 
       static_assert(BlockSize > 1, "BlockSize has to be >= 2 in UnitFilterBlocked!");
 
+      /// our supported vector type
+      typedef DenseVectorBlocked<MemType, DataType, IndexType, BlockSize> VectorType;
+
     private:
       /// SparseVector, containing all entries of the unit filter
       SparseVectorBlocked<MemType, DataType, IndexType, BlockSize> _sv;
