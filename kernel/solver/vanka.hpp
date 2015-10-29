@@ -6,6 +6,7 @@
 #include <kernel/solver/base.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -98,6 +99,52 @@ namespace FEAST
             _vec_cor[idx[i]] += omega * x[off+i];
           }
           return off+n;
+        }
+      };
+
+      template<typename DT_, typename IT_, int dim_>
+      class VankaVector<LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_>>
+      {
+      public:
+        typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, dim_> VectorType;
+        typedef typename VectorType::ValueType ValueType;
+        static constexpr int dim = dim_;
+
+      protected:
+        ValueType* _vec_cor;
+
+      public:
+        explicit VankaVector(VectorType& vec_cor) :
+          _vec_cor(vec_cor.elements())
+        {
+        }
+
+        IT_ gather_def(DT_* x, const VectorType& vec, const IT_* idx, const IT_ n, const IT_ off) const
+        {
+          const ValueType* vdef = vec.elements();
+
+          for(IT_ i(0); i < n; ++i)
+          {
+            const ValueType& vi = vdef[idx[i]];
+            for(int j(0); j < dim; ++j)
+            {
+              x[off + IT_(i*dim + j)] = vi[j];
+            }
+          }
+          return off + IT_(dim)*n;
+        }
+
+        IT_ scatter_cor(const DT_ omega, const DT_* x, const IT_* idx, const IT_ n, const IT_ off)
+        {
+          for(IT_ i(0); i < n; ++i)
+          {
+            ValueType& vi = _vec_cor[idx[i]];
+            for(int j(0); j < dim; ++j)
+            {
+              vi[j] += omega * x[off + IT_(i*dim + j)];
+            }
+          }
+          return off + IT_(dim)*n;
         }
       };
 
@@ -276,6 +323,198 @@ namespace FEAST
           return off + m;
         }
       };
+
+      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+      template<typename DT_, typename IT_, int row_dim_, int col_dim_>
+      class VankaMatrix<LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, row_dim_, col_dim_>>
+      {
+      public:
+        typedef LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, row_dim_, col_dim_> MatrixType;
+
+        typedef typename MatrixType::ValueType MatVal;
+
+        static constexpr int row_dim = row_dim_;
+        static constexpr int col_dim = col_dim_;
+
+      protected:
+        const IT_* _row_ptr;
+        const IT_* _col_idx;
+        const MatVal* _mat_val;
+
+      public:
+        explicit VankaMatrix(const MatrixType& matrix) :
+          _row_ptr(matrix.row_ptr()),
+          _col_idx(matrix.col_ind()),
+          _mat_val(matrix.val())
+        {
+        }
+
+        std::pair<IT_, IT_> gather_full(
+          DT_* data, const IT_* ridx, const IT_* cidx,
+          const IT_ m, const IT_ n, const IT_ stride,
+          const IT_ mo = IT_(0), const IT_ no = IT_(0)) const
+        {
+          // empty matrix?
+          if(_mat_val == nullptr)
+            //return std::make_pair(mo+m, no+n);
+            throw InternalError("Vanka: invalid empty BCSR matrix");
+
+          // loop over all local rows
+          for(IT_ i(0); i < m; ++i)
+          {
+            // get row index
+            const IT_ ri = ridx[i];
+
+            // initialise loop variable for local columns
+            IT_ j = IT_(0);
+
+            // loop over the ri row of our matrix
+            for(IT_ ai = _row_ptr[ri]; ai < _row_ptr[ri+1]; ++ai)
+            {
+              // get column index
+              const IT_ rj = _col_idx[ai];
+
+              // now search its position in our local matrix
+              while((j < n) && (cidx[j] < rj))
+              {
+                ++j;
+              }
+              // did we find our local entry?
+              if((j < n) && (cidx[j] == rj))
+              {
+                // found, so store it in our local matrix
+                const MatVal& mv = _mat_val[ai];
+
+                // copy matrix block
+                for(int ii(0); ii < row_dim; ++ii)
+                {
+                  // compute offset
+                  const IT_ lro = (mo + i * IT_(row_dim) + IT_(ii)) * stride + no + j * IT_(col_dim);
+
+                  // copy block row
+                  for(int jj(0); jj < col_dim; ++jj)
+                  {
+                    data[lro + IT_(jj)] = mv[ii][jj];
+                  }
+                }
+              }
+            }
+          }
+          return std::make_pair(mo + IT_(row_dim)*m, no + IT_(col_dim)*n);
+        }
+
+        IT_ gather_diag(DT_* data, const IT_* idx, const IT_ m, const IT_ mo = IT_(0)) const
+        {
+          // loop over all local rows
+          for(IT_ i(0); i < m; ++i)
+          {
+            // get row index
+            const IT_ ri = idx[i];
+
+            // find diagonal entry
+            for(IT_ ai = _row_ptr[ri]; ai < _row_ptr[ri+1]; ++ai)
+            {
+              // is it our diagonal?
+              if(_col_idx[ai] == ri)
+              {
+                const MatVal& mv = _mat_val[ai];
+
+                // copy block diagonal
+                for(int k(0); k < row_dim; ++k)
+                {
+                  data[mo + i*IT_(row_dim) + k] = mv[k][k];
+                }
+                break;
+              }
+            }
+          }
+          return mo + m;
+        }
+
+        IT_ mult_cor(DT_* x, const DT_ alpha, const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, col_dim_>& vec_cor,
+          const IT_* idx, const IT_ m, const IT_ off) const
+        {
+          if(_mat_val == nullptr)
+            return off + m;
+
+          typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, col_dim_> VectorType;
+          typedef typename VectorType::ValueType VecVal;
+          const VecVal* v = vec_cor.elements();
+
+          // loop over all local rows
+          for(IT_ i(0); i < m; ++i)
+          {
+            const IT_ vi = idx[i];
+
+            // loop over all columns
+            for(IT_ k = _row_ptr[vi]; k < _row_ptr[vi+1]; ++k)
+            {
+              // get matrix and vector values
+              const MatVal& mv = _mat_val[k];
+              const VecVal& vv = v[_col_idx[k]];
+
+              // loop over all block rows
+              for(int ii(0); ii < row_dim; ++ii)
+              {
+                DT_ r = DT_(0);
+                // loop over all block columns
+                for(int jj(0); jj < col_dim; ++jj)
+                {
+                  r += mv[ii][jj] * vv[jj];
+                }
+                x[off + i*IT_(row_dim) + ii] += alpha * r;
+              }
+            }
+          }
+          return off + m* IT_(row_dim);
+        }
+
+        IT_ mult_cor(DT_* x, const DT_ alpha, const LAFEM::DenseVector<Mem::Main, DT_, IT_>& vec_cor,
+          const IT_* idx, const IT_ m, const IT_ off) const
+        {
+          if(_mat_val == nullptr)
+            return off + m;
+
+          const DT_* v = vec_cor.elements();
+
+          // loop over all local rows
+          for(IT_ i(0); i < m; ++i)
+          {
+            const IT_ vi = idx[i];
+
+            // loop over all columns
+            for(IT_ k = _row_ptr[vi]; k < _row_ptr[vi+1]; ++k)
+            {
+              // get matrix and vector values
+              const MatVal& mv = _mat_val[k];
+              //const VecVal& vv = v[_col_idx[k]];
+
+              // compute vector offset
+              const IT_ vo = _col_idx[k] * IT_(col_dim);
+
+              // loop over all block rows
+              for(int ii(0); ii < row_dim; ++ii)
+              {
+                DT_ r = DT_(0);
+                // loop over all block columns
+                for(int jj(0); jj < col_dim; ++jj)
+                {
+                  r += mv[ii][jj] * v[vo + jj];
+                }
+                x[off + i*IT_(row_dim) + ii] += alpha * r;
+              }
+            }
+          }
+          return off + m* IT_(row_dim);
+        }
+      };
+
+      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
       template<typename SubMatrix_, int dim_>
       class VankaMatrix<LAFEM::PowerDiagMatrix<SubMatrix_, dim_>>
@@ -593,6 +832,51 @@ namespace FEAST
           return _cont.mult_cor(x, alpha, vec_cor, idx, m, off);
         }
       };
+
+      template<typename DT_, typename IT_>
+      std::pair<const IT_*, const IT_*> vanka_graph(const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix)
+      {
+        return std::make_pair(matrix.row_ptr(), matrix.col_ind());
+      }
+
+      template<typename DT_, typename IT_, int m_, int n_>
+      std::pair<const IT_*, const IT_*> vanka_graph(const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, m_, n_>& matrix)
+      {
+        return std::make_pair(matrix.row_ptr(), matrix.col_ind());
+      }
+
+      template<typename DT_, typename IT_, int dim_>
+      std::pair<const IT_*, const IT_*> vanka_graph(
+        const LAFEM::PowerColMatrix<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, dim_>& matrix)
+      {
+        const auto& m = matrix.first();
+        return std::make_pair(m.row_ptr(), m.col_ind());
+      }
+
+      template<typename DT_, typename IT_, int dim_>
+      std::pair<const IT_*, const IT_*> vanka_graph(
+        const LAFEM::PowerRowMatrix<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, dim_>& matrix)
+      {
+        const auto& m = matrix.first();
+        return std::make_pair(m.row_ptr(), m.col_ind());
+      }
+
+      template<typename DT_, typename IT_, int dim_>
+      std::pair<const IT_*, const IT_*> vanka_graph(
+        const LAFEM::PowerDiagMatrix<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, dim_>& matrix)
+      {
+        const auto& m = matrix.first();
+        return std::make_pair(m.row_ptr(), m.col_ind());
+      }
+
+      template<typename DT_, typename IT_, int row_dim_, int col_dim_>
+      std::pair<const IT_*, const IT_*> vanka_graph(
+        const LAFEM::PowerFullMatrix<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, row_dim_, col_dim_>& matrix)
+      {
+        const auto& m = matrix.template at<0,0>();
+        return std::make_pair(m.row_ptr(), m.col_ind());
+      }
+
     } // namespace Intern
     /// \endcond
 
@@ -912,17 +1196,16 @@ namespace FEAST
        */
       void _build_p_block()
       {
-        const auto& mat_b = _matrix.block_b().first();
-        const auto& mat_d = _matrix.block_d().first();
-
         // fetch matrix dimensions
-        const IndexType m = IndexType(mat_d.rows());
+        const IndexType m = IndexType(_matrix.block_d().rows());
 
         // fetch the matrix arrays
-        const IndexType* row_ptr_b = mat_b.row_ptr();
-        const IndexType* col_idx_b = mat_b.col_ind();
-        const IndexType* row_ptr_d = mat_d.row_ptr();
-        const IndexType* col_idx_d = mat_d.col_ind();
+        auto graph_b = Intern::vanka_graph(_matrix.block_b());
+        const IndexType* row_ptr_b = graph_b.first;
+        const IndexType* col_idx_b = graph_b.second;
+        auto graph_d = Intern::vanka_graph(_matrix.block_d());
+        const IndexType* row_ptr_d = graph_d.first;
+        const IndexType* col_idx_d = graph_d.second;
 
         // clear block arrays
         _block_p_ptr.clear();
@@ -993,8 +1276,7 @@ namespace FEAST
        */
       void _build_p_nodal()
       {
-        const auto& mat_d = _matrix.block_d().first();
-        const IndexType m = IndexType(mat_d.rows());
+        const IndexType m = IndexType(_matrix.block_d().rows());
 
         // clear block arrays
         _block_p_ptr.clear();
@@ -1013,9 +1295,9 @@ namespace FEAST
       void _build_v_block()
       {
         // fetch the matrix arrays
-        const auto& mat_d = _matrix.block_d().first();
-        const IndexType* row_ptr_d = mat_d.row_ptr();
-        const IndexType* col_idx_d = mat_d.col_ind();
+        auto graph_d = Intern::vanka_graph(_matrix.block_d());
+        const IndexType* row_ptr_d = graph_d.first;
+        const IndexType* col_idx_d = graph_d.second;
 
         // fetch number of pressure blocks
         const IndexType m = IndexType(_block_p_ptr.size()-1);
