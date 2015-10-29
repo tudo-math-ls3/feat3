@@ -18,6 +18,7 @@
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
+#include <kernel/lafem/arch/component_invert.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
 #include <iostream>
@@ -480,6 +481,23 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
         Arch::ComponentProduct<Mem_>::value(raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
+      }
+
+      /**
+       * \brief Performs \f$ this_i \leftarrow \alpha / x_i \f$
+       *
+       * \param[in] x
+       * The vector whose components serve as denominators.
+       *
+       * \param[in] alpha
+       * The nominator.
+       */
+      void component_invert(const DenseVectorBlocked & x, const DT_ alpha = DT_(1))
+      {
+        if (this->size() != x.size())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+
+        Arch::ComponentInvert<Mem_>::value(this->raw_elements(), x.raw_elements(), alpha, this->raw_size());
       }
 
       /**
