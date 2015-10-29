@@ -1048,6 +1048,30 @@ namespace FEAST
       }
       ///@}
 
+      /// \copydoc extract_diag()
+      void extract_diag(VectorTypeL & diag) const
+      {
+        ASSERT(diag.size() == rows(), "Error: diag size does not match matrix row count!");
+        ASSERT(rows() == columns(), "Error: matrix is not square!");
+
+        for (Index i(0) ; i < num_of_offsets() ; ++i)
+        {
+          if (MemoryPool<Mem_>::get_element(offsets(), i) == rows() - 1)
+          {
+            MemoryPool<Mem_>::copy(diag.elements(), val(), rows());
+            break;
+          }
+        }
+      }
+
+      /// extract main diagonal vector from matrix
+      VectorTypeL extract_diag() const
+      {
+        VectorTypeL diag = create_vector_l();
+        extract_diag(diag);
+        return diag;
+      }
+
       /**
        * \brief Deserialisation of complete container entity.
        *
