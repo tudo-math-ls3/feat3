@@ -387,6 +387,7 @@ namespace FEAST
       std::shared_ptr<SolverA> _solver_a;
       std::shared_ptr<SolverS> _solver_s;
       SchurType _schur_type;
+      const bool _auto_init_s;
 
     public:
       explicit SchurPrecond(
@@ -397,7 +398,8 @@ namespace FEAST
         const GlobalFilterTypeP& filter_p,
         std::shared_ptr<SolverA> solver_a,
         std::shared_ptr<SolverS> solver_s,
-        SchurType type = SchurType::diagonal
+        SchurType type = SchurType::diagonal,
+        bool auto_init_s = true
         ) :
         _matrix_a(matrix_a),
         _matrix_b(matrix_b),
@@ -406,7 +408,8 @@ namespace FEAST
         _filter_p(filter_p),
         _solver_a(solver_a),
         _solver_s(solver_s),
-        _schur_type(type)
+        _schur_type(type),
+        _auto_init_s(auto_init_s)
       {
       }
 
@@ -419,7 +422,10 @@ namespace FEAST
       {
         BaseClass::init_symbolic();
         _solver_a->init_symbolic();
-        _solver_s->init_symbolic();
+        if(_auto_init_s)
+        {
+          _solver_s->init_symbolic();
+        }
 
         _vec_rhs_v = _matrix_b.create_vector_l();
         _vec_sol_v = _matrix_b.create_vector_l();
@@ -437,7 +443,10 @@ namespace FEAST
       {
         BaseClass::init_numeric();
         _solver_a->init_numeric();
-        _solver_s->init_numeric();
+        if(_auto_init_s)
+        {
+          _solver_s->init_numeric();
+        }
       }
 
       virtual void init_branch(String root = "") override
@@ -449,7 +458,10 @@ namespace FEAST
 
       virtual void done_numeric() override
       {
-        _solver_s->done_numeric();
+        if(_auto_init_s)
+        {
+          _solver_s->done_numeric();
+        }
         _solver_a->done_numeric();
         BaseClass::done_numeric();
       }
@@ -465,7 +477,10 @@ namespace FEAST
         _vec_rhs_p.clear();
         _vec_sol_v.clear();
         _vec_rhs_v.clear();
-        _solver_s->done_symbolic();
+        if(_auto_init_s)
+        {
+          _solver_s->done_symbolic();
+        }
         _solver_a->done_symbolic();
         BaseClass::done_symbolic();
       }
