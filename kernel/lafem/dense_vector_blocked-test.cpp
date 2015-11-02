@@ -111,6 +111,34 @@ public:
     DenseVectorBlocked<Mem_, DT_, IT_, 3> g(f.size(), f.raw_elements());
     TEST_CHECK_EQUAL(g, f);
     TEST_CHECK_EQUAL((void*)g.raw_elements(), (void*)f.raw_elements());
+
+    std::stringstream mts;
+    g.write_out(FileMode::fm_mtx, mts);
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> l(FileMode::fm_mtx, mts);
+    TEST_CHECK_EQUAL(l, g);
+    /*for (Index i(0) ; i < g.raw_size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(l.raw_elements()[i], g.raw_elements()[i], 1e-4);*/
+
+    std::stringstream ts;
+    g.write_out(FileMode::fm_exp, ts);
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> m(FileMode::fm_exp, ts);
+    TEST_CHECK_EQUAL(m, g);
+    /*for (Index i(0) ; i < k.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-4);*/
+
+    BinaryStream bs;
+    g.write_out(FileMode::fm_dvb, bs);
+    bs.seekg(0);
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> n(FileMode::fm_dvb, bs);
+    TEST_CHECK_EQUAL(n, g);
+    /*for (Index i(0) ; i < k.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), 1e-5);*/
+
+    auto op = g.serialise();
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> o(op);
+    TEST_CHECK_EQUAL(o, g);
+    /*for (Index i(0) ; i < k.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), 1e-5);*/
   }
 };
 DenseVectorBlockedTest<Mem::Main, float, Index> cpu_dense_vector_blocked_test_float;

@@ -156,6 +156,12 @@ namespace FEAST
         }
       }; // class GatherAxpy
 
+    private:
+      Index & _size()
+      {
+        return this->_scalar_index.at(0);
+      }
+
     public:
       /**
        * \brief Constructor
@@ -244,6 +250,53 @@ namespace FEAST
       }
 
       /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The source file.
+       *
+       * Creates a vector from the given source file.
+       */
+      explicit DenseVectorBlocked(FileMode mode, String filename) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        CONTEXT("When creating DenseVectorBlocked");
+
+        read_from(mode, filename);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that is to be read from.
+       *
+       * Creates a vector from the given source file.
+       */
+      explicit DenseVectorBlocked(FileMode mode, std::istream& file) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        CONTEXT("When creating DenseVectorBlocked");
+
+        read_from(mode, file);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] std::vector<char> A std::vector, containing the byte.
+       *
+       * Creates a vector from the given byte array.
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      explicit DenseVectorBlocked(std::vector<char> input) :
+        Container<Mem_, DT_, IT_>(0)
+      {
+        CONTEXT("When creating DenseVectorBlocked");
+        deserialise<DT2_, IT2_>(input);
+      }
+
+      /**
        * \brief Move Constructor
        *
        * \param[in] other The source vector.
@@ -329,6 +382,35 @@ namespace FEAST
           MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
           MemoryPool<Mem_>::increase_memory(this->_indices.at(i));
+      }
+
+      /**
+       * \brief Deserialisation of complete container entity.
+       *
+       * \param[in] std::vector<char> A std::vector, containing the byte array.
+       *
+       * Recreate a complete container entity by a single binary array.
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      void deserialise(std::vector<char> input)
+      {
+        this->template _deserialise<DT2_, IT2_>(FileMode::fm_dvb, input);
+      }
+
+      /**
+       * \brief Serialisation of complete container entity.
+       *
+       * \param[in] mode FileMode enum, describing the actual container specialisation.
+       * \param[out] std::vector<char> A std::vector, containing the byte array.
+       *
+       * Serialize a complete container entity into a single binary array.
+       *
+       * See \ref FEAST::LAFEM::Container::_serialise for details.
+       */
+      template <typename DT2_ = DT_, typename IT2_ = IT_>
+      std::vector<char> serialise()
+      {
+        return this->template _serialise<DT2_, IT2_>(FileMode::fm_dvb);
       }
 
       /**
@@ -431,6 +513,369 @@ namespace FEAST
       void copy(const DenseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & x)
       {
         this->_copy_content(x);
+      }
+
+      /**
+       * \brief Read in vector from file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from(FileMode mode, String filename)
+      {
+        CONTEXT("When reading in DenseVectorBlocked");
+
+        switch(mode)
+        {
+        case FileMode::fm_mtx:
+          read_from_mtx(filename);
+          break;
+        case FileMode::fm_exp:
+          read_from_exp(filename);
+          break;
+        case FileMode::fm_dvb:
+          read_from_dvb(filename);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Read in vector from stream.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from(FileMode mode, std::istream& file)
+      {
+        CONTEXT("When reading in DenseVectorBlocked");
+
+        switch(mode)
+        {
+        case FileMode::fm_mtx:
+          read_from_mtx(file);
+          break;
+        case FileMode::fm_exp:
+          read_from_exp(file);
+          break;
+        case FileMode::fm_dvb:
+          read_from_dvb(file);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Read in vector from MatrixMarket mtx file.
+       *
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from_mtx(String filename)
+      {
+        std::ifstream file(filename.c_str(), std::ifstream::in);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        read_from_mtx(file);
+        file.close();
+      }
+
+      /**
+       * \brief Read in vector from MatrixMarket mtx stream.
+       *
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from_mtx(std::istream& file)
+      {
+        this->clear();
+        this->_scalar_index.push_back(0);
+
+        Index rows;
+        String line;
+        std::getline(file, line);
+        if (line.find("%%MatrixMarket matrix array real general") == String::npos)
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Input-file is not a compatible mtx-vector-file");
+        }
+        while(!file.eof())
+        {
+          std::getline(file,line);
+          if (file.eof())
+            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is empty");
+
+          String::size_type begin(line.find_first_not_of(" "));
+          if (line.at(begin) != '%')
+            break;
+        }
+        {
+          String::size_type begin(line.find_first_not_of(" "));
+          line.erase(0, begin);
+          String::size_type end(line.find_first_of(" "));
+          String srows(line, 0, end);
+          rows = (Index)atol(srows.c_str());
+          line.erase(0, end);
+
+          begin = line.find_first_not_of(" ");
+          line.erase(0, begin);
+          end = line.find_first_of(" ");
+          String scols(line, 0, end);
+          Index cols((Index)atol(scols.c_str()));
+          line.erase(0, end);
+          if (cols != 1)
+            throw InternalError(__func__, __FILE__, __LINE__, "Input-file is no dense-vector-file");
+        }
+
+        DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> tmp(rows / BlockSize_);
+        DT_ * pval(tmp.raw_elements());
+
+        while(!file.eof())
+        {
+          std::getline(file, line);
+          if (file.eof())
+            break;
+
+          String::size_type begin(line.find_first_not_of(" "));
+          line.erase(0, begin);
+          String::size_type end(line.find_first_of(" "));
+          String sval(line, 0, end);
+          DT_ tval((DT_)atof(sval.c_str()));
+
+          *pval = tval;
+          ++pval;
+        }
+        this->assign(tmp);
+      }
+
+      /**
+       * \brief Read in vector from ASCII file.
+       *
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from_exp(String filename)
+      {
+        std::ifstream file(filename.c_str(), std::ifstream::in);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        read_from_exp(file);
+        file.close();
+      }
+
+      /**
+       * \brief Read in vector from ASCII stream.
+       *
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from_exp(std::istream& file)
+      {
+        this->clear();
+        this->_scalar_index.push_back(0);
+
+        std::vector<DT_> data;
+
+        while(!file.eof())
+        {
+          std::string line;
+          std::getline(file, line);
+          if(line.find("#", 0) < line.npos)
+            continue;
+          if(file.eof())
+            break;
+
+          std::string n_z_s;
+
+          std::string::size_type first_digit(line.find_first_not_of(" "));
+          line.erase(0, first_digit);
+          std::string::size_type eol(line.length());
+          for(unsigned long i(0) ; i < eol ; ++i)
+          {
+            n_z_s.append(1, line[i]);
+          }
+
+          DT_ n_z((DT_)atof(n_z_s.c_str()));
+
+          data.push_back(n_z);
+
+        }
+
+        _size() = Index(data.size()) / Index(BlockSize_);
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(Index(data.size())));
+        this->_elements_size.push_back(Index(data.size()));
+        MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
+      }
+
+      /**
+       * \brief Read in vector from binary file.
+       *
+       * \param[in] filename The file that shall be read in.
+       */
+      void read_from_dvb(String filename)
+      {
+        std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        read_from_dvb(file);
+        file.close();
+      }
+
+      /**
+       * \brief Read in vector from binary stream.
+       *
+       * \param[in] file The stream that shall be read in.
+       */
+      void read_from_dvb(std::istream& file)
+      {
+        this->clear();
+        this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
+
+        this->template _deserialise<double, uint64_t>(FileMode::fm_dvb, file);
+      }
+
+      /**
+       * \brief Write out vector to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] filename The file where the vector shall be stored.
+       */
+      void write_out(FileMode mode, String filename) const
+      {
+        CONTEXT("When writing out DenseVectorBlocked");
+
+        switch(mode)
+        {
+        case FileMode::fm_mtx:
+          write_out_mtx(filename);
+          break;
+        case FileMode::fm_exp:
+          write_out_exp(filename);
+          break;
+        case FileMode::fm_dvb:
+          write_out_dvb(filename);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Write out vector to file.
+       *
+       * \param[in] mode The used file format.
+       * \param[in] file The stream that shall be written to.
+       */
+      void write_out(FileMode mode, std::ostream& file) const
+      {
+        CONTEXT("When writing out DenseVectorBlocked");
+
+        switch(mode)
+        {
+        case FileMode::fm_mtx:
+          write_out_mtx(file);
+          break;
+        case FileMode::fm_exp:
+          write_out_exp(file);
+          break;
+        case FileMode::fm_dvb:
+          write_out_dvb(file);
+          break;
+        default:
+          throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+        }
+      }
+
+      /**
+       * \brief Write out vector to MatrixMarket mtx file.
+       *
+       * \param[in] filename The file where the vector shall be stored.
+       */
+      void write_out_mtx(String filename) const
+      {
+        std::ofstream file(filename.c_str(), std::ofstream::out);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        write_out_mtx(file);
+        file.close();
+      }
+
+      /**
+       * \brief Write out vector to MatrixMarket mtx file.
+       *
+       * \param[in] file The stream that shall be written to.
+       */
+      void write_out_mtx(std::ostream& file) const
+      {
+        DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> temp;
+        temp.convert(*this);
+
+        const Index tsize(temp.raw_size());
+        file << "%%MatrixMarket matrix array real general" << std::endl;
+        file << tsize << " " << 1 << std::endl;
+
+        const DT_ * pval(temp.raw_elements());
+        for (Index i(0) ; i < tsize ; ++i, ++pval)
+        {
+          file << std::scientific << *pval << std::endl;
+        }
+      }
+
+      /**
+       * \brief Write out vector to file.
+       *
+       * \param[in] filename The file where the vector shall be stored.
+       */
+      void write_out_exp(String filename) const
+      {
+        std::ofstream file(filename.c_str(), std::ofstream::out);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        write_out_exp(file);
+        file.close();
+      }
+
+      /**
+       * \brief Write out vector to file.
+       *
+       * \param[in] file The stream that shall be written to.
+       */
+      void write_out_exp(std::ostream& file) const
+      {
+        DT_ * temp = MemoryPool<Mem::Main>::template allocate_memory<DT_>((this->raw_size()));
+        MemoryPool<Mem_>::template download<DT_>(temp, this->raw_elements(), this->raw_size());
+
+        for (Index i(0) ; i < this->raw_size() ; ++i)
+        {
+          file << std::scientific << temp[i] << std::endl;
+        }
+
+        MemoryPool<Mem::Main>::release_memory(temp);
+      }
+
+      /**
+       * \brief Write out vector to file.
+       *
+       * \param[in] filename The file where the vector shall be stored.
+       */
+      void write_out_dvb(String filename) const
+      {
+        std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
+        write_out_dvb(file);
+        file.close();
+      }
+
+      /**
+       * \brief Write out vector to file.
+       *
+       * \param[in] file The stream that shall be written to.
+       */
+      void write_out_dvb(std::ostream& file) const
+      {
+        if (! std::is_same<DT_, double>::value)
+          std::cout<<"Warning: You are writing out a dense vector that is not double precision!"<<std::endl;
+
+        this->template _serialise<double, uint64_t>(FileMode::fm_dvb, file);
       }
 
       ///@name Linear algebra operations

@@ -2,6 +2,7 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
+#include <kernel/util/binary_stream.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -97,6 +98,26 @@ public:
     TEST_CHECK_EQUAL(f.used_elements(), c.used_elements());
     TEST_CHECK_NOT_EQUAL((void*)f.raw_val(), (void*)c.raw_val());
     TEST_CHECK_EQUAL((void*)f.row_ptr(), (void*)c.row_ptr());
+
+    BinaryStream bs;
+    c.write_out(FileMode::fm_bcsr, bs);
+    bs.seekg(0);
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> g(FileMode::fm_bcsr, bs);
+    TEST_CHECK_EQUAL(g, c);
+
+    /*std::stringstream ts;
+    f.write_out(FileMode::fm_mtx, ts);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
+    TEST_CHECK_EQUAL(j, f);
+
+    std::stringstream ts2;
+    f.write_out_mtx(ts2, true);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
+    TEST_CHECK_EQUAL(j2, f);*/
+
+    auto kp = c.serialise();
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> k(kp);
+    TEST_CHECK_EQUAL(k, c);
   }
 };
 SparseMatrixBCSRTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_test_float_ulong;

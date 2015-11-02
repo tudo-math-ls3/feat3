@@ -359,7 +359,7 @@ namespace FEAST
        * \brief Constructor
        *
        * \param[in] mode The used file format.
-       * \param[in] filename The source file in EXP format.
+       * \param[in] filename The source file.
        *
        * Creates a vector from the given source file.
        */
@@ -575,7 +575,6 @@ namespace FEAST
 
         this->template _copy_inv<VT_>(a);
       }
-
 
       /**
        * \brief Read in vector from file.

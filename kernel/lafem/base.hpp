@@ -26,14 +26,16 @@ namespace FEAST
     enum class FileMode
     {
       fm_exp = 0, /**< Exponential ascii */
-      fm_dv, /**< Binary data */
+      fm_dv, /**< Binary vector data */
       fm_mtx, /**< Matrix market ascii */
       fm_ell, /**< Binary ell data */
       fm_csr, /**< Binary csr data */
       fm_coo, /**< Binary coo data */
       fm_bm, /**< Binary banded data */
       fm_dm,  /**< Binary dense matrix data */
-      fm_sv  /**< Binary sparse vector data */
+      fm_sv,  /**< Binary sparse vector data */
+      fm_dvb, /**< Binary block vector data */
+      fm_bcsr /**< Binary block csr data */
     };
 
     /**
