@@ -20,6 +20,8 @@
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/lafem/arch/component_invert.hpp>
 #include <kernel/util/tiny_algebra.hpp>
+#include <kernel/util/statistics.hpp>
+#include <kernel/util/time_stamp.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -897,19 +899,33 @@ namespace FEAST
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        TimeStamp ts_start;
+
         // check for special cases
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
+        {
+          Statistics::add_flops(this->raw_size());
           Arch::Sum<Mem_>::value(raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
+        }
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+        {
+          Statistics::add_flops(this->raw_size());
           Arch::Difference<Mem_>::value(raw_elements(), y.raw_elements(), x.raw_elements(), this->raw_size());
+        }
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
           this->copy(y);
         // r <- y + alpha*x
         else
+        {
+          Statistics::add_flops(this->raw_size() * 2);
           Arch::Axpy<Mem_>::dv(raw_elements(), alpha, x.raw_elements(), y.raw_elements(), this->raw_size());
+        }
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -925,7 +941,13 @@ namespace FEAST
         if (this->size() != y.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        TimeStamp ts_start;
+
         Arch::ComponentProduct<Mem_>::value(raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
+        Statistics::add_flops(this->raw_size());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -942,7 +964,13 @@ namespace FEAST
         if (this->size() != x.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        TimeStamp ts_start;
+
         Arch::ComponentInvert<Mem_>::value(this->raw_elements(), x.raw_elements(), alpha, this->raw_size());
+        Statistics::add_flops(this->raw_size());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -956,7 +984,13 @@ namespace FEAST
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
+        TimeStamp ts_start;
+
         Arch::Scale<Mem_>::value(raw_elements(), x.raw_elements(), alpha, this->raw_size());
+        Statistics::add_flops(this->raw_size());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -971,7 +1005,15 @@ namespace FEAST
         if (x.size() != this->size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-        return Arch::DotProduct<Mem_>::value(raw_elements(), x.raw_elements(), this->raw_size());
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->raw_size() * 2);
+        DataType result = Arch::DotProduct<Mem_>::value(raw_elements(), x.raw_elements(), this->raw_size());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
       }
 
       /**
@@ -981,7 +1023,16 @@ namespace FEAST
        */
       DT_ norm2() const
       {
-        return Arch::Norm2<Mem_>::value(raw_elements(), this->raw_size());
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->raw_size() * 2);
+        DataType result = Arch::Norm2<Mem_>::value(raw_elements(), this->raw_size());
+
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
       }
 
       /**
