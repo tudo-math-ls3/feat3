@@ -55,6 +55,24 @@ namespace FEAST
         }
       }
 
+      template <typename DT_, typename IT_, int BlockSize_>
+      void ProductMatVec<Mem::Main>::csrsb_generic(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
+      {
+        Tiny::Vector<DT_, BlockSize_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockSize_> *>(r));
+        const Tiny::Vector<DT_, BlockSize_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, BlockSize_> * const>(x));
+
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          Tiny::Vector<DT_, BlockSize_> bsum(0);
+          const IT_ end(row_ptr[row + 1]);
+          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          {
+            bsum += val[i] * bx[col_ind[i]];
+          }
+          br[row] = bsum;
+        }
+      }
+
       namespace Intern
       {
         template <Index Start, Index End, Index Step = 1>

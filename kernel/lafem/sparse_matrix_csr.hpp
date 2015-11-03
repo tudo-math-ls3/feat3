@@ -1927,6 +1927,39 @@ namespace FEAST
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
+       * \param[out] r The block vector that recieves the result.
+       * \param[in] x The block vector to be multiplied by this matrix.
+       *
+       * \note Every element of each block in the vector x is multiplied with the corresponding single scalar entry in the matrix.
+       */
+      template<int BlockSize_>
+      void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockSize_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & x) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements() * 2);
+        Arch::ProductMatVec<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
+          r.raw_elements(), this->val(), this->col_ind(), this->row_ptr(),
+          x.raw_elements(), this->rows(), columns(), used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+       * \brief Calculate \f$ r \leftarrow this\cdot x \f$
+       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */

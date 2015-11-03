@@ -325,6 +325,83 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
+class SparseMatrixCSRBApplyTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixCSRBApplyTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRBApplyTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
+      DenseVector<Mem::Main, DT_, IT_> ref_x_local(size);
+      DenseVector<Mem::Main, DT_, IT_> ref_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        ref_x_local(i, DT_(i % 100 * DT_(1.234)));
+      }
+
+      Index ue(0);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+          {
+            a_local(row, col, DT_(2));
+            ++ue;
+          }
+          else if((row == col+1) || (row+1 == col))
+          {
+            a_local(row, col, DT_(-1));
+            ++ue;
+          }
+        }
+      }
+      SparseMatrixCSR<Mem_,DT_, IT_> a(a_local);
+
+      a_local.apply(ref_local, ref_x_local);
+
+      DenseVectorBlocked<Mem::Main, DT_, IT_, 3> x_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        auto temp = x_local(i);
+        temp[0] = ref_x_local(i);
+        temp[1] = DT_(0.5) * ref_x_local(i);
+        temp[2] = DT_(2.0) * ref_x_local(i);
+        x_local(i, temp);
+      }
+      DenseVectorBlocked<Mem_, DT_, IT_, 3> x;
+      x.convert(x_local);
+
+      DenseVectorBlocked<Mem_, DT_, IT_, 3> r(size);
+      DenseVectorBlocked<Mem_, DT_, IT_, 3> r_local;
+
+      a.apply(r, x);
+      r_local.convert(r);
+
+      for (Index i(0) ; i < size ; ++i)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], ref_local(i), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], ref_local(i) * DT_(0.5), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], ref_local(i) * DT_(2.0), 1e-5);
+      }
+    }
+  }
+};
+
+SparseMatrixCSRBApplyTest<Mem::Main, float, unsigned long> sm_csrib_apply_test_float_ulong;
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
 class SparseMatrixCSRScaleTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {

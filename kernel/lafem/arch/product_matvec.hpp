@@ -58,6 +58,12 @@ namespace FEAST
           csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
         }
 
+        template <typename DT_, typename IT_, int BlockSize_>
+        static void csrsb(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        {
+          csrsb_generic<DT_, IT_, BlockSize_>(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
+        }
+
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows)
         {
@@ -104,6 +110,9 @@ namespace FEAST
 
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb_generic(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+        template <typename DT_, typename IT_, int BlockSize_>
+        static void csrsb_generic(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_>
         static void ell_generic(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows);
