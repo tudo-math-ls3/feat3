@@ -1520,7 +1520,13 @@ namespace FEAST
         const Index n = rows();
         for(Index i(0); i < n; ++i)
         {
-          diag(i, (*this)(i, i));
+          auto diag_sub_matrix = (*this)(i, i);
+          FEAST::Tiny::Vector<double, BlockHeight_> diag_sub_vector;
+          for (int j(0) ; j < BlockHeight_ ; ++j)
+          {
+            diag_sub_vector[j] = diag_sub_matrix[j][j];
+          }
+          diag(i, diag_sub_vector);
         }
       }
 
