@@ -1369,6 +1369,8 @@ namespace FEAST
        *
        * \param[in] filename The file where the matrix shall be stored.
        * \param[in] symmetric Should we store only the lower half of the matrix in symmetric format?
+       *
+       * \warning This routine does no check on symmetric properties of the source matrix!
        */
       void write_out_mtx(String filename, bool symmetric = false) const
       {

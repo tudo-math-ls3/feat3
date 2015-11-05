@@ -542,6 +542,7 @@ namespace FEAST
 
         switch(mode)
         {
+        /// \todo read_from_mtx
         /*case FileMode::fm_mtx:
           read_from_mtx(filename);
           break;*/
@@ -762,9 +763,9 @@ namespace FEAST
         case FileMode::fm_bcsr:
           write_out_bcsr(filename);
           break;
-        /*case FileMode::fm_mtx:
+        case FileMode::fm_mtx:
           write_out_mtx(filename);
-          break;*/
+          break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
@@ -785,9 +786,9 @@ namespace FEAST
         case FileMode::fm_bcsr:
           write_out_bcsr(file);
           break;
-        /*case FileMode::fm_mtx:
+        case FileMode::fm_mtx:
           write_out_mtx(file);
-          break;*/
+          break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
@@ -824,71 +825,45 @@ namespace FEAST
        * \brief Write out matrix to MatrixMarktet mtx file.
        *
        * \param[in] filename The file where the matrix shall be stored.
-       * \param[in] symmetric Should we store only the lower half of the matrix in symmetric format?
        */
-      /*void write_out_mtx(String filename, bool symmetric = false) const
+      void write_out_mtx(String filename) const
       {
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
-        write_out_mtx(file, symmetric);
+        write_out_mtx(file);
         file.close();
-      }*/
+      }
 
       /**
        * \brief Write out matrix to MatrixMarktet mtx file.
        *
        * \param[in] file The stream that shall be written to.
-       * \param[in] symmetric Should we store only the LD part of the matrix in symmetric format?
-       *
-       * \warning This routine does no check on symmetric properties of the source matrix!
        */
-      /*void write_out_mtx(std::ostream& file, bool symmetric = false) const
+      void write_out_mtx(std::ostream& file) const
       {
-        SparseMatrixCSR<Mem::Main, DT_, IT_> temp;
+        SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> temp;
         temp.convert(*this);
 
-        if (symmetric)
+        file << "%%MatrixMarket matrix coordinate real general" << std::endl;
+        file << temp.rows() * BlockHeight_<< " " << temp.columns() * BlockWidth_<< " " << temp.used_elements() * BlockHeight_ * BlockWidth_ << std::endl;
+
+        for (Index row(0) ; row < rows() ; ++row)
         {
-          file << "%%MatrixMarket matrix coordinate real symmetric" << std::endl;
-          std::vector<IT_> rowv;
-          std::vector<IT_> colv;
-          std::vector<DT_> valv;
-          for (Index row(0) ; row < rows() ; ++row)
+          const IT_ end(temp.row_ptr()[row + 1]);
+          for (IT_ i(temp.row_ptr()[row]) ; i < end ; ++i)
           {
-            const IT_ end(temp.row_ptr()[row + 1]);
-            for (IT_ i(temp.row_ptr()[row]) ; i < end ; ++i)
+            auto block = temp.val()[i];
+            for (int y(0) ; y < BlockHeight_ ; ++y)
             {
-              const IT_ col(temp.col_ind()[i]);
-              if (row >= col)
+              for (int x(0) ; x < BlockWidth_ ; ++x)
               {
-                rowv.push_back(IT_(row + 1));
-                colv.push_back(col + 1);
-                valv.push_back(temp.val()[i]);
+                file << (row * BlockHeight_) + y + 1 << " " << (temp.col_ind()[i] * BlockWidth_) + x + 1 << " " << std::scientific << block[y][x] << std::endl;
               }
             }
           }
-          file << temp.rows() << " " << temp.columns() << " " << valv.size() << std::endl;
-          for (Index i(0) ; i < valv.size() ; ++i)
-          {
-            file << rowv.at(i) << " " << colv.at(i) << " " << std::scientific << valv.at(i) << std::endl;
-          }
         }
-        else
-        {
-          file << "%%MatrixMarket matrix coordinate real general" << std::endl;
-          file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;
-
-          for (Index row(0) ; row < rows() ; ++row)
-          {
-            const IT_ end(temp.row_ptr()[row + 1]);
-            for (IT_ i(temp.row_ptr()[row]) ; i < end ; ++i)
-            {
-              file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << std::endl;
-            }
-          }
-        }
-      }*/
+      }
 
       /**
        * \brief Retrieve specific matrix element.
