@@ -858,7 +858,7 @@ namespace FEAST
             {
               for (int x(0) ; x < BlockWidth_ ; ++x)
               {
-                file << (row * BlockHeight_) + y + 1 << " " << (temp.col_ind()[i] * BlockWidth_) + x + 1 << " " << std::scientific << block[y][x] << std::endl;
+                file << ((int)row * BlockHeight_) + y + 1 << " " << ((int)temp.col_ind()[i] * BlockWidth_) + x + 1 << " " << std::scientific << block[y][x] << std::endl;
               }
             }
           }
