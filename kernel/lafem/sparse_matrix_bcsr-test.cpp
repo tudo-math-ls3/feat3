@@ -239,3 +239,46 @@ SparseMatrixBCSRApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcs
 SparseMatrixBCSRApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_apply_test_double_ulong;
 SparseMatrixBCSRApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_apply_test_float_uint;
 SparseMatrixBCSRApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_apply_test_double_uint;
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRDiagTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixBCSRDiagTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRDiagTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    DenseVector<Mem_, DT_, IT_> dv1(18);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+      dv1(i, DT_(i+1));
+    DenseVector<Mem_, IT_, IT_> dv2(3);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    dv2(2, IT_(2));
+    DenseVector<Mem_, IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> smb(2, 2, dv2, dv1, dv3);
+
+    auto diag = smb.extract_diag();
+    TEST_CHECK_EQUAL(diag.raw_elements()[0], 1);
+    TEST_CHECK_EQUAL(diag.raw_elements()[1], 5);
+    TEST_CHECK_EQUAL(diag.raw_elements()[2], 9);
+    TEST_CHECK_EQUAL(diag.raw_elements()[3], 10);
+    TEST_CHECK_EQUAL(diag.raw_elements()[4], 14);
+    TEST_CHECK_EQUAL(diag.raw_elements()[5], 18);
+  }
+};
+SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_diag_test_float_ulong;
+SparseMatrixBCSRDiagTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_diag_test_double_ulong;
+SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_diag_test_float_uint;
+SparseMatrixBCSRDiagTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_diag_test_double_uint;
