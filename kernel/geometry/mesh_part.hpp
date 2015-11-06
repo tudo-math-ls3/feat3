@@ -1478,17 +1478,17 @@ namespace FEAST
             {
               // Index of the current entity in the parent
               Index parent_index(ts_above[i]);
-              for(Index j(0); int(j) < is_parent_above.get_num_indices(); ++j)
+              for(int j(0); j < is_parent_above.get_num_indices(); ++j)
               {
                 // This is i.e. the global number of local edge j at face parent_index in the parent
-                Index parent_sub_entity_index(is_parent_above[parent_index][j]);
+                Index parent_sub_entity_index(is_parent_above[parent_index][Index(j)]);
                 upper_origin_set[parent_sub_entity_index] = marker;
               }
             }
 
             // Temporary TargetSet initialised with the maximum possible size (= number of entities in the parent mesh,
             // which is the case if the MeshPart contains all entities of the parent mesh)
-            TargetSet tmp_target_set(is_parent_above.get_num_entities());
+            TargetSet tmp_target_set(is_parent_above.get_index_bound());
             // Count the number of entities that get added
             Index num_entities_current_dim(0);
             for(Index i(0); i < upper_origin_set.get_num_entities(); ++i)
