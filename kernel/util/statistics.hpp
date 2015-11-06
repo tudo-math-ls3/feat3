@@ -11,6 +11,7 @@
 
 namespace FEAST
 {
+  /// Defect norm and time of execution for all iterations of a solver execution
   struct SolverStatistics
   {
     ///contains def_init and def_cur per iteration, implicitly contains the iteration count, too.
@@ -20,6 +21,32 @@ namespace FEAST
     /// Time of each iteration in seconds
     std::vector<double> toe;
   };
+
+  /**
+   * This struct holds the intermediate summation result and the calculation error from the previous sum operation
+   * See https://en.wikipedia.org/wiki/Kahan_summation_algorithm and
+   * https://stackoverflow.com/questions/10330002/sum-of-small-double-numbers-c/10330857#10330857
+   * for details.
+  */
+  struct KahanAccumulation
+  {
+    double sum;
+    double correction;
+
+    KahanAccumulation() :
+      sum(0.0),
+      correction(0.0)
+    {
+    }
+  };
+
+  /**
+   * This struct executes the actual Kahan Summation step.
+   * See https://en.wikipedia.org/wiki/Kahan_summation_algorithm and
+   * https://stackoverflow.com/questions/10330002/sum-of-small-double-numbers-c/10330857#10330857
+   * for details.
+   */
+  KahanAccumulation KahanSum(KahanAccumulation accumulation, double value);
 
   /**
    * \brief Statistics collection class
@@ -35,22 +62,22 @@ namespace FEAST
       static Index _flops;
 
       /// global time of execution for reduction type operations
-      static double _time_reduction;
+      static KahanAccumulation _time_reduction;
 
       /// global time of execution for blas-2 type operations
-      static double _time_spmv;
+      static KahanAccumulation _time_spmv;
 
       /// global time of execution for blas-1 type operations
-      static double _time_axpy;
+      static KahanAccumulation _time_axpy;
 
       /// global time of execution for special preconditioner kernel type operations
-      static double _time_precon;
+      static KahanAccumulation _time_precon;
 
       /// global time of execution for mpi related operations, e.g. send/recv or gather/scatter
-      static double _time_mpi_execute;
+      static KahanAccumulation _time_mpi_execute;
 
       /// global time of execution for mpi related idle/wait tasks
-      static double _time_mpi_wait;
+      static KahanAccumulation _time_mpi_wait;
 
       static std::map<FEAST::String, SolverStatistics> _solver_statistics;
 
@@ -118,52 +145,52 @@ namespace FEAST
 
       inline static void add_time_reduction(double seconds)
       {
-        _time_reduction += seconds;
+        _time_reduction = KahanSum(_time_reduction, seconds);
       }
       inline static void add_time_spmv(double seconds)
       {
-        _time_spmv += seconds;
+        _time_spmv = KahanSum(_time_spmv, seconds);
       }
       inline static void add_time_axpy(double seconds)
       {
-        _time_axpy += seconds;
+        _time_axpy = KahanSum(_time_axpy, seconds);
       }
       inline static void add_time_precon(double seconds)
       {
-        _time_precon += seconds;
+        _time_precon = KahanSum(_time_precon, seconds);
       }
       inline static void add_time_mpi_execute(double seconds)
       {
-        _time_mpi_execute += seconds;
+        _time_mpi_execute = KahanSum(_time_mpi_execute, seconds);
       }
       inline static void add_time_mpi_wait(double seconds)
       {
-        _time_mpi_wait += seconds;
+        _time_mpi_wait = KahanSum(_time_mpi_wait, seconds);
       }
 
       inline static double get_time_reduction()
       {
-        return _time_reduction;
+        return _time_reduction.sum;
       }
       inline static double get_time_spmv()
       {
-        return _time_spmv;
+        return _time_spmv.sum;
       }
       inline static double get_time_axpy()
       {
-        return _time_axpy;
+        return _time_axpy.sum;
       }
       inline static double get_time_precon()
       {
-        return _time_precon;
+        return _time_precon.sum;
       }
       inline static double get_time_mpi_execute()
       {
-        return _time_mpi_execute;
+        return _time_mpi_execute.sum;
       }
       inline static double get_time_mpi_wait()
       {
-        return _time_mpi_wait;
+        return _time_mpi_wait.sum;
       }
 
       /// add toe statistics entry for specific solver (branch name)
@@ -247,12 +274,13 @@ namespace FEAST
           return _format_solver_statistics(branch, it->second);
       }
 
+      /*
       /// Retrieve formated time consumption overview in percent
       static String get_formated_times()
       {
-        double total_time = _time_reduction + _time_spmv + _time_axpy + _time_precon + _time_mpi_execute + _time_mpi_wait;
+        double total_time = get_time_reduction() + get_time_spmv() + get_time_axpy() + get_time_precon() + get_time_mpi_execute() + get_time_mpi_wait();
         return get_formated_times(total_time);
-      }
+      }*/
 
       /// Retrieve formated time consumption overview in percent relative to some provided total time
       static String get_formated_times(double total_time)
@@ -261,30 +289,42 @@ namespace FEAST
         if (total_time == 0.)
           return result;
 
-        double measured_time = _time_reduction + _time_spmv + _time_axpy + _time_precon + _time_mpi_execute + _time_mpi_wait;
-        if (measured_time > total_time)
-          throw InternalError("Accumulated op time (" + stringify(measured_time) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
+        KahanAccumulation measured_time;
+        measured_time = KahanSum(measured_time, get_time_reduction());
+        measured_time = KahanSum(measured_time, get_time_spmv());
+        measured_time = KahanSum(measured_time, get_time_axpy());
+        measured_time = KahanSum(measured_time, get_time_precon());
+        measured_time = KahanSum(measured_time, get_time_mpi_execute());
+        measured_time = KahanSum(measured_time, get_time_mpi_wait());
+        //if (measured_time.sum > total_time)
+        //  throw InternalError("Accumulated op time (" + stringify(measured_time.sum) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
 
         result += "\n";
-        result += "Reductions: " + stringify(_time_reduction / total_time * 100.) + "%\n";
-        result += "Blas-1: " + stringify(_time_axpy / total_time * 100.) + "%\n";
-        result += "Blas-2: " + stringify(_time_spmv / total_time * 100.) + "%\n";
-        result += "Precon Kernels: " + stringify(_time_precon / total_time * 100.) + "%\n";
-        result += "MPI Execution: " + stringify(_time_mpi_execute / total_time * 100.) + "%\n";
-        result += "MPI Wait: " + stringify(_time_mpi_wait / total_time * 100.) + "%\n";
-        result += "Not covered: " + stringify( (total_time - measured_time) / total_time * 100.) + "%";
+        result += "Reductions: " + stringify(get_time_reduction() / total_time * 100.) + "%\n";
+        result += "Blas-1: " + stringify(get_time_axpy() / total_time * 100.) + "%\n";
+        result += "Blas-2: " + stringify(get_time_spmv() / total_time * 100.) + "%\n";
+        result += "Precon Kernels: " + stringify(get_time_precon() / total_time * 100.) + "%\n";
+        result += "MPI Execution: " + stringify(get_time_mpi_execute() / total_time * 100.) + "%\n";
+        result += "MPI Wait: " + stringify(get_time_mpi_wait() / total_time * 100.) + "%\n";
+        result += "Not covered: " + ((measured_time.sum <= total_time) ? (stringify( (total_time - measured_time.sum) / total_time * 100.) + "%") : ("not available"));
         return result;
       }
 
       /// Reset all global timer counters
       static void reset_times()
       {
-        _time_reduction = 0.;
-        _time_spmv = 0.;
-        _time_axpy = 0.;
-        _time_precon = 0.;
-        _time_mpi_execute = 0.;
-        _time_mpi_wait = 0.;
+        _time_reduction.sum = 0.;
+        _time_reduction.correction = 0.;
+        _time_spmv.sum = 0.;
+        _time_spmv.correction = 0.;
+        _time_axpy.sum = 0.;
+        _time_axpy.correction = 0.;
+        _time_precon.sum = 0.;
+        _time_precon.correction = 0.;
+        _time_mpi_execute.sum = 0.;
+        _time_mpi_execute.correction = 0.;
+        _time_mpi_wait.sum = 0.;
+        _time_mpi_wait.correction = 0.;
       }
 
   };

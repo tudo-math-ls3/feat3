@@ -58,6 +58,7 @@ namespace FEAST
       }
 
       double mean(0);
+      /// \todo use KahanSummation from statistics.hpp, see https://stackoverflow.com/questions/10330002/sum-of-small-double-numbers-c/10330857#10330857 for std::accumulate usage
       for (auto & time : times)
         mean += time;
       mean /= double(times.size());

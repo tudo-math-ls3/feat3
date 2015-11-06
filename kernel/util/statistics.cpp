@@ -4,10 +4,20 @@ using namespace FEAST;
 
 // static member initialisation
 Index Statistics::_flops = Index(0);
-double Statistics::_time_reduction = 0.;
-double Statistics::_time_spmv = 0.;
-double Statistics::_time_axpy = 0.;
-double Statistics::_time_precon = 0.;
-double Statistics::_time_mpi_execute = 0.;
-double Statistics::_time_mpi_wait = 0.;
+KahanAccumulation Statistics::_time_reduction;
+KahanAccumulation Statistics::_time_spmv;
+KahanAccumulation Statistics::_time_axpy;
+KahanAccumulation Statistics::_time_precon;
+KahanAccumulation Statistics::_time_mpi_execute;
+KahanAccumulation Statistics::_time_mpi_wait;
 std::map<FEAST::String, SolverStatistics> Statistics::_solver_statistics;
+
+KahanAccumulation FEAST::KahanSum(KahanAccumulation accumulation, double value)
+{
+  KahanAccumulation result;
+  double y = value - accumulation.correction;
+  double t = accumulation.sum + y;
+  result.correction = (t - accumulation.sum) - y;
+  result.sum = t;
+  return result;
+};
