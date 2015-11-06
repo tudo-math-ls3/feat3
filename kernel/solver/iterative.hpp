@@ -517,11 +517,11 @@ namespace FEAST
           _precond->init_numeric();
       }
 
-      virtual void init_branch(String root = "") override
+      virtual void init_branch(String parent = "") override
       {
-        BaseClass::init_branch(root);
+        BaseClass::init_branch(parent);
         if(_precond)
-          _precond->init_branch(root + "::" + this->name());
+          _precond->init_branch(parent + "::" + this->name());
       }
 
       virtual void done_numeric() override

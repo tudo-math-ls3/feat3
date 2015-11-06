@@ -190,10 +190,17 @@ namespace FEAST
       {
       }
 
-      /// Initialise solver branch description
-      virtual void init_branch(String root = "")
+      /** \brief Initialise solver branch description
+       *
+       * This method initialises the object's absolute path in the complete solver tree.
+       * When called from the solver tree's root object, the parent parameter can be used to distinguish different
+       * solver trees from each other, e.g. in multiphysics environments.
+       *
+       * \param[in] parent The absolute tree path to the objects parent node.
+       */
+      virtual void init_branch(String parent = "")
       {
-        _branch = root + "::" + name();
+        _branch = parent + "::" + name();
       }
 
       /**

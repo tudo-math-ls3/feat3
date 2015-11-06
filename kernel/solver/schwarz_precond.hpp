@@ -87,10 +87,10 @@ namespace FEAST
         _local_solver->init_numeric();
       }
 
-      virtual void init_branch(String root = "") override
+      virtual void init_branch(String parent = "") override
       {
-        BaseClass::init_branch(root);
-        _local_solver->init_branch(root + "::" + this->name());
+        BaseClass::init_branch(parent);
+        _local_solver->init_branch(parent + "::" + this->name());
       }
 
       virtual void done_numeric() override

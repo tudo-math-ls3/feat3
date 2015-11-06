@@ -268,9 +268,9 @@ namespace FEAST
         }
       }
 
-      virtual void init_branch(String root = "") override
+      virtual void init_branch(String parent = "") override
       {
-        BaseClass::init_branch(root);
+        BaseClass::init_branch(parent);
 
         // loop over all level
         for(auto it = system_levels.begin(); it != system_levels.end(); ++it)
@@ -279,20 +279,20 @@ namespace FEAST
           {
             if((*it)->coarse_solver)
             {
-              (*it)->coarse_solver->init_branch(root + "::" + this->name());
+              (*it)->coarse_solver->init_branch(parent + "::" + this->name());
             }
           }
           else
           {
             if((*it)->pre_smoother)
             {
-              (*it)->pre_smoother->init_branch(root + "::" + this->name());
+              (*it)->pre_smoother->init_branch(parent + "::" + this->name());
             }
             if((*it)->post_smoother)
             {
               if((*it)->post_smoother != (*it)->pre_smoother)
               {
-                (*it)->post_smoother->init_branch(root + "::" + this->name());
+                (*it)->post_smoother->init_branch(parent + "::" + this->name());
               }
             }
           }
