@@ -74,7 +74,6 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("corresponding to your $PATH settings.")
   print ("Note that the source code for third party libraries is automatically downloaded if it is not")
   print ("provided in the first place.")
-  print ("The target cpu is detected automatically manual override options are not implemented yet.")
   print ("")
   print ("============== ADDITIONAL OPTIONS ==============")
   print ("--system_host_compiler=/usr/bin/gcc")
