@@ -36,6 +36,7 @@ endif(FEAST_BACKENDS_CUDA)
 SET (test_list
   basic_solver-test
   cusolver-test
+  optimiser-test
   umfpack-test
   vanka-test
 )
