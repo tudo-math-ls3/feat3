@@ -127,7 +127,7 @@ namespace FEAST
           FaceEvaluator trafo_eval(*this);
           trafo_eval.prepare(k);
 
-          // This will be the coordinates of the Lagrange points on the reference cell the face is paremetrised over
+          // This will be the coordinates of the Lagrange points on the reference cell the face is parametrised over
           Tiny::Matrix<CoordType, num_coeff_facet, ShapeType::dimension - 1> xloc(CoordType(0));
           for(int i(0); i < num_coeff_facet; ++i)
           {
