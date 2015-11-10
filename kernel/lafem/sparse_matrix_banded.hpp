@@ -792,6 +792,7 @@ namespace FEAST
        *
        * \returns Matrix row count.
        */
+      template <Perspective = Perspective::native>
       const Index & rows() const
       {
         return this->_scalar_index.at(1);
@@ -802,6 +803,7 @@ namespace FEAST
        *
        * \returns Matrix column count.
        */
+      template <Perspective = Perspective::native>
       const Index & columns() const
       {
         return this->_scalar_index.at(2);
@@ -812,7 +814,8 @@ namespace FEAST
        *
        * \returns Non zero element count.
        */
-      Index used_elements() const override
+      template <Perspective = Perspective::native>
+      Index used_elements() const
       {
         return this->_scalar_index.at(3);
       }

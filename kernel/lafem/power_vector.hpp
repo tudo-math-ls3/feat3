@@ -223,9 +223,10 @@ namespace FEAST
       }
 
       /// Returns the total number of scalar entries of this power-vector.
+      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return first().size() + rest().size();
+        return first().template size<perspective_>() + rest().template size<perspective_>();
       }
 
       /**
@@ -572,9 +573,10 @@ namespace FEAST
         return 1;
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return _first.size();
+        return _first.template size<perspective_>();
       }
 
       void format(DataType value = DataType(0))

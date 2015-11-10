@@ -33,6 +33,23 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename DT_, int BlockSize_, Perspective perspective_>
+      struct DenseVectorBlockedPerspectiveHelper
+      {
+        typedef Tiny::Vector<DT_, BlockSize_> Type;
+      };
+
+      template<typename DT_, int BlockSize_>
+      struct DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, Perspective::pod>
+      {
+        typedef DT_ Type;
+      };
+    } // namespace Intern
+    /// \endcond
+
     /**
      * \brief Blocked Dense data vector class template.
      *
@@ -189,8 +206,8 @@ namespace FEAST
       {
         CONTEXT("When creating DenseVectorBlocked");
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(raw_size()));
-        this->_elements_size.push_back(raw_size());
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
+        this->_elements_size.push_back(size<Perspective::pod>());
       }
 
       /**
@@ -209,10 +226,10 @@ namespace FEAST
       {
         CONTEXT("When creating DenseVectorBlocked");
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(raw_size()));
-        this->_elements_size.push_back(raw_size());
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
+        this->_elements_size.push_back(size<Perspective::pod>());
 
-        MemoryPool<Mem_>::set_memory(this->_elements.at(0), value, raw_size());
+        MemoryPool<Mem_>::set_memory(this->_elements.at(0), value, size<Perspective::pod>());
       }
 
       /**
@@ -229,7 +246,7 @@ namespace FEAST
         CONTEXT("When creating DenseVectorBlocked");
 
         this->_elements.push_back(data);
-        this->_elements_size.push_back(raw_size());
+        this->_elements_size.push_back(size<Perspective::pod>());
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
           MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
@@ -378,7 +395,7 @@ namespace FEAST
         this->_scalar_index.push_back(other.size() / Index(BlockSize_));
 
         this->_elements.push_back(other.get_elements().at(0));
-        this->_elements_size.push_back(raw_size());
+        this->_elements_size.push_back(size<Perspective::pod>());
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
           MemoryPool<Mem_>::increase_memory(this->_elements.at(i));
@@ -416,43 +433,46 @@ namespace FEAST
       }
 
       /**
-       * \brief Get a pointer to the data array.
+       * \brief Retrieve a pointer to the data array.
        *
-       * \returns Pointer to the data array.
+       * \template perspective_ template parameter to choose the return value type
+       *
+       * \returns Non zero element array if perspective_ = Perspective::native, e.g. treat every block as one block.
+       * \returns Raw non zero element array if perspective_ = Perspective::pod, e.g. treat every entry of a block separated.
        */
-      Tiny::Vector<DT_, BlockSize_> * elements()
+      template <Perspective perspective_ = Perspective::native>
+      auto elements() const -> const typename Intern::DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *
       {
-        return (Tiny::Vector<DT_, BlockSize_>*)this->_elements.at(0);
+        if (this->size() == 0)
+          return nullptr;
+
+        return (const typename Intern::DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *)(this->_elements.at(0));
       }
 
-      /// \copydoc elements()
+      /// \copydoc val()
       /// const version.
-      Tiny::Vector<DT_, BlockSize_> const * elements() const
+      template <Perspective perspective_ = Perspective::native>
+      auto elements() -> typename Intern::DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *
       {
-        return (Tiny::Vector<DT_, BlockSize_>*)this->_elements.at(0);
+        if (this->size() == 0)
+          return nullptr;
+
+        return (typename Intern::DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *)(this->_elements.at(0));
       }
 
       /**
-       * \brief Get a pointer to the raw data array.
+       * \brief The number of elements
        *
-       * \returns Pointer to the raw data array.
+       * \returns number of elements of type Tiny::Vector<DT_, Blocksize_> if perspective_ = false, e.g. count every block as one entry.
+       * \returns Raw number of elements of type DT_ if perspective_ = true, e.g. size * BlockSize_
        */
-      DT_ * raw_elements()
+      template <Perspective perspective_ = Perspective::native>
+      Index size() const
       {
-        return this->_elements.at(0);
-      }
-
-      /// \copydoc raw_elements()
-      /// const version.
-      DT_ const * raw_elements() const
-      {
-        return this->_elements.at(0);
-      }
-
-      /// The raw number of elements of type DT_
-      Index raw_size() const
-      {
-        return this->size() * Index(BlockSize_);
+        if (perspective_ == Perspective::pod)
+          return static_cast<const Container<Mem_, DT_, IT_> *>(this)->size() * Index(BlockSize_);
+        else
+          return static_cast<const Container<Mem_, DT_, IT_> *>(this)->size();
       }
 
       /**
@@ -629,7 +649,7 @@ namespace FEAST
         }
 
         DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> tmp(rows / BlockSize_);
-        DT_ * pval(tmp.raw_elements());
+        DT_ * pval(tmp.template elements<Perspective::pod>());
 
         while(!file.eof())
         {
@@ -810,11 +830,11 @@ namespace FEAST
         DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> temp;
         temp.convert(*this);
 
-        const Index tsize(temp.raw_size());
+        const Index tsize(temp.template size<Perspective::pod>());
         file << "%%MatrixMarket matrix array real general" << std::endl;
         file << tsize << " " << 1 << std::endl;
 
-        const DT_ * pval(temp.raw_elements());
+        const DT_ * pval(temp.template elements<Perspective::pod>());
         for (Index i(0) ; i < tsize ; ++i, ++pval)
         {
           file << std::scientific << *pval << std::endl;
@@ -842,10 +862,10 @@ namespace FEAST
        */
       void write_out_exp(std::ostream& file) const
       {
-        DT_ * temp = MemoryPool<Mem::Main>::template allocate_memory<DT_>((this->raw_size()));
-        MemoryPool<Mem_>::template download<DT_>(temp, this->raw_elements(), this->raw_size());
+        DT_ * temp = MemoryPool<Mem::Main>::template allocate_memory<DT_>((this->size<Perspective::pod>()));
+        MemoryPool<Mem_>::template download<DT_>(temp, this->template elements<Perspective::pod>(), this->size<Perspective::pod>());
 
-        for (Index i(0) ; i < this->raw_size() ; ++i)
+        for (Index i(0) ; i < this->size<Perspective::pod>() ; ++i)
         {
           file << std::scientific << temp[i] << std::endl;
         }
@@ -905,14 +925,14 @@ namespace FEAST
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
         {
-          Statistics::add_flops(this->raw_size());
-          Arch::Sum<Mem_>::value(raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
+          Statistics::add_flops(this->size<Perspective::pod>());
+          Arch::Sum<Mem_>::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
         }
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Statistics::add_flops(this->raw_size());
-          Arch::Difference<Mem_>::value(raw_elements(), y.raw_elements(), x.raw_elements(), this->raw_size());
+          Statistics::add_flops(this->size<Perspective::pod>());
+          Arch::Difference<Mem_>::value(elements<Perspective::pod>(), y.template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->size<Perspective::pod>());
         }
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -920,8 +940,8 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Statistics::add_flops(this->raw_size() * 2);
-          Arch::Axpy<Mem_>::dv(raw_elements(), alpha, x.raw_elements(), y.raw_elements(), this->raw_size());
+          Statistics::add_flops(this->size<Perspective::pod>() * 2);
+          Arch::Axpy<Mem_>::dv(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
         }
 
         TimeStamp ts_stop;
@@ -943,8 +963,8 @@ namespace FEAST
 
         TimeStamp ts_start;
 
-        Arch::ComponentProduct<Mem_>::value(raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
-        Statistics::add_flops(this->raw_size());
+        Arch::ComponentProduct<Mem_>::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        Statistics::add_flops(this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -966,8 +986,8 @@ namespace FEAST
 
         TimeStamp ts_start;
 
-        Arch::ComponentInvert<Mem_>::value(this->raw_elements(), x.raw_elements(), alpha, this->raw_size());
-        Statistics::add_flops(this->raw_size());
+        Arch::ComponentInvert<Mem_>::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), alpha, this->size<Perspective::pod>());
+        Statistics::add_flops(this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -986,8 +1006,8 @@ namespace FEAST
 
         TimeStamp ts_start;
 
-        Arch::Scale<Mem_>::value(raw_elements(), x.raw_elements(), alpha, this->raw_size());
-        Statistics::add_flops(this->raw_size());
+        Arch::Scale<Mem_>::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), alpha, this->size<Perspective::pod>());
+        Statistics::add_flops(this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
@@ -1032,8 +1052,8 @@ namespace FEAST
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->raw_size() * 2);
-        DataType result = Arch::DotProduct<Mem_>::value(raw_elements(), x.raw_elements(), this->raw_size());
+        Statistics::add_flops(this->size<Perspective::pod>() * 2);
+        DataType result = Arch::DotProduct<Mem_>::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1050,8 +1070,8 @@ namespace FEAST
       {
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->raw_size() * 2);
-        DataType result = Arch::Norm2<Mem_>::value(raw_elements(), this->raw_size());
+        Statistics::add_flops(this->size<Perspective::pod>() * 2);
+        DataType result = Arch::Norm2<Mem_>::value(elements<Perspective::pod>(), this->size<Perspective::pod>());
 
 
         TimeStamp ts_stop;
@@ -1101,18 +1121,18 @@ namespace FEAST
           ta = (DT_*)a.elements();
         else
         {
-          ta = new DT_[a.raw_size()];
-          MemoryPool<Mem_>::template download<DT_>(ta, a.raw_elements(), a.raw_size());
+          ta = new DT_[a.template size<Perspective::pod>()];
+          MemoryPool<Mem_>::template download<DT_>(ta, a.template elements<Perspective::pod>(), a.template size<Perspective::pod>());
         }
         if(std::is_same<Mem::Main, Mem2_>::value)
           tb = (DT_*)b.elements();
         else
         {
-          tb = new DT_[b.raw_size()];
-          MemoryPool<Mem2_>::template download<DT_>(tb, b.raw_elements(), b.raw_size());
+          tb = new DT_[b.template size<Perspective::pod>()];
+          MemoryPool<Mem2_>::template download<DT_>(tb, b.template elements<Perspective::pod>(), b.template size<Perspective::pod>());
         }
 
-        for (Index i(0) ; i < a.raw_size() ; ++i)
+        for (Index i(0) ; i < a.template size<Perspective::pod>() ; ++i)
           if (ta[i] != tb[i])
           {
             ret = false;

@@ -76,27 +76,27 @@ public:
     TEST_CHECK_EQUAL(d.columns(), c.columns());
     TEST_CHECK_EQUAL(d.used_elements(), c.used_elements());
     TEST_CHECK_EQUAL(d, c);
-    TEST_CHECK_EQUAL((void*)d.raw_val(), (void*)c.raw_val());
+    TEST_CHECK_EQUAL((void*)d.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_EQUAL((void*)d.row_ptr(), (void*)c.row_ptr());
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> e;
     e.clone(c);
     TEST_CHECK_EQUAL(e, c);
-    TEST_CHECK_NOT_EQUAL((void*)e.raw_val(), (void*)c.raw_val());
+    TEST_CHECK_NOT_EQUAL((void*)e.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
     e = c.clone(CloneMode::Deep);
     TEST_CHECK_EQUAL(e, c);
-    TEST_CHECK_NOT_EQUAL((void*)e.raw_val(), (void*)c.raw_val());
+    TEST_CHECK_NOT_EQUAL((void*)e.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_NOT_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
     e = c.shared();
     TEST_CHECK_EQUAL(e, c);
-    TEST_CHECK_EQUAL((void*)e.raw_val(), (void*)c.raw_val());
+    TEST_CHECK_EQUAL((void*)e.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
 
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> f(c.layout());
     TEST_CHECK_EQUAL(f.rows(), c.rows());
     TEST_CHECK_EQUAL(f.columns(), c.columns());
     TEST_CHECK_EQUAL(f.used_elements(), c.used_elements());
-    TEST_CHECK_NOT_EQUAL((void*)f.raw_val(), (void*)c.raw_val());
+    TEST_CHECK_NOT_EQUAL((void*)f.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_EQUAL((void*)f.row_ptr(), (void*)c.row_ptr());
 
     BinaryStream bs;
@@ -165,10 +165,10 @@ public:
     dv3(2, IT_(2));
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
 
-    DenseVector<Mem_, DT_, IT_> x(c.raw_columns());
-    DenseVector<Mem_, DT_, IT_> y(c.raw_rows());
-    DenseVector<Mem_, DT_, IT_> r(c.raw_rows());
-    DenseVector<Mem_, DT_, IT_> ref(c.raw_rows());
+    DenseVector<Mem_, DT_, IT_> x(c.template columns<Perspective::pod>());
+    DenseVector<Mem_, DT_, IT_> y(c.template rows<Perspective::pod>());
+    DenseVector<Mem_, DT_, IT_> r(c.template rows<Perspective::pod>());
+    DenseVector<Mem_, DT_, IT_> ref(c.template rows<Perspective::pod>());
     for (Index i(0) ; i < x.size() ; ++i)
     {
       x(i, DT_(i));
@@ -270,12 +270,12 @@ public:
     SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> smb(2, 2, dv2, dv1, dv3);
 
     auto diag = smb.extract_diag();
-    TEST_CHECK_EQUAL(diag.raw_elements()[0], 1);
-    TEST_CHECK_EQUAL(diag.raw_elements()[1], 5);
-    TEST_CHECK_EQUAL(diag.raw_elements()[2], 9);
-    TEST_CHECK_EQUAL(diag.raw_elements()[3], 10);
-    TEST_CHECK_EQUAL(diag.raw_elements()[4], 14);
-    TEST_CHECK_EQUAL(diag.raw_elements()[5], 18);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[0], 1);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[1], 5);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[2], 9);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[3], 10);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[4], 14);
+    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[5], 18);
   }
 };
 SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_diag_test_float_ulong;

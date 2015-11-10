@@ -1125,9 +1125,9 @@ namespace FEAST
         ta.convert(a);
 
         const Index aC(this->C());
-        const Index arows(ta.rows());
-        const Index acolumns(ta.columns());
-        const Index aused_elements(ta.used_elements());
+        const Index arows(ta.template rows<Perspective::pod>());
+        const Index acolumns(ta.template columns<Perspective::pod>());
+        const Index aused_elements(ta.template used_elements<Perspective::pod>());
         const Index anum_of_chunks((arows + aC - Index(1)) / aC);
 
         DenseVector<Mem::Main, IT_, IT_> arl(arows);
@@ -1633,6 +1633,7 @@ namespace FEAST
        *
        * \returns Matrix row count.
        */
+      template <Perspective = Perspective::native>
       const Index & rows() const
       {
         return this->_scalar_index.at(1);
@@ -1643,6 +1644,7 @@ namespace FEAST
        *
        * \returns Matrix column count.
        */
+      template <Perspective = Perspective::native>
       const Index & columns() const
       {
         return this->_scalar_index.at(2);
@@ -1683,7 +1685,8 @@ namespace FEAST
        *
        * \returns Non zero element count.
        */
-      Index used_elements() const override
+      template <Perspective = Perspective::native>
+      Index used_elements() const
       {
         return this->_scalar_index.at(6);
       }

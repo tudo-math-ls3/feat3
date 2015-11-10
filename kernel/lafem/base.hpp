@@ -59,6 +59,24 @@ namespace FEAST
       lt_ell,
       lt_banded
     };
+
+    /**
+     * Supported perspective modes.
+     *
+     * This enumerated type is necessary to specify the treatment of
+     * blocked datatypes like
+     * - SparseMatrixCSRBlocked
+     * - SparseVectorBlocked
+     * - DenseVectorBlocked
+     * whether each block is treated as one entry or (native perspective)
+     * each entry of a block is treated as its own (raw/pod perspective).
+     *
+     */
+    enum class Perspective
+    {
+      native = 0, /**< each block is treated as one entry */
+      pod /**< each entry of a block is treated as its own; raw */
+    };
   } // namespace LAFEM
 } // namespace FEAST
 

@@ -16,6 +16,23 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename DT_, int BlockSize_, Perspective perspective_>
+      struct SparseVectorBlockedPerspectiveHelper
+      {
+        typedef Tiny::Vector<DT_, BlockSize_> Type;
+      };
+
+      template<typename DT_, int BlockSize_>
+      struct SparseVectorBlockedPerspectiveHelper<DT_, BlockSize_, Perspective::pod>
+      {
+        typedef DT_ Type;
+      };
+    } // namespace Intern
+    /// \endcond
+
     /**
      * \brief Sparse vector class template.
      *
@@ -203,45 +220,35 @@ namespace FEAST
       }
 
       /**
-       * \brief Get a pointer to the data array.
+       * \brief Retrieve a pointer to the data array.
        *
-       * \returns Pointer to the data array.
-       */
-      Tiny::Vector<DT_, BlockSize_> * elements()
-      {
-        if (sorted() == 0)
-          const_cast<SparseVectorBlocked *>(this)->sort();
-        return this->_elements.at(0);
-      }
-
-      /// \copydoc elements()
-      /// const version.
-      Tiny::Vector<DT_, BlockSize_> const * elements() const
-      {
-        if (sorted() == 0)
-          const_cast<SparseVectorBlocked *>(this)->sort();
-        return this->_elements.at(0);
-      }
-
-      /**
-       * \brief Get a pointer to the raw data array.
+       * \template perspective_ template parameter to choose the return value type
        *
-       * \returns Pointer to the raw data array.
+       * \returns Non zero element array if perspective_ = Perspective::native, e.g. treat every block as one block.
+       * \returns Raw non zero element array if perspective_ = Perspective::pod, e.g. treat every entry of a block separated.
        */
-      DT_ * raw_elements()
+      template <Perspective perspective_ = Perspective::native>
+      auto elements() const -> const typename Intern::SparseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *
       {
+        if (this->size() == 0)
+          return nullptr;
+
         if (sorted() == 0)
           const_cast<SparseVectorBlocked *>(this)->sort();
-        return this->_elements.at(0);
+        return (const typename Intern::SparseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *)(this->_elements.at(0));
       }
 
-      /// \copydoc raw_elements()
+      /// \copydoc val()
       /// const version.
-      DT_ const * raw_elements() const
+      template <Perspective perspective_ = Perspective::native>
+      auto elements() -> typename Intern::SparseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *
       {
+        if (this->size() == 0)
+          return nullptr;
+
         if (sorted() == 0)
           const_cast<SparseVectorBlocked *>(this)->sort();
-        return this->_elements.at(0);
+        return (typename Intern::SparseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *)(this->_elements.at(0));
       }
 
       /**
@@ -265,10 +272,19 @@ namespace FEAST
         return this->_indices.at(0);
       }
 
-      /// The raw number of elements of type DT_
-      Index raw_size() const
+      /**
+       * \brief The number of elements
+       *
+       * \returns number of elements of type Tiny::Vector<DT_, Blocksize_> if perspective_ = false.
+       * \returns Raw number of elements of type DT_ if perspective_ = true.
+       */
+    template <Perspective perspective_ = Perspective::native>
+      Index size() const
       {
-        return this->size() * Index(BlockSize_);
+        if (perspective_ == Perspective::pod)
+          return static_cast<const Container<Mem_, DT_, IT_> *>(this)->size() * Index(BlockSize_);
+        else
+          return static_cast<const Container<Mem_, DT_, IT_> *>(this)->size();
       }
 
       /**
@@ -419,7 +435,7 @@ namespace FEAST
        *
        * \returns Non zero element count.
        */
-      Index used_elements() const override
+      Index used_elements(const Perspective = Perspective::native) const
       {
         if (sorted() == 0)
           const_cast<SparseVectorBlocked *>(this)->sort();

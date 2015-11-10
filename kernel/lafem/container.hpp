@@ -863,7 +863,15 @@ namespace FEAST
        * \brief Returns the containers size.
        *
        * \returns The containers size.
+       *
+       * The template parameter of type Perspective is used in
+       * blocked containers to switch between
+       * the raw size and
+       * the size, when every block is treated as one entry.
+       *
+       * Most containers like SparseMatrixCSR ignore this template parameter.
        */
+      template <Perspective = Perspective::native>
       Index size() const
       {
         if (_scalar_index.size() > 0)
@@ -876,8 +884,16 @@ namespace FEAST
        * \brief Returns the number of effective stored elements.
        *
        * \returns The number of data values.
+       *
+       * The template parameter of type Perspective is used in
+       * block containers to switch between
+       * the raw number of used elements and
+       * the number of used elements, when every block is counted as one entry.
+       *
+       * Most containers like SparseMatrixCSR ignore this template parameter.
        */
-      virtual Index used_elements() const
+      template <Perspective = Perspective::native>
+      Index used_elements() const
       {
         return this->size();
       }

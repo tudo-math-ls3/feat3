@@ -321,22 +321,40 @@ namespace FEAST
       }
       /// \endcond
 
-      /// Returns the total number of rows in this matrix.
+      /**
+       * \brief Returns the total number of rows in this matrix.
+       *
+       * \returns Matrix row count if raw = false.
+       * \returns Raw matrix row count if raw = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index rows() const
       {
-        return first().rows();
+        return first().template rows<perspective_>();
       }
 
-      /// Returns the total number of columns in this matrix.
+      /**
+       * \brief Returns the total number of columns in this matrix.
+       *
+       * \returns Matrix column count if raw = false.
+       * \returns Raw matrix column count if raw = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index columns() const
       {
-        return first().columns() + rest().columns();
+        return first().template columns<perspective_>() + rest().template columns<perspective_>();
       }
 
-      /// Returns the total number of non-zeros in this matrix.
+      /**
+       * \brief Returns the total number of non-zeros in this matrix.
+       *
+       * \returns Matrix non zero element count if raw = false.
+       * \returns Raw matrix non zero element count if raw = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index used_elements() const
       {
-        return first().used_elements() + rest().used_elements();
+        return first().template used_elements<perspective_>() + rest().template used_elements<perspective_>();
       }
 
       /// Returns a descriptive string for this container.
@@ -345,9 +363,10 @@ namespace FEAST
         return String("PowerRowMatrix<") + SubMatrixType::name() + "," + stringify(blocks_) + ">";
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return rows() * columns();
+        return rows(perspective_) * columns(perspective_);
       }
 
       /**
@@ -459,7 +478,7 @@ namespace FEAST
         const Index length_of_base(this->first().get_length_of_line(row));
 
         this->first().set_line(row, pval_set, pcol_set, col_start, stride);
-        this->rest().set_line(row, pval_set + stride * length_of_base, pcol_set + stride * length_of_base, col_start + this->first().columns(), stride);
+        this->rest().set_line(row, pval_set + stride * length_of_base, pcol_set + stride * length_of_base, col_start + this->first().template columns<Perspective::pod>(), stride);
       }
       /// \endcond
 
@@ -689,19 +708,22 @@ namespace FEAST
         return 1;
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index rows() const
       {
-        return first().rows();
+        return first().template rows<perspective_>();
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index columns() const
       {
-        return first().columns();
+        return first().template columns<perspective_>();
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index used_elements() const
       {
-        return first().used_elements();
+        return first().template used_elements<perspective_>();
       }
 
       static String name()
@@ -709,9 +731,10 @@ namespace FEAST
         return String("PowerRowMatrix<") + SubMatrixType::name() + "," + stringify(1) + ">";
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return rows() * columns();
+        return rows(perspective_) * columns(perspective_);
       }
 
       void format(DataType value = DataType(0))

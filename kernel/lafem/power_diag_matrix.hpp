@@ -327,22 +327,40 @@ namespace FEAST
       }
       /// \endcond
 
-      /// Returns the total number of rows in this matrix.
+      /**
+       * \brief Returns the total number of rows in this matrix.
+       *
+       * \returns Matrix row count if perspective_ = false.
+       * \returns Raw matrix row count if perspective_ = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index rows() const
       {
-        return first().rows() + rest().rows();
+        return first().template rows<perspective_>() + rest().template rows<perspective_>();
       }
 
-      /// Returns the total number of columns in this matrix.
+      /**
+       * \brief Returns the total number of columns in this matrix.
+       *
+       * \returns Matrix column count if perspective_ = false.
+       * \returns Raw matrix column count if perspective_ = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index columns() const
       {
-        return first().columns() + rest().columns();
+        return first().template columns<perspective_>() + rest().template columns<perspective_>();
       }
 
-      /// Returns the total number of non-zeros in this matrix.
+      /**
+       * \brief Returns the total number of non-zeros in this matrix.
+       *
+       * \returns Matrix non zero element count if perspective_ = false.
+       * \returns Raw matrix non zero element count if perspective_ = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index used_elements() const
       {
-        return first().used_elements() + rest().used_elements();
+        return first().template used_elements<perspective_>() + rest().template used_elements<perspective_>();
       }
 
       /// Returns a descriptive string for this container.
@@ -482,7 +500,7 @@ namespace FEAST
       /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
-        const Index brows(this->first().rows());
+        const Index brows(this->first().template rows<Perspective::pod>());
 
         if (row < brows)
         {
@@ -499,8 +517,8 @@ namespace FEAST
       void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
                     const Index col_start, const Index stride = 1) const
       {
-        const Index brows(this->first().rows());
-        const Index bcolumns(this->first().columns());
+        const Index brows(this->first().template rows<Perspective::pod>());
+        const Index bcolumns(this->first().template columns<Perspective::pod>());
 
         if (row < brows)
         {
@@ -744,19 +762,22 @@ namespace FEAST
         return 1;
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index rows() const
       {
-        return first().rows();
+        return first().template rows<perspective_>();
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index columns() const
       {
-        return first().columns();
+        return first().template columns<perspective_>();
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index used_elements() const
       {
-        return first().used_elements();
+        return first().template used_elements<perspective_>();
       }
 
       static String name()
@@ -764,9 +785,10 @@ namespace FEAST
         return String("PowerDiagMatrix<") + SubMatrixType::name() + "," + stringify(1) + ">";
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return rows() * columns();
+        return rows<perspective_>() * columns<perspective_>();
       }
 
       void format(DataType value = DataType(0))

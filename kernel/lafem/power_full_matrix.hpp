@@ -264,22 +264,40 @@ namespace FEAST
         return _container.create_vector_r();
       }
 
-      /// Returns the total number of rows in this matrix.
+      /**
+       * \brief Returns the total number of rows in this matrix.
+       *
+       * \returns Matrix row count if perspective_ = false.
+       * \returns Raw matrix row count if perspective_ = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index rows() const
       {
-        return _container.rows();
+        return _container.template rows<perspective_>();
       }
 
-      /// Returns the total number of columns in this matrix.
+      /**
+       * \brief Returns the total number of columns in this matrix.
+       *
+       * \returns Matrix column count if raw = false.
+       * \returns Raw matrix column count if raw = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index columns() const
       {
-        return _container.columns();
+        return _container.template columns<perspective_>();
       }
 
-      /// Returns the total number of non-zeros in this matrix.
+      /**
+       * \brief Returns the total number of non-zeros in this matrix.
+       *
+       * \returns Matrix non zero element count if raw = false.
+       * \returns Raw matrix non zero element count if raw = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index used_elements() const
       {
-        return _container.used_elements();
+        return _container.template used_elements<perspective_>();
       }
 
       /// Returns a descriptive string for this container.
@@ -288,9 +306,10 @@ namespace FEAST
         return String("PowerFullMatrix<") + SubMatrixType::name() + "," + stringify(width_) + "," + stringify(height_) + ">";
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return rows() * columns();
+        return rows<perspective_>() * columns<perspective_>();
       }
 
       void format(DataType value = DataType(0))

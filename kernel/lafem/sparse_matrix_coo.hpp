@@ -989,9 +989,9 @@ namespace FEAST
         typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
         ta.convert(a);
 
-        const Index arows(ta.rows());
-        const Index acolumns(ta.columns());
-        const Index aused_elements(ta.used_elements());
+        const Index arows(ta.template rows<Perspective::pod>());
+        const Index acolumns(ta.template columns<Perspective::pod>());
+        const Index aused_elements(ta.template used_elements<Perspective::pod>());
 
         DenseVector<Mem::Main, DT_, IT_> tval(aused_elements);
         DenseVector<Mem::Main, IT_, IT_> tcol_ind(aused_elements);
@@ -1565,6 +1565,7 @@ namespace FEAST
        *
        * \returns Matrix row count.
        */
+      template <Perspective = Perspective::native>
       const Index & rows() const
       {
         return this->_scalar_index.at(1);
@@ -1575,6 +1576,7 @@ namespace FEAST
        *
        * \returns Matrix column count.
        */
+      template <Perspective = Perspective::native>
       const Index & columns() const
       {
         return this->_scalar_index.at(2);
@@ -1585,7 +1587,8 @@ namespace FEAST
        *
        * \returns Non zero element count.
        */
-      Index used_elements() const override
+      template <Perspective = Perspective::native>
+      Index used_elements() const
       {
         if (sorted() == 0)
           const_cast<SparseMatrixCOO *>(this)->sort();

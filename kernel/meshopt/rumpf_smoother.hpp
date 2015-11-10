@@ -809,7 +809,7 @@ namespace FEAST
         //CoordType norm_grad(0);
         for(Index j(0); j < world_dim*num_vert; ++j)
         {
-          grad[alglib::ae_int_t(j)] = my_smoother->_grad.raw_elements()[j];
+          grad[alglib::ae_int_t(j)] = my_smoother->_grad.template elements<LAFEM::Perspective::pod>()[j];
         }
       }
     }; // struct ALGLIBWrapper

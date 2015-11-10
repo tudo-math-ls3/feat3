@@ -243,7 +243,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
             Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
-              (vector.raw_elements(), _sv.raw_elements(), _sv.indices(), _sv.used_elements());
+              (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements());
         }
 
         /**
@@ -270,7 +270,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
             Arch::SlipFilter<Mem_>::template filter_rhs<DT_, IT_, BlockSize_>
-              (vector.raw_elements(), _sv.raw_elements(), _sv.indices(), _sv.used_elements() );
+              (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements() );
         }
 
         /**

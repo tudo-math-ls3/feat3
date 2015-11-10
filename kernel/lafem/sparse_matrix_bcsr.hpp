@@ -44,6 +44,18 @@ namespace FEAST
       {
         typedef DenseVector<Mem_, DT_, IT_> VectorType;
       };
+
+      template<typename DT_, int BlockHeight_, int BlockWidth_, Perspective perspective_>
+      struct BCSRPerspectiveHelper
+      {
+        typedef Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> Type;
+      };
+
+      template<typename DT_, int BlockHeight_, int BlockWidth_>
+      struct BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, Perspective::pod>
+      {
+        typedef DT_ Type;
+      };
     } // namespace Intern
     /// \endcond
 
@@ -279,8 +291,8 @@ namespace FEAST
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(raw_used_elements()));
-        this->_elements_size.push_back(raw_used_elements());
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
+        this->_elements_size.push_back(used_elements<Perspective::pod>());
       }
 
       /**
@@ -495,8 +507,8 @@ namespace FEAST
         for (auto i : this->_indices)
           MemoryPool<Mem_>::increase_memory(i);
 
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(raw_used_elements()));
-        this->_elements_size.push_back(raw_used_elements());
+        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
+        this->_elements_size.push_back(used_elements<Perspective::pod>());
 
         return *this;
       }
@@ -909,57 +921,46 @@ namespace FEAST
       /**
        * \brief Retrieve matrix row count.
        *
-       * \returns Matrix row count.
+       * \returns Matrix row count if perspective_ = false, e.g. count every block as one row.
+       * \returns Raw matrix row count if perspective_ = true, e.g. row_count * BlockHeight_.
        */
-      const Index & rows() const
+      template <Perspective perspective_ = Perspective::native>
+      Index rows() const
       {
-        return this->_scalar_index.at(1);
+        if (perspective_ == Perspective::pod)
+          return this->_scalar_index.at(1) * Index(BlockHeight_);
+        else
+          return this->_scalar_index.at(1);
       }
 
       /**
        * \brief Retrieve matrix column count.
        *
-       * \returns Matrix column count.
+       * \returns Matrix column count if perspective_ = false, e.g. count every block as one column.
+       * \returns Raw matrix column count if perspective_ = true, e.g. column_count * BlockWidth_.
        */
-      const Index & columns() const
+      template <Perspective perspective_ = Perspective::native>
+      Index columns() const
       {
-        return this->_scalar_index.at(2);
-      }
-
-      /**
-       * \brief Retrieve raw row count.
-       *
-       * \returns Raw matrix row count.
-       */
-      Index raw_rows() const
-      {
-        return this->_scalar_index.at(1) * Index(BlockHeight_);
-      }
-
-      /**
-       * \brief Retrieve raw column count.
-       *
-       * \returns Raw matrix column count.
-       */
-      Index raw_columns() const
-      {
-        return this->_scalar_index.at(2) * BlockWidth_;
+        if (perspective_ == Perspective::pod)
+          return this->_scalar_index.at(2) * Index(BlockWidth_);
+        else
+          return this->_scalar_index.at(2);
       }
 
       /**
        * \brief Retrieve non zero element count.
        *
-       * \returns Non zero element count.
+       * \returns Non zero element count if perspective_ = false, e.g. count every block as one entry.
+       * \returns Raw non zero element count if perspective_ = true, e.g. used_elements * BlockHeight_ * BlockWidth_.
        */
-      Index used_elements() const override
+      template <Perspective perspective_ = Perspective::native>
+      Index used_elements() const
       {
-        return this->_scalar_index.at(3);
-      }
-
-      /// The raw number of non zero elements of type DT_
-      Index raw_used_elements() const
-      {
-        return used_elements() * Index(BlockHeight_ * BlockWidth_);
+        if (perspective_ == Perspective::pod)
+          return this->_scalar_index.at(3) * Index(BlockHeight_ * BlockWidth_);
+        else
+          return this->_scalar_index.at(3);
       }
 
       /**
@@ -988,47 +989,29 @@ namespace FEAST
       /**
        * \brief Retrieve non zero element array.
        *
-       * \returns Non zero element array.
+       * \template perspective_ template parameter to choose the return value type
+       *
+       * \returns Non zero element array if perspective_ = Perspective::native, e.g. treat every block as one block.
+       * \returns Raw non zero element array if perspective_ = Perspective::pod, e.g. treat every entry of a block separated.
        */
-      Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * val()
+      template <Perspective perspective_ = Perspective::native>
+      auto val() const -> const typename Intern::BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, perspective_>::Type *
       {
         if (this->size() == 0)
           return nullptr;
 
-        return (Tiny::Matrix<DT_, BlockHeight_, BlockWidth_>*)this->_elements.at(0);
+        return (const typename Intern::BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, perspective_>::Type *)(this->_elements.at(0));
       }
 
       /// \copydoc val()
       /// const version.
-      Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> const * val() const
+      template <Perspective perspective_ = Perspective::native>
+      auto val() -> typename Intern::BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, perspective_>::Type *
       {
         if (this->size() == 0)
           return nullptr;
 
-        return (Tiny::Matrix<DT_, BlockHeight_, BlockWidth_>*)this->_elements.at(0);
-      }
-
-      /**
-       * \brief Get a pointer to the raw non zero element array.
-       *
-       * \returns Pointer to the raw non zero element array.
-       */
-      DT_ * raw_val()
-      {
-        if (this->_elements.size() == 0)
-          return nullptr;
-
-        return this->_elements.at(0);
-      }
-
-      /// \copydoc raw_val()
-      /// const version.
-      DT_ const * raw_val() const
-      {
-        if (this->_elements.size() == 0)
-          return nullptr;
-
-        return this->_elements.at(0);
+        return (typename Intern::BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, perspective_>::Type *)(this->_elements.at(0));
       }
 
       /**
@@ -1128,14 +1111,20 @@ namespace FEAST
         // r <- x + y
         if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
         {
-          Statistics::add_flops(this->raw_used_elements());
-          Arch::Sum<Mem_>::value(this->raw_val(), x.raw_val(), y.raw_val(), this->raw_used_elements());
+          Statistics::add_flops(this->used_elements<Perspective::pod>());
+          Arch::Sum<Mem_>::value(this->template val<Perspective::pod>(),
+                                 x.template val<Perspective::pod>(),
+                                 y.template val<Perspective::pod>(),
+                                 this->used_elements<Perspective::pod>());
         }
         // r <- y - x
         else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Statistics::add_flops(this->raw_used_elements());
-          Arch::Difference<Mem_>::value(this->raw_val(), y.raw_val(), x.raw_val(), this->raw_used_elements());
+          Statistics::add_flops(this->used_elements<Perspective::pod>());
+          Arch::Difference<Mem_>::value(this->template val<Perspective::pod>(),
+                                        y.template val<Perspective::pod>(),
+                                        x.template val<Perspective::pod>(),
+                                        this->used_elements<Perspective::pod>());
         }
         // r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -1143,8 +1132,12 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Statistics::add_flops(this->raw_used_elements() * 2);
-          Arch::Axpy<Mem_>::dv(this->raw_val(), alpha, x.raw_val(), y.raw_val(), this->raw_used_elements());
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
+          Arch::Axpy<Mem_>::dv(this->template val<Perspective::pod>(),
+                               alpha,
+                               x.template val<Perspective::pod>(),
+                               y.template val<Perspective::pod>(),
+                               this->used_elements<Perspective::pod>());
         }
 
         TimeStamp ts_stop;
@@ -1167,8 +1160,8 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
         TimeStamp ts_start;
-        Statistics::add_flops(this->raw_used_elements());
-        Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->raw_used_elements());
+        Statistics::add_flops(this->used_elements<Perspective::pod>());
+        Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->used_elements<Perspective::pod>());
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
@@ -1181,8 +1174,9 @@ namespace FEAST
       DT_ norm_frobenius() const
       {
         TimeStamp ts_start;
-        Statistics::add_flops(this->raw_used_elements() * 2);
-        DT_ result = Arch::Norm2<Mem_>::value(this->raw_val(), this->raw_used_elements());
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
+        DT_ result = Arch::Norm2<Mem_>::value(this->template val<Perspective::pod>(),
+                                              this->used_elements<Perspective::pod>());
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
         return result;
@@ -1196,16 +1190,16 @@ namespace FEAST
        */
       void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
       {
-        if (r.size() != this->raw_rows())
+        if (r.size() != this->rows<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->raw_columns())
+        if (x.size() != this->columns<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->raw_used_elements() * 2);
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
         Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-          r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+          r.elements(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
           x.elements(), this->rows(), columns(), used_elements());
 
         TimeStamp ts_stop;
@@ -1222,15 +1216,15 @@ namespace FEAST
       {
         if (r.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->raw_columns())
+        if (x.size() != this->columns<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->raw_used_elements() * 2);
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
         Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-          r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+          r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
           x.elements(), this->rows(), columns(), used_elements());
 
         TimeStamp ts_stop;
@@ -1245,18 +1239,18 @@ namespace FEAST
        */
       void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
       {
-        if (r.size() != this->raw_rows())
+        if (r.size() != this->rows<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->raw_used_elements() * 2);
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
         Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-          r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
-          x.raw_elements(), this->rows(), columns(), used_elements());
+          r.elements(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
+          x.template elements<Perspective::pod>(), this->rows(), columns(), used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1277,11 +1271,11 @@ namespace FEAST
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->raw_used_elements() * 2);
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
         Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-          r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
-          x.raw_elements(), this->rows(), columns(), used_elements());
+          r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
+          x.template elements<Perspective::pod>(), this->rows(), columns(), used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -1301,11 +1295,11 @@ namespace FEAST
                  const DenseVector<Mem_, DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
-        if (r.size() != this->raw_rows())
+        if (r.size() != this->rows<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->raw_columns())
+        if (x.size() != this->columns<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
-        if (y.size() != this->raw_rows())
+        if (y.size() != this->rows<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
         TimeStamp ts_start;
@@ -1314,10 +1308,10 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Statistics::add_flops(this->raw_used_elements() * 3);
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
 
           Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.elements(), y.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
+            r.elements(), y.elements(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
             x.elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
@@ -1326,10 +1320,10 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Statistics::add_flops(this->raw_used_elements() * 3);
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
 
           Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.elements(), alpha, x.elements(), y.elements(), this->raw_val(), this->col_ind(),
+            r.elements(), alpha, x.elements(), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
 
@@ -1353,7 +1347,7 @@ namespace FEAST
       {
         if (r.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->raw_columns())
+        if (x.size() != this->columns<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
         if (y.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
@@ -1364,9 +1358,9 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Statistics::add_flops(this->raw_used_elements() * 3);
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
           Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
+            r.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
@@ -1376,9 +1370,9 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Statistics::add_flops(this->raw_used_elements() * 3);
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
           Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.raw_elements(), alpha, x.elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
+            r.template elements<Perspective::pod>(), alpha, x.elements(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
 
@@ -1400,11 +1394,11 @@ namespace FEAST
                  const DenseVector<Mem_, DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
-        if (r.size() != this->raw_rows())
+        if (r.size() != this->rows<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
-        if (y.size() != this->raw_rows())
+        if (y.size() != this->rows<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
         TimeStamp ts_start;
@@ -1413,10 +1407,10 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Statistics::add_flops(this->raw_used_elements() * 3);
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
           Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.elements(), y.elements(), this->raw_val(), this->col_ind(),  this->row_ptr(),
-            x.raw_elements(), this->rows(), this->columns(), this->used_elements());
+            r.elements(), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),  this->row_ptr(),
+            x.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -1425,9 +1419,9 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Statistics::add_flops(this->raw_used_elements() * 3);
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
           Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.elements(), alpha, x.raw_elements(), y.elements(), this->raw_val(), this->col_ind(),
+            r.elements(), alpha, x.template elements<Perspective::pod>(), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
 
@@ -1462,10 +1456,10 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Statistics::add_flops(this->raw_used_elements() * 3);
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
           Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
-            x.raw_elements(), this->rows(), this->columns(), this->used_elements());
+            r.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
+            x.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
         }
         //r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -1473,9 +1467,9 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Statistics::add_flops(this->raw_used_elements() * 3);
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
           Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
-            r.raw_elements(), alpha, x.raw_elements(), y.raw_elements(), this->raw_val(),
+            r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
 
@@ -1555,8 +1549,8 @@ namespace FEAST
         {
           col_ind_a = new IT_[a.used_elements()];
           MemoryPool<Mem_>::template download<IT_>(col_ind_a, a.col_ind(), a.used_elements());
-          val_a = new DT_[a.raw_used_elements()];
-          MemoryPool<Mem_>::template download<DT_>(val_a, a.raw_val(), a.raw_used_elements());
+          val_a = new DT_[a.template used_elements<Perspective::pod>()];
+          MemoryPool<Mem_>::template download<DT_>(val_a, a.template val<Perspective::pod>(), a.template used_elements<Perspective::pod>());
           row_ptr_a = new IT_[a.rows() + 1];
           MemoryPool<Mem_>::template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
         }
@@ -1570,8 +1564,8 @@ namespace FEAST
         {
           col_ind_b = new IT_[b.used_elements()];
           MemoryPool<Mem2_>::template download<IT_>(col_ind_b, b.col_ind(), b.used_elements());
-          val_b = new DT_[b.raw_used_elements()];
-          MemoryPool<Mem2_>::template download<DT_>(val_b, b.raw_val(), b.raw_used_elements());
+          val_b = new DT_[b.template used_elements<Perspective::pod>()];
+          MemoryPool<Mem2_>::template download<DT_>(val_b, b.template val<Perspective::pod>(), b.template used_elements<Perspective::pod>());
           row_ptr_b = new IT_[b.rows() + 1];
           MemoryPool<Mem2_>::template download<IT_>(row_ptr_b, b.row_ptr(), b.rows() + 1);
         }
@@ -1586,7 +1580,7 @@ namespace FEAST
         }
         if (ret)
         {
-          for (Index i(0) ; i < a.raw_used_elements() ; ++i)
+          for (Index i(0) ; i < a.template used_elements<Perspective::pod>() ; ++i)
           {
             if (val_a[i] != val_b[i])
             {

@@ -341,22 +341,40 @@ namespace FEAST
         return SaddlePointMatrixElement<MatrixA_, MatrixB_, MatrixD_, i_, j_>::get(*this);
       }
 
-      /// Returns the total number of rows in this matrix.
+      /**
+       * \brief Returns the total number of rows in this matrix.
+       *
+       * \returns Matrix row count if perspective_ = false.
+       * \returns Raw matrix row count if perspective_ = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index rows() const
       {
-        return _matrix_a.rows() + _matrix_d.rows();
+        return _matrix_a.template rows<perspective_>() + _matrix_d.template rows<perspective_>();
       }
 
-      /// Returns the total number of columns in this matrix.
+      /**
+       * \brief Returns the total number of columns in this matrix.
+       *
+       * \returns Matrix column count if perspective_ = false.
+       * \returns Raw matrix column count if perspective_ = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index columns() const
       {
-        return _matrix_a.columns() + _matrix_b.columns();
+        return _matrix_a.template columns<perspective_>() + _matrix_b.template columns<perspective_>();
       }
 
-      /// Returns the total number of non-zeros in this matrix.
+      /**
+       * \brief Returns the total number of non-zeros in this matrix.
+       *
+       * \returns Matrix non zero element count if perspective_ = false.
+       * \returns Raw matrix non zero element count if perspective_ = true.
+       */
+      template <Perspective perspective_ = Perspective::native>
       Index used_elements() const
       {
-        return _matrix_a.used_elements() + _matrix_b.used_elements() + _matrix_d.used_elements();
+        return _matrix_a.template used_elements<perspective_>() + _matrix_b.template used_elements<perspective_>() + _matrix_d.template used_elements<perspective_>();
       }
 
       /// Returns a descriptive string for this container.
@@ -367,9 +385,10 @@ namespace FEAST
           MatrixTypeD::name() + ">";
       }
 
+      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return rows() * columns();
+        return rows<perspective_>() * columns<perspective_>();
       }
 
       /// extract main diagonal vector from matrix
@@ -478,7 +497,7 @@ namespace FEAST
       /// Returns the number of NNZ-elements of the selected row
       Index get_length_of_line(const Index row) const
       {
-        const Index arows(this->block_a().rows());
+        const Index arows(this->block_a().template rows<Perspective::pod>());
 
         if (row < arows)
         {
@@ -495,14 +514,14 @@ namespace FEAST
       void set_line(const Index row, typename MatrixA_::DataType * const pval_set, typename MatrixA_::IndexType * const pcol_set,
                     const Index col_start, const Index stride = 1) const
       {
-        const Index arows(this->block_a().rows());
+        const Index arows(this->block_a().template rows<Perspective::pod>());
 
         if (row < arows)
         {
           const Index length_of_a(this->block_a().get_length_of_line(row));
 
           this->block_a().set_line(row, pval_set, pcol_set, col_start, stride);
-          this->block_b().set_line(row, pval_set + stride * length_of_a, pcol_set + stride * length_of_a, col_start + this->block_a().columns(), stride);
+          this->block_b().set_line(row, pval_set + stride * length_of_a, pcol_set + stride * length_of_a, col_start + this->block_a().template columns<Perspective::pod>(), stride);
         }
         else
         {

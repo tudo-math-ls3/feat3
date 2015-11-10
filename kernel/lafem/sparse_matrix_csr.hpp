@@ -893,10 +893,10 @@ namespace FEAST
 
         this->clear();
 
-        this->_scalar_index.push_back(other.raw_rows() * other.raw_columns());
-        this->_scalar_index.push_back(other.raw_rows());
-        this->_scalar_index.push_back(other.raw_columns());
-        this->_scalar_index.push_back(other.raw_used_elements());
+        this->_scalar_index.push_back(other.template rows<Perspective::pod>() * other.template columns<Perspective::pod>());
+        this->_scalar_index.push_back(other.template rows<Perspective::pod>());
+        this->_scalar_index.push_back(other.template columns<Perspective::pod>());
+        this->_scalar_index.push_back(other.template used_elements<Perspective::pod>());
 
         SparseMatrixBCSR<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> cother;
         cother.convert(other);
@@ -972,9 +972,9 @@ namespace FEAST
         typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
         ta.convert(a);
 
-        const Index arows(ta.rows());
-        const Index acolumns(ta.columns());
-        const Index aused_elements(ta.used_elements());
+        const Index arows(ta.template rows<Perspective::pod>());
+        const Index acolumns(ta.template columns<Perspective::pod>());
+        const Index aused_elements(ta.template used_elements<Perspective::pod>());
 
         DenseVector<Mem::Main, DT_, IT_> tval(aused_elements);
         DenseVector<Mem::Main, IT_, IT_> tcol_ind(aused_elements);
@@ -1476,6 +1476,7 @@ namespace FEAST
        *
        * \returns Matrix row count.
        */
+      template <Perspective = Perspective::native>
       const Index & rows() const
       {
         return this->_scalar_index.at(1);
@@ -1486,6 +1487,7 @@ namespace FEAST
        *
        * \returns Matrix column count.
        */
+      template <Perspective = Perspective::native>
       const Index & columns() const
       {
         return this->_scalar_index.at(2);
@@ -1496,7 +1498,8 @@ namespace FEAST
        *
        * \returns Non zero element count.
        */
-      Index used_elements() const override
+      template <Perspective = Perspective::native>
+      Index used_elements() const
       {
         return this->_scalar_index.at(3);
       }
@@ -1952,8 +1955,8 @@ namespace FEAST
 
         Statistics::add_flops(this->used_elements() * 2);
         Arch::ProductMatVec<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
-          r.raw_elements(), this->val(), this->col_ind(), this->row_ptr(),
-          x.raw_elements(), this->rows(), columns(), used_elements());
+          r.template elements<Perspective::pod>(), this->val(), this->col_ind(), this->row_ptr(),
+          x.template elements<Perspective::pod>(), this->rows(), columns(), used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));

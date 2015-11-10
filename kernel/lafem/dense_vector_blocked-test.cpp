@@ -108,16 +108,16 @@ public:
     TEST_CHECK_EQUAL(dv2, dv);
     TEST_CHECK_EQUAL((void*)dv2.elements(), (void*)dv.elements());
 
-    DenseVectorBlocked<Mem_, DT_, IT_, 3> g(f.size(), f.raw_elements());
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> g(f.size(), f.template elements<Perspective::pod>());
     TEST_CHECK_EQUAL(g, f);
-    TEST_CHECK_EQUAL((void*)g.raw_elements(), (void*)f.raw_elements());
+    TEST_CHECK_EQUAL((void*)g.template elements<Perspective::pod>(), (void*)f.template elements<Perspective::pod>());
 
     std::stringstream mts;
     g.write_out(FileMode::fm_mtx, mts);
     DenseVectorBlocked<Mem_, DT_, IT_, 3> l(FileMode::fm_mtx, mts);
     TEST_CHECK_EQUAL(l, g);
-    /*for (Index i(0) ; i < g.raw_size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(l.raw_elements()[i], g.raw_elements()[i], 1e-4);*/
+    /*for (Index i(0) ; i < g.template size<Perspective::pod>() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(l.template elements<Perspective::pod>()[i], g.template elements<Perspective::pod>()[i], 1e-4);*/
 
     std::stringstream ts;
     g.write_out(FileMode::fm_exp, ts);

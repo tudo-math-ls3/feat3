@@ -347,7 +347,7 @@ namespace FEAST
        */
       template <int BS_>
       explicit DenseVector(const DenseVectorBlocked<Mem_, DT_, IT_, BS_> & other) :
-        Container<Mem_, DT_, IT_>(other.raw_size())
+        Container<Mem_, DT_, IT_>(other.template size<Perspective::pod>())
       {
         CONTEXT("When creating DenseVector");
 
@@ -493,7 +493,7 @@ namespace FEAST
 
         this->clear();
 
-        this->_scalar_index.push_back(other.raw_size());
+        this->_scalar_index.push_back(other.template size<Perspective::pod>());
         this->_scalar_index.push_back(0);
         this->_elements.push_back(other.get_elements().at(0));
         this->_elements_size.push_back(this->size());

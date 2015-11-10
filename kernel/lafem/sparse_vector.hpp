@@ -687,7 +687,8 @@ namespace FEAST
        *
        * \returns Non zero element count.
        */
-      Index used_elements() const override
+      template <Perspective = Perspective::native>
+      Index used_elements() const
       {
         if (sorted() == 0)
           const_cast<SparseVector *>(this)->sort();
