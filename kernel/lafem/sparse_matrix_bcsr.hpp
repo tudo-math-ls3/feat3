@@ -1656,6 +1656,37 @@ namespace FEAST
       {
         return VectorTypeR(this->columns());
       }
+
+      /// Returns the number of NNZ-elements of the selected row
+      Index get_length_of_line(const Index row) const
+      {
+        const auto * prow_ptr(this->row_ptr());
+        const auto trow = row / Index(BlockHeight_);
+        return Index(prow_ptr[trow + 1] - prow_ptr[trow]) * Index(BlockWidth_);
+      }
+
+      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
+      void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
+                    const Index col_start, const Index stride = 1) const
+      {
+        const auto * prow_ptr(this->row_ptr());
+        const auto * pcol_ind(this->col_ind());
+        const auto * pval(this->val());
+
+        const auto trow = int(row) / BlockHeight_;
+        const auto lrow = int(row) - trow * BlockHeight_;
+
+        const Index start((Index(prow_ptr[trow])));
+        const Index end((Index(prow_ptr[trow + 1] - prow_ptr[trow])));
+        for (Index i(0); i < end; ++i)
+        {
+          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
+          {
+            pval_set[(i * Index(BlockWidth_) + ti) * stride] = pval[start + i](lrow, int(ti));
+            pcol_set[(i * Index(BlockWidth_) + ti) * stride] = pcol_ind[start + i] * IT_(BlockWidth_) + IT_(ti) + IT_(col_start);
+          }
+        }
+      }
       /// \endcond
     };
   } // namespace LAFEM

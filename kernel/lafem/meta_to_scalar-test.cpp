@@ -2,8 +2,15 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/saddle_point_matrix.hpp>
+#include <kernel/lafem/power_diag_matrix.hpp>
+#include <kernel/lafem/power_col_matrix.hpp>
+#include <kernel/lafem/power_row_matrix.hpp>
+#include <kernel/lafem/power_full_matrix.hpp>
 #include <kernel/lafem/meta_matrix_test_base.hpp>
 #include <kernel/util/random.hpp>
 
@@ -143,6 +150,136 @@ MetaToScalarTest<SparseMatrixELL<Mem::CUDA, double, unsigned int> > cuda_meta_ma
 MetaToScalarTest<SparseMatrixELL<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_ell_test_generic_float_ulong;
 MetaToScalarTest<SparseMatrixELL<Mem::CUDA, double, unsigned long> > cuda_meta_matrix_to_ell_test_generic_double_ulong;
 #endif
+
+
+/**
+ * \brief MetaBCSRToScalarTest
+ *
+ * This class defines the MetaBCSRToScalarTest which transforms a meta-matrix with a block-csr-matrix to a scalar matrix
+ *
+ * \author Christoph Lohmann
+ */
+template<typename MT_>
+class MetaBCSRToScalarTest
+  : public FEAST::TestSystem::FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>
+{
+public:
+  typedef typename MT_::DataType DataType;
+  typedef typename MT_::IndexType IndexType;
+  typedef typename MT_::MemType Mem_;
+  typedef DataType DT_;
+  typedef IndexType IT_;
+
+  MetaBCSRToScalarTest()
+    : FEAST::TestSystem::FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>("meta_block_csr_to_scalar_test: " + MT_::name()) {}
+
+  virtual void run() const
+  {
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    Random random(seed);
+    std::cout << "seed: " << seed << std::endl;
+
+    DenseVector<Mem_, DT_, IT_> dv11(18);
+    for (Index i(0) ; i < dv11.size() ; ++i)
+      dv11(i, random(DT_(0), DT_(10)));
+    DenseVector<Mem_, IT_, IT_> dv12(3);
+    dv12(0, IT_(0));
+    dv12(1, IT_(1));
+    dv12(2, IT_(2));
+    DenseVector<Mem_, IT_, IT_> dv13(3);
+    dv13(0, IT_(0));
+    dv13(1, IT_(1));
+    dv13(2, IT_(3));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c1(2, 3, dv12, dv11, dv13);
+
+    DenseVector<Mem_, DT_, IT_> dv21(24);
+    for (Index i(0) ; i < dv21.size() ; ++i)
+      dv21(i, random(DT_(0), DT_(10)));
+    DenseVector<Mem_, IT_, IT_> dv22(4);
+    dv22(0, IT_(0));
+    dv22(1, IT_(1));
+    dv22(2, IT_(1));
+    dv22(3, IT_(2));
+    DenseVector<Mem_, IT_, IT_> dv23(4);
+    dv23(0, IT_(0));
+    dv23(1, IT_(1));
+    dv23(2, IT_(2));
+    dv23(3, IT_(4));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c2(3, 3, dv22, dv21, dv23);
+
+    typedef SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> BCSRMatrix;
+    typedef PowerColMatrix<BCSRMatrix, 2> ColMatrix;
+    typedef PowerRowMatrix<BCSRMatrix, 2> RowMatrix;
+    typedef SaddlePointMatrix<BCSRMatrix, RowMatrix, ColMatrix> SaddleMatrix;
+
+    typedef SparseMatrixCSR<Mem_, DT_, IT_> CSRMatrix;
+    typedef PowerColMatrix<CSRMatrix, 2> ColMatrix2;
+    typedef PowerRowMatrix<CSRMatrix, 2> RowMatrix2;
+    typedef SaddlePointMatrix<CSRMatrix, RowMatrix2, ColMatrix2> SaddleMatrix2;
+
+    SaddleMatrix c4;
+    c4.template at<0,0>().convert(c2);
+    c4.template at<0,1>().template at<0,0>().convert(c2);
+    c4.template at<0,1>().template at<0,1>().convert(c2);
+    c4.template at<1,0>().template at<0,0>().convert(c1);
+    c4.template at<1,0>().template at<1,0>().convert(c1);
+
+    SaddleMatrix2 c5;
+    c5.convert(c4);
+
+    MT_ c6;
+    c6.convert(c5);
+
+    MT_ c7;
+    c7.convert(c4);
+
+    TEST_CHECK_EQUAL(c6, c7);
+  }
+};
+
+MetaBCSRToScalarTest<SparseMatrixCOO<Mem::Main, float, unsigned int> > cpu_meta_bcsr_matrix_to_coo_test_generic_float_uint;
+MetaBCSRToScalarTest<SparseMatrixCOO<Mem::Main, double, unsigned int> > cpu_meta_bcsr_matrix_to_coo_test_generic_double_uint;
+MetaBCSRToScalarTest<SparseMatrixCOO<Mem::Main, float, unsigned long> > cpu_meta_bcsr_matrix_to_coo_test_generic_float_ulong;
+MetaBCSRToScalarTest<SparseMatrixCOO<Mem::Main, double, unsigned long> > cpu_meta_bcsr_matrix_to_coo_test_generic_double_ulong;
+
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::Main, float, unsigned int> > cpu_meta_bcsr_matrix_to_csr_test_generic_float_uint;
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::Main, double, unsigned int> > cpu_meta_bcsr_matrix_to_csr_test_generic_double_uint;
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::Main, float, unsigned long> > cpu_meta_bcsr_matrix_to_csr_test_generic_float_ulong;
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::Main, double, unsigned long> > cpu_meta_bcsr_matrix_to_csr_test_generic_double_ulong;
+
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, float, unsigned int> > cpu_meta_bcsr_matrix_to_ell_test_generic_float_uint;
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, double, unsigned int> > cpu_meta_bcsr_matrix_to_ell_test_generic_double_uint;
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, float, unsigned long> > cpu_meta_bcsr_matrix_to_ell_test_generic_float_ulong;
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, double, unsigned long> > cpu_meta_bcsr_matrix_to_ell_test_generic_double_ulong;
+
+#ifdef FEAST_HAVE_QUADMATH
+MetaBCSRToScalarTest<SparseMatrixCOO<Mem::Main, __float128, unsigned int> > cpu_meta_bcsr_matrix_to_coo_test_generic_float128_uint;
+MetaBCSRToScalarTest<SparseMatrixCOO<Mem::Main, __float128, unsigned long> > cpu_meta_bcsr_matrix_to_coo_test_generic_float128_ulong;
+
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::Main, __float128, unsigned int> > cpu_meta_bcsr_matrix_to_csr_test_generic_float128_uint;
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::Main, __float128, unsigned long> > cpu_meta_bcsr_matrix_to_csr_test_generic_float128_ulong;
+
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, __float128, unsigned int> > cpu_meta_bcsr_matrix_to_ell_test_generic_float128_uint;
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, __float128, unsigned long> > cpu_meta_bcsr_matrix_to_ell_test_generic_float128_ulong;
+#endif
+
+#ifdef FEAST_BACKENDS_CUDA
+// MetaBCSRToScalarTest<SparseMatrixCOO<Mem::CUDA, float, unsigned int> > cuda_meta_bcsr_matrix_to_coo_test_generic_float_uint;
+// MetaBCSRToScalarTest<SparseMatrixCOO<Mem::CUDA, double, unsigned int> > cuda_meta_bcsr_matrix_to_coo_test_generic_double_uint;
+// MetaBCSRToScalarTest<SparseMatrixCOO<Mem::CUDA, float, unsigned long> > cuda_meta_bcsr_matrix_to_coo_test_generic_float_ulong;
+// MetaBCSRToScalarTest<SparseMatrixCOO<Mem::CUDA, double, unsigned long> > cuda_meta_bcsr_matrix_to_coo_test_generic_double_ulong;
+
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::CUDA, float, unsigned int> > cuda_meta_bcsr_matrix_to_csr_test_generic_float_uint;
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::CUDA, double, unsigned int> > cuda_meta_bcsr_matrix_to_csr_test_generic_double_uint;
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::CUDA, float, unsigned long> > cuda_meta_bcsr_matrix_to_csr_test_generic_float_ulong;
+MetaBCSRToScalarTest<SparseMatrixCSR<Mem::CUDA, double, unsigned long> > cuda_meta_bcsr_matrix_to_csr_test_generic_double_ulong;
+
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::CUDA, float, unsigned int> > cuda_meta_bcsr_matrix_to_ell_test_generic_float_uint;
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::CUDA, double, unsigned int> > cuda_meta_bcsr_matrix_to_ell_test_generic_double_uint;
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::CUDA, float, unsigned long> > cuda_meta_bcsr_matrix_to_ell_test_generic_float_ulong;
+MetaBCSRToScalarTest<SparseMatrixELL<Mem::CUDA, double, unsigned long> > cuda_meta_bcsr_matrix_to_ell_test_generic_double_ulong;
+#endif
+
 
 
 /**
