@@ -154,6 +154,16 @@ void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ *
 template void Axpy<Mem::CUDA>::csr(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 template void Axpy<Mem::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 
+template <typename DT_>
+void Axpy<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize)
+{
+  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA>::csrb_intern(r, val, col_ind, row_ptr, x, rows, columns, used_elements, blocksize);
+  FEAST::LAFEM::Arch::Scale<Mem::CUDA>::value(r, r, a, rows * blocksize);
+  FEAST::LAFEM::Arch::Sum<Mem::CUDA>::value(r, r, y, rows * blocksize);
+}
+template void Axpy<Mem::CUDA>::csrb_intern(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int);
+template void Axpy<Mem::CUDA>::csrb_intern(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int);
+
 template <typename DT_, typename IT_>
 void Axpy<Mem::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
 {

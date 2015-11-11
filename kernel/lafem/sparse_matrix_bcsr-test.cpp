@@ -241,6 +241,120 @@ SparseMatrixBCSRApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr
 SparseMatrixBCSRApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_apply_test_double_uint;
 
 
+/**
+ * \brief Test class for the sparse matrix csr blocked apply method.
+ *
+ * \test test description missing
+ *
+ * \author Dirk Ribbrock
+ */
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRApplySquareTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixBCSRApplySquareTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRApplySquareTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    DenseVector<Mem_, DT_, IT_> dv1(18);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+      dv1(i, DT_(i+1));
+    DenseVector<Mem_, IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<Mem_, IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 3, 3> c(2, 2, dv2, dv1, dv3);
+
+    DenseVector<Mem_, DT_, IT_> x(c.template columns<Perspective::pod>());
+    DenseVector<Mem_, DT_, IT_> y(c.template rows<Perspective::pod>());
+    DenseVector<Mem_, DT_, IT_> r(c.template rows<Perspective::pod>());
+    DenseVector<Mem_, DT_, IT_> ref(c.template rows<Perspective::pod>());
+    for (Index i(0) ; i < x.size() ; ++i)
+    {
+      x(i, DT_(i));
+    }
+    for (Index i(0) ; i < r.size() ; ++i)
+    {
+      r(i, DT_(4711));
+      ref(i, DT_(4711));
+      y(i, DT_(i % 100));
+    }
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> xb(x);
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> yb(y);
+    DenseVectorBlocked<Mem_, DT_, IT_, 3> rb(r);
+
+    SparseMatrixCSR<Mem_, DT_, IT_> csr;
+    csr.convert(c);
+    csr.apply(ref, x);
+
+    c.apply(r, x);
+
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(rb, x);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(r, xb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(rb, xb);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    DT_ alpha(-1);
+    csr.apply(ref, x, y, alpha);
+    c.apply(r, x, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(rb, x, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(r, xb, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(rb, xb, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    alpha = DT_(1.234);
+    csr.apply(ref, x, y, alpha);
+    c.apply(r, x, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(rb, x, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(r, xb, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply(rb, xb, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+  }
+};
+SparseMatrixBCSRApplySquareTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_apply_square_test_float_ulong;
+SparseMatrixBCSRApplySquareTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_apply_square_test_double_ulong;
+SparseMatrixBCSRApplySquareTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_apply_square_test_float_uint;
+SparseMatrixBCSRApplySquareTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_apply_square_test_double_uint;
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixBCSRApplySquareTest<Mem::CUDA, float, unsigned int> gpu_sparse_matrix_bcsr_apply_square_test_float_uint;
+SparseMatrixBCSRApplySquareTest<Mem::CUDA, double, unsigned int> gpu_sparse_matrix_bcsr_apply_square_test_double_uint;
+#endif
+
+
 template<
   typename Mem_,
   typename DT_,

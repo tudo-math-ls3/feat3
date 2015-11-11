@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
+#include <typeinfo>
 
 
 namespace FEAST
@@ -45,7 +46,14 @@ namespace FEAST
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
         {
+#ifdef FEAST_BACKENDS_MKL
+          if (typeid(IT_) == typeid(unsigned long) && BlockHeight_ == BlockWidth_)
+            csrb_mkl(r, rhs, val, (unsigned long*)col_ind, (unsigned long*)row_ptr, x, rows, columns, used_elements, BlockHeight_);
+          else
+            csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, rhs, val, col_ind, row_ptr, x, rows, columns, used_elements);
+#else
           csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, rhs, val, col_ind, row_ptr, x, rows, columns, used_elements);
+#endif
         }
 
         template <typename DT_, typename IT_>
@@ -110,6 +118,9 @@ namespace FEAST
         static void csr_mkl(float * r, const float * const rhs, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const float * const x, const Index rows, const Index, const Index);
         static void csr_mkl(double * r, const double * const rhs, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const double * const x, const Index rows, const Index, const Index);
 
+        static void csrb_mkl(float * r, const float * const rhs, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const float * const x, const Index rows, const Index, const Index, const int blocksize);
+        static void csrb_mkl(double * r, const double * const rhs, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const double * const x, const Index rows, const Index, const Index, const int blocksize);
+
         static void coo_mkl(float * r, const float * const rhs, const float * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements);
         static void coo_mkl(double * r, const double * const rhs, const double * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements);
       };
@@ -143,6 +154,17 @@ namespace FEAST
 
         template <typename DT_>
         static void csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+        static void csrb(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        {
+          static_assert(std::is_same<IT_, unsigned int>::value, "cuda bcsr only supports unsigned int!");
+          static_assert(BlockHeight_ == BlockWidth_, "cuda bcsr only supports squared matrix blocks!");
+          csrb_intern(r, rhs, val, col_ind, row_ptr, x, rows, columns, used_elements, BlockHeight_);
+        }
+
+        template <typename DT_>
+        static void csrb_intern(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index, const int blocksize);
 
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const DT_ * const x, const Index C, const Index rows);

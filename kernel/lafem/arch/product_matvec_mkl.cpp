@@ -22,6 +22,22 @@ void ProductMatVec<Mem::Main>::csr_mkl(double * r, const double * const val, con
   mkl_cspblas_dcsrgemv(&trans, &mrows, (double *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, (double *)x, r);
 }
 
+void ProductMatVec<Mem::Main>::csrb_mkl(float * r, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const float * const x, const Index rows, const Index, const Index, const int blocksize)
+{
+  MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mblocksize = (MKL_INT)blocksize;
+  char trans = 'N';
+  mkl_cspblas_sbsrgemv(&trans, &mrows, &mblocksize, (float *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, (float *)x, r);
+}
+
+void ProductMatVec<Mem::Main>::csrb_mkl(double * r, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const double * const x, const Index rows, const Index, const Index, const int blocksize)
+{
+  MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mblocksize = (MKL_INT)blocksize;
+  char trans = 'N';
+  mkl_cspblas_dbsrgemv(&trans, &mrows, &mblocksize, (double *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, (double *)x, r);
+}
+
 void ProductMatVec<Mem::Main>::coo_mkl(float * r, const float * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const float * const x, const Index rows, const Index used_elements)
 {
   MKL_INT mrows = (MKL_INT)rows;

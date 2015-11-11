@@ -60,6 +60,28 @@ namespace FEAST
                        csrColInd, x, beta, y);
       }
 
+      void cusparse_product_matvec_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const float * alpha, const cusparseMatDescr_t descrA,
+                                       const float * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       int block_dim,
+                                       const float * x, const float * beta, float * y)
+      {
+        cusparseSbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, block_dim, x, beta, y);
+      }
+
+      void cusparse_product_matvec_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const double * alpha, const cusparseMatDescr_t descrA,
+                                       const double * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       int block_dim,
+                                       const double * x, const double * beta, double * y)
+      {
+        cusparseDbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, block_dim, x, beta, y);
+      }
+
       template <typename DT_, typename IT_>
       __global__ void cuda_product_matvec_ell(DT_ * r, const DT_ * x, const DT_ * val, const IT_ * col_ind,
                                               const IT_ * cs, const IT_ * cl, const Index C, const Index rows)
@@ -228,6 +250,23 @@ void ProductMatVec<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const unsigne
 }
 template void ProductMatVec<Mem::CUDA>::csr(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
 template void ProductMatVec<Mem::CUDA>::csr(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+
+template <typename DT_>
+void ProductMatVec<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements, const int blocksize)
+{
+  cusparseMatDescr_t descr=0;
+  cusparseCreateMatDescr(&descr);
+  cusparseSetMatType(descr,CUSPARSE_MATRIX_TYPE_GENERAL);
+  cusparseSetMatIndexBase(descr,CUSPARSE_INDEX_BASE_ZERO);
+
+  DT_ one(1);
+  DT_ zero(0);
+  FEAST::LAFEM::Intern::cusparse_product_matvec_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &one, descr, val, (int*)row_ptr, (int*)col_ind, blocksize, x, &zero, r);
+
+  cusparseDestroyMatDescr(descr);
+}
+template void ProductMatVec<Mem::CUDA>::csrb_intern(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index, const int);
+template void ProductMatVec<Mem::CUDA>::csrb_intern(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index, const int);
 
 
 template <typename DT_, typename IT_>

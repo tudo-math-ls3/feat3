@@ -858,7 +858,7 @@ namespace FEAST
         temp.convert(*this);
 
         file << "%%MatrixMarket matrix coordinate real general" << std::endl;
-        file << temp.rows() * BlockHeight_<< " " << temp.columns() * BlockWidth_<< " " << temp.used_elements() * BlockHeight_ * BlockWidth_ << std::endl;
+        file << temp.template rows<Perspective::pod>() << " " << temp.template columns<Perspective::pod>() << " " << temp.template used_elements<Perspective::pod>() << std::endl;
 
         for (Index row(0) ; row < rows() ; ++row)
         {
