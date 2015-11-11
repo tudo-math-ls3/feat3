@@ -1580,6 +1580,67 @@ namespace FEAST
           return Index(_coeff.size());
         }
       }; // class PolynomialFunction1D
+
+      /**
+       * \brief Himmelblau function
+       *
+       * This class implements the StaticFunction interface representing the function
+       *   - u(x,y) = (x^2 + y^2 - 11)^2 + (x + y^2 - 7)^2
+       *
+       * \author Jordi Paul
+       */
+      template<typename DataType_>
+      class HimmelblauStatic
+      {
+      public:
+        /// function value
+        static DataType_ eval(DataType_ x, DataType_ y)
+        {
+          return Math::sqr(Math::sqr(x) + y - DataType_(11))
+            + Math::sqr( x + Math::sqr(y) - DataType_(7));
+        }
+
+        /// x-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y)
+        {
+          return DataType_(4)*x*(Math::sqr(x) + y - DataType_(11)) + DataType_(2)*(x + Math::sqr(y) - DataType_(7));
+        }
+
+        /// y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y)
+        {
+          return DataType_(2)* (Math::sqr(x) + y - DataType_(11)) + DataType_(4)*y*(x + Math::sqr(y) - DataType_(7));
+        }
+
+        /// xx-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ y)
+        {
+          return DataType_(12)*Math::sqr(x) + DataType_(4)*y - DataType_(42);
+        }
+
+        /// yy-derivative
+        static DataType_ der_yy(DataType_ x, DataType_ y)
+        {
+          return DataType_(4)*x + DataType_(12)*Math::sqr(y) - DataType_(26);
+        }
+
+        /// xy-derivative
+        static DataType_ der_xy(DataType_ x, DataType_ y)
+        {
+          return DataType_(4)*(x + y);
+        }
+
+        /// yx-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y)
+        {
+          return der_xy(x,y);
+        }
+
+      }; // class HimmelblauStatic<...>
+
+      /// \cond internal
+      using HimmelblauFunction = StaticWrapperFunction<2, HimmelblauStatic, true, true, true>;
+      /// \endcond
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAST
