@@ -162,26 +162,29 @@ namespace FEAST
          */
         MeshAttribute& operator=(const MeshAttribute& other)
         {
-          _num_vertices = other.get_num_vertices();
-          _num_coords = other.get_num_coords();
-          _stride = other.get_stride();
-          _identifier = other.get_identifier();
-
-          if(_vertices != nullptr)
-            delete[] _vertices;
-
-          if(other._vertices != nullptr)
+          if(&other != this)
           {
-            if((_num_vertices > 0) && (_num_coords > 0))
-            {
-              _vertices = new CoordType[_num_vertices * Index(_stride)];
-              for(Index i(0); i < _num_vertices; ++i)
-              {
-                for(Index j(0); j < Index(_num_coords); ++j)
-                  _vertices[i * Index(_stride) + j] = other[i][j];
+            _num_vertices = other.get_num_vertices();
+            _num_coords = other.get_num_coords();
+            _stride = other.get_stride();
+            _identifier = other.get_identifier();
 
-                for(Index j = Index(_num_coords); j < Index(_stride); ++j)
-                  _vertices[i * Index(_stride) + j] = CoordType(0);
+            if(_vertices != nullptr)
+              delete[] _vertices;
+
+            if(other._vertices != nullptr)
+            {
+              if((_num_vertices > 0) && (_num_coords > 0))
+              {
+                _vertices = new CoordType[_num_vertices * Index(_stride)];
+                for(Index i(0); i < _num_vertices; ++i)
+                {
+                  for(Index j(0); j < Index(_num_coords); ++j)
+                    _vertices[i * Index(_stride) + j] = other[i][j];
+
+                  for(Index j = Index(_num_coords); j < Index(_stride); ++j)
+                    _vertices[i * Index(_stride) + j] = CoordType(0);
+                }
               }
             }
           }
