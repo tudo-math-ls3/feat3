@@ -1585,7 +1585,9 @@ namespace FEAST
        * \brief Himmelblau function
        *
        * This class implements the StaticFunction interface representing the function
-       *   - u(x,y) = (x^2 + y^2 - 11)^2 + (x + y^2 - 7)^2
+       *  \f[
+       *    u(x,y) = (x^2 + y^2 - 11)^2 + (x + y^2 - 7)^2
+       *  \f]
        *
        * \author Jordi Paul
        */
@@ -1640,6 +1642,68 @@ namespace FEAST
 
       /// \cond internal
       using HimmelblauFunction = StaticWrapperFunction<2, HimmelblauStatic, true, true, true>;
+      /// \endcond
+
+      /**
+       * \brief Rosenbrock function
+       *
+       * This class implements the StaticFunction interface representing the function
+       * \f[
+       *   u(x,y) = 100(y-x^2)^2 + (1-x)^2
+       * \f]
+       *
+       * \author Jordi Paul
+       */
+      template<typename DataType_>
+      class RosenbrockStatic
+      {
+      public:
+        /// function value
+        static DataType_ eval(DataType_ x, DataType_ y)
+        {
+          return DataType_(100)*Math::sqr( y - Math::sqr(x)) + Math::sqr(DataType_(1) - x);
+        }
+
+        /// x-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y)
+        {
+          return -DataType_(400)*x*(y - Math::sqr(x) ) + DataType_(2)*(x - DataType_(1));
+        }
+
+        /// y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y)
+        {
+          return DataType_(200)*(y - Math::sqr(x));
+        }
+
+        /// xx-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ y)
+        {
+          return DataType_(1200)*Math::sqr(x) - DataType_(400)*y + DataType_(2);
+        }
+
+        /// yy-derivative
+        static DataType_ der_yy(DataType_ DOXY(x), DataType_ DOXY(y))
+        {
+          return DataType_(200);
+        }
+
+        /// xy-derivative
+        static DataType_ der_xy(DataType_ x, DataType_ DOXY(y))
+        {
+          return -DataType_(400)*x;
+        }
+
+        /// yx-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y)
+        {
+          return der_xy(x,y);
+        }
+
+      }; // class HimmelblauStatic<...>
+
+      /// \cond internal
+      using RosenbrockFunction = StaticWrapperFunction<2, RosenbrockStatic, true, true, true>;
       /// \endcond
     } // namespace Common
   } // namespace Analytic
