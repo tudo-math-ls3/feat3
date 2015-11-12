@@ -8,6 +8,7 @@
 #include <kernel/geometry/structured_mesh.hpp>
 #include <kernel/geometry/shape_convert_factory.hpp>
 
+#include <deque>
 namespace FEAST
 {
   namespace Geometry
@@ -709,6 +710,89 @@ namespace FEAST
 
     };
     /// \endcond
+
+    /**
+     * \brief Constructs a polyline mesh
+     *
+     * \tparam[dim_]
+     * Dimension of the input points
+     *
+     * \tparam[stride_]
+     * Padded dimension of the input points
+     *
+     * \tparam[Coord_]
+     * Floating point type for mesh coordinates
+     *
+     * \author Jordi Paul
+     *
+     * This simply joins all points of a given std::deque together to a polygonal straight line graph.
+     *
+     */
+    template<int dim_, int stride_, typename Coord_>
+    class PolylineFactory :
+    public Factory< ConformalMesh<Shape::Hypercube<1>, dim_, stride_, Coord_> >
+    {
+      public:
+        /// mesh type
+        typedef ConformalMesh<Shape::Hypercube<1>, dim_, stride_, Coord_> MeshType;
+        /// vertex set type
+        typedef typename MeshType::VertexSetType VertexSetType;
+        /// index holder type
+        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+
+      private:
+        /// Reference to the set of points in the polyline
+        std::deque<Tiny::Vector<Coord_, dim_, stride_>>& _points;
+
+      public:
+
+        /**
+         * \brief From deque-of-Tiny::Vectors constructor
+         */
+        PolylineFactory(std::deque<typename VertexSetType::VertexType>& points_) :
+          _points(points_)
+        {
+
+        }
+
+        /**
+         * \copydoc Factory::get_num_entities(int)
+         */
+        virtual Index get_num_entities(int dimension)
+        {
+          switch(dimension)
+          {
+            case 0:
+              return _points.size();
+            case 1:
+              return _points.size()-size_t(1);
+            default:
+              return 0;
+          }
+        }
+
+        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        {
+          size_t i(0);
+          const auto& jt(_points.end());
+          for(auto it(_points.begin()); it != jt; ++i)
+          {
+            vertex_set[i] = *it;
+            it++;
+          }
+        }
+
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        {
+          IndexSet<2>& v_e(index_set_holder.template get_index_set<1,0>());
+          for(Index i(0); i < get_num_entities(1); ++i)
+          {
+            v_e[i][0] = i;
+            v_e[i][1] = i + Index(1);
+          }
+        }
+
+    };
 
   } // namespace Geometry
 } // namespace FEAST
