@@ -54,6 +54,7 @@ thirdparty/*.tgz
 thirdparty/*.zip
 thirdparty/alglib/*
 thirdparty/SuiteSparse/*
+thirdparty/fparser/*
 
 # Ignore Visual Studio user/filter files
 *.vcxproj.user
@@ -74,4 +75,4 @@ ipch
 *.lnk
 
 # Ignore Visual Studio user-configfiles
-config-vc12.xml
+config-vc14.xml
