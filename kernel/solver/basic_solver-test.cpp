@@ -122,7 +122,7 @@ public:
       test_solver("PCG-SSOR", solver, vec_sol, vec_ref, vec_rhs);
     }
 
-    // test FGMRES-ILU
+    // test FGMRES-SPAI
     {
       // create an SPAI preconditioner
       auto precon = Solver::new_spai_precond(matrix, filter, matrix.layout());
