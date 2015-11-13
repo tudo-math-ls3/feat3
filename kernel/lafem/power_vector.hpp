@@ -412,14 +412,14 @@ namespace FEAST
       void set_vec(DataType * const pval_set) const
       {
         this->first().set_vec(pval_set);
-        this->rest().set_vec(pval_set + this->first().size());
+        this->rest().set_vec(pval_set + this->first().template size<Perspective::pod>());
       }
 
       /// Writes data of an array in the vector
       void set_vec_inv(const DataType * const pval_set)
       {
         this->first().set_vec_inv(pval_set);
-        this->rest().set_vec_inv(pval_set + this->first().size());
+        this->rest().set_vec_inv(pval_set + this->first().template size<Perspective::pod>());
       }
       /// \endcond
 

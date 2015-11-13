@@ -197,9 +197,10 @@ namespace FEAST
       }
 
       /// Returns the total size of this tuple-vector.
+      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return _first.size() + _rest.size();
+        return _first.template size<perspective_>() + _rest.template size<perspective_>();
       }
 
       /// Returns the number of blocks in this tuple-vector.
@@ -318,14 +319,14 @@ namespace FEAST
       void set_vec(DataType * const pval_set) const
       {
         this->first().set_vec(pval_set);
-        this->rest().set_vec(pval_set + this->first().size());
+        this->rest().set_vec(pval_set + this->first().template size<Perspective::pod>());
       }
 
       /// Writes data of an array in the vector
       void set_vec_inv(const DataType * const pval_set)
       {
         this->first().set_vec_inv(pval_set);
-        this->rest().set_vec_inv(pval_set + this->first().size());
+        this->rest().set_vec_inv(pval_set + this->first().template size<Perspective::pod>());
       }
       /// \endcond
 
@@ -446,10 +447,10 @@ namespace FEAST
       {
         return _first;
       }
-
+      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return _first.size();
+        return _first.template size<perspective_>();
       }
 
       /// Returns the number of blocks in this tuple-vector.
