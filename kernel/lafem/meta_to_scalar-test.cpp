@@ -2,6 +2,7 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
@@ -299,10 +300,11 @@ class VecMetaToScalarTest
 {
 public:
   typedef DenseVector<Mem_, DT_, IT_> DenseVec;
+  typedef DenseVectorBlocked<Mem_, DT_, IT_, 3> DenseVecBlocked;
   typedef PowerVector<DenseVec, 1> PowerVec1;
   typedef PowerVector<DenseVec, 2> PowerVec2;
   typedef PowerVector<DenseVec, 3> PowerVec3;
-  typedef TupleVector<PowerVec3, PowerVec2, PowerVec1, DenseVec> TupleVec;
+  typedef TupleVector<PowerVec3, PowerVec2, PowerVec1, DenseVec, DenseVecBlocked> TupleVec;
 
   VecMetaToScalarTest()
     : FullTaggedTest<Mem_, DT_, IT_>("vec_meta_to_scalar_test")
@@ -328,11 +330,23 @@ public:
       }
     }
 
+    DenseVecBlocked dvb(2);
+    Tiny::Vector<DT_, 3> tv1, tv2(0);
+    tv1(0) = DT_(0);
+    tv1(1) = DT_(3);
+    tv1(2) = DT_(5);
+    tv2(0) = DT_(0.1);
+    tv2(1) = DT_(3);
+    tv2(2) = DT_(-3.4);
+    dvb(0, tv1);
+    dvb(1, tv2);
+
     Index glob_size(0);
     for (Index j(0); j < 7; ++j)
     {
       glob_size += dv[j].size();
     }
+    glob_size += dvb.template size<Perspective::pod>();
 
     PowerVec3 pv3;
     pv3.template at<0>().convert(dv[0]);
@@ -351,6 +365,7 @@ public:
     tv.template at<1>().convert(pv2);
     tv.template at<2>().convert(pv1);
     tv.template at<3>().convert(dv[6]);
+    tv.template at<4>().convert(dvb);
 
     typename TupleVec::template ContainerType<Mem::Main, DT_, IT_> tv_main;
     typename TupleVec::template ContainerType<Mem_, DT_, IT_> tv_convert;

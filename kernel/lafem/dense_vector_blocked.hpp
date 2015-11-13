@@ -1092,6 +1092,20 @@ namespace FEAST
       }
       ///@}
 
+      /// \cond internal
+      /// Writes the vector-entries in an allocated array
+      void set_vec(DT_ * const pval_set) const
+      {
+        MemoryPool<Mem_>::copy(pval_set, this->elements(), this->size<Perspective::pod>());
+      }
+
+      /// Writes data of an array in the vector
+      void set_vec_inv(const DT_ * const pval_set)
+      {
+        MemoryPool<Mem_>::copy(this->elements(), pval_set, this->size<Perspective::pod>());
+      }
+      /// \endcond
+
       /**
        * \brief DenseVectorBlocked comparison operator
        *
