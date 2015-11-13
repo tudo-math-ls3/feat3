@@ -461,6 +461,25 @@ namespace FEAST
       {
         return Math::sqrt(norm_euclid_sqr());
       }
+
+
+      /**
+       * \brief Tiny::Vector streaming operator
+       *
+       * \param[in] lhs The target stream.
+       * \param[in] b The vector to be streamed.
+       */
+      friend std::ostream & operator<< (std::ostream & lhs, const Vector & b)
+      {
+        lhs << "[";
+        for (int i(0) ; i < b.n() ; ++i)
+        {
+          lhs << "  " << b(i);
+        }
+        lhs << "]";
+
+        return lhs;
+      }
     }; // class Vector
 
     /**
