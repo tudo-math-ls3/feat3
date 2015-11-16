@@ -259,6 +259,10 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  do not use thirdparty libraries at all.")
   print ("nomemcheck")
   print ("  do not use memory checking tools at all.")
+  print ("novalgrind")
+  print ("  do not use valgrind.")
+  print ("nocudamemcheck")
+  print ("  do not use cudamemcheck.")
   print ("system_host_compiler=binary")
   print ("  use binary as host compiler for e.g. intel icc.")
   print ("cuda_host_compiler=binary")
@@ -277,7 +281,8 @@ sqlhost = "augias"
 sqlport = 3306
 note = ""
 nothirdparty = False
-nomemcheck = False
+novalgrind = False
+nocudamemcheck = False
 nomkl = False
 system_host_compiler = ""
 cuda_host_compiler = ""
@@ -298,7 +303,12 @@ for i in range(1, len(sys.argv)):
   if sys.argv[i].startswith("nothirdparty"):
     nothirdparty = True
   if sys.argv[i].startswith("nomemcheck"):
-    nomemcheck = True
+    novalgrind = True
+    nocudamemcheck = True
+  if sys.argv[i].startswith("novalgrind"):
+    novalgrind = True
+  if sys.argv[i].startswith("nocudamemcheck"):
+    nocudamemcheck = True
   if sys.argv[i].startswith("nomkl"):
     nomkl = True
   if sys.argv[i].startswith("system_host_compiler="):
@@ -438,28 +448,12 @@ if branch_names.count("master") > 0:
 for branch in branch_names:
   run_test("guess", branch, myDB, extra_opts)
 
-  if (not nomemcheck):
-    if is_found ("valgrind") and is_found ("nvcc") and is_found("g++"):
-        run_test("serial-gcc-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
-    elif is_found ("valgrind") and is_found("g++"):
-        run_test("serial-gcc-debug-valgrind" + addition + quadmath_add, branch, myDB, extra_opts)
-    elif is_found ("nvcc") and is_found("g++"):
-        run_test("serial-gcc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
-    '''
-    if is_found ("valgrind") and is_found ("nvcc") and is_found("icpc"):
-        run_test("serial-icc-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
-    elif is_found ("valgrind") and is_found("icpc"):
-        run_test("serial-icc-debug-valgrind" + addition + quadmath_add, branch, myDB, extra_opts)
-    elif is_found ("nvcc") and is_found("icpc"):
-        run_test("serial-icc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
-
-    if is_found ("valgrind") and is_found ("nvcc") and is_found("clang++"):
-        run_test("serial-clang-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
-    elif is_found ("valgrind") and is_found("clang++"):
-        run_test("serial-clang-debug-valgrind" + addition, branch, myDB, extra_opts)
-    elif is_found ("nvcc") and is_found("clang++"):
-        run_test("serial-clang-debug-cudamemcheck" + addition, branch, myDB, extra_opts)
-    '''
+  if is_found ("valgrind") and is_found ("nvcc") and is_found("g++") and not novalgrind and not nocudamemcheck:
+      run_test("serial-gcc-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
+  elif is_found ("valgrind") and is_found("g++") and not novalgrind:
+      run_test("serial-gcc-debug-valgrind" + addition + quadmath_add, branch, myDB, extra_opts)
+  elif is_found ("nvcc") and is_found("g++") and not nocudamemcheck:
+      run_test("serial-gcc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
 
   if is_found("mpic++"):
     if is_found("g++"):
