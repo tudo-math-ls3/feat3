@@ -1164,7 +1164,7 @@ namespace FEAST
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->size() * 2);
+        Statistics::add_flops(this->size() * 3);
         DataType result = Arch::TripleDotProduct<Mem_>::value(this->elements(), x.elements(), y.elements(), this->size());
 
         TimeStamp ts_stop;

@@ -994,6 +994,31 @@ namespace FEAST
       }
 
       /**
+       * \brief Calculate \f$result \leftarrow x^T \mathrm{diag}(this) y \f$
+       *
+       * \param[in] x The first vector.
+       *
+       * \param[in] y The second vector.
+       *
+       * \return The computed triple dot product.
+       */
+      DataType triple_dot(const DenseVectorBlocked & x, const DenseVectorBlocked & y) const
+      {
+        if (x.raw_size() != this->raw_size() || y.raw_size() != this->raw_size())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector sizes does not match!");
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->raw_size() * 3);
+        DataType result = Arch::TripleDotProduct<Mem_>::value(this->raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
        * \brief Calculate \f$this \leftarrow this \cdot x\f$
        *
        * \param[in] x The other vector.

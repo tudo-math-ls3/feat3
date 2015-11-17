@@ -284,6 +284,78 @@ template<
   typename DT_,
   typename IT_,
   Index BS_>
+class DenseVectorBlockedTripleDotTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  DenseVectorBlockedTripleDotTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedTripleDotTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
+      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> b_local(size);
+      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> c_local(size);
+      const DT_ den(DT_(1) / DT_(size * BS_));
+      for (Index i(0) ; i < size ; ++i)
+      {
+        Tiny::Vector<DT_, BS_> tv1;
+        for (Index j(0) ; j < BS_ ; ++j)
+          tv1.v[j] = DT_(i * BS_ + j + 1) * den;
+        a_local(i, tv1);
+        Tiny::Vector<DT_, BS_> tv2;
+        for (Index j(0) ; j < BS_ ; ++j)
+          tv2.v[j] = DT_(1) / DT_(i * BS_ + j + 1);
+        b_local(i, tv2);
+        Tiny::Vector<DT_, BS_> tv3;
+        for (Index j(0) ; j < BS_ ; ++j)
+          tv3.v[j] = DT_(3) / DT_(i * BS_ + j + 1);
+        c_local(i, tv3);
+      }
+
+      DenseVectorBlocked<Mem_, DT_, IT_, BS_> a;
+      a.convert(a_local);
+      DenseVectorBlocked<Mem_, DT_, IT_, BS_> b;
+      b.convert(b_local);
+      DenseVectorBlocked<Mem_, DT_, IT_, BS_> c;
+      c.convert(c_local);
+
+      DenseVector<Mem_, DT_, IT_> ref_a;
+      ref_a.convert(a);
+      DenseVector<Mem_, DT_, IT_> ref_b;
+      ref_b.convert(b);
+      DenseVector<Mem_, DT_, IT_> ref_c;
+      ref_c.convert(c);
+
+      DT_ ref(ref_a.triple_dot(ref_b, ref_c));
+      DT_ res  = a.triple_dot(b, c);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      res = b.triple_dot(a, c);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      res = c.triple_dot(b, a);
+      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+    }
+  }
+};
+DenseVectorBlockedTripleDotTest<Mem::Main, float, Index, 2> dv_triple_dot_product_test_float;
+DenseVectorBlockedTripleDotTest<Mem::Main, double, Index, 2> dv_triple_dot_product_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+DenseVectorBlockedTripleDotTest<Mem::CUDA, float, Index, 2> cuda_dv_triple_dot_product_test_float;
+DenseVectorBlockedTripleDotTest<Mem::CUDA, double, Index, 2> cuda_dv_triple_dot_product_test_double;
+#endif
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_,
+  Index BS_>
 class DenseVectorBlockedComponentProductTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
