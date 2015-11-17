@@ -160,6 +160,124 @@ template<
   typename MemType_,
   typename DataType_,
   typename IndexType_>
+class CUDASolverTest :
+  public FullTaggedTest<MemType_, DataType_, IndexType_>
+{
+public:
+  typedef DataType_ DataType;
+  typedef IndexType_ IndexType;
+  typedef ScalarMatrix_<MemType_, DataType, IndexType> MatrixType;
+  typedef typename MatrixType::VectorTypeR VectorType;
+  typedef NoneFilter<MemType_, DataType, IndexType> FilterType;
+
+public:
+  CUDASolverTest() :
+    FullTaggedTest<MemType_, DataType, IndexType>("CUDASolverTest-" + MatrixType::name())
+  {
+  }
+
+  template<typename Solver_>
+  void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs) const
+  {
+    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
+
+    // initialise solver
+    solver.init();
+
+    // solve
+    Status status = solver.apply(vec_sol, vec_rhs);
+    TEST_CHECK_MSG(status_success(status), (String("Failed to solve: '") + name + ("'")));
+
+    // release solver
+    solver.done();
+
+    // check against reference solution
+    vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
+    DataType d = vec_sol.norm2sqr();
+    TEST_CHECK_EQUAL_WITHIN_EPS(d, DataType(0), tol);
+  }
+
+  virtual void run() const
+  {
+    const Index m = 17;
+    const Index d = 2;
+
+    // create a pointstar factory
+    PointstarFactoryFD<DataType, IndexType> psf(m, d);
+
+    // create 5-point star CSR matrix
+    SparseMatrixCSR<Mem::Main, DataType, IndexType> csr_mat(psf.matrix_csr());
+
+    // create a Q2 bubble vector
+    DenseVector<Mem::Main, DataType, IndexType> q2b_vec(psf.vector_q2_bubble());
+
+    // create a NoneFilter
+    FilterType filter;
+
+    // convert to system matrix type
+    MatrixType matrix;
+    matrix.convert(csr_mat);
+
+    // convert bubble vector
+    VectorType vec_ref;
+    vec_ref.convert(q2b_vec);
+
+    // compute rhs vector
+    VectorType vec_rhs(vec_ref.clone(CloneMode::Layout));
+    matrix.apply(vec_rhs, vec_ref);
+
+    // initialise sol vector
+    VectorType vec_sol(vec_ref.clone(CloneMode::Layout));
+
+    // test plain CG
+    {
+      // create a CG solver
+      PCG<MatrixType, FilterType> solver(matrix, filter);
+      test_solver("CG", solver, vec_sol, vec_ref, vec_rhs);
+    }
+
+    // test PCG-JAC
+    {
+      // create a Jacobi preconditioner
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      // create a CG solver
+      PCG<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs);
+    }
+
+    // test Richardson-JAC
+    {
+      // create a Jacobi preconditioner
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      // create a Richardson solver
+      Richardson<MatrixType, FilterType> solver(matrix, filter, DataType(1.0), precon);
+      solver.set_max_iter(1000);
+      test_solver("Richardson-JAC", solver, vec_sol, vec_ref, vec_rhs);
+    }
+
+    // test BiCGStab-JAC
+    {
+      // create a Jacobi preconditioner
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      // create a BiCGStab solver
+      BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("BiCGStab-JAC", solver, vec_sol, vec_ref, vec_rhs);
+    }
+  }
+};
+
+#ifdef FEAST_BACKENDS_CUDA
+CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned long> cuda_solver_csr_generic_double_ulong;
+CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned long> cuda_solver_ell_generic_double_ulong;
+CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned int> cuda_solver_csr_generic_double_uint;
+CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned int> cuda_solver_ell_generic_double_uint;
+#endif
+
+template<
+  template<typename,typename,typename> class ScalarMatrix_,
+  typename MemType_,
+  typename DataType_,
+  typename IndexType_>
 class BandedSolverTest :
   public FullTaggedTest<MemType_, DataType_, IndexType_>
 {
