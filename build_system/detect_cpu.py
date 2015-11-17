@@ -127,6 +127,8 @@ def detect_cpu():
         cputype = "haswell"
       elif model == 62:
         cputype = "ivybridge"
+      elif model == 63:
+        cputype = "haswell"
       elif model == 69:
         cputype = "haswell"
     elif cpu_family == 7:
