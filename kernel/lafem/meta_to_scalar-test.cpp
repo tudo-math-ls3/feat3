@@ -63,12 +63,16 @@ public:
 
     DenseVector<Mem_, DT_, IT_> vec_rhs_scalar(mat_sys_scalar.rows());
     DenseVector<Mem_, DT_, IT_> vec_rhs_scalar2(mat_sys_scalar.rows());
+    DenseVector<Mem_, DT_, IT_> vec_sol_scalar(mat_sys_scalar.columns());
+    vec_sol_scalar.format();
+
+
 
     for (Index i(0); i < vec_sol.size(); ++i)
     {
-      vec_sol(i, DT_(1));
+      vec_sol_scalar(i, DT_(1));
+      vec_sol_scalar.copy_inv(vec_sol);
       mat_sys.apply(vec_rhs, vec_sol);
-      DenseVector<Mem_, DT_, IT_> vec_sol_scalar;
       vec_sol_scalar.convert(vec_sol);
       vec_rhs_scalar2.copy(vec_rhs);
       mat_sys_scalar.apply(vec_rhs_scalar, vec_sol_scalar);
@@ -78,7 +82,7 @@ public:
         TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j), vec_rhs_scalar2(j), tol);
       }
 
-      vec_sol(i, DT_(0));
+      vec_sol_scalar(i, DT_(0));
     }
 
     /**
@@ -93,18 +97,34 @@ public:
 
     vec_rhs_scalar.copy_inv(vec_rhs);
 
-    for (Index j(0); j < vec_rhs_scalar.size(); ++j)
+    for (Index j(0); j < vec_rhs.first().first().size(); ++j)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j), vec_rhs(j), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j), vec_rhs.first().first()(j), tol);
+    }
+    for (Index j(0); j < vec_rhs.first().rest().size(); ++j)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j + vec_rhs.first().first().size()), vec_rhs.first().rest()(j), tol);
+    }
+    for (Index j(0); j < vec_rhs.rest().size(); ++j)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j + vec_rhs.first().size()), vec_rhs.rest()(j), tol);
     }
 
     vec_rhs_scalar.scale(vec_rhs_scalar, DT_(0));
 
     vec_rhs_scalar.copy(vec_rhs);
 
-    for (Index j(0); j < vec_rhs_scalar.size(); ++j)
+    for (Index j(0); j < vec_rhs.first().first().size(); ++j)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs(j), vec_rhs_scalar(j), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j), vec_rhs.first().first()(j), tol);
+    }
+    for (Index j(0); j < vec_rhs.first().rest().size(); ++j)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j + vec_rhs.first().first().size()), vec_rhs.first().rest()(j), tol);
+    }
+    for (Index j(0); j < vec_rhs.rest().size(); ++j)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j + vec_rhs.first().size()), vec_rhs.rest()(j), tol);
     }
   }
 };
@@ -346,7 +366,14 @@ public:
     {
       glob_size += dv[j].size();
     }
-    glob_size += dvb.template size<Perspective::pod>();
+    glob_size += dvb.template size<Perspective::native>();
+
+    Index glob_size_pod(0);
+    for (Index j(0); j < 7; ++j)
+    {
+      glob_size_pod += dv[j].size();
+    }
+    glob_size_pod += dvb.template size<Perspective::pod>();
 
     PowerVec3 pv3;
     pv3.template at<0>().convert(dv[0]);
@@ -373,18 +400,47 @@ public:
 
     TEST_CHECK_EQUAL(tv.name(), tv_convert.name());
     TEST_CHECK_EQUAL(tv_main.size(), glob_size);
+    TEST_CHECK_EQUAL(tv_main.template size<Perspective::pod>(), glob_size_pod);
 
-    for (Index i(0); i < glob_size; ++i)
+    for (Index i(0); i < tv.template at<2>().template at<0>().size(); ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(tv_main(i), tv(i), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(tv_main.template at<2>().template at<0>()(i), tv.template at<2>().template at<0>()(i), eps);
+    }
+    for (Index i(0); i < tv.template at<4>().size(); ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(tv_main.template at<4>()(i)(0), tv.template at<4>()(i)(0), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(tv_main.template at<4>()(i)(1), tv.template at<4>()(i)(1), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(tv_main.template at<4>()(i)(2), tv.template at<4>()(i)(2), eps);
     }
 
     DenseVector<Mem::Main, DT_, IT_> tv_scalar_main;
     tv_scalar_main.convert(tv);
 
-    for (Index i(0); i < glob_size; ++i)
+    std::cout << tv.template at<1>().size() << std::endl;
+
+    for (Index i(0); i < tv.template at<2>().template at<0>().size(); ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(tv_scalar_main(i), tv(i), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(tv_scalar_main(i + tv.template at<0>().template size<Perspective::pod>()
+                                                 + tv.template at<1>().template size<Perspective::pod>()),
+                                  tv.template at<2>().template at<0>()(i), eps);
+    }
+    for (Index i(0); i < tv.template at<4>().size(); ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(tv_scalar_main(Index(3) * i + Index(0) + tv.template at<0>().template size<Perspective::pod>()
+                                                 + tv.template at<1>().template size<Perspective::pod>()
+                                                 + tv.template at<2>().template size<Perspective::pod>()
+                                                 + tv.template at<3>().template size<Perspective::pod>()),
+                                  tv.template at<4>()(i)(0), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(tv_scalar_main(Index(3) * i + Index(1) + tv.template at<0>().template size<Perspective::pod>()
+                                                 + tv.template at<1>().template size<Perspective::pod>()
+                                                 + tv.template at<2>().template size<Perspective::pod>()
+                                                 + tv.template at<3>().template size<Perspective::pod>()),
+                                  tv.template at<4>()(i)(1), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(tv_scalar_main(Index(3) * i + Index(2) + tv.template at<0>().template size<Perspective::pod>()
+                                                 + tv.template at<1>().template size<Perspective::pod>()
+                                                 + tv.template at<2>().template size<Perspective::pod>()
+                                                 + tv.template at<3>().template size<Perspective::pod>()),
+                                  tv.template at<4>()(i)(2), eps);
     }
   }
 };

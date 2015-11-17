@@ -284,36 +284,6 @@ namespace FEAST
         return Math::sqrt(norm2sqr());
       }
 
-      const typename First_::DataType operator()(Index index) const
-      {
-        CONTEXT("When retrieving TupleVector element");
-
-        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
-        if (index < first().size())
-        {
-          return first()(index);
-        }
-        else
-        {
-          return rest()(index - first().size());
-        }
-      }
-
-      void operator()(Index index, typename First_::DataType value)
-      {
-        CONTEXT("When retrieving TupleVector element");
-
-        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
-        if (index < first().size())
-        {
-          first()(index, value);
-        }
-        else
-        {
-          rest()(index - first().size(), value);
-        }
-      }
-
       /// \cond internal
       /// Writes the vector-entries in an allocated array
       void set_vec(DataType * const pval_set) const

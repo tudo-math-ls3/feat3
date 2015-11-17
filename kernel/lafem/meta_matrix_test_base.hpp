@@ -143,7 +143,8 @@ namespace FEAST
         const SparseMatrixCSR<Mem::Main, DataType_, IndexType_> mat_fe(ps_fe.matrix_csr());
 
         // generate Q2-bubble and eigenvector
-        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen(ps_fd.eigenvector_min());
+        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen1(ps_fd.eigenvector_min());
+        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen2(ps_fd.eigenvector_min());
         const DenseVector<Mem::Main, DataType_, IndexType_> vec_bubble(ps_fd.vector_q2_bubble());
 
         // set system matrix
@@ -156,8 +157,8 @@ namespace FEAST
 
         // set solution vector
         vec_sol.template at<0>().template at<0>().convert(vec_bubble); // u1
-        vec_sol.template at<0>().template at<1>().convert(vec_eigen); // u2
-        vec_sol.template at<1>().convert(vec_eigen); // p
+        vec_sol.template at<0>().template at<1>().convert(vec_eigen1); // u2
+        vec_sol.template at<1>().convert(vec_eigen2); // p
 
         // create vectors for rhs computation
         DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs1(vec_bubble.size());
@@ -166,10 +167,10 @@ namespace FEAST
 
         // compute rhs vector (by exploiting the eigenvector property)
         mat_fe.apply(vec_rhs1, vec_bubble); // A11*u1
-        vec_rhs1.axpy(vec_eigen, vec_rhs1, ps_fd.lambda_min()); // B1*p
-        vec_rhs2.scale(vec_eigen, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
+        vec_rhs1.axpy(vec_eigen1, vec_rhs1, ps_fd.lambda_min()); // B1*p
+        vec_rhs2.scale(vec_eigen1, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
         mat_fd.apply(vec_rhs3, vec_bubble); // D1*u1
-        vec_rhs3.axpy(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
+        vec_rhs3.axpy(vec_eigen1, vec_rhs3, ps_fd.lambda_min()); // D2*u2
 
         // set rhs vector
         vec_rhs.template at<0>().template at<0>().convert(vec_rhs1);
@@ -189,7 +190,8 @@ namespace FEAST
         const SparseMatrixCSR<Mem::Main, DataType_, IndexType_> mat_fe(ps_fe.matrix_csr());
 
         // generate Q2-bubble and eigenvector
-        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen(ps_fd.eigenvector_min());
+        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen1(ps_fd.eigenvector_min());
+        const DenseVector<Mem::Main, DataType_, IndexType_> vec_eigen2(ps_fd.eigenvector_min());
         const DenseVector<Mem::Main, DataType_, IndexType_> vec_bubble(ps_fd.vector_q2_bubble());
 
         // set system matrix
@@ -204,8 +206,8 @@ namespace FEAST
 
         // set solution vector
         vec_sol.template at<0>().template at<0>().convert(vec_bubble); // u1
-        vec_sol.template at<0>().template at<1>().convert(vec_eigen); // u2
-        vec_sol.template at<1>().convert(vec_eigen); // p
+        vec_sol.template at<0>().template at<1>().convert(vec_eigen1); // u2
+        vec_sol.template at<1>().convert(vec_eigen2); // p
 
         // create vectors for rhs computation
         DenseVector<Mem::Main, DataType_, IndexType_> vec_rhs1(vec_bubble.size());
@@ -215,10 +217,10 @@ namespace FEAST
         // compute rhs vector (by exploiting the eigenvector property)
         mat_fe.apply(vec_rhs1, vec_bubble); // A11*u1
         mat_fd.apply(vec_rhs2, vec_bubble); // A21*u1
-        vec_rhs1.axpy(vec_eigen, vec_rhs1, ps_fd.lambda_min() + ps_fd.lambda_min()); // A12*u2 + B1*p
-        vec_rhs2.axpy(vec_eigen, vec_rhs2, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
+        vec_rhs1.axpy(vec_eigen1, vec_rhs1, ps_fd.lambda_min() + ps_fd.lambda_min()); // A12*u2 + B1*p
+        vec_rhs2.axpy(vec_eigen1, vec_rhs2, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
         mat_fd.apply(vec_rhs3, vec_bubble); // D1*u1
-        vec_rhs3.axpy(vec_eigen, vec_rhs3, ps_fd.lambda_min()); // D2*u2
+        vec_rhs3.axpy(vec_eigen1, vec_rhs3, ps_fd.lambda_min()); // D2*u2
 
         // set rhs vector
         vec_rhs.template at<0>().template at<0>().convert(vec_rhs1);
