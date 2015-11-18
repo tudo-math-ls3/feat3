@@ -104,6 +104,11 @@ namespace FEAST
         return *this;
       }
 
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        return std::size_t(_num_entities) * sizeof(Index);
+      }
 
       /// Returns the number of entities.
       Index get_num_entities() const
@@ -199,6 +204,11 @@ namespace FEAST
         CONTEXT(name() + "::~TargetSetHolder()");
       }
 
+      std::size_t bytes() const
+      {
+        return BaseClass::bytes() + _target_set.bytes();
+      }
+
       template<int dim_>
       TargetSet& get_target_set()
       {
@@ -270,6 +280,11 @@ namespace FEAST
       virtual ~TargetSetHolder()
       {
         CONTEXT(name() + "::~TargetSetHolder()");
+      }
+
+      std::size_t bytes() const
+      {
+        return _target_set.bytes();
       }
 
       template<int dim_>

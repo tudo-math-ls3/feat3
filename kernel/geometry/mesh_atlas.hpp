@@ -74,6 +74,15 @@ namespace FEAST
         _chart_map.clear();
       }
 
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        std::size_t s(0);
+        for(auto it = _chart_map.begin(); it != _chart_map.end(); ++it)
+          s += it->second->bytes();
+        return s;
+      }
+
       /**
        * \brief Inserts a new chart into the map.
        *

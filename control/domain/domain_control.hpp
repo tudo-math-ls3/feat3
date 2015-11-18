@@ -37,6 +37,11 @@ namespace FEAST
         {
         }
 
+        std::size_t bytes() const
+        {
+          return (_ranks.size() + _ctags.size()) * sizeof(Index);
+        }
+
         Index size() const
         {
           return Index(_ranks.size());
@@ -94,6 +99,11 @@ namespace FEAST
           {
             delete _mesh_node;
           }
+        }
+
+        std::size_t bytes() const
+        {
+          return _mesh_node->bytes();
         }
 
         int get_level_index() const
@@ -169,6 +179,18 @@ namespace FEAST
           {
             delete _atlas;
           }
+        }
+
+        std::size_t bytes() const
+        {
+          std::size_t s(0);
+          if(_atlas != nullptr)
+            s += _atlas->bytes();
+          for(auto it = _layers.begin(); it != _layers.end(); ++it)
+            s += (*it)->bytes();
+          for(auto it = _levels.begin(); it != _levels.end(); ++it)
+            s += (*it)->bytes();
+          return s;
         }
 
         Index num_levels() const

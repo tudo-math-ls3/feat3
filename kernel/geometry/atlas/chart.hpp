@@ -41,6 +41,12 @@ namespace FEAST
         /// virtual DTOR
         virtual ~ChartBase() {}
 
+        /// \returns The size of dynamically allocated memory in bytes.
+        virtual std::size_t bytes() const
+        {
+          return std::size_t(0);
+        }
+
         /**
          * \brief Adapts a mesh using this chart.
          *

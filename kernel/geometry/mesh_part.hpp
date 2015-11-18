@@ -102,6 +102,15 @@ namespace FEAST
         CONTEXT(name() + "::~MeshAttributeHolder()");
       }
 
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        std::size_t s(BaseClass::bytes());
+        for(auto it = _mesh_attributes.begin(); it != _mesh_attributes.end(); ++it)
+          s += it->bytes();
+        return s;
+      }
+
       /**
        * \brief Returns a reference to the set of attributes belonging to dimension dim_
        *
@@ -297,6 +306,14 @@ namespace FEAST
       virtual ~MeshAttributeHolder()
       {
         CONTEXT(name() + "::~MeshAttributeHolder()");
+      }
+
+      std::size_t bytes() const
+      {
+        std::size_t s(0);
+        for(auto it = _mesh_attributes.begin(); it != _mesh_attributes.end(); ++it)
+          s += it->bytes();
+        return s;
       }
 
       AttributeType* find_attribute(String identifier, int dim)
@@ -689,6 +706,13 @@ namespace FEAST
 
           if(_index_set_holder != nullptr)
             delete _index_set_holder;
+        }
+
+        /// \returns The size of dynamically allocated memory in bytes.
+        std::size_t bytes() const
+        {
+          return _attribute_holder.bytes() + _target_set_holder.bytes() +
+            (_index_set_holder != nullptr ? _index_set_holder->bytes() : std::size_t(0));
         }
 
         /// \brief Checks if this MeshPart has a mesh topology

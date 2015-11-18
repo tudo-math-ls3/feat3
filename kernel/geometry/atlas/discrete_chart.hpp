@@ -121,6 +121,14 @@ namespace FEAST
               delete _surface_mesh;
           }
 
+          virtual std::size_t bytes() const
+          {
+            if(_surface_mesh != nullptr)
+              return _surface_mesh->bytes();
+            else
+              return std::size_t(0);
+          }
+
           /** \copydoc ChartBase::get_type() */
           virtual String get_type() const override
           {

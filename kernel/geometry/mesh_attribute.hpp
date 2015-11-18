@@ -191,6 +191,12 @@ namespace FEAST
           return *this;
         }
 
+        /// \returns The size of dynamically allocated memory in bytes.
+        std::size_t bytes() const
+        {
+          return std::size_t(_num_vertices * _stride) * sizeof(CoordType);
+        }
+
         /**
          * \brief Returns a copy of the name identifier
          */

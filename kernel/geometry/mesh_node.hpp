@@ -174,6 +174,17 @@ namespace FEAST
         }
       }
 
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        std::size_t s(0);
+        if(_mesh != nullptr)
+          s += _mesh->bytes();
+        for(auto it = _mesh_part_nodes.begin(); it != _mesh_part_nodes.end(); ++it)
+          s += it->second.node->bytes();
+        return s;
+      }
+
       /**
        * \brief Returns the mesh of this node.
        * \returns
@@ -917,11 +928,6 @@ namespace FEAST
         return "RootMeshNode<...>";
       }
     }; // class RootMeshNode
-
-    namespace Intern
-    {
-
-    } // namespace Intern
   } // namespace Geometry
 } // namespace FEAST
 

@@ -136,6 +136,12 @@ namespace FEAST
         return *this;
       }
 
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        return std::size_t(_num_entities) * sizeof(IndexVectorType);
+      }
+
       /**
        * \brief Returns the number of indices per entity.
        * \returns
@@ -383,6 +389,11 @@ namespace FEAST
       {
         return "IndexSetWrapper<" + Shape_::name() + "," + stringify(face_dim_) + ">";
       }
+
+      std::size_t bytes() const
+      {
+        return BaseClass::bytes() + _index_set.bytes();
+      }
     };
 
     template<typename Shape_>
@@ -441,6 +452,11 @@ namespace FEAST
       static String name()
       {
         return "IndexSetWrapper<" + Shape_::name() + ",0>";
+      }
+
+      std::size_t bytes() const
+      {
+        return _index_set.bytes();
       }
     };
 
@@ -594,6 +610,11 @@ namespace FEAST
       {
         return "IndexSetHolder<" + Shape_::name() + ">";
       }
+
+      std::size_t bytes() const
+      {
+        return BaseClass::bytes() + _index_set_wrapper.bytes();
+      }
     };
 
     template<>
@@ -623,6 +644,11 @@ namespace FEAST
       static String name()
       {
         return "IndexSetHolder<Vertex>";
+      }
+
+      std::size_t bytes() const
+      {
+        return std::size_t(0);
       }
     };
 

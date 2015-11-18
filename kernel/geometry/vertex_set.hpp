@@ -134,6 +134,12 @@ namespace FEAST
         }
       }
 
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        return std::size_t(_num_vertices) * sizeof(VertexType);
+      }
+
       /// Returns the number of coordinates per vertex.
       int get_num_coords() const
       {

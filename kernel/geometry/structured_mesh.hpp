@@ -163,6 +163,12 @@ namespace FEAST
         CONTEXT(name() + "::~StructuredMesh()");
       }
 
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        return _vertex_set.bytes() + _index_set_holder.bytes();
+      }
+
       /**
        * \brief Returns the number of slices.
        *

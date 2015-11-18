@@ -111,6 +111,12 @@ namespace FEAST
         }
       }
 
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        return std::size_t(0);
+      }
+
       /**
        * \brief Returns the number of indices per entity.
        * \returns
@@ -221,6 +227,11 @@ namespace FEAST
         static_assert((face_dim__ >= 0) && (face_dim__ <= face_dim_), "invalid face dimension");
         return StructIndexSetWrapper<shape_dim_, cell_dim_, face_dim__>::_index_set;
       }
+
+      std::size_t bytes() const
+      {
+        return BaseClass::bytes() + _index_set.bytes();
+      }
     };
 
     template<
@@ -242,6 +253,11 @@ namespace FEAST
       {
         static_assert(face_dim__ == 0, "invalid face dimension");
         return _index_set;
+      }
+
+      std::size_t bytes() const
+      {
+        return _index_set.bytes();
       }
     };
 
@@ -274,6 +290,11 @@ namespace FEAST
       {
         return get_index_set_wrapper<cell_dim__>().template get_index_set<face_dim__>();
       }
+
+      std::size_t bytes() const
+      {
+        return BaseClass::bytes() + _index_set_wrapper.bytes();
+      }
     };
 
     template<int shape_dim_>
@@ -282,6 +303,11 @@ namespace FEAST
     public:
       explicit StructIndexSetHolder(const Index /*num_slices*/[])
       {
+      }
+
+      std::size_t bytes() const
+      {
+        return std::size_t(0);
       }
     };
     /// \endcond

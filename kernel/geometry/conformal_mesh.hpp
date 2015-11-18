@@ -195,6 +195,12 @@ namespace FEAST
         CONTEXT(name() + "::~ConformalMesh()");
       }
 
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        return _vertex_set.bytes() + _index_set_holder.bytes() + _neighbours.bytes();
+      }
+
       /**
        * \brief Returns the number of entities.
        *
