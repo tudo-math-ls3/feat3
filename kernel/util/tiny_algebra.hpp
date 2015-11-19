@@ -472,7 +472,7 @@ namespace FEAST
       friend std::ostream & operator<< (std::ostream & lhs, const Vector & b)
       {
         lhs << "[";
-        for (int i(0) ; i < b.n() ; ++i)
+        for (int i(0) ; i < b.n ; ++i)
         {
           lhs << "  " << b(i);
         }
@@ -1138,6 +1138,23 @@ namespace FEAST
       {
         format();
         return add_vec_tensor_mult(x, t, alpha);
+      }
+
+      /**
+       * \brief Tiny::Matrix streaming operator
+       *
+       * \param[in] lhs The target stream.
+       * \param[in] b The matrix to be streamed.
+       */
+      friend std::ostream & operator<< (std::ostream & lhs, const Matrix& A)
+      {
+        for (int i(0) ; i < m-1 ; ++i)
+        {
+          lhs << A[i] << std::endl;
+        }
+        lhs << A[m-1];
+
+        return lhs;
       }
     }; // class Matrix
 
