@@ -121,7 +121,7 @@ namespace FEAST
               delete _surface_mesh;
           }
 
-          virtual std::size_t bytes() const
+          virtual std::size_t bytes() const override
           {
             if(_surface_mesh != nullptr)
               return _surface_mesh->bytes();
