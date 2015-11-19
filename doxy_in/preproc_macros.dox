@@ -283,6 +283,10 @@ This macro can be defined to enable live-tracing of the context stack.
 <b>Effects:</b><br>
 If defined, the context live-trace system is enabled.
 
+<hr>
+\subsection ppm_feast_unroll_banded FEAST_UNROLL_BANDED
+This macro can be defined to enable loop unrolling of the SparseMatrixBanded kernels via template meta programming.
+
 <hr><hr>
 \section preproc_sec_misc Miscellaneous Macros
 This section enlists various macros which do not fit into any other section.

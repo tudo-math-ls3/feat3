@@ -105,4 +105,7 @@
 /// cmake 'makefile' generator
 #define CMAKE_GENERATOR "${CMAKE_GENERATOR}"
 
+/// Should we unroll all banded matrix kernels via template meta programming?
+#cmakedefine FEAST_UNROLL_BANDED
+
 #endif // FEAST_CONFIG_HPP

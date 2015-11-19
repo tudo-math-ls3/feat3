@@ -91,6 +91,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Override default c++ compiler binary by absolute path to binary. This does not replace the proper compiler statement in the build id.")
   print ("--cuda_verbose")
   print ("  Be way more verbosive on cuda compilation steps")
+  print ("--unroll_banded")
+  print ("  Use fancy template meta programming to unroll SparseMatrixBanded kernels.")
   print ("")
   print ("Note that the first gcc(g++) in $PATH is choosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode.")
@@ -259,6 +261,9 @@ for option in extra_options:
 
   if option.startswith("--export_compile_commands"):
     cmake_flags += " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+
+  if option.startswith("--unroll_banded"):
+    cmake_flags += " -DFEAST_UNROLL_BANDED:BOOL=TRUE"
 
 if not cputype:
   cputype = detect_cpu()

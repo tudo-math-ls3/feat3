@@ -273,6 +273,8 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  use user defined cuda arch.")
   print ("nomkl")
   print ("  do not use mkl")
+  print ("unroll_banded")
+  print ("  unroll banded matrix kernels")
   sys.exit();
 
 dump_filename = ""
@@ -284,6 +286,7 @@ nothirdparty = False
 novalgrind = False
 nocudamemcheck = False
 nomkl = False
+unroll_banded = False
 system_host_compiler = ""
 cuda_host_compiler = ""
 onlynew = False
@@ -319,6 +322,8 @@ for i in range(1, len(sys.argv)):
     onlynew = True
   if sys.argv[i].startswith("cuda_arch="):
     cuda_arch = sys.argv[i].replace("cuda_arch=", "", 1)
+  if sys.argv[i].startswith("unroll_banded"):
+    unroll_banded = True
 
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 myDB = pw.MySQLDatabase("feastdash", host=sqlhost, port=sqlport, user="feastdash", passwd="feastdash", threadlocals=True)
@@ -419,6 +424,9 @@ gcc_minor = int(gcc_version["__GNUC_MINOR__"])
 gcc_minor2 = int(gcc_version["__GNUC_PATCHLEVEL__"])
 if gcc_major > 4 or (gcc_major == 4 and gcc_minor > 5):
   quadmath_add = "-quadmath"
+
+if (unroll_banded):
+  addition = addition + " --unroll_banded "
 
 #extract valid branch names
 branch_names = []

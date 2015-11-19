@@ -386,6 +386,7 @@ namespace FEAST
                                                            const IT_ * const offsets, const DT_ * const x,
                                                            const Index num_of_offsets, const Index rows, const Index columns)
       {
+#ifdef FEAST_UNROLL_BANDED
         switch (num_of_offsets)
         {
         case 3:
@@ -407,6 +408,9 @@ namespace FEAST
 #endif
           Intern::ProductMatVecBanded::product_matvec_banded_generic(r, val, offsets, x, num_of_offsets, rows, columns);
         }
+#else
+        Intern::ProductMatVecBanded::product_matvec_banded_generic(r, val, offsets, x, num_of_offsets, rows, columns);
+#endif //FEAST_UNROLL_BANDED
       }
 
       template <typename DT_>
