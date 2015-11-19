@@ -1024,13 +1024,13 @@ namespace FEAST
        */
       DataType triple_dot(const DenseVectorBlocked & x, const DenseVectorBlocked & y) const
       {
-        if (x.raw_size() != this->raw_size() || y.raw_size() != this->raw_size())
+        if (x.template size<Perspective::pod>() != this->template size<Perspective::pod>() || y.template size<Perspective::pod>() != this->template size<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector sizes does not match!");
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->raw_size() * 3);
-        DataType result = Arch::TripleDotProduct<Mem_>::value(this->raw_elements(), x.raw_elements(), y.raw_elements(), this->raw_size());
+        Statistics::add_flops(this->template size<Perspective::pod>() * 3);
+        DataType result = Arch::TripleDotProduct<Mem_>::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
