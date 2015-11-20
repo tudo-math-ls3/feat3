@@ -1086,6 +1086,8 @@ namespace FEAST
        * \param[in] x The first summand matrix to be scaled.
        * \param[in] y The second summand matrix
        * \param[in] alpha A scalar to multiply x with.
+       *
+       * \warning All three matrices must have the same non zero layout. This operation assumes this silently and does not check this on its own!
        */
       void axpy(
                 const SparseMatrixBCSR & x,
@@ -1161,7 +1163,7 @@ namespace FEAST
 
         TimeStamp ts_start;
         Statistics::add_flops(this->used_elements<Perspective::pod>());
-        Arch::Scale<Mem_>::value(this->val(), x.val(), alpha, this->used_elements<Perspective::pod>());
+        Arch::Scale<Mem_>::value(this->template val<Perspective::pod>(), x.template val<Perspective::pod>(), alpha, this->used_elements<Perspective::pod>());
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }

@@ -1710,6 +1710,8 @@ namespace FEAST
        * \param[in] x The first summand matrix to be scaled.
        * \param[in] y The second summand matrix
        * \param[in] alpha A scalar to multiply x with.
+       *
+       * \warning All three matrices must have the same non zero layout. This operation assumes this silently and does not check this on its own!
        */
       void axpy(
                 const SparseMatrixCSR & x,

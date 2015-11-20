@@ -396,3 +396,205 @@ SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr
 SparseMatrixBCSRDiagTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_diag_test_double_ulong;
 SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_diag_test_float_uint;
 SparseMatrixBCSRDiagTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_diag_test_double_uint;
+
+/**
+ * \brief Test class for the sparse matrix csr blocked axpy method.
+ *
+ * \test test description missing
+ *
+ * \author Dirk Ribbrock
+ */
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRAxpyTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixBCSRAxpyTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRAxpyTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    DenseVector<Mem_, DT_, IT_> dv1(12);
+    DenseVector<Mem_, DT_, IT_> dv4(12);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(i+1));
+      dv4(i, DT_(i) - DT_(1));
+    }
+    DenseVector<Mem_, IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<Mem_, IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> b(2, 2, dv2, dv4, dv3);
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(b.layout());
+
+    SparseMatrixCSR<Mem_, DT_, IT_> a_s;
+    a_s.convert(a);
+    SparseMatrixCSR<Mem_, DT_, IT_> b_s;
+    b_s.convert(b);
+    SparseMatrixCSR<Mem_, DT_, IT_> ref(a_s.layout());
+    SparseMatrixCSR<Mem_, DT_, IT_> result_s;
+    ref.axpy(a_s, b_s);
+
+    c.axpy(a, b);
+    result_s.convert(c);
+    TEST_CHECK_EQUAL(result_s, ref);
+
+    c.axpy(b, a);
+    result_s.convert(c);
+    TEST_CHECK_EQUAL(result_s, ref);
+
+    c.copy(a); //push orig a
+
+    a.axpy(a, b);
+    result_s.convert(a);
+    TEST_CHECK_EQUAL(result_s, ref);
+
+    a.copy(c); //pop orig a
+
+    b.axpy(a, b);
+    result_s.convert(b);
+    TEST_CHECK_EQUAL(result_s, ref);
+  }
+};
+SparseMatrixBCSRAxpyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_axpy_test_float_ulong;
+SparseMatrixBCSRAxpyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_axpy_test_double_ulong;
+SparseMatrixBCSRAxpyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_axpy_test_float_uint;
+SparseMatrixBCSRAxpyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_axpy_test_double_uint;
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixBCSRAxpyTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_axpy_test_float_ulong;
+SparseMatrixBCSRAxpyTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_axpy_test_double_ulong;
+SparseMatrixBCSRAxpyTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_axpy_test_float_uint;
+SparseMatrixBCSRAxpyTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_axpy_test_double_uint;
+#endif
+
+
+/**
+ * \brief Test class for the sparse matrix csr blocked scale method.
+ *
+ * \test test description missing
+ *
+ * \author Dirk Ribbrock
+ */
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRScaleTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixBCSRScaleTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRScaleTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    DenseVector<Mem_, DT_, IT_> dv1(12);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(i+1));
+    }
+    DenseVector<Mem_, IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<Mem_, IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> c(a.layout());
+
+    DT_ scal = DT_(4711);
+
+    SparseMatrixCSR<Mem_, DT_, IT_> a_s;
+    a_s.convert(a);
+    SparseMatrixCSR<Mem_, DT_, IT_> ref(a_s.layout());
+    SparseMatrixCSR<Mem_, DT_, IT_> result_s;
+    ref.scale(a_s, scal);
+
+    c.scale(a, scal);
+    result_s.convert(c);
+    TEST_CHECK_EQUAL(result_s, ref);
+
+    a.scale(a, scal);
+    result_s.convert(a);
+    TEST_CHECK_EQUAL(result_s, ref);
+  }
+};
+SparseMatrixBCSRScaleTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_scale_test_float_ulong;
+SparseMatrixBCSRScaleTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_scale_test_double_ulong;
+SparseMatrixBCSRScaleTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_scale_test_float_uint;
+SparseMatrixBCSRScaleTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_scale_test_double_uint;
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixBCSRScaleTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_scale_test_float_ulong;
+SparseMatrixBCSRScaleTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_scale_test_double_ulong;
+SparseMatrixBCSRScaleTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_scale_test_float_uint;
+SparseMatrixBCSRScaleTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_scale_test_double_uint;
+#endif
+
+
+/**
+ * \brief Test class for the sparse matrix csr blocked norm method.
+ *
+ * \test test description missing
+ *
+ * \author Dirk Ribbrock
+ */
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRNormTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixBCSRNormTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRNormTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    DenseVector<Mem_, DT_, IT_> dv1(12);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(i+1));
+    }
+    DenseVector<Mem_, IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<Mem_, IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+
+    SparseMatrixCSR<Mem_, DT_, IT_> a_s;
+    a_s.convert(a);
+    DT_ ref = a_s.norm_frobenius();
+
+    DT_ result = a.norm_frobenius();
+    TEST_CHECK_EQUAL(result, ref);
+  }
+};
+SparseMatrixBCSRNormTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_norm_test_float_ulong;
+SparseMatrixBCSRNormTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_norm_test_double_ulong;
+SparseMatrixBCSRNormTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_norm_test_float_uint;
+SparseMatrixBCSRNormTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_norm_test_double_uint;
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixBCSRNormTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_norm_test_float_ulong;
+SparseMatrixBCSRNormTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_norm_test_double_ulong;
+SparseMatrixBCSRNormTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_norm_test_float_uint;
+SparseMatrixBCSRNormTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_norm_test_double_uint;
+#endif
