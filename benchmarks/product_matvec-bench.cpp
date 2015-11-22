@@ -152,7 +152,7 @@ int main(int argc, char ** argv)
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> >();
 #ifdef FEAST_BACKENDS_MKL
-  run<Algo::MKL, SparseMatrixCSR<Mem::Main, double> >();
+  run<Algo::MKL, SparseMatrixCSR<Mem::Main, double, unsigned long> >();
 #endif
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> >();

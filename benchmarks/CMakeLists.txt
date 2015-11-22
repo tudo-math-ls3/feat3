@@ -8,6 +8,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 set(benchmarks
   axpy-bench
+  block_product_matvec-bench
   product_matvec-bench
 )
 
