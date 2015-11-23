@@ -119,10 +119,10 @@ void run()
     b.convert(bmain);
     DenseVectorBlocked<Mem_, DT_, IT_, Blocksize_> x(size, DT_(4711));
 
-    double flops(used_elements);
+    double flops = double(used_elements);
     flops *= 2;
 
-    double bytes(used_elements);
+    double bytes = double(used_elements);
     bytes *= sizeof(DT_);
     bytes += used_elements * sizeof(IT_);
     bytes += size * Blocksize_ * sizeof(DT_);
@@ -151,10 +151,10 @@ void run()
     b.convert(bmain);
     DenseVector<Mem_, DT_, IT_> x(size, DT_(4711));
 
-    double flops(used_elements);
+    double flops = double(used_elements);
     flops *= 2;
 
-    double bytes(used_elements);
+    double bytes = double(used_elements);
     bytes *= sizeof(DT_);
     bytes += used_elements * sizeof(IT_);
     bytes += size * sizeof(DT_);
