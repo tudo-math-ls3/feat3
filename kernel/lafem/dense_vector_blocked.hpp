@@ -558,6 +558,9 @@ namespace FEAST
         case FileMode::fm_dvb:
           read_from_dvb(filename);
           break;
+        case FileMode::fm_binary:
+          read_from_dvb(filename);
+          break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
@@ -582,6 +585,9 @@ namespace FEAST
           read_from_exp(file);
           break;
         case FileMode::fm_dvb:
+          read_from_dvb(file);
+          break;
+        case FileMode::fm_binary:
           read_from_dvb(file);
           break;
         default:
@@ -775,6 +781,9 @@ namespace FEAST
         case FileMode::fm_dvb:
           write_out_dvb(filename);
           break;
+        case FileMode::fm_binary:
+          write_out_dvb(filename);
+          break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
@@ -799,6 +808,9 @@ namespace FEAST
           write_out_exp(file);
           break;
         case FileMode::fm_dvb:
+          write_out_dvb(file);
+          break;
+        case FileMode::fm_binary:
           write_out_dvb(file);
           break;
         default:

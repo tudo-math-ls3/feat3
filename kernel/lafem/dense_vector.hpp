@@ -597,6 +597,9 @@ namespace FEAST
         case FileMode::fm_dv:
           read_from_dv(filename);
           break;
+        case FileMode::fm_binary:
+          read_from_dv(filename);
+          break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
@@ -621,6 +624,9 @@ namespace FEAST
           read_from_exp(file);
           break;
         case FileMode::fm_dv:
+          read_from_dv(file);
+          break;
+        case FileMode::fm_binary:
           read_from_dv(file);
           break;
         default:
@@ -788,10 +794,6 @@ namespace FEAST
        */
       void read_from_dv(std::istream& file)
       {
-        this->clear();
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
-
         this->template _deserialise<double, uint64_t>(FileMode::fm_dv, file);
       }
 
@@ -815,6 +817,9 @@ namespace FEAST
           write_out_exp(filename);
           break;
         case FileMode::fm_dv:
+          write_out_dv(filename);
+          break;
+        case FileMode::fm_binary:
           write_out_dv(filename);
           break;
         default:
@@ -841,6 +846,9 @@ namespace FEAST
           write_out_exp(file);
           break;
         case FileMode::fm_dv:
+          write_out_dv(file);
+          break;
+        case FileMode::fm_binary:
           write_out_dv(file);
           break;
         default:

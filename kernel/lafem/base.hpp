@@ -35,7 +35,8 @@ namespace FEAST
       fm_dm,  /**< Binary dense matrix data */
       fm_sv,  /**< Binary sparse vector data */
       fm_dvb, /**< Binary block vector data */
-      fm_bcsr /**< Binary block csr data */
+      fm_bcsr, /**< Binary block csr data */
+      fm_binary /**< Binary format of corresponding container type */
     };
 
     /**

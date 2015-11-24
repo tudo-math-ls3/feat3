@@ -573,7 +573,7 @@ namespace FEAST
         uint64_t tsize;
         file.read((char *)&tsize, (long)(sizeof(uint64_t)));
         std::vector<char> temp((size_t(tsize)));
-        file.seekg(0, file.beg);
+        file.seekg(-(long)sizeof(uint64_t), file.cur);
         file.read(temp.data(), (long)(tsize));
         if (!file.good())
           throw InternalError(__func__, __FILE__, __LINE__, "Error in _deserialise - file istream is not good anymore!");
