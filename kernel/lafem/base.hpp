@@ -54,10 +54,10 @@ namespace FEAST
      */
     enum class SparseLayoutId
     {
-      lt_csr = 0,
-      lt_coo,
-      lt_ell,
-      lt_banded
+      lt_csr = 0, /**< csr / bcsr layout */
+      lt_coo, /**< coo layout */
+      lt_ell, /**< ell layout */
+      lt_banded /**< arbitrary banded layout */
     };
 
     /**
@@ -65,17 +65,18 @@ namespace FEAST
      *
      * This enumerated type is necessary to specify the treatment of
      * blocked datatypes like
-     * - SparseMatrixCSRBlocked
+     * - SparseMatrixBCSR
      * - SparseVectorBlocked
      * - DenseVectorBlocked
-     * whether each block is treated as one entry or (native perspective)
-     * each entry of a block is treated as its own (raw/pod perspective).
+     *
+     * whether each block is treated as one entry (native perspective)
+     * or each entry of a block is treated as its own (raw/pod perspective).
      *
      */
     enum class Perspective
     {
       native = 0, /**< each block is treated as one entry */
-      pod /**< each entry of a block is treated as its own; raw */
+      pod /**< each entry of a block is treated as one entry on its own (formerly known as 'raw') */
     };
   } // namespace LAFEM
 } // namespace FEAST
