@@ -481,6 +481,8 @@ namespace FEAST
       {
         auto temp(this->template _serialise<DT2_, IT2_>(mode));
         file.write(temp.data(), long(temp.size()));
+        if (!file.good())
+          throw InternalError(__func__, __FILE__, __LINE__, "Error in _serialise - file ostream is not good anymore!");
       }
 
       /**
@@ -572,7 +574,9 @@ namespace FEAST
         file.read((char *)&tsize, (long)(sizeof(uint64_t)));
         std::vector<char> temp((size_t(tsize)));
         file.seekg(0, file.beg);
-        file.read(temp.data(), (long)(tsize * sizeof(uint64_t)));
+        file.read(temp.data(), (long)(tsize));
+        if (!file.good())
+          throw InternalError(__func__, __FILE__, __LINE__, "Error in _deserialise - file istream is not good anymore!");
         this->template _deserialise<DT2_, IT2_>(mode, temp);
       }
 

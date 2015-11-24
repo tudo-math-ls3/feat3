@@ -117,33 +117,43 @@ public:
     ap.permute(prm_rnd);
     TEST_CHECK_EQUAL(ap, a);
 
-    DenseVector<Mem_, DT_, IT_> k(123);
+    DenseVector<Mem_, DT_, IT_> k(1234);
     for (Index i(0) ; i < k.size() ; ++i)
       k(i, DT_(i) / DT_(12));
 
-    std::stringstream mts;
-    k.write_out(FileMode::fm_mtx, mts);
-    DenseVector<Mem_, DT_, IT_> l(FileMode::fm_mtx, mts);
-    for (Index i(0) ; i < k.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-4);
+    {
+      std::stringstream mts;
+      k.write_out(FileMode::fm_mtx, mts);
+      DenseVector<Mem_, DT_, IT_> l(FileMode::fm_mtx, mts);
+      for (Index i(0) ; i < k.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-4);
+    }
 
-    std::stringstream ts;
-    k.write_out(FileMode::fm_exp, ts);
-    DenseVector<Mem_, DT_, IT_> m(FileMode::fm_exp, ts);
-    for (Index i(0) ; i < k.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-4);
+    {
+      std::stringstream ts;
+      k.write_out(FileMode::fm_exp, ts);
+      DenseVector<Mem_, DT_, IT_> m(FileMode::fm_exp, ts);
+      for (Index i(0) ; i < k.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-4);
+    }
 
-    BinaryStream bs;
-    k.write_out(FileMode::fm_dv, bs);
-    bs.seekg(0);
-    DenseVector<Mem_, DT_, IT_> n(FileMode::fm_dv, bs);
-    for (Index i(0) ; i < k.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), 1e-5);
+    {
+      BinaryStream bs;
+      k.write_out(FileMode::fm_dv, bs);
+      TEST_CHECK_EQUAL(bs.tellg(), 9976);
+      bs.seekg(0);
+      DenseVector<Mem_, DT_, IT_> n(FileMode::fm_dv, bs);
+      for (Index i(0) ; i < k.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), 1e-5);
+      TEST_CHECK_EQUAL(bs.tellg(), 9976);
+    }
 
-    auto op = k.serialise();
-    DenseVector<Mem_, DT_, IT_> o(op);
-    for (Index i(0) ; i < k.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), 1e-5);
+    {
+      auto op = k.serialise();
+      DenseVector<Mem_, DT_, IT_> o(op);
+      for (Index i(0) ; i < k.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), 1e-5);
+    }
 
     // new clone testing
     auto clone1 = a.clone(CloneMode::Deep);
