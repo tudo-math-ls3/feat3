@@ -1652,6 +1652,17 @@ namespace FEAST
        *  \f[
        *    u(x,y) = (x^2 + y^2 - 11)^2 + (x + y^2 - 7)^2
        *  \f]
+       *  The function is nonconvex and has 4 local minima at
+       *  \f{align*}{
+       *    x_0 & \approx (-3.77931025337774689189076584129, -3.28318599128616941226600051437)^T \\
+       *    x_1 & \approx (-2.80511808695274485305357239809, 3.13131251825057296580430072341)^T \\
+       *    x_2 & = (3, 2)^T \\
+       *    x_3 & \approx (3.58442834033049174494433823938, -1.84812652696440355353830020904)^T.
+       *  \f}
+       *  with \f$ \forall i = 0, \dots, 3: u(x_i) = 0 \f$.
+       *
+       *  It is often used for testing optimisation algorithms because of the nonconvexity and existance of a local
+       *  maximum in \f$ x_4 \approx ( -0.270845, -0.93039)^T \f$ and several saddle points.
        *
        * \author Jordi Paul
        */
@@ -1713,8 +1724,12 @@ namespace FEAST
        *
        * This class implements the StaticFunction interface representing the function
        * \f[
-       *   u(x,y) = 100(y-x^2)^2 + (1-x)^2
+       *   u(x,y) = 100(y-x^2)^2 + (1-x)^2.
        * \f]
+       *
+       * The function has a global minimum in \f$ x_0 = (1, 1)^T\f$ and a "steep valley" along the parabola
+       * \f$ y = x^2 \f$. This is a great challange to descend-based optimisation algorithms like steepest descent or
+       * nonlinear CG and the reason it is frequently used as a target function to test such algorithms.
        *
        * \author Jordi Paul
        */
@@ -1764,7 +1779,7 @@ namespace FEAST
           return der_xy(x,y);
         }
 
-      }; // class HimmelblauStatic<...>
+      }; // class RosenbrockStatic<...>
 
       /// \cond internal
       using RosenbrockFunction = StaticWrapperFunction<2, RosenbrockStatic, true, true, true>;
