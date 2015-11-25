@@ -1582,6 +1582,70 @@ namespace FEAST
       }; // class PolynomialFunction1D
 
       /**
+       * \brief Bazaraa/Shetty function
+       *
+       * This class implements the StaticFunction interface representing the function
+       *  \f[
+       *    u(x,y) = (x - 2)^4 + (x - 2 y)^2
+       *  \f]
+       *  This function has a global miminum in \f$ x_0 = (2, 1)^T, u(x_0) = 0 \f$ and is frequently used for
+       *  testing optimisation algorithms because the hessian at the minimal point is singular.
+       *
+       * \author Jordi Paul
+       */
+      template<typename DataType_>
+      class BazaraaShettyStatic
+      {
+      public:
+        /// function value
+        static DataType_ eval(DataType_ x, DataType_ y)
+        {
+          return Math::sqr(Math::sqr(x - DataType_(2))) + Math::sqr(x - DataType_(2)*y);
+        }
+
+        /// x-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y)
+        {
+          return DataType_(4)*(x - DataType_(2))*Math::sqr(x - DataType_(2)) + DataType_(2)*(x - DataType_(2)*y);
+        }
+
+        /// y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y)
+        {
+          return DataType_(4)*(DataType_(2)*y - x);
+        }
+
+        /// xx-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ DOXY(y))
+        {
+          return DataType_(12)*Math::sqr(x - DataType_(2)) + DataType_(2);
+        }
+
+        /// yy-derivative
+        static DataType_ der_yy(DataType_ DOXY(x), DataType_ DOXY(y))
+        {
+          return DataType_(8);
+        }
+
+        /// xy-derivative
+        static DataType_ der_xy(DataType_ DOXY(x), DataType_ DOXY(y))
+        {
+          return DataType_(4);
+        }
+
+        /// yx-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y)
+        {
+          return der_xy(x,y);
+        }
+
+      }; // class BazaraaShettyStatic<...>
+
+      /// \cond internal
+      using BazaraaShettyFunction = StaticWrapperFunction<2, BazaraaShettyStatic, true, true, true>;
+      /// \endcond
+
+      /**
        * \brief Himmelblau function
        *
        * This class implements the StaticFunction interface representing the function
