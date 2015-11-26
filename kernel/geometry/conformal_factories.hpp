@@ -752,6 +752,8 @@ namespace FEAST
         PolylineFactory(std::deque<typename VertexSetType::VertexType>& points_) :
           _points(points_)
         {
+          if(points_.empty())
+            throw InternalError("PolylineFactory constructor called on empty point set!");
 
         }
 
@@ -763,9 +765,9 @@ namespace FEAST
           switch(dimension)
           {
             case 0:
-              return _points.size();
+              return Index(_points.size());
             case 1:
-              return _points.size()-size_t(1);
+              return Index(_points.size())-Index(1);
             default:
               return 0;
           }
@@ -773,7 +775,7 @@ namespace FEAST
 
         virtual void fill_vertex_set(VertexSetType& vertex_set)
         {
-          size_t i(0);
+          Index i(0);
           const auto& jt(_points.end());
           for(auto it(_points.begin()); it != jt; ++i)
           {
