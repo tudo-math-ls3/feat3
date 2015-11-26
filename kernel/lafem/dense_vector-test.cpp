@@ -140,12 +140,12 @@ public:
     {
       BinaryStream bs;
       k.write_out(FileMode::fm_dv, bs);
-      TEST_CHECK_EQUAL(bs.tellg(), 9976);
+      TEST_CHECK_EQUAL(bs.tellg(), std::streampos(9976));
       bs.seekg(0);
       DenseVector<Mem_, DT_, IT_> n(FileMode::fm_dv, bs);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), 1e-5);
-      TEST_CHECK_EQUAL(bs.tellg(), 9976);
+      TEST_CHECK_EQUAL(bs.tellg(), std::streampos(9976));
     }
 
     {
