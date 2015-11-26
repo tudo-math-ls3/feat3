@@ -11,7 +11,12 @@ using namespace FEAST;
 using namespace FEAST::Solver;
 using namespace FEAST::TestSystem;
 
-template<typename Mem_, typename DT_, typename IT_, typename Function_, template<typename, typename> class Linesearch_>
+template
+<
+  typename Mem_, typename DT_, typename IT_,
+  typename Function_,
+  template<typename, typename> class Linesearch_
+>
 class NLCGTest:
   public FullTaggedTest<Mem_, DT_, IT_>
 {
@@ -64,24 +69,28 @@ class NLCGTest:
       solver->set_max_iter(250);
       //std::cout << solver->get_formated_solver_tree() << std::endl;
 
+      // This will hold the solution
       auto sol = my_op.create_vector_r();
+      // We need a dummy rhs
       auto rhs = my_op.create_vector_r();
 
+      // Get an initial guess from the Traits class for the given function
       PointType starting_point(DT_(0));
       TestTraitsType::get_starting_point(starting_point);
       sol(0,starting_point);
 
       my_op.prepare(sol);
 
+      // Solve the optimisation problem
       solver->correct(sol, rhs);
-      //std::cout << "sol = " << sol << std::endl;
-      //std::cout << "f(sol) = " << my_op.compute_fval() << std::endl;
 
       solver->done();
 
+      // From the traits class, get the set of minimal points
       std::deque<PointType> min_points;
       TestTraitsType::get_minimal_points(min_points);
 
+      // Check the distance betwen solution and minimal points
       DT_ min_dist(Math::Limits<DT_>::max());
 
       const auto& jt = min_points.end();
@@ -89,13 +98,11 @@ class NLCGTest:
       for(; it != jt; ++it)
       {
         DT_ dist((sol(0) - *it).norm_euclid());
-        //std::cout << "dist = " << stringify_fp_sci(dist) << std::endl;
         if(dist  < min_dist)
           min_dist = dist;
       }
-      //std::cout << "min_dist " << stringify_fp_sci(min_dist) << std::endl;
+      // Check if we found a valid minimum
       TEST_CHECK_MSG(min_dist < _tol,"min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
-
     }
 };
 

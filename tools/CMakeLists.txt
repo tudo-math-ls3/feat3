@@ -19,6 +19,9 @@ TARGET_LINK_LIBRARIES(dbg-fe-asm-1 feast)
 ADD_EXECUTABLE(dbg-fe-asm-2 dbg_fe_asm_2/dbg_fe_asm_2.cpp)
 TARGET_LINK_LIBRARIES(dbg-fe-asm-2 feast)
 
+ADD_EXECUTABLE(dbg-nlopt dbg_nlopt/dbg_nlopt.cpp)
+TARGET_LINK_LIBRARIES(dbg-nlopt feast)
+
 ADD_EXECUTABLE(dbg-vanka dbg_vanka/dbg_vanka.cpp)
 TARGET_LINK_LIBRARIES(dbg-vanka feast)
 
