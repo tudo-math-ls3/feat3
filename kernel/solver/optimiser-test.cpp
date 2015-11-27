@@ -11,6 +11,13 @@ using namespace FEAST;
 using namespace FEAST::Solver;
 using namespace FEAST::TestSystem;
 
+/**
+ * \brief Test class template for the nonlinear CG optimiser
+ *
+ * This has the analytic function and the linesearch as template parameters because not all linesearches are suitable
+ * for all functions. Same with preconditioners.
+ *
+ */
 template
 <
   typename Mem_, typename DT_, typename IT_,
@@ -33,9 +40,9 @@ class NLCGTest:
     String _precon_type;
 
   public:
-    NLCGTest(DT_ tol_, String precon_type_) :
+    NLCGTest(DT_ exponent_, String precon_type_) :
       FullTaggedTest<Mem_, DT_, IT_>("NLCGTest"),
-      _tol(tol_),
+      _tol(Math::pow(Math::eps<DT_>(), exponent_)),
       _precon_type(precon_type_)
     {
     }
@@ -58,6 +65,8 @@ class NLCGTest:
 
       if(_precon_type == "ApproximateHessian")
         my_precond = new_approximate_hessian_precond(my_op, my_filter);
+      else if(_precon_type == "Hessian")
+        my_precond = new_hessian_precond(my_op, my_filter);
       else if(_precon_type != "none")
         throw InternalError("Got invalid precon_type: "+_precon_type);
 
@@ -106,20 +115,31 @@ class NLCGTest:
     }
 };
 
-float tol_f = Math::pow(Math::eps<float>(), float(0.8));
+// The Himmelblau function is not too difficult, so low tolerance
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction, Solver::NRLinesearch>
-opt_hb_f(tol_f,"ApproximateHessian");
+opt_hb_f(float(0.8),"ApproximateHessian");
 
-double tol_d = Math::pow(Math::eps<double>(), double(0.6));
-NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> opt_hb_d(tol_d,"none");
+// The same with Secant linesearch and without preconditioner
+NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> opt_hb_d(double(0.6),"none");
 
-double tol_d2 = Math::eps<double>();
+// The Rosenbrock function's steep valley is bad for secant linesearch, so just use Newton Raphson
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
-opt_rb_d(tol_d2,"none");
+opt_rb_d(double(1),"none");
 
-double tol_d3 = Math::pow(Math::eps<double>(), double(0.25));
+// The Hessian of the Bazaraa/Shetty function is singular at the optimal point, so Newton Raphson linesearch does not
+// work very well, so just use the secant linesearch
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
-opt_bs_d(tol_d3,"ApproximateHessian");
+opt_bs_d(double(0.25),"Hessian");
 
-//OptimiserTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction> opt_rb(tol_d);
-//OptimiserTest<Mem::Main, float, unsigned int, Analytic::Common::BazaraaShettyFunction> opt_bs(tol_f);
+// Rosenbrock with Newton Raphson and preconditioning in quad precision
+#ifdef FEAST_HAVE_QUADMATH
+NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
+opt_rb_q(__float128(1),"Hessian");
+#endif
+
+// Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
+// Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
+#ifdef FEAST_BACKENDS_CUDA
+NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
+opt_bs_f_cuda(double(0.25),"Hessian");
+#endif

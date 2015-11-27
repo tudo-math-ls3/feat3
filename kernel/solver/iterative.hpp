@@ -322,7 +322,7 @@ namespace FEAST
         Statistics::add_solver_toe(this->_branch, double(-1));
         //insert -1 as first defect, to signalize a new starting solver iteration run
         Statistics::add_solver_defect(this->_branch, double(-1));
-        Statistics::add_solver_defect(this->_branch, this->_def_init);
+        Statistics::add_solver_defect(this->_branch, double(this->_def_init));
         this->_num_iter = Index(0);
         this->_num_stag_iter = Index(0);
 
