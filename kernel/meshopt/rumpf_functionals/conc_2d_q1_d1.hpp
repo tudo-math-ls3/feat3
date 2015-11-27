@@ -62,7 +62,7 @@ namespace FEAST
          * \brief Adds the part coming from the chain rule involving h to the local gradient
          **/
         template<typename Tgrad_, typename Tx_, typename Th_, typename Tgradh_>
-        void add_grad_h_part(Tgrad_& grad, const Tx_& x, const Th_& h, const Tgradh_& grad_h)
+        void NOINLINE add_grad_h_part(Tgrad_& grad, const Tx_& x, const Th_& h, const Tgradh_& grad_h)
         {
 
           DataType der_h_(0);
