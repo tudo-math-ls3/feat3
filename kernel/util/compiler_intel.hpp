@@ -59,6 +59,13 @@
 
 #endif //  (__INTEL_COMPILER != 1400) && defined(FEAST_USE_COMPILER_WRAPPER)
 
+// define the noinline specifier
+#define NOINLINE \
+    _Pragma("warning(push)") \
+    _Pragma("warning(disable:2196)") \
+    __attribute__((noinline)) \
+    _Pragma("warning(pop)")
+
 #define FORCE_INLINE inline __forceinline
 
 #endif // !defined(FEAST_COMPILER) && defined(__INTEL_COMPILER)

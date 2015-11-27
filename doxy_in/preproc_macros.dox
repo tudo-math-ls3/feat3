@@ -183,6 +183,10 @@ immediately before - not in - a loop definition. The pragma takes effect for the
 This macro can be used to force the compiler to compile a function inline. The semantics of FORCE_INLINE are exactly the
 same as those for the C++ inline keyword.
 
+<hr>
+\subsection ppm_feast_noinline NOINLINE
+This macro can be used to force the compiler to compile a function without inlining.
+
 <hr><hr>
 \section preproc_sec_backends Backend / Library Macros
 This section enlists macros defined by the build system, which specify what types of third-party libraries and backends
