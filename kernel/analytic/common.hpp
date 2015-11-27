@@ -1210,15 +1210,23 @@ namespace FEAST
         }
       }; // class MinOfTwoFunctions
 
+      /// \cond internal
       /**
        * \brief Heaviside static function
        *
        * This class implements the StaticFunction interface representing the function
-       *                           ( 0, x  < 0
-       *   - 1D: u(x)     = H(x) = (
-       *                           ( 1, x >= 0
-       *   - 2D: u(x,y)   = H(x)*H(y)
-       *   - 3D: u(x,y,z) = H(x)*H(y)*H(z)
+       * \f[
+       *   u(x) = H(x) =
+       *   \begin{cases}
+       *     0, & x < 0 \\
+       *     1, & x \geq 0
+       *   \end{cases}
+       * \f]
+       * in \f$ 1D \f$ and
+       * \f[
+       *   u(x,y) = H(x) H(y), u(x,y,z) = H(x) H(y) H(z)
+       * \f]
+       * in \f$ 2D, 3D \f$ respectively.
        *
        * \author Jordi Paul
        */
@@ -1246,33 +1254,48 @@ namespace FEAST
         }
 
       }; // class HeavisideStatic<...>
+      /// \endcond
 
       /**
        * \brief Heaviside function
        *
-       * This class implements the StaticFunction interface representing the function
-       *                           ( 0, x  < 0
-       *   - 1D: u(x)     = H(x) = (
-       *                           ( 1, x >= 0
-       *   - 2D: u(x,y)   = H(x)*H(y)
-       *   - 3D: u(x,y,z) = H(x)*H(y)*H(z)
-       *
-       *   This class supports only values.
+       * This class implements the AnalyticFunction interface representing the function
+       * \f[
+       *   u(x) = H(x) =
+       *   \begin{cases}
+       *     0, & x < 0 \\
+       *     1, & x \geq 0
+       *   \end{cases}
+       * \f]
+       * in \f$ 1D \f$ and
+       * \f[
+       *   u(x,y) = H(x) H(y), u(x,y,z) = H(x) H(y) H(z)
+       * \f]
+       * in \f$ 2D, 3D \f$ respectively.
        *
        * \author Jordi Paul
        */
       template<int dim_>
       using HeavisideFunction = StaticWrapperFunction<dim_, HeavisideStatic, true, false, false>;
 
+      /// \cond internal
       /**
        * \brief Regularised Heaviside static function
        *
        * This class implements the StaticFunction interface representing the function
-       *                           ( 0,               x  < 0
-       *   - 1D: u(x)     = H(x) = (
-       *                           ( 2 (cosh(x) - 1), x >= 0
-       *   - 2D: u(x,y)   = H(x)*H(y)
-       *   - 3D: u(x,y,z) = H(x)*H(y)*H(z)
+       * \f[
+       *   u(x) = H(x) =
+       *   \begin{cases}
+       *     0, & x < 0 \\
+       *     1, & 2 (\cosh(x) - 1) \geq 0
+       *   \end{cases}
+       * \f]
+       *
+       * in \f$ 1D \f$ and
+       * \f[
+       *   u(x,y) = H(x) H(y), u(x,y,z) = H(x) H(y) H(z)
+       * \f]
+       * in \f$ 2D, 3D \f$ respectively.
        *
        * \author Jordi Paul
        */
@@ -1420,23 +1443,30 @@ namespace FEAST
         }
 
       }; // class HeavisideRegStatic<...>
+      /// \endcond
 
       /**
-       * \brief Regularised Heaviside function
+       * \brief Regularised Heaviside static function
        *
-       * This class implements the StaticFunction interface representing the function
-       *                           ( 0,               x  < 0
-       *   - 1D: u(x)     = H(x) = (
-       *                           ( 2 (cosh(x) - 1), x >= 0
-       *   - 2D: u(x,y)   = H(x)*H(y)
-       *   - 3D: u(x,y,z) = H(x)*H(y)*H(z)
+       * This class implements the AnalyticFunction interface representing the function
+       * \f[
+       *   u(x) = H(x) =
+       *   \begin{cases}
+       *     0, & x < 0 \\
+       *     1, & 2 (\cosh(x) - 1) \geq 0
+       *   \end{cases}
+       * \f]
        *
-       *   This class supports function values, gradients and hessians for all dimensions.
+       * in \f$ 1D \f$ and
+       * \f[
+       *   u(x,y)   = H(x)*H(y), u(x,y,z) = H(x)*H(y)*H(z)
+       * \f]
+       * in \f$ 2D, 3D \f$ respectively.
        *
        * \author Jordi Paul
        */
       template<int dim_>
-      using HeavisideRefFunction = StaticWrapperFunction<dim_, HeavisideRegStatic, true, false, false>;
+      using HeavisideRegFunction = StaticWrapperFunction<dim_, HeavisideRegStatic, true, false, false>;
 
       /**
        * \brief 1D Polynomial function class template
@@ -1581,8 +1611,12 @@ namespace FEAST
         }
       }; // class PolynomialFunction1D
 
+      /// \cond internal
       /**
        * \brief Bazaraa/Shetty function
+       *
+       * \tparam DataType_
+       * Floating point precision
        *
        * This class implements the StaticFunction interface representing the function
        *  \f[
@@ -1640,13 +1674,28 @@ namespace FEAST
         }
 
       }; // class BazaraaShettyStatic<...>
-
-      /// \cond internal
-      using BazaraaShettyFunction = StaticWrapperFunction<2, BazaraaShettyStatic, true, true, true>;
       /// \endcond
 
       /**
+       * \brief Bazaraa/Shetty function
+       *
+       * This class implements the AnalyticFunction interface representing the function
+       *  \f[
+       *    u(x,y) = (x - 2)^4 + (x - 2 y)^2
+       *  \f]
+       *  This function has a global miminum in \f$ x_0 = (2, 1)^T, u(x_0) = 0 \f$ and is frequently used for
+       *  testing optimisation algorithms because the hessian at the minimal point is singular.
+       *
+       * \author Jordi Paul
+       */
+      using BazaraaShettyFunction = StaticWrapperFunction<2, BazaraaShettyStatic, true, true, true>;
+
+      /// \cond internal
+      /**
        * \brief Himmelblau function
+       *
+       * \tparam DataType_
+       * Floating point precision
        *
        * This class implements the StaticFunction interface representing the function
        *  \f[
@@ -1714,25 +1763,32 @@ namespace FEAST
         }
 
       }; // class HimmelblauStatic<...>
-
-      /// \cond internal
-      using HimmelblauFunction = StaticWrapperFunction<2, HimmelblauStatic, true, true, true>;
       /// \endcond
 
       /**
-       * \brief Rosenbrock function
+       * \brief Himmelblau function
        *
-       * This class implements the StaticFunction interface representing the function
-       * \f[
-       *   u(x,y) = 100(y-x^2)^2 + (1-x)^2.
-       * \f]
+       * This class implements the AnalyticFunction interface representing the function
+       *  \f[
+       *    u(x,y) = (x^2 + y^2 - 11)^2 + (x + y^2 - 7)^2
+       *  \f]
+       *  The function is nonconvex and has 4 local minima at
+       *  \f{align*}{
+       *    x_0 & \approx (-3.77931025337774689189076584129, -3.28318599128616941226600051437)^T \\
+       *    x_1 & \approx (-2.80511808695274485305357239809, 3.13131251825057296580430072341)^T \\
+       *    x_2 & = (3, 2)^T \\
+       *    x_3 & \approx (3.58442834033049174494433823938, -1.84812652696440355353830020904)^T.
+       *  \f}
+       *  with \f$ \forall i = 0, \dots, 3: u(x_i) = 0 \f$.
        *
-       * The function has a global minimum in \f$ x_0 = (1, 1)^T\f$ and a "steep valley" along the parabola
-       * \f$ y = x^2 \f$. This is a great challange to descend-based optimisation algorithms like steepest descent or
-       * nonlinear CG and the reason it is frequently used as a target function to test such algorithms.
+       *  It is often used for testing optimisation algorithms because of the nonconvexity and existance of a local
+       *  maximum in \f$ x_4 \approx ( -0.270845, -0.93039)^T \f$ and several saddle points.
        *
        * \author Jordi Paul
        */
+      using HimmelblauFunction = StaticWrapperFunction<2, HimmelblauStatic, true, true, true>;
+
+      /// \cond internal
       template<typename DataType_>
       class RosenbrockStatic
       {
@@ -1780,10 +1836,23 @@ namespace FEAST
         }
 
       }; // class RosenbrockStatic<...>
-
-      /// \cond internal
-      using RosenbrockFunction = StaticWrapperFunction<2, RosenbrockStatic, true, true, true>;
       /// \endcond
+
+      /**
+       * \brief Rosenbrock function
+       *
+       * This class implements the AnalyticFunction interface representing the function
+       * \f[
+       *   u(x,y) = 100(y-x^2)^2 + (1-x)^2.
+       * \f]
+       *
+       * The function has a global minimum in \f$ x_0 = (1, 1)^T\f$ and a "steep valley" along the parabola
+       * \f$ y = x^2 \f$. This is a great challange to descend-based optimisation algorithms like steepest descent or
+       * nonlinear CG and the reason it is frequently used as a target function to test such algorithms.
+       *
+       * \author Jordi Paul
+       */
+      using RosenbrockFunction = StaticWrapperFunction<2, RosenbrockStatic, true, true, true>;
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAST
