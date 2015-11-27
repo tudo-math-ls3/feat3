@@ -220,7 +220,7 @@ namespace FEAST
       // "warning C4723: potential divide by 0" in the next statement - even altough this case is
       // explicitly handled by the if above...
       // Since this warning may be useful in other cases, it has only been disabled for this function.
-#ifndef FEAST_COMPILER_MICROSOFT
+#ifdef FEAST_COMPILER_MICROSOFT
 #pragma warning(push)
 #pragma warning(disable:4723)
 #endif
@@ -237,7 +237,7 @@ namespace FEAST
         yn = T_(0.5)*y * (T_(3) - (y*y*z));
       } while(yn > y);
 
-#ifndef FEAST_COMPILER_MICROSOFT
+#ifdef FEAST_COMPILER_MICROSOFT
 #pragma warning(pop)
 #endif
 
