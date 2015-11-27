@@ -561,6 +561,9 @@ namespace FEAST
         case FileMode::fm_bcsr:
           read_from_bcsr(filename);
           break;
+        case FileMode::fm_binary:
+          read_from_bcsr(filename);
+          break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
@@ -582,6 +585,9 @@ namespace FEAST
           read_from_mtx(file);
           break;*/
         case FileMode::fm_bcsr:
+          read_from_bcsr(file);
+          break;
+        case FileMode::fm_binary:
           read_from_bcsr(file);
           break;
         default:
@@ -775,6 +781,9 @@ namespace FEAST
         case FileMode::fm_bcsr:
           write_out_bcsr(filename);
           break;
+        case FileMode::fm_binary:
+          write_out_bcsr(filename);
+          break;
         case FileMode::fm_mtx:
           write_out_mtx(filename);
           break;
@@ -796,6 +805,9 @@ namespace FEAST
         switch(mode)
         {
         case FileMode::fm_bcsr:
+          write_out_bcsr(file);
+          break;
+        case FileMode::fm_binary:
           write_out_bcsr(file);
           break;
         case FileMode::fm_mtx:

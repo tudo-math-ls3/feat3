@@ -1083,6 +1083,9 @@ namespace FEAST
         case FileMode::fm_coo:
           read_from_coo(filename);
           break;
+        case FileMode::fm_binary:
+          read_from_coo(filename);
+          break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
@@ -1104,6 +1107,9 @@ namespace FEAST
           read_from_mtx(file);
           break;
         case FileMode::fm_coo:
+          read_from_coo(file);
+          break;
+        case FileMode::fm_binary:
           read_from_coo(file);
           break;
         default:
@@ -1283,6 +1289,9 @@ namespace FEAST
         case FileMode::fm_coo:
           write_out_coo(filename);
           break;
+        case FileMode::fm_binary:
+          write_out_coo(filename);
+          break;
         default:
           throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
         }
@@ -1308,6 +1317,9 @@ namespace FEAST
           write_out_mtx(file);
           break;
         case FileMode::fm_coo:
+          write_out_coo(file);
+          break;
+        case FileMode::fm_binary:
           write_out_coo(file);
           break;
         default:
