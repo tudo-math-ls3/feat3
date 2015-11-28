@@ -59,12 +59,12 @@
 
 #endif //  (__INTEL_COMPILER != 1400) && defined(FEAST_USE_COMPILER_WRAPPER)
 
+// disable warning #2196 (routine is both "inline" and "noinline") unconditionally
+/// \todo evaluate, if the icc finally inlines or not the corresponding routines, marked by NOINLINE
+_Pragma("warning(disable:2196)")
+
 // define the noinline specifier
-#define NOINLINE \
-    _Pragma("warning(push)") \
-    _Pragma("warning(disable:2196)") \
-    __attribute__((noinline)) \
-    _Pragma("warning(pop)")
+#define NOINLINE __attribute__((noinline))
 
 #define FORCE_INLINE inline __forceinline
 
