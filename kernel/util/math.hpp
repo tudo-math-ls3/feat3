@@ -207,7 +207,13 @@ namespace FEAST
      * \param[in] x The value to calculate the square-root from.
      *
      * \returns sqrt(x)
+     *
+     * \compilerhack disable "warning C4723: potential divide by 0" for MSVC compiler
      */
+#ifdef FEAST_COMPILER_MICROSOFT
+#pragma warning(push)
+#pragma warning(disable:4723)
+#endif
     template<typename T_>
     inline T_ sqrt(T_ x)
     {
@@ -215,15 +221,6 @@ namespace FEAST
 
       if(x <= T_(0))
         return T_(0);
-
-      // In some rare cases (depending on the compiler optimisation flags), the MSVC compiler may emit
-      // "warning C4723: potential divide by 0" in the next statement - even altough this case is
-      // explicitly handled by the if above...
-      // Since this warning may be useful in other cases, it has only been disabled for this function.
-#ifdef FEAST_COMPILER_MICROSOFT
-#pragma warning(push)
-#pragma warning(disable:4723)
-#endif
 
       // use Newton iteration: y_{k+1} := y_k/2 * (3 - (y_k^2)/x)
       // we choose y_0 = min(1,x); this ensures that the sequence y_k is monotonically increasing
@@ -237,12 +234,11 @@ namespace FEAST
         yn = T_(0.5)*y * (T_(3) - (y*y*z));
       } while(yn > y);
 
+      return y;
+    }
 #ifdef FEAST_COMPILER_MICROSOFT
 #pragma warning(pop)
 #endif
-
-      return y;
-    }
 
     // wrap std::sqrt
     WRAP_STD_MATH1(sqrt)
