@@ -456,6 +456,7 @@ if branch_names.count("master") > 0:
 for branch in branch_names:
   run_test("guess", branch, myDB, extra_opts)
 
+#TODO valgrind/cudamemcheck mit opt ?
   if is_found ("valgrind") and is_found ("nvcc") and is_found("g++") and not novalgrind and not nocudamemcheck:
       run_test("serial-gcc-debug-valgrind-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
   elif is_found ("valgrind") and is_found("g++") and not novalgrind:

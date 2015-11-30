@@ -48,6 +48,8 @@ public:
     Tuning::tune_cuda_blocksize(mat_sys, vec_rhs);
   }
 };
+#ifndef FEAST_DEBUG
 #ifdef FEAST_BACKENDS_CUDA
 TuningTest<Mem::CUDA, float, unsigned long> cuda_tuning_test_float_ulong;
+#endif
 #endif
