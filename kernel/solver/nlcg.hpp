@@ -11,6 +11,35 @@ namespace FEAST
 {
   namespace Solver
   {
+    /**
+     * \brief Enum for NLCG search direction updates
+     */
+    enum class NLCGDirectionUpdate
+    {
+      undefined = 0,
+      FletcherReeves,
+      PolakRibiere
+    };
+
+    /// \cond internal
+    /**
+     * \brief Streamin operator for NLCGDirectionUpdates
+     */
+    inline std::ostream& operator<<(std::ostream& os, NLCGDirectionUpdate update)
+    {
+      switch(update)
+      {
+        case NLCGDirectionUpdate::undefined:
+          return os << "undefined";
+        case NLCGDirectionUpdate::FletcherReeves:
+          return os << "Fletcher-Reeves";
+        case NLCGDirectionUpdate::PolakRibiere:
+          return os << "Polak-Ribière";
+        default:
+          return os << "-unknown-";
+      }
+    }
+    /// \endcond
 
     /**
      * \brief Nonlinear Conjugate Gradient method for finding a minimum of an operator's gradient
@@ -58,6 +87,9 @@ namespace FEAST
         /// The linesearch used along the descent direction
         LinesearchType& _linesearch;
 
+        /// Method to update the search direction, defaults to PolakRibiere
+        NLCGDirectionUpdate _direction_update;
+
         /// defect vector
         VectorType _vec_def;
         /// descend direction vector
@@ -100,6 +132,7 @@ namespace FEAST
           _op(op_),
           _filter(filter_),
           _linesearch(linesearch_),
+          _direction_update(NLCGDirectionUpdate::PolakRibiere),
           restart_freq(0),
           iterates(nullptr)
           {
@@ -146,7 +179,7 @@ namespace FEAST
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "NLCG-"+_linesearch.name();
+          return "NLCG-"+_linesearch.name()+"-"+stringify(_direction_update);
         }
 
         /// \copydoc BaseClass::apply()
@@ -180,6 +213,14 @@ namespace FEAST
           return st;
         }
 
+        /**
+         * \brief Sets the direction update method
+         */
+        void set_direction_update(NLCGDirectionUpdate update_)
+        {
+          _direction_update = update_;
+        }
+
       protected:
         /**
          * \brief Internal function, applies the solver
@@ -187,8 +228,12 @@ namespace FEAST
          * \param[in, out] vec_sol
          * The initial guess, gets overwritten by the solution
          *
+         * \returns
+         * A solver status code.
+         *
          * This does not have a right hand side because that is contained in the gradient of the operator and we
          * always seek grad operator(vec_sol) = 0
+         *
          */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
@@ -249,14 +294,20 @@ namespace FEAST
             }
 
             DataType beta(DataType(0));
-            bool restart(false);
 
-            status = polak_ribiere(beta, gamma, restart, at);
+            // Compute the new beta for the search direction update. This also checks if the computed beta is valid
+            // (e.g. leads to a decrease) and applies the preconditioner to the new defect vector
+            status = compute_beta(beta, gamma, at);
 
+            // If a restart is scheduled, reset beta to 0
             if(restart_freq > 0 && its_since_restart%restart_freq == 0)
-              restart = true;
+            {
+              beta = DataType(0);
+            }
 
-            if(restart)
+            /// Restarting means discarding the new search direction and setting the new search direction to the
+            // (preconditioned) steepest descent direction
+            if(beta == DataType(0))
             {
               its_since_restart = Index(0);
               num_subsequent_restarts++;
@@ -269,43 +320,118 @@ namespace FEAST
               this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, beta);
             }
 
-
+            // If there were too many subsequent restarts, the solver is stagnated
             if(num_subsequent_restarts > max_num_subs_restarts)
               return Status::stagnated;
 
+            // If there were too many stagnated iterations, the solver is stagnated
             if(this->_min_stag_iter > 0 && this->_num_stag_iter > this->_min_stag_iter)
               return Status::stagnated;
 
           }
 
+          // We should never come to this point
           return Status::undefined;
         }
 
-        Status polak_ribiere(DataType& beta, DataType& gamma, bool& restart, TimeStamp& at)
+        /**
+         * \brief Computes the parameter beta for the search direction update
+         *
+         * \param[out] beta
+         * Parameter for updating the search direction: \f$ d_{k+1} = s_{k+1} + \beta_{k+1} d_k \f$
+         *
+         * \param[in, out] gamma
+         * This is the scalar product of the defect and the preconditioned defect
+         *
+         * \param[in, out] at
+         * Timestamp for solver timings
+         *
+         * \returns A solver status code.
+         */
+        Status compute_beta(DataType& beta, DataType& gamma, TimeStamp& at)
         {
-            DataType gamma_old(gamma);
-            DataType gamma_mid = this->_vec_tmp.dot(this->_vec_def);
-
-            // apply preconditioner
-            if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+          switch(_direction_update)
+          {
+            case NLCGDirectionUpdate::FletcherReeves:
+              return fletcher_reeves(beta, gamma, at);
+            case NLCGDirectionUpdate::PolakRibiere:
+              return polak_ribiere(beta, gamma, at);
+            default:
               return Status::aborted;
-            }
+          }
+        }
 
-            gamma = this->_vec_def.dot(this->_vec_tmp);
+        /**
+         * \brief Internal function: sets the new defect norm
+         *
+         * This function computes the defect vector's norm, increments the iteration count,
+         * plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.
+         *
+         * \param[in] vec_def
+         * The new defect vector.
+         *
+         * \param[in] vec_sol
+         * The current solution vector approximation.
+         *
+         * \returns
+         * A solver status code.
+         */
+        virtual Status _set_new_defect(const VectorType& vec_def, const VectorType& vec_sol) override
+        {
+          // increase iteration count
+          ++this->_num_iter;
 
-            beta = (gamma - gamma_mid)/gamma_old;
+          // first, let's see if we have to compute the defect at all
+          bool calc_def = false;
+          calc_def = calc_def || (this->_min_iter < this->_max_iter);
+          calc_def = calc_def || this->_plot;
+          calc_def = calc_def || (this->_min_stag_iter > Index(0));
 
-            restart = (beta < DataType(0));
+          // compute new defect
+          if(calc_def)
+            this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
+
+          Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
+
+          // plot?
+          if(this->_plot)
+          {
+            std::cout << this->_plot_name
+            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
+            << " : " << stringify_fp_sci(this->_def_cur)
+            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
+            << std::endl;
+          }
+
+          // ensure that the defect is neither NaN nor infinity
+          if(!Math::isfinite(this->_def_cur))
+            return Status::aborted;
+
+          // is diverged?
+          if(this->is_diverged())
+            return Status::diverged;
+
+          // minimum number of iterations performed?
+          if(this->_num_iter < this->_min_iter)
+            return Status::progress;
+
+          // is converged?
+          if(this->is_converged())
+            return Status::success;
+
+          // maximum number of iterations performed?
+          if(this->_num_iter >= this->_max_iter)
+            return Status::max_iter;
+
+          // continue iterating
           return Status::progress;
         }
 
-        Status fletcher_reeves(DataType& beta, DataType& gamma, bool& restart, TimeStamp& at)
+        /// \copydoc compute_beta()
+        Status polak_ribiere(DataType& beta, DataType& gamma, TimeStamp& at)
         {
-          DataType gamma_old = gamma;
-          DataType gamma_mid = this->_vec_dir.dot(this->vec_def);
+          DataType gamma_old(gamma);
+          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_def);
 
           // apply preconditioner
           if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
@@ -317,78 +443,37 @@ namespace FEAST
 
           gamma = this->_vec_def.dot(this->_vec_tmp);
 
-          beta = gamma/gamma_old;
-
-          restart = (gamma_mid < DataType(0));
+          beta = Math::max((gamma - gamma_mid)/gamma_old, DataType(0));
 
           return Status::progress;
         }
 
-      /**
-       * \brief Internal function: sets the new defect norm
-       *
-       * This function computes the defect vector's norm, increments the iteration count,
-       * plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.
-       *
-       * \param[in] vec_def
-       * The new defect vector.
-       *
-       * \param[in] vec_sol
-       * The current solution vector approximation.
-       *
-       * \returns
-       * A Status code.
-       */
-      virtual Status _set_new_defect(const VectorType& vec_def, const VectorType& vec_sol) override
-      {
-        // increase iteration count
-        ++this->_num_iter;
-
-        // first, let's see if we have to compute the defect at all
-        bool calc_def = false;
-        calc_def = calc_def || (this->_min_iter < this->_max_iter);
-        calc_def = calc_def || this->_plot;
-        calc_def = calc_def || (this->_min_stag_iter > Index(0));
-
-        // compute new defect
-        if(calc_def)
-          this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
-
-        Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
-
-        // plot?
-        if(this->_plot)
+        /// \copydoc compute_beta()
+        Status fletcher_reeves(DataType& beta, DataType& gamma, TimeStamp& at)
         {
-          std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-            << " : " << stringify_fp_sci(this->_def_cur)
-            << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-            << std::endl;
+          DataType gamma_old = gamma;
+          DataType gamma_mid = this->_vec_dir.dot(this->_vec_def);
+
+          if(gamma_mid < DataType(0))
+            beta = DataType(0);
+          else
+          {
+            // apply preconditioner
+            if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+            {
+              TimeStamp bt;
+              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+              return Status::aborted;
+            }
+
+            gamma = this->_vec_def.dot(this->_vec_tmp);
+
+            beta = gamma/gamma_old;
+          }
+
+          return Status::progress;
         }
 
-        // ensure that the defect is neither NaN nor infinity
-        if(!Math::isfinite(this->_def_cur))
-          return Status::aborted;
-
-        // is diverged?
-        if(this->is_diverged())
-          return Status::diverged;
-
-        // minimum number of iterations performed?
-        if(this->_num_iter < this->_min_iter)
-          return Status::progress;
-
-        // is converged?
-        if(this->is_converged())
-          return Status::success;
-
-        // maximum number of iterations performed?
-        if(this->_num_iter >= this->_max_iter)
-          return Status::max_iter;
-
-        // continue iterating
-        return Status::progress;
-      }
 
     }; // class NLCG
 
