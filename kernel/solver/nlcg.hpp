@@ -12,27 +12,50 @@ namespace FEAST
   namespace Solver
   {
 
+    /**
+     * \brief Nonlinear Conjugate Gradient method for finding a minimum of an operator's gradient
+     *
+     * \tparam Operator_
+     * Nonlinear Operator to minimise the gradient of
+     *
+     * \tparam Filter_
+     * Filter to apply to the operator's gradient
+     *
+     * \tparam Linesearch_
+     * Type of linesearch to use along the descent direction
+     *
+     */
     template<typename Operator_, typename Filter_, typename Linesearch_>
     class NLCG : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
     {
       public:
+        /// The nonlinear operator type
         typedef Operator_ OperatorType;
+        /// The filter type
         typedef Filter_ FilterType;
+        /// Our type of linesearch
         typedef Linesearch_ LinesearchType;
 
-        //typedef typename Operator_::ValueType ValueType;
+        /// Type of the operator's gradient has
         typedef typename Operator_::GradientType GradientType;
+        /// Input type for the gradient
         typedef typename Operator_::VectorTypeR VectorType;
+        /// Underlying floating point type
         typedef typename Operator_::DataType DataType;
 
+        /// Our baseclass
         typedef PreconditionedIterativeSolver<VectorType> BaseClass;
+        /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
-
+        /// Maximum number of subsequent restarts (meaning steepest descent steps) before aborting
         static constexpr Index max_num_subs_restarts = Index(3);
 
       protected:
+        /// Our nonlinear operator
         Operator_& _op;
+        /// The filter we apply to the gradient
         const Filter_& _filter;
+        /// The linesearch used along the descent direction
         LinesearchType& _linesearch;
 
         /// defect vector
@@ -42,13 +65,35 @@ namespace FEAST
         /// temporary vector
         VectorType _vec_tmp;
 
+        /// The mininum update we require the linesearch to make
         DataType _min_update;
 
       public:
+        /// Restart frequency, defaults to problemsize+1
         Index restart_freq;
+        /// For debugging purposes, all iterates can be logged to here
         std::deque<VectorType>* iterates;
 
       public:
+        /**
+         * \brief Standard constructor
+         *
+         * \param[in, out] op_
+         * The (nonlinear) operator. Cannot be const because it saves its own state
+         *
+         * \param[in] filter_
+         * Filter to apply to the operator's gradient
+         *
+         * \param[in, out] linesearch_
+         * The linesearch to be used, cannot be const as internal data changes
+         *
+         * \param[in] keep_iterates
+         * Keep all iterates in a std::deque. Defaults to false.
+         *
+         * \param[in, out] precond
+         * Preconditioner, defaults to nullptr. Cannot be const as internal data changes
+         *
+         */
         explicit NLCG(Operator_& op_, const Filter_& filter_, LinesearchType& linesearch_,
         bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass("NLCG", precond),
@@ -66,12 +111,16 @@ namespace FEAST
             _min_update = Math::sqrt(Math::eps<DataType>());
           }
 
+        /**
+         * \brief Virtual destructor
+         */
         virtual ~NLCG()
         {
           if(iterates != nullptr)
             delete iterates;
         }
 
+        /// \copydoc BaseClass::init_symbolic()
         virtual void init_symbolic() override
         {
           BaseClass::init_symbolic();
@@ -80,10 +129,10 @@ namespace FEAST
           _vec_dir = this->_op.create_vector_r();
           _vec_tmp = this->_op.create_vector_r();
           restart_freq = _vec_def.size() + Index(1);
-          //std::cout << "restart_freq = " << restart_freq << std::endl;
           _linesearch.init_symbolic();
         }
 
+        /// \copydoc BaseClass::done_symbolic()
         virtual void done_symbolic() override
         {
           this->_vec_tmp.clear();
@@ -94,12 +143,13 @@ namespace FEAST
           BaseClass::done_symbolic();
         }
 
-
+        /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "NLCG";
+          return "NLCG-"+_linesearch.name();
         }
 
+        /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
           // save defect
@@ -115,7 +165,8 @@ namespace FEAST
           return _apply_intern(vec_cor);
         }
 
-        virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(rhs)) override
+        /// \copydoc BaseClass::correct()
+        virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
           this->_op.prepare(vec_sol);
           // compute defect
@@ -126,18 +177,21 @@ namespace FEAST
           // apply
           Status st =_apply_intern(vec_sol);
 
-          //std::cout << "NLCG finished with status " << st << std::endl;
-
           return st;
         }
 
       protected:
+        /**
+         * \brief Internal function, applies the solver
+         *
+         * \param[in, out] vec_sol
+         * The initial guess, gets overwritten by the solution
+         *
+         * This does not have a right hand side because that is contained in the gradient of the operator and we
+         * always seek grad operator(vec_sol) = 0
+         */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
-
-          //std::cout << "apply_intern: initial sol = " << vec_sol << std::endl;
-          //std::cout << "apply_intern: initial def = " << _vec_def << std::endl;
-
           if(iterates != nullptr)
           {
             auto tmp = vec_sol.clone();
@@ -154,7 +208,6 @@ namespace FEAST
             return Status::aborted;
 
           this->_vec_dir.clone(this->_vec_tmp);
-          //std::cout << "apply_intern: initial dir = " << _vec_dir<< std::endl;
 
           // compute initial gamma
           DataType gamma = this->_vec_def.dot(this->_vec_dir);
@@ -167,18 +220,11 @@ namespace FEAST
             TimeStamp at;
             ++its_since_restart;
 
-            //std::cout << "pre  linesearch " << stringify_fp_sci(vec_sol(0)(0)) << " "
-            //<< stringify_fp_sci(vec_sol(0)(1)) << std::endl;
-
             _linesearch.correct(vec_sol, this->_vec_dir);
             if(_linesearch.get_rel_update() < _min_update)
             {
-              //std::cout << "rel_update " << stringify_fp_sci(_linesearch.get_rel_update()) << " < " << stringify_fp_sci(_min_update) << std::endl;
               this->_num_stag_iter++;
             }
-
-            //std::cout << "post linesearch " << stringify_fp_sci(vec_sol(0)(0)) << " "
-            //<< stringify_fp_sci(vec_sol(0)(1)) << std::endl;
 
             if(iterates != nullptr)
             {
@@ -191,7 +237,6 @@ namespace FEAST
             this->_op.compute_gradient(this->_vec_def);
             this->_vec_def.scale(this->_vec_def,DataType(-1));
             this->_filter.filter_def(this->_vec_def);
-            //std::cout << "NLCG grad = " << this->_vec_def << std::endl;
 
             // compute defect norm
             status = this->_set_new_defect(this->_vec_def, vec_sol);
@@ -217,7 +262,6 @@ namespace FEAST
               num_subsequent_restarts++;
 
               this->_vec_dir.clone(this->_vec_tmp);
-              //std::cout << "NLCG restart beta = " << stringify_fp_sci(beta) << ", dir = " << this->_vec_dir << std::endl;
             }
             else
             {
@@ -225,7 +269,6 @@ namespace FEAST
               this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, beta);
             }
 
-            //std::cout << "beta = " << stringify_fp_sci(beta) << ", gamma = " << stringify_fp_sci(gamma) << " " << its_since_restart << " its_since_restart, " << num_subsequent_restarts << " num_subsequent_restarts " << this->_num_stag_iter << " stagnated iterations" << std::endl;
 
             if(num_subsequent_restarts > max_num_subs_restarts)
               return Status::stagnated;
@@ -250,7 +293,6 @@ namespace FEAST
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return Status::aborted;
             }
-            //std::cout << "NLCG precon = " << this->_vec_tmp << std::endl;
 
             gamma = this->_vec_def.dot(this->_vec_tmp);
 
@@ -288,7 +330,7 @@ namespace FEAST
        * This function computes the defect vector's norm, increments the iteration count,
        * plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.
        *
-       * \param[in] vector
+       * \param[in] vec_def
        * The new defect vector.
        *
        * \param[in] vec_sol
@@ -307,9 +349,6 @@ namespace FEAST
         calc_def = calc_def || (this->_min_iter < this->_max_iter);
         calc_def = calc_def || this->_plot;
         calc_def = calc_def || (this->_min_stag_iter > Index(0));
-
-        // save previous defect
-        //DataType def_old = this->_def_cur;
 
         // compute new defect
         if(calc_def)
@@ -364,6 +403,12 @@ namespace FEAST
      *
      * \param[in] precond
      * The preconditioner. May be \c nullptr.
+     *
+     * \param[in] linesearch
+     * The linesearch to use.
+     *
+     * \param[in] keep_iterates
+     * Flag for keeping the iterates, defaults to false
      *
      * \returns
      * A shared pointer to a new PCG object.

@@ -240,7 +240,6 @@ namespace FEAST
             {
               TimeStamp bt;
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              //std::cout << "last alpha " << stringify_fp_sci(_alpha) << ", sum_alpha = " << stringify_fp_sci(_sum_alpha) << ", rel update " << stringify_fp_sci(get_rel_update()) << std::endl;
               return status;
             }
 
@@ -279,8 +278,6 @@ namespace FEAST
           _op.apply_hess(this->_vec_tmp, dir);
           _filter.filter_def(this->_vec_tmp);
           _alpha = -grad.dot(dir)/dir.dot(this->_vec_tmp);
-
-          //std::cout << " alpha^2 * delta_0 = " << stringify_fp_sci(Math::sqr(_alpha)*this->_def_init) << std::endl;
 
           Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
@@ -323,9 +320,6 @@ namespace FEAST
               // increment stagnation count
               if(++this->_num_stag_iter >= this->_min_stag_iter)
               {
-                //std::cout << this->_plot_name <<" stagnated with " <<
-                //  stringify_fp_sci(Math::sqr(_alpha)*this->_def_init) << " <= " <<
-                //  stringify_fp_sci(Math::sqr(this->_tol_rel)) << std::endl;
                 return Status::stagnated;
               }
             }
@@ -521,9 +515,6 @@ namespace FEAST
           Status status(Status::progress);
           this->_num_iter = Index(0);
 
-          //std::cout << "initial sol " << sol << std::endl;
-          //std::cout << "        dir " << dir << std::endl;
-
           // The second secant point in the first iteration is x + _sigma_0 * dir
           _alpha = _sigma_0;
 
@@ -563,7 +554,6 @@ namespace FEAST
             {
               TimeStamp bt;
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              //std::cout << "last alpha " << stringify_fp_sci(_alpha) << ", sum_alpha = " << stringify_fp_sci(_sum_alpha) << ", rel update " << stringify_fp_sci(get_rel_update()) << std::endl;
               return status;
             }
 
@@ -596,17 +586,12 @@ namespace FEAST
           // Check if the update is too small
           if(Math::abs(_eta - eta_prev) < Math::eps<DataType>())///(Math::abs(_alpha*_eta)*_norm_dir))
           {
-            //std::cout << "Update stagnation " << stringify_fp_sci(Math::abs(_eta - eta_prev)) << " < "
-            //<< stringify_fp_sci(Math::eps<DataType>())<< std::endl;///(Math::abs(_alpha*_eta)*_norm_dir)) << std::endl;
             return Status::stagnated;
           }
 
           // Update alpha according to secant formula
           _alpha *= _eta/(eta_prev - _eta);
           _sum_alpha += _alpha;
-          //std::cout << "eta_prev = " << stringify_fp_sci(eta_prev) << ", eta = " << stringify_fp_sci(_eta)
-          //<< ",  alpha = " << stringify_fp_sci(_alpha);// << std::endl;
-          //std::cout << " alpha^2 * delta_0 = " << stringify_fp_sci(Math::sqr(_alpha)*this->_def_init) << std::endl;
 
           Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
@@ -649,9 +634,6 @@ namespace FEAST
               // increment stagnation count
               if(++this->_num_stag_iter >= this->_min_stag_iter)
               {
-                //std::cout << this->_plot_name <<" stagnated with " <<
-                //  stringify_fp_sci(Math::sqr(_alpha)*this->_def_init) << " <= " <<
-                //  stringify_fp_sci(Math::sqr(this->_tol_rel)) << std::endl;
                 return Status::stagnated;
               }
             }
