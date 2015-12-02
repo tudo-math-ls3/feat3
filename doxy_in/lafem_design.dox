@@ -77,4 +77,13 @@ typedef typename VT_::template ContainerType<Mem::CUDA, typename VT_main::DataTy
 - VT_ - Vectortype (DenseVector<...>)
 - MT_ - Matrixtype, not to be confused with Mem_
 - FT_ - Filtertype (UnitFilter, NoneFilter)
+
+\section lafem_sec_backends Common Backends
+Currently, two memory backends are supported:
+- FEAST::Mem::Main
+- FEAST::Mem::CUDA
+
+To gain optimal performance from external libraries like MKL or CuBLAS, which automagically replace the generic algorithms if available, one needs to match the supported container configurations:
+- MKL: IT_ = unsigned long
+- CUDA: IT_ = unsigned int
 **/

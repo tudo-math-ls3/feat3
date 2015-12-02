@@ -20,6 +20,7 @@ TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-solver-cuda
     cusolver.cu
+    ilu_precond.cu
     STATIC
   )
   if (FEAST_HAVE_CUSOLVER)

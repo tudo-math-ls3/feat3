@@ -152,8 +152,10 @@ public:
   }
 };
 
-BasicSolverTest<SparseMatrixCSR, Mem::Main, double, Index> basic_solver_csr_generic_double_index;
-BasicSolverTest<SparseMatrixELL, Mem::Main, double, Index> basic_solver_ell_generic_double_index;
+BasicSolverTest<SparseMatrixCSR, Mem::Main, double, unsigned int> basic_solver_csr_generic_double_uint;
+BasicSolverTest<SparseMatrixELL, Mem::Main, double, unsigned int> basic_solver_ell_generic_double_uint;
+BasicSolverTest<SparseMatrixCSR, Mem::Main, double, unsigned long> basic_solver_csr_generic_double_ulong;
+BasicSolverTest<SparseMatrixELL, Mem::Main, double, unsigned long> basic_solver_ell_generic_double_ulong;
 
 template<
   template<typename,typename,typename> class ScalarMatrix_,
@@ -255,22 +257,22 @@ public:
       test_solver("Richardson-JAC", solver, vec_sol, vec_ref, vec_rhs);
     }
 
-    // test BiCGStab-JAC
+    // test BiCGStab-ILU(0)
     {
-      // create a Jacobi preconditioner
-      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      // create a ILU(0) preconditioner
+      auto precon = Solver::new_ilu_precond(matrix, filter);
       // create a BiCGStab solver
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
-      test_solver("BiCGStab-JAC", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs);
     }
   }
 };
 
 #ifdef FEAST_BACKENDS_CUDA
-CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned long> cuda_solver_csr_generic_double_ulong;
-CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned long> cuda_solver_ell_generic_double_ulong;
+//CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned long> cuda_solver_csr_generic_double_ulong;
+//CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned long> cuda_solver_ell_generic_double_ulong;
 CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned int> cuda_solver_csr_generic_double_uint;
-CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned int> cuda_solver_ell_generic_double_uint;
+//CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned int> cuda_solver_ell_generic_double_uint;
 #endif
 
 template<

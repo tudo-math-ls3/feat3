@@ -7,8 +7,6 @@
 
 #include "cusparse_v2.h"
 
-#include <stdio.h>
-
 namespace FEAST
 {
   namespace Util
