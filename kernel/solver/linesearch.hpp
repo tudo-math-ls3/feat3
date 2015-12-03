@@ -583,8 +583,8 @@ namespace FEAST
           _eta = grad.dot(dir);
           this->_def_cur = Math::abs(_eta);
 
-          // Check if the update is too small
-          if(Math::abs(_eta - eta_prev) < Math::eps<DataType>())///(Math::abs(_alpha*_eta)*_norm_dir))
+          // Check if the diffence in etas is too small, thus leading to a huge update of relative size > sqrt(eps)
+          if(Math::abs(_eta - eta_prev) < Math::abs(_alpha*_eta)*_norm_dir*Math::sqrt(Math::eps<DataType>()))
           {
             return Status::stagnated;
           }

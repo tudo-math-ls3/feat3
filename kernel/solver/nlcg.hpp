@@ -141,7 +141,7 @@ namespace FEAST
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
 
-            _min_update = Math::sqrt(Math::eps<DataType>());
+            _min_update = (Math::eps<DataType>());
           }
 
         /**
@@ -271,6 +271,7 @@ namespace FEAST
               this->_num_stag_iter++;
             }
 
+            // Log iterates if necessary
             if(iterates != nullptr)
             {
               auto tmp = vec_sol.clone();
@@ -511,7 +512,7 @@ namespace FEAST
       Operator_& op, const Filter_& filter, Linesearch_& linesearch, bool keep_iterates,
       std::shared_ptr<Precond_> precond)
       {
-        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, precond);
+        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, keep_iterates, linesearch, precond);
       }
 #else
     template<typename Operator_, typename Filter_, typename Linesearch_>

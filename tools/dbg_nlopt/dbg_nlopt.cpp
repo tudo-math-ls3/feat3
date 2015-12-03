@@ -26,7 +26,7 @@ template
   typename Function_,
   template<typename, typename> class Linesearch_
 >
-int run(String precon_type)
+int run(String precon_name, NLCGDirectionUpdate update_type)
 {
   typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
   typedef typename OperatorType::PointType PointType;
@@ -77,23 +77,25 @@ int run(String precon_type)
 
   // Create the linesearch
   LinesearchType my_linesearch(my_op, my_filter);
-  my_linesearch.set_plot(false);
+  my_linesearch.set_plot(true);
 
   // Ugly way to get a preconditioner, or not
   std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
 
-  if(precon_type == "Hessian")
+  if(precon_name== "Hessian")
     my_precond = new_hessian_precond(my_op, my_filter);
-  else if(precon_type == "ApproximateHessian")
+  else if(precon_name == "ApproximateHessian")
     my_precond = new_approximate_hessian_precond(my_op, my_filter);
-  else if(precon_type != "none")
-    throw InternalError("Got invalid precon_type: "+precon_type);
+  else if(precon_name != "none")
+    throw InternalError("Got invalid precon_name: "+precon_name);
 
   auto solver = new_nlcg(my_op, my_filter, my_linesearch, true, my_precond);
   solver->init();
   solver->set_tol_rel(Math::eps<DT_>());
   solver->set_plot(true);
   solver->set_max_iter(250);
+  // Set different direction updates here
+  solver->set_direction_update(update_type);
   std::cout << "Using solver " << solver->get_formated_solver_tree() << std::endl;
 
   // This will hold the solution
@@ -225,7 +227,9 @@ int run(String precon_type)
 
 int main(int argc, char* argv[])
 {
-  // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates
+  // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
+  // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
+  // specifying the real minima and a starting point.
   typedef Analytic::Common::HimmelblauFunction AnalyticFunctionType;
 
   // create an argument parser
@@ -233,6 +237,7 @@ int main(int argc, char* argv[])
 
   // add all supported options
   args.support("precon");
+  args.support("direction_update");
 
   // check for unsupported options
   auto unsupported = args.query_unsupported();
@@ -244,14 +249,30 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  // The default is no preconditioner
   String precon_name("none");
+  // Check if any preconditioner was specified on the command line
   auto* precon_pair(args.query("precon"));
   if(precon_pair != nullptr)
   {
     precon_name = precon_pair->second.front();
   }
 
+  // The default is the Polak-Ribière update
+  NLCGDirectionUpdate update_type(NLCGDirectionUpdate::PolakRibiere);
+  auto* update_pair(args.query("direction_update"));
+  if(update_pair != nullptr)
+  {
+    String update_name(update_pair->second.front());
+    if(update_name == "FletcherReeves")
+      update_type = NLCGDirectionUpdate::FletcherReeves;
+    else if(update_name == "PolakRibiere")
+      update_type = NLCGDirectionUpdate::PolakRibiere;
+    else
+      throw InternalError("Got invalid NLCG direction update: "+update_name);
+  }
+
   // Canditates for the linesearch type (last template parameter) are SecantLinesearch and NRLinesearch
-  return run<Mem::Main, double, Index, AnalyticFunctionType, Solver::SecantLinesearch> (precon_name);
+  return run<Mem::Main, double, Index, AnalyticFunctionType, Solver::NRLinesearch> (precon_name, update_type);
 
 }

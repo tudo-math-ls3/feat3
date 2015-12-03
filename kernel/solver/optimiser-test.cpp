@@ -38,12 +38,14 @@ class NLCGTest:
   private:
     DT_ _tol;
     String _precon_type;
+    NLCGDirectionUpdate _update;
 
   public:
-    NLCGTest(DT_ exponent_, String precon_type_) :
+    NLCGTest(DT_ exponent_, String precon_type_, NLCGDirectionUpdate update_) :
       FullTaggedTest<Mem_, DT_, IT_>("NLCGTest"),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
-      _precon_type(precon_type_)
+      _precon_type(precon_type_),
+      _update(update_)
     {
     }
 
@@ -76,6 +78,7 @@ class NLCGTest:
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
       solver->set_max_iter(250);
+      solver->set_direction_update(_update);
       //std::cout << solver->get_formated_solver_tree() << std::endl;
 
       // This will hold the solution
@@ -117,29 +120,29 @@ class NLCGTest:
 
 // The Himmelblau function is not too difficult, so low tolerance
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction, Solver::NRLinesearch>
-opt_hb_f(float(0.8),"ApproximateHessian");
+opt_hb_f(float(0.8),"ApproximateHessian", NLCGDirectionUpdate::PolakRibiere);
 
-// The same with Secant linesearch and without preconditioner
-NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> opt_hb_d(double(0.6),"none");
+// The same with Secant linesearch, without preconditioner and with Fletcher-Reeves update
+NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> opt_hb_d(double(0.6),"none", NLCGDirectionUpdate::PolakRibiere);
 
-// The Rosenbrock function's steep valley is bad for secant linesearch, so just use Newton Raphson
+// The Rosenbrock function's steep valley is bad for secant linesearch, so use Newton Raphson
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
-opt_rb_d(double(1),"none");
+opt_rb_d(double(1),"none", NLCGDirectionUpdate::PolakRibiere);
 
 // The Hessian of the Bazaraa/Shetty function is singular at the optimal point, so Newton Raphson linesearch does not
 // work very well, so just use the secant linesearch
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
-opt_bs_d(double(0.25),"Hessian");
+opt_bs_d(double(0.4),"none", NLCGDirectionUpdate::PolakRibiere);
 
-// Rosenbrock with Newton Raphson and preconditioning in quad precision
+// Rosenbrock with secant linesearch, preconditioning and Polak-Ribière in quad precision
 #ifdef FEAST_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
-opt_rb_q(__float128(1),"Hessian");
+opt_rb_q(__float128(1),"Hessian", NLCGDirectionUpdate::PolakRibiere);
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAST_BACKENDS_CUDA
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
-opt_bs_f_cuda(double(0.25),"Hessian");
+opt_bs_f_cuda(double(0.4),"none", NLCGDirectionUpdate::PolakRibiere);
 #endif
