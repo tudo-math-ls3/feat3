@@ -230,7 +230,7 @@ namespace StokesPoiseuille2D
     const Index num_levels = Index(domain_levels.size());
 
     //Lin-Solve phase related typedefs
-    //Main-CSR or CUDA-ELL
+    //Main-CSR or CUDA-CSR
     typedef typename TargetMatrixSolve_::MemType MemTypeSolve;
     typedef Control::StokesUnitVeloNonePresSystemLevel<dim, MemTypeSolve, DataType, IndexType, TargetMatrixSolve_> SystemLevelTypeSolve;
     typedef Control::StokesBasicTransferLevel<SystemLevelTypeSolve> TransferLevelTypeSolve;
@@ -391,13 +391,11 @@ namespace StokesPoiseuille2D
     // create S-solver
     {
       // create a local ILU(0) for S
-      //auto loc_ilu = Solver::new_ilu_precond(*the_system_level_solve.matrix_s, *the_system_level_solve.filter_pres, Index(0));
-      auto loc_jac = Solver::new_jacobi_precond(*the_system_level_solve.matrix_s, *the_system_level_solve.filter_pres, 0.7);
-      auto loc_pcg = Solver::new_pcg(*the_system_level_solve.matrix_s, *the_system_level_solve.filter_pres, loc_jac);
+      auto loc_ilu = Solver::new_ilu_precond(*the_system_level_solve.matrix_s, *the_system_level_solve.filter_pres, Index(0));
+
 
       // make it Schwarz...
-      //auto glob_ilu = Solver::new_schwarz_precond(loc_ilu, the_system_level_solve.filter_pres);
-      auto glob_ilu = Solver::new_schwarz_precond(loc_pcg, the_system_level_solve.filter_pres);
+      auto glob_ilu = Solver::new_schwarz_precond(loc_ilu, the_system_level_solve.filter_pres);
 
       // set our S-solver
       solver_s = glob_ilu;
@@ -566,7 +564,7 @@ namespace StokesPoiseuille2D
 #ifdef FEAST_BACKENDS_CUDA
       else if(mem_string == "cuda")
       {
-        run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(rank, nprocs, args, domain);
+        run<MeshType, LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> >(rank, nprocs, args, domain);
       }
 #endif
       else
