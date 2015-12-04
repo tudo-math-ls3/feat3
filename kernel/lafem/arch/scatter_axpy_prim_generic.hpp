@@ -17,8 +17,8 @@ namespace FEAST
     namespace Arch
     {
 
-      template <typename DT_>
-      void ScatterAxpyPrim<Mem::Main>::dv_csr_generic(DT_* v, const DT_* b, const Index* col_ind, const DT_* val, const Index* row_ptr, const DT_ alpha, const Index size, const Index offset)
+      template <typename DT_, typename IT_>
+      void ScatterAxpyPrim<Mem::Main>::dv_csr_generic(DT_* v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const DT_ alpha, const Index size, const Index offset)
       {
         // loop over all scatter-matrix rows
         for (Index row(0) ; row < size ; ++row)

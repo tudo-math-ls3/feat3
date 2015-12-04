@@ -11,8 +11,8 @@ namespace FEAST
   {
     namespace Intern
     {
-      template <typename DT_>
-      __global__ void cuda_gather_axpy_prim_dv_csr(DT_ * b, const DT_* v, const Index* col_ind, const DT_* val, const Index* row_ptr, const DT_ alpha, const Index size, const Index offset)
+      template <typename DT_, typename IT_>
+      __global__ void cuda_gather_axpy_prim_dv_csr(DT_ * b, const DT_* v, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const DT_ alpha, const Index size, const Index offset)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= size)
@@ -33,8 +33,8 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
-template <typename DT_>
-void GatherAxpyPrim<Mem::CUDA>::dv_csr(DT_ * v, const DT_* b, const Index* col_ind, const DT_* val, const Index* row_ptr, const DT_ alpha, const Index size, const Index offset)
+template <typename DT_, typename IT_>
+void GatherAxpyPrim<Mem::CUDA>::dv_csr(DT_ * v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const DT_ alpha, const Index size, const Index offset)
 {
   Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
   dim3 grid;
@@ -51,5 +51,7 @@ void GatherAxpyPrim<Mem::CUDA>::dv_csr(DT_ * v, const DT_* b, const Index* col_i
 #endif
 }
 
-template void GatherAxpyPrim<Mem::CUDA>::dv_csr(float *, const float*, const Index*, const float*, const Index*, const float alpha, const Index, const Index);
-template void GatherAxpyPrim<Mem::CUDA>::dv_csr(double *, const double*, const Index*, const double*, const Index*, const double alpha, const Index, const Index);
+template void GatherAxpyPrim<Mem::CUDA>::dv_csr(float *, const float*, const unsigned long*, const float*, const unsigned long*, const float alpha, const Index, const Index);
+template void GatherAxpyPrim<Mem::CUDA>::dv_csr(double *, const double*, const unsigned long*, const double*, const unsigned long*, const double alpha, const Index, const Index);
+template void GatherAxpyPrim<Mem::CUDA>::dv_csr(float *, const float*, const unsigned int*, const float*, const unsigned int*, const float alpha, const Index, const Index);
+template void GatherAxpyPrim<Mem::CUDA>::dv_csr(double *, const double*, const unsigned int*, const double*, const unsigned int*, const double alpha, const Index, const Index);

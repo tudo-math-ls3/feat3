@@ -481,7 +481,11 @@ public:
   }
 };
 
-VectorMirrorTest<Mem::Main, double, Index> vector_mirror_test_generic_d;
+VectorMirrorTest<Mem::Main, double, unsigned long> vector_mirror_test_main_d_ul;
+VectorMirrorTest<Mem::Main, float, unsigned int> vector_mirror_test_main_f_ui;
+/// \todo Add cuda vector mirror tests
+//VectorMirrorTest<Mem::CUDA, double, unsigned long> vector_mirror_test_cuda_d_ul;
+//VectorMirrorTest<Mem::CUDA, float, unsigned int> vector_mirror_test_cuda_f_ui;
 
 /**
  * \brief Test class for VectorMirrorBlocked class template

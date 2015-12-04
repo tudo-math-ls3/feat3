@@ -17,8 +17,8 @@ namespace FEAST
     namespace Arch
     {
 
-      template <typename DT_>
-      void ScatterPrim<Mem::Main>::dv_csr_generic(DT_* v, const DT_* b, const Index* col_ind, const DT_* val, const Index* row_ptr, const Index size, const Index offset)
+      template <typename DT_, typename IT_>
+      void ScatterPrim<Mem::Main>::dv_csr_generic(DT_* v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const Index size, const Index offset)
       {
         for (Index row(0) ; row < size ; ++row)
         {

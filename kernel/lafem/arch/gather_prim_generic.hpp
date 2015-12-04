@@ -17,8 +17,8 @@ namespace FEAST
     namespace Arch
     {
 
-      template <typename DT_>
-      void GatherPrim<Mem::Main>::dv_csr_generic(DT_* b, const DT_* v, const Index* col_ind, const DT_* val, const Index* row_ptr, const Index size, const Index offset)
+      template <typename DT_, typename IT_>
+      void GatherPrim<Mem::Main>::dv_csr_generic(DT_* b, const DT_* v, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const Index size, const Index offset)
       {
         for (Index row(0) ; row < size; ++row)
         {

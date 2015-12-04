@@ -18,24 +18,24 @@ namespace FEAST
       template <>
       struct ScatterPrim<Mem::Main>
       {
-        template <typename DT_>
+        template <typename DT_, typename IT_>
         static void dv_csr(DT_* v,
                            const DT_* b,
-                           const Index* col_ind,
+                           const IT_* col_ind,
                            const DT_* val,
-                           const Index* row_ptr,
+                           const IT_* row_ptr,
                            const Index size,
                            const Index offset)
         {
           dv_csr_generic(v, b, col_ind, val, row_ptr, size, offset);
         }
 
-        template <typename DT_>
+        template <typename DT_, typename IT_>
         static void dv_csr_generic(DT_* v,
                                    const DT_* b,
-                                   const Index* col_ind,
+                                   const IT_* col_ind,
                                    const DT_* val,
-                                   const Index* row_ptr,
+                                   const IT_* row_ptr,
                                    const Index size,
                                    const Index offset);
 
@@ -44,12 +44,12 @@ namespace FEAST
       template <>
       struct ScatterPrim<Mem::CUDA>
       {
-        template <typename DT_>
+        template <typename DT_, typename IT_>
         static void dv_csr(DT_* v,
                            const DT_* b,
-                           const Index* col_ind,
+                           const IT_* col_ind,
                            const DT_* val,
-                           const Index* row_ptr,
+                           const IT_* row_ptr,
                            const Index size,
                            const Index offset);
       };
