@@ -45,7 +45,7 @@ public:
   }
 
   template<typename Solver_>
-  void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs) const
+  void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs, const Index ref_iters) const
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
@@ -63,6 +63,7 @@ public:
     vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
     DataType d = vec_sol.norm2sqr();
     TEST_CHECK_EQUAL_WITHIN_EPS(d, DataType(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(solver.get_num_iter(), ref_iters, 2);
   }
 
   virtual void run() const
@@ -101,7 +102,7 @@ public:
     {
       // create a CG solver
       PCG<MatrixType, FilterType> solver(matrix, filter);
-      test_solver("CG", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("CG", solver, vec_sol, vec_ref, vec_rhs, 28);
     }
 
     // test PCG-JAC
@@ -110,7 +111,7 @@ public:
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       // create a CG solver
       PCG<MatrixType, FilterType> solver(matrix, filter, precon);
-      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
     }
 
     // test PCG-SSOR
@@ -119,7 +120,7 @@ public:
       auto precon = Solver::new_ssor_precond(matrix, filter);
       // create a CG solver
       PCG<MatrixType, FilterType> solver(matrix, filter, precon);
-      test_solver("PCG-SSOR", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("PCG-SSOR", solver, vec_sol, vec_ref, vec_rhs, 19);
     }
 
     // test FGMRES-SPAI
@@ -128,7 +129,7 @@ public:
       auto precon = Solver::new_spai_precond(matrix, filter, matrix.layout());
       // create a FMGRES solver
       FGMRES<MatrixType, FilterType> solver(matrix, filter, 16, 0.0, precon);
-      test_solver("FGMRES(16)-SPAI", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("FGMRES(16)-SPAI", solver, vec_sol, vec_ref, vec_rhs, 32);
     }
 
     // test Richardson-SOR
@@ -138,7 +139,7 @@ public:
       // create a Richardson solver
       Richardson<MatrixType, FilterType> solver(matrix, filter, DataType(1.0), precon);
       solver.set_max_iter(1000);
-      test_solver("Richardson-SOR(1.7)", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("Richardson-SOR(1.7)", solver, vec_sol, vec_ref, vec_rhs, 71);
     }
 
     // test BiCGStab-ILU(0)
@@ -147,7 +148,7 @@ public:
       auto precon = Solver::new_ilu_precond(matrix, filter, Index(0));
       // create a BiCGStab solver
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
-      test_solver("BiCGStab-ILU(0)", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("BiCGStab-ILU(0)", solver, vec_sol, vec_ref, vec_rhs, 12);
     }
   }
 };
@@ -179,7 +180,7 @@ public:
   }
 
   template<typename Solver_>
-  void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs) const
+  void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs, const Index ref_iters) const
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
@@ -197,6 +198,7 @@ public:
     vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
     DataType d = vec_sol.norm2sqr();
     TEST_CHECK_EQUAL_WITHIN_EPS(d, DataType(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(solver.get_num_iter(), ref_iters, 2);
   }
 
   virtual void run() const
@@ -235,7 +237,7 @@ public:
     {
       // create a CG solver
       PCG<MatrixType, FilterType> solver(matrix, filter);
-      test_solver("CG", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("CG", solver, vec_sol, vec_ref, vec_rhs, 28);
     }
 
     // test PCG-JAC
@@ -244,7 +246,7 @@ public:
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       // create a CG solver
       PCG<MatrixType, FilterType> solver(matrix, filter, precon);
-      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
     }
 
     // test Richardson-JAC
@@ -253,8 +255,8 @@ public:
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       // create a Richardson solver
       Richardson<MatrixType, FilterType> solver(matrix, filter, DataType(1.0), precon);
-      solver.set_max_iter(1000);
-      test_solver("Richardson-JAC", solver, vec_sol, vec_ref, vec_rhs);
+      solver.set_max_iter(2000);
+      test_solver("Richardson-JAC", solver, vec_sol, vec_ref, vec_rhs, 1175);
     }
 
     // test BiCGStab-ILU(0)
@@ -263,7 +265,7 @@ public:
       auto precon = Solver::new_ilu_precond(matrix, filter);
       // create a BiCGStab solver
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
-      test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs);
+      test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs, 12);
     }
   }
 };
@@ -297,7 +299,7 @@ public:
   }
 
   template<typename Solver_>
-  void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs) const
+  void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs, const Index ref_iters) const
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
@@ -315,6 +317,7 @@ public:
     vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
     DataType d = vec_sol.norm2sqr();
     TEST_CHECK_EQUAL_WITHIN_EPS(d, DataType(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(solver.get_num_iter(), ref_iters, 2);
   }
 
   virtual void run() const
@@ -356,7 +359,8 @@ public:
     {
       // create a PCG solver
       PCG<MatrixType, FilterType> solver(matrix, filter);
-      test_solver("PCG", solver, vec_sol, vec_ref, vec_rhs);
+      solver.set_max_iter(1000);
+      test_solver("PCG", solver, vec_sol, vec_ref, vec_rhs, 105);
     }
 
     // test PCG-JAC
@@ -365,7 +369,8 @@ public:
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       // create a CG solver
       PCG<MatrixType, FilterType> solver(matrix, filter, precon);
-      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs);
+      solver.set_max_iter(1000);
+      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 105);
     }
   }
 };
