@@ -267,9 +267,7 @@ namespace FEAST
 
             _linesearch.correct(vec_sol, this->_vec_dir);
             if(_linesearch.get_rel_update() < _min_update)
-            {
               this->_num_stag_iter++;
-            }
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -302,9 +300,7 @@ namespace FEAST
 
             // If a restart is scheduled, reset beta to 0
             if(restart_freq > 0 && its_since_restart%restart_freq == 0)
-            {
               beta = DataType(0);
-            }
 
             /// Restarting means discarding the new search direction and setting the new search direction to the
             // (preconditioned) steepest descent direction
@@ -346,6 +342,10 @@ namespace FEAST
          *
          * \param[in, out] at
          * Timestamp for solver timings
+         *
+         * If the returned \f$ \beta = 0,\f$ the next search direction is the steepest descent direction. Many of the
+         * update formulas need the old (preconditioned) defect we keep in _vec_temp, so the preconditioner is always
+         * called in these routines.
          *
          * \returns A solver status code.
          */
@@ -428,7 +428,16 @@ namespace FEAST
           return Status::progress;
         }
 
-        /// \copydoc compute_beta()
+        /**
+         * \copydoc compute_beta()
+         *
+         * The Polak-Ribière update sets
+         * \f{align*}{
+         *   r_k & := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} = \left<r_{k+1}, s_k \right> \\
+         *   \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
+         * \f}
+        */
         Status polak_ribiere(DataType& beta, DataType& gamma, TimeStamp& at)
         {
           DataType gamma_old(gamma);
@@ -449,26 +458,39 @@ namespace FEAST
           return Status::progress;
         }
 
-        /// \copydoc compute_beta()
+        /**
+         * \copydoc compute_beta()
+         * The Fletcher-Reeves update sets
+         * \f[
+         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} = \left<r_{k+1}, d_k \right>
+         * \f]
+         * \f[
+         *   \beta_{k+1} :=
+         *   \begin{cases}
+         *     0, & \gamma_{k+\frac{1}{2}} \leq 0 \\
+         *     \frac{\gamma_{k+1}}{\gamma_k}, & \mathrm{else}
+         *   \end{cases}
+         * \f]
+         */
         Status fletcher_reeves(DataType& beta, DataType& gamma, TimeStamp& at)
         {
-          DataType gamma_old = gamma;
-          DataType gamma_mid = this->_vec_dir.dot(this->_vec_def);
+          // apply preconditioner
+          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          {
+            TimeStamp bt;
+            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+            return Status::aborted;
+          }
 
-          if(gamma_mid < DataType(0))
+          DataType gamma_old = gamma;
+          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_dir);
+
+          if(gamma_mid < -gamma_old)
             beta = DataType(0);
           else
           {
-            // apply preconditioner
-            if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              return Status::aborted;
-            }
-
             gamma = this->_vec_def.dot(this->_vec_tmp);
-
             beta = gamma/gamma_old;
           }
 
@@ -512,7 +534,7 @@ namespace FEAST
       Operator_& op, const Filter_& filter, Linesearch_& linesearch, bool keep_iterates,
       std::shared_ptr<Precond_> precond)
       {
-        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, keep_iterates, linesearch, precond);
+        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, keep_iterates, precond);
       }
 #else
     template<typename Operator_, typename Filter_, typename Linesearch_>

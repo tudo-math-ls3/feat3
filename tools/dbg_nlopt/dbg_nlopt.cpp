@@ -225,12 +225,24 @@ int run(String precon_name, NLCGDirectionUpdate update_type)
 
 }
 
+static void display_help()
+{
+  std::cout << "dbg-nlopt usage:" << std::endl;
+  std::cout << "Optional arguments:" << std::endl;
+  std::cout << " --precon [String]: Available preconditioners are Hessian, ApproximateHessian, none(default)"
+  << std::endl;
+  std::cout << " --direction_update [String]: Available NLCG search direction updates are FletcherReeves and"
+    << " PolakRibiere (default)" << std::endl;
+  std::cout << " --help: Displays this text" << std::endl;
+
+}
+
 int main(int argc, char* argv[])
 {
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::HimmelblauFunction AnalyticFunctionType;
+  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
 
   // create an argument parser
   SimpleArgParser args(argc, argv);
@@ -238,14 +250,16 @@ int main(int argc, char* argv[])
   // add all supported options
   args.support("precon");
   args.support("direction_update");
+  args.support("help");
 
   // check for unsupported options
   auto unsupported = args.query_unsupported();
-  if( !unsupported.empty() )
+  if( !unsupported.empty() || args.check("help") > -1)
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
       std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
+    display_help();
     return 1;
   }
 
@@ -254,9 +268,7 @@ int main(int argc, char* argv[])
   // Check if any preconditioner was specified on the command line
   auto* precon_pair(args.query("precon"));
   if(precon_pair != nullptr)
-  {
     precon_name = precon_pair->second.front();
-  }
 
   // The default is the Polak-Ribière update
   NLCGDirectionUpdate update_type(NLCGDirectionUpdate::PolakRibiere);

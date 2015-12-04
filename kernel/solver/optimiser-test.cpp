@@ -123,26 +123,26 @@ NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction, Solver::
 opt_hb_f(float(0.8),"ApproximateHessian", NLCGDirectionUpdate::PolakRibiere);
 
 // The same with Secant linesearch, without preconditioner and with Fletcher-Reeves update
-NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> opt_hb_d(double(0.6),"none", NLCGDirectionUpdate::PolakRibiere);
+NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> opt_hb_d(double(0.8),"none", NLCGDirectionUpdate::FletcherReeves);
 
 // The Rosenbrock function's steep valley is bad for secant linesearch, so use Newton Raphson
-NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
-opt_rb_d(double(1),"none", NLCGDirectionUpdate::PolakRibiere);
+NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
+opt_rb_d(float(0.8),"Hessian", NLCGDirectionUpdate::PolakRibiere);
 
 // The Hessian of the Bazaraa/Shetty function is singular at the optimal point, so Newton Raphson linesearch does not
 // work very well, so just use the secant linesearch
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
-opt_bs_d(double(0.4),"none", NLCGDirectionUpdate::PolakRibiere);
+opt_bs_d(double(0.3),"none", NLCGDirectionUpdate::PolakRibiere);
 
 // Rosenbrock with secant linesearch, preconditioning and Polak-Ribière in quad precision
 #ifdef FEAST_HAVE_QUADMATH
-NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
-opt_rb_q(__float128(1),"Hessian", NLCGDirectionUpdate::PolakRibiere);
+NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction, Solver::SecantLinesearch>
+opt_rb_q(__float128(0.9),"Hessian", NLCGDirectionUpdate::PolakRibiere);
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAST_BACKENDS_CUDA
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
-opt_bs_f_cuda(double(0.4),"none", NLCGDirectionUpdate::PolakRibiere);
+opt_bs_f_cuda(double(0.25),"none", NLCGDirectionUpdate::FletcherReeves);
 #endif

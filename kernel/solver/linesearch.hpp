@@ -245,6 +245,7 @@ namespace FEAST
 
           }
 
+          // We should never come to this point
           return Status::undefined;
 
         }
@@ -426,7 +427,7 @@ namespace FEAST
               iterates = new std::deque<VectorType>;
 
             this->_min_stag_iter = Index(2);
-            this->_min_iter = Index(5);
+            this->_min_iter = Index(1);
 
             this->set_plot(true);
           }
