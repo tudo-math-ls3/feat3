@@ -449,6 +449,7 @@ namespace FEAST
        *
        * \param[in] y
        * The summand vector
+       *
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const

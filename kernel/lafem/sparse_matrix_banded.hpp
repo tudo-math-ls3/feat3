@@ -1041,7 +1041,7 @@ namespace FEAST
         //r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
           r.copy(y);
-        // r <- y + alpha*x
+        // r <- y + alpha*A*x
         else
         {
           Arch::Axpy<Mem_>::banded(r.elements(),

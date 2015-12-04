@@ -295,7 +295,21 @@ public:
       ref_local.copy(ref);
 
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
+
+      // apply-test for alpha = 4711.1 and &r==&y
+      r.copy(y);
+      a.apply(r, x, r, s);
+      result_local.copy(r);
+
+      //ref.product_matvec(a, x);
+      a.apply(ref, x);
+      ref.scale(ref, s);
+      ref.axpy(ref, y);
+      ref_local.copy(ref);
+
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
 
       a.apply(r, x);
       result_local.copy(r);

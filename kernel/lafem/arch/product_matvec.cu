@@ -237,8 +237,8 @@ void ProductMatVec<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const unsigne
 {
   cusparseMatDescr_t descr=0;
   cusparseCreateMatDescr(&descr);
-  cusparseSetMatType(descr,CUSPARSE_MATRIX_TYPE_GENERAL);
-  cusparseSetMatIndexBase(descr,CUSPARSE_INDEX_BASE_ZERO);
+  cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+  cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
   DT_ one(1);
   DT_ zero(0);
@@ -254,8 +254,8 @@ void ProductMatVec<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const val, const
 {
   cusparseMatDescr_t descr=0;
   cusparseCreateMatDescr(&descr);
-  cusparseSetMatType(descr,CUSPARSE_MATRIX_TYPE_GENERAL);
-  cusparseSetMatIndexBase(descr,CUSPARSE_INDEX_BASE_ZERO);
+  cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+  cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
   DT_ one(1);
   DT_ zero(0);

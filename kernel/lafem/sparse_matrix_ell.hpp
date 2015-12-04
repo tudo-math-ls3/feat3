@@ -2154,7 +2154,7 @@ namespace FEAST
         // r <- y
         else if (Math::abs(alpha) < Math::eps<DT_>())
           r.copy(y);
-        // r <- y + alpha*x
+        // r <- y + alpha*A*x
         else
         {
           Statistics::add_flops(this->used_elements() * 3);

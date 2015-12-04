@@ -9,8 +9,18 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
+#include "cusparse_v2.h"
+
 namespace FEAST
 {
+  namespace Util
+  {
+    namespace Intern
+    {
+      extern cusparseHandle_t cusparse_handle;
+    }
+  }
+
   namespace LAFEM
   {
     namespace Intern
@@ -94,6 +104,48 @@ namespace FEAST
         }
         r[idx] = (sum*alpha) + y[idx];
       }
+
+      void cusparse_axpy_csr(cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const float * alpha, const cusparseMatDescr_t descrA,
+                                       const float * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       const float * x, const float * beta, float * y)
+      {
+        cusparseScsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, x, beta, y);
+      }
+
+      void cusparse_axpy_csr(cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const double * alpha, const cusparseMatDescr_t descrA,
+                                       const double * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       const double * x, const double * beta, double * y)
+      {
+        cusparseDcsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, x, beta, y);
+      }
+
+      void cusparse_axpy_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const float * alpha, const cusparseMatDescr_t descrA,
+                                       const float * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       int block_dim,
+                                       const float * x, const float * beta, float * y)
+      {
+        cusparseSbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, block_dim, x, beta, y);
+      }
+
+      void cusparse_axpy_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const double * alpha, const cusparseMatDescr_t descrA,
+                                       const double * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       int block_dim,
+                                       const double * x, const double * beta, double * y)
+      {
+        cusparseDbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, block_dim, x, beta, y);
+      }
     }
   }
 }
@@ -147,9 +199,32 @@ template void Axpy<Mem::CUDA>::csr(double *, const double, const double * const,
 template <typename DT_>
 void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements)
 {
-  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA>::csr(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
-  FEAST::LAFEM::Arch::Scale<Mem::CUDA>::value(r, r, a, rows);
-  FEAST::LAFEM::Arch::Sum<Mem::CUDA>::value(r, r, y, rows);
+  if (r == y)
+  {
+    cusparseMatDescr_t descr=0;
+    cusparseCreateMatDescr(&descr);
+    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+
+    DT_ one(1);
+    FEAST::LAFEM::Intern::cusparse_axpy_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
+
+    cusparseDestroyMatDescr(descr);
+  }
+  else
+  {
+    cudaMemcpy(r, y, rows * sizeof(DT_), cudaMemcpyDeviceToDevice);
+
+    cusparseMatDescr_t descr=0;
+    cusparseCreateMatDescr(&descr);
+    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+
+    DT_ one(1);
+    FEAST::LAFEM::Intern::cusparse_axpy_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
+
+    cusparseDestroyMatDescr(descr);
+  }
 }
 template void Axpy<Mem::CUDA>::csr(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 template void Axpy<Mem::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
@@ -157,9 +232,34 @@ template void Axpy<Mem::CUDA>::csr(double *, const double, const double * const,
 template <typename DT_>
 void Axpy<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int blocksize)
 {
-  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA>::csrb_intern(r, val, col_ind, row_ptr, x, rows, columns, used_elements, blocksize);
-  FEAST::LAFEM::Arch::Scale<Mem::CUDA>::value(r, r, a, rows * blocksize);
-  FEAST::LAFEM::Arch::Sum<Mem::CUDA>::value(r, r, y, rows * blocksize);
+  if (r == y)
+  {
+    cusparseMatDescr_t descr=0;
+    cusparseCreateMatDescr(&descr);
+    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+
+    DT_ one(1);
+    FEAST::LAFEM::Intern::cusparse_axpy_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+        blocksize, x, &one, r);
+
+    cusparseDestroyMatDescr(descr);
+  }
+  else
+  {
+    cudaMemcpy(r, y, rows * blocksize * sizeof(DT_), cudaMemcpyDeviceToDevice);
+
+    cusparseMatDescr_t descr=0;
+    cusparseCreateMatDescr(&descr);
+    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+
+    DT_ one(1);
+    FEAST::LAFEM::Intern::cusparse_axpy_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+        blocksize, x, &one, r);
+
+    cusparseDestroyMatDescr(descr);
+  }
 }
 template void Axpy<Mem::CUDA>::csrb_intern(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int);
 template void Axpy<Mem::CUDA>::csrb_intern(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int);
