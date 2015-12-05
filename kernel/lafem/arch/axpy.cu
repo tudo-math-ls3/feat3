@@ -225,6 +225,13 @@ void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ *
 
     cusparseDestroyMatDescr(descr);
   }
+
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Axpy<Mem::CUDA>::csr(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 template void Axpy<Mem::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
@@ -260,6 +267,13 @@ void Axpy<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, con
 
     cusparseDestroyMatDescr(descr);
   }
+
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Axpy<Mem::CUDA>::csrb_intern(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int);
 template void Axpy<Mem::CUDA>::csrb_intern(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int);

@@ -245,6 +245,13 @@ void ProductMatVec<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const unsigne
   FEAST::LAFEM::Intern::cusparse_product_matvec_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &one, descr, val, (int*)row_ptr, (int*)col_ind, x, &zero, r);
 
   cusparseDestroyMatDescr(descr);
+
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void ProductMatVec<Mem::CUDA>::csr(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
 template void ProductMatVec<Mem::CUDA>::csr(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
@@ -262,6 +269,13 @@ void ProductMatVec<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const val, const
   FEAST::LAFEM::Intern::cusparse_product_matvec_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &one, descr, val, (int*)row_ptr, (int*)col_ind, blocksize, x, &zero, r);
 
   cusparseDestroyMatDescr(descr);
+
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void ProductMatVec<Mem::CUDA>::csrb_intern(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index, const int);
 template void ProductMatVec<Mem::CUDA>::csrb_intern(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index, const int);
