@@ -78,7 +78,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("")
   print ("============== ADDITIONAL OPTIONS ==============")
   print ("--system_host_compiler=/usr/bin/gcc")
-  print ("  Selects the system compiler (and header files) used by icc.")
+  print ("  Selects the system compiler (and header files) used by icc and clang.")
+  print ("  Be aware that icc needs the path to a gcc binary and clang needs the path to folder containing the whole toolchain.")
   print ("--cuda_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by nvcc.")
   print ("--cuda_arch=sm_20")
@@ -306,7 +307,7 @@ elif "clang" in buildid or "llvm" in buildid:
   remove_string(unused_tokens, "llvm")
   os.environ["CC"] = "clang"
   os.environ["CXX"] = compiler
-  cxxflags += " " + configure_clang (cputype, buildid, compiler)
+  cxxflags += " " + configure_clang (cputype, buildid, compiler, system_host_compiler)
 elif "msc" in buildid:
   if not compiler:
     compiler = "cl"

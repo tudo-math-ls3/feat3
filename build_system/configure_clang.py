@@ -1,7 +1,7 @@
 import platform
 from build_system.feast_util import get_output
 
-def configure_clang(cpu, buildid, compiler):
+def configure_clang(cpu, buildid, compiler, system_host_compiler):
   version = get_output(compiler + " -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__clang_major__"])
@@ -14,6 +14,9 @@ def configure_clang(cpu, buildid, compiler):
     sys.exit(1)
 
   cxxflags = "-pipe  -std=c++11 -ggdb -fcolor-diagnostics -m64"
+  if system_host_compiler:
+    cxxflags += " --gcc-toolchain=" + system_host_compiler
+
   if "ccache" in buildid:
     cxxflags += " -Qunused-arguments"
   if "debug" in buildid:
