@@ -235,6 +235,10 @@ public:
     c.apply(r, xb, y, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
+    c.apply(rb, xb, y, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
     c.apply(rb, xb, yb, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
@@ -354,6 +358,11 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);
 
     c.apply(rb, xb, yb, alpha);
+    r.convert(rb);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);
+
+    c.apply(rb, xb, y, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);

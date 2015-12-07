@@ -1490,6 +1490,54 @@ namespace FEAST
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
+
+      /**
+       * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+       *
+       * \param[out] r The vector that recieves the result.
+       * \param[in] x The vector to be multiplied by this matrix.
+       * \param[in] y The summand vector.
+       * \param[in] alpha A scalar to scale the product with.
+       */
+      void apply(
+                 DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
+                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
+                 const DenseVector<Mem_, DT_, IT_> & y,
+                 const DT_ alpha = DT_(1)) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        if (y.size() != this->rows<Perspective::pod>())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+        TimeStamp ts_start;
+
+        // check for special cases
+        // r <- y - A*x
+        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+        {
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
+          Arch::Defect<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(), this->row_ptr(),
+            x.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
+        }
+        //r <- y
+        else if(Math::abs(alpha) < Math::eps<DT_>())
+          r.convert(y);
+        // r <- y + alpha*A*x
+        else
+        {
+          Statistics::add_flops(this->used_elements<Perspective::pod>() * 3);
+          Arch::Axpy<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
+            r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
+            this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+        }
+
+        TimeStamp ts_stop;
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
+      }
       ///@}
 
 

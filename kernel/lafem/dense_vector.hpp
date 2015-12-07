@@ -955,6 +955,7 @@ namespace FEAST
        *
        * \returns Pointer to the data array.
        */
+      template <Perspective = Perspective::native>
       DT_ * elements()
       {
         if (this->_elements.size() == 0)
@@ -963,6 +964,7 @@ namespace FEAST
         return this->_elements.at(0);
       }
 
+      template <Perspective = Perspective::native>
       DT_ const * elements() const
       {
         if (this->_elements.size() == 0)
