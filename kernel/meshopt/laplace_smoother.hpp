@@ -89,7 +89,7 @@ namespace FEAST
 
       protected:
         /// Transformation
-         TrafoType _trafo;
+        TrafoType _trafo;
         /// FE space the transformation is from
         TrafoSpace _trafo_space;
         /// System matrix
@@ -227,12 +227,12 @@ namespace FEAST
               tmp(d) = sol_backcopy(i);
               this->_coords(i, tmp);
             }
-          }
 
-          // Print solver summary
-          std::cout << "Component " << d << ": " << solver->get_plot_name() << ": " << st << ", "
-          << solver->get_num_iter() << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial())
-          << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
+            // Print solver summary
+            std::cout << "Component " << d << ": " << solver->get_plot_name() << ": " << st << ", "
+            << solver->get_num_iter() << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial())
+            << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
+          }
 
           // Release the solver
           solver->done();
