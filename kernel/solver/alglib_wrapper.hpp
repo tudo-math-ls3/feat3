@@ -24,9 +24,6 @@ namespace FEAST
      * \tparam Filter_
      * Filter to apply to the operator's gradient
      *
-     * \tparam Linesearch_
-     * Type of linesearch to use along the descent direction
-     *
      */
     template<typename Operator_, typename Filter_>
     class ALGLIBMinCG : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
@@ -60,11 +57,20 @@ namespace FEAST
         /// temporary vector
         VectorType _vec_tmp;
 
+        /// Tolerance for function improvement
+        DataType _tol_update_func;
+        /// Tolerance for gradient improvement
+        DataType _tol_update_grad;
+
+        /// Optimisation variable for ALGLIB
         alglib::real_1d_array _opt_var;
+        /// This will hold the state of the optimisation problem in ALGLIB
         alglib::mincgstate _state;
+        /// Convergence report etc.
         alglib::mincgreport _report;
 
       public:
+        /// Can hold all iterates for debugging purposes
         std::deque<VectorType>* iterates;
 
       public:
@@ -91,6 +97,8 @@ namespace FEAST
           BaseClass("ALGLIBMinCG", precond),
           _op(op_),
           _filter(filter_),
+          _tol_update_func(DataType(0)),
+          _tol_update_grad(DataType(0)),
           iterates(nullptr)
           {
             if(keep_iterates)
@@ -109,9 +117,6 @@ namespace FEAST
         /// \copydoc BaseClass::init_symbolic()
         virtual void init_symbolic() override
         {
-          double epsg(1e-10);
-          double epsf(0);
-          double epsx(0);
           BaseClass::init_symbolic();
           //// create three temporary vectors
           _vec_def = this->_op.create_vector_r();
@@ -122,7 +127,7 @@ namespace FEAST
           // Set the algorithm type: -1 (automatic selection of best algorithm), 0 (Dai-Yuan), 1 (hybrid Day-Yuan
           // and Hestenes-Stiefel)
           alglib::mincgsetcgtype(_state, -1);
-          alglib::mincgsetcond(_state, epsg, epsf, epsx, alglib::ae_int_t(this->_max_iter));
+          alglib::mincgsetxrep(_state, true);
         }
 
         /// \copydoc BaseClass::done_symbolic()
@@ -187,6 +192,11 @@ namespace FEAST
         virtual Status _apply_intern(VectorType& vec_sol)
         {
 
+          // Get tolerances for ALGLIB
+          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_update_func), double(_tol_update_grad),
+          alglib::ae_int_t(this->_max_iter));
+
+          // Write initial guess to iterates if desired
           if(iterates != nullptr)
           {
             auto tmp = vec_sol.clone();
@@ -198,14 +208,13 @@ namespace FEAST
           if(status != Status::progress)
             return status;
 
+          // Copy initial guess to optimisation state variable
           auto vec_sol_elements = vec_sol.template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
             _opt_var[i] = vec_sol_elements[i];
 
-          alglib::mincgoptimize(_state, _func_grad, nullptr, this);
+          alglib::mincgoptimize(_state, _func_grad, _log, this);
           alglib::mincgresults(_state, _opt_var, _report);
-
-        std::cout << "mincg: terminationtype " << _report.terminationtype << ", " << _report.iterationscount << " its, " << _report.nfev << " grad evals" << std::endl;
 
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
             vec_sol_elements[i] = _opt_var[i];
@@ -213,33 +222,45 @@ namespace FEAST
           switch(_report.terminationtype)
           {
             case(-8):
-              std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << std::endl;
+              //std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << std::endl;
               return Status::aborted;
             case(-7):
-              std::cout << "ALGLIB: Gradient verification failed." << std::endl;
+              //std::cout << "ALGLIB: Gradient verification failed." << std::endl;
               return Status::aborted;
             case(1):
-              std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
+              //std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
               return Status::stagnated;
             case(2):
-              std::cout << "ALGLIB: Update step size stagnated." << std::endl;
+              //std::cout << "ALGLIB: Update step size stagnated." << std::endl;
               return Status::stagnated;
             case(4):
-              std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
+              //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
               return Status::success;
             case(5):
               return Status::max_iter;
             case(7):
-              std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
+              //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
               return Status::stagnated;
             default:
               return Status::undefined;
           }
         }
 
+        /**
+         * \brief Internal function for logging/plotting
+         *
+         * \param[in] x
+         * The state variable of the optimisation problem
+         *
+         * \param[in] func
+         * The functional value
+         *
+         * \param[in] ptr
+         * this, as the function needs to be static because it gets passed around as a C-style function pointer
+         *
+         */
         static void _log(const alglib::real_1d_array& DOXY(x), double DOXY(func), void* ptr)
         {
-          std::cout << "log called" << std::endl;
           ALGLIBMinCG<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<OperatorType, FilterType>*>(ptr);
 
           // increase iteration count
@@ -274,20 +295,41 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief Internal function for computing functional value and gradient
+         *
+         * \param[in] x
+         * The state variable of the optimisation problem
+         *
+         * \param[out] func
+         * The functional value
+         *
+         * \param[out] grad
+         * The operator's gradient
+         *
+         * \param[in] ptr
+         * this, as the function needs to be static because it gets passed around as a C-style function pointer
+         *
+         */
         static void _func_grad(const alglib::real_1d_array& x, double& func, alglib::real_1d_array& grad, void* ptr)
         {
+          // Downcast because we know what we are doing, right?
           ALGLIBMinCG<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<OperatorType, FilterType>*>(ptr);
 
           auto vec_tmp_elements = me->_vec_tmp.template elements<LAFEM::Perspective::pod>();
 
+          // Copy back ALGLIB's state variable to our solver
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
             vec_tmp_elements[i] = x[i];
 
+          // Prepare the operator
           me->_op.prepare(me->_vec_tmp);
+          // Compute functional value and gradient
           func = me->_op.compute_fval();
           me->_op.compute_grad(me->_vec_def);
           me->_filter.filter_def(me->_vec_def);
 
+          // Copy the operator's gradient to ALGLIB's grad variable
           auto vec_def_elements = me->_vec_def.template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
             grad[i] = vec_def_elements[i];
@@ -297,7 +339,7 @@ namespace FEAST
     }; // class ALGLIBMinCG
 
     /**
-     * \brief Creates a new NLCG solver object
+     * \brief Creates a new ALGLIBMinCG solver object
      *
      * \param[in] op
      * The operator
@@ -308,22 +350,37 @@ namespace FEAST
      * \param[in] precond
      * The preconditioner. May be \c nullptr.
      *
-     * \param[in] linesearch
-     * The linesearch to use.
-     *
      * \param[in] keep_iterates
      * Flag for keeping the iterates, defaults to false
      *
      * \returns
-     * A shared pointer to a new PCG object.
+     * A shared pointer to a new ALGLIBMinCG object.
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
+#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
     template<typename Operator_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
-      Operator_& op, const Filter_& filter, bool keep_iterates = false)
+      Operator_& op, const Filter_& filter, bool keep_iterates)
       {
         return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op, filter, keep_iterates, nullptr);
       }
+
+    template<typename Operator_, typename Filter_, typename Precond_>
+    inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
+      Operator_& op, const Filter_& filter, bool keep_iterates, std::shared_ptr<Precond_> precond)
+      {
+        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op, filter, keep_iterates, precond);
+      }
+#else
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
+      Operator_& op, const Filter_& filter, bool keep_iterates = false,
+      std::shared_ptr<SolverBase<typename Operator_::VectorTypeL>> precond = nullptr)
+      {
+        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op, filter, keep_iterates, precond);
+      }
+
+#endif // (FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
 #endif // FEAST_HAVE_ALGLIB
   } // namespace Solver
 } // namespace FEAST

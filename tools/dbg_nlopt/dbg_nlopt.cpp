@@ -200,11 +200,11 @@ static void display_help()
 {
   std::cout << "dbg-nlopt usage:" << std::endl;
   std::cout << "Optional arguments:" << std::endl;
+  std::cout << " --help: Displays this text" << std::endl;
   std::cout << " --precon [String]: Available preconditioners are Hessian, ApproximateHessian, none(default)"
   << std::endl;
   std::cout << " --direction_update [String]: Available NLCG search direction updates are FletcherReeves and"
     << " PolakRibiere (default)" << std::endl;
-  std::cout << " --help: Displays this text" << std::endl;
 
 }
 
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
+  typedef Analytic::Common::BazaraaShettyFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, Index, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;

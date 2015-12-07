@@ -34,7 +34,7 @@ namespace FEAST
         case NLCGDirectionUpdate::FletcherReeves:
           return os << "Fletcher-Reeves";
         case NLCGDirectionUpdate::PolakRibiere:
-          return os << "Polak-Ribière";
+          return os << "Polak-Ribiere";
         default:
           return os << "-unknown-";
       }
@@ -118,6 +118,9 @@ namespace FEAST
          *
          * \param[in, out] linesearch_
          * The linesearch to be used, cannot be const as internal data changes
+         *
+         * \param[in] du_
+         * Which direction update to use
          *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
@@ -520,11 +523,14 @@ namespace FEAST
      * \param[in] linesearch
      * The linesearch to use.
      *
+     * \param[in] direction_update
+     * The direction update to use, defaults to Polak-Ribiere.
+     *
      * \param[in] keep_iterates
      * Flag for keeping the iterates, defaults to false
      *
      * \returns
-     * A shared pointer to a new PCG object.
+     * A shared pointer to a new NLCG object.
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
