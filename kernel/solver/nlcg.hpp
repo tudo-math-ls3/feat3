@@ -126,13 +126,13 @@ namespace FEAST
          * Preconditioner, defaults to nullptr. Cannot be const as internal data changes
          *
          */
-        explicit NLCG(Operator_& op_, const Filter_& filter_, LinesearchType& linesearch_,
+        explicit NLCG(Operator_& op_, const Filter_& filter_, LinesearchType& linesearch_, NLCGDirectionUpdate du_,
         bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass("NLCG", precond),
           _op(op_),
           _filter(filter_),
           _linesearch(linesearch_),
-          _direction_update(NLCGDirectionUpdate::PolakRibiere),
+          _direction_update(du_),
           restart_freq(0),
           iterates(nullptr)
           {
@@ -182,6 +182,11 @@ namespace FEAST
           return "NLCG-"+_linesearch.name()+"-"+stringify(_direction_update);
         }
 
+        Operator_& get_operator()
+        {
+          return _op;
+        }
+
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
@@ -203,7 +208,7 @@ namespace FEAST
         {
           this->_op.prepare(vec_sol);
           // compute defect
-          this->_op.compute_gradient(this->_vec_def);
+          this->_op.compute_grad(this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
           this->_filter.filter_def(this->_vec_def);
 
@@ -278,7 +283,7 @@ namespace FEAST
 
             this->_op.prepare(vec_sol);
             // update defect vector
-            this->_op.compute_gradient(this->_vec_def);
+            this->_op.compute_grad(this->_vec_def);
             this->_vec_def.scale(this->_vec_def,DataType(-1));
             this->_filter.filter_def(this->_vec_def);
 
@@ -525,24 +530,33 @@ namespace FEAST
 #if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
     template<typename Operator_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLCG<Operator_, Filter_, Linesearch_>> new_nlcg(
-      Operator_& op, const Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false)
+      Operator_& op, const Filter_& filter, Linesearch_& linesearch,
+      NLCGDirectionUpdate direction_update = NLCGDirectionUpdate::PolakRibiere,
+      bool keep_iterates = false)
       {
-        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, keep_iterates, nullptr);
+        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, direction_update,
+        keep_iterates, nullptr);
       }
     template<typename Operator_, typename Filter_, typename Linesearch_, typename Precond_>
     inline std::shared_ptr<NLCG<Operator_, Filter_, Linesearch_>> new_nlcg(
-      Operator_& op, const Filter_& filter, Linesearch_& linesearch, bool keep_iterates,
+      Operator_& op, const Filter_& filter, Linesearch_& linesearch,
+      NLCGDirectionUpdate direction_update,
+      bool keep_iterates,
       std::shared_ptr<Precond_> precond)
       {
-        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, keep_iterates, precond);
+        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, direction_update,
+        keep_iterates, precond);
       }
 #else
     template<typename Operator_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLCG<Operator_, Filter_, Linesearch_>> new_nlcg(
-      Operator_& op, const Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false,
+      Operator_& op, const Filter_& filter, Linesearch_& linesearch,
+      NLCGDirectionUpdate direction_update = NLCGDirectionUpdate::PolakRibiere,
+      bool keep_iterates = false,
       std::shared_ptr<SolverBase<typename Operator_::VectorTypeL>> precond = nullptr)
       {
-        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, keep_iterates, precond);
+        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, direction_update,
+        keep_iterates, precond);
       }
 #endif
   } //namespace Solver

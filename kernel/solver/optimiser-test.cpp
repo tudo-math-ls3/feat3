@@ -2,6 +2,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/lafem/none_filter.hpp>
+#include <kernel/solver/alglib_wrapper.hpp>
 #include <kernel/solver/nlcg.hpp>
 #include <kernel/solver/hessian_precond.hpp>
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
@@ -73,13 +74,12 @@ class NLCGTest:
         throw InternalError("Got invalid precon_type: "+_precon_type);
 
       //auto my_precond = nullptr;
-      auto solver = new_nlcg(my_op, my_filter, my_linesearch, false, my_precond);
+      auto solver = new_nlcg(my_op, my_filter, my_linesearch, _update, false, my_precond);
       solver->init();
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
       solver->set_max_iter(250);
       solver->set_direction_update(_update);
-      //std::cout << solver->get_formated_solver_tree() << std::endl;
 
       // This will hold the solution
       auto sol = my_op.create_vector_r();

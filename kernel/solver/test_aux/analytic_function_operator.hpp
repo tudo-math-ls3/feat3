@@ -49,6 +49,9 @@ namespace FEAST
         /// Integer type
         typedef IT_ IndexType;
 
+        /// The type of the underlying analytic function
+        typedef Function_ FunctionType;
+
         /// Class that knows what Function_ wants as input parameters for its evaluator etc.
         typedef Analytic::EvalTraits<DT_, Function_> FuncEvalTraits;
         /// Type of Function_'s evaluator
@@ -109,6 +112,16 @@ namespace FEAST
           {
           }
 
+        Index columns()
+        {
+          return Index(dim);
+        }
+
+        Index rows()
+        {
+          return Index(dim);
+        }
+
         /**
          * \brief Prepares the operator for evaluation by setting the current state
          *
@@ -140,7 +153,7 @@ namespace FEAST
          * \param[out] vec_out
          * The vector containing the gradient
          */
-        void compute_gradient(GradientType& vec_out)
+        void compute_grad(GradientType& vec_out)
         {
           ++num_grad_evals;
           _func_eval.gradient(_my_grad, _my_state);

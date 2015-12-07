@@ -215,7 +215,7 @@ namespace FEAST
           // Set state in the operator
           _op.prepare(sol);
           // Compute and filter gradient
-          _op.compute_gradient(this->_vec_grad);
+          _op.compute_grad(this->_vec_grad);
           _filter.filter_def(this->_vec_grad);
 
           // Compute initial defect. We want to minimise d^T * grad(_op)
@@ -227,7 +227,7 @@ namespace FEAST
             TimeStamp at;
 
             this->_op.prepare(sol);
-            _op.compute_gradient(this->_vec_grad);
+            _op.compute_grad(this->_vec_grad);
             _filter.filter_def(this->_vec_grad);
 
             status = this->_set_new_defect(dir, this->_vec_grad);
@@ -530,7 +530,7 @@ namespace FEAST
           this->_vec_tmp.axpy(dir, sol, _sigma_0);
           // Set the state in the operator
           _op.prepare(this->_vec_tmp);
-          _op.compute_gradient(this->_vec_tmp);
+          _op.compute_grad(this->_vec_tmp);
           _filter.filter_def(this->_vec_tmp);
 
           _eta = dir.dot(this->_vec_tmp);
@@ -542,7 +542,7 @@ namespace FEAST
             TimeStamp at;
 
             this->_op.prepare(sol);
-            _op.compute_gradient(this->_vec_tmp);
+            _op.compute_grad(this->_vec_tmp);
             _filter.filter_def(this->_vec_tmp);
 
             // Set new defect, do convergence checks and compute the new _alpha

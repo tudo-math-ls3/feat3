@@ -5,6 +5,7 @@
 #include <kernel/analytic/wrappers.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/none_filter.hpp>
+#include <kernel/solver/alglib_wrapper.hpp>
 #include <kernel/solver/nlcg.hpp>
 #include <kernel/solver/hessian_precond.hpp>
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
@@ -20,29 +21,25 @@
 using namespace FEAST;
 using namespace FEAST::Solver;
 
-template
-<
-  typename Mem_, typename DT_, typename IT_,
-  typename Function_,
-  template<typename, typename> class Linesearch_
->
-int run(String precon_name, NLCGDirectionUpdate update_type)
+template<typename Solver_, typename Operator_>
+int run(Solver_& solver, Operator_& op)
 {
-  typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
-  typedef typename OperatorType::PointType PointType;
+  typedef Operator_ OperatorType;
+  typedef typename OperatorType::MemType MemType;
+  typedef typename OperatorType::DataType DataType;
+  typedef typename OperatorType::IndexType IndexType;
 
+  typedef typename OperatorType::FunctionType FunctionType;
+  typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
 
-  typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, dim> FilterType;
-  typedef Linesearch_<OperatorType, FilterType> LinesearchType;
+  typedef LAFEM::DenseVector<MemType, DataType, IndexType> VertexVectorType;
+  typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> VertexFieldVectorType;
 
-  typedef LAFEM::DenseVector<Mem_, DT_, IT_> VertexVectorType;
-  typedef LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, dim> VertexFieldVectorType;
-
-  typedef OptimisationTestTraits<DT_, Function_> TestTraitsType;
+  typedef OptimisationTestTraits<DataType, FunctionType> TestTraitsType;
 
   // Get an initial guess from the Traits class for the given function
-  PointType starting_point(DT_(0));
+  PointType starting_point(DataType(0));
   TestTraitsType::get_starting_point(starting_point);
 
   // From the traits class, get the set of minimal points
@@ -50,12 +47,11 @@ int run(String precon_name, NLCGDirectionUpdate update_type)
   TestTraitsType::get_minimal_points(min_points);
 
   // Get the default domain for post processing
-  Tiny::Matrix<DT_, dim, 2> domain_bounds(DT_(0));
+  Tiny::Matrix<DataType, dim, 2> domain_bounds(DataType(0));
   for(int d(0); d < dim; ++d)
   {
     TestTraitsType::get_domain_bounds(domain_bounds[d], d);
   }
-
 
   std::cout << "dbg-nlopt: Minimising " << TestTraitsType::name();
   std::cout << ", starting point is " << starting_point << std::endl;
@@ -68,54 +64,32 @@ int run(String precon_name, NLCGDirectionUpdate update_type)
   }
   std::cout << std::endl;
 
-  // The analytic function
-  Function_ my_function;
-  // Create the (nonlinear) operator
-  OperatorType my_op(my_function);
-  // The filter
-  FilterType my_filter;
+  FunctionType my_function;
 
-  // Create the linesearch
-  LinesearchType my_linesearch(my_op, my_filter);
-  my_linesearch.set_plot(true);
-
-  // Ugly way to get a preconditioner, or not
-  std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
-
-  if(precon_name== "Hessian")
-    my_precond = new_hessian_precond(my_op, my_filter);
-  else if(precon_name == "ApproximateHessian")
-    my_precond = new_approximate_hessian_precond(my_op, my_filter);
-  else if(precon_name != "none")
-    throw InternalError("Got invalid precon_name: "+precon_name);
-
-  auto solver = new_nlcg(my_op, my_filter, my_linesearch, true, my_precond);
   solver->init();
-  solver->set_tol_rel(Math::eps<DT_>());
+  solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
   solver->set_max_iter(250);
-  // Set different direction updates here
-  solver->set_direction_update(update_type);
   std::cout << "Using solver " << solver->get_formated_solver_tree() << std::endl;
 
   // This will hold the solution
-  auto sol = my_op.create_vector_r();
+  auto sol = op.create_vector_r();
   sol(0,starting_point);
   // We need a dummy rhs
-  auto rhs = my_op.create_vector_r();
+  auto rhs = op.create_vector_r();
 
-  my_op.prepare(sol);
+  op.prepare(sol);
 
   // Solve the optimisation problem
   Status st = solver->correct(sol, rhs);
 
   // Check the distance betwen solution and minimal points
-  DT_ min_dist(Math::Limits<DT_>::max());
+  DataType min_dist(Math::Limits<DataType>::max());
 
   it = min_points.begin();
   for(; it != jt; ++it)
   {
-    DT_ dist((sol(0) - *it).norm_euclid());
+    DataType dist((sol(0) - *it).norm_euclid());
     if(dist  < min_dist)
       min_dist = dist;
   }
@@ -125,13 +99,10 @@ int run(String precon_name, NLCGDirectionUpdate update_type)
   std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
   std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());
   std::cout << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
-  std::cout << "Needed evaluations: " << my_op.num_func_evals << " (func) / " << my_op.num_grad_evals;
-  std::cout <<  " (grad) / " << my_op.num_hess_evals << " (hess)" << std::endl;
+  std::cout << "Needed evaluations: " << op.num_func_evals << " (func) / " << op.num_grad_evals;
+  std::cout <<  " (grad) / " << op.num_hess_evals << " (hess)" << std::endl;
 
   // Finish the solver
-  solver->done();
-
-
   solver->done();
 
   String filename("");
@@ -162,8 +133,8 @@ int run(String precon_name, NLCGDirectionUpdate update_type)
     }
 
     // This Factory will create the polyline mesh
-    Geometry::PolylineFactory<dim, dim, DT_> pl_factory(points);
-    typedef Geometry::ConformalMesh<Shape::Hypercube<1>, dim, dim, DT_> PolylineMesh;
+    Geometry::PolylineFactory<dim, dim, DataType> pl_factory(points);
+    typedef Geometry::ConformalMesh<Shape::Hypercube<1>, dim, dim, DataType> PolylineMesh;
     PolylineMesh polyline(pl_factory);
 
     // Write this to file
@@ -173,9 +144,9 @@ int run(String precon_name, NLCGDirectionUpdate update_type)
   }
 
   // Enlarge the plot domain by 10 percent in each direction
-  PointType scaling(DT_(0));
+  PointType scaling(DataType(0));
   for(int d(0); d < dim; ++d)
-    scaling(d) = DT_(1.1)*(domain_bounds[d](1) - domain_bounds[d](0));
+    scaling(d) = DataType(1.1)*(domain_bounds[d](1) - domain_bounds[d](0));
 
   filename = "dbg_nlopt_"+TestTraitsType::name()+"_domain";
   std::cout << "Writing domain to file " << filename << ".vtu" << std::endl;
@@ -183,7 +154,7 @@ int run(String precon_name, NLCGDirectionUpdate update_type)
   // Shape for the mesh for plotting
   typedef Shape::Hypercube<dim> ShapeType;
   // The mesh tupe
-  typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DT_> MeshType;
+  typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension, ShapeType::dimension, DataType> MeshType;
   // We need a transformation so we can project the analytic function
   typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
@@ -198,7 +169,7 @@ int run(String precon_name, NLCGDirectionUpdate update_type)
   for(Index i(0); i < mesh->get_num_entities(0); ++i)
   {
     for(int d(0); d < dim; ++d)
-      vtx[i](d) = scaling(d)*vtx[i](d) + (domain_bounds(d,0) - scaling(d)*DT_(0.05));
+      vtx[i](d) = scaling(d)*vtx[i](d) + (domain_bounds(d,0) - scaling(d)*DataType(0.05));
   }
 
   // This will hold the function values
@@ -209,7 +180,7 @@ int run(String precon_name, NLCGDirectionUpdate update_type)
   // Project the analytic function
   Assembly::AnalyticVertexProjector::project(vtx_vec, my_function, trafo);
   // Get the gradient and project it
-  Analytic::Gradient<Function_> my_grad(my_function);
+  Analytic::Gradient<FunctionType> my_grad(my_function);
   Assembly::AnalyticVertexProjector::project(vtx_grad, my_grad, trafo);
 
   // Write the mesh
@@ -239,18 +210,42 @@ static void display_help()
 
 int main(int argc, char* argv[])
 {
+  typedef Mem::Main MemType;
+  typedef double DataType;
+
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
   typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
+  typedef AnalyticFunctionOperator<MemType, DataType, Index, AnalyticFunctionType> OperatorType;
+  typedef typename OperatorType::PointType PointType;
+  static constexpr int dim = PointType::n;
+
+  typedef LAFEM::NoneFilterBlocked<MemType, DataType, Index, dim> FilterType;
+  typedef Solver::SecantLinesearch<OperatorType, FilterType> LinesearchType;
+
+  // The analytic function
+  AnalyticFunctionType my_function;
+  // Create the (nonlinear) operator
+  OperatorType my_op(my_function);
+  // The filter
+  FilterType my_filter;
+
+  // Create the linesearch
+  LinesearchType my_linesearch(my_op, my_filter);
+  my_linesearch.set_plot(true);
+
+  // Ugly way to get a preconditioner, or not
+  std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
 
   // create an argument parser
   SimpleArgParser args(argc, argv);
 
   // add all supported options
-  args.support("precon");
   args.support("direction_update");
   args.support("help");
+  args.support("precon");
+  args.support("solver");
 
   // check for unsupported options
   auto unsupported = args.query_unsupported();
@@ -263,28 +258,54 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  // The default is no preconditioner
-  String precon_name("none");
-  // Check if any preconditioner was specified on the command line
-  auto* precon_pair(args.query("precon"));
-  if(precon_pair != nullptr)
-    precon_name = precon_pair->second.front();
+  String solver_name("NLCG");
+  auto* solver_pair(args.query("solver"));
+  if(solver_pair != nullptr)
+    solver_name = solver_pair->second.front();
 
-  // The default is the Polak-Ribière update
-  NLCGDirectionUpdate update_type(NLCGDirectionUpdate::PolakRibiere);
-  auto* update_pair(args.query("direction_update"));
-  if(update_pair != nullptr)
+  if(solver_name == "NLCG")
   {
-    String update_name(update_pair->second.front());
-    if(update_name == "FletcherReeves")
-      update_type = NLCGDirectionUpdate::FletcherReeves;
-    else if(update_name == "PolakRibiere")
-      update_type = NLCGDirectionUpdate::PolakRibiere;
-    else
-      throw InternalError("Got invalid NLCG direction update: "+update_name);
-  }
+    // The default is no preconditioner
+    String precon_name("none");
+    // Check if any preconditioner was specified on the command line
+    auto* precon_pair(args.query("precon"));
+    if(precon_pair != nullptr)
+      precon_name = precon_pair->second.front();
 
-  // Canditates for the linesearch type (last template parameter) are SecantLinesearch and NRLinesearch
-  return run<Mem::Main, double, Index, AnalyticFunctionType, Solver::NRLinesearch> (precon_name, update_type);
+    if(precon_name== "Hessian")
+      my_precond = new_hessian_precond(my_op, my_filter);
+    else if(precon_name == "ApproximateHessian")
+      my_precond = new_approximate_hessian_precond(my_op, my_filter);
+    else if(precon_name != "none")
+      throw InternalError("Got invalid precon_name: "+precon_name);
+
+
+    NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::PolakRibiere);
+    auto* update_pair(args.query("direction_update"));
+    if(update_pair != nullptr)
+    {
+      String update_name(update_pair->second.front());
+      if(update_name == "FletcherReeves")
+        my_direction_update = NLCGDirectionUpdate::FletcherReeves;
+      else if(update_name == "PolakRibiere")
+        my_direction_update = NLCGDirectionUpdate::PolakRibiere;
+      else
+        throw InternalError("Got invalid NLCG direction update: "+update_name);
+    }
+
+    auto my_solver = new_nlcg(my_op, my_filter, my_linesearch, my_direction_update, true, my_precond);
+    return run(my_solver, my_op);
+
+  }
+  else if (solver_name == "ALGLIBMinCG")
+  {
+    auto my_solver = new_alglib_mincg(my_op, my_filter, true);
+    my_solver->set_plot(true);
+    return run(my_solver, my_op);
+  }
+  else
+    throw InternalError("dbg-nlopt got invalid solver name: "+solver_name);
+
+
 
 }
