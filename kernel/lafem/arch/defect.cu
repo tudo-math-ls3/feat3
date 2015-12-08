@@ -7,8 +7,17 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
+#include "cusparse_v2.h"
+
 namespace FEAST
 {
+  namespace Util
+  {
+    namespace Intern
+    {
+      extern cusparseHandle_t cusparse_handle;
+    }
+  }
   namespace LAFEM
   {
     namespace Intern
@@ -83,6 +92,48 @@ namespace FEAST
         }
         r[idx] = rhs[idx] - sum;
       }
+
+      void cusparse_defect_csr(cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const float * alpha, const cusparseMatDescr_t descrA,
+                                       const float * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       const float * x, const float * beta, float * y)
+      {
+        cusparseScsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, x, beta, y);
+      }
+
+      void cusparse_defect_csr(cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const double * alpha, const cusparseMatDescr_t descrA,
+                                       const double * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       const double * x, const double * beta, double * y)
+      {
+        cusparseDcsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, x, beta, y);
+      }
+
+      void cusparse_defect_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const float * alpha, const cusparseMatDescr_t descrA,
+                                       const float * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       int block_dim,
+                                       const float * x, const float * beta, float * y)
+      {
+        cusparseSbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, block_dim, x, beta, y);
+      }
+
+      void cusparse_defect_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
+                                       int m, int n, int nnz,
+                                       const double * alpha, const cusparseMatDescr_t descrA,
+                                       const double * csrVal, const int * csrRowPtr, const int *csrColInd,
+                                       int block_dim,
+                                       const double * x, const double * beta, double * y)
+      {
+        cusparseDbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+                       csrColInd, block_dim, x, beta, y);
+      }
     }
   }
 }
@@ -115,8 +166,40 @@ template void Defect<Mem::CUDA>::csr(double *, const double * const, const doubl
 template <typename DT_>
 void Defect<Mem::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
 {
-  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA>::csr(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
-  FEAST::LAFEM::Arch::Difference<Mem::CUDA>::value(r, rhs, r, rows);
+  const DT_ a(-1.);
+  if (r == rhs)
+  {
+    cusparseMatDescr_t descr=0;
+    cusparseCreateMatDescr(&descr);
+    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+
+    DT_ one(1);
+    FEAST::LAFEM::Intern::cusparse_defect_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
+
+    cusparseDestroyMatDescr(descr);
+  }
+  else
+  {
+    cudaMemcpy(r, rhs, rows * sizeof(DT_), cudaMemcpyDeviceToDevice);
+
+    cusparseMatDescr_t descr=0;
+    cusparseCreateMatDescr(&descr);
+    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+
+    DT_ one(1);
+    FEAST::LAFEM::Intern::cusparse_defect_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
+
+    cusparseDestroyMatDescr(descr);
+  }
+
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Defect<Mem::CUDA>::csr(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
 template void Defect<Mem::CUDA>::csr(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
@@ -124,8 +207,42 @@ template void Defect<Mem::CUDA>::csr(double *, const double * const, const doubl
 template <typename DT_>
 void Defect<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements, const int blocksize)
 {
-  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA>::csrb_intern(r, val, col_ind, row_ptr, x, rows, columns, used_elements, blocksize);
-  FEAST::LAFEM::Arch::Difference<Mem::CUDA>::value(r, rhs, r, rows * blocksize);
+  const DT_ a(-1.);
+  if (r == rhs)
+  {
+    cusparseMatDescr_t descr=0;
+    cusparseCreateMatDescr(&descr);
+    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+
+    DT_ one(1);
+    FEAST::LAFEM::Intern::cusparse_defect_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+        blocksize, x, &one, r);
+
+    cusparseDestroyMatDescr(descr);
+  }
+  else
+  {
+    cudaMemcpy(r, rhs, rows * blocksize * sizeof(DT_), cudaMemcpyDeviceToDevice);
+
+    cusparseMatDescr_t descr=0;
+    cusparseCreateMatDescr(&descr);
+    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+
+    DT_ one(1);
+    FEAST::LAFEM::Intern::cusparse_defect_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+        blocksize, x, &one, r);
+
+    cusparseDestroyMatDescr(descr);
+  }
+
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
 }
 template void Defect<Mem::CUDA>::csrb_intern(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index, const int);
 template void Defect<Mem::CUDA>::csrb_intern(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index, const int);
