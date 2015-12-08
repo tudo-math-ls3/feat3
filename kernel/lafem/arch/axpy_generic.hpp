@@ -217,7 +217,7 @@ namespace FEAST
 
       template <typename DT_, typename IT_>
       void Axpy<Mem::Main>::coo_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-                                               const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index used_elements)
+                                               const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index, const Index used_elements)
       {
         Index iter(0);
         for (IT_ row(0); row < IT_(rows); ++row)

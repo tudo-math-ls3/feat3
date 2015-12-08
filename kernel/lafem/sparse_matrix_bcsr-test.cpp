@@ -202,9 +202,15 @@ public:
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
+    //defect
     DT_ alpha(-1);
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    // &r == &y
+    r.copy(y);
+    c.apply(r, x, r, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
     c.apply(rb, x, yb, alpha);
@@ -218,13 +224,15 @@ public:
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
+
+    //axpy
     alpha = DT_(1.234);
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
+    // &r == &y
     r.copy(y);
-    csr.apply(ref, x, y, alpha);
     c.apply(r, x, r, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
@@ -321,9 +329,15 @@ public:
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
+    // defect
     DT_ alpha(-1);
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    // &r == &y
+    r.copy(y);
+    c.apply(r, x, r, alpha);
     TEST_CHECK_EQUAL(r, ref);
 
     c.apply(rb, x, yb, alpha);
@@ -337,12 +351,14 @@ public:
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
 
+    // axpy
     alpha = DT_(1.234);
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), 1e-3);
 
+    // &r == &y
     r.copy(y);
     c.apply(r, x, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)

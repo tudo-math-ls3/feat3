@@ -1993,7 +1993,7 @@ namespace FEAST
         else
         {
           Arch::Axpy<Mem_>::coo(r.elements(), alpha, x.elements(), y.elements(),
-                                       this->val(), this->row_indices(), this->column_indices(), this->rows(), this->used_elements());
+                                       this->val(), this->row_indices(), this->column_indices(), this->rows(), this->columns(), this->used_elements());
         }
       }
       ///@}

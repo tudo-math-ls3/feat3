@@ -52,136 +52,136 @@ void Axpy<Mem::Main>::dv_mkl(double * r, const double a, const double * const x,
   }
 }
 
-void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
+void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
+  float beta = 1.f;
   char trans = 'N';
-
+  char matdescra[6];
+  matdescra[0] = 'G';
+  matdescra[3] = 'C';
   if (r == y)
   {
-    float * t = new float[rows];
-    mkl_cspblas_scsrgemv(&trans, &mrows, (float *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, (float *)x, t);
-    cblas_saxpy((MKL_INT)mrows, a, t, 1, r, 1);
-    delete[] t;
-  }
-  else if (r == x)
-  {
-    float * t = new float[rows];
-    memcpy(t, x, sizeof(float) * rows);
-    mkl_cspblas_scsrgemv(&trans, &mrows, (float *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, t, r);
-    memcpy(t, y, sizeof(float) * rows);
-    cblas_saxpy(mrows, a, r, 1, t, 1);
-    memcpy(r, t, sizeof(float) * rows);
-    delete[] t;
+    mkl_scsrmv(&trans, &mrows, &mcolumns, &a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
   }
   else
   {
-    mkl_cspblas_scsrgemv(&trans, &mrows, (float *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, (float *)x, r);
-    float * t = new float[rows];
-    memcpy(t, y, sizeof(float) * rows);
-    cblas_saxpy(mrows, a, r, 1, t, 1);
-    memcpy(r, t, sizeof(float) * rows);
-    delete[] t;
+    MKL_INT one = 1;
+    scopy(&mrows, (float*)y, &one, r, &one);
+    mkl_scsrmv(&trans, &mrows, &mcolumns, &a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
   }
 }
 
-void Axpy<Mem::Main>::csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
+void Axpy<Mem::Main>::csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
+  double beta = 1;
   char trans = 'N';
-
+  char matdescra[6];
+  matdescra[0] = 'G';
+  matdescra[3] = 'C';
   if (r == y)
   {
-    double * t = new double[rows];
-    mkl_cspblas_dcsrgemv(&trans, &mrows, (double *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, (double *)x, t);
-    cblas_daxpy((MKL_INT)mrows, a, t, 1, r, 1);
-    delete[] t;
-  }
-  else if (r == x)
-  {
-    double * t = new double[rows];
-    memcpy(t, x, sizeof(double) * rows);
-    mkl_cspblas_dcsrgemv(&trans, &mrows, (double *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, t, r);
-    memcpy(t, y, sizeof(double) * rows);
-    cblas_daxpy(mrows, a, r, 1, t, 1);
-    memcpy(r, t, sizeof(double) * rows);
-    delete[] t;
+    mkl_dcsrmv(&trans, &mrows, &mcolumns, &a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
   }
   else
   {
-    mkl_cspblas_dcsrgemv(&trans, &mrows, (double *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, (double *)x, r);
-    double * t = new double[rows];
-    memcpy(t, y, sizeof(double) * rows);
-    cblas_daxpy(mrows, a, r, 1, t, 1);
-    memcpy(r, t, sizeof(double) * rows);
-    delete[] t;
+    MKL_INT one = 1;
+    dcopy(&mrows, (double*)y, &one, r, &one);
+    mkl_dcsrmv(&trans, &mrows, &mcolumns, &a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
   }
 }
 
-void Axpy<Mem::Main>::coo_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
+void Axpy<Mem::Main>::csrb_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize)
 {
+  MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
+  MKL_INT mblocksize = (MKL_INT)blocksize;
+  MKL_INT mcopysize = mrows * mblocksize;
+  float beta = 1.f;
+  char trans = 'N';
+  char matdescra[6];
+  matdescra[0] = 'G';
+  matdescra[3] = 'C';
+  if (r == y)
+  {
+    mkl_sbsrmv(&trans, &mrows, &mcolumns, &mblocksize, &a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
+  }
+  else
+  {
+    MKL_INT one = 1;
+    scopy(&mcopysize, (float*)y, &one, r, &one);
+    mkl_sbsrmv(&trans, &mrows, &mcolumns, &mblocksize, &a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
+  }
+}
+
+void Axpy<Mem::Main>::csrb_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize)
+{
+  MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
+  MKL_INT mblocksize = (MKL_INT)blocksize;
+  MKL_INT mcopysize = mrows * mblocksize;
+  double beta = 1.;
+  char trans = 'N';
+  char matdescra[6];
+  matdescra[0] = 'G';
+  matdescra[3] = 'C';
+  if (r == y)
+  {
+    mkl_dbsrmv(&trans, &mrows, &mcolumns, &mblocksize, &a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
+  }
+  else
+  {
+    MKL_INT one = 1;
+    dcopy(&mcopysize, (double*)y, &one, r, &one);
+    mkl_dbsrmv(&trans, &mrows, &mcolumns, &mblocksize, &a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
+  }
+}
+
+void Axpy<Mem::Main>::coo_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows,
+  const Index columns, const Index used_elements)
+{
+  MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
+  char trans = 'N';
   MKL_INT ue = (MKL_INT)used_elements;
-  MKL_INT mrows = (MKL_INT)rows;
-  char trans = 'N';
-
+  float beta = 1.f;
+  char matdescra[6];
+  matdescra[0] = 'G';
+  matdescra[3] = 'C';
   if (r == y)
   {
-    float * t = new float[rows];
-    mkl_cspblas_scoogemv(&trans, &mrows, (float *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (float *)x, t);
-    cblas_saxpy((MKL_INT)mrows, a, t, 1, r, 1);
-    delete[] t;
-  }
-  else if (r == x)
-  {
-    float * t = new float[rows];
-    memcpy(t, x, sizeof(float) * rows);
-    mkl_cspblas_scoogemv(&trans, &mrows, (float *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, t, r);
-    memcpy(t, y, sizeof(float) * rows);
-    cblas_saxpy(mrows, a, r, 1, t, 1);
-    memcpy(r, t, sizeof(float) * rows);
-    delete[] t;
+    mkl_scoomv(&trans, &mrows, &mcolumns, &a, matdescra, (float*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (float*)x, &beta, r);
   }
   else
   {
-    mkl_cspblas_scoogemv(&trans, &mrows, (float *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (float *)x, r);
-    float * t = new float[rows];
-    memcpy(t, y, sizeof(float) * rows);
-    cblas_saxpy(mrows, a, r, 1, t, 1);
-    memcpy(r, t, sizeof(float) * rows);
-    delete[] t;
+    MKL_INT one = 1;
+    scopy(&mrows, (float*)y, &one, r, &one);
+    mkl_scoomv(&trans, &mrows, &mcolumns, &a, matdescra, (float*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (float*)x, &beta, r);
   }
 }
 
-void Axpy<Mem::Main>::coo_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
+void Axpy<Mem::Main>::coo_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr,
+  const Index rows, const Index columns, const Index used_elements)
 {
-  MKL_INT ue = (MKL_INT)used_elements;
   MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
   char trans = 'N';
-
+  MKL_INT ue = (MKL_INT)used_elements;
+  double beta = 1.;
+  char matdescra[6];
+  matdescra[0] = 'G';
+  matdescra[3] = 'C';
   if (r == y)
   {
-    double * t = new double[rows];
-    mkl_cspblas_dcoogemv(&trans, &mrows, (double *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double *)x, t);
-    cblas_daxpy((MKL_INT)mrows, a, t, 1, r, 1);
-    delete[] t;
-  }
-  else if (r == x)
-  {
-    double * t = new double[rows];
-    memcpy(t, x, sizeof(double) * rows);
-    mkl_cspblas_dcoogemv(&trans, &mrows, (double *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, t, r);
-    memcpy(t, y, sizeof(double) * rows);
-    cblas_daxpy(mrows, a, r, 1, t, 1);
-    memcpy(r, t, sizeof(double) * rows);
-    delete[] t;
+    mkl_dcoomv(&trans, &mrows, &mcolumns, &a, matdescra, (double*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double*)x, &beta, r);
   }
   else
   {
-    mkl_cspblas_dcoogemv(&trans, &mrows, (double *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double *)x, r);
-    double * t = new double[rows];
-    memcpy(t, y, sizeof(double) * rows);
-    cblas_daxpy(mrows, a, r, 1, t, 1);
-    memcpy(r, t, sizeof(double) * rows);
-    delete[] t;
+    MKL_INT one = 1;
+    dcopy(&mrows, (double*)y, &one, r, &one);
+    mkl_dcoomv(&trans, &mrows, &mcolumns, &a, matdescra, (double*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double*)x, &beta, r);
   }
 }

@@ -6,6 +6,8 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
+#include <typeinfo>
+
 namespace FEAST
 {
   namespace LAFEM
@@ -69,7 +71,14 @@ namespace FEAST
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
+#ifdef FEAST_BACKENDS_MKL
+          if (typeid(IT_) == typeid(unsigned long) && BlockHeight_ == BlockWidth_)
+            csrb_mkl(r, a, x, y, val, (unsigned long*)col_ind, (unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
+          else
+            csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements);
+#else
           csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements);
+#endif
         }
 
         template <typename DT_, typename IT_>
@@ -80,27 +89,27 @@ namespace FEAST
 
         template <typename DT_, typename IT_>
         static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-                        const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index used_elements)
+                        const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index columns, const Index used_elements)
         {
-          coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, used_elements);
+          coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);
         }
 
         template <typename DT_>
         static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
+                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
         {
 #ifdef FEAST_BACKENDS_MKL
-          coo_mkl(r, a, x, y, val, row_ptr, col_ptr, rows, used_elements);
+          coo_mkl(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);
 #else
-          coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, used_elements);
+          coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);
 #endif
         }
 
 #if defined(FEAST_HAVE_QUADMATH) && !defined(__CUDACC__)
         static void coo(__float128 * r, const __float128 a, const __float128 * const x, const __float128 * const y, const __float128 * const val,
-                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
+                        const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
         {
-          coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, used_elements);
+          coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);
         }
 #endif
 
@@ -133,7 +142,7 @@ namespace FEAST
 
         template <typename DT_, typename IT_>
         static void coo_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-                        const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index used_elements);
+                        const IT_ * const row_ptr, const IT_ * const col_ptr, const Index rows, const Index columns, const Index used_elements);
 
         template <typename DT_, typename IT_>
         static void banded_generic(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
@@ -144,11 +153,16 @@ namespace FEAST
         static void dv_mkl(float * r, const float a, const float * const x, const float * const y, const Index size);
         static void dv_mkl(double * r, const double a, const double * const x, const double * const y, const Index size);
 
-        static void csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index);
-        static void csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index);
+        static void csr_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index);
+        static void csr_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index);
 
-        static void coo_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements);
-        static void coo_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements);
+        static void csrb_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
+        static void csrb_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const int blocksize);
+
+        static void coo_mkl(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const row_ptr, const Index * const col_ptr, const Index rows,
+        const Index columns, const Index used_elements);
+        static void coo_mkl(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const row_ptr, const Index * const col_ptr,
+        const Index rows, const Index columns, const Index used_elements);
       };
 
       extern template void Axpy<Mem::Main>::dv_generic(float *, const float, const float * const, const float * const, const Index);
@@ -164,10 +178,10 @@ namespace FEAST
       extern template void Axpy<Mem::Main>::ell_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
       extern template void Axpy<Mem::Main>::ell_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
 
-      extern template void Axpy<Mem::Main>::coo_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-      extern template void Axpy<Mem::Main>::coo_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
-      extern template void Axpy<Mem::Main>::coo_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
-      extern template void Axpy<Mem::Main>::coo_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
+      extern template void Axpy<Mem::Main>::coo_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+      extern template void Axpy<Mem::Main>::coo_generic(float *, const float, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+      extern template void Axpy<Mem::Main>::coo_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
+      extern template void Axpy<Mem::Main>::coo_generic(double *, const double, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
 
       extern template void Axpy<Mem::Main>::banded_generic(float *, const float * const, const float, const float * const, const Index * const, const float * const, const Index, const Index, const Index);
       extern template void Axpy<Mem::Main>::banded_generic(double *, const double * const, const double, const double * const, const Index * const, const double * const, const Index, const Index, const Index);

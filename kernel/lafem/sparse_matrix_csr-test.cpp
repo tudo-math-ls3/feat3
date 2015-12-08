@@ -271,29 +271,37 @@ public:
 
       // apply-test for alpha = 0.0
       a.apply(r, x, y, DT_(0.0));
+      result_local.copy(r);
+      ref_local.copy(y);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), r(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
 
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));
+      result_local.copy(r);
       a.apply(ref, x);
       ref.scale(ref, DT_(-1.0));
       ref.axpy(ref, y);
-
+      ref_local.copy(ref);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(ref(i), r(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+
+      // apply-test for alpha = -1.0 and &r==&y
+      r.copy(y);
+      a.apply(r, x, r, DT_(-1.0));
+      result_local.copy(r);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
 
       // apply-test for alpha = 4711.1
       //r.axpy(s, a, x, y);
       a.apply(r, x, y, s);
       result_local.copy(r);
-
       //ref.product_matvec(a, x);
       a.apply(ref, x);
       ref.scale(ref, s);
       ref.axpy(ref, y);
       ref_local.copy(ref);
-
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
 
@@ -301,13 +309,6 @@ public:
       r.copy(y);
       a.apply(r, x, r, s);
       result_local.copy(r);
-
-      //ref.product_matvec(a, x);
-      a.apply(ref, x);
-      ref.scale(ref, s);
-      ref.axpy(ref, y);
-      ref_local.copy(ref);
-
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
 
