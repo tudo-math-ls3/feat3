@@ -10,14 +10,6 @@
 
 namespace FEAST
 {
-  namespace Util
-  {
-    namespace Intern
-    {
-      extern cublasHandle_t cublas_handle;
-    }
-  }
-
   namespace LAFEM
   {
     namespace Intern

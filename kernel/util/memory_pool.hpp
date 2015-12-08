@@ -14,6 +14,10 @@
 #include <cstdio>
 #include <cstddef>
 
+#ifdef __CUDACC__
+#include "cusparse_v2.h"
+#include <cublas_v2.h>
+#endif
 
 namespace FEAST
 {
@@ -22,6 +26,11 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
+#ifdef __CUDACC__
+      extern cusparseHandle_t cusparse_handle;
+      extern cublasHandle_t cublas_handle;
+#endif
+
       struct MemoryInfo
       {
         Index counter;

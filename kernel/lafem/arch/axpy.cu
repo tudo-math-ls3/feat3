@@ -13,14 +13,6 @@
 
 namespace FEAST
 {
-  namespace Util
-  {
-    namespace Intern
-    {
-      extern cusparseHandle_t cusparse_handle;
-    }
-  }
-
   namespace LAFEM
   {
     namespace Intern
