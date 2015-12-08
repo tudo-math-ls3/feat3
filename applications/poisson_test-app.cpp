@@ -169,7 +169,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   HaloControl<dim_2D>::fill_sizes(macro_subset, polytopes_in_macrosubset);
   CellSubSet<Shape::Hypercube<2> > macro_subset_geo(polytopes_in_macrosubset);
   HaloControl<dim_2D>::fill_target_set(macro_subset, macro_subset_geo);
-  delete polytopes_in_macrosubset;
+  delete[] polytopes_in_macrosubset;
 
   ///get a mesh from this
   PatchFactory<BaseMeshType> pf(*macro_basemesh, macro_subset_geo);
