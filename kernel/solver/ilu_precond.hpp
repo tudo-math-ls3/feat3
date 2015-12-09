@@ -3,8 +3,9 @@
 #define KERNEL_SOLVER_ILU_PRECOND_HPP 1
 
 // includes, FEAST
-#include <kernel/solver/precon_wrapper.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 
 namespace FEAST
 {
@@ -16,6 +17,11 @@ namespace FEAST
       void * cuda_ilu_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd);
       void cuda_ilu_init_numeric(double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
       void cuda_ilu_done(void * vinfo);
+
+      int cuda_ilub_apply(double * y, const double * x, double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
+      void * cuda_ilub_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd, const int blocksize);
+      void cuda_ilub_init_numeric(double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
+      void cuda_ilub_done(void * vinfo);
     }
 
     template<typename Matrix_, typename Filter_>
@@ -901,6 +907,100 @@ namespace FEAST
         return (status == 0) ? Status::success :  Status::aborted;
       }
     }; // class ILUPrecond<SparseMatrixCSR<Mem::CUDA>>
+
+    /**
+     * \brief ILU(0) preconditioner implementation
+     *
+     * This class implements a simple ILU(0) preconditioner,
+     * e.g. zero fill-in and no pivoting.
+     *
+     * This implementation works for the following matrix types and combinations thereof:
+     * - LAFEM::SparseMatrixBCSR
+     *
+     * Moreover, this implementation supports only CUDA and uint containers.
+     *
+     * \author Dirk Ribbrock
+     */
+    template<typename Filter_, int blocksize_>
+    class ILUPrecond<LAFEM::SparseMatrixBCSR<Mem::CUDA, double, unsigned int, blocksize_, blocksize_>, Filter_> :
+      public SolverBase<typename LAFEM::SparseMatrixBCSR<Mem::CUDA, double, unsigned int, blocksize_, blocksize_>::VectorTypeL>
+    {
+    public:
+      typedef LAFEM::SparseMatrixBCSR<Mem::CUDA, double, unsigned int, blocksize_, blocksize_> MatrixType;
+      typedef Filter_ FilterType;
+      typedef typename MatrixType::VectorTypeL VectorType;
+      typedef typename MatrixType::DataType DataType;
+
+    protected:
+      const MatrixType& _matrix;
+      MatrixType _lu_matrix;
+      const FilterType& _filter;
+      void * cuda_info;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] matrix
+       * The matrix to be used.
+       *
+       * \param[in] filter
+       * The filter to be used for the correction vector.
+       *
+       * \note The parameter p is not active in CUDA, i.e. only ILU(0) is supported.
+       */
+      explicit ILUPrecond(const MatrixType& matrix, const FilterType& filter, const Index = 0) :
+        _matrix(matrix),
+        _filter(filter)
+      {
+        if (_matrix.columns() != _matrix.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+
+      /// Returns the name of the solver.
+      virtual String name() const override
+      {
+        return "ILU";
+      }
+
+      virtual void init_symbolic() override
+      {
+        _lu_matrix.clone(_matrix, LAFEM::CloneMode::Layout);
+
+        cuda_info = Intern::cuda_ilub_init_symbolic((int)_lu_matrix.rows(), (int)_lu_matrix.used_elements(), _lu_matrix.template val<LAFEM::Perspective::pod>(),
+          (int*)_lu_matrix.row_ptr(), (int*)_lu_matrix.col_ind(), blocksize_);
+      }
+
+      virtual void done_symbolic() override
+      {
+        Intern::cuda_ilub_done(cuda_info);
+      }
+
+      virtual void init_numeric() override
+      {
+        _lu_matrix.copy(_matrix);
+
+        Intern::cuda_ilub_init_numeric(_lu_matrix.template val<LAFEM::Perspective::pod>(), (int*)_lu_matrix.row_ptr(), (int*)_lu_matrix.col_ind(), cuda_info);
+      }
+
+      virtual void done_numeric() override
+      {
+      }
+
+      virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
+      {
+        ASSERT(_matrix.rows() == vec_cor.size(), "Error: matrix / vector size missmatch!");
+        ASSERT(_matrix.rows() == vec_def.size(), "Error: matrix / vector size missmatch!");
+
+        int status = Intern::cuda_ilub_apply(vec_cor.template elements<LAFEM::Perspective::pod>(), vec_def.template elements<LAFEM::Perspective::pod>(),
+          _lu_matrix.template val<LAFEM::Perspective::pod>(), (int*)_lu_matrix.row_ptr(), (int*)_lu_matrix.col_ind(), cuda_info);
+
+        this->_filter.filter_cor(vec_cor);
+        return (status == 0) ? Status::success :  Status::aborted;
+      }
+    }; // class ILUPrecond<SparseMatrixBCSR<Mem::CUDA>>
 
     /**
      * \brief Creates a new ILUPrecond solver object
