@@ -14,6 +14,9 @@ ADD_LIBRARY(kernel-util STATIC
   statistics.cpp
 )
 
+if (FEAST_COTIRE)
+  cotire(kernel-util)
+endif (FEAST_COTIRE)
 
 #link against mpi if available
 TARGET_LINK_LIBRARIES(kernel-util ${MPI_C_LIBRARIES})

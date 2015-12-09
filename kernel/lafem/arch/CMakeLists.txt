@@ -46,6 +46,9 @@ if (FEAST_BACKENDS_MKL)
 endif(FEAST_BACKENDS_MKL)
 
 ADD_LIBRARY(kernel-lafem-arch STATIC ${kernel-lafem-arch-list})
+if (FEAST_COTIRE)
+  cotire(kernel-lafem-arch)
+endif (FEAST_COTIRE)
 
 if (FEAST_BACKENDS_MKL)
   TARGET_LINK_LIBRARIES(kernel-lafem-arch

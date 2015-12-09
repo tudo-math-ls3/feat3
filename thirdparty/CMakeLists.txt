@@ -7,6 +7,9 @@ if (FEAST_HAVE_ALGLIB)
   file(GLOB alglib-list "${FEAST_SOURCE_DIR}/thirdparty/alglib/cpp/src/*.cpp")
 
   ADD_LIBRARY(thirdparty-alglib STATIC ${alglib-list})
+  if (FEAST_COTIRE)
+    cotire(thirdparty-alglib)
+  endif (FEAST_COTIRE)
   SET_PROPERTY(TARGET thirdparty-alglib PROPERTY COMPILE_FLAGS " -w")
 endif (FEAST_HAVE_ALGLIB)
 
@@ -35,5 +38,8 @@ if (FEAST_HAVE_UMFPACK)
 
   ADD_DEFINITIONS(-DNCHOLMOD -DDLONG -DNBLAS -DNTIMER)
   ADD_LIBRARY(thirdparty-umfpack STATIC ${suite_sparse-list} ${amd-list} ${umfpack-list})
+  if (FEAST_COTIRE)
+    cotire(thirdparty-umfpack)
+  endif (FEAST_COTIRE)
   SET_PROPERTY(TARGET thirdparty-umfpack PROPERTY COMPILE_FLAGS " -w")
 endif (FEAST_HAVE_UMFPACK)

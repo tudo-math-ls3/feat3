@@ -10,6 +10,9 @@ ADD_LIBRARY(kernel-adjacency STATIC
   graph.cpp
   permutation.cpp
 )
+if (FEAST_COTIRE)
+  cotire(kernel-adjacency)
+endif (FEAST_COTIRE)
 
 # list of adjacency tests
 SET (test_list

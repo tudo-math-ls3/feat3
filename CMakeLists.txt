@@ -12,6 +12,10 @@ site_name( FEAST_HOSTNAME )
 include (CTest)
 ENABLE_TESTING()
 
+if (FEAST_COTIRE)
+  include(${FEAST_SOURCE_DIR}/build_system/cotire.cmake)
+endif (FEAST_COTIRE)
+
 if (FEAST_BACKENDS_CUDA)
   FIND_PACKAGE(CUDA)
   set(CUDA_NVCC_FLAGS "-g -lineinfo -arch=${FEAST_CUDA_ARCH} -O3 --restrict --use_fast_math --compiler-options -Wall;-g;-std=c++11")
