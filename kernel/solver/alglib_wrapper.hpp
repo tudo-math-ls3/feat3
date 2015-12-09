@@ -16,7 +16,7 @@ namespace FEAST
   namespace Solver
   {
     /**
-     * \brief Nonlinear Conjugate Gradient method for finding a minimum of an operator's gradient
+     * \brief Wrapper around ALGLIB's mincg implementation for minimising an operator's gradient
      *
      * \tparam Operator_
      * Nonlinear Operator to minimise the gradient of
@@ -24,9 +24,19 @@ namespace FEAST
      * \tparam Filter_
      * Filter to apply to the operator's gradient
      *
+     * \note ALGLIB's mincg appearantly supports preconditioning with the diagonal of the Hessian which can be set by
+     * calling alglib::mincgsetprecdiag(state, [diagonal_of_hessian]). Every call like this triggers an internal
+     * reset, seemingly turning the algorithm into steepest descent if called in every iteration. For strongly
+     * nonlinear problems (like the ones we are interested in), this makes preconditioning awkward to useless.
+     *
+     * \note ALGLIB's algorithms always run in Mem::Main in double precision. Although the Operator can specify other
+     * types, this will just to excess type conversions with no added benefit (like the speedup from computing in
+     * float) and a general slow-down. It is not prohibited at this point so that these classes can be instantiated
+     * so check if the implementation is clean.
+     *
      */
     template<typename Operator_, typename Filter_>
-    class ALGLIBMinCG : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
+    class ALGLIBMinCG : public IterativeSolver<typename Operator_::VectorTypeR>
     {
       public:
         /// The nonlinear operator type
@@ -42,7 +52,7 @@ namespace FEAST
         typedef typename Operator_::DataType DataType;
 
         /// Our baseclass
-        typedef PreconditionedIterativeSolver<VectorType> BaseClass;
+        typedef IterativeSolver<VectorType> BaseClass;
         /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
 
@@ -83,18 +93,12 @@ namespace FEAST
          * \param[in] filter_
          * Filter to apply to the operator's gradient
          *
-         * \param[in, out] linesearch_
-         * The linesearch to be used, cannot be const as internal data changes
-         *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
-         * \param[in, out] precond
-         * Preconditioner, defaults to nullptr. Cannot be const as internal data changes
-         *
          */
-        explicit ALGLIBMinCG(Operator_& op_, const Filter_& filter_, bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
-          BaseClass("ALGLIBMinCG", precond),
+        explicit ALGLIBMinCG(Operator_& op_, const Filter_& filter_, bool keep_iterates = false) :
+          BaseClass("ALGLIBMinCG"),
           _op(op_),
           _filter(filter_),
           _tol_update_func(DataType(0)),
@@ -123,6 +127,9 @@ namespace FEAST
           _vec_tmp = this->_op.create_vector_r();
 
           _opt_var.setlength(alglib::ae_int_t(_op.columns()));
+          for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
+            _opt_var[i] = double(0);
+
           alglib::mincgcreate(_opt_var, _state);
           // Set the algorithm type: -1 (automatic selection of best algorithm), 0 (Dai-Yuan), 1 (hybrid Day-Yuan
           // and Hestenes-Stiefel)
@@ -133,8 +140,8 @@ namespace FEAST
         /// \copydoc BaseClass::done_symbolic()
         virtual void done_symbolic() override
         {
-          this->_vec_tmp.clear();
           this->_vec_def.clear();
+          this->_vec_tmp.clear();
           BaseClass::done_symbolic();
         }
 
@@ -213,11 +220,13 @@ namespace FEAST
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
             _opt_var[i] = vec_sol_elements[i];
 
+          alglib::mincgcreate(_opt_var, _state);
+          alglib::mincgsetxrep(_state, true);
           alglib::mincgoptimize(_state, _func_grad, _log, this);
           alglib::mincgresults(_state, _opt_var, _report);
 
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
-            vec_sol_elements[i] = _opt_var[i];
+            vec_sol_elements[i] = DataType(_opt_var[i]);
 
           switch(_report.terminationtype)
           {
@@ -293,6 +302,7 @@ namespace FEAST
             auto tmp = me->_vec_tmp.clone();
             me->iterates->push_back(std::move(tmp));
           }
+
         }
 
         /**
@@ -320,7 +330,7 @@ namespace FEAST
 
           // Copy back ALGLIB's state variable to our solver
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
-            vec_tmp_elements[i] = x[i];
+            vec_tmp_elements[i] = DataType(x[i]);
 
           // Prepare the operator
           me->_op.prepare(me->_vec_tmp);
@@ -332,7 +342,7 @@ namespace FEAST
           // Copy the operator's gradient to ALGLIB's grad variable
           auto vec_def_elements = me->_vec_def.template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
-            grad[i] = vec_def_elements[i];
+            grad[i] = double(vec_def_elements[i]);
 
         }
 
@@ -347,9 +357,6 @@ namespace FEAST
      * \param[in] filter
      * The system filter.
      *
-     * \param[in] precond
-     * The preconditioner. May be \c nullptr.
-     *
      * \param[in] keep_iterates
      * Flag for keeping the iterates, defaults to false
      *
@@ -357,31 +364,14 @@ namespace FEAST
      * A shared pointer to a new ALGLIBMinCG object.
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
     template<typename Operator_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
-      Operator_& op, const Filter_& filter, bool keep_iterates)
+      Operator_& op, const Filter_& filter, bool keep_iterates = false)
       {
-        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op, filter, keep_iterates, nullptr);
+        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op, filter, keep_iterates);
       }
 
-    template<typename Operator_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
-      Operator_& op, const Filter_& filter, bool keep_iterates, std::shared_ptr<Precond_> precond)
-      {
-        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op, filter, keep_iterates, precond);
-      }
-#else
-    template<typename Operator_, typename Filter_>
-    inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
-      Operator_& op, const Filter_& filter, bool keep_iterates = false,
-      std::shared_ptr<SolverBase<typename Operator_::VectorTypeL>> precond = nullptr)
-      {
-        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op, filter, keep_iterates, precond);
-      }
-
-#endif // (FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
-#endif // FEAST_HAVE_ALGLIB
   } // namespace Solver
 } // namespace FEAST
+#endif // FEAST_HAVE_ALGLIB
 #endif // FEAST_KERNEL_SOLVER_ALGLIB_WRAPPER

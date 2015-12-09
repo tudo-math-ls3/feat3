@@ -1,6 +1,5 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
-//#include <kernel/analytic/auto_derive.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/analytic/wrappers.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
@@ -11,7 +10,6 @@
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
 #include <kernel/solver/test_aux/function_traits.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
-// DEBUG
 #include <kernel/assembly/analytic_projector.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/reference_cell_factory.hpp>
@@ -201,9 +199,12 @@ static void display_help()
   std::cout << "dbg-nlopt usage:" << std::endl;
   std::cout << "Optional arguments:" << std::endl;
   std::cout << " --help: Displays this text" << std::endl;
-  std::cout << " --precon [String]: Available preconditioners are Hessian, ApproximateHessian, none(default)"
+#ifdef FEAST_HAVE_ALGLIB
+  std::cout << " --solver[String]: Available solvers are ALGLIBMinCG (all other arguments are then ignored) and NLCG";
+#endif // FEAST_HAVE_ALGLIB
+  std::cout << " --precon [String]: Available preconditioners for NLCG are Hessian, ApproximateHessian, none(default)"
   << std::endl;
-  std::cout << " --direction_update [String]: Available NLCG search direction updates are FletcherReeves and"
+  std::cout << " --direction_update [String]: Available NLCG search direction updates for NLCG are FletcherReeves and"
     << " PolakRibiere (default)" << std::endl;
 
 }
@@ -216,7 +217,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::BazaraaShettyFunction AnalyticFunctionType;
+  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, Index, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
@@ -297,12 +298,14 @@ int main(int argc, char* argv[])
     return run(my_solver, my_op);
 
   }
+#ifdef FEAST_HAVE_ALGLIB
   else if (solver_name == "ALGLIBMinCG")
   {
     auto my_solver = new_alglib_mincg(my_op, my_filter, true);
     my_solver->set_plot(true);
     return run(my_solver, my_op);
   }
+#endif // FEAST_HAVE_ALGLIB
   else
     throw InternalError("dbg-nlopt got invalid solver name: "+solver_name);
 

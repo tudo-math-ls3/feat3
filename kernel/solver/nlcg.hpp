@@ -185,11 +185,6 @@ namespace FEAST
           return "NLCG-"+_linesearch.name()+"-"+stringify(_direction_update);
         }
 
-        Operator_& get_operator()
-        {
-          return _op;
-        }
-
         /// \copydoc BaseClass::apply()
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {

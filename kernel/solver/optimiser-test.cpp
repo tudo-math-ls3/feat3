@@ -146,3 +146,92 @@ opt_rb_q(__float128(0.9),"Hessian", NLCGDirectionUpdate::PolakRibiere);
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
 opt_bs_f_cuda(double(0.25),"none", NLCGDirectionUpdate::FletcherReeves);
 #endif
+
+#ifdef FEAST_HAVE_ALGLIB
+/**
+ * \brief Test class template for ALGLIB's mincg optimiser
+ *
+ */
+template < typename Mem_, typename DT_, typename IT_, typename Function_ >
+class ALGLIBMinCGTest:
+  public FullTaggedTest<Mem_, DT_, IT_>
+{
+  public:
+    typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
+    typedef typename OperatorType::PointType PointType;
+    typedef OptimisationTestTraits<DT_, Function_> TestTraitsType;
+
+    typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
+
+  private:
+    DT_ _tol;
+
+  public:
+    ALGLIBMinCGTest(DT_ exponent_) :
+      FullTaggedTest<Mem_, DT_, IT_>("ALGLIBMinCGTest"),
+      _tol(Math::pow(Math::eps<DT_>(), exponent_))
+    {
+    }
+
+    void run() const
+    {
+      // The analytic function
+      Function_ my_function;
+      // Create the (nonlinear) operator
+      OperatorType my_op(my_function);
+      // The filter
+      FilterType my_filter;
+
+      //auto my_precond = nullptr;
+      auto solver = new_alglib_mincg(my_op, my_filter, false);
+      solver->init();
+      solver->set_tol_rel(Math::eps<DT_>());
+      solver->set_plot(false);
+      solver->set_max_iter(250);
+
+      // This will hold the solution
+      auto sol = my_op.create_vector_r();
+      // We need a dummy rhs
+      auto rhs = my_op.create_vector_r();
+
+      // Get an initial guess from the Traits class for the given function
+      PointType starting_point(DT_(0));
+      TestTraitsType::get_starting_point(starting_point);
+      sol(0,starting_point);
+
+      my_op.prepare(sol);
+
+      // Solve the optimisation problem
+      solver->correct(sol, rhs);
+
+      solver->done();
+
+      // From the traits class, get the set of minimal points
+      std::deque<PointType> min_points;
+      TestTraitsType::get_minimal_points(min_points);
+
+      // Check the distance betwen solution and minimal points
+      DT_ min_dist(Math::Limits<DT_>::max());
+
+      const auto& jt = min_points.end();
+      auto it = min_points.begin();
+      for(; it != jt; ++it)
+      {
+        DT_ dist((sol(0) - *it).norm_euclid());
+        if(dist  < min_dist)
+          min_dist = dist;
+      }
+      // Check if we found a valid minimum
+      TEST_CHECK_MSG(min_dist < _tol,"min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
+    }
+};
+
+// The Himmelblau function is not too difficult, so low tolerance
+ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction> alg_opt_hb_f(float(0.8));
+
+// The Rosenbrock function's steep valley is bad
+ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction> alg_opt_rb_d(double(0.6));
+
+// The Hessian of the Bazaraa/Shetty function is singular at the optimal point
+ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction> alg_opt_bs_d(double(0.1));
+#endif // FEAST_HAVE_ALGLIB

@@ -52,6 +52,9 @@ namespace FEAST
         /// The type of the underlying analytic function
         typedef Function_ FunctionType;
 
+        static constexpr bool can_hess = FunctionType::can_hess;
+        static constexpr bool can_diag_hess = can_hess;
+
         /// Class that knows what Function_ wants as input parameters for its evaluator etc.
         typedef Analytic::EvalTraits<DT_, Function_> FuncEvalTraits;
         /// Type of Function_'s evaluator
@@ -59,6 +62,7 @@ namespace FEAST
         /// Input type for Function_
         typedef typename EvalType::PointType PointType;
 
+        /// Dimension each variable is from
         static constexpr int dim = PointType::n;
 
         /// Input vector for the operator and its gradient
