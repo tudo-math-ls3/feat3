@@ -107,11 +107,11 @@ class LinearVariationalSmootherTest
 };
 
 LinearVariationalSmootherTest<Mem::Main, double, unsigned int, Shape::Simplex<2>, Meshopt::LaplaceSmoother> laplace_d_s2(4);
+LinearVariationalSmootherTest<Mem::Main, double, unsigned int, Shape::Hypercube<3>, Meshopt::LaplaceSmoother> laplace_d_hc3(3);
 #ifdef FEAST_BACKENDS_CUDA
 LinearVariationalSmootherTest<Mem::CUDA, float, Index, Shape::Simplex<3>, Meshopt::LaplaceSmoother> laplace_f_s3(3);
 LinearVariationalSmootherTest<Mem::CUDA, double, unsigned int, Shape::Hypercube<2>, Meshopt::LaplaceSmoother> laplace_f_hc2(5);
 #endif
-LinearVariationalSmootherTest<Mem::Main, double, unsigned int, Shape::Hypercube<3>, Meshopt::LaplaceSmoother> laplace_d_hc3(3);
 
 LinearVariationalSmootherTest<Mem::Main, double, Index, Shape::Simplex<2>, Meshopt::DuDvSmoother> dudv_f_s2(4);
 LinearVariationalSmootherTest<Mem::Main, float, Index, Shape::Simplex<3>, Meshopt::DuDvSmoother> dudv_f_s3(2);
@@ -120,6 +120,6 @@ LinearVariationalSmootherTest<Mem::Main, float, Index, Shape::Hypercube<2>, Mesh
 LinearVariationalSmootherTest<Mem::Main, double, unsigned int, Shape::Hypercube<3>, Meshopt::DuDvSmoother> dudv_f_hc3(3);
 
 #ifdef FEAST_BACKENDS_CUDA
-LinearVariationalSmootherTest<Mem::CUDA, float, unsigned int, Shape::Simplex<3>, Meshopt::DuDvSmoother> dudv_cuda_f_s3(2);
+LinearVariationalSmootherTest<Mem::CUDA, double, unsigned int, Shape::Simplex<2>, Meshopt::DuDvSmoother> dudv_cuda_f_s2(4);
 LinearVariationalSmootherTest<Mem::CUDA, double, unsigned int, Shape::Hypercube<3>, Meshopt::DuDvSmoother> dudv_cuda_f_hc3(3);
 #endif

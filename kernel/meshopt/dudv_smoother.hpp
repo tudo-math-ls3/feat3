@@ -18,8 +18,9 @@
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/meshopt/mesh_smoother.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
-#include <kernel/solver/pcg.hpp>
 #include <kernel/solver/ssor_precond.hpp>
+#include <kernel/solver/ilu_precond.hpp>
+#include <kernel/solver/pcg.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 
 namespace FEAST
@@ -307,7 +308,7 @@ namespace FEAST
         template<typename Matrix_, typename Filter_>
         static std::shared_ptr<Solver::IterativeSolver<typename Matrix_::VectorTypeR>> solver(Matrix_& matrix, Filter_& filter)
         {
-          auto precond = Solver::new_jacobi_precond(matrix, filter);
+          auto precond = Solver::new_ilu_precond(matrix, filter);
           auto my_solver = Solver::new_pcg<Matrix_, Filter_>(matrix, filter, precond);
           return my_solver;
         }
