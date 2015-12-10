@@ -90,7 +90,7 @@ namespace FEAST
         /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
         /// Maximum number of subsequent restarts (meaning steepest descent steps) before aborting
-        static constexpr Index max_num_subs_restarts = Index(3);
+        static constexpr Index max_num_subs_restarts = Index(10);
 
       protected:
         /// Our nonlinear operator
@@ -159,7 +159,7 @@ namespace FEAST
           restart_freq(0),
           iterates(nullptr)
           {
-            this->_min_stag_iter = Index(3);
+            //this->_min_stag_iter = Index(3);
 
             // If we use Fletcher-Reeves, frequent restarts are needed
             if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
@@ -345,6 +345,7 @@ namespace FEAST
               num_subsequent_restarts = Index(0);
               this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, beta);
             }
+            std::cout << "NLCG: beta = " << stringify_fp_sci(beta) << std::endl;
 
             // Now that we know the new search direction, we can update _eta
             _eta = this->_vec_dir.dot(this->_vec_def);

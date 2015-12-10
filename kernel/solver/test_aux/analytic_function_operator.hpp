@@ -159,7 +159,7 @@ namespace FEAST
          *
          * \returns The function value at the current state
          */
-        typename EvalType::ValueType compute_fval()
+        typename EvalType::ValueType compute_func()
         {
           ++num_func_evals;
           typename EvalType::ValueType ret;

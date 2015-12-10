@@ -67,7 +67,7 @@ int run(Solver_& solver, Operator_& op)
   solver->init();
   solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
-  solver->set_max_iter(250);
+  solver->set_max_iter(100);
   std::cout << "Using solver " << solver->get_formated_solver_tree() << std::endl;
 
   // This will hold the solution
@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::HimmelblauFunction AnalyticFunctionType;
+  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, Index, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;

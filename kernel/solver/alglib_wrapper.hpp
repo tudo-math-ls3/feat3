@@ -336,7 +336,7 @@ namespace FEAST
           // Prepare the operator
           me->_op.prepare(me->_vec_tmp);
           // Compute functional value and gradient
-          func = me->_op.compute_fval();
+          func = me->_op.compute_func();
           me->_op.compute_grad(me->_vec_def);
           me->_filter.filter_def(me->_vec_def);
 
