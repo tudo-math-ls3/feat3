@@ -21,7 +21,6 @@ namespace FEAST
         status = cublasSnrm2(Util::Intern::cublas_handle, size, x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasnrm2 failed with status code: " + stringify(status));
-        cudaDeviceSynchronize();
         return result;
       }
 
@@ -32,7 +31,6 @@ namespace FEAST
         status = cublasDnrm2(Util::Intern::cublas_handle, size, x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasnrm2 failed with status code: " + stringify(status));
-        cudaDeviceSynchronize();
         return result;
       }
     }

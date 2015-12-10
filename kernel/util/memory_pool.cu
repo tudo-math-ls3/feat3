@@ -53,6 +53,8 @@ void MemoryPool<Mem::CUDA>::initialise()
     throw InternalError(__func__, __FILE__, __LINE__, "cublasCreate failed!");
   if (CUSPARSE_STATUS_SUCCESS != cusparseCreate(&Util::Intern::cusparse_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseCreate failed!");
+  cublasSetPointerMode(Util::Intern::cublas_handle, CUBLAS_POINTER_MODE_HOST);
+  cusparseSetPointerMode(Util::Intern::cusparse_handle, CUSPARSE_POINTER_MODE_HOST);
 }
 
 void MemoryPool<Mem::CUDA>::finalise()

@@ -23,7 +23,6 @@ namespace FEAST
         status = cublasSdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasdot failed with status code "+ stringify(status));
-        cudaDeviceSynchronize();
         return result;
       }
 
@@ -34,7 +33,6 @@ namespace FEAST
         status = cublasDdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasdot failed with status code "+ stringify(status));
-        cudaDeviceSynchronize();
         return result;
       }
     }
