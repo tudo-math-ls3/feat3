@@ -19,8 +19,10 @@ namespace FEAST
       float cuda_dot_product(const float * x, const float * y, const Index size)
       {
         float result;
-        if (CUBLAS_STATUS_SUCCESS != cublasSdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result))
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasSdot failed!");
+        cublasStatus_t status;
+        status = cublasSdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result);
+        if (status != CUBLAS_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasdot failed with status code "+ stringify(status));
         cudaDeviceSynchronize();
         return result;
       }
@@ -28,8 +30,10 @@ namespace FEAST
       double cuda_dot_product(const double * x, const double * y, const Index size)
       {
         double result;
-        if (CUBLAS_STATUS_SUCCESS != cublasDdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result))
-          throw InternalError(__func__, __FILE__, __LINE__, "cublasDdot failed!");
+        cublasStatus_t status;
+        status = cublasDdot(Util::Intern::cublas_handle, size, x, 1, y, 1, &result);
+        if (status != CUBLAS_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasdot failed with status code "+ stringify(status));
         cudaDeviceSynchronize();
         return result;
       }
@@ -45,6 +49,12 @@ template <typename DT_>
 DT_ DotProduct<Mem::CUDA>::value(const DT_ * const x, const DT_ * const y, const Index size)
 {
   DT_ result = Intern::cuda_dot_product(x, y, size);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
   return result;
 }
 
@@ -59,6 +69,12 @@ DT_ TripleDotProduct<Mem::CUDA>::value(const DT_ * const x, const DT_ * const y,
   ComponentProduct<Mem::CUDA>::value(temp, y, z, size);
   DT_ result = Intern::cuda_dot_product(x, temp, size);
   cudaFree(temp);
+#ifdef FEAST_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
   return result;
 }
 

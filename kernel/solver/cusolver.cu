@@ -29,6 +29,8 @@ namespace FEAST
 
         int singularity;
         cusolverStatus_t status = cusolverSpDcsrlsvluHost(handle, n, nnzA, descr, csrValA, csrRowPtrA, csrColIndA, b, 0.0, 1, x, &singularity);
+        if (status != CUSOLVER_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusolverSpDcsrlsvluHost failed with status code: " + stringify(status));
 
         cusparseDestroyMatDescr(descr);
         cusolverSpDestroy(handle);
@@ -57,6 +59,8 @@ namespace FEAST
 
         int singularity;
         cusolverStatus_t status = cusolverSpDcsrlsvqr(handle, m, nnz, descr, csrValA, csrRowPtrA, csrColIndA, b, 0.0, 1, x, &singularity);
+        if (status != CUSOLVER_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusolverSPDcsrlvsqr failed with status code: " + stringify(status));
 
         cusparseDestroyMatDescr(descr);
         cusolverSpDestroy(handle);

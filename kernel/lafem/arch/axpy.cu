@@ -103,8 +103,11 @@ namespace FEAST
                                        const float * csrVal, const int * csrRowPtr, const int *csrColInd,
                                        const float * x, const float * beta, float * y)
       {
-        cusparseScsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+        cusparseStatus_t status;
+        status = cusparseScsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
                        csrColInd, x, beta, y);
+        if (status != CUSPARSE_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrmv failed with status code: " + stringify(status));
       }
 
       void cusparse_axpy_csr(cusparseOperation_t trans,
@@ -113,8 +116,11 @@ namespace FEAST
                                        const double * csrVal, const int * csrRowPtr, const int *csrColInd,
                                        const double * x, const double * beta, double * y)
       {
-        cusparseDcsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+        cusparseStatus_t status;
+        status = cusparseDcsrmv(Util::Intern::cusparse_handle, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
                        csrColInd, x, beta, y);
+        if (status != CUSPARSE_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrmv failed with status code: " + stringify(status));
       }
 
       void cusparse_axpy_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
@@ -124,8 +130,11 @@ namespace FEAST
                                        int block_dim,
                                        const float * x, const float * beta, float * y)
       {
-        cusparseSbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+        cusparseStatus_t status;
+        status = cusparseSbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
                        csrColInd, block_dim, x, beta, y);
+        if (status != CUSPARSE_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrmv failed with status code: " + stringify(status));
       }
 
       void cusparse_axpy_csrb(cusparseDirection_t dir, cusparseOperation_t trans,
@@ -135,8 +144,11 @@ namespace FEAST
                                        int block_dim,
                                        const double * x, const double * beta, double * y)
       {
-        cusparseDbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
+        cusparseStatus_t status;
+        status = cusparseDbsrmv(Util::Intern::cusparse_handle, dir, trans, m, n, nnz, alpha, descrA, csrVal, csrRowPtr,
                        csrColInd, block_dim, x, beta, y);
+        if (status != CUSPARSE_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrmv failed with status code: " + stringify(status));
       }
     }
   }
