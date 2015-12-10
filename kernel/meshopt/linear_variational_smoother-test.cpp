@@ -118,3 +118,8 @@ LinearVariationalSmootherTest<Mem::Main, float, Index, Shape::Simplex<3>, Meshop
 
 LinearVariationalSmootherTest<Mem::Main, float, Index, Shape::Hypercube<2>, Meshopt::DuDvSmoother> dudv_f_hc2(5);
 LinearVariationalSmootherTest<Mem::Main, double, unsigned int, Shape::Hypercube<3>, Meshopt::DuDvSmoother> dudv_f_hc3(3);
+
+#ifdef FEAST_BACKENDS_CUDA
+LinearVariationalSmootherTest<Mem::CUDA, float, unsigned int, Shape::Simplex<3>, Meshopt::DuDvSmoother> dudv_cuda_f_s3(2);
+LinearVariationalSmootherTest<Mem::CUDA, double, unsigned int, Shape::Hypercube<3>, Meshopt::DuDvSmoother> dudv_cuda_f_hc3(3);
+#endif
