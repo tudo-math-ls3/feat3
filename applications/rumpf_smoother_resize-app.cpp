@@ -10,6 +10,8 @@
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
 
+#include <kernel/util/runtime.hpp>
+
 using namespace FEAST;
 
 /// \cond internal
@@ -173,10 +175,13 @@ using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
 template<typename A, typename B>
 using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional_D2>;
 
-int main()
+int main(int argc, char** argv)
 {
+  FEAST::Runtime::initialise(argc, argv);
+
   ResizeApp<double, Shape::Hypercube<2>, MyFunctional, MySmoother>::run();
-  return 0;
+
+  return FEAST::Runtime::finalise();
 }
 
 /// \brief Specialisation for hypercubes

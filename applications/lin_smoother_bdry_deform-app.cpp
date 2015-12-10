@@ -1,10 +1,11 @@
 #include <kernel/base_header.hpp>
-#include <kernel/util/math.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/export_vtk.hpp>
 #include <kernel/meshopt/dudv_smoother.hpp>
 #include <kernel/meshopt/laplace_smoother.hpp>
-#include <kernel/geometry/export_vtk.hpp>
+#include <kernel/util/math.hpp>
+#include <kernel/util/runtime.hpp>
 
 using namespace FEAST;
 /**
@@ -203,10 +204,11 @@ template
   } // void run()
 }; // struct BdryDeformApp
 
-int main()
+int main(int argc, char** argv)
 {
+  FEAST::Runtime::initialise(argc, argv);
   Index level(3);
 
   BdryDeformApp<Mem::Main, double, Index, Shape::Hypercube<2>, Meshopt::DuDvSmoother>::run(level);
-  return 0;
+  return FEAST::Runtime::finalise();
 }

@@ -8,6 +8,7 @@
 #include <kernel/meshopt/dudv_smoother.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/mesh_streamer.hpp>
+#include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
@@ -39,8 +40,8 @@ template
   typename DT_,
   typename IT_,
   typename MeshType_
-  >
-  struct DuDvSmootherExcentricApp
+>
+struct DuDvSmootherExcentricApp
 {
   /// Precision for meshes etc, everything else uses the same data type
   typedef DT_ DataType;
@@ -353,6 +354,7 @@ template
  */
 int main(int argc, char* argv[])
 {
+  FEAST::Runtime::initialise(argc, argv);
   // Creata a parser for command line arguments.
   SimpleArgParser args(argc, argv);
 
@@ -425,20 +427,23 @@ int main(int argc, char* argv[])
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, DataType> Simplex2Mesh_2d;
   typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, DataType> Hypercube2Mesh_2d;
 
+  int ret(1);
+
   // Call the run() method of the appropriate wrapper class
   if(shape_type == mesh_data.st_tria)
   {
-    return DuDvSmootherExcentricApp<MemType, DataType, IndexType, Simplex2Mesh_2d>::
+    ret = DuDvSmootherExcentricApp<MemType, DataType, IndexType, Simplex2Mesh_2d>::
       run(my_streamer, lvl_max, deltat);
   }
 
   if(shape_type == mesh_data.st_quad)
   {
-      return DuDvSmootherExcentricApp<MemType, DataType, IndexType, Hypercube2Mesh_2d>::
-        run(my_streamer, lvl_max, deltat);
+    ret = DuDvSmootherExcentricApp<MemType, DataType, IndexType, Hypercube2Mesh_2d>::
+      run(my_streamer, lvl_max, deltat);
   }
 
+  ret = ret | FEAST::Runtime::finalise();
   // If no MeshType from the list was in the file, return 1
-  return 1;
+  return ret;
 }
 /// \endcond

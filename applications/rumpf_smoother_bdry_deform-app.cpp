@@ -2,6 +2,7 @@
 #include <kernel/util/math.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/export_vtk.hpp>
 #include <kernel/meshopt/rumpf_smoother.hpp>
 #include <kernel/meshopt/rumpf_smoother_q1hack.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
@@ -9,7 +10,7 @@
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1hack.hpp>
-#include <kernel/geometry/export_vtk.hpp>
+#include <kernel/util/runtime.hpp>
 
 using namespace FEAST;
 /**
@@ -276,10 +277,13 @@ using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
 template<typename A, typename B>
 using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
 
-int main()
+int main(int argc, char** argv)
 {
+  FEAST::Runtime::initialise(argc, argv);
+
   Index level(3);
 
   BdryDeformApp<double, Shape::Hypercube<2>, MyFunctionalQ1Hack, MySmootherQ1Hack>::run(level);
-  return 0;
+
+  return FEAST::Runtime::finalise();
 }

@@ -24,6 +24,8 @@
 #include <kernel/util/math.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 
+#include <kernel/util/runtime.hpp>
+
 using namespace FEAST;
 
   template<typename PointType, typename DataType>
@@ -347,6 +349,7 @@ using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFu
 
 int main(int argc, char* argv[])
 {
+  FEAST::Runtime::initialise(argc, argv);
   // Creata a parser for command line arguments.
   SimpleArgParser args(argc, argv);
 
@@ -413,16 +416,19 @@ int main(int argc, char* argv[])
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> Simplex2Mesh_2d;
   typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> Hypercube2Mesh_2d;
 
+  int ret(1);
+
   // Call the run() method of the appropriate wrapper class
   if(shape_type == mesh_data.st_tria)
-    return LevelsetApp<DataType, Simplex2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
+    ret = LevelsetApp<DataType, Simplex2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
       run(my_streamer, lvl_max, deltat);
   if(shape_type == mesh_data.st_quad)
-    return LevelsetApp<DataType, Hypercube2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
+    ret = LevelsetApp<DataType, Hypercube2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
       run(my_streamer, lvl_max, deltat);
 
-  // If no MeshType from the list was in the file, return 1
-  return 1;
+  ret = ret | FEAST::Runtime::finalise();
+  // If no MeshType from the list was in the file, ret is 1
+  return ret;
 }
 /// \endcond
 #endif // FEAST_HAVE_ALGLIB

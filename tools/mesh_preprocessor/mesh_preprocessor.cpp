@@ -7,6 +7,8 @@
 #include <kernel/util/mesh_streamer.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 
+#include <kernel/util/runtime.hpp>
+
 /**
  * Mesh preprocessing tool, mainly copy-pasted from tools/mesh2vtk.
  *
@@ -169,8 +171,9 @@ String get_file_title(const String& filename)
     return 0;
   }
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
+  FEAST::Runtime::initialise(argc, argv);
   // create an argument parser
   SimpleArgParser args(argc, argv);
 
@@ -188,14 +191,14 @@ int main(int argc, char* argv[])
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
       std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
-    return 1;
+    FEAST::Runtime::abort();
   }
 
   auto* filenames_pair(args.query("filenames"));
   if(filenames_pair == nullptr)
   {
     std::cerr << "ERROR: No filenames specified!" << std::endl;
-    return 1;
+    FEAST::Runtime::abort();
   }
   std::deque<String> filenames(filenames_pair->second);
 
@@ -218,10 +221,8 @@ int main(int argc, char* argv[])
   Index lvl_max(0);
   int level_flag(args.parse("levels", lvl_min, lvl_max));
   if(level_flag < 0)
-  {
-    std::cerr << "ERROR: Invalid level information " << args.get_arg(-level_flag) << std::endl;
-    return 1;
-  }
+    throw InternalError("ERROR: Invalid level information "+args.get_arg(-level_flag));
+
   if(level_flag == 1)
   {
     lvl_max = lvl_min;
@@ -249,7 +250,7 @@ int main(int argc, char* argv[])
   catch(const std::exception& exc)
   {
     std::cerr << "ERROR: " << exc.what() << std::endl;
-    return 1;
+    FEAST::Runtime::abort();
   }
 
   // This is the raw mesh data my_streamer read from filename
@@ -262,25 +263,26 @@ int main(int argc, char* argv[])
   if(mesh_type != mesh_data.mt_conformal)
   {
     std::cerr << "ERROR: Unsupported mesh type; only conformal meshes are supported" << std::endl;
-    return 1;
+    FEAST::Runtime::abort();
   }
 
   String& filename(filenames[0]);
   // Call the run() method of the appropriate wrapper class
+  int ret(1);
   if(shape_type == mesh_data.st_edge)
   {
     if(mesh_data.coord_per_vertex == 1)
-      return run<Simplex1Mesh_1d>(my_streamer, filename, lvl_min, lvl_max,
+      ret = run<Simplex1Mesh_1d>(my_streamer, filename, lvl_min, lvl_max,
       deduct_from_bottom, deduct_from_top, deduct_topology);
     if(mesh_data.coord_per_vertex == 2)
-      return run<Simplex1Mesh_2d>(my_streamer, filename, lvl_min, lvl_max,
+      ret = run<Simplex1Mesh_2d>(my_streamer, filename, lvl_min, lvl_max,
       deduct_from_bottom, deduct_from_top, deduct_topology);
     if(mesh_data.coord_per_vertex == 3)
-      return run<Simplex1Mesh_3d>(my_streamer, filename, lvl_min, lvl_max,
+      ret = run<Simplex1Mesh_3d>(my_streamer, filename, lvl_min, lvl_max,
       deduct_from_bottom, deduct_from_top, deduct_topology);
 
     std::cerr << "ERROR: Unsupported world dim " << mesh_data.coord_per_vertex << " for Simplex<1> mesh!"<< std::endl;
-    return 1;
+    FEAST::Runtime::abort();
   }
 
   if(shape_type == mesh_data.st_tria)
@@ -292,28 +294,30 @@ int main(int argc, char* argv[])
       return run<Simplex2Mesh_3d>(my_streamer, filename, lvl_min, lvl_max,
       deduct_from_bottom, deduct_from_top, deduct_topology);
     std::cerr << "ERROR: Unsupported world dim " << mesh_data.coord_per_vertex << " for Simplex<2> mesh!"<< std::endl;
-    return 1;
+    FEAST::Runtime::abort();
   }
 
   if(shape_type == mesh_data.st_tetra)
-    return run<Simplex3Mesh>(my_streamer, filename, lvl_min, lvl_max,
+    ret = run<Simplex3Mesh>(my_streamer, filename, lvl_min, lvl_max,
     deduct_from_bottom, deduct_from_top, deduct_topology);
 
   if(shape_type == mesh_data.st_quad)
   {
     if(mesh_data.coord_per_vertex == 2)
-      return run<Hypercube2Mesh_2d>(my_streamer, filename, lvl_min, lvl_max,
+      ret = run<Hypercube2Mesh_2d>(my_streamer, filename, lvl_min, lvl_max,
       deduct_from_bottom, deduct_from_top, deduct_topology);
     if(mesh_data.coord_per_vertex == 3)
-      return run<Hypercube2Mesh_3d>(my_streamer, filename, lvl_min, lvl_max,
+      ret = run<Hypercube2Mesh_3d>(my_streamer, filename, lvl_min, lvl_max,
       deduct_from_bottom, deduct_from_top, deduct_topology);
 
     std::cerr << "ERROR: Unsupported world dim " << mesh_data.coord_per_vertex << " for Hypercube<2> mesh!"<< std::endl;
-    return 1;
+    FEAST::Runtime::abort();
   }
-  if(shape_type == mesh_data.st_hexa)
-    return run<Hypercube3Mesh>(my_streamer, filename, lvl_min, lvl_max, deduct_from_bottom, deduct_from_top, deduct_topology);
 
+  if(shape_type == mesh_data.st_hexa)
+    ret = run<Hypercube3Mesh>(my_streamer, filename, lvl_min, lvl_max, deduct_from_bottom, deduct_from_top, deduct_topology);
+
+  ret = ret | FEAST::Runtime::finalise();
   // If no MeshType from the list was in the file, return 1
-  return 1;
+  return ret;
 }
