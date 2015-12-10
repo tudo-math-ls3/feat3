@@ -51,9 +51,10 @@ public:
   {
     test_vector_types();
 
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> a;
-    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> b;
-    TEST_CHECK_EQUAL(b, a);
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zero1;
+    SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zero2;
+    TEST_CHECK_EQUAL(zero2, zero1);
+    zero2.convert(zero1);
 
     DenseVector<Mem_, DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)

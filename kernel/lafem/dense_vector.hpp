@@ -163,7 +163,7 @@ namespace FEAST
       template <typename VT_, typename IT2_>
       void _convert(const typename VT_::template ContainerType<Mem_, DT_, IT2_> & a)
       {
-        DenseVector<Mem_, DT_, IT_> vec(a.template size<Perspective::pod>());
+        DenseVector vec(a.template size<Perspective::pod>());
         a.set_vec(vec.elements());
 
         this->assign(vec);

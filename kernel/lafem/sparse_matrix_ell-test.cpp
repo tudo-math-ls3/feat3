@@ -44,6 +44,7 @@ public:
     SparseMatrixELL<Mem_, DT_, IT_> zero1;
     SparseMatrixELL<Mem::Main, DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
+    zero2.convert(zero1);
 
     SparseMatrixCOO<Mem::Main, DT_, IT_> a(10, 12);
     a(1,2,7);

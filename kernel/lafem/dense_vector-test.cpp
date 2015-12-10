@@ -43,6 +43,7 @@ public:
     DenseVector<Mem_, DT_, IT_> zero1;
     DenseVector<Mem::Main, DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
+    zero2.convert(zero1);
 
     if (typeid(Mem::CUDA) != typeid(Mem_))
     {
