@@ -106,16 +106,15 @@ int Runtime::finalise()
     throw InternalError(__func__, __FILE__, __LINE__, "Runtime::finalise called twice!");
   }
 
-#ifdef FEAST_MPI
-  // finalise MPI
-  ::MPI_Finalize();
-#endif
-
   MemoryPool<Mem::Main>::finalise();
 #ifdef FEAST_BACKENDS_CUDA
   MemoryPool<Mem::CUDA>::finalise();
 #endif
 
+#ifdef FEAST_MPI
+  // finalise MPI
+  ::MPI_Finalize();
+#endif
 
   _finished = true;
 
