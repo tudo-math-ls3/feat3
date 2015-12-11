@@ -17,6 +17,8 @@ void Defect<Mem::Main>::csr_mkl(float * r, const float * const rhs, const float 
   char trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == rhs)
   {
@@ -39,6 +41,8 @@ void Defect<Mem::Main>::csr_mkl(double * r, const double * const rhs, const doub
   char trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == rhs)
   {
@@ -64,6 +68,8 @@ void Defect<Mem::Main>::csrb_mkl(float * r, const float * const rhs, const float
   char trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == rhs)
   {
@@ -88,6 +94,8 @@ void Defect<Mem::Main>::csrb_mkl(double * r, const double * const rhs, const dou
   char trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == rhs)
   {
@@ -111,6 +119,8 @@ void Defect<Mem::Main>::coo_mkl(float * r, const float * const rhs, const float 
   float beta = 1.f;
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == rhs)
   {
@@ -134,6 +144,8 @@ void Defect<Mem::Main>::coo_mkl(double * r, const double * const rhs, const doub
   double beta = 1.;
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == rhs)
   {

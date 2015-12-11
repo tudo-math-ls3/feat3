@@ -60,6 +60,8 @@ void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, c
   char trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == y)
   {
@@ -81,6 +83,8 @@ void Axpy<Mem::Main>::csr_mkl(double * r, const double a, const double * const x
   char trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == y)
   {
@@ -104,6 +108,8 @@ void Axpy<Mem::Main>::csrb_mkl(float * r, const float a, const float * const x, 
   char trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == y)
   {
@@ -127,6 +133,8 @@ void Axpy<Mem::Main>::csrb_mkl(double * r, const double a, const double * const 
   char trans = 'N';
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == y)
   {
@@ -150,6 +158,8 @@ void Axpy<Mem::Main>::coo_mkl(float * r, const float a, const float * const x, c
   float beta = 1.f;
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == y)
   {
@@ -173,6 +183,8 @@ void Axpy<Mem::Main>::coo_mkl(double * r, const double a, const double * const x
   double beta = 1.;
   char matdescra[6];
   matdescra[0] = 'G';
+  matdescra[1] = 0; //ingored by mkl, but valgrind complains otherwise
+  matdescra[2] = 0; //ingored by mkl, but valgrind complains otherwise
   matdescra[3] = 'C';
   if (r == y)
   {
