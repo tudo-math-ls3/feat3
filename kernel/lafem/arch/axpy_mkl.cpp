@@ -65,13 +65,13 @@ void Axpy<Mem::Main>::csr_mkl(float * r, const float a, const float * const x, c
   matdescra[3] = 'C';
   if (r == y)
   {
-    mkl_scsrmv(&trans, &mrows, &mcolumns, &a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
+    mkl_scsrmv(&trans, &mrows, &mcolumns, (float*)&a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
   }
   else
   {
     MKL_INT one = 1;
     scopy(&mrows, (float*)y, &one, r, &one);
-    mkl_scsrmv(&trans, &mrows, &mcolumns, &a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
+    mkl_scsrmv(&trans, &mrows, &mcolumns, (float*)&a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
   }
 }
 
@@ -88,13 +88,13 @@ void Axpy<Mem::Main>::csr_mkl(double * r, const double a, const double * const x
   matdescra[3] = 'C';
   if (r == y)
   {
-    mkl_dcsrmv(&trans, &mrows, &mcolumns, &a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
+    mkl_dcsrmv(&trans, &mrows, &mcolumns, (double*)&a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
   }
   else
   {
     MKL_INT one = 1;
     dcopy(&mrows, (double*)y, &one, r, &one);
-    mkl_dcsrmv(&trans, &mrows, &mcolumns, &a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
+    mkl_dcsrmv(&trans, &mrows, &mcolumns, (double*)&a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
   }
 }
 
@@ -113,13 +113,13 @@ void Axpy<Mem::Main>::csrb_mkl(float * r, const float a, const float * const x, 
   matdescra[3] = 'C';
   if (r == y)
   {
-    mkl_sbsrmv(&trans, &mrows, &mcolumns, &mblocksize, &a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
+    mkl_sbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (float*)&a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
   }
   else
   {
     MKL_INT one = 1;
     scopy(&mcopysize, (float*)y, &one, r, &one);
-    mkl_sbsrmv(&trans, &mrows, &mcolumns, &mblocksize, &a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
+    mkl_sbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (float*)&a, matdescra, (float*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (float*)x, &beta, r);
   }
 }
 
@@ -138,13 +138,13 @@ void Axpy<Mem::Main>::csrb_mkl(double * r, const double a, const double * const 
   matdescra[3] = 'C';
   if (r == y)
   {
-    mkl_dbsrmv(&trans, &mrows, &mcolumns, &mblocksize, &a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
+    mkl_dbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (double*)&a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
   }
   else
   {
     MKL_INT one = 1;
     dcopy(&mcopysize, (double*)y, &one, r, &one);
-    mkl_dbsrmv(&trans, &mrows, &mcolumns, &mblocksize, &a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
+    mkl_dbsrmv(&trans, &mrows, &mcolumns, &mblocksize, (double*)&a, matdescra, (double*) val, (MKL_INT*)col_ind, (MKL_INT*)row_ptr, (MKL_INT*)(row_ptr) + 1, (double*)x, &beta, r);
   }
 }
 
@@ -163,13 +163,13 @@ void Axpy<Mem::Main>::coo_mkl(float * r, const float a, const float * const x, c
   matdescra[3] = 'C';
   if (r == y)
   {
-    mkl_scoomv(&trans, &mrows, &mcolumns, &a, matdescra, (float*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (float*)x, &beta, r);
+    mkl_scoomv(&trans, &mrows, &mcolumns, (float*)&a, matdescra, (float*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (float*)x, &beta, r);
   }
   else
   {
     MKL_INT one = 1;
     scopy(&mrows, (float*)y, &one, r, &one);
-    mkl_scoomv(&trans, &mrows, &mcolumns, &a, matdescra, (float*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (float*)x, &beta, r);
+    mkl_scoomv(&trans, &mrows, &mcolumns, (float*)&a, matdescra, (float*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (float*)x, &beta, r);
   }
 }
 
@@ -188,12 +188,12 @@ void Axpy<Mem::Main>::coo_mkl(double * r, const double a, const double * const x
   matdescra[3] = 'C';
   if (r == y)
   {
-    mkl_dcoomv(&trans, &mrows, &mcolumns, &a, matdescra, (double*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double*)x, &beta, r);
+    mkl_dcoomv(&trans, &mrows, &mcolumns, (double*)&a, matdescra, (double*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double*)x, &beta, r);
   }
   else
   {
     MKL_INT one = 1;
     dcopy(&mrows, (double*)y, &one, r, &one);
-    mkl_dcoomv(&trans, &mrows, &mcolumns, &a, matdescra, (double*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double*)x, &beta, r);
+    mkl_dcoomv(&trans, &mrows, &mcolumns, (double*)&a, matdescra, (double*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double*)x, &beta, r);
   }
 }
