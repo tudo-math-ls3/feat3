@@ -375,13 +375,15 @@ namespace PoissonDirichlet2D
 
     if (rank == 0 && args.check("statistics") >= 0)
     {
-      String flops = Statistics::get_formated_flops(bt.elapsed(at), nprocs);
       std::cout<<std::endl<<solver->get_formated_solver_tree().trim()<<std::endl;
       String flops = Statistics::get_formated_flops(bt.elapsed(at), nprocs);
       std::cout<<"\nComplete solver TOE: "<<bt.elapsed(at)<<std::endl;
-      std::cout<<flops<<std::endl;
-      std::cout<<Statistics::get_formated_times(bt.elapsed(at))<<std::endl;
-      std::cout<<Statistics::get_formated_solvers()<<std::endl;
+      std::cout<<flops<<std::endl<<std::endl;
+      std::cout<<Statistics::get_formated_times(bt.elapsed(at))<<std::endl<<std::endl;
+      if (args.check("statistics") > 0) // provided parameter full or whatever
+      {
+        std::cout<<Statistics::get_formated_solvers();
+      }
     }
 
     // release solver
