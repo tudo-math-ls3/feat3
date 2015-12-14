@@ -267,6 +267,16 @@ public:
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("BiCGStab-ILU", solver, vec_sol, vec_ref, vec_rhs, 12);
     }
+
+    // test FGMRES-JAC
+    {
+      // create a Jacobi preconditioner
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      // create a Richardson solver
+      FGMRES<MatrixType, FilterType> solver(matrix, filter, 16, DataType(0), precon);
+      solver.set_max_iter(2000);
+      test_solver("FGMRES-JAC", solver, vec_sol, vec_ref, vec_rhs, 48);
+    }
   }
 };
 
