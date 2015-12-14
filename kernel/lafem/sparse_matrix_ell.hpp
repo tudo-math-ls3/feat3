@@ -2079,6 +2079,9 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+
         if (this->used_elements() == 0)
         {
           r.format();

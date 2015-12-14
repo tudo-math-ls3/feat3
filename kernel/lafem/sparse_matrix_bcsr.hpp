@@ -1209,6 +1209,9 @@ namespace FEAST
         if (x.size() != this->columns<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
@@ -1232,6 +1235,9 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
         if (x.size() != this->columns<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
         TimeStamp ts_start;
 
@@ -1258,6 +1264,9 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
@@ -1282,6 +1291,9 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
 
         TimeStamp ts_start;
 

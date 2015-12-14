@@ -1934,6 +1934,9 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+
         Arch::ProductMatVec<Mem_>::coo(r.elements(), this->val(), this->row_indices(),
                                               this->column_indices(), x.elements(), this->rows(), this->used_elements());
       }
