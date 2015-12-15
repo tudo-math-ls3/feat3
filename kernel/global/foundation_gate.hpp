@@ -82,6 +82,14 @@ namespace FEAST
         _freqs.component_invert(_freqs);
       }
 
+      virtual void from_1_to_0(LocalVector_& vector) const override
+      {
+        if(!_ranks.empty())
+        {
+          vector.component_product(vector, _freqs);
+        }
+      }
+
       virtual void sync_0(LocalVector_& vector) const override
       {
         if(_ranks.empty())

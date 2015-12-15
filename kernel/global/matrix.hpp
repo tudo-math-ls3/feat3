@@ -102,18 +102,20 @@ namespace FEAST
 
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const
       {
-        //if((*r).elements() == (*y).elements())
-        //  throw InternalError("invalid vectors in global mat-vec mult");
+        // copy y to r
+        r.copy(y);
 
-        // r <- A*x
-        _matrix.apply(*r, *x);
+        // convert from type-1 to type-0
+        r.from_1_to_0();
+
+        // r <- r + alpha*A*x
+        _matrix.apply(*r, *x, *r, alpha);
+
+        // synchronise r
         r.sync_0();
-        // r <- y + alpha*r
-        r.axpy(r, y, alpha);
       }
     };
   } // namespace Global
 } // namespace FEAST
-
 
 #endif // KERNEL_GLOBAL_MATRIX_HPP

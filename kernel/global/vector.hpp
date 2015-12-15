@@ -61,6 +61,14 @@ namespace FEAST
         this->_vector.convert(*other);
       }
 
+      void from_1_to_0()
+      {
+        if(_gate != nullptr)
+        {
+          _gate->from_1_to_0(this->_vector);
+        }
+      }
+
       void sync_0()
       {
         if(_gate != nullptr)
@@ -90,7 +98,11 @@ namespace FEAST
 
       void copy(const Vector& x)
       {
-        _vector.copy(*x);
+        // avoid self-copy
+        if(this != &x)
+        {
+          _vector.copy(*x);
+        }
       }
 
       void axpy(const Vector& x, const Vector& y, const DataType alpha = DataType(1))
