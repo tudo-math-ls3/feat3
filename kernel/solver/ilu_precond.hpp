@@ -130,6 +130,8 @@ namespace FEAST
        */
       virtual Status apply(VectorType& out, const VectorType& in) override
       {
+        TimeStamp ts_start;
+
         // copy in-vector to out-vector
         out.copy(in);
 
@@ -176,6 +178,10 @@ namespace FEAST
         }
 
         this->_filter.filter_cor(out);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_precon(ts_stop.elapsed(ts_start));
+        Statistics::add_flops(_LU.used_elements() * 2 + out.size());
 
         return Status::success;
       } // function apply
@@ -504,6 +510,8 @@ namespace FEAST
        */
       virtual Status apply(VectorType& out, const VectorType& in) override
       {
+        TimeStamp ts_start;
+
         // copy in-vector to out-vector
         out.copy(in);
 
@@ -552,6 +560,10 @@ namespace FEAST
         }
 
         this->_filter.filter_cor(out);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_precon(ts_stop.elapsed(ts_start));
+        Statistics::add_flops(_LU.used_elements() * 2 + out.size());
 
         return Status::success;
       } // function apply
@@ -901,9 +913,16 @@ namespace FEAST
         ASSERT(_matrix.rows() == vec_cor.size(), "Error: matrix / vector size missmatch!");
         ASSERT(_matrix.rows() == vec_def.size(), "Error: matrix / vector size missmatch!");
 
+        TimeStamp ts_start;
+
         int status = Intern::cuda_ilu_apply(vec_cor.elements(), vec_def.elements(), _lu_matrix.val(), (int*)_lu_matrix.row_ptr(), (int*)_lu_matrix.col_ind(), cuda_info);
 
         this->_filter.filter_cor(vec_cor);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_precon(ts_stop.elapsed(ts_start));
+        Statistics::add_flops(_matrix.used_elements() * 2 + vec_cor.size());
+
         return (status == 0) ? Status::success :  Status::aborted;
       }
     }; // class ILUPrecond<SparseMatrixCSR<Mem::CUDA>>
@@ -994,10 +1013,17 @@ namespace FEAST
         ASSERT(_matrix.rows() == vec_cor.size(), "Error: matrix / vector size missmatch!");
         ASSERT(_matrix.rows() == vec_def.size(), "Error: matrix / vector size missmatch!");
 
+        TimeStamp ts_start;
+
         int status = Intern::cuda_ilub_apply(vec_cor.template elements<LAFEM::Perspective::pod>(), vec_def.template elements<LAFEM::Perspective::pod>(),
           _lu_matrix.template val<LAFEM::Perspective::pod>(), (int*)_lu_matrix.row_ptr(), (int*)_lu_matrix.col_ind(), cuda_info);
 
         this->_filter.filter_cor(vec_cor);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_precon(ts_stop.elapsed(ts_start));
+        Statistics::add_flops(_matrix.used_elements() * 2 + vec_cor.size());
+
         return (status == 0) ? Status::success :  Status::aborted;
       }
     }; // class ILUPrecond<SparseMatrixBCSR<Mem::CUDA>>
