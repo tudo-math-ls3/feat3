@@ -25,8 +25,8 @@ namespace FEAST
         cusparseMatDescr_t descr_L;
         cusparseMatDescr_t descr_U;
         csrilu02Info_t info_M;
-        csrsv2Info_t info_L;
-        csrsv2Info_t info_U;
+        cusparseSolveAnalysisInfo_t info_L;
+        cusparseSolveAnalysisInfo_t info_U;
         cusparseOperation_t trans_L;
         cusparseOperation_t trans_U;
         cusparseSolvePolicy_t policy_M;
@@ -47,11 +47,9 @@ namespace FEAST
         cusparseMatDescr_t descr_L = 0;
         cusparseMatDescr_t descr_U = 0;
         csrilu02Info_t info_M  = 0;
-        csrsv2Info_t  info_L  = 0;
-        csrsv2Info_t  info_U  = 0;
+        cusparseSolveAnalysisInfo_t info_L  = 0;
+        cusparseSolveAnalysisInfo_t info_U  = 0;
         int pBufferSize_M;
-        int pBufferSize_L;
-        int pBufferSize_U;
         int pBufferSize;
         void *pBuffer = 0;
         int structural_zero;
@@ -80,23 +78,15 @@ namespace FEAST
         cusparseSetMatDiagType(descr_U, CUSPARSE_DIAG_TYPE_NON_UNIT);
 
         cusparseCreateCsrilu02Info(&info_M);
-        cusparseCreateCsrsv2Info(&info_L);
-        cusparseCreateCsrsv2Info(&info_U);
+        cusparseCreateSolveAnalysisInfo(&info_L);
+        cusparseCreateSolveAnalysisInfo(&info_U);
 
         status = cusparseDcsrilu02_bufferSize(Util::Intern::cusparse_handle, m, nnz,
                 descr_M, csrVal, csrRowPtr, csrColInd, info_M, &pBufferSize_M);
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrilu02_bufferSize failed with status code: " + stringify(status));
-        status = cusparseDcsrsv2_bufferSize(Util::Intern::cusparse_handle, trans_L, m, nnz,
-                descr_L, csrVal, csrRowPtr, csrColInd, info_L, &pBufferSize_L);
-        if (status != CUSPARSE_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrilu02_bufferSize failed with status code: " + stringify(status));
-        status = cusparseDcsrsv2_bufferSize(Util::Intern::cusparse_handle, trans_U, m, nnz,
-                descr_U, csrVal, csrRowPtr, csrColInd, info_U, &pBufferSize_U);
-        if (status != CUSPARSE_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrilu02_bufferSize failed with status code: " + stringify(status));
 
-        pBufferSize = max(pBufferSize_M, max(pBufferSize_L, pBufferSize_U));
+        pBufferSize = pBufferSize_M;
 
         cudaMalloc((void**)&pBuffer, pBufferSize);
 
@@ -111,15 +101,15 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "CUSPARSE ZERO PIVOT ERROR!");
         }
 
-        status = cusparseDcsrsv2_analysis(Util::Intern::cusparse_handle, trans_L, m, nnz, descr_L,
-                csrVal, csrRowPtr, csrColInd, info_L, policy_L, pBuffer);
+        status = cusparseDcsrsv_analysis(Util::Intern::cusparse_handle, trans_L, m, nnz, descr_L,
+                csrVal, csrRowPtr, csrColInd, info_L);
         if (status != CUSPARSE_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrv2_analysis failed with status code: " + stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparse_csrv_analysis failed with status code: " + stringify(status));
 
-        status = cusparseDcsrsv2_analysis(Util::Intern::cusparse_handle, trans_U, m, nnz, descr_U,
-                csrVal, csrRowPtr, csrColInd, info_U, policy_U, pBuffer);
+        status = cusparseDcsrsv_analysis(Util::Intern::cusparse_handle, trans_U, m, nnz, descr_U,
+                csrVal, csrRowPtr, csrColInd, info_U);
         if (status != CUSPARSE_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrv2_analysis failed with status code: " + stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparse_csrv_analysis failed with status code: " + stringify(status));
 
 
 #ifdef FEAST_DEBUG_MODE
@@ -170,15 +160,15 @@ namespace FEAST
         CudaIluSolveInfo * info = (CudaIluSolveInfo *) vinfo;
         const double alpha = 1.;
 
-        cusparseStatus_t status = cusparseDcsrsv2_solve(Util::Intern::cusparse_handle, info->trans_L, info->m, info->nnz, &alpha, info->descr_L,
+        cusparseStatus_t status = cusparseDcsrsv_solve(Util::Intern::cusparse_handle, info->trans_L, info->m, &alpha, info->descr_L,
                csrVal, csrRowPtr, csrColInd, info->info_L,
-                  x, info->z, info->policy_L, info->pBuffer);
+                  x, info->z);
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsr2_solve failed with status code: " + stringify(status));
 
-        status = cusparseDcsrsv2_solve(Util::Intern::cusparse_handle, info->trans_U, info->m, info->nnz, &alpha, info->descr_U,
+        status = cusparseDcsrsv_solve(Util::Intern::cusparse_handle, info->trans_U, info->m, &alpha, info->descr_U,
                csrVal, csrRowPtr, csrColInd, info->info_U,
-                  info->z, y, info->policy_U, info->pBuffer);
+                  info->z, y);
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsr2_solve failed with status code: " + stringify(status));
 
@@ -202,8 +192,8 @@ namespace FEAST
         cusparseDestroyMatDescr(info->descr_L);
         cusparseDestroyMatDescr(info->descr_U);
         cusparseDestroyCsrilu02Info(info->info_M);
-        cusparseDestroyCsrsv2Info(info->info_L);
-        cusparseDestroyCsrsv2Info(info->info_U);
+        cusparseDestroySolveAnalysisInfo(info->info_L);
+        cusparseDestroySolveAnalysisInfo(info->info_U);
 
         delete info;
       }
