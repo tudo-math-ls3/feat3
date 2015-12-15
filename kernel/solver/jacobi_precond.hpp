@@ -59,6 +59,9 @@ namespace FEAST
        * \param[in] matrix
        * The matrix whose main diagonal is to be used.
        *
+       * \param[in] filter
+       * The system filter.
+       *
        * \param[in] omega
        * The damping parameter for the preconditioner.
        */
