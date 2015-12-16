@@ -646,7 +646,7 @@ namespace FEAST
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
 
           //_y.product_matvec(_l, _r);
-          _l.apply(_y, _r);
+          _l.apply(_y, _r.clone());
         }
 
         ProductFunctorProxyResultRight& operator=(const ProductFunctorProxyResultRight& rhs)
