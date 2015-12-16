@@ -590,3 +590,59 @@ SparseMatrixCOOAxpyTest<Mem::CUDA, double, unsigned int> cuda_sm_coo_axpy_test_d
 SparseMatrixCOOAxpyTest<Mem::CUDA, float, unsigned long> cuda_sm_coo_axpy_test_float_ulong;
 SparseMatrixCOOAxpyTest<Mem::CUDA, double, unsigned long> cuda_sm_coo_axpy_test_double_ulong;
 #endif
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixCOOFrobeniusTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixCOOFrobeniusTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOFrobeniusTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(2) ; size < 3e2 ; size*=2)
+    {
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(2));
+          else if((row == col+1) || (row+1 == col))
+            a_local(row, col, DT_(-1));
+        }
+      }
+
+      SparseMatrixCOO<Mem_, DT_, IT_> a;
+      a.convert(a_local);
+
+      DenseVector<Mem_, DT_, IT_> refv(a.used_elements(), a.val());
+      DT_ ref = refv.norm2();
+      DT_ c = a.norm_frobenius();
+      TEST_CHECK_EQUAL(c, ref);
+    }
+  }
+};
+
+SparseMatrixCOOFrobeniusTest<Mem::Main, float, unsigned int> sm_coo_frobenius_test_float_uint;
+SparseMatrixCOOFrobeniusTest<Mem::Main, double, unsigned int> sm_coo_frobenius_test_double_uint;
+SparseMatrixCOOFrobeniusTest<Mem::Main, float, unsigned long> sm_coo_frobenius_test_float_ulong;
+SparseMatrixCOOFrobeniusTest<Mem::Main, double, unsigned long> sm_coo_frobenius_test_double_ulong;
+#ifdef FEAST_HAVE_QUADMATH
+SparseMatrixCOOFrobeniusTest<Mem::Main, __float128, unsigned int> sm_coo_frobenius_test_float128_uint;
+SparseMatrixCOOFrobeniusTest<Mem::Main, __float128, unsigned long> sm_coo_frobenius_test_float128_ulong;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixCOOFrobeniusTest<Mem::CUDA, float, unsigned int> cuda_sm_coo_frobenius_test_float_uint;
+SparseMatrixCOOFrobeniusTest<Mem::CUDA, double, unsigned int> cuda_sm_coo_frobenius_test_double_uint;
+SparseMatrixCOOFrobeniusTest<Mem::CUDA, float, unsigned long> cuda_sm_coo_frobenius_test_float_ulong;
+SparseMatrixCOOFrobeniusTest<Mem::CUDA, double, unsigned long> cuda_sm_coo_frobenius_test_double_ulong;
+#endif
