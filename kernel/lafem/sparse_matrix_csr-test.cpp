@@ -805,3 +805,100 @@ SparseMatrixCSRDiagTest<Mem::CUDA, double, unsigned int> cuda_sm_csr_diag_test_d
 SparseMatrixCSRDiagTest<Mem::CUDA, float, unsigned long> cuda_sm_csr_diag_test_float_ulong;
 SparseMatrixCSRDiagTest<Mem::CUDA, double, unsigned long> cuda_sm_csr_diag_test_double_ulong;
 #endif
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSRAxpyTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixCSRAxpyTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRAxpyTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(2) ; size < 3e2 ; size*=2)
+    {
+      DT_ s(DT_(4.321));
+
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
+      SparseMatrixCOO<Mem::Main, DT_, IT_> b_local(size, size + 2);
+      SparseMatrixCOO<Mem::Main, DT_, IT_> ref_local(size, size + 2);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(2));
+          else if((row == col+1) || (row+1 == col))
+            a_local(row, col, DT_(-1));
+
+          if((row == col+1) || (row+1 == col) || row==col)
+          {
+            b_local(row, col, DT_((row+col) % 15));
+            ref_local(row, col, a_local(row, col) * s + b_local(row, col));
+          }
+        }
+      }
+
+      SparseMatrixCSR<Mem_, DT_, IT_> ref(ref_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> a(a_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> b(b_local);
+      SparseMatrixCSR<Mem_, DT_, IT_> c;
+
+      c.clone(a);
+      c.axpy(c, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      c.clone(b);
+      c.axpy(a, c, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      c.axpy(a, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      s = DT_(0);
+      ref.clone(b);
+      c.axpy(a, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      s = DT_(1);
+      for (Index i(0) ; i < c.used_elements() ; ++i)
+      {
+        ref_local.val()[i] = a_local.val()[i] + b_local.val()[i];
+      }
+      ref.convert(ref_local);
+      c.axpy(a, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      s = DT_(-1);
+      for (Index i(0) ; i < c.used_elements() ; ++i)
+      {
+        ref_local.val()[i] = b_local.val()[i] - a_local.val()[i];
+      }
+      ref.convert(ref_local);
+      c.axpy(a, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+    }
+  }
+};
+
+SparseMatrixCSRAxpyTest<Mem::Main, float, unsigned int> sm_csr_axpy_test_float_uint;
+SparseMatrixCSRAxpyTest<Mem::Main, double, unsigned int> sm_csr_axpy_test_double_uint;
+SparseMatrixCSRAxpyTest<Mem::Main, float, unsigned long> sm_csr_axpy_test_float_ulong;
+SparseMatrixCSRAxpyTest<Mem::Main, double, unsigned long> sm_csr_axpy_test_double_ulong;
+#ifdef FEAST_HAVE_QUADMATH
+SparseMatrixCSRAxpyTest<Mem::Main, __float128, unsigned int> sm_csr_axpy_test_float128_uint;
+SparseMatrixCSRAxpyTest<Mem::Main, __float128, unsigned long> sm_csr_axpy_test_float128_ulong;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixCSRAxpyTest<Mem::CUDA, float, unsigned int> cuda_sm_csr_axpy_test_float_uint;
+SparseMatrixCSRAxpyTest<Mem::CUDA, double, unsigned int> cuda_sm_csr_axpy_test_double_uint;
+SparseMatrixCSRAxpyTest<Mem::CUDA, float, unsigned long> cuda_sm_csr_axpy_test_float_ulong;
+SparseMatrixCSRAxpyTest<Mem::CUDA, double, unsigned long> cuda_sm_csr_axpy_test_double_ulong;
+#endif

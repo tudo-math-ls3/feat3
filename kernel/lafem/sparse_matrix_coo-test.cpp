@@ -490,3 +490,103 @@ SparseMatrixCOOTranspositionTest<Mem::CUDA, double, unsigned int> cuda_sm_coo_tr
 SparseMatrixCOOTranspositionTest<Mem::CUDA, float, unsigned long> cuda_sm_coo_transposition_test_float_ulong;
 SparseMatrixCOOTranspositionTest<Mem::CUDA, double, unsigned long> cuda_sm_coo_transposition_test_double_ulong;
 #endif
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixCOOAxpyTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixCOOAxpyTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOAxpyTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(2) ; size < 3e2 ; size*=2)
+    {
+      DT_ s(DT_(4.321));
+
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size + 2);
+      SparseMatrixCOO<Mem::Main, DT_, IT_> b_local(size, size + 2);
+      SparseMatrixCOO<Mem::Main, DT_, IT_> ref_local(size, size + 2);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(2));
+          else if((row == col+1) || (row+1 == col))
+            a_local(row, col, DT_(-1));
+
+          if((row == col+1) || (row+1 == col) || row==col)
+          {
+            b_local(row, col, DT_((row+col) % 15));
+            ref_local(row, col, a_local(row, col) * s + b_local(row, col));
+          }
+        }
+      }
+
+      SparseMatrixCOO<Mem_, DT_, IT_> ref;
+      ref.convert(ref_local);
+      SparseMatrixCOO<Mem_, DT_, IT_> a;
+      a.convert(a_local);
+      SparseMatrixCOO<Mem_, DT_, IT_> b;
+      b.convert(b_local);
+      SparseMatrixCOO<Mem_, DT_, IT_> c;
+
+      c.clone(a);
+      c.axpy(c, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      c.clone(b);
+      c.axpy(a, c, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      c.axpy(a, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      s = DT_(0);
+      ref.clone(b);
+      c.axpy(a, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      s = DT_(1);
+      for (Index i(0) ; i < c.used_elements() ; ++i)
+      {
+        ref_local.val()[i] = a_local.val()[i] + b_local.val()[i];
+      }
+      ref.convert(ref_local);
+      c.axpy(a, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+
+      s = DT_(-1);
+      for (Index i(0) ; i < c.used_elements() ; ++i)
+      {
+        ref_local.val()[i] = b_local.val()[i] - a_local.val()[i];
+      }
+      ref.convert(ref_local);
+      c.axpy(a, b, s);
+      TEST_CHECK_EQUAL(c, ref);
+    }
+  }
+};
+
+SparseMatrixCOOAxpyTest<Mem::Main, float, unsigned int> sm_coo_axpy_test_float_uint;
+SparseMatrixCOOAxpyTest<Mem::Main, double, unsigned int> sm_coo_axpy_test_double_uint;
+SparseMatrixCOOAxpyTest<Mem::Main, float, unsigned long> sm_coo_axpy_test_float_ulong;
+SparseMatrixCOOAxpyTest<Mem::Main, double, unsigned long> sm_coo_axpy_test_double_ulong;
+#ifdef FEAST_HAVE_QUADMATH
+SparseMatrixCOOAxpyTest<Mem::Main, __float128, unsigned int> sm_coo_axpy_test_float128_uint;
+SparseMatrixCOOAxpyTest<Mem::Main, __float128, unsigned long> sm_coo_axpy_test_float128_ulong;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixCOOAxpyTest<Mem::CUDA, float, unsigned int> cuda_sm_coo_axpy_test_float_uint;
+SparseMatrixCOOAxpyTest<Mem::CUDA, double, unsigned int> cuda_sm_coo_axpy_test_double_uint;
+SparseMatrixCOOAxpyTest<Mem::CUDA, float, unsigned long> cuda_sm_coo_axpy_test_float_ulong;
+SparseMatrixCOOAxpyTest<Mem::CUDA, double, unsigned long> cuda_sm_coo_axpy_test_double_ulong;
+#endif
