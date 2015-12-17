@@ -535,11 +535,12 @@ namespace FEAST
           _temp0.copy(this->_data->sol());
           while(true)
           {
+            auto temp_x = _temp0.clone();
             ///temp0 <- b - SYNCH(Ax)
             Foundation::GlobalDefect<MemTag_>::exec(_temp0,
                                                            this->_data->rhs(),
                                                            this->_data->sys(),
-                                                           _temp0,
+                                                           temp_x,
                                                            this->_data->vector_mirrors(),
                                                            this->_data->dest_ranks(),
                                                            this->_data->vector_mirror_sendbufs(),
@@ -598,11 +599,12 @@ namespace FEAST
           store_to.copy(apply_to);
           while(true)
           {
+            auto temp_x = _temp0.clone();
             ///temp0 <- b - SYNCH(Ax)
             Foundation::GlobalDefect<MemTag_>::exec(_temp0,
                                                apply_rhs,
                                                this->_data->sys(),
-                                               _temp0,
+                                               temp_x,
                                                this->_data->vector_mirrors(),
                                                this->_data->dest_ranks(),
                                                this->_data->vector_mirror_sendbufs(),
@@ -905,8 +907,9 @@ namespace FEAST
           _temp0.copy(this->_data->sol());
           while(true)
           {
+            auto temp_x = _temp0.clone();
             ///temp0 <- b - Ax
-            this->_data->localsys().apply(_temp0, _temp0, this->_data->rhs(), -DataType_(1));
+            this->_data->localsys().apply(_temp0, temp_x, this->_data->rhs(), -DataType_(1));
             if(this->_conv_check)
             {
               if(this->_used_iters == 0)
@@ -945,8 +948,9 @@ namespace FEAST
           store_to.copy(apply_to);
           while(true)
           {
+            auto temp_x = _temp0.clone();
             ///temp0 <- b - Ax
-            this->_data->localsys().apply(_temp0, _temp0, apply_rhs, -DataType_(1));
+            this->_data->localsys().apply(_temp0, temp_x, apply_rhs, -DataType_(1));
 
             if(this->_conv_check)
             {
