@@ -81,6 +81,16 @@ namespace FEAST
 #endif
         }
 
+#if defined(FEAST_HAVE_QUADMATH) && !defined(__CUDACC__)
+        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+        static void csrb(__float128 * r, const __float128 a, const __float128 * const x, const __float128 * const y, const __float128 * const val,
+                         const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
+                         const Index used_elements)
+        {
+          csrb_generic<__float128, IT_, BlockHeight_, BlockWidth_>(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements);
+        }
+#endif
+
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows)
         {
