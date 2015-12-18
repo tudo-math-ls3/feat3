@@ -3,6 +3,7 @@
 #define KERNEL_SOLVER_ILU_PRECOND_HPP 1
 
 // includes, FEAST
+#include <kernel/solver/base.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
