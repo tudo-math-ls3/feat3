@@ -286,7 +286,9 @@ int main(int argc, char* argv[])
     if(update_pair != nullptr)
     {
       String update_name(update_pair->second.front());
-      if(update_name == "FletcherReeves")
+      if(update_name == "DaiYao")
+        my_direction_update = NLCGDirectionUpdate::DaiYao;
+      else if(update_name == "FletcherReeves")
         my_direction_update = NLCGDirectionUpdate::FletcherReeves;
       else if(update_name == "PolakRibiere")
         my_direction_update = NLCGDirectionUpdate::PolakRibiere;

@@ -17,7 +17,9 @@ namespace FEAST
     enum class NLCGDirectionUpdate
     {
       undefined = 0,
+      DaiYao,
       FletcherReeves,
+      HestenesStiefel,
       PolakRibiere
     };
 
@@ -31,8 +33,12 @@ namespace FEAST
       {
         case NLCGDirectionUpdate::undefined:
           return os << "undefined";
+        case NLCGDirectionUpdate::DaiYao:
+          return os << "Dai-Yao";
         case NLCGDirectionUpdate::FletcherReeves:
           return os << "Fletcher-Reeves";
+        case NLCGDirectionUpdate::HestenesStiefel:
+          return os << "Hestenes-Stiefel";
         case NLCGDirectionUpdate::PolakRibiere:
           return os << "Polak-Ribiere";
         default:
@@ -356,6 +362,8 @@ namespace FEAST
         {
           switch(_direction_update)
           {
+            case NLCGDirectionUpdate::DaiYao:
+              return dai_yao(beta, gamma, at);
             case NLCGDirectionUpdate::FletcherReeves:
               return fletcher_reeves(beta, gamma, at);
             case NLCGDirectionUpdate::PolakRibiere:
@@ -437,7 +445,7 @@ namespace FEAST
          * The Polak-Ribière update sets
          * \f{align*}{
          *   r_k & := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
-         *   \gamma_{k+\frac{1}{2}} = \left<r_{k+1}, s_k \right> \\
+         *   \gamma_{k+\frac{1}{2}} := \left<r_{k+1}, s_k \right> \\
          *   \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
          * \f}
         */
@@ -457,6 +465,47 @@ namespace FEAST
           gamma = this->_vec_def.dot(this->_vec_tmp);
 
           beta = Math::max((gamma - gamma_mid)/gamma_old, DataType(0));
+
+          return Status::progress;
+        }
+
+        /**
+         * \copydoc compute_beta()
+         *
+         * The Dai-Yao update sets
+         * \f[
+         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
+         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<s_k, d_k\right>
+         * \f]
+         * \f[
+         *   \beta_{k+1} :=
+         *   \begin{cases}
+         *     0, & \gamma_{k+\frac{1}{2}} \leq 0 \\
+         *     \frac{\gamma_{k+1}}{\eta_{k+1} - \eta_k}, & \mathrm{else}
+         *   \end{cases}
+         * \f]
+         */
+        Status dai_yao(DataType& beta, DataType& gamma, TimeStamp& at)
+        {
+
+          // _vec_tmp still contais the old (preconditioned) defect
+          DataType eta_old = this->_vec_tmp.dot(this->_vec_dir);
+
+          // apply preconditioner
+          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          {
+            TimeStamp bt;
+            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+            return Status::aborted;
+          }
+
+          DataType eta_mid = this->_vec_tmp.dot(this->_vec_dir);
+
+          gamma = this->_vec_def.dot(this->_vec_tmp);
+
+          beta = gamma/(eta_old - eta_mid);
+
+          std::cout << "Dai-Yao: beta = " << stringify_fp_sci(beta) << std::endl;
 
           return Status::progress;
         }

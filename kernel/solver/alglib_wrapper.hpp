@@ -133,7 +133,7 @@ namespace FEAST
           alglib::mincgcreate(_opt_var, _state);
           // Set the algorithm type: -1 (automatic selection of best algorithm), 0 (Dai-Yuan), 1 (hybrid Day-Yuan
           // and Hestenes-Stiefel)
-          alglib::mincgsetcgtype(_state, -1);
+          alglib::mincgsetcgtype(_state, 0);
           alglib::mincgsetxrep(_state, true);
         }
 
