@@ -68,6 +68,16 @@ void MemoryPool<Mem::CUDA>::finalise()
     std::exit(1);
   }
 
+  if (CUBLAS_STATUS_SUCCESS != cublasDestroy(Util::Intern::cublas_handle))
+    throw InternalError(__func__, __FILE__, __LINE__, "cublasDestroy failed!");
+  if (CUSPARSE_STATUS_SUCCESS != cusparseDestroy(Util::Intern::cusparse_handle))
+    throw InternalError(__func__, __FILE__, __LINE__, "cusparseDestroy failed!");
+
+  if (cudaSuccess != cudaDeviceSynchronize())
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
+  if (cudaSuccess != cudaDeviceReset())
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
+
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "Pending cuda errors occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -214,19 +224,6 @@ void MemoryPool<Mem::CUDA>::synchronize()
 void MemoryPool<Mem::CUDA>::reset_device()
 {
   cudaDeviceReset();
-}
-
-void MemoryPool<Mem::CUDA>::shutdown_device()
-{
-  if (CUBLAS_STATUS_SUCCESS != cublasDestroy(Util::Intern::cublas_handle))
-    throw InternalError(__func__, __FILE__, __LINE__, "cublasDestroy failed!");
-  if (CUSPARSE_STATUS_SUCCESS != cusparseDestroy(Util::Intern::cusparse_handle))
-    throw InternalError(__func__, __FILE__, __LINE__, "cusparseDestroy failed!");
-
-  if (cudaSuccess != cudaDeviceSynchronize())
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
-  if (cudaSuccess != cudaDeviceReset())
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
 }
 
 void MemoryPool<Mem::CUDA>::set_blocksize(Index misc, Index reduction, Index spmv, Index axpy)

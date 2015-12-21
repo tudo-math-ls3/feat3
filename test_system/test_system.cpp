@@ -28,9 +28,6 @@ int main(int argc, char** argv)
 #endif // FEAST_TESTING_VC
 
   int result(EXIT_SUCCESS);
-#ifdef FEAST_BACKENDS_CUDA
-  bool cudadevicereset(false);
-#endif
 
   if(argc > 1)
   {
@@ -43,13 +40,6 @@ int main(int argc, char** argv)
         all_filter = true;
         continue;
       }
-#ifdef FEAST_BACKENDS_CUDA
-      if (0 == strcmp(argv[i], "--cudadevicereset"))
-      {
-        cudadevicereset = true;
-        continue;
-      }
-#endif
 
       //discard any unused parameters, marked by "--"
       if (strlen(argv[i]) > 1 && argv[i][0] == '-' && argv[i][0] == '-')
@@ -138,12 +128,6 @@ int main(int argc, char** argv)
     std::cout << tests_passed << " of " << list_size << " tests PASSED, "
       << tests_failed << " tests FAILED!" << std::endl;
   }
-
-#ifdef FEAST_BACKENDS_CUDA
-  if (cudadevicereset)
-    // we need to use the instance here, to ensure the device has been set up properly, if no cuda is used at all
-    FEAST::MemoryPool<Mem::CUDA>::shutdown_device();
-#endif
 
   Runtime::finalise();
 
