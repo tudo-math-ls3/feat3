@@ -270,9 +270,14 @@ namespace FEAST
         measured_time = KahanSum(measured_time, get_time_axpy());
         measured_time = KahanSum(measured_time, get_time_precon());
         measured_time = KahanSum(measured_time, get_time_mpi_execute());
-        measured_time = KahanSum(measured_time, get_time_mpi_wait());
-        //if (measured_time.sum > total_time)
-        //  throw InternalError("Accumulated op time (" + stringify(measured_time.sum) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
+        /// \todo readd mpi_wait time, once wait is no more included in execute
+        // mpi_wait is included in mpi_execute
+        //measured_time = KahanSum(measured_time, get_time_mpi_wait());
+        // subtract wait from execute time, as the later is included in the former accidentaly
+        _time_mpi_execute.sum -= _time_mpi_wait.sum;
+
+        if (measured_time.sum > total_time)
+          throw InternalError("Accumulated op time (" + stringify(measured_time.sum) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
 
         result += "\n";
         result += "Reductions: " + stringify(get_time_reduction() / total_time * 100.) + "%\n";
@@ -281,7 +286,7 @@ namespace FEAST
         result += "Precon Kernels: " + stringify(get_time_precon() / total_time * 100.) + "%\n";
         result += "MPI Execution: " + stringify(get_time_mpi_execute() / total_time * 100.) + "%\n";
         result += "MPI Wait: " + stringify(get_time_mpi_wait() / total_time * 100.) + "%\n";
-        result += "Not covered: " + ((measured_time.sum <= total_time) ? (stringify( (total_time - measured_time.sum) / total_time * 100.) + "%") : ("not available"));
+        result += "Not covered: " + stringify( (total_time - measured_time.sum) / total_time * 100.) + "%";
         return result;
       }
 
