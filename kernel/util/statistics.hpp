@@ -102,14 +102,14 @@ namespace FEAST
       }
 
       /// Retrieve formated flops per second string
-      static String get_formated_flops(double seconds)
+      static String get_formated_flops(double seconds, int ranks = 1)
       {
         double flops((double)_flops);
         flops /= seconds;
         flops /= 1000.; // kilo
         flops /= 1000.; // mega
         flops /= 1000.; // giga
-        return stringify(flops) + " GFlop/s";
+        return stringify(flops) + " GFlop/s [" + stringify(flops * double(ranks)) + " GFlops/s]";
       }
 
       /// Reset global flop counter
