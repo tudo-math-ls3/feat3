@@ -401,7 +401,7 @@ if (FEAST_MPI)
     --build-target stokes_poiseuille_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/stokes_poiseuille_2d ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/stokes_poiseuille_2d --level 5 1 ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST stokes_poiseuille_2d_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST stokes_poiseuille_2d_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -412,7 +412,7 @@ else (FEAST_MPI)
     --build-target stokes_poiseuille_2d
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/stokes_poiseuille_2d)
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/stokes_poiseuille_2d --level 5 1)
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAST_MPI)
