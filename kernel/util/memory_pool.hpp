@@ -52,7 +52,7 @@ namespace FEAST
 
       public:
         /// Setup memory pools
-        static void initialise();
+        static void initialise(int rank);
 
         /// Shutdown memory pool and clean up allocated memory pools
         static void finalise();

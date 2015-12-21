@@ -47,8 +47,11 @@ Index MemoryPool<Mem::CUDA>::blocksize_reduction = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_spmv = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_axpy = 256;
 
-void MemoryPool<Mem::CUDA>::initialise()
+void MemoryPool<Mem::CUDA>::initialise(int rank)
 {
+  if (cudaSuccess != cudaSetDevice(rank % 1))
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaSetDevice failed!");
+
   if (CUBLAS_STATUS_SUCCESS != cublasCreate(&Util::Intern::cublas_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasCreate failed!");
   if (CUSPARSE_STATUS_SUCCESS != cusparseCreate(&Util::Intern::cusparse_handle))
