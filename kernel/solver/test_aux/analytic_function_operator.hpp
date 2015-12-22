@@ -52,7 +52,9 @@ namespace FEAST
         /// The type of the underlying analytic function
         typedef Function_ FunctionType;
 
+        /// Can the operator compute its full Hessian?
         static constexpr bool can_hess = FunctionType::can_hess;
+        /// Can the operator compute the diagonal of its Hessian?
         static constexpr bool can_diag_hess = can_hess;
 
         /// Class that knows what Function_ wants as input parameters for its evaluator etc.
@@ -116,11 +118,25 @@ namespace FEAST
           {
           }
 
+        /**
+         * \brief The number of input variables for the operator and its gradient
+         *
+         * For compatibility with linear operators represented by matrices, this is called columns.
+         *
+         * \returns The number of input variables the operator needs.
+         */
         Index columns()
         {
           return Index(dim);
         }
 
+        /**
+         * \brief The number of output variables of the operator's gradient
+         *
+         * For compatibility with linear operators represented by matrices, this is called rows.
+         *
+         * \returns The number of out variables the operator's gradient gives.
+         */
         Index rows()
         {
           return Index(dim);
