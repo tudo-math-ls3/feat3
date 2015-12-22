@@ -17,7 +17,7 @@ namespace FEAST
     enum class NLCGDirectionUpdate
     {
       undefined = 0,
-      DaiYao,
+      DaiYuan,
       FletcherReeves,
       HestenesStiefel,
       PolakRibiere
@@ -33,8 +33,8 @@ namespace FEAST
       {
         case NLCGDirectionUpdate::undefined:
           return os << "undefined";
-        case NLCGDirectionUpdate::DaiYao:
-          return os << "Dai-Yao";
+        case NLCGDirectionUpdate::DaiYuan:
+          return os << "Dai-Yuan";
         case NLCGDirectionUpdate::FletcherReeves:
           return os << "Fletcher-Reeves";
         case NLCGDirectionUpdate::HestenesStiefel:
@@ -59,6 +59,10 @@ namespace FEAST
      * \tparam Linesearch_
      * Type of linesearch to use along the descent direction
      *
+     * See \cite NW06 for an overview of optimisation techniques.
+     *
+     * Possible update strategies for the search direction are Dai-Yuan \cite DY99, Fletcher-Reeves \cite FR64,
+     * Hestenes-Stiefel \cite HS52 and Polak-Ribière \cite PR64.
      */
     template<typename Operator_, typename Filter_, typename Linesearch_>
     class NLCG : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
@@ -103,8 +107,12 @@ namespace FEAST
         /// temporary vector
         VectorType _vec_tmp;
 
-        /// The mininum update we require the linesearch to make
-        DataType _min_update;
+        /// Tolerance for function improvement
+        DataType _tol_update_func;
+        /// Tolerance for the lenght of the update step
+        DataType _tol_update_step;
+
+        DataType _eta;
 
       public:
         /// Restart frequency, defaults to problemsize+1
@@ -142,15 +150,19 @@ namespace FEAST
           _filter(filter_),
           _linesearch(linesearch_),
           _direction_update(du_),
+          _tol_update_func(DataType(0)),
+          _tol_update_step(Math::sqrt(Math::eps<DataType>())),
           restart_freq(0),
           iterates(nullptr)
           {
             this->_min_stag_iter = Index(3);
 
+            // If we use Fletcher-Reeves, frequent restarts are needed
+            if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
+              restart_freq = _vec_def.size() + Index(1);
+
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
-
-            _min_update = (Math::eps<DataType>());
           }
 
         /**
@@ -170,7 +182,6 @@ namespace FEAST
           _vec_def = this->_op.create_vector_r();
           _vec_dir = this->_op.create_vector_r();
           _vec_tmp = this->_op.create_vector_r();
-          restart_freq = _vec_def.size() + Index(1);
           _linesearch.init_symbolic();
         }
 
@@ -228,6 +239,9 @@ namespace FEAST
         void set_direction_update(NLCGDirectionUpdate update_)
         {
           _direction_update = update_;
+          // If we use Fletcher-Reeves, frequent restarts are needed
+          if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
+            restart_freq = _vec_def.size() + Index(1);
         }
 
       protected:
@@ -265,6 +279,8 @@ namespace FEAST
 
           // compute initial gamma
           DataType gamma = this->_vec_def.dot(this->_vec_dir);
+          // Compute initial eta = <d, r>
+          this->_eta = gamma;
 
           // start iterating
           Index its_since_restart(0);
@@ -275,7 +291,7 @@ namespace FEAST
             ++its_since_restart;
 
             _linesearch.correct(vec_sol, this->_vec_dir);
-            if(_linesearch.get_rel_update() < _min_update)
+            if(_linesearch.get_rel_update() < this->_tol_update_step)
               this->_num_stag_iter++;
 
             // Log iterates if necessary
@@ -326,6 +342,9 @@ namespace FEAST
               this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, beta);
             }
 
+            // Now that we know the new search direction, we can update _eta
+            _eta = this->_vec_dir.dot(this->_vec_def);
+
             // If there were too many subsequent restarts, the solver is stagnated
             if(num_subsequent_restarts > max_num_subs_restarts)
               return Status::stagnated;
@@ -362,10 +381,12 @@ namespace FEAST
         {
           switch(_direction_update)
           {
-            case NLCGDirectionUpdate::DaiYao:
-              return dai_yao(beta, gamma, at);
+            case NLCGDirectionUpdate::DaiYuan:
+              return dai_yuan(beta, gamma, at);
             case NLCGDirectionUpdate::FletcherReeves:
               return fletcher_reeves(beta, gamma, at);
+            case NLCGDirectionUpdate::HestenesStiefel:
+              return hestenes_stiefel(beta, gamma, at);
             case NLCGDirectionUpdate::PolakRibiere:
               return polak_ribiere(beta, gamma, at);
             default:
@@ -442,54 +463,24 @@ namespace FEAST
         /**
          * \copydoc compute_beta()
          *
-         * The Polak-Ribière update sets
-         * \f{align*}{
-         *   r_k & := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
-         *   \gamma_{k+\frac{1}{2}} := \left<r_{k+1}, s_k \right> \\
-         *   \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
-         * \f}
-        */
-        Status polak_ribiere(DataType& beta, DataType& gamma, TimeStamp& at)
-        {
-          DataType gamma_old(gamma);
-          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_def);
-
-          // apply preconditioner
-          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            return Status::aborted;
-          }
-
-          gamma = this->_vec_def.dot(this->_vec_tmp);
-
-          beta = Math::max((gamma - gamma_mid)/gamma_old, DataType(0));
-
-          return Status::progress;
-        }
-
-        /**
-         * \copydoc compute_beta()
-         *
-         * The Dai-Yao update sets
+         * The Dai-Yuan update sets
          * \f[
          *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
          *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<s_k, d_k\right>
          * \f]
          * \f[
-         *   \beta_{k+1} :=
-         *   \begin{cases}
-         *     0, & \gamma_{k+\frac{1}{2}} \leq 0 \\
-         *     \frac{\gamma_{k+1}}{\eta_{k+1} - \eta_k}, & \mathrm{else}
-         *   \end{cases}
+         *   \beta_{k+1} := \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}} - \eta_k}
          * \f]
+         *
+         * Note the sign changes due to this being formulated in terms of the defect rather than the function's
+         * gradient.
          */
-        Status dai_yao(DataType& beta, DataType& gamma, TimeStamp& at)
+        Status dai_yuan(DataType& beta, DataType& gamma, TimeStamp& at)
         {
 
           // _vec_tmp still contais the old (preconditioned) defect
-          DataType eta_old = this->_vec_tmp.dot(this->_vec_dir);
+          DataType eta_old(this->_eta);
+          DataType eta_mid(this->_vec_def.dot(this->_vec_dir));
 
           // apply preconditioner
           if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
@@ -499,13 +490,14 @@ namespace FEAST
             return Status::aborted;
           }
 
-          DataType eta_mid = this->_vec_tmp.dot(this->_vec_dir);
-
           gamma = this->_vec_def.dot(this->_vec_tmp);
 
-          beta = gamma/(eta_old - eta_mid);
+          beta = gamma/( - eta_mid + eta_old);
 
-          std::cout << "Dai-Yao: beta = " << stringify_fp_sci(beta) << std::endl;
+          std::cout << "Dai-Yuan:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
+
+          std::cout << "Dai-Yuan:  eta = " << stringify_fp_sci(eta_mid) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
+          std::cout << "Dai-Yuan: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
 
           return Status::progress;
         }
@@ -527,6 +519,7 @@ namespace FEAST
          */
         Status fletcher_reeves(DataType& beta, DataType& gamma, TimeStamp& at)
         {
+
           // apply preconditioner
           if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
           {
@@ -549,6 +542,82 @@ namespace FEAST
           return Status::progress;
         }
 
+        /**
+         * \copydoc compute_beta()
+         *
+         * The Hestenes-Stiefel update sets
+         * \f[
+         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} := \left< r_k, s_{k+1} \right>, \quad
+         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<s_k, d_k\right>
+         * \f]
+         * \f[
+         *   \beta_{k+1} := \max \left\{0, \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}
+         *   + \eta_k} \right\}
+         * \f]
+         *
+         * Note the sign changes due to this being formulated in terms of the defect rather than the function's
+         * gradient.
+         */
+        Status hestenes_stiefel(DataType& beta, DataType& gamma, TimeStamp& at)
+        {
+
+          DataType eta_old = this->_eta;
+          // _vec_dir still contains the old search direction
+          DataType eta_mid = this->_vec_def.dot(this->_vec_dir);
+          // _vec_tmp still contains the old (preconditioned) defect
+          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_def);
+
+          // apply preconditioner
+          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          {
+            TimeStamp bt;
+            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+            return Status::aborted;
+          }
+
+          gamma = this->_vec_def.dot(this->_vec_tmp);
+
+          beta = Math::max(DataType(0), (gamma - gamma_mid)/( -eta_mid + eta_old));
+
+          std::cout << "Hestenes-Stiefel:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
+
+          std::cout << "Hestenes-Stiefel:  eta = " << stringify_fp_sci(_eta) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
+          std::cout << "Hestenes-Stiefel: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
+
+          return Status::progress;
+        }
+
+        /**
+         * \copydoc compute_beta()
+         *
+         * The Polak-Ribière update sets
+         * \f{align*}{
+         *   r_k & := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} := \left<r_{k+1}, s_k \right> \\
+         *   \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
+         * \f}
+         */
+        Status polak_ribiere(DataType& beta, DataType& gamma, TimeStamp& at)
+        {
+          DataType gamma_old(gamma);
+          // vec_tmp still contains the old (preconditioned) defect
+          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_def);
+
+          // apply preconditioner
+          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          {
+            TimeStamp bt;
+            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+            return Status::aborted;
+          }
+
+          gamma = this->_vec_def.dot(this->_vec_tmp);
+
+          beta = Math::max((gamma - gamma_mid)/gamma_old, DataType(0));
+
+          return Status::progress;
+        }
 
     }; // class NLCG
 

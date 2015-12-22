@@ -204,8 +204,8 @@ static void display_help()
 #endif // FEAST_HAVE_ALGLIB
   std::cout << " --precon [String]: Available preconditioners for NLCG are Hessian, ApproximateHessian, none(default)"
   << std::endl;
-  std::cout << " --direction_update [String]: Available NLCG search direction updates for NLCG are FletcherReeves and"
-    << " PolakRibiere (default)" << std::endl;
+  std::cout << " --direction_update [String]: Available NLCG search direction updates for NLCG are Dai-Yuan, FletcherReeves,"
+  << "                              Hestenes-Stiefel and PolakRibiere (default)" << std::endl;
 
 }
 
@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
+  typedef Analytic::Common::HimmelblauFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, Index, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
@@ -286,10 +286,12 @@ int main(int argc, char* argv[])
     if(update_pair != nullptr)
     {
       String update_name(update_pair->second.front());
-      if(update_name == "DaiYao")
-        my_direction_update = NLCGDirectionUpdate::DaiYao;
+      if(update_name == "DaiYuan")
+        my_direction_update = NLCGDirectionUpdate::DaiYuan;
       else if(update_name == "FletcherReeves")
         my_direction_update = NLCGDirectionUpdate::FletcherReeves;
+      else if(update_name == "HestenesStiefel")
+        my_direction_update = NLCGDirectionUpdate::HestenesStiefel;
       else if(update_name == "PolakRibiere")
         my_direction_update = NLCGDirectionUpdate::PolakRibiere;
       else
