@@ -1,6 +1,7 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/time_stamp.hpp>
+#include <kernel/util/statistics.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
@@ -424,8 +425,28 @@ namespace StokesPoiseuille2D
     // initialise
     solver->init();
 
+    Statistics::reset_flops();
+    Statistics::reset_times();
+    Statistics::reset_solver_statistics();
+
+    TimeStamp at;
+
     // solve
     Solver::solve(*solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
+    TimeStamp bt;
+
+    if (rank == 0 && args.check("statistics") >= 0)
+    {
+      std::cout<<std::endl<<solver->get_formated_solver_tree().trim()<<std::endl;
+      String flops = Statistics::get_formated_flops(bt.elapsed(at), nprocs);
+      std::cout<<"\nComplete solver TOE: "<<bt.elapsed(at)<<std::endl;
+      std::cout<<flops<<std::endl<<std::endl;
+      std::cout<<Statistics::get_formated_times(bt.elapsed(at))<<std::endl<<std::endl;
+      if (args.check("statistics") > 0) // provided parameter full or whatever
+      {
+        std::cout<<Statistics::get_formated_solvers();
+      }
+    }
 
     // release solver
     solver->done();
@@ -512,6 +533,7 @@ namespace StokesPoiseuille2D
     args.support("level");
     args.support("no-err");
     args.support("vtk");
+    args.support("statistics");
     args.support("mem");
 
     // check for unsupported options
