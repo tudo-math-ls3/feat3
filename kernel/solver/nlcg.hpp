@@ -18,6 +18,7 @@ namespace FEAST
     {
       undefined = 0,
       DaiYuan,
+      DYHSHybrid,
       FletcherReeves,
       HestenesStiefel,
       PolakRibiere
@@ -35,6 +36,8 @@ namespace FEAST
           return os << "undefined";
         case NLCGDirectionUpdate::DaiYuan:
           return os << "Dai-Yuan";
+        case NLCGDirectionUpdate::DYHSHybrid:
+          return os << "DY-HS-Hybrid";
         case NLCGDirectionUpdate::FletcherReeves:
           return os << "Fletcher-Reeves";
         case NLCGDirectionUpdate::HestenesStiefel:
@@ -112,6 +115,7 @@ namespace FEAST
         /// Tolerance for the lenght of the update step
         DataType _tol_update_step;
 
+        /// <vec_def, vec_dir>
         DataType _eta;
 
       public:
@@ -159,7 +163,7 @@ namespace FEAST
 
             // If we use Fletcher-Reeves, frequent restarts are needed
             if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
-              restart_freq = _vec_def.size() + Index(1);
+              restart_freq = _op.columns() + Index(1);
 
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
@@ -344,6 +348,8 @@ namespace FEAST
 
             // Now that we know the new search direction, we can update _eta
             _eta = this->_vec_dir.dot(this->_vec_def);
+            if(_eta <= DataType(0))
+              std::cout << "New direction is not a descent direction!" << std::endl;
 
             // If there were too many subsequent restarts, the solver is stagnated
             if(num_subsequent_restarts > max_num_subs_restarts)
@@ -383,6 +389,8 @@ namespace FEAST
           {
             case NLCGDirectionUpdate::DaiYuan:
               return dai_yuan(beta, gamma, at);
+            case NLCGDirectionUpdate::DYHSHybrid:
+              return dy_hs_hybrid(beta, gamma, at);
             case NLCGDirectionUpdate::FletcherReeves:
               return fletcher_reeves(beta, gamma, at);
             case NLCGDirectionUpdate::HestenesStiefel:
@@ -495,9 +503,51 @@ namespace FEAST
           beta = gamma/( - eta_mid + eta_old);
 
           std::cout << "Dai-Yuan:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
-
           std::cout << "Dai-Yuan:  eta = " << stringify_fp_sci(eta_mid) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
           std::cout << "Dai-Yuan: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
+
+          return Status::progress;
+        }
+
+        /**
+         * \copydoc compute_beta()
+         *
+         * The hybrid Dai-Yuan/Hestenes-Stiefel update sets
+         * \f[
+         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} := \left< r_k, s_{k+1} \right>, \quad
+         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<s_k, d_k\right>
+         * \f]
+         * \f[
+         *   \beta_{k+1} := \max \left\{0, \min \left\{ \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}+ \eta_k}, \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}}+ \eta_k} \right\} \right\}
+         * \f]
+         *
+         * Note the sign changes due to this being formulated in terms of the defect rather than the function's
+         * gradient.
+         */
+        Status dy_hs_hybrid(DataType& beta, DataType& gamma, TimeStamp& at)
+        {
+          DataType eta_old = this->_eta;
+          // _vec_dir still contains the old search direction
+          DataType eta_mid = this->_vec_def.dot(this->_vec_dir);
+          // _vec_tmp still contains the old (preconditioned) defect
+          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_def);
+
+          // apply preconditioner
+          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          {
+            TimeStamp bt;
+            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+            return Status::aborted;
+          }
+
+          gamma = this->_vec_def.dot(this->_vec_tmp);
+
+          beta = Math::max(DataType(0), Math::min(gamma, gamma - gamma_mid)/( -eta_mid + eta_old));
+
+          //std::cout << "DY-HS-Hybrid:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
+          //std::cout << "DY-HS-Hybrid:  eta = " << stringify_fp_sci(_eta) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
+          //std::cout << "DY-HS-Hybrid: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
 
           return Status::progress;
         }
@@ -561,7 +611,6 @@ namespace FEAST
          */
         Status hestenes_stiefel(DataType& beta, DataType& gamma, TimeStamp& at)
         {
-
           DataType eta_old = this->_eta;
           // _vec_dir still contains the old search direction
           DataType eta_mid = this->_vec_def.dot(this->_vec_dir);
@@ -580,10 +629,9 @@ namespace FEAST
 
           beta = Math::max(DataType(0), (gamma - gamma_mid)/( -eta_mid + eta_old));
 
-          std::cout << "Hestenes-Stiefel:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
-
-          std::cout << "Hestenes-Stiefel:  eta = " << stringify_fp_sci(_eta) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
-          std::cout << "Hestenes-Stiefel: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
+          //std::cout << "Hestenes-Stiefel:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
+          //std::cout << "Hestenes-Stiefel:  eta = " << stringify_fp_sci(eta_mid) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
+          //std::cout << "Hestenes-Stiefel: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
 
           return Status::progress;
         }

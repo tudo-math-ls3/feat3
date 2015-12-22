@@ -200,12 +200,14 @@ static void display_help()
   std::cout << "Optional arguments:" << std::endl;
   std::cout << " --help: Displays this text" << std::endl;
 #ifdef FEAST_HAVE_ALGLIB
-  std::cout << " --solver[String]: Available solvers are ALGLIBMinCG (all other arguments are then ignored) and NLCG";
+  std::cout << " --solver[String]: Available solvers are ALGLIBMinCG (all other arguments are then ignored) and NLCG"
+    << std::endl;
 #endif // FEAST_HAVE_ALGLIB
   std::cout << " --precon [String]: Available preconditioners for NLCG are Hessian, ApproximateHessian, none(default)"
   << std::endl;
-  std::cout << " --direction_update [String]: Available NLCG search direction updates for NLCG are Dai-Yuan, FletcherReeves,"
-  << "                              Hestenes-Stiefel and PolakRibiere (default)" << std::endl;
+  std::cout << " --direction_update [String]: Available NLCG search direction updates for NLCG are DaiYuan,"
+  << "                              DYHSHybrid, FletcherReeves, HestenesStiefel and PolakRibiere (default)"
+  << std::endl;
 
 }
 
@@ -223,7 +225,7 @@ int main(int argc, char* argv[])
   static constexpr int dim = PointType::n;
 
   typedef LAFEM::NoneFilterBlocked<MemType, DataType, Index, dim> FilterType;
-  typedef Solver::SecantLinesearch<OperatorType, FilterType> LinesearchType;
+  typedef Solver::SWLinesearch<OperatorType, FilterType> LinesearchType;
 
   // The analytic function
   AnalyticFunctionType my_function;
@@ -288,6 +290,8 @@ int main(int argc, char* argv[])
       String update_name(update_pair->second.front());
       if(update_name == "DaiYuan")
         my_direction_update = NLCGDirectionUpdate::DaiYuan;
+      else if(update_name == "DYHSHybrid")
+        my_direction_update = NLCGDirectionUpdate::DYHSHybrid;
       else if(update_name == "FletcherReeves")
         my_direction_update = NLCGDirectionUpdate::FletcherReeves;
       else if(update_name == "HestenesStiefel")

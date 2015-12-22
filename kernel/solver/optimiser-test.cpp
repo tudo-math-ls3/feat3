@@ -127,12 +127,12 @@ NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver:
 
 // The Rosenbrock function's steep valley is bad for secant linesearch, so use Newton Raphson
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
-opt_rb_d(float(0.8),"Hessian", NLCGDirectionUpdate::PolakRibiere);
+opt_rb_d(float(0.8),"Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
 // The Hessian of the Bazaraa/Shetty function is singular at the optimal point, so Newton Raphson linesearch does not
 // work very well, so just use the secant linesearch
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
-opt_bs_d(double(0.3),"none", NLCGDirectionUpdate::PolakRibiere);
+opt_bs_d(double(0.3),"none", NLCGDirectionUpdate::HestenesStiefel);
 
 // Rosenbrock with secant linesearch, preconditioning and Polak-Ribière in quad precision
 #ifdef FEAST_HAVE_QUADMATH
@@ -227,11 +227,11 @@ class ALGLIBMinCGTest:
 };
 
 // The Himmelblau function is not too difficult, so low tolerance
-ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction> alg_opt_hb_f(float(0.8));
+ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction> alg_opt_hb_f(float(0.6));
 
 // The Rosenbrock function's steep valley is bad
-ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction> alg_opt_rb_d(double(0.6));
+ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction> alg_opt_rb_d(double(0.4));
 
-// The Hessian of the Bazaraa/Shetty function is singular at the optimal point
-ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction> alg_opt_bs_d(double(0.1));
+//// The Hessian of the Bazaraa/Shetty function is singular at the optimal point
+ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction> alg_opt_bs_d(double(0.15));
 #endif // FEAST_HAVE_ALGLIB
