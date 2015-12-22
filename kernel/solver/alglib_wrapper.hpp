@@ -70,7 +70,7 @@ namespace FEAST
         /// Tolerance for function improvement
         DataType _tol_update_func;
         /// Tolerance for gradient improvement
-        DataType _tol_update_grad;
+        DataType _tol_update_step;
 
         /// Optimisation variable for ALGLIB
         alglib::real_1d_array _opt_var;
@@ -102,7 +102,7 @@ namespace FEAST
           _op(op_),
           _filter(filter_),
           _tol_update_func(DataType(0)),
-          _tol_update_grad(DataType(0)),
+          _tol_update_step(Math::sqrt(Math::eps<DataType>())),
           iterates(nullptr)
           {
             if(keep_iterates)
@@ -135,6 +135,9 @@ namespace FEAST
           // and Hestenes-Stiefel)
           alglib::mincgsetcgtype(_state, 0);
           alglib::mincgsetxrep(_state, true);
+          // Set stopping criteria: Relative tolerance, function improvement, length of update step, max iterations
+          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_update_func), double(_tol_update_step),
+          alglib::ae_int_t(this->_max_iter));
         }
 
         /// \copydoc BaseClass::done_symbolic()
@@ -199,10 +202,6 @@ namespace FEAST
         virtual Status _apply_intern(VectorType& vec_sol)
         {
 
-          // Get tolerances for ALGLIB
-          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_update_func), double(_tol_update_grad),
-          alglib::ae_int_t(this->_max_iter));
-
           // Write initial guess to iterates if desired
           if(iterates != nullptr)
           {
@@ -220,8 +219,10 @@ namespace FEAST
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
             _opt_var[i] = vec_sol_elements[i];
 
-          alglib::mincgcreate(_opt_var, _state);
-          alglib::mincgsetxrep(_state, true);
+          alglib::mincgrestartfrom(_state, _opt_var);
+          //alglib::mincgcreate(_opt_var, _state);
+          //alglib::mincgsetcgtype(_state, 0);
+          //alglib::mincgsetxrep(_state, true);
           alglib::mincgoptimize(_state, _func_grad, _log, this);
           alglib::mincgresults(_state, _opt_var, _report);
 
@@ -231,24 +232,24 @@ namespace FEAST
           switch(_report.terminationtype)
           {
             case(-8):
-              //std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << std::endl;
+              std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << std::endl;
               return Status::aborted;
             case(-7):
-              //std::cout << "ALGLIB: Gradient verification failed." << std::endl;
+              std::cout << "ALGLIB: Gradient verification failed." << std::endl;
               return Status::aborted;
             case(1):
-              //std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
+              std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
               return Status::stagnated;
             case(2):
-              //std::cout << "ALGLIB: Update step size stagnated." << std::endl;
+              std::cout << "ALGLIB: Update step size stagnated." << std::endl;
               return Status::stagnated;
             case(4):
-              //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
+              std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
               return Status::success;
             case(5):
               return Status::max_iter;
             case(7):
-              //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
+              std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
               return Status::stagnated;
             default:
               return Status::undefined;
