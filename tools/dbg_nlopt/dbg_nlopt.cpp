@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
   static constexpr int dim = PointType::n;
 
   typedef LAFEM::NoneFilterBlocked<MemType, DataType, Index, dim> FilterType;
-  typedef Solver::SWLinesearch<OperatorType, FilterType> LinesearchType;
+  typedef Solver::SecantLinesearch<OperatorType, FilterType> LinesearchType;
 
   // The analytic function
   AnalyticFunctionType my_function;

@@ -123,7 +123,7 @@ NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction, Solver::
 opt_hb_f(float(0.8),"ApproximateHessian", NLCGDirectionUpdate::PolakRibiere);
 
 // The same with Secant linesearch, without preconditioner and with Fletcher-Reeves update
-NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> opt_hb_d(double(0.8),"none", NLCGDirectionUpdate::FletcherReeves);
+NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> opt_hb_d(double(0.6),"none", NLCGDirectionUpdate::FletcherReeves);
 
 // The Rosenbrock function's steep valley is bad for secant linesearch, so use Newton Raphson
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
@@ -137,7 +137,7 @@ opt_bs_d(double(0.3),"none", NLCGDirectionUpdate::HestenesStiefel);
 // Rosenbrock with secant linesearch, preconditioning and Polak-Ribière in quad precision
 #ifdef FEAST_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction, Solver::SecantLinesearch>
-opt_rb_q(__float128(0.9),"Hessian", NLCGDirectionUpdate::PolakRibiere);
+opt_rb_q(__float128(0.6),"Hessian", NLCGDirectionUpdate::PolakRibiere);
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
