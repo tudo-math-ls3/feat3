@@ -21,6 +21,8 @@ if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-solver-cuda
     cusolver.cu
     ilu_precond.cu
+    sor_precond.cu
+    ssor_precond.cu
     STATIC
   )
   if (FEAST_HAVE_CUSOLVER)

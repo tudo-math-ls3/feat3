@@ -29,7 +29,7 @@ namespace FEAST
      *
      * \attention
      * This class is only declared if FEAST was configured to build and link against
-     * cuda and the cuda sdk ships with the cusolver library.
+     * cuda and the cuda sdk ships with the cusolver library (cuda version >= 7).
      *
      * \note CuSolverLU need its input data in Mem::Main memory
      */
@@ -84,7 +84,7 @@ namespace FEAST
      *
      * \attention
      * This class is only declared if FEAST was configured to build and link against
-     * cuda and the cuda sdk ships with the cusolver library.
+     * cuda and the cuda sdk ships with the cusolver library (cuda version >= 7).
      */
     class CuSolverQR :
       public SolverBase<LAFEM::DenseVector<Mem::CUDA, double, unsigned int>>

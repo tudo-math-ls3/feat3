@@ -277,6 +277,26 @@ public:
       solver.set_max_iter(2000);
       test_solver("FGMRES-JAC", solver, vec_sol, vec_ref, vec_rhs, 48);
     }
+
+#ifdef FEAST_HAVE_CUSOLVER
+    // test BiCGStab-SOR
+    {
+      // create a SOR preconditioner
+      auto precon = Solver::new_sor_precond(matrix, filter);
+      // create a BiCGStab solver
+      BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("BiCGStab-SOR", solver, vec_sol, vec_ref, vec_rhs, 33);
+    }
+
+    // test BiCGStab-SSOR
+    {
+      // create a SSOR preconditioner
+      auto precon = Solver::new_ssor_precond(matrix, filter);
+      // create a CG solver
+      BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("BiCGStab-SSOR", solver, vec_sol, vec_ref, vec_rhs, 22);
+    }
+#endif // FEAST_HAVE_CUSOLVER
   }
 };
 
