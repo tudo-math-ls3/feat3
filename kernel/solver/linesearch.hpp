@@ -699,23 +699,35 @@ namespace FEAST
         /// temporary vector
         VectorType _vec_tmp;
 
-        /// Line search parameter
+        /// Line search step length parameter
         DataType _alpha;
+        /// Last successfull line step, needs to start with 1
         DataType _alpha_0;
+        /// Hard maximum for the step length
         DataType _alpha_max;
+        /// Hard minimum for the step length
         DataType _alpha_min;
+        /// Step length from previous iteration
         DataType _alpha_prev;
+        /// Derivative along the search direction
         DataType _delta;
+        /// Initial delta
         DataType _delta_0;
+        /// Derivative from the last iteration
         DataType _delta_prev;
+        /// Operator functional value
         DataType _f;
+        /// Initial funcitonal value
         DataType _f_0;
+        /// Functional value form the previous iteration
         DataType _f_prev;
         /// The 2-norm of the search direction
         DataType _norm_dir;
         /// The 2-norm of the iterate
         DataType _norm_sol;
+        /// Tolerance for sufficient decrease in the functional value (Wolfe conditions)
         DataType _tol_decrease;
+        /// Tolerance for sufficient decrease in the norm of the gradient (Wolfe conditions)
         DataType _tol_curvature;
 
       public:
