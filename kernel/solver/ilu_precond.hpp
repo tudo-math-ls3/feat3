@@ -20,12 +20,12 @@ namespace FEAST
       int cuda_ilu_apply(double * y, const double * x, double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
       void * cuda_ilu_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd);
       void cuda_ilu_init_numeric(double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
-      void cuda_ilu_done(void * vinfo);
+      void cuda_ilu_done_symbolic(void * vinfo);
 
       int cuda_ilub_apply(double * y, const double * x, double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
       void * cuda_ilub_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd, const int blocksize);
       void cuda_ilub_init_numeric(double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
-      void cuda_ilub_done(void * vinfo);
+      void cuda_ilub_done_symbolic(void * vinfo);
 
       /**
        * \brief ILU(k) symbolic core
@@ -1088,7 +1088,7 @@ namespace FEAST
 
       virtual void done_symbolic() override
       {
-        Intern::cuda_ilu_done(cuda_info);
+        Intern::cuda_ilu_done_symbolic(cuda_info);
       }
 
       virtual void init_numeric() override
@@ -1200,7 +1200,7 @@ namespace FEAST
 
       virtual void done_symbolic() override
       {
-        Intern::cuda_ilub_done(cuda_info);
+        Intern::cuda_ilub_done_symbolic(cuda_info);
       }
 
       virtual void init_numeric() override

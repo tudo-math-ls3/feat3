@@ -182,7 +182,7 @@ namespace FEAST
         return 0;
       }
 
-      void cuda_ilu_done(void * vinfo)
+      void cuda_ilu_done_symbolic(void * vinfo)
       {
         CudaIluSolveInfo * info = (CudaIluSolveInfo *) vinfo;
 
@@ -371,7 +371,7 @@ namespace FEAST
         return 0;
       }
 
-      void cuda_ilub_done(void * vinfo)
+      void cuda_ilub_done_symbolic(void * vinfo)
       {
         CudaIluBSolveInfo * info = (CudaIluBSolveInfo *) vinfo;
 
