@@ -133,7 +133,7 @@ namespace FEAST
           alglib::mincgcreate(_opt_var, _state);
           // Set the algorithm type: -1 (automatic selection of best algorithm), 0 (Dai-Yuan), 1 (hybrid Day-Yuan
           // and Hestenes-Stiefel)
-          alglib::mincgsetcgtype(_state, 0);
+          alglib::mincgsetcgtype(_state, 1);
           alglib::mincgsetxrep(_state, true);
           // Set stopping criteria: Relative tolerance, function improvement, length of update step, max iterations
           alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_update_func), double(_tol_update_step),
@@ -272,9 +272,8 @@ namespace FEAST
         static void _log(const alglib::real_1d_array& DOXY(x), double DOXY(func), void* ptr)
         {
           ALGLIBMinCG<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<OperatorType, FilterType>*>(ptr);
-
-          // increase iteration count
-          ++me->_num_iter;
+          if(me->_num_iter>0)
+          {
 
           // first, let's see if we have to compute the defect at all
           bool calc_def = false;
@@ -303,6 +302,10 @@ namespace FEAST
             auto tmp = me->_vec_tmp.clone();
             me->iterates->push_back(std::move(tmp));
           }
+          }
+
+          // increase iteration count
+          ++me->_num_iter;
 
         }
 

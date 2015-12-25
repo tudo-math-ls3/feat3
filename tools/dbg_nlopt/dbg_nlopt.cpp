@@ -64,10 +64,10 @@ int run(Solver_& solver, Operator_& op)
 
   FunctionType my_function;
 
-  solver->init();
-  solver->set_tol_rel(Math::eps<DataType>());
-  solver->set_plot(true);
   solver->set_max_iter(100);
+  solver->set_tol_rel(Math::eps<DataType>());
+  solver->init();
+  solver->set_plot(true);
   std::cout << "Using solver " << solver->get_formated_solver_tree() << std::endl;
 
   // This will hold the solution
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
   static constexpr int dim = PointType::n;
 
   typedef LAFEM::NoneFilterBlocked<MemType, DataType, Index, dim> FilterType;
-  typedef Solver::SecantLinesearch<OperatorType, FilterType> LinesearchType;
+  typedef Solver::SWLinesearch<OperatorType, FilterType> LinesearchType;
 
   // The analytic function
   AnalyticFunctionType my_function;

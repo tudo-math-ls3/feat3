@@ -117,6 +117,7 @@ namespace FEAST
 
         /// <vec_def, vec_dir>
         DataType _eta;
+        DataType _fval;
 
       public:
         /// Restart frequency, defaults to problemsize+1
@@ -164,6 +165,10 @@ namespace FEAST
             // If we use Fletcher-Reeves, frequent restarts are needed
             if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
               restart_freq = _op.columns() + Index(1);
+            if(_direction_update == NLCGDirectionUpdate::DaiYuan)
+              restart_freq = _op.columns() + Index(4);
+            if(_direction_update == NLCGDirectionUpdate::DYHSHybrid)
+              restart_freq = _op.columns() + Index(4);
 
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
@@ -275,6 +280,8 @@ namespace FEAST
           if(status != Status::progress)
             return status;
 
+          this->_fval = this->_op.compute_func();
+
           // apply preconditioner to defect vector
           if(!this->_apply_precond(this->_vec_tmp, this->_vec_def, this->_filter))
             return Status::aborted;
@@ -294,9 +301,15 @@ namespace FEAST
             TimeStamp at;
             ++its_since_restart;
 
+            _linesearch.set_initial_fval(this->_fval);
+            _linesearch._vec_grad.scale(this->_vec_def, DataType(-1));
             _linesearch.correct(vec_sol, this->_vec_dir);
             if(_linesearch.get_rel_update() < this->_tol_update_step)
-              this->_num_stag_iter++;
+            {
+              std::cout << "NLCG update step stagnated: " << stringify_fp_sci(_linesearch.get_rel_update()) <<
+                " < " << stringify_fp_sci(this->_tol_update_step);
+              return Status::stagnated;
+            }
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -305,9 +318,11 @@ namespace FEAST
               iterates->push_back(std::move(tmp));
             }
 
-            this->_op.prepare(vec_sol);
+            //this->_op.prepare(vec_sol);
             // update defect vector
-            this->_op.compute_grad(this->_vec_def);
+            //this->_op.compute_grad(this->_vec_def);
+            this->_fval = _linesearch.get_final_fval();
+            this->_vec_def.clone(_linesearch._vec_grad);
             this->_vec_def.scale(this->_vec_def,DataType(-1));
             this->_filter.filter_def(this->_vec_def);
 
@@ -329,13 +344,17 @@ namespace FEAST
 
             // If a restart is scheduled, reset beta to 0
             if(restart_freq > 0 && its_since_restart%restart_freq == 0)
+            {
               beta = DataType(0);
+              its_since_restart++;
+            }
 
             /// Restarting means discarding the new search direction and setting the new search direction to the
             // (preconditioned) steepest descent direction
             if(beta == DataType(0))
             {
-              its_since_restart = Index(0);
+              //its_since_restart = Index(1);
+              //its_since_restart++;
               num_subsequent_restarts++;
 
               this->_vec_dir.clone(this->_vec_tmp);
@@ -345,7 +364,7 @@ namespace FEAST
               num_subsequent_restarts = Index(0);
               this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, beta);
             }
-            std::cout << "NLCG: beta = " << stringify_fp_sci(beta) << std::endl;
+            std::cout << "NLCG: beta = " << stringify_fp_sci(beta) << " its_since_restart = " << its_since_restart <<std::endl;
 
             // Now that we know the new search direction, we can update _eta
             _eta = this->_vec_dir.dot(this->_vec_def);
@@ -546,9 +565,9 @@ namespace FEAST
 
           beta = Math::max(DataType(0), Math::min(gamma, gamma - gamma_mid)/( -eta_mid + eta_old));
 
-          //std::cout << "DY-HS-Hybrid:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
-          //std::cout << "DY-HS-Hybrid:  eta = " << stringify_fp_sci(_eta) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
-          //std::cout << "DY-HS-Hybrid: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
+          std::cout << "DY-HS-Hybrid:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
+          std::cout << "DY-HS-Hybrid:  eta = " << stringify_fp_sci(_eta) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
+          std::cout << "DY-HS-Hybrid: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
 
           return Status::progress;
         }
