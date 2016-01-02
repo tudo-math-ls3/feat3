@@ -781,7 +781,7 @@ namespace FEAST
             for(IT_ j(rptr[i]); j < rptr[i+1]; ++j)
             {
               // x_j -= U_ij * x_i
-              x[cidx[i]] -= data_u[j] * x[i];
+              x[cidx[j]] -= data_u[j] * x[i];
             }
           }
         }
