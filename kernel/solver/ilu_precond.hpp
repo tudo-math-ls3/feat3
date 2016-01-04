@@ -807,16 +807,18 @@ namespace FEAST
     class ILUPrecond;
 
     /**
-     * \brief ILU(p) specialisation for SparseMatrixCSR<Mem::Main,...>
+     * \brief ILU(p) specialisation for SparseMatrixCSR/ELL<Mem::Main,...>
+     *
+     * This specialisation takes care of all scalar matrix containers residing in main memory.
      *
      * \author Peter Zajac
      */
-    template<typename DT_, typename IT_, typename Filter_>
-    class ILUPrecond<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, Filter_> :
-      public SolverBase<typename LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>::VectorTypeL>
+    template<template<class,class,class> class ScalarMatrix_, typename DT_, typename IT_, typename Filter_>
+    class ILUPrecond<ScalarMatrix_<Mem::Main, DT_, IT_>, Filter_> :
+      public SolverBase<typename ScalarMatrix_<Mem::Main, DT_, IT_>::VectorTypeL>
     {
     public:
-      typedef LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_> MatrixType;
+      typedef ScalarMatrix_<Mem::Main, DT_, IT_> MatrixType;
       typedef Mem::Main MemType;
       typedef DT_ DataType;
       typedef IT_ IndexType;
@@ -909,112 +911,7 @@ namespace FEAST
 
         return Status::success;
       }
-    }; // class ILUPrecond<SparseMatrixCSR<Mem::Main,...>,...>
-
-    /**
-     * \brief ILU(p) specialisation for SparseMatrixELL<Mem::Main,...>
-     *
-     * \author Peter Zajac
-     */
-    template<typename DT_, typename IT_, typename Filter_>
-    class ILUPrecond<LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_>, Filter_> :
-      public SolverBase<typename LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_>::VectorTypeL>
-    {
-    public:
-      typedef LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_> MatrixType;
-      typedef Mem::Main MemType;
-      typedef DT_ DataType;
-      typedef IT_ IndexType;
-      typedef Filter_ FilterType;
-      typedef typename MatrixType::VectorTypeL VectorType;
-
-    protected:
-      const MatrixType& _matrix;
-      const FilterType& _filter;
-      Intern::ILUCore<DataType, IndexType> _ilu;
-      const int _p;
-
-    public:
-      /**
-       * \brief Constructor
-       *
-       * \param[in] matrix
-       * The matrix to be used.
-       *
-       * \param[in] p
-       * Maximum level of fillin.
-       */
-      explicit ILUPrecond(const MatrixType& matrix, const FilterType& filter, const int p = 0) :
-        _matrix(matrix),
-        _filter(filter),
-        _p(p)
-      {
-      }
-
-      /// Returns the name of the solver.
-      virtual String name() const override
-      {
-        return "ILU";
-      }
-
-      virtual void init_symbolic() override
-      {
-        if (_matrix.columns() != _matrix.rows())
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
-        }
-
-        // set matrix structure
-        _ilu.set_struct(_matrix);
-
-        // perform symbolic factorisation
-        _ilu.factorise_symbolic(_p);
-
-        // allocate data arrays
-        _ilu.alloc_data();
-      }
-
-      virtual void done_symbolic() override
-      {
-        _ilu.clear();
-      }
-
-      virtual void init_numeric() override
-      {
-        _ilu.copy_data(_matrix);
-        _ilu.factorise_numeric_il_du();
-      }
-
-      /**
-       * \brief apply the preconditioner
-       *
-       * \param[out] out The preconditioner result.
-       * \param[in] in The vector to be preconditioned.
-       */
-      virtual Status apply(VectorType& out, const VectorType& in) override
-      {
-        TimeStamp ts_start;
-
-        // get vector data arrays
-        DataType* x = out.elements();
-        const DataType* b = in.elements();
-
-        // solve: (I+L)*y = b
-        _ilu.solve_il(x, b);
-
-        // solve: (D+U)*x = y
-        _ilu.solve_du(x, x);
-
-        // apply filter
-        this->_filter.filter_cor(out);
-
-        TimeStamp ts_stop;
-        Statistics::add_time_precon(ts_stop.elapsed(ts_start));
-        Statistics::add_flops(_ilu.get_nnze() * 2 + out.size());
-
-        return Status::success;
-      }
-    }; // class ILUPrecond<SparseMatrixELL<Mem::Main,...>,...>
+    }; // class ILUPrecond<ScalarMatrix_<Mem::Main,...>,...>
 
     /**
      * \brief ILU(0) preconditioner implementation
