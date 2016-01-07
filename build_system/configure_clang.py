@@ -25,6 +25,8 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
       cxxflags += " -fsanitize=undefined" # darwin clang does not like sanitize=undefined
     #if "mpi" not in buildid and "cuda" not in buildid and "valgrind" not in buildid and "xcode" not in buildid:
       #cxxflags += " -fsanitize=address" # -fsanitize=memory" -fsanitize=address-full
+    if major == 3 and minor > 6:
+      cxxflags += " -Wrange-loop-analysis -Wobjc-circular-container"
 
   elif "opt" in buildid:
     cxxflags += " -O3"
