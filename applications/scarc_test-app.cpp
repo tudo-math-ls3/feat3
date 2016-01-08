@@ -117,8 +117,8 @@ void check_scarc_rich_rich_1D(Index rank)
    */
 
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries;
-  boundaries.push_back(std::move(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine)));
-  boundaries.push_back(std::move(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine)));
+  boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine));
+  boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine));
   boundaries.at(0).push_back(0);
   boundaries.at(1).push_back(1);
 
@@ -370,8 +370,8 @@ void check_scarc_pcg_rich_1D(Index rank)
    */
 
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries;
-  boundaries.push_back(std::move(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine)));
-  boundaries.push_back(std::move(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine)));
+  boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine));
+  boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine));
   boundaries.at(0).push_back(0);
   boundaries.at(1).push_back(1);
 
@@ -624,8 +624,8 @@ void check_scarc_rich_pcg_1D(Index rank)
    */
 
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries;
-  boundaries.push_back(std::move(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine)));
-  boundaries.push_back(std::move(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine)));
+  boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine));
+  boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine));
   boundaries.at(0).push_back(0);
   boundaries.at(1).push_back(1);
 
@@ -876,8 +876,8 @@ void check_scarc_pcg_pcg_1D(Index rank)
    */
 
   std::vector<Halo<0, PLVertex, Mesh<Dim1D> > > boundaries;
-  boundaries.push_back(std::move(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine)));
-  boundaries.push_back(std::move(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine)));
+  boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine));
+  boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D> >(m_fine));
   boundaries.at(0).push_back(0);
   boundaries.at(1).push_back(1);
 

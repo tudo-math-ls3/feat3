@@ -313,7 +313,7 @@ namespace FEAST
       }
 
       // return graph
-      return std::move(graph);
+      return graph;
     }
 
   } // namespace Adjacency

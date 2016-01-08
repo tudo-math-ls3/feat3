@@ -228,7 +228,7 @@ namespace FEAST
       perm.calc_swap_from_perm();
 
       // return permutation
-      return std::move(perm);
+      return perm;
     }
   } // namespace Adjacency
 } // namespace FEAST
