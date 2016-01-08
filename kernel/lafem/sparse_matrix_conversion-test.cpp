@@ -110,26 +110,30 @@ SparseMatrixConversionTest<Mem::Main, double, unsigned long> sparse_matrix_conve
  * \tparam DT_
  * description missing
  *
+ * \tparam IT_
+ * description missing
+ *
  * \author Dirk Ribbrock
  */
 template<
   typename Mem_,
-  typename DT_>
+  typename DT_,
+  typename IT_>
 class SparseMatrixCudaConversionTest
-  : public TaggedTest<Mem_, DT_>
+  : public FullTaggedTest<Mem_, DT_, IT_>
 {
 
 public:
 
   SparseMatrixCudaConversionTest()
-    : TaggedTest<Mem_, DT_>("sparse_matrix_cuda_conversion_test")
+    : FullTaggedTest<Mem_, DT_, IT_>("sparse_matrix_cuda_conversion_test")
   {
   }
 
   virtual void run() const
   {
 
-    SparseMatrixCOO<Mem::Main, DT_> a(121, 121);
+    SparseMatrixCOO<Mem::Main, DT_, IT_> a(121, 121);
     for (Index row(0) ; row < a.rows() ; ++row)
     {
       for (Index col(0) ; col < a.columns() ; ++col)
@@ -142,72 +146,74 @@ public:
     }
 
     {
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m1;
+      SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m1;
       coo_m1.convert(a);
-      SparseMatrixELL<Mem::CUDA, DT_> ell_m1(coo_m1);
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m2(ell_m1);
+      SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m1(coo_m1);
+      SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m2(ell_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
-      SparseMatrixCSR<Mem::CUDA, DT_> csr_m1(coo_m1);
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m3(csr_m1);
+      SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m1(coo_m1);
+      SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m3(csr_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
     }
 
     {
-      SparseMatrixELL<Mem::CUDA, DT_> ell_m1(a);
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m1(ell_m1);
-      SparseMatrixELL<Mem::CUDA, DT_> ell_m2(coo_m1);
+      SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m1(a);
+      SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m1(ell_m1);
+      SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m2(coo_m1);
       TEST_CHECK_EQUAL(ell_m2, ell_m1);
-      SparseMatrixCSR<Mem::CUDA, DT_> csr_m1(ell_m1);
-      SparseMatrixELL<Mem::CUDA, DT_> ell_m3(csr_m1);
+      SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m1(ell_m1);
+      SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m3(csr_m1);
       TEST_CHECK_EQUAL(ell_m3, ell_m1);
     }
 
     {
-      SparseMatrixCSR<Mem::CUDA, DT_> csr_m1(a);
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m1(csr_m1);
-      SparseMatrixCSR<Mem::CUDA, DT_> csr_m2(coo_m1);
+      SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m1(a);
+      SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m1(csr_m1);
+      SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m2(coo_m1);
       TEST_CHECK_EQUAL(csr_m2, csr_m1);
-      SparseMatrixELL<Mem::CUDA, DT_> ell_m1(csr_m1);
-      SparseMatrixCSR<Mem::CUDA, DT_> csr_m3(ell_m1);
+      SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m1(csr_m1);
+      SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m3(ell_m1);
       TEST_CHECK_EQUAL(csr_m3, csr_m1);
     }
 
     {
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m1;
+      SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m1;
       coo_m1.convert(a);
-      SparseMatrixELL<Mem::Main, DT_> ell_m1(coo_m1);
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m2(ell_m1);
+      SparseMatrixELL<Mem::Main, DT_, IT_> ell_m1(coo_m1);
+      SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m2(ell_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
-      SparseMatrixCSR<Mem::Main, DT_> csr_m1(coo_m1);
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m3(csr_m1);
+      SparseMatrixCSR<Mem::Main, DT_, IT_> csr_m1(coo_m1);
+      SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m3(csr_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
     }
 
     {
-      SparseMatrixELL<Mem::CUDA, DT_> ell_m1(a);
-      SparseMatrixCOO<Mem::Main, DT_> coo_m1(ell_m1);
-      SparseMatrixELL<Mem::CUDA, DT_> ell_m2(coo_m1);
+      SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m1(a);
+      SparseMatrixCOO<Mem::Main, DT_, IT_> coo_m1(ell_m1);
+      SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m2(coo_m1);
       TEST_CHECK_EQUAL(ell_m2, ell_m1);
-      SparseMatrixCSR<Mem::Main, DT_> csr_m1(ell_m1);
-      SparseMatrixELL<Mem::CUDA, DT_> ell_m3(csr_m1);
+      SparseMatrixCSR<Mem::Main, DT_, IT_> csr_m1(ell_m1);
+      SparseMatrixELL<Mem::CUDA, DT_, IT_> ell_m3(csr_m1);
       TEST_CHECK_EQUAL(ell_m3, ell_m1);
     }
 
     {
-      SparseMatrixCSR<Mem::CUDA, DT_> csr_m1(a);
-      SparseMatrixCOO<Mem::Main, DT_> coo_m1(csr_m1);
-      SparseMatrixCSR<Mem::CUDA, DT_> csr_m2(coo_m1);
+      SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m1(a);
+      SparseMatrixCOO<Mem::Main, DT_, IT_> coo_m1(csr_m1);
+      SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m2(coo_m1);
       TEST_CHECK_EQUAL(csr_m2, csr_m1);
-      SparseMatrixELL<Mem::Main, DT_> ell_m1(csr_m1);
-      SparseMatrixCSR<Mem::CUDA, DT_> csr_m3(ell_m1);
+      SparseMatrixELL<Mem::Main, DT_, IT_> ell_m1(csr_m1);
+      SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m3(ell_m1);
       TEST_CHECK_EQUAL(csr_m3, csr_m1);
     }
 
   }
 };
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixCudaConversionTest<Mem::CUDA, float> sparse_matrix_cuda_conversion_test_float;
-SparseMatrixCudaConversionTest<Mem::CUDA, double> sparse_matrix_cuda_conversion_test_double;
+SparseMatrixCudaConversionTest<Mem::CUDA, float, unsigned long> sparse_matrix_cuda_conversion_test_float_ulong;
+SparseMatrixCudaConversionTest<Mem::CUDA, double, unsigned long> sparse_matrix_cuda_conversion_test_double_ulong;
+SparseMatrixCudaConversionTest<Mem::CUDA, float, unsigned int> sparse_matrix_cuda_conversion_test_float_uint;
+SparseMatrixCudaConversionTest<Mem::CUDA, double, unsigned int> sparse_matrix_cuda_conversion_test_double_uint;
 #endif
 
 /**
