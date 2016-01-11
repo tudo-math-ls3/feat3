@@ -74,7 +74,11 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
   MemoryPool<Mem::Main>::initialise();
 
 #ifdef FEAST_BACKENDS_CUDA
-  MemoryPool<Mem::CUDA>::initialise(rank);
+  MemoryPool<Mem::CUDA>::initialise(rank,
+    atoi(_global_property_map.query("MPI.ranks_per_node", "1").c_str()),
+    atoi(_global_property_map.query("MPI.ranks_per_uma", "1").c_str()),
+    atoi(_global_property_map.query("MPI.gpus_per_node", "1").c_str())
+    );
   // read in initial settings from Runtime and store them in MemoryPool<CUDA>
   Index misc = (Index)atoi(_global_property_map.query("CUDA.blocksize_misc", "256").c_str());
   Index reduction = (Index)atoi(_global_property_map.query("CUDA.blocksize_reduction", "256").c_str());

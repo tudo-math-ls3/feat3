@@ -47,9 +47,11 @@ Index MemoryPool<Mem::CUDA>::blocksize_reduction = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_spmv = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_axpy = 256;
 
-void MemoryPool<Mem::CUDA>::initialise(int rank)
+void MemoryPool<Mem::CUDA>::initialise(int rank, int /*ranks_per_node*/, int /*ranks_per_uma*/, int gpus_per_node)
 {
-  if (cudaSuccess != cudaSetDevice(rank % 1))
+  /// \todo enable non cuda ranks and ensure balance of ranks per numa section
+  int device = rank % gpus_per_node;
+  if (cudaSuccess != cudaSetDevice(device))
     throw InternalError(__func__, __FILE__, __LINE__, "cudaSetDevice failed!");
 
   if (CUBLAS_STATUS_SUCCESS != cublasCreate(&Util::Intern::cublas_handle))
