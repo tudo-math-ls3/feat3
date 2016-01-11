@@ -111,13 +111,17 @@ namespace FEAST
         VectorType _vec_tmp;
 
         /// Tolerance for function improvement
-        DataType _tol_update_func;
+        DataType _tol_fval;
         /// Tolerance for the lenght of the update step
-        DataType _tol_update_step;
+        DataType _tol_step;
 
         /// <vec_def, vec_dir>
         DataType _eta;
         DataType _fval;
+        DataType _fval_prev;
+
+        /// Number of subsequent steepest descent steps
+        Index _num_subs_restarts;
 
       public:
         /// Restart frequency, defaults to problemsize+1
@@ -155,8 +159,8 @@ namespace FEAST
           _filter(filter_),
           _linesearch(linesearch_),
           _direction_update(du_),
-          _tol_update_func(DataType(0)),
-          _tol_update_step(Math::sqrt(Math::eps<DataType>())),
+          _tol_fval(DataType(0)),
+          _tol_step(Math::sqrt(Math::eps<DataType>())),
           restart_freq(0),
           iterates(nullptr)
           {
@@ -209,6 +213,35 @@ namespace FEAST
         virtual String name() const override
         {
           return "NLCG-"+_linesearch.name()+"-"+stringify(_direction_update);
+        }
+
+        /**
+         * \brief Sets the tolerance for function value improvement
+         *
+         * \param[in] tol_fval
+         * New tolerance for function value improvement.
+         *
+         * The convergence check is against the maximum of the absolute and relative function value.
+         *
+         */
+        void set_tol_fval(DataType tol_fval)
+        {
+          _tol_fval = tol_fval;
+        }
+
+        /**
+         * \brief Sets the tolerance for the linesearch step size.
+         *
+         * \param[in] tol_step
+         * New tolerance for the linesearch step size.
+         *
+         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
+         * update will fail to produce a new search direction so the NLCG has to be terminated.
+         *
+         */
+        void set_tol_step(DataType tol_step)
+        {
+          _tol_step = tol_step;
         }
 
         /// \copydoc BaseClass::apply()
@@ -293,23 +326,26 @@ namespace FEAST
           // Compute initial eta = <d, r>
           this->_eta = gamma;
 
-          // start iterating
           Index its_since_restart(0);
-          Index num_subsequent_restarts(0);
+          _num_subs_restarts = Index(0);
+          // start iterating
           while(status == Status::progress)
           {
             TimeStamp at;
-            ++its_since_restart;
 
+            ++its_since_restart;
+            _fval_prev = _fval;
+
+            // Copy information to the linesearch
             _linesearch.set_initial_fval(this->_fval);
-            _linesearch._vec_grad.scale(this->_vec_def, DataType(-1));
-            _linesearch.correct(vec_sol, this->_vec_dir);
-            if(_linesearch.get_rel_update() < this->_tol_update_step)
-            {
-              std::cout << "NLCG update step stagnated: " << stringify_fp_sci(_linesearch.get_rel_update()) <<
-                " < " << stringify_fp_sci(this->_tol_update_step);
-              return Status::stagnated;
-            }
+            _linesearch.set_grad_from_defect(this->_vec_def);
+
+            // Call the linesearch to update vec_sol
+            status = _linesearch.correct(vec_sol, this->_vec_dir);
+
+            // Copy back information from the linesearch
+            this->_fval = _linesearch.get_final_fval();
+            _linesearch.get_defect_from_grad(this->_vec_def);
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -318,15 +354,7 @@ namespace FEAST
               iterates->push_back(std::move(tmp));
             }
 
-            //this->_op.prepare(vec_sol);
-            // update defect vector
-            //this->_op.compute_grad(this->_vec_def);
-            this->_fval = _linesearch.get_final_fval();
-            this->_vec_def.clone(_linesearch._vec_grad);
-            this->_vec_def.scale(this->_vec_def,DataType(-1));
-            this->_filter.filter_def(this->_vec_def);
-
-            // compute defect norm
+            // Compute defect norm. This also performs the convergence/divergence checks.
             status = this->_set_new_defect(this->_vec_def, vec_sol);
 
             if(status != Status::progress)
@@ -342,6 +370,14 @@ namespace FEAST
             // (e.g. leads to a decrease) and applies the preconditioner to the new defect vector
             status = compute_beta(beta, gamma, at);
 
+            // Something might have gone wrong in applying the preconditioner, so check status again.
+            if(status != Status::progress)
+            {
+              TimeStamp bt;
+              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+              return status;
+            }
+
             // If a restart is scheduled, reset beta to 0
             if(restart_freq > 0 && its_since_restart%restart_freq == 0)
             {
@@ -355,29 +391,26 @@ namespace FEAST
             {
               //its_since_restart = Index(1);
               //its_since_restart++;
-              num_subsequent_restarts++;
+              _num_subs_restarts++;
 
               this->_vec_dir.clone(this->_vec_tmp);
             }
             else
             {
-              num_subsequent_restarts = Index(0);
+              _num_subs_restarts = Index(0);
               this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, beta);
             }
             std::cout << "NLCG: beta = " << stringify_fp_sci(beta) << " its_since_restart = " << its_since_restart <<std::endl;
 
             // Now that we know the new search direction, we can update _eta
             _eta = this->_vec_dir.dot(this->_vec_def);
+
+            // Safeguard as this should not happen
             if(_eta <= DataType(0))
+            {
               std::cout << "New direction is not a descent direction!" << std::endl;
-
-            // If there were too many subsequent restarts, the solver is stagnated
-            if(num_subsequent_restarts > max_num_subs_restarts)
-              return Status::stagnated;
-
-            // If there were too many stagnated iterations, the solver is stagnated
-            if(this->_min_stag_iter > 0 && this->_num_stag_iter > this->_min_stag_iter)
-              return Status::stagnated;
+              return Status::aborted;
+            }
 
           }
 
@@ -476,9 +509,38 @@ namespace FEAST
           if(this->_num_iter < this->_min_iter)
             return Status::progress;
 
-          // is converged?
+          // Check for convergence of the gradient norm
           if(this->is_converged())
             return Status::success;
+
+          // Check for convergence wrt. the function value improvement if _tol_fval says so
+          if(_tol_fval > DataType(0))
+          {
+            // This is the factor for the relative funciton value
+            DataType scale(Math::max(_fval, _fval_prev));
+            // Make sure it is at least 1
+            scale = Math::max(scale, DataType(1));
+            // Check for success
+            if(Math::abs(_fval - _fval_prev)/scale < _tol_fval)
+              return Status::success;
+          }
+
+          // If the linesearch failed to make progress, the new iterate is too close to the old iterate to compute
+          // a new search direction etc. so we have to abort.
+          if(_linesearch.get_rel_update() < this->_tol_step)
+          {
+            std::cout << "NLCG update step stagnated: " << stringify_fp_sci(_linesearch.get_rel_update()) <<
+              " < " << stringify_fp_sci(this->_tol_step) << std::endl;
+            return Status::stagnated;
+          }
+
+          // If there were too many subsequent restarts, the solver is stagnated
+          if(_num_subs_restarts > max_num_subs_restarts)
+            return Status::stagnated;
+
+          // If there were too many stagnated iterations, the solver is stagnated
+          if(this->_min_stag_iter > 0 && this->_num_stag_iter > this->_min_stag_iter)
+            return Status::stagnated;
 
           // maximum number of iterations performed?
           if(this->_num_iter >= this->_max_iter)
