@@ -17,6 +17,7 @@ namespace FEAST
     enum class NLCGDirectionUpdate
     {
       undefined = 0,
+      automatic,
       DaiYuan,
       DYHSHybrid,
       FletcherReeves,
@@ -34,16 +35,18 @@ namespace FEAST
       {
         case NLCGDirectionUpdate::undefined:
           return os << "undefined";
+        case NLCGDirectionUpdate::automatic:
+          return os << "automatic";
         case NLCGDirectionUpdate::DaiYuan:
-          return os << "Dai-Yuan";
+          return os << "DaiYuan";
         case NLCGDirectionUpdate::DYHSHybrid:
-          return os << "DY-HS-Hybrid";
+          return os << "DYHSHybrid";
         case NLCGDirectionUpdate::FletcherReeves:
-          return os << "Fletcher-Reeves";
+          return os << "FletcherReeves";
         case NLCGDirectionUpdate::HestenesStiefel:
-          return os << "Hestenes-Stiefel";
+          return os << "HestenesStiefel";
         case NLCGDirectionUpdate::PolakRibiere:
-          return os << "Polak-Ribiere";
+          return os << "PolakRibiere";
         default:
           return os << "-unknown-";
       }
@@ -115,6 +118,7 @@ namespace FEAST
         /// Tolerance for the lenght of the update step
         DataType _tol_step;
 
+        DataType _beta;
         /// <vec_def, vec_dir>
         DataType _eta;
         DataType _fval;
@@ -161,6 +165,7 @@ namespace FEAST
           _direction_update(du_),
           _tol_fval(DataType(0)),
           _tol_step(Math::sqrt(Math::eps<DataType>())),
+          _beta(0),
           restart_freq(0),
           iterates(nullptr)
           {
@@ -169,8 +174,10 @@ namespace FEAST
             // If we use Fletcher-Reeves, frequent restarts are needed
             if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
               restart_freq = _op.columns() + Index(1);
+            // This is to make the restarts to occur at the same iterations as ALGLIB
             if(_direction_update == NLCGDirectionUpdate::DaiYuan)
               restart_freq = _op.columns() + Index(4);
+            // This is to make the restarts to occur at the same iterations as ALGLIB
             if(_direction_update == NLCGDirectionUpdate::DYHSHybrid)
               restart_freq = _op.columns() + Index(4);
 
@@ -282,8 +289,12 @@ namespace FEAST
         {
           _direction_update = update_;
           // If we use Fletcher-Reeves, frequent restarts are needed
-          if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
-            restart_freq = _vec_def.size() + Index(1);
+          // This is to make the restarts to occur at the same iterations as ALGLIB
+          if(_direction_update == NLCGDirectionUpdate::DaiYuan)
+            restart_freq = _op.columns() + Index(4);
+          // This is to make the restarts to occur at the same iterations as ALGLIB
+          if(_direction_update == NLCGDirectionUpdate::DYHSHybrid)
+            restart_freq = _op.columns() + Index(4);
         }
 
       protected:
@@ -314,17 +325,17 @@ namespace FEAST
             return status;
 
           this->_fval = this->_op.compute_func();
-
-          // apply preconditioner to defect vector
-          if(!this->_apply_precond(this->_vec_tmp, this->_vec_def, this->_filter))
-            return Status::aborted;
-
-          this->_vec_dir.clone(this->_vec_tmp);
+          // The first direction has to be the steepest descent direction
+          this->_vec_dir.clone(this->_vec_def);
 
           // compute initial gamma
           DataType gamma = this->_vec_def.dot(this->_vec_dir);
           // Compute initial eta = <d, r>
           this->_eta = gamma;
+
+          // apply preconditioner to defect vector
+          if(!this->_apply_precond(this->_vec_tmp, this->_vec_def, this->_filter))
+            return Status::aborted;
 
           Index its_since_restart(0);
           _num_subs_restarts = Index(0);
@@ -335,6 +346,9 @@ namespace FEAST
 
             ++its_since_restart;
             _fval_prev = _fval;
+            _beta = DataType(0);
+
+            std::cout << "NLCG: sol = " << vec_sol << " def = " << this->_vec_def << " dir = " << this->_vec_dir << " tmp " << this->_vec_tmp <<std::endl;
 
             // Copy information to the linesearch
             _linesearch.set_initial_fval(this->_fval);
@@ -346,6 +360,9 @@ namespace FEAST
             // Copy back information from the linesearch
             this->_fval = _linesearch.get_final_fval();
             _linesearch.get_defect_from_grad(this->_vec_def);
+
+            std::cout << "      sol = " << vec_sol << " def = " << this->_vec_def << " dir = " << this->_vec_dir <<
+              std::endl;
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -364,11 +381,11 @@ namespace FEAST
               return status;
             }
 
-            DataType beta(DataType(0));
+            //DataType beta(DataType(0));
 
             // Compute the new beta for the search direction update. This also checks if the computed beta is valid
             // (e.g. leads to a decrease) and applies the preconditioner to the new defect vector
-            status = compute_beta(beta, gamma, at);
+            status = compute_beta(_beta, gamma, at);
 
             // Something might have gone wrong in applying the preconditioner, so check status again.
             if(status != Status::progress)
@@ -381,13 +398,13 @@ namespace FEAST
             // If a restart is scheduled, reset beta to 0
             if(restart_freq > 0 && its_since_restart%restart_freq == 0)
             {
-              beta = DataType(0);
+              _beta = DataType(0);
               its_since_restart++;
             }
 
             /// Restarting means discarding the new search direction and setting the new search direction to the
             // (preconditioned) steepest descent direction
-            if(beta == DataType(0))
+            if(_beta == DataType(0))
             {
               //its_since_restart = Index(1);
               //its_since_restart++;
@@ -398,9 +415,9 @@ namespace FEAST
             else
             {
               _num_subs_restarts = Index(0);
-              this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, beta);
+              this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, _beta);
             }
-            std::cout << "NLCG: beta = " << stringify_fp_sci(beta) << " its_since_restart = " << its_since_restart <<std::endl;
+            std::cout << "NLCG: beta = " << stringify_fp_sci(_beta) << " its_since_restart = " << its_since_restart <<std::endl;
 
             // Now that we know the new search direction, we can update _eta
             _eta = this->_vec_dir.dot(this->_vec_def);
@@ -408,8 +425,10 @@ namespace FEAST
             // Safeguard as this should not happen
             if(_eta <= DataType(0))
             {
-              std::cout << "New direction is not a descent direction!" << std::endl;
-              return Status::aborted;
+              std::cout << "New direction is not a descent direction: eta = " << stringify_fp_sci(_eta) << std::endl;
+              this->_vec_dir.clone(this->_vec_def);
+              _eta = this->_vec_dir.dot(this->_vec_def);
+              //return Status::aborted;
             }
 
           }
@@ -527,10 +546,10 @@ namespace FEAST
 
           // If the linesearch failed to make progress, the new iterate is too close to the old iterate to compute
           // a new search direction etc. so we have to abort.
-          if(_linesearch.get_rel_update() < this->_tol_step)
+          if(_linesearch.get_rel_update() < this->_tol_step && Math::abs(_beta) < Math::eps<DataType>())
           {
             std::cout << "NLCG update step stagnated: " << stringify_fp_sci(_linesearch.get_rel_update()) <<
-              " < " << stringify_fp_sci(this->_tol_step) << std::endl;
+              " < " << stringify_fp_sci(this->_tol_step) << " beta = " << stringify_fp_sci(_beta) << std::endl;
             return Status::stagnated;
           }
 

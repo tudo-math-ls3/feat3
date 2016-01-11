@@ -4,6 +4,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
+#include <kernel/solver/nlcg.hpp>
 
 #include <deque>
 
@@ -62,15 +63,18 @@ namespace FEAST
         /// The filter we apply to the gradient
         const Filter_& _filter;
 
+        /// Method to update the search direction, defaults to ALGLIB's automatic setting
+        NLCGDirectionUpdate _direction_update;
+
         /// defect vector
         VectorType _vec_def;
         /// temporary vector
         VectorType _vec_tmp;
 
         /// Tolerance for function improvement
-        DataType _tol_update_func;
+        DataType _tol_fval;
         /// Tolerance for gradient improvement
-        DataType _tol_update_step;
+        DataType _tol_step;
 
         /// Optimisation variable for ALGLIB
         alglib::real_1d_array _opt_var;
@@ -97,12 +101,14 @@ namespace FEAST
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit ALGLIBMinCG(Operator_& op_, const Filter_& filter_, bool keep_iterates = false) :
+        explicit ALGLIBMinCG(Operator_& op_, const Filter_& filter_,
+        NLCGDirectionUpdate du_ = NLCGDirectionUpdate::automatic, bool keep_iterates = false) :
           BaseClass("ALGLIBMinCG"),
           _op(op_),
           _filter(filter_),
-          _tol_update_func(DataType(0)),
-          _tol_update_step(Math::sqrt(Math::eps<DataType>())),
+          _direction_update(du_),
+          _tol_fval(DataType(0)),
+          _tol_step(Math::sqrt(Math::eps<DataType>())),
           iterates(nullptr)
           {
             if(keep_iterates)
@@ -131,13 +137,34 @@ namespace FEAST
             _opt_var[i] = double(0);
 
           alglib::mincgcreate(_opt_var, _state);
-          // Set the algorithm type: -1 (automatic selection of best algorithm), 0 (Dai-Yuan), 1 (hybrid Day-Yuan
-          // and Hestenes-Stiefel)
-          alglib::mincgsetcgtype(_state, 1);
           alglib::mincgsetxrep(_state, true);
           // Set stopping criteria: Relative tolerance, function improvement, length of update step, max iterations
-          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_update_func), double(_tol_update_step),
+          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
+          // Set the direction update
+          set_direction_update(this->_direction_update);
+        }
+
+        /**
+         * \brief Sets the direction update method
+         */
+        void set_direction_update(NLCGDirectionUpdate update_)
+        {
+          switch(update_)
+          {
+            case NLCGDirectionUpdate::automatic:
+                alglib::mincgsetcgtype(_state, -1);
+                break;
+            case NLCGDirectionUpdate::DaiYuan:
+                alglib::mincgsetcgtype(_state, 0);
+                break;
+            case NLCGDirectionUpdate::DYHSHybrid:
+                alglib::mincgsetcgtype(_state, 1);
+                break;
+            default:
+                throw InternalError(name()+" got invalid direction update: "+stringify(update_));
+
+          }
         }
 
         /// \copydoc BaseClass::done_symbolic()
@@ -151,7 +178,64 @@ namespace FEAST
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "ALGLIBMinCG";
+          return "ALGLIBMinCG-"+stringify(_direction_update);
+        }
+
+        /**
+         * \copydoc BaseClass::set_max_iter()
+         */
+        void set_max_iter(Index max_iter)
+        {
+          this->_max_iter = max_iter;
+          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::ae_int_t(this->_max_iter));
+        }
+
+        /**
+         * \brief Sets the tolerance for function value improvement
+         *
+         * \param[in] tol_fval
+         * New tolerance for function value improvement.
+         *
+         * The convergence check is against the maximum of the absolute and relative function value.
+         *
+         */
+        void set_tol_fval(DataType tol_fval)
+        {
+          _tol_fval = tol_fval;
+          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::ae_int_t(this->_max_iter));
+        }
+
+        /**
+         * \brief Sets the relative tolerance for the norm of the defect vector
+         *
+         * \param[in] tol_rel
+         * New relative tolerance for the norm of the defect vector.
+         *
+         */
+        void set_tol_rel(DataType tol_rel)
+        {
+          this->_tol_rel = tol_rel;
+          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::ae_int_t(this->_max_iter));
+        }
+
+        /**
+         * \brief Sets the tolerance for the linesearch step size.
+         *
+         * \param[in] tol_step
+         * New tolerance for the linesearch step size.
+         *
+         * If the linesearch fails to find a new iterate because its relative update is too small, the direction
+         * update will fail to produce a new search direction so the NLCG has to be terminated.
+         *
+         */
+        void set_tol_step(DataType tol_step)
+        {
+          _tol_step = tol_step;
+          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::ae_int_t(this->_max_iter));
         }
 
         /// \copydoc BaseClass::apply()
@@ -220,9 +304,6 @@ namespace FEAST
             _opt_var[i] = vec_sol_elements[i];
 
           alglib::mincgrestartfrom(_state, _opt_var);
-          //alglib::mincgcreate(_opt_var, _state);
-          //alglib::mincgsetcgtype(_state, 0);
-          //alglib::mincgsetxrep(_state, true);
           alglib::mincgoptimize(_state, _func_grad, _log, this);
           alglib::mincgresults(_state, _opt_var, _report);
 
@@ -370,9 +451,10 @@ namespace FEAST
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
     template<typename Operator_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
-      Operator_& op, const Filter_& filter, bool keep_iterates = false)
+      Operator_& op_, const Filter_& filter_, NLCGDirectionUpdate du_ = NLCGDirectionUpdate::automatic,
+      bool keep_iterates_ = false)
       {
-        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op, filter, keep_iterates);
+        return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op_, filter_, du_, keep_iterates_);
       }
 
   } // namespace Solver

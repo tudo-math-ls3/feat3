@@ -61,7 +61,7 @@ class NLCGTest:
 
       // Create the linesearch
       LinesearchType my_linesearch(my_op, my_filter);
-      my_linesearch.set_plot(false);
+      my_linesearch.set_plot(true);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
@@ -77,7 +77,7 @@ class NLCGTest:
       auto solver = new_nlcg(my_op, my_filter, my_linesearch, _update, false, my_precond);
       solver->init();
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot(false);
+      solver->set_plot(true);
       solver->set_max_iter(250);
       solver->set_direction_update(_update);
 
@@ -91,7 +91,7 @@ class NLCGTest:
       TestTraitsType::get_starting_point(starting_point);
       sol(0,starting_point);
 
-      my_op.prepare(sol);
+      //my_op.prepare(sol);
 
       // Solve the optimisation problem
       solver->correct(sol, rhs);
@@ -114,19 +114,19 @@ class NLCGTest:
           min_dist = dist;
       }
       // Check if we found a valid minimum
-      TEST_CHECK_MSG(min_dist < _tol,"min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
+      TEST_CHECK_MSG(min_dist < _tol,solver->name()+": min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
     }
 };
 
 // The Himmelblau function is not too difficult, so low tolerance
-NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction, Solver::NRLinesearch>
+NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction, Solver::NewtonRaphsonLinesearch>
 opt_hb_f(float(0.8),"ApproximateHessian", NLCGDirectionUpdate::PolakRibiere);
 
 // The same with Secant linesearch, without preconditioner and with Fletcher-Reeves update
 NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> opt_hb_d(double(0.6),"none", NLCGDirectionUpdate::FletcherReeves);
 
 // The Rosenbrock function's steep valley is bad for secant linesearch, so use Newton Raphson
-NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NRLinesearch>
+NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NewtonRaphsonLinesearch>
 opt_rb_d(float(0.8),"Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
 // The Hessian of the Bazaraa/Shetty function is singular at the optimal point, so Newton Raphson linesearch does not
@@ -165,11 +165,13 @@ class ALGLIBMinCGTest:
 
   private:
     DT_ _tol;
+    NLCGDirectionUpdate _direction_update;
 
   public:
-    ALGLIBMinCGTest(DT_ exponent_) :
+    ALGLIBMinCGTest(DT_ exponent_, NLCGDirectionUpdate direction_update_) :
       FullTaggedTest<Mem_, DT_, IT_>("ALGLIBMinCGTest"),
-      _tol(Math::pow(Math::eps<DT_>(), exponent_))
+      _tol(Math::pow(Math::eps<DT_>(), exponent_)),
+      _direction_update(direction_update_)
     {
     }
 
@@ -183,7 +185,7 @@ class ALGLIBMinCGTest:
       FilterType my_filter;
 
       //auto my_precond = nullptr;
-      auto solver = new_alglib_mincg(my_op, my_filter, false);
+      auto solver = new_alglib_mincg(my_op, my_filter, _direction_update, false);
       solver->init();
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
@@ -222,16 +224,19 @@ class ALGLIBMinCGTest:
           min_dist = dist;
       }
       // Check if we found a valid minimum
-      TEST_CHECK_MSG(min_dist < _tol,"min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
+      TEST_CHECK_MSG(min_dist < _tol,solver->name()+": min_dist = "+stringify_fp_sci(min_dist)+" > "+stringify_fp_sci(_tol)+" = tol");
     }
 };
 
 // The Himmelblau function is not too difficult, so low tolerance
-ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction> alg_opt_hb_f(float(0.6));
+ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction> alg_opt_hb_f(float(0.6),
+NLCGDirectionUpdate::DaiYuan);
 
 // The Rosenbrock function's steep valley is bad
-ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction> alg_opt_rb_d(double(0.4));
+ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction> alg_opt_rb_d(double(0.4),
+NLCGDirectionUpdate::automatic);
 
 //// The Hessian of the Bazaraa/Shetty function is singular at the optimal point
-ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction> alg_opt_bs_d(double(0.15));
+ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction> alg_opt_bs_d(double(0.15),
+NLCGDirectionUpdate::DYHSHybrid);
 #endif // FEAST_HAVE_ALGLIB

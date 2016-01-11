@@ -64,9 +64,10 @@ int run(Solver_& solver, Operator_& op)
 
   FunctionType my_function;
 
-  solver->set_max_iter(100);
-  solver->set_tol_rel(Math::eps<DataType>());
   solver->init();
+  solver->set_max_iter(50);
+  solver->set_tol_fval(DataType(0));
+  solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
   std::cout << "Using solver " << solver->get_formated_solver_tree() << std::endl;
 
@@ -204,10 +205,13 @@ static void display_help()
     << std::endl;
 #endif // FEAST_HAVE_ALGLIB
   std::cout << " --precon [String]: Available preconditioners for NLCG are Hessian, ApproximateHessian, none(default)"
-  << std::endl;
-  std::cout << " --direction_update [String]: Available NLCG search direction updates for NLCG are DaiYuan,"
-  << "                              DYHSHybrid, FletcherReeves, HestenesStiefel and PolakRibiere (default)"
-  << std::endl;
+  << std::endl
+  << " --direction_update [String]: Available search direction updates for NLCG are DaiYuan," << std::endl
+  << "                              DYHSHybrid, FletcherReeves, HestenesStiefel and PolakRibiere (default)."
+  << std::endl
+  << "                              Available search direction updates for ALGLIBMinCG are DaiYuan,"
+  << std::endl
+  << "                              DYHSHybrid and automatic (default)."  << std::endl;
 
 }
 
@@ -225,7 +229,7 @@ int main(int argc, char* argv[])
   static constexpr int dim = PointType::n;
 
   typedef LAFEM::NoneFilterBlocked<MemType, DataType, Index, dim> FilterType;
-  typedef Solver::SWLinesearch<OperatorType, FilterType> LinesearchType;
+  typedef Solver::StrongWolfeLinesearch<OperatorType, FilterType> LinesearchType;
 
   // The analytic function
   AnalyticFunctionType my_function;
@@ -309,7 +313,22 @@ int main(int argc, char* argv[])
 #ifdef FEAST_HAVE_ALGLIB
   else if (solver_name == "ALGLIBMinCG")
   {
-    auto my_solver = new_alglib_mincg(my_op, my_filter, true);
+    NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::automatic);
+    auto* update_pair(args.query("direction_update"));
+    if(update_pair != nullptr)
+    {
+      String update_name(update_pair->second.front());
+      if(update_name == "automatic")
+        my_direction_update = NLCGDirectionUpdate::automatic;
+      else if(update_name == "DaiYuan")
+        my_direction_update = NLCGDirectionUpdate::DaiYuan;
+      else if(update_name == "DYHSHybrid")
+        my_direction_update = NLCGDirectionUpdate::DYHSHybrid;
+      else
+        throw InternalError("Got invalid ALGLIBMinCG direction update: "+update_name);
+    }
+
+    auto my_solver = new_alglib_mincg(my_op, my_filter, my_direction_update, true);
     my_solver->set_plot(true);
     return run(my_solver, my_op);
   }
