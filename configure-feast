@@ -13,7 +13,6 @@ from build_system.detect_cpu import detect_cpu
 from build_system.configure_gcc import configure_gcc
 from build_system.configure_icc import configure_icc
 from build_system.configure_clang import configure_clang
-from build_system.configure_msc import configure_msc
 from build_system.feast_util import remove_string
 from build_system.feast_util import remove_substring
 from build_system.feast_util import is_found
@@ -59,10 +58,10 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("These categories are:")
   print ("  Build Mode: debug, opt")
   print ("  Parallelisation: serial, mpi")
-  print ("  Compiler: gcc, icc, clang, msc")
+  print ("  Compiler: gcc, icc, clang")
   print ("  Compiler frontends: ccache")
   print ("  Backends: cuda, mkl")
-  print ("  Generators: unixmake, ninja, xcode, mingw, msys, msc - defaults to unixmake if none is choosen")
+  print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
   print ("  Instrumentation: scalasca (not implemented yet)")
   print ("  Debugging: valgrind, cudamemcheck")
   print ("  Precision extensions: quadmath")
@@ -179,15 +178,6 @@ elif "msys" in buildid:
 elif "unixmake" in buildid:
   remove_string(unused_tokens, "unixmake")
   generator = "Unix Makefiles"
-elif "msc" in buildid:
-  remove_string(unused_tokens, "msc")
-  if "x64" in buildid:
-    remove_string(unused_tokens, "x64")
-    generator = "Visual Studio 12 Win64" # 64-bit compiler
-  else:
-    generator = "Visual Studio 12" # 32-bit compiler
-  # Override the compiler version
-  cmake_flags += " -T \"CTP_Nov2013\""
 else:
   generator = "Unix Makefiles"
 
@@ -309,16 +299,6 @@ elif "clang" in buildid or "llvm" in buildid:
   os.environ["CC"] = "clang"
   os.environ["CXX"] = compiler
   cxxflags += " " + configure_clang (cputype, buildid, compiler, system_host_compiler)
-elif "msc" in buildid:
-  if not compiler:
-    compiler = "cl"
-  if not is_found(compiler):
-    print ("Error: Chosen compiler binary '" + compiler +"' not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "msc")
-  os.environ["CC"] = "cl"
-  os.environ["CXX"] = compiler
-  cxxflags += " " + configure_msc (cputype, buildid)
 else:
   print ("Error: No supported compiler found in build id:")
   print (buildid_string)
