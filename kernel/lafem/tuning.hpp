@@ -81,9 +81,10 @@ namespace FEAST
        * Thus the given matrix/vector should represent the majority of the following computational effort.
        */
       template <typename DT_, typename IT_>
-      static void tune_cuda_blocksize(SparseMatrixELL<Mem::CUDA, DT_, IT_> & matrix, DenseVector<Mem::CUDA, DT_, IT_> & vector)
+      static void tune_cuda_blocksize(SparseMatrixELL<Mem::CUDA, DT_, IT_> & matrix)
       {
-        DenseVector<Mem::CUDA, DT_, IT_> temp(vector.size(), DT_(0));
+        DenseVector<Mem::CUDA, DT_, IT_> vector(matrix.columns(), DT_(1));
+        DenseVector<Mem::CUDA, DT_, IT_> temp(matrix.rows(), DT_(0));
 
         /////// SPMV
         double best_toe = std::numeric_limits<double>::max();
