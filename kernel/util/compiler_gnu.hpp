@@ -19,13 +19,13 @@
 // define FEAST_COMPILER_GCC
 #  define FEAST_COMPILER_GNU _GCC_VER
 
-#if(__GNUC__ >= 4)
-#  define FEAST_COMPILER "GNU C++ compiler 4.x.x (or newer)"
-#elif(__GNUC__ >= 3)
-#  define FEAST_COMPILER "GNU C++ compiler 3.x.x"
+#if(__GNUC__ >= 5)
+#  define FEAST_COMPILER "GNU C++ compiler 5.x.x (or newer)"
+#elif(__GNUC__ >= 4)
+#  define FEAST_COMPILER "GNU C++ compiler 4.x.x"
 #else
 // too old to compile FEAST anyway...
-#  define FEAST_COMPILER "GNU C++ compiler 2.x.x (or older)"
+#  define FEAST_COMPILER "GNU C++ compiler"
 #endif
 
 #if(_GCC_VER >= 40900)

@@ -17,8 +17,10 @@
 #  define FEAST_COMPILER_INTEL __INTEL_COMPILER
 
 // map version to human-readable string
-#  if(__INTEL_COMPILER >= 1500)
-#    define FEAST_COMPILER "Intel C/C++ compiler 15.0 (or newer)"
+#  if(__INTEL_COMPILER >= 1600)
+#    define FEAST_COMPILER "Intel C/C++ compiler 16.0 (or newer)"
+#  elif(__INTEL_COMPILER >= 1500)
+#    define FEAST_COMPILER "Intel C/C++ compiler 15.0"
 #  elif(__INTEL_COMPILER >= 1400)
 #    define FEAST_COMPILER "Intel C/C++ compiler 14.0"
 #  elif(__INTEL_COMPILER >= 1310)
