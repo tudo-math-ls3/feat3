@@ -97,7 +97,7 @@ namespace FEAST
 
         void erase(IndexType_ i)
         {
-          _topology.erase(_topology.begin() + (const typename compound_storage_type_::difference_type)i);
+          _topology.erase(_topology.begin() + (typename compound_storage_type_::difference_type)i);
         }
 
         ///insert value into list i (not an insert in the STL-sense)
@@ -174,7 +174,7 @@ namespace FEAST
         }
 
         ///implementation of Bufferable interface
-        virtual BufferedData<OuterStorageType_> buffer(IndexType_ estimated_size_increase = 0)
+        virtual BufferedData<OuterStorageType_> buffer(IndexType_ estimated_size_increase = 0) override
         {
           BufferedData<OuterStorageType_> result;
 
@@ -200,7 +200,7 @@ namespace FEAST
           return result;
         }
 
-        virtual void to_buffer(BufferedData<OuterStorageType_>& b)
+        virtual void to_buffer(BufferedData<OuterStorageType_>& b) override
         {
           IndexType_ head(0);
 
@@ -214,7 +214,7 @@ namespace FEAST
           }
         }
 
-        virtual void from_buffer(const BufferedData<OuterStorageType_>& b)
+        virtual void from_buffer(const BufferedData<OuterStorageType_>& b) override
         {
           _topology.clear();
 
@@ -232,10 +232,10 @@ namespace FEAST
         }
 
         ///implementation of Communicateable interface
-        void send_recv(BufferedData<OuterStorageType_>& sendbuffers,
+        virtual void send_recv(BufferedData<OuterStorageType_>& sendbuffers,
                        Index destrank,
                        BufferedData<OuterStorageType_>& recvbuffers,
-                       Index sourcerank)
+                       Index sourcerank) override
         {
           //get sizes
           Status s1;

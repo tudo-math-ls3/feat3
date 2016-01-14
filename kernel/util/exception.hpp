@@ -84,7 +84,7 @@ namespace FEAST
     bool empty() const;
 
     /// return descriptive exception name
-    const char * what() const throw();
+    virtual const char * what() const throw() override;
   };
 
 

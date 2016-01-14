@@ -27,7 +27,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // create root mesh node
     RootMeshNodeType* root_mesh_node = nullptr;

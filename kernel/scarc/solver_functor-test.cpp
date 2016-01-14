@@ -21,7 +21,7 @@ class SolverFunctorTest:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       DenseVector<Tag_, DataType_> y(1000, DataType_(0)), r(1000, DataType_(1));
       DenseVector<Tag_, DataType_> dummy;

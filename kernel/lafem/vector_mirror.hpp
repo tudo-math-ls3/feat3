@@ -295,6 +295,9 @@ namespace FEAST
         const Index num_cols(_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
+#ifndef DEBUG
+        (void)num_cols;
+#endif
 
         // loop over all scatter-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -351,6 +354,9 @@ namespace FEAST
         const Index num_cols(_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
+#ifndef DEBUG
+        (void)num_cols;
+#endif
 
         // loop over all scatter-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)

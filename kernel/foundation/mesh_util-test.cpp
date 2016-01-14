@@ -21,7 +21,7 @@ class MeshUtilTest2D:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /*(0,1) (1,1)
        *  *----*
@@ -225,7 +225,7 @@ class MeshUtilTest2D_triangle:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /*(0,1)
        *  *\
@@ -334,7 +334,7 @@ class MeshUtilTest2D_triangle_fine:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /*(0,1)
        *  *\
@@ -510,7 +510,7 @@ class MeshUtilTest3D:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /*(-0.5,1,1.5) (0.5,1,2)
        *  *----*
@@ -718,7 +718,7 @@ class MeshUtilTest3D_hexa:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /*
        * (0,1,1)  (1,1,1)
@@ -1008,7 +1008,7 @@ class MeshUtilTest3D_tetra:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /*
        * (0,1,1)  (1,1,1)

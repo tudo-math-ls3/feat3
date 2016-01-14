@@ -26,7 +26,7 @@ class HaloControlTest1D:
     {
     }
 
-    void run() const
+    void run() const override
     {
       /* (0)  (1)
        *  *----*
@@ -142,7 +142,7 @@ class HaloControlTest2D:
     {
     }
 
-    void run() const
+    void run() const override
     {
       /*(0,1) (1,1)
        *  *----*
@@ -325,7 +325,7 @@ class HaloControlTest3D:
     {
     }
 
-    void run() const
+    void run() const override
     {
       /*
        * (0,1,1)  (1,1,1)

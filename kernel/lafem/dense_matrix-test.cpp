@@ -35,7 +35,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DenseMatrix<Mem_, DT_, IT_> zero1;
     DenseMatrix<Mem::Main, DT_, IT_> zero2;
@@ -94,7 +94,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e3 ; size*=2)

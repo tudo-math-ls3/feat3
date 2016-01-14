@@ -66,7 +66,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(solver.get_num_iter(), ref_iters, 2);
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const Index m = 17;
     const Index d = 2;
@@ -201,7 +201,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(solver.get_num_iter(), ref_iters, 2);
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const Index m = 17;
     const Index d = 2;
@@ -350,7 +350,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(solver.get_num_iter(), ref_iters, 2);
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // create band matrix from pointstar structure fe
     std::vector<IndexType> num_of_nodes;

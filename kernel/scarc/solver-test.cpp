@@ -26,7 +26,7 @@ class SolverTest:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
 
       SparseMatrixCOO<Mem::Main, DataType_> fcoo(10, 10);

@@ -30,7 +30,7 @@ public:
   using BaseClass::fy01;
   using BaseClass::fy1;
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.6));
 
@@ -109,7 +109,7 @@ public:
   using BaseClass::fz01;
   using BaseClass::fz1;
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.6));
 

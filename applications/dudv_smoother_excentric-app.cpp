@@ -410,12 +410,10 @@ int main(int argc, char* argv[])
 
   // This is the raw mesh data my_streamer read from filename
   auto& mesh_data = my_streamer.get_root_mesh_node()->mesh_data;
-  // Marker int for the MeshType
-  int mesh_type = mesh_data.mesh_type;
   // Marker int for the ShapeType
   int shape_type = mesh_data.shape_type;
 
-  ASSERT(mesh_type == mesh_data.mt_conformal, "This application only works for conformal meshes!");
+  ASSERT(mesh_data.mesh_type == mesh_data.mt_conformal, "This application only works for conformal meshes!");
 
   typedef Mem::Main MemType;
   typedef double DataType;

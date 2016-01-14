@@ -47,7 +47,7 @@ public:
     TEST_CHECK_EQUAL(bcsr_1x1.create_vector_r().name(), "DenseVector");
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     test_vector_types();
 
@@ -156,7 +156,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DenseVector<Mem_, DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
@@ -287,7 +287,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DenseVector<Mem_, DT_, IT_> dv1(18);
     for (Index i(0) ; i < dv1.size() ; ++i)
@@ -420,7 +420,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DenseVector<Mem_, DT_, IT_> dv1(18);
     for (Index i(0) ; i < dv1.size() ; ++i)
@@ -474,7 +474,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DenseVector<Mem_, DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
@@ -544,7 +544,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DenseVector<Mem_, DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
@@ -604,7 +604,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DenseVector<Mem_, DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)

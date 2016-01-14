@@ -28,7 +28,7 @@ public:
   }
 
   // run the tests
-  virtual void run() const
+  virtual void run() const override
   {
     hexa_index_tree_test();
     tetra_index_tree_test();
@@ -289,7 +289,7 @@ class IndexCalculatorVertexTest
       }
 
     // run the tests
-    virtual void run() const
+    virtual void run() const override
     {
       typedef ConformalMesh<ShapeType> MeshType;
 

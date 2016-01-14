@@ -19,7 +19,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DataType_ tol(Math::pow(Math::eps<DataType_>(), DataType_(0.7)));
 
@@ -104,7 +104,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DataType_ tol(Math::pow(Math::eps<DataType_>(), DataType_(0.8)));
 

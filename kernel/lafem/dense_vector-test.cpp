@@ -38,7 +38,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DenseVector<Mem_, DT_, IT_> zero1;
     DenseVector<Mem::Main, DT_, IT_> zero2;
@@ -213,7 +213,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e3 ; size*=2)
@@ -280,7 +280,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
@@ -351,7 +351,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
@@ -472,7 +472,7 @@ public:
     }
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     run1();
   }
@@ -506,7 +506,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
@@ -563,7 +563,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
@@ -619,7 +619,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     const DT_ alpha(Math::pi<DT_>());

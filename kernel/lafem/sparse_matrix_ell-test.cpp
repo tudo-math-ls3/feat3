@@ -39,7 +39,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     SparseMatrixELL<Mem_, DT_, IT_> zero1;
     SparseMatrixELL<Mem::Main, DT_, IT_> zero2;
@@ -169,7 +169,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e3 ; size*=2)
@@ -278,7 +278,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(2) ; size < 3e2 ; size*=2)
     {
@@ -346,7 +346,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(2) ; size < 2e2 ; size*=3)
     {
@@ -453,7 +453,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(2) ; size < 3e2 ; size*=4)
     {
@@ -520,7 +520,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(2) ; size < 3e2 ; size*=2)
     {
@@ -581,7 +581,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(2) ; size < 3e2 ; size*=2)
     {
@@ -678,7 +678,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(2) ; size < 3e2 ; size*=2)
     {

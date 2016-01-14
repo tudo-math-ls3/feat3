@@ -37,7 +37,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // test assembly on 1D unit interval
     asm_unit_interval();

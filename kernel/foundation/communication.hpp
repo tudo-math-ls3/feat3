@@ -56,6 +56,7 @@ namespace FEAST
                                Index destrank,
                                BufferType_& recvdata,
                                Index sourcerank) = 0;
+        virtual ~Communicateable() {}
     };
 
     template<typename T_, Tier0CommModes c_>

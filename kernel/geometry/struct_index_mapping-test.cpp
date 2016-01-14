@@ -24,7 +24,7 @@ public:
   }
 
   // test
-  virtual void run() const
+  virtual void run() const override
   {
     // 2d mesh
     Index num_slices2d[2] =

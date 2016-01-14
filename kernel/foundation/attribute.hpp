@@ -70,7 +70,7 @@ namespace FEAST
           return _data;
         }
 
-        virtual Index size() const
+        virtual Index size() const override
         {
           return Index(_data.size());
         }
@@ -115,7 +115,7 @@ namespace FEAST
         }
 
         ///implementation of Bufferable interface
-        virtual BufferedData<StorageType_> buffer(Index estimated_size_increase = 0)
+        virtual BufferedData<StorageType_> buffer(Index estimated_size_increase = 0) override
         {
           BufferedData<StorageType_> result;
           result.get().push_back(BufferedSharedArray<Index>::create(2));
@@ -127,7 +127,7 @@ namespace FEAST
           return result;
         }
 
-        virtual void to_buffer(BufferedData<StorageType_>& b)
+        virtual void to_buffer(BufferedData<StorageType_>& b) override
         {
           for(Index i(0) ; i < (Index)(_data.size()) ; ++i)
           {
@@ -135,7 +135,7 @@ namespace FEAST
           }
         }
 
-        virtual void from_buffer(const BufferedData<StorageType_>& b)
+        virtual void from_buffer(const BufferedData<StorageType_>& b) override
         {
           _data.clear();
           for(Index i(0) ; i < (*(BufferedSharedArray<Index>*)((b.get().at(0).get())))[1] ; ++i)
@@ -145,10 +145,10 @@ namespace FEAST
         }
 
         ///implementation of Communicateable interface
-        void send_recv(BufferedData<StorageType_>& sendbuffers,
+        virtual void send_recv(BufferedData<StorageType_>& sendbuffers,
                        Index destrank,
                        BufferedData<StorageType_>& recvbuffers,
-                       Index sourcerank)
+                       Index sourcerank) override
         {
           Status s1;
           Comm::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),

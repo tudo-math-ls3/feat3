@@ -81,7 +81,7 @@ public:
     }
   } // test_0
 
-  virtual void run() const
+  virtual void run() const override
   {
     // run test #0
     test_0();

@@ -25,7 +25,7 @@ class RefinementTest1D:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /* (0)  (1)
        *  *----*

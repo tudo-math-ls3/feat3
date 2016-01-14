@@ -183,7 +183,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   {
     if(potential_comm_partners_for_face_rank.at(i) == (Index)rank)
     {
-      potential_comm_partners_for_face_rank.erase(potential_comm_partners_for_face_rank.begin() + (const TopologyStorageType::difference_type)i);
+      potential_comm_partners_for_face_rank.erase(potential_comm_partners_for_face_rank.begin() + (TopologyStorageType::difference_type)i);
       break;
     }
   }
@@ -230,7 +230,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
       {
         if(adjacent_edges_for_halo_elem.at(j) == elem)
         {
-          adjacent_edges_for_halo_elem.erase(adjacent_edges_for_halo_elem.begin() + (const TopologyStorageType::difference_type)j);
+          adjacent_edges_for_halo_elem.erase(adjacent_edges_for_halo_elem.begin() + (TopologyStorageType::difference_type)j);
           break;
         }
       }

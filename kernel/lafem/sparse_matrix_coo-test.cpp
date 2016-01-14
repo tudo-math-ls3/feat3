@@ -35,7 +35,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     SparseMatrixCOO<Mem_, DT_, IT_> zero1;
     SparseMatrixCOO<Mem::Main, DT_, IT_> zero2;
@@ -163,7 +163,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e3 ; size*=2)
@@ -267,7 +267,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(2) ; size < 3e2 ; size*=2)
     {
@@ -334,7 +334,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     Index size(123);
     //for (Index size(2) ; size < 3e2 ; size*=10)
@@ -437,7 +437,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     Index size(31);
     {
@@ -505,7 +505,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(2) ; size < 3e2 ; size*=2)
     {
@@ -605,7 +605,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(2) ; size < 3e2 ; size*=2)
     {

@@ -27,7 +27,7 @@ public:
   using BaseClass::fx01;
   using BaseClass::fx1;
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.7));
 

@@ -34,7 +34,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // create a pointstar factory
     PointstarFactoryFD<double> psf(270);

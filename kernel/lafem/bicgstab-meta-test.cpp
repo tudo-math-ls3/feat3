@@ -154,7 +154,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     SystemMatrix mat_sys;
     SystemVector vec_sol, vec_rhs;

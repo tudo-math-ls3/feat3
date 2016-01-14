@@ -59,7 +59,7 @@ public:
    * This constructs a mesh and its boundary MeshPart using the BoundaryFactory. Then some TargetSets get deleted
    * and re-computed
    */
-  virtual void run() const
+  virtual void run() const override
   {
     RefineFactory< MeshType, UnitCubeFactory> my_factory(3);
     MeshType my_mesh(my_factory);

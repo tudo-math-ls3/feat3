@@ -171,7 +171,7 @@ namespace FEAST
 
         virtual void erase_element(const index_type_ index)
         {
-          _halo_elements.erase(_halo_elements.begin() + (const typename compound_storage_type_::difference_type)index);
+          _halo_elements.erase(_halo_elements.begin() + (typename compound_storage_type_::difference_type)index);
         }
 
         virtual index_type_ size() const
@@ -234,7 +234,7 @@ namespace FEAST
         }
 
         ///implementation of Bufferable interface
-        virtual BufferedData<BufferStorageType_> buffer(index_type_ estimated_size_increase = 0)
+        virtual BufferedData<BufferStorageType_> buffer(index_type_ estimated_size_increase = 0) override
         {
           BufferedData<BufferStorageType_> result;
           result.get().push_back(BufferedSharedArray<index_type_>::create(3));
@@ -246,7 +246,7 @@ namespace FEAST
           return result;
         }
 
-        virtual void to_buffer(BufferedData<BufferStorageType_>& b)
+        virtual void to_buffer(BufferedData<BufferStorageType_>& b) override
         {
           for(index_type_ i(0) ; i < _halo_elements.size() ; ++i)
           {
@@ -254,7 +254,7 @@ namespace FEAST
           }
         }
 
-        virtual void from_buffer(const BufferedData<BufferStorageType_>& b)
+        virtual void from_buffer(const BufferedData<BufferStorageType_>& b) override
         {
           _halo_elements.clear();
 
@@ -268,7 +268,7 @@ namespace FEAST
         virtual void send_recv(BufferedData<BufferStorageType_>& sendbuffers,
                        typename MeshType_::index_type_ destrank,
                        BufferedData<BufferStorageType_>& recvbuffers,
-                       typename MeshType_::index_type_ sourcerank)
+                       typename MeshType_::index_type_ sourcerank) override
         {
           Status s1;
           Comm::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(0).get())->get(),
@@ -383,12 +383,12 @@ namespace FEAST
         {
         }
 
-        virtual unsigned get_overlap() const
+        virtual unsigned get_overlap() const override
         {
           return _overlap;
         }
 
-        virtual PolytopeLevels get_level() const
+        virtual PolytopeLevels get_level() const override
         {
           return _level;
         }

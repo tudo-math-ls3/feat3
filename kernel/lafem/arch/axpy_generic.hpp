@@ -65,9 +65,9 @@ namespace FEAST
                                                 const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
       {
         Tiny::Vector<DT_, BlockHeight_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockHeight_> *>(r));
-        const Tiny::Vector<DT_, BlockHeight_> * const by(reinterpret_cast<const Tiny::Vector<DT_, BlockHeight_> * const>(y));
-        const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const bval(reinterpret_cast<const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const>(val));
-        const Tiny::Vector<DT_, BlockWidth_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, BlockWidth_> * const>(x));
+        const Tiny::Vector<DT_, BlockHeight_> * const by(reinterpret_cast<const Tiny::Vector<DT_, BlockHeight_> *>(y));
+        const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const bval(reinterpret_cast<const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> *>(val));
+        const Tiny::Vector<DT_, BlockWidth_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, BlockWidth_> *>(x));
 
         for (Index row(0) ; row < rows ; ++row)
         {
@@ -105,7 +105,7 @@ namespace FEAST
                           const IT_ * const cl, const Index /*C*/, const Index rows)
             {
               DT_ tmp[C_];
-              const DT_ * const ctmp(static_cast<const DT_ * const>(tmp));
+              const DT_ * const ctmp(static_cast<DT_ *>(tmp));
 
               for (Index i(0) ; i < rows/C_ ; ++i)
               {

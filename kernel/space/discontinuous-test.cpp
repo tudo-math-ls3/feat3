@@ -54,7 +54,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // test assembly on unit quad
     asm_unit_quad_q0();

@@ -20,7 +20,7 @@ class PDataTest:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       PData<
         Dim1D,

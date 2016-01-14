@@ -22,7 +22,7 @@ class TopologyTest:
     {
     }
 
-    void run() const
+    void run() const override
     {
       Foundation::Topology<> t;
 

@@ -43,17 +43,17 @@ namespace FEAST
       static constexpr int shape_dim = ShapeType::dimension;
 
     public:
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         return Index(Intern::DynamicNumFaces<Shape_>::value(dim));
       }
 
-      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
       {
         Intern::RefCellVertexer<ShapeType>::fill(vertex_set);
       }
 
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
       {
         Intern::MacroIndexWrapper<Shape_>::build(index_set_holder);
       }

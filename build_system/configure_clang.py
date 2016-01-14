@@ -13,20 +13,22 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
     print ("Error: Clang Compiler version less then 3.3 is not supported, please update your compiler!")
     sys.exit(1)
 
-  cxxflags = "-pipe  -std=c++11 -ggdb -fcolor-diagnostics -m64"
+  cxxflags = "-pipe  -std=c++11 -ggdb -fcolor-diagnostics -m64 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene -Wpedantic"
+
+  if major == 3 and minor > 6:
+    cxxflags += " -Wrange-loop-analysis -Wobjc-circular-container"
+
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
 
   if "ccache" in buildid:
     cxxflags += " -Qunused-arguments"
   if "debug" in buildid:
-    cxxflags += " -O0 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -fdiagnostics-show-template-tree -fdiagnostics-show-category=name -fno-omit-frame-pointer -fno-optimize-sibling-calls -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene"
+    cxxflags += " -O0  -fdiagnostics-show-template-tree -fdiagnostics-show-category=name -fno-omit-frame-pointer -fno-optimize-sibling-calls"
     if platform.system() != "Darwin":
       cxxflags += " -fsanitize=undefined" # darwin clang does not like sanitize=undefined
     #if "mpi" not in buildid and "cuda" not in buildid and "valgrind" not in buildid and "xcode" not in buildid:
       #cxxflags += " -fsanitize=address" # -fsanitize=memory" -fsanitize=address-full
-    if major == 3 and minor > 6:
-      cxxflags += " -Wrange-loop-analysis -Wobjc-circular-container"
 
   elif "opt" in buildid or "fast" in buildid:
     if "opt" in buildid:

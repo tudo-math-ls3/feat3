@@ -46,7 +46,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
 
     SparseMatrixCOO<Mem_, DT_, IT_> a(121, 121);
@@ -130,7 +130,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
 
     SparseMatrixCOO<Mem::Main, DT_, IT_> a(121, 121);
@@ -240,7 +240,7 @@ public:
   typedef typename MT_::DataType DT_;
   typedef typename MT_::IndexType IT_;
 
-  virtual void run() const
+  virtual void run() const override
   {
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);

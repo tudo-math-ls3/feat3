@@ -87,13 +87,13 @@ namespace FEAST
           _num_entities[d] = _mesh_data->num_entities[d];
       }
 
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         ASSERT( (dim >= 0) && (dim <= Shape_::dimension), "No num_entities for dimension!");
         return _num_entities[dim];
       }
 
-      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
       {
 
         const Index num_vertices(Index(_mesh_data->coords.size()));
@@ -113,7 +113,7 @@ namespace FEAST
         }
       }
 
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
       {
         // call wrapper
         Intern::MeshStreamerIndexer<Shape_>::wrap(index_set_holder, _mesh_data->adjacencies);

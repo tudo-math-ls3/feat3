@@ -25,7 +25,7 @@ class AuraTest:
     {
     }
 
-    void run() const
+    void run() const override
     {
       /*(0,1) (1,1)
        *  *----*

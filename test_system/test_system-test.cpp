@@ -49,7 +49,7 @@ public:
   }
 
   /// runs the tests
-  virtual void run() const
+  virtual void run() const override
   {
     TEST_CHECK(true);
     TEST_CHECK_EQUAL(1,1);
@@ -89,7 +89,7 @@ public:
   }
 
   /// runs the tests
-  virtual void run() const
+  virtual void run() const override
   {
     TEST_CHECK(true);
     TEST_CHECK_EQUAL(1,1);
@@ -130,7 +130,7 @@ public:
   }
 
   /// runs the tests
-  virtual void run() const
+  virtual void run() const override
   {
     TEST_CHECK(true);
     TEST_CHECK_EQUAL(1,1);

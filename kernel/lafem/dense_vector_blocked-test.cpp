@@ -39,7 +39,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DenseVectorBlocked<Mem_, DT_, IT_, 2> zero1;
     DenseVectorBlocked<Mem::Main, DT_, IT_, 2> zero2;
@@ -162,7 +162,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e3 ; size*=2)
@@ -232,7 +232,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
@@ -293,7 +293,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
@@ -415,7 +415,7 @@ public:
     }
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     run1();
   }
@@ -441,7 +441,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
@@ -494,7 +494,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 

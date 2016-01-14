@@ -284,7 +284,7 @@ public:
     return true;
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // create an adjacency graph
     //       0  1  2  3  4  5  6  7  8  9 10 11   degree

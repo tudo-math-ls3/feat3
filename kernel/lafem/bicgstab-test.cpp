@@ -214,7 +214,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     PSF_ factory(13);
     MT_ sys;
@@ -976,7 +976,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     std::vector<IT_> num_of_subintervalls;
     num_of_subintervalls.push_back(2);
@@ -1054,7 +1054,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     Index size(1000);
     VectorType x(size);

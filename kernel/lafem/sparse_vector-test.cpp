@@ -33,7 +33,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     SparseVector<Mem_, DT_, IT_> zero1;
     SparseVector<Mem::Main, DT_, IT_> zero2;

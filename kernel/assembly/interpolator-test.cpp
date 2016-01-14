@@ -40,7 +40,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     test_unit_2d();
   }

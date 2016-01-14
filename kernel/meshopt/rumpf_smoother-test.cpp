@@ -60,7 +60,7 @@ class RumpfSmootherTest_2d
       {
       }
 
-    virtual void run() const
+    virtual void run() const override
     {
       // Mesh
       Geometry::ReferenceCellFactory<ShapeType, DataType> mesh_factory;

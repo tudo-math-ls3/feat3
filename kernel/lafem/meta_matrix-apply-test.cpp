@@ -30,7 +30,7 @@ public:
 
   MetaMatrixApplyTest() : BaseClass("MetaMatrixApplyTest") {}
 
-  virtual void run() const
+  virtual void run() const override
   {
     test_diag();
     test_full();

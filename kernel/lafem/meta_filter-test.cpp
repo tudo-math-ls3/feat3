@@ -116,7 +116,7 @@ public:
     return MetaVector(std::move(vec), std::move(tvz));
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
 

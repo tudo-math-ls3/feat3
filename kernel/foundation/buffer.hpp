@@ -40,7 +40,7 @@ namespace FEAST
           return _data[i];
         }
 
-        Index size() const
+        virtual Index size() const override
         {
           return _size;
         }
@@ -98,6 +98,7 @@ namespace FEAST
       virtual void to_buffer(T_& buffer) = 0;
       ///must implement how data is transfered from buffers
       virtual void from_buffer(const T_& buffer) = 0;
+      virtual ~Bufferable() {}
     };
 
     template<template<typename, typename> class ST_ = std::vector>

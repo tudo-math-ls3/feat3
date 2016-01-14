@@ -50,7 +50,7 @@ class NLCGTest:
     {
     }
 
-    void run() const
+    void run() const override
     {
       // The analytic function
       Function_ my_function;
@@ -173,7 +173,7 @@ class ALGLIBMinCGTest:
     {
     }
 
-    void run() const
+    void run() const override
     {
       // The analytic function
       Function_ my_function;

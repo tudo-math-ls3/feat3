@@ -35,6 +35,8 @@ namespace FEAST
         ASSERT(d >= Index(1), "You need at least 1 dimension");
       }
 
+      virtual ~PointstarFactoryBase() {}
+
     public:
       /**
        * \brief Computes the pointstar matrix in CSR format.
@@ -175,6 +177,8 @@ namespace FEAST
         PointstarFactoryBase<DataType_, IndexType_>(m, d)
       {
       }
+
+      virtual ~PointstarFactoryFD() {}
 
       /**
        * \brief Generates a FD-style pointstar CSR matrix
@@ -428,6 +432,8 @@ namespace FEAST
         PointstarFactoryBase<DataType_, IndexType_>(m, Index(2))
       {
       }
+
+      virtual ~PointstarFactoryFE() {}
 
       /**
        * \brief Generates a FE-style pointstar CSR matrix
@@ -704,6 +710,8 @@ namespace FEAST
         }
       }
 
+      virtual ~PointstarFactoryBase2() {}
+
     public:
       /**
        * \brief Computes the pointstar matrix in banded format.
@@ -791,6 +799,8 @@ namespace FEAST
         PointstarFactoryBase2<DataType_, IndexType_>(num_of_subintervalls, dimensions)
       {
       }
+
+      virtual ~PointstarFactoryFD2() {}
 
       /**
        * \brief Generates a FD-style pointstar banded matrix

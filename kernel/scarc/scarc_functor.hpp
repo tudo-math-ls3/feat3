@@ -419,17 +419,17 @@ namespace FEAST
     {
       public:
 
-        virtual void execute()
+        virtual void execute() override
         {
         }
 
-        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_&)
+        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_&) override
         {
           store_to.convert(apply_to);
         }
 
         ///returns a string that describes the functor
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "NULL\n    ";
         }
@@ -524,7 +524,7 @@ namespace FEAST
     {
       public:
 
-        virtual void execute()
+        virtual void execute() override
         {
           ///TODO add omega to PreconData interface
 
@@ -587,7 +587,7 @@ namespace FEAST
 
         }
 
-        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
+        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs) override
         {
           ///TODO add omega to PreconData interface
 
@@ -651,7 +651,7 @@ namespace FEAST
         }
 
         ///returns a string that describes the functor
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "Richardson0\n    ";
         }
@@ -773,18 +773,18 @@ namespace FEAST
     {
       public:
 
-        virtual void execute()
+        virtual void execute() override
         {
           this->_data->precon().apply(this->_data->sol(), this->_data->sol());
         }
 
-        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_&)
+        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_&) override
         {
           this->_data->precon().apply(store_to, apply_to);
         }
 
         ///returns a string that describes the functor
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "PreconSpM1V1\n    ";
         }
@@ -896,7 +896,7 @@ namespace FEAST
     {
       public:
 
-        virtual void execute()
+        virtual void execute() override
         {
           ///TODO add omega to PreconData interface
 
@@ -936,7 +936,7 @@ namespace FEAST
 
         }
 
-        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
+        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs) override
         {
           ///TODO add omega to PreconData interface
 
@@ -981,7 +981,7 @@ namespace FEAST
         }
 
         ///returns a string that describes the functor
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "Richardson1\n    ";
         }
@@ -1103,7 +1103,7 @@ namespace FEAST
     {
       public:
 
-        virtual void execute()
+        virtual void execute() override
         {
           //global defect
           Foundation::GlobalDefect<MemTag_>::exec(this->_data->def(),
@@ -1137,7 +1137,7 @@ namespace FEAST
 
         }
 
-        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
+        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs) override
         {
           Foundation::GlobalDefect<MemTag_>::exec(_temp0,
                                              apply_rhs,
@@ -1171,7 +1171,7 @@ namespace FEAST
         }
 
         ///returns a string that describes the functor
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "PreconBlock\n    ";
         }
@@ -1297,7 +1297,7 @@ namespace FEAST
     {
       public:
 
-        virtual void execute()
+        virtual void execute() override
         {
           Foundation::GlobalDefect<MemTag_>::exec(_r,
                                              this->_data->rhs(),
@@ -1403,7 +1403,7 @@ namespace FEAST
           }
         }
 
-        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
+        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs) override
         {
           Foundation::GlobalDefect<MemTag_>::exec(_r,
                                              apply_rhs,
@@ -1510,7 +1510,7 @@ namespace FEAST
         }
 
         ///returns a string that describes the functor
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "PCG0\n    ";
         }
@@ -1654,7 +1654,7 @@ namespace FEAST
     {
       public:
 
-        virtual void execute()
+        virtual void execute() override
         {
           this->_data->localsys().apply(_r, this->_data->sol(), this->_data->rhs(), -DataType_(1));
 
@@ -1715,7 +1715,7 @@ namespace FEAST
           }
         }
 
-        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs)
+        virtual void apply(VectorType_& store_to, VectorType_& apply_to, VectorType_& apply_rhs) override
         {
           this->_data->localsys().apply(_r, apply_to, apply_rhs, -DataType_(1));
 
@@ -1778,7 +1778,7 @@ namespace FEAST
         }
 
         ///returns a string that describes the functor
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "PCG1\n    ";
         }

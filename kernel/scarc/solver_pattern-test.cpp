@@ -23,7 +23,7 @@ class SolverPatternTest:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       DenseVector<Tag_, DataType_> x(100, DataType_(1)), b(100, DataType_(1));
       SparseMatrixCOO<Mem::Main, DataType_> T(100, 100);

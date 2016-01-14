@@ -21,7 +21,7 @@ class ScaRCDataTest:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       DenseVector<Tag_, DataType_> x(1000, DataType_(1)), b(1000, DataType_(1));
       SparseMatrixCOO<Mem::Main, DataType_> T(1000, 1000);

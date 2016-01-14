@@ -19,7 +19,7 @@ class BufferTest:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       std::vector<std::shared_ptr<Foundation::SharedArrayBase > > buffers;
       buffers.push_back(Foundation::BufferedSharedArray<DataType_>::create(20));

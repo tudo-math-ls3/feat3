@@ -41,7 +41,7 @@ public:
 
   typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
 
-  virtual void run() const
+  virtual void run() const override
   {
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
@@ -178,7 +178,7 @@ public:
 
   typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
 
-  virtual void run() const
+  virtual void run() const override
   {
     DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.5)));
 
@@ -315,7 +315,7 @@ public:
 
   typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
 
-  virtual void run() const
+  virtual void run() const override
   {
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);

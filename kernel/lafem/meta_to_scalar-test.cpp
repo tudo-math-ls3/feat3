@@ -46,7 +46,7 @@ public:
   MetaToScalarTest()
     : BaseClass("meta_to_scalar_test: " + MT_::name()) {}
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
 
@@ -194,7 +194,7 @@ public:
   MetaBCSRToScalarTest()
     : FEAST::TestSystem::FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>("meta_block_csr_to_scalar_test: " + MT_::name()) {}
 
-  virtual void run() const
+  virtual void run() const override
   {
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
@@ -331,7 +331,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
 

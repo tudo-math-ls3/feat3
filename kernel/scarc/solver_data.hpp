@@ -257,7 +257,7 @@ namespace FEAST
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::index_storage_type_ index_storage_type_;
 
       ///fulfill pure virtual
-      virtual const std::string type_name()
+      virtual const std::string type_name() override
       {
         return "SolverData";
       }
@@ -919,7 +919,7 @@ namespace FEAST
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_storage_type_ vector_storage_type_;
 
       ///fulfill pure virtual
-      virtual const std::string type_name()
+      virtual const std::string type_name() override
       {
         return "SynchronisedPreconditionedFilteredSolverData";
       }

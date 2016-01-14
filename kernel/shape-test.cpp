@@ -28,7 +28,7 @@ public:
     return ret;
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // test simplex vertex counts
 

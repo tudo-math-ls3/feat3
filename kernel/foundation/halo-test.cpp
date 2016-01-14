@@ -26,7 +26,7 @@ class HaloTest:
     {
     }
 
-    void run() const
+    void run() const override
     {
 
       //##################################################################
@@ -138,7 +138,7 @@ class HaloTestGeometryInterface:
     {
     }
 
-    void run() const
+    void run() const override
     {
       /*(0,1) (1,1)
        *  *----*

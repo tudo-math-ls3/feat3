@@ -93,7 +93,7 @@ public:
     return is_id(wp) && is_id(ws);
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // create an rng
     Random rng;

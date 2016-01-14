@@ -46,7 +46,7 @@ class StandardTrafoTest
     {
     }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // test assembly on unit quad
     test_unit_quad();
@@ -649,7 +649,7 @@ class InverseMappingTest
       {
       }
 
-    virtual void run() const
+    virtual void run() const override
     {
       run_1d();
       run_2d();
@@ -1018,7 +1018,7 @@ class StandardTrafoVolumeTest
       {
       }
 
-    virtual void run() const
+    virtual void run() const override
     {
       test_1d_quad();
       test_1d_simplex();

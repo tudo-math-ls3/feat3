@@ -68,7 +68,7 @@ public:
     return SparseMatrixCSR<Mem::Main, DataType, IndexType>(m, m*m, col_idx, data, row_ptr);
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
 

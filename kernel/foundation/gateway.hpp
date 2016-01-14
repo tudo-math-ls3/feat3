@@ -21,9 +21,9 @@ namespace FEAST
         {
         }
 
-        virtual typename VectorT_::DataType value(const VectorT_& x, const VectorT_& y) const
+        virtual typename VectorT_::DataType value(const VectorT_& x, const VectorT_& y) const override
         {
-          typename VectorT_::DataType r;
+          typename VectorT_::DataType r = 0;
           GlobalDot<Mem_>::value(r,
                                         x,
                                         y,
@@ -44,9 +44,9 @@ namespace FEAST
         {
         }
 
-        virtual typename VectorT_::DataType value(const VectorT_& x) const
+        virtual typename VectorT_::DataType value(const VectorT_& x) const override
         {
-          typename VectorT_::DataType r;
+          typename VectorT_::DataType r = 0;
           GlobalNorm2<Mem_>::value(r,
                                           x,
                                           _frequencies);
@@ -66,9 +66,9 @@ namespace FEAST
         {
         }
 
-        virtual typename VectorT_::DataType value(const VectorT_& x) const
+        virtual typename VectorT_::DataType value(const VectorT_& x) const override
         {
-          typename VectorT_::DataType r;
+          typename VectorT_::DataType r = 0;
           GlobalNorm2Squared<Mem_>::value(r,
                                                  x,
                                                  _frequencies);
@@ -120,7 +120,7 @@ namespace FEAST
         }
 #endif
 
-        virtual VectorT_& value(VectorT_& x) const
+        virtual VectorT_& value(VectorT_& x) const override
         {
           GlobalSynchVec0<Mem_>::exec(
                                               x,
@@ -187,7 +187,7 @@ namespace FEAST
         }
 #endif
 
-        virtual VectorT_& value(VectorT_& x) const
+        virtual VectorT_& value(VectorT_& x) const override
         {
           GlobalSynchVec1<Mem_>::exec(
                                               x,
@@ -255,7 +255,7 @@ namespace FEAST
         }
 #endif
 
-        virtual VectorT_& value(VectorT_& r, const MatrixT_& A, const VectorT_& x)
+        virtual VectorT_& value(VectorT_& r, const MatrixT_& A, const VectorT_& x) override
         {
           GlobalProductMat0Vec1<Mem_>::exec(
                                                    r,

@@ -45,7 +45,7 @@ class LinearVariationalSmootherTest
      * with the original boundary coordinates as Dirichlet boundary conditions should reproduce the original mesh
      * for the LaplaceSmoother and for the DuDvSmoother
      */
-    virtual void run() const
+    virtual void run() const override
     {
       Geometry::RefineFactory<MeshType, Geometry::UnitCubeFactory> mesh_factory(level);
       MeshType* mesh(new MeshType(mesh_factory));

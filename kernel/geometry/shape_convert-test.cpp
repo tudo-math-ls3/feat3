@@ -31,7 +31,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // test quad->tria conversion
     unit_quad_to_tria();

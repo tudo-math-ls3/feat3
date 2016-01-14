@@ -27,7 +27,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     PSF_ factory(13);
     SM_ sys;

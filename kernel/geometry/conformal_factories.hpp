@@ -81,7 +81,7 @@ namespace FEAST
         {
         }
 
-        virtual Index get_num_entities(int dim)
+        virtual Index get_num_entities(int dim) override
         {
           switch(dim)
           {
@@ -96,7 +96,7 @@ namespace FEAST
           }
         }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        virtual void fill_vertex_set(VertexSetType& vertex_set) override
         {
           for(Index i(0); i < 4u; ++i)
           {
@@ -107,7 +107,7 @@ namespace FEAST
           }
         }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           _fill_sub_index_set<1,0>(index_set_holder);
           _fill_cell_index_set<0>(index_set_holder);
@@ -243,7 +243,7 @@ namespace FEAST
           typedef MeshType::TargetSetHolderType TargetSetHolderType;
 
         public:
-          virtual Index get_num_entities(int dim)
+          virtual Index get_num_entities(int dim) override
           {
             switch(dim)
             {
@@ -256,7 +256,7 @@ namespace FEAST
             }
           }
 
-          virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+          virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
           {
             // set vertex indices
             TargetSet& vi(target_set_holder.get_target_set<0>());
@@ -422,17 +422,17 @@ namespace FEAST
           }
         }
 
-        virtual Index get_num_entities(int dim)
+        virtual Index get_num_entities(int dim) override
         {
           return _factory->get_num_entities(dim);
         }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        virtual void fill_vertex_set(VertexSetType& vertex_set) override
         {
           _factory->fill_vertex_set(vertex_set);
         }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           _factory->fill_index_sets(index_set_holder);
         }
@@ -760,7 +760,7 @@ namespace FEAST
         /**
          * \copydoc Factory::get_num_entities(int)
          */
-        virtual Index get_num_entities(int dimension)
+        virtual Index get_num_entities(int dimension) override
         {
           switch(dimension)
           {
@@ -773,7 +773,7 @@ namespace FEAST
           }
         }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        virtual void fill_vertex_set(VertexSetType& vertex_set) override
         {
           Index i(0);
           const auto& jt(_points.end());
@@ -784,7 +784,7 @@ namespace FEAST
           }
         }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           IndexSet<2>& v_e(index_set_holder.template get_index_set<1,0>());
           for(Index i(0); i < get_num_entities(1); ++i)

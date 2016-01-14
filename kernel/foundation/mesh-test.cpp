@@ -25,7 +25,7 @@ public:
   {
   }
 
-  void run() const
+  void run() const override
   {
     TEST_CHECK_MSG(test(), "Test Failed");
   }
@@ -550,7 +550,7 @@ class MeshTestGeometryInterface:
     {
     }
 
-    void run() const
+    void run() const override
     {
       TEST_CHECK_MSG(test(), "Test Failed");
     }

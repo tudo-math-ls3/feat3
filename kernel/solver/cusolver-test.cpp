@@ -14,7 +14,7 @@ class CuSolverLUTest :
 public:
   CuSolverLUTest() : TestSystem::TaggedTest<Mem::CUDA, double>("CuSolverQRTest") {}
 
-  virtual void run() const
+  virtual void run() const override
   {
     typedef SparseMatrixCSR<Mem::Main, double, unsigned int> MatrixType;
     typedef DenseVector<Mem::Main, double, unsigned int> VectorType;
@@ -63,7 +63,7 @@ class CuSolverQRTest :
 public:
   CuSolverQRTest() : TestSystem::TaggedTest<Mem::CUDA, double>("CuSolverLUTest") {}
 
-  virtual void run() const
+  virtual void run() const override
   {
     typedef SparseMatrixCSR<Mem::CUDA, double, unsigned int> MatrixType;
     typedef DenseVector<Mem::CUDA, double, unsigned int> VectorType;

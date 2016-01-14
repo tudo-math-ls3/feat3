@@ -120,7 +120,7 @@ class ScaRCFunctorTest:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       int rank(0), nprocs(1);
       ///setup geometric problem data: mesh, its attributes and boundaries

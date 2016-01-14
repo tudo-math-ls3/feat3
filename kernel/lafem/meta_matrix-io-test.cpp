@@ -30,7 +30,7 @@ public:
 
   MetaMatrixIOTest() : BaseClass("MetaMatrixIOTest") {}
 
-  virtual void run() const
+  virtual void run() const override
   {
     // String directory("meta_matrix-io-test.directory/");
     String directory ("./");

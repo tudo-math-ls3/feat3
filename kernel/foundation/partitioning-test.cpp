@@ -21,7 +21,7 @@ class PartitioningTest1D:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /* (0)  (1)
        *  *----*
@@ -125,7 +125,7 @@ class PartitioningTest2D:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /*(0,1) (1,1)
        *  *----*
@@ -362,7 +362,7 @@ class PartitioningTest3D:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /*
        * (0,1,1)  (1,1,1)
@@ -815,7 +815,7 @@ class PartitioningTest2DHaloOrdering:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       /*(0,1) (1,1)
        *  *----*

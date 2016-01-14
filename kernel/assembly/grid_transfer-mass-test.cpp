@@ -42,7 +42,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // create coarse mesh
     Geometry::RefinedUnitCubeFactory<MeshType> coarse_factory(level_coarse_);

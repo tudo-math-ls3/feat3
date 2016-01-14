@@ -42,7 +42,7 @@ class MeshControlTest1D:
     {
     }
 
-    void run() const
+    void run() const override
     {
       /* (0)  (1)
        *  *----*
@@ -120,7 +120,7 @@ class MeshControlTest2D:
     {
     }
 
-    void run() const
+    void run() const override
     {
 
       /*(0,1) (1,1)
@@ -261,7 +261,7 @@ class MeshControlTest3D:
     {
     }
 
-    void run() const
+    void run() const override
     {
 
       /*
@@ -611,7 +611,7 @@ class MeshControlPartitioningTest2D:
     {
     }
 
-    void run() const
+    void run() const override
     {
 
       /*(0,1) (1,1)

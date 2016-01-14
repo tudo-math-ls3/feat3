@@ -475,7 +475,7 @@ namespace FEAST
        * \returns
        * The number of entities of dimension \p dim.
        */
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         return _num_entities_fine[dim];
       }
@@ -486,7 +486,7 @@ namespace FEAST
        * \param[in,out] vertex_set
        * The vertex set whose coordinates are to be filled.
        */
-      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
       {
         // refine vertices
         Intern::StandardVertexRefineWrapper<ShapeType, VertexSetType>
@@ -499,7 +499,7 @@ namespace FEAST
        * \param[in,out] index_set_holder
        * The index set holder whose index sets are to be filled.
        */
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
       {
         // refine indices
         Intern::IndexRefineWrapper<ShapeType>

@@ -19,7 +19,7 @@ class AttributeTest:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       std::vector<std::shared_ptr<Foundation::AttributeBase<ST_> > > attrs;
 

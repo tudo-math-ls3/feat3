@@ -20,7 +20,7 @@ class FunctorTest:
     {
     }
 
-    virtual void run() const
+    virtual void run() const override
     {
       //Testing with simple stl container
       std::vector<IndexType_> vector_0;

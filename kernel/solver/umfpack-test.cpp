@@ -18,7 +18,7 @@ public:
 
   UmfpackTest() : TestSystem::FullTaggedTest<Mem::Main, double, Index>("UmfpackTest") {}
 
-  virtual void run() const
+  virtual void run() const override
   {
     const double tol = Math::pow(Math::eps<double>(), 0.6);
 
@@ -73,7 +73,7 @@ public:
 
   UmfpackMeanTest() : TestSystem::FullTaggedTest<Mem::Main, double, Index>("UmfpackMeanTest") {}
 
-  virtual void run() const
+  virtual void run() const override
   {
     const double tol = Math::pow(Math::eps<double>(), 0.8);
     const double pi = Math::pi<double>();

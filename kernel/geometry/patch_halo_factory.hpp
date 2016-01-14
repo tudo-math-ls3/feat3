@@ -52,32 +52,32 @@ namespace FEAST
         Intern::PatchHaloWrapper<Shape_>::build(_ics, _patch_set.get_target_set_holder());
       }
 
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         return _halo_set.get_num_entities(dim);
       }
 
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
       {
         Intern::PatchHaloWrapper<Shape_>::map(_ics, _halo_set.get_target_set_holder(), target_set_holder);
       }
 
-      virtual void fill_attribute_sets(typename MeshType::AttributeHolderType& DOXY(attribute_holder))
+      virtual void fill_attribute_sets(typename MeshType::AttributeHolderType& DOXY(attribute_holder)) override
       {
         // do nothing as the object has no attribute sets
       }
 
-      virtual void fill_index_sets(typename MeshType::IndexSetHolderType*& DOXY(index_set_holder))
+      virtual void fill_index_sets(typename MeshType::IndexSetHolderType*& DOXY(index_set_holder)) override
       {
         // do nothing as the object has no index sets
       }
 
-      virtual String get_identifier() const
+      virtual String get_identifier() const override
       {
         return _patch_set.get_identifier()+"_"+_halo_set.get_identifier()+"_patch_halo";
       }
 
-      virtual String get_parent_identifier() const
+      virtual String get_parent_identifier() const override
       {
         return _patch_set.get_parent_identifier();
       }
