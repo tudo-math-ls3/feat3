@@ -477,7 +477,7 @@ void check_halo_transfer(Index rank)
 #else
     TestResult<Index, Index, Index> res[1];
     res[0] = test_check_equal_within_eps(h.get_element(0), rank, Index(1));
-    for(unsigned long i(0) ; i < 2 ; ++i)
+    for(unsigned long i(0) ; i < 1 ; ++i)
       if(!res[i].passed)
       {
         std::cout << "FAILED: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!(halo transfer)" << std::endl;
