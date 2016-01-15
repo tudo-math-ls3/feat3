@@ -232,7 +232,7 @@ namespace FEAST
         return *this;
       }
 
-      InsertDeepClone( SparseVector );
+      InsertDeepClone( SparseVector )
 
       /** \brief Shallow copy operation
        *

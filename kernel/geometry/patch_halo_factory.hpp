@@ -17,7 +17,7 @@ namespace FEAST
     {
       template<typename Shape_>
       struct PatchHaloWrapper;
-    };
+    }
 
     /// \endcond
 

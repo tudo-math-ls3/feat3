@@ -450,7 +450,7 @@ namespace FEAST
         return *this;
       }
 
-      InsertWeakClone( DenseVector );
+      InsertWeakClone( DenseVector )
 
       /** \brief Shallow copy operation
        *

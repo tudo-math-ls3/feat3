@@ -29,7 +29,7 @@ namespace FEAST
       typedef Vector<LocalVectorTypeR> VectorTypeR;
 
       typedef Gate<LocalVectorTypeL> GateRowType;
-      typedef Gate<LocalVectorTypeR> GateColType;;
+      typedef Gate<LocalVectorTypeR> GateColType;
 
     protected:
       GateRowType* _row_gate;

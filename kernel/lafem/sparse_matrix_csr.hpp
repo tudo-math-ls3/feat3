@@ -589,7 +589,7 @@ namespace FEAST
         return *this;
       }
 
-      InsertWeakClone( SparseMatrixCSR );
+      InsertWeakClone( SparseMatrixCSR )
 
       /** \brief Shallow copy operation
        *

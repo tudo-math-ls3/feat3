@@ -346,7 +346,7 @@ namespace FEAST
         return *this;
       }
 
-      InsertWeakClone( DenseVectorBlocked );
+      InsertWeakClone( DenseVectorBlocked )
 
       /**
        * \brief Shallow copy operation

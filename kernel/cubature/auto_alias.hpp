@@ -22,7 +22,7 @@ namespace FEAST
     {
       template<typename Shape_>
       class AutoDegree;
-    };
+    }
     /// \endcond
 
     template<typename Shape_>

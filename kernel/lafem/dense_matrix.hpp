@@ -168,7 +168,7 @@ namespace FEAST
         return *this;
       }
 
-      InsertWeakClone ( DenseMatrix );
+      InsertWeakClone ( DenseMatrix )
 
       /** \brief Shallow copy operation
        *

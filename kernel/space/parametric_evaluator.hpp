@@ -14,7 +14,7 @@ namespace FEAST
     {
       template<bool _enable>
       struct ParamBasisEvalHelper;
-    }; // namespace Intern
+    } // namespace Intern
     /// \endcond
 
     /**
@@ -265,7 +265,7 @@ namespace FEAST
           }
         }
       };
-    }; // namespace Intern
+    } // namespace Intern
     /// \endcond
   } // namespace Space
 } // namespace FEAST

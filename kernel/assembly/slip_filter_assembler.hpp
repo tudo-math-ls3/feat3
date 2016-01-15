@@ -499,7 +499,7 @@ namespace FEAST
         static void project(Vector_&, const Vector_&, const Space_&, const TSH_*)
         {
           // do nothing
-        };
+        }
       };
 
       template< typename Vector_, typename Space_, int shape_dim_>

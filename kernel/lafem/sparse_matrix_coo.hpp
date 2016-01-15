@@ -693,7 +693,7 @@ namespace FEAST
       }
 
 
-      InsertDeepClone( SparseMatrixCOO );
+      InsertDeepClone( SparseMatrixCOO )
 
       /** \brief Shallow copy operation
        *

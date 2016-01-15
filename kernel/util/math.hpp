@@ -753,7 +753,7 @@ namespace FEAST
     template<typename T_>
     inline bool isfinite(T_ x);
 
-    WRAP_STD_MATH1BRET(isfinite);
+    WRAP_STD_MATH1BRET(isfinite)
 
 #ifdef FEAST_HAVE_QUADMATH
     inline bool isfinite(__float128 x)
@@ -775,7 +775,7 @@ namespace FEAST
     template<typename T_>
     inline bool isinf(T_ x);
 
-    WRAP_STD_MATH1BRET(isinf);
+    WRAP_STD_MATH1BRET(isinf)
 
 #ifdef FEAST_HAVE_QUADMATH
     inline bool isinf(__float128 x)
@@ -797,7 +797,7 @@ namespace FEAST
     template<typename T_>
     inline bool isnan(T_ x);
 
-    WRAP_STD_MATH1BRET(isnan);
+    WRAP_STD_MATH1BRET(isnan)
 
 #ifdef FEAST_HAVE_QUADMATH
     inline bool isnan(__float128 x)
@@ -821,7 +821,7 @@ namespace FEAST
     template<typename T_>
     inline bool isnormal(T_ x);
 
-    WRAP_STD_MATH1BRET(isnormal);
+    WRAP_STD_MATH1BRET(isnormal)
 
 #ifdef FEAST_HAVE_QUADMATH
     inline bool isnormal(__float128 x)
