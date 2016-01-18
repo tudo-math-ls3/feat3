@@ -403,10 +403,11 @@ if is_found ("nvcc"):
 if is_found ("ccache"):
   addition = addition + "-ccache"
 
-#unconditionally add umfpack/alglib/fparser and delete it before the first test run to trigger package downloads
+#unconditionally add umfpack/alglib/fparser/parmetis and delete it before the first test run to trigger package downloads
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"alglib", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"fparser", True)
+shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"parmetis", True)
 
 icc_version = get_output("icpc -dM -E - ")
 icc_version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in icc_version]))
@@ -416,6 +417,7 @@ icc_minor2 = int(icc_version["__INTEL_COMPILER_UPDATE"])
 if (not nothirdparty):
   addition = addition + "-umfpack"
   addition = addition + "-fparser"
+  addition = addition + "-parmetis"
   if icc_major >= 15:
     addition = addition + "-alglib"
 
