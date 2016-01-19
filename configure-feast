@@ -361,6 +361,11 @@ if "cotire" in buildid:
   cmake_flags += " -DFEAST_COTIRE:BOOL=ON"
 
 
+#prevent parmetis without mpi enabled (needed by parmetis)
+if "mpi" not in buildid and "parmetis" in buildid:
+  print("Error: Using parmetis without mpi is not allowed!")
+  sys.exit()
+
 # optional third party libraries
 for package in available_packages(trunk_dirname+os.sep+"build_system",trunk_dirname+os.sep+"thirdparty"):
   if package.name in buildid:
