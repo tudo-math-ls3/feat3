@@ -115,13 +115,16 @@ namespace FEAST
 
         /// Tolerance for function improvement
         DataType _tol_fval;
-        /// Tolerance for the lenght of the update step
+        /// Tolerance for the length of the update step
         DataType _tol_step;
 
+        /// vec_dir <- vec_def + _beta * vec_dir
         DataType _beta;
-        /// <vec_def, vec_dir>
+        /// _eta = <vec_def, vec_dir>
         DataType _eta;
+        /// Current functional value
         DataType _fval;
+        /// Functional value from the previous iteration
         DataType _fval_prev;
 
         /// Number of subsequent steepest descent steps
@@ -169,8 +172,6 @@ namespace FEAST
           restart_freq(0),
           iterates(nullptr)
           {
-            //this->_min_stag_iter = Index(3);
-
             // If we use Fletcher-Reeves, frequent restarts are needed
             if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
               restart_freq = _op.columns() + Index(1);
@@ -287,11 +288,16 @@ namespace FEAST
 
         /**
          * \brief Sets the direction update method
+         *
+         * \param[in] update_
+         * NLCGDirectionUpdate to use.
          */
         void set_direction_update(NLCGDirectionUpdate update_)
         {
           _direction_update = update_;
           // If we use Fletcher-Reeves, frequent restarts are needed
+          if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
+            restart_freq = _op.columns() + Index(1);
           // This is to make the restarts to occur at the same iterations as ALGLIB
           if(_direction_update == NLCGDirectionUpdate::DaiYuan)
             restart_freq = _op.columns() + Index(4);
@@ -351,8 +357,6 @@ namespace FEAST
             _fval_prev = _fval;
             _beta = DataType(0);
 
-            std::cout << "NLCG: sol = " << vec_sol << " def = " << this->_vec_def << " dir = " << this->_vec_dir << " tmp " << this->_vec_tmp <<std::endl;
-
             // Copy information to the linesearch
             _linesearch.set_initial_fval(this->_fval);
             _linesearch.set_grad_from_defect(this->_vec_def);
@@ -363,9 +367,6 @@ namespace FEAST
             // Copy back information from the linesearch
             this->_fval = _linesearch.get_final_fval();
             _linesearch.get_defect_from_grad(this->_vec_def);
-
-            std::cout << "      sol = " << vec_sol << " def = " << this->_vec_def << " dir = " << this->_vec_dir <<
-              std::endl;
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -382,8 +383,6 @@ namespace FEAST
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return status;
             }
-
-            //DataType beta(DataType(0));
 
             // Compute the new beta for the search direction update. This also checks if the computed beta is valid
             // (e.g. leads to a decrease) and applies the preconditioner to the new defect vector
@@ -408,8 +407,8 @@ namespace FEAST
             // (preconditioned) steepest descent direction
             if(_beta == DataType(0))
             {
-              //its_since_restart = Index(1);
-              //its_since_restart++;
+              // Comment the line below to the the ALGLIBMinCG behaviour
+              its_since_restart = Index(1);
               _num_subs_restarts++;
 
               this->_vec_dir.clone(this->_vec_tmp);
@@ -419,15 +418,14 @@ namespace FEAST
               _num_subs_restarts = Index(0);
               this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, _beta);
             }
-            std::cout << "NLCG: beta = " << stringify_fp_sci(_beta) << " its_since_restart = " << its_since_restart <<std::endl;
 
             // Now that we know the new search direction, we can update _eta
             _eta = this->_vec_dir.dot(this->_vec_def);
 
             // Safeguard as this should not happen
+            // TODO: Correct the output of the preconditioner if it turns out to not have been positive definite
             if(_eta <= DataType(0))
             {
-              std::cout << "New direction is not a descent direction: eta = " << stringify_fp_sci(_eta) << std::endl;
               this->_vec_dir.clone(this->_vec_def);
               _eta = this->_vec_dir.dot(this->_vec_def);
               //return Status::aborted;
@@ -550,8 +548,6 @@ namespace FEAST
           // a new search direction etc. so we have to abort.
           if(_linesearch.get_rel_update() < this->_tol_step && Math::abs(_beta) < Math::eps<DataType>())
           {
-            std::cout << "NLCG update step stagnated: " << stringify_fp_sci(_linesearch.get_rel_update()) <<
-              " < " << stringify_fp_sci(this->_tol_step) << " beta = " << stringify_fp_sci(_beta) << std::endl;
             return Status::stagnated;
           }
 
@@ -605,10 +601,6 @@ namespace FEAST
 
           beta = gamma/( - eta_mid + eta_old);
 
-          std::cout << "Dai-Yuan:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
-          std::cout << "Dai-Yuan:  eta = " << stringify_fp_sci(eta_mid) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
-          std::cout << "Dai-Yuan: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
-
           return Status::progress;
         }
 
@@ -647,10 +639,6 @@ namespace FEAST
           gamma = this->_vec_def.dot(this->_vec_tmp);
 
           beta = Math::max(DataType(0), Math::min(gamma, gamma - gamma_mid)/( -eta_mid + eta_old));
-
-          std::cout << "DY-HS-Hybrid:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
-          std::cout << "DY-HS-Hybrid:  eta = " << stringify_fp_sci(_eta) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
-          std::cout << "DY-HS-Hybrid: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
 
           return Status::progress;
         }
@@ -731,10 +719,6 @@ namespace FEAST
           gamma = this->_vec_def.dot(this->_vec_tmp);
 
           beta = Math::max(DataType(0), (gamma - gamma_mid)/( -eta_mid + eta_old));
-
-          //std::cout << "Hestenes-Stiefel:  def = " << this->_vec_def << " dir = " << this->_vec_dir << std::endl;
-          //std::cout << "Hestenes-Stiefel:  eta = " << stringify_fp_sci(eta_mid) << " eta_old = " << stringify_fp_sci(eta_old) << std::endl;
-          //std::cout << "Hestenes-Stiefel: beta = " << stringify_fp_sci(beta) << " gamma   = " << stringify_fp_sci(gamma) << std::endl;
 
           return Status::progress;
         }

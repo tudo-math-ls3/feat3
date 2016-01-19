@@ -2,6 +2,10 @@
 #include <kernel/archs.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/analytic/wrappers.hpp>
+#include <kernel/assembly/analytic_projector.hpp>
+#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/reference_cell_factory.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/solver/alglib_wrapper.hpp>
@@ -9,12 +13,9 @@
 #include <kernel/solver/hessian_precond.hpp>
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
 #include <kernel/solver/test_aux/function_traits.hpp>
-#include <kernel/util/simple_arg_parser.hpp>
-#include <kernel/assembly/analytic_projector.hpp>
-#include <kernel/geometry/export_vtk.hpp>
-#include <kernel/geometry/reference_cell_factory.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/util/simple_arg_parser.hpp>
+#include <kernel/util/runtime.hpp>
 
 using namespace FEAST;
 using namespace FEAST::Solver;
@@ -180,7 +181,7 @@ int run(Solver_& solver, Operator_& op)
 
   auto& vtx = mesh->get_vertex_set();
   // Transform the mesh
-  for(Index i(0); i < mesh->get_num_entities(0); ++i)
+  for(IndexType i(0); i < mesh->get_num_entities(0); ++i)
   {
     for(int d(0); d < dim; ++d)
       vtx[i](d) = scaling(d)*vtx[i](d) + (domain_bounds(d,0) - scaling(d)*DataType(0.05));
@@ -242,18 +243,21 @@ static void display_help()
 
 int main(int argc, char* argv[])
 {
+  Runtime::initialise(argc, argv);
+
   typedef Mem::Main MemType;
   typedef double DataType;
+  typedef unsigned int IndexType;
 
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
-  typedef AnalyticFunctionOperator<MemType, DataType, Index, AnalyticFunctionType> OperatorType;
+  typedef Analytic::Common::BazaraaShettyFunction AnalyticFunctionType;
+  typedef AnalyticFunctionOperator<MemType, DataType, IndexType, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
 
-  typedef LAFEM::NoneFilterBlocked<MemType, DataType, Index, dim> FilterType;
+  typedef LAFEM::NoneFilterBlocked<MemType, DataType, IndexType, dim> FilterType;
   typedef Solver::StrongWolfeLinesearch<OperatorType, FilterType> LinesearchType;
 
   // The analytic function
@@ -265,7 +269,7 @@ int main(int argc, char* argv[])
 
   // Create the linesearch
   LinesearchType my_linesearch(my_op, my_filter);
-  my_linesearch.set_plot(true);
+  my_linesearch.set_plot(false);
 
   // Ugly way to get a preconditioner, or not
   std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
@@ -287,6 +291,8 @@ int main(int argc, char* argv[])
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
       std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
     display_help();
+
+    Runtime::abort();
     return 1;
   }
 
@@ -310,7 +316,6 @@ int main(int argc, char* argv[])
       my_precond = new_approximate_hessian_precond(my_op, my_filter);
     else if(precon_name != "none")
       throw InternalError("Got invalid precon_name: "+precon_name);
-
 
     NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::PolakRibiere);
     auto* update_pair(args.query("direction_update"));
@@ -362,7 +367,6 @@ int main(int argc, char* argv[])
 
     int ret = run(my_solver, my_op);
 
-    // Clean up
     my_solver.reset();
     Runtime::finalise();
     return ret;
@@ -370,7 +374,4 @@ int main(int argc, char* argv[])
 #endif // FEAST_HAVE_ALGLIB
   else
     throw InternalError("dbg-nlopt got invalid solver name: "+solver_name);
-
-
-
 }

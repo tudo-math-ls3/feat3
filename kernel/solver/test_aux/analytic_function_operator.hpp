@@ -162,7 +162,6 @@ namespace FEAST
         typename EvalType::ValueType compute_func()
         {
           ++num_func_evals;
-          std::cout << "func eval no " << num_func_evals << std::endl;
           typename EvalType::ValueType ret;
           _func_eval.value(ret, _my_state);
           return ret;
@@ -177,7 +176,6 @@ namespace FEAST
         void compute_grad(GradientType& vec_out)
         {
           ++num_grad_evals;
-          std::cout << "grad eval no " << num_grad_evals << std::endl;
           _func_eval.gradient(_my_grad, _my_state);
           vec_out(0, _my_grad);
         }

@@ -313,24 +313,24 @@ namespace FEAST
           switch(_report.terminationtype)
           {
             case(-8):
-              std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << std::endl;
+              //std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << std::endl;
               return Status::aborted;
             case(-7):
-              std::cout << "ALGLIB: Gradient verification failed." << std::endl;
+              //std::cout << "ALGLIB: Gradient verification failed." << std::endl;
               return Status::aborted;
             case(1):
-              std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
+              //std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
               return Status::stagnated;
             case(2):
-              std::cout << "ALGLIB: Update step size stagnated." << std::endl;
+              //std::cout << "ALGLIB: Update step size stagnated." << std::endl;
               return Status::stagnated;
             case(4):
-              std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
+              //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
               return Status::success;
             case(5):
               return Status::max_iter;
             case(7):
-              std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
+              //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
               return Status::stagnated;
             default:
               return Status::undefined;
