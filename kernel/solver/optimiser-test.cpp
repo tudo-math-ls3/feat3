@@ -61,7 +61,7 @@ class NLCGTest:
 
       // Create the linesearch
       LinesearchType my_linesearch(my_op, my_filter);
-      my_linesearch.set_plot(true);
+      my_linesearch.set_plot(false);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
@@ -77,7 +77,7 @@ class NLCGTest:
       auto solver = new_nlcg(my_op, my_filter, my_linesearch, _update, false, my_precond);
       solver->init();
       solver->set_tol_rel(Math::eps<DT_>());
-      solver->set_plot(true);
+      solver->set_plot(false);
       solver->set_max_iter(250);
       solver->set_direction_update(_update);
 
@@ -129,6 +129,10 @@ NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver:
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NewtonRaphsonLinesearch>
 opt_rb_d(float(0.8),"Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
+// Do it again with the StrongWolfeLinesearch and the approximate hessian preconditioner
+NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction, Solver::StrongWolfeLinesearch>
+opt_rb_d_sw(double(0.5),"ApproximateHessian", NLCGDirectionUpdate::DYHSHybrid);
+
 // The Hessian of the Bazaraa/Shetty function is singular at the optimal point, so Newton Raphson linesearch does not
 // work very well, so just use the secant linesearch
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
@@ -138,13 +142,19 @@ opt_bs_d(double(0.3),"none", NLCGDirectionUpdate::HestenesStiefel);
 #ifdef FEAST_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction, Solver::SecantLinesearch>
 opt_rb_q(__float128(0.6),"Hessian", NLCGDirectionUpdate::PolakRibiere);
+
+NLCGTest<Mem::Main, __float128, Index, Analytic::Common::BazaraaShettyFunction, Solver::StrongWolfeLinesearch>
+opt_bs_q(__float128(0.2),"ApproximateHessian", NLCGDirectionUpdate::HestenesStiefel);
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAST_BACKENDS_CUDA
+NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction, Solver::StrongWolfeLinesearch>
+opt_hb_f_cuda(float(0.6),"Hessian", NLCGDirectionUpdate::FletcherReeves);
+
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
-opt_bs_f_cuda(double(0.25),"none", NLCGDirectionUpdate::FletcherReeves);
+opt_bs_d_cuda(double(0.25),"none", NLCGDirectionUpdate::FletcherReeves);
 #endif
 
 #ifdef FEAST_HAVE_ALGLIB

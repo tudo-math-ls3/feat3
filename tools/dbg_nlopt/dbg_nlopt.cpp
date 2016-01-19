@@ -19,6 +19,24 @@
 using namespace FEAST;
 using namespace FEAST::Solver;
 
+/**
+ * \brief Tool for debugging of nonlinear optimisers
+ *
+ * The tool can be used for testing nonlinear optimisers on a few well-known functions. It has been used for
+ * nonlinear operators generated from AnalyticFunctions using the AnalyticFunctionOperator wrapper class. Have a look
+ * at the Analytic::Common namespace candidates. There must be an implementation of a helper traits class in
+ * kernel/solver/test_aux/function_traits.hpp specifying the real minima and a starting point.
+ *
+ * Some part of the solver configuration can be done on the command line (solvertype, direction update,
+ * preconditioner), while other options must be specified at compile time (the linesearch, memory architecture and
+ * floating point precision). The solver by default logs all iterates and produces a vtk output of the domain of
+ * interest and a polyline of all iterates so one can study the convergence behaviour of the solver.
+ *
+ * This can easily be extended to use nonlinear operators from other sources, but the whole plotting procedures
+ * require that we optimise a scalar function in two or three variables.
+ *
+ */
+
 template<typename Solver_, typename Operator_>
 int run(Solver_& solver, Operator_& op)
 {
@@ -101,9 +119,6 @@ int run(Solver_& solver, Operator_& op)
   std::cout << "Needed evaluations: " << op.num_func_evals << " (func) / " << op.num_grad_evals;
   std::cout <<  " (grad) / " << op.num_hess_evals << " (hess)" << std::endl;
 
-  // Finish the solver
-  solver->done();
-
   String filename("");
 
   // Write the iterates to file if we can
@@ -123,7 +138,7 @@ int run(Solver_& solver, Operator_& op)
       auto tmp2 = (*it2)(0);
       points.push_back(tmp2);
 
-      // Check if we needd to adjust the default domain
+      // Check if we need to adjust the default domain
       for(int d(0); d < dim; ++d)
       {
         domain_bounds[d](0) = Math::min(domain_bounds[d](0), tmp2[d]);
@@ -191,28 +206,38 @@ int run(Solver_& solver, Operator_& op)
   // Clean up
   delete mesh;
 
+  // Finish the solver
+  solver->done();
+
   return 0;
 
 }
 
 static void display_help()
 {
-  std::cout << "dbg-nlopt usage:" << std::endl;
+  std::cout << "dbg-nlopt: Nonlinear optimiser debugging tool." << std::endl;
   std::cout << "Optional arguments:" << std::endl;
   std::cout << " --help: Displays this text" << std::endl;
 #ifdef FEAST_HAVE_ALGLIB
-  std::cout << " --solver[String]: Available solvers are ALGLIBMinCG (all other arguments are then ignored) and NLCG"
+  std::cout << " --solver [String]: Available solvers are ALGLIBMinCG and NLCG(default)" << std::endl;
+#else
+  std::cout << " --solver [String]: NLCG (default). Reconfigure and compile with the alglib token in the buildid "
+  << std::endl <<
+  "                    to enable ALGLIBMinCG" << std::endl;
+#endif // FEAST_HAVE_ALGLIB
+  std::cout <<
+    " --precon [String]: Available preconditioners for NLCG are Hessian, ApproximateHessian, none(default)"
+    << std::endl <<
+    " --direction_update [String]: Available search direction updates for NLCG are DaiYuan," << std::endl <<
+    "                              DYHSHybrid, FletcherReeves, HestenesStiefel and PolakRibiere (default)."
+    << std::endl;
+#ifdef FEAST_HAVE_ALGLIB
+  std::cout <<
+    "                              Available search direction updates for ALGLIBMinCG are DaiYuan,"
+    << std::endl <<
+    "                              DYHSHybrid and automatic (default)."
     << std::endl;
 #endif // FEAST_HAVE_ALGLIB
-  std::cout << " --precon [String]: Available preconditioners for NLCG are Hessian, ApproximateHessian, none(default)"
-  << std::endl
-  << " --direction_update [String]: Available search direction updates for NLCG are DaiYuan," << std::endl
-  << "                              DYHSHybrid, FletcherReeves, HestenesStiefel and PolakRibiere (default)."
-  << std::endl
-  << "                              Available search direction updates for ALGLIBMinCG are DaiYuan,"
-  << std::endl
-  << "                              DYHSHybrid and automatic (default)."  << std::endl;
-
 }
 
 int main(int argc, char* argv[])
@@ -307,8 +332,13 @@ int main(int argc, char* argv[])
     }
 
     auto my_solver = new_nlcg(my_op, my_filter, my_linesearch, my_direction_update, true, my_precond);
-    return run(my_solver, my_op);
 
+    int ret = run(my_solver, my_op);
+
+    // Clean up
+    my_solver.reset();
+    Runtime::finalise();
+    return ret;
   }
 #ifdef FEAST_HAVE_ALGLIB
   else if (solver_name == "ALGLIBMinCG")
@@ -329,8 +359,13 @@ int main(int argc, char* argv[])
     }
 
     auto my_solver = new_alglib_mincg(my_op, my_filter, my_direction_update, true);
-    my_solver->set_plot(true);
-    return run(my_solver, my_op);
+
+    int ret = run(my_solver, my_op);
+
+    // Clean up
+    my_solver.reset();
+    Runtime::finalise();
+    return ret;
   }
 #endif // FEAST_HAVE_ALGLIB
   else

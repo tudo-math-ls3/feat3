@@ -208,6 +208,9 @@ namespace FEAST
         /// \copydoc BaseClass::done_symbolic()
         virtual void done_symbolic() override
         {
+          if(iterates != nullptr)
+            iterates->clear();
+
           this->_vec_tmp.clear();
           this->_vec_dir.clear();
           this->_vec_def.clear();
@@ -367,8 +370,7 @@ namespace FEAST
             // Log iterates if necessary
             if(iterates != nullptr)
             {
-              auto tmp = vec_sol.clone();
-              iterates->push_back(std::move(tmp));
+              iterates->push_back(vec_sol.clone());
             }
 
             // Compute defect norm. This also performs the convergence/divergence checks.
