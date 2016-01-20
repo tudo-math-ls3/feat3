@@ -150,7 +150,7 @@ def run_test(build_id, branch, myDB, extra_opts):
         #search for end of block
         iend = len(output)
         for i in range(idx, len(output)):
-          if "Building" in output[i] or "Linking" in output[idx] or ninja_build_target_detection.search(output[idx]):
+          if "Building" in output[i] or "Linking" in output[i] or ninja_build_target_detection.search(output[i]):
             iend = i
             break
         idx = iend
