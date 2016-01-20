@@ -14,7 +14,7 @@
 #include <kernel/meshopt/mesh_smoother.hpp>
 // ALGLIB includes
 FEAST_DISABLE_WARNINGS
-#include <thirdparty/alglib/cpp/src/optimization.h>
+#include <optimization.h>
 FEAST_RESTORE_WARNINGS
 
 namespace FEAST

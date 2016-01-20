@@ -14,10 +14,10 @@ SET (test_list
     linear_variational_smoother-test
     )
 if (FEAST_HAVE_ALGLIB)
-SET (test_list
-    ${test_list}
-    rumpf_smoother-test
-  )
+  SET (test_list
+      ${test_list}
+      rumpf_smoother-test
+    )
 endif (FEAST_HAVE_ALGLIB)
 
 # create all tests
