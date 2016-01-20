@@ -434,6 +434,9 @@ gcc_minor = int(gcc_version["__GNUC_MINOR__"])
 gcc_minor2 = int(gcc_version["__GNUC_PATCHLEVEL__"])
 if gcc_major > 4 or (gcc_major == 4 and gcc_minor > 5):
   quadmath_add = "-quadmath"
+parmetis_add = ""
+if (not nothirdparty):
+  parmetis_add = "-parmetis"
 
 #extract valid branch names
 branch_names = []
@@ -482,14 +485,12 @@ for branch in branch_names:
     run_test("serial-icc-opt" + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
 
   if is_found("mpic++"):
-    if (not nothirdparty):
-      addition = addition + "-parmetis"
     if is_found("g++"):
-      run_test("mpi-gcc-debug" + addition + quadmath_add, branch, myDB, extra_opts)
-      run_test("mpi-gcc-opt" + addition + quadmath_add, branch, myDB, extra_opts)
+      run_test("mpi-gcc-debug" + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts)
+      run_test("mpi-gcc-opt" + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts)
     if is_found("clang++"):
-      run_test("mpi-clang-debug" + addition, branch, myDB, extra_opts + clang_system_host_compiler)
-      run_test("mpi-clang-opt" + addition, branch, myDB, extra_opts + clang_system_host_compiler)
+      run_test("mpi-clang-debug" + addition + parmetis_add, branch, myDB, extra_opts + clang_system_host_compiler)
+      run_test("mpi-clang-opt" + addition + parmetis_add, branch, myDB, extra_opts + clang_system_host_compiler)
     if is_found("icpc"):
-      run_test("mpi-icc-debug" + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
-      run_test("mpi-icc-opt" + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
+      run_test("mpi-icc-debug" + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts + intel_system_host_compiler)
+      run_test("mpi-icc-opt" + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts + intel_system_host_compiler)
