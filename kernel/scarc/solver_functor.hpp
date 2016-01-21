@@ -129,12 +129,12 @@ namespace FEAST
           this->_complete = false;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "SumFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
@@ -160,7 +160,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& arg) override
         {
           _l.convert(arg);
           this->_complete = true;
@@ -185,12 +185,12 @@ namespace FEAST
           this->_complete = false;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "SumFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
@@ -216,7 +216,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& arg) override
         {
           _y.convert(arg);
           _l.convert(arg);
@@ -300,12 +300,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "SumFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           _y.axpy(_l, _r);
         }
@@ -328,7 +328,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -526,12 +526,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "DifferenceFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           //_y.difference( _l, _r);
           _y.axpy(_r, _l, typename VT_::DataType(-1));
@@ -555,7 +555,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -578,12 +578,12 @@ namespace FEAST
           this->_complete = false;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "ProductFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
@@ -610,7 +610,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& arg) override
         {
           _r.convert(arg);
           this->_complete = true;
@@ -635,12 +635,12 @@ namespace FEAST
           this->_complete = false;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "ProductFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
@@ -667,7 +667,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& arg) override
         {
           _y.convert(arg);
           _r.convert(arg);
@@ -692,12 +692,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "ProductFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           //_y.product_matvec(_l, _r);
           _l.apply(_y, _r);
@@ -721,7 +721,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -744,12 +744,12 @@ namespace FEAST
           this->_complete = false;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "DefectFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DefectFunctor can not be executed!");
@@ -778,7 +778,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& arg) override
         {
           _r.convert(arg);
           this->_complete = true;
@@ -865,12 +865,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "DefectFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           //_y.defect(_l, _m, _r);
           _m.apply(_y, _r, _l, typename MT_::DataType(-1));
@@ -896,7 +896,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -919,7 +919,7 @@ namespace FEAST
           this->_complete = false;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           if(!this->_complete)
             return "PreconFunctor[]";
@@ -938,7 +938,7 @@ namespace FEAST
           return true;
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete PreconFunctor can not be executed!");
@@ -962,11 +962,11 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
-        void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
+        virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& functor) override
         {
           functor->substitute(_y);
           _functor = functor;
@@ -1044,7 +1044,7 @@ namespace FEAST
           this->_complete = this->_substitution_complete && _precon_complete;
         }
 
-        void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
+        virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
         {
           functor->substitute(_y);
           _functor = functor;
@@ -1090,7 +1090,7 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           std::string result("IterateFunctor[");
 
@@ -1104,7 +1104,7 @@ namespace FEAST
           return true;
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(_maxiter == 0)
             return;
@@ -1158,12 +1158,12 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& arg) override
         {
           _functor->substitute(arg);
         }
 
-        virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& precon)
+        virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& precon) override
         {
           _functor->set_preconditioner(precon);
         }
@@ -1188,12 +1188,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "CopyFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           _y.copy(_x);
         }
@@ -1214,7 +1214,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -1234,12 +1234,12 @@ namespace FEAST
           this->_complete = false;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "CopyFunctorProxyResult";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
@@ -1263,7 +1263,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& arg) override
         {
           _y.convert(arg);
           this->_complete = true;
@@ -1285,12 +1285,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "NormFunctor2wosqrt";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           _y = _x.norm2sqr();
         }
@@ -1311,7 +1311,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -1379,12 +1379,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "NormFunctor2";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           _y = _x.norm2();
         }
@@ -1405,7 +1405,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -1474,12 +1474,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "DivFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           _y = _l / _r;
         }
@@ -1502,7 +1502,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -1524,7 +1524,7 @@ namespace FEAST
           this->_complete = false;
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& arg) override
         {
           for(Index i(0) ; i < (this->_functors).size() ; ++i)
           {
@@ -1532,7 +1532,7 @@ namespace FEAST
           }
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           for(Index i(0) ; i < (this->_functors).size() ; ++i)
           {
@@ -1540,7 +1540,7 @@ namespace FEAST
           }
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           std::string result("CompoundSolverFunctor[");
 
@@ -1599,7 +1599,7 @@ namespace FEAST
         {
         }
 
-        void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
+        virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& functor) override
         {
           for(Index i(0) ; i < (this->_functors).size() ; ++i)
           {
@@ -1635,12 +1635,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "SynchVecFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           Foundation::SynchVec<cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
         }
@@ -1670,7 +1670,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -1775,12 +1775,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "SynchScalFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           Foundation::SynchScal<cm_>::execute(_l, _sendbuf, _recvbuf);
         }
@@ -1803,7 +1803,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -1825,12 +1825,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "FilterDefectFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           _r.filter_def(_l);
         }
@@ -1851,7 +1851,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -1871,12 +1871,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "FilterCorrectionFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           _r.filter_cor(_l);
         }
@@ -1897,7 +1897,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -1917,12 +1917,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "InspectionFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           std::cout << _tracetag << "| element of size " << sizeof(T_) << " at address " << &_y << " !" << std::endl;
         }
@@ -1943,7 +1943,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -1964,12 +1964,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "InspectionFunctorSTL";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           std::cout << _tracetag << "| element of size " << sizeof(T_) << " at index " << _index << " with value " << _y.at(_index) << " !" << std::endl;
         }
@@ -1992,7 +1992,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 
@@ -2013,12 +2013,12 @@ namespace FEAST
           this->_complete = true;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "InspectionConstFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           std::cout << _tracetag << "| element of size " << sizeof(T_) << " at address " << &_y << " with value " << T_(_y) << " !" << std::endl;
         }
@@ -2039,7 +2039,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& /*arg*/)
+        virtual void substitute(VT_& /*arg*/) override
         {
         }
 

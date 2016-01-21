@@ -450,7 +450,7 @@ namespace FEAST
       typedef PreconContType_<MemTag_, DataType_, IT_> precon_type_;
 
       ///fulfill pure virtual
-      virtual const std::string type_name()
+      virtual const std::string type_name() override
       {
         return "PreconditionedSolverData";
       }
@@ -653,7 +653,7 @@ namespace FEAST
       typedef StorageType_<IT_, std::allocator<IT_> > index_storage_type_;
 
       ///fulfill pure virtual
-      virtual const std::string type_name()
+      virtual const std::string type_name() override
       {
         return "SynchronisedSolverData";
       }
@@ -753,7 +753,7 @@ namespace FEAST
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_storage_type_ vector_storage_type_;
 
       ///fulfill pure virtual
-      virtual const std::string type_name()
+      virtual const std::string type_name() override
       {
         return "SynchronisedPreconditionedSolverData";
       }
@@ -1000,7 +1000,7 @@ namespace FEAST
       typedef StorageType_<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_> >, std::allocator<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_> > > > leveldata_storage_type_;
 
       ///fulfill pure virtual
-      virtual const std::string type_name()
+      virtual const std::string type_name() override
       {
         return "MultiLevelSolverData";
       }

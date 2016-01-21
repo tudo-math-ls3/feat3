@@ -507,7 +507,7 @@ namespace FEAST
         {
         }
 
-        virtual Index get_num_entities(int dim)
+        virtual Index get_num_entities(int dim) override
         {
           switch(dim)
           {
@@ -522,7 +522,7 @@ namespace FEAST
           }
         }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        virtual void fill_vertex_set(VertexSetType& vertex_set) override
         {
           vertex_set[0][0] = Coord_(0);
           vertex_set[0][1] = Coord_(0);
@@ -550,7 +550,7 @@ namespace FEAST
 
         }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           IndexSet<4>& v_q = index_set_holder.template get_index_set<2,0>();
 

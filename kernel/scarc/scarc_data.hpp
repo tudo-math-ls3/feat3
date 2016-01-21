@@ -309,7 +309,7 @@ namespace FEAST
       typedef PreconContType_ precon_type_;
 
       ///fulfill pure virtual
-      virtual const std::string type_name()
+      virtual const std::string type_name() override
       {
         return "PreconditionedScaRCData";
       }
@@ -546,7 +546,7 @@ namespace FEAST
       typedef StorageType_<IT_, std::allocator<IT_> > index_storage_type_;
 
       ///fulfill pure virtual
-      virtual const std::string type_name()
+      virtual const std::string type_name() override
       {
         return "SynchronisedScaRCData";
       }
@@ -869,7 +869,7 @@ namespace FEAST
       typedef StorageType_<std::shared_ptr<ScaRCDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_> >, std::allocator<std::shared_ptr<ScaRCDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_> > > > leveldata_storage_type_;
 
       ///fulfill pure virtual
-      virtual const std::string type_name()
+      virtual const std::string type_name() override
       {
         return "MultiLevelScaRCData";
       }
