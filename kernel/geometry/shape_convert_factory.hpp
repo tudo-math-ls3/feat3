@@ -98,19 +98,19 @@ namespace FEAST
         Intern::EntityCountWrapper<Intern::ShapeConvertTraits, OtherShapeType>::query(_num_entities_out);
       }
 
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         return _num_entities_out[dim];
       }
 
-      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
       {
         // call wrapper
         Intern::ShapeConvertVertexWrapper<OtherShapeType, VertexSetType>
           ::refine(vertex_set, _other_mesh.get_vertex_set(), _other_mesh.get_index_set_holder());
       }
 
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
       {
         // call wrapper to build essential index sets
         Intern::ShapeConvertIndexWrapper<ShapeType>

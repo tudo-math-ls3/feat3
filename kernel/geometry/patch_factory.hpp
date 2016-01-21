@@ -49,12 +49,12 @@ namespace FEAST
       {
       }
 
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         return _patch_set.get_num_entities(dim);
       }
 
-      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
       {
         // fetch vertex-target-indices of the patch mesh
         const typename CellSetType::template TargetSet<0>::Type& idx(_patch_set.template get_target_set<0>());
@@ -77,7 +77,7 @@ namespace FEAST
         }
       }
 
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
       {
         // set up base-mesh num_entities
         Index num_entities[Shape_::dimension + 1];

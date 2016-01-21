@@ -1254,7 +1254,7 @@ namespace FEAST
          * \returns
          * The number of entities of dimension \p dim.
          */
-        virtual Index get_num_entities(int dim)
+        virtual Index get_num_entities(int dim) override
         {
           return _num_entities_fine[dim];
         }
@@ -1264,7 +1264,7 @@ namespace FEAST
          *
          * \returns The name of the coarse MeshPart
          */
-        virtual String get_identifier() const
+        virtual String get_identifier() const override
         {
           return _coarse_mesh.get_identifier();
         }
@@ -1274,7 +1274,7 @@ namespace FEAST
          *
          * \returns The name of the parent mesh of the coarse MeshPart
          */
-        virtual String get_parent_identifier() const
+        virtual String get_parent_identifier() const override
         {
           return _coarse_mesh.get_parent_identifier();
         }
@@ -1286,7 +1286,7 @@ namespace FEAST
          * Container for the attribute sets being added to
          *
          */
-        virtual void fill_attribute_sets(AttributeHolderType& attribute_set_holder)
+        virtual void fill_attribute_sets(AttributeHolderType& attribute_set_holder) override
         {
           // Attributes of shape dimension 0 only make sense if we have a mesh topology
           if(_coarse_mesh.has_topology())
@@ -1315,7 +1315,7 @@ namespace FEAST
          * \param[in,out] index_set_holder
          * The index set holder whose index sets are to be filled.
          */
-        virtual void fill_index_sets(IndexSetHolderType*& index_set_holder)
+        virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
         {
           ASSERT(index_set_holder == nullptr, "fill_index_sets: index_set_holder != nullptr!");
 
@@ -1338,7 +1338,7 @@ namespace FEAST
          * \param[in,out] target_set_holder
          * The target set holder whose target sets are to be filled.
          */
-        virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+        virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
           // refine target indices
          const IndexSetHolderType* coarse_ish(_coarse_mesh.get_topology());

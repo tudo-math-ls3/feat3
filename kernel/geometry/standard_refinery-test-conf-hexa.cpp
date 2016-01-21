@@ -29,7 +29,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     hexa_std_test();
     hexa_tetris_test();

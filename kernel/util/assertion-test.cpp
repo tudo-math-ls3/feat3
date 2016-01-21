@@ -37,7 +37,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     CONTEXT("When breaching the surface");
     CONTEXT("When going deeper");

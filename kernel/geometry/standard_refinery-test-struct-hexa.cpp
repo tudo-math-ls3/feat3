@@ -23,7 +23,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
 
     // allocate a 3x1x2 structured hexa-mesh

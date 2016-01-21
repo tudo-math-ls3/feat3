@@ -42,18 +42,18 @@ namespace FEAST
         {
         }
 
-        virtual Index get_num_entities(int dim)
+        virtual Index get_num_entities(int dim) override
         {
           return Index(2 - dim);
         }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        virtual void fill_vertex_set(VertexSetType& vertex_set) override
         {
           vertex_set[0][0] = Coord_(0);
           vertex_set[1][0] = Coord_(1);
         }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           IndexSet<2>& v_e(index_set_holder.template get_index_set<1,0>());
           v_e[0][0] = 0;
@@ -162,7 +162,7 @@ namespace FEAST
         {
         }
 
-        virtual Index get_num_entities(int dim)
+        virtual Index get_num_entities(int dim) override
         {
           switch(dim)
           {
@@ -179,7 +179,7 @@ namespace FEAST
           }
         }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        virtual void fill_vertex_set(VertexSetType& vertex_set) override
         {
           for(Index i(0); i < 8u; ++i)
           {
@@ -190,7 +190,7 @@ namespace FEAST
           }
         }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           _fill_sub_index_set<1,0>(index_set_holder);
           _fill_sub_index_set<2,0>(index_set_holder);
@@ -319,17 +319,17 @@ namespace FEAST
           delete _factory;
         }
 
-        virtual Index get_num_entities(int dim)
+        virtual Index get_num_entities(int dim) override
         {
           return _factory->get_num_entities(dim);
         }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        virtual void fill_vertex_set(VertexSetType& vertex_set) override
         {
           _factory->fill_vertex_set(vertex_set);
         }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           _factory->fill_index_sets(index_set_holder);
         }

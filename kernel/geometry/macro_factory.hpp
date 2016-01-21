@@ -44,12 +44,12 @@ namespace FEAST
         ASSERT(cell_idx < base_mesh.get_num_entities(Shape_::dimension), "cell index out-of-bounds");
       }
 
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         return Index(Intern::DynamicNumFaces<Shape_>::value(dim));
       }
 
-      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
       {
         // fetch the cell's vertex indices
         typedef typename MeshType::template IndexSet<Shape_::dimension, 0>::Type IndexSetType;
@@ -72,7 +72,7 @@ namespace FEAST
         }
       }
 
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
       {
         Intern::MacroIndexWrapper<Shape_>::build(index_set_holder);
       }

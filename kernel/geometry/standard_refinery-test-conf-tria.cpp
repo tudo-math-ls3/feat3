@@ -29,7 +29,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     tria_std_test();
     tria_patch_test();

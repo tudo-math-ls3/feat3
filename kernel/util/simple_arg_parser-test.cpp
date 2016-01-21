@@ -42,7 +42,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // create a string map for our precon
     std::map<String, MyPrecon> precon_map;

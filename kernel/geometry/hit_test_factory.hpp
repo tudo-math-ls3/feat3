@@ -83,33 +83,33 @@ namespace FEAST
       }
 
       /// \copydoc Factory::get_num_entities()
-      virtual Index get_num_entities(int dim)
+      virtual Index get_num_entities(int dim) override
       {
         return Index(_target_data.at(std::size_t(dim)).size());
       }
 
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
       {
         // call wrapper
         Intern::HitTestTargeter<ShapeType>::wrap(target_set_holder, _target_data);
       }
 
-      virtual void fill_attribute_sets(typename MeshType::AttributeHolderType& DOXY(attribute_holder))
+      virtual void fill_attribute_sets(typename MeshType::AttributeHolderType& DOXY(attribute_holder)) override
       {
         // do nothing as the object has no attribute sets
       }
 
-      virtual void fill_index_sets(typename MeshType::IndexSetHolderType*& DOXY(index_set_holder))
+      virtual void fill_index_sets(typename MeshType::IndexSetHolderType*& DOXY(index_set_holder)) override
       {
         // do nothing as the object has no index sets
       }
 
-      virtual String get_identifier() const
+      virtual String get_identifier() const override
       {
         return get_parent_identifier()+"_hit_test";
       }
 
-      virtual String get_parent_identifier() const
+      virtual String get_parent_identifier() const override
       {
         return _mesh.get_identifier();
       }

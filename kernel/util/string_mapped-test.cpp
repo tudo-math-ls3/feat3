@@ -44,7 +44,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // create a string-map for our preconditioner and
     // insert all supported enumeration values into it

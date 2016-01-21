@@ -26,7 +26,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // allocate a 2x3 structured mesh
     Index num_slices[] =

@@ -29,7 +29,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     tetra_std_test();
     big_tetra_mesh_test();

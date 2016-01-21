@@ -29,7 +29,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     refine_tree_test();
   }

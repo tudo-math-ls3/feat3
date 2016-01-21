@@ -58,12 +58,12 @@ namespace FEAST
           this->_executed = false;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "PushBackFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(this->_executed)
             throw FunctorError("Already executed!");
@@ -72,7 +72,7 @@ namespace FEAST
           this->_executed = true;
         }
 
-        virtual void undo()
+        virtual void undo() override
         {
           if(!(this->_executed))
             throw FunctorError("Already undone!");
@@ -127,12 +127,12 @@ namespace FEAST
           this->_executed = false;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "EraseFunctor";
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(this->_executed)
             throw FunctorError("Already executed!");
@@ -141,7 +141,7 @@ namespace FEAST
           this->_executed = true;
         }
 
-        virtual void undo()
+        virtual void undo() override
         {
           if(!(this->_executed))
             throw FunctorError("Already undone!");
@@ -193,7 +193,7 @@ namespace FEAST
           this->_executed = executed;
         }
 
-        virtual const std::string type_name()
+        virtual const std::string type_name() override
         {
           return "CompoundFunctor";
         }
@@ -208,7 +208,7 @@ namespace FEAST
           _functors.push_back(functor);
         }
 
-        virtual void execute()
+        virtual void execute() override
         {
           if(this->_executed)
             throw FunctorError("Already executed!");
@@ -220,7 +220,7 @@ namespace FEAST
           this->_executed = true;
         }
 
-        virtual void undo()
+        virtual void undo() override
         {
           if(!(this->_executed))
             throw FunctorError("Already undone!");

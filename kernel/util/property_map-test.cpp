@@ -277,7 +277,7 @@ public:
     //ok, everything is right
   } //test_6
 
-  virtual void run() const
+  virtual void run() const override
   {
     // run test #0
     test_0();

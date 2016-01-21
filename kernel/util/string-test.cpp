@@ -20,7 +20,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     bool b;
     int i;

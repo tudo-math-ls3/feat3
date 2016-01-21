@@ -74,7 +74,7 @@ namespace FEAST
       }
 
     protected:
-      virtual std::streamsize xsputn(const char* ptr, std::streamsize count)
+      virtual std::streamsize xsputn(const char* ptr, std::streamsize count) override
       {
         streamsize copied(0);
 
@@ -89,7 +89,7 @@ namespace FEAST
         return copied;
       }
 
-      virtual std::streamsize xsgetn(char* ptr, std::streamsize count)
+      virtual std::streamsize xsgetn(char* ptr, std::streamsize count) override
       {
         streamsize copied(0);
         datasize len(_data.size());
@@ -108,7 +108,7 @@ namespace FEAST
       virtual pos_type seekoff(
         off_type off,
         std::ios_base::seekdir way,
-        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out)
+        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override
       {
         if((which & (std::ios_base::in|std::ios_base::out)) == 0)
           return pos_type(-1);
@@ -139,7 +139,7 @@ namespace FEAST
 
       virtual pos_type seekpos(
         pos_type pos,
-        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out)
+        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override
       {
         if((which & (std::ios_base::in|std::ios_base::out)) == 0)
           return pos_type(-1);

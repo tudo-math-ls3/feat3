@@ -358,7 +358,7 @@ namespace FEAST
        * \returns
        * The number of slices in direction \p dir.
        */
-      virtual Index get_num_slices(int dir)
+      virtual Index get_num_slices(int dir) override
       {
         return 2 * _coarse_mesh.get_num_slices(dir);
       }
@@ -369,7 +369,7 @@ namespace FEAST
        * \param[in,out] vertex_set
        * The vertex set whose coordinates are to be filled.
        */
-      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
       {
         // refine vertices
         Intern::StructuredVertexRefiner<ShapeType, VertexSetType>

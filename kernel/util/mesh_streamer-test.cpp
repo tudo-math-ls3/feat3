@@ -750,7 +750,7 @@ public:
   } // test_2
 
 
-  virtual void run() const
+  virtual void run() const override
   {
     // run test #0 (checks parsing)
     test_0();

@@ -31,7 +31,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     quad_std_test();
     quad_tetris_test();

@@ -21,7 +21,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     test_factorial();
     test_binomial();
@@ -76,7 +76,7 @@ public:
   {
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     test_sqrt();
     test_sin();

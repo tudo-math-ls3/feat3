@@ -123,7 +123,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(a.det(), dets[n_], tol);
   }
 
-  virtual void run() const
+  virtual void run() const override
   {
     // test matrix inversion
     test_mat_inv_lehmer<1>(); // specialised
