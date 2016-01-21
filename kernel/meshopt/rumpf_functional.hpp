@@ -392,7 +392,7 @@ namespace FEAST
     };
 #endif
     /**
-     * \brief Class template for Rumpf functionals using the Q1 Hack
+     * \brief Class template for Rumpf functionals splitting hypercubes into simplices
      *
      * Each Hypercube<d> is subdivided into d! simplices and the P1 functional is evaluated for each of the possible
      * ways of performing that subdivision.
@@ -410,9 +410,9 @@ namespace FEAST
      * this is basically a wrapper that makes specialisations in Hypercube<d> use the specialisation of BaseClass in
      * Simplex<d>, to keep the template interface clean and the parameters consistent.
      *
-     **/
+     */
     template<typename DataType_, typename ShapeType_, template<typename, typename> class BaseClass_>
-    class RumpfFunctionalQ1Hack;
+    class RumpfFunctionalQ1Split;
 
     /// \cond internal
     /**

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_MESHOPT_MESH_SMOOTHER_HPP
-#define KERNEL_MESHOPT_MESH_SMOOTHER_HPP 1
+#ifndef KERNEL_MESHOPT_MESH_QUALITY_FUNCTIONAL_HPP
+#define KERNEL_MESHOPT_MESH_QUALITY_FUNCTIONAL_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/mesh_node.hpp>
@@ -33,7 +33,7 @@ namespace FEAST
      *
      */
     template<typename MeshType_>
-    class MeshSmoother
+    class MeshQualityFunctional
     {
       public:
         /// Type of the mesh to optimise
@@ -45,11 +45,20 @@ namespace FEAST
         /// Type for the vectors to hold coordinates etc.
         typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, MeshType::world_dim> VertexVectorType;
 
+
       public:
         /// The mesh for the underlying transformation
         Geometry::RootMeshNode<MeshType>* _mesh_node;
         /// Coordinates, used for setting new boundary values etc.
         VertexVectorType _coords;
+
+      protected:
+        /// Counter for number of function evaluations
+        Index _num_func_evals;
+        /// Counter for number of gradient evaluations
+        Index _num_grad_evals;
+        /// Counter for number of hessian evaluations
+        Index _num_hess_evals;
 
       public:
         /**
@@ -59,18 +68,22 @@ namespace FEAST
          * The RootMeshNode this mesh optimiser will refer to.
          *
          */
-        explicit MeshSmoother(Geometry::RootMeshNode<MeshType>* mesh_node_) :
+        explicit MeshQualityFunctional(Geometry::RootMeshNode<MeshType>* mesh_node_) :
           _mesh_node(mesh_node_),
-          _coords(mesh_node_->get_mesh()->get_num_entities(0), CoordType(0))
+          _coords(mesh_node_->get_mesh()->get_num_entities(0), CoordType(0)),
+          _num_func_evals(0),
+          _num_grad_evals(0),
+          _num_hess_evals(0)
           {
             get_coords();
           }
 
         /// \brief Virtual destructor
-        virtual ~MeshSmoother()
+        virtual ~MeshQualityFunctional()
         {
           // Just set it to nullptr since we did not allocate the memory for this
           _mesh_node = nullptr;
+          _coords.clear();
         }
 
         /**
@@ -80,11 +93,17 @@ namespace FEAST
          */
         static String name()
         {
-          return "MeshSmoother<"+MeshType_::name()+">";
+          return "MeshQualityFunctional<"+MeshType_::name()+">";
         }
 
         /// \returns The root mesh
         MeshType* get_mesh()
+        {
+          return _mesh_node->get_mesh();
+        }
+
+        /// \returns The root mesh as const pointer
+        const MeshType* get_mesh() const
         {
           return _mesh_node->get_mesh();
         }
@@ -108,6 +127,40 @@ namespace FEAST
         }
 
         /**
+         * \returns The number of times the functional value was computed.
+         */
+        Index get_num_func_evals() const
+        {
+          return _num_func_evals;
+        }
+
+        /**
+         * \returns The number of times the gradient was computed.
+         */
+        Index get_num_grad_evals() const
+        {
+          return _num_grad_evals;
+        }
+
+        /**
+         * \returns The number of times the hessian was computed.
+         */
+        Index get_num_hess_evals() const
+        {
+          return _num_hess_evals;
+        }
+
+        /**
+         * \brief Resets all evaluation counts
+         */
+        void reset_num_evals()
+        {
+          _num_func_evals = Index(0);
+          _num_grad_evals = Index(0);
+          _num_hess_evals = Index(0);
+        }
+
+        /**
          * \brief Performs one-time initialisations
          *
          * Because of the whole class inheritance hierarchy, some one time initialisations cannot be performed in the
@@ -115,13 +168,10 @@ namespace FEAST
          */
         virtual void init() = 0;
 
-        /// \brief Optimises the mesh according to the criteria implemented in the mesh smoother.
-        virtual void optimise() = 0;
+        ///// \brief Prepares the mesh optimiser for application
+        //virtual void prepare(VectorTypeR&) = 0;
 
-        /// \brief Prepares the mesh optimiser for application
-        virtual void prepare() = 0;
-
-    }; // class MeshSmoother
+    }; // class MeshQualityFunctional
 
     /// \cond internal
     namespace Intern
@@ -151,4 +201,4 @@ namespace FEAST
 
   } // namespace Meshopt
 } // namespace FEAST
-#endif // KERNEL_MESHOPT_MESH_SMOOTHER_HPP
+#endif // KERNEL_MESHOPT_MESH_QUALITY_FUNCTIONAL_HPP

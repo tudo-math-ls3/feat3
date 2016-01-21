@@ -10,16 +10,19 @@ if (FEAST_HAVE_PARMETIS)
   INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
 endif (FEAST_HAVE_PARMETIS)
 
+ADD_SUBDIRECTORY( meshopt_boundary-app )
+ADD_SUBDIRECTORY( meshopt_screws-app )
+
 # applications to build
 SET (app_list
-  dudv_smoother_excentric-app
   #  foundation_global_ops_convex_2procs_test-app
   #  foundation_global_ops_convex_4procs_test-app
   #  foundation_global_ops_concave_3procs_test-app
   #  foundation_global_ops_concave_4procs_test-app
   #  foundation_global_ops_synch_scal_test-app
   foundation_psystem_test-app
-  lin_smoother_bdry_deform-app
+  meshopt_refinement-app
+  meshopt_hyperelasticity_resize-app
   parti_poisson_dirichlet_2d
   poisson_dirichlet_2d
   poisson_neumann_2d
@@ -27,18 +30,6 @@ SET (app_list
   stokes_poiseuille_2d
   stokes_vortex_2d
   )
-
-# only add mesh_smoother_*-app if ALGLIB is used
-if (FEAST_HAVE_ALGLIB)
-  SET (app_list
-    ${app_list}
-    rumpf_smoother_bdry_deform-app
-    rumpf_smoother_excentric-app
-    rumpf_smoother_excentric_lvlset-app
-    rumpf_smoother_lvlset-app
-    rumpf_smoother_resize-app
-  )
-endif (FEAST_HAVE_ALGLIB)
 
 FOREACH (app ${app_list} )
   ADD_EXECUTABLE(${app} ${app}.cpp)

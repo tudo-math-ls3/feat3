@@ -869,6 +869,7 @@ namespace FEAST
 
           // Copy the operator's gradient to ALGLIB's grad variable
           auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template elements<LAFEM::Perspective::pod>();
+
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
             grad[i] = double(vec_def_elements[i]);
 

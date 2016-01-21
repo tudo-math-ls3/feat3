@@ -1,0 +1,690 @@
+#pragma once
+#ifndef FEAST_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP
+#define FEAST_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP 1
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
+#include <kernel/assembly/grid_transfer.hpp>
+#include <kernel/assembly/mirror_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
+#include <kernel/assembly/slip_filter_assembler.hpp>
+#include <kernel/lafem/filter_chain.hpp>
+#include <kernel/lafem/filter_sequence.hpp>
+#include <kernel/lafem/none_filter.hpp>
+#include <kernel/lafem/slip_filter.hpp>
+#include <kernel/lafem/unit_filter.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
+#include <kernel/lafem/vector_mirror.hpp>
+#include <kernel/geometry/mesh_file_writer.hpp>
+#include <kernel/global/filter.hpp>
+#include <kernel/global/foundation_gate.hpp>
+#include <kernel/global/matrix.hpp>
+#include <kernel/global/nonlinear_functional.hpp>
+#include <kernel/global/vector.hpp>
+
+#include <control/domain/domain_control.hpp>
+#include <control/meshopt/meshopt_solver_factory.hpp>
+
+namespace FEAST
+{
+  namespace Control
+  {
+    namespace Meshopt
+    {
+      /**
+       * \brief Transfermatrix for blocked vector types, i.e. DenseVectorBlocked
+       *
+       * \tparam Mem_
+       * The memory architecture of the vectors to transfer
+       *
+       * \tparam DT_
+       * Floating point datatype for the vectors to transfer
+       *
+       * \tparam IT_
+       * Index type for the vectors to transfer
+       *
+       * \tparam BlockSize_
+       * Size of the vector's blocks
+       *
+       * This class acts as a wrapper around a standard SparseMatrixBCSR transfermatrix, pretending to be a
+       * SparseMatrixBCSR. This works because the inter-level transfer is just a multiplication with the
+       * transfer matrix, and SparseMatrixCSR can be multiplied with a DenseVectorBlocked in the obvious and
+       * desired fashion. The only pitfall is that the corresponding routine only accepts inputs of type
+       * TransferMatrix::VectorTypeR.
+       *
+       * \author Jordi Paul
+       *
+       */
+      template<typename Mem_, typename DT_, typename IT_, int BlockSize_>
+      class TransferMatrixBlocked : public LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>
+      {
+        public:
+          /// The memory architecture
+          typedef Mem_ MemType;
+          /// The floating point datatype
+          typedef DT_ DataType;
+          /// The index type
+          typedef IT_ IndexType;
+
+          /// The block height the TransferMatrixBlocked pretends to have
+          static constexpr int BlockHeight = BlockSize_;
+          /// The block width the TransferMatrixBlocked pretends to have
+          static constexpr int BlockWidth = BlockSize_;
+
+          /// The real type of the underlying matrix
+          typedef LAFEM::SparseMatrixCSR<Mem_, DT_, IT_> BaseClass;
+          /// What this matrix pretends to be
+          typedef LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, BlockSize_, BlockSize_> PretendType;
+
+          /// Vector type accepted for multiplication form the left
+          typedef typename PretendType::VectorTypeL VectorTypeL;
+          /// Vector type accepted for multiplication form the right
+          typedef typename PretendType::VectorTypeR VectorTypeR;
+
+          /// Inherit base class constructors
+          using BaseClass::BaseClass;
+
+          /**
+           * \brief Returns a new compatible vector for left-multiplication
+           *
+           * \returns An empty left-vector
+           *
+           */
+          VectorTypeL create_vector_l() const
+          {
+            return VectorTypeL(this->rows());
+          }
+
+          /**
+           * \brief Returns a new compatible vector for right-multiplication
+           *
+           * \returns An empty right-vector
+           *
+           */
+          VectorTypeR create_vector_r() const
+          {
+            return VectorTypeR(this->columns());
+          }
+      };
+
+      /// \cond internal
+      /// Forward declarations
+      template<typename>
+      class MeshoptAssemblerLevel;
+
+      template<typename, typename, typename, template<typename, typename, typename> class, template<typename> class>
+      class MeshoptSystemLevel;
+
+      template<typename, typename>
+      class MeshoptTransferLevel;
+      /// \endcond
+
+      /**
+       * \brief Base class for Meshopt control objects
+       *
+       * \tparam DomainControl_
+       * Type of the underlying domain control
+       *
+       * \tparam Trafo_
+       * The type of transformation defining all meshes, i.e. P1/Q1 transformation
+       *
+       * For every mesh quality functional, there is a control class which inherits from this. This class only knows
+       * the base minimum.
+       *
+       */
+      template<typename DomainControl_, typename Trafo_>
+      class MeshoptControlBase
+      {
+        public:
+          /// The world dimension, i.e. number of coordinates
+          static constexpr int world_dim = DomainControl_::MeshType::world_dim;
+          /// Floating point type for coordinates
+          typedef typename DomainControl_::MeshType::CoordType CoordType;
+          /// Type for buffer vectors exchanging information between mesh and some vector type on which the solvers
+          /// operate
+          typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, world_dim> LocalCoordsBuffer;
+          /// The global version of LocalCoordsBuffer, needed for prepare setting the internal state variable
+          typedef Global::Vector<LocalCoordsBuffer> GlobalCoordsBuffer;
+          /// Type of the vtk exporter this (and derived classes) can write to
+          typedef Geometry::ExportVTK<typename Trafo_::MeshType> VTKExporterType;
+
+          /// Check if DomainControl and Trafo are compatible
+          static_assert( std::is_same<typename DomainControl_::MeshType, typename Trafo_::MeshType>::value,
+          "DomainControl/Trafo MeshType mismatch");
+
+          /**
+           * \brief Empty default constructor
+           */
+          explicit MeshoptControlBase()
+          {
+          }
+
+          /**
+           * \brief Empty virtual destructor
+           */
+          virtual ~MeshoptControlBase()
+          {
+          }
+
+          /**
+           * \brief Optimises the current mesh
+           */
+          virtual void optimise() = 0;
+
+          /**
+           * \brief Sets the internal state variable
+           *
+           * \param[in] vec_state
+           * Global buffer vector containing (possibly new) mesh vertex coordinates
+           *
+           */
+          virtual void prepare(const GlobalCoordsBuffer& DOXY(vec_state)) = 0;
+
+          /**
+           * \brief Copies the mesh's vertex coordinates to the buffer vector
+           */
+          virtual void mesh_to_buffer() = 0;
+
+          /**
+           * \brief Copies the contents of the buffer vector to the mesh's vertex coordinates
+           */
+          virtual void buffer_to_mesh() = 0;
+
+          /**
+           * \brief Gets the coordinates buffer vector
+           *
+           * \returns A reference to the coordinates buffer
+           */
+          virtual GlobalCoordsBuffer& get_coords() = 0;
+
+          virtual String name() const = 0;
+
+          /**
+           * \brief Adds quantities of the underlying mesh quality functional to a given exporter object
+           *
+           */
+          virtual void add_to_vtk_exporter
+            (Geometry::ExportVTK<typename Trafo_::MeshType>& DOXY(exporter), const int DOXY(lvl_index)) const
+          {
+          }
+
+      };
+
+      template
+      <
+        typename Mem_, typename DT_, typename IT_,
+        template<typename, typename, typename> class Op_,
+        template<typename> class GlobalOp_ = Global::Matrix
+      >
+      class MeshoptSystemLevel
+      {
+        public:
+          // basic types
+          typedef Mem_ MemType;
+          typedef DT_ DataType;
+          typedef IT_ IndexType;
+
+          /// define local scalar matrix type
+          typedef Op_<Mem_, DT_, IT_> LocalQualityFunctional;
+
+          /// define local system vector type
+          typedef LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> LocalSystemVector;
+          typedef LAFEM::VectorMirrorBlocked<MemType, DataType, IndexType, LocalQualityFunctional::BlockHeight> SystemMirror;
+          typedef Global::FoundationGate<LocalSystemVector, SystemMirror> SystemGate;
+
+          /// define local scalar vector type
+          typedef typename LAFEM::DenseVector<Mem_, DT_, IT_> LocalScalarVector;
+          typedef LAFEM::VectorMirror<Mem_, DT_, IT_> ScalarMirror;
+          typedef Global::FoundationGate<LocalScalarVector, ScalarMirror> ScalarGate;
+
+          /// Filter for Dirichlet boundary conditions
+          typedef LAFEM::UnitFilterBlocked<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> DirichletFilterType;
+          typedef LAFEM::FilterSequence<DirichletFilterType> DirichletFilterSequence;
+          /// Filter for slip boundary conditions
+          typedef LAFEM::SlipFilter<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> SlipFilterType;
+          typedef LAFEM::FilterSequence<SlipFilterType> SlipFilterSequence;
+          /// Combined filter
+          typedef LAFEM::FilterChain<SlipFilterSequence, DirichletFilterSequence> LocalSystemFilter;
+
+          /// Define global filter type
+          typedef Global::Filter<LocalSystemFilter> GlobalSystemFilter;
+          typedef GlobalOp_<LocalQualityFunctional> GlobalQualityFunctional;
+          typedef Global::Vector<LocalSystemVector> GlobalSystemVector;
+          typedef Global::Vector<LocalScalarVector> GlobalScalarVector;
+
+          typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, Index, LocalQualityFunctional::BlockHeight> LocalCoordsBuffer;
+
+          typedef Global::Vector<LocalCoordsBuffer> GlobalCoordsBuffer;
+
+          /// The scalar gate
+          ScalarGate gate_scalar;
+          /// The system gate
+          SystemGate gate_sys;
+          /// The global filter
+          GlobalSystemFilter filter_sys;
+          /// Buffer vector for copying coordinates back and forth
+          GlobalCoordsBuffer coords_buffer;
+          /// The global system matrix
+          GlobalQualityFunctional op_sys;
+
+        public:
+          template<typename... Args_>
+          MeshoptSystemLevel(const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
+          Args_&&... args) :
+            gate_sys(),
+            filter_sys(),
+            coords_buffer(&gate_sys),
+            op_sys(&gate_sys, &gate_sys, /*filter_sys,*/ std::forward<Args_>(args)...)
+            {
+
+              DirichletFilterSequence dirichlet_sequence(dirichlet_list);
+              SlipFilterSequence slip_sequence(slip_list);
+
+              LocalSystemFilter local_filter (std::move(slip_sequence), std::move(dirichlet_sequence));
+
+              *filter_sys = std::move(local_filter);
+
+            }
+
+          virtual ~MeshoptSystemLevel()
+          {
+          }
+
+      }; // class MeshoptSystemLevel<...>
+
+      template<typename SystemLevel_, typename TransferMatrix_>
+      class MeshoptTransferLevel
+      {
+        public:
+          /// Our local transfer matrix type
+          typedef TransferMatrix_ LocalSystemTransferMatrix;
+          /// Our global transfer matrix type
+          typedef Global::Matrix<LocalSystemTransferMatrix> GlobalSystemTransferMatrix;
+          /// The AssemblerLevel below needs to know the global scalar vector type
+          typedef typename SystemLevel_::GlobalScalarVector GlobalScalarVector;
+
+          /// The coarse level
+          SystemLevel_& level_coarse;
+          /// The fine level
+          SystemLevel_& level_fine;
+
+          /// Our global transfer matrices
+          GlobalSystemTransferMatrix prol_sys, rest_sys;
+
+        public:
+          explicit MeshoptTransferLevel(SystemLevel_& lvl_coarse, SystemLevel_& lvl_fine) :
+            level_coarse(lvl_coarse),
+            level_fine(lvl_fine),
+            prol_sys(&level_fine.gate_sys, &level_coarse.gate_sys),
+            rest_sys(&level_coarse.gate_sys, &level_fine.gate_sys)
+            {
+            }
+
+          virtual ~MeshoptTransferLevel()
+          {
+          }
+      };
+
+      /**
+       * \brief Base class for assembler levels for mesh optimisation
+       *
+       * \tparam Space_
+       * The finite element space the problem is solved on.
+       *
+       * Control objects inheriting from MeshControlBase may overwrite this, but it contains all basic
+       * functionality.
+       *
+       */
+      template<typename Space_>
+      class MeshoptAssemblerLevel
+      {
+        public:
+          /// The finite element space
+          typedef Space_ SpaceType;
+          /// The underlying transformation
+          typedef typename SpaceType::TrafoType TrafoType;
+          /// The type of mesh we use
+          typedef typename TrafoType::MeshType MeshType;
+          /// Type for one level of the DomainControl, needed i.e. for multigrid solvers
+          typedef Control::Domain::DomainLevel<MeshType> DomainLevelType;
+          /// Type for one layer of the DomainControl, needed i.e. for ScaRC
+          typedef Control::Domain::DomainLayer<MeshType> DomainLayerType;
+
+        public:
+          DomainLevelType& domain_level;
+          MeshType& mesh;
+          TrafoType trafo;
+          SpaceType trafo_space;
+          Cubature::DynamicFactory cubature;
+
+          std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> dirichlet_asm;
+          std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> slip_asm;
+
+        public:
+          explicit MeshoptAssemblerLevel( DomainLevelType& dom_lvl, const std::deque<String>& dirichlet_list,
+          const std::deque<String>& slip_list) :
+            domain_level(dom_lvl),
+            mesh(domain_level.get_mesh()),
+            trafo(mesh),
+            trafo_space(trafo),
+            cubature("auto-degree:" + stringify(Math::sqr(SpaceType::local_degree)+2)),
+            dirichlet_asm(),
+            slip_asm()
+            {
+              // For every MeshPart specified in the list of Dirichlet boundaries, create a UnitFilterAssembler and
+              // insert it into the std::map
+              for(auto& it : dirichlet_list)
+              {
+                // Create empty assembler
+                auto new_asm = std::make_shared<Assembly::UnitFilterAssembler<MeshType>>();
+
+                // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+                // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
+                auto* mpp = domain_level.get_mesh_node()->find_mesh_part(it);
+                if(mpp != nullptr)
+                  new_asm->add_mesh_part(*mpp);
+
+                // Insert into the map
+                String identifier(it);
+                dirichlet_asm.emplace(identifier, new_asm);
+              }
+
+              // For every MeshPart specified in the list of slip boundaries, create a SlipFilterAssembler and
+              // insert it into the std::map
+              for(auto& it : slip_list)
+              {
+                // Create empty assembler
+                auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<MeshType>>(mesh);
+
+                // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+                // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
+                auto* mpp = domain_level.get_mesh_node()->find_mesh_part(it);
+                if(mpp != nullptr)
+                  new_asm->add_mesh_part(*mpp);
+
+                // Insert into the map
+                String identifier(it);
+                slip_asm.emplace(identifier, new_asm);
+              }
+
+            }
+
+          virtual ~MeshoptAssemblerLevel()
+          {
+          }
+
+          template<typename SystemLevel_>
+          void assemble_coords_buffer(SystemLevel_& sys_level)
+          {
+            typename SystemLevel_::GlobalCoordsBuffer& global_coords_buffer(sys_level.coords_buffer);
+
+            typename SystemLevel_::LocalCoordsBuffer& local_coords_buffer = *global_coords_buffer;
+
+            if(local_coords_buffer.size() != trafo_space.get_num_dofs())
+              local_coords_buffer = std::move(typename SystemLevel_::LocalCoordsBuffer(trafo_space.get_num_dofs()));
+          }
+
+          template<typename SystemLevel_>
+          void assemble_system_filter(SystemLevel_& sys_level)
+          {
+            // get our global system filter
+            typename SystemLevel_::GlobalSystemFilter& fil_glob = sys_level.filter_sys;
+            // get our local system filter
+            typename SystemLevel_::LocalSystemFilter& fil_loc = *fil_glob;
+
+            // Assemble homogeneous dirichlet filters
+            auto& dirichlet_filters = fil_loc.template at<1>();
+            for(auto& it : dirichlet_filters)
+            {
+              const auto& assembler = dirichlet_asm.find(it.first);
+              if(assembler == dirichlet_asm.end())
+                throw InternalError(__func__,__FILE__,__LINE__,
+                "Could not find dirichlet assembler for filter with key "+it.first);
+
+              assembler->second->assemble(it.second, trafo_space);
+            }
+
+            // The slip filter contains the outer unit normal, so reassemble it
+            auto& slip_filters = fil_loc.template at<0>();
+            for(auto& it : slip_filters)
+            {
+              const auto& assembler = slip_asm.find(it.first);
+              if(assembler == slip_asm.end())
+                throw InternalError(__func__,__FILE__,__LINE__,
+                "Could not find slip filter assembler for filter with key "+it.first);
+
+              assembler->second->assemble(it.second, trafo_space);
+            }
+
+            // Sync the filter vectors in the SlipFilters
+            {
+              for(auto& it : slip_filters)
+              {
+                // Get the filter vector
+                auto& slip_filter_vector = it.second.get_filter_vector();
+
+                if(slip_filter_vector.used_elements() > 0)
+                {
+                  // Temporary DenseVector for syncing
+                  typename SystemLevel_::LocalSystemVector tmp(slip_filter_vector.size());
+                  auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
+                  auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
+
+                  // Copy sparse filter vector contents to DenseVector
+                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+                  {
+                    Index idense(slip_filter_vector.indices()[isparse]);
+                    tmp_elements[idense] = sfv_elements[isparse];
+                  }
+
+                  sys_level.gate_sys.sync_0(tmp);
+
+                  // Copy sparse filter vector contents to DenseVector
+                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+                  {
+                    Index idense(slip_filter_vector.indices()[isparse]);
+                    sfv_elements[isparse] = tmp_elements[idense];
+                  }
+                }
+              }
+
+            } // evil slip filter sync
+
+          }
+
+          template<typename SystemLevel_>
+          void assemble_system_filter(SystemLevel_& sys_level, /* const */ typename SystemLevel_::GlobalSystemVector& vec)
+          {
+            // get our global system filter
+            typename SystemLevel_::GlobalSystemFilter& fil_glob = sys_level.filter_sys;
+            // get our local system filter
+            typename SystemLevel_::LocalSystemFilter& fil_loc = *fil_glob;
+
+            typename SystemLevel_::LocalSystemVector& vec_loc = *vec;
+
+            // Assemble Dirichlet boundary conditions from sol, as this->_coords contains the new boundary
+            // coordinates
+            auto& dirichlet_filters = fil_loc.template at<1>();
+
+            for(auto& it : dirichlet_filters)
+            {
+              const auto& assembler = dirichlet_asm.find(it.first);
+              if(assembler == dirichlet_asm.end())
+                throw InternalError(__func__,__FILE__,__LINE__,
+                "Could not find dirichlet assembler for filter with key "+it.first);
+
+              assembler->second->assemble(it.second, trafo_space, vec_loc);
+            }
+
+            // The slip filter contains the outer unit normal, so reassemble it
+            auto& slip_filters = fil_loc.template at<0>();
+
+            for(auto& it : slip_filters)
+            {
+              const auto& assembler = slip_asm.find(it.first);
+              if(assembler == slip_asm.end())
+                throw InternalError(__func__,__FILE__,__LINE__,
+                "Could not find slip filter assembler for filter with key "+it.first);
+
+              assembler->second->assemble(it.second, trafo_space);
+            }
+
+            // Sync the filter vectors in the SlipFilters
+            {
+              for(auto& it : slip_filters)
+              {
+                // Get the filter vector
+                auto& slip_filter_vector = it.second.get_filter_vector();
+
+                if(slip_filter_vector.used_elements() > 0)
+                {
+                  // Temporary DenseVector for syncing
+                  typename SystemLevel_::LocalSystemVector tmp(slip_filter_vector.size());
+                  auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
+                  auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
+
+                  // Copy sparse filter vector contents to DenseVector
+                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+                  {
+                    Index idense(slip_filter_vector.indices()[isparse]);
+                    tmp_elements[idense] = sfv_elements[isparse];
+                  }
+
+                  sys_level.gate_sys.sync_0(tmp);
+
+                  // Copy sparse filter vector contents to DenseVector
+                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+                  {
+                    Index idense(slip_filter_vector.indices()[isparse]);
+                    sfv_elements[isparse] = tmp_elements[idense];
+                  }
+                }
+              }
+
+            } // evil slip filter sync
+
+          }
+
+          template<typename SystemLevel_>
+          typename SystemLevel_::GlobalSystemVector assemble_rhs_vector(SystemLevel_& sys_level)
+          {
+            ASSERT(!(*sys_level.op_sys).empty(), "assemble_rhs_vector for empty operator");
+            // create new vector
+            typename SystemLevel_::GlobalSystemVector vec_rhs = sys_level.op_sys.create_vector_r();
+
+            vec_rhs.format();
+
+            // get our local system filter
+            typename SystemLevel_::LocalSystemFilter& fil_loc = *(sys_level.filter_sys);
+
+            fil_loc.filter_rhs(*vec_rhs);
+
+            return vec_rhs;
+          }
+
+          template<typename SystemLevel_>
+          typename SystemLevel_::GlobalSystemVector assemble_sol_vector(SystemLevel_& sys_level)
+          {
+            ASSERT(!(*sys_level.op_sys).empty(), "assemble_sol_vector for empty operator");
+            typename SystemLevel_::GlobalSystemVector vec_sol(sys_level.coords_buffer.clone());
+
+            return vec_sol;
+          }
+
+          template<typename SystemLevel_>
+          void assemble_gates(const DomainLayerType& dom_layer, SystemLevel_& sys_level)
+          {
+            // Create the system gate
+            typename SystemLevel_::SystemGate& gate_sys = sys_level.gate_sys;
+            // Create the scalar gate
+            typename SystemLevel_::ScalarGate& gate_scalar = sys_level.gate_scalar;
+
+            // Loop over all ranks
+            for(Index i(0); i < dom_layer.size(); ++i)
+            {
+              Index rank = dom_layer.get_rank(i);
+              Index ctag = dom_layer.get_ctag(i);
+
+              // try to find our halo
+              auto* halo = domain_level.find_halo_part(rank);
+              if(halo == nullptr)
+                throw InternalError("ERROR: Halo not found!");
+
+              // assemble the system mirror
+              typename SystemLevel_::SystemMirror sys_mirror;
+              Assembly::MirrorAssembler::assemble_mirror(sys_mirror, this->trafo_space, *halo);
+
+              // push mirror into gates
+              gate_sys.push(rank, ctag, std::move(sys_mirror));
+
+              // assemble the scalar mirror
+              typename SystemLevel_::ScalarMirror scalar_mirror;
+              Assembly::MirrorAssembler::assemble_mirror(scalar_mirror, this->trafo_space, *halo);
+
+              // push mirror into gates
+              gate_scalar.push(rank, ctag, std::move(scalar_mirror));
+            }
+
+            // create local template vectors
+            typename SystemLevel_::LocalSystemVector tmp_sys(trafo_space.get_num_dofs());
+            typename SystemLevel_::LocalScalarVector tmp_scalar(trafo_space.get_num_dofs());
+
+            // compile gates
+            gate_sys.compile(std::move(tmp_sys));
+            gate_scalar.compile(std::move(tmp_scalar));
+          }
+
+          template<typename TransferLevel_>
+          void assemble_system_transfer(TransferLevel_& trans_level, MeshoptAssemblerLevel& level_coarse)
+          {
+            // Get global (blocked) transfer matrices
+            typename TransferLevel_::GlobalSystemTransferMatrix& glob_prol= trans_level.prol_sys;
+            typename TransferLevel_::GlobalSystemTransferMatrix& glob_rest = trans_level.rest_sys;
+
+            // Get local (scalar) transfer matrices
+            typename TransferLevel_::LocalSystemTransferMatrix::BaseClass& loc_prol = (*glob_prol);
+            typename TransferLevel_::LocalSystemTransferMatrix::BaseClass& loc_rest = (*glob_rest);
+
+            // assemble structure?
+            if(loc_prol.empty())
+            {
+              Assembly::SymbolicAssembler::assemble_matrix_2lvl(
+                loc_prol, this->trafo_space, level_coarse.trafo_space);
+            }
+
+            // Create a global scalar weight vector
+            typename TransferLevel_::GlobalScalarVector glob_vec_weight(
+              &trans_level.level_fine.gate_scalar, loc_prol.create_vector_l());
+
+            // Get local scalar weight vector
+            auto& loc_vec_weight = (*glob_vec_weight);
+
+            // Assemble the underlying scalar prolongation matrix
+            {
+              loc_prol.format();
+              loc_vec_weight.format();
+
+              // Assemble prolongation matrix
+              Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
+              this->trafo_space, level_coarse.trafo_space, this->cubature);
+
+              // Synchronise weight vector
+              glob_vec_weight.sync_0();
+
+              // Invert components
+              loc_vec_weight.component_invert(loc_vec_weight);
+
+              // Scale prolongation matrix
+              loc_prol.scale_rows(loc_prol, loc_vec_weight);
+
+              // Copy and transpose
+              loc_rest = loc_prol.transpose();
+            }
+          }
+      }; // class MeshoptAssemblerLevel
+
+    } // namespace Meshopt
+
+  } // namespace Control
+} //namespace FEAST
+#endif // FEAST_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP

@@ -922,7 +922,7 @@ namespace FEAST
           this->_num_iter = Index(0);
 
           // Save the intial state
-          this->_vec_initial_sol.clone(vec_sol);
+          this->_vec_initial_sol = vec_sol.clone();
           // Norm of the search direction vector
           this->_norm_dir = vec_dir.norm2();
           // Norm of the initial guess
@@ -1329,6 +1329,7 @@ namespace FEAST
 
             this->_op.prepare(vec_sol, this->_filter);
             this->_op.compute_grad(this->_vec_grad);
+            this->_filter.filter_def(this->_vec_grad);
           }
 
           //std::cout << "Bracket stops at sol = " << vec_sol << " grad = " << this->_vec_grad << std::endl;

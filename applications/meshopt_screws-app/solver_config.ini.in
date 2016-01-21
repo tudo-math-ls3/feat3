@@ -1,0 +1,64 @@
+[ALGLIBMinLBFGS]
+type = ALGLIBMinLBFGS
+plot = 1
+max_iter = 10000
+precon = none
+lbfgs_dim = 10
+keep_iterates = 0
+
+[NLCG]
+type = NLCG
+precon = none
+plot = 1
+max_iter = 10000
+linesearch = StrongWolfeLinesearch
+direction_update = DYHSHybrid
+keep_iterates = 0
+
+[DuDvPrecon]
+type = DuDvPrecon
+dirichlet_boundaries = inner outer
+linear_solver = PCG
+
+[StrongWolfeLinesearch]
+type = StrongWolfeLinesearch
+plot = 0
+max_iter = 100
+tol_decrease = 1e-3
+tol_curvature = 0.3
+keep_iterates = 0
+
+[SecantLinesearch]
+type = SecantLinesearch
+plot = 0
+initial_step = 1e-2
+max_iter = 100
+keep_iterates = 0
+
+[PCG-MGV]
+type = pcg
+max_iter = 100
+tol_rel = 1e-8
+plot = 1
+precon = mgv
+
+[rich]
+type = richardson
+max_iter = 4
+min_iter = 4
+precon = jac
+
+[jac]
+type = jac
+omega = 0.7
+
+[mgv]
+type = mgv
+smoother = rich
+coarse = pcg
+
+[pcg]
+type = pcg
+max_iter = 1000
+tol_rel = 1e-8
+precon = jac

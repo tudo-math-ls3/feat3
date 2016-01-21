@@ -5,6 +5,11 @@ cmake_minimum_required (VERSION 2.8)
 #enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
+if (FEAST_HAVE_PARMETIS)
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/include/")
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
+endif (FEAST_HAVE_PARMETIS)
+
 # applications to build
 ADD_EXECUTABLE(tutorial-01-poisson tutorial_01_poisson.cpp)
 TARGET_LINK_LIBRARIES(tutorial-01-poisson feast)

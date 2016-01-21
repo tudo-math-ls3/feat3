@@ -2,14 +2,16 @@
 #include <kernel/util/math.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/reference_cell_factory.hpp>
-#include <kernel/meshopt/rumpf_smoother.hpp>
-#include <kernel/meshopt/rumpf_smoother_q1hack.hpp>
+#include <kernel/assembly/slip_filter_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
+#include <kernel/meshopt/hyperelasticity_functional.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1hack.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1split.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
-
+#include <kernel/solver/linesearch.hpp>
+#include <kernel/solver/nlcg.hpp>
 #include <kernel/util/runtime.hpp>
 
 using namespace FEAST;
@@ -22,7 +24,7 @@ struct helperclass;
 /// \endcond
 
 /**
- * \brief This application demonstrates the usage of some of the RumpfSmoother classes to resize reference cells
+ * \brief This application demonstrates the usage of some of the HyperelasticityFunctional classes to resize reference cells
  *
  * This is excellent for error checking in smoothers and functionals, as a correct implementation should resize
  * a Rumpf reference cell to the desired volume and achieve a global minimum of the functional value.
@@ -41,7 +43,7 @@ struct helperclass;
  * \tparam FunctionalType
  * The Rumpf functional variant to use
  *
- * \tparam RumpfSmootherType_
+ * \tparam HyperelasticityFunctionalType_
  * The Rumpf smoother variant to use
  *
  **/
@@ -50,7 +52,7 @@ template
   typename DT_,
   typename ShapeType_,
   template<typename, typename> class FunctionalType_,
-  template<typename ... > class RumpfSmootherType_
+  template<typename ... > class HyperelasticityFunctionalType_
   > struct ResizeApp
 {
   /**
@@ -62,63 +64,96 @@ template
     /// Precision for meshes etc, everything else uses the same data type
     typedef DT_ DataType;
     // Rumpf Smoothers are implemented for Mem::Main only
-    //typedef Mem::Main MemType;
+    typedef Mem::Main MemType;
     // So we use Index
-    //typedef Index IndexType;
+    typedef Index IndexType;
     /// Shape of the mesh cells
     typedef ShapeType_ ShapeType;
     /// The complete mesh type
     typedef Geometry::ConformalMesh<ShapeType, ShapeType::dimension,ShapeType::dimension, DataType> MeshType;
     /// The corresponding transformation
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    /// The FE space for the transformation
+    typedef typename FEAST::Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoSpace;
     /// Our functional type
     typedef FunctionalType_<DataType, ShapeType> FunctionalType;
     /// The Rumpf smoother
-    typedef RumpfSmootherType_<TrafoType, FunctionalType> RumpfSmootherType;
+    typedef HyperelasticityFunctionalType_<MemType, DataType, IndexType, TrafoType, FunctionalType> HyperelasticityFunctionalType;
+    /// Filter for Dirichlet boundary conditions
+    typedef LAFEM::UnitFilterBlocked<MemType, DataType, IndexType, MeshType::world_dim> DirichletFilterType;
+    /// Filter for slip boundary conditions
+    typedef LAFEM::SlipFilter<MemType, DataType, IndexType, MeshType::world_dim> SlipFilterType;
+    /// Combined filter
+    typedef LAFEM::FilterChain
+    <
+      LAFEM::FilterSequence<SlipFilterType>,
+      LAFEM::FilterSequence<DirichletFilterType>
+    > FilterType;
+
 
     // Create a single reference cell of the shape type
     Geometry::ReferenceCellFactory<ShapeType, DataType> mesh_factory;
     // Create the mesh
     MeshType* mesh(new MeshType(mesh_factory));
+    // Trafo and trafo FE space
+    TrafoType trafo(*mesh);
+    TrafoSpace trafo_space(trafo);
+    // The filters will be empty, but we still need the filter and assembler objects
+    std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> dirichlet_asm;
+    std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> slip_asm;
+    FilterType my_filter;
 
+    // Create the root mesh node
     Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
 
     // Parameters for the Rumpf functional
     DataType fac_norm = DataType(1e0),fac_det = DataType(1),fac_cof = DataType(0), fac_reg(DataType(0e0));
     // Create the functional with these parameters
-    FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
+    auto my_functional = std::make_shared<FunctionalType>(fac_norm, fac_det, fac_cof, fac_reg);
 
-    // As we set no boundary conditions, these lists remain empty
-    std::deque<String> dirichlet_list;
-    std::deque<String> slip_list;
     // Create the smoother
-    RumpfSmootherType rumpflpumpfl(rmn, slip_list, dirichlet_list, my_functional);
+    HyperelasticityFunctionalType rumpflpumpfl(rmn, trafo_space, dirichlet_asm, slip_asm, my_functional);
     // Print information
     rumpflpumpfl.print();
 
-    // Set initial coordinates by scaling the original Rumpf reference cell by ...
+    // Vector for setting coordinates
+    auto new_coords = rumpflpumpfl.create_vector_r();
+
+    // First we scale the reference element and call compute_h(). This sets the optimal scales. Then we rescale the
+    // cell again WITHOUT calling compute_h(): this sets our initial state from which we start the optimisation.
+    // After optimisation, the original optimal scale should have been recovered.
+
+    // Set optimal scale
     DataType target_scaling(DataType(2.5));
-    helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, target_scaling);
+    helperclass<ShapeType>::set_coords(new_coords, target_scaling);
     // init() sets the coordinates in the mesh and computes h
     rumpflpumpfl.init();
+    // Now set
+    rumpflpumpfl.prepare(new_coords, my_filter);
+    rumpflpumpfl.compute_h();
 
-    // This transforms the unit element to the Rumpf reference element
+    // Transform the cell to the initial state
     DataType scaling(DataType(5.5));
-    helperclass<ShapeType>::set_coords(rumpflpumpfl._coords, scaling);
-    rumpflpumpfl.set_coords();
+    helperclass<ShapeType>::set_coords(new_coords, scaling);
+    rumpflpumpfl.prepare(new_coords, my_filter);
 
     // Arrays for saving the contributions of the different Rumpf functional parts
     DataType* func_norm(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
     DataType* func_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
     DataType* func_rec_det(new DataType[mesh->get_num_entities(MeshType::shape_dim)]);
 
+    // Dummy vector for rhs
+    auto rhs = rumpflpumpfl.create_vector_r();
+    // Vector to save the gradient in for visualisation
+    auto grad = rumpflpumpfl.create_vector_r();
+
     // Compute initial functional value
     DataType fval(0);
-    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
+    fval = rumpflpumpfl.compute_func(func_norm, func_det, func_rec_det);
     std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << std::endl;
 
     // Compute initial functional gradient
-    rumpflpumpfl.compute_gradient();
+    rumpflpumpfl.compute_grad(grad);
 
     std::string filename;
     // Write initial state to file
@@ -126,26 +161,36 @@ template
     Geometry::ExportVTK<MeshType> writer_initial_pre(*mesh);
     writer_initial_pre.add_cell_vector("h", rumpflpumpfl._h);
     writer_initial_pre.add_cell_vector("fval", func_norm, func_det, func_rec_det);
-    writer_initial_pre.add_vertex_vector("grad", rumpflpumpfl._grad);
+    writer_initial_pre.add_vertex_vector("grad", grad);
     writer_initial_pre.write(filename);
 
-    // Smooth the mesh
-    rumpflpumpfl.optimise();
+    // Create a solver
+    auto linesearch = Solver::new_strong_wolfe_linesearch(rumpflpumpfl, my_filter);
 
-    fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det);
+    auto solver = Solver::new_nlcg(
+      rumpflpumpfl, // operator
+      my_filter, // filter
+      linesearch, // linesearch
+      Solver::NLCGDirectionUpdate::DYHSHybrid, // search direction update
+      false /*, // do not keep iterates
+      nullptr*/); // no preconditioner
+
+    solver->init();
+    solver->set_plot(true);
+    solver->correct(new_coords, rhs);
+    solver->done();
+
+    fval = rumpflpumpfl.compute_func(func_norm, func_det, func_rec_det);
     std::cout << "fval post optimisation = " << stringify_fp_sci(fval) << std::endl;
 
-    // Call prepare() again because the mesh changed due to the optimisation and it was not called again after the
-    // last iteration
-    rumpflpumpfl.prepare();
-    rumpflpumpfl.compute_gradient();
+    rumpflpumpfl.compute_grad(grad);
 
     // Write optimised initial mesh
     filename = "post_" + helperclass<ShapeType>::print_typename();
     Geometry::ExportVTK<MeshType> writer_initial_post(*mesh);
     writer_initial_post.add_cell_vector("h", rumpflpumpfl._h);
     writer_initial_post.add_cell_vector("fval", func_norm, func_det, func_rec_det);
-    writer_initial_post.add_vertex_vector("grad", rumpflpumpfl._grad);
+    writer_initial_post.add_vertex_vector("grad", grad);
     writer_initial_post.write(filename);
 
     // Clean up
@@ -160,26 +205,22 @@ template
 
 // Template aliases to easier switch between variants
 
+template<typename A, typename B>
+using MyLocalFunctional = Meshopt::RumpfFunctional<A, B>;
+
+// For using the Q1 split functional, the functional is a bit more complicated
+template<typename A, typename B>
+using MyLocalFunctionalQ1Split = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional_D2>;
+
 // Vanilla Rumpf smoother
-template<typename A, typename B>
-using MySmoother = Meshopt::RumpfSmoother<A, B>;
-
-template<typename A, typename B>
-using MyFunctional = Meshopt::RumpfFunctional<A, B>;
-
-// Using the Q1 hack
-template<typename A, typename B>
-using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
-
-// For the Q1 hack, the functional is a bit more complicated
-template<typename A, typename B>
-using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional_D2>;
+template<typename A, typename B, typename C, typename D, typename E>
+using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D, E>;
 
 int main(int argc, char** argv)
 {
   FEAST::Runtime::initialise(argc, argv);
 
-  ResizeApp<double, Shape::Hypercube<2>, MyFunctional, MySmoother>::run();
+  ResizeApp<double, Shape::Hypercube<2>, MyLocalFunctional, MyQualityFunctional>::run();
 
   return FEAST::Runtime::finalise();
 }

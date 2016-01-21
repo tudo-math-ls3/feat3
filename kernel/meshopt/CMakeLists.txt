@@ -8,14 +8,8 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of meshopt tests
 SET (test_list
-    linear_variational_smoother-test
+    hyperelasticity_functional-test
     )
-if (FEAST_HAVE_ALGLIB)
-  SET (test_list
-      ${test_list}
-      rumpf_smoother-test
-    )
-endif (FEAST_HAVE_ALGLIB)
 
 # create all tests
 FOREACH (test ${test_list} )

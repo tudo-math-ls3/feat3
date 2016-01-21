@@ -1,0 +1,9 @@
+[ApplicationSettings]
+mesh_file = ./unit-circle-tria.xml
+meshopt_config_file = ./meshopt_config.ini
+mesh_optimiser = HyperelasticityDefault
+solver_config_file = ./solver_config.ini
+lvl_min = 0
+lvl_max = 2
+delta_t = 1e-2
+t_end = 5e-2
