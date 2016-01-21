@@ -15,14 +15,12 @@ def configure_gcc(cpu, buildid, compiler):
     sys.exit(1)
 
   cxxflags = "-pipe -std=c++11 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla"
-  if major >= 5:
-    cxxflags += " -Wswitch-bool -Wsizeof-array-argument -Wbool-compare"
-    #cxxflags += " -Wsuggest-final-types -Wsuggest-final-methods"
-    #cxxflags += " -Wsuggest-override"
-    cxxflags += " -Wnon-virtual-dtor -Wdelete-non-virtual-dtor"
-
   if (major == 4 and minor >= 9) or major > 4:
     cxxflags += " -fdiagnostics-color=always"
+
+  if major >= 5:
+    cxxflags += " -Wswitch-bool -Wsizeof-array-argument -Wbool-compare -Wsuggest-override -Wnon-virtual-dtor -Wdelete-non-virtual-dtor"
+    #cxxflags += " -Wsuggest-final-types -Wsuggest-final-methods"
 
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
