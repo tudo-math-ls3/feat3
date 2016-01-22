@@ -63,8 +63,8 @@ endif (FEAST_MPI)
 
 if (FEAST_VALGRIND)
   find_program(VALGRIND_EXE valgrind)
-  set (VALGRIND_EXE ${VALGRIND_EXE} --fullpath-after=${FEAST_SOURCE_DIR} --leak-check=full
-    --track-origins=yes --partial-loads-ok=yes)
+  set (VALGRIND_EXE ${VALGRIND_EXE} --fullpath-after=${FEAST_SOURCE_DIR} --leak-check=full --partial-loads-ok=yes)
+  #--track-origins=yes
   #--keep-stacktraces=alloc-and-free
 endif (FEAST_VALGRIND)
 
