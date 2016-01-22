@@ -326,6 +326,8 @@ void check_scarc_rich_rich_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_test_1D (Rich/Rich)) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (scarc_test_1D (Rich/Rich)) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_scarc_pcg_rich_1D(Index rank)
@@ -580,6 +582,8 @@ void check_scarc_pcg_rich_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_test_1D (PCG/RICH)) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (scarc_test_1D (PCG/RICH)) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_scarc_rich_pcg_1D(Index rank)
@@ -833,6 +837,8 @@ void check_scarc_rich_pcg_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_test_1D (RICH/PCG)) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (scarc_test_1D (RICH/PCG)) " << std::endl;
+
+  delete[] size_set;
 }
 void check_scarc_pcg_pcg_1D(Index rank)
 {
@@ -1086,6 +1092,8 @@ void check_scarc_pcg_pcg_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_test_1D (PCG/PCG)) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (scarc_test_1D (PCG/PCG)) " << std::endl;
+
+  delete[] size_set;
 }
 
 int main(int argc, char* argv[])

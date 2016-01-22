@@ -278,6 +278,8 @@ void check_scarc_rich_1D(Index rank)
     std::cout << "FAILED: " << res1.left << " (1) not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (scarc_test_1D (rich)) " << std::endl;
   else if(!res2.passed)
     std::cout << "FAILED: " << res2.left << " (2) not within range (eps = " << res2.epsilon << ") of " << res2.right << "! (scarc_test_1D (rich)) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_scarc_pcg_1D(Index rank)
@@ -483,6 +485,8 @@ void check_scarc_pcg_1D(Index rank)
     std::cout << "FAILED: " << res1.left << " (1) not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (scarc_test_1D (rich)) " << std::endl;
   else if(!res2.passed)
     std::cout << "FAILED: " << res2.left << " (2) not within range (eps = " << res2.epsilon << ") of " << res2.right << "! (scarc_test_1D (rich)) " << std::endl;
+
+  delete[] size_set;
 }
 
 int main(int argc, char* argv[])

@@ -197,6 +197,8 @@ void check_dot_gateway_1D(Index rank)
     std::cout << "PASSED (rank " << rank <<"): scarc_gateway_test_1D (dot)" << std::endl;
   else
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_gateway_test_1D (dot) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_nrm2_gateway_1D(Index rank)
@@ -322,6 +324,8 @@ void check_nrm2_gateway_1D(Index rank)
     std::cout << "PASSED (rank " << rank <<"): scarc_gateway_test_1D (nrm2)" << std::endl;
   else
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_gateway_test_1D (nrm2) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_nrm2sqr_gateway_1D(Index rank)
@@ -449,6 +453,8 @@ void check_nrm2sqr_gateway_1D(Index rank)
     std::cout << "PASSED (rank " << rank <<"): scarc_gateway_test_1D (nrm2sqr)" << std::endl;
   else
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_gateway_test_1D (nrm2sqr) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_synch0_gateway_1D(Index rank)
@@ -585,6 +591,8 @@ void check_synch0_gateway_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_gateway_test_1D (synch0) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (scarc_gateway_test_1D (synch0) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_synch1_gateway_1D(Index rank)
@@ -721,6 +729,8 @@ void check_synch1_gateway_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_gateway_test_1D (synch1) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (scarc_gateway_test_1D (synch1) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_prodmat0vec1_gateway_1D(Index rank)
@@ -860,6 +870,8 @@ void check_prodmat0vec1_gateway_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (scarc_gateway_test_1D (prodmat0vec1) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (scarc_gateway_test_1D (prodmat0vec1) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 int main(int argc, char* argv[])

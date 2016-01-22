@@ -169,6 +169,8 @@ void check_global_dot_1D(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_1D (dot)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_1D (dot) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_dot_2D(Index rank)
@@ -285,6 +287,8 @@ void check_global_dot_2D(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_2D (dot)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_2D (dot))" << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_dot_3D(Index rank)
@@ -532,6 +536,8 @@ void check_global_dot_3D(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D (dot)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_3D (dot))" << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec0_1D(Index rank)
@@ -640,6 +646,8 @@ void check_global_synchvec0_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (foundation_global_ops_test_1D (synch_vec0) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (foundation_global_ops_test_1D (synch_vec0) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec0_2D(Index rank)
@@ -785,6 +793,8 @@ void check_global_synchvec0_2D(Index rank)
     std::cout << "FAILED: " << res4.left << " not within range (eps = " << res4.epsilon << ") of " << res4.right << "! (foundation_global_ops_test_2D (synch_vec0) ) " << std::endl;
   else if(!res5.passed)
     std::cout << "FAILED: " << res5.left << " not within range (eps = " << res5.epsilon << ") of " << res5.right << "! (foundation_global_ops_test_2D (synch_vec0) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec0_3D(Index rank)
@@ -1073,6 +1083,8 @@ void check_global_synchvec0_3D(Index rank)
       if(!res[j].passed)
         std::cout << "FAILED: " << res[j].left << " not within range (eps = " << res[j].epsilon << ") of " << res[j].right << "! (foundation_global_ops_test_3D (synch_vec0) ) " << std::endl;
   }
+
+  delete[] size_set;
 }
 
 void check_global_synchvec1_1D(Index rank)
@@ -1339,6 +1351,8 @@ void check_global_synchvec1_2D(Index rank)
     std::cout << "FAILED: " << res4.left << " not within range (eps = " << res4.epsilon << ") of " << res4.right << "! (foundation_global_ops_test_2D (synch_vec1) ) " << std::endl;
   else if(!res5.passed)
     std::cout << "FAILED: " << res5.left << " not within range (eps = " << res5.epsilon << ") of " << res5.right << "! (foundation_global_ops_test_2D (synch_vec1) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec1_3D(Index rank)
@@ -1613,6 +1627,7 @@ void check_global_synchvec1_3D(Index rank)
         std::cout << "FAILED: " << res[j].left << " not within range (eps = " << res[j].epsilon << ") of " << res[j].right << "! (foundation_global_ops_test_3D (synch_vec1) ) " << std::endl;
   }
 
+  delete[] size_set;
 }
 
 void check_global_product_mat_vec_1D(Index rank)
@@ -1740,6 +1755,8 @@ void check_global_product_mat_vec_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (foundation_global_ops_test_1D (product_mat0vec1) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (foundation_global_ops_test_1D (product_mat0vec1) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_defect_1D(Index rank)
@@ -1869,6 +1886,8 @@ void check_global_defect_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (foundation_global_ops_test_1D (defect) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (foundation_global_ops_test_1D (defect) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_dot_1D_gateway(Index rank)
@@ -1971,6 +1990,8 @@ void check_global_dot_1D_gateway(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_1D (dot by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_1D (dot by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_dot_2D_gateway(Index rank)
@@ -2094,6 +2115,8 @@ void check_global_dot_2D_gateway(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_2D (dot by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_2D (dot by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_dot_3D_gateway(Index rank)
@@ -2349,6 +2372,8 @@ void check_global_dot_3D_gateway(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D (dot by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_3D (dot by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2_1D(Index rank)
@@ -2450,6 +2475,8 @@ void check_global_nrm2_1D(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_1D (nrm2)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_1D (nrm2) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2_2D(Index rank)
@@ -2573,6 +2600,8 @@ void check_global_nrm2_2D(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_2D (nrm2)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_2D (nrm2) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2_3D(Index rank)
@@ -2827,6 +2856,8 @@ void check_global_nrm2_3D(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D (nrm2)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_3D (nrm2) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2_1D_gateway(Index rank)
@@ -2927,6 +2958,8 @@ void check_global_nrm2_1D_gateway(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_1D (nrm2 by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_1D (nrm2 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2_2D_gateway(Index rank)
@@ -3048,6 +3081,8 @@ void check_global_nrm2_2D_gateway(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_2D (nrm2 by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_2D (nrm2 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2_3D_gateway(Index rank)
@@ -3301,6 +3336,8 @@ void check_global_nrm2_3D_gateway(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D (nrm2 by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_3D (nrm2 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2sqr_1D_gateway(Index rank)
@@ -3401,6 +3438,8 @@ void check_global_nrm2sqr_1D_gateway(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_1D (nrm2sqr by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_1D (nrm2sqr by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2sqr_2D_gateway(Index rank)
@@ -3522,6 +3561,8 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_2D (nrm2sqr by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_2D (nrm2sqr by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2sqr_3D_gateway(Index rank)
@@ -3775,6 +3816,8 @@ void check_global_nrm2sqr_3D_gateway(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D (nrm2sqr by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_3D (nrm2sqr by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec0_1D_gateway(Index rank)
@@ -3884,6 +3927,8 @@ void check_global_synchvec0_1D_gateway(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (foundation_global_ops_test_1D (synch_vec0 by gateway) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (foundation_global_ops_test_1D (synch_vec0 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec0_2D_gateway(Index rank)
@@ -4030,6 +4075,8 @@ void check_global_synchvec0_2D_gateway(Index rank)
     std::cout << "FAILED: " << res4.left << " not within range (eps = " << res4.epsilon << ") of " << res4.right << "! (foundation_global_ops_test_2D (synch_vec0 by gateway) ) " << std::endl;
   else if(!res5.passed)
     std::cout << "FAILED: " << res5.left << " not within range (eps = " << res5.epsilon << ") of " << res5.right << "! (foundation_global_ops_test_2D (synch_vec0 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec0_3D_gateway(Index rank)
@@ -4317,6 +4364,8 @@ void check_global_synchvec0_3D_gateway(Index rank)
       if(!res[j].passed)
         std::cout << "FAILED: " << res[j].left << " not within range (eps = " << res[j].epsilon << ") of " << res[j].right << "! (foundation_global_ops_test_3D (synch_vec0 by gateway) ) " << std::endl;
   }
+
+  delete[] size_set;
 }
 
 void check_global_synchvec1_1D_gateway(Index rank)
@@ -4435,6 +4484,8 @@ void check_global_synchvec1_1D_gateway(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (foundation_global_ops_test_1D (synch_vec1 by gateway) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (foundation_global_ops_test_1D (synch_vec1 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec1_2D_gateway(Index rank)
@@ -4586,6 +4637,8 @@ void check_global_synchvec1_2D_gateway(Index rank)
     std::cout << "FAILED: " << res4.left << " not within range (eps = " << res4.epsilon << ") of " << res4.right << "! (foundation_global_ops_test_2D (synch_vec1 by gateway) ) " << std::endl;
   else if(!res5.passed)
     std::cout << "FAILED: " << res5.left << " not within range (eps = " << res5.epsilon << ") of " << res5.right << "! (foundation_global_ops_test_2D (synch_vec1 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec1_3D_gateway(Index rank)
@@ -4863,6 +4916,7 @@ void check_global_synchvec1_3D_gateway(Index rank)
         std::cout << "FAILED: " << res[j].left << " not within range (eps = " << res[j].epsilon << ") of " << res[j].right << "! (foundation_global_ops_test_3D (synch_vec1 by gateway) ) " << std::endl;
   }
 
+  delete[] size_set;
 }
 
 void check_global_product_mat_vec_1D_gateway(Index rank)
@@ -4993,6 +5047,8 @@ void check_global_product_mat_vec_1D_gateway(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (foundation_global_ops_test_1D (product_mat0vec1 by gateway) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (foundation_global_ops_test_1D (product_mat0vec1 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 int main(int argc, char* argv[])

@@ -450,6 +450,8 @@ void check_global_dot_3D_concave(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D_concave (dot)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_3D_concave (dot))" << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_dot_3D_gateway_concave(Index rank)
@@ -837,6 +839,8 @@ void check_global_dot_3D_gateway_concave(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D_concave (dot by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_3D_concave (dot by gateway))" << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2_3D_concave(Index rank)
@@ -1224,6 +1228,8 @@ void check_global_nrm2_3D_concave(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D_concave (norm2)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "!" << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2_3D_gateway_concave(Index rank)
@@ -1611,6 +1617,8 @@ void check_global_nrm2_3D_gateway_concave(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D_cocave (norm2 by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "!" << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec0_3D_concave(Index rank)
@@ -2040,6 +2048,8 @@ void check_global_synchvec0_3D_concave(Index rank)
     std::cout << "FAILED: " << res6.left << " not within range (eps = " << res6.epsilon << ") of " << res6.right << "! (foundation_global_ops_test_3D_concave (synch_vec0) ) " << std::endl;
   else if(!res7.passed)
     std::cout << "FAILED: " << res7.left << " not within range (eps = " << res7.epsilon << ") of " << res7.right << "! (foundation_global_ops_test_3D_concave (synch_vec0) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec1_3D_concave(Index rank)
@@ -2482,6 +2492,8 @@ void check_global_synchvec1_3D_concave(Index rank)
     std::cout << "FAILED: " << res6.left << " not within range (eps = " << res6.epsilon << ") of " << res6.right << "! (foundation_global_ops_test_3D_concave (synch_vec1) ) " << std::endl;
   else if(!res7.passed)
     std::cout << "FAILED: " << res7.left << " not within range (eps = " << res7.epsilon << ") of " << res7.right << "! (foundation_global_ops_test_3D_concave (synch_vec1) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_nrm2sqr_3D_gateway_concave(Index rank)
@@ -2869,6 +2881,8 @@ void check_global_nrm2sqr_3D_gateway_concave(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_global_ops_test_3D_concave (norm2sqr by gateway)" << std::endl;
   else
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "!" << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec0_3D_gateway_concave(Index rank)
@@ -3300,6 +3314,8 @@ void check_global_synchvec0_3D_gateway_concave(Index rank)
     std::cout << "FAILED: " << res6.left << " not within range (eps = " << res6.epsilon << ") of " << res6.right << "! (foundation_global_ops_test_3D_concave (synch_vec0 by gateway) ) " << std::endl;
   else if(!res7.passed)
     std::cout << "FAILED: " << res7.left << " not within range (eps = " << res7.epsilon << ") of " << res7.right << "! (foundation_global_ops_test_3D_concave (synch_vec0 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec1_3D_gateway_concave(Index rank)
@@ -3743,6 +3759,8 @@ void check_global_synchvec1_3D_gateway_concave(Index rank)
     std::cout << "FAILED: " << res6.left << " not within range (eps = " << res6.epsilon << ") of " << res6.right << "! (foundation_global_ops_test_3D_concave (synch_vec1 by gateway) ) " << std::endl;
   else if(!res7.passed)
     std::cout << "FAILED: " << res7.left << " not within range (eps = " << res7.epsilon << ") of " << res7.right << "! (foundation_global_ops_test_3D_concave (synch_vec1 by gateway) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 int main(int argc, char* argv[])
