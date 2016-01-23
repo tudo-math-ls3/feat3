@@ -29,7 +29,7 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
     if major == 14:
       cxxflags += " -ip"
     else:
-      cxxflags += " -ipo -diag-disable11074,11076,11000,11006"
+      cxxflags += " -ipo -diag-disable11074,11076,11000,11001,11006"
 
     if "opt" in buildid:
       cxxflags += " -O3"
