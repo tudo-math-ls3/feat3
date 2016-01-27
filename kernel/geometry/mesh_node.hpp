@@ -8,11 +8,18 @@
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_streamer_factory.hpp>
 #include <kernel/geometry/macro_factory.hpp>
+#include <kernel/geometry/patch_factory.hpp>
+#include <kernel/geometry/patch_halo_builder.hpp>
+#include <kernel/geometry/patch_meshpart_factory.hpp>
+#include <kernel/geometry/patch_meshpart_splitter.hpp>
 #include <kernel/geometry/intern/dual_adaptor.hpp>
+#include <kernel/adjacency/graph.hpp>
 #include <kernel/util/mesh_streamer.hpp>
 
 // includes, STL
 #include <map>
+#include <deque>
+#include <vector>
 
 namespace FEAST
 {
@@ -819,8 +826,12 @@ namespace FEAST
         // Add MeshStreamer::MeshNodes for holding the MeshParts
         for(auto& it : this->_mesh_part_nodes)
         {
+          auto* mpart = it.second.node->get_mesh();
+          if(mpart == nullptr)
+            continue;
+
           MeshStreamer::MeshNode* mesh_part(new MeshStreamer::MeshNode);
-          MeshWriter<RootMesh_>::write_mesh_part(mesh_part->mesh_data, *(it.second.node->get_mesh()));
+          MeshWriter<RootMesh_>::write_mesh_part(mesh_part->mesh_data, *(mpart));
 
           // Add the chart (if any)
           auto* chart(it.second.chart);
@@ -916,6 +927,114 @@ namespace FEAST
 
         // okay
         return fine_node;
+      }
+
+      /**
+       * \brief Extracts a patch from the root mesh as a new mesh node
+       *
+       * \param[in] rank
+       * The rank of the patch to be created.
+       *
+       * \param[in] ranks_at_elem
+       * A graph specifies the ranks for each element of the base mesh
+       *
+       * \param[in] comm_ranks
+       * A vector of all ranks adjacent to the current rank
+       *
+       * \returns
+       * A new mesh node representing the extracted patch.
+       */
+      RootMeshNode* extract_patch(
+        const Index rank,
+        const Adjacency::Graph& ranks_at_elem,
+        const std::vector<Index>& comm_ranks)
+      {
+        // get base root mesh
+        MeshType& base_root_mesh = *this->get_mesh();
+
+        // get all mesh part names
+        std::deque<String> part_names = this->get_mesh_part_names();
+
+        // Step 1: create mesh part of the patch
+        MeshPartType* patch_mesh_part = nullptr;
+        {
+          PatchMeshPartFactory<MeshType> part_factory(rank, base_root_mesh, ranks_at_elem);
+
+          // create patch mesh part
+          patch_mesh_part = new MeshPartType(part_factory);
+          patch_mesh_part->template deduct_target_sets_from_top<MeshType::shape_dim>(
+            base_root_mesh.get_index_set_holder());
+
+          /// \todo really add to this mesh node?
+          this->add_mesh_part(String("_patch:") + stringify(rank), patch_mesh_part);
+        }
+
+        // Step 2: Create root mesh of partition by using PatchFactory
+        MeshType* patch_root_mesh = nullptr;
+        {
+          // create patch root mesh
+          PatchFactory<MeshType> patch_factory(base_root_mesh, *patch_mesh_part);
+          patch_root_mesh = new MeshType(patch_factory);
+        }
+
+        // Step 3: Create root mesh node for mesh
+        RootMeshNode* patch_node = new RootMeshNode(patch_root_mesh, this->_atlas);
+
+        // Step 4: intersect boundary and other base mesh parts
+        {
+          // create mesh part splitter
+          PatchMeshPartSplitter<MeshType> part_splitter(base_root_mesh, *patch_mesh_part);
+
+          // loop over all base-mesh mesh parts
+          for(auto it = part_names.begin(); it != part_names.end(); ++it)
+          {
+            // get base mesh part node
+            auto* base_part_node = this->find_mesh_part_node(*it);
+            if(base_part_node == nullptr)
+              throw InternalError(String("base-mesh part '") + (*it) + "' not found!");
+
+            // our split mesh part
+            MeshPartType* split_part = nullptr;
+
+            // get base-mesh part
+            MeshPartType* base_part = base_part_node->get_mesh();
+
+            // build
+            if((base_part != nullptr) && part_splitter.build(*base_part))
+            {
+              // create our mesh part
+              split_part = new MeshPartType(part_splitter);
+
+              /// \todo deduct mesh part topology
+              /// \todo split mesh part attributes
+            }
+
+            // insert patch mesh part
+            patch_node->add_mesh_part(*it, split_part);
+          }
+        }
+
+        // Step 5: Create halos
+        {
+          // create halo builder
+          PatchHaloBuilder<MeshType> halo_builder(ranks_at_elem, base_root_mesh, *patch_mesh_part);
+
+          // loop over all comm ranks
+          for(auto it = comm_ranks.begin(); it != comm_ranks.end(); ++it)
+          {
+            // build halo
+            halo_builder.build(*it);
+
+            // create halo mesh part
+            MeshPartType* halo_part = new MeshPartType(halo_builder);
+
+            // insert into patch mesh node
+            patch_node->add_mesh_part(String("_halo:") + stringify(*it), halo_part);
+          }
+        }
+
+        // return patch mesh part
+        return patch_node;
       }
 
       /**
