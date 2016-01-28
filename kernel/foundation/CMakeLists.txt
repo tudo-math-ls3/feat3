@@ -3,6 +3,11 @@ cmake_minimum_required (VERSION 2.8)
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
+if (FEAST_HAVE_PARMETIS)
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/include/")
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
+endif (FEAST_HAVE_PARMETIS)
+
 ADD_LIBRARY(kernel-foundation STATIC
   environment.cpp
   attribute_error.cpp
@@ -22,11 +27,14 @@ SET (test_list
   functor-test
   halo-test
   halo_control-test
+  have_parmetis-test
   load_balancing-test
   mesh-test
   mesh_control-test
   mesh_util-test
   partitioning-test
+  pexecutor-test
+  pgraph-test
   refinement_1D-test
   refinement_2D-test
   refinement_3D-test

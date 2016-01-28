@@ -105,6 +105,16 @@ namespace FEAST
       static const RequiredNumTopologies required_num_topologies = rnt_3D;
     };
 
+#ifdef FEAST_HAVE_PARMETIS
+    struct ParmetisModePartKway
+    {
+    };
+
+    struct ParmetisModePartGeomKway
+    {
+    };
+#endif
+
   }
 }
 #endif

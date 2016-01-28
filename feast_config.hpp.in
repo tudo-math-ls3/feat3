@@ -49,6 +49,9 @@
 /// Do we have UMFPACK support enabled?
 #cmakedefine FEAST_HAVE_UMFPACK
 
+/// Do we have PARMETIS support enabled?
+#cmakedefine FEAST_HAVE_PARMETIS
+
 /// Do we use a compiler wrapper, e.g. ccache or distcc
 #cmakedefine FEAST_USE_COMPILER_WRAPPER
 

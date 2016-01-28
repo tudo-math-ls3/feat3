@@ -91,6 +91,11 @@ namespace FEAST
         return _comm;
       }
 
+      MPI_Comm* get_mpi_comm()
+      {
+        return &_comm;
+      }
+
       private:
         MPI_Comm _comm;
     };
@@ -395,6 +400,41 @@ namespace FEAST
                             communicator.mpi_comm());
             }
 
+            template<typename DataType_>
+            static inline int alltoallv(const DataType_ * sendbuf,
+                                        const int sendcounts[],
+                                        const int sdispls[],
+                                        DataType_* recvbuf,
+                                        const int recvcounts[],
+                                        const int rdispls[],
+                                        Communicator communicator = Communicator(MPI_COMM_WORLD),
+                                        bool in_place = false)
+            {
+              if(!in_place)
+              {
+                return MPI_Alltoallv(sendbuf,
+                                     sendcounts,
+                                     sdispls,
+                                     MPIType<DataType_>::value(),
+                                     recvbuf,
+                                     recvcounts,
+                                     rdispls,
+                                     MPIType<DataType_>::value(),
+                                     communicator.mpi_comm());
+              }
+              else
+              {
+                return MPI_Alltoallv(MPI_IN_PLACE,
+                                     sendcounts,
+                                     sdispls,
+                                     MPIType<DataType_>::value(),
+                                     recvbuf,
+                                     recvcounts,
+                                     rdispls,
+                                     MPIType<DataType_>::value(),
+                                     communicator.mpi_comm());
+              }
+            }
           template<typename DataType1_>
             static inline void iallreduce(DataType1_ * sendbuf,
                                           Index num_elements_to_send_and_receive,
@@ -411,6 +451,30 @@ namespace FEAST
                             communicator.mpi_comm(),
                             &(r.mpi_request()));
             }
+
+#ifndef MSMPI_VER
+          template<typename DataType_>
+            static inline void ialltoallv(const DataType_ * sendbuf,
+                                          const int sendcounts[],
+                                          const int sdispls[],
+                                          DataType_* recvbuf,
+                                          const int recvcounts[],
+                                          const int rdispls[],
+                                          Request& r,
+                                          Communicator communicator = Communicator(MPI_COMM_WORLD))
+            {
+              MPI_Ialltoallv(sendbuf,
+                             sendcounts,
+                             sdispls,
+                             MPIType<DataType_>::value(),
+                             recvbuf,
+                             recvcounts,
+                             rdispls,
+                             MPIType<DataType_>::value(),
+                             communicator.mpi_comm(),
+                             &(r.mpi_request()));
+            }
+#endif
 
           static inline Index rank(Communicator c = Communicator(MPI_COMM_WORLD))
           {
