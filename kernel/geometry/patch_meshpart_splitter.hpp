@@ -21,11 +21,13 @@ namespace FEAST
       {
       private:
         std::map<Index,Index> _idx_map;
+        std::map<Index,Index> _io_map;
         std::vector<Index> _indices;
 
       public:
         explicit PatchPartMap(const TargetSet& target_set) :
           _idx_map(),
+          _io_map(),
           _indices()
         {
           // loop over all indices
@@ -41,11 +43,13 @@ namespace FEAST
         bool build(const TargetSet& target_in)
         {
           _indices.clear();
+          _io_map.clear();
           for(Index i(0); i < target_in.get_num_entities(); ++i)
           {
             auto it = _idx_map.find(target_in[i]);
             if(it != _idx_map.end())
             {
+              _io_map.emplace(i, Index(_indices.size()));
               _indices.push_back(it->second);
             }
           }
@@ -57,7 +61,8 @@ namespace FEAST
           return Index(_indices.size());
         }
 
-        void fill(TargetSet& target_out) const
+
+        void fill_target_set(TargetSet& target_out) const
         {
           ASSERT_(target_out.get_num_entities() == size());
           for(Index i(0); i < target_out.get_num_entities(); ++i)
@@ -65,29 +70,62 @@ namespace FEAST
             target_out[i] = _indices[i];
           }
         }
+
+        template<typename IndexSetType_>
+        void fill_index_set(IndexSetType_& index_set_out, const IndexSetType_& index_set_in, const std::map<Index, Index>& vertex_map) const
+        {
+          for(Index k(0); k < index_set_in.get_num_entities(); ++k)
+          {
+            auto kt = _io_map.find(k);
+            if(kt != _io_map.end())
+            {
+              for(Index j(0); j < Index(index_set_in.get_num_indices()); ++j)
+              {
+                Index i_in(index_set_in(k,j));
+                auto jt = vertex_map.find(i_in);
+                if(jt != vertex_map.end())
+                  index_set_out(kt->second, j) = jt->second;
+                else
+                  throw InternalError("Vertex "+stringify(i_in)+" missing in MeshPart topology!");
+              }
+            }
+          }
+        }
+
+        const std::map<Index, Index>& get_io_map() const
+        {
+          return _io_map;
+        }
+
       };
 
       template<typename Shape_, int dim_ = Shape_::dimension>
-      class PatchPartMapper :
-        public PatchPartMapper<Shape_, dim_ - 1>
+      class PatchPartMapHolder :
+        public PatchPartMapHolder<Shape_, dim_ - 1>
       {
       public:
-        typedef PatchPartMapper<Shape_, dim_ - 1> BaseClass;
+        typedef PatchPartMapHolder<Shape_, dim_ - 1> BaseClass;
 
       private:
         PatchPartMap _patch_map;
 
+        bool _has_topology;
+
       public:
-        explicit PatchPartMapper(const TargetSetHolder<Shape_>& tsh) :
+        explicit PatchPartMapHolder(const TargetSetHolder<Shape_>& tsh) :
           BaseClass(tsh),
-          _patch_map(tsh.template get_target_set<dim_>())
+          _patch_map(tsh.template get_target_set<dim_>()),
+          _has_topology(false)
         {
         }
 
-        bool build(const TargetSetHolder<Shape_>& tsh)
+        bool build(const TargetSetHolder<Shape_>& tsh, const IndexSetHolder<Shape_>* ish)
         {
-          bool b1 = BaseClass::build(tsh);
+          ish == nullptr ? _has_topology = false : _has_topology = true;
+
+          bool b1 = BaseClass::build(tsh, ish);
           bool b2 =  _patch_map.build(tsh.template get_target_set<dim_>());
+
           return  b1 || b2;
         }
 
@@ -100,26 +138,44 @@ namespace FEAST
             return BaseClass::get_num_entities(dim);
         }
 
-        void fill(TargetSetHolder<Shape_>& tsh) const
+        bool has_topology() const
         {
-          BaseClass::fill(tsh);
-          _patch_map.fill(tsh.template get_target_set<dim_>());
+          return _has_topology;
+        }
+
+        void fill_target_sets(TargetSetHolder<Shape_>& tsh) const
+        {
+          BaseClass::fill_target_sets(tsh);
+          _patch_map.fill_target_set(tsh.template get_target_set<dim_>());
+        }
+
+        template<typename IndexSetHolder_>
+        void fill_index_sets(IndexSetHolder_& ish, const IndexSetHolder_& ish_in) const
+        {
+          BaseClass::fill_index_sets(ish, ish_in);
+          _patch_map.fill_index_set(ish.template get_index_set<dim_,0>(), ish_in.template get_index_set<dim_,0>(),
+          get_vertex_map());
+        }
+
+        const std::map<Index, Index>& get_vertex_map() const
+        {
+          return BaseClass::get_vertex_map();
         }
       };
 
       template<typename Shape_>
-      class PatchPartMapper<Shape_, 0>
+      class PatchPartMapHolder<Shape_, 0>
       {
       private:
         PatchPartMap _patch_map;
 
       public:
-        explicit PatchPartMapper(const TargetSetHolder<Shape_>& tsh) :
+        explicit PatchPartMapHolder(const TargetSetHolder<Shape_>& tsh) :
           _patch_map(tsh.template get_target_set<0>())
         {
         }
 
-        bool build(const TargetSetHolder<Shape_>& tsh)
+        bool build(const TargetSetHolder<Shape_>& tsh, const IndexSetHolder<Shape_>* DOXY(ish))
         {
           return _patch_map.build(tsh.template get_target_set<0>());
         }
@@ -134,10 +190,22 @@ namespace FEAST
           return _patch_map.size();
         }
 
-        void fill(TargetSetHolder<Shape_>& tsh) const
+        void fill_target_sets(TargetSetHolder<Shape_>& tsh) const
         {
-          _patch_map.fill(tsh.template get_target_set<0>());
+          _patch_map.fill_target_set(tsh.template get_target_set<0>());
         }
+
+        template<typename IndexSetHolder_>
+        void fill_index_sets(IndexSetHolder_& DOXY(ish), const IndexSetHolder_& DOXY(ish_in)) const
+        {
+        }
+
+        const std::map<Index, Index>& get_vertex_map() const
+        {
+          return _patch_map.get_io_map();
+        }
+
+
       };
     } // namespace Intern
     /// \endcond
@@ -170,14 +238,16 @@ namespace FEAST
       const MeshType& _base_mesh;
       const MeshPartType& _patch_mesh_part;
       String _cur_part_name;
-      Intern::PatchPartMapper<ShapeType> _part_mapper;
+      const IndexSetHolder<ShapeType>* _cur_part_topology;
+      Intern::PatchPartMapHolder<ShapeType> _part_holder;
 
     public:
       explicit PatchMeshPartSplitter(const MeshType& base_mesh, const MeshPartType& patch_mesh_part) :
         _base_mesh(base_mesh),
         _patch_mesh_part(patch_mesh_part),
         _cur_part_name(),
-        _part_mapper(patch_mesh_part.get_target_set_holder())
+        _cur_part_topology(nullptr),
+        _part_holder(patch_mesh_part.get_target_set_holder())
       {
       }
 
@@ -188,7 +258,8 @@ namespace FEAST
       bool build(const MeshPartType& mesh_part)
       {
         _cur_part_name = mesh_part.get_identifier();
-        return _part_mapper.build(mesh_part.get_target_set_holder());
+        _cur_part_topology = mesh_part.get_topology();
+        return _part_holder.build(mesh_part.get_target_set_holder(), mesh_part.get_topology());
       }
 
       /* *************************************************************************************** */
@@ -207,7 +278,7 @@ namespace FEAST
 
       virtual Index get_num_entities(int dim) override
       {
-        return _part_mapper.get_num_entities(dim);
+        return _part_holder.get_num_entities(dim);
       }
 
       virtual void fill_attribute_sets(AttributeHolderType&) override
@@ -215,14 +286,28 @@ namespace FEAST
         // nothing to do
       }
 
-      virtual void fill_index_sets(IndexSetHolderType*&) override
+      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
       {
-        // nothing to do
+        ASSERT(index_set_holder == nullptr, "fill_index_sets: index_set_holder != nullptr!");
+
+        // If the base MeshPart has a topology, create one for the patch MeshPart, too
+        if(_part_holder.has_topology())
+        {
+          Index num_entities[shape_dim+1];
+          for(int i(0); i < shape_dim+1; ++i)
+            num_entities[i] = get_num_entities(i);
+
+          index_set_holder = new IndexSetHolderType(num_entities);
+          _part_holder.fill_index_sets(*index_set_holder, *_cur_part_topology);
+
+          //RedundantIndexSetBuilder<ShapeType>::compute(*index_set_holder);
+        }
+
       }
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
       {
-        _part_mapper.fill(target_set_holder);
+        _part_holder.fill_target_sets(target_set_holder);
       }
     };
 
