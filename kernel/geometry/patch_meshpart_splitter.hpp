@@ -54,7 +54,7 @@ namespace FEAST
 
         Index size() const
         {
-          return _indices.size();
+          return Index(_indices.size());
         }
 
         void fill(TargetSet& target_out) const
@@ -95,7 +95,7 @@ namespace FEAST
         {
           ASSERT_(dim <= dim_);
           if(dim == dim_)
-            return Index(_patch_map.size());
+            return _patch_map.size();
           else
             return BaseClass::get_num_entities(dim);
         }
@@ -131,7 +131,7 @@ namespace FEAST
 #else
           (void)dim;
 #endif
-          return Index(_patch_map.size());
+          return _patch_map.size();
         }
 
         void fill(TargetSetHolder<Shape_>& tsh) const
