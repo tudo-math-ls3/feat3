@@ -96,6 +96,7 @@ public:
     VectorType vec_buf_ac(Index(1), DT_(0));
     VectorType vec_buf_bc(Index(1), DT_(0));
     auto vec_buf_abc(mirror0.create_buffer_vector());
+    vec_buf_abc.format();
     VectorType vec_buf_tmp(Index(1), DT_(0));
 
     // gather from a
@@ -203,6 +204,7 @@ public:
 
     // create four buffer and one temporary vectors
     auto vec_buf_ab(mirror0.create_buffer_vector());
+    vec_buf_ab.format();
     VectorType vec_buf_ac(Index(1), DT_(0));
     VectorType vec_buf_bc(Index(1), DT_(0));
     VectorType vec_buf_abc(Index(1), DT_(0));
@@ -357,6 +359,7 @@ public:
     BufferVectorType vec_buf_bc(Index(BlockSize)*Index(1), DT_(0));
     // a1(0) + b1(0) + c1(0)
     auto vec_buf_abc(mirror0.create_buffer_vector());
+    vec_buf_abc.format();
     // Generic buffer for adding
     BufferVectorType vec_buf_tmp(Index(BlockSize)*Index(1), DT_(0));
 
@@ -482,6 +485,7 @@ public:
     BufferVectorType vec_buf_ab(Index(BlockSize)*Index(1), DT_(0));
     // a1(1)+c1(2)
     auto vec_buf_ac(mirror1.create_buffer_vector());
+    vec_buf_ac.format();
     // b1(2)+c(1)
     BufferVectorType vec_buf_bc(Index(BlockSize)*Index(1), DT_(0));
     // a1(0) + b1(0) + c1(0)
