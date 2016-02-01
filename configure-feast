@@ -21,7 +21,6 @@ from build_system.feast_util import get_output
 from build_system.thirdparty_package import *
 
 #TODO help, ? und guess nicht in sys.argv[0] suchen
-#TODO scalasca
 
 # output help screen
 if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.argv)):
@@ -61,7 +60,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Compiler frontends: ccache")
   print ("  Backends: cuda, mkl")
   print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
-  print ("  Instrumentation: scalasca (not implemented yet)")
+  print ("  Instrumentation: scorep")
   print ("  Debugging: valgrind, cudamemcheck")
   print ("  Precision extensions: quadmath")
   print ("  Compilation optimisations: cotire")
@@ -312,11 +311,28 @@ if "ccache" in buildid:
   if not is_found("ccache"):
     print ("Error: Choosen compiler frontend binary ccache not found!")
     sys.exit(1)
+  if "scorep" in buildid:
+    print ("Error: ccache and scorep cannot be used together!")
+    sys.exit(1)
   print("ccache version: " + get_output("ccache -V")[0])
   remove_string(unused_tokens, "ccache")
   os.environ["CC"] = "ccache " + os.environ["CC"]
   os.environ["CXX"] = "ccache " + os.environ["CXX"]
   cmake_flags += " -DFEAST_USE_COMPILER_WRAPPER:BOOL=ON"
+
+if "scorep" in buildid:
+  if not is_found("scorep"):
+    print ("Error: Choosen compiler frontend binary scorep not found!")
+    sys.exit(1)
+  if "ccache" in buildid:
+    print ("Error: ccache and scorep cannot be used together!")
+    sys.exit(1)
+  remove_string(unused_tokens, "scorep")
+  os.environ["CC"] = "scorep " + os.environ["CC"]
+  os.environ["CXX"] = "scorep " + os.environ["CXX"]
+  cmake_flags += " -DFEAST_USE_COMPILER_WRAPPER:BOOL=ON"
+
+
 
 if "cuda" in buildid:
   if not is_found("nvcc"):
