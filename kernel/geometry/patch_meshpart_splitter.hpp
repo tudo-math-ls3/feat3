@@ -80,6 +80,8 @@ namespace FEAST
         /// The identifier of the current BaseMesh MeshPart
         String _cur_part_name;
         /// The topology of the current BaseMesh MeshPart
+        const AttributeHolderType* _cur_part_attribute_holder;
+        /// The topology of the current BaseMesh MeshPart
         const IndexSetHolder<ShapeType>* _cur_part_topology;
         /// The BaseMesh MeshPart to PatchMeshPart MeshPart mapping information
         PatchPartMapHolder<ShapeType, ShapeType::dimension> _part_holder;
@@ -98,6 +100,7 @@ namespace FEAST
           _base_mesh(base_mesh),
           _patch_mesh_part(patch_mesh_part),
           _cur_part_name(),
+          _cur_part_attribute_holder(nullptr),
           _cur_part_topology(nullptr),
           _part_holder(patch_mesh_part.get_target_set_holder())
           {
@@ -121,6 +124,7 @@ namespace FEAST
         {
           _cur_part_name = mesh_part.get_identifier();
           _cur_part_topology = mesh_part.get_topology();
+          _cur_part_attribute_holder = &(mesh_part.get_attribute_holder());
           return _part_holder.build(mesh_part.get_target_set_holder(), mesh_part.get_topology());
         }
 
@@ -164,9 +168,15 @@ namespace FEAST
           return _part_holder.get_num_entities(dim);
         }
 
-        virtual void fill_attribute_sets(AttributeHolderType&) override
+        /**
+         * \brief Fills the attribute sets.
+         *
+         * \param[in,out] attribute_set_holder
+         * The attribute set holder whose attribute sets are to be filled.
+         */
+        virtual void fill_attribute_sets(typename MeshPartType::AttributeHolderType& ash) override
         {
-          // nothing to do
+          _part_holder.fill_attribute_sets(ash, *_cur_part_attribute_holder);
         }
 
         /**
@@ -297,6 +307,40 @@ namespace FEAST
         Index size() const
         {
           return Index(_indices.size());
+        }
+
+        /**
+         * \brief Fills an attribute set
+         *
+         * \tparam Attribute_
+         * Type of the attribute contained in the passed sets.
+         *
+         * \param[out] attribute_set_out
+         * The attribute set to fill
+         *
+         * \param[in] attribute_set_in
+         * AttributeSet of the BaseMesh MeshPart to copy to the PatchMeshPart's MeshPart
+         *
+         */
+        template<typename Attribute_>
+        void fill_attribute_set(
+          std::vector<Attribute_>& attribute_set_out,
+          const std::vector<Attribute_>& attribute_set_in) const
+        {
+          for(auto it(attribute_set_in.begin()); it != attribute_set_in.end(); ++it)
+          {
+            // Create new attribute for the PatchMeshPart MeshPart
+            Attribute_ new_attribute(
+              Index(_indices.size()), it->get_num_coords(), it->get_stride(), it->get_identifier());
+
+            // Emplace all elements referred to by the _io_map into new_attribute
+            for(auto jt: _io_map)
+              new_attribute(jt.second, it->operator[](jt.first) );
+
+            // Push the new attribute to set_out
+            attribute_set_out.push_back(std::move(new_attribute));
+          }
+
         }
 
         /**
@@ -474,6 +518,34 @@ namespace FEAST
         }
 
         /**
+         * \brief MeshPart Factory interface: Fills the AttributeSetHolder
+         *
+         * \tparam AttributeSetHolder_
+         * Type of the AttributeSetHolder_. This is always the whole (meaning the highest dimension)
+         * AttributeSetHolder, so the type is not known to this class in advance.
+         *
+         * \param[out] attribute_set_out
+         * AttributeSet of the PatchMeshPart's MeshPart to be filled
+         *
+         * \param[in] attribute_set_in
+         * AttributeSet of the BaseMesh's MeshPart to restrict to the PatchMeshPart's MeshPart.
+         *
+         */
+        template<typename AttributeSetHolder_>
+        void fill_attribute_sets(
+          AttributeSetHolder_& attribute_set_out,
+          const AttributeSetHolder_& attribute_set_in) const
+        {
+          // Fill attribute sets of one shape dimension lower first
+          BaseClass::fill_attribute_sets(attribute_set_out, attribute_set_in);
+
+          // Fill this shape dimension's attribute set
+          _patch_map.fill_attribute_set(
+            attribute_set_out.template get_mesh_attributes<dim_>(),
+            attribute_set_in.template get_mesh_attributes<dim_>());
+        }
+
+        /**
          * \brief Factory interface: Fills the TargetSetHolder
          *
          * \param[in] tsh
@@ -548,15 +620,27 @@ namespace FEAST
           return _patch_map.size();
         }
 
-        void fill_target_sets(TargetSetHolder<Shape_>& tsh) const
+        template<typename AttributeSetHolder_>
+        void fill_attribute_sets(
+          AttributeSetHolder_& attribute_set_out,
+          const AttributeSetHolder_& attribute_set_in) const
         {
-          _patch_map.fill_target_set(tsh.template get_target_set<0>());
+          // Fill attribute set to shape dimension 0
+          _patch_map.fill_attribute_set(
+            attribute_set_out.template get_mesh_attributes<0>(),
+            attribute_set_in.template get_mesh_attributes<0>());
         }
 
         template<typename IndexSetHolder_>
         void fill_index_sets(IndexSetHolder_& DOXY(ish), const IndexSetHolder_& DOXY(ish_in)) const
         {
         }
+
+        void fill_target_sets(TargetSetHolder<Shape_>& tsh) const
+        {
+          _patch_map.fill_target_set(tsh.template get_target_set<0>());
+        }
+
 
         const std::map<Index, Index>& get_vertex_map() const
         {

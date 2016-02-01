@@ -1004,9 +1004,6 @@ namespace FEAST
             {
               // create our mesh part
               split_part = new MeshPartType(part_splitter);
-
-              /// \todo deduct mesh part topology
-              /// \todo split mesh part attributes
             }
 
             // insert patch mesh part
