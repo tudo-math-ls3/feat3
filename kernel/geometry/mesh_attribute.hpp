@@ -256,8 +256,31 @@ namespace FEAST
         {
           CONTEXT(name() + "::operator[]() [const]");
           ASSERT_(_vertices != nullptr);
-          ASSERT_(i < _num_vertices);
+          ASSERT(i < _num_vertices, "i = "+stringify(i)+" >= "+stringify(_num_vertices)+" = num_vertices");
           return &_vertices[Index(_stride) * i];
+        }
+
+        /**
+         * \brief Vertex emplacement operator
+         *
+         * \param[in] i
+         * Index to write the new vertex to
+         *
+         * \param[in] v
+         * Vertex data to write
+         *
+         */
+        void operator()(Index i, ConstVertexReference v)
+        {
+          CONTEXT(name() + "::operator()()");
+          ASSERT(_vertices != nullptr, "_vertices == nullptr");
+          ASSERT(i < _num_vertices, "i = "+stringify(i)+" >= "+stringify(_num_vertices)+" = num_vertices");
+
+          for(Index j(0); j < Index(_num_coords); ++j)
+            _vertices[Index(_stride)*i + j] = v[j];
+
+          for(Index j = Index(_num_coords); j < Index(_stride); ++j)
+            _vertices[Index(_stride)*i + j] = CoordType(0);
         }
 
         /// Returns the name of the class.
