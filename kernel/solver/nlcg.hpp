@@ -324,8 +324,7 @@ namespace FEAST
         {
           if(iterates != nullptr)
           {
-            auto tmp = vec_sol.clone();
-            iterates->push_back(std::move(tmp));
+            iterates->push_back(std::move(vec_sol.clone()));
           }
 
           // compute initial defect
