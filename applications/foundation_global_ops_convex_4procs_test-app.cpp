@@ -408,6 +408,9 @@ void check_global_dot_2D_gateway(Index rank)
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "! (foundation_global_ops_test_2D (dot))" << std::endl;
 
   delete[] size_set;
+  delete[] polytopes_in_subset0;
+  delete[] polytopes_in_subset1;
+  delete[] polytopes_in_subset2;
 }
 
 void check_global_nrm2_2D(Index rank)
@@ -579,6 +582,9 @@ void check_global_nrm2_2D(Index rank)
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "!" << std::endl;
 
   delete[] size_set;
+  delete[] polytopes_in_subset0;
+  delete[] polytopes_in_subset1;
+  delete[] polytopes_in_subset2;
 }
 
 void check_global_nrm2_2D_gateway(Index rank)
@@ -1157,6 +1163,9 @@ void check_global_synchvec1_2D(Index rank)
     std::cout << "FAILED: " << res3.left << " not within range (eps = " << res3.epsilon << ") of " << res3.right << "! (foundation_global_ops_test_2D (synch_vec1) ) " << std::endl;
 
   delete[] size_set;
+  delete[] polytopes_in_subset0;
+  delete[] polytopes_in_subset1;
+  delete[] polytopes_in_subset2;
 }
 
 void check_global_synchvec0_2D_gateway(Index rank)
@@ -1356,6 +1365,9 @@ void check_global_synchvec0_2D_gateway(Index rank)
     std::cout << "FAILED: " << res3.left << " not within range (eps = " << res3.epsilon << ") of " << res3.right << "! (foundation_global_ops_test_2D (synch_vec0 by gateway) ) " << std::endl;
 
   delete[] size_set;
+  delete[] polytopes_in_subset0;
+  delete[] polytopes_in_subset1;
+  delete[] polytopes_in_subset2;
 }
 
 void check_global_synchvec1_2D_gateway(Index rank)
@@ -1568,6 +1580,9 @@ void check_global_synchvec1_2D_gateway(Index rank)
     std::cout << "FAILED: " << res3.left << " not within range (eps = " << res3.epsilon << ") of " << res3.right << "! (foundation_global_ops_test_2D (synch_vec1 by gateway) ) " << std::endl;
 
   delete[] size_set;
+  delete[] polytopes_in_subset0;
+  delete[] polytopes_in_subset1;
+  delete[] polytopes_in_subset2;
 }
 
 void check_global_nrm2sqr_2D_gateway(Index rank)
@@ -1739,6 +1754,9 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
     std::cout << "FAILED: " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "!" << std::endl;
 
   delete[] size_set;
+  delete[] polytopes_in_subset0;
+  delete[] polytopes_in_subset1;
+  delete[] polytopes_in_subset2;
 }
 
 int main(int argc, char* argv[])

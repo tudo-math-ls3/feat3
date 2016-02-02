@@ -1202,6 +1202,8 @@ void check_global_synchvec1_1D(Index rank)
     std::cout << "FAILED: " << res0.left << " not within range (eps = " << res0.epsilon << ") of " << res0.right << "! (foundation_global_ops_test_1D (synch_vec1) ) " << std::endl;
   else if(!res1.passed)
     std::cout << "FAILED: " << res1.left << " not within range (eps = " << res1.epsilon << ") of " << res1.right << "! (foundation_global_ops_test_1D (synch_vec1) ) " << std::endl;
+
+  delete[] size_set;
 }
 
 void check_global_synchvec1_2D(Index rank)
