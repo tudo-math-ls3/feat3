@@ -47,7 +47,7 @@ namespace FEAST
      * which in turn has values of dimension d.
      *
      * Up until now, only MeshAttributes of dimension 0 are implemented and used, although this might change in the
-     * future.
+     * future. MeshAttributes of higher dimension can be present, but cannot be refined.
      *
      * Note that a MeshAttribute needs to be refined if the mesh it refers to is refined. For dimension 0 attributes,
      * it is clear how to refine them: Linear interpolation. For attributes of the highest possible dimension
@@ -809,7 +809,7 @@ namespace FEAST
          *
          * \returns The number of Attributes in the AttributeSet of dimension dim.
          */
-        int get_num_attributes(int dim)
+        int get_num_attributes(int dim) const
         {
           return _attribute_holder.get_num_attributes(dim);
         }
@@ -1306,6 +1306,15 @@ namespace FEAST
               // Add the attribute to the corresponding set
               attribute_set_holder.add_attribute(refined_attribute,0);
             }
+          }
+
+          // Attributes of shape dimension > 0 are implemented, but as there is no use case for them yet, we do not
+          // know how to refine them
+          for(int d(1); d <= shape_dim; ++d)
+          {
+            if(_coarse_mesh.get_num_attributes(d) > 0)
+              throw InternalError("MeshPart contains "+stringify(_coarse_mesh.get_num_attributes(d))+
+                  " attributes to shape dimension "+stringify(d)+". These cannot be refined!");
           }
         }
 
