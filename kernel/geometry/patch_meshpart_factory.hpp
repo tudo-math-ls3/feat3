@@ -11,6 +11,12 @@ namespace FEAST
   namespace Geometry
   {
     /**
+     * \brief  Factory for building a PatchBaseMesh from a given partitioning
+     *
+     * \tparam MeshType_
+     * Type of the BaseMesh
+     *
+     * \author Jordi Paul
      */
     template<typename MeshType_>
     class PatchMeshPartFactory : public Factory< MeshPart<MeshType_> >
@@ -24,32 +30,44 @@ namespace FEAST
         typedef typename MeshType_::VertexSetType::CoordType AttributeDataType;
         /// Mesh attribute holder type
         typedef MeshAttributeHolder<ShapeType, AttributeDataType> AttributeHolderType;
-        /// index set holder type
+        /// Index set holder type
         typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
-        /// target set holder type
+        /// Target set holder type
         typedef typename MeshPartType::TargetSetHolderType TargetSetHolderType;
-
+        /// The shape dimension
         static constexpr int shape_dim = ShapeType::dimension;
 
       private:
-        /// number of entities for fine mesh
+        /// Number of entities for each shape dimension
         Index _num_entities[shape_dim + 1];
+        /// This will hold all BaseMesh cell numbers of cells present in the patch
         std::vector<Index> _cells_patch;
 
       public:
-        explicit PatchMeshPartFactory(Index my_rank, const MeshType_& DOXY(base_mesh_),
-          const Adjacency::Graph& ranks_at_cells)
+        /**
+         * \brief Builds a factory from a given partitioning
+         *
+         * \param[in] my_rank
+         * Identifier for this patch. Usually this is the MPI rank
+         *
+         * \param[in] ranks_at_cells
+         * For all cells in the BaseMesh, this contains the patches it is present in (this means that true overlap
+         * is supported)
+         *
+         */
+        explicit PatchMeshPartFactory(Index my_rank, const Adjacency::Graph& ranks_at_cells)
         {
+          // The patch initially has no entities
           for(int i(0); i < shape_dim + 1; ++i)
             _num_entities[i] = 0;
 
+          // Number of cells in the BaseMesh
           Index ncells_base(ranks_at_cells.get_num_nodes_domain());
 
+          // For each cell in the BaseMesh, find out if it belongs to this patch
           for(Index cell(0); cell < ncells_base; ++cell)
           {
-            Adjacency::Graph::ImageIterator it(ranks_at_cells.image_begin(cell));
-            Adjacency::Graph::ImageIterator jt(ranks_at_cells.image_end(cell));
-            for(; it != jt; ++it)
+            for(auto it(ranks_at_cells.image_begin(cell)); it != ranks_at_cells.image_end(cell); ++it)
             {
               if(*it == my_rank)
               {
@@ -59,12 +77,14 @@ namespace FEAST
             }
           }
 
+          // Now we know the number of cells
           _num_entities[shape_dim] = Index(_cells_patch.size());
         }
 
         /// virtual destructor
         virtual ~PatchMeshPartFactory()
         {
+          _cells_patch.clear();
         }
 
         /**
@@ -78,9 +98,8 @@ namespace FEAST
          */
         virtual Index get_num_entities(int dim) override
         {
-          ASSERT_(dim >= 0); //, "There are no entities of dim "+stringify(dim)+" < 0!");
-          ASSERT_(dim <= shape_dim); //, "There are no entities of dim "+stringify(dim)+" > "
-              //+stringify(shape_dim)+" = ShapeType::dimension");
+          ASSERT_(dim >= 0);
+          ASSERT_(dim <= shape_dim);
 
           return _num_entities[dim];
         }
@@ -118,6 +137,8 @@ namespace FEAST
          *
          * \param[in,out] target_set_holder
          * The target set holder whose target sets are to be filled.
+         *
+         * This fills just the TargetSet corresponding to the cell dimension.
          */
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
@@ -151,7 +172,7 @@ namespace FEAST
         {
           return "root";
         };
-    }; // class Factory<MeshPart<...>>
+    }; // class PatchMeshPartFactory<MeshPart<...>>
   } // namespace Geometry
 } // namespace FEAST
 

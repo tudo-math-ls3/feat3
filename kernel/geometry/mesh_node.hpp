@@ -958,7 +958,7 @@ namespace FEAST
         // Step 1: create mesh part of the patch
         MeshPartType* patch_mesh_part = nullptr;
         {
-          PatchMeshPartFactory<MeshType> part_factory(rank, base_root_mesh, ranks_at_elem);
+          PatchMeshPartFactory<MeshType> part_factory(rank, ranks_at_elem);
 
           // create patch mesh part
           patch_mesh_part = new MeshPartType(part_factory);
@@ -1007,6 +1007,7 @@ namespace FEAST
             }
 
             // insert patch mesh part
+            // \todo Add chart
             patch_node->add_mesh_part(*it, split_part);
           }
         }

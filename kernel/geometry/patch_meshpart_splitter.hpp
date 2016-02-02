@@ -8,12 +8,12 @@
 // includes, system
 #include <map>
 
-
 namespace FEAST
 {
   namespace Geometry
   {
     /// \cond internal
+    // Forward declarations
     class PatchPartMap;
 
     template<typename, int>
@@ -24,7 +24,9 @@ namespace FEAST
      * \brief Class for creating MeshParts referring to a patch BaseMesh
      *
      * \tparam Mesh_
-     * The mesh type the MeshParts etc. refer to
+     * The mesh type the MeshParts etc. refer to.
+     *
+     * Generic class template. The implementations are in specialisations wrt. Mesh_.
      */
     template<typename Mesh_>
     class PatchMeshPartSplitter;
@@ -119,6 +121,9 @@ namespace FEAST
          * \param[in] mesh_part
          * BaseMesh MeshPart
          *
+         * \returns
+         * true if there is a nonempty cut between mesh_part and the PatchMeshPart.
+         *
          */
         bool build(const MeshPartType& mesh_part)
         {
@@ -171,7 +176,7 @@ namespace FEAST
         /**
          * \brief Fills the attribute sets.
          *
-         * \param[in,out] attribute_set_holder
+         * \param[in,out] ash
          * The attribute set holder whose attribute sets are to be filled.
          */
         virtual void fill_attribute_sets(typename MeshPartType::AttributeHolderType& ash) override
@@ -275,6 +280,9 @@ namespace FEAST
          *
          * \param[in] target_in
          * Target set of the BaseMesh MeshPart
+         *
+         * \returns
+         * true if there is a nonempty cut between the entities referenced by target_in and the PatchMeshPart.
          */
         bool build(const TargetSet& target_in)
         {
@@ -370,7 +378,7 @@ namespace FEAST
          *
          * So we really need to copy the BaseMesh MeshPart's topology to the PatchMeshPart MeshPart's topology.
          *
-         * \tparam[IndexSetType_]
+         * \tparam IndexSetType_
          * Type of the vertex-at-shape IndexSet to be filled.
          *
          * \param[out] index_set_out
@@ -430,10 +438,10 @@ namespace FEAST
     /**
      * \brief This is a container class for holding PatchPartMaps for all dimensions
      *
-     * \tparam[Shape_]
+     * \tparam Shape_
      * The ShapeType this container refers to. This also defines the dimension etc.
      *
-     * \tparam[dim_]
+     * \tparam dim_
      * Shape dimension this container refers to
      *
      */
@@ -563,8 +571,11 @@ namespace FEAST
          * \tparam IndexSetHolder_
          * The type of the IndexSetHolder
          *
-         * \param[in] tsh
+         * \param[in] ish
          * The PatchMeshPart MeshPart's IndexSetHolder
+         *
+         * \param[in] ish_in
+         * The PatchMeshPart's IndexSetHolder
          *
          * Note that it has to be checked beforehand if the IndexSetHolder(s) are nullptr.
          */
@@ -646,7 +657,6 @@ namespace FEAST
         {
           return _patch_map.get_io_map();
         }
-
 
     };
     /// \endcond
