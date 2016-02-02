@@ -1022,6 +1022,18 @@ namespace FEAST
     if(real_num_attributes != this->attribute_count)
       throw InternalError("Parsed " + stringify(real_num_attributes) + " attribute sets but " + stringify(this->attribute_count) + " were specified!");
 
+    // Check if all attributes have the correct lengths
+    for(int d(0); d < 4; ++d)
+    {
+      for(auto& it: this->attributes[d])
+      {
+        if(it.value_count != this->num_entities[d])
+          throw InternalError("Attribute "+it.identifier+" has "+stringify(it.value_count)+" values to shape"
+              +" dimension "+stringify(d)+ " but MeshPart has "+stringify(this->num_entities[d])+" entities!");
+      }
+
+    }
+
     // return number of lines read so far
     return cur_line;
 
