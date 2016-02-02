@@ -2013,7 +2013,8 @@ namespace FEAST
             ofs << "   ";
             // Write all member of the value vector
             for(auto& val_it:val_vec_it)
-              ofs << " " << val_it << std::endl;
+              ofs << " " << val_it;
+            ofs << std::endl;
           }
           ofs << "  </values>" << std::endl;
           ofs << " </attribute>" << std::endl;
