@@ -385,14 +385,6 @@ namespace FEAST
        * A pointer to the chart associated with \p part_name of \c nullptr if no such node was found or if
        * the corresponding node did not have a chart.
        */
-      MeshChartType* find_mesh_part_chart(const String& part_name)
-      {
-        CONTEXT(name() + "::find_mesh_part_chart()");
-        MeshPartNodeIterator it(_mesh_part_nodes.find(part_name));
-        return (it != _mesh_part_nodes.end()) ? it->second.chart : nullptr;
-      }
-
-      /** \copydoc find_mesh_part_chart() */
       const MeshChartType* find_mesh_part_chart(const String& part_name) const
       {
         CONTEXT(name() + "::find_mesh_part_chart() [const]");
@@ -1006,9 +998,8 @@ namespace FEAST
               split_part = new MeshPartType(part_splitter);
             }
 
-            // insert patch mesh part
-            // \todo Add chart
-            patch_node->add_mesh_part(*it, split_part);
+            // Insert patch mesh part
+            patch_node->add_mesh_part(*it, split_part, this->find_mesh_part_chart(*it));
           }
         }
 
