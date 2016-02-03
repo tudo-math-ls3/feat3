@@ -1065,8 +1065,8 @@ namespace FEAST
           if(_index_set_holder == nullptr)
             _index_set_holder = new IndexSetHolderType(_num_entities);
 
-          Intern::IndexSetFiller<ShapeType_::dimension>::template fill_ish
-            (*_index_set_holder, _target_set_holder, parent_ish);
+          Intern::IndexSetFiller<ShapeType_::dimension>::fill_ish(
+            *_index_set_holder, _target_set_holder, parent_ish);
 
           // build redundant index sets
           RedundantIndexSetBuilder<ShapeType_>::compute(*_index_set_holder);

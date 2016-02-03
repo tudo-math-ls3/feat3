@@ -454,7 +454,8 @@ namespace FEAST
         // get number of entities in coarse mesh
         for(int i(0); i <= shape_dim; ++i)
         {
-          _num_entities_fine[i] = _num_entities_coarse[i] = coarse_mesh.get_num_entities(i);
+          _num_entities_fine[i] = coarse_mesh.get_num_entities(i);
+          _num_entities_coarse[i] = coarse_mesh.get_num_entities(i);
         }
 
         // calculate number of entities in fine mesh

@@ -73,7 +73,7 @@ namespace FEAST
         Index num_entities[n_+1];
 
         template<typename Factory_>
-        NumEntitiesWrapper(Factory_& factory)
+        explicit NumEntitiesWrapper(Factory_& factory)
         {
           for(int i(0); i <= n_; ++i)
           {
@@ -97,7 +97,7 @@ namespace FEAST
         Index num_slices[n_];
 
         template<typename Factory_>
-        NumSlicesWrapper(Factory_& factory)
+        explicit NumSlicesWrapper(Factory_& factory)
         {
           for(int i(0); i < n_; ++i)
           {

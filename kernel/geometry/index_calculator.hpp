@@ -38,6 +38,8 @@ namespace FEAST
 
         IndexVector()
         {
+          for(int i(0); i < num_indices; ++i)
+            idx[i] = Index(0);
         }
 
         IndexVector(const IndexVector& iv)
