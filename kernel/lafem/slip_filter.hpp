@@ -77,6 +77,8 @@ namespace FEAST
         static constexpr int BlockSize = BlockSize_;
         /// Value type
         typedef Tiny::Vector<DataType, BlockSize> ValueType;
+        /// Our supported vector type
+        typedef DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> VectorType;
 
         static_assert(BlockSize > 1, "BlockSize has to be >= 2 in SlipFilter!");
 
@@ -237,7 +239,7 @@ namespace FEAST
          * \param[in,out] vector
          * A reference to the right-hand-side vector to be filtered.
          */
-        void filter_rhs(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
+        void filter_rhs(VectorType& vector) const
         {
           if(_sv.size() != vector.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
@@ -252,7 +254,7 @@ namespace FEAST
          * \param[in,out] vector
          * A reference to the solution vector to be filtered.
          */
-        void filter_sol(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
+        void filter_sol(VectorType& vector) const
         {
           // same as rhs
           filter_rhs(vector);
@@ -264,7 +266,7 @@ namespace FEAST
          * \param[in,out] vector
          * A reference to the defect vector to be filtered.
          */
-        void filter_def(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
+        void filter_def(VectorType& vector) const
         {
           if(_sv.size() != vector.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
@@ -279,7 +281,7 @@ namespace FEAST
          * \param[in,out] vector
          * A reference to the correction vector to be filtered.
          */
-        void filter_cor(DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & vector) const
+        void filter_cor(VectorType& vector) const
         {
           // same as def
           filter_def(vector);

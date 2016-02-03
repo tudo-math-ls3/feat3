@@ -41,6 +41,8 @@ namespace FEAST
       /// sub-filter index-type
       typedef typename First_::IndexType IndexType;
 
+      typedef typename First_::VectorType VectorType;
+
       // ensure that all sub-vector have the same mem- and data-type
       static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
                     "sub-filters have different mem-types");
