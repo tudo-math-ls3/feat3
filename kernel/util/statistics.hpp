@@ -21,6 +21,9 @@ namespace FEAST
 
     /// Time of each iteration in seconds
     std::vector<double> toe;
+
+    /// Time of mpi execution of each iteration in seconds
+    std::vector<double> mpi_toe;
   };
 
   /**
@@ -82,6 +85,17 @@ namespace FEAST
             result += "------\n";
           else
             result += stringify_fp_sci(stat.toe.at(i)) + "\n";
+        }
+
+        result +="MPI Iteration Timings [s]:\n";
+        for (Index i(0) ; i < stat.mpi_toe.size() ; ++i)
+        {
+          if (i == 0 && stat.mpi_toe.at(i) == double(-1))
+            continue;
+          if (stat.mpi_toe.at(i) == double(-1))
+            result += "------\n";
+          else
+            result += stringify_fp_sci(stat.mpi_toe.at(i)) + "\n";
         }
 
         return result;
@@ -181,6 +195,23 @@ namespace FEAST
         {
           SolverStatistics temp;
           temp.toe.push_back(seconds);
+          _solver_statistics[solver] = temp;
+        }
+      }
+
+      /// add mpi toe statistics entry for specific solver (branch name)
+      inline static void add_solver_mpi_toe(String solver, double seconds)
+      {
+        auto it = _solver_statistics.find(solver);
+
+        if (it != _solver_statistics.end())
+        {
+          it->second.mpi_toe.push_back(seconds);
+        }
+        else
+        {
+          SolverStatistics temp;
+          temp.mpi_toe.push_back(seconds);
           _solver_statistics[solver] = temp;
         }
       }

@@ -141,6 +141,7 @@ namespace FEAST
         while(status == Status::progress)
         {
           TimeStamp at;
+          double mpi_start(Statistics::get_time_mpi_execute());
 
           // compute A*d
           matrix.apply(vec_tmp, vec_dir);
@@ -161,6 +162,8 @@ namespace FEAST
           {
             TimeStamp bt;
             Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+            double mpi_stop(Statistics::get_time_mpi_execute());
+            Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
             return status;
           }
 
@@ -169,6 +172,8 @@ namespace FEAST
           {
             TimeStamp bt;
             Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+            double mpi_stop(Statistics::get_time_mpi_execute());
+            Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
             return Status::aborted;
           }
           //filter.filter_cor(vec_tmp);
@@ -185,6 +190,8 @@ namespace FEAST
 
           TimeStamp bt;
           Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+          double mpi_stop(Statistics::get_time_mpi_execute());
+          Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
         }
 
         // we should never reach this point...

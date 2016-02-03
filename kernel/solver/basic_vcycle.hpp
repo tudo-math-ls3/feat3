@@ -392,9 +392,12 @@ namespace FEAST
 
         // insert -1 to signal new starting v cycle
         Statistics::add_solver_toe(this->_branch, double(-1));
+        Statistics::add_solver_mpi_toe(this->_branch, double(-1));
 
         // array containing toe for each processed level
         std::vector<double> toes((size_t)nl, double(0));
+        // array containing toe of mpi execution for each processed level
+        std::vector<double> mpi_toes((size_t)nl, double(0));
 
         // copy RHS vector
         system_levels.back()->vec_rhs.copy(vec_def);
@@ -403,6 +406,7 @@ namespace FEAST
         for(int i(nl-1); i > 0; --i)
         {
           TimeStamp at;
+          double mpi_start(Statistics::get_time_mpi_execute());
 
           // get our level and the coarse level
           SystemLevel& lvl = *system_levels.at(std::size_t(i));
@@ -441,6 +445,8 @@ namespace FEAST
 
           TimeStamp bt;
           toes.at((size_t)i)= bt.elapsed(at);
+          double mpi_stop(Statistics::get_time_mpi_execute());
+          mpi_toes.at((size_t)i) = mpi_stop - mpi_start;
 
           // descent to prior level
         }
@@ -448,6 +454,7 @@ namespace FEAST
         // process the coarse grid level
         {
           TimeStamp at;
+          double mpi_start(Statistics::get_time_mpi_execute());
 
           SystemLevel& lvl = *system_levels.front();
 
@@ -468,12 +475,15 @@ namespace FEAST
 
           TimeStamp bt;
           toes.at(0) = bt.elapsed(at);
+          double mpi_stop(Statistics::get_time_mpi_execute());
+          mpi_toes.at(0) = mpi_stop - mpi_start;
         }
 
         // prolongation loop
         for(int i(1); i < nl; ++i)
         {
           TimeStamp at;
+          double mpi_start(Statistics::get_time_mpi_execute());
 
           // get our level and the coarse level
           SystemLevel& lvl = *system_levels.at(std::size_t(i));
@@ -513,6 +523,8 @@ namespace FEAST
 
           TimeStamp bt;
           toes.at((size_t)i) += bt.elapsed(at);
+          double mpi_stop(Statistics::get_time_mpi_execute());
+          mpi_toes.at((size_t)i) += mpi_stop - mpi_start;
 
           // ascend to next level
         }
@@ -523,6 +535,7 @@ namespace FEAST
         for (int i(0) ; i < nl ; ++i)
         {
           Statistics::add_solver_toe(this->_branch, toes.at((size_t)i));
+          Statistics::add_solver_mpi_toe(this->_branch, mpi_toes.at((size_t)i));
         }
 
         // okay

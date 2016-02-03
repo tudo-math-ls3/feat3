@@ -320,6 +320,7 @@ namespace FEAST
         this->_def_init = this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
         // insert special toe to signal new start of solver
         Statistics::add_solver_toe(this->_branch, double(-1));
+        Statistics::add_solver_mpi_toe(this->_branch, double(-1));
         //insert -1 as first defect, to signalize a new starting solver iteration run
         Statistics::add_solver_defect(this->_branch, double(-1));
         Statistics::add_solver_defect(this->_branch, double(this->_def_init));

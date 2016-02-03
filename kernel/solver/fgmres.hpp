@@ -155,6 +155,7 @@ namespace FEAST
         while(status == Status::progress)
         {
           TimeStamp at;
+          double mpi_start(Statistics::get_time_mpi_execute());
 
           _q.clear();
           _s.clear();
@@ -173,6 +174,8 @@ namespace FEAST
             {
               TimeStamp bt;
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+              double mpi_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
               return Status::aborted;
             }
             //filter.filter_cor(this->_vec_z.at(i));
@@ -277,6 +280,8 @@ namespace FEAST
 
           TimeStamp bt;
           Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+          double mpi_stop(Statistics::get_time_mpi_execute());
+          Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
         }
 
         // finished
