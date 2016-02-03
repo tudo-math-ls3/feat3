@@ -11,7 +11,27 @@ namespace FEAST
   namespace LAFEM
   {
     /**
-     * \brief Vector-Mirror class template
+     * \brief Handles vector prolongation, restriction and serialisation
+     *
+     * \tparam Mem_
+     * Memory architecture
+     *
+     * \tparam DataType_
+     * Data type in the vector
+     *
+     * \tparam IndexType_
+     * Type for indexing
+     *
+     * A Mirror handles the restriction of a given vector to a subvector of itself and the serialisation into
+     * buffer vector (which always is a LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>), as well as the
+     * prolongation of such buffer vectors. The buffer vectors then can be communicated via MPI etc.
+     *
+     * This can be used for restricting a vector associated with a Mesh to a subset of that Mesh, i.e. identified by
+     * a MeshPart. The standard use case is that we have an FE coefficient vector living on a patch that we want to
+     * communicate. For this, we need all coefficients (= vector entries) that contribute to other patches, and
+     * these are identified by a MeshPart called Halo. The mirror is constructed from the restriction (gather) and
+     * prolongation (scatter) matrices representing the adjacency structure of the underlying FE space and thus the
+     * coefficients.
      *
      * \author Peter Zajac
      */
@@ -484,7 +504,21 @@ namespace FEAST
     }; // class VectorMirror<...>
 
     /**
-     * \brief Mirror class template for DenseVectorBlocked
+     * \brief Handles DenseVectorBlocked prolongation, restriction and serialisation
+     *
+     * \tparam Mem_
+     * Memory architecture
+     *
+     * \tparam DataType_
+     * Data type in the vector
+     *
+     * \tparam IndexType_
+     * Type for indexing
+     *
+     * \tparam BlockSize_
+     * Size of the DenseVectorBlocked blocks.
+     *
+     * \see VectorMirror for more details on Mirrors in general.
      *
      * \author Jordi Paul
      */
