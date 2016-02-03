@@ -230,6 +230,54 @@ namespace FEAST
         assemble_mirror(vec_mirror, assemble_mirror_graph(space, cell_set));
       }
 
+      /**
+       * \brief Assembles a VectorMirrorBlocked from graph.
+       *
+       * \param[out] vec_mirror
+       * The vector mirror that is to be assembled.
+       *
+       * \param[in] graph
+       * The mirror adjacency graph.
+       */
+      template<typename MemType_, typename DataType_, typename IndexType_, int BlockSize_>
+      static void assemble_mirror(
+        LAFEM::VectorMirrorBlocked<MemType_, DataType_, IndexType_, BlockSize_>& vec_mirror,
+        const Adjacency::Graph& graph)
+      {
+        SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_gather_prim(), graph);
+        SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_scatter_prim(),
+          Adjacency::Graph(Adjacency::rt_transpose, graph));
+
+        vec_mirror.get_gather_prim().format(DataType_(1));
+        vec_mirror.get_scatter_prim().format(DataType_(1));
+      }
+
+      /**
+       * \brief Assembles a VectorMirrorBlocked from a space and a cell-set.
+       *
+       * \param[out] vec_mirror
+       * The vector mirror that is to be assembled.
+       *
+       * \param[in] space
+       * A reference to the finite element space to be used.
+       *
+       * \param[in] cell_set
+       * A reference to the cell-set that is to be mirrored.
+       */
+      template<
+        typename MemType_,
+        typename DataType_,
+        typename IndexType_,
+        int BlockSize_,
+        typename Space_,
+        typename CellSet_>
+      static void assemble_mirror(
+        LAFEM::VectorMirrorBlocked<MemType_, DataType_, IndexType_, BlockSize_>& vec_mirror,
+        const Space_& space, const CellSet_& cell_set)
+      {
+        assemble_mirror(vec_mirror, assemble_mirror_graph(space, cell_set));
+      }
+
       template<
         typename MemType_,
         typename DataType_,
