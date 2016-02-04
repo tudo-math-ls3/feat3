@@ -154,7 +154,6 @@ namespace FEAST
         //bool early_exit = 0;
         bool restarted = false;
 
-        /// \todo Instrument iteration timings, beware the inner/outer loop twist
         while(status == Status::progress)
         {
           if (restarted == false)
@@ -181,17 +180,30 @@ namespace FEAST
           // main BiCGStab loop
           while(status == Status::progress)
           {
+            TimeStamp at;
+            double mpi_start(Statistics::get_time_mpi_execute());
+
             mat_sys.apply(vec_v, vec_p_tilde);
             fil_sys.filter_def(vec_v);
             // apply preconditioner
             if(!this->_apply_precond(vec_v_tilde, vec_v, fil_sys))
+            {
+              TimeStamp bt;
+              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+              double mpi_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
               return Status::aborted;
+            }
             //fil_sys.filter_cor(vec_v_tilde);
 
             gamma_tilde = vec_v_tilde.dot(vec_r_tilde_0);
 
             if (Math::abs(gamma_tilde) < Math::abs(rho_tilde)*1e-14)
             {
+              TimeStamp bt;
+              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+              double mpi_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
               restarted = true;
               //std::cout << "Breakpoint 1" << std::endl;
               break;
@@ -227,7 +239,13 @@ namespace FEAST
 
             // apply preconditioner
             if(!this->_apply_precond(vec_t_tilde, vec_t, fil_sys))
+            {
+              TimeStamp bt;
+              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+              double mpi_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
               return Status::aborted;
+            }
             //fil_sys.filter_cor(vec_t_tilde);
 
             gamma_tilde = vec_t_tilde.dot(vec_t_tilde);
@@ -235,6 +253,10 @@ namespace FEAST
 
             if (Math::abs(gamma_tilde) < Math::abs(omega_tilde) * 1e-14)
             {
+              TimeStamp bt;
+              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+              double mpi_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
               restarted = true;
               //std::cout << "Breakpoint 4" << std::endl;
               break;
@@ -251,6 +273,10 @@ namespace FEAST
             status = this->_set_new_defect(vec_r, vec_sol);
             if (status == Status::success)
             {
+              TimeStamp bt;
+              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+              double mpi_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
               //std::cout << "Breakpoint 5 (converged)" << std::endl;
               return status;
             }
@@ -265,6 +291,11 @@ namespace FEAST
             vec_p_tilde.axpy(vec_v_tilde, vec_p_tilde, momega_tilde);
             vec_p_tilde.scale(vec_p_tilde, beta_tilde);
             vec_p_tilde.axpy(vec_p_tilde, vec_r_tilde);
+
+            TimeStamp bt;
+            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+            double mpi_stop(Statistics::get_time_mpi_execute());
+            Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
           }
         }
 
