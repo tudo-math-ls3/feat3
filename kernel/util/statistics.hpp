@@ -9,6 +9,9 @@
 
 #include <list>
 #include <map>
+#include <time.h>
+#include <iostream>
+#include <fstream>
 
 namespace FEAST
 {
@@ -338,6 +341,75 @@ namespace FEAST
         _time_mpi_wait.correction = 0.;
       }
 
+      static void write_out_solver_statistics(int rank, String filename = "solver_stats")
+      {
+        filename += ".";
+        filename += stringify(rank);
+
+        std::ofstream file(filename.c_str(), std::ofstream::out);
+        if (! file.is_open())
+          throw InternalError(__func__, __FILE__, __LINE__, "Unable to open statistics file " + filename);
+
+        {
+          time_t t = time(NULL);
+          struct tm * ts = localtime(&t);
+
+          file << "timestamp " << stringify(ts->tm_mon + 1) << "/" << stringify(ts->tm_mday) << "/" << stringify(ts->tm_year + 1900) << " " << stringify(ts->tm_hour)
+            << ":" << stringify(ts->tm_min) << ":" << stringify(ts->tm_sec) << std::endl;
+        }
+
+        file << std::endl;
+
+        file << "#global time" << std::endl;
+        file << "reduction " << stringify(get_time_reduction()) <<std::endl;
+        file << "axpy " << stringify(get_time_axpy()) <<std::endl;
+        file << "spmv " << stringify(get_time_spmv()) <<std::endl;
+        file << "precon " << stringify(get_time_precon()) <<std::endl;
+        file << "mpi " << stringify(get_time_mpi_execute()) <<std::endl;
+
+        file << std::endl;
+
+        file << "#solver statistics" << std::endl;
+        for (auto stat : _solver_statistics)
+        {
+          file << stat.first << std::endl;
+
+          file << "#defects" << std::endl;
+          for (Index i(0) ; i < stat.second.defect.size() ; ++i)
+          {
+            if (i == 0 && stat.second.defect.at(i) == double(-1))
+              continue;
+            if (stat.second.defect.at(i) == double(-1))
+              file << "-" << std::endl;
+            else
+              file << stringify_fp_sci(stat.second.defect.at(i)) << std::endl;
+          }
+
+          file << "#toe" << std::endl;
+          for (Index i(0) ; i < stat.second.toe.size() ; ++i)
+          {
+            if (i == 0 && stat.second.toe.at(i) == double(-1))
+              continue;
+            if (stat.second.toe.at(i) == double(-1))
+              file << "-" << std::endl;
+            else
+              file << stringify_fp_sci(stat.second.toe.at(i)) << std::endl;
+          }
+
+          file << "#mpi_toe" << std::endl;
+          for (Index i(0) ; i < stat.second.mpi_toe.size() ; ++i)
+          {
+            if (i == 0 && stat.second.mpi_toe.at(i) == double(-1))
+              continue;
+            if (stat.second.mpi_toe.at(i) == double(-1))
+              file << "-" << std::endl;
+            else
+              file << stringify_fp_sci(stat.second.mpi_toe.at(i)) << std::endl;
+          }
+        }
+
+        file.close();
+      }
   };
 } // namespace FEAST
 
