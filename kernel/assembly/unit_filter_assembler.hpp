@@ -138,7 +138,7 @@ namespace FEAST
        * A LAFEM::DenseVector containing (among other stuff) the entries to be added.
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
-       * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
+       * and then cloned to the real filter. This means a slight overhead in the case that MemType_ == Mem::Main.
        */
       template<typename MemType_, typename DataType_, typename IndexType_, typename Space_>
       void assemble(
