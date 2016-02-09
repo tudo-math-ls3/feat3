@@ -213,22 +213,22 @@ namespace FEAST
           return _levels.back()->get_level_index();
         }
 
-        std::deque<LevelType*> get_levels()
+        std::deque<LevelType*>& get_levels()
         {
           return _levels;
         }
 
-        const std::deque<LevelType*> get_levels() const
+        const std::deque<LevelType*>& get_levels() const
         {
           return _levels;
         }
 
-        std::deque<LayerType*> get_layers()
+        std::deque<LayerType*>& get_layers()
         {
           return _layers;
         }
 
-        const std::deque<LayerType*> get_layers() const
+        const std::deque<LayerType*>& get_layers() const
         {
           return _layers;
         }
