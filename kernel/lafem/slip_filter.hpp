@@ -241,6 +241,8 @@ namespace FEAST
          */
         void filter_rhs(VectorType& vector) const
         {
+          if(_sv.empty())
+            return;
           if(_sv.size() != vector.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
@@ -256,6 +258,8 @@ namespace FEAST
          */
         void filter_sol(VectorType& vector) const
         {
+          if(_sv.empty())
+            return;
           // same as rhs
           filter_rhs(vector);
         }
@@ -268,6 +272,8 @@ namespace FEAST
          */
         void filter_def(VectorType& vector) const
         {
+          if(_sv.empty())
+            return;
           if(_sv.size() != vector.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
