@@ -424,7 +424,7 @@ namespace FEAST
       {
         CONTEXT("When destroying DenseVector");
 
-        // avoid releasing memory by base class destructore, because we do not own the referenced memory
+        // avoid releasing memory by base class destructor, because we do not own the referenced memory
         if (this->_scalar_index.size() > 0 && this->_scalar_index.at(1) == 1)
         {
           for (Index i(0) ; i < this->_elements.size() ; ++i)

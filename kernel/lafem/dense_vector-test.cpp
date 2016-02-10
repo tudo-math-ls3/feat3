@@ -60,7 +60,7 @@ public:
     TEST_CHECK_EQUAL(b(3), DT_(5));
     DenseVector<Mem_, DT_, IT_> b_r(b, 5, 3);
     TEST_CHECK_EQUAL(b_r(0), b(0+3));
-    TEST_CHECK_EQUAL(b_r(4), b(0+7));
+    TEST_CHECK_EQUAL(b_r(4), b(4+3));
     DenseVector<Mem_, DT_, IT_> c(b.clone());
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c(7), b(7));

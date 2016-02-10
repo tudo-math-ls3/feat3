@@ -63,6 +63,7 @@ namespace FEAST
      * Data survey: \n
      * _elements[0]: raw number values \n
      * _scalar_index[0]: container size - aka block count
+     * _scalar_index[1]: boolean flag, signaling DenseVectorRange usage
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -191,6 +192,8 @@ namespace FEAST
         Container<Mem_, DT_, IT_> (0)
       {
         CONTEXT("When creating DenseVectorBlocked");
+
+        this->_scalar_index.push_back(0);
       }
 
       /**
@@ -206,6 +209,7 @@ namespace FEAST
       {
         CONTEXT("When creating DenseVectorBlocked");
 
+        this->_scalar_index.push_back(0);
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
         this->_elements_size.push_back(size<Perspective::pod>());
       }
@@ -226,6 +230,7 @@ namespace FEAST
       {
         CONTEXT("When creating DenseVectorBlocked");
 
+        this->_scalar_index.push_back(0);
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
         this->_elements_size.push_back(size<Perspective::pod>());
 
@@ -245,6 +250,7 @@ namespace FEAST
       {
         CONTEXT("When creating DenseVectorBlocked");
 
+        this->_scalar_index.push_back(0);
         this->_elements.push_back(data);
         this->_elements_size.push_back(size<Perspective::pod>());
 
@@ -265,7 +271,31 @@ namespace FEAST
         Container<Mem_, DT_, IT_>(other.size() / Index(BlockSize_))
       {
         CONTEXT("When creating DenseVectorBlocked");
+
+        this->_scalar_index.push_back(0);
         convert(other);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] dvb_ind The source DenseVectorBlocked
+       * \param[in] size_in The (native) size of the created vector range.
+       * \param[in] offset The (native) starting element of the created vector range in relation to the source vector.
+       *
+       * Creates a vector range from a given DenseVectorBlocked
+       *
+       * \note The created DenseVectorBlocked has no own memory management nor own allocated memory and should be used carefully!
+       */
+      explicit DenseVectorBlocked(const DenseVectorBlocked & dv_in, Index size_in, Index offset_in) :
+        Container<Mem_, DT_, IT_>(size_in)
+      {
+        CONTEXT("When creating DenseVectorBlocked");
+
+        this->_scalar_index.push_back(1);
+        DT_ * te(const_cast<DT_*>(dv_in.template elements<Perspective::pod>()));
+        this->_elements.push_back(te + offset_in * Index(BlockSize_));
+        this->_elements_size.push_back(size<Perspective::pod>());
       }
 
       /**
@@ -326,6 +356,25 @@ namespace FEAST
         Container<Mem_, DT_, IT_>(std::forward<DenseVectorBlocked>(other))
       {
         CONTEXT("When moving DenseVectorBlocked");
+      }
+
+      /**
+       * \brief Destructor
+       *
+       * Destroys the DenseVectorBlocked and releases all of its used arrays if its not marked a range vector.
+       */
+      virtual ~DenseVectorBlocked()
+      {
+        CONTEXT("When destroying DenseVectorBlocked");
+
+        // avoid releasing memory by base class destructor, because we do not own the referenced memory
+        if (this->_scalar_index.size() > 0 && this->_scalar_index.at(1) == 1)
+        {
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            this->_elements.at(i) = nullptr;
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            this->_indices.at(i) = nullptr;
+        }
       }
 
       /**
@@ -393,6 +442,7 @@ namespace FEAST
         this->clear();
 
         this->_scalar_index.push_back(other.size() / Index(BlockSize_));
+        this->_scalar_index.push_back(0);
 
         this->_elements.push_back(other.get_elements().at(0));
         this->_elements_size.push_back(size<Perspective::pod>());
@@ -618,6 +668,7 @@ namespace FEAST
       {
         this->clear();
         this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
 
         Index rows;
         String line;
@@ -698,6 +749,7 @@ namespace FEAST
       {
         this->clear();
         this->_scalar_index.push_back(0);
+        this->_scalar_index.push_back(0);
 
         std::vector<DT_> data;
 
@@ -754,8 +806,6 @@ namespace FEAST
       void read_from_dvb(std::istream& file)
       {
         this->clear();
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
 
         this->template _deserialise<double, uint64_t>(FileMode::fm_dvb, file);
       }

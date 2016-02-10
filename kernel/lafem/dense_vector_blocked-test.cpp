@@ -47,10 +47,17 @@ public:
 
     DenseVectorBlocked<Mem_, DT_, IT_, 2> a(10, DT_(7));
     TEST_CHECK_EQUAL(a, a);
-    TEST_CHECK_EQUAL(a.bytes_allocated(), 20 * sizeof(DT_) + sizeof(Index));
+    TEST_CHECK_EQUAL(a.bytes_allocated(), 20 * sizeof(DT_) + 2 * sizeof(Index));
     DenseVectorBlocked<Mem_, DT_, IT_, 2> b(10, DT_(5));
     Tiny::Vector<DT_, 2> tv(42);
     b(7, tv);
+
+    DenseVectorBlocked<Mem_, DT_, IT_, 2> b_r(b, 4, 6);
+    TEST_CHECK_EQUAL(b_r(0)[0], b(0+6)[0]);
+    TEST_CHECK_EQUAL(b_r(0)[1], b(0+6)[1]);
+    TEST_CHECK_EQUAL(b_r(1)[0], b(1+6)[0]);
+    TEST_CHECK_EQUAL(b_r(1)[1], b(1+6)[1]);
+
     DenseVectorBlocked<Mem_, DT_, IT_, 2> c(b.clone());
     TEST_CHECK_EQUAL(c.size(), b.size());
     //TEST_CHECK_EQUAL(c(7), b(7));
