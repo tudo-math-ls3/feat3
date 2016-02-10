@@ -359,11 +359,15 @@ namespace FEAST
        * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
        *
        */
-      template<typename MemType_, typename DataType_, typename IndexType_, int BlockSize_, typename Space_>
+      template
+      <
+        typename MemF_, typename DTF_, typename ITF_,
+        typename MemV_, typename DTV_, typename ITV_,
+        int BlockSize_, typename Space_>
       void assemble(
-        LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>& filter,
+        LAFEM::UnitFilterBlocked<MemF_, DTF_, ITF_, BlockSize_>& filter,
         const Space_& space,
-        const LAFEM::DenseVectorBlocked<MemType_, DataType_, IndexType_, BlockSize_>& vector_) const
+        const LAFEM::DenseVectorBlocked<MemV_, DTV_, ITV_, BlockSize_>& vector_) const
       {
         // build index set
         std::set<Index> idx_set;
@@ -372,11 +376,11 @@ namespace FEAST
         // allocate filter if necessary
         if (filter.size() == Index(0))
         {
-          filter = LAFEM::UnitFilterBlocked<MemType_, DataType_, IndexType_, BlockSize_>(space.get_num_dofs());
+          filter = LAFEM::UnitFilterBlocked<MemF_, DTF_, ITF_, BlockSize_>(space.get_num_dofs());
         }
 
         // Create buffer filter for assembly
-        LAFEM::UnitFilterBlocked<Mem::Main, DataType_, IndexType_, BlockSize_> buffer;
+        LAFEM::UnitFilterBlocked<Mem::Main, DTF_, ITF_, BlockSize_> buffer;
         buffer.convert(filter);
 
         // loop over all dof-indices
@@ -385,7 +389,7 @@ namespace FEAST
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index
-          buffer.add(IndexType_(*it), vector_(IndexType_(*it)));
+          buffer.add(ITF_(*it), vector_(ITV_(*it)));
         }
 
         // Upload assembled result to the filter
