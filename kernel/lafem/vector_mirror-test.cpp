@@ -208,7 +208,6 @@ public:
     VectorType vec_buf_ac(Index(1), DT_(0));
     VectorType vec_buf_bc(Index(1), DT_(0));
     VectorType vec_buf_abc(Index(1), DT_(0));
-    VectorType vec_buf_tmp(Index(1), DT_(0));
 
     // gather from a
     mirror0.gather_axpy_prim(vec_buf_abc, a1);
@@ -490,7 +489,6 @@ public:
     BufferVectorType vec_buf_bc(Index(BlockSize)*Index(1), DT_(0));
     // a1(0) + b1(0) + c1(0)
     BufferVectorType vec_buf_abc(Index(BlockSize)*Index(1), DT_(0));
-    BufferVectorType vec_buf_tmp(Index(BlockSize)*Index(1), DT_(0));
 
     // Gather from a
     mirror0.gather_axpy_prim(vec_buf_abc, a1);

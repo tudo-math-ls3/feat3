@@ -187,7 +187,7 @@ namespace ElementRegression
       TimeStamp stamp;
 
       int nl_min(1);
-      int nl_max = (Math::min(int(_level), nl));
+      int nl_max = Math::min(int(_level), nl);
 
       for(int i(nl_min); i <= nl_max; ++i)
       {
@@ -268,10 +268,6 @@ namespace ElementRegression
 
       // slighty disturb the mesh
       MeshDisturb<Shape_::dimension>::apply(mesh, 0.05 / double(1 << level));
-
-      // create boundary
-      Geometry::BoundaryFactory<MeshType> bnd_factory(mesh);
-      RegionType boundary(bnd_factory);
 
       // create trafo
       TrafoType trafo(mesh);

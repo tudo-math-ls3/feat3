@@ -153,7 +153,7 @@ public:
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
       SparseMatrixCSR<Mem::CUDA, DT_, IT_> csr_m1(coo_m1);
       SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m3(csr_m1);
-      TEST_CHECK_EQUAL(coo_m2, coo_m1);
+      TEST_CHECK_EQUAL(coo_m3, coo_m1);
     }
 
     {
@@ -184,7 +184,7 @@ public:
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
       SparseMatrixCSR<Mem::Main, DT_, IT_> csr_m1(coo_m1);
       SparseMatrixCOO<Mem::CUDA, DT_, IT_> coo_m3(csr_m1);
-      TEST_CHECK_EQUAL(coo_m2, coo_m1);
+      TEST_CHECK_EQUAL(coo_m3, coo_m1);
     }
 
     {

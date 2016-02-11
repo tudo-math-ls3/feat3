@@ -47,6 +47,10 @@ public:
     zero2.convert(zero1);
 
     SparseMatrixCSR<Mem_, DT_, IT_> zero3(10, 11, 12);
+    TEST_CHECK_EQUAL(zero3.used_elements(), 12);
+    TEST_CHECK_EQUAL(zero3.rows(), 10);
+    TEST_CHECK_EQUAL(zero3.columns(), 11);
+    TEST_CHECK_EQUAL(zero3.size(), 110);
 
     SparseMatrixCOO<Mem::Main, DT_, IT_> a(10, 10);
     a(1,2,7);
@@ -94,12 +98,14 @@ public:
     TEST_CHECK_EQUAL(bl.columns(), b.columns());
 
     typename SparseLayout<Mem_, IT_, SparseLayoutId::lt_csr>::template MatrixType<DT_> x(b.layout());
+    TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
+    TEST_CHECK_NOT_EQUAL((void*)x.val(), (void*)b.val());
     // icc 14.0.2 does not understand the following line, so we need a typedef hier
     //typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
     typedef decltype(b.layout()) LayoutId;
     typename LayoutId::template MatrixType<DT_> y(b.layout());
-    TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
-    TEST_CHECK_NOT_EQUAL((void*)x.val(), (void*)b.val());
+    TEST_CHECK_EQUAL((void*)y.row_ptr(), (void*)b.row_ptr());
+    TEST_CHECK_NOT_EQUAL((void*)y.val(), (void*)b.val());
 
 
     SparseMatrixCSR<Mem_, DT_, IT_> z;

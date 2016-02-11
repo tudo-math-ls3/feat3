@@ -41,7 +41,10 @@ public:
     DenseMatrix<Mem::Main, DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
 
-    DenseMatrix<Mem_, DT_, IT_> a(10, 10);
+    DenseMatrix<Mem_, DT_, IT_> a(10, 11);
+    TEST_CHECK_EQUAL(a.rows(), 10);
+    TEST_CHECK_EQUAL(a.columns(), 11);
+    TEST_CHECK_EQUAL(a.size() , 110);
     DenseMatrix<Mem_, DT_, IT_> b(10, 10, 5.);
     b(7, 6, DT_(42));
     DenseMatrix<Mem_, DT_, IT_> c;
