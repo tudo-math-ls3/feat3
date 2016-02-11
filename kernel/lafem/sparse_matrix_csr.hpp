@@ -1717,7 +1717,7 @@ namespace FEAST
       ///@name Linear algebra operations
       ///@{
       /**
-       * \brief Calculate \f$this \leftarrow y + \alpha x\f$
+       * \brief Calculate \f$this \leftarrow y + \alpha~ x\f$
        *
        * \param[in] x The first summand matrix to be scaled.
        * \param[in] y The second summand matrix
@@ -1773,7 +1773,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Calculate \f$this \leftarrow \alpha x \f$
+       * \brief Calculate \f$this \leftarrow \alpha~ x \f$
        *
        * \param[in] x The matrix to be scaled.
        * \param[in] alpha A scalar to scale x with.
@@ -2032,7 +2032,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+       * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
@@ -2087,7 +2087,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+       * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \param[out] r The block vector that recieves the result.
        * \param[in] x The block vector to be multiplied by this matrix.

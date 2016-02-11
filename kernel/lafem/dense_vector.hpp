@@ -1048,7 +1048,7 @@ namespace FEAST
       ///@name Linear algebra operations
       ///@{
       /**
-       * \brief Calculate \f$this \leftarrow \alpha x + y\f$
+       * \brief Calculate \f$this \leftarrow \alpha~ x + y\f$
        *
        * \param[in] x The first summand vector to be scaled.
        * \param[in] y The second summand vector
@@ -1139,7 +1139,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Calculate \f$this \leftarrow \alpha x \f$
+       * \brief Calculate \f$this \leftarrow \alpha~ x \f$
        *
        * \param[in] x The vector to be scaled.
        * \param[in] alpha A scalar to scale x with.
