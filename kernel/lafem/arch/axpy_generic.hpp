@@ -87,6 +87,25 @@ namespace FEAST
         }
       }
 
+      template <typename DT_, typename IT_, int BlockSize_>
+      void Axpy<Mem::Main>::csrsb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
+      {
+        Tiny::Vector<DT_, BlockSize_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockSize_> *>(r));
+        const Tiny::Vector<DT_, BlockSize_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, BlockSize_> *>(x));
+        const Tiny::Vector<DT_, BlockSize_> * const by(reinterpret_cast<const Tiny::Vector<DT_, BlockSize_> *>(y));
+
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          Tiny::Vector<DT_, BlockSize_> bsum(0);
+          const IT_ end(row_ptr[row + 1]);
+          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          {
+            bsum += val[i] * bx[col_ind[i]];
+          }
+          br[row] = (bsum * a) + by[row];
+        }
+      }
+
       namespace Intern
       {
         namespace AxpyELL

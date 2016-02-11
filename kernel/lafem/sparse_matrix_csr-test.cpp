@@ -255,7 +255,6 @@ public:
       DenseVector<Mem_, DT_, IT_> y(size);
       y.copy(y_local);
 
-      Index ue(0);
       for (Index row(0) ; row < a_local.rows() ; ++row)
       {
         for (Index col(0) ; col < a_local.columns() ; ++col)
@@ -263,12 +262,10 @@ public:
           if(row == col)
           {
             a_local(row, col, DT_(2));
-            ++ue;
           }
           else if((row == col+1) || (row+1 == col))
           {
             a_local(row, col, DT_(-1));
-            ++ue;
           }
         }
       }
@@ -370,7 +367,6 @@ public:
         ref_x_local(i, DT_(i % 100 * DT_(1.234)));
       }
 
-      Index ue(0);
       for (Index row(0) ; row < a_local.rows() ; ++row)
       {
         for (Index col(0) ; col < a_local.columns() ; ++col)
@@ -378,12 +374,10 @@ public:
           if(row == col)
           {
             a_local(row, col, DT_(2));
-            ++ue;
           }
           else if((row == col+1) || (row+1 == col))
           {
             a_local(row, col, DT_(-1));
-            ++ue;
           }
         }
       }
@@ -403,23 +397,56 @@ public:
       DenseVectorBlocked<Mem_, DT_, IT_, 3> x;
       x.convert(x_local);
 
+      DenseVectorBlocked<Mem::Main, DT_, IT_, 3> y_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        auto temp = y_local(i);
+        temp[0] = DT_(i);
+        temp[1] = DT_(i*2);
+        temp[2] = DT_(i*3);
+        y_local(i, temp);
+      }
+      DenseVectorBlocked<Mem_, DT_, IT_, 3> y;
+      y.convert(y_local);
+
       DenseVectorBlocked<Mem_, DT_, IT_, 3> r(size);
       DenseVectorBlocked<Mem_, DT_, IT_, 3> r_local;
 
       a.apply(r, x);
       r_local.convert(r);
-
       for (Index i(0) ; i < size ; ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], ref_local(i), 1e-5);
         TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], ref_local(i) * DT_(0.5), 1e-5);
         TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], ref_local(i) * DT_(2.0), 1e-5);
       }
+
+      a.apply(r, x, y, DT_(-1));
+      r_local.convert(r);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] - ref_local(i), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] - ref_local(i) * DT_(0.5), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] - ref_local(i) * DT_(2.0), 1e-5);
+      }
+
+      DT_ alpha(0.75);
+      a.apply(r, x, y, alpha);
+      r_local.convert(r);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] + alpha * ref_local(i), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] + alpha * ref_local(i) * DT_(0.5), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] + alpha * ref_local(i) * DT_(2.0), 1e-5);
+      }
     }
   }
 };
 
 SparseMatrixCSRBApplyTest<Mem::Main, float, unsigned long> sm_csrib_apply_test_float_ulong;
+SparseMatrixCSRBApplyTest<Mem::Main, double, unsigned long> sm_csrib_apply_test_double_ulong;
+SparseMatrixCSRBApplyTest<Mem::Main, float, unsigned int> sm_csrib_apply_test_float_uint;
+SparseMatrixCSRBApplyTest<Mem::Main, double, unsigned int> sm_csrib_apply_test_double_uint;
 
 
 template<

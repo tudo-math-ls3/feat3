@@ -190,7 +190,6 @@ public:
       DenseVector<Mem_, DT_, IT_> y(size);
       y.copy(y_local);
 
-      Index ue(0);
       for (Index row(0) ; row < a_local.rows() ; ++row)
       {
         for (Index col(0) ; col < a_local.columns() ; ++col)
@@ -198,12 +197,10 @@ public:
           if(row == col)
           {
             a_local(row, col, DT_(2));
-            ++ue;
           }
           else if((row == col+1) || (row+1 == col))
           {
             a_local(row, col, DT_(-1));
-            ++ue;
           }
         }
       }

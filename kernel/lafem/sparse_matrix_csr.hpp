@@ -1946,42 +1946,6 @@ namespace FEAST
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
-       * \param[out] r The block vector that recieves the result.
-       * \param[in] x The block vector to be multiplied by this matrix.
-       *
-       * \note Every element of each block in the vector x is multiplied with the corresponding single scalar entry in the matrix.
-       */
-      template<int BlockSize_>
-      void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockSize_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & x) const
-      {
-        if (r.size() != this->rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-        if (x.size() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
-
-        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        if (this->used_elements() == 0)
-        {
-          r.format();
-          return;
-        }
-
-        TimeStamp ts_start;
-
-        Statistics::add_flops(this->used_elements() * 2);
-        Arch::ProductMatVec<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
-          r.template elements<Perspective::pod>(), this->val(), this->col_ind(), this->row_ptr(),
-          x.template elements<Perspective::pod>(), this->rows(), columns(), used_elements());
-
-        TimeStamp ts_stop;
-        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
-      }
-
-      /**
-       * \brief Calculate \f$ r \leftarrow this\cdot x \f$
-       *
        * \param[out] r The vector that recieves the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
@@ -2006,6 +1970,42 @@ namespace FEAST
         Statistics::add_flops(this->used_elements() * 2);
         Arch::ProductMatVec<Mem_>::csr(r.elements(), this->val(), this->col_ind(), this->row_ptr(),
                                               x.elements(), this->rows(), columns(), used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+       * \brief Calculate \f$ r \leftarrow this\cdot x \f$
+       *
+       * \param[out] r The block vector that recieves the result.
+       * \param[in] x The block vector to be multiplied by this matrix.
+       *
+       * \note Every element of each block in the vector x is multiplied with the corresponding single scalar entry in the matrix.
+       */
+      template<int BlockSize_>
+      void apply(DenseVectorBlocked<Mem_,DT_, IT_, BlockSize_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & x) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements() * 2 * BlockSize_);
+        Arch::ProductMatVec<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
+          r.template elements<Perspective::pod>(), this->val(), this->col_ind(), this->row_ptr(),
+          x.template elements<Perspective::pod>(), this->rows(), columns(), used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
@@ -2080,6 +2080,66 @@ namespace FEAST
           Statistics::add_flops(this->used_elements() * 3);
           Arch::Axpy<Mem_>::csr(r.elements(), alpha, x.elements(), y.elements(),
                                        this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+        }
+
+        TimeStamp ts_stop;
+        Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+       * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+       *
+       * \param[out] r The block vector that recieves the result.
+       * \param[in] x The block vector to be multiplied by this matrix.
+       * \param[in] y The summand block vector.
+       * \param[in] alpha A scalar to scale the product with.
+       *
+       * \note Every element of each block in the vector x is multiplied with the corresponding single scalar entry in the matrix.
+       */
+      template<int BlockSize_>
+      void apply(
+                 DenseVectorBlocked<Mem_,DT_, IT_, BlockSize_> & r,
+                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & x,
+                 const DenseVectorBlocked<Mem_, DT_, IT_, BlockSize_> & y,
+                 const DT_ alpha = DT_(1)) const
+      {
+        if (r.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+        if (x.size() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+        if (y.size() != this->rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+        if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
+
+        if (this->used_elements() == 0)
+        {
+          r.copy(y);
+          return;
+        }
+
+        TimeStamp ts_start;
+
+        // check for special cases
+        // r <- y - A*x
+        if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+        {
+          Statistics::add_flops(this->used_elements() * 3 * BlockSize_);
+          Arch::Defect<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
+              r.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->val(), this->col_ind(),
+              this->row_ptr(), x.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
+        }
+        //r <- y
+        else if(Math::abs(alpha) < Math::eps<DT_>())
+          r.copy(y);
+        // r <- y + alpha*A*x
+        else
+        {
+          Statistics::add_flops(this->used_elements() * 3 * BlockSize_);
+          Arch::Axpy<Mem_>::template csrsb<DT_, IT_, BlockSize_>(
+              r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(),
+              this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
         }
 
         TimeStamp ts_stop;
