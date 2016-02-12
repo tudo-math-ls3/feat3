@@ -433,7 +433,7 @@ namespace FEAST
        * \note
        * Specifying \p nparts < 1 is equivalent to calling <c>write(filename)</c>.
        */
-      void write(const String& filename, const int rank, const int nparts) const
+      void write(const String& filename, const int rank, const int nparts)
       {
         // call the standard serial write version if nparts < 1
         if(nparts < 1)
@@ -445,6 +445,14 @@ namespace FEAST
         // verify rank
         if((rank < 0) || (rank >= nparts))
           throw InternalError("Invalid rank '" + stringify(rank) + "'");
+
+        // Add rank cell array since we're parallel if we come to here
+        double* rank_array = new double[_num_cells];
+        for(Index i(0); i < _num_cells; ++i)
+          rank_array[i] = double(rank);
+
+        add_scalar_cell("rank", rank_array);
+        delete[] rank_array;
 
         // compute number of non-zero digits in (nparts-1) for padding
         const std::size_t ndigits = Math::ilog10(std::size_t(nparts-1));
