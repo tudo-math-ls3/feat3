@@ -427,7 +427,7 @@ public:
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[0], y_local(i)[0] - ref_local(i), 1e-5);
         TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[1], y_local(i)[1] - ref_local(i) * DT_(0.5), 1e-5);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] - ref_local(i) * DT_(2.0), 1e-5);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r_local(i)[2], y_local(i)[2] - ref_local(i) * DT_(2.0), 1e-4);
       }
 
       DT_ alpha(0.75);
