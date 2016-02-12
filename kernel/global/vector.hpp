@@ -86,6 +86,11 @@ namespace FEAST
         return Vector(_gate, _vector.clone(mode));
       }
 
+      void clone(const Vector& other, LAFEM::CloneMode mode = LAFEM::CloneMode::Weak)
+      {
+        *(*this) = (*other).clone(mode);
+      }
+
       void clear()
       {
         _vector.clear();
