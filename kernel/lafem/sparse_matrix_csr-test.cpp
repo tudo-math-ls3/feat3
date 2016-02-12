@@ -100,10 +100,13 @@ public:
     typename SparseLayout<Mem_, IT_, SparseLayoutId::lt_csr>::template MatrixType<DT_> x(b.layout());
     TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
     TEST_CHECK_NOT_EQUAL((void*)x.val(), (void*)b.val());
-    // icc 14.0.2 does not understand the following line, so we need a typedef hier
-    //typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
+    /// \compilerhack icc 14.x does not understand the following single line, so we need a typedef detour here
+#if defined(FEAST_COMPILER_INTEL) && __INTEL_COMPILER < 1500
     typedef decltype(b.layout()) LayoutId;
     typename LayoutId::template MatrixType<DT_> y(b.layout());
+#else
+    typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
+#endif
     TEST_CHECK_EQUAL((void*)y.row_ptr(), (void*)b.row_ptr());
     TEST_CHECK_NOT_EQUAL((void*)y.val(), (void*)b.val());
 
