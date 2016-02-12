@@ -37,6 +37,9 @@
 /// Do we have QUADMATH support enabled?
 #cmakedefine FEAT_HAVE_QUADMATH
 
+/// Do we have HALFMATH support enabled?
+#cmakedefine FEAT_HAVE_HALFMATH
+
 /// Do we have ALGLIB support enabled?
 #cmakedefine FEAT_HAVE_ALGLIB
 

@@ -201,6 +201,10 @@ DenseVectorTest<Mem::Main, double, unsigned long> cpu_dense_vector_test_double_u
 DenseVectorTest<Mem::Main, __float128, unsigned int> cpu_dense_vector_test_float128_uint;
 DenseVectorTest<Mem::Main, __float128, unsigned long> cpu_dense_vector_test_float128_ulong;
 #endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorTest<Mem::Main, half_float::half, unsigned int> cpu_dense_vector_test_half_uint;
+DenseVectorTest<Mem::Main, half_float::half, unsigned long> cpu_dense_vector_test_half_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
 DenseVectorTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_test_float_uint;
 DenseVectorTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_test_double_uint;

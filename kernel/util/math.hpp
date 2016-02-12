@@ -788,6 +788,13 @@ namespace FEAT
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
+#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
+    inline bool isfinite(half_float::half x)
+    {
+      return half_float::isfinite(x);
+    }
+#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
+
     /**
      * \brief Checks whether a value is infinite.
      *
@@ -810,6 +817,13 @@ namespace FEAT
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
 
+#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
+    inline bool isinfinite(half_float::half x)
+    {
+      return half_float::isinf(x);
+    }
+#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
+
     /**
      * \brief Checks whether a value is Not-A-Number.
      *
@@ -831,6 +845,13 @@ namespace FEAT
       return (::isnanq(x) != 0);
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
+
+#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
+    inline bool isnan(half_float::half x)
+    {
+      return half_float::isnan(x);
+    }
+#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
 
     /**
      * \brief Checks whether a value is normal.
@@ -858,6 +879,13 @@ namespace FEAT
       return !(::fabsq(x) < FLT128_MIN);
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
+
+#if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
+    inline bool isnormal(half_float::half x)
+    {
+      return half_float::isnormal(x);
+    }
+#endif // FEAT_HAVE_HALFMATH && !__CUDA_CC__
 
     /**
      * \brief Calculates the (partial) factorial.

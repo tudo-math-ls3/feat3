@@ -7,6 +7,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/binary_stream.hpp>
+#include <kernel/util/type_traits.hpp>
 
 // includes, system
 #include <vector>
@@ -37,6 +38,8 @@ namespace FEAT
      *
      * - If FEAT_HAVE_QUADMATH is defined, this function will initialise the
      *   dt__float128 datatype.
+     * - If FEAT_HAVE_HALFMATH is defined, this function will initialise the
+     *   dt__half datatype.
      * - If FEAT_OVERRIDE_MPI_OPS is defined, this function will override
      *   the standard op_sum, op_max and op_min operations by custom
      *   implementations.
@@ -168,6 +171,11 @@ namespace FEAT
     extern const Datatype dt__float128;
 #endif
 
+#if defined(FEAT_HAVE_HALFMATH) || defined(DOXYGEN)
+    /// custom Datatype for half_float::half
+    extern const Datatype dt__half;
+#endif
+
     /**
      * \brief Automatic Datatype deduction function template
      *
@@ -200,6 +208,10 @@ namespace FEAT
 
 #if defined(FEAT_HAVE_QUADMATH) || defined(DOXYGEN)
     template<> inline const Datatype& autotype<__float128>()        {return dt__float128;}
+#endif
+
+#if defined(FEAT_HAVE_HALFMATH) || defined(DOXYGEN)
+    template<> inline const Datatype& autotype<half_float::half>()  {return dt__half;}
 #endif
 
     /// \endcond

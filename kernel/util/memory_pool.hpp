@@ -324,7 +324,7 @@ namespace FEAT
         {
           for (Index i(0) ; i < count ; ++i)
           {
-            dest[i] = (DT1_)src[i];
+            dest[i] = DT1_(src[i]);
           }
         }
 

@@ -21,6 +21,8 @@
 
 #define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
   _Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
+  _Pragma("clang diagnostic ignored \"-Wconversion\"") \
+  _Pragma("clang diagnostic ignored \"-Wmismatched-tags\"") \
   _Pragma("clang diagnostic ignored \"-Wignored-qualifiers\"")
 
 #define FEAT_RESTORE_WARNINGS _Pragma("clang diagnostic pop")

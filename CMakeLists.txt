@@ -118,6 +118,10 @@ if (FEAT_HAVE_ZLIB)
 endif(FEAT_HAVE_ZLIB)
 
 
+if (FEAT_HAVE_HALFMATH)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/half/include/")
+endif(FEAT_HAVE_HALFMATH)
+
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 

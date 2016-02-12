@@ -7,6 +7,14 @@
 
 #include <typeindex>
 
+#ifdef FEAT_HAVE_HALFMATH
+FEAT_DISABLE_WARNINGS
+#define HALF_ROUND_STYLE 2
+//#define HALF_ROUND_TIES_TO_EVEN 1
+#include <half.hpp>
+FEAT_RESTORE_WARNINGS
+#endif // FEAT_HAVE_HALFMATH
+
 namespace FEAT
 {
   /**
@@ -580,6 +588,40 @@ namespace FEAT
       }
     };
 #endif // FEAT_HAVE_QUADMATH && !__CUDA__CC
+
+#ifdef FEAT_HAVE_HALFMATH
+    /**
+     * \brief Type Traits specialisation for <c>half</c>
+     *
+     * \author Dirk Ribbrock
+     */
+    template<>
+    struct Traits<half_float::half>
+    {
+      /// this type is not integral
+      static constexpr bool is_int = false;
+      /// this type is floating
+      static constexpr bool is_float = true;
+      /// this type is not boolean
+      static constexpr bool is_bool = false;
+      /// this type is signed
+      static constexpr bool is_signed = true;
+
+      /// this type is of floating class
+      typedef FloatingClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "half";
+      }
+
+      static uint64_t hash_code()
+      {
+        return uint64_t(1234);
+      }
+    };
+#endif // FEAT_HAVE_HALFMATH
   } // namespace Type
 } // namespace FEAT
 
