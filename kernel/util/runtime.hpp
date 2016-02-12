@@ -42,7 +42,7 @@ namespace FEAST
      * The MPI rank of this process. Is always 0 for serial builds.
      *
      * \param[out] nprocs
-     * The total number of MPI processes. Is always 0 for serial builds.
+     * The total number of MPI processes. Is always 1 for serial builds.
      */
     static void initialise(int& argc, char**& argv, int& rank, int& nprocs);
 
