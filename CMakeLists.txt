@@ -72,6 +72,12 @@ if (FEAST_HAVE_ALGLIB)
   INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/alglib/cpp/src/")
 endif(FEAST_HAVE_ALGLIB)
 
+if (FEAST_HAVE_UMFPACK)
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/SuiteSparse_config/")
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/AMD/Include/")
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/UMFPACK/Include/")
+endif (FEAST_HAVE_UMFPACK)
+
 if (FEAST_HAVE_FPARSER)
   INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/fparser/")
 endif(FEAST_HAVE_FPARSER)

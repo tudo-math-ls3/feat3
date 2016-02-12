@@ -14,7 +14,6 @@ if (FEAST_HAVE_ALGLIB)
 endif (FEAST_HAVE_ALGLIB)
 
 if (FEAST_HAVE_FPARSER)
-  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/fparser/")
   file(GLOB fparser-list "${FEAST_SOURCE_DIR}/thirdparty/fparser/*.cc")
 
   # The 'fpoptimizer.cc' can not be compiled with clang++, so we have to disable

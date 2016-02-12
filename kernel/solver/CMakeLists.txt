@@ -8,12 +8,6 @@ SET (kernel-solver-list
   umfpack.cpp
   )
 
-if (FEAST_HAVE_UMFPACK)
-  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/SuiteSparse_config/")
-  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/AMD/Include/")
-  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/UMFPACK/Include/")
-endif (FEAST_HAVE_UMFPACK)
-
 ADD_LIBRARY(kernel-solver STATIC ${kernel-solver-list})
 TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 
