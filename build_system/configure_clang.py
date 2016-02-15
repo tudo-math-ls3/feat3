@@ -41,8 +41,8 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler):
         cxxflags += " -Ofast -D__extern_always_inline='extern __always_inline'"
 
     if cpu == "unknown":
-      cxxflags += " -mtune=generic"
-      print ("Warning: cpu type not detected, using -mtune=generic instead.")
+      cxxflags += " -march=native"
+      print ("Warning: cpu type not detected, using -march=native instead.")
 
     # INTEL
     elif cpu == "i486":

@@ -57,8 +57,8 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -Ofast"
 
     if cpu == "unknown":
-      cxxflags += " -mtune=generic"
-      print ("Warning: cpu type not detected, using -mtune=generic instead.")
+      cxxflags += " -march=native"
+      print ("Warning: cpu type not detected, using -march=native instead.")
 
     # INTEL
     elif cpu == "i486":
