@@ -1,6 +1,7 @@
 import platform
 import sys
 from build_system.feast_util import get_output
+from build_system.feast_util import find_exe
 
 def configure_gcc(cpu, buildid, compiler):
   version = get_output(compiler + " -dM -E - ")
@@ -14,6 +15,7 @@ def configure_gcc(cpu, buildid, compiler):
     print ("Error: GNU Compiler version less then 4.8 is not supported, please update your compiler or choose another one!")
     sys.exit(1)
 
+  cmake_flags = ""
   cxxflags = "-pipe -std=c++11 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla"
   if (major == 4 and minor >= 9) or major > 4:
     cxxflags += " -fdiagnostics-color=always"
@@ -49,6 +51,11 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
   elif "opt" in buildid or "fast" in buildid:
     cxxflags += " -funsafe-loop-optimizations"
+    if "lto" in buildid:
+      cxxflags += " -flto"
+      #use gcc provided binutils for lto
+      cmake_flags += " -DCMAKE_RANLIB:PATH=" + find_exe("gcc-ranlib")
+      cmake_flags += " -DCMAKE_AR:PATH=" + find_exe("gcc-ar")
     if major >= 5:
       cxxflags +=" -malign-data=cacheline"
     if "opt" in buildid:
@@ -148,4 +155,4 @@ def configure_gcc(cpu, buildid, compiler):
       cxxflags += " -march=native"
       print ("Warning: Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
 
-  return cxxflags
+  return cxxflags, cmake_flags

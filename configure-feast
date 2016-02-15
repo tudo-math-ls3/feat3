@@ -52,8 +52,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("============== BUILD ID ====================")
   print ("The FEAST build-id is a string of various keywords, delimited by hyphes or whitespaces")
   print ("It is used to choose different tools and configurations related to the build process.")
-  print ("With the exception of the additional backends and thirdpartylibs, you can choose one token out of each category.")
-  print ("These categories are:")
+  print ("The keywords, sorted by categories are:")
   print ("  Build Mode: debug, opt, fast")
   print ("  Parallelisation: serial, mpi")
   print ("  Compiler: gcc, icc, clang")
@@ -63,10 +62,10 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Instrumentation: scorep")
   print ("  Debugging: valgrind, cudamemcheck")
   print ("  Precision extensions: quadmath")
-  print ("  Compilation optimisations: cotire")
+  print ("  Compilation process optimisations: cotire")
+  print ("  Compiler optimisation steps: lto")
   print ("  Third party source code: alglib, fparser, umfpack, parmetis")
-  print ("")
-  print ("Note that you need to provide at least a build mode, a parallelisation mode and a compiler.")
+  print ("Note that you must provide exactly one build mode, one parallelisation mode and one compiler.")
   print ("Note that you cannot combine any build id token with the guess token.")
   print ("Note that cudamemcheck is only active if cuda is activated, too.")
   print ("Note that the actual compiler version and mpi implementation is choosen by first come, fist serve")
@@ -94,7 +93,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Use fancy template meta programming to unroll SparseMatrixBanded kernels.")
   print ("")
   print ("Note that the first gcc(g++) in $PATH is choosen as the cuda host compiler, if no other one is provided.")
-  print ("Note that these additional options are only valid in build-id mode.")
+  print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
   sys.exit()
 
 #get path to feast source trunk
@@ -103,7 +102,9 @@ trunk_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 #clear all related
 os.environ["CXXFLAGS"] = ""
 os.environ["CXX"] = ""
+os.environ["LD"] = ""
 os.environ["CC"] = ""
+os.environ["LDFLAGS"] = ""
 os.environ["OMP_CXX"] = ""
 os.environ["OMP_CC"] = ""
 os.environ["MPICH_CXX"] = ""
@@ -271,7 +272,10 @@ if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
   remove_string(unused_tokens, "gnu")
   os.environ["CC"] = "gcc"
   os.environ["CXX"] = compiler
-  cxxflags += " " + configure_gcc (cputype, buildid, compiler)
+  os.environ["LD"] = compiler
+  cxxflags_temp, cmake_temp = configure_gcc (cputype, buildid, compiler)
+  cxxflags += cxxflags_temp
+  cmake_flags += cmake_temp
   if "coverage" in buildid:
     remove_string(unused_tokens, "coverage")
     ldflags += " -fprofile-arcs -ftest-coverage"
@@ -287,6 +291,7 @@ elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   remove_string(unused_tokens, "intel")
   os.environ["CC"] = "icc"
   os.environ["CXX"] = compiler
+  os.environ["LD"] = compiler
   cxxflags += " " + configure_icc (cputype, buildid, compiler, system_host_compiler)
   cmake_flags += " -DFEAST_COMPILER_ID:STRING=icc"
 elif "clang" in buildid or "llvm" in buildid:
@@ -299,6 +304,7 @@ elif "clang" in buildid or "llvm" in buildid:
   remove_string(unused_tokens, "llvm")
   os.environ["CC"] = "clang"
   os.environ["CXX"] = compiler
+  os.environ["LD"] = compiler
   cxxflags += " " + configure_clang (cputype, buildid, compiler, system_host_compiler)
   cmake_flags += " -DFEAST_COMPILER_ID:STRING=clang"
 else:
@@ -376,7 +382,6 @@ if "cotire" in buildid:
   remove_string(unused_tokens, "cotire")
   cmake_flags += " -DFEAST_COTIRE:BOOL=ON"
 
-
 #prevent parmetis without mpi enabled (needed by parmetis)
 if "mpi" not in buildid and "parmetis" in buildid:
   print("Error: Using parmetis without mpi is not allowed!")
@@ -413,6 +418,9 @@ for i in clean:
 
 #export compiler/linker flags
 os.environ["CXXFLAGS"] = cxxflags
+if "lto" in buildid:
+  remove_string(unused_tokens, "lto")
+  ldflags += cxxflags
 os.environ["LDFLAGS"] = ldflags
 #set system host compiler in cflags to pass cmake's c compiler check
 if "icc" in buildid or "intel" in buildid or "icpc" in buildid:

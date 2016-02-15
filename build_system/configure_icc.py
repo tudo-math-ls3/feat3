@@ -26,10 +26,10 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
 
   elif "opt" in buildid or "fast" in buildid:
     cxxflags += " -no-prec-div"
-    if major == 14:
-      cxxflags += " -ip"
-    else:
+    if "lto" in buildid:
       cxxflags += " -ipo -diag-disable11074,11076,11000,11001,11006"
+    else:
+      cxxflags += " -ip -diag-disable11074,11076"
 
     if "opt" in buildid:
       cxxflags += " -O3"
