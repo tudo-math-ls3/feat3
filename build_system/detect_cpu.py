@@ -187,5 +187,5 @@ def detect_cpu():
 
   # TODO insert sparc support here once it has been implemented properly
 
-  print ("Warning: cputype unknown - vendor_id: " + vendor_id + ", cpu_family: " + cpu_family + ", model: " + model)
+  print ("Warning: cputype unknown - vendor_id: " + vendor_id + ", cpu_family: " + str(cpu_family) + ", model: " + str(model))
   return cputype
