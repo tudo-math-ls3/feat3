@@ -100,8 +100,8 @@ public:
     typename SparseLayout<Mem_, IT_, SparseLayoutId::lt_csr>::template MatrixType<DT_> x(b.layout());
     TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
     TEST_CHECK_NOT_EQUAL((void*)x.val(), (void*)b.val());
-    /// \compilerhack icc 14.x does not understand the following single line, so we need a typedef detour here
-#if defined(FEAST_COMPILER_INTEL) && __INTEL_COMPILER < 1500
+    /// \compilerhack icc 14.x and msvc do not understand the following single line, so we need a typedef detour here
+#if defined(FEAST_COMPILER_MICROSOFT) || (defined(FEAST_COMPILER_INTEL) && __INTEL_COMPILER < 1500)
     typedef decltype(b.layout()) LayoutId;
     typename LayoutId::template MatrixType<DT_> y(b.layout());
 #else
