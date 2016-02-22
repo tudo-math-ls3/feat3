@@ -13,7 +13,7 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
     print ("Error: Intel Compiler version less then 14.0.2 is not supported, please update your compiler!")
     sys.exit(1)
 
-  cxxflags = "-std=c++11 -g -Wall -Wextra -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -diag-disable 2304 -diag-disable 2305"
+  cxxflags = "-std=c++11 -g -Wall -Wextra -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -diag-disable 2304,2305"
   if system_host_compiler:
     cxxflags += " -gcc-name=" + system_host_compiler
 
@@ -27,9 +27,9 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
   elif "opt" in buildid or "fast" in buildid:
     cxxflags += " -no-prec-div"
     if "lto" in buildid:
-      cxxflags += " -ipo -diag-disable11074,11076,11000,11001,11006"
+      cxxflags += " -ipo -diag-disable 11074,11076,11000,11001,11006"
     else:
-      cxxflags += " -ip -diag-disable11074,11076"
+      cxxflags += " -ip -diag-disable 11074,11076"
 
     if "opt" in buildid:
       cxxflags += " -O3"
