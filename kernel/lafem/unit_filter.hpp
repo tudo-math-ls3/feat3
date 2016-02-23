@@ -121,6 +121,12 @@ namespace FEAST
         _sv.clear();
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _sv.bytes();
+      }
+
       /// \cond internal
       SparseVector<Mem_, DT_, IT_>& get_filter_vector()
       {

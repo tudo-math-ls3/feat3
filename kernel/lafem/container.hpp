@@ -782,24 +782,24 @@ namespace FEAST
        *
        * \returns The amount of bytes allocated in all arrays
        */
-      Index bytes_allocated() const
+      std::size_t bytes() const
       {
-        Index bytes(0);
+        std::size_t tbytes(0);
 
         for (Index i(0) ; i < _elements_size.size() ; ++i)
         {
-          bytes += Index(_elements_size.at(i) * sizeof(DT_));
+          tbytes += std::size_t(_elements_size.at(i) * sizeof(DT_));
         }
 
         for (Index i(0) ; i < _indices_size.size() ; ++i)
         {
-          bytes += Index(_indices_size.at(i) * sizeof(IT_));
+          tbytes += std::size_t(_indices_size.at(i) * sizeof(IT_));
         }
 
-        bytes += Index(_scalar_index.size() * sizeof(Index));
-        bytes += Index(_scalar_dt.size() * sizeof(DT_));
+        tbytes += std::size_t(_scalar_index.size() * sizeof(Index));
+        tbytes += std::size_t(_scalar_dt.size() * sizeof(DT_));
 
-        return bytes;
+        return tbytes;
       }
 
 

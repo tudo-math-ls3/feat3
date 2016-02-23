@@ -85,6 +85,12 @@ namespace FEAST
         return VectorTypeR(_col_gate, _matrix.create_vector_r());
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _matrix.bytes();
+      }
+
       void extract_diag(VectorTypeL& diag, bool sync = true) const
       {
         _matrix.extract_diag(*diag);

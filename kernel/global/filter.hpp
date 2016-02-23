@@ -45,6 +45,12 @@ namespace FEAST
         this->_filter.convert(*other);
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _filter.bytes();
+      }
+
       void filter_rhs(VectorType& vector) const
       {
         _filter.filter_rhs(*vector);

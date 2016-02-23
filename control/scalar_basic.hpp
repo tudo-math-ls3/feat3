@@ -117,6 +117,12 @@ namespace FEAST
         BaseClass()
       {
       }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return this->matrix_sys.bytes () + filter_sys.bytes();
+      }
     }; // class ScalarUnitFilterSystemLevel<...>
 
     template<
@@ -143,6 +149,12 @@ namespace FEAST
       ScalarMeanFilterSystemLevel() :
         BaseClass()
       {
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return this->matrix_sys.bytes () + filter_sys.bytes();
       }
     }; // class ScalarMeanFilterSystemLevel<...>
 
@@ -174,6 +186,12 @@ namespace FEAST
 
       virtual ~ScalarBasicTransferLevel()
       {
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return prol_sys.bytes() + rest_sys.bytes();
       }
     };
 
