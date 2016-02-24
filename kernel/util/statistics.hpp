@@ -60,6 +60,7 @@ namespace FEAST
       /// global time of execution for mpi related idle/wait tasks
       static KahanAccumulation _time_mpi_wait;
 
+      /// map of SolverStatistics and their corresponding solver name
       static std::map<FEAST::String, SolverStatistics> _solver_statistics;
 
       static String _format_solver_statistics(String branch, SolverStatistics & stat)
