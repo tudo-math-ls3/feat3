@@ -302,6 +302,9 @@ namespace FEAST
         const Index num_cols(_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
+#ifndef DEBUG
+        (void)num_cols;
+#endif
 
         Arch::ScatterPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
       }
@@ -343,6 +346,9 @@ namespace FEAST
         const Index num_cols(_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
+#ifndef DEBUG
+        (void)num_cols;
+#endif
 
         Arch::ScatterAxpyPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
       }
