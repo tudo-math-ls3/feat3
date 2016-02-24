@@ -420,6 +420,9 @@ for i in clean:
 os.environ["CXXFLAGS"] = cxxflags
 if "lto" in buildid:
   remove_string(unused_tokens, "lto")
+  if not "opt" in buildid and not "fast" in buildid:
+    print("Error: lto not usable in debug mode!")
+    sys.exit()
   ldflags += cxxflags
 os.environ["LDFLAGS"] = ldflags
 #set system host compiler in cflags to pass cmake's c compiler check

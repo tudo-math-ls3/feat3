@@ -481,22 +481,22 @@ for branch in branch_names:
     run_test("serial-gcc-debug-cudamemcheck" + addition + quadmath_add, branch, myDB, extra_opts)
 
   if is_found("g++"):
-    run_test("serial-gcc-debug" + lto + addition + quadmath_add, branch, myDB, extra_opts)
+    run_test("serial-gcc-debug" + addition + quadmath_add, branch, myDB, extra_opts)
     run_test("serial-gcc-opt" + lto + addition + quadmath_add, branch, myDB, extra_opts)
   if is_found("clang++"):
     run_test("serial-clang-debug" + addition, branch, myDB, extra_opts + clang_system_host_compiler)
     run_test("serial-clang-opt" + addition, branch, myDB, extra_opts + clang_system_host_compiler)
   if is_found("icpc"):
-    run_test("serial-icc-debug" + lto + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
+    run_test("serial-icc-debug" + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
     run_test("serial-icc-opt" + lto + addition + quadmath_add, branch, myDB, extra_opts + intel_system_host_compiler)
 
   if is_found("mpic++"):
     if is_found("g++"):
-      run_test("mpi-gcc-debug" + lto + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts)
+      run_test("mpi-gcc-debug" + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts)
       run_test("mpi-gcc-opt" + lto + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts)
     if is_found("clang++"):
       run_test("mpi-clang-debug" + addition + parmetis_add, branch, myDB, extra_opts + clang_system_host_compiler)
       run_test("mpi-clang-opt" + addition + parmetis_add, branch, myDB, extra_opts + clang_system_host_compiler)
     if is_found("icpc"):
-      run_test("mpi-icc-debug" + lto + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts + intel_system_host_compiler)
+      run_test("mpi-icc-debug" + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts + intel_system_host_compiler)
       run_test("mpi-icc-opt" + lto + addition + quadmath_add + parmetis_add, branch, myDB, extra_opts + intel_system_host_compiler)
