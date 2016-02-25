@@ -191,10 +191,10 @@ namespace Tutorial01
     // All finite element spaces are parameterised (templated) by the transformation type.
 
     // Use the Lagrange-1 element (aka "Q1"):
-    //typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+    typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
     // Use the Lagrange-2 element (aka "Q2"):
-    typedef Space::Lagrange2::Element<TrafoType> SpaceType;
+    // typedef Space::Lagrange2::Element<TrafoType> SpaceType;
 
     std::cout << "Creating Space..." << std::endl;
 
