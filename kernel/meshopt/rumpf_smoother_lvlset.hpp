@@ -461,7 +461,7 @@ namespace FEAST
             this->set_coords();
 
             // DEBUG
-            std::cout << "Fixed point iteration " << iter <<", diff = " << stringify_fp_sci(diff) << ", mincg iterations: " << iterations << ", grad evals: " << grad_evals << std::endl;
+            //std::cout << "Fixed point iteration " << iter <<", diff = " << stringify_fp_sci(diff) << ", mincg iterations: " << iterations << ", grad evals: " << grad_evals << std::endl;
 
             if(diff <= tol)
             {
@@ -513,7 +513,7 @@ namespace FEAST
             CoordType fac_lvlset_org(this->_lvlset_functional.fac_lvlset);
 
             // The Penalty Iteration(TM)
-            while(this->lvlset_constraint_last > this->lvlset_constraint_tol && this->_lvlset_functional.fac_lvlset < Math::sqrt(Math::Limits<CoordType>::max()))
+            while(this->lvlset_constraint_last > this->lvlset_constraint_tol && this->_lvlset_functional.fac_lvlset < Math::pow(Math::Limits<CoordType>::max(), CoordType(0.25)))
             {
               int grad_evals(0);
               int iterations(0);
