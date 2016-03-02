@@ -133,28 +133,30 @@ template
     > RumpfSmootherType;
 
     // Parameters for the funcitional
-    DataType fac_norm = DataType(1e0),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
+    DataType fac_norm = DataType(1e-2),fac_det = DataType(1e0),fac_cof = DataType(0), fac_reg(DataType(1e-8));
     // Create the functional
     FunctionalType my_functional(fac_norm, fac_det, fac_cof, fac_reg);
     // Parameters for the Rumpf smoother
-    bool align_to_lvlset(false);
+    bool align_to_lvlset(true);
     bool r_adaptivity(true);
     DataType r_adapt_reg = DataType(1e-2), r_adapt_pow = DataType(0.5);
     // Create levelset part of the functional
     LevelsetFunctionalType my_levelset_functional;
 
     std::deque<String> slip_list;
-    slip_list.push_back("left");
-    slip_list.push_back("right");
+    slip_list.push_back("bottom");
+    slip_list.push_back("top");
 
     std::deque<String> dirichlet_list;
-    dirichlet_list.push_back("bottom");
-    dirichlet_list.push_back("top");
+    dirichlet_list.push_back("left");
+    dirichlet_list.push_back("right");
 
     // The smoother in all its template glory
     RumpfSmootherType rumpflpumpfl(rmn, slip_list, dirichlet_list, my_functional, my_levelset_functional,
     align_to_lvlset, r_adaptivity, analytic_lvlset);
     rumpflpumpfl.init();
+
+    //rumpflpumpfl.lvlset_constraint_tol = Math::pow(Math::eps<DataType>(),DataType(0.5) );
 
     //rumpflpumpfl._update_h = true;
 
@@ -223,10 +225,10 @@ template
     LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, MeshType::world_dim> mesh_velocity(mesh->get_num_entities(0), DataType(0));
 
     std::cout << "deltat = " << stringify_fp_sci(deltat) << std::endl;
-    while(time < DataType(1))
+    while(time < DataType(2)*Math::pi<DataType>())
     {
       std::cout << "timestep " << n << std::endl;
-      time+= deltat;
+      time += deltat;
 
       // Save old vertex coordinates
       coords_old.clone(rumpflpumpfl._coords);
@@ -234,11 +236,14 @@ template
       // update levelset function
       x0.v[0] = DataType(0.25) *(DataType(2) + Math::cos(time));
       x0.v[1] = DataType(0.25) *(DataType(2) + Math::sin(DataType(3)*time));
+      //x0.v[0] = DataType(0.25) *(DataType(2) + Math::cos(time*Math::pi<DataType>()));
+      //x0.v[1] = DataType(0.25) *(DataType(2) + Math::sin(DataType(3)*time*Math::pi<DataType>()));
 
       // Update the reference point of the distance function
-      analytic_lvlset.set_point(x0);
+      rumpflpumpfl._analytic_lvlset.set_point(x0);
 
       // Compute functional value and gradient
+      rumpflpumpfl.prepare();
       fval = rumpflpumpfl.compute_functional(func_norm, func_det, func_rec_det, func_lvlset);
       rumpflpumpfl.compute_gradient();
       std::cout << "fval pre optimisation = " << stringify_fp_sci(fval) << " cell size quality indicator: " <<
@@ -318,7 +323,7 @@ template<typename A, typename B, typename C, typename D>
 using MySmootherQ1Hack = Meshopt::RumpfSmootherLevelsetAnalyticQ1Hack<A, B, C, D>;
 
 template<typename A, typename B>
-using MyFunctional= Meshopt::RumpfFunctionalConc<A, B>;
+using MyFunctional= Meshopt::RumpfFunctionalConc_D2<A, B>;
 
 template<typename A, typename B>
 using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFunctional>;
@@ -401,7 +406,7 @@ int main(int argc, char* argv[])
     return LevelsetApp<DataType, Simplex2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
       run(my_streamer, lvl_max, deltat);
   if(shape_type == mesh_data.st_quad)
-    return LevelsetApp<DataType, Hypercube2Mesh_2d, MySmootherQ1Hack, MyFunctionalQ1Hack, Meshopt::RumpfFunctionalLevelset>::
+    return LevelsetApp<DataType, Hypercube2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
       run(my_streamer, lvl_max, deltat);
 
   ret = ret | FEAST::Runtime::finalise();
