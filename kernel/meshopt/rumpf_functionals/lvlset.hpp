@@ -78,23 +78,20 @@ namespace FEAST
           // Loop over all edges of the current cell
           for(int edge(0); edge < Shape::FaceTraits<ShapeType,1>::count; ++edge)
           {
-            // These are the indices of the vertices on edge
+            //These are the indices of the vertices on edge
             int i(FimType::map(edge,0));
             int j(FimType::map(edge,1));
-
             penalty += FEAST::Analytic::Common::template HeavisideRegStatic<DataType>::eval(-heaviside_reg_fac()
                 * lvlset_vals(i) * lvlset_vals(j));
           }
-
-          // This is the version for penalising the diagonal cuts as well
           /*
-             DataType penalty(0);
-             for(Index i(0); i < Index(4); ++i)
-             {
-             for(Index j(0); j < i; ++j)
-             penalty += FEAST::Analytic::Common::template HeavisideRegStatic<DataType>::eval(-heaviside_reg_fac*lvlset_vals(i)*lvlset_vals(j));
-             }
-             */
+          // This is the version for penalising the diagonal cuts as well
+          for(int i(0); i < Shape::FaceTraits<ShapeType,0>::count; ++i)
+          {
+            for(int j(0); j < i; ++j)
+              penalty += FEAST::Analytic::Common::template HeavisideRegStatic<DataType>::eval(-heaviside_reg_fac()*lvlset_vals(i)*lvlset_vals(j));
+          }
+          */
 
           return penalty;
         }
@@ -128,19 +125,23 @@ namespace FEAST
               }
             }
 
-            // This is the version for penalising the diagonal cuts as well
             /*
-            // Compute local gradient
-            for(Index i(0); i < Index(4); ++i)
+            // This is the version for penalising the diagonal cuts as well
+            for(int i(0); i < Shape::FaceTraits<ShapeType,0>::count; ++i)
             {
-            for(Index j(0); j < i; ++j)
-            {
-            auto lvlset_prod = -heaviside_reg_fac*lvlset_vals(i)*lvlset_vals(j);
-            // Derivative of the heaviside function
-            auto heaviside_der = FEAST::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(lvlset_prod);
-            for(Index d(0); d < 2; ++d)
-            grad(d,i) -= heaviside_reg_fac*fac_lvlset*Math::sqr(lvlset_constraint_last) * (heaviside_der * lvlset_grad_vals(d,i) * lvlset_vals(j));
-            }
+              for(int j(0); j < i; ++j)
+              {
+                auto lvlset_prod = -heaviside_reg_fac()*lvlset_vals(i)*lvlset_vals(j);
+                // Derivative of the heaviside function
+                auto heaviside_der = FEAST::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(lvlset_prod);
+                for(int d(0); d < ShapeType::dimension; ++d)
+                {
+                  grad(i,d) -= heaviside_reg_fac()*fac_lvlset*Math::sqr(lvlset_constraint_last) *
+                    (heaviside_der * lvlset_grad_vals(i,d) * lvlset_vals(j));
+                  grad(j,d) -= heaviside_reg_fac()*fac_lvlset*Math::sqr(lvlset_constraint_last) *
+                    (heaviside_der * lvlset_grad_vals(j,d) * lvlset_vals(i));
+                }
+              }
             }
             */
           }
