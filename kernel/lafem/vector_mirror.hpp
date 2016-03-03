@@ -501,6 +501,337 @@ namespace FEAST
       {
         this->scatter_axpy_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, alpha, buffer_offset);
       }
+
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void gather_prim(
+                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
+                       const LAFEM::SparseVector<Mem::Main, Ty_, Iy_>& vector,
+                       const Index buffer_offset = Index(0)) const
+      {
+        // skip on empty mirror
+        if(_mirror_gather.empty())
+          return;
+
+        Tx_ * x(buffer.elements());
+        const Ty_ * y(vector.elements());
+        const IndexType_ * col_idx(_mirror_gather.col_ind());
+        const DataType_* val(_mirror_gather.val());
+        const IndexType_ * row_ptr(_mirror_gather.row_ptr());
+        Index num_rows(_mirror_gather.rows());
+
+        ASSERT_(num_rows + buffer_offset <= buffer.size());
+
+        // This is only safe because vector is in Mem::Main
+        const auto& v_elements = vector.elements();
+        const auto& v_indices = vector.indices();
+
+        // loop over all gather-matrix rows
+        for (Index row(0) ; row < num_rows ; ++row)
+        {
+          Tx_ sum(Tx_(0));
+          // Loop over all columns. For every column, we need to find the corresponding entry in the SparseVector
+          // (if any).
+          Index istart(0);
+          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
+          {
+            for (Index isparse(istart); isparse < vector.used_elements(); ++isparse)
+            {
+              Index iv(v_indices[isparse]);
+
+              if(iv < col_idx[i])
+                continue;
+
+              if(iv == col_idx[i])
+                sum += Tx_(val[i]) * Tx_(y[isparse]);
+
+              istart = isparse;
+              break;
+            }
+
+          }
+          x[buffer_offset + row] = sum;
+        }
+      }
+
+      /**
+       * \brief Performs a gather-axpy-operation on a primal vector.
+       *
+       * \param[in,out] buffer
+       * A reference to a buffer vector.
+       *
+       * \param[in] vector
+       * A primal vector whose entries are to be gathered.
+       *
+       * \param[in] alpha
+       * A scaling factor for the operation.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
+       */
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void gather_axpy_prim(
+                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
+                            const LAFEM::SparseVector<Mem::Main, Ty_, Iy_>& vector,
+                            const Tx_ alpha = Tx_(1),
+                            const Index buffer_offset = Index(0)) const
+      {
+        // skip on empty mirror
+        if(_mirror_gather.empty())
+          return;
+
+        Tx_ * x(buffer.elements());
+        const Ty_ * y(vector.elements());
+        const IndexType_ * col_idx(_mirror_gather.col_ind());
+        const DataType_* val(_mirror_gather.val());
+        const IndexType_* row_ptr(_mirror_gather.row_ptr());
+        Index num_rows(_mirror_gather.rows());
+
+        ASSERT_(num_rows + buffer_offset <= buffer.size());
+
+        //// loop over all gather-matrix rows
+        //for (Index row(0) ; row < num_rows ; ++row)
+        //{
+        //  Tx_ sum(Tx_(0));
+        //  for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
+        //  {
+        //    sum += Tx_(val[i]) * Tx_(y[col_idx[i]]);
+        //  }
+        //  x[buffer_offset + row] += alpha*sum;
+        //}
+      }
+
+      /**
+       * \brief Performs a scatter-operation on a primal vector.
+       *
+       * \param[in,out] vector
+       * A reference to a primal vector.
+       *
+       * \param[in] buffer
+       * A reference to the buffer vector whose entries are to be scattered.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
+       */
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void scatter_prim(
+                        LAFEM::SparseVector<Mem::Main, Tx_, Ix_>& vector,
+                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
+                        const Index buffer_offset = Index(0)) const
+      {
+        // skip on empty mirror
+        if(_mirror_scatter.empty())
+          return;
+
+        Tx_ * x(vector.elements());
+        const Ty_ * y(buffer.elements());
+        const IndexType_ * col_idx(_mirror_scatter.col_ind());
+        const DataType_* val(_mirror_scatter.val());
+        const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
+        const Index num_rows(_mirror_scatter.rows());
+        const Index num_cols(_mirror_scatter.columns());
+
+        ASSERT_(num_cols + buffer_offset <= buffer.size());
+#ifndef DEBUG
+        (void)num_cols;
+#endif
+
+        const IndexType_* v_indices(vector.indices());
+
+        for (Index isparse(0); isparse < vector.used_elements(); ++isparse)
+        {
+          Index row(v_indices[isparse]);
+          // skip empty rows
+          if(row_ptr[row] >= row_ptr[row + 1])
+            continue;
+
+          Tx_ sum(Tx_(0));
+          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
+          {
+            sum += Tx_(val[i]) * Tx_(y[buffer_offset + col_idx[i]]);
+          }
+          x[isparse] = sum;
+        }
+      }
+
+      /**
+       * \brief Performs a scatter-axpy-operation on a primal vector.
+       *
+       * \param[in,out] vector
+       * A reference to a primal vector.
+       *
+       * \param[in] buffer
+       * A reference to the buffer vector whose entries are to be scattered.
+       *
+       * \param[in] alpha
+       * A scaling factor for the operation.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
+       */
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void scatter_axpy_prim(
+                             LAFEM::SparseVector<Mem::Main, Tx_, Ix_>& vector,
+                             const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
+                             const Tx_ alpha = Tx_(1),
+                             const Index buffer_offset = Index(0)) const
+      {
+        // skip on empty mirror
+        if(_mirror_scatter.empty())
+          return;
+
+        Tx_ * x(vector.elements());
+        const Ty_ * y(buffer.elements());
+        const IndexType_ * col_idx(_mirror_scatter.col_ind());
+        const DataType_* val(_mirror_scatter.val());
+        const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
+        const Index num_rows(_mirror_scatter.rows());
+        const Index num_cols(_mirror_scatter.columns());
+
+        ASSERT_(num_cols + buffer_offset <= buffer.size());
+#ifndef DEBUG
+        (void)num_cols;
+#endif
+
+        //// loop over all scatter-matrix rows
+        //for (Index row(0) ; row < num_rows ; ++row)
+        //{
+        //  // skip empty rows
+        //  if(row_ptr[row] >= row_ptr[row + 1])
+        //    continue;
+
+        //  Tx_ sum(Tx_(0));
+        //  for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
+        //  {
+        //    sum += Tx_(val[i]) * Tx_(y[buffer_offset + col_idx[i]]);
+        //  }
+        //  x[row] += alpha*sum;
+        //}
+      }
+
+      /**
+       * \brief Performs a gather-operation on a dual vector.
+       *
+       * \param[in,out] buffer
+       * A reference to a buffer vector.
+       *
+       * \param[in] vector
+       * A dual vector whose entries are to be gathered.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
+       */
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void gather_dual(
+                       LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
+                       const LAFEM::SparseVector<Mem::Main, Ty_, Iy_>& vector,
+                       const Index buffer_offset = Index(0)) const
+      {
+        this->gather_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, buffer_offset);
+      }
+
+      /**
+       * \brief Performs a gather-axpy-operation on a dual vector.
+       *
+       * \param[in,out] buffer
+       * A reference to a buffer vector.
+       *
+       * \param[in] vector
+       * A dual vector whose entries are to be gathered.
+       *
+       * \param[in] alpha
+       * A scaling factor for the operation.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
+       */
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void gather_axpy_dual(
+                            LAFEM::DenseVector<Mem::Main, Tx_, Ix_>& buffer,
+                            const LAFEM::SparseVector<Mem::Main, Ty_, Iy_>& vector,
+                            const Tx_ alpha = Tx_(1),
+                            const Index buffer_offset = Index(0)) const
+      {
+        this->gather_axpy_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, alpha, buffer_offset);
+      }
+
+      /**
+       * \brief Performs a scatter-operation on a dual vector.
+       *
+       * \param[in,out] vector
+       * A reference to a dual vector.
+       *
+       * \param[in] buffer
+       * A reference to the buffer vector whose entries are to be scattered.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
+       */
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void scatter_dual(
+                        LAFEM::SparseVector<Mem::Main, Tx_, Ix_>& vector,
+                        const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
+                        const Index buffer_offset = Index(0)) const
+      {
+        this->scatter_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, buffer_offset);
+      }
+
+      /**
+       * \brief Performs a scatter-axpy-operation on a dual vector.
+       *
+       * \param[in,out] vector
+       * A reference to a dual vector.
+       *
+       * \param[in] buffer
+       * A reference to the buffer vector whose entries are to be scattered.
+       *
+       * \param[in] alpha
+       * A scaling factor for the operation.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
+       */
+      template<
+        typename Tx_,
+        typename Ix_,
+        typename Ty_,
+        typename Iy_>
+      void scatter_axpy_dual(
+                             LAFEM::SparseVector<Mem::Main, Tx_, Ix_>& vector,
+                             const LAFEM::DenseVector<Mem::Main, Ty_, Iy_>& buffer,
+                             const Tx_ alpha = Tx_(1),
+                             const Index buffer_offset = Index(0)) const
+      {
+        this->scatter_axpy_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, alpha, buffer_offset);
+      }
+
     }; // class VectorMirror<...>
 
     /**
