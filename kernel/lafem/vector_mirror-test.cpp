@@ -228,46 +228,37 @@ public:
     LAFEM::SparseVector<Mem::Main, DT_, IT_> a1_main; a1_main.convert(sparse_a1);
     LAFEM::SparseVector<Mem::Main, DT_, IT_> a2_main; a2_main.convert(sparse_a2);
 
-    auto a1_elements = a1_main.elements(); auto a1_indices = a1_main.indices();
-    auto a2_elements = a2_main.elements(); auto a2_indices = a2_main.indices();
-
     TEST_CHECK_MSG(a1_main.used_elements() == a2_main.used_elements(),"Wrong number of nonzeros.");
     for(Index i(0); i < a1_main.used_elements(); ++i)
     {
-      Index i1(a1_indices[i]);
-      Index i2(a2_indices[i]);
+      Index i1(a1_main.indices()[i]);
+      Index i2(a2_main.indices()[i]);
       TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-      TEST_CHECK_EQUAL_WITHIN_EPS(a1_elements[i], a2_elements[i], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(a1_main.elements()[i], a2_main.elements()[i], tol);
     }
 
     LAFEM::SparseVector<Mem::Main, DT_, IT_> b1_main; b1_main.convert(sparse_b1);
     LAFEM::SparseVector<Mem::Main, DT_, IT_> b2_main; b2_main.convert(sparse_b2);
 
-    auto b1_elements = b1_main.elements(); auto b1_indices = b1_main.indices();
-    auto b2_elements = b2_main.elements(); auto b2_indices = b2_main.indices();
-
     TEST_CHECK_MSG(b1_main.used_elements() == b2_main.used_elements(),"Wrong number of nonzeros.");
     for(Index i(0); i < b1_main.used_elements(); ++i)
     {
-      Index i1(b1_indices[i]);
-      Index i2(b2_indices[i]);
+      Index i1(b1_main.indices()[i]);
+      Index i2(b2_main.indices()[i]);
       TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-      TEST_CHECK_EQUAL_WITHIN_EPS(b1_elements[i], b2_elements[i], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(b1_main.elements()[i], b2_main.elements()[i], tol);
     }
 
     LAFEM::SparseVector<Mem::Main, DT_, IT_> c1_main; c1_main.convert(sparse_c1);
     LAFEM::SparseVector<Mem::Main, DT_, IT_> c2_main; c2_main.convert(sparse_c2);
 
-    auto c1_elements = c1_main.elements(); auto c1_indices = c1_main.indices();
-    auto c2_elements = c2_main.elements(); auto c2_indices = c2_main.indices();
-
     TEST_CHECK_MSG(c1_main.used_elements() == c2_main.used_elements(),"Wrong number of nonzeros.");
     for(Index i(0); i < c1_main.used_elements(); ++i)
     {
-      Index i1(c1_indices[i]);
-      Index i2(c2_indices[i]);
+      Index i1(c1_main.indices()[i]);
+      Index i2(c2_main.indices()[i]);
       TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-      TEST_CHECK_EQUAL_WITHIN_EPS(c1_elements[i], c2_elements[i], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(c1_main.elements()[i], c2_main.elements()[i], tol);
     }
 
   }
@@ -421,64 +412,58 @@ public:
     mirror2.gather_axpy_prim(vec_buf_ac, sparse_c1);
 
     // scatter to a
-    mirror0.scatter_axpy_prim(sparse_a1, vec_buf_abc);
-    mirror1.scatter_axpy_prim(sparse_a1, vec_buf_ac);
-    mirror2.scatter_axpy_prim(sparse_a1, vec_buf_ab);
+    sparse_a1.format(DT_(0));
+    mirror0.scatter_axpy_prim(sparse_a1, vec_buf_abc, -DT_(1));
+    mirror1.scatter_axpy_prim(sparse_a1, vec_buf_ac, -DT_(1));
+    mirror2.scatter_axpy_prim(sparse_a1, vec_buf_ab, -DT_(1));
 
     // scatter to b
-    mirror0.scatter_axpy_prim(sparse_b1, vec_buf_abc);
-    mirror1.scatter_axpy_prim(sparse_b1, vec_buf_ab);
-    mirror2.scatter_axpy_prim(sparse_b1, vec_buf_bc);
+    sparse_b1.format(DT_(0));
+    mirror0.scatter_axpy_prim(sparse_b1, vec_buf_abc, -DT_(1));
+    mirror1.scatter_axpy_prim(sparse_b1, vec_buf_ab, -DT_(1));
+    mirror2.scatter_axpy_prim(sparse_b1, vec_buf_bc, -DT_(1));
 
     // scatter to c
-    mirror0.scatter_axpy_prim(sparse_c1, vec_buf_abc);
-    mirror1.scatter_axpy_prim(sparse_c1, vec_buf_bc);
-    mirror2.scatter_axpy_prim(sparse_c1, vec_buf_ac);
+    sparse_c1.format(DT_(0));
+    mirror0.scatter_axpy_prim(sparse_c1, vec_buf_abc, -DT_(1));
+    mirror1.scatter_axpy_prim(sparse_c1, vec_buf_bc, -DT_(1));
+    mirror2.scatter_axpy_prim(sparse_c1, vec_buf_ac, -DT_(1));
 
     // There is no axpy for SparseVector yet, so for now download the vectors (if necessary) and do it by hand.
     LAFEM::SparseVector<Mem::Main, DT_, IT_> a1_main; a1_main.convert(sparse_a1);
     LAFEM::SparseVector<Mem::Main, DT_, IT_> a2_main; a2_main.convert(sparse_a2);
 
-    auto a1_elements = a1_main.elements(); auto a1_indices = a1_main.indices();
-    auto a2_elements = a2_main.elements(); auto a2_indices = a2_main.indices();
-
     TEST_CHECK_MSG(a1_main.used_elements() == a2_main.used_elements(),"Wrong number of nonzeros.");
     for(Index i(0); i < a1_main.used_elements(); ++i)
     {
-      Index i1(a1_indices[i]);
-      Index i2(a2_indices[i]);
+      Index i1(a1_main.indices()[i]);
+      Index i2(a2_main.indices()[i]);
       TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-      TEST_CHECK_EQUAL_WITHIN_EPS(a1_elements[i], a2_elements[i], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(a1_main.elements()[i]+a2_main.elements()[i], DT_(0), tol);
     }
 
     LAFEM::SparseVector<Mem::Main, DT_, IT_> b1_main; b1_main.convert(sparse_b1);
     LAFEM::SparseVector<Mem::Main, DT_, IT_> b2_main; b2_main.convert(sparse_b2);
 
-    auto b1_elements = b1_main.elements(); auto b1_indices = b1_main.indices();
-    auto b2_elements = b2_main.elements(); auto b2_indices = b2_main.indices();
-
     TEST_CHECK_MSG(b1_main.used_elements() == b2_main.used_elements(),"Wrong number of nonzeros.");
     for(Index i(0); i < b1_main.used_elements(); ++i)
     {
-      Index i1(b1_indices[i]);
-      Index i2(b2_indices[i]);
+      Index i1(b1_main.indices()[i]);
+      Index i2(b2_main.indices()[i]);
       TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-      TEST_CHECK_EQUAL_WITHIN_EPS(b1_elements[i], b2_elements[i], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(b1_main.elements()[i]+b2_main.elements()[i], DT_(0), tol);
     }
 
     LAFEM::SparseVector<Mem::Main, DT_, IT_> c1_main; c1_main.convert(sparse_c1);
     LAFEM::SparseVector<Mem::Main, DT_, IT_> c2_main; c2_main.convert(sparse_c2);
 
-    auto c1_elements = c1_main.elements(); auto c1_indices = c1_main.indices();
-    auto c2_elements = c2_main.elements(); auto c2_indices = c2_main.indices();
-
     TEST_CHECK_MSG(c1_main.used_elements() == c2_main.used_elements(),"Wrong number of nonzeros.");
     for(Index i(0); i < c1_main.used_elements(); ++i)
     {
-      Index i1(c1_indices[i]);
-      Index i2(c2_indices[i]);
+      Index i1(c1_main.indices()[i]);
+      Index i2(c2_main.indices()[i]);
       TEST_CHECK_MSG(i1 == i2,"Error in sparsity pattern.");
-      TEST_CHECK_EQUAL_WITHIN_EPS(c1_elements[i], c2_elements[i], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(c1_main.elements()[i]+c2_main.elements()[i], DT_(0), tol);
     }
   }
 };

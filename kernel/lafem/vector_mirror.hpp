@@ -502,6 +502,7 @@ namespace FEAST
         this->scatter_axpy_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, alpha, buffer_offset);
       }
 
+      /// \copydoc gather_prim()
       template<
         typename Tx_,
         typename Ix_,
@@ -525,10 +526,6 @@ namespace FEAST
 
         ASSERT_(num_rows + buffer_offset <= buffer.size());
 
-        // This is only safe because vector is in Mem::Main
-        const auto& v_elements = vector.elements();
-        const auto& v_indices = vector.indices();
-
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
         {
@@ -540,7 +537,8 @@ namespace FEAST
           {
             for (Index isparse(istart); isparse < vector.used_elements(); ++isparse)
             {
-              Index iv(v_indices[isparse]);
+              // This is only safe because vector is in Mem::Main
+              Index iv(vector.indices()[isparse]);
 
               if(iv < col_idx[i])
                 continue;
@@ -551,27 +549,12 @@ namespace FEAST
               istart = isparse;
               break;
             }
-
           }
           x[buffer_offset + row] = sum;
         }
       }
 
-      /**
-       * \brief Performs a gather-axpy-operation on a primal vector.
-       *
-       * \param[in,out] buffer
-       * A reference to a buffer vector.
-       *
-       * \param[in] vector
-       * A primal vector whose entries are to be gathered.
-       *
-       * \param[in] alpha
-       * A scaling factor for the operation.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
+      /// \copydoc gather_axpy_prim()
       template<
         typename Tx_,
         typename Ix_,
@@ -596,30 +579,36 @@ namespace FEAST
 
         ASSERT_(num_rows + buffer_offset <= buffer.size());
 
-        //// loop over all gather-matrix rows
-        //for (Index row(0) ; row < num_rows ; ++row)
-        //{
-        //  Tx_ sum(Tx_(0));
-        //  for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
-        //  {
-        //    sum += Tx_(val[i]) * Tx_(y[col_idx[i]]);
-        //  }
-        //  x[buffer_offset + row] += alpha*sum;
-        //}
+        // loop over all gather-matrix rows
+        for (Index row(0) ; row < num_rows ; ++row)
+        {
+          Tx_ sum(Tx_(0));
+          // Loop over all columns. For every column, we need to find the corresponding entry in the SparseVector
+          // (if any).
+          Index istart(0);
+          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
+          {
+            for (Index isparse(istart); isparse < vector.used_elements(); ++isparse)
+            {
+              // This is only safe because vector is in Mem::Main
+              Index iv(vector.indices()[isparse]);
+
+              if(iv < col_idx[i])
+                continue;
+
+              if(iv == col_idx[i])
+                sum += Tx_(val[i]) * Tx_(y[isparse]);
+
+              istart = isparse;
+              break;
+            }
+
+          }
+          x[buffer_offset + row] += alpha*sum;
+        }
       }
 
-      /**
-       * \brief Performs a scatter-operation on a primal vector.
-       *
-       * \param[in,out] vector
-       * A reference to a primal vector.
-       *
-       * \param[in] buffer
-       * A reference to the buffer vector whose entries are to be scattered.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
+      /// \copydoc scatter_prim()
       template<
         typename Tx_,
         typename Ix_,
@@ -643,15 +632,15 @@ namespace FEAST
         const Index num_cols(_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
+        ASSERT_(num_rows >= vector.indices()[vector.used_elements()-1]);
 #ifndef DEBUG
         (void)num_cols;
+        (void)num_rows;
 #endif
-
-        const IndexType_* v_indices(vector.indices());
 
         for (Index isparse(0); isparse < vector.used_elements(); ++isparse)
         {
-          Index row(v_indices[isparse]);
+          Index row(vector.indices()[isparse]);
           // skip empty rows
           if(row_ptr[row] >= row_ptr[row + 1])
             continue;
@@ -665,21 +654,7 @@ namespace FEAST
         }
       }
 
-      /**
-       * \brief Performs a scatter-axpy-operation on a primal vector.
-       *
-       * \param[in,out] vector
-       * A reference to a primal vector.
-       *
-       * \param[in] buffer
-       * A reference to the buffer vector whose entries are to be scattered.
-       *
-       * \param[in] alpha
-       * A scaling factor for the operation.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
+      /// \copydoc scatter_axpy_prim()
       template<
         typename Tx_,
         typename Ix_,
@@ -704,38 +679,30 @@ namespace FEAST
         const Index num_cols(_mirror_scatter.columns());
 
         ASSERT_(num_cols + buffer_offset <= buffer.size());
+        ASSERT_(num_rows >= vector.indices()[vector.used_elements()-1]);
 #ifndef DEBUG
         (void)num_cols;
+        (void)num_rows;
 #endif
 
-        //// loop over all scatter-matrix rows
-        //for (Index row(0) ; row < num_rows ; ++row)
-        //{
-        //  // skip empty rows
-        //  if(row_ptr[row] >= row_ptr[row + 1])
-        //    continue;
+        for (Index isparse(0); isparse < vector.used_elements(); ++isparse)
+        {
+          Index row(vector.indices()[isparse]);
 
-        //  Tx_ sum(Tx_(0));
-        //  for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
-        //  {
-        //    sum += Tx_(val[i]) * Tx_(y[buffer_offset + col_idx[i]]);
-        //  }
-        //  x[row] += alpha*sum;
-        //}
+          // skip empty rows
+          if(row_ptr[row] >= row_ptr[row + 1])
+            continue;
+
+          Tx_ sum(Tx_(0));
+          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
+          {
+            sum += Tx_(val[i]) * Tx_(y[buffer_offset + col_idx[i]]);
+          }
+          x[isparse] += alpha*sum;
+        }
       }
 
-      /**
-       * \brief Performs a gather-operation on a dual vector.
-       *
-       * \param[in,out] buffer
-       * A reference to a buffer vector.
-       *
-       * \param[in] vector
-       * A dual vector whose entries are to be gathered.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
+      /// \copydoc gather_dual()
       template<
         typename Tx_,
         typename Ix_,
@@ -749,21 +716,7 @@ namespace FEAST
         this->gather_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, buffer_offset);
       }
 
-      /**
-       * \brief Performs a gather-axpy-operation on a dual vector.
-       *
-       * \param[in,out] buffer
-       * A reference to a buffer vector.
-       *
-       * \param[in] vector
-       * A dual vector whose entries are to be gathered.
-       *
-       * \param[in] alpha
-       * A scaling factor for the operation.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
+      /// \copydoc gather_axpy_dual()
       template<
         typename Tx_,
         typename Ix_,
@@ -778,18 +731,7 @@ namespace FEAST
         this->gather_axpy_prim<Tx_, Ix_, Ty_, Iy_>(buffer, vector, alpha, buffer_offset);
       }
 
-      /**
-       * \brief Performs a scatter-operation on a dual vector.
-       *
-       * \param[in,out] vector
-       * A reference to a dual vector.
-       *
-       * \param[in] buffer
-       * A reference to the buffer vector whose entries are to be scattered.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
+      /// \copydoc scatter_dual()
       template<
         typename Tx_,
         typename Ix_,
@@ -803,21 +745,7 @@ namespace FEAST
         this->scatter_prim<Tx_, Ix_, Ty_, Iy_>(vector, buffer, buffer_offset);
       }
 
-      /**
-       * \brief Performs a scatter-axpy-operation on a dual vector.
-       *
-       * \param[in,out] vector
-       * A reference to a dual vector.
-       *
-       * \param[in] buffer
-       * A reference to the buffer vector whose entries are to be scattered.
-       *
-       * \param[in] alpha
-       * A scaling factor for the operation.
-       *
-       * \param[in] buffer_offset
-       * The offset within the buffer vector.
-       */
+      /// \copydoc scatter_axpy_dual()
       template<
         typename Tx_,
         typename Ix_,
