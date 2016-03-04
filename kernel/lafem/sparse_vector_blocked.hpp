@@ -331,7 +331,7 @@ namespace FEAST
        * \param[in] index The index of the vector element.
        * \param[in] val The val to be set.
        */
-      void operator()(Index index, Tiny::Vector<DT_, BlockSize_> & val)
+      void operator()(Index index, const Tiny::Vector<DT_, BlockSize_>& val)
       {
         CONTEXT("When setting SparseVectorBlocked element");
 
