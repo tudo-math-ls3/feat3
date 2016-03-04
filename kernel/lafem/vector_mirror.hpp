@@ -532,10 +532,13 @@ namespace FEAST
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
         {
+          // Because the index array of the SparseVector AND the row_ptr are sorted, we remember the last position
+          // in the SparseVector which contained a required entry OR told us that the required entry is not there.
+          Index istart(0);
+
           Tx_ sum(Tx_(0));
           // Loop over all columns. For every column, we need to find the corresponding entry in the SparseVector
           // (if any).
-          Index istart(0);
           for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
           {
             for (Index isparse(istart); isparse < vector.used_elements(); ++isparse)
@@ -549,6 +552,7 @@ namespace FEAST
               if(iv == col_idx[i])
                 sum += Tx_(val[i]) * Tx_(y[isparse]);
 
+              // If we come to here, we know we found something, so set istart and break
               istart = isparse;
               break;
             }
@@ -585,10 +589,13 @@ namespace FEAST
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
         {
+          // Because the index array of the SparseVector AND the row_ptr are sorted, we remember the last position
+          // in the SparseVector which contained a required entry OR told us that the required entry is not there.
+          Index istart(0);
+
           Tx_ sum(Tx_(0));
           // Loop over all columns. For every column, we need to find the corresponding entry in the SparseVector
           // (if any).
-          Index istart(0);
           for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
           {
             for (Index isparse(istart); isparse < vector.used_elements(); ++isparse)
@@ -602,6 +609,7 @@ namespace FEAST
               if(iv == col_idx[i])
                 sum += Tx_(val[i]) * Tx_(y[isparse]);
 
+              // If we come to here, we know we found something, so set istart and break
               istart = isparse;
               break;
             }
@@ -1236,13 +1244,13 @@ namespace FEAST
         const LAFEM::SparseVectorBlocked<Mem::Main, Ty_, Iy_, BS_>& vector,
         const Index buffer_offset = Index(0)) const
       {
-        typedef typename LAFEM::SparseVectorBlocked<Mem::Main, Ty_, Iy_, BS_>::ValueType ValueType;
+        typedef typename LAFEM::SparseVectorBlocked<Mem::Main, Tx_, Ix_, BS_>::ValueType ValueType;
         // skip on empty mirror
         if(_mirror_gather.empty())
           return;
 
         Tx_* x(buffer.elements());
-        const auto * y = vector.template elements<Perspective::native>();
+        const Ty_* y(vector.template elements<Perspective::pod>());
         const IndexType* col_idx(_mirror_gather.col_ind());
         const DataType* val(_mirror_gather.val());
         const IndexType* row_ptr(_mirror_gather.row_ptr());
@@ -1257,7 +1265,7 @@ namespace FEAST
           // in the SparseVector which contained a required entry OR told us that the required entry is not there.
           Index istart(0);
 
-          ValueType sum(Ty_(0));
+          ValueType sum(Tx_(0));
           // Loop over all columns. For every column, we need to find the corresponding entry in the SparseVector
           // (if any).
           for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
@@ -1271,8 +1279,13 @@ namespace FEAST
                 continue;
 
               if(iv == col_idx[i])
-                sum += Tx_(val[i]) * y[isparse];
+              {
+                // Address sum explicitly here so we can cast the elements of y to Tx_
+                for(int j(0); j < BS_; ++j)
+                  sum(j) += Tx_(val[i]) * Tx_(y[Index(BS_)*isparse + Index(j)]);
+              }
 
+              // If we come to here, we know we found something, so set istart and break
               istart = isparse;
               break;
             }
@@ -1291,32 +1304,57 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
+        typedef typename LAFEM::SparseVectorBlocked<Mem::Main, Tx_, Ix_, BS_>::ValueType ValueType;
+
         // skip on empty mirror
         if(_mirror_gather.empty())
           return;
 
-        //Tx_* x(buffer.elements());
-        //const Ty_* y(vector.template elements<Perspective::pod>());
-        //const IndexType* col_idx(_mirror_gather.col_ind());
-        //const DataType* val(_mirror_gather.val());
-        //const IndexType* row_ptr(_mirror_gather.row_ptr());
-        //Index num_rows(_mirror_gather.rows());
+        Tx_* x(buffer.elements());
+        const Ty_* y(vector.template elements<Perspective::pod>());
+        const IndexType* col_idx(_mirror_gather.col_ind());
+        const DataType* val(_mirror_gather.val());
+        const IndexType* row_ptr(_mirror_gather.row_ptr());
+        Index num_rows(_mirror_gather.rows());
 
-        //ASSERT_(Index(BS_)*num_rows + buffer_offset <= buffer.size());
+        ASSERT_(Index(BS_)*num_rows + buffer_offset <= buffer.size());
 
-        //// loop over all gather-matrix rows
-        //for (Index row(0) ; row < num_rows ; ++row)
-        //{
-        //  for (Index j(0); j < Index(BS_); ++j)
-        //  {
-        //    Tx_ sum(Tx_(0));
-        //    for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
-        //    {
-        //      sum += Tx_(val[i]) * Tx_(y[Index(BS_)*col_idx[i] + j]);
-        //    }
-        //    x[buffer_offset + Index(BS_)*row + j] += alpha*sum;
-        //  }
-        //}
+        // loop over all gather-matrix rows
+        for (Index row(0) ; row < num_rows ; ++row)
+        {
+          // Because the index array of the SparseVector AND the row_ptr are sorted, we remember the last position
+          // in the SparseVector which contained a required entry OR told us that the required entry is not there.
+          Index istart(0);
+
+          ValueType sum(Tx_(0));
+          // Loop over all columns. For every column, we need to find the corresponding entry in the SparseVector
+          // (if any).
+          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
+          {
+            for (Index isparse(istart); isparse < vector.used_elements(); ++isparse)
+            {
+              // This is only safe because vector is in Mem::Main
+              Index iv(vector.indices()[isparse]);
+
+              if(iv < col_idx[i])
+                continue;
+
+              if(iv == col_idx[i])
+              {
+                // Address sum explicitly here so we can cast the elements of y to Tx_
+                for(int j(0); j < BS_; ++j)
+                  sum(j) += Tx_(val[i]) * Tx_(y[Index(BS_)*isparse + Index(j)]);
+              }
+
+              // If we come to here, we know we found something, so set istart and break
+              istart = isparse;
+              break;
+            }
+
+            for (int j(0); j < BS_; ++j)
+              x[buffer_offset + Index(BS_)*row + Index(j)] += alpha*Tx_(sum(j));
+          }
+        }
       }
 
       /// \copydoc scatter_prim
@@ -1373,11 +1411,12 @@ namespace FEAST
         const Tx_ alpha = Tx_(1),
         const Index buffer_offset = Index(0)) const
       {
+        typedef typename LAFEM::SparseVectorBlocked<Mem::Main, Tx_, Ix_, BS_>::ValueType ValueType;
         // skip on empty mirror
         if(_mirror_scatter.empty())
           return;
 
-        Tx_* x(vector.template elements<Perspective::pod>());
+        ValueType* x = vector.template elements<Perspective::native>();
         const Ty_* y(buffer.elements());
         const IndexType* col_idx(_mirror_scatter.col_ind());
         const DataType* val(_mirror_scatter.val());
@@ -1386,26 +1425,29 @@ namespace FEAST
         const Index num_cols(_mirror_scatter.columns());
 
         ASSERT_(Index(BS_)*num_cols + buffer_offset <= buffer.size());
+        ASSERT_(num_rows >= vector.indices()[vector.used_elements()-1]);
 #ifndef DEBUG
         (void)num_cols;
+        (void)num_rows;
 #endif
 
-        //// loop over all scatter-matrix rows
-        //for (Index row(0) ; row < num_rows ; ++row)
-        //{
-        //  // skip empty rows
-        //  if(row_ptr[row] >= row_ptr[row + 1])
-        //    continue;
+        for(Index isparse(0) ; isparse < vector.used_elements() ; ++isparse)
+        {
+          Index row(vector.indices()[isparse]);
 
-        //  for(Index j(0); j < Index(BS_); ++j)
-        //  {
-        //    Tx_ sum(Tx_(0));
-        //    for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
-        //      sum += Tx_(val[i]) * Tx_(y[buffer_offset + Index(BS_)*col_idx[i] + j]);
+          // skip empty rows
+          if(row_ptr[row] >= row_ptr[row + 1])
+            continue;
 
-        //    x[Index(BS_)*row + j] += alpha*sum;
-        //  }
-        //}
+          ValueType sum(Tx_(0));
+          for(int j(0); j < BS_; ++j)
+          {
+            for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
+              sum(j) += Tx_(val[i]) * Tx_(y[buffer_offset + Index(BS_)*col_idx[i] + Index(j)]);
+          }
+
+          x[isparse] += alpha*sum;
+        }
       }
 
       /// \copydoc gather_dual()
