@@ -693,17 +693,17 @@ namespace FEAST
           delete _factory;
         }
 
-        virtual Index get_num_entities(int dim)
+        virtual Index get_num_entities(int dim) override
         {
           return _factory->get_num_entities(dim);
         }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set)
+        virtual void fill_vertex_set(VertexSetType& vertex_set) override
         {
           _factory->fill_vertex_set(vertex_set);
         }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           _factory->fill_index_sets(index_set_holder);
         }
