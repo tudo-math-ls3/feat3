@@ -79,7 +79,7 @@ namespace FEAST
 
       private:
 
-        BufferedSharedArray(Index i) :
+        explicit BufferedSharedArray(Index i) :
           _data(new T_[i]),
           _size(i)
         {

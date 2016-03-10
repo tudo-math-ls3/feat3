@@ -445,7 +445,7 @@ namespace FEAST
     class Communicator
     {
       public:
-        Communicator(Index comm) :
+        explicit Communicator(Index comm) :
           _comm(comm)
       {
       }
@@ -457,7 +457,7 @@ namespace FEAST
     class Operation
     {
       public:
-        Operation(Index op) :
+        explicit Operation(Index op) :
           _op(op)
       {
       }
