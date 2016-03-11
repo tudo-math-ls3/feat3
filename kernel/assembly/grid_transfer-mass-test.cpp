@@ -42,6 +42,10 @@ public:
   {
   }
 
+  virtual ~GridTransferMassTest()
+  {
+  }
+
   virtual void run() const override
   {
     // create coarse mesh

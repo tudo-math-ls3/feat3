@@ -44,6 +44,10 @@ public:
   {
   }
 
+  virtual ~BilinearOperatorTest()
+  {
+  }
+
   virtual void run() const override
   {
     test_unit_2d();
@@ -366,6 +370,10 @@ class BandedBilinearOperatorTest :
 public:
   BandedBilinearOperatorTest() :
     TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>("BandedBilinearOperatorTest")
+  {
+  }
+
+  virtual ~BandedBilinearOperatorTest()
   {
   }
 

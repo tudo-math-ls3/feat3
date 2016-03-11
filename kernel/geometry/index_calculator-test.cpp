@@ -27,6 +27,10 @@ public:
   {
   }
 
+  virtual ~IndexCalculatorTest()
+  {
+  }
+
   // run the tests
   virtual void run() const override
   {

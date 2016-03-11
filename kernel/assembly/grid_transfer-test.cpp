@@ -33,6 +33,10 @@ public:
   {
   }
 
+  virtual ~GridTransferTest()
+  {
+  }
+
   virtual void run() const override
   {
     test_unit_2d();

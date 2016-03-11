@@ -21,6 +21,10 @@ public:
   {
   }
 
+  virtual ~BasicMathTest()
+  {
+  }
+
   virtual void run() const override
   {
     test_factorial();
@@ -70,9 +74,14 @@ class MathTest
 {
 public:
   const DT_ tol;
+
   MathTest() :
     TaggedTest<Archs::None, DT_>("MathTest"),
     tol(Math::pow(Math::eps<DT_>(), DT_(0.9)))
+  {
+  }
+
+  virtual ~MathTest()
   {
   }
 
@@ -255,6 +264,10 @@ class MatrixInvertTest :
 public:
   MatrixInvertTest() :
     FullTaggedTest<Archs::None, DT_, IT_>("MatrixInvertTest")
+  {
+  }
+
+  virtual ~MatrixInvertTest()
   {
   }
 

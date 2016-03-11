@@ -66,6 +66,10 @@ public:
   {
   }
 
+  virtual ~TinyAlgebraTest()
+  {
+  }
+
   template<int n_>
   void test_mat_inv_lehmer() const
   {

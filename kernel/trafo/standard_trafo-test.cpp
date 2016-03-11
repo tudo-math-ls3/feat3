@@ -46,6 +46,10 @@ class StandardTrafoTest
     {
     }
 
+  virtual ~StandardTrafoTest()
+  {
+  }
+
   virtual void run() const override
   {
     // test assembly on unit quad
@@ -649,6 +653,10 @@ class InverseMappingTest
       {
       }
 
+    virtual ~InverseMappingTest()
+    {
+    }
+
     virtual void run() const override
     {
       run_1d();
@@ -1017,6 +1025,10 @@ class StandardTrafoVolumeTest
       TestSystem::TaggedTest<Archs::None, DataType_>("standard_trafo_volume_test")
       {
       }
+
+    virtual ~StandardTrafoVolumeTest()
+    {
+    }
 
     virtual void run() const override
     {
