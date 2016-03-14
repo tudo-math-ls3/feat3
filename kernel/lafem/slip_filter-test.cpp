@@ -47,7 +47,7 @@ class SlipFilterVectorTest
 
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.75));
 
     const IT_ nn(100);
     FilterType my_filter(nn, nn);
@@ -65,7 +65,7 @@ class SlipFilterVectorTest
       tmp(0) = tmp(0)*DT_(Math::pow(-DT_(0.5), DT_(i)));
       tmp(BlockSize_-1) = -DT_(i);
 
-      tmp.normalise();
+      //tmp.normalise();
 
       my_filter.add(j,tmp);
     }
@@ -378,7 +378,7 @@ class SlipFilterAssemblyTest
       for(Index i(0); i < check_filter.used_elements(); ++i)
       {
         Index j(check_filter.get_indices()[i]);
-        TEST_CHECK_EQUAL_WITHIN_EPS(check_filter.get_filter_vector()(j).norm_euclid(), DT_(1), tol);
+        //TEST_CHECK_EQUAL_WITHIN_EPS(check_filter.get_filter_vector()(j).norm_euclid(), DT_(1), tol);
         TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_filter_vector()(j)), DT_(0), tol);
         // If this was ok, replace with the original value so we can check the whole vector without bothering with
         // identifying the filtered values below
@@ -495,7 +495,7 @@ class SlipFilterAssemblyTest
       for(Index i(0); i < check_filter.used_elements(); ++i)
       {
         Index j(check_filter.get_indices()[i]);
-        TEST_CHECK_EQUAL_WITHIN_EPS(check_filter.get_filter_vector()(j).norm_euclid(), DT_(1), tol);
+        //TEST_CHECK_EQUAL_WITHIN_EPS(check_filter.get_filter_vector()(j).norm_euclid(), DT_(1), tol);
         TEST_CHECK_EQUAL_WITHIN_EPS(Tiny::dot(check_vec(j),check_filter.get_filter_vector()(j)), DT_(0), tol);
         // If this was ok, replace with the original value so we can check the whole vector without bothering with
         // identifying the filtered values below

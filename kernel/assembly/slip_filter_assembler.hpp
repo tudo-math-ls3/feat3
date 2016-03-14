@@ -207,15 +207,15 @@ namespace FEAST
               }
             }
 
-            // Normalize nu
-            for(Index i(0); i < nu.used_elements(); ++i)
-            {
-              Index j(nu.indices()[i]);
-              tmp = nu(j);
-              tmp.normalise();
+            //// Normalize nu
+            //for(Index i(0); i < nu.used_elements(); ++i)
+            //{
+            //  Index j(nu.indices()[i]);
+            //  tmp = nu(j);
+            //  tmp.normalise();
 
-              nu(j,tmp);
-            }
+            //  nu(j,tmp);
+            //}
           } // compute_outer_unit_normal
 
     }; // struct OuterNormalComputer

@@ -20,8 +20,14 @@ namespace FEAST
         for(Index i(0); i < ue; ++i)
         {
           DT_ sp(DT_(0));
+          DT_ scal(DT_(0));
           for(Index j(0) ; j < block_size ; ++j)
+          {
             sp += v[block_size * sv_indices[i] + j] *nu_elements[block_size * i + j];
+            scal += nu_elements[block_size * i + j]*nu_elements[block_size * i + j];
+          }
+
+          sp /= scal;
 
           for(Index j(0) ; j < block_size ; ++j)
             v[block_size * sv_indices[i] + j] -= sp*nu_elements[block_size * i + j];
@@ -35,8 +41,14 @@ namespace FEAST
         for(Index i(0); i < ue; ++i)
         {
           DT_ sp(DT_(0));
+          DT_ scal(DT_(0));
           for(Index j(0) ; j < block_size ; ++j)
+          {
             sp += v[block_size * sv_indices[i] + j] *nu_elements[block_size * i + j];
+            scal += nu_elements[block_size * i + j]*nu_elements[block_size * i + j];
+          }
+
+          sp /= scal;
 
           for(Index j(0) ; j < block_size ; ++j)
             v[block_size * sv_indices[i] + j] -= sp*nu_elements[block_size * i + j];
