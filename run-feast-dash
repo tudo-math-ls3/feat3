@@ -14,6 +14,7 @@ import time
 import datetime
 import random
 import multiprocessing
+import fnmatch
 import peewee as pw
 from build_system.feast_util import is_found
 from build_system.feast_util import get_output
@@ -257,6 +258,8 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  set note for all runs.")
   print ("nothirdparty")
   print ("  do not use thirdparty libraries at all.")
+  print ("download3party")
+  print ("  delete third party zip files and trigger new download")
   print ("nomemcheck")
   print ("  do not use memory checking tools at all.")
   print ("novalgrind")
@@ -287,6 +290,7 @@ sqlhost = "augias"
 sqlport = 3306
 note = ""
 nothirdparty = False
+download3party = False
 novalgrind = False
 nocudamemcheck = False
 nomkl = False
@@ -311,6 +315,8 @@ for i in range(1, len(sys.argv)):
     note = sys.argv[i].replace("note=", "", 1)
   if sys.argv[i].startswith("nothirdparty"):
     nothirdparty = True
+  if sys.argv[i].startswith("download3party"):
+    download3party = True
   if sys.argv[i].startswith("nomemcheck"):
     novalgrind = True
     nocudamemcheck = True
@@ -408,7 +414,7 @@ if is_found ("nvcc"):
 if is_found ("ccache"):
   addition = addition + "-ccache"
 
-#unconditionally add umfpack/alglib/fparser/parmetis and delete it before the first test run to trigger package downloads
+#delete third party folders to trigger new unpacking, if used
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"alglib", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"fparser", True)
@@ -420,7 +426,12 @@ icc_major = int(icc_version["__INTEL_COMPILER"][0:2])
 icc_minor = int(icc_version["__INTEL_COMPILER"][-2:])
 icc_minor2 = int(icc_version["__INTEL_COMPILER_UPDATE"])
 
-
+#delete even the thirdparty package files to trigger new download
+if download3party:
+  for root, dirs, files in os.walk(src_dirname+os.sep+"thirdparty"):
+    for basename in files:
+      if fnmatch.fnmatch(basename, "*.zip") or fnmatch.fnmatch(basename, "*.gz") or fnmatch.fnmatch(basename, "*.bz2") or fnmatch.fnmatch(basename, "*.tar"):
+        os.remove(os.path.join(root, basename))
 
 if (not nothirdparty):
   addition = addition + "-umfpack"
