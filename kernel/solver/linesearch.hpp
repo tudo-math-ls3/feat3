@@ -44,7 +44,7 @@ namespace FEAST
         // Note that this cannot be const, as the operator saves its state and thus changes
         Operator_& _op;
         /// The filter to be applied to the operator's gradient
-        const Filter_& _filter;
+        Filter_& _filter;
 
         /// Gradient vector
         VectorType _vec_grad;
@@ -88,7 +88,7 @@ namespace FEAST
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit Linesearch(String name_, Operator_& op_, const Filter_& filter_, bool keep_iterates = false) :
+        explicit Linesearch(String name_, Operator_& op_, Filter_& filter_, bool keep_iterates = false) :
           BaseClass(name_),
           _op(op_),
           _filter(filter_),
@@ -311,7 +311,7 @@ namespace FEAST
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit NewtonRaphsonLinesearch(Operator_& op_, const Filter_& filter_, bool keep_iterates = false) :
+        explicit NewtonRaphsonLinesearch(Operator_& op_, Filter_& filter_, bool keep_iterates = false) :
           BaseClass("NR-LS", op_, filter_, keep_iterates)
           {
           }
