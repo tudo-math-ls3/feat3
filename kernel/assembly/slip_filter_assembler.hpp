@@ -182,6 +182,7 @@ namespace FEAST
           const CoordType* orientation,
           const TrafoType_& trafo)
           {
+            nu.format(CoordType(0));
             // Vertex at facet index set from the parent
             auto& idx(trafo.get_mesh().template get_index_set<facet_dim,0>());
             // Temporary vector for holding one normal at a time
