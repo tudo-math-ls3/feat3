@@ -327,23 +327,32 @@ namespace FEAST
             iterates->push_back(std::move(vec_sol.clone()));
           }
 
-          // compute initial defect
+          // Compute intitial function value
+          this->_fval = this->_op.compute_func();
+          // Compute initial defect
           Status status = this->_set_initial_defect(this->_vec_def, vec_sol);
           if(status != Status::progress)
             return status;
 
-          this->_fval = this->_op.compute_func();
-          // The first direction has to be the steepest descent direction
-          this->_vec_dir.clone(this->_vec_def);
-
-          // compute initial gamma
-          DataType gamma = this->_vec_def.dot(this->_vec_dir);
-          // Compute initial eta = <d, r>
-          this->_eta = gamma;
-
           // apply preconditioner to defect vector
           if(!this->_apply_precond(this->_vec_tmp, this->_vec_def, this->_filter))
             return Status::aborted;
+
+          // The first direction has to be the (preconditioned) steepest descent direction
+          this->_vec_dir.clone(this->_vec_tmp);
+
+          // Compute initial eta = <d, r>
+          this->_eta = this->_vec_tmp.dot(this->_vec_def);
+
+          // If the preconditioner was not pd in the first step, reset the search direction to steepest descent
+          if(_eta <= DataType(0))
+          {
+            this->_vec_dir.clone(this->_vec_def);
+            _eta = this->_vec_dir.dot(this->_vec_def);
+          }
+
+          // compute initial gamma
+          DataType gamma = this->_vec_def.dot(this->_vec_dir);
 
           Index its_since_restart(0);
           _num_subs_restarts = Index(0);
