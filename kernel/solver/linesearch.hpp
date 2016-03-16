@@ -279,7 +279,7 @@ namespace FEAST
         {
           // clear solution vector
           vec_cor.format();
-          this->_op.prepare(vec_cor);
+          this->_op.prepare(vec_cor, this->_filter);
 
           // apply
           return _apply_intern(vec_cor, vec_dir);
@@ -298,7 +298,7 @@ namespace FEAST
          */
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
         {
-          this->_op.prepare(vec_sol);
+          this->_op.prepare(vec_sol, this->_filter);
           // apply
           Status st =_apply_intern(vec_sol, vec_dir);
 
@@ -372,7 +372,7 @@ namespace FEAST
             // Increase iteration count
             ++this->_num_iter;
 
-            this->_op.prepare(sol);
+            this->_op.prepare(sol, this->_filter);
             this->_op.compute_grad(this->_vec_grad);
             this->_filter.filter_def(this->_vec_grad);
             DataType fval = this->_op.compute_func();
@@ -529,7 +529,7 @@ namespace FEAST
         {
           // clear solution vector
           vec_cor.format();
-          this->_op.prepare(vec_cor);
+          this->_op.prepare(vec_cor, this->_filter);
 
           // apply
           return _apply_intern(vec_cor, vec_dir);
@@ -548,7 +548,7 @@ namespace FEAST
          */
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
         {
-          this->_op.prepare(vec_sol);
+          this->_op.prepare(vec_sol, this->_filter);
           // apply
           Status st =_apply_intern(vec_sol, vec_dir);
 
@@ -601,7 +601,7 @@ namespace FEAST
             // Increase iteration count
             ++this->_num_iter;
 
-            this->_op.prepare(sol);
+            this->_op.prepare(sol, this->_filter);
             DataType fval = this->_op.compute_func();
             this->_op.compute_grad(this->_vec_grad);
             this->_filter.filter_def(this->_vec_grad);
@@ -799,7 +799,7 @@ namespace FEAST
         {
           // clear solution vector
           vec_cor.format();
-          this->_op.prepare(vec_cor);
+          this->_op.prepare(vec_cor, this->_filter);
 
           // apply
           return _apply_intern(vec_cor, vec_dir);
@@ -818,7 +818,7 @@ namespace FEAST
          */
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
         {
-          this->_op.prepare(vec_sol);
+          this->_op.prepare(vec_sol, this->_filter);
           auto normed_dir = vec_dir.clone();
           normed_dir.scale(normed_dir, DataType(1)/vec_dir.norm2());
 
@@ -916,7 +916,7 @@ namespace FEAST
             ++this->_num_iter;
 
             // Prepare and evaluate
-            this->_op.prepare(vec_sol);
+            this->_op.prepare(vec_sol, this->_filter);
             fval = this->_op.compute_func();
 
             // Compute and filter the gradient
@@ -1134,7 +1134,7 @@ namespace FEAST
 
             // Update the solution and evaluate functional/gradient there
             vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha_new/this->_norm_dir);
-            this->_op.prepare(vec_sol);
+            this->_op.prepare(vec_sol, this->_filter);
 
             f_new = this->_op.compute_func();
             this->_op.compute_grad(this->_vec_grad);
@@ -1211,7 +1211,7 @@ namespace FEAST
           {
             vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha_lo/this->_norm_dir);
 
-            this->_op.prepare(vec_sol);
+            this->_op.prepare(vec_sol, this->_filter);
             this->_op.compute_grad(this->_vec_grad);
           }
           else

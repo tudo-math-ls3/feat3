@@ -10,6 +10,7 @@
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/solver/alglib_wrapper.hpp>
 #include <kernel/solver/nlcg.hpp>
+#include <kernel/solver/nlsd.hpp>
 #include <kernel/solver/hessian_precond.hpp>
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
 #include <kernel/solver/test_aux/function_traits.hpp>
@@ -219,15 +220,16 @@ static void display_help()
   std::cout << "dbg-nlopt: Nonlinear optimiser debugging tool." << std::endl;
   std::cout << "Optional arguments:" << std::endl;
   std::cout << " --help: Displays this text" << std::endl;
+  std::cout << " --solver [String]: Available solvers are NLCG, NLSD" << std::endl;
 #ifdef FEAST_HAVE_ALGLIB
-  std::cout << " --solver [String]: Available solvers are ALGLIBMinCG and NLCG(default)" << std::endl;
+  std::cout << "                    and ALGLIBMinLBFGS, ALGLIBMinCG" << std::endl;
 #else
-  std::cout << " --solver [String]: NLCG (default). Reconfigure and compile with the alglib token in the buildid "
+  std::cout << "                    Compiling with the alglib token in the buildid "
   << std::endl <<
-  "                    to enable ALGLIBMinCG" << std::endl;
+  "                    will enable ALGLIBMinLBFGS and ALGLIBMinCG" << std::endl;
 #endif // FEAST_HAVE_ALGLIB
   std::cout <<
-    " --precon [String]: Available preconditioners for NLCG are Hessian, ApproximateHessian, none(default)"
+    " --precon [String]: Available preconditioners for NLCG and NLSD are Hessian, ApproximateHessian, none(default)"
     << std::endl <<
     " --direction_update [String]: Available search direction updates for NLCG are DaiYuan," << std::endl <<
     "                              DYHSHybrid, FletcherReeves, HestenesStiefel and PolakRibiere (default)."
@@ -252,7 +254,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
+  typedef Analytic::Common::HimmelblauFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, IndexType, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
@@ -296,10 +298,15 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  String solver_name("NLCG");
+  String solver_name("");
   auto* solver_pair(args.query("solver"));
   if(solver_pair != nullptr)
     solver_name = solver_pair->second.front();
+  else
+  {
+    display_help();
+    return 1;
+  }
 
   if(solver_name == "NLCG")
   {
@@ -337,6 +344,35 @@ int main(int argc, char* argv[])
     }
 
     auto my_solver = new_nlcg(my_op, my_filter, my_linesearch, my_direction_update, true, my_precond);
+
+    int ret = run(my_solver, my_op);
+
+    // Clean up
+    my_solver.reset();
+    Runtime::finalise();
+    return ret;
+  }
+  else if(solver_name == "NLSD")
+  {
+    // The default is no preconditioner
+    String precon_name("none");
+    // Check if any preconditioner was specified on the command line
+    auto* precon_pair(args.query("precon"));
+    if(precon_pair != nullptr)
+      precon_name = precon_pair->second.front();
+
+    if(precon_name== "Hessian")
+      my_precond = new_hessian_precond(my_op, my_filter);
+    else if(precon_name == "ApproximateHessian")
+      my_precond = new_approximate_hessian_precond(my_op, my_filter);
+    else if(precon_name != "none")
+      throw InternalError("Got invalid precon_name: "+precon_name);
+
+    auto* update_pair(args.query("direction_update"));
+    if(update_pair != nullptr)
+      std::cout << "Parameter direction_update specified for NLSD solver, ignoring it." << std::endl;
+
+    auto my_solver = new_nlsd(my_op, my_filter, my_linesearch, true, my_precond);
 
     int ret = run(my_solver, my_op);
 

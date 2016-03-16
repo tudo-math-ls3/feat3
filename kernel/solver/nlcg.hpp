@@ -265,7 +265,7 @@ namespace FEAST
           // clear solution vector
           vec_cor.format();
 
-          this->_op.prepare(vec_cor);
+          this->_op.prepare(vec_cor, this->_filter);
 
           // apply
           return _apply_intern(vec_cor);
@@ -274,7 +274,7 @@ namespace FEAST
         /// \copydoc BaseClass::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
-          this->_op.prepare(vec_sol);
+          this->_op.prepare(vec_sol, this->_filter);
           // compute defect
           this->_op.compute_grad(this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
