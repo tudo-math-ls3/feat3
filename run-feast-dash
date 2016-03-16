@@ -87,6 +87,7 @@ def run_test(build_id, branch, myDB, extra_opts):
   m.save()
   if dump_filename != "":
     dump_file.write("\n" + "\n".join(git_output))
+    dump_file.flush()
   os.chdir(build_dirname)
 
 #workaround for network base file system to prevent rebuilding everything in ctest phase
@@ -113,6 +114,7 @@ def run_test(build_id, branch, myDB, extra_opts):
   if dump_filename != "":
     dump_file.write("\n" + src_dirname + os.sep + "configure-feast " + build_id + "\n")
     dump_file.write("\n" + configure_output)
+    dump_file.flush()
 
 #workaround for network base file system to prevent rebuilding everything in ctest phase
   if is_found("sync"):
@@ -185,6 +187,7 @@ def run_test(build_id, branch, myDB, extra_opts):
   if dump_filename != "":
     dump_file.write("\n" + make_command + "\n\n")
     dump_file.write("\n".join(make_output))
+    dump_file.flush()
 
 #workaround for network base file system to prevent rebuilding everything in ctest phase
   if is_found("sync"):
