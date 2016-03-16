@@ -149,7 +149,8 @@ namespace FEAST
          * The current state
          *
          */
-        void prepare(const VectorTypeR& vec_state)
+        template<typename FilterType_>
+        void prepare(const VectorTypeR& vec_state, FilterType_& DOXY(filter))
         {
           _my_state = vec_state(0);
         }

@@ -96,7 +96,7 @@ int run(Solver_& solver, Operator_& op)
   // We need a dummy rhs
   auto rhs = op.create_vector_r();
 
-  op.prepare(sol);
+  //op.prepare(sol);
 
   // Solve the optimisation problem
   Status st = solver->correct(sol, rhs);
@@ -252,7 +252,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::BazaraaShettyFunction AnalyticFunctionType;
+  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, IndexType, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
@@ -346,6 +346,16 @@ int main(int argc, char* argv[])
     return ret;
   }
 #ifdef FEAST_HAVE_ALGLIB
+  else if (solver_name == "ALGLIBMinLBFGS")
+  {
+    auto my_solver = new_alglib_minlbfgs(my_op, my_filter, true);
+
+    int ret = run(my_solver, my_op);
+
+    my_solver.reset();
+    Runtime::finalise();
+    return ret;
+  }
   else if (solver_name == "ALGLIBMinCG")
   {
     NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::automatic);
