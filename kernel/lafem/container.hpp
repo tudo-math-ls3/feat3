@@ -680,6 +680,11 @@ namespace FEAST
       {
         CONTEXT("When cloning Container");
 
+        if (this == &other)
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Trying to self-clone a lafem container!");
+        }
+
         this->clear();
 
         this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());

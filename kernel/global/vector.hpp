@@ -89,7 +89,9 @@ namespace FEAST
       void clone(const Vector& other, LAFEM::CloneMode mode = LAFEM::CloneMode::Weak)
       {
         if(&(*other) == &(*(*this)))
-          throw InternalError("Trying to self-clone a Global::Vector");
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Trying to self-clone a Global::Vector!");
+        }
 
         *(*this) = (*other).clone(mode);
       }
