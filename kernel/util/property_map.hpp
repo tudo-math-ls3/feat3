@@ -69,6 +69,10 @@ namespace FEAST
   public:
     /// Default Constructor
     explicit PropertyMap(PropertyMap* parent = nullptr);
+    /// Delete copy constructor
+    PropertyMap(const PropertyMap&) = delete;
+    /// Delete copy assignment operator
+    PropertyMap& operator=(const PropertyMap&) = delete;
 
     /// Virtual Destructor
     virtual ~PropertyMap();
