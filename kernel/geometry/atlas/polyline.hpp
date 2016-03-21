@@ -88,7 +88,6 @@ namespace FEAST
          *
          * \param[in] param
          * The parameter point to be mapped
-         *
          */
         void map(WorldPoint& point, const ParamPoint& param) const
         {
@@ -107,26 +106,33 @@ namespace FEAST
             return;
           }
 
-          /// \todo replace by binary search
-          // apply linear search
-          for(std::size_t i(0); (i+1) < _param.size(); ++i)
+          // apply binary search
+          DataType xl = _param.front()[0];
+          DataType xr = _param.back()[0];
+          std::size_t il(0), ir(_param.size()-1);
+          while(il+1 < ir)
           {
-            // fetch left and right interval ends
-            const DataType& xl = _param[i  ][0];
-            const DataType& xr = _param[i+1][0];
-
-            // is this our interval?
-            if((xl <= x) && (x <= xr))
+            // test median
+            std::size_t im = (il+ir)/2;
+            DataType xm = _param.at(im)[0];
+            if(x < xm)
             {
-              // compute normalised interpolation factor
-              DataType t1 = (x - xl) / (xr - xl);
-              DataType t0 = DataType(1) - t1;
-
-              // interpolate world point
-              point = (t0 * _world[i+0]) + (t1 * _world[i+1]);
-              return;
+              xr = xm;
+              ir = im;
+            }
+            else
+            {
+              xl = xm;
+              il = im;
             }
           }
+
+          // compute normalised interpolation factor
+          DataType t1 = (x - xl) / (xr - xl);
+          DataType t0 = DataType(1) - t1;
+
+          // interpolate world point
+          point = (t0 * _world[il]) + (t1 * _world[ir]);
         }
 
         /** \copydoc ChartBase::get_type() */
@@ -138,7 +144,6 @@ namespace FEAST
         /** \copydoc ChartBase::write_data_container */
         virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
         {
-
           size_t num_points(_world.size());
 
           // GCC 4.9.2 complains at link time in the img_dim line otherwise
