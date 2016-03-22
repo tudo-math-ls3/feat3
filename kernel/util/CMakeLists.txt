@@ -12,6 +12,7 @@ ADD_LIBRARY(kernel-util STATIC
   property_map.cpp
   runtime.cpp
   statistics.cpp
+  xml_scanner.cpp
 )
 
 if (FEAST_COTIRE)
@@ -53,6 +54,7 @@ SET (test_list
   string-test
   string_mapped-test
   tiny_algebra-test
+  xml_scanner-test
 )
 
 # create all tests
