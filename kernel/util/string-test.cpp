@@ -44,6 +44,32 @@ public:
     TEST_CHECK_EQUAL(String("abcd").pad_front(2), "abcd");
     TEST_CHECK_EQUAL(String("abcd").pad_back(4), "abcd");
 
+    // test starts_with(String)
+    TEST_CHECK_EQUAL(String("abcde").starts_with("abc"), true);
+    TEST_CHECK_EQUAL(String("abcde").starts_with("foo"), false);
+    TEST_CHECK_EQUAL(String("abcde").starts_with(""), true);
+    TEST_CHECK_EQUAL(String("abcde").starts_with("abcdef"), false);
+    TEST_CHECK_EQUAL(String("").starts_with(""), true);
+    TEST_CHECK_EQUAL(String("").starts_with("foo"), false);
+
+    // test ends_with(String)
+    TEST_CHECK_EQUAL(String("abcde").ends_with("cde"), true);
+    TEST_CHECK_EQUAL(String("abcde").ends_with("foo"), false);
+    TEST_CHECK_EQUAL(String("abcde").ends_with(""), true);
+    TEST_CHECK_EQUAL(String("abcde").ends_with("abcdef"), false);
+    TEST_CHECK_EQUAL(String("").ends_with(""), true);
+    TEST_CHECK_EQUAL(String("").ends_with("foo"), false);
+
+    // test starts_with(char)
+    TEST_CHECK_EQUAL(String("abcde").starts_with('a'), true);
+    TEST_CHECK_EQUAL(String("abcde").starts_with('x'), false);
+    TEST_CHECK_EQUAL(String("").starts_with('x'), false);
+
+    // test ends_with(char)
+    TEST_CHECK_EQUAL(String("abcde").ends_with('e'), true);
+    TEST_CHECK_EQUAL(String("abcde").ends_with('x'), false);
+    TEST_CHECK_EQUAL(String("").ends_with('x'), false);
+
     // test bool stringify/parse
     TEST_CHECK(stringify(b = true).parse(b));
     TEST_CHECK(b == true);

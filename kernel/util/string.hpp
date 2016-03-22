@@ -710,6 +710,80 @@ namespace FEAST
     }
 
     /**
+     * \brief Checks whether this string starts with another string.
+     *
+     * \param[in] head
+     * The string that the front of this string is to be checked against.
+     *
+     * \returns
+     * \c true, if \c this starts with \p head, otherwise \c false
+     */
+    bool starts_with(const String& head) const
+    {
+      // every string starts with an empty string
+      if(head.empty())
+        return true;
+
+      // check size
+      if(this->size() <  head.size())
+        return false;
+
+      // compare head
+      return (this->compare(std::size_t(0), head.size(), head) == 0);
+    }
+
+    /**
+     * \brief Checks whether this string ends with another string.
+     *
+     * \param[in] tail
+     * The string that the back of this string is to be checked against.
+     *
+     * \returns
+     * \c true, if \c this ends with \p tail, otherwise \c false
+     */
+    bool ends_with(const String& tail) const
+    {
+      // every string ends with an empty string
+      if(tail.empty())
+        return true;
+
+      // check size
+      if(this->size() <  tail.size())
+        return false;
+
+      // compare tail
+      return (this->compare(this->size() - tail.size(), tail.size(), tail) == 0);
+    }
+
+    /**
+     * \brief Checks whether this string starts with a specified character.
+     *
+     * \param[in] head
+     * The character that the front of this string is to be checked against.
+     *
+     * \returns
+     * \c true, if \c this starts with \p head, otherwise \c false
+     */
+    bool starts_with(const char head) const
+    {
+      return (this->empty() ? false : this->front() == head);
+    }
+
+    /**
+     * \brief Checks whether this string ends with a specified character.
+     *
+     * \param[in] tail
+     * The character that the back of this string is to be checked against.
+     *
+     * \returns
+     * \c true, if \c this ends with \p tail, otherwise \c false
+     */
+    bool ends_with(const char tail) const
+    {
+      return (this->empty() ? false : this->back() == tail);
+    }
+
+    /**
      * \brief Parses the string.
      *
      * \param[out] t
