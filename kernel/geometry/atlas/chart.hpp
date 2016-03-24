@@ -6,6 +6,7 @@
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/util/mesh_streamer.hpp> // for MeshDataContainer
 #include <kernel/util/tiny_algebra.hpp>
+#include <kernel/util/xml_scanner.hpp>
 
 namespace FEAST
 {
@@ -86,6 +87,17 @@ namespace FEAST
          *
          */
         virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const = 0;
+
+        /**
+         * \brief Writes the Chart into a stream in XML format.
+         *
+         * \param[in,out] os
+         * The output stream to write into.
+         *
+         * \param[in] sindent
+         * The indentation string.
+         */
+        virtual void write(std::ostream& os, const String& sindent) const = 0;
       }; // class ChartBase<...>
 
       /// \cond internal
@@ -107,7 +119,13 @@ namespace FEAST
           template<typename CT_, typename MT_, typename PT_>
           static bool adapt(const CT_& chart, MT_& mesh, const PT_& part)
           {
-            chart.project(mesh, part);
+            // First of all, check whether the chart can really perform
+            // implicit adaption
+            if(!chart.can_implicit())
+              return false;
+
+            // Try to project the whole meshpart
+            chart.project_meshpart(mesh, part);
 
             // okay
             return true;
@@ -140,6 +158,11 @@ namespace FEAST
 
             // attribute type of our mesh part
             typedef typename PT_::AttributeType AttributeType;
+
+            // First of all, check whether the chart can really perform
+            // explicit adaption
+            if(!chart.can_explicit())
+              return false;
 
             // Try to fetch the parametrisation attribute.
             const AttributeType* attrib = part.find_attribute("param", 0);
@@ -242,6 +265,30 @@ namespace FEAST
 
       public:
         /**
+         * \brief Specifies whether the chart can perform explicit projection.
+         *
+         * This function returns #is_explicit by default, but it may be
+         * overridden by the derived class in case that explicit projection
+         * can be disabled at runtime (e.g. due to missing parameters).
+         */
+        bool can_explicit() const
+        {
+          return is_explicit;
+        }
+
+        /**
+         * \brief Specifies whether the chart can perform implicit projection.
+         *
+         * This function returns #is_implicit by default, but it may be
+         * overridden by the derived class in case that implicit projection
+         * can be disabled at runtime.
+         */
+        bool can_implicit() const
+        {
+          return is_implicit;
+        }
+
+        /**
          * \brief Adapts a whole MeshPart
          *
          * \param[in] mesh
@@ -249,7 +296,6 @@ namespace FEAST
          *
          * \param[in] part
          * MeshPart identifying the region to be adapted
-         *
          */
         virtual void adapt(MeshType& mesh, const PartType& part) const override
         {
@@ -281,7 +327,6 @@ namespace FEAST
          * \todo: Implement this
          *
          * There is currently no code that uses MeshParts referring to other MeshParts instead of a RootMesh.
-         *
          */
         virtual void adapt(PartType& DOXY(parent_meshpart), const PartType& DOXY(meshpart)) const override
         {

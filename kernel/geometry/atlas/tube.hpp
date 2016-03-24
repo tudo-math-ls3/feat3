@@ -107,6 +107,16 @@ namespace FEAST
           chart_container.data.push_back(" </tube>");
         }
 
+        /** \copydoc ChartBase::write */
+        virtual void write(std::ostream& os, const String& sindent) const override
+        {
+          os << sindent << "<Tube";
+          os << " radius=\"" << this->_radius << "\"";
+          os << " midpoint=\"" << this->_midpoint[0] << " " << this->_midpoint[1] << " " << this->_midpoint[2] << "\"";
+          os << " axis=\"" << this->_rot_axis[0] << " " << this->_rot_axis[1] << " " << this->_rot_axis[2] << "\"";
+          os << " />" << std::endl;
+        }
+
         /**
          * \brief Projects a single world point
          *
@@ -136,7 +146,7 @@ namespace FEAST
          * The MeshPart identifying the point to be projected
          *
          */
-        void project(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
+        void project_meshpart(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
         {
           auto& vtx = mesh.get_vertex_set();
           const auto& target_vtx = meshpart.template get_target_set<0>();

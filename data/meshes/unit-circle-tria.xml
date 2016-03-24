@@ -1,0 +1,61 @@
+<FeatMeshFile version="1" mesh="conformal:simplex:2:2">
+  <Info>
+   This is the unit-circle mesh consisting of four triangles.
+  </Info>
+  <Chart name="outer">
+    <Circle radius="1" midpoint="0 0" domain="0 4" />
+  </Chart>
+  <Mesh type="conformal:simplex:2:2" size="5 8 4">
+    <Vertices>
+      1 0
+      0 1
+      -1 0
+      0 -1
+      0 0
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 0
+      0 4
+      1 4
+      2 4
+      3 4
+    </Topology>
+    <Topology dim="2">
+      0 1 4
+      1 2 4
+      2 3 4
+      3 0 4
+    </Topology>
+  </Mesh>
+  <MeshPart name="outer" parent="root" chart="outer" topology="full" size="5 4">
+    <Mapping dim="0">
+      0
+      1
+      2
+      3
+      0
+    </Mapping>
+    <Mapping dim="1">
+      0
+      1
+      2
+      3
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+    </Topology>
+    <Attribute name="param" dim="1">
+      0
+      1
+      2
+      3
+      4
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>

@@ -4,12 +4,14 @@
 
 #include <kernel/util/mesh_streamer.hpp> // for MeshDataContainer
 #include <kernel/geometry/atlas/chart.hpp>
+#include <kernel/geometry/atlas/bezier.hpp>
 #include <kernel/geometry/atlas/circle.hpp>
 #include <kernel/geometry/atlas/discrete_chart.hpp>
 #include <kernel/geometry/atlas/polyline.hpp>
 #include <kernel/geometry/atlas/sphere.hpp>
 #include <kernel/geometry/atlas/tube.hpp>
-
+#include <kernel/geometry/atlas/surface_mesh.hpp>
+#include <kernel/geometry/atlas/extrude.hpp>
 
 namespace FEAST
 {

@@ -114,7 +114,7 @@ namespace FEAST
          * The MeshPart identifying the point to be projected
          *
          */
-        void project(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
+        void project_meshpart(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
         {
           auto& vtx = mesh.get_vertex_set();
           const auto& target_vtx = meshpart.template get_target_set<0>();
@@ -199,6 +199,15 @@ namespace FEAST
 
           // okay, create sphere
           return new Sphere<Mesh_>(mid_x, mid_y, mid_z, radius);
+        }
+
+        /** \copydoc ChartBase::write */
+        virtual void write(std::ostream& os, const String& sindent) const override
+        {
+          os << sindent << "<Sphere";
+          os << " radius=\"" << this->_radius << "\"";
+          os << " midpoint=\"" << this->_midpoint[0] << " " << this->_midpoint[1] << " " << this->_midpoint[2] << "\"";
+          os << " />" << std::endl;
         }
       };
     } // namespace Atlas

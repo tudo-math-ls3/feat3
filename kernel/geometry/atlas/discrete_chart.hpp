@@ -153,6 +153,12 @@ namespace FEAST
             Geometry::MeshWriter<SurfaceMeshType>::write_mesh(chart_container.mesh_data, *_surface_mesh);
           }
 
+          /** \copydoc ChartBase::write */
+          virtual void write(std::ostream&, const String&) const override
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "XML export of DiscreteChart not implemented yet");
+          }
+
           /**
            * \brief Parses a MeshDataContainer
            *
@@ -234,7 +240,7 @@ namespace FEAST
            * the search stack.
            *
            */
-          void project(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
+          void project_meshpart(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
           {
             CONTEXT(name()+"::project(Mesh_&, const MeshPart<Mesh>&)");
 

@@ -2,9 +2,7 @@
 #ifndef KERNEL_GEOMETRY_ATLAS_POLYLINE_HPP
 #define KERNEL_GEOMETRY_ATLAS_POLYLINE_HPP 1
 
-#include <kernel/geometry/atlas/chart.hpp>
-
-#include <deque>
+#include <kernel/geometry/atlas/spline_base.hpp>
 
 namespace FEAST
 {
@@ -12,37 +10,26 @@ namespace FEAST
   {
     namespace Atlas
     {
-      /// Polyline chart traits
-      struct PolylineTraits
-      {
-        /// we support explicit map
-        static constexpr bool is_explicit = true;
-        /// we don't support implicit project
-        static constexpr bool is_implicit = false;
-        /// this is a 2D object
-        static constexpr int world_dim = 2;
-        /// we have 1D parameters
-        static constexpr int param_dim = 1;
-      };
-
       /**
        * \brief Polyline chart class template
        *
        * This chart represents a 2D polygonal chain (aka "polyline") characterised
        * by vector of parameter and world point coordinates.
        *
-       * This chart currently implements only the explicit chart interface.
+       * This chart implements both the implicit and explicit chart interfaces.
        *
        * \tparam Mesh_
        * The type of the mesh to be parameterised by this chart.
+       *
+       * \author Peter Zajac
        */
       template<typename Mesh_>
       class Polyline :
-        public ChartCRTP<Polyline<Mesh_>, Mesh_, PolylineTraits>
+        public SplineBaseCRTP<Polyline<Mesh_>, Mesh_>
       {
       public:
         /// The CRTP base class
-        typedef ChartCRTP<Polyline<Mesh_>, Mesh_, PolylineTraits> BaseClass;
+        typedef SplineBaseCRTP<Polyline<Mesh_>, Mesh_> BaseClass;
         /// Floating point type for coordinates
         typedef typename BaseClass::CoordType DataType;
         /// Vector type for world points aka. image points
@@ -50,15 +37,10 @@ namespace FEAST
         /// Vector type for parameter points aka. domain points
         typedef typename BaseClass::ParamPoint ParamPoint;
 
-      protected:
-        /// The world points making up the polygon line
-        std::deque<WorldPoint> _world;
-        /// The parameter values for these world points
-        std::deque<ParamPoint> _param;
-
       public:
         /// default CTOR
-        explicit Polyline()
+        explicit Polyline(bool closed = false) :
+          BaseClass(closed)
         {
         }
 
@@ -70,69 +52,62 @@ namespace FEAST
          *
          * \param[in] param
          * A deque of parameter points representing the parameter space.
+         *
+         * \param[in] closed
+         * Specifies whether the polyline is closed.
          */
-        explicit Polyline(const std::deque<WorldPoint>& world, const std::deque<ParamPoint>& param) :
-          _world(world),
-          _param(param)
+        explicit Polyline(const std::deque<WorldPoint>& world, const std::deque<ParamPoint>& param, bool closed) :
+          BaseClass(closed)
         {
-          ASSERT_(_param.size() == _world.size());
+          this->_world = world;
+          this->_param = param;
+
           // we need at least 2 points
-          ASSERT_(_param.size() > std::size_t(1));
+          ASSERT_(this->_world.size() > std::size_t(1));
+          ASSERT_(this->_param.empty() || (this->_param.size() == this->_world.size()));
         }
 
         /**
-         * \brief Maps a single parameter point
+         * \brief Maps a local segment parameter point
          *
-         * \param[out] point
-         * The image of the parameter point under the chart mapping
+         * \param[in] i
+         * The segment index onto which to map
          *
-         * \param[in] param
-         * The parameter point to be mapped
+         * \param[in] t
+         * The local segment parameter
          */
-        void map(WorldPoint& point, const ParamPoint& param) const
+        WorldPoint map_on_segment(const Index i, const DataType t) const
         {
-          // get our point coord
-          const DataType& x = param[0];
+          ASSERT_((i+1) < Index(this->_world.size()));
+          return ((DataType(1) - t) * this->_world[i]) + (t * this->_world[i+1]);
+        }
 
-          // check for boundary
-          if(x <= _param.front()[0])
-          {
-            point = _world.front();
-            return;
-          }
-          if(x >= _param.back()[0])
-          {
-            point = _world.back();
-            return;
-          }
+        /**
+         * \brief Projects a point onto one segment of the polyline.
+         *
+         * \param[in] i
+         * The index of the polyline segment onto which to project
+         *
+         * \param[in] point
+         * The world point that is to be projected.
+         *
+         * \returns
+         * The projected world point parameter.
+         */
+        DataType project_on_segment(const Index i, const WorldPoint& point) const
+        {
+          ASSERT_((i+1) < Index(this->_world.size()));
 
-          // apply binary search
-          DataType xl = _param.front()[0];
-          DataType xr = _param.back()[0];
-          std::size_t il(0), ir(_param.size()-1);
-          while(il+1 < ir)
-          {
-            // test median
-            std::size_t im = (il+ir)/2;
-            DataType xm = _param.at(im)[0];
-            if(x < xm)
-            {
-              xr = xm;
-              ir = im;
-            }
-            else
-            {
-              xl = xm;
-              il = im;
-            }
-          }
+          // get the ends of the line segment
+          const WorldPoint& x0 = this->_world.at(i);
+          const WorldPoint& x1 = this->_world.at(i+1);
 
-          // compute normalised interpolation factor
-          DataType t1 = (x - xl) / (xr - xl);
-          DataType t0 = DataType(1) - t1;
+          // compute xe := x1-x0 and xp := p-x0
+          WorldPoint xe = x1 - x0;
+          WorldPoint xp = point - x0;
 
-          // interpolate world point
-          point = (t0 * _world[il]) + (t1 * _world[ir]);
+          // compute t = <xp,xe>/<xe,xe> and clamp it to [0,1]
+          return Math::clamp(Tiny::dot(xp,xe) / Tiny::dot(xe,xe), DataType(0), DataType(1));
         }
 
         /** \copydoc ChartBase::get_type() */
@@ -144,7 +119,7 @@ namespace FEAST
         /** \copydoc ChartBase::write_data_container */
         virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
         {
-          size_t num_points(_world.size());
+          size_t num_points(this->_world.size());
 
           // GCC 4.9.2 complains at link time in the img_dim line otherwise
           int img_dim(BaseClass::world_dim);
@@ -159,17 +134,31 @@ namespace FEAST
             String tmp("  ");
 
             for(int j(0); j < BaseClass::param_dim; ++j)
-              tmp += " "+stringify((_param[i])[j]);
+              tmp += " "+stringify((this->_param[i])[j]);
 
             // GCC 4.9.2 does not complain here, though
             for(int j(0); j < BaseClass::world_dim; ++j)
-              tmp += " "+stringify((_world[i])[j]);
+              tmp += " "+stringify((this->_world[i])[j]);
 
             chart_container.data.push_back(tmp);
           }
 
           chart_container.data.push_back("  </points>");
           chart_container.data.push_back(" </polyline>");
+        }
+
+        /** \copydoc ChartBase::write */
+        virtual void write(std::ostream& os, const String& sindent) const override
+        {
+          String sind(sindent);
+          if(!sind.empty())
+            sind.append("  ");
+
+          os << sindent << "<Polyline dim=\"2\" size=\"" << this->_world.size() << "\"";
+          os << " type=\"" << (this->_closed ? "closed" : "open") << "\">" << std::endl;
+          this->write_points(os, sind);
+          this->write_params(os, sind);
+          os << sindent << "</Polyline>" << std::endl;
         }
 
         /**
@@ -324,9 +313,96 @@ namespace FEAST
             throw InternalError("Parsed " + stringify(param.size()) + " points but expected " + stringify(num_points));
 
           // alright, create the chart
-          return new Polyline<Mesh_>(world, param);
+          return new Polyline<Mesh_>(world, param, false);
         }
       }; // class Polyline<...>
+
+      template<typename Mesh_, typename ChartReturn_ = ChartBase<Mesh_>>
+      class PolylineChartParser :
+        public Xml::MarkupParser
+      {
+      private:
+        typedef Polyline<Mesh_> ChartType;
+        typedef typename ChartType::DataType DataType;
+        ChartReturn_*& _chart;
+        Polyline<Mesh_>* _polyline;
+        Index _size;
+
+      public:
+        explicit PolylineChartParser(ChartReturn_*& chart) :
+          _chart(chart),
+          _polyline(nullptr),
+          _size(0)
+        {
+        }
+
+        virtual bool attribs(std::map<String,bool>& attrs) const override
+        {
+          attrs.emplace("dim", true);
+          attrs.emplace("size", true);
+          attrs.emplace("type", false);
+          return true;
+        }
+
+        virtual void create(
+          int iline,
+          const String& sline,
+          const String&,
+          const std::map<String, String>& attrs,
+          bool closed) override
+        {
+          // make sure this one isn't closed
+          if(closed)
+            throw Xml::GrammarError(iline, sline, "Invalid closed Polyline markup");
+
+          Index dim(0);
+
+          // try to parse the dimension
+          if(!attrs.find("dim")->second.parse(dim))
+            throw Xml::GrammarError(iline, sline, "Failed to parse polyline dimension");
+          if(dim != Index(2))
+            throw Xml::GrammarError(iline, sline, "Invalid polyline dimension");
+
+          // try to parse the size
+          if(!attrs.find("size")->second.parse(_size))
+            throw Xml::GrammarError(iline, sline, "Failed to parse polyline size");
+          if(_size < Index(2))
+            throw Xml::GrammarError(iline, sline, "Invalid polyline size");
+
+          // try to check type
+          bool poly_closed(false);
+          auto it = attrs.find("type");
+          if(it != attrs.end())
+          {
+            String stype = it->second;
+            if(it->second == "closed")
+              poly_closed = true;
+            else if (it->second != "open")
+              throw Xml::ContentError(iline, sline, "Invalid polyline type; must be either 'closed' or 'open'");
+          }
+
+          // up to now, everything's fine
+          _polyline = new ChartType(poly_closed);
+        }
+
+        virtual void close(int, const String&) override
+        {
+          // okay
+          _chart = _polyline;
+        }
+
+        virtual bool content(int, const String&) override
+        {
+          return false;
+        }
+
+        virtual std::shared_ptr<Xml::MarkupParser> markup(int, const String&, const String& name) override
+        {
+          if(name == "Points") return std::make_shared<SplinePointsParser<Polyline<Mesh_>>>(*_polyline, _size);
+          if(name == "Params") return std::make_shared<SplineParamsParser<Polyline<Mesh_>>>(*_polyline, _size);
+          return nullptr;
+        }
+      }; // class PolylineChartParser<...>
     } // namespace Atlas
   } // namespace Geometry
 } // namespace FEAST

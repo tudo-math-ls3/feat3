@@ -1,0 +1,99 @@
+<FeatMeshFile version="1" mesh="conformal:simplex:2:2">
+  <Chart name="cap_r">
+    <Circle radius="1" midpoint="1 0" domain="0 4" />
+  </Chart>
+  <Chart name="cap_l">
+    <Circle radius="1" midpoint="-1 0" domain="0 4" />
+  </Chart>
+  <Mesh type="conformal:simplex:2:2" size="7 12 6">
+    <Vertices>
+      -1 -1
+       1 -1
+       1  1
+      -1  1
+       0  0
+       2  0
+      -2  0
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      4 5
+      2 3
+      4 6
+      0 4
+      1 4
+      2 4
+      3 4
+      1 5
+      5 2
+      3 6
+      6 0
+    </Topology>
+    <Topology dim="2">
+      0 1 4
+      1 5 4
+      2 4 5
+      2 3 4
+      3 6 4
+      0 4 6
+    </Topology>
+  </Mesh>
+  <MeshPart name="bottom" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      0
+      1
+    </Mapping>
+    <Mapping dim="1">
+      0
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="top" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      2
+      3
+    </Mapping>
+    <Mapping dim="1">
+      2
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="right" parent="root" chart="cap_r" topology="full" size="3 2">
+    <Mapping dim="0">
+      1
+      5
+      2
+    </Mapping>
+    <Mapping dim="1">
+      8
+      9
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+    </Topology>
+    <Attribute name="param" dim="1">
+      -1
+      0
+      1
+    </Attribute>
+  </MeshPart>
+  <MeshPart name="left" parent="root" chart="cap_l" topology="full" size="3 2">
+    <Mapping dim="0">
+      3
+      6
+      0
+    </Mapping>
+    <Mapping dim="1">
+      10
+      11
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+    </Topology>
+    <Attribute name="param" dim="1">
+      1
+      2
+      3
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>

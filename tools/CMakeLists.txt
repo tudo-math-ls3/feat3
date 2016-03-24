@@ -31,6 +31,9 @@ TARGET_LINK_LIBRARIES(matrix-cond feast)
 ADD_EXECUTABLE(matrix-info matrix_info/matrix_info.cpp)
 TARGET_LINK_LIBRARIES(matrix-info feast)
 
+ADD_EXECUTABLE(mesh-extruder mesh_extruder/mesh_extruder.cpp)
+TARGET_LINK_LIBRARIES(mesh-extruder feast)
+
 ADD_EXECUTABLE(mesh-preprocessor mesh_preprocessor/mesh_preprocessor.cpp)
 TARGET_LINK_LIBRARIES(mesh-preprocessor feast)
 

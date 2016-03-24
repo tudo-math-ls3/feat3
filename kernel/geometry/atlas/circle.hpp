@@ -62,6 +62,8 @@ namespace FEAST
         WorldPoint _midpoint;
         /// the circle's radius
         DataType _radius;
+        /// Specifies whether the circle mapping has a domain
+        bool _have_domain;
         /// Left parametrisation domain boundary
         DataType _trafo_a;
         /// Right parametrisation domain boundary
@@ -69,7 +71,27 @@ namespace FEAST
 
       public:
         /**
-         * \brief Constructor
+         * \brief Creates a Circle chart for implicit adaption
+         *
+         * \param[in] mid_x, mid_y
+         * The coordinates of the circle midpoint.
+         *
+         * \param[in] radius
+         * The radius of the circle. Must be positive.
+         */
+        explicit Circle(DataType mid_x, DataType mid_y, DataType radius) :
+          _radius(radius),
+          _have_domain(false),
+          _trafo_a(0.0),
+          _trafo_b(0.0)
+        {
+          ASSERT_(radius > DataType(0));
+          _midpoint[0] = mid_x;
+          _midpoint[1] = mid_y;
+        }
+
+        /**
+         * \brief Creates a Circle chart for both implicit and explicit adaption
          *
          * \param[in] mid_x, mid_y
          * The coordinates of the circle midpoint.
@@ -82,14 +104,20 @@ namespace FEAST
          * See the documentation of this class template for details.
          */
         explicit Circle(DataType mid_x, DataType mid_y, DataType radius,
-          DataType param_l = DataType(0), DataType param_r = DataType(1)) :
+          DataType param_l, DataType param_r) :
           _radius(radius),
+          _have_domain(true),
           _trafo_a(-param_l),
           _trafo_b((DataType(2) * Math::pi<DataType>()) / (param_r - param_l))
         {
           ASSERT_(radius > DataType(0));
           _midpoint[0] = mid_x;
           _midpoint[1] = mid_y;
+        }
+
+        bool can_explicit() const
+        {
+          return _have_domain;
         }
 
         /**
@@ -117,7 +145,7 @@ namespace FEAST
          * The MeshPart identifying the point to be projected
          *
          */
-        void project(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
+        void project_meshpart(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
         {
           auto& vtx = mesh.get_vertex_set();
           const auto& target_vtx = meshpart.template get_target_set<0>();
@@ -163,6 +191,22 @@ namespace FEAST
           chart_container.data.push_back("  midpoint "+stringify_fp_sci(_midpoint(0))+" "+stringify_fp_sci(_midpoint(1)));
           chart_container.data.push_back("  domain "+stringify_fp_sci(param_l)+" "+stringify_fp_sci(param_r));
           chart_container.data.push_back(" </circle>");
+        }
+
+        /** \copydoc ChartBase::write */
+        virtual void write(std::ostream& os, const String& sindent) const override
+        {
+          os << sindent << "<Circle";
+          os << " radius=\"" << this->_radius << "\"";
+          os << " midpoint=\"" << this->_midpoint[0] << " " << this->_midpoint[1] << "\"";
+          // reconstruct domain from trafo
+          if(_have_domain)
+          {
+            DataType param_l(-_trafo_a);
+            DataType param_r(param_l + DataType(2) * Math::pi<DataType>() / _trafo_b);
+            os << " domain=\"" << param_l << " " << param_r << "\"";
+          }
+          os << " />" << std::endl;
         }
 
         /**
@@ -255,6 +299,92 @@ namespace FEAST
           return new Circle<Mesh_>(mid_x, mid_y, radius, dom_l, dom_r);
         }
       }; // class Circle<...>
+
+      template<typename Mesh_, typename ChartReturn_ = ChartBase<Mesh_>>
+      class CircleChartParser :
+        public Xml::MarkupParser
+      {
+      private:
+        typedef Circle<Mesh_> ChartType;
+        typedef typename ChartType::DataType DataType;
+        ChartReturn_*& _chart;
+
+      public:
+        explicit CircleChartParser(ChartReturn_*& chart) :
+          _chart(chart)
+        {
+        }
+
+        virtual bool attribs(std::map<String,bool>& attrs) const override
+        {
+          attrs.emplace("radius", true);
+          attrs.emplace("midpoint", true);
+          attrs.emplace("domain", false);
+          return true;
+        }
+
+        virtual void create(
+          int iline,
+          const String& sline,
+          const String&,
+          const std::map<String, String>& attrs,
+          bool) override
+        {
+          DataType radius = DataType(0);
+          DataType mid_x = DataType(0);
+          DataType mid_y = DataType(0);
+          DataType dom_0 = DataType(0);
+          DataType dom_1 = DataType(1);
+          bool have_domain(false);
+
+          // try to parse the radius
+          if(!attrs.find("radius")->second.parse(radius))
+            throw Xml::GrammarError(iline, sline, "Failed to parse circle radius");
+          if(radius < DataType(1E-5))
+            throw Xml::GrammarError(iline, sline, "Invalid circle radius");
+
+          // try to parse midpoind
+          std::deque<String> mids;
+          attrs.find("midpoint")->second.split_by_charset(mids);
+          if(mids.size() != std::size_t(2))
+            throw Xml::GrammarError(iline, sline, "Invalid circle midpoint string");
+          if(!mids.front().parse(mid_x) || !mids.back().parse(mid_y))
+            throw Xml::GrammarError(iline, sline, "'Failed to parse circle midpoint");
+
+          // do we have a domain?
+          auto it = attrs.find("domain");
+          if(it != attrs.end())
+          {
+            have_domain = true;
+            std::deque<String> doms;
+            it->second.split_by_charset(doms);
+            if(doms.size() != std::size_t(2))
+              throw Xml::GrammarError(iline, sline, "Invalid circle domain string");
+            if(!doms.front().parse(dom_0) || !doms.back().parse(dom_1))
+              throw Xml::GrammarError(iline, sline, "'Failed to parse circle domain");
+          }
+
+          // everything seems fine, let's create the chart then
+          if(have_domain)
+            _chart = new ChartType(mid_x, mid_y, radius, dom_0, dom_1);
+          else
+            _chart = new ChartType(mid_x, mid_y, radius);
+        }
+
+        virtual void close(int, const String&) override
+        {
+        }
+
+        virtual bool content(int, const String&) override
+        {
+          return false;
+        }
+
+        virtual std::shared_ptr<Xml::MarkupParser> markup(int, const String&, const String&) override
+        {
+          return nullptr;
+        }
+      }; // class CircleChartParser<...>
     } // namespace Atlas
   } // namespace Geometry
 } // namespace FEAST
