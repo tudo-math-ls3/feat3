@@ -23,7 +23,7 @@ namespace FEAST
      * See \cite NW06 for an overview of optimisation techniques.
      *
      */
-    template<typename Operator_, typename Filter_, typename Linesearch_>
+    template<typename Operator_, typename Filter_>
     class NLSD : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
     {
       public:
@@ -31,8 +31,8 @@ namespace FEAST
         typedef Operator_ OperatorType;
         /// The filter type
         typedef Filter_ FilterType;
-        /// Our type of linesearch
-        typedef Linesearch_ LinesearchType;
+        /// The baseclass for all applicable linesearches
+        typedef Linesearch<OperatorType, FilterType> LinesearchType;
 
         /// Type of the operator's gradient has
         typedef typename Operator_::GradientType GradientType;
@@ -52,14 +52,12 @@ namespace FEAST
         /// The filter we apply to the gradient
         Filter_& _filter;
         /// The linesearch used along the descent direction
-        LinesearchType& _linesearch;
+        std::shared_ptr<LinesearchType> _linesearch;
 
         /// defect vector
         VectorType _vec_def;
         /// descend direction vector
         VectorType _vec_dir;
-        /// temporary vector
-        //VectorType _vec_tmp;
 
         /// Tolerance for function improvement
         DataType _tol_fval;
@@ -95,7 +93,7 @@ namespace FEAST
          * Preconditioner, defaults to nullptr. Cannot be const as internal data changes
          *
          */
-        explicit NLSD(Operator_& op_, Filter_& filter_, LinesearchType& linesearch_,
+        explicit NLSD(Operator_& op_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
         bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass("NLSD", precond),
           _op(op_),
@@ -105,6 +103,7 @@ namespace FEAST
           _tol_step(Math::sqrt(Math::eps<DataType>())),
           iterates(nullptr)
           {
+            ASSERT_(_linesearch != nullptr);
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
           }
@@ -125,8 +124,7 @@ namespace FEAST
           // create three temporary vectors
           _vec_def = this->_op.create_vector_r();
           _vec_dir = this->_op.create_vector_r();
-          //_vec_tmp = this->_op.create_vector_r();
-          _linesearch.init_symbolic();
+          _linesearch->init_symbolic();
         }
 
         /// \copydoc BaseClass::done_symbolic()
@@ -138,14 +136,14 @@ namespace FEAST
           //this->_vec_tmp.clear();
           this->_vec_dir.clear();
           this->_vec_def.clear();
-          _linesearch.done_symbolic();
+          _linesearch->done_symbolic();
           BaseClass::done_symbolic();
         }
 
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "NLSD-"+_linesearch.name();
+          return "NLSD-"+_linesearch->name();
         }
 
         /**
@@ -261,15 +259,15 @@ namespace FEAST
             _fval_prev = _fval;
 
             // Copy information to the linesearch
-            _linesearch.set_initial_fval(this->_fval);
-            _linesearch.set_grad_from_defect(this->_vec_def);
+            _linesearch->set_initial_fval(this->_fval);
+            _linesearch->set_grad_from_defect(this->_vec_def);
 
             // Call the linesearch to update vec_sol
-            status = _linesearch.correct(vec_sol, this->_vec_dir);
+            status = _linesearch->correct(vec_sol, this->_vec_dir);
 
             // Copy back information from the linesearch
-            this->_fval = _linesearch.get_final_fval();
-            _linesearch.get_defect_from_grad(this->_vec_def);
+            this->_fval = _linesearch->get_final_fval();
+            _linesearch->get_defect_from_grad(this->_vec_def);
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -383,7 +381,7 @@ namespace FEAST
 
           // If the linesearch failed to make progress, the new iterate is too close to the old iterate to compute
           // a new search direction etc. so we have to abort.
-          if(_linesearch.get_rel_update() < this->_tol_step)
+          if(_linesearch->get_rel_update() < this->_tol_step)
           {
             return Status::stagnated;
           }
@@ -426,27 +424,27 @@ namespace FEAST
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
     template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLSD<Operator_, Filter_, Linesearch_>> new_nlsd(
+    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
       Operator_& op, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false)
       {
-        return std::make_shared<NLSD<Operator_, Filter_, Linesearch_>>(op, filter, linesearch,
+        return std::make_shared<NLSD<Operator_, Filter_>>(op, filter, linesearch,
         keep_iterates, nullptr);
       }
     template<typename Operator_, typename Filter_, typename Linesearch_, typename Precond_>
-    inline std::shared_ptr<NLSD<Operator_, Filter_, Linesearch_>> new_nlsd(
+    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
       Operator_& op, Filter_& filter, Linesearch_& linesearch, bool keep_iterates,
       std::shared_ptr<Precond_> precond)
       {
-        return std::make_shared<NLSD<Operator_, Filter_, Linesearch_>>(op, filter, linesearch,
+        return std::make_shared<NLSD<Operator_, Filter_>>(op, filter, linesearch,
         keep_iterates, precond);
       }
 #else
     template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLSD<Operator_, Filter_, Linesearch_>> new_nlsd(
+    inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
       Operator_& op, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false,
       std::shared_ptr<SolverBase<typename Operator_::VectorTypeL>> precond = nullptr)
       {
-        return std::make_shared<NLSD<Operator_, Filter_, Linesearch_>>(op, filter, linesearch,
+        return std::make_shared<NLSD<Operator_, Filter_>>(op, filter, linesearch,
         keep_iterates, precond);
       }
 #endif

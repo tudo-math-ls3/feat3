@@ -27,7 +27,7 @@ namespace FEAST
 
     /// \cond internal
     /**
-     * \brief Streamin operator for NLCGDirectionUpdates
+     * \brief Streaming operator for NLCGDirectionUpdates
      */
     inline std::ostream& operator<<(std::ostream& os, NLCGDirectionUpdate update)
     {
@@ -51,6 +51,28 @@ namespace FEAST
           return os << "-unknown-";
       }
     }
+
+    inline void operator<<(NLCGDirectionUpdate& update, const String& update_name)
+    {
+        if(update_name == "undefined")
+          update = NLCGDirectionUpdate::undefined;
+        else if(update_name == "automatic")
+          update = NLCGDirectionUpdate::automatic;
+        else if(update_name == "DaiYuan")
+          update = NLCGDirectionUpdate::DaiYuan;
+        else if(update_name == "DYHSHybrid")
+          update = NLCGDirectionUpdate::DYHSHybrid;
+        else if(update_name == "FletcherReeves")
+          update = NLCGDirectionUpdate::FletcherReeves;
+        else if(update_name == "HestenesStiefel")
+          update = NLCGDirectionUpdate::HestenesStiefel;
+        else if(update_name == "PolakRibiere")
+          update = NLCGDirectionUpdate::PolakRibiere;
+        else
+          throw InternalError(__func__, __FILE__, __LINE__, "Unknown NLCGDirectionUpdate identifier string "
+              +update_name);
+    }
+
     /// \endcond
 
     /**
@@ -70,7 +92,7 @@ namespace FEAST
      * Possible update strategies for the search direction are Dai-Yuan \cite DY99, Fletcher-Reeves \cite FR64,
      * Hestenes-Stiefel \cite HS52 and Polak-Ribière \cite PR64.
      */
-    template<typename Operator_, typename Filter_, typename Linesearch_>
+    template<typename Operator_, typename Filter_>
     class NLCG : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
     {
       public:
@@ -79,7 +101,7 @@ namespace FEAST
         /// The filter type
         typedef Filter_ FilterType;
         /// Our type of linesearch
-        typedef Linesearch_ LinesearchType;
+        typedef Solver::Linesearch<Operator_, Filter_> LinesearchType;
 
         /// Type of the operator's gradient has
         typedef typename Operator_::GradientType GradientType;
@@ -101,7 +123,7 @@ namespace FEAST
         /// The filter we apply to the gradient
         const Filter_& _filter;
         /// The linesearch used along the descent direction
-        LinesearchType& _linesearch;
+        std::shared_ptr<LinesearchType> _linesearch;
 
         /// Method to update the search direction, defaults to PolakRibiere
         NLCGDirectionUpdate _direction_update;
@@ -159,7 +181,8 @@ namespace FEAST
          * Preconditioner, defaults to nullptr. Cannot be const as internal data changes
          *
          */
-        explicit NLCG(Operator_& op_, const Filter_& filter_, LinesearchType& linesearch_, NLCGDirectionUpdate du_,
+        explicit NLCG(Operator_& op_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
+        const NLCGDirectionUpdate du_,
         bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass("NLCG", precond),
           _op(op_),
@@ -172,6 +195,8 @@ namespace FEAST
           restart_freq(0),
           iterates(nullptr)
           {
+            ASSERT_(_linesearch != nullptr);
+
             // If we use Fletcher-Reeves, frequent restarts are needed
             if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
               restart_freq = _op.columns() + Index(1);
@@ -203,7 +228,7 @@ namespace FEAST
           _vec_def = this->_op.create_vector_r();
           _vec_dir = this->_op.create_vector_r();
           _vec_tmp = this->_op.create_vector_r();
-          _linesearch.init_symbolic();
+          _linesearch->init_symbolic();
         }
 
         /// \copydoc BaseClass::done_symbolic()
@@ -216,14 +241,14 @@ namespace FEAST
           this->_vec_dir.clear();
           this->_vec_def.clear();
           restart_freq = Index(0);
-          _linesearch.done_symbolic();
+          _linesearch->done_symbolic();
           BaseClass::done_symbolic();
         }
 
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "NLCG-"+_linesearch.name()+"-"+stringify(_direction_update);
+          return "NLCG-"+_linesearch->name()+"-"+stringify(_direction_update);
         }
 
         /**
@@ -366,15 +391,15 @@ namespace FEAST
             _beta = DataType(0);
 
             // Copy information to the linesearch
-            _linesearch.set_initial_fval(this->_fval);
-            _linesearch.set_grad_from_defect(this->_vec_def);
+            _linesearch->set_initial_fval(this->_fval);
+            _linesearch->set_grad_from_defect(this->_vec_def);
 
             // Call the linesearch to update vec_sol
-            status = _linesearch.correct(vec_sol, this->_vec_dir);
+            status = _linesearch->correct(vec_sol, this->_vec_dir);
 
             // Copy back information from the linesearch
-            this->_fval = _linesearch.get_final_fval();
-            _linesearch.get_defect_from_grad(this->_vec_def);
+            this->_fval = _linesearch->get_final_fval();
+            _linesearch->get_defect_from_grad(this->_vec_def);
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -554,7 +579,7 @@ namespace FEAST
 
           // If the linesearch failed to make progress, the new iterate is too close to the old iterate to compute
           // a new search direction etc. so we have to abort.
-          if(_linesearch.get_rel_update() < this->_tol_step && Math::abs(_beta) < Math::eps<DataType>())
+          if(_linesearch->get_rel_update() < this->_tol_step && Math::abs(_beta) < Math::eps<DataType>())
           {
             return Status::stagnated;
           }
@@ -791,33 +816,33 @@ namespace FEAST
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
     template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLCG<Operator_, Filter_, Linesearch_>> new_nlcg(
-      Operator_& op, const Filter_& filter, Linesearch_& linesearch,
+    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
+      Operator_& op, Filter_& filter, Linesearch_& linesearch,
       NLCGDirectionUpdate direction_update = NLCGDirectionUpdate::PolakRibiere,
       bool keep_iterates = false)
       {
-        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, direction_update,
+        return std::make_shared<NLCG<Operator_, Filter_>>(op, filter, linesearch, direction_update,
         keep_iterates, nullptr);
       }
     template<typename Operator_, typename Filter_, typename Linesearch_, typename Precond_>
-    inline std::shared_ptr<NLCG<Operator_, Filter_, Linesearch_>> new_nlcg(
-      Operator_& op, const Filter_& filter, Linesearch_& linesearch,
+    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
+      Operator_& op, Filter_& filter, Linesearch_& linesearch,
       NLCGDirectionUpdate direction_update,
       bool keep_iterates,
       std::shared_ptr<Precond_> precond)
       {
-        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, direction_update,
+        return std::make_shared<NLCG<Operator_, Filter_>>(op, filter, linesearch, direction_update,
         keep_iterates, precond);
       }
 #else
     template<typename Operator_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLCG<Operator_, Filter_, Linesearch_>> new_nlcg(
-      Operator_& op, const Filter_& filter, Linesearch_& linesearch,
+    inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
+      Operator_& op, Filter_& filter, Linesearch_& linesearch,
       NLCGDirectionUpdate direction_update = NLCGDirectionUpdate::PolakRibiere,
       bool keep_iterates = false,
       std::shared_ptr<SolverBase<typename Operator_::VectorTypeL>> precond = nullptr)
       {
-        return std::make_shared<NLCG<Operator_, Filter_, Linesearch_>>(op, filter, linesearch, direction_update,
+        return std::make_shared<NLCG<Operator_, Filter_>>(op, filter, linesearch, direction_update,
         keep_iterates, precond);
       }
 #endif

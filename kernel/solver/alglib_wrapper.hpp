@@ -92,6 +92,8 @@ namespace FEAST
         alglib::minlbfgsstate _state;
         /// Convergence report etc.
         alglib::minlbfgsreport _report;
+        /// Dimension for lBFGS Hessian update
+        alglib::ae_int_t _lbfgs_dim;
 
       public:
         /// Can hold all iterates for debugging purposes
@@ -102,25 +104,34 @@ namespace FEAST
          * \brief Standard constructor
          *
          * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * The (nonlinear) operator. Cannot be const because it saves its own state.
          *
          * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * Filter to apply to the operator's gradient.
+         *
+         * \param[in] lbfgs_dim_
+         * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, op_.columns()).
          *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit ALGLIBMinLBFGS(Operator_& op_, Filter_& filter_, bool keep_iterates = false) :
+        explicit ALGLIBMinLBFGS(
+          Operator_& op_, Filter_& filter_, const alglib::ae_int_t lbfgs_dim_ = alglib::ae_int_t(0),
+          const bool keep_iterates = false) :
           BaseClass("ALGLIBMinLBFGS"),
           _op(op_),
           _filter(filter_),
           _tol_fval(DataType(0)),
           _tol_step(Math::sqrt(Math::eps<DataType>())),
+          _lbfgs_dim(lbfgs_dim_),
           iterates(nullptr)
           {
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
+
+            if(_lbfgs_dim == alglib::ae_int_t(0))
+              _lbfgs_dim = alglib::ae_int_t(Math::min(Index(7), _op.columns()));
           }
 
         /**
@@ -147,9 +158,7 @@ namespace FEAST
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
             _opt_var[i] = double(0);
 
-          // \todo: Set sensible dimension
-          alglib::ae_int_t lbfgs_dim = Math::min(alglib::ae_int_t(10), _opt_var.length());
-          alglib::minlbfgscreate(lbfgs_dim, _opt_var, _state);
+          alglib::minlbfgscreate(_lbfgs_dim, _opt_var, _state);
           alglib::minlbfgssetxrep(_state, true);
           // Set stopping criteria: Relative tolerance, function improvement, length of update step, max iterations
           alglib::minlbfgssetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
@@ -441,9 +450,10 @@ namespace FEAST
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
     template<typename Operator_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinLBFGS<Operator_, Filter_>> new_alglib_minlbfgs(
-      Operator_& op_, Filter_& filter_, bool keep_iterates_ = false)
+      Operator_& op_, Filter_& filter_, alglib::ae_int_t lbfgs_dim_ = alglib::ae_int_t(0),
+      bool keep_iterates_ = false)
       {
-        return std::make_shared<ALGLIBMinLBFGS<Operator_, Filter_>>(op_, filter_, keep_iterates_);
+        return std::make_shared<ALGLIBMinLBFGS<Operator_, Filter_>>(op_, filter_, lbfgs_dim_, keep_iterates_);
       }
     /**
      * \brief Wrapper around ALGLIB's mincg implementation for minimising an operator's gradient

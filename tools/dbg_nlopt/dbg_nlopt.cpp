@@ -218,8 +218,7 @@ int run(Solver_& solver, Operator_& op)
 static void display_help()
 {
   std::cout << "dbg-nlopt: Nonlinear optimiser debugging tool." << std::endl;
-  std::cout << "Optional arguments:" << std::endl;
-  std::cout << " --help: Displays this text" << std::endl;
+  std::cout << "Required arguments:" << std::endl;
   std::cout << " --solver [String]: Available solvers are NLCG, NLSD" << std::endl;
 #ifdef FEAST_HAVE_ALGLIB
   std::cout << "                    and ALGLIBMinLBFGS, ALGLIBMinCG" << std::endl;
@@ -228,6 +227,12 @@ static void display_help()
   << std::endl <<
   "                    will enable ALGLIBMinLBFGS and ALGLIBMinCG" << std::endl;
 #endif // FEAST_HAVE_ALGLIB
+  std::cout << "Optional arguments:" << std::endl;
+  std::cout << " --help: Displays this text" << std::endl;
+  std::cout << " --linesearch [String]: Available linesearches for NLCG and NLSD are NewtonRaphsonLinesearch,"
+  << std::endl;
+  std::cout << "                    SecantLinesearch and StrongWolfeLinesearch (default)"
+  << std::endl;
   std::cout <<
     " --precon [String]: Available preconditioners for NLCG and NLSD are Hessian, ApproximateHessian, none(default)"
     << std::endl <<
@@ -260,7 +265,6 @@ int main(int argc, char* argv[])
   static constexpr int dim = PointType::n;
 
   typedef LAFEM::NoneFilterBlocked<MemType, DataType, IndexType, dim> FilterType;
-  typedef Solver::StrongWolfeLinesearch<OperatorType, FilterType> LinesearchType;
 
   // The analytic function
   AnalyticFunctionType my_function;
@@ -269,12 +273,10 @@ int main(int argc, char* argv[])
   // The filter
   FilterType my_filter;
 
-  // Create the linesearch
-  LinesearchType my_linesearch(my_op, my_filter);
-  my_linesearch.set_plot(false);
-
   // Ugly way to get a preconditioner, or not
   std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
+  // We might need a linesearch
+  std::shared_ptr<Linesearch<OperatorType, FilterType> > my_linesearch(nullptr);
 
   // create an argument parser
   SimpleArgParser args(argc, argv);
@@ -282,6 +284,7 @@ int main(int argc, char* argv[])
   // add all supported options
   args.support("direction_update");
   args.support("help");
+  args.support("linesearch");
   args.support("precon");
   args.support("solver");
 
@@ -310,6 +313,19 @@ int main(int argc, char* argv[])
 
   if(solver_name == "NLCG")
   {
+    // The default linesearch is StrongWolfeLinesearch
+    String linesearch_name("StrongWolfeLinesearch");
+    auto* linesearch_pair(args.query("linesearch"));
+    if(linesearch_pair != nullptr)
+      linesearch_name = linesearch_pair->second.front();
+
+    if(linesearch_name== "NewtonRaphsonLinesearch")
+      my_linesearch = new_newton_raphson_linesearch(my_op, my_filter);
+    else if(linesearch_name== "SecantLinesearch")
+      my_linesearch = new_secant_linesearch(my_op, my_filter);
+    else if(linesearch_name== "StrongWolfeLinesearch")
+      my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter);
+
     // The default is no preconditioner
     String precon_name("none");
     // Check if any preconditioner was specified on the command line
@@ -354,6 +370,19 @@ int main(int argc, char* argv[])
   }
   else if(solver_name == "NLSD")
   {
+    // The default linesearch is StrongWolfeLinesearch
+    String linesearch_name("StrongWolfeLinesearch");
+    auto* linesearch_pair(args.query("linesearch"));
+    if(linesearch_pair != nullptr)
+      linesearch_name = linesearch_pair->second.front();
+
+    if(linesearch_name== "NewtonRaphsonLinesearch")
+      my_linesearch = new_newton_raphson_linesearch(my_op, my_filter);
+    else if(linesearch_name== "SecantLinesearch")
+      my_linesearch = new_secant_linesearch(my_op, my_filter);
+    else if(linesearch_name== "StrongWolfeLinesearch")
+      my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter);
+
     // The default is no preconditioner
     String precon_name("none");
     // Check if any preconditioner was specified on the command line
@@ -384,7 +413,7 @@ int main(int argc, char* argv[])
 #ifdef FEAST_HAVE_ALGLIB
   else if (solver_name == "ALGLIBMinLBFGS")
   {
-    auto my_solver = new_alglib_minlbfgs(my_op, my_filter, true);
+    auto my_solver = new_alglib_minlbfgs(my_op, my_filter);
 
     int ret = run(my_solver, my_op);
 

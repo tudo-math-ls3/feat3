@@ -20,12 +20,7 @@ using namespace FEAST::TestSystem;
  * for all functions. Same with preconditioners.
  *
  */
-template
-<
-  typename Mem_, typename DT_, typename IT_,
-  typename Function_,
-  template<typename, typename> class Linesearch_
->
+template<typename Mem_, typename DT_, typename IT_, typename Function_>
 class NLCGTest:
   public FullTaggedTest<Mem_, DT_, IT_>
 {
@@ -35,17 +30,19 @@ class NLCGTest:
     typedef OptimisationTestTraits<DT_, Function_> TestTraitsType;
 
     typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
-    typedef Linesearch_<OperatorType, FilterType> LinesearchType;
+    //typedef Linesearch<OperatorType, FilterType> LinesearchType;
 
   private:
     DT_ _tol;
-    String _precon_type;
+    const String _linesearch_type;
+    const String _precon_type;
     NLCGDirectionUpdate _update;
 
   public:
-    NLCGTest(DT_ exponent_, String precon_type_, NLCGDirectionUpdate update_) :
+    NLCGTest(DT_ exponent_, const String& linesearch_type_, const String& precon_type_, NLCGDirectionUpdate update_) :
       FullTaggedTest<Mem_, DT_, IT_>("NLCGTest"),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
+      _linesearch_type(linesearch_type_),
       _precon_type(precon_type_),
       _update(update_)
     {
@@ -61,8 +58,17 @@ class NLCGTest:
       FilterType my_filter;
 
       // Create the linesearch
-      LinesearchType my_linesearch(my_op, my_filter);
-      my_linesearch.set_plot(false);
+      std::shared_ptr<Solver::Linesearch<OperatorType, FilterType>> my_linesearch;
+      if(_linesearch_type == "NewtonRaphsonLinesearch")
+        my_linesearch = new_newton_raphson_linesearch(my_op, my_filter, false);
+      else if(_linesearch_type == "SecantLinesearch")
+        my_linesearch = new_secant_linesearch(my_op, my_filter, DT_(1e-2), false);
+      else if(_linesearch_type == "StrongWolfeLinesearch")
+        my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter, false);
+      else
+        throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
+
+      my_linesearch->set_plot(false);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
@@ -72,7 +78,7 @@ class NLCGTest:
       else if(_precon_type == "Hessian")
         my_precond = new_hessian_precond(my_op, my_filter);
       else if(_precon_type != "none")
-        throw InternalError("Got invalid precon_type: "+_precon_type);
+        throw InternalError(__func__, __FILE__, __LINE__, "Got invalid precon_type: "+_precon_type);
 
       //auto my_precond = nullptr;
       auto solver = new_nlcg(my_op, my_filter, my_linesearch, _update, false, my_precond);
@@ -118,42 +124,42 @@ class NLCGTest:
 };
 
 // The Himmelblau function is not too difficult, so low tolerance
-NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction, Solver::NewtonRaphsonLinesearch>
-nlcg_hb_f(float(0.8),"ApproximateHessian", NLCGDirectionUpdate::PolakRibiere);
+NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
+nlcg_hb_f(float(0.8),"NewtonRaphsonLinesearch","ApproximateHessian", NLCGDirectionUpdate::PolakRibiere);
 
 // The same with Secant linesearch, without preconditioner and with Fletcher-Reeves update
-NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction, Solver::SecantLinesearch> nlcg_hb_d(double(0.6),"none", NLCGDirectionUpdate::FletcherReeves);
+NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction> nlcg_hb_d(double(0.6),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
 
 // The Rosenbrock function's steep valley is bad for secant linesearch, so use Newton Raphson
-NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NewtonRaphsonLinesearch>
-nlcg_rb_d(float(0.8),"Hessian", NLCGDirectionUpdate::DaiYuan);
+NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
+nlcg_rb_d(float(0.8),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::DaiYuan);
 
 // Do it again with the StrongWolfeLinesearch and the approximate hessian preconditioner
-NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction, Solver::StrongWolfeLinesearch>
-nlcg_rb_d_sw(double(0.5),"ApproximateHessian", NLCGDirectionUpdate::DYHSHybrid);
+NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
+nlcg_rb_d_sw(double(0.5), "StrongWolfeLinesearch","ApproximateHessian", NLCGDirectionUpdate::DYHSHybrid);
 
 // The Hessian of the Bazaraa/Shetty function is singular at the optimal point, so Newton Raphson linesearch does not
 // work very well, so just use the secant linesearch
-NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
-nlcg_bs_d(double(0.3),"none", NLCGDirectionUpdate::HestenesStiefel);
+NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
+nlcg_bs_d(double(0.3), "SecantLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel);
 
 // Rosenbrock with secant linesearch, preconditioning and Polak-Ribière in quad precision
 #ifdef FEAST_HAVE_QUADMATH
-NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction, Solver::SecantLinesearch>
-nlcg_rb_q(__float128(0.6),"Hessian", NLCGDirectionUpdate::PolakRibiere);
+NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
+nlcg_rb_q(__float128(0.6),"SecantLinesearch", "Hessian", NLCGDirectionUpdate::PolakRibiere);
 
-NLCGTest<Mem::Main, __float128, Index, Analytic::Common::BazaraaShettyFunction, Solver::StrongWolfeLinesearch>
-nlcg_bs_q(__float128(0.2),"ApproximateHessian", NLCGDirectionUpdate::HestenesStiefel);
+NLCGTest<Mem::Main, __float128, Index, Analytic::Common::BazaraaShettyFunction>
+nlcg_bs_q(__float128(0.2),"StrongWolfeLinesearch", "ApproximateHessian", NLCGDirectionUpdate::HestenesStiefel);
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAST_BACKENDS_CUDA
-NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction, Solver::StrongWolfeLinesearch>
-nlcg_hb_f_cuda(float(0.6),"Hessian", NLCGDirectionUpdate::FletcherReeves);
+NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
+nlcg_hb_f_cuda(float(0.6),"StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
-NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction, Solver::SecantLinesearch>
-nlcg_bs_d_cuda(double(0.25),"none", NLCGDirectionUpdate::FletcherReeves);
+NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
+nlcg_bs_d_cuda(double(0.25),"SecantLinesearch", "none", NLCGDirectionUpdate::FletcherReeves);
 #endif
 
 /**
@@ -163,12 +169,7 @@ nlcg_bs_d_cuda(double(0.25),"none", NLCGDirectionUpdate::FletcherReeves);
  * for all functions. Same with preconditioners.
  *
  */
-template
-<
-  typename Mem_, typename DT_, typename IT_,
-  typename Function_,
-  template<typename, typename> class Linesearch_
->
+template < typename Mem_, typename DT_, typename IT_, typename Function_ >
 class NLSDTest:
   public FullTaggedTest<Mem_, DT_, IT_>
 {
@@ -178,16 +179,17 @@ class NLSDTest:
     typedef OptimisationTestTraits<DT_, Function_> TestTraitsType;
 
     typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
-    typedef Linesearch_<OperatorType, FilterType> LinesearchType;
 
   private:
     DT_ _tol;
-    String _precon_type;
+    const String _linesearch_type;
+    const String _precon_type;
 
   public:
-    NLSDTest(DT_ exponent_, String precon_type_) :
+    NLSDTest(DT_ exponent_, const String& linesearch_type_, const String& precon_type_) :
       FullTaggedTest<Mem_, DT_, IT_>("NLSDTest"),
       _tol(Math::pow(Math::eps<DT_>(), exponent_)),
+      _linesearch_type(linesearch_type_),
       _precon_type(precon_type_)
     {
     }
@@ -202,8 +204,17 @@ class NLSDTest:
       FilterType my_filter;
 
       // Create the linesearch
-      LinesearchType my_linesearch(my_op, my_filter);
-      my_linesearch.set_plot(false);
+      std::shared_ptr<Solver::Linesearch<OperatorType, FilterType>> my_linesearch(nullptr);
+      if(_linesearch_type == "NewtonRaphsonLinesearch")
+        my_linesearch = new_newton_raphson_linesearch(my_op, my_filter, false);
+      else if(_linesearch_type == "SecantLinesearch")
+        my_linesearch = new_secant_linesearch(my_op, my_filter, DT_(1e-2), false);
+      else if(_linesearch_type == "StrongWolfeLinesearch")
+        my_linesearch = new_strong_wolfe_linesearch(my_op, my_filter, false);
+      else
+        throw InternalError(__func__, __FILE__, __LINE__, "Got invalid linesearch_type: "+_linesearch_type);
+
+      my_linesearch->set_plot(false);
 
       // Ugly way to get a preconditioner, or not
       std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
@@ -258,28 +269,28 @@ class NLSDTest:
 };
 
 // The Himmelblau function is not too difficult, so low tolerance
-NLSDTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction, Solver::NewtonRaphsonLinesearch>
-nlsd_hb_f(float(0.8),"ApproximateHessian");
+NLSDTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
+nlsd_hb_f(float(0.8),"NewtonRaphsonLinesearch", "ApproximateHessian");
 
 // The Rosenbrock function's steep valley is bad for secant linesearch, so use Newton Raphson
-NLSDTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction, Solver::NewtonRaphsonLinesearch>
-nlsd_rb_d(float(0.8),"Hessian");
+NLSDTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
+nlsd_rb_d(float(0.8),"NewtonRaphsonLinesearch", "Hessian");
 
 // Do it again with the StrongWolfeLinesearch and the approximate hessian preconditioner
-NLSDTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction, Solver::StrongWolfeLinesearch>
-nlsd_rb_d_sw(double(0.5),"Hessian");
+NLSDTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
+nlsd_rb_d_sw(double(0.5), "StrongWolfeLinesearch", "Hessian");
 
 // Rosenbrock with secant linesearch and preconditioning  in quad precision
 #ifdef FEAST_HAVE_QUADMATH
-NLSDTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction, Solver::SecantLinesearch>
-nlsd_rb_q(__float128(0.6),"Hessian");
+NLSDTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
+nlsd_rb_q(__float128(0.6),"SecantLinesearch", "Hessian");
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAST_BACKENDS_CUDA
-NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction, Solver::StrongWolfeLinesearch>
-nlsd_hb_f_cuda(float(0.6),"Hessian");
+NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
+nlsd_hb_f_cuda(float(0.6),"StrongWolfeLinesearch", "Hessian");
 #endif
 
 #ifdef FEAST_HAVE_ALGLIB
@@ -322,7 +333,7 @@ class ALGLIBMinLBFGSTest:
       FilterType my_filter;
 
       //auto my_precond = nullptr;
-      auto solver = new_alglib_minlbfgs(my_op, my_filter, false);
+      auto solver = new_alglib_minlbfgs(my_op, my_filter);
       solver->init();
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);

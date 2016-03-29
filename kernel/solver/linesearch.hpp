@@ -495,8 +495,8 @@ namespace FEAST
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit SecantLinesearch(Operator_& op_, const Filter_& filter_, DataType initial_step = DataType(1e-2),
-        bool keep_iterates = false) :
+        explicit SecantLinesearch(Operator_& op_, Filter_& filter_, const DataType initial_step = DataType(1e-2),
+        const bool keep_iterates = false) :
           BaseClass("S-LS", op_, filter_, keep_iterates),
           _sigma_0(initial_step),
           _eta(DataType(0))
@@ -768,6 +768,7 @@ namespace FEAST
           _alpha_hard_min(DataType(0)),
           _alpha_soft_max(DataType(0)),
           _alpha_soft_min(DataType(0)),
+          _delta_0(Math::huge<DataType>()),
           _tol_decrease(DataType(1e-3)),
           _tol_curvature(DataType(0.3))
           {
@@ -1486,7 +1487,74 @@ namespace FEAST
 
           return alpha;
         }
-    }; // class StronWolfeLinesearch
+    }; // class StrongWolfeLinesearch
+
+    /**
+     * \brief Creates a new NewtonRaphsonLinesearch object
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] keep_iterates
+     * Flag for keeping the iterates, defaults to false
+     *
+     * \returns
+     * A shared pointer to a new NewtonRaphsonLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<NewtonRaphsonLinesearch<Operator_, Filter_>> new_newton_raphson_linesearch(
+      Operator_& op, Filter_& filter, bool keep_iterates = false)
+      {
+        return std::make_shared<NewtonRaphsonLinesearch<Operator_, Filter_>>(op, filter, keep_iterates);
+      }
+
+    /**
+     * \brief Creates a new SecantLinesearch object
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] keep_iterates
+     * Flag for keeping the iterates, defaults to false
+     *
+     * \returns
+     * A shared pointer to a new SecantLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<SecantLinesearch<Operator_, Filter_>> new_secant_linesearch(
+      Operator_& op, Filter_& filter,
+      typename Operator_::DataType initial_step = typename Operator_::DataType(1e-2),
+      bool keep_iterates = false)
+      {
+        return std::make_shared<SecantLinesearch<Operator_, Filter_>>(op, filter, initial_step, keep_iterates);
+      }
+    /**
+     * \brief Creates a new StrongWolfeLinesearch object
+     *
+     * \param[in] op
+     * The operator
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \param[in] keep_iterates
+     * Flag for keeping the iterates, defaults to false
+     *
+     * \returns
+     * A shared pointer to a new StrongWolfeLinesearch object.
+     */
+    template<typename Operator_, typename Filter_>
+    inline std::shared_ptr<StrongWolfeLinesearch<Operator_, Filter_>> new_strong_wolfe_linesearch(
+      Operator_& op, Filter_& filter, bool keep_iterates = false)
+      {
+        return std::make_shared<StrongWolfeLinesearch<Operator_, Filter_>>(op, filter, keep_iterates);
+      }
 
   } // namespace Solver
 } // namespace FEAST
