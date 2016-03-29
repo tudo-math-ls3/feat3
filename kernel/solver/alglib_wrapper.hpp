@@ -16,6 +16,24 @@ namespace FEAST
 {
   namespace Solver
   {
+    namespace Intern
+    {
+      /// returns the object, if T_ has a GateType, i.e. is a GlobalVector - SFINAE at its best
+      template <typename Evaluator_, typename T_>
+      static auto derefer(T_ & object, typename Evaluator_::GateType *) -> decltype(*object)
+      {
+        return *object;
+      }
+
+      /// returns the dereferenced object, if T_ has no GateType, i.e. is a LocalVector - SFINAE at its best
+      template <typename Evaluator_, typename T_>
+      static T_& derefer(T_ & object, ...)
+      {
+        return object;
+      }
+
+    } // namespace Intern
+
     /**
      * \brief Wrapper around ALGLIB's lBFGS implementation for minimising an operator's gradient
      *
@@ -32,7 +50,7 @@ namespace FEAST
      *
      */
     template<typename Operator_, typename Filter_>
-    class ALGLIBMinLBFGS: public IterativeSolver<typename Operator_::VectorTypeR>
+    class ALGLIBMinLBFGS: public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
     {
       public:
         /// The nonlinear operator type
@@ -48,7 +66,7 @@ namespace FEAST
         typedef typename Operator_::DataType DataType;
 
         /// Our baseclass
-        typedef IterativeSolver<VectorType> BaseClass;
+        typedef PreconditionedIterativeSolver<VectorType> BaseClass;
         /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
 
@@ -118,11 +136,14 @@ namespace FEAST
         virtual void init_symbolic() override
         {
           BaseClass::init_symbolic();
-          //// create three temporary vectors
+          // create two temporary vectors
           _vec_def = this->_op.create_vector_r();
           _vec_tmp = this->_op.create_vector_r();
 
-          _opt_var.setlength(alglib::ae_int_t(_op.columns()));
+          // The length of the optimisation variable is the raw length of a temporary vector
+          _opt_var.setlength(alglib::ae_int_t(
+            Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
+
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
             _opt_var[i] = double(0);
 
@@ -268,7 +289,7 @@ namespace FEAST
             return status;
 
           // Copy initial guess to optimisation state variable
-          auto vec_sol_elements = vec_sol.template elements<LAFEM::Perspective::pod>();
+          auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
             _opt_var[i] = vec_sol_elements[i];
 
@@ -380,7 +401,7 @@ namespace FEAST
           ALGLIBMinLBFGS<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinLBFGS<OperatorType, FilterType>*>
             (ptr);
 
-          auto vec_tmp_elements = me->_vec_tmp.template elements<LAFEM::Perspective::pod>();
+          auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).template elements<LAFEM::Perspective::pod>();
 
           // Copy back ALGLIB's state variable to our solver
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
@@ -394,7 +415,7 @@ namespace FEAST
           me->_filter.filter_def(me->_vec_def);
 
           // Copy the operator's gradient to ALGLIB's grad variable
-          auto vec_def_elements = me->_vec_def.template elements<LAFEM::Perspective::pod>();
+          auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
             grad[i] = double(vec_def_elements[i]);
 
@@ -445,7 +466,7 @@ namespace FEAST
      *
      */
     template<typename Operator_, typename Filter_>
-    class ALGLIBMinCG : public IterativeSolver<typename Operator_::VectorTypeR>
+    class ALGLIBMinCG : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
     {
       public:
         /// The nonlinear operator type
@@ -461,7 +482,7 @@ namespace FEAST
         typedef typename Operator_::DataType DataType;
 
         /// Our baseclass
-        typedef IterativeSolver<VectorType> BaseClass;
+        typedef PreconditionedIterativeSolver<VectorType> BaseClass;
         /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
 
@@ -536,11 +557,14 @@ namespace FEAST
         virtual void init_symbolic() override
         {
           BaseClass::init_symbolic();
-          //// create three temporary vectors
+          // Create two temporary vectors
           _vec_def = this->_op.create_vector_r();
           _vec_tmp = this->_op.create_vector_r();
 
-          _opt_var.setlength(alglib::ae_int_t(_op.columns()));
+          // The length of the optimisation variable is the raw length of a temporary vector
+          _opt_var.setlength(alglib::ae_int_t(
+            Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
+
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
             _opt_var[i] = double(0);
 
@@ -570,7 +594,8 @@ namespace FEAST
                 alglib::mincgsetcgtype(_state, 1);
                 break;
             default:
-                throw InternalError(name()+" got invalid direction update: "+stringify(update_));
+                throw InternalError(__func__,__FILE__, __LINE__, name()+" got invalid direction update: "
+                    +stringify(update_));
 
           }
         }
@@ -707,7 +732,7 @@ namespace FEAST
             return status;
 
           // Copy initial guess to optimisation state variable
-          auto vec_sol_elements = vec_sol.template elements<LAFEM::Perspective::pod>();
+          auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < _opt_var.length(); ++i)
             _opt_var[i] = vec_sol_elements[i];
 
@@ -819,7 +844,7 @@ namespace FEAST
           // Downcast because we know what we are doing, right?
           ALGLIBMinCG<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<OperatorType, FilterType>*>(ptr);
 
-          auto vec_tmp_elements = me->_vec_tmp.template elements<LAFEM::Perspective::pod>();
+          auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).template elements<LAFEM::Perspective::pod>();
 
           // Copy back ALGLIB's state variable to our solver
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
@@ -833,7 +858,7 @@ namespace FEAST
           me->_filter.filter_def(me->_vec_def);
 
           // Copy the operator's gradient to ALGLIB's grad variable
-          auto vec_def_elements = me->_vec_def.template elements<LAFEM::Perspective::pod>();
+          auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
             grad[i] = double(vec_def_elements[i]);
 
@@ -864,6 +889,7 @@ namespace FEAST
       {
         return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op_, filter_, du_, keep_iterates_);
       }
+
 
   } // namespace Solver
 } // namespace FEAST
