@@ -132,7 +132,7 @@ NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction> nlcg_hb
 
 // The Rosenbrock function's steep valley is bad for secant linesearch, so use Newton Raphson
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
-nlcg_rb_d(float(0.8),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::DaiYuan);
+nlcg_rb_d(float(0.7),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::DaiYuan);
 
 // Do it again with the StrongWolfeLinesearch and the approximate hessian preconditioner
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
