@@ -146,7 +146,10 @@ namespace FEAST
          * \brief Prepares the operator for evaluation by setting the current state
          *
          * \param[in] vec_state
-         * The current state
+         * The current state.
+         *
+         * \param[in] filter
+         * The system filter. Kept for a unified interface because other operators need to re-assemble it.
          *
          */
         template<typename FilterType_>
@@ -189,8 +192,10 @@ namespace FEAST
          *
          * \param[in] vec_in
          * (Defect/gradient) vector to apply the hessian to
+         *
+         * \returns Status::success as for this type of operator, the operation cannot fail.
          */
-        void apply_diag_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
+        Status apply_diag_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
         {
           ++num_hess_evals;
           _func_eval.hessian(_my_hess, _my_state);
@@ -204,6 +209,8 @@ namespace FEAST
           //  std::cout << "Warning: det(Hess) = " << stringify_fp_sci(det_hess) << " < 0!" << std::endl;
 
           vec_out(0, _my_grad);
+
+          return Status::success;
         }
 
         /**
@@ -214,8 +221,10 @@ namespace FEAST
          *
          * \param[in] vec_in
          * (Defect/gradient) vector to apply the hessian to
+         *
+         * \returns Status::success as for this type of operator, the operation cannot fail.
          */
-        void apply_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
+        Status apply_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
         {
           ++num_hess_evals;
           _func_eval.hessian(_my_hess, _my_state);
@@ -224,6 +233,8 @@ namespace FEAST
           _my_grad = _my_hess*vec_in(0);
 
           vec_out(0, _my_grad);
+
+          return Status::success;
         }
 
         /**
@@ -234,8 +245,10 @@ namespace FEAST
          *
          * \param[in] vec_in
          * (Defect/gradient) vector to apply the inverse hessian to
+         *
+         * \returns Status::success as for this type of operator, the operation cannot fail.
          */
-        void apply_inv_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
+        Status apply_inv_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
         {
           ++num_hess_evals;
           _func_eval.hessian(_my_hess, _my_state);
@@ -244,6 +257,8 @@ namespace FEAST
           _my_grad = _my_hess_inv*vec_in(0);
 
           vec_out(0, _my_grad);
+
+          return Status::success;
         }
 
         /**
@@ -254,8 +269,10 @@ namespace FEAST
          *
          * \param[in] vec_in
          * (Defect/gradient) vector to apply the inverse of the diagonal of the hessian to
+         *
+         * \returns Status::success as for this type of operator, the operation cannot fail.
          */
-        void apply_approx_inv_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
+        Status apply_approx_inv_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
         {
           ++num_hess_evals;
           _func_eval.hessian(_my_hess, _my_state);
@@ -264,6 +281,8 @@ namespace FEAST
             _my_grad[i] = vec_in(0)[i]/Math::abs(_my_hess[i][i]);
 
           vec_out(0, _my_grad);
+
+          return Status::success;
         }
 
         /**

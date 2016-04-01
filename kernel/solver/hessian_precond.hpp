@@ -89,12 +89,15 @@ namespace FEAST
          *
          * \param[in] vec_def
          * The vector to apply the preconditioner to
+         *
+         * \returns Status::success if the inverse hessian was applied successfully.
          */
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
-          _op.apply_inv_hess(vec_cor, vec_def);
+          Status st(_op.apply_inv_hess(vec_cor, vec_def));
           this->_filter.filter_cor(vec_cor);
-          return Status::success;
+
+          return st;
         }
     };
 
@@ -104,7 +107,7 @@ namespace FEAST
      * \param[in] op_
      * The (nonlinear) operator
      *
-     * \param[in] filter
+     * \param[in] filter_
      * The system filter.
      *
      * \returns
@@ -200,12 +203,15 @@ namespace FEAST
          *
          * \param[in] vec_def
          * The vector to apply the preconditioner to
+         *
+         * \returns Status::success if the approximate inverse hessian was applied successfully.
          */
         virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
-          _op.apply_approx_inv_hess(vec_cor, vec_def);
+          Status st(_op.apply_approx_inv_hess(vec_cor, vec_def));
           this->_filter.filter_cor(vec_cor);
-          return Status::success;
+
+          return st;
         }
     };
 
@@ -215,7 +221,7 @@ namespace FEAST
      * \param[in] op_
      * The (nonlinear) operator
      *
-     * \param[in] filter
+     * \param[in] filter_
      * The system filter.
      *
      * \returns
