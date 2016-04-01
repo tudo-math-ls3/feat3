@@ -1520,6 +1520,9 @@ namespace FEAST
      * \param[in] filter
      * The system filter.
      *
+     * \param[in] initial_step
+     * Length for first secant step.
+     *
      * \param[in] keep_iterates
      * Flag for keeping the iterates, defaults to false
      *

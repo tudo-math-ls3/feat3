@@ -714,13 +714,13 @@ namespace FEAST
     /**
      * \brief Constructs a polyline mesh
      *
-     * \tparam[dim_]
+     * \tparam dim_
      * Dimension of the input points
      *
-     * \tparam[stride_]
+     * \tparam stride_
      * Padded dimension of the input points
      *
-     * \tparam[Coord_]
+     * \tparam Coord_
      * Floating point type for mesh coordinates
      *
      * \author Jordi Paul
@@ -747,7 +747,7 @@ namespace FEAST
       public:
 
         /**
-         * \brief From deque-of-Tiny::Vectors constructor
+         * \brief From deque of Tiny::Vectors constructor
          */
         PolylineFactory(std::deque<typename VertexSetType::VertexType>& points_) :
           _points(points_)
@@ -758,7 +758,7 @@ namespace FEAST
         }
 
         /**
-         * \copydoc Factory::get_num_entities(int)
+         * \copydoc Factory::get_num_entities()
          */
         virtual Index get_num_entities(int dimension) override
         {
@@ -773,6 +773,9 @@ namespace FEAST
           }
         }
 
+        /**
+         * \copydoc Factory::fill_vertex_set()
+         */
         virtual void fill_vertex_set(VertexSetType& vertex_set) override
         {
           Index i(0);
@@ -784,6 +787,9 @@ namespace FEAST
           }
         }
 
+        /**
+         * \copydoc Factory::fill_index_sets()
+         */
         virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
         {
           IndexSet<2>& v_e(index_set_holder.template get_index_set<1,0>());
