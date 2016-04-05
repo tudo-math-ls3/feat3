@@ -358,7 +358,8 @@ namespace FEAST
 
           DataType eta = dir.dot(this->_vec_grad);
           if(eta > DataType(0))
-            throw InternalError("Search direction is not a descent direction: "+stringify_fp_sci(eta));
+            throw InternalError(__func__,__FILE__,__LINE__,"Search direction is not a descent direction: "
+                +stringify_fp_sci(eta));
 
           // Compute initial defect. We want to minimise d^T * grad(_op)
           this->_def_init = Math::abs(dir.dot(this->_vec_grad));
@@ -471,11 +472,13 @@ namespace FEAST
         typedef typename Operator_::DataType DataType;
         /// Our base class
         typedef Linesearch<Operator_, Filter_> BaseClass;
+        /// Default initial step length
+        static constexpr DataType initial_step_default = DataType(1e-2);
 
       protected:
         /// Step for calculating the "other" secant point in the initial step. Crucial
         DataType _sigma_0;
-        /// dir^T * preconditioned defect. We want to find the minimum of the along dir
+        /// dir^T * preconditioned defect. We want to find the minimum of the functional value along dir
         DataType _eta;
 
       public:
@@ -483,22 +486,24 @@ namespace FEAST
          * \brief Standard constructor
          *
          * \param[in, out] op_
-         * The (nonlinear) operator. Cannot be const because it saves its own state
+         * The (nonlinear) operator. Cannot be const because it saves its own state.
          *
          * \param[in] filter_
-         * Filter to apply to the operator's gradient
+         * Filter to apply to the operator's gradient.
          *
-         * \param[in] initial_step
+         * \param[in] initial_step_
          * Step length for setting the "other" secant point in the first iteration. Crucial.
          *
-         * \param[in] keep_iterates
+         * \param[in] keep_iterates_
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit SecantLinesearch(Operator_& op_, Filter_& filter_, const DataType initial_step = DataType(1e-2),
-        const bool keep_iterates = false) :
-          BaseClass("S-LS", op_, filter_, keep_iterates),
-          _sigma_0(initial_step),
+        explicit SecantLinesearch(
+          Operator_& op_, Filter_& filter_,
+          const DataType initial_step_ = initial_step_default,
+          const bool keep_iterates_ = false) :
+          BaseClass("S-LS", op_, filter_, keep_iterates_),
+          _sigma_0(initial_step_),
           _eta(DataType(0))
           {
           }
@@ -585,7 +590,8 @@ namespace FEAST
 
           _eta = dir.dot(this->_vec_grad);
           if(_eta > DataType(0))
-            throw InternalError("Search direction is not a descent direction: "+stringify_fp_sci(_eta));
+            throw InternalError(__func__,__FILE__,__LINE__,"Search direction is not a descent direction: "
+                +stringify_fp_sci(_eta));
 
           // The first "other" point for the secant
           sol.axpy(dir, this->_vec_initial_sol, _sigma_0/this->_norm_dir);
@@ -728,6 +734,10 @@ namespace FEAST
         typedef typename Operator_::DataType DataType;
         /// Our base class
         typedef Linesearch<Operator_, Filter_> BaseClass;
+        /// Default tolerance for functional value decrease for the strong Wolfe conditions
+        static constexpr DataType tol_decrease_default = DataType(1e-3);
+        /// Default tolerance for curvature decrease for the strong Wolfe conditions
+        static constexpr DataType tol_curvature_default = DataType(0.3);
 
       protected:
         /// Last successful line step, needs to start with 1
@@ -761,7 +771,8 @@ namespace FEAST
          * Keep all iterates in a std::deque. Defaults to false.
          *
          */
-        explicit StrongWolfeLinesearch(Operator_& op_, const Filter_& filter_, bool keep_iterates = false) :
+        explicit StrongWolfeLinesearch(Operator_& op_, Filter_& filter_, bool keep_iterates = false,
+        DataType tol_decrease_ = tol_decrease_default, DataType tol_curvature_ = tol_curvature_default) :
           BaseClass("SW-LS", op_, filter_, keep_iterates),
           _alpha_0(DataType(1)),
           _alpha_hard_max(DataType(0)),
@@ -769,8 +780,8 @@ namespace FEAST
           _alpha_soft_max(DataType(0)),
           _alpha_soft_min(DataType(0)),
           _delta_0(Math::huge<DataType>()),
-          _tol_decrease(DataType(1e-3)),
-          _tol_curvature(DataType(0.3))
+          _tol_decrease(tol_decrease_),
+          _tol_curvature(tol_curvature_)
           {
           }
 
@@ -907,7 +918,8 @@ namespace FEAST
 
           // This is a sanity check
           if(_delta_0 > DataType(0))
-            throw InternalError("Initial search direction is not a descent direction: "+stringify_fp_sci(_delta_0));
+            throw InternalError(__func__,__FILE__,__LINE__,"Initial search direction is not a descent direction: "
+                +stringify_fp_sci(_delta_0));
 
           // start iterating
           while(status == Status::progress)
@@ -1532,7 +1544,7 @@ namespace FEAST
     template<typename Operator_, typename Filter_>
     inline std::shared_ptr<SecantLinesearch<Operator_, Filter_>> new_secant_linesearch(
       Operator_& op, Filter_& filter,
-      typename Operator_::DataType initial_step = typename Operator_::DataType(1e-2),
+      typename Operator_::DataType initial_step = SecantLinesearch<Operator_, Filter_>::initial_step_default,
       bool keep_iterates = false)
       {
         return std::make_shared<SecantLinesearch<Operator_, Filter_>>(op, filter, initial_step, keep_iterates);
@@ -1554,9 +1566,12 @@ namespace FEAST
      */
     template<typename Operator_, typename Filter_>
     inline std::shared_ptr<StrongWolfeLinesearch<Operator_, Filter_>> new_strong_wolfe_linesearch(
-      Operator_& op, Filter_& filter, bool keep_iterates = false)
+      Operator_& op, Filter_& filter, bool keep_iterates = false,
+      typename Operator_::DataType tol_decrease = StrongWolfeLinesearch<Operator_, Filter_>::tol_decrease_default,
+      typename Operator_::DataType tol_curvature = StrongWolfeLinesearch<Operator_, Filter_>::tol_curvature_default)
       {
-        return std::make_shared<StrongWolfeLinesearch<Operator_, Filter_>>(op, filter, keep_iterates);
+        return std::make_shared<StrongWolfeLinesearch<Operator_, Filter_>>
+          (op, filter, keep_iterates, tol_decrease, tol_curvature);
       }
 
   } // namespace Solver

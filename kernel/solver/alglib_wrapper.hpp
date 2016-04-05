@@ -496,6 +496,9 @@ namespace FEAST
         /// Generic preconditioner
         typedef SolverBase<VectorType> PrecondType;
 
+        /// Default NLCG search direction update
+        static constexpr NLCGDirectionUpdate direction_update_default = NLCGDirectionUpdate::automatic;
+
       protected:
         /// Our nonlinear operator
         Operator_& _op;
@@ -541,7 +544,7 @@ namespace FEAST
          *
          */
         explicit ALGLIBMinCG(Operator_& op_, Filter_& filter_,
-        NLCGDirectionUpdate du_ = NLCGDirectionUpdate::automatic, bool keep_iterates = false) :
+        NLCGDirectionUpdate du_ = direction_update_default, bool keep_iterates = false) :
           BaseClass("ALGLIBMinCG"),
           _op(op_),
           _filter(filter_),

@@ -116,6 +116,8 @@ namespace FEAST
         typedef SolverBase<VectorType> PrecondType;
         /// Maximum number of subsequent restarts (meaning steepest descent steps) before aborting
         static constexpr Index max_num_subs_restarts = Index(10);
+        /// Default search direction update
+        static constexpr NLCGDirectionUpdate direction_update_default = NLCGDirectionUpdate::DYHSHybrid;
 
       protected:
         /// Our nonlinear operator
@@ -182,7 +184,7 @@ namespace FEAST
          *
          */
         explicit NLCG(Operator_& op_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
-        const NLCGDirectionUpdate du_,
+        const NLCGDirectionUpdate du_ = direction_update_default,
         bool keep_iterates = false, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass("NLCG", precond),
           _op(op_),
@@ -818,7 +820,7 @@ namespace FEAST
     template<typename Operator_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
       Operator_& op, Filter_& filter, Linesearch_& linesearch,
-      NLCGDirectionUpdate direction_update = NLCGDirectionUpdate::PolakRibiere,
+      NLCGDirectionUpdate direction_update = NLCG<Operator_, Filter_>::direction_update_default,
       bool keep_iterates = false)
       {
         return std::make_shared<NLCG<Operator_, Filter_>>(op, filter, linesearch, direction_update,
@@ -838,7 +840,7 @@ namespace FEAST
     template<typename Operator_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLCG<Operator_, Filter_>> new_nlcg(
       Operator_& op, Filter_& filter, Linesearch_& linesearch,
-      NLCGDirectionUpdate direction_update = NLCGDirectionUpdate::PolakRibiere,
+      NLCGDirectionUpdate direction_update = NLCG<Operator_, Filter_>::direction_update_default,
       bool keep_iterates = false,
       std::shared_ptr<SolverBase<typename Operator_::VectorTypeL>> precond = nullptr)
       {
