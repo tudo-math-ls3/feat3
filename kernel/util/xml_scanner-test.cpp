@@ -5,9 +5,6 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-//#undef TEST_CHECK_THROWS
-//#define TEST_CHECK_THROWS(x,y) do {try{x;} catch(std::exception& e) {std::cout << e.what() << std::endl;}} while(false)
-
 // cannot be closed
 class TestParser1 :
   public Xml::DummyParser
@@ -49,19 +46,19 @@ class TestRootParser2 :
   public Xml::DummyParser
 {
 public:
-  virtual bool attribs(std::map<String,bool>& attribs) const override
+  virtual bool attribs(std::map<String,bool>& attrs) const override
   {
-    attribs.emplace("mandat", true);
-    attribs.emplace("option", false);
+    attrs.emplace("mandat", true);
+    attrs.emplace("option", false);
     return true;
   }
 
-  virtual void create(int, const String&, const String&, const std::map<String, String>& attribs, bool) override
+  virtual void create(int, const String&, const String&, const std::map<String, String>& attrs, bool) override
   {
     // make sure that we have the mandatory attribute
     // no XML error is thrown here, but an InternalError instead to
     // indicate failure of the code rather than an XML error
-    if(attribs.find("mandat") == attribs.end())
+    if(attrs.find("mandat") == attrs.end())
       throw InternalError("Missing mandatory attribute!");
   }
 };

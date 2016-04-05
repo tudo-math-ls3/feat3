@@ -151,14 +151,14 @@ namespace FEAST
       /**
        * \brief Specifies the mandatory and optional attributes
        *
-       * \param[out] attribs
+       * \param[out] attrs
        * A map of all supported attribute key names. The second component specifies
        * whether the attribute is mandatory (\c true) or optional (\c false).
        *
        * \returns
        * \c true, if the scanner should check for valid arguments, otherwise \c false.
        */
-      virtual bool attribs(std::map<String,bool>& attribs) const = 0;
+      virtual bool attribs(std::map<String,bool>& attrs) const = 0;
 
       /**
        * \brief Creates this markup parser node
@@ -172,7 +172,7 @@ namespace FEAST
        * \param[in] name
        * The name of the markup.
        *
-       * \param[in] attribs
+       * \param[in] attrs
        * A map of all attributes of the markup.
        *
        * \param[in] closed
@@ -182,7 +182,7 @@ namespace FEAST
         int iline,
         const String& sline,
         const String& name,
-        const std::map<String, String>& attribs,
+        const std::map<String, String>& attrs,
         bool closed) = 0;
 
       /**
@@ -481,19 +481,40 @@ namespace FEAST
        */
       void scan(std::shared_ptr<MarkupParser> root_parser);
 
-    protected:
-      /// Throws a SyntaxError for the current line
-      void throw_syntax(const String& msg)
+      /**
+       * \brief Throws a SyntaxError for the current line
+       *
+       * \param[in] msg
+       * The error message.
+       */
+      void throw_syntax(const String& msg) const
       {
         throw SyntaxError(_cur_iline, _cur_sline, msg);
       }
 
-      /// Throws a GrammarError for the current line
-      void throw_grammar(const String& msg)
+      /**
+       * \brief Throws a GrammarError for the current line
+       *
+       * \param[in] msg
+       * The error message.
+       */
+      void throw_grammar(const String& msg) const
       {
         throw GrammarError(_cur_iline, _cur_sline, msg);
       }
 
+      /**
+       * \brief Throws a ContentError for the current line
+       *
+       * \param[in] msg
+       * The error message.
+       */
+      void throw_content(const String& msg) const
+      {
+        throw ContentError(_cur_iline, _cur_sline, msg);
+      }
+
+    protected:
       /**
        * \brief Reads the next non-empty line from the stream.
        *
