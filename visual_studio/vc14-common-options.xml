@@ -33,8 +33,7 @@
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointExceptions>true</FloatingPointExceptions>
-      <!-- Needs to be 'false' due to a compiler bug -->
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <DisableLanguageExtensions>true</DisableLanguageExtensions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -49,7 +48,6 @@
       <FloatingPointModel>Strict</FloatingPointModel>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <OmitFramePointers>false</OmitFramePointers>
-      <SmallerTypeCheck>true</SmallerTypeCheck>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <MinimalRebuild>true</MinimalRebuild>
