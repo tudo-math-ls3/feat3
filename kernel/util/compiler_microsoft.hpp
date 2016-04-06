@@ -103,6 +103,10 @@
 // This warning is disabled as it is mass-produced when compiling standard libraries.
 #  pragma warning(disable: 4820)
 
+// C4883: function size suppresses optimizations
+// This is an annoying optimisation information.
+#  pragma warning(disable: 4883)
+
 // C5024: 'class' : move constructor was implicitly defined as deleted
 // C5025: 'class' : move assignment operator was implicitly defined as deleted
 // C5026: 'class' : move constructor was implicitly defined as deleted because
