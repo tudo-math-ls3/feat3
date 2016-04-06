@@ -799,36 +799,36 @@ namespace FEAST
         static void _log(const alglib::real_1d_array& DOXY(x), double DOXY(func), void* ptr)
         {
           ALGLIBMinCG<OperatorType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<OperatorType, FilterType>*>(ptr);
+
           if(me->_num_iter>0)
           {
+            // first, let's see if we have to compute the defect at all
+            bool calc_def = false;
+            calc_def = calc_def || (me->_min_iter < me->_max_iter);
+            calc_def = calc_def || me->_plot;
+            calc_def = calc_def || (me->_min_stag_iter > Index(0));
 
-          // first, let's see if we have to compute the defect at all
-          bool calc_def = false;
-          calc_def = calc_def || (me->_min_iter < me->_max_iter);
-          calc_def = calc_def || me->_plot;
-          calc_def = calc_def || (me->_min_stag_iter > Index(0));
+            // compute new defect
+            if(calc_def)
+              me->_def_cur = me->_calc_def_norm(me->_vec_def, me->_vec_tmp);
 
-          // compute new defect
-          if(calc_def)
-            me->_def_cur = me->_calc_def_norm(me->_vec_def, me->_vec_tmp);
+            Statistics::add_solver_defect(me->_branch, double(me->_def_cur));
 
-          Statistics::add_solver_defect(me->_branch, double(me->_def_cur));
-
-          // plot?
-          if(me->_plot)
-          {
-            std::cout << me->_plot_name
-            <<  ": " << stringify(me->_num_iter).pad_front(me->_iter_digits)
-            << " : " << stringify_fp_sci(me->_def_cur)
-            << " / " << stringify_fp_sci(me->_def_cur / me->_def_init)
-            << std::endl;
-          }
-          // Log iterates if necessary
-          if(me->iterates != nullptr)
-          {
-            auto tmp = me->_vec_tmp.clone();
-            me->iterates->push_back(std::move(tmp));
-          }
+            // plot?
+            if(me->_plot)
+            {
+              std::cout << me->_plot_name
+              <<  ": " << stringify(me->_num_iter).pad_front(me->_iter_digits)
+              << " : " << stringify_fp_sci(me->_def_cur)
+              << " / " << stringify_fp_sci(me->_def_cur / me->_def_init)
+              << std::endl;
+            }
+            // Log iterates if necessary
+            if(me->iterates != nullptr)
+            {
+              auto tmp = me->_vec_tmp.clone();
+              me->iterates->push_back(std::move(tmp));
+            }
           }
 
           // increase iteration count

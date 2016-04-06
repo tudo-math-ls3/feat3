@@ -350,9 +350,9 @@ namespace FEAST
         virtual Status _apply_intern(VectorType& vec_sol)
         {
           if(iterates != nullptr)
-          {
             iterates->push_back(std::move(vec_sol.clone()));
-          }
+
+          std::cout << "tol_step" << _tol_step << " tol_fval " << _tol_fval << " tol_grad " << this->_tol_rel << std::endl;
 
           // Compute intitial function value
           this->_fval = this->_op.compute_func();
@@ -442,8 +442,8 @@ namespace FEAST
             // (preconditioned) steepest descent direction
             if(_beta == DataType(0))
             {
-              // Comment the line below to the the ALGLIBMinCG behaviour
-              its_since_restart = Index(1);
+              // Uncomment the line below to deviate from the ALGLIBMinCG behaviour
+              // its_since_restart = Index(1);
               _num_subs_restarts++;
 
               this->_vec_dir.clone(this->_vec_tmp);
@@ -582,9 +582,7 @@ namespace FEAST
           // If the linesearch failed to make progress, the new iterate is too close to the old iterate to compute
           // a new search direction etc. so we have to abort.
           if(_linesearch->get_rel_update() < this->_tol_step && Math::abs(_beta) < Math::eps<DataType>())
-          {
             return Status::stagnated;
-          }
 
           // If there were too many subsequent restarts, the solver is stagnated
           if(_num_subs_restarts > max_num_subs_restarts)
