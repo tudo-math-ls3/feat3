@@ -352,7 +352,7 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open statistics file " + filename);
 
         {
-          time_t t = time(NULL);
+          time_t t = time(nullptr);
           struct tm * ts = localtime(&t);
 
           file << "timestamp " << stringify(ts->tm_mon + 1) << "/" << stringify(ts->tm_mday) << "/" << stringify(ts->tm_year + 1900) << " " << stringify(ts->tm_hour)
