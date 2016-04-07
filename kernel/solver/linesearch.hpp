@@ -853,9 +853,10 @@ namespace FEAST
           // The functional value from the best step so far
           DataType fval_prev(fval);
 
-          //std::cout << "SWLinesearch start:     sol = " << this->_vec_initial_sol << " dir = " << vec_dir <<
-          //  " grad = " << this->_vec_grad << std::endl;
-          //std::cout << "SWLinesearch start:     f_0 = " << stringify_fp_sci(this->_fval_0) << " delta_0 = "
+          //std::cout << "SWLinesearch start: sol = " << *(this->_vec_initial_sol) << std::endl;
+          //std::cout << "                    dir = " << *vec_dir << std::endl;
+          //std::cout << "                   grad = " << *(this->_vec_grad) << std::endl;
+          //std::cout << "SWLinesearch start: f_0 = " << stringify_fp_sci(this->_fval_0) << " delta_0 = "
           //<< stringify_fp_sci(_delta_0) << std::endl;
 
           // The step length from the best step so far, so it starts with 0
@@ -1145,19 +1146,19 @@ namespace FEAST
 
             //std::cout << "Bracket iter " << iter << " sol = " << vec_sol << " dir = " << vec_dir
             //<< " grad = " << this->_vec_grad << std::endl;
-            std::cout << "  alpha_new " << stringify_fp_sci(alpha_new) << " f_new " << stringify_fp_sci(f_new) << " delta_new " << stringify_fp_sci(delta_new) << std::endl;
-            std::cout << "  alpha_lo  " << stringify_fp_sci(alpha_lo) << " f_lo  " << stringify_fp_sci(f_lo) << " delta_lo  " << stringify_fp_sci(delta_lo) << std::endl;
-            std::cout << "  alpha_hi  " << stringify_fp_sci(alpha_hi) << " f_hi  " << stringify_fp_sci(f_hi) << " delta_hi  " << stringify_fp_sci(delta_hi) << std::endl;
+            //std::cout << "  alpha_new " << stringify_fp_sci(alpha_new) << " f_new " << stringify_fp_sci(f_new) << " delta_new " << stringify_fp_sci(delta_new) << std::endl;
+            //std::cout << "  alpha_lo  " << stringify_fp_sci(alpha_lo) << " f_lo  " << stringify_fp_sci(f_lo) << " delta_lo  " << stringify_fp_sci(delta_lo) << std::endl;
+            //std::cout << "  alpha_hi  " << stringify_fp_sci(alpha_hi) << " f_hi  " << stringify_fp_sci(f_hi) << " delta_hi  " << stringify_fp_sci(delta_hi) << std::endl;
 
             // Update of interval of uncertainity. We might already be successful.
 
             // Check if the sufficient decrease condition is violated
             if(f_new > this->_fval_0 +_tol_decrease*alpha_new*_delta_0 || ( (f_new > f_lo) && iter > 1) )
             {
-              std::cout << "  sufficient decrease violated" << std::endl;
-              std::cout << "  f_0 + tol_decrease*alpha_new*_delta_0 " <<
-                stringify_fp_sci(this->_fval_0 +_tol_decrease*alpha_new*_delta_0)
-                << " f_lo = " << stringify_fp_sci(f_lo) << "f_new = " << stringify_fp_sci(f_new) << std::endl;
+              //std::cout << "  sufficient decrease violated" << std::endl;
+              //std::cout << "  f_0 + tol_decrease*alpha_new*_delta_0 " <<
+              //  stringify_fp_sci(this->_fval_0 +_tol_decrease*alpha_new*_delta_0)
+              //  << " f_lo = " << stringify_fp_sci(f_lo) << "f_new = " << stringify_fp_sci(f_new) << std::endl;
 
               alpha_hi = alpha_new;
               f_hi = f_new;
@@ -1166,14 +1167,14 @@ namespace FEAST
             // If we have a sufficient decrease, we need to check the curvature condition
             else
             {
-              std::cout << "  bracket: sufficient decrease satisfied:  f = " << stringify_fp_sci(f_new) << " <= "
-              << stringify_fp_sci(this->_fval_0 +_tol_decrease*alpha_new*_delta_0) << std::endl;
+              //std::cout << "  bracket: sufficient decrease satisfied:  f = " << stringify_fp_sci(f_new) << " <= "
+              //<< stringify_fp_sci(this->_fval_0 +_tol_decrease*alpha_new*_delta_0) << std::endl;
 
               // If the curvature condition is satisfied too, we are successful
               if(Math::abs(delta_new) < -_tol_curvature*_delta_0)
               {
-                std::cout << "           curvature condition satisfied " << stringify_fp_sci(Math::abs(delta_new))
-                << " < "  << stringify_fp_sci(-_tol_curvature*_delta_0) << std::endl;
+                //std::cout << "           curvature condition satisfied " << stringify_fp_sci(Math::abs(delta_new))
+                //<< " < "  << stringify_fp_sci(-_tol_curvature*_delta_0) << std::endl;
 
                 // Ok, alpha_new contains a better step than alpha_lo
                 alpha_lo = alpha_new;
@@ -1185,8 +1186,8 @@ namespace FEAST
               // If the curvature condition is violated, we replace either alpha_lo or alpha_hi by alpha_new
               else
               {
-                std::cout << "  curvature condition violated: " << stringify_fp_sci(Math::abs(delta_new)) << " > "
-                << stringify_fp_sci(-_tol_curvature*_delta_0) << std::endl;
+                //std::cout << "  curvature condition violated: " << stringify_fp_sci(Math::abs(delta_new)) << " > "
+                //<< stringify_fp_sci(-_tol_curvature*_delta_0) << std::endl;
 
                 // This is the original condition from GN06
                 //if(delta_new*(alpha_hi - alpha_lo) >= DataType(0))
@@ -1276,11 +1277,11 @@ namespace FEAST
          */
         Status _polynomial_fit(DataType& alpha_new, DataType alpha_lo, DataType alpha, DataType f_lo, DataType f, DataType df_lo, DataType df, bool& min_in_interval, bool df_was_negative) const
         {
-          std::cout << "Polynomial_fit: min_in_interval = " << min_in_interval << std::endl;
-          std::cout << "  alpha_lo = " << stringify_fp_sci(alpha_lo) << " f_lo = "<< stringify_fp_sci(f_lo)
-          << " df_lo = " << stringify_fp_sci(df_lo) << std::endl;
-          std::cout << "  alpha    = " << stringify_fp_sci(alpha) << " f    = "<< stringify_fp_sci(f)
-          << " df    = " << stringify_fp_sci(df) << std::endl;
+          //std::cout << "Polynomial_fit: min_in_interval = " << min_in_interval << std::endl;
+          //std::cout << "  alpha_lo = " << stringify_fp_sci(alpha_lo) << " f_lo = "<< stringify_fp_sci(f_lo)
+          //<< " df_lo = " << stringify_fp_sci(df_lo) << std::endl;
+          //std::cout << "  alpha    = " << stringify_fp_sci(alpha) << " f    = "<< stringify_fp_sci(f)
+          //<< " df    = " << stringify_fp_sci(df) << std::endl;
 
           // Default: Quadratic interpolant using f_lo, df_lo and df
           DataType alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, true);
@@ -1292,7 +1293,7 @@ namespace FEAST
             // The first derivative was negative, but the function value increases, so the minimum has to be in this
             // interval (or have been in the original interval, which this interval is a subset of)
             min_in_interval = true;
-            std::cout << "  Case 1 : ";
+            //std::cout << "  Case 1 : ";
             // use diffent 2nd order approximation to mimick ALGLIB
             alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, false);
             // If the cubic minimum is closer to the old best step length, take it. Otherwise, take the mean
@@ -1309,7 +1310,7 @@ namespace FEAST
             // Because the derivative changed sign, it has to be zero somewhere in between, so the minimum is in the
             // current interval
             min_in_interval = true;
-            std::cout << "  Case 2 : ";
+            //std::cout << "  Case 2 : ";
             // Take the step closer to the new step alpha
             Math::abs(alpha - alpha_c) > Math::abs(alpha - alpha_q) ? alpha_new = alpha_q : alpha_new = alpha_c;
           }
@@ -1319,16 +1320,16 @@ namespace FEAST
           // This means we have to further search in the direction of alpha.
           else if(Math::abs(df) > Math::abs(df_lo))
           {
-            std::cout << "  Case 3";
+            //std::cout << "  Case 3";
             // If the cubic step is closer to the trial step
             if(Math::abs(alpha - alpha_c) < Math::abs(alpha - alpha_q))
             {
-              std::cout << "a: ";
+              //std::cout << "a: ";
               min_in_interval ? alpha_new = alpha_c : alpha_new = alpha_q;
             }
             else
             {
-              std::cout << "b: ";
+              //std::cout << "b: ";
               min_in_interval ? alpha_new = alpha_q : alpha_new = alpha_c;
             }
           }
@@ -1337,14 +1338,14 @@ namespace FEAST
           // change sign.
           else
           {
-            std::cout << "  Case 4: ";
+            //std::cout << "  Case 4: ";
             // Here we can just take the cubic step because the cubic interpolation sets it to the alpha_soft_max
             // if it recognises that the minimum is outside the current interval.
             alpha_new = alpha_c;
           }
 
-          std::cout << "alpha_new = " << stringify_fp_sci(alpha_new) <<
-          " alpha_c = " << stringify_fp_sci(alpha_c) << " alpha_q = " << stringify_fp_sci(alpha_q) << " min_in_interval " << min_in_interval << std::endl;
+          //std::cout << "alpha_new = " << stringify_fp_sci(alpha_new) <<
+          //" alpha_c = " << stringify_fp_sci(alpha_c) << " alpha_q = " << stringify_fp_sci(alpha_q) << " min_in_interval " << min_in_interval << std::endl;
 
           return Status::success;
         }
@@ -1374,12 +1375,12 @@ namespace FEAST
           if(alpha_new >= _alpha_soft_max)
           {
             alpha_new = _alpha_soft_max;
-            std::cout << "SWLinesearch: increase soft min from " << stringify_fp_sci(_alpha_soft_min) << " to ";
+            //std::cout << "SWLinesearch: increase soft min from " << stringify_fp_sci(_alpha_soft_min) << " to ";
             _alpha_soft_min = alpha;
-            std::cout << stringify_fp_sci(_alpha_soft_min) << std::endl;
-            std::cout << "SWLinesearch: increase soft max from  " << stringify_fp_sci(_alpha_soft_max) << " to ";
+            //std::cout << stringify_fp_sci(_alpha_soft_min) << std::endl;
+            //std::cout << "SWLinesearch: increase soft max from  " << stringify_fp_sci(_alpha_soft_max) << " to ";
             _alpha_soft_max = alpha + DataType(4)*(alpha_new - alpha_prev);
-            std::cout << stringify_fp_sci(_alpha_soft_max) << std::endl;
+            //std::cout << stringify_fp_sci(_alpha_soft_max) << std::endl;
           }
 
         }

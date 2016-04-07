@@ -352,8 +352,6 @@ namespace FEAST
           if(iterates != nullptr)
             iterates->push_back(std::move(vec_sol.clone()));
 
-          std::cout << "tol_step" << _tol_step << " tol_fval " << _tol_fval << " tol_grad " << this->_tol_rel << std::endl;
-
           // Compute intitial function value
           this->_fval = this->_op.compute_func();
           // Compute initial defect
