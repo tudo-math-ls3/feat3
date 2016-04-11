@@ -106,6 +106,13 @@ namespace FEAST
         return TupleFilter(_first.clone(clone_mode), _rest.clone(clone_mode));
       }
 
+      /// \brief Clones data from another TupleFilter
+      void clone(const TupleFilter & other, CloneMode clone_mode = CloneMode::Deep)
+      {
+        _first.clone(other._first.get_filter_vector(), clone_mode);
+        _rest.clone(other._rest, clone_mode);
+      }
+
       template<typename... SubFilter2_>
       void convert(const TupleFilter<SubFilter2_...>& other)
       {
@@ -240,6 +247,12 @@ namespace FEAST
       TupleFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
         return TupleFilter(_first.clone(clone_mode));
+      }
+
+      /// \brief Clones data from another TupleFilter
+      void clone(const TupleFilter & other, CloneMode clone_mode = CloneMode::Deep)
+      {
+        _first.clone(other._first.get_filter_vector(), clone_mode);
       }
 
       template<typename SubFilter2_>

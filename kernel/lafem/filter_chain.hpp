@@ -101,6 +101,13 @@ namespace FEAST
         return FilterChain(_first.clone(clone_mode), _rest.clone(clone_mode));
       }
 
+      /// \brief Clones data from another FilterChain
+      void clone(const FilterChain & other, CloneMode clone_mode = CloneMode::Deep)
+      {
+        _first.clone(other._first.get_filter_vector(), clone_mode);
+        _rest.clone(other._rest, clone_mode);
+      }
+
       template<typename... SubFilter2_>
       void convert(const FilterChain<SubFilter2_...>& other)
       {
@@ -231,6 +238,12 @@ namespace FEAST
       FilterChain clone(CloneMode clone_mode = CloneMode::Deep) const
       {
         return FilterChain(_first.clone(clone_mode));
+      }
+
+      /// \brief Clones data from another FilterChain
+      void clone(const FilterChain & other, CloneMode clone_mode = CloneMode::Deep)
+      {
+        _first.clone(other._first.get_filter_vector(), clone_mode);
       }
 
       template<typename SubFilter2_>

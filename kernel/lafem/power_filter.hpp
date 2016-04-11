@@ -99,6 +99,13 @@ namespace FEAST
         return PowerFilter(first().clone(clone_mode), rest().clone(clone_mode));
       }
 
+      /// \brief Clones data from another PowerFilter
+      void clone(const PowerFilter & other, CloneMode clone_mode = CloneMode::Deep)
+      {
+        _first.clone(other._first.get_filter_vector(), clone_mode);
+        _rest.clone(other._rest, clone_mode);
+      }
+
       /// Conversion method
       template<typename SubFilter2_>
       void convert(const PowerFilter<SubFilter2_, count_>& other)
@@ -227,6 +234,12 @@ namespace FEAST
       PowerFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
         return PowerFilter(first().clone(clone_mode));
+      }
+
+      /// \brief Clones data from another PowerFilter
+      void clone(const PowerFilter & other, CloneMode clone_mode = CloneMode::Deep)
+      {
+        _first.clone(other._first.get_filter_vector(), clone_mode);
       }
 
       template<typename SubFilter2_>
