@@ -95,9 +95,10 @@ namespace FEAST
         return *this;
       }
 
-      FilterChain clone() const
+      /// \brief Creates a clone of itself
+      FilterChain clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        return FilterChain(_first.clone(), _rest.clone());
+        return FilterChain(_first.clone(clone_mode), _rest.clone(clone_mode));
       }
 
       template<typename... SubFilter2_>
@@ -226,9 +227,10 @@ namespace FEAST
         return *this;
       }
 
-      FilterChain clone() const
+      /// \brief Creates a clone of itself
+      FilterChain clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        return FilterChain(_first.clone());
+        return FilterChain(_first.clone(clone_mode));
       }
 
       template<typename SubFilter2_>

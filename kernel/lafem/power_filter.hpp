@@ -93,10 +93,10 @@ namespace FEAST
         return *this;
       }
 
-      /// Creates and returns a deep copy of this filter.
-      PowerFilter clone() const
+      /// \brief Creates a clone of itself
+      PowerFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        return PowerFilter(first().clone(), rest().clone());
+        return PowerFilter(first().clone(clone_mode), rest().clone(clone_mode));
       }
 
       /// Conversion method
@@ -223,9 +223,10 @@ namespace FEAST
         return *this;
       }
 
-      PowerFilter clone() const
+      /// \brief Creates a clone of itself
+      PowerFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        return PowerFilter(first().clone());
+        return PowerFilter(first().clone(clone_mode));
       }
 
       template<typename SubFilter2_>

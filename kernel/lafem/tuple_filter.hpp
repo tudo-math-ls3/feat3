@@ -100,9 +100,10 @@ namespace FEAST
         return *this;
       }
 
-      TupleFilter clone() const
+      /// \brief Creates a clone of itself
+      TupleFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        return TupleFilter(_first.clone(), _rest.clone());
+        return TupleFilter(_first.clone(clone_mode), _rest.clone(clone_mode));
       }
 
       template<typename... SubFilter2_>
@@ -235,9 +236,10 @@ namespace FEAST
         return *this;
       }
 
-      TupleFilter clone() const
+      /// \brief Creates a clone of itself
+      TupleFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        return TupleFilter(_first.clone());
+        return TupleFilter(_first.clone(clone_mode));
       }
 
       template<typename SubFilter2_>

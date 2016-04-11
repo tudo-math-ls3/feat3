@@ -94,18 +94,18 @@ namespace FEAST
       {
       }
 
-      /// \returns A deep copy of itself
-      UnitFilter clone() const
+      /// \brief Creates a clone of itself
+      UnitFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
         UnitFilter other;
-        other.clone(*this);
+        other.clone(*this, clone_mode);
         return std::move(other);
       }
 
       /// \brief Clones data from another UnitFilter
-      void clone(const UnitFilter & other)
+      void clone(const UnitFilter & other, CloneMode clone_mode = CloneMode::Deep)
       {
-        _sv.clone(other.get_filter_vector());
+        _sv.clone(other.get_filter_vector(), clone_mode);
       }
 
       /// \brief Converts data from another UnitFilter

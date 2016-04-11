@@ -97,11 +97,26 @@ namespace FEAST
       {
       }
 
-      /// Creates and returns a deep copy of this filter.
-      MeanFilter clone() const
+      /**
+       * \brief Creates a clone of itself
+       * \warning _volume will always be a deep copy
+       */
+      MeanFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        return MeanFilter(_vec_prim.clone(), _vec_dual.clone(), _volume);
+        return MeanFilter(_vec_prim.clone(clone_mode), _vec_dual.clone(clone_mode), _volume);
       }
+
+      /**
+       * \brief Clones data from another MeanFilter
+       * \warning _volume will always be a deep copy
+       */
+      void clone(const MeanFilter & other, CloneMode clone_mode = CloneMode::Deep)
+      {
+        _vec_prim.clone(other.get_vec_prim(), clone_mode);
+        _vec_dual.clone(other.get_vec_dual(), clone_mode);
+        _volume = other._volume;
+      }
+
 
       /// Conversion method
       template<typename Mem2_, typename DT2_, typename IT2_>

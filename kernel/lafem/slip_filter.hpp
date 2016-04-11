@@ -135,19 +135,19 @@ namespace FEAST
         {
         }
 
-        /// \returns A deep copy of itself
-        SlipFilter clone() const
+        /// \brief Creates a clone of itself
+        SlipFilter clone(CloneMode clone_mode = CloneMode::Deep) const
         {
           SlipFilter other;
-          other.clone(*this);
+          other.clone(*this, clone_mode);
           return std::move(other);
         }
 
-        /// \brief Clones data from another UnitFilter
-        void clone(const SlipFilter & other)
+        /// \brief Clones data from another SlipFilter
+        void clone(const SlipFilter & other, CloneMode clone_mode = CloneMode::Deep)
         {
-          _nu.clone(other.get_nu());
-          _sv.clone(other.get_filter_vector());
+          _nu.clone(other.get_nu(), clone_mode);
+          _sv.clone(other.get_filter_vector(), clone_mode);
         }
 
         /// \brief Converts data from another UnitFilter

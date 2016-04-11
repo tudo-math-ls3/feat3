@@ -36,10 +36,16 @@ namespace FEAST
       /// our supported vector type
       typedef DenseVector<MemType, DataType, IndexType> VectorType;
 
-      /// Creates and returns a (empty) deep copy of this filter.
-      NoneFilter clone() const
+      /// \brief Creates a (empty) clone of itself
+      NoneFilter clone(CloneMode /*clone_mode*/ = CloneMode::Deep) const
       {
         return NoneFilter();
+      }
+
+      /// \brief Clones data from another NoneFilter
+      void clone(const NoneFilter & /*other*/, CloneMode /*clone_mode*/ = CloneMode::Deep)
+      {
+        // do nothing
       }
 
       template<typename MT2_, typename DT2_, typename IT2_>
@@ -124,10 +130,16 @@ namespace FEAST
       /// our supported vector type
       typedef DenseVectorBlocked<MemType, DataType, IndexType, BlockSize> VectorType;
 
-      /// Creates and returns a (empty) deep copy of this filter.
-      NoneFilterBlocked clone() const
+      /// \brief Creates a (empty) clone of itself
+      NoneFilterBlocked clone(CloneMode /*clone_mode*/ = CloneMode::Deep) const
       {
         return NoneFilterBlocked();
+      }
+
+      /// \brief Clones data from another NoneFilterBlocked
+      void clone(const NoneFilterBlocked & /*other*/, CloneMode /*clone_mode*/ = CloneMode::Deep)
+      {
+        // do nothing
       }
 
       template<typename MT2_, typename DT2_, typename IT2_>
