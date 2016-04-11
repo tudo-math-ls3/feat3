@@ -192,6 +192,12 @@ namespace FEAST
         return PowerFullMatrix(_container.clone(mode));
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _container.bytes();
+      }
+
       /**
        * \brief Returns a sub-matrix block.
        *

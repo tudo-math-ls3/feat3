@@ -260,6 +260,12 @@ namespace FEAST
         return PowerColMatrix(_first.clone(mode), _rest.clone(mode));
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes() + _rest.bytes();
+      }
+
       /**
        * \brief Returns a sub-matrix block.
        *
@@ -688,6 +694,12 @@ namespace FEAST
       PowerColMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return PowerColMatrix(_first.clone(mode));
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes();
       }
 
       template<int i, int j>

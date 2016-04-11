@@ -260,6 +260,12 @@ namespace FEAST
         return PowerRowMatrix(_first.clone(mode), _rest.clone(mode));
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes() + _rest.bytes();
+      }
+
       /**
        * \brief Returns a sub-matrix block.
        *
@@ -671,6 +677,13 @@ namespace FEAST
       {
         return PowerRowMatrix(_first.clone(mode));
       }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes();
+      }
+
 
       template<int i, int j>
       SubMatrixType& at()

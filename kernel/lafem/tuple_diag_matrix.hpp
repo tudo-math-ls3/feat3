@@ -256,6 +256,12 @@ namespace FEAST
         return TupleDiagMatrix(_first.clone(mode), _rest.clone(mode));
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes() + _rest.bytes();
+      }
+
       /**
        * \brief Creates and returns the transpose of this matrix.
        */
@@ -698,6 +704,12 @@ namespace FEAST
       TupleDiagMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return TupleDiagMatrix(_first.clone(mode));
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes();
       }
 
       TupleDiagMatrix transpose() const

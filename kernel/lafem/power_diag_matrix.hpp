@@ -258,6 +258,12 @@ namespace FEAST
         return PowerDiagMatrix(_first.clone(mode), _rest.clone(mode));
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes() + _rest.bytes();
+      }
+
       /**
        * \brief Creates and returns the transpose of this matrix.
        */
@@ -719,6 +725,12 @@ namespace FEAST
       PowerDiagMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return PowerDiagMatrix(_first.clone(mode));
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes();
       }
 
       PowerDiagMatrix transpose() const

@@ -274,6 +274,12 @@ namespace FEAST
         return SaddlePointMatrix(_matrix_a.clone(mode), _matrix_b.clone(mode), _matrix_d.clone(mode));
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _matrix_a.bytes() + _matrix_b.bytes() + _matrix_d.bytes();
+      }
+
       /// Returns the sub-matrix block A.
       MatrixTypeA& block_a()
       {

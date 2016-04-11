@@ -47,6 +47,12 @@ namespace FEAST
       {
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return 0;
+      }
+
       /**
        * \brief Applies the filter onto the right-hand-side vector.
        *

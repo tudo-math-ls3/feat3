@@ -107,6 +107,12 @@ namespace FEAST
         _rest.convert(other._rest);
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes() + _rest.bytes();
+      }
+
       /// \cond internal
       SubFilterType& first()
       {
@@ -226,6 +232,12 @@ namespace FEAST
       void convert(const PowerFilter<SubFilter2_, 1>& other)
       {
         _first.convert(other._first);
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes();
       }
 
       SubFilterType& first()
