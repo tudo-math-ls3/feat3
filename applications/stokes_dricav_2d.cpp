@@ -133,8 +133,8 @@ namespace StokesDriCav2D
       assemble_pressure_filter(sys_level);
 
       // clone into system filter
-      (*sys_level.filter_sys).template at<0>() = (*sys_level.filter_velo).clone();
-      (*sys_level.filter_sys).template at<1>() = (*sys_level.filter_pres).clone();
+      (*sys_level.filter_sys).template at<0>() = (*sys_level.filter_velo).clone(LAFEM::CloneMode::Shallow);
+      (*sys_level.filter_sys).template at<1>() = (*sys_level.filter_pres).clone(LAFEM::CloneMode::Shallow);
     }
 
     template<typename SystemLevel_>

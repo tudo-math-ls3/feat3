@@ -139,7 +139,7 @@ namespace FEAST
        *
        * \brief Conversion method
        *
-       * Use source ScalarBasicTransferLevel content as content of current ScalarBasicTransferLevel.
+       * Use source ScalarUnitFilterSystemLevel content as content of current ScalarUnitFilterSystemLevel.
        *
        */
       template<typename M_, typename D_, typename I_, typename SM_>
@@ -186,7 +186,7 @@ namespace FEAST
        *
        * \brief Conversion method
        *
-       * Use source ScalarBasicTransferLevel content as content of current ScalarBasicTransferLevel.
+       * Use source ScalarMeanFilterSystemLevel content as content of current ScalarMeanFilterSystemLevel.
        *
        */
       template<typename M_, typename D_, typename I_, typename SM_>

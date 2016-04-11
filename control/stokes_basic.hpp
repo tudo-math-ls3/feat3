@@ -129,11 +129,14 @@ namespace FEAST
         gate_pres.convert(other.gate_pres);
         gate_sys.convert(other.gate_sys);
 
-        matrix_sys.convert(&gate_sys, &gate_sys, other.matrix_sys);
         matrix_a.convert(&gate_velo, &gate_velo, other.matrix_a);
         matrix_b.convert(&gate_velo, &gate_pres, other.matrix_b);
         matrix_d.convert(&gate_pres, &gate_velo, other.matrix_d);
         matrix_s.convert(&gate_pres, &gate_pres, other.matrix_s);
+
+        (*matrix_sys).block_a() = (*matrix_a).clone(LAFEM::CloneMode::Shallow);
+        (*matrix_sys).block_b() = (*matrix_b).clone(LAFEM::CloneMode::Shallow);
+        (*matrix_sys).block_d() = (*matrix_d).clone(LAFEM::CloneMode::Shallow);
       }
     }; // struct StokesBasicSystemLevel<...>
 
@@ -164,13 +167,28 @@ namespace FEAST
       GlobalVeloFilter filter_velo;
       GlobalPresFilter filter_pres;
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return this->matrix_sys.bytes () + this->matrix_s.bytes() + filter_sys.bytes();
+      }
+
+      /**
+       *
+       * \brief Conversion method
+       *
+       * Use source StokesUnitVeloNonePresSystemLevel content as content of current StokesUnitVeloNonePresSystemLevel.
+       *
+       */
       template<typename M_, typename D_, typename I_, typename SM_>
       void convert(const StokesUnitVeloNonePresSystemLevel<dim_, M_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
-        filter_sys.convert(other.filter_sys);
         filter_velo.convert(other.filter_velo);
         filter_pres.convert(other.filter_pres);
+
+        (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
+        (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
       }
     }; // struct StokesUnitVeloNonePresSystemLevel<...>
 
@@ -203,13 +221,28 @@ namespace FEAST
       GlobalVeloFilter filter_velo;
       GlobalPresFilter filter_pres;
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return this->matrix_sys.bytes () + this->matrix_s.bytes() + filter_sys.bytes();
+      }
+
+      /**
+       *
+       * \brief Conversion method
+       *
+       * Use source StokesUnitVeloMeanPresSystemLevel content as content of current StokesUnitVeloMeanPresSystemLevel.
+       *
+       */
       template<typename M_, typename D_, typename I_, typename SM_>
       void convert(const StokesUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
-        filter_sys.convert(other.filter_sys);
         filter_velo.convert(other.filter_velo);
         filter_pres.convert(other.filter_pres);
+
+        (*filter_sys).template at<0>() = (*filter_velo).clone(LAFEM::CloneMode::Shallow);
+        (*filter_sys).template at<1>() = (*filter_pres).clone(LAFEM::CloneMode::Shallow);
       }
     }; // struct StokesUnitVeloNonePresSystemLevel<...>
 
@@ -253,6 +286,19 @@ namespace FEAST
       {
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return prol_sys.bytes () + rest_sys.bytes();
+      }
+
+      /**
+       *
+       * \brief Conversion method
+       *
+       * Use source StokesBasicTransferLevel content as content of current StokesBasicTransferLevel.
+       *
+       */
       template <typename SL_>
       void convert(SystemLevel_ & lvl_coarse, SystemLevel_ & lvl_fine, const StokesBasicTransferLevel<SL_> & other)
       {
@@ -260,8 +306,11 @@ namespace FEAST
         rest_velo.convert(&lvl_coarse.gate_velo, &lvl_fine.gate_velo, other.rest_velo);
         prol_pres.convert(&lvl_fine.gate_pres, &lvl_coarse.gate_pres, other.prol_pres);
         rest_pres.convert(&lvl_coarse.gate_pres, &lvl_fine.gate_pres, other.rest_pres);
-        prol_sys.convert(&lvl_fine.gate_sys, &lvl_coarse.gate_sys, other.prol_sys);
-        rest_sys.convert(&lvl_coarse.gate_sys, &lvl_fine.gate_sys, other.rest_sys);
+
+        (*prol_sys).template at<0,0>() = (*prol_velo).clone(LAFEM::CloneMode::Shallow);
+        (*prol_sys).template at<1,1>() = (*prol_pres).clone(LAFEM::CloneMode::Shallow);
+        (*rest_sys).template at<0,0>() = (*rest_velo).clone(LAFEM::CloneMode::Shallow);
+        (*rest_sys).template at<1,1>() = (*rest_pres).clone(LAFEM::CloneMode::Shallow);
       }
     }; // struct StokesBasicTransferLevel<...>
 
@@ -348,7 +397,7 @@ namespace FEAST
         // compile gates
         gate_velo.compile(std::move(tmpl_v));
         gate_pres.compile(std::move(tmpl_p));
-        gate_sys. compile(std::move(tmpl_s));
+        gate_sys.compile(std::move(tmpl_s));
       }
 
       template<typename SystemLevel_>
