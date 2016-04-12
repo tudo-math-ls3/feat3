@@ -46,7 +46,7 @@ do for [file in files]{
 
 
 #####################
-# GLobal time / ranks
+# Global time / ranks
 #####################
 reset
 

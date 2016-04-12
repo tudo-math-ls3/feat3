@@ -222,7 +222,7 @@ def dat(file_path, file_base, ranks):
 
         line = f.readline()
         level = 0
-        while "::" not in line and "#" not in line:
+        while "::" not in line and "#" not in line and len(line) != 0:
           if line[0] == "-":
             level = 0
           else:
