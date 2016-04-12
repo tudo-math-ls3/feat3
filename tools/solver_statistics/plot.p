@@ -70,6 +70,32 @@ do for [file in files]{
 }
 
 
+
+#####################
+# Global size / ranks
+#####################
+reset
+
+set key outside
+set xlabel "Rank"
+set ylabel "Size [MByte]"
+set xtics rotate out
+set style data histogram
+set style histogram rowstacked
+set boxwidth 0.6 relative
+set style fill solid border
+set style fill solid 0.3
+set bars front
+set terminal postscript eps enhanced color font "Helvetica,16"
+
+files = system("ls -1 global-size-ranks*.dat")
+do for [file in files]{
+  print file
+  set output file.".eps"
+  plot for [COL=2:4] file using COL:xticlabels(1) title columnheader
+}
+
+
 #####################
 # iters / ranks
 #####################

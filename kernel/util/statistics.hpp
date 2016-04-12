@@ -342,7 +342,7 @@ namespace FEAST
         _time_mpi_wait.correction = 0.;
       }
 
-      static void write_out_solver_statistics(int rank, String filename = "solver_stats")
+      static void write_out_solver_statistics(int rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, String filename = "solver_stats")
       {
         filename += ".";
         filename += stringify(rank);
@@ -362,11 +362,18 @@ namespace FEAST
         file << std::endl;
 
         file << "#global time" << std::endl;
-        file << "reduction " << stringify(get_time_reduction()) <<std::endl;
-        file << "axpy " << stringify(get_time_axpy()) <<std::endl;
-        file << "spmv " << stringify(get_time_spmv()) <<std::endl;
-        file << "precon " << stringify(get_time_precon()) <<std::endl;
-        file << "mpi " << stringify(get_time_mpi_execute()) <<std::endl;
+        file << "reduction " << stringify(get_time_reduction()) << std::endl;
+        file << "axpy " << stringify(get_time_axpy()) << std::endl;
+        file << "spmv " << stringify(get_time_spmv()) << std::endl;
+        file << "precon " << stringify(get_time_precon()) << std::endl;
+        file << "mpi " << stringify(get_time_mpi_execute()) << std::endl;
+
+        file << std::endl;
+
+        file << "#global size" << std::endl;
+        file << "la " << stringify(la_bytes) << std::endl;
+        file << "domain " << stringify(domain_bytes) << std::endl;
+        file << "mpi " << stringify(mpi_bytes) << std::endl;
 
         file << std::endl;
 

@@ -158,6 +158,41 @@ def dat(file_path, file_base, ranks):
       out.writelines(lines)
 
 
+  # global size / ranks
+    lines = []
+    la = 0.
+    domain = 0.
+    mpi = 0.
+    for rank in range(0, ranks):
+      with open(file_path + os.sep + file_base + "." + str(rank), "r") as f:
+        newline = str(rank)
+        #iterate to global time entries in corresponding rank file
+        while "#global size" not in f.readline():
+          pass
+        temp = float(f.readline().rsplit(" ")[1])
+        temp = temp / 1024. / 1024.
+        la += temp
+        newline += " " + str(temp)
+        temp = float(f.readline().rsplit(" ")[1])
+        temp = temp / 1024. / 1024.
+        domain += temp
+        newline += " " + str(temp)
+        temp = float(f.readline().rsplit(" ")[1])
+        temp = temp / 1024. / 1024.
+        mpi += temp
+        newline += " " + str(temp)
+        lines.append(newline + os.linesep)
+
+    la /= float(ranks)
+    domain /= float(ranks)
+    mpi /= float(ranks)
+    newline = "average " + str(la) + " " + str(domain) + " " + str(mpi) + os.linesep
+    lines.insert(0, newline)
+    lines.insert(0, "rank la domain mpi" + os.linesep)
+    with open(file_path + os.sep + "global-size-ranks.dat", "w") as out:
+      out.writelines(lines)
+
+
   # iters / ranks
   for solver in solvers:
     if solver.endswith("::VCycle"):
