@@ -109,6 +109,12 @@ namespace FEAST
         return VectorMirror(_mirror_gather.clone(), _mirror_scatter.clone());
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _mirror_gather.bytes() + _mirror_scatter.bytes();
+      }
+
       /**
        * \brief Conversion method
        *

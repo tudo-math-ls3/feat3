@@ -216,6 +216,12 @@ namespace FEAST
         this->_sub_mirror.convert(other._sub_mirror);
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _sub_mirror.bytes();
+      }
+
       /// Returns the total size of the mirror.
       Index size() const
       {

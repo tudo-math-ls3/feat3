@@ -117,6 +117,12 @@ namespace FEAST
         this->_rest.convert(other._rest);
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes() + _rest.bytes();
+      }
+
       /// \cond internal
       First_& first()
       {
@@ -319,6 +325,12 @@ namespace FEAST
       void convert(const TupleMirror<SubMirror2_>& other)
       {
         this->_first.convert(other._first);
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes();
       }
 
       First_& first()

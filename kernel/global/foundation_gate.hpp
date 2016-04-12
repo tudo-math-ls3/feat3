@@ -85,6 +85,29 @@ namespace FEAST
         this->_freqs.convert(other._freqs);
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        size_t temp(0);
+        for (auto& i : _mirrors)
+        {
+          temp += i.bytes();
+        }
+        for (auto& i : _send_bufs)
+        {
+          temp += i.bytes();
+        }
+        for (auto& i : _recv_bufs)
+        {
+          temp += i.bytes();
+        }
+        temp += _freqs.bytes();
+        temp += _ranks.size() * sizeof(Index);
+        temp += _ctags.size() * sizeof(Index);
+
+        return temp;
+      }
+
       void push(Index rank, Index ctag, Mirror_&& mirror)
       {
         // push rank and tags

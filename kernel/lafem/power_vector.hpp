@@ -460,6 +460,12 @@ namespace FEAST
         this->rest().convert(other.rest());
       }
 
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes() + _rest.bytes();
+      }
+
       /**
        * \brief Read in vector from file.
        *
@@ -871,6 +877,12 @@ namespace FEAST
         CONTEXT("When converting PowerVector");
 
         this->first().convert(other.first());
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return _first.bytes();
       }
 
       /**

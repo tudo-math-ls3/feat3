@@ -438,6 +438,8 @@ namespace StokesPoiseuille2D
     std::size_t la_size(0);
     std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { la_size += n->bytes(); });
     std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (TransferLevelType * n) { la_size += n->bytes(); });
+    std::size_t mpi_size(0);
+    std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { mpi_size += n->gate_sys.bytes(); });
     if (rank == 0 && args.check("statistics") >= 0)
     {
       std::cout<<std::endl<<solver->get_formated_solver_tree().trim()<<std::endl;
@@ -454,7 +456,7 @@ namespace StokesPoiseuille2D
     }
     /// \todo add mpi related allocation size
     if (args.check("statistics") > 0) // provided parameter full or whatever
-      Statistics::write_out_solver_statistics(rank, la_size, domain.bytes(), 0);
+      Statistics::write_out_solver_statistics(rank, la_size, domain.bytes(), mpi_size);
 
     // release solver
     solver->done();

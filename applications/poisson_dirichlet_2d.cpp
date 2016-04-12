@@ -377,6 +377,8 @@ namespace PoissonDirichlet2D
     std::size_t la_size(0);
     std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { la_size += n->bytes(); });
     std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (TransferLevelType * n) { la_size += n->bytes(); });
+    std::size_t mpi_size(0);
+    std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { mpi_size += n->gate_sys.bytes(); });
     if (rank == 0 && args.check("statistics") >= 0)
     {
       std::cout<<std::endl<<solver->get_formated_solver_tree().trim()<<std::endl;
@@ -386,6 +388,7 @@ namespace PoissonDirichlet2D
       std::cout<<Statistics::get_formated_times(bt.elapsed(at))<<std::endl<<std::endl;
       std::cout<<"Domain size: " << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
       std::cout<<"LA size: " << double(la_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
+      std::cout<<"MPI size: " << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
       if (args.check("statistics") > 0) // provided parameter full or whatever
       {
         std::cout<<Statistics::get_formated_solvers();
@@ -393,7 +396,7 @@ namespace PoissonDirichlet2D
     }
     /// \todo add mpi related allocation size
     if (args.check("statistics") > 0) // provided parameter full or whatever
-      Statistics::write_out_solver_statistics(rank, la_size, domain.bytes(), 0);
+      Statistics::write_out_solver_statistics(rank, la_size, domain.bytes(), mpi_size);
 
     // release solver
     solver->done();
