@@ -59,8 +59,9 @@ namespace FEAST
      *
      * This class acts as an data wrapper for all index arrays, describing a specific sparse matrix layout.
      * It enables FEAST to store layout related data only once per layout per matrix type.
-     * \TODO Enable layout conversion between matrix types
      * In addition, one is able to create a new matrix with a given layout without assembling it a second time.
+     *
+     * \todo Enable layout conversion between matrix types
      *
      * \author Dirk Ribbrock
      */
