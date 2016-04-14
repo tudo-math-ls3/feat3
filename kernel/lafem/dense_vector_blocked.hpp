@@ -201,16 +201,35 @@ namespace FEAST
        *
        * \param[in] size_in
        * The size of the created vector. aka block count
+       * \param[in] pinned_allocation True if the memory should be allocated in a pinned manner.
+       *
+       * \warning Pinned memory allocation is only possible in main memory and needs cuda support.
        *
        * Creates a vector with a given block count.
        */
-      explicit DenseVectorBlocked(Index size_in) :
+      explicit DenseVectorBlocked(Index size_in, bool pinned_allocation = false) :
         Container<Mem_, DT_, IT_>(size_in)
       {
         CONTEXT("When creating DenseVectorBlocked");
 
+        ASSERT(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Error: Pinned memory allocation only possible in main memory!");
+
         this->_scalar_index.push_back(0);
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
+
+        if (pinned_allocation)
+        {
+#ifdef FEAST_BACKENDS_CUDA
+          this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size<Perspective::pod>()));
+#else
+          // no cuda support enabled - we cannot serve and do not need pinned memory support
+          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
+#endif
+        }
+        else
+        {
+          this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
+        }
+
         this->_elements_size.push_back(size<Perspective::pod>());
       }
 

@@ -251,7 +251,7 @@ namespace FEAST
       {
         CONTEXT("When creating DenseVector");
 
-        ASSERT(! (pinned_allocation && (typeid(Mem::CUDA) == typeid(Mem_))), "Error: You cannot create CUDA DV with pinned_allocation enabled!");
+        ASSERT(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Error: Pinned memory allocation only possible in main memory!");
 
         this->_scalar_index.push_back(0);
 
@@ -260,6 +260,7 @@ namespace FEAST
 #ifdef FEAST_BACKENDS_CUDA
           this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size_in));
 #else
+          // no cuda support enabled - we cannot serve and do not need pinned memory support
           this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
 #endif
         }
