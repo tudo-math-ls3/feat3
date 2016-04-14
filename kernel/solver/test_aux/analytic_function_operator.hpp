@@ -89,13 +89,12 @@ namespace FEAST
         /// Temporary variable to save the current inverse hessian
         typename EvalType::HessianType _my_hess_inv;
 
-      public:
         /// Counter for number of function evaluations
-        IT_ num_func_evals;
+        Index _num_func_evals;
         /// Counter for number of gradient evaluations
-        IT_ num_grad_evals;
+        Index _num_grad_evals;
         /// Counter for number of hessian evaluations
-        IT_ num_hess_evals;
+        Index _num_hess_evals;
 
       public:
         /**
@@ -112,9 +111,9 @@ namespace FEAST
           _my_grad(DT_(0)),
           _my_hess(DT_(0)),
           _my_hess_inv(DT_(0)),
-          num_func_evals(IT_(0)),
-          num_grad_evals(IT_(0)),
-          num_hess_evals(IT_(0))
+          _num_func_evals(Index(0)),
+          _num_grad_evals(Index(0)),
+          _num_hess_evals(Index(0))
           {
           }
 
@@ -143,6 +142,40 @@ namespace FEAST
         }
 
         /**
+         * \returns The number of times the functional value was computed.
+         */
+        Index get_num_func_evals() const
+        {
+          return _num_func_evals;
+        }
+
+        /**
+         * \returns The number of times the gradient was computed.
+         */
+        Index get_num_grad_evals() const
+        {
+          return _num_grad_evals;
+        }
+
+        /**
+         * \returns The number of times the hessian was computed.
+         */
+        Index get_num_hess_evals() const
+        {
+          return _num_hess_evals;
+        }
+
+        /**
+         * \brief Resets all evaluation counts
+         */
+        void reset_num_evals()
+        {
+          _num_func_evals = Index(0);
+          _num_grad_evals = Index(0);
+          _num_hess_evals = Index(0);
+        }
+
+        /**
          * \brief Prepares the operator for evaluation by setting the current state
          *
          * \param[in] vec_state
@@ -165,7 +198,7 @@ namespace FEAST
          */
         typename EvalType::ValueType compute_func()
         {
-          ++num_func_evals;
+          ++_num_func_evals;
           typename EvalType::ValueType ret;
           _func_eval.value(ret, _my_state);
           return ret;
@@ -179,7 +212,7 @@ namespace FEAST
          */
         void compute_grad(GradientType& vec_out)
         {
-          ++num_grad_evals;
+          ++_num_grad_evals;
           _func_eval.gradient(_my_grad, _my_state);
           vec_out(0, _my_grad);
         }
@@ -197,7 +230,7 @@ namespace FEAST
          */
         Status apply_diag_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
         {
-          ++num_hess_evals;
+          ++_num_hess_evals;
           _func_eval.hessian(_my_hess, _my_state);
 
           // Only diagonal of the hessian
@@ -226,7 +259,7 @@ namespace FEAST
          */
         Status apply_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
         {
-          ++num_hess_evals;
+          ++_num_hess_evals;
           _func_eval.hessian(_my_hess, _my_state);
 
           // Apply exact hessian
@@ -250,7 +283,7 @@ namespace FEAST
          */
         Status apply_inv_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
         {
-          ++num_hess_evals;
+          ++_num_hess_evals;
           _func_eval.hessian(_my_hess, _my_state);
 
           _my_hess_inv.set_inverse(_my_hess);
@@ -274,7 +307,7 @@ namespace FEAST
          */
         Status apply_approx_inv_hess(VectorTypeR& vec_out, const VectorTypeR& vec_in)
         {
-          ++num_hess_evals;
+          ++_num_hess_evals;
           _func_eval.hessian(_my_hess, _my_state);
 
           for(int i(0); i < _my_grad.n; ++i)

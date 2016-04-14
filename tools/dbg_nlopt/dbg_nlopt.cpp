@@ -118,8 +118,8 @@ int run(Solver_& solver, Operator_& op)
   std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
   std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());
   std::cout << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
-  std::cout << "Needed evaluations: " << op.num_func_evals << " (func) / " << op.num_grad_evals;
-  std::cout <<  " (grad) / " << op.num_hess_evals << " (hess)" << std::endl;
+  std::cout << "Needed evaluations: " << op.get_num_func_evals() << " (func) / " << op.get_num_grad_evals();
+  std::cout <<  " (grad) / " << op.get_num_hess_evals() << " (hess)" << std::endl;
 
   String filename("");
 
