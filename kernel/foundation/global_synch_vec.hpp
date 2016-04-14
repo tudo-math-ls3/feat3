@@ -36,9 +36,7 @@ namespace FEAST
 
             TimeStamp ts_start;
 
-            ///assumes type-0 vector (entry fractions at inner boundaries)
-
-            ///start recv
+            //start recv
             StorageT_<Request, std::allocator<Request> > recvrequests(mirrors.size());
             StorageT_<Status, std::allocator<Status> > recvstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
@@ -57,7 +55,7 @@ namespace FEAST
 
             }
 
-            ///gather and start send
+            //gather and start send
             StorageT_<Request, std::allocator<Request> > sendrequests(mirrors.size());
             StorageT_<Status, std::allocator<Status> > sendstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
@@ -86,6 +84,7 @@ namespace FEAST
             }
 
             Index count(0);
+            //handle receives
             while(count != recvrequests.size())
             {
               //go through all requests round robin
@@ -138,7 +137,6 @@ namespace FEAST
         public:
 
 #ifndef SERIAL
-          ///TODO start all recvs in one sweep first
           template<typename TargetVectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
           static void exec(
                            TargetVectorT_& target,
@@ -154,92 +152,10 @@ namespace FEAST
             if(mirrors.size() == 0)
               return;
 
-            TimeStamp ts_start;
-
-            ///assumes type-1 vector (full entries at inner boundaries)
-
-            ///start recv
-            StorageT_<Request, std::allocator<Request> > recvrequests(mirrors.size());
-            StorageT_<Status, std::allocator<Status> > recvstatus;
-            for(Index i(0) ; i < mirrors.size() ; ++i)
-            {
-              Status rs;
-
-              recvstatus.push_back(std::move(rs));
-
-              Comm::irecv(recvbufs.at(i).elements(),
-                          recvbufs.at(i).size(),
-                          other_ranks.at(i),
-                          recvrequests.at(i),
-                          tags.at(i),
-                          communicator
-                         );
-            }
-
-            ///gather and start send
-            StorageT_<Request, std::allocator<Request> > sendrequests(mirrors.size());
-            StorageT_<Status, std::allocator<Status> > sendstatus;
-            for(Index i(0) ; i < mirrors.size() ; ++i)
-            {
-              mirrors.at(i).gather_dual(sendbufs.at(i), target);
-
-              Status ss;
-
-              sendstatus.push_back(std::move(ss));
-
-              Comm::isend(sendbufs.at(i).elements(),
-                          sendbufs.at(i).size(),
-                          other_ranks.at(i),
-                          sendrequests.at(i),
-                          tags.at(i),
-                          communicator
-                          );
-            }
-
-            int* recvflags = new int[recvrequests.size()];
-            int* taskflags = new int[recvrequests.size()];
-            for(Index i(0) ; i < recvrequests.size() ; ++i)
-            {
-              recvflags[i] = 0;
-              taskflags[i] = 0;
-            }
-
-
-            Index count(0);
-
-            ///handle receives
-            while(count != recvrequests.size())
-            {
-              //go through all requests round robin
-              for(Index i(0) ; i < recvrequests.size() ; ++i)
-              {
-                if(taskflags[i] == 0)
-                {
-                  Comm::test(recvrequests.at(i), recvflags[i], recvstatus.at(i));
-                  if(recvflags[i] != 0)
-                  {
-                    mirrors.at(i).scatter_axpy_dual(target, recvbufs.at(i));
-                    ++count;
-                    taskflags[i] = 1;
-                  }
-                }
-              }
-            }
+            GlobalSynchVec0<Mem_>::exec(target, mirrors, other_ranks, sendbufs, recvbufs, tags, communicator);
 
             // scale target vector by frequencies
             target.component_product(target, frequencies);
-
-            for(Index i(0) ; i < sendrequests.size() ; ++i)
-            {
-              Status ws;
-              Comm::wait(sendrequests.at(i), ws);
-            }
-
-            delete[] recvflags;
-            delete[] taskflags;
-
-            TimeStamp ts_stop;
-            Statistics::add_time_mpi_execute(ts_stop.elapsed(ts_start));
           }
 #else
           template<typename TargetVectorT_, typename VectorMirrorT_, typename BufferVectorT_, template<typename, typename> class StorageT_>
