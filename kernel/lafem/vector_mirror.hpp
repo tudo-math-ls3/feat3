@@ -183,7 +183,7 @@ namespace FEAST
        */
       DenseVector<Mem::Main, DataType, IndexType> create_buffer_vector() const
       {
-        return DenseVector<Mem::Main, DataType, IndexType>(size(), true);
+        return DenseVector<Mem::Main, DataType, IndexType>(size(), false);
       }
 
       /**
@@ -869,7 +869,7 @@ namespace FEAST
        */
        BufferVectorType create_buffer_vector() const
       {
-        return BufferVectorType(Index(BlockSize)*_mirror_gather.rows());
+        return BufferVectorType(Index(BlockSize)*_mirror_gather.rows(), false);
       }
 
       /**
