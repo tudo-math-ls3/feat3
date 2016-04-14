@@ -37,8 +37,6 @@ namespace FEAST
       std::vector<Mirror_> _mirrors;
       /// frequency fector
       LocalVector_ _freqs;
-      /// send/receive buffers
-      mutable std::vector<BufferVectorType> _send_bufs, _recv_bufs;
 
     public:
       explicit FoundationGate()
@@ -55,8 +53,6 @@ namespace FEAST
         this->_ranks.clear();
         this->_ctags.clear();
         this->_mirrors.clear();
-        this->_send_bufs.clear();
-        this->_recv_bufs.clear();
 
         this->_ranks = other._ranks;
         this->_ctags = other._ctags;
@@ -68,20 +64,6 @@ namespace FEAST
           this->_mirrors.push_back(std::move(mirrors_i));
         }
 
-        for(auto& other_send_bufs_i : other._send_bufs)
-        {
-          BufferVectorType send_bufs_i;
-          send_bufs_i.convert(other_send_bufs_i);
-          this->_send_bufs.push_back(std::move(send_bufs_i));
-        }
-
-        for(auto& other_recv_bufs_i : other._recv_bufs)
-        {
-          BufferVectorType recv_bufs_i;
-          recv_bufs_i.convert(other_recv_bufs_i);
-          this->_recv_bufs.push_back(std::move(recv_bufs_i));
-        }
-
         this->_freqs.convert(other._freqs);
       }
 
@@ -90,14 +72,6 @@ namespace FEAST
       {
         size_t temp(0);
         for (auto& i : _mirrors)
-        {
-          temp += i.bytes();
-        }
-        for (auto& i : _send_bufs)
-        {
-          temp += i.bytes();
-        }
-        for (auto& i : _recv_bufs)
         {
           temp += i.bytes();
         }
@@ -116,10 +90,6 @@ namespace FEAST
 
         // push mirror
         _mirrors.push_back(std::move(mirror));
-
-        // push buffers
-        _send_bufs.push_back(_mirrors.back().create_buffer_vector());
-        _recv_bufs.push_back(_mirrors.back().create_buffer_vector());
       }
 
       void compile(LocalVector_&& vector)
@@ -131,11 +101,12 @@ namespace FEAST
         // loop over all mirrors
         for(std::size_t i(0); i < _mirrors.size(); ++i)
         {
-          // format receive buffer to 1
-          _recv_bufs.at(i).format(DataType(1));
+          // sum up number of ranks per frequency entry, listed in different mirrors
+          auto temp = _mirrors.at(i).create_buffer_vector();
+          temp.format(DataType(1));
 
           // gather-axpy into frequency vector
-          _mirrors.at(i).scatter_axpy_dual(_freqs, _recv_bufs.at(i));
+          _mirrors.at(i).scatter_axpy_dual(_freqs, temp);
         }
 
         // invert frequencies
@@ -155,6 +126,13 @@ namespace FEAST
         if(_ranks.empty())
           return;
 
+        std::vector<BufferVectorType> _send_bufs(_mirrors.size()), _recv_bufs(_mirrors.size());
+        for (Index i(0) ; i < _mirrors.size() ; ++i)
+        {
+          _send_bufs.at(i) = _mirrors.at(i).create_buffer_vector();
+          _recv_bufs.at(i) = _mirrors.at(i).create_buffer_vector();
+        }
+
         Foundation::GlobalSynchVec0<MemType>::exec(
           vector, _mirrors, _ranks, _send_bufs, _recv_bufs, _ctags);
       }
@@ -163,6 +141,14 @@ namespace FEAST
       {
         if(_ranks.empty())
           return;
+
+        std::vector<BufferVectorType> _send_bufs(_mirrors.size()), _recv_bufs(_mirrors.size());
+        for (Index i(0) ; i < _mirrors.size() ; ++i)
+        {
+          _send_bufs.at(i) = _mirrors.at(i).create_buffer_vector();
+          _recv_bufs.at(i) = _mirrors.at(i).create_buffer_vector();
+        }
+
         Foundation::GlobalSynchVec1<MemType>::exec(
           vector, _mirrors, _freqs, _ranks, _send_bufs, _recv_bufs, _ctags);
       }
