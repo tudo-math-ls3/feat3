@@ -1022,10 +1022,11 @@ namespace FEAST
             DataType alpha_new(0);
 
             bool min_in_interval(false);
+            bool drive_to_bndry(false);
 
             // We discard the status returned by _polynomial_fit because it means nothing at this point
             _polynomial_fit(alpha_new, alpha, alpha_prev, fval, fval_prev, delta, delta_prev, min_in_interval,
-            (delta < 0));
+            drive_to_bndry, (delta < 0));
             _enforce_step_limits(alpha_new, alpha, alpha_prev);
 
             // Since the sufficient decrease condition was satisfied, we update alpha_prev
@@ -1103,6 +1104,7 @@ namespace FEAST
           // We need to remember if the minimum is already known to be in the interval of uncertainity for subsequent
           // calls to _polynomial_fit
           bool min_in_interval(false);
+          bool drive_to_bndry(false);
 
           // Trial step and functional value/gradient there
           DataType alpha_new(0);
@@ -1117,7 +1119,7 @@ namespace FEAST
 
             // Find new trial step
             st = _polynomial_fit(alpha_new, alpha_lo, alpha_hi, f_lo, f_hi, delta_lo, delta_hi, min_in_interval,
-            df_was_negative);
+            drive_to_bndry, df_was_negative);
 
             // If the polynomial fit was not successful, we need to break from the iteration
             if(st != Status::success)
@@ -1127,14 +1129,16 @@ namespace FEAST
 
             _enforce_step_limits(alpha_new, alpha_lo, alpha_hi);
 
-            //// If we know the minimum is in the intervall, we can drive alpha to the corresponding end more quickly
-            //if(min_in_interval)
-            //{
-            //  if((alpha_hi-alpha_lo)*delta_lo > DataType(0) )
-            //    alpha_new = Math::min(alpha_lo + DataType(0.66)*(alpha_hi-alpha_lo), alpha_new);
-            //  else
-            //    alpha_new = Math::max(alpha_lo + DataType(0.66)*(alpha_hi-alpha_lo), alpha_new);
-            //}
+            // If we know the minimum is in the intervall, we can drive alpha to the corresponding end more quickly
+            if(min_in_interval && drive_to_bndry)
+            {
+              //std::cout << "Bracketing adjust alpha_new from " << alpha_new;
+              if((alpha_hi-alpha_lo) > DataType(0))
+                alpha_new = Math::min(alpha_lo + DataType(0.66)*(alpha_hi-alpha_lo), alpha_new);
+              else
+                alpha_new = Math::max(alpha_lo + DataType(0.66)*(alpha_hi-alpha_lo), alpha_new);
+              //std::cout << " to " << alpha_new << std::endl;
+            }
 
             // Update the solution and evaluate functional/gradient there
             vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha_new/this->_norm_dir);
@@ -1144,8 +1148,7 @@ namespace FEAST
             this->_op.compute_grad(this->_vec_grad);
             delta_new = this->_vec_grad.dot(vec_dir);
 
-            //std::cout << "Bracket iter " << iter << " sol = " << vec_sol << " dir = " << vec_dir
-            //<< " grad = " << this->_vec_grad << std::endl;
+            //std::cout << "Bracket iter " << iter <<std::endl; //<< " sol = " << vec_sol << " dir = " << vec_dir //<< " grad = " << this->_vec_grad << std::endl;
             //std::cout << "  alpha_new " << stringify_fp_sci(alpha_new) << " f_new " << stringify_fp_sci(f_new) << " delta_new " << stringify_fp_sci(delta_new) << std::endl;
             //std::cout << "  alpha_lo  " << stringify_fp_sci(alpha_lo) << " f_lo  " << stringify_fp_sci(f_lo) << " delta_lo  " << stringify_fp_sci(delta_lo) << std::endl;
             //std::cout << "  alpha_hi  " << stringify_fp_sci(alpha_hi) << " f_hi  " << stringify_fp_sci(f_hi) << " delta_hi  " << stringify_fp_sci(delta_hi) << std::endl;
@@ -1275,7 +1278,11 @@ namespace FEAST
          * extrapolation as well.
          *
          */
-        Status _polynomial_fit(DataType& alpha_new, DataType alpha_lo, DataType alpha, DataType f_lo, DataType f, DataType df_lo, DataType df, bool& min_in_interval, bool df_was_negative) const
+        Status _polynomial_fit(
+          DataType& alpha_new, DataType alpha_lo, DataType alpha,
+          DataType f_lo, DataType f,
+          DataType df_lo, DataType df,
+          bool& min_in_interval, bool& drive_to_bndry, bool df_was_negative) const
         {
           //std::cout << "Polynomial_fit: min_in_interval = " << min_in_interval << std::endl;
           //std::cout << "  alpha_lo = " << stringify_fp_sci(alpha_lo) << " f_lo = "<< stringify_fp_sci(f_lo)
@@ -1293,6 +1300,7 @@ namespace FEAST
             // The first derivative was negative, but the function value increases, so the minimum has to be in this
             // interval (or have been in the original interval, which this interval is a subset of)
             min_in_interval = true;
+            drive_to_bndry = true;
             //std::cout << "  Case 1 : ";
             // use diffent 2nd order approximation to mimick ALGLIB
             alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, false);
@@ -1310,6 +1318,7 @@ namespace FEAST
             // Because the derivative changed sign, it has to be zero somewhere in between, so the minimum is in the
             // current interval
             min_in_interval = true;
+            drive_to_bndry = false;
             //std::cout << "  Case 2 : ";
             // Take the step closer to the new step alpha
             Math::abs(alpha - alpha_c) > Math::abs(alpha - alpha_q) ? alpha_new = alpha_q : alpha_new = alpha_c;
@@ -1320,6 +1329,7 @@ namespace FEAST
           // This means we have to further search in the direction of alpha.
           else if(Math::abs(df) > Math::abs(df_lo))
           {
+            drive_to_bndry = true;
             //std::cout << "  Case 3";
             // If the cubic step is closer to the trial step
             if(Math::abs(alpha - alpha_c) < Math::abs(alpha - alpha_q))
@@ -1342,6 +1352,7 @@ namespace FEAST
             // Here we can just take the cubic step because the cubic interpolation sets it to the alpha_soft_max
             // if it recognises that the minimum is outside the current interval.
             alpha_new = alpha_c;
+            drive_to_bndry = false;
           }
 
           //std::cout << "alpha_new = " << stringify_fp_sci(alpha_new) <<
@@ -1375,10 +1386,10 @@ namespace FEAST
           if(alpha_new >= _alpha_soft_max)
           {
             alpha_new = _alpha_soft_max;
-            //std::cout << "SWLinesearch: increase soft min from " << stringify_fp_sci(_alpha_soft_min) << " to ";
+            //std::cout << "SWLinesearch: alpha_soft_min: " << stringify_fp_sci(_alpha_soft_min) << " to ";
             _alpha_soft_min = alpha;
             //std::cout << stringify_fp_sci(_alpha_soft_min) << std::endl;
-            //std::cout << "SWLinesearch: increase soft max from  " << stringify_fp_sci(_alpha_soft_max) << " to ";
+            //std::cout << "SWLinesearch: alpha_soft_max: " << stringify_fp_sci(_alpha_soft_max) << " to ";
             _alpha_soft_max = alpha + DataType(4)*(alpha_new - alpha_prev);
             //std::cout << stringify_fp_sci(_alpha_soft_max) << std::endl;
           }
@@ -1481,11 +1492,11 @@ namespace FEAST
 
             alpha -= (alpha_lo - alpha_hi)*(-d1 + df_lo + d2)/(d2 - df_hi + df_lo + d2);
           }
-          // r <= 0 means that the minimum is not in the interiour, so it has to lie across the endpoint with the
+          // r <= 0 means that the minimum is not in the interior, so it has to lie across the endpoint with the
           // lower function value
           else
           {
-            alpha_lo < alpha_hi ? alpha = _alpha_soft_min : alpha = _alpha_soft_max;
+            (alpha_lo < alpha_hi && df_lo > DataType(0) )? alpha = _alpha_soft_min : alpha = _alpha_soft_max;
           }
 
           return alpha;
