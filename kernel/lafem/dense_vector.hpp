@@ -333,6 +333,8 @@ namespace FEAST
       {
         CONTEXT("When creating DenseVector");
 
+        ASSERT(size_in + offset_in <= dv_in.size(), "Ranged vector part exceeds orig vector size!");
+
         this->_scalar_index.push_back(1);
         DT_ * te(const_cast<DT_*>(dv_in.elements()));
         this->_elements.push_back(te + offset_in);

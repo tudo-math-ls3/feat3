@@ -18,7 +18,7 @@ namespace FEAST
     {
 
       template <typename DT_, typename IT_>
-      void ScatterPrim<Mem::Main>::dv_csr_generic(DT_* v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const Index size, const Index offset)
+      void ScatterPrim<Mem::Main>::dv_csr_generic(DT_* v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const Index size)
       {
         for (Index row(0) ; row < size ; ++row)
         {
@@ -29,7 +29,7 @@ namespace FEAST
           DT_ sum(0);
           for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
           {
-            sum += val[i] * (b[offset + col_ind[i]]);
+            sum += val[i] * (b[col_ind[i]]);
           }
           v[row] = sum;
         }

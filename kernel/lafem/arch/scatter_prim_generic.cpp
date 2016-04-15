@@ -9,7 +9,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
-template void ScatterPrim<Mem::Main>::dv_csr_generic(float*, const float*, const unsigned long*, const float*, const unsigned long*, const Index, const Index);
-template void ScatterPrim<Mem::Main>::dv_csr_generic(double*, const double*, const unsigned long*, const double*, const unsigned long*, const Index, const Index);
-template void ScatterPrim<Mem::Main>::dv_csr_generic(float*, const float*, const unsigned int*, const float*, const unsigned int*, const Index, const Index);
-template void ScatterPrim<Mem::Main>::dv_csr_generic(double*, const double*, const unsigned int*, const double*, const unsigned int*, const Index, const Index);
+template void ScatterPrim<Mem::Main>::dv_csr_generic(float*, const float*, const unsigned long*, const float*, const unsigned long*, const Index);
+template void ScatterPrim<Mem::Main>::dv_csr_generic(double*, const double*, const unsigned long*, const double*, const unsigned long*, const Index);
+template void ScatterPrim<Mem::Main>::dv_csr_generic(float*, const float*, const unsigned int*, const float*, const unsigned int*, const Index);
+template void ScatterPrim<Mem::Main>::dv_csr_generic(double*, const double*, const unsigned int*, const double*, const unsigned int*, const Index);

@@ -25,10 +25,9 @@ namespace FEAST
                            const DT_* val,
                            const IT_* row_ptr,
                            const DT_ alpha,
-                           const Index size,
-                           const Index offset)
+                           const Index size)
         {
-          dv_csr_generic(v, b, col_ind, val, row_ptr, alpha, size, offset);
+          dv_csr_generic(v, b, col_ind, val, row_ptr, alpha, size);
         }
 
         template <typename DT_, typename IT_>
@@ -38,8 +37,7 @@ namespace FEAST
                                    const DT_* val,
                                    const IT_* row_ptr,
                                    const DT_ alpha,
-                                   const Index size,
-                                   const Index offset);
+                                   const Index size);
 
       };
 
@@ -53,8 +51,7 @@ namespace FEAST
                            const DT_* val,
                            const IT_* row_ptr,
                            const DT_ alpha,
-                           const Index size,
-                           const Index offset);
+                           const Index size);
       };
 
 

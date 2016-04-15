@@ -8,8 +8,6 @@
 #include <kernel/lafem/sparse_vector.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/arch/gather_prim.hpp>
-#include <kernel/lafem/arch/gather_axpy_prim.hpp>
 #include <kernel/lafem/arch/scatter_prim.hpp>
 #include <kernel/lafem/arch/scatter_axpy_prim.hpp>
 
@@ -211,25 +209,18 @@ namespace FEAST
                        const LAFEM::DenseVector<Mem_, DataType_, IndexType_>& mem_vector,
                        const Index buffer_offset = Index(0)) const
       {
+        // skip on empty mirror
         if(_mirror_gather.empty())
           return;
 
-        LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
-        mem_buffer.copy(buffer); /// \todo necessary to satisfy mirror tests but should not be!
-
-        DataType_ * x(mem_buffer.elements());
-        const DataType_ * y(mem_vector.elements());
-        const IndexType_ * col_idx(_mirror_gather.col_ind());
-        const DataType_* val(_mirror_gather.val());
-        const IndexType_* row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
+        LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(num_rows);
 
-        ASSERT_(num_rows + buffer_offset <= mem_buffer.size());
-
-        Arch::GatherPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
+        _mirror_gather.apply(mem_buffer, mem_vector);
 
         //download
-        buffer.copy(mem_buffer);
+        DenseVector<Mem::Main, DataType_, IndexType_> buffer_range(buffer, num_rows, buffer_offset);
+        buffer_range.copy(mem_buffer);
       }
 
       /**
@@ -257,22 +248,16 @@ namespace FEAST
         if(_mirror_gather.empty())
           return;
 
-        DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
-        mem_buffer.copy(buffer);/// \todo necessary to satisfy mirror tests but should not be!
-
-        DataType_ * x(mem_buffer.elements());
-        const DataType_ * y(mem_vector.elements());
-        const IndexType_ * col_idx(_mirror_gather.col_ind());
-        const DataType_* val(_mirror_gather.val());
-        const IndexType_ * row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
+        DenseVector<Mem_, DataType_, IndexType_> mem_buffer(num_rows);
+        DenseVector<Mem::Main, DataType_, IndexType_> buffer_range(buffer, num_rows, buffer_offset);
+        //upload
+        mem_buffer.copy(buffer_range);
 
-        ASSERT_(num_rows + buffer_offset <= buffer.size());
-
-        Arch::GatherAxpyPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
+        _mirror_gather.apply(mem_buffer, mem_vector, mem_buffer, alpha);
 
         //download
-        buffer.copy(mem_buffer);
+        buffer_range.copy(mem_buffer);
       }
 
       /**
@@ -296,8 +281,10 @@ namespace FEAST
         if(_mirror_scatter.empty())
           return;
 
-        LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
-        mem_buffer.copy(buffer);
+        const Index num_cols(_mirror_scatter.columns());
+        DenseVector<Mem_, DataType_, IndexType_> mem_buffer(num_cols);
+        DenseVector<Mem::Main, DataType_, IndexType_> buffer_range(buffer, num_cols, buffer_offset);
+        mem_buffer.copy(buffer_range);
 
         DataType_ * x(mem_vector.elements());
         const DataType_ * y(mem_buffer.elements());
@@ -305,14 +292,8 @@ namespace FEAST
         const DataType_* val(_mirror_scatter.val());
         const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
         const Index num_rows(_mirror_scatter.rows());
-        const Index num_cols(_mirror_scatter.columns());
 
-        ASSERT_(num_cols + buffer_offset <= buffer.size());
-#ifndef DEBUG
-        (void)num_cols;
-#endif
-
-        Arch::ScatterPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, num_rows, buffer_offset);
+        Arch::ScatterPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, num_rows);
       }
 
       /**
@@ -340,8 +321,10 @@ namespace FEAST
         if(_mirror_scatter.empty())
           return;
 
-        LAFEM::DenseVector<Mem_, DataType_, IndexType_> mem_buffer(buffer.size());
-        mem_buffer.copy(buffer);
+        const Index num_cols(_mirror_scatter.columns());
+        DenseVector<Mem_, DataType_, IndexType_> mem_buffer(num_cols);
+        DenseVector<Mem::Main, DataType_, IndexType_> buffer_range(buffer, num_cols, buffer_offset);
+        mem_buffer.copy(buffer_range);
 
         DataType_ * x(mem_vector.elements());
         const DataType_ * y(mem_buffer.elements());
@@ -349,14 +332,8 @@ namespace FEAST
         const DataType_* val(_mirror_scatter.val());
         const IndexType_ * row_ptr(_mirror_scatter.row_ptr());
         const Index num_rows(_mirror_scatter.rows());
-        const Index num_cols(_mirror_scatter.columns());
 
-        ASSERT_(num_cols + buffer_offset <= buffer.size());
-#ifndef DEBUG
-        (void)num_cols;
-#endif
-
-        Arch::ScatterAxpyPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows, buffer_offset);
+        Arch::ScatterAxpyPrim<Mem_>::dv_csr(x, y, col_idx, val, row_ptr, alpha, num_rows);
       }
 
       /**

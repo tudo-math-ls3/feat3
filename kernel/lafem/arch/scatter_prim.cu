@@ -12,7 +12,7 @@ namespace FEAST
     namespace Intern
     {
       template <typename DT_, typename IT_>
-      __global__ void cuda_scatter_prim_dv_csr(DT_ * v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const Index size, const Index offset)
+      __global__ void cuda_scatter_prim_dv_csr(DT_ * v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const Index size)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= size)
@@ -25,7 +25,7 @@ namespace FEAST
         DT_ sum(0);
         for (Index i(row_ptr[idx]) ; i < row_ptr[idx + 1] ; ++i)
         {
-          sum += val[i] * (b[offset + col_ind[i]]);
+          sum += val[i] * (b[col_ind[i]]);
         }
         v[idx] = sum;
       }
@@ -38,7 +38,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_, typename IT_>
-void ScatterPrim<Mem::CUDA>::dv_csr(DT_ * v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const Index size, const Index offset)
+void ScatterPrim<Mem::CUDA>::dv_csr(DT_ * v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const Index size)
 {
   Index blocksize = MemoryPool<Mem::CUDA>::blocksize_spmv;
   dim3 grid;
@@ -46,7 +46,7 @@ void ScatterPrim<Mem::CUDA>::dv_csr(DT_ * v, const DT_* b, const IT_* col_ind, c
   block.x = blocksize;
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_scatter_prim_dv_csr<<<grid, block>>>(v, b, col_ind, val, row_ptr, size, offset);
+  FEAST::LAFEM::Intern::cuda_scatter_prim_dv_csr<<<grid, block>>>(v, b, col_ind, val, row_ptr, size);
 #ifdef FEAST_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
@@ -55,7 +55,7 @@ void ScatterPrim<Mem::CUDA>::dv_csr(DT_ * v, const DT_* b, const IT_* col_ind, c
 #endif
 }
 
-template void ScatterPrim<Mem::CUDA>::dv_csr(float *, const float*, const unsigned long*, const float*, const unsigned long*, const Index, const Index);
-template void ScatterPrim<Mem::CUDA>::dv_csr(double *, const double*, const unsigned long*, const double*, const unsigned long*, const Index, const Index);
-template void ScatterPrim<Mem::CUDA>::dv_csr(float *, const float*, const unsigned int*, const float*, const unsigned int*, const Index, const Index);
-template void ScatterPrim<Mem::CUDA>::dv_csr(double *, const double*, const unsigned int*, const double*, const unsigned int*, const Index, const Index);
+template void ScatterPrim<Mem::CUDA>::dv_csr(float *, const float*, const unsigned long*, const float*, const unsigned long*, const Index);
+template void ScatterPrim<Mem::CUDA>::dv_csr(double *, const double*, const unsigned long*, const double*, const unsigned long*, const Index);
+template void ScatterPrim<Mem::CUDA>::dv_csr(float *, const float*, const unsigned int*, const float*, const unsigned int*, const Index);
+template void ScatterPrim<Mem::CUDA>::dv_csr(double *, const double*, const unsigned int*, const double*, const unsigned int*, const Index);
