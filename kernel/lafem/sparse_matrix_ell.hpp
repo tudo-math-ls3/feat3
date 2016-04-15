@@ -1800,21 +1800,23 @@ namespace FEAST
        * \brief Performs \f$this \leftarrow x\f$.
        *
        * \param[in] x The Matrix to be copied.
+       * \param[in] full Shall we create a full copy, including scalars and index arrays?
        */
-      void copy(const SparseMatrixELL & x)
+      void copy(const SparseMatrixELL & x, bool full = false)
       {
-        this->_copy_content(x);
+        this->_copy_content(x, full);
       }
 
       /**
        * \brief Performs \f$this \leftarrow x\f$.
        *
        * \param[in] x The Matrix to be copied.
+       * \param[in] full Shall we create a full copy, including scalars and index arrays?
        */
       template <typename Mem2_>
-      void copy(const SparseMatrixELL<Mem2_, DT_, IT_> & x)
+      void copy(const SparseMatrixELL<Mem2_, DT_, IT_> & x, bool full = false)
       {
-        this->_copy_content(x);
+        this->_copy_content(x, full);
       }
 
       ///@name Linear algebra operations

@@ -279,12 +279,13 @@ namespace FEAST
        * \brief Performs \f$this \leftarrow x\f$.
        *
        * \param[in] x The vector to be copied.
+       * \param[in] full Shall we create a full copy, including scalars and index arrays?
        */
       template<typename SubType2_>
-      void copy(const PowerVector<SubType2_, count_>& x)
+      void copy(const PowerVector<SubType2_, count_>& x, bool full = false)
       {
-        first().copy(x.first());
-        rest().copy(x.rest());
+        first().copy(x.first(), full);
+        rest().copy(x.rest(), full);
       }
 
       /**
@@ -786,9 +787,9 @@ namespace FEAST
       }
 
       template<typename SubType2_>
-      void copy(const PowerVector<SubType2_, 1>& x)
+      void copy(const PowerVector<SubType2_, 1>& x, bool full = false)
       {
-        first().copy(x.first());
+        first().copy(x.first(), full);
       }
 
       void axpy(const PowerVector& x, const PowerVector& y, DataType alpha = DataType(1))

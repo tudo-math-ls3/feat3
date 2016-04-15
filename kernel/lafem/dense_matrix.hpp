@@ -309,21 +309,23 @@ namespace FEAST
        * \brief Performs \f$this \leftarrow x\f$.
        *
        * \param[in] x The Matrix to be copied.
+       * \param[in] full Shall we create a full copy, including scalars and index arrays?
        */
-      void copy(const DenseMatrix & x)
+      void copy(const DenseMatrix & x, bool full = false)
       {
-        this->_copy_content(x);
+        this->_copy_content(x, full);
       }
 
       /**
        * \brief Performs \f$this \leftarrow x\f$.
        *
        * \param[in] x The Matrix to be copied.
+       * \param[in] full Shall we create a full copy, including scalars and index arrays?
        */
       template <typename Mem2_>
-      void copy(const DenseMatrix<Mem2_, DT_, IT_> & x)
+      void copy(const DenseMatrix<Mem2_, DT_, IT_> & x, bool full = false)
       {
-        this->_copy_content(x);
+        this->_copy_content(x, full);
       }
 
       /// Returns a new compatible L-Vector.

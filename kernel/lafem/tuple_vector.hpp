@@ -250,11 +250,17 @@ namespace FEAST
         rest().clear();
       }
 
+      /**
+       * \brief Performs \f$this \leftarrow x\f$.
+       *
+       * \param[in] x The vector to be copied.
+       * \param[in] full Shall we create a full copy, including scalars and index arrays?
+       */
       //template<typename First2_, typename... Rest2_>
-      void copy(const TupleVector/*<First2_, Rest2_...>*/& x)
+      void copy(const TupleVector/*<First2_, Rest2_...>*/& x, bool full = false)
       {
-        first().copy(x.first());
-        rest().copy(x.rest());
+        first().copy(x.first(), full);
+        rest().copy(x.rest(), full);
       }
 
       void axpy(const TupleVector& x, const TupleVector& y, DataType alpha = DataType(1))
@@ -650,9 +656,9 @@ namespace FEAST
       }
 
       //template<typename First2_>
-      void copy(const TupleVector/*<First2_>*/& x)
+      void copy(const TupleVector/*<First2_>*/& x, bool full = false)
       {
-        first().copy(x.first());
+        first().copy(x.first(), full);
       }
 
       void axpy(const TupleVector& x, const TupleVector& y, DataType alpha = DataType(1))

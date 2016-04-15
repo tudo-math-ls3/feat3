@@ -589,21 +589,23 @@ namespace FEAST
        * \brief Performs \f$this \leftarrow x\f$.
        *
        * \param[in] x The vector to be copied.
+       * \param[in] full Shall we create a full copy, including scalars and index arrays?
        */
-      void copy(const DenseVectorBlocked & x)
+      void copy(const DenseVectorBlocked & x, bool full = false)
       {
-        this->_copy_content(x);
+        this->_copy_content(x, full);
       }
 
       /**
        * \brief Performs \f$this \leftarrow x\f$.
        *
        * \param[in] x The vector to be copied.
+       * \param[in] full Shall we create a full copy, including scalars and index arrays?
        */
       template <typename Mem2_>
-      void copy(const DenseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & x)
+      void copy(const DenseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & x, bool full = false)
       {
-        this->_copy_content(x);
+        this->_copy_content(x, full);
       }
 
       /**
