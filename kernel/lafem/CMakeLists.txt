@@ -23,8 +23,7 @@ endif(FEAST_BACKENDS_CUDA)
 SET (test_list
   bicgstab-test
   bicgstab-meta-test
-  slip_filter-test
-  meta_to_scalar-test
+  container_main_wrapper-test
   dense_matrix-test
   dense_vector-test
   dense_vector_blocked-test
@@ -32,6 +31,7 @@ SET (test_list
   meta_matrix-apply-test
   meta_matrix-io-test
   meta_mirror-test
+  meta_to_scalar-test
   meta_vector-axpy-test
   meta_vector-comp_prod-test
   meta_vector-comp_invert-test
@@ -40,6 +40,7 @@ SET (test_list
   meta_vector-scale-test
   pointstar_factory-test
   richardson-test
+  slip_filter-test
   sparse_matrix_conversion-test
   sparse_matrix_banded-test
   sparse_matrix_coo-test
