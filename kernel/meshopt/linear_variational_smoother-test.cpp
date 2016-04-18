@@ -69,7 +69,7 @@ class LinearVariationalSmootherTest
       // Create a basic RootMeshNode from this mesh
       Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
       // Add the boundary to the RootMeshNode
-      rmn->add_mesh_part("boundary", boundary, nullptr);
+      rmn->add_mesh_part("boundary", boundary);
       // Boundary stuff: Dirichlet boundary conditions on the outer boundary
       std::deque<String> dirichlet_list;
       dirichlet_list.push_back("boundary");

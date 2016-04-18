@@ -103,6 +103,8 @@ namespace FEAST
       public:
         /// This container's MeshPartNode
         MeshPartNodeType* node;
+        /// Name of the chart
+        String chart_name;
         /// Chart belonging to node
         const MeshChartType* chart;
 
@@ -117,8 +119,9 @@ namespace FEAST
          * Chart for this container.
          *
          */
-        explicit MeshPartNodeBin(MeshPartNodeType* node_, const MeshChartType* chart_) :
+        explicit MeshPartNodeBin(MeshPartNodeType* node_, String chart_name_, const MeshChartType* chart_) :
           node(node_),
+          chart_name(chart_name_),
           chart(chart_)
         {
         }
@@ -202,6 +205,19 @@ namespace FEAST
         return _mesh;
       }
 
+      /** \copydoc get_mesh() */
+      const MeshType* get_mesh() const
+      {
+        return _mesh;
+      }
+
+      void set_mesh(MeshType* mesh)
+      {
+        if(_mesh != nullptr)
+          throw InternalError(__func__, __FILE__, __LINE__, "Mesh node already has a mesh");
+        _mesh = mesh;
+      }
+
       /**
        * \brief Gets the identifier
        *
@@ -212,12 +228,6 @@ namespace FEAST
         if(_mesh != nullptr)
           return _mesh->get_identifier();
         return "";
-      }
-
-      /** \copydoc get_mesh() */
-      const MeshType* get_mesh() const
-      {
-        return _mesh;
       }
 
       /**
@@ -254,12 +264,13 @@ namespace FEAST
       MeshPartNodeType* add_mesh_part_node(
         const String& part_name,
         MeshPartNodeType* mesh_part_node,
+        const String chart_name = "",
         const MeshChartType* chart = nullptr)
       {
         CONTEXT(name() + "::add_mesh_part_node()");
         if(mesh_part_node != nullptr)
         {
-          if(_mesh_part_nodes.insert(std::make_pair(part_name, MeshPartNodeBin(mesh_part_node, chart))).second)
+          if(_mesh_part_nodes.insert(std::make_pair(part_name, MeshPartNodeBin(mesh_part_node, chart_name, chart))).second)
           {
             // Set identifier in the MeshPartNode
             mesh_part_node->set_identifier(part_name);
@@ -291,11 +302,12 @@ namespace FEAST
       MeshPartNodeType* add_mesh_part(
         const String& part_name,
         MeshPartType* mesh_part,
+        const String chart_name = "",
         const MeshChartType* chart = nullptr)
       {
         CONTEXT(name() + "::add_mesh_part()");
         MeshPartNodeType* part_node = new MeshPartNodeType(mesh_part);
-        if(add_mesh_part_node(part_name, part_node, chart) == nullptr)
+        if(add_mesh_part_node(part_name, part_node, chart_name, chart) == nullptr)
         {
           delete part_node;
           return nullptr;
@@ -318,11 +330,12 @@ namespace FEAST
        * \c true if the chart was assigned successfully or \c false if no mesh part
        * with the specified name was found.
        */
-      bool set_mesh_part_chart(const String& part_name, const MeshChartType* chart)
+      bool set_mesh_part_chart(const String& part_name, const String& chart_name, const MeshChartType* chart)
       {
         MeshPartNodeIterator it(_mesh_part_nodes.find(part_name));
         if(it == _mesh_part_nodes.end())
           return false;
+        it->second.chart_name = chart_name;
         it->second.chart = chart;
         return true;
       }
@@ -390,6 +403,23 @@ namespace FEAST
         CONTEXT(name() + "::find_mesh_part_chart() [const]");
         MeshPartNodeConstIterator it(_mesh_part_nodes.find(part_name));
         return (it != _mesh_part_nodes.end()) ? it->second.chart : nullptr;
+      }
+
+      /**
+       * \brief Searches for a chart name belonging to a MeshPart by name
+       *
+       * \param[in] part_name
+       * The name of the node associated with the chart to be found.
+       *
+       * \returns
+       * The name of the chart associated with \p part_name or an empty string is no
+       * such node was found.
+       */
+      String find_mesh_part_chart_name(const String& part_name) const
+      {
+        CONTEXT(name() + "::find_mesh_part_chart_name() [const]");
+        MeshPartNodeConstIterator it(_mesh_part_nodes.find(part_name));
+        return (it != _mesh_part_nodes.end()) ? it->second.chart_name : String();
       }
 
       /**
@@ -501,7 +531,7 @@ namespace FEAST
 
         for(; it != jt; ++it)
         {
-          refined_node.add_mesh_part_node(it->first, it->second.node->refine(*_mesh), it->second.chart);
+          refined_node.add_mesh_part_node(it->first, it->second.node->refine(*_mesh), it->second.chart_name, it->second.chart);
         }
       }
 
@@ -578,10 +608,11 @@ namespace FEAST
           MeshPartNode<RootMesh_>* my_mesh_part_node = new MeshPartNode<RootMesh_>(streamer_subnode, atlas);
 
           // check for a chart to assign
+          String chart_name;
           MeshChartType* chart = nullptr;
           if(atlas != nullptr)
           {
-            String chart_name = streamer_subnode.mesh_data.chart;
+            chart_name = streamer_subnode.mesh_data.chart;
             if(!chart_name.empty())
             {
               chart = atlas->find_mesh_chart(chart_name);
@@ -591,7 +622,7 @@ namespace FEAST
           }
 
           // Add the new MeshPartNode to this node
-          this->add_mesh_part_node(it.first, my_mesh_part_node, chart);
+          this->add_mesh_part_node(it.first, my_mesh_part_node, chart_name, chart);
         }
       }
 
@@ -779,10 +810,11 @@ namespace FEAST
           MeshPartNode<RootMesh_>* my_mesh_part_node = new MeshPartNode<RootMesh_>(streamer_subnode, atlas);
 
           // check for a chart to assign
+          String chart_name;
           MeshChartType* chart = nullptr;
           if(atlas != nullptr)
           {
-            String chart_name = streamer_subnode.mesh_data.chart;
+            chart_name = streamer_subnode.mesh_data.chart;
             if(!chart_name.empty())
             {
               chart = atlas->find_mesh_chart(chart_name);
@@ -792,7 +824,7 @@ namespace FEAST
           }
 
           // Add the new MeshPartNode to this node
-          this->add_mesh_part_node(it.first, my_mesh_part_node, chart);
+          this->add_mesh_part_node(it.first, my_mesh_part_node, chart_name, chart);
         }
       }
 

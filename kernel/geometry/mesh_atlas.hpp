@@ -10,6 +10,7 @@
 
 // includes, system
 #include <map>
+#include <deque>
 
 namespace FEAST
 {
@@ -119,6 +120,19 @@ namespace FEAST
         // assign new chart
         it.first->second = chart;
         return true;
+      }
+
+      /**
+       * \brief Returns the names of all charts of this atlas.
+       */
+      std::deque<String> get_chart_names() const
+      {
+        std::deque<String> names;
+        for(auto it = _chart_map.begin(); it != _chart_map.end(); ++it)
+        {
+          names.push_back((*it).first);
+        }
+        return names;
       }
 
       /**
