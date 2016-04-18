@@ -757,6 +757,64 @@ namespace FEAST
         ish.template get_index_set<shape_dim_-1, shape_dim_-2>() = std::move(subshape_at_intermediate_index_set);
       }
     };
+
+    /**
+     * \brief Helper class for extracting num_entities information from an IndexSetHolder
+     *
+     * \tparam dim_
+     * Maximum dimension of the shape to extract said information for.
+     *
+     * If the mesh file read by the MeshStreamer used by the MeshStreamerFactory does not provide complete
+     * information about edge@cell, edge@face and/or face@cell, the number of edges/faces is not correct in
+     * the _mesh_data object. After fill_index_sets() is called, the size of these index set in the corresponding
+     * IndexSetHolder gives the right number of edges/faces.
+     *
+     * Because the get_index_set routine uses the dimensions as template parameters, the loop has to be realised
+     * by template recursion and as the end of that recursion needs partial specialisation, a helper class.
+     *
+     * \author Jordi Paul
+     */
+    template<int dim_>
+    struct NumEntitiesExtractor
+    {
+      /**
+       * \brief Computes certain entries of num_entities from an IndexSetHolder
+       *
+       * \tparam IndexSetHolderType_
+       * Type of the IndexSetHolder
+       *
+       * \param[in] ish
+       * IndexSetHolder to set num_entities from
+       *
+       * \param[out] num_entities
+       * num_entities[d] = Number of objects of dimension d
+       *
+       */
+      template<typename IndexSetHolderType_>
+      static void set_num_entities(IndexSetHolderType_& ish, Index* num_entities)
+      {
+        // The number of entities of dimension dim_ is the length of the vertex@shape[dim_] IndexSet
+        num_entities[dim_] = ish.template get_index_set<dim_,0>().get_num_entities();
+        // Recurse down
+        NumEntitiesExtractor<dim_-1>::set_num_entities(ish, num_entities);
+      }
+    };
+
+    /**
+     * \brief Full specialisation of NumEntitiesExtractor as end of the template recursion
+     *
+     * As num_entities[0] = number of vertices and this information must be present and correct, this stops at 1.
+     *
+     */
+    template<>
+    struct NumEntitiesExtractor<1>
+    {
+      template<typename IndexSetHolderType_>
+      static void set_num_entities(IndexSetHolderType_& ish, Index* num_entities)
+      {
+        num_entities[1] = ish.template get_index_set<1,0>().get_num_entities();
+      }
+    };
     /// \endcond
   } // namespace Geometry
 } // namespace FEAST

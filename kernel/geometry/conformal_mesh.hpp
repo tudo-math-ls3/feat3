@@ -7,7 +7,7 @@
 #include <kernel/geometry/intern/facet_neighbours.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
-
+#include <kernel/geometry/index_calculator.hpp>
 
 namespace FEAST
 {
@@ -125,7 +125,7 @@ namespace FEAST
         CONTEXT(name() + "::ConformalMesh(const Index[])");
         for(int i(0); i <= shape_dim; ++i)
         {
-          ASSERT(num_entities[i] > 0, "Number of entities must not be zero!");
+          //ASSERT(num_entities[i] > 0, "Number of entities must not be zero!");
           _num_entities[i] = num_entities[i];
         }
       }
@@ -322,6 +322,16 @@ namespace FEAST
         return &_index_set_holder;
       }
       /// \endcond
+
+      /**
+       * \brief Deducts the topology from the Vertex-At-Shape index set.
+       */
+      void deduct_topology_from_top()
+      {
+        RedundantIndexSetBuilder<ShapeType>::compute(_index_set_holder);
+        NumEntitiesExtractor<shape_dim>::set_num_entities(_index_set_holder, _num_entities);
+        this->fill_neighbours();
+      }
 
       /**
        * \brief Returns the name of the class.
