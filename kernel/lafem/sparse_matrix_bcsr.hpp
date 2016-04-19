@@ -1211,10 +1211,16 @@ namespace FEAST
         if (x.size() != this->columns<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
         Arch::ProductMatVec<Mem_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(
@@ -1238,10 +1244,16 @@ namespace FEAST
         if (x.size() != this->columns<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
@@ -1266,10 +1278,16 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
@@ -1294,10 +1312,16 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
@@ -1330,10 +1354,16 @@ namespace FEAST
         if (y.size() != this->rows<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        TimeStamp ts_start;
 
         // check for special cases
         // r <- y - A*x
@@ -1383,10 +1413,16 @@ namespace FEAST
         if (y.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        TimeStamp ts_start;
 
         // check for special cases
         // r <- y - A*x
@@ -1435,10 +1471,16 @@ namespace FEAST
         if (y.size() != this->rows<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        TimeStamp ts_start;
 
         // check for special cases
         // r <- y - A*x
@@ -1487,10 +1529,16 @@ namespace FEAST
         if (y.size() != this->rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        TimeStamp ts_start;
 
         // check for special cases
         // r <- y - A*x
@@ -1538,10 +1586,16 @@ namespace FEAST
         if (y.size() != this->rows<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
         if (r.template elements<Perspective::pod>() == x.template elements<Perspective::pod>())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector x and r must not share the same memory!");
-
-        TimeStamp ts_start;
 
         // check for special cases
         // r <- y - A*x
