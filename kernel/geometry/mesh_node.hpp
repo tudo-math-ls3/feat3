@@ -1037,7 +1037,7 @@ namespace FEAST
             }
 
             // Insert patch mesh part
-            patch_node->add_mesh_part(*it, split_part, this->find_mesh_part_chart(*it));
+            patch_node->add_mesh_part(*it, split_part, this->find_mesh_part_chart_name(*it), this->find_mesh_part_chart(*it));
           }
         }
 
