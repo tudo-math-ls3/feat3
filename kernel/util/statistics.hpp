@@ -353,6 +353,8 @@ namespace FEAST
         _time_mpi_wait.correction = 0.;
       }
 
+      static void write_out_solver_statistics_scheduled(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, String filename = "solver_stats");
+
       static void write_out_solver_statistics(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, String filename = "solver_stats")
       {
         filename += ".";

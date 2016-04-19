@@ -6,6 +6,7 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 #include <kernel/util/file_error.hpp>
+#include <kernel/util/function_scheduler.hpp>
 
 // includes, STL
 #include <fstream>
@@ -479,6 +480,12 @@ namespace FEAST
 
         // and close
         ofs.close();
+      }
+
+      void write_scheduled(const String& filename, const int rank, const int nparts)
+      {
+        auto func = [&] () { write_scheduled(filename, rank, nparts); };
+        Util::schedule_function(func, Util::ScheduleMode::clustered);
       }
 
       /**

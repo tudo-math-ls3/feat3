@@ -63,7 +63,9 @@ namespace FEAST
             }
           }
           if (statistics_check > 0) // provided parameter full or whatever
-            FEAST::Statistics::write_out_solver_statistics(rank, la_size, domain.bytes(), mpi_size);
+          {
+            FEAST::Statistics::write_out_solver_statistics_scheduled(rank, la_size, domain.bytes(), mpi_size);
+          }
         }
 
     }; // StatisticsControl

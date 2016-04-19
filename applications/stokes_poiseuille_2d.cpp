@@ -466,7 +466,7 @@ namespace StokesPoiseuille2D
       vtk_name += "-n" + stringify(nprocs);
 
       // write VTK file
-      the_asm_level.write_vtk(vtk_name, *vec_sol, rank, nprocs);
+      the_asm_level.write_vtk_scheduled(vtk_name, *vec_sol, rank, nprocs);
     }
 
     /* ***************************************************************************************** */

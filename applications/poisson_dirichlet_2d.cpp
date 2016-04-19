@@ -24,6 +24,7 @@
 #include <kernel/solver/precon_wrapper.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
+#include <kernel/util/mpi_cout.hpp>
 
 #include <control/domain/partitioner_domain_control.hpp>
 #include <control/scalar_basic.hpp>
@@ -219,10 +220,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Creating gates..." << std::endl;
-    }
+    Util::mpi_cout("Creating gates..\n");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -231,10 +229,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Assembling system matrices..." << std::endl;
-    }
+    Util::mpi_cout("Assembling system matrices...\n");
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -243,10 +238,8 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Assembling system filters..." << std::endl;
-    }
+    Util::mpi_cout("Assembling system filters...\n");
+
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -255,10 +248,7 @@ namespace PoissonDirichlet2D
 
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-    std::cout << "Assembling transfer matrices..." << std::endl;
-    }
+    Util::mpi_cout("Assembling transfer matrices...\n");
 
     for (Index i(0); (i + 1) < num_levels; ++i)
     {
@@ -283,12 +273,8 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
-    if (rank == 0)
-    {
-      std::cout << "Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() <<
-        ", Mem:" << MemType::name() << " to " << TargetMatrixSolve_::name() << ", Mem:" <<
-        TargetMatrixSolve_::MemType::name() << "..." << std::endl;
-    }
+    Util::mpi_cout("Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() + ", Mem:" + MemType::name() +
+        " to " + TargetMatrixSolve_::name() + ", Mem:" + TargetMatrixSolve_::MemType::name() + "...\n");
 
     // create system levels, transfer levels and vectors for linear solver
     Control::ScalarSolver<TargetMatrixSolve_, SystemLevelType, TransferLevelType> scalar_solver(system_levels, transfer_levels, vec_sol, vec_rhs);
@@ -368,7 +354,7 @@ namespace PoissonDirichlet2D
       exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
 
       // finally, write the VTK file
-      exporter.write(vtk_name, rank, nprocs);
+      exporter.write_scheduled(vtk_name, rank, nprocs);
     }
 
     /* ***************************************************************************************** */
@@ -418,10 +404,7 @@ namespace PoissonDirichlet2D
     // initialise
     FEAST::Runtime::initialise(argc, argv, rank, nprocs);
 #ifndef SERIAL
-    if (rank == 0)
-    {
-      std::cout << "NUM-PROCS: " << nprocs << std::endl;
-    }
+    Util::mpi_cout("NUM-PROCS: " + stringify(nprocs) + "\n");
 #endif
 
     // create arg parser
@@ -472,10 +455,7 @@ namespace PoissonDirichlet2D
       TimeStamp stamp1;
 
       // let's create our domain
-      if (rank == 0)
-      {
-        std::cout << "Preparing domain..." << std::endl;
-      }
+      Util::mpi_cout("Preparing domain...\n");
       int min_elems_partitioner(nprocs * 4);
       args.parse("part_min_elems", min_elems_partitioner);
 
@@ -496,11 +476,8 @@ namespace PoissonDirichlet2D
 #endif
 
       // plot our levels
-      if (rank == 0)
-      {
-        std::cout << "LVL-MIN: " << domain.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
-        std::cout << "LVL-MAX: " << domain.get_levels().back()->get_level_index() << " [" << lvl_max << "]" << std::endl;
-      }
+      Util::mpi_cout("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]\n");
+      Util::mpi_cout("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]\n");
 
       // run our application
       if (mem_string == "main")
@@ -527,12 +504,8 @@ namespace PoissonDirichlet2D
       long long time2 = time1 * (long long) nprocs;
 
       // print time
-      if (rank == 0)
-      {
-        std::cout << "Run-Time: "
-          << TimeStamp::format_micros(time1, TimeFormat::m_s_m) << " ["
-          << TimeStamp::format_micros(time2, TimeFormat::m_s_m) << "]" << std::endl;
-      }
+      Util::mpi_cout("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
+        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]\n");
     }
 #ifndef DEBUG
     catch (const std::exception& exc)

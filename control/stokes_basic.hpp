@@ -35,6 +35,7 @@
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/filter.hpp>
 #include <kernel/global/mean_filter.hpp>
+#include <kernel/util/function_scheduler.hpp>
 
 #include <control/domain/domain_control.hpp>
 
@@ -665,6 +666,13 @@ namespace FEAST
 
         // finally, write the VTK file
         exporter.write(vtk_name, rank, nprocs);
+      }
+
+      template<typename SolVector_>
+      void write_vtk_scheduled(const String& vtk_name, const SolVector_& vector, int rank, int nprocs) const
+      {
+        auto func = [&] () { write_vtk(vtk_name, vector, rank, nprocs); };
+        Util::schedule_function(func, Util::ScheduleMode::clustered);
       }
     };
   } // namespace Control
