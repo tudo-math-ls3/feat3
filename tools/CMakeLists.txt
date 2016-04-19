@@ -13,12 +13,6 @@ TARGET_LINK_LIBRARIES(basis-dump feast)
 ADD_EXECUTABLE(cub-list cub_list/cub_list.cpp)
 TARGET_LINK_LIBRARIES(cub-list feast)
 
-ADD_EXECUTABLE(dbg-fe-asm-1 dbg_fe_asm_1/dbg_fe_asm_1.cpp)
-TARGET_LINK_LIBRARIES(dbg-fe-asm-1 feast)
-
-ADD_EXECUTABLE(dbg-fe-asm-2 dbg_fe_asm_2/dbg_fe_asm_2.cpp)
-TARGET_LINK_LIBRARIES(dbg-fe-asm-2 feast)
-
 ADD_EXECUTABLE(dbg-nlopt dbg_nlopt/dbg_nlopt.cpp)
 TARGET_LINK_LIBRARIES(dbg-nlopt feast)
 
