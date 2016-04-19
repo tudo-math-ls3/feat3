@@ -449,7 +449,13 @@ namespace FEAST
           // adapt this node if a chart is given
           if(it->second.chart != nullptr)
           {
-            it->second.chart->adapt(*_mesh, *(it->second.node->get_mesh()));
+            // we need to check whether the mesh part really exists
+            // because it may be nullptr in a parallel run, which
+            // indicates that the current patch is not adjacent to
+            // the boundary represented by the mesh part.
+            const MeshPartType* mesh_part = it->second.node->get_mesh();
+            if(mesh_part != nullptr)
+              it->second.chart->adapt(*_mesh, *mesh_part);
           }
         }
       }
