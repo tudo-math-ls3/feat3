@@ -156,6 +156,28 @@ namespace FEAST
         return PowerElement<i_, SubFilterType>::get(*this);
       }
 
+      /**
+       * \brief Returns a sub-filter block.
+       *
+       * \param[in] i
+       * The index of the sub-filter block that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the sub-filter at position \p i.
+       */
+      SubFilterType& get(int i)
+      {
+        ASSERT_((0 <= i) && (i < count_));
+        return (i == 0) ? _first : _rest.get(i-1);
+      }
+
+      /** \copydoc get() */
+      const SubFilterType& get(int i) const
+      {
+        ASSERT_((0 <= i) && (i < count_));
+        return (i == 0) ? _first : _rest.get(i-1);
+      }
+
       /** \copydoc UnitFilter::filter_rhs() */
       void filter_rhs(VectorType& vector) const
       {
@@ -275,6 +297,24 @@ namespace FEAST
       const SubFilterType& at() const
       {
         static_assert(i_ != 0, "invalid sub-filter index");
+        return _first;
+      }
+
+      SubFilterType& get(int i)
+      {
+#ifndef DEBUG
+        (void)i;
+#endif
+        ASSERT_(i == 0);
+        return _first;
+      }
+
+      const SubFilterType& get(int i) const
+      {
+#ifndef DEBUG
+        (void)i;
+#endif
+        ASSERT_(i == 0);
         return _first;
       }
 

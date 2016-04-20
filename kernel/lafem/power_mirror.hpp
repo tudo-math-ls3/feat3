@@ -260,6 +260,34 @@ namespace FEAST
         return _sub_mirror;
       }
 
+      /**
+       * \brief Returns a sub-mirror block.
+       *
+       * \param[in] i
+       * The index of the sub-mirror block that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the sub-mirror at position \p i.
+       */
+      SubMirrorType& get(int i)
+      {
+#ifndef DEBUG
+        (void)i;
+#endif
+        ASSERT_((0 <= i) && (i < count_));
+        return _sub_mirror;
+      }
+
+      /** \copydoc get() */
+      const SubMirrorType& get(int i) const
+      {
+#ifndef DEBUG
+        (void)i;
+#endif
+        ASSERT_((0 <= i) && (i < count_));
+        return _sub_mirror;
+      }
+
       /** \copydoc VectorMirror::gather_prim() */
       template<typename Tx_, typename Ix_, typename Tv_>
       void gather_prim(

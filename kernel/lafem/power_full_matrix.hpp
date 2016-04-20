@@ -227,6 +227,30 @@ namespace FEAST
         return _container.template at<i_, 0>().template at<0, j_>();
       }
 
+      /**
+       * \brief Returns a sub-matrix block.
+       *
+       * \param[in] i, j
+       * The indices of the sub-matrix block that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the sub-matrix at position (i,j).
+       */
+      SubMatrixType& get(int i, int j)
+      {
+        ASSERT_((0 <= i) && (i < height_));
+        ASSERT_((0 <= j) && (j < width_));
+        return _container.get(i, 0).get(0, j);
+      }
+
+      /** \copydoc get() */
+      const SubMatrixType& get(int i, int j) const
+      {
+        ASSERT_((0 <= i) && (i < height_));
+        ASSERT_((0 <= j) && (j < width_));
+        return _container.get(i, 0).get(0, j);
+      }
+
       /// \cond internal
       int row_blocks() const
       {

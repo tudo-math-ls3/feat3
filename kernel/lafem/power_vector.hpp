@@ -215,6 +215,28 @@ namespace FEAST
         return PowerElement<i_, SubVectorType>::get(*this);
       }
 
+      /**
+       * \brief Returns a sub-vector block.
+       *
+       * \param[in] i
+       * The index of the sub-vector block that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the sub-vector at position \p i.
+       */
+      SubVectorType& get(int i)
+      {
+        ASSERT_((0 <= i) && (i < count_));
+        return (i == 0) ? _first : _rest.get(i-1);
+      }
+
+      /** \copydoc get() */
+      const SubVectorType& get(int i) const
+      {
+        ASSERT_((0 <= i) && (i < count_));
+        return (i == 0) ? _first : _rest.get(i-1);
+      }
+
       /// \cond internal
       SubVectorType& first()
       {
@@ -747,6 +769,24 @@ namespace FEAST
       const SubVectorType& at() const
       {
         static_assert(i == 0, "invalid sub-vector index");
+        return _first;
+      }
+
+      SubVectorType& get(int i)
+      {
+#ifndef DEBUG
+        (void)i;
+#endif
+        ASSERT_(i == 0);
+        return _first;
+      }
+
+      const SubVectorType& get(int i) const
+      {
+#ifndef DEBUG
+        (void)i;
+#endif
+        ASSERT_(i == 0);
         return _first;
       }
 

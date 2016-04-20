@@ -295,6 +295,28 @@ namespace FEAST
         return PowerElement<i_, SubMatrixType>::get(*this);
       }
 
+      /**
+       * \brief Returns a sub-matrix block.
+       *
+       * \param[in] i, j
+       * The indices of the sub-matrix block that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the sub-matrix at position (i,j).
+       */
+      SubMatrixType& get(int i, int j)
+      {
+        ASSERT_((j == 0) && (0 <= i) && (i < blocks_));
+        return (i == 0) ? _first : _rest.get(i-1, j);
+      }
+
+      /** \copydoc get() */
+      const SubMatrixType& get(int i, int j) const
+      {
+        ASSERT_((j == 0) && (0 <= i) && (i < blocks_));
+        return (i == 0) ? _first : _rest.get(i-1, j);
+      }
+
       /// \cond internal
       SubMatrixType& first()
       {
@@ -715,6 +737,26 @@ namespace FEAST
       {
         static_assert(i == 0, "invalid sub-matrix index");
         static_assert(j == 0, "invalid sub-matrix index");
+        return _first;
+      }
+
+      SubMatrixType& get(int i, int j)
+      {
+#ifndef DEBUG
+        (void)i;
+        (void)j;
+#endif
+        ASSERT_((i == 0) && (j == 0));
+        return _first;
+      }
+
+      const SubMatrixType& get(int i, int j) const
+      {
+#ifndef DEBUG
+        (void)i;
+        (void)j;
+#endif
+        ASSERT_((i == 0) && (j == 0));
         return _first;
       }
 
