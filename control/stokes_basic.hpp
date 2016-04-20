@@ -410,14 +410,17 @@ namespace FEAST
         typename SystemLevel_::LocalMatrixBlockA& mat_loc_a = *mat_glob_a;
 
         // get the diagonal blocks
-        typename SystemLevel_::LocalScalarMatrix& mat_loc_a1 = mat_loc_a.template at<0,0>();
-        typename SystemLevel_::LocalScalarMatrix& mat_loc_a2 = mat_loc_a.template at<1,1>();
+        typename SystemLevel_::LocalScalarMatrix& mat_loc_a1 = mat_loc_a.get(0,0);
 
         // assemble matrix structure?
         if(mat_loc_a1.empty())
         {
+          // assemble matrix structure for A11
           Assembly::SymbolicMatrixAssembler<>::assemble1(mat_loc_a1, space_velo);
-          mat_loc_a2 = mat_loc_a1.clone(LAFEM::CloneMode::Layout);
+
+          // clone layout for A22,...,Ann
+          for(int i(1); i < mat_loc_a.num_row_blocks; ++i)
+            mat_loc_a.get(i,i) = mat_loc_a1.clone(LAFEM::CloneMode::Layout);
         }
 
         // assemble velocity laplace matrix
@@ -427,8 +430,9 @@ namespace FEAST
           Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_a1, laplace_op, space_velo, cubature);
         }
 
-        // copy into A2
-        mat_loc_a2.copy(mat_loc_a1);
+        // copy data into A22,...,Ann
+        for(int i(1); i < mat_loc_a.num_row_blocks; ++i)
+          mat_loc_a.get(i,i).copy(mat_loc_a1);
       }
 
       template<typename SystemLevel_>
@@ -445,34 +449,45 @@ namespace FEAST
         typename SystemLevel_::LocalMatrixBlockD& mat_loc_d = *mat_glob_d;
 
         // get the matrix blocks
-        typename SystemLevel_::LocalScalarMatrix& mat_loc_b1 = mat_loc_b.template at<0,0>();
-        typename SystemLevel_::LocalScalarMatrix& mat_loc_b2 = mat_loc_b.template at<1,0>();
-        typename SystemLevel_::LocalScalarMatrix& mat_loc_d1 = mat_loc_d.template at<0,0>();
-        typename SystemLevel_::LocalScalarMatrix& mat_loc_d2 = mat_loc_d.template at<0,1>();
+        typename SystemLevel_::LocalScalarMatrix& mat_loc_b1 = mat_loc_b.get(0,0);
 
         // assemble matrix structure?
         if(mat_loc_b1.empty())
         {
           Assembly::SymbolicMatrixAssembler<>::assemble2(mat_loc_b1, space_velo, space_pres);
-          mat_loc_b2 = mat_loc_b1.clone(LAFEM::CloneMode::Layout);
+          for(int i(1); i < mat_loc_b.num_row_blocks; ++i)
+            mat_loc_b.get(i,0) = mat_loc_b1.clone(LAFEM::CloneMode::Layout);
         }
 
         // assemble pressure gradient matrices
         {
-          mat_loc_b1.format();
-          mat_loc_b2.format();
-          Assembly::Common::TestDerivativeOperator<0> der_x;
-          Assembly::Common::TestDerivativeOperator<1> der_y;
-          Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_b1, der_x, space_velo, space_pres, cubature, -DataType(1));
-          Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_b2, der_y, space_velo, space_pres, cubature, -DataType(1));
+          /// \todo replace by for-loop
+          if(mat_loc_b.num_row_blocks > 0)
+          {
+            typename SystemLevel_::LocalScalarMatrix& mat_loc_bi = mat_loc_b.get(0,0);
+            mat_loc_bi.format();
+            Assembly::Common::TestDerivativeOperator<0> deri;
+            Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_bi, deri, space_velo, space_pres, cubature, -DataType(1));
+          }
+          if(mat_loc_b.num_row_blocks > 1)
+          {
+            typename SystemLevel_::LocalScalarMatrix& mat_loc_bi = mat_loc_b.get(1,0);
+            mat_loc_bi.format();
+            Assembly::Common::TestDerivativeOperator<1> deri;
+            Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_bi, deri, space_velo, space_pres, cubature, -DataType(1));
+          }
+          if(mat_loc_b.num_row_blocks > 2)
+          {
+            typename SystemLevel_::LocalScalarMatrix& mat_loc_bi = mat_loc_b.get(2,0);
+            mat_loc_bi.format();
+            Assembly::Common::TestDerivativeOperator<2> deri;
+            Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_bi, deri, space_velo, space_pres, cubature, -DataType(1));
+          }
         }
 
         // assemble velocity divergence matrices
-        {
-          // "assemble" by transposing B
-          mat_loc_d1 = mat_loc_b1.transpose();
-          mat_loc_d2 = mat_loc_b2.transpose();
-        }
+        for(int i(0); i < mat_loc_b.num_row_blocks; ++i)
+          mat_loc_d.get(0,i) = mat_loc_b.get(i,0).transpose();
       }
 
       template<typename SystemLevel_>
@@ -525,10 +540,8 @@ namespace FEAST
         typename TransferLevel_::LocalVeloTransferMatrix& loc_rest_v = (*glob_rest_v);
 
         // get the matrix blocks
-        typename TransferLevel_::LocalScalarMatrix& loc_prol_vx = loc_prol_v.template at<0,0>();
-        typename TransferLevel_::LocalScalarMatrix& loc_prol_vy = loc_prol_v.template at<1,1>();
-        typename TransferLevel_::LocalScalarMatrix& loc_rest_vx = loc_rest_v.template at<0,0>();
-        typename TransferLevel_::LocalScalarMatrix& loc_rest_vy = loc_rest_v.template at<1,1>();
+        typename TransferLevel_::LocalScalarMatrix& loc_prol_vx = loc_prol_v.get(0,0);
+        typename TransferLevel_::LocalScalarMatrix& loc_rest_vx = loc_rest_v.get(0,0);
 
         // assemble structure?
         if(loc_prol_vx.empty())
@@ -536,7 +549,8 @@ namespace FEAST
           Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(
             loc_prol_vx, this->space_velo, level_coarse.space_velo);
 
-          loc_prol_vy = loc_prol_vx.clone(LAFEM::CloneMode::Layout);
+          for(int i(1); i < loc_prol_v.num_row_blocks; ++i)
+            loc_prol_v.get(i,i) = loc_prol_vx.clone(LAFEM::CloneMode::Layout);
         }
 
         // create a global velocity weight vector
@@ -546,8 +560,7 @@ namespace FEAST
         auto& loc_vec_weight = (*glob_vec_weight);
 
         // get local weight vector components
-        auto& loc_vec_wx = loc_vec_weight.template at<0>();
-        auto& loc_vec_wy = loc_vec_weight.template at<1>();
+        auto& loc_vec_wx = loc_vec_weight.get(0);
 
         // assemble prolongation matrix
         {
@@ -559,7 +572,8 @@ namespace FEAST
             this->space_velo, level_coarse.space_velo, this->cubature);
 
           // synchronise weight vector
-          loc_vec_wy.copy(loc_vec_wx);
+          for(int i(1); i < loc_vec_weight.num_blocks; ++i)
+            loc_vec_weight.get(i).copy(loc_vec_wx);
           glob_vec_weight.sync_0();
 
           // invert components
@@ -569,9 +583,12 @@ namespace FEAST
           loc_prol_vx.scale_rows(loc_prol_vx, loc_vec_wx);
 
           // copy and transpose
-          loc_prol_vy = loc_prol_vx.clone(LAFEM::CloneMode::Shallow);
           loc_rest_vx = loc_prol_vx.transpose();
-          loc_rest_vy = loc_rest_vx.clone(LAFEM::CloneMode::Shallow);
+          for(int i(1); i < loc_prol_v.num_row_blocks; ++i)
+          {
+            loc_prol_v.get(i,i) = loc_prol_vx.clone(LAFEM::CloneMode::Shallow);
+            loc_rest_v.get(i,i) = loc_rest_vx.clone(LAFEM::CloneMode::Shallow);
+          }
         }
       }
 
@@ -642,13 +659,24 @@ namespace FEAST
         Geometry::ExportVTK<MeshType> exporter(this->mesh);
 
         // project velocity and pressure
-        LAFEM::DenseVector<Mem::Main, double, Index> vtx_vx, vtx_vy, vtx_p;
-        Assembly::DiscreteVertexProjector::project(vtx_vx, vector.template at<0>().template at<0>(), this->space_velo);
-        Assembly::DiscreteVertexProjector::project(vtx_vy, vector.template at<0>().template at<1>(), this->space_velo);
-        Assembly::DiscreteCellProjector::project(vtx_p, vector.template at<1>(), this->space_pres, this->cubature);
+        LAFEM::DenseVector<Mem::Main, double, Index> vtx_vx, vtx_vy, vtx_vz;
+        Assembly::DiscreteVertexProjector::project(vtx_vx, vector.template at<0>().get(0), this->space_velo);
+        Assembly::DiscreteVertexProjector::project(vtx_vy, vector.template at<0>().get(1), this->space_velo);
+        if(vector.num_blocks > 2)
+        {
+          Assembly::DiscreteVertexProjector::project(vtx_vz, vector.template at<0>().get(2), this->space_velo);
+          // write 3D velocity
+          exporter.add_field_vertex("velocity", vtx_vx.elements(), vtx_vy.elements(), vtx_vz.elements());
+        }
+        else
+        {
+          // write 2D velocity
+          exporter.add_field_vertex("velocity", vtx_vx.elements(), vtx_vy.elements());
+        }
 
-        // write velocity
-        exporter.add_field_vertex("velocity", vtx_vx.elements(), vtx_vy.elements());;
+        // project pressure
+        LAFEM::DenseVector<Mem::Main, double, Index> vtx_p;
+        Assembly::DiscreteCellProjector::project(vtx_p, vector.template at<1>(), this->space_pres, this->cubature);
 
         // write pressure
         exporter.add_scalar_cell("pressure", vtx_p.elements());
