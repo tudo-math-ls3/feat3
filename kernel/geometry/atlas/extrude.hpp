@@ -114,11 +114,6 @@ namespace FEAST
           return "extrude";
         }
 
-        virtual void write_data_container(MeshStreamer::ChartContainer&) const override
-        {
-          throw InternalError("Obsolete Extrude export not implemented");
-        }
-
         virtual void write(std::ostream& os, const String& sindent) const override
         {
           String sind(sindent);

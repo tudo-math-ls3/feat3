@@ -2,10 +2,17 @@
 #ifndef KERNEL_GEOMETRY_MESH_FILE_READER_HPP
 #define KERNEL_GEOMETRY_MESH_FILE_READER_HPP 1
 
-#include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/atlas/bezier.hpp>
+#include <kernel/geometry/atlas/circle.hpp>
+#include <kernel/geometry/atlas/extrude.hpp>
+#include <kernel/geometry/atlas/polyline.hpp>
+#include <kernel/geometry/atlas/surface_mesh.hpp>
+#include <kernel/geometry/atlas/sphere.hpp>
+#include <kernel/geometry/atlas/tube.hpp>
 #include <kernel/util/xml_scanner.hpp>
 
 namespace FEAST
@@ -80,7 +87,11 @@ namespace FEAST
         if(name == "Bezier")       return std::make_shared<Atlas::BezierChartParser<RootMesh_>>(_chart);
         if(name == "Circle")       return std::make_shared<Atlas::CircleChartParser<RootMesh_>>(_chart);
         if(name == "Polyline")     return std::make_shared<Atlas::PolylineChartParser<RootMesh_>>(_chart);
+        // \todo: Implement SphereChartParser
+        //if(name == "Sphere")       return std::make_shared<Atlas::SphereChartParser<RootMesh_>>(_chart);
         if(name == "SurfaceMesh")  return std::make_shared<Atlas::SurfaceMeshChartParser<RootMesh_>>(_chart);
+        // \todo: Implement TubeChartParser
+        //if(name == "Tube")       return std::make_shared<Atlas::TubeChartParser<RootMesh_>>(_chart);
         if(name == "Extrude")      return std::make_shared<Atlas::ExtrudeChartParser<RootMesh_>>(_chart);
 
         return nullptr;

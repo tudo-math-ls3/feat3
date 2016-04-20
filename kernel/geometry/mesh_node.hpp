@@ -6,7 +6,6 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
-#include <kernel/geometry/mesh_streamer_factory.hpp>
 #include <kernel/geometry/macro_factory.hpp>
 #include <kernel/geometry/patch_factory.hpp>
 #include <kernel/geometry/patch_halo_builder.hpp>
@@ -14,7 +13,6 @@
 #include <kernel/geometry/patch_meshpart_splitter.hpp>
 #include <kernel/geometry/intern/dual_adaptor.hpp>
 #include <kernel/adjacency/graph.hpp>
-#include <kernel/util/mesh_streamer.hpp>
 
 // includes, STL
 #include <map>
@@ -582,56 +580,6 @@ namespace FEAST
         CONTEXT(name() + "::MeshPartNode()");
       }
 
-      /**
-       * \brief Constructs a MeshPartNode from a MeshStreamer::MeshNode and adds all MeshParts therein
-       *
-       * \param streamer_node
-       * Container holding streamed mesh data.
-       *
-       * \param atlas
-       * MeshAtlas holding all charts.
-       *
-       * If a mesh part from the streamer node specifies a chart, it is meant to be contained in atlas and added to
-       * the (sub) MeshPartNode that gets added to (this).
-       *
-       */
-      explicit MeshPartNode(MeshStreamer::MeshNode& streamer_node, MeshAtlasType* atlas = nullptr) :
-        BaseClass(nullptr)
-      {
-        // create a factory for our mesh
-        MeshStreamerFactory<MeshPartType> my_factory(&streamer_node.mesh_data);
-
-        // create our mesh
-        this->_mesh = new MeshType(my_factory);
-
-        // now loop over all mesh parts
-        for(auto& it : streamer_node.meshpart_map)
-        {
-          // get the node of this mesh part
-          MeshStreamer::MeshNode& streamer_subnode = *it.second;
-
-          // create its node
-          MeshPartNode<RootMesh_>* my_mesh_part_node = new MeshPartNode<RootMesh_>(streamer_subnode, atlas);
-
-          // check for a chart to assign
-          String chart_name;
-          MeshChartType* chart = nullptr;
-          if(atlas != nullptr)
-          {
-            chart_name = streamer_subnode.mesh_data.chart;
-            if(!chart_name.empty())
-            {
-              chart = atlas->find_mesh_chart(chart_name);
-              if(chart == nullptr)
-                throw InternalError("Chart not found!");
-            }
-          }
-
-          // Add the new MeshPartNode to this node
-          this->add_mesh_part_node(it.first, my_mesh_part_node, chart_name, chart);
-        }
-      }
-
       /// virtual destructor
       virtual ~MeshPartNode()
       {
@@ -782,109 +730,6 @@ namespace FEAST
         BaseClass(mesh),
         _atlas(atlas)
       {
-      }
-
-      /**
-       * \brief Constructs a RootMeshNode from a streamed mesh
-       *
-       * \param[in] mesh_reader
-       * MeshStreamer that contains the information from the streamed mesh.
-       *
-       * \param atlas
-       * MeshAtlas to be added to the new RootMeshNode, can be nullptr.
-       *
-       */
-      explicit RootMeshNode(MeshStreamer& mesh_reader, MeshAtlasType* atlas = nullptr) :
-        BaseClass(nullptr),
-        _atlas(atlas)
-      {
-        MeshStreamer::MeshNode& streamer_node = *mesh_reader.get_root_mesh_node();
-
-        // create a factory for our mesh
-        MeshStreamerFactory<MeshType> my_factory(&streamer_node.mesh_data);
-
-        // create our mesh
-        this->_mesh = new MeshType(my_factory);
-
-        // now loop over all mesh parts
-        for(auto& it : streamer_node.meshpart_map)
-        {
-          // get the node of this mesh part
-          MeshStreamer::MeshNode& streamer_subnode = *it.second;
-
-          // create its node
-          MeshPartNode<RootMesh_>* my_mesh_part_node = new MeshPartNode<RootMesh_>(streamer_subnode, atlas);
-
-          // check for a chart to assign
-          String chart_name;
-          MeshChartType* chart = nullptr;
-          if(atlas != nullptr)
-          {
-            chart_name = streamer_subnode.mesh_data.chart;
-            if(!chart_name.empty())
-            {
-              chart = atlas->find_mesh_chart(chart_name);
-              if(chart == nullptr)
-                throw InternalError("Chart not found!");
-            }
-          }
-
-          // Add the new MeshPartNode to this node
-          this->add_mesh_part_node(it.first, my_mesh_part_node, chart_name, chart);
-        }
-      }
-
-      /**
-       * \brief Creates a MeshStreamer object for writing
-       *
-       * \returns MeshStreamer containing all data to be written.
-       *
-       */
-      MeshStreamer* create_mesh_writer()
-      {
-        MeshStreamer* mesh_writer(new MeshStreamer);
-
-        // Write MeshStreamer part
-        // Set these to 0 because they increase when we add MeshParts/MeshCharts
-        mesh_writer->_num_charts = 0;
-        mesh_writer->_num_meshparts = 0;
-        mesh_writer->_info = "Written by MeshNode::create_mesh_writer";
-        // Create MeshStreamer::MeshNode for holding the root mesh
-        mesh_writer->_root_mesh_node = new MeshStreamer::MeshNode;
-        MeshWriter<RootMesh_>::write_mesh(mesh_writer->_root_mesh_node->mesh_data, *(this->get_mesh()));
-
-        // Add MeshStreamer::MeshNodes for holding the MeshParts
-        for(auto& it : this->_mesh_part_nodes)
-        {
-          auto* mpart = it.second.node->get_mesh();
-          if(mpart == nullptr)
-            continue;
-
-          MeshStreamer::MeshNode* mesh_part(new MeshStreamer::MeshNode);
-          MeshWriter<RootMesh_>::write_mesh_part(mesh_part->mesh_data, *(mpart));
-
-          // Add the chart (if any)
-          auto* chart(it.second.chart);
-          if(chart != nullptr)
-          {
-            // Get chart
-            mesh_part->mesh_data.chart = it.first;
-
-            MeshStreamer::ChartContainer* chart_data(new MeshStreamer::ChartContainer);
-
-            MeshWriter<RootMesh_>::write_chart(*chart_data, it.first, *(it.second.chart));
-
-            // Insert copies to an std::vector...
-            mesh_writer->insert_chart(*chart_data);
-            // ... so we need to clean up afterwards
-            delete chart_data;
-          }
-
-          // Add the new mesh part to the MeshStreamer
-          mesh_writer->_insert_meshpart(mesh_part);
-        }
-
-        return mesh_writer;
       }
 
       /**

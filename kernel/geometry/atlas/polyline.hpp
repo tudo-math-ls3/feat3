@@ -116,37 +116,6 @@ namespace FEAST
           return "polyline";
         }
 
-        /** \copydoc ChartBase::write_data_container */
-        virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
-        {
-          size_t num_points(this->_world.size());
-
-          // GCC 4.9.2 complains at link time in the img_dim line otherwise
-          int img_dim(BaseClass::world_dim);
-
-          chart_container.data.push_back(" <polyline>");
-          chart_container.data.push_back("  img_dim "+stringify(img_dim));
-          chart_container.data.push_back("  num_points "+stringify(num_points));
-          chart_container.data.push_back("  <points>");
-
-          for(size_t i(0); i < num_points; ++i)
-          {
-            String tmp("  ");
-
-            for(int j(0); j < BaseClass::param_dim; ++j)
-              tmp += " "+stringify((this->_param[i])[j]);
-
-            // GCC 4.9.2 does not complain here, though
-            for(int j(0); j < BaseClass::world_dim; ++j)
-              tmp += " "+stringify((this->_world[i])[j]);
-
-            chart_container.data.push_back(tmp);
-          }
-
-          chart_container.data.push_back("  </points>");
-          chart_container.data.push_back(" </polyline>");
-        }
-
         /** \copydoc ChartBase::write */
         virtual void write(std::ostream& os, const String& sindent) const override
         {
@@ -161,112 +130,12 @@ namespace FEAST
           os << sindent << "</Polyline>" << std::endl;
         }
 
-        /**
-         * \brief Builds a Polyline<Mesh> object from parsed data
-         *
-         * \param[in] data
-         * Parameters for the object in the form of Strings
-         *
-         * \param[in] line
-         * The line in which the polyline data started in the original file
-         *
-         * \returns
-         * A pointer to the new object.
-         */
-        static Polyline<Mesh_>* parse(const std::deque<String>& data, const Index line)
-        {
-          bool have_img_dim(false), have_num_points(false);
-          std::deque<String> lines(data), dat_line;
-          int img_dim = 0;
-          int num_points = 0;
-
-          if(lines.front() != "<polyline>")
-            throw InternalError("Invalid marker");
-          lines.pop_front();
-
-          // loop over all data chunk lines
-          Index lno(line+1);
-          for(; !lines.empty(); ++lno)
-          {
-            // get line
-            String l = lines.front().trim();
-
-            // is it the <points> marker?
-            if(l == "<points>")
-              break;
-
-            // pop line from deque
-            lines.pop_front();
-
-            // trim line and check for emptyness
-            if(l.empty())
-              continue;
-
-            // split line
-            l.split_by_charset(dat_line);
-
-            if(dat_line[0] == "img_dim")
-            {
-              if(dat_line.size() != 2)
-                throw InternalError("Invalid number of arguments");
-
-              // try to parse image dimension
-              have_img_dim = dat_line[1].parse(img_dim);
-              if(!have_img_dim)
-                throw InternalError("Failed to parse '" + dat_line[1] + "' as image dimension");
-
-              continue;
-            }
-
-            if(dat_line[0] == "num_points")
-            {
-              if(dat_line.size() != 2)
-                throw InternalError("Invalid number of arguments");
-
-              // try to parse radius
-              have_num_points = dat_line[1].parse(num_points);
-              if(!have_num_points)
-                throw InternalError("Failed to parse '" + dat_line[1] + "' as point count");
-
-              continue;
-            }
-
-            // something invalid
-            throw InternalError("Unrecognised line '" + l + "'");
-          }
-
-          if(!have_img_dim)
-            throw  InternalError("Polyline has no image dimension!");
-          if(!have_num_points)
-            throw  InternalError("Polyline has no point count!");
-
-          // ensure that we have at least 2 points
-          if(num_points < 2)
-            throw InternalError("Invalid number of points for Polyline!");
-
-          // create the polyline
-          switch(img_dim)
-          {
-          /*case 1:
-            _parse_polyline1d_points(lines, num_points);
-            break;*/
-          case 2:
-            return _parse_polyline2d_points(lines, lno, num_points);
-          /*case 3:
-            _parse_polyline3d_points(lines, num_points);
-            break;*/
-          default:
-            throw InternalError("Invalid image dimension for Polyline!");
-          }
-
-          return nullptr;
-        }
-
       protected:
         /**
          * \brief Parses the 'points' section of a 2D 'polyline' chart
          */
-        static Polyline<Mesh_>* _parse_polyline2d_points(std::deque<String>& lines, const Index line, const int num_points)
+        static Polyline<Mesh_>* _parse_polyline2d_points(
+          std::deque<String>& lines, const Index line, const int num_points)
         {
           // get front line
           if(lines.front() != "<points>")

@@ -8,7 +8,6 @@ ADD_LIBRARY(kernel-util STATIC
   exception.cpp
   kahan_summation.cpp
   memory_pool.cpp
-  mesh_streamer.cpp
   property_map.cpp
   runtime.cpp
   statistics.cpp
@@ -46,7 +45,6 @@ SET (test_list
   assertion-test
   binary_stream-test
   math-test
-  mesh_streamer-test
   meta_math-test
   property_map-test
   random-test

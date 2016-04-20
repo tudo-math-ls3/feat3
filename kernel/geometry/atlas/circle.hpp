@@ -180,19 +180,6 @@ namespace FEAST
           return "circle";
         }
 
-        /** \copydoc ChartBase::write_data_container */
-        virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const override
-        {
-          DataType param_l(-_trafo_a);
-          DataType param_r(param_l + DataType(2) * Math::pi<DataType>() / _trafo_b);
-
-          chart_container.data.push_back(" <circle>");
-          chart_container.data.push_back("  radius  "+stringify_fp_sci(_radius));
-          chart_container.data.push_back("  midpoint "+stringify_fp_sci(_midpoint(0))+" "+stringify_fp_sci(_midpoint(1)));
-          chart_container.data.push_back("  domain "+stringify_fp_sci(param_l)+" "+stringify_fp_sci(param_r));
-          chart_container.data.push_back(" </circle>");
-        }
-
         /** \copydoc ChartBase::write */
         virtual void write(std::ostream& os, const String& sindent) const override
         {
@@ -208,97 +195,7 @@ namespace FEAST
           }
           os << " />" << std::endl;
         }
-
-        /**
-         * \brief Builds a Circle<Mesh> object from parsed data
-         *
-         * \param[in] data
-         * Parameters for the object in the form of Strings
-         *
-         * \param[in] line
-         * The line in which the circle data started in the original file
-         *
-         * \returns
-         * A pointer to the new object.
-         */
-        static Circle<Mesh_>* parse(const std::deque<String>& data, const Index line)
-        {
-          bool have_midpoint(false), have_radius(false), have_domain(false);
-          DataType mid_x(0), mid_y(0), dom_l(0), dom_r(0), radius(0);
-          std::deque<String> lines(data), dat_line;
-
-          if(lines.front() != "<circle>")
-            throw InternalError("Expected '<circle>' but found '" + lines.front() + "' in line " + stringify(line));
-          lines.pop_front();
-
-          // loop over all data chunk lines
-          for(Index lno(line+1); !lines.empty(); ++lno)
-          {
-            String l = lines.front().trim();
-            lines.pop_front();
-
-            if(l.empty())
-              continue;
-
-            if(l == "</circle>")
-              break;
-
-            // split the line by whitespaces
-            l.split_by_charset(dat_line);
-            if(dat_line[0] == "radius")
-            {
-              if(dat_line.size() != 2)
-                throw InternalError("Invalid number of arguments in line " + stringify(lno));
-
-              // try to parse radius
-              have_radius = dat_line[1].parse(radius);
-              if(!have_radius)
-                throw InternalError("Failed to parse '" + dat_line[1] + "' as circle radius in line " + stringify(lno));
-
-              // okay
-              continue;
-            }
-            if(dat_line[0] == "midpoint")
-            {
-              if(dat_line.size() != 3)
-                throw InternalError("Invalid number of arguments in line " + stringify(lno));
-
-              // try to parse midpoint
-              have_midpoint = dat_line[1].parse(mid_x) && dat_line[2].parse(mid_y);
-              if(!have_midpoint)
-                throw InternalError("Failed to parse '" + dat_line[1] + " " + dat_line[2] + "' as circle midpoint in line " + stringify(lno));
-
-              // okay
-              continue;
-            }
-            if(dat_line[0] == "domain")
-            {
-              if(dat_line.size() != 3)
-                throw InternalError("Invalid number of arguments in line " + stringify(lno));
-
-              have_domain = dat_line[1].parse(dom_l) && dat_line[2].parse(dom_r);
-              if(!have_domain)
-                throw InternalError("Failed to parse '" + dat_line[1] + " " + dat_line[2] + "' as circle domain in line " + stringify(lno));
-
-              // okay
-              continue;
-            }
-
-            // something invalid
-            throw InternalError("Unexpected '" + l + "' in line " + stringify(lno));
-          }
-
-          if(!have_midpoint)
-            throw  InternalError("Circle chart has no midpoint!");
-          if(!have_radius)
-            throw  InternalError("Circle chart has no radius!");
-          if(!have_domain)
-            throw  InternalError("Circle chart has no domain!");
-
-          // okay, create circle
-          return new Circle<Mesh_>(mid_x, mid_y, radius, dom_l, dom_r);
-        }
-      }; // class Circle<...>
+      }; // class Circle
 
       template<typename Mesh_, typename ChartReturn_ = ChartBase<Mesh_>>
       class CircleChartParser :

@@ -227,10 +227,10 @@ namespace FEAST
           return "bezier";
         }
 
-        virtual void write_data_container(MeshStreamer::ChartContainer&) const override
-        {
-          throw InternalError("Obsolete Bezier export not implemented");
-        }
+        //virtual void write_data_container(MeshStreamer::ChartContainer&) const override
+        //{
+        //  throw InternalError("Obsolete Bezier export not implemented");
+        //}
 
         /** \copydoc ChartBase::write */
         virtual void write(std::ostream& os, const String& sindent) const override

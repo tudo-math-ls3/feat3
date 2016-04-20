@@ -3,10 +3,9 @@
 #define KERNEL_GEOMETRY_MESH_ATLAS_HPP 1
 
 // includes, FEAST
-#include <kernel/util/mesh_streamer.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_part.hpp>
-#include <kernel/geometry/atlas/standard_chart_factory.hpp>
+#include <kernel/geometry/atlas/chart.hpp>
 
 // includes, system
 #include <map>
@@ -44,18 +43,6 @@ namespace FEAST
       /// default CTOR
       MeshAtlas()
       {
-      }
-
-      /**
-       * \brief Parses an atlas from a mesh streamer object using the standard chart factory.
-       *
-       * \param[in] streamer
-       * The mesh streamer to be used for parsing.
-       */
-      explicit MeshAtlas(MeshStreamer& streamer)
-      {
-        Atlas::StandardChartFactory<MeshType> factory;
-        _parse_charts(streamer, factory);
       }
 
       /// move CTOR
@@ -172,34 +159,6 @@ namespace FEAST
         return (*it).second;
       }
 
-    protected:
-      /**
-       * \brief Parses all charts from a MeshStreamer
-       *
-       * \param[in] streamer
-       * The MeshStreamer containing the data to be parsed.
-       *
-       * \param factory
-       * The factory used to create Charts from the parsed data. Cannot be const as parsing writes data to it.
-       *
-       */
-      void _parse_charts(MeshStreamer& streamer, Atlas::ChartFactory<MeshType>& factory)
-      {
-        for(auto& c : streamer.charts)
-        {
-          MeshChartType* chart(nullptr);
-
-          if(c.type == "discrete")
-            chart = factory.parse_discrete_chart(c.mesh_data);
-          else
-            chart = factory.parse_chart(c.type, c.data, c.start_of_data);
-
-          if(chart == nullptr)
-            throw InternalError("Failed to parse chart '" + c.name + "': unknown type '" + c.type + "' ?");
-
-          add_mesh_chart(c.name, chart, false);
-        }
-      }
     }; // class MeshAltas<...>
   } // namespace Geometry
 } // namespace FEAST

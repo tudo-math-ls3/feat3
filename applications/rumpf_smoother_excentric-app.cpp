@@ -1,10 +1,9 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
-#include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_node.hpp>
-#include <kernel/geometry/mesh_streamer_factory.hpp>
 #include <kernel/meshopt/rumpf_smoother.hpp>
 #include <kernel/meshopt/rumpf_smoother_q1hack.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
@@ -13,7 +12,6 @@
 #include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1hack.hpp>
 #include <kernel/util/math.hpp>
-#include <kernel/util/mesh_streamer.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
@@ -105,7 +103,7 @@ template
    * \param[in] level
    * Number of refines.
    */
-  static int run(MeshStreamer& my_streamer, Index lvl_max, DT_ deltat)
+  static int run(Geometry::MeshFileReader& file_reader, Geometry::MeshFileReader& chart_reader, Index lvl_max, DT_ deltat)
   {
     // Filename for writing .vtu output
     String filename("");
@@ -120,32 +118,30 @@ template
     slip_list.push_back("outer");
     slip_list.push_back("inner");
 
-    // Read mesh from the MeshStreamer and create the MeshAtlas
-    std::cout << "Creating mesh atlas..." << std::endl;
-    Geometry::MeshAtlas<MeshType_>* atlas = nullptr;
-    try
-    {
-      atlas = new Geometry::MeshAtlas<MeshType_>(my_streamer);
-    }
-    catch(std::exception& exc)
-    {
-      std::cerr << "ERROR: " << exc.what() << std::endl;
-      return 1;
-    }
+    // create an empty atlas and a root mesh node
+    Geometry::MeshAtlas<MeshType>* atlas = new Geometry::MeshAtlas<MeshType>();
+    Geometry::RootMeshNode<MeshType>* rmn = new Geometry::RootMeshNode<MeshType>(nullptr, atlas);
 
-    // Create mesh node
-    std::cout << "Creating mesh node..." << std::endl;
-    Geometry::RootMeshNode<MeshType_>* rmn = nullptr;
+    // try to parse the mesh files
+#ifndef DEBUG
     try
+#endif
     {
-      rmn = new Geometry::RootMeshNode<MeshType_>(my_streamer, atlas);
-      rmn ->adapt();
+      chart_reader.parse(*rmn, *atlas);
+      file_reader.parse(*rmn, *atlas);
     }
+#ifndef DEBUG
     catch(std::exception& exc)
     {
       std::cerr << "ERROR: " << exc.what() << std::endl;
       return 1;
     }
+    catch(...)
+    {
+      std::cerr << "ERROR: unknown exception" << std::endl;
+      return 1;
+    }
+#endif
 
     // refine
     for(Index lvl(1); lvl <= lvl_max; ++lvl)
@@ -200,6 +196,8 @@ template
 
     }
 
+    rmn->adapt();
+
     auto* mesh = rmn->get_mesh();
 
     // This is the centre reference point
@@ -220,9 +218,8 @@ template
     // The smoother in all its template glory
     RumpfSmootherType rumpflpumpfl(rmn, dirichlet_list, slip_list, my_functional);
     rumpflpumpfl.init();
-    //rumpflpumpfl.compute_lambda_uniform();
-    //rumpflpumpfl.compute_h();
     rumpflpumpfl.print();
+
     rumpflpumpfl.prepare();
 
     // Arrays for saving the contributions of the different Rumpf functional parts
@@ -321,19 +318,19 @@ template
         rumpflpumpfl._coords(j, x_inner + tmp2);
       }
 
-      // Rotate the mesh in the discrete chart. This has to use an evil downcast for now
-      auto* inner_chart = reinterpret_cast< Geometry::Atlas::DiscreteChart<MeshType, SurfaceMeshType>*>
+      // Rotate the chart. This has to use an evil downcast for now
+      auto* inner_chart = reinterpret_cast< Geometry::Atlas::Polyline<MeshType>*>
         (atlas->find_mesh_chart("inner"));
 
-      auto& vtx_inner = inner_chart->_surface_mesh->get_vertex_set();
+      auto& vtx_inner = inner_chart->get_world_points();
 
-      for(Index i(0); i < inner_chart->_surface_mesh->get_num_entities(0); ++i)
+      for(auto& it : vtx_inner)
       {
-        tmp = vtx_inner[i] - x_inner;
+        tmp = it - x_inner;
         // Rotate
         tmp2.set_vec_mat_mult(tmp, rot);
         // Translate the point by the new centre of rotation
-        vtx_inner[i] = x_inner + tmp2;
+        it = x_inner + tmp2;
       }
 
       //filename = "chart_inner_" + stringify(n);
@@ -359,18 +356,18 @@ template
         rumpflpumpfl._coords(j, x_outer + tmp2);
       }
 
-      // Rotate the mesh in the discrete chart. This has to use an evil downcast for now
-      auto* outer_chart = reinterpret_cast<Geometry::Atlas::DiscreteChart<MeshType, SurfaceMeshType>*>
+      // Rotate the outer chart. This has to use an evil downcast for now
+      auto* outer_chart = reinterpret_cast<Geometry::Atlas::Polyline<MeshType>*>
         (atlas->find_mesh_chart("outer"));
 
-      auto& vtx_outer = outer_chart->_surface_mesh->get_vertex_set();
+      auto& vtx_outer = outer_chart->get_world_points();
 
-      for(Index i(0); i < outer_chart->_surface_mesh->get_num_entities(0); ++i)
+      for(auto& it :vtx_outer)
       {
-        tmp = vtx_outer[i] - x_outer;
+        tmp = it - x_outer;
         // Rotate
         tmp2.set_vec_mat_mult(tmp, rot);
-        vtx_outer[i] = x_outer + tmp2;
+        it = x_outer + tmp2;
       }
 
       const auto& idx = mesh->template get_index_set<ShapeType::dimension, 0>();
@@ -511,6 +508,7 @@ using MySmootherQ1Hack = Meshopt::RumpfSmootherQ1Hack<A, B>;
  */
 int main(int argc, char* argv[])
 {
+  typedef double DataType;
   FEAST::Runtime::initialise(argc, argv);
   // Creata a parser for command line arguments.
   SimpleArgParser args(argc, argv);
@@ -525,7 +523,8 @@ int main(int argc, char* argv[])
   }
   // Specify supported command line switches
   args.support("level");
-  args.support("filename");
+  args.support("meshfile");
+  args.support("chartfile");
   args.support("help");
   args.support("q1hack");
   // Refinement level
@@ -533,8 +532,10 @@ int main(int argc, char* argv[])
   // Switch for the Q1Hack
   bool use_q1hack(false);
 
-  // Input file name, required
-  String filename;
+  // Input mesh file name, required
+  String meshfile;
+  // Input chart file name, required
+  String chartfile;
   // Get unsupported command line arguments
   std::deque<std::pair<int,String> > unsupported = args.query_unsupported();
   if( !unsupported.empty() )
@@ -544,16 +545,28 @@ int main(int argc, char* argv[])
       std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
   }
 
-  // Check and parse --filename
-  if(args.check("filename") != 1 )
+  // Check and parse --meshfile
+  if(args.check("meshfile") != 1 )
   {
-    std::cout << "You need to specify a mesh file with --filename.";
+    std::cout << "You need to specify a mesh file with --meshfile.";
     throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --filename");
   }
   else
   {
-    args.parse("filename", filename);
-    std::cout << "Reading mesh from file " << filename << std::endl;
+    args.parse("meshfile", meshfile);
+    std::cout << "Reading mesh from file " << meshfile << std::endl;
+  }
+
+  // Check and parse --chartfile
+  if(args.check("chartfile") != 1 )
+  {
+    std::cout << "You need to specify a chart file with --chartfile.";
+    throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --filename");
+  }
+  else
+  {
+    args.parse("chartfile", chartfile);
+    std::cout << "Reading chart from file " << chartfile << std::endl;
   }
 
   // Check and parse --level
@@ -576,42 +589,55 @@ int main(int argc, char* argv[])
     std::cout << "Using the Q1Hack for hypercube meshes." << std::endl;
   }
 
-  // Create a MeshStreamer and read the mesh file
-  MeshStreamer my_streamer;
-  my_streamer.parse_mesh_file(filename);
+  // Create mesh input file stream
+  std::ifstream ifs_mesh(meshfile, std::ios_base::in);
+  if(!ifs_mesh.is_open() || !ifs_mesh.good())
+  {
+    std::cerr << "ERROR: Failed to open '" << meshfile << "'" << std::endl;
+    return 1;
+  }
+  // Create a reader and read the root markup
+  Geometry::MeshFileReader mesh_reader(ifs_mesh);
+  mesh_reader.read_root_markup();
 
-  // This is the raw mesh data my_streamer read from filename
-  auto& mesh_data = my_streamer.get_root_mesh_node()->mesh_data;
-  // Marker int for the ShapeType
-  int shape_type = mesh_data.shape_type;
+  // Create chart input file stream
+  std::ifstream ifs_chart(chartfile, std::ios_base::in);
+  if(!ifs_chart.is_open() || !ifs_chart.good())
+  {
+    std::cerr << "ERROR: Failed to open '" << chartfile << "'" << std::endl;
+    return 1;
+  }
 
-  ASSERT(mesh_data.mesh_type == mesh_data.mt_conformal, "This application only works for conformal meshes!");
-
-  typedef double DataType;
-
-  DataType deltat(DataType(1e-4));
+  // Create a reader for the chart file
+  Geometry::MeshFileReader chart_reader(ifs_chart);
 
   // This is the list of all supported meshes that could appear in the mesh file
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, DataType> Simplex2Mesh_2d;
   typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, DataType> Hypercube2Mesh_2d;
 
-  int ret(1);
-  // Call the run() method of the appropriate wrapper class
-  if(shape_type == mesh_data.st_tria)
-    ret = RumpfSmootherExcentricApp<DataType, Simplex2Mesh_2d, MyFunctional, MySmoother>::
-      run(my_streamer, lvl_max, deltat);
+  // get mesh type
+  const String mtype = mesh_reader.get_meshtype_string();
 
-  if(shape_type == mesh_data.st_quad)
+  int ret(1);
+
+  DataType deltat(DataType(1e-4));
+
+  // Call the run() method of the appropriate wrapper class
+  if(mtype == "conformal:simplex:2:2")
+    ret = RumpfSmootherExcentricApp<DataType, Simplex2Mesh_2d, MyFunctional, MySmoother>::
+      run(mesh_reader, chart_reader, lvl_max, deltat);
+
+  if(mtype == "conformal:hypercube:2:2")
   {
     if(use_q1hack)
     {
       ret = RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctionalQ1Hack, MySmootherQ1Hack>::
-        run(my_streamer, lvl_max, deltat);
+        run(mesh_reader, chart_reader, lvl_max, deltat);
     }
     else
     {
       ret = RumpfSmootherExcentricApp<DataType, Hypercube2Mesh_2d, MyFunctional, MySmoother>::
-        run(my_streamer, lvl_max, deltat);
+        run(mesh_reader, chart_reader, lvl_max, deltat);
     }
   }
 

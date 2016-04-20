@@ -14,6 +14,33 @@ namespace FEAST
   {
     namespace Atlas
     {
+      /// \cond internal
+      namespace Intern
+      {
+        /**
+         * \brief Coefficient / facet numbering permutation
+         *
+         * For Simplex<d>, d != 1, facet i lies opposite of the local vertex i and nothing needs to be done
+         */
+        template<int shape_dim>
+        inline int coeffperm(int i)
+        {
+          return i;
+        }
+
+        /**
+         * \brief Coefficient / facet numbering permutation
+         *
+         * For Simplex<1>, facet i is the local vertex i, so the coefficients need to be permuted
+         */
+        template<>
+        inline int coeffperm<1>(int i)
+        {
+          return 1-i;
+        }
+      } // namespace Intern
+      /// \endcond
+
       struct SurfaceMeshTraits
       {
         /// No explicit map is available in general
@@ -39,8 +66,6 @@ namespace FEAST
         typedef typename BaseClass::WorldPoint WorldPoint;
         /// The type for the mesh defining the discrete surface
         typedef ConformalMesh<Shape::Triangle, 3, 3, CoordType> SurfaceMeshType;
-
-      protected:
         /// Pointer to the surface mesh object
         SurfaceMeshType* _surface_mesh;
 
@@ -73,11 +98,6 @@ namespace FEAST
         virtual String get_type() const override
         {
           return "discrete";
-        }
-
-        virtual void write_data_container(MeshStreamer::ChartContainer&) const override
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Delete this deprecated function");
         }
 
         /** \copydoc ChartBase::write */
@@ -131,7 +151,6 @@ namespace FEAST
           point = vtx[min_index];
 
         } // void project()
-
 
         /**
          * \brief Orthogonally projects all vertices at facets of a MeshPart

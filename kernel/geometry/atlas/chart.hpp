@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/mesh_part.hpp>
-#include <kernel/util/mesh_streamer.hpp> // for MeshDataContainer
+//#include <kernel/util/mesh_streamer.hpp> // for MeshDataContainer
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/xml_scanner.hpp>
 
@@ -78,15 +78,6 @@ namespace FEAST
          * \returns The class name as String.
          */
         virtual String get_type() const = 0;
-
-        /**
-         * \brief Writes the Chart to a data container for streaming to files etc.
-         *
-         * \param[in,out] chart_container
-         * The container that gets the data.
-         *
-         */
-        virtual void write_data_container(MeshStreamer::ChartContainer& chart_container) const = 0;
 
         /**
          * \brief Writes the Chart into a stream in XML format.
@@ -335,55 +326,6 @@ namespace FEAST
 
       }; // class ChartCRTP<...>
 
-      /**
-       * \brief Chart factory base-class template
-       *
-       * \tparam Mesh_
-       * The mesh parameter for the MeshChart class template.
-       *
-       * \author Peter Zajac
-       */
-      template<typename Mesh_>
-      class ChartFactory
-      {
-      public:
-        /// virtual DTOR
-        virtual ~ChartFactory()
-        {
-        }
-
-        /**
-         * \brief Parses a chart from a string.
-         *
-         * \param[in] type
-         * The type of the chart as a string.
-         *
-         * \param[in] data
-         * The deque of lines that make up the data section of the chart.
-         *
-         * \param[in] line
-         * The line number of the chart section within the mesh/chart file.
-         *
-         * \returns
-         * A pointer to the parsed MeshChart if parsing was successful,
-         * or \c nullptr if the type of the chart is unknown.
-         */
-        virtual ChartBase<Mesh_>* parse_chart(const String& type, const std::deque<String>& data, const Index line) = 0;
-
-        /**
-         *
-         * \brief Parses a discrete chart from a MeshStreamer::MeshDataContainer.
-         *
-         * \param[in] data
-         * The data container from MeshStreamer containing the boundary mesh. Cannot be const since it is passed non-const to a constructor later.
-         *
-         * \returns
-         * A pointer to the parsed MeshChart if parsing was successful,
-         * or \c nullptr if the type of the chart is unknown.
-         */
-        virtual ChartBase<Mesh_>* parse_discrete_chart(FEAST::MeshStreamer::MeshDataContainer& data) = 0;
-
-      }; // class ChartFactory
     } // namespace Atlas
   } // namespace Geometry
 } // namespace FEAST

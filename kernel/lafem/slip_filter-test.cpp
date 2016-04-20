@@ -4,7 +4,7 @@
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/slip_filter_assembler.hpp>
-#include <kernel/geometry/mesh_streamer_factory.hpp>
+#include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/unit_cube_patch_generator.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
@@ -194,129 +194,78 @@ class SlipFilterAssemblyTest
       std::stringstream ioss;
 
       // Dump the content of ./data/meshes/unit-circle-tria.txt into the stream
-      ioss << "<feat_domain_file> " << std::endl;
-      ioss << "<header> " << std::endl;
-      ioss << " version 1 " << std::endl;
-      ioss << " meshparts 1 " << std::endl;
-      ioss << " charts 1 " << std::endl;
-      ioss << "</header> " << std::endl;
-      ioss << "<info> " << std::endl;
-      ioss << " This is the unit-circle mesh consisting of a four triangular cells. " << std::endl;
-      ioss << "</info> " << std::endl;
-      ioss << "<chart> " << std::endl;
-      ioss << " <header> " << std::endl;
-      ioss << "  name outer " << std::endl;
-      ioss << "  type circle " << std::endl;
-      ioss << " </header> " << std::endl;
-      ioss << " <circle> " << std::endl;
-      ioss << "  radius 1 " << std::endl;
-      ioss << "  midpoint 0 0 " << std::endl;
-      ioss << "  domain 0 4 " << std::endl;
-      ioss << " </circle> " << std::endl;
-      ioss << "</chart> " << std::endl;
-      ioss << "<mesh> " << std::endl;
-      ioss << " <header> " << std::endl;
-      ioss << "  type conformal " << std::endl;
-      ioss << "  shape tria " << std::endl;
-      ioss << "  coords 2 " << std::endl;
-      ioss << " </header> " << std::endl;
-      ioss << " <counts> " << std::endl;
-      ioss << "  verts 5 " << std::endl;
-      ioss << "  edges 8 " << std::endl;
-      ioss << "  trias 4 " << std::endl;
-      ioss << " </counts> " << std::endl;
-      ioss << " <coords> " << std::endl;
-      ioss << "  1 0 " << std::endl;
-      ioss << "  0 1 " << std::endl;
-      ioss << "  -1 0 " << std::endl;
-      ioss << "  0 -1 " << std::endl;
-      ioss << "  0 0 " << std::endl;
-      ioss << " </coords> " << std::endl;
-      ioss << " <vert@edge> " << std::endl;
-      ioss << "  0 1 " << std::endl;
-      ioss << "  1 2 " << std::endl;
-      ioss << "  2 3 " << std::endl;
-      ioss << "  3 0 " << std::endl;
-      ioss << "  0 4 " << std::endl;
-      ioss << "  1 4 " << std::endl;
-      ioss << "  2 4 " << std::endl;
-      ioss << "  3 4 " << std::endl;
-      ioss << " </vert@edge> " << std::endl;
-      ioss << " <vert@tria> " << std::endl;
-      ioss << "  0 1 4 " << std::endl;
-      ioss << "  1 2 4 " << std::endl;
-      ioss << "  2 3 4 " << std::endl;
-      ioss << "  3 0 4 " << std::endl;
-      ioss << " </vert@tria> " << std::endl;
-      ioss << "</mesh> " << std::endl;
-      ioss << "<meshpart> " << std::endl;
-      ioss << " <header> " << std::endl;
-      ioss << "  name outer " << std::endl;
-      ioss << "  parent root " << std::endl;
-      ioss << "  chart outer " << std::endl;
-      ioss << "  type conformal " << std::endl;
-      ioss << "  shape edge " << std::endl;
-      ioss << "  attribute_sets 1 " << std::endl;
-      ioss << " </header> " << std::endl;
-      ioss << " <info> " << std::endl;
-      ioss << "  This meshpart defines the outer circular boundary component. " << std::endl;
-      ioss << " </info> " << std::endl;
-      ioss << " <counts> " << std::endl;
-      ioss << "  verts 5 " << std::endl;
-      ioss << "  edges 4 " << std::endl;
-      ioss << " </counts> " << std::endl;
-      ioss << " <vert@edge> " << std::endl;
-      ioss << "  0 1 " << std::endl;
-      ioss << "  1 2 " << std::endl;
-      ioss << "  2 3 " << std::endl;
-      ioss << "  3 4 " << std::endl;
-      ioss << " </vert@edge> " << std::endl;
-      ioss << " <vert_idx> " << std::endl;
-      ioss << "  0 " << std::endl;
-      ioss << "  1 " << std::endl;
-      ioss << "  2 " << std::endl;
-      ioss << "  3 " << std::endl;
-      ioss << "  0 " << std::endl;
-      ioss << " </vert_idx> " << std::endl;
-      ioss << " <edge_idx> " << std::endl;
-      ioss << "  0 " << std::endl;
-      ioss << "  1 " << std::endl;
-      ioss << "  2 " << std::endl;
-      ioss << "  3 " << std::endl;
-      ioss << " </edge_idx> " << std::endl;
-      ioss << " <attribute> " << std::endl;
-      ioss << "  <header> " << std::endl;
-      ioss << "   dimension 0 " << std::endl;
-      ioss << "   name param " << std::endl;
-      ioss << "   value_dim 1 " << std::endl;
-      ioss << "   value_count 5 " << std::endl;
-      ioss << "  </header> " << std::endl;
-      ioss << "  <values> " << std::endl;
-      ioss << "   0 " << std::endl;
-      ioss << "   1 " << std::endl;
-      ioss << "   2 " << std::endl;
-      ioss << "   3 " << std::endl;
-      ioss << "   4 " << std::endl;
-      ioss << "  </values> " << std::endl;
-      ioss << " </attribute> " << std::endl;
-      ioss << "</meshpart> " << std::endl;
-      ioss << "</feat_domain_file> " << std::endl;
+      ioss << "<FeatMeshFile version=\"1\" mesh=\"conformal:simplex:2:2\">" << std::endl;
+      ioss << "  <Info>" << std::endl;
+      ioss << "   This is the unit-circle mesh consisting of four triangles." << std::endl;
+      ioss << "  </Info>" << std::endl;
+      ioss << "  <Chart name=\"outer\">" << std::endl;
+      ioss << "    <Circle radius=\"1\" midpoint=\"0 0\" domain=\"0 4\" />" << std::endl;
+      ioss << "  </Chart>" << std::endl;
+      ioss << "  <Mesh type=\"conformal:simplex:2:2\" size=\"5 8 4\">" << std::endl;
+      ioss << "    <Vertices>" << std::endl;
+      ioss << "      1 0" << std::endl;
+      ioss << "      0 1" << std::endl;
+      ioss << "      -1 0" << std::endl;
+      ioss << "      0 -1" << std::endl;
+      ioss << "      0 0" << std::endl;
+      ioss << "    </Vertices>" << std::endl;
+      ioss << "    <Topology dim=\"1\">" << std::endl;
+      ioss << "      0 1" << std::endl;
+      ioss << "      1 2" << std::endl;
+      ioss << "      2 3" << std::endl;
+      ioss << "      3 0" << std::endl;
+      ioss << "      0 4" << std::endl;
+      ioss << "      1 4" << std::endl;
+      ioss << "      2 4" << std::endl;
+      ioss << "      3 4" << std::endl;
+      ioss << "    </Topology>" << std::endl;
+      ioss << "    <Topology dim=\"2\">" << std::endl;
+      ioss << "      0 1 4" << std::endl;
+      ioss << "      1 2 4" << std::endl;
+      ioss << "      2 3 4" << std::endl;
+      ioss << "      3 0 4" << std::endl;
+      ioss << "    </Topology>" << std::endl;
+      ioss << "  </Mesh>" << std::endl;
+      ioss << "  <MeshPart name=\"outer\" parent=\"root\" chart=\"outer\" topology=\"full\" size=\"5 4\">" << std::endl;
+      ioss << "    <Mapping dim=\"0\">" << std::endl;
+      ioss << "      0" << std::endl;
+      ioss << "      1" << std::endl;
+      ioss << "      2" << std::endl;
+      ioss << "      3" << std::endl;
+      ioss << "      0" << std::endl;
+      ioss << "    </Mapping>" << std::endl;
+      ioss << "    <Mapping dim=\"1\">" << std::endl;
+      ioss << "      0" << std::endl;
+      ioss << "      1" << std::endl;
+      ioss << "      2" << std::endl;
+      ioss << "      3" << std::endl;
+      ioss << "    </Mapping>" << std::endl;
+      ioss << "    <Topology dim=\"1\">" << std::endl;
+      ioss << "      0 1" << std::endl;
+      ioss << "      1 2" << std::endl;
+      ioss << "      2 3" << std::endl;
+      ioss << "      3 4" << std::endl;
+      ioss << "    </Topology>" << std::endl;
+      ioss << "    <Attribute name=\"param\" dim=\"1\">" << std::endl;
+      ioss << "      0" << std::endl;
+      ioss << "      1" << std::endl;
+      ioss << "      2" << std::endl;
+      ioss << "      3" << std::endl;
+      ioss << "      4" << std::endl;
+      ioss << "    </Attribute>" << std::endl;
+      ioss << "  </MeshPart>" << std::endl;
+      ioss << "</FeatMeshFile>" << std::endl;
 
-      // Create a FEAST::MeshStreamer and parse the stream
-      MeshStreamer my_streamer;
+      // create a reader and read the root markup
+      Geometry::MeshFileReader reader(ioss);
+      reader.read_root_markup();
 
-      my_streamer.parse_mesh_file(ioss);
+      // create an empty atlas and a root mesh node
+      Geometry::MeshAtlas<MeshType>* atlas = new Geometry::MeshAtlas<MeshType>();
+      Geometry::RootMeshNode<MeshType>* node = new Geometry::RootMeshNode<MeshType>(nullptr, atlas);
 
-      // Create a Factory
-      Geometry::MeshStreamerFactory<MeshType> my_factory(my_streamer);
+      reader.parse(*node, *atlas);
 
-      // Get the Atlas
-      Geometry::MeshAtlas<MeshType>* my_atlas(nullptr);
-      my_atlas = new Geometry::MeshAtlas<MeshType>(my_streamer);
-
-      // Get the RootMeshNode and adapt it
-      Geometry::RootMeshNode<MeshType>* node(nullptr);
-      node = new Geometry::RootMeshNode<MeshType>(my_streamer, my_atlas);
       node->adapt();
 
       // Refine the MeshNode so the MeshParts get refined, too.
@@ -392,10 +341,9 @@ class SlipFilterAssemblyTest
           TEST_CHECK_EQUAL(check_vec(i)(d), vec_org(i)(d));
       }
 
-
       // Clean up
       delete node;
-      delete my_atlas;
+      delete atlas;
     }
 
     /**

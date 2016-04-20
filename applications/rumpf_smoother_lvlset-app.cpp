@@ -4,6 +4,7 @@
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/meshopt/rumpf_smoother_conc.hpp>
 #include <kernel/meshopt/rumpf_smoother_lvlset.hpp>
 #include <kernel/meshopt/rumpf_smoother_lvlset_q1hack.hpp>
@@ -63,39 +64,37 @@ template
    * \param[in] level
    * Number of refines.
    */
-  static int run(MeshStreamer& my_streamer, Index level, DT_ deltat)
+  static int run(Geometry::MeshFileReader& file_reader, Index lvl_max, DT_ deltat)
   {
-    // Read mesh from the MeshStreamer and create the MeshAtlas
-    std::cout << "Creating mesh atlas..." << std::endl;
-    Geometry::MeshAtlas<MeshType_>* atlas = nullptr;
-    try
-    {
-      atlas = new Geometry::MeshAtlas<MeshType_>(my_streamer);
-    }
-    catch(std::exception& exc)
-    {
-      std::cerr << "ERROR: " << exc.what() << std::endl;
-      return 1;
-    }
+    // create an empty atlas and a root mesh node
+    Geometry::MeshAtlas<MeshType>* atlas = new Geometry::MeshAtlas<MeshType>();
+    Geometry::RootMeshNode<MeshType>* rmn = new Geometry::RootMeshNode<MeshType>(nullptr, atlas);
 
-    // Create mesh node
-    std::cout << "Creating mesh node..." << std::endl;
-    Geometry::RootMeshNode<MeshType_>* rmn = nullptr;
+    // try to parse the mesh files
+#ifndef DEBUG
     try
+#endif
     {
-      rmn = new Geometry::RootMeshNode<MeshType_>(my_streamer, atlas);
-      rmn ->adapt();
+      file_reader.parse(*rmn, *atlas);
     }
+#ifndef DEBUG
     catch(std::exception& exc)
     {
       std::cerr << "ERROR: " << exc.what() << std::endl;
       return 1;
     }
+    catch(...)
+    {
+      std::cerr << "ERROR: unknown exception" << std::endl;
+      return 1;
+    }
+#endif
 
     // refine
-    for(Index lvl(1); lvl <= level; ++lvl)
+    for(Index lvl(1); lvl <= lvl_max; ++lvl)
     {
       std::cout << "Refining up to level " << lvl << "..." << std::endl;
+
       auto* old = rmn;
       rmn = old->refine();
       delete old;
@@ -336,6 +335,8 @@ using MyFunctionalQ1Hack = Meshopt::RumpfFunctionalQ1Hack<A, B, Meshopt::RumpfFu
  */
 int main(int argc, char* argv[])
 {
+  typedef double DataType;
+
   // Creata a parser for command line arguments.
   SimpleArgParser args(argc, argv);
 
@@ -348,12 +349,13 @@ int main(int argc, char* argv[])
   }
   // Specify supported command line switches
   args.support("level");
-  args.support("filename");
+  args.support("meshfile");
   args.support("help");
+
   // Refinement level
   Index lvl_max(0);
-  // Input file name, required
-  FEAST::String filename;
+  // Input mesh file name, required
+  FEAST::String meshfile;
   // Get unsupported command line arguments
   std::deque<std::pair<int,String> > unsupported = args.query_unsupported();
   if( !unsupported.empty() )
@@ -363,13 +365,16 @@ int main(int argc, char* argv[])
       std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
   }
 
-  // Check and parse --filename
-  if(args.check("filename") != 1 )
+  // Check and parse --meshfile
+  if(args.check("meshfile") != 1 )
+  {
+    std::cout << "You need to specify a mesh file with --meshfile.";
     throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --filename");
+  }
   else
   {
-    args.parse("filename", filename);
-    std::cout << "Reading mesh from file " << filename << std::endl;
+    args.parse("meshfile", meshfile);
+    std::cout << "Reading mesh from file " << meshfile << std::endl;
   }
 
   // Check and parse --level
@@ -381,18 +386,16 @@ int main(int argc, char* argv[])
     std::cout << "Refinement level " << lvl_max << std::endl;
   }
 
-  // Create a MeshStreamer and read the mesh file
-  MeshStreamer my_streamer;
-  my_streamer.parse_mesh_file(filename);
-
-  // This is the raw mesh data my_streamer read from filename
-  auto& mesh_data = my_streamer.get_root_mesh_node()->mesh_data;
-  // Marker int for the ShapeType
-  int shape_type = mesh_data.shape_type;
-
-  ASSERT(mesh_data.mesh_type == mesh_data.mt_conformal, "This application only works for conformal meshes!");
-
-  typedef double DataType;
+  // Create mesh input file stream
+  std::ifstream ifs_mesh(meshfile, std::ios_base::in);
+  if(!ifs_mesh.is_open() || !ifs_mesh.good())
+  {
+    std::cerr << "ERROR: Failed to open '" << meshfile << "'" << std::endl;
+    return 1;
+  }
+  // Create a reader and read the root markup
+  Geometry::MeshFileReader mesh_reader(ifs_mesh);
+  mesh_reader.read_root_markup();
 
   DataType deltat(DataType(1e-2));
 
@@ -400,14 +403,18 @@ int main(int argc, char* argv[])
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> Simplex2Mesh_2d;
   typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> Hypercube2Mesh_2d;
 
+  // get mesh type
+  const String mtype = mesh_reader.get_meshtype_string();
+
   int ret(1);
+
   // Call the run() method of the appropriate wrapper class
-  if(shape_type == mesh_data.st_tria)
+  if(mtype == "conformal:simplex:2:2")
     return LevelsetApp<DataType, Simplex2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
-      run(my_streamer, lvl_max, deltat);
-  if(shape_type == mesh_data.st_quad)
+      run(mesh_reader, lvl_max, deltat);
+  if(mtype == "conformal:hypercube:2:2")
     return LevelsetApp<DataType, Hypercube2Mesh_2d, MySmoother, MyFunctional, Meshopt::RumpfFunctionalLevelset>::
-      run(my_streamer, lvl_max, deltat);
+      run(mesh_reader, lvl_max, deltat);
 
   ret = ret | FEAST::Runtime::finalise();
   // If no MeshType from the list was in the file, return 1

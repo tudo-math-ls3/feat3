@@ -74,6 +74,16 @@ namespace FEAST
           return !_param.empty();
         }
 
+        std::deque<WorldPoint>& get_world_points()
+        {
+          return _world;
+        }
+
+        const std::deque<WorldPoint>& get_world_points() const
+        {
+          return _world;
+        }
+
         /**
          * \brief Maps a single parameter point
          *
