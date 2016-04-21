@@ -120,8 +120,8 @@ public:
       Assembly::SymbolicMatrixAssembler<>::assemble2(mat, space_v, space_p);
       mat_b = MatrixTypeB(mat.layout());
       mat_b.format();
-      Assembly::Common::TestDerivativeOperator<0> oper_x;
-      Assembly::Common::TestDerivativeOperator<1> oper_y;
+      Assembly::Common::TestDerivativeOperator oper_x(0);
+      Assembly::Common::TestDerivativeOperator oper_y(1);
       Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_b.template at<0,0>(), oper_x, space_v, space_p, cubature, -1.0);
       Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_b.template at<1,0>(), oper_y, space_v, space_p, cubature, -1.0);
     }
@@ -240,10 +240,10 @@ public:
       Assembly::SymbolicMatrixAssembler<>::assemble1(mat, space_v);
       mat_a = MatrixTypeA(mat.layout());
       mat_a.format();
-      Assembly::Common::DuDvOperator<0,0> dudv00;
-      Assembly::Common::DuDvOperator<0,1> dudv01;
-      Assembly::Common::DuDvOperator<1,0> dudv10;
-      Assembly::Common::DuDvOperator<1,1> dudv11;
+      Assembly::Common::DuDvOperator dudv00(0,0);
+      Assembly::Common::DuDvOperator dudv01(0,1);
+      Assembly::Common::DuDvOperator dudv10(1,0);
+      Assembly::Common::DuDvOperator dudv11(1,1);
       Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_a.template at<0,0>(), dudv00, space_v, cubature, 0.5);
       Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_a.template at<0,1>(), dudv01, space_v, cubature, 0.5);
       Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_a.template at<1,0>(), dudv10, space_v, cubature, 0.5);
@@ -254,8 +254,8 @@ public:
       Assembly::SymbolicMatrixAssembler<>::assemble2(mat, space_v, space_p);
       mat_b = MatrixTypeB(mat.layout());
       mat_b.format();
-      Assembly::Common::TestDerivativeOperator<0> oper_x;
-      Assembly::Common::TestDerivativeOperator<1> oper_y;
+      Assembly::Common::TestDerivativeOperator oper_x(0);
+      Assembly::Common::TestDerivativeOperator oper_y(1);
       Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_b.template at<0,0>(), oper_x, space_v, space_p, cubature, -1.0);
       Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_b.template at<1,0>(), oper_y, space_v, space_p, cubature, -1.0);
     }

@@ -192,20 +192,15 @@ namespace FEAST
        * This functor can be used with the BilinearOperator assembly class template to assemble a
        * scalar matrix for the pressure-gradient operator of the Stokes equation.
        *
-       * \tparam derivative_
-       * The index of the derivative for this operator:
-       *  - 0: X-derivative
-       *  - 1: Y-derivative
-       *  - 2: Z-derivative
-       *  - ...
-       *
        * \author Peter Zajac
        */
-      template<Index derivative_>
       class TestDerivativeOperator :
         public BilinearOperator
       {
       public:
+        /// the desired derivative
+        int deriv;
+
         /// test space configuration
         struct TestConfig :
           public Space::ConfigBase
@@ -232,7 +227,7 @@ namespace FEAST
          */
         template<typename AsmTraits_>
         class Evaluator :
-            public BilinearOperator::Evaluator<AsmTraits_>
+          public BilinearOperator::Evaluator<AsmTraits_>
         {
         public:
           /// the data type to be used
@@ -244,6 +239,10 @@ namespace FEAST
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
+        protected:
+          /// the desired derivative
+          int deriv;
+
         public:
           /**
            * \brief Constructor
@@ -251,7 +250,8 @@ namespace FEAST
            * \param[in] operat
            * A reference to the Laplace operator object.
            */
-          explicit Evaluator(const TestDerivativeOperator<derivative_>& DOXY(operat))
+          explicit Evaluator(const TestDerivativeOperator& operat) :
+            deriv(operat.deriv)
           {
           }
 
@@ -274,9 +274,23 @@ namespace FEAST
            **/
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
-            return phi.value * psi.grad[derivative_];
+            return phi.value * psi.grad[deriv];
           }
         }; // class TestDerivativeOperator::Evaluator<...>
+
+        /*
+         *
+         * \param[in] derivative
+         * The index of the derivative for this operator:
+         *  - 0: X-derivative
+         *  - 1: Y-derivative
+         *  - 2: Z-derivative
+         *  - ...
+        */
+        explicit TestDerivativeOperator(int derivative) :
+          deriv(derivative)
+        {
+        }
       }; // class TestDerivativeOperator
 
       /**
@@ -293,19 +307,14 @@ namespace FEAST
        * Note that \f[ \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \psi + \nabla \varphi : \left( \nabla \psi \right)^T \right) \f],
        * so the \f$ (k,l) \f$-block consists of entries corresponding to \f$ \partial_k \varphi \partial_l \psi \f$.
        *
-       * \tparam ir
-       * The row index of the block
-       *
-       * \tparam ic
-       * The column index of the block
-       *
        * \author Jordi Paul
        */
-      template<int ir, int ic>
       class DuDvOperator :
         public BilinearOperator
       {
       public:
+        int ir, ic;
+
         /// test space configuration
         struct TestConfig :
           public Space::ConfigBase
@@ -344,6 +353,9 @@ namespace FEAST
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
+        protected:
+          int ir, ic;
+
         public:
           /**
            * \brief Constructor
@@ -351,7 +363,8 @@ namespace FEAST
            * \param[in] operat
            * A reference to the Du : Dv operator object.
            */
-          explicit Evaluator(const DuDvOperator<ir,ic>& DOXY(operat))
+          explicit Evaluator(const DuDvOperator& operat) :
+            ir(operat.ir), ic(operat.ic)
           {
           }
 
@@ -372,10 +385,24 @@ namespace FEAST
            **/
           DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
           {
-            return DataType(ir==ic)*dot(phi.grad,psi.grad) + phi.grad[ir] * psi.grad[ic];
+            return ((ir==ic) ? dot(phi.grad,psi.grad) : DataType(0)) + phi.grad[ir] * psi.grad[ic];
           }
         }; // class DuDvOperator::Evaluator<...>
-      }; // class DuDVOperator
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] ir
+         * The row index of the block
+         *
+         * \param[in] ic
+         * The column index of the block
+         */
+        explicit DuDvOperator(int _ir, int _ic) :
+          ir(_ir), ic(_ic)
+        {
+        }
+      }; // class DuDvOperator
 
       /**
        * \brief Du:Dv operator implementation

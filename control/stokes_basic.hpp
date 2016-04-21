@@ -460,29 +460,12 @@ namespace FEAST
         }
 
         // assemble pressure gradient matrices
+        for(int ider(0); ider < mat_loc_b.num_row_blocks; ++ider)
         {
-          /// \todo replace by for-loop
-          if(mat_loc_b.num_row_blocks > 0)
-          {
-            typename SystemLevel_::LocalScalarMatrix& mat_loc_bi = mat_loc_b.get(0,0);
-            mat_loc_bi.format();
-            Assembly::Common::TestDerivativeOperator<0> deri;
-            Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_bi, deri, space_velo, space_pres, cubature, -DataType(1));
-          }
-          if(mat_loc_b.num_row_blocks > 1)
-          {
-            typename SystemLevel_::LocalScalarMatrix& mat_loc_bi = mat_loc_b.get(1,0);
-            mat_loc_bi.format();
-            Assembly::Common::TestDerivativeOperator<1> deri;
-            Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_bi, deri, space_velo, space_pres, cubature, -DataType(1));
-          }
-          if(mat_loc_b.num_row_blocks > 2)
-          {
-            typename SystemLevel_::LocalScalarMatrix& mat_loc_bi = mat_loc_b.get(2,0);
-            mat_loc_bi.format();
-            Assembly::Common::TestDerivativeOperator<2> deri;
-            Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_bi, deri, space_velo, space_pres, cubature, -DataType(1));
-          }
+          typename SystemLevel_::LocalScalarMatrix& mat_loc_bi = mat_loc_b.get(ider,0);
+          mat_loc_bi.format();
+          Assembly::Common::TestDerivativeOperator deri(ider);
+          Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_bi, deri, space_velo, space_pres, cubature, -DataType(1));
         }
 
         // assemble velocity divergence matrices
