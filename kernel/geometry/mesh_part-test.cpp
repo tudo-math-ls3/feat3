@@ -128,33 +128,31 @@ public:
 
     // Check MeshAttribute functionality
     // Create attributes of dimension 0
-    MeshAttributeType att_0_1(mesh_part_to_test.get_num_entities(0),1,1,"SomeName");
-    MeshAttributeType att_0_2(mesh_part_to_test.get_num_entities(0),1,1,"SomeOtherName");
-    MeshAttributeType att_0_3(mesh_part_to_test.get_num_entities(0),1,1,"SomeName");
+    MeshAttributeType* att_0_1 = new MeshAttributeType(mesh_part_to_test.get_num_entities(0),1,1);
+    MeshAttributeType* att_0_2 = new MeshAttributeType(mesh_part_to_test.get_num_entities(0),1,1);
+    MeshAttributeType* att_0_3 = new MeshAttributeType(mesh_part_to_test.get_num_entities(0),1,1);
     // Change some data
-    att_0_1[1][0] = DataType(12);
-    att_0_3[1][0] = DataType(-5);
+    (*att_0_1)[1][0] = DataType(12);
+    (*att_0_3)[1][0] = DataType(-5);
 
     // Add attributes of dimension 0
     TEST_CHECK(mesh_part_to_test.get_num_attributes() == 0);
-    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_1,0));
-    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_2,0));
+    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_1,"SomeName"));
+    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_2,"SomeOtherName"));
 
     TEST_CHECK(mesh_part_to_test.get_num_attributes() == 2);
 
     // As an attribute with the same name is already present, this must return false
-    TEST_CHECK(!mesh_part_to_test.add_attribute(att_0_3,0));
+    TEST_CHECK(!mesh_part_to_test.add_attribute(att_0_3,"SomeName"));
     // There should still be only 2 attributes in the mesh
-    TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(0),2);
-    TEST_CHECK_EQUAL((*mesh_part_to_test.find_attribute("SomeName",0))[1][0], DataType(12));
-    // Now we specify replace=true and it should return true
-    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_3,0,true));
-    TEST_CHECK_EQUAL((*mesh_part_to_test.find_attribute("SomeName",0))[1][0], DataType(-5));
+    TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(),2);
+    TEST_CHECK_EQUAL((*mesh_part_to_test.find_attribute("SomeName"))[1][0], DataType(12));
     // There should still be only 2 attributes in the mesh
-    TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(0),2);
+    TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(),2);
 
-    // Add attribute of dimension 0 as attribute of dimension 1. This should throw an InternalError.
-    TEST_CHECK_THROWS(mesh_part_to_test.add_attribute(att_0_2,1), InternalError);
+    // Since we never successfully inserted this, we have to clean it up
+    delete att_0_3;
+
   }
 
 } mesh_part_test;

@@ -43,8 +43,6 @@ namespace FEAST
         int _stride;
         /// Value array
         CoordType* _vertices;
-        /// Name identifier
-        String _identifier;
 
       public:
         /**
@@ -58,21 +56,12 @@ namespace FEAST
          *
          * \param[in] stride
          * The vertex stride. If = 0, then num_coords will be used for the vertex stride.
-         *
-         * \param[in] identifier
-         * Name identifier, defaults to the empty String.
          */
-        explicit MeshAttribute(
-          Index num_vertices,
-          int num_coords,
-          int stride = 0,
-          String identifier = "")
-          :
+        explicit MeshAttribute( Index num_vertices, int num_coords, int stride = 0) :
             _num_vertices(num_vertices),
             _num_coords(num_coords),
             _stride(stride > 0 ? stride : num_coords),
-            _vertices(nullptr),
-            _identifier(identifier)
+            _vertices(nullptr)
             {
               CONTEXT(name() + "::MeshAttribute()");
               ASSERT_(_num_coords >= 0);
@@ -87,60 +76,57 @@ namespace FEAST
               }
             }
 
-        /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other
-         * The vertex set that is to be copied.
-         */
-        //template<typename Coord2_>
-        //MeshAttribute(const MeshAttribute<Coord2_>& other) :
-        MeshAttribute(const MeshAttribute& other) :
-          _num_vertices(other.get_num_vertices()),
-          _num_coords(other.get_num_coords()),
-          _stride(other.get_stride()),
-          _vertices(nullptr),
-          _identifier(other.get_identifier())
-          {
-            if((_num_vertices > 0) && (_num_coords > 0))
-            {
-              _vertices = new CoordType[_num_vertices * Index(_stride)];
-              for(Index i(0); i < _num_vertices; ++i)
-              {
-                for(Index j(0); j < Index(_num_coords); ++j)
-                {
-                  _vertices[i * Index(_stride) + j] = CoordType(other[i][j]);
-                }
-                for(Index j = Index(_num_coords); j < Index(_stride); ++j)
-                {
-                  _vertices[i * Index(_stride) + j] = CoordType(0);
-                }
-              }
-            }
-          }
+        ///**
+        // * \brief Copy Constructor
+        // *
+        // * \param[in] other
+        // * The vertex set that is to be copied.
+        // */
+        ////template<typename Coord2_>
+        ////MeshAttribute(const MeshAttribute<Coord2_>& other) :
+        //MeshAttribute(const MeshAttribute& other) :
+        //  _num_vertices(other.get_num_vertices()),
+        //  _num_coords(other.get_num_coords()),
+        //  _stride(other.get_stride()),
+        //  _vertices(nullptr)
+        //  {
+        //    if((_num_vertices > 0) && (_num_coords > 0))
+        //    {
+        //      _vertices = new CoordType[_num_vertices * Index(_stride)];
+        //      for(Index i(0); i < _num_vertices; ++i)
+        //      {
+        //        for(Index j(0); j < Index(_num_coords); ++j)
+        //        {
+        //          _vertices[i * Index(_stride) + j] = CoordType(other[i][j]);
+        //        }
+        //        for(Index j = Index(_num_coords); j < Index(_stride); ++j)
+        //        {
+        //          _vertices[i * Index(_stride) + j] = CoordType(0);
+        //        }
+        //      }
+        //    }
+        //  }
 
-        /**
-         * \brief Move Constructor
-         *
-         * \param[in] other
-         * The vertex set to be moved
-         */
-        MeshAttribute(MeshAttribute&& other) :
-          _num_vertices(other.get_num_vertices()),
-          _num_coords(other.get_num_coords()),
-          _stride(other.get_stride()),
-          _vertices(nullptr),
-          _identifier(other.get_identifier())
-          {
-            if((_num_vertices > 0) && (_num_coords > 0))
-              _vertices = other._vertices;
+        ///**
+        // * \brief Move Constructor
+        // *
+        // * \param[in] other
+        // * The vertex set to be moved
+        // */
+        //MeshAttribute(MeshAttribute&& other) :
+        //  _num_vertices(other.get_num_vertices()),
+        //  _num_coords(other.get_num_coords()),
+        //  _stride(other.get_stride()),
+        //  _vertices(nullptr)
+        //  {
+        //    if((_num_vertices > 0) && (_num_coords > 0))
+        //      _vertices = other._vertices;
 
-            other._num_vertices = 0;
-            other._num_coords = 0;
-            other._stride = 0;
-            other._vertices = nullptr;
-            other._identifier = "";
-          }
+        //    other._num_vertices = 0;
+        //    other._num_coords = 0;
+        //    other._stride = 0;
+        //    other._vertices = nullptr;
+        //  }
 
         /// virtual destructor
         virtual ~MeshAttribute()
@@ -152,57 +138,48 @@ namespace FEAST
           }
         }
 
-        /**
-         * \brief Copy assignment operator
-         *
-         * This is needed for replacing one MeshAttribute by another when inserting into a \ref MeshAttributeHolder.
-         *
-         * \param[in] other
-         * Other MeshAttribute to copy from.
-         */
-        MeshAttribute& operator=(const MeshAttribute& other)
-        {
-          if(&other != this)
-          {
-            _num_vertices = other.get_num_vertices();
-            _num_coords = other.get_num_coords();
-            _stride = other.get_stride();
-            _identifier = other.get_identifier();
+        ///**
+        // * \brief Copy assignment operator
+        // *
+        // * This is needed for replacing one MeshAttribute by another when inserting into a \ref MeshAttributeHolder.
+        // *
+        // * \param[in] other
+        // * Other MeshAttribute to copy from.
+        // */
+        //MeshAttribute& operator=(const MeshAttribute& other)
+        //{
+        //  if(&other != this)
+        //  {
+        //    _num_vertices = other.get_num_vertices();
+        //    _num_coords = other.get_num_coords();
+        //    _stride = other.get_stride();
 
-            if(_vertices != nullptr)
-              delete[] _vertices;
+        //    if(_vertices != nullptr)
+        //      delete[] _vertices;
 
-            if(other._vertices != nullptr)
-            {
-              if((_num_vertices > 0) && (_num_coords > 0))
-              {
-                _vertices = new CoordType[_num_vertices * Index(_stride)];
-                for(Index i(0); i < _num_vertices; ++i)
-                {
-                  for(Index j(0); j < Index(_num_coords); ++j)
-                    _vertices[i * Index(_stride) + j] = other[i][j];
+        //    if(other._vertices != nullptr)
+        //    {
+        //      if((_num_vertices > 0) && (_num_coords > 0))
+        //      {
+        //        _vertices = new CoordType[_num_vertices * Index(_stride)];
+        //        for(Index i(0); i < _num_vertices; ++i)
+        //        {
+        //          for(Index j(0); j < Index(_num_coords); ++j)
+        //            _vertices[i * Index(_stride) + j] = other[i][j];
 
-                  for(Index j = Index(_num_coords); j < Index(_stride); ++j)
-                    _vertices[i * Index(_stride) + j] = CoordType(0);
-                }
-              }
-            }
-          }
-          return *this;
-        }
+        //          for(Index j = Index(_num_coords); j < Index(_stride); ++j)
+        //            _vertices[i * Index(_stride) + j] = CoordType(0);
+        //        }
+        //      }
+        //    }
+        //  }
+        //  return *this;
+        //}
 
         /// \returns The size of dynamically allocated memory in bytes.
         std::size_t bytes() const
         {
           return std::size_t(_num_vertices * std::size_t(_stride)) * sizeof(CoordType);
-        }
-
-        /**
-         * \brief Returns a copy of the name identifier
-         */
-        String get_identifier() const
-        {
-          return _identifier;
         }
 
         /**

@@ -29,7 +29,7 @@ namespace FEAST
         /// Data type for attributes
         typedef typename MeshType_::VertexSetType::CoordType AttributeDataType;
         /// Mesh attribute holder type
-        typedef MeshAttributeHolder<ShapeType, AttributeDataType> AttributeHolderType;
+        typedef typename MeshPartType::MeshAttributeContainer MeshAttributeContainer;
         /// Index set holder type
         typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
         /// Target set holder type
@@ -112,7 +112,7 @@ namespace FEAST
          *
          * This MeshPart does not have any attributes.
          */
-        virtual void fill_attribute_sets(AttributeHolderType& DOXY(attribute_set_holder)) override
+        virtual void fill_attribute_sets(MeshAttributeContainer& DOXY(attribute_set_holder)) override
         {
           // Do nothing
           return;

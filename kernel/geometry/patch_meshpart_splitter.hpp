@@ -67,7 +67,7 @@ namespace FEAST
         /// Data type for attributes
         typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
         /// Mesh attribute holder type
-        typedef MeshAttributeHolder<ShapeType, AttributeDataType> AttributeHolderType;
+        typedef typename MeshPartType::MeshAttributeContainer MeshAttributeContainer;
         /// Index set holder type
         typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
         /// Target set holder type
@@ -79,8 +79,8 @@ namespace FEAST
         /// The MeshPart identifying this patch
         const MeshPartType& _patch_mesh_part;
 
-        /// The topology of the current BaseMesh MeshPart
-        const AttributeHolderType* _cur_part_attribute_holder;
+        /// The mesh attributes of the current BaseMesh MeshPart
+        const MeshAttributeContainer* __cur_part_attribute_container;
         /// The topology of the current BaseMesh MeshPart
         const IndexSetHolder<ShapeType>* _cur_part_topology;
         /// The BaseMesh MeshPart to PatchMeshPart MeshPart mapping information
@@ -99,7 +99,7 @@ namespace FEAST
         explicit PatchMeshPartSplitter(const MeshType& base_mesh, const MeshPartType& patch_mesh_part) :
           _base_mesh(base_mesh),
           _patch_mesh_part(patch_mesh_part),
-          _cur_part_attribute_holder(nullptr),
+          __cur_part_attribute_container(nullptr),
           _cur_part_topology(nullptr),
           _part_holder(patch_mesh_part.get_target_set_holder())
           {
@@ -125,7 +125,7 @@ namespace FEAST
         bool build(const MeshPartType& mesh_part)
         {
           _cur_part_topology = mesh_part.get_topology();
-          _cur_part_attribute_holder = &(mesh_part.get_attribute_holder());
+          __cur_part_attribute_container = &(mesh_part.get_attribute_holder());
           return _part_holder.build(mesh_part.get_target_set_holder(), mesh_part.get_topology());
         }
 
@@ -153,9 +153,9 @@ namespace FEAST
          * \param[in,out] ash
          * The attribute set holder whose attribute sets are to be filled.
          */
-        virtual void fill_attribute_sets(typename MeshPartType::AttributeHolderType& ash) override
+        virtual void fill_attribute_sets(MeshAttributeContainer& attribute_container) override
         {
-          _part_holder.fill_attribute_sets(ash, *_cur_part_attribute_holder);
+          _part_holder.fill_attribute_sets(attribute_container, *__cur_part_attribute_container);
         }
 
         /**

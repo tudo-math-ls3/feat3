@@ -69,8 +69,8 @@ namespace FEAST
       typedef typename QuadPart::TargetSetHolderType QuadTrgSetHolder;
       typedef typename HexaPart::TargetSetHolderType HexaTrgSetHolder;
 
-      typedef typename QuadPart::AttributeType QuadAttrib;
-      typedef typename HexaPart::AttributeType HexaAttrib;
+      typedef typename QuadPart::MeshAttributeType QuadAttrib;
+      typedef typename HexaPart::MeshAttributeType HexaAttrib;
 
     protected:
       /// the number of slices in z-direction
@@ -497,7 +497,7 @@ namespace FEAST
         const int quad_num_coords = quad_attrib.get_num_coords();
 
         // create attribute
-        hexa_attrib = HexaAttrib(quad_num_verts * (_slices+1), quad_num_coords+1, 0, quad_attrib.get_identifier());
+        hexa_attrib = HexaAttrib(quad_num_verts * (_slices+1), quad_num_coords+1, 0);
 
         // loop over all slices
         for(Index j(0); j <= _slices; ++j)
@@ -674,8 +674,8 @@ namespace FEAST
 
       typedef typename HexaPart::IndexSetHolderType IndexSetHolderType;
       typedef typename HexaPart::TargetSetHolderType TargetSetHolderType;
-      typedef typename HexaPart::AttributeHolderType AttributeHolderType;
-      typedef typename HexaPart::AttributeType HexaAttribute;
+      typedef typename HexaPart::MeshAttributeContainer MeshAttributeContainer;
+      typedef typename HexaPart::MeshAttributeType HexaAttribute;
 
     protected:
       const MeshExtruderType& _mesh_extruder;
@@ -730,14 +730,14 @@ namespace FEAST
         }
       }
 
-      virtual void fill_attribute_sets(AttributeHolderType& attribute_set_holder) override
+      virtual void fill_attribute_sets(MeshAttributeContainer& attribute_container) override
       {
         // extrude attributes
-        for(const auto& quad_attrib : _quad_part.template get_attributes<0>())
+        for(const auto& quad_attrib : _quad_part.get_mesh_attributes())
         {
-          HexaAttribute hexa_attrib(Index(0), 0);
-          _mesh_extruder.extrude_attribute(hexa_attrib, quad_attrib);
-          attribute_set_holder.add_attribute(hexa_attrib, 0);
+          HexaAttribute* hexa_attrib = new HexaAttribute(Index(0), 0);
+          _mesh_extruder.extrude_attribute(*hexa_attrib, *(quad_attrib.second));
+          attribute_container.insert(std::make_pair(quad_attrib.first, hexa_attrib));
         }
       }
     }; // class MeshPartExtruderFactory<ConformalMesh<Shape::Hypercube<2>,...>>
@@ -765,8 +765,8 @@ namespace FEAST
 
       typedef typename HexaPart::IndexSetHolderType IndexSetHolderType;
       typedef typename HexaPart::TargetSetHolderType TargetSetHolderType;
-      typedef typename HexaPart::AttributeHolderType AttributeHolderType;
-      typedef typename HexaPart::AttributeType HexaAttribute;
+      typedef typename HexaPart::MeshAttributeContainer MeshAttributeContainer;
+      typedef typename HexaPart::MeshAttributeType HexaAttribute;
 
     protected:
       const MeshExtruderType& _mesh_extruder;
@@ -811,7 +811,7 @@ namespace FEAST
         index_set_holder = nullptr;
       }
 
-      virtual void fill_attribute_sets(AttributeHolderType& /*attribute_set_holder*/) override
+      virtual void fill_attribute_sets(MeshAttributeContainer& /*attribute_set_holder*/) override
       {
       }
     }; // class MeshPartSliceExtruderFactory<ConformalMesh<Shape::Hypercube<2>,...>>

@@ -230,9 +230,9 @@ namespace FEAST
         // create mesh part
         QuadSubMesh* mesh = new QuadSubMesh(num_entities, true);
         // create a MeshAttribute that holds one value for each vertex
-        QuadSubMesh::AttributeType my_vertex_set(num_entities[0],1);
+        QuadSubMesh::MeshAttributeType* my_vertex_set = new QuadSubMesh::MeshAttributeType(num_entities[0],1);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, 0);
+        mesh->add_attribute(my_vertex_set, "EdgeSubMeshAttribute");
 
         // set up vertex coordinates array
         Real vtx[] =
@@ -242,7 +242,7 @@ namespace FEAST
           2.0,
           3.0
         };
-        copy_vtx(mesh->get_attributes<0>()[0], vtx);
+        copy_vtx(*(mesh->find_attribute("EdgeSubMeshAttribute")), vtx);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -292,7 +292,7 @@ namespace FEAST
           1.5,
           2.5
         };
-        if(!comp_vtx(mesh.get_attributes<0>()[0], vtx))
+        if(!comp_vtx(*(mesh.find_attribute("EdgeSubMeshAttribute")), vtx))
           throw String("Vertex coordinate refinement failure");
 
         // check vertices-at-edge array
@@ -350,9 +350,9 @@ namespace FEAST
         // create mesh
         QuadSubMesh* mesh = new QuadSubMesh(num_entities, true);
         // create a MeshAttribute that holds one value for each vertex
-        QuadSubMesh::AttributeType my_vertex_set(num_entities[0],2);
+        QuadSubMesh::MeshAttributeType* my_vertex_set = new QuadSubMesh::MeshAttributeType(num_entities[0],2);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, 0);
+        mesh->add_attribute(my_vertex_set, "QuadSubMeshAttribute");
 
         // set up vertex coordinates array
         Real vtx[] =
@@ -364,7 +364,7 @@ namespace FEAST
           1.0, 2.0,
           1.0, 0.0
         };
-        copy_vtx(mesh->get_attributes<0>()[0], vtx);
+        copy_vtx(*(mesh->find_attribute("QuadSubMeshAttribute")), vtx);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -467,7 +467,7 @@ namespace FEAST
           0.5, 1.5, // quad midpoints
           0.5, 0.5
         };
-        if(!comp_vtx(mesh.get_attributes<0>()[0], vtx))
+        if(!comp_vtx(*(mesh.find_attribute("QuadSubMeshAttribute")), vtx))
           throw String("Vertex coordinate refinement failure");
 
         // check vertices-at-edge array
@@ -566,9 +566,9 @@ namespace FEAST
         // create mesh
         QuadSubMesh* mesh = new QuadSubMesh(num_entities, true);
         // create a MeshAttribute that holds one value for each vertex
-        QuadSubMesh::AttributeType my_vertex_set(num_entities[0],1);
+        QuadSubMesh::MeshAttributeType* my_vertex_set = new QuadSubMesh::MeshAttributeType(num_entities[0],1);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, 0);
+        mesh->add_attribute(my_vertex_set, "QuadSubMeshAttribute");
 
         // set up vertex coordinates array
         Real vtx[] =
@@ -578,7 +578,7 @@ namespace FEAST
           2.0,
           3.0
         };
-        copy_vtx(mesh->get_attributes<0>()[0], vtx);
+        copy_vtx(*(mesh->find_attribute("QuadSubMeshAttribute")), vtx);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -628,7 +628,7 @@ namespace FEAST
           1.5,
           2.5
         };
-        if(!comp_vtx(mesh.get_attributes<0>()[0], vtx))
+        if(!comp_vtx(*(mesh.find_attribute("QuadSubMeshAttribute")), vtx))
           throw String("Vertex coordinate refinement failure");
 
         // check vertices-at-edge array

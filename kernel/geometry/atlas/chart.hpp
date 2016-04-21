@@ -148,7 +148,7 @@ namespace FEAST
             typedef typename MT_::VertexSetType VertexSetType;
 
             // attribute type of our mesh part
-            typedef typename PT_::AttributeType AttributeType;
+            typedef typename PT_::MeshAttributeType AttributeType;
 
             // First of all, check whether the chart can really perform
             // explicit adaption
@@ -156,7 +156,7 @@ namespace FEAST
               return false;
 
             // Try to fetch the parametrisation attribute.
-            const AttributeType* attrib = part.find_attribute("param", 0);
+            const AttributeType* attrib = part.find_attribute("param");
             if(attrib == nullptr)
               return false;
 
@@ -222,7 +222,7 @@ namespace FEAST
         /// mesh-part type
         typedef typename BaseClass::PartType PartType;
         /// attribute type of our mesh-part
-        typedef typename PartType::AttributeType AttributeType;
+        typedef typename PartType::MeshAttributeType AttributeType;
         /// vertex set type of our mesh
         typedef typename MeshType::VertexSetType VertexSetType;
         /// coordinate type

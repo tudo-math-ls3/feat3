@@ -29,8 +29,8 @@ namespace MeshExtruderTool
   typedef QuadPart::TargetSetHolderType QuadTrgSetHolder;
   typedef HexaPart::TargetSetHolderType HexaTrgSetHolder;
 
-  typedef QuadPart::AttributeType QuadAttrib;
-  typedef HexaPart::AttributeType HexaAttrib;
+  typedef QuadPart::MeshAttributeType QuadAttrib;
+  typedef HexaPart::MeshAttributeType HexaAttrib;
 
   typedef MeshAtlas<QuadMesh> QuadAtlas;
   typedef MeshAtlas<HexaMesh> HexaAtlas;

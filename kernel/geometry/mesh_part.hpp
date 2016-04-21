@@ -12,6 +12,8 @@
 #include <kernel/geometry/intern/standard_target_refiner.hpp>
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
 
+#include<map>
+
 namespace FEAST
 {
   namespace Geometry
@@ -26,386 +28,6 @@ namespace FEAST
       template<int>
       struct IndexSetFiller;
     }
-
-    /**
-     * \brief Class for holding MeshAttributes for all shape dimensions
-     *
-     * \tparam Shape_
-     * Shape type of the highest dimensional cell type, i.e. 3 for Hypercube<3> meshes
-     *
-     * \tparam DataType_
-     * DataType used in the attribute's values, i.e. double
-     *
-     * A MeshAttribute is some kind of data that refers to an entity type in a mesh, like vertices, edges, faces or
-     * cells. The MeshAttributeHolder contains the set of attributes for its dimension (Shape_::dimension) and
-     * inherits from its lower dimensional version. By this inheritance structure, it contains all MeshAttribute
-     * information from dimension 0 (vertices) up to Shape_::dimension.
-     *
-     * A MeshAttribute's values themselves are vector valued in general. The most important use of a MeshAttribute
-     * at the time of writing is the parametrisation variable in (boundary) submeshes. A d-dimensional boundary mesh
-     * therefore can have a MeshAttribute of dimension 0 (meaning it refers to vertices) as parametrisation variable,
-     * which in turn has values of dimension d.
-     *
-     * Up until now, only MeshAttributes of dimension 0 are implemented and used, although this might change in the
-     * future. MeshAttributes of higher dimension can be present, but cannot be refined.
-     *
-     * Note that a MeshAttribute needs to be refined if the mesh it refers to is refined. For dimension 0 attributes,
-     * it is clear how to refine them: Linear interpolation. For attributes of the highest possible dimension
-     * (meaning cell attributes), new cells inherit the value from their parent cells. For attributes of intermediate
-     * dimension, this is not clear.
-     *
-     * \author Jordi Paul
-     *
-     */
-    template<typename Shape_, typename DataType_>
-    class MeshAttributeHolder :
-      public MeshAttributeHolder<typename Shape::FaceTraits<Shape_, Shape_::dimension - 1>::ShapeType, DataType_>
-    {
-    public:
-      /// Type of the highest dimensional entity
-      typedef Shape_ ShapeType;
-      /// Dimension of ShapeType
-      static constexpr int shape_dim = ShapeType::dimension;
-      /// Type the MeshAttribute uses
-      typedef DataType_ DataType;
-      /// Type of the Attribute
-      typedef MeshAttribute<DataType_> AttributeType;
-      /// Type for the set of all Attributes belonging to shape_dim
-      typedef std::vector<MeshAttribute<DataType_>> AttributeSetType;
-
-    protected:
-      /// This type's base class, meaning a MeshAttributeHolder of one dimension less
-      typedef MeshAttributeHolder
-      <
-        typename Shape::FaceTraits<ShapeType, shape_dim - 1>::ShapeType, DataType_
-      > BaseClass;
-
-      /// The set of all attributes belonging to shape_dim
-      AttributeSetType _mesh_attributes;
-
-    public:
-      /// \brief Empty default constructor
-      explicit MeshAttributeHolder()
-      {
-      }
-
-      /// \brief Copy constructor
-      MeshAttributeHolder(const MeshAttributeHolder& other) :
-        BaseClass(other),
-        _mesh_attributes(other._mesh_attributes)
-      {
-      }
-
-      /// \brief Virtual destructor
-      virtual ~MeshAttributeHolder()
-      {
-        CONTEXT(name() + "::~MeshAttributeHolder()");
-      }
-
-      /// \returns The size of dynamically allocated memory in bytes.
-      std::size_t bytes() const
-      {
-        std::size_t s(BaseClass::bytes());
-        for(auto it = _mesh_attributes.begin(); it != _mesh_attributes.end(); ++it)
-          s += it->bytes();
-        return s;
-      }
-
-      /**
-       * \brief Returns a reference to the set of attributes belonging to dimension dim_
-       *
-       * \tparam dim_
-       * Shape dim of the mesh entity the attribute set retrieved refers to
-       *
-       * \returns
-       * A reference to the AttributeSet to dimension dim_.
-       */
-      template<int dim_>
-      AttributeSetType& get_mesh_attributes()
-      {
-        CONTEXT(name() + "::get_mesh_attributes()");
-        static_assert(dim_ >= 0, "invalid dimension");
-        static_assert(dim_ <= shape_dim, "invalid dimension");
-        typedef typename Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
-        return MeshAttributeHolder<CellType, DataType_>::_mesh_attributes;
-      }
-
-      /// \copydoc get_mesh_attributes()
-      template<int dim_>
-      const AttributeSetType& get_mesh_attributes() const
-      {
-        CONTEXT(name() + "::get_mesh_attributes() [const]");
-        static_assert(dim_ >= 0, "invalid dimension");
-        static_assert(dim_ <= shape_dim, "invalid dimension");
-        typedef typename Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
-        return MeshAttributeHolder<CellType, DataType_>::_mesh_attributes;
-      }
-
-      /**
-       * \brief Returns the number of attributes in the attribute set of dimension dim
-       *
-       * \param[in] dim
-       * Dimension the number of attributes is to be computed for
-       *
-       * \returns
-       * The number of attributes of dimension dim.
-       */
-      int get_num_attributes(int dim) const
-      {
-        CONTEXT(name() + "::get_num_attributes()");
-        ASSERT(dim >= 0, "dim has to be > 0");
-        ASSERT(dim <= shape_dim, "dim has to be < shape_dim");
-
-        if(dim == shape_dim)
-          // If the requested dimension is mine...
-          return int(_mesh_attributes.size());
-
-        // Otherwise recurse down
-        return BaseClass::get_num_attributes(dim);
-      }
-
-      /// \brief Return the name of the class
-      static String name()
-      {
-        return "MeshAttributeHolder<" + Shape_::name() + ">";
-      }
-
-      /**
-       * \brief Adds one attribute of shape dimension dim to the corresponding set
-       *
-       * \param[in] attribute_
-       * The Attribute to be added.
-       *
-       * \param[in] dim
-       * Shape dimension of attribute.
-       *
-       * \param[in] replace
-       * If there is an attribute present with the same identifier, should it be replaced?
-       *
-       * \returns
-       * True if the attribute was successfully added, meaning no attribute with the appropriate identifier was
-       * present, or it was present and replace was set to true, or false otherwise
-       *
-       * \warning Checks whether attribute has the same number of entries as the corresponding mesh has entities of
-       * dimension dim have to be performed by the caller!
-       */
-      bool add_attribute(const AttributeType& attribute_, int dim, bool replace = false)
-      {
-        ASSERT(dim >= 0, "dim has to be >= 0");
-        ASSERT(dim <= shape_dim, "dim has to be <= shape_dim");
-
-        // If the requested dimension is mine...
-        if(dim == shape_dim)
-        {
-          for(auto it:_mesh_attributes)
-          {
-            if((it.get_identifier() == attribute_.get_identifier()))
-            {
-              if(replace)
-              {
-                it = attribute_;
-                return true;
-              }
-              else
-                return false;
-            }
-          }
-
-          _mesh_attributes.push_back(attribute_);
-          return true;
-        }
-        else
-          // Otherwise recurse down
-          return BaseClass::add_attribute(attribute_, dim, replace);
-      }
-
-      /**
-       * \brief Finds an Attribute by its identifier String and returns a pointer to it
-       *
-       * \param[in] identifier
-       * Identifier to match.
-       *
-       * \param[in] dim
-       * Dimension the desired attribute has.
-       *
-       * \returns A pointer to the Attribute of shape dimension dim if present.
-       *
-       * \warning Will return nullptr if no Attribute with the given identifier is found
-       *
-       */
-      AttributeType* find_attribute(String identifier, int dim)
-      {
-        ASSERT(dim >= 0, "dim has to be >= 0");
-        ASSERT(dim <= shape_dim, "dim has to be <= shape_dim");
-
-        // If the requested dimension is mine...
-        if(dim == shape_dim)
-        {
-          for(auto it(_mesh_attributes.begin()); it != _mesh_attributes.end(); ++it)
-          {
-            if((it->get_identifier() == identifier))
-              return &(*it);
-          }
-          return nullptr;
-        }
-        else
-          // Otherwise recurse down
-          return BaseClass::find_attribute(identifier, dim);
-      }
-
-      /** \copydoc find_attribute() */
-      const AttributeType* find_attribute(String identifier, int dim) const
-      {
-        ASSERT(dim >= 0, "dim has to be >= 0");
-        ASSERT(dim <= shape_dim, "dim has to be <= shape_dim");
-
-        // If the requested dimension is mine...
-        if(dim == shape_dim)
-        {
-          for(auto it(_mesh_attributes.begin()); it != _mesh_attributes.end(); ++it)
-          {
-            if((it->get_identifier() == identifier))
-              return &(*it);
-          }
-          return nullptr;
-        }
-        else
-          // Otherwise recurse down
-          return BaseClass::find_attribute(identifier, dim);
-      }
-
-    }; // class MeshAttributeHolder<Shape_, DataType_>
-
-    /// \cond internal
-    /**
-     * \brief Specialisation for dimension 0
-     */
-    template<typename DataType_>
-    class MeshAttributeHolder<Shape::Vertex, DataType_>
-    {
-    public:
-      typedef Shape::Vertex ShapeType;
-      static constexpr int shape_dim = ShapeType::dimension;
-      typedef MeshAttribute<DataType_> AttributeType;
-      typedef std::vector<MeshAttribute<DataType_>> AttributeSetType;
-
-    protected:
-      AttributeSetType _mesh_attributes;
-
-    public:
-      explicit MeshAttributeHolder()
-      {
-        CONTEXT(name() + "::MeshAttributeHolder(const Index[])");
-      }
-
-      MeshAttributeHolder(const MeshAttributeHolder& other) :
-        _mesh_attributes(other._mesh_attributes)
-      {
-      }
-
-      virtual ~MeshAttributeHolder()
-      {
-        CONTEXT(name() + "::~MeshAttributeHolder()");
-      }
-
-      std::size_t bytes() const
-      {
-        std::size_t s(0);
-        for(auto it = _mesh_attributes.begin(); it != _mesh_attributes.end(); ++it)
-          s += it->bytes();
-        return s;
-      }
-
-      AttributeType* find_attribute(String identifier, int dim)
-      {
-#if defined DEBUG
-        ASSERT(dim == 0, "dim has to be = 0");
-#else
-        (void)dim;
-#endif
-
-        for(auto it(_mesh_attributes.begin()); it != _mesh_attributes.end(); ++it)
-        {
-          if((it->get_identifier() == identifier))
-            return &(*it);
-        }
-        return nullptr;
-      }
-
-      const AttributeType* find_attribute(String identifier, int dim) const
-      {
-#if defined DEBUG
-        ASSERT(dim == 0, "dim has to be = 0");
-#else
-        (void)dim;
-#endif
-
-        for(auto it(_mesh_attributes.begin()); it != _mesh_attributes.end(); ++it)
-        {
-          if((it->get_identifier() == identifier))
-            return &(*it);
-        }
-        return nullptr;
-      }
-
-      template<int dim_>
-      AttributeSetType& get_mesh_attributes()
-      {
-        CONTEXT(name() + "::get_mesh_attributes()");
-        static_assert(dim_ == 0, "invalid dimension");
-        return _mesh_attributes;
-      }
-
-      template<int dim_>
-      const AttributeSetType& get_mesh_attributes() const
-      {
-        CONTEXT(name() + "::get_mesh_attributes() [const]");
-        static_assert(dim_ == 0, "invalid dimension");
-        return _mesh_attributes;
-      }
-
-      int get_num_attributes(int dim) const
-      {
-        CONTEXT(name() + "::get_num_attributes()");
-#if defined DEBUG
-        ASSERT(dim == 0, "invalid dimension parameter");
-#else
-        (void)dim;
-#endif
-        return int(_mesh_attributes.size());
-      }
-
-      bool add_attribute(const MeshAttribute<DataType_>& attribute_, int dim, bool replace = false)
-      {
-#if defined DEBUG
-        ASSERT(dim == 0, "Only attributes of shape dim 0 can be added to MeshParts of shape dim 0");
-#else
-        (void)dim;
-#endif
-        for(auto& it:_mesh_attributes)
-        {
-          if((it.get_identifier() == attribute_.get_identifier()))
-          {
-            if(replace)
-            {
-              it = attribute_;
-              return true;
-            }
-            else
-              return false;
-          }
-        }
-
-        _mesh_attributes.push_back(attribute_);
-        return true;
-      }
-
-      static String name()
-      {
-        return "MeshAttributeHolder<Vertex>";
-      }
-    };
-    /// \endcond
 
     /**
      * \brief Class template for partial meshes
@@ -494,12 +116,6 @@ namespace FEAST
         typedef IndexSetHolder<ShapeType> IndexSetHolderType;
         /// Target set holder type
         typedef TargetSetHolder<ShapeType> TargetSetHolderType;
-        /// Data type for attributes
-        typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
-        /// Type for mesh attributes
-        typedef MeshAttribute<AttributeDataType> AttributeType;
-        /// Mesh attribute holder type
-        typedef MeshAttributeHolder<ShapeType, AttributeDataType> AttributeHolderType;
         /// Shape dimension
         static constexpr int shape_dim = ShapeType::dimension;
 
@@ -530,24 +146,19 @@ namespace FEAST
           > Type;
         }; // struct IndexSet<...>
 
-        /**
-         * \brief Attribute set type class template
-         *
-         * This is used to define the return type of the get_attributes() function template.
-         *
-         * \tparam cell_dim_
-         * Shape dim of the attribute set
-         *
-         * \tparam DataType_
-         * Type used in members of the attribute set
-         *
-         */
-        template<int cell_dim_, typename DataType_>
-        struct AttributeSet
-        {
-          /// Attribute set type
-          typedef std::vector<FEAST::Geometry::MeshAttribute<DataType_>> Type;
-        };
+        /// Data type for attributes
+        typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
+        /// Type for mesh attributes
+        typedef MeshAttribute<AttributeDataType> MeshAttributeType;
+
+        /// submesh node bin container type
+        typedef std::map<String, MeshAttributeType*> MeshAttributeContainer;
+        /// submesh node iterator type
+        typedef typename MeshAttributeContainer::iterator MeshAttributeIterator;
+        /// submesh node const-iterator type
+        typedef typename MeshAttributeContainer::const_iterator MeshAttributeConstIterator;
+        /// submesh node reverse-iterator type
+        typedef typename MeshAttributeContainer::reverse_iterator MeshAttributeReverseIterator;
 
         /**
          * \brief Target set type class template.
@@ -568,12 +179,12 @@ namespace FEAST
       protected:
         /// Number of entities for each shape dimension
         Index _num_entities[shape_dim + 1];
-        /// The vertex set of the mesh
-        AttributeHolderType _attribute_holder;
         /// The index sets of the mesh
         IndexSetHolderType* _index_set_holder;
         /// The target sets of the mesh.
         TargetSetHolderType _target_set_holder;
+        /// The vertex set of the mesh
+        MeshAttributeContainer _mesh_attributes;
 
       private:
         /// \brief Copy assignment operator
@@ -592,9 +203,9 @@ namespace FEAST
          *
          */
         explicit MeshPart(const Index num_entities[], bool create_topology = false) :
-          _attribute_holder(),
           _index_set_holder(nullptr),
-          _target_set_holder(num_entities)
+          _target_set_holder(num_entities),
+          _mesh_attributes()
           {
             CONTEXT(name() + "::MeshPart()");
             for(int i(0); i <= shape_dim; ++i)
@@ -611,9 +222,9 @@ namespace FEAST
          * The factory that is to be used to create the mesh.
          */
         explicit MeshPart(Factory<MeshPart>& factory) :
-          _attribute_holder(),
           _index_set_holder(nullptr),
-          _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
+          _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
+          _mesh_attributes()
           {
             CONTEXT(name() + "::MeshPart() [factory]");
 
@@ -627,29 +238,8 @@ namespace FEAST
             factory.fill_index_sets(_index_set_holder);
 
             // Fill attribute sets
-            factory.fill_attribute_sets(_attribute_holder);
+            factory.fill_attribute_sets(_mesh_attributes);
 
-          }
-
-        /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other
-         * The MeshPart that is to be copied.
-         */
-        MeshPart(const MeshPart& other) :
-          _attribute_holder(other.get_attribute_holder()),
-          _index_set_holder(nullptr),
-          _target_set_holder(other.get_target_set_holder())
-          {
-            CONTEXT(name() + "::MeshPart() [copy]");
-
-            for(int i(0); i <= shape_dim; ++i)
-              _num_entities[i] = other.get_num_entities(i);
-
-            // Only create _index_set_holder if other has one as well
-            if(other.has_topology())
-              _index_set_holder = new IndexSetHolderType(*other._index_set_holder);
           }
 
         /// Virtual destructor
@@ -659,13 +249,32 @@ namespace FEAST
 
           if(_index_set_holder != nullptr)
             delete _index_set_holder;
+
+          // Loop over all mesh attributes in reverse order and delete them
+          MeshAttributeReverseIterator it(_mesh_attributes.rbegin());
+          MeshAttributeReverseIterator jt(_mesh_attributes.rend());
+          for(; it != jt; ++it)
+          {
+            if(it->second != nullptr)
+              delete it->second;
+          }
         }
 
         /// \returns The size of dynamically allocated memory in bytes.
         std::size_t bytes() const
         {
-          return _attribute_holder.bytes() + _target_set_holder.bytes() +
-            (_index_set_holder != nullptr ? _index_set_holder->bytes() : std::size_t(0));
+          std::size_t bytes(0);
+
+          for(const auto& it : _mesh_attributes)
+          {
+            if(it.second != nullptr)
+              bytes += it.second->bytes();
+          }
+
+          bytes += _target_set_holder.bytes();
+          bytes +=(_index_set_holder != nullptr ? _index_set_holder->bytes() : std::size_t(0));
+
+          return bytes;
         }
 
         /// \brief Checks if this MeshPart has a mesh topology
@@ -697,74 +306,44 @@ namespace FEAST
          * \param[in] identifier
          * Identifier to match.
          *
-         * \param[in] dim
-         * Dimension the desired attribute has.
-         *
          * \returns A pointer to the Attribute of shape dimension dim if present.
          *
          * \warning Will return nullptr if no Attribute with the given identifier is found
          *
          */
-        AttributeType* find_attribute(String identifier, int dim)
+        MeshAttributeType* find_attribute(const String& identifier)
         {
-          return _attribute_holder.find_attribute(identifier, dim);
+          CONTEXT(name() + "::find_mesh_part_node()");
+          MeshAttributeIterator it(_mesh_attributes.find(identifier));
+          return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
         }
 
         /** \copydoc find_attribute() */
-        const AttributeType* find_attribute(String identifier, int dim) const
+        const MeshAttributeType* find_attribute(const String& identifier) const
         {
-          return _attribute_holder.find_attribute(identifier, dim);
+          CONTEXT(name() + "::find_mesh_part_node()[const]");
+          MeshAttributeConstIterator it(_mesh_attributes.find(identifier));
+          return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
         }
 
         /**
-         * \brief Returns the AttributeSet belonging to dimension dim_
+         * \brief Returns a const reference to the mesh attributes container
          *
-         * \tparam dim_
-         * Shape dimension we want to have the attribute set for
-         *
-         * \returns A reference to the AttributeSet belonging to dimension dim_
+         * \returns A const reference to the mesh attributes container
          */
-        template<int dim_>
-        typename AttributeSet<dim_, AttributeDataType>::Type& get_attributes()
+        const MeshAttributeContainer& get_mesh_attributes() const
         {
-          CONTEXT(name() + "::get_attributes()");
-          return _attribute_holder.template get_mesh_attributes<dim_>();
-        }
-
-        /// \copydoc get_attributes()
-        template<int dim_>
-        const typename AttributeSet<dim_, AttributeDataType>::Type& get_attributes() const
-        {
-          CONTEXT(name() + "::get_attributes( ) [const]");
-          return _attribute_holder.template get_mesh_attributes<dim_>();
+          return _mesh_attributes;
         }
 
         /**
-         * \brief Computes the total number of Attributes in this MeshPart
+         * \brief Returns the total number of Attributes in this MeshPart
          *
-         * \returns The total number of Attributes in all attribute sets
+         * \returns The total number of Attributes.
          */
         int get_num_attributes() const
         {
-          int num_attribute_sets(0);
-          // Sum up the number of attributes over all attribute sets
-          for(int d(0); d < shape_dim; ++d)
-            num_attribute_sets += _attribute_holder.get_num_attributes(d);
-
-          return num_attribute_sets;
-        }
-
-        /**
-         * \brief Computes the number of Attributes of a certain dimension in this MeshPart
-         *
-         * \param[in] dim
-         * Dimension to compute the number of attributes for.
-         *
-         * \returns The number of Attributes in the AttributeSet of dimension dim.
-         */
-        int get_num_attributes(int dim) const
-        {
-          return _attribute_holder.get_num_attributes(dim);
+          return int(_mesh_attributes.size());
         }
 
         /**
@@ -773,25 +352,23 @@ namespace FEAST
          * \param[in] attribute
          * Attribute to be added.
          *
-         * \param[in] dim
-         * Shape dimension of the Attribute to be added
-         *
-         * \param[in] replace
-         * If there is an attribute present with the same identifier, should it be replaced?
+         * \param[in] identifier
+         * Identifier for the map.
          *
          * \returns
          * True if the attribute was successfully added, meaning no attribute with the appropriate identifier was
-         * present, or it was present and replace was set to true, or false otherwise.
+         * present, or false otherwise.
          *
          */
-        virtual bool add_attribute(const AttributeType& attribute, int dim, bool replace = false)
+        virtual bool add_attribute(MeshAttributeType* attribute, const String& identifier)
         {
           CONTEXT(name() + "::add_attribute()");
-          // Check if the attribute to be added has the same number of entities as the MeshPart wrt. dim_
-          if(attribute.get_num_vertices() != get_num_entities(dim))
-              throw InternalError("Attribute/entity count mismatch!");
+          if(attribute != nullptr || (attribute->get_num_vertices() != get_num_entities(0)) )
+          {
+            return (_mesh_attributes.insert( std::make_pair(identifier, attribute))).second;
+          }
 
-          return _attribute_holder.add_attribute(attribute, dim, replace);
+          return false;
         }
 
         /**
@@ -823,20 +400,6 @@ namespace FEAST
         }
 
         /// \cond internal
-
-        /// Returns a reference to the attribute holder of the mesh.
-        AttributeHolderType& get_attribute_holder()
-        {
-          CONTEXT(name() + "::get_attribute_holder()");
-          return _attribute_holder;
-        }
-
-        /** \copydoc get_attribute_holder() */
-        const AttributeHolderType& get_attribute_holder() const
-        {
-          CONTEXT(name() + "::get_attribute_holder() [const]");
-          return _attribute_holder;
-        }
 
         /// Returns a reference to the index set holder of the mesh.
         IndexSetHolderType* get_topology()
@@ -935,7 +498,6 @@ namespace FEAST
           // Update num_entities information from the possibly modified _target_set_holder
           for(int i(end_dim_); i <= current_dim_; ++i)
             _num_entities[i] = _target_set_holder.get_num_entities(i);
-
         }
 
         /**
@@ -1004,7 +566,7 @@ namespace FEAST
         /// Data type for attributes
         typedef typename MeshType_::VertexSetType::CoordType AttributeDataType;
         /// Mesh attribute holder type
-        typedef MeshAttributeHolder<ShapeType, AttributeDataType> AttributeHolderType;
+        typedef typename MeshPartType::MeshAttributeContainer MeshAttributeContainer;
         /// index set holder type
         typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
         /// target set holder type
@@ -1033,7 +595,7 @@ namespace FEAST
          * \param[in,out] attribute_set_holder
          * The attribute set holder whose attribute sets are to be filled.
          */
-        virtual void fill_attribute_sets(AttributeHolderType& attribute_set_holder) = 0;
+        virtual void fill_attribute_sets(MeshAttributeContainer& attribute_set_holder) = 0;
 
         /**
          * \brief Fills the index sets.
@@ -1068,9 +630,9 @@ namespace FEAST
         /// shape type
         typedef typename MeshType::ShapeType ShapeType;
         /// Attribute set type
-        typedef typename MeshType::AttributeType AttributeType;
+        typedef typename MeshType::MeshAttributeType AttributeType;
         /// index set holder type
-        typedef typename MeshType::AttributeHolderType AttributeHolderType;
+        typedef typename MeshType::MeshAttributeContainer MeshAttributeContainer;
         /// index set holder type
         typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
         /// target set holder type
@@ -1163,41 +725,35 @@ namespace FEAST
         /**
          * \brief Fills attribute sets where applicable
          *
-         * \param[in,out] attribute_set_holder
+         * \param[in,out] attribute_container
          * Container for the attribute sets being added to
          *
          */
-        virtual void fill_attribute_sets(AttributeHolderType& attribute_set_holder) override
+        virtual void fill_attribute_sets(MeshAttributeContainer& attribute_container) override
         {
           // Attributes of shape dimension 0 only make sense if we have a mesh topology
           if(_coarse_mesh.has_topology())
           {
-            // Iterate over the dim 0 attributes in the coarse mesh
-            for(Index i(0); i < _coarse_mesh.get_attribute_holder().template get_mesh_attributes<0>().size(); ++i)
-            {
-              auto& coarse_attribute =_coarse_mesh.template get_attributes<0>()[i];
+            // Iterate over the attributes in the coarse mesh
+            typename MeshType::MeshAttributeConstIterator it(_coarse_mesh.get_mesh_attributes().begin());
+            typename MeshType::MeshAttributeConstIterator jt(_coarse_mesh.get_mesh_attributes().end());
 
+            for(; it != jt; ++it)
+            {
               // Create a new empty attribute of the desired size
-              AttributeType refined_attribute(
-                get_num_entities(0), coarse_attribute.get_num_coords(), 0, coarse_attribute.get_identifier());
+              AttributeType* refined_attribute = new AttributeType(
+                get_num_entities(0), it->second->get_num_coords(), 0);
 
               // Refine the attribute in the coarse mesh and write the result to the new attribute
               Intern::StandardVertexRefineWrapper<ShapeType, AttributeType>
-                ::refine(refined_attribute, coarse_attribute, *_coarse_mesh.get_topology());
+                ::refine(*refined_attribute, *(it->second), *_coarse_mesh.get_topology());
 
               // Add the attribute to the corresponding set
-              attribute_set_holder.add_attribute(refined_attribute,0);
+              if(!(attribute_container.insert(std::make_pair(it->first, refined_attribute))).second)
+                throw InternalError(__func__,__FILE__,__LINE__,"Error refining attribute "+it->first);
             }
           }
 
-          // Attributes of shape dimension > 0 are implemented, but as there is no use case for them yet, we do not
-          // know how to refine them
-          for(int d(1); d <= shape_dim; ++d)
-          {
-            if(_coarse_mesh.get_num_attributes(d) > 0)
-              throw InternalError("MeshPart contains "+stringify(_coarse_mesh.get_num_attributes(d))+
-                  " attributes to shape dimension "+stringify(d)+". These cannot be refined!");
-          }
         }
 
         /**

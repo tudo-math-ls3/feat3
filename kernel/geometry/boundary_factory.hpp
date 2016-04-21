@@ -69,9 +69,10 @@ namespace FEAST
       }
 
       /// Fills the MeshPart's target set, except that it doesn't
-      virtual void fill_attribute_sets(typename BaseClass::AttributeHolderType& DOXY(target_set_holder)) override
+      virtual void fill_attribute_sets(typename BaseClass::MeshAttributeContainer& DOXY(target_set_holder)) override
       {
       }
+
       /// Fills the MeshPart's index_set_holder, except that it doesn't as there is no topology
       virtual void fill_index_sets(typename BaseClass::IndexSetHolderType*& DOXY(index_set_holder)) override
       {

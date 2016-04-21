@@ -94,7 +94,7 @@ namespace FEAST
         Intern::HitTestTargeter<ShapeType>::wrap(target_set_holder, _target_data);
       }
 
-      virtual void fill_attribute_sets(typename MeshType::AttributeHolderType& DOXY(attribute_holder)) override
+      virtual void fill_attribute_sets(typename MeshType::MeshAttributeContainer& DOXY(attribute_container)) override
       {
         // do nothing as the object has no attribute sets
       }

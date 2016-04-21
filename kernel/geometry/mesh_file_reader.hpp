@@ -459,8 +459,9 @@ namespace FEAST
 
       virtual ~AttributeParser()
       {
+        // Because adding the MeshAttribute to a MeshPart passes ownership, we just need to nullify the pointer here
         if(_attrib != nullptr)
-          delete _attrib;
+          _attrib = nullptr;
       }
 
       virtual bool attribs(std::map<String,bool>& attrs) const override
@@ -488,7 +489,7 @@ namespace FEAST
 
         // create mesh attribute
         _count = _mesh_part.get_num_entities(0);
-        _attrib = new AttribType(_count, int(_my_dim), 0, _my_name);
+        _attrib = new AttribType(_count, int(_my_dim), 0);
       }
 
       virtual void close(int iline, const String& sline) override
@@ -498,8 +499,7 @@ namespace FEAST
           throw Xml::GrammarError(iline, sline, "Invalid terminator; expected index");
 
         // okay, add attribute to mesh part
-        // Note: this function creates a deep copy of '_attrib'
-        _mesh_part.add_attribute(*_attrib, 0);
+        _mesh_part.add_attribute(_attrib, _my_name);
       }
 
       virtual std::shared_ptr<MarkupParser> markup(int, const String&, const String&) override

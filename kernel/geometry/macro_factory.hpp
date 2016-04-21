@@ -89,7 +89,7 @@ namespace FEAST
 
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
       typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
-      typedef typename MeshType::AttributeHolderType AttributeHolderType;
+      typedef typename MeshType::MeshAttributeContainer MeshAttributeContainer;
 
     protected:
       const BaseMesh_& _base_mesh;
@@ -108,7 +108,7 @@ namespace FEAST
         return Index(Intern::DynamicNumFaces<ShapeType>::value(dim));
       }
 
-      virtual void fill_attribute_sets(AttributeHolderType&) override
+      virtual void fill_attribute_sets(MeshAttributeContainer&) override
       {
         // nothing to do here
       }

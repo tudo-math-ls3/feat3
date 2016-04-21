@@ -57,7 +57,7 @@ namespace FEAST
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::AttributeHolderType AttributeHolderType;
+        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -75,7 +75,7 @@ namespace FEAST
           return Index(dim == 0 ? 1 : 0);
         }
 
-        virtual void fill_attribute_sets(AttributeHolderType&) override
+        virtual void fill_attribute_sets(MeshAttributeContainer&) override
         {
         }
 
@@ -194,7 +194,7 @@ namespace FEAST
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::AttributeHolderType AttributeHolderType;
+        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -212,7 +212,7 @@ namespace FEAST
           return Index(dim == 0 ? 1 : 0);
         }
 
-        virtual void fill_attribute_sets(AttributeHolderType&) override
+        virtual void fill_attribute_sets(MeshAttributeContainer&) override
         {
         }
 
@@ -231,7 +231,7 @@ namespace FEAST
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::AttributeHolderType AttributeHolderType;
+        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -249,7 +249,7 @@ namespace FEAST
           return Index(dim == 0 ? 2 : (dim == 1 ? 1 : 0));
         }
 
-        virtual void fill_attribute_sets(AttributeHolderType&) override
+        virtual void fill_attribute_sets(MeshAttributeContainer&) override
         {
         }
 
@@ -460,7 +460,7 @@ namespace FEAST
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::AttributeHolderType AttributeHolderType;
+        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -478,7 +478,7 @@ namespace FEAST
           return Index(dim == 0 ? 1 : 0);
         }
 
-        virtual void fill_attribute_sets(AttributeHolderType&) override
+        virtual void fill_attribute_sets(MeshAttributeContainer&) override
         {
         }
 
@@ -497,7 +497,7 @@ namespace FEAST
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::AttributeHolderType AttributeHolderType;
+        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -515,7 +515,7 @@ namespace FEAST
           return Index(dim == 0 ? 2 : (dim == 1 ? 1 : 0));
         }
 
-        virtual void fill_attribute_sets(AttributeHolderType&) override
+        virtual void fill_attribute_sets(MeshAttributeContainer&) override
         {
         }
 
@@ -537,7 +537,7 @@ namespace FEAST
       {
       public:
         typedef Geometry::Factory<PartType> BaseClass;
-        typedef typename BaseClass::AttributeHolderType AttributeHolderType;
+        typedef typename BaseClass::MeshAttributeContainer MeshAttributeContainer;
         typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
         typedef typename BaseClass::TargetSetHolderType TargetSetHolderType;
 
@@ -555,7 +555,7 @@ namespace FEAST
           return Index(dim == 0 ? 4 : (dim == 1 ? 4 : (dim == 2 ? 1 : 0)));
         }
 
-        virtual void fill_attribute_sets(AttributeHolderType&) override
+        virtual void fill_attribute_sets(MeshAttributeContainer&) override
         {
         }
 

@@ -62,7 +62,7 @@ namespace FEAST
         Intern::PatchHaloWrapper<Shape_>::map(_ics, _halo_set.get_target_set_holder(), target_set_holder);
       }
 
-      virtual void fill_attribute_sets(typename MeshType::AttributeHolderType& DOXY(attribute_holder)) override
+      virtual void fill_attribute_sets(typename MeshType::MeshAttributeContainer& DOXY(attribute_container)) override
       {
         // do nothing as the object has no attribute sets
       }

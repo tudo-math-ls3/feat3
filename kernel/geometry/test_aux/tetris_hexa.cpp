@@ -1450,9 +1450,9 @@ namespace FEAST
         // create mesh
         HexaSubMesh* mesh = new HexaSubMesh(num_entities, true);
         // create a MeshAttribute that holds one value for each vertex
-        HexaSubMesh::AttributeType my_vertex_set(num_entities[0],2);
+        HexaSubMesh::MeshAttributeType* my_vertex_set = new HexaSubMesh::MeshAttributeType(num_entities[0],2);
         // Add the attribute to mesh
-        mesh->add_attribute(my_vertex_set, 0);
+        mesh->add_attribute(my_vertex_set, "HexaSubMeshAttribute");
 
         // set up vertex coordinates array
         Real vtx[] =
@@ -1466,7 +1466,7 @@ namespace FEAST
           1.0, 0.0,
           0.0, 1.0
         };
-        copy_vtx(mesh->get_attributes<0>()[0], vtx);
+        copy_vtx(*(mesh->find_attribute("HexaSubMeshAttribute")), vtx);
 
         // set up vertices-at-edge array
         Index v_e[] =
@@ -1563,7 +1563,7 @@ namespace FEAST
           1.5, 0.5,
           1.5, 1.5
         };
-        if(!comp_vtx(mesh.get_attributes<0>()[0], vtx))
+        if(!comp_vtx(*(mesh.find_attribute("HexaSubMeshAttribute")), vtx))
           throw String("Vertex coordinate refinement failure");
 
         // check vertices-at-edge array

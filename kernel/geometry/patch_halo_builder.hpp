@@ -232,7 +232,7 @@ namespace FEAST
       /// Data type for attributes
       typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
       /// Mesh attribute holder type
-      typedef MeshAttributeHolder<ShapeType, AttributeDataType> AttributeHolderType;
+      typedef typename MeshPartType::MeshAttributeContainer MeshAttributeContainer;
       /// index set holder type
       typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
       /// target set holder type
@@ -275,7 +275,7 @@ namespace FEAST
         return _halo_wrapper.get_num_entities(dim);
       }
 
-      virtual void fill_attribute_sets(AttributeHolderType&) override
+      virtual void fill_attribute_sets(MeshAttributeContainer&) override
       {
         // nothing to do
       }

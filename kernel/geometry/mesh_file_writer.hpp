@@ -261,9 +261,9 @@ namespace FEAST
           Intern::TopoWriteHelper<ShapeType>::write_topology(_os, *meshpart.get_topology(), _sindent, true);
 
         // write attributes
-        const auto& attrs = meshpart.template get_attributes<0>();
+        const auto& attrs = meshpart.get_mesh_attributes();
         for(auto it = attrs.begin(); it != attrs.end(); ++it)
-          write_attribute(*it, it->get_identifier());
+          write_attribute(*(it->second), it->first);
 
         pop_indent();
         _os << _sindent << "</MeshPart>" << std::endl;
