@@ -15,8 +15,8 @@ void * FEAST::Util::cuda_malloc_host(const Index bytes)
   if (bytes == 0)
     return memory;
 
-  if (cudaErrorMemoryAllocation == cudaMallocHost((void**)&memory, bytes))
-    throw InternalError("MemoryPool<CUDA> cuda pinned allocation error (cudaErrorMemoryAllocation)");
+  if (cudaErrorMemoryAllocation == cudaMallocHost((void**)&memory, bytes, cudaHostAllocMapped))
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA> cuda pinned allocation error (cudaErrorMemoryAllocation)");
   if (memory == nullptr)
     throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc_host allocation error (null pointer returned)");
   return memory;
@@ -37,4 +37,12 @@ void FEAST::Util::cuda_check_last_error()
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+}
+
+void * FEAST::Util::cuda_get_device_pointer(void * host)
+{
+  void * device(nullptr);
+  if (cudaSuccess != cudaHostGetDevicePointer((void**)&device, host, 0))
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaHostGetDevicePointer failed!");
+  return device;
 }

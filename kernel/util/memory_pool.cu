@@ -54,6 +54,9 @@ void MemoryPool<Mem::CUDA>::initialise(int rank, int /*ranks_per_node*/, int /*r
   if (cudaSuccess != cudaSetDevice(device))
     throw InternalError(__func__, __FILE__, __LINE__, "cudaSetDevice failed!");
 
+  if (cudaSuccess != cudaSetDeviceFlags(cudaDeviceMapHost))
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaSetDeviceFlags failed!");
+
   if (CUBLAS_STATUS_SUCCESS != cublasCreate(&Util::Intern::cublas_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasCreate failed!");
   if (CUSPARSE_STATUS_SUCCESS != cusparseCreate(&Util::Intern::cusparse_handle))
