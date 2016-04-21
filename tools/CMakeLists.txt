@@ -16,6 +16,12 @@ TARGET_LINK_LIBRARIES(cub-list feast)
 ADD_EXECUTABLE(dbg-nlopt dbg_nlopt/dbg_nlopt.cpp)
 TARGET_LINK_LIBRARIES(dbg-nlopt feast)
 
+ADD_EXECUTABLE(dbg-trace-1 dbg_trace/dbg_trace_1.cpp)
+TARGET_LINK_LIBRARIES(dbg-trace-1 feast)
+
+ADD_EXECUTABLE(dbg-trace-2 dbg_trace/dbg_trace_2.cpp)
+TARGET_LINK_LIBRARIES(dbg-trace-2 feast)
+
 ADD_EXECUTABLE(dbg-vanka dbg_vanka/dbg_vanka.cpp)
 TARGET_LINK_LIBRARIES(dbg-vanka feast)
 
