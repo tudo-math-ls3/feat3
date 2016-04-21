@@ -3,8 +3,8 @@
 #define CONTROL_DOMAIN_MESH_STREAMER_DOMAIN_CONTROL_HPP 1
 
 #include <control/domain/domain_control.hpp>
+#include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_node.hpp>
-#include <kernel/util/mesh_streamer.hpp>
 
 namespace FEAST
 {
@@ -24,36 +24,43 @@ namespace FEAST
         typedef Geometry::MeshAtlas<MeshType> AtlasType;
 
       public:
-        explicit MeshStreamerDomainControl(MeshStreamer& streamer, int lvl_max, int lvl_min = -1) :
+        explicit MeshStreamerDomainControl(Geometry::MeshFileReader& mesh_file_reader, int lvl_max, int lvl_min = -1) :
           BaseClass()
         {
-          this->_create(streamer, lvl_max, lvl_min);
+          this->_create(mesh_file_reader, lvl_max, lvl_min);
         }
 
 
         explicit MeshStreamerDomainControl(const String& filename, int lvl_max, int lvl_min = -1) :
           BaseClass()
         {
-          MeshStreamer streamer(filename);
-          this->_create(streamer, lvl_max, lvl_min);
+          // create input file stream
+          std::ifstream ifs(filename, std::ios_base::in);
+          if(!ifs.is_open() || !ifs.good())
+            throw InternalError(__func__,__FILE__,__LINE__,"Could not open file "+filename);
+
+          Geometry::MeshFileReader mesh_file_reader(ifs);
+          this->_create(mesh_file_reader, lvl_max, lvl_min);
         }
 
       protected:
-        void _create(MeshStreamer& streamer, int lvl_max, int lvl_min)
+        void _create(Geometry::MeshFileReader& mesh_file_reader, int lvl_max, int lvl_min)
         {
           typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
 
-          // communication data structures
+          // Communication data structures
           std::vector<Index> ranks, ctags;
 
-          // push layer
+          // Push layer
           this->_layers.push_back(new LayerType(std::move(ranks), std::move(ctags)));
 
-          // create mesh atlas
-          this->_atlas = new AtlasType(streamer);
+          // Create mesh atlas
+          this->_atlas = new AtlasType();
+          // Create temporary root mesh node
+          MeshNodeType* mesh_node = new MeshNodeType(nullptr, this->_atlas);
 
-          // create root mesh node
-          MeshNodeType* mesh_node = new MeshNodeType(streamer, this->_atlas);
+          // Parse mesh_node and atlas
+          mesh_file_reader.parse(*mesh_node, *(this->_atlas));
 
           // adjust lvl_max and lvl_min
           lvl_max = Math::max(lvl_max, 0);
