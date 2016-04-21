@@ -126,15 +126,6 @@ namespace FEAST
         Intern::MacroTargetWrapper<ShapeType>::build(target_set_holder, _base_mesh.get_index_set_holder(), _cell_idx);
       }
 
-      virtual String get_identifier() const override
-      {
-        return String("_base:") + stringify(_cell_idx);
-      }
-
-      virtual String get_parent_identifier() const override
-      {
-        return _base_mesh.get_identifier();
-      }
     };
     /// \endcond
   } // namespace Geometry

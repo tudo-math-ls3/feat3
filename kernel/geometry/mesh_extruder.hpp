@@ -716,16 +716,6 @@ namespace FEAST
         return _hexa_num_entities[dim];
       }
 
-      virtual String get_identifier() const override
-      {
-        return _quad_part.get_identifier();
-      }
-
-      virtual String get_parent_identifier() const override
-      {
-        return _quad_part.get_parent_identifier();
-      }
-
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
       {
         _mesh_extruder.extrude_mapping(target_set_holder, _quad_part.get_target_set_holder(), _quad_parent);
@@ -809,16 +799,6 @@ namespace FEAST
       {
         ASSERT_(dim < 4);
         return (dim < 3) ? _quad_parent.get_num_entities(dim) : Index(0);
-      }
-
-      virtual String get_identifier() const override
-      {
-        return _name;
-      }
-
-      virtual String get_parent_identifier() const override
-      {
-        return "root";
       }
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override

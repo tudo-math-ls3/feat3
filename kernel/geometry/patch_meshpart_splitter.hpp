@@ -79,8 +79,6 @@ namespace FEAST
         /// The MeshPart identifying this patch
         const MeshPartType& _patch_mesh_part;
 
-        /// The identifier of the current BaseMesh MeshPart
-        String _cur_part_name;
         /// The topology of the current BaseMesh MeshPart
         const AttributeHolderType* _cur_part_attribute_holder;
         /// The topology of the current BaseMesh MeshPart
@@ -101,7 +99,6 @@ namespace FEAST
         explicit PatchMeshPartSplitter(const MeshType& base_mesh, const MeshPartType& patch_mesh_part) :
           _base_mesh(base_mesh),
           _patch_mesh_part(patch_mesh_part),
-          _cur_part_name(),
           _cur_part_attribute_holder(nullptr),
           _cur_part_topology(nullptr),
           _part_holder(patch_mesh_part.get_target_set_holder())
@@ -127,7 +124,6 @@ namespace FEAST
          */
         bool build(const MeshPartType& mesh_part)
         {
-          _cur_part_name = mesh_part.get_identifier();
           _cur_part_topology = mesh_part.get_topology();
           _cur_part_attribute_holder = &(mesh_part.get_attribute_holder());
           return _part_holder.build(mesh_part.get_target_set_holder(), mesh_part.get_topology());
@@ -136,28 +132,6 @@ namespace FEAST
         /* *************************************************************************************** */
         /* F A C T O R Y   I N T E R F A C E   I M P L E M E N T A T I O N                         */
         /* *************************************************************************************** */
-
-        /**
-         * \brief Returns the name of the MeshPart this factory will construct
-         *
-         * \returns The name
-         */
-        virtual String get_identifier() const override
-        {
-          return _cur_part_name;
-        }
-
-        /**
-         * \brief Returns the name of the parent mesh
-         *
-         * All MeshParts constructed by this refer to the root mesh.
-         *
-         * \returns The name of the parent mesh the constructed MeshPart will refer to
-         */
-        virtual String get_parent_identifier() const override
-        {
-          return "root";
-        }
 
         /**
          * \brief Returns the number of entities.

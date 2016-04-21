@@ -153,25 +153,6 @@ namespace FEAST
           return;
         }
 
-        /**
-         * \brief Returns the name of the MeshPart this factory will construct
-         *
-         * \returns The name
-         */
-        virtual String get_identifier() const override
-        {
-          return "root_meshpart";
-        }
-
-        /**
-         * \brief Returns the name of the parent mesh
-         *
-         * \returns The name of the parent mesh the constructed MeshPart will refer to
-         */
-        virtual String get_parent_identifier() const override
-        {
-          return "root";
-        };
     }; // class PatchMeshPartFactory<MeshPart<...>>
   } // namespace Geometry
 } // namespace FEAST

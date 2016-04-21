@@ -62,19 +62,6 @@ namespace FEAST
       {
       }
 
-      /// \returns The name of the MeshPart
-      virtual String get_identifier() const override
-      {
-        return get_parent_identifier()+"-boundary";
-
-      }
-
-      /// \returns the name of the parent mesh
-      virtual String get_parent_identifier() const override
-      {
-        return _mesh_in.get_identifier();
-      }
-
       /// Returns the number of entities.
       virtual Index get_num_entities(int dim) override
       {

@@ -88,15 +88,6 @@ namespace FEAST
           target_set_holder.template get_target_set<0>()[0] = Index(_k);
         }
 
-        virtual String get_identifier() const override
-        {
-          return "halo_0";
-        }
-
-        virtual String get_parent_identifier() const override
-        {
-          return "root";
-        }
       };
 
       static PartType* create_halo0(int k)
@@ -233,16 +224,6 @@ namespace FEAST
         {
           target_set_holder.template get_target_set<0>()[0] = Index(_k);
         }
-
-        virtual String get_identifier() const override
-        {
-          return "halo_0";
-        }
-
-        virtual String get_parent_identifier() const override
-        {
-          return "root";
-        }
       };
 
       class Halo1Factory :
@@ -282,16 +263,6 @@ namespace FEAST
           target_set_holder.template get_target_set<0>()[0] = Index(Fim::map(_k, 0));
           target_set_holder.template get_target_set<0>()[1] = Index(Fim::map(_k, 1));
           target_set_holder.template get_target_set<1>()[0] = Index(_k);
-        }
-
-        virtual String get_identifier() const override
-        {
-          return "halo_1";
-        }
-
-        virtual String get_parent_identifier() const override
-        {
-          return "root";
         }
       };
 
@@ -519,16 +490,6 @@ namespace FEAST
         {
           target_set_holder.template get_target_set<0>()[0] = Index(_p);
         }
-
-        virtual String get_identifier() const override
-        {
-          return "halo_0";
-        }
-
-        virtual String get_parent_identifier() const override
-        {
-          return "root";
-        }
       };
 
       class Halo1Factory :
@@ -568,16 +529,6 @@ namespace FEAST
           target_set_holder.template get_target_set<0>()[0] = Index(Fim::map(_p, 0));
           target_set_holder.template get_target_set<0>()[1] = Index(Fim::map(_p, 1));
           target_set_holder.template get_target_set<1>()[0] = Index(_p);
-        }
-
-        virtual String get_identifier() const override
-        {
-          return "halo_1";
-        }
-
-        virtual String get_parent_identifier() const override
-        {
-          return "root";
         }
       };
 
@@ -625,16 +576,6 @@ namespace FEAST
           target_set_holder.template get_target_set<1>()[2] = Index(Fim1::map(_p, 2));
           target_set_holder.template get_target_set<1>()[3] = Index(Fim1::map(_p, 3));
           target_set_holder.template get_target_set<2>()[0] = Index(_p);
-        }
-
-        virtual String get_identifier() const override
-        {
-          return "halo_2";
-        }
-
-        virtual String get_parent_identifier() const override
-        {
-          return "root";
         }
       };
 

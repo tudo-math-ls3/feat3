@@ -574,10 +574,6 @@ namespace FEAST
         IndexSetHolderType* _index_set_holder;
         /// The target sets of the mesh.
         TargetSetHolderType _target_set_holder;
-        /// The meshpart's name
-        String _identifier;
-        /// Name String of the parent
-        String _parent_identifier;
 
       private:
         /// \brief Copy assignment operator
@@ -585,7 +581,7 @@ namespace FEAST
 
       public:
         /**
-         * \brief Constructor without identifiers
+         * \brief Constructor
          *
          * \param[in] num_entities
          * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
@@ -593,51 +589,12 @@ namespace FEAST
          *
          * \param[in] create_topology
          * Determines if the MeshPart is to have a mesh topology.
-         *
-         * \warning This sets the identifier and parent_identifier to empty Strings, so this MeshPart will in general
-         * not be useful in MeshNodes.
          *
          */
         explicit MeshPart(const Index num_entities[], bool create_topology = false) :
           _attribute_holder(),
           _index_set_holder(nullptr),
-          _target_set_holder(num_entities),
-          _identifier(""),
-          _parent_identifier("")
-          {
-            CONTEXT(name() + "::MeshPart()");
-            for(int i(0); i <= shape_dim; ++i)
-              _num_entities[i] = num_entities[i];
-
-            if(create_topology)
-              _index_set_holder = new IndexSetHolderType(num_entities);
-          }
-
-        /**
-         * \brief Constructor without identifiers
-         *
-         * \param[in] num_entities
-         * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
-         * Must not be \c nullptr.
-         *
-         * \param[in] identifier
-         * Name for this MeshPart
-         *
-         * \param[in] parent_identifier
-         * Name of the parent mesh this MeshPart refers to
-         *
-         * \param[in] create_topology
-         * Determines if the MeshPart is to have a mesh topology.
-         *
-         *
-         */
-        explicit MeshPart(
-          const Index num_entities[], String identifier, String parent_identifier, bool create_topology = false) :
-          _attribute_holder(),
-          _index_set_holder(nullptr),
-          _target_set_holder(num_entities),
-          _identifier(identifier),
-          _parent_identifier(parent_identifier)
+          _target_set_holder(num_entities)
           {
             CONTEXT(name() + "::MeshPart()");
             for(int i(0); i <= shape_dim; ++i)
@@ -656,9 +613,7 @@ namespace FEAST
         explicit MeshPart(Factory<MeshPart>& factory) :
           _attribute_holder(),
           _index_set_holder(nullptr),
-          _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
-          _identifier(factory.get_identifier()),
-          _parent_identifier(factory.get_parent_identifier())
+          _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
           {
             CONTEXT(name() + "::MeshPart() [factory]");
 
@@ -685,9 +640,7 @@ namespace FEAST
         MeshPart(const MeshPart& other) :
           _attribute_holder(other.get_attribute_holder()),
           _index_set_holder(nullptr),
-          _target_set_holder(other.get_target_set_holder()),
-          _identifier(other.get_identifier()),
-          _parent_identifier(other.get_parent_identifier())
+          _target_set_holder(other.get_target_set_holder())
           {
             CONTEXT(name() + "::MeshPart() [copy]");
 
@@ -958,45 +911,6 @@ namespace FEAST
           return "MeshPart<...>";
         }
 
-        /// \brief Returns the name of this MeshPart
-        String get_identifier() const
-        {
-          return _identifier;
-        }
-
-        /// \brief Returns the name of the parent mesh this MeshPart refers to
-        String get_parent_identifier() const
-        {
-          return _parent_identifier;
-        }
-
-        /**
-         * \brief Sets the name of this MeshPart
-         *
-         * \param[in] identifier
-         * New name of the MeshPart
-         *
-         * This is needed because adding a MeshPart to a MeshNode will change the MeshPart's name for consistency.
-         */
-        void set_identifier(String identifier)
-        {
-          _identifier = identifier;
-        }
-
-        /**
-         * \brief Sets the name of this MeshPart
-         *
-         * \param[in] parent_identifier
-         * New name to identify the MeshPart's parent by
-         *
-         * This is needed because adding a MeshPart to a MeshNode will change the MeshPart's parent_identifier for
-         * consistency.
-         */
-        void set_parent_identifier(String parent_identifier)
-        {
-          _parent_identifier = parent_identifier;
-        }
-
         /**
          * \brief Deducts the target sets from bottom to top
          *
@@ -1137,19 +1051,6 @@ namespace FEAST
          */
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) = 0;
 
-        /**
-         * \brief Returns the name of the MeshPart this factory will construct
-         *
-         * \returns The name
-         */
-        virtual String get_identifier() const = 0;
-
-        /**
-         * \brief Returns the name of the parent mesh
-         *
-         * \returns The name of the parent mesh the constructed MeshPart will refer to
-         */
-        virtual String get_parent_identifier() const = 0;
     }; // class Factory<MeshPart<...>>
 
     /**
@@ -1260,26 +1161,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Returns the name of the MeshPart this factory will construct
-         *
-         * \returns The name of the coarse MeshPart
-         */
-        virtual String get_identifier() const override
-        {
-          return _coarse_mesh.get_identifier();
-        }
-
-        /**
-         * \brief Returns the name of the parent mesh
-         *
-         * \returns The name of the parent mesh of the coarse MeshPart
-         */
-        virtual String get_parent_identifier() const override
-        {
-          return _coarse_mesh.get_parent_identifier();
-        }
-
-        /**
          * \brief Fills attribute sets where applicable
          *
          * \param[in,out] attribute_set_holder
@@ -1297,7 +1178,8 @@ namespace FEAST
               auto& coarse_attribute =_coarse_mesh.template get_attributes<0>()[i];
 
               // Create a new empty attribute of the desired size
-              AttributeType refined_attribute(get_num_entities(0), coarse_attribute.get_num_coords(), 0, coarse_attribute.get_identifier());
+              AttributeType refined_attribute(
+                get_num_entities(0), coarse_attribute.get_num_coords(), 0, coarse_attribute.get_identifier());
 
               // Refine the attribute in the coarse mesh and write the result to the new attribute
               Intern::StandardVertexRefineWrapper<ShapeType, AttributeType>

@@ -270,16 +270,6 @@ namespace FEAST
       /* F A C T O R Y   I N T E R F A C E   I M P L E M E N T A T I O N                         */
       /* *************************************************************************************** */
 
-      virtual String get_identifier() const override
-      {
-        return String("_halo:") + stringify(_cur_halo_rank);
-      }
-
-      virtual String get_parent_identifier() const override
-      {
-        return "root";
-      }
-
       virtual Index get_num_entities(int dim) override
       {
         return _halo_wrapper.get_num_entities(dim);

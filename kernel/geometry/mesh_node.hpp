@@ -217,18 +217,6 @@ namespace FEAST
       }
 
       /**
-       * \brief Gets the identifier
-       *
-       * \returns The name of the mesh or meshpart contained in this node.
-       */
-      String get_identifier() const
-      {
-        if(_mesh != nullptr)
-          return _mesh->get_identifier();
-        return "";
-      }
-
-      /**
        * \brief Returns the names of all mesh parts of this node.
        */
       std::deque<String> get_mesh_part_names() const
@@ -256,8 +244,6 @@ namespace FEAST
        * \returns
        * \p mesh_part_node if the insertion was successful, otherwise \c nullptr.
        *
-       * \note Because mesh_part_node gets added to (this) with identifier part_name, the identifier and
-       * parent_identifier get overwritten with part_name and this->get_identifier() respectively.
        */
       MeshPartNodeType* add_mesh_part_node(
         const String& part_name,
@@ -268,16 +254,11 @@ namespace FEAST
         CONTEXT(name() + "::add_mesh_part_node()");
         if(mesh_part_node != nullptr)
         {
-          if(_mesh_part_nodes.insert(std::make_pair(part_name, MeshPartNodeBin(mesh_part_node, chart_name, chart))).second)
-          {
-            // Set identifier in the MeshPartNode
-            mesh_part_node->set_identifier(part_name);
-
-            // Set parent_identifier in the MeshPartNode
-            mesh_part_node->set_parent_identifier(this->get_identifier());
-
-            return mesh_part_node;
-          }
+          if(_mesh_part_nodes.insert(
+            std::make_pair(part_name, MeshPartNodeBin(mesh_part_node, chart_name, chart))).second)
+            {
+              return mesh_part_node;
+            }
         }
         return nullptr;
       }
@@ -310,8 +291,6 @@ namespace FEAST
           delete part_node;
           return nullptr;
         }
-
-        part_node->set_parent_identifier(this->get_identifier());
 
         return part_node;
       }
@@ -584,39 +563,6 @@ namespace FEAST
       virtual ~MeshPartNode()
       {
         CONTEXT(name() + "::~MeshPartNode()");
-      }
-
-      void set_identifier(const String& id)
-      {
-        if (this->_mesh != nullptr)
-          this->_mesh->set_identifier(id);
-      }
-
-      /**
-      * \brief Gets the parent's identifier
-      *
-      * \returns The parent's identifer
-      */
-      String get_parent_identifier() const
-      {
-        if(this->_mesh != nullptr)
-          return this->_mesh->get_parent_identifier();
-        return "";
-      }
-
-      /**
-      * \brief Sets the parent_identifier
-      *
-      * \param[in] parent_identifier
-      * New parent identifier.
-      *
-      * This is used to keep the identifiers consistent when adding MeshNodes as children to other MeshNodes.
-      *
-      */
-      void set_parent_identifier(String parent_identifier)
-      {
-        if(this->_mesh != nullptr)
-          this->_mesh->set_parent_identifier(parent_identifier);
       }
 
       /**

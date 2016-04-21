@@ -104,17 +104,6 @@ namespace FEAST
         // do nothing as the object has no index sets
       }
 
-      virtual String get_identifier() const override
-      {
-        return get_parent_identifier()+"_hit_test";
-      }
-
-      virtual String get_parent_identifier() const override
-      {
-        return _mesh.get_identifier();
-      }
-
-
     }; // class HitTestFactory
 
     /// \cond internal
