@@ -199,7 +199,7 @@ namespace FEAST
 
             // compute function derivative:  f'(t) := < B"(t), B(t) - X > + < B'(t), B'(t) >
             DataType fd = (d2x*vpx + d2y*vpy + d1x*d1x + d1y*d1y);
-            if(std::abs(fd) < DataType(1E-8))
+            if(Math::abs(fd) < DataType(1E-8))
             {
               // This should not happen...
               break;
@@ -227,7 +227,7 @@ namespace FEAST
           return "bezier";
         }
 
-        //virtual void write_data_container(MeshStreamer::ChartContainer&) const override
+        //virtual Mathvoid write_data_container(MeshStreamer::ChartContainer&) const override
         //{
         //  throw InternalError("Obsolete Bezier export not implemented");
         //}
