@@ -263,18 +263,18 @@ namespace FEAST
         /// \returns The size of dynamically allocated memory in bytes.
         std::size_t bytes() const
         {
-          std::size_t bytes(0);
+          std::size_t my_bytes(0);
 
           for(const auto& it : _mesh_attributes)
           {
             if(it.second != nullptr)
-              bytes += it.second->bytes();
+              my_bytes += it.second->bytes();
           }
 
-          bytes += _target_set_holder.bytes();
-          bytes +=(_index_set_holder != nullptr ? _index_set_holder->bytes() : std::size_t(0));
+          my_bytes += _target_set_holder.bytes();
+          my_bytes +=(_index_set_holder != nullptr ? _index_set_holder->bytes() : std::size_t(0));
 
-          return bytes;
+          return my_bytes;
         }
 
         /// \brief Checks if this MeshPart has a mesh topology
