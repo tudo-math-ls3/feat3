@@ -227,6 +227,11 @@ namespace FEAST
         Tiny::Vector<DataType, shape_dim> face_vec;
         Tiny::Vector<DataType, facet_dim> ori_vec;
 
+        face_mat.format();
+        ori_mat.format();
+        face_vec.format();
+        ori_vec.format();
+
         // loop over all cells of the mesh
         for(Index f(0); f < Index(_facets.size()); ++f)
         {
@@ -395,6 +400,11 @@ namespace FEAST
         Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat;
         Tiny::Vector<DataType, shape_dim> face_vec;
         Tiny::Vector<DataType, facet_dim> ori_vec;
+
+        face_mat.format();
+        ori_mat.format();
+        face_vec.format();
+        ori_vec.format();
 
         // loop over all cells of the mesh
         for(Index f(0); f < Index(_facets.size()); ++f)
