@@ -30,17 +30,12 @@ namespace FEAST
 
             Status stat;
 
-// The current MS-MPI implementation does not offer the MPI_Iallreduce function...
-/// \todo Remove this workaround once MS does its homework.
-#ifdef MSMPI_VER
-            Comm::allreduce(&sendbuf, Index(1), &recvbuf);
-#else
             Request req;
 
             Comm::iallreduce(&sendbuf, Index(1), &recvbuf, req);
 
             Comm::wait(req, stat);
-#endif // MSMPI_VER
+
             r = recvbuf;
 
             TimeStamp ts_stop;
