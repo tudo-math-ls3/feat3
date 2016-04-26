@@ -9,13 +9,13 @@ import time
 
 sys.dont_write_bytecode = True
 
-for i in range(0, 5):
+for i in range(1, 5):
   with open("temp", "w") as f:
     f.write("#!/bin/bash -x" + os.linesep)
 
     f.write("#SBATCH --nodes=" + str(4**i) + os.linesep)
 
-    f.write("#SBATCH --ntasks-per-node=12" + os.linesep)
+    f.write("#SBATCH --ntasks-per-node=16" + os.linesep)
     f.write("#SBATCH --time=00:20:00" + os.linesep)
     f.write("#SBATCH --partition=batch" + os.linesep)
     # http://www.fz-juelich.de/ias/jsc/EN/Expertise/Supercomputers/JURECA/UserInfo/QuickIntroduction.html?nn=1803700#ReqGres
@@ -35,7 +35,7 @@ for i in range(0, 5):
     f.write("srun parti_poisson_dirichlet_2d  --level " +  str(9+i) + " 4 --part_min_elems 500" + os.linesep)
 
   #sbatch
-  subprocess.call(["cat", "temp"])
+  subprocess.call(["sbatch", "temp"])
   time.sleep(1)
 
 os.remove("temp")
