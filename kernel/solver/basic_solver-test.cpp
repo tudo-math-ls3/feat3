@@ -17,6 +17,7 @@
 #include <kernel/solver/sor_precond.hpp>
 #include <kernel/solver/ssor_precond.hpp>
 #include <kernel/solver/spai_precond.hpp>
+#include <kernel/solver/matrix_precond.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -150,6 +151,22 @@ public:
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("BiCGStab-ILU(0)", solver, vec_sol, vec_ref, vec_rhs, 12);
     }
+
+    // test PCG-jac-matrix
+    {
+      SparseMatrixCOO<Mem::Main, DataType, IndexType> coo_jac(csr_mat.rows(), csr_mat.columns());
+      for (Index i(0) ; i < csr_mat.rows() ; ++i)
+      {
+        coo_jac(i, i, DataType(1) / csr_mat(i,i));
+      }
+      MatrixType jac_matrix;
+      jac_matrix.convert(coo_jac);
+      // create a Matrix preconditioner
+      auto precon = Solver::new_matrix_precond(jac_matrix, filter);
+      // create a CG solver
+      PCG<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
+    }
   }
 };
 
@@ -276,6 +293,22 @@ public:
       FGMRES<MatrixType, FilterType> solver(matrix, filter, 16, DataType(0), precon);
       solver.set_max_iter(2000);
       test_solver("FGMRES-JAC", solver, vec_sol, vec_ref, vec_rhs, 48);
+    }
+
+    // test PCG-jac-matrix
+    {
+      SparseMatrixCOO<Mem::Main, DataType, IndexType> coo_jac(csr_mat.rows(), csr_mat.columns());
+      for (Index i(0) ; i < csr_mat.rows() ; ++i)
+      {
+        coo_jac(i, i, DataType(1) / csr_mat(i,i));
+      }
+      MatrixType jac_matrix;
+      jac_matrix.convert(coo_jac);
+      // create a Matrix preconditioner
+      auto precon = Solver::new_matrix_precond(jac_matrix, filter);
+      // create a CG solver
+      PCG<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
     }
 
 #ifdef FEAST_HAVE_CUSOLVER
