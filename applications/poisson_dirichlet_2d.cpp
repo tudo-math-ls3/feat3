@@ -516,7 +516,7 @@ namespace PoissonDirichlet2D
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
 
     int lvl_max = 3;
-    int lvl_min = -1;
+    int lvl_min = 0;
     args.parse("level", lvl_max, lvl_min);
 
     FEAST::String mem_string = "main";
