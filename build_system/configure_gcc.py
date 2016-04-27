@@ -24,6 +24,9 @@ def configure_gcc(cpu, buildid, compiler):
     cxxflags += " -Wswitch-bool -Wsizeof-array-argument -Wbool-compare -Wsuggest-override -Wnon-virtual-dtor -Wdelete-non-virtual-dtor"
     #cxxflags += " -Wsuggest-final-types -Wsuggest-final-methods"
 
+  if major >= 6:
+    cxxflags += " -Wshift-negative-value -Wnull-dereference -Wduplicated-cond"
+
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
 
@@ -49,6 +52,8 @@ def configure_gcc(cpu, buildid, compiler):
     if major >= 5:
       cxxflags += " -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=bounds"
       cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
+    if major >= 6:
+      cxxflags += " -fsanitize=bounds-strict"
   elif "opt" in buildid or "fast" in buildid:
     cxxflags += " -funsafe-loop-optimizations"
     if "lto" in buildid:
