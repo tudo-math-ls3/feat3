@@ -194,7 +194,7 @@ def run_test(build_id, branch, myDB, extra_opts):
     get_output("sync")
 
 ######### TEST #####################
-  test_command = "ctest --output-on-failure --schedule-random"
+  test_command = "ctest --output-on-failure --schedule-random --output-log " + dump_filename_full + ".ctest"
   test_output = get_output_utf8(test_command)
 
   idx = 0
