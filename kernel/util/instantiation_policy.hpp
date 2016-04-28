@@ -61,11 +61,11 @@ namespace FEAST
   private:
 
     /// Unwanted copy constructor: Do not implement!
-    InstantiationPolicy(const InstantiationPolicy &);
+    InstantiationPolicy(const InstantiationPolicy &) = delete;
 
 
     /// Unwanted copy assignment operator: Do not implement!
-    InstantiationPolicy & operator= (const InstantiationPolicy &);
+    InstantiationPolicy & operator= (const InstantiationPolicy &) = delete;
 
 
   public:
@@ -92,10 +92,10 @@ namespace FEAST
   private:
 
     /// Unwanted copy constructor: Do not implement!
-    InstantiationPolicy(const InstantiationPolicy &);
+    InstantiationPolicy(const InstantiationPolicy &) = delete;
 
     /// Unwanted copy assignment operator: Do not implement!
-    InstantiationPolicy & operator= (const InstantiationPolicy &);
+    InstantiationPolicy & operator= (const InstantiationPolicy &) = delete;
 
     /// Unwanted default constructor: Do not implement!
     InstantiationPolicy();
@@ -143,11 +143,11 @@ namespace FEAST
 
 
     /// Unwanted copy constructor: Do not implement!
-    InstantiationPolicy(const InstantiationPolicy &);
+    InstantiationPolicy(const InstantiationPolicy &) = delete;
 
 
     /// Unwanted copy assignment operator: Do not implement!
-    InstantiationPolicy & operator= (const InstantiationPolicy &);
+    InstantiationPolicy & operator= (const InstantiationPolicy &) = delete;
 
 
   protected:
