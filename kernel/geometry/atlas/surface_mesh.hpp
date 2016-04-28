@@ -41,6 +41,9 @@ namespace FEAST
       } // namespace Intern
       /// \endcond
 
+      /**
+       * Traits for the SurfaceMesh class
+       */
       struct SurfaceMeshTraits
       {
         /// No explicit map is available in general
@@ -53,6 +56,15 @@ namespace FEAST
         static constexpr int param_dim = 2;
       }; // struct SurfaceMeshTraits
 
+      /**
+       * \brief Boundary description by a surface mesh in 3d
+       *
+       * \tparam Mesh_
+       * Type for the mesh this boundary description refers to
+       *
+       * \author Jordi Paul
+       *
+       */
       template<typename Mesh_>
       class SurfaceMesh :
         public ChartCRTP<SurfaceMesh<Mesh_>, Mesh_, SurfaceMeshTraits>

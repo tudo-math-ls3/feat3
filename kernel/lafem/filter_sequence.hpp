@@ -139,7 +139,6 @@ namespace FEAST
 
     }; // class FilterSequence
 
-    /// \endcond
   } // namespace LAFEM
 } // namespace FEAST
 

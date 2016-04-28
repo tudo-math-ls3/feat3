@@ -41,7 +41,7 @@ namespace FEAST
      * of the normals of the surrounding facets, weighted by the facet's volume. The same can be done for P2/Q2
      * transformations, which are not implemented yet.
      *
-     * In some circumstances, this leads to error estimates of optimal order, see @cite BD99
+     * In some circumstances, this leads to error estimates of optimal order, see \cite BD99
      *
      * This weighted mean outer unit normal is used in the SlipFilter.
      *

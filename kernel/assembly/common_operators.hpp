@@ -313,7 +313,10 @@ namespace FEAST
         public BilinearOperator
       {
       public:
-        int ir, ic;
+        /// Row index
+        int ir;
+        /// Column index
+        int ic;
 
         /// test space configuration
         struct TestConfig :
@@ -354,7 +357,10 @@ namespace FEAST
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
         protected:
-          int ir, ic;
+          /// Row index
+          int ir;
+          /// Column index
+          int ic;
 
         public:
           /**
@@ -392,14 +398,14 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] ir
+         * \param[in] ir_
          * The row index of the block
          *
-         * \param[in] ic
+         * \param[in] ic_
          * The column index of the block
          */
-        explicit DuDvOperator(int _ir, int _ic) :
-          ir(_ir), ic(_ic)
+        explicit DuDvOperator(int ir_, int ic_) :
+          ir(ir_), ic(ic_)
         {
         }
       }; // class DuDvOperator

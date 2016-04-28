@@ -11,7 +11,7 @@ namespace FEAST
 {
   namespace Geometry
   {
-    /// cond internal
+    /// \cond internal
     namespace Intern
     {
       /**
@@ -99,7 +99,7 @@ namespace FEAST
 
       }; // struct FacetNeighbours
 
-    } // namespace intern
+    } // namespace Intern
     /// \endcond
   } // namespace Geometry
 } // namespace FEAST
