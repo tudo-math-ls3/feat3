@@ -287,6 +287,13 @@ namespace FEAST
               _num_entities[i] = Index(0);
           }
 
+        /// Explicitly delete the copy constructor
+        SlipFilterAssembler(const SlipFilterAssembler&) = delete;
+        /// Explicitly delete the move constructor
+        SlipFilterAssembler(SlipFilterAssembler&&) = delete;
+        /// Explicitly delete the move assignment operator
+        SlipFilterAssembler& operator=(SlipFilterAssembler&&) = delete;
+
         /**
          * \brief Virtual destructor
          */
