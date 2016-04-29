@@ -743,6 +743,12 @@ namespace FEAST
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
+         * \param[in] tol_decrease
+         * Tolerance for sufficient decrease in function value.
+         *
+         * \param[in] tol_curvature
+         * Tolerance for the curvature condition.
+         *
          */
         explicit StrongWolfeLinesearch(Operator_& op_, Filter_& filter_, bool keep_iterates = false,
         DataType tol_decrease_ = tol_decrease_default, DataType tol_curvature_ = tol_curvature_default) :
@@ -1263,9 +1269,14 @@ namespace FEAST
          * Do we know the minimum has to be in the interval (or any superset we worked on before)? Because this gets
          * called several times, this knowledge has to be passed back and forth.
          *
+         * \param[out] drive_to_bndry
+         * In the cases 1 and 3 this is set to true, in cases 2 and 4 to false. This determines if convergence can be
+         * improved by driving the step size to the appropriate boundary more quickly.
+         *
          * \param[in] df_was_negative
          * If the first df_lo was POSITIVE, we have some sort of backwards search (decreasing step lengths) and this
          * changes how the cases get treated (see Case 1).
+         *
          *
          * \returns
          * Status::success as there is nothing that can fail.
@@ -1562,6 +1573,12 @@ namespace FEAST
      *
      * \param[in] keep_iterates
      * Flag for keeping the iterates, defaults to false
+     *
+     * \param[in] tol_decrease
+     * Tolerance for sufficient decrease in function value.
+     *
+     * \param[in] tol_curvature
+     * Tolerance for the curvature condition.
      *
      * \returns
      * A shared pointer to a new StrongWolfeLinesearch object.

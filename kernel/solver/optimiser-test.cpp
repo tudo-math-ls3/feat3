@@ -6,6 +6,7 @@
 #include <kernel/solver/nlcg.hpp>
 #include <kernel/solver/nlsd.hpp>
 #include <kernel/solver/hessian_precond.hpp>
+#include <kernel/solver/nlopt_precond.hpp>
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
 #include <kernel/solver/test_aux/function_traits.hpp>
 
@@ -30,7 +31,6 @@ class NLCGTest:
     typedef OptimisationTestTraits<DT_, Function_> TestTraitsType;
 
     typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
-    //typedef Linesearch<OperatorType, FilterType> LinesearchType;
 
   private:
     DT_ _tol;
@@ -71,7 +71,7 @@ class NLCGTest:
       my_linesearch->set_plot(false);
 
       // Ugly way to get a preconditioner, or not
-      std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
+      std::shared_ptr<NLOptPrecond<typename OperatorType::VectorTypeL, FilterType>> my_precond(nullptr);
 
       if(_precon_type == "ApproximateHessian")
         my_precond = new_approximate_hessian_precond(my_op, my_filter);
@@ -217,7 +217,7 @@ class NLSDTest:
       my_linesearch->set_plot(false);
 
       // Ugly way to get a preconditioner, or not
-      std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
+      std::shared_ptr<NLOptPrecond<typename OperatorType::VectorTypeL, FilterType>> my_precond(nullptr);
 
       if(_precon_type == "ApproximateHessian")
         my_precond = new_approximate_hessian_precond(my_op, my_filter);

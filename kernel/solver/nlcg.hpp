@@ -5,6 +5,7 @@
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
 #include <kernel/solver/linesearch.hpp>
+#include <kernel/solver/nlopt_precond.hpp>
 
 #include <deque>
 namespace FEAST
@@ -113,7 +114,7 @@ namespace FEAST
         /// Our baseclass
         typedef PreconditionedIterativeSolver<VectorType> BaseClass;
         /// Generic preconditioner
-        typedef SolverBase<VectorType> PrecondType;
+        typedef NLOptPrecond<typename Operator_::VectorTypeL, Filter_> PrecondType;
         /// Maximum number of subsequent restarts (meaning steepest descent steps) before aborting
         static constexpr Index max_num_subs_restarts = Index(10);
         /// Default search direction update
@@ -123,9 +124,12 @@ namespace FEAST
         /// Our nonlinear operator
         Operator_& _op;
         /// The filter we apply to the gradient
-        const Filter_& _filter;
+        Filter_& _filter;
         /// The linesearch used along the descent direction
         std::shared_ptr<LinesearchType> _linesearch;
+        /// This will be the preconditioner, or a nullptr. We need to save it ourselves because we cannot access the
+        /// prepare() routine through the SolverBase pointer in our BaseClass
+        std::shared_ptr<PrecondType> _precond;
 
         /// Method to update the search direction, defaults to PolakRibiere
         NLCGDirectionUpdate _direction_update;
@@ -190,6 +194,7 @@ namespace FEAST
           _op(op_),
           _filter(filter_),
           _linesearch(linesearch_),
+          _precond(precond),
           _direction_update(du_),
           _tol_fval(DataType(0)),
           _tol_step(Math::sqrt(Math::eps<DataType>())),
@@ -292,7 +297,12 @@ namespace FEAST
           // clear solution vector
           vec_cor.format();
 
+          // Evaluate the operator at the new state
           this->_op.prepare(vec_cor, this->_filter);
+
+          // Prepare the preconditioner (if any)
+          if(this->_precond != nullptr)
+            this->_precond->prepare(vec_cor, this->_filter);
 
           // apply
           return _apply_intern(vec_cor);
@@ -301,11 +311,17 @@ namespace FEAST
         /// \copydoc BaseClass::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
+          // Evaluate the operator at the new state
           this->_op.prepare(vec_sol, this->_filter);
-          // compute defect
+
+          // Compute defect
           this->_op.compute_grad(this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
           this->_filter.filter_def(this->_vec_def);
+
+          // Prepare the preconditioner (if any)
+          if(this->_precond != nullptr)
+            this->_precond->prepare(vec_sol, this->_filter);
 
           // apply
           Status st =_apply_intern(vec_sol);
@@ -416,6 +432,10 @@ namespace FEAST
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return status;
             }
+
+            // Update preconditioner if necessary
+            if(this->_precond != nullptr)
+              this->_precond->prepare(vec_sol, this->_filter);
 
             // Compute the new beta for the search direction update. This also checks if the computed beta is valid
             // (e.g. leads to a decrease) and applies the preconditioner to the new defect vector
@@ -838,7 +858,7 @@ namespace FEAST
       Operator_& op, Filter_& filter, Linesearch_& linesearch,
       NLCGDirectionUpdate direction_update = NLCG<Operator_, Filter_>::direction_update_default,
       bool keep_iterates = false,
-      std::shared_ptr<SolverBase<typename Operator_::VectorTypeL>> precond = nullptr)
+      std::shared_ptr<NLOptPrecond<typename Operator_::VectorTypeL, Filter_>> precond = nullptr)
       {
         return std::make_shared<NLCG<Operator_, Filter_>>(op, filter, linesearch, direction_update,
         keep_iterates, precond);

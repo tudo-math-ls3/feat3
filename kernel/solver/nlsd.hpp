@@ -5,6 +5,7 @@
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
 #include <kernel/solver/linesearch.hpp>
+#include <kernel/solver/nlopt_precond.hpp>
 
 #include <deque>
 namespace FEAST
@@ -44,7 +45,7 @@ namespace FEAST
         /// Our baseclass
         typedef PreconditionedIterativeSolver<VectorType> BaseClass;
         /// Generic preconditioner
-        typedef SolverBase<VectorType> PrecondType;
+        typedef NLOptPrecond<typename Operator_::VectorTypeL, Filter_> PrecondType;
 
       protected:
         /// Our nonlinear operator
@@ -53,6 +54,9 @@ namespace FEAST
         Filter_& _filter;
         /// The linesearch used along the descent direction
         std::shared_ptr<LinesearchType> _linesearch;
+        /// This will be the preconditioner, or a nullptr. We need to save it ourselves because we cannot access the
+        /// prepare() routine through the SolverBase pointer in our BaseClass
+        std::shared_ptr<PrecondType> _precond;
 
         /// defect vector
         VectorType _vec_def;
@@ -99,6 +103,7 @@ namespace FEAST
           _op(op_),
           _filter(filter_),
           _linesearch(linesearch_),
+          _precond(precond),
           _tol_fval(DataType(0)),
           _tol_step(Math::sqrt(Math::eps<DataType>())),
           iterates(nullptr)
@@ -187,6 +192,10 @@ namespace FEAST
 
           this->_op.prepare(vec_cor, this->_filter);
 
+          if(this->_precond != nullptr)
+            this->_precond->prepare(vec_cor, this->_filter);
+
+
           // apply
           return _apply_intern(vec_cor);
         }
@@ -199,6 +208,9 @@ namespace FEAST
           this->_op.compute_grad(this->_vec_def);
           this->_vec_def.scale(this->_vec_def,DataType(-1));
           this->_filter.filter_def(this->_vec_def);
+
+          if(this->_precond != nullptr)
+            this->_precond->prepare(vec_sol, this->_filter);
 
           // apply
           Status st =_apply_intern(vec_sol);
@@ -285,8 +297,11 @@ namespace FEAST
               return status;
             }
 
+            // Re-assemble preconditioner if necessary
+            if(this->_precond != nullptr)
+              this->_precond->prepare(vec_sol, this->_filter);
+
             // apply preconditioner
-            //if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
             if(!this->_apply_precond(_vec_dir, _vec_def, this->_filter))
             {
               TimeStamp bt;
@@ -442,7 +457,7 @@ namespace FEAST
     template<typename Operator_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
       Operator_& op, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false,
-      std::shared_ptr<SolverBase<typename Operator_::VectorTypeL>> precond = nullptr)
+      std::shared_ptr<NLOptPrecond<typename Operator_::VectorTypeL, Filter_>> precond = nullptr)
       {
         return std::make_shared<NLSD<Operator_, Filter_>>(op, filter, linesearch,
         keep_iterates, precond);

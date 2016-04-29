@@ -259,7 +259,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::BazaraaShettyFunction AnalyticFunctionType;
+  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, IndexType, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
@@ -274,7 +274,7 @@ int main(int argc, char* argv[])
   FilterType my_filter;
 
   // Ugly way to get a preconditioner, or not
-  std::shared_ptr<SolverBase<typename OperatorType::VectorTypeL> > my_precond(nullptr);
+  std::shared_ptr<NLOptPrecond<typename OperatorType::VectorTypeL, FilterType> > my_precond(nullptr);
   // We might need a linesearch
   std::shared_ptr<Linesearch<OperatorType, FilterType> > my_linesearch(nullptr);
 
