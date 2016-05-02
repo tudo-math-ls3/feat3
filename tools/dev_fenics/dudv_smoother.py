@@ -6,6 +6,7 @@
 # modified and enhanced for computing on the deformed domain by Jordi Paul
 import sys
 from dolfin import *
+import math
 import mesh_deformation
 from mesh_deformation import gen_mesh, Top, NotTop
 
@@ -23,11 +24,11 @@ def mesh_problem(mesh, V, Q):
 
   # Output files
   if(update_mesh):
-    outfile = File("results_laplace_smoother_moving/mesh.pvd")
-    outfile_u = File("results_laplace_smoother_moving/mesh_u.pvd")
+    outfile = File("results_dudv_smoother_moving/mesh.pvd")
+    outfile_u = File("results_dudv_smoother_moving/mesh_u.pvd")
   else:
-    outfile = File("results_laplace_smoother/mesh.pvd")
-    outfile_u = File("results_laplace_smoother/mesh_u.pvd")
+    outfile = File("results_dudv_smoother/mesh.pvd")
+    outfile_u = File("results_dudv_smoother/mesh_u.pvd")
 
   # write out initial mesh
   outfile << mesh
@@ -49,7 +50,7 @@ def mesh_problem(mesh, V, Q):
   v = TestFunction(V)
 
   # Laplace
-  A = assemble(inner(grad(u), grad(v))*dx)
+  A = assemble(0.5*inner(grad(u)+transpose(grad(u)), grad(v)+transpose(grad(v)))*dx)
   rhs = assemble(inner(coords_old,v)*dx)
 
   # We need the mesh coordinates in the FE function coords_old, so we solve
@@ -92,7 +93,7 @@ def mesh_problem(mesh, V, Q):
     if(update_mesh):
       mesh.move(deform)
       mesh_new = mesh
-      A = assemble(inner(grad(u), grad(v))*dx)
+      A = assemble(0.5*inner( grad(u)+transpose(grad(u)), grad(v)+transpose(grad(v))) *dx)
       coords_old = coords_new.copy(deepcopy=True)
     else:
       mesh_new = Mesh(mesh)

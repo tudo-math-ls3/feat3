@@ -100,8 +100,6 @@ def compute_lambda_uniform(rumpf_lambda, mesh):
   for cell in cells(mesh):
     vol += cell.volume()
 
-  vol = 1./vol
-
   ncells = 1./mesh.num_cells()
 
   for cell in cells(mesh):
@@ -147,34 +145,37 @@ def prepare_lvlset(lvlset_function, analytic_lvlset, t):
 # by computing the local Rumpf transformation matrix c, the local optimal
 # scales h, the local target cell sizes rumpf_lambda according to the given
 # mesh
-def prepare(c, h, rumpf_lambda, mesh, lvlset_function, use_r_adaptivity):
+def prepare(c, h, rumpf_lambda, mesh, lvlset_function, use_r_adaptivity, use_rumpf_trafo):
   if(use_r_adaptivity==1):
     compute_lambda_nonuniform(rumpf_lambda, mesh, lvlset_function)
+    compute_h(h, 2, mesh, rumpf_lambda)
+  #else:
+  #  compute_lambda_uniform(rumpf_lambda, mesh)
+  #  compute_h(h, 2, mesh, rumpf_lambda)
+
+  if(use_rumpf_trafo):
+    for cell in cells(mesh):
+      x = cell.get_vertex_coordinates()
+      x1 = x[0]
+      x2 = x[2]
+      x3 = x[4]
+      y1 = x[1]
+      y2 = x[3]
+      y3 = x[5]
+      r11 = x2-x1
+      r12 = x3-x1
+      r21 = y2-y1
+      r22 = y3-y1
+      c.c11.array()[cell.index()] = r11/h.array()[cell.index()]
+      c.c12.array()[cell.index()] = (-r11+2.*r12)/sqrt(3.)/h.array()[cell.index()]
+      c.c21.array()[cell.index()] = r21/h.array()[cell.index()]
+      c.c22.array()[cell.index()] = (-r21+2.*r22)/sqrt(3.)/h.array()[cell.index()]
   else:
-    compute_lambda_uniform(rumpf_lambda, mesh)
-
-  compute_h(h, 2, mesh, rumpf_lambda)
-
-  for cell in cells(mesh):
-    x = cell.get_vertex_coordinates()
-    x1 = x[0]
-    x2 = x[2]
-    x3 = x[4]
-    y1 = x[1]
-    y2 = x[3]
-    y3 = x[5]
-    r11 = x2-x1
-    r12 = x3-x1
-    r21 = y2-y1
-    r22 = y3-y1
-    c.c11.array()[cell.index()] = r11/h.array()[cell.index()]
-    c.c12.array()[cell.index()] = (-r11+2.*r12)/sqrt(3.)/h.array()[cell.index()]
-    c.c21.array()[cell.index()] = r21/h.array()[cell.index()]
-    c.c22.array()[cell.index()] = (-r21+2.*r22)/sqrt(3.)/h.array()[cell.index()]
-    #c11[cell] = 1.0
-    #c12[cell] = 0.0
-    #c21[cell] = 0.0
-    #c22[cell] = 1.0
+    for cell in cells(mesh):
+      c.c11.array()[cell.index()] = 1.0
+      c.c12.array()[cell.index()] = 0.0
+      c.c21.array()[cell.index()] = 0.0
+      c.c22.array()[cell.index()] = 1.0
 
 def assemble_operator(fac_norm, fac_det, fac_reg, p, C, u, v):
 
@@ -199,57 +200,46 @@ def assemble_operator(fac_norm, fac_det, fac_reg, p, C, u, v):
     F += (inner((fac_det*det_rumpf - fac_rec_det*det_rumpf/((sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg)+det_rumpf)*(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg))))*inv(transpose(dolfin.grad(u)*C)), dolfin.grad(v)*C)*dx)
   else :
     # det^2 + 1/det^2
-    #F += (inner((2.*fac_det*det_rumpf*det_rumpf-2.*fac_rec_det/(pow(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg)+det_rumpf,2.0)*(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg))))*inv(transpose(dolfin.grad(u)*(C))), dolfin.grad(v)*(C))*dx)
     F += inner((2.*fac_det*det_rumpf*det_rumpf - 2.*fac_rec_det*det_rumpf \
-		    /( pow(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg)+det_rumpf,2.0)*(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg))))*inv(transpose(dolfin.grad(u)*(C))), dolfin.grad(v)*(C))*dx
+         /( pow(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg)+det_rumpf,2.0) \
+	 *(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg))))*inv(transpose(dolfin.grad(u)*(C))), dolfin.grad(v)*(C))*dx
 
-  # Rumpf functional without transformation to the local Rumpf reference
-  # cells. No multiplication by C.
-  # F = fac_norm*4.*inner((inner(dolfin.grad(u),dolfin.grad(u))-2.)*dolfin.grad(u),dolfin.grad(v))*dx # mit MINUS 2
-  #F = fac_norm*4.*inner((inner(dolfin.grad(u),dolfin.grad(u)))*dolfin.grad(u),dolfin.grad(v))*dx # ohne MINUS 2
-  ##det_rumpf = det(dolfin.grad(u))
-  # det^2 + 1/det^2
-  #F += (inner((2.*fac_det*det_rumpf*det_rumpf-2.*fac_rec_det/(pow(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg)+det_rumpf,2.0)*(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg))))*inv(transpose(dolfin.grad(u))), dolfin.grad(v))*dx)
-
-  # These are for toying with other (nonsensical?) transformations
-  # Multiplication by inv(C) from the right.
-  #F = fac_norm*4*inner((inner(dolfin.grad(u)*inv(C),dolfin.grad(u)*inv(C))-2.)*dolfin.grad(u)*inv(C),dolfin.grad(v)*inv(C))*dx
-  #det_rumpf = det(dolfin.grad(u))*abs(det((inv(C))))
-  #F += (inner((fac_det*det_rumpf-fac_rec_det/((sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg)+det_rumpf)*(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg))))*inv(transpose(dolfin.grad(u)*inv(C))), dolfin.grad(v)*inv(C))*dx)
-
-  # Multiplication by inv(C) from the left.
-  #det_rumpf = det(dolfin.grad(u))*abs(det((inv(C))))
-  #F = fac_norm*4*inner((inner(inv(C)*dolfin.grad(u),inv(C)*dolfin.grad(u))-2.)*inv(C)*dolfin.grad(u),inv(C)*dolfin.grad(v))*dx
-  #F += (inner((fac_det*det_rumpf-fac_rec_det/((sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg)+det_rumpf)*(sqrt(det_rumpf*det_rumpf+fac_reg*fac_reg))))*inv(transpose(inv(C)*dolfin.grad(u))), inv(C)*dolfin.grad(v))*dx)
-
-  # Laplace
-  # F = inner(grad(u),grad(v))*dx
-
-  # Elastic
-  #E = as_matrix(((1., 0.), (0., 1.)))
-  #F = 3.*inner((grad(u)+transpose(grad(u))),grad(v))*dx
-  #F += 15.*inner(div(u)*E,grad(v))*dx
   return F
 
 # Mesh optimisation code
 def mesh_problem(mesh, function_space_family, function_space_parameter):
-  use_r_adaptivity = 1
+  use_r_adaptivity = 0
   # Regularisation parameter for the 1/det term in the Rumpf functional
-  fac_reg = (1e-12)
+  fac_reg = (1e-8)
   # Factor for the Frobenius norm term in the Rumpf functional
   fac_norm = (1e0)
   # Factor for the det term in the Rumpf functional
   fac_det = (1e0)
-  # The det term is fac_det*det^exponent_det + fac_rec_det/(det + sqrt(det^2 + fac_reg^2))
+  # The det term is fac_det*det^exponent_det + fac_rec_det/(det + sqrt(det^2 + fac_reg^2))^exponent_det
   exponent_det = 2
-  # Output file for the deformed mesh
-  outfile =  File("results_rumpf_smoother/mesh.pvd")
-  # Output file for the deformation plotted on the original mesh
-  outfile_u = File("results_rumpf_smoother/mesh_u.pvd")
-
   # If we update the mesh for computation, that means that the computational
   # domain is the domain from the last timestep
   update_mesh = False
+  # Use the transformation to the Rumpf reference simplex?
+  use_rumpf_trafo = True
+
+  filename="results_rumpf_smoother"
+  if(use_rumpf_trafo):
+    filename+="_trafo"
+  else:
+    filename+="_notrafo"
+
+  if(update_mesh):
+    filename+="_moving"
+  else:
+    filename+="_default"
+
+  filename+="_d"+str(exponent_det)
+
+  # Output file for the deformed mesh
+  outfile =  File(filename+"/mesh.pvd")
+  # Output file for the deformation plotted on the original mesh
+  outfile_u = File(filename+"/mesh_u.pvd")
 
   # Starting time
   t = 0.
@@ -261,6 +251,7 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
   print "delta_t = ", delta_t, " t_end = ", t_end
   print "use_r_adaptivity = ", use_r_adaptivity, ", update_mesh = ", update_mesh
   print "fac_norm = ", fac_norm, "fac_det = ", fac_det, "fac_reg = ", fac_reg, "exponent_det = ", exponent_det
+  print "writing to directory ", filename
   # Create a copy of the original mesh that we can deform
   deformed_mesh = Mesh(mesh)
 
@@ -322,7 +313,8 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
   compute_lambda_uniform(rumpf_lambda, mesh)
   compute_h(h, 2, mesh, rumpf_lambda)
 
-  for cell in cells(mesh):
+  if(use_rumpf_trafo):
+    for cell in cells(mesh):
       x = cell.get_vertex_coordinates()
       x1 = x[0]
       x2 = x[2]
@@ -338,6 +330,12 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
       c.c12.array()[cell.index()] = (-r11+2.*r12)/sqrt(3.)/h.array()[cell.index()]
       c.c21.array()[cell.index()] = r21/h.array()[cell.index()]
       c.c22.array()[cell.index()] = (-r21+2.*r22)/sqrt(3.)/h.array()[cell.index()]
+  else:
+    for cell in cells(mesh):
+      c.c11.array()[cell.index()] = 1.0
+      c.c12.array()[cell.index()] = 0.0
+      c.c21.array()[cell.index()] = 0.0
+      c.c22.array()[cell.index()] = 1.0
 
   F = assemble_operator(fac_norm, fac_det, fac_reg, exponent_det, C, u, v)
 
@@ -366,7 +364,7 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
   deform_0.vector().zero()
 
   # Now prepare everything again with (potentially) nonuniform rumpf_lambda
-  prepare(c, h, rumpf_lambda, deformed_mesh, lvlset_function, use_r_adaptivity)
+  prepare(c, h, rumpf_lambda, deformed_mesh, lvlset_function, use_r_adaptivity, use_rumpf_trafo)
 
   F = assemble_operator(fac_norm, fac_det, fac_reg, exponent_det, C, u, v)
 
@@ -387,12 +385,11 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
     # Save old vertex coordinates
     coords_old.vector()[:] = coords.vector()
 
-    # t = 0 means Picard iteration at t = 0
-    prepare_lvlset(lvlset_function, analytic_lvlset, 0)
-    prepare(c, h, rumpf_lambda, mesh, lvlset_function, use_r_adaptivity)
-
     # Select boundary conditions here
     if use_r_adaptivity :
+      # t = 0 means Picard iteration at t = 0
+      prepare_lvlset(lvlset_function, analytic_lvlset, 0)
+      prepare(c, h, rumpf_lambda, mesh, lvlset_function, use_r_adaptivity, use_rumpf_trafo)
       bc0 = DirichletBC(V, mesh_deformation.my_deform.bc1, everywhere)
       bcs = [bc0]
     else :
@@ -448,7 +445,7 @@ def mesh_problem(mesh, function_space_family, function_space_parameter):
 def main():
   print list_linear_solver_methods()
   dim = 2
-  mesh = gen_mesh(16, dim)
+  mesh = gen_mesh(32, dim)
 
   mesh_problem(mesh, "Lagrange", 1)
   sys.exit(0)
