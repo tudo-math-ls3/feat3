@@ -25,7 +25,8 @@ def configure_gcc(cpu, buildid, compiler):
     #cxxflags += " -Wsuggest-final-types -Wsuggest-final-methods"
 
   if major >= 6:
-    cxxflags += " -Wshift-negative-value -Wnull-dereference -Wduplicated-cond"
+    cxxflags += " -Wshift-negative-value -Wduplicated-cond"
+    #cxxflags += " -Wnull-dereference" #produces too much false positives
 
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
