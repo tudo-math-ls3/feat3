@@ -25,7 +25,7 @@
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
 
-#include <control/domain/unit_cube_domain_control.hpp>
+#include <control/domain/partitioner_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 
 namespace PoissonDirichlet2D
@@ -82,24 +82,27 @@ namespace PoissonDirichlet2D
       // create unit-filter assembler
       Assembly::UnitFilterAssembler<MeshType> unit_asm;
 
-      // loop over all boundary components
-      for (int i(0); i < 4; ++i)
+      std::deque<String> part_names = this->domain_level.get_mesh_node()->get_mesh_part_names();
+      for(const auto& name : part_names)
       {
-        // try to fetch the corresponding mesh part node
-        auto* mesh_part_node = this->domain_level.get_mesh_node()->find_mesh_part_node(String("bnd:") + stringify(i));
+        if(name.starts_with('_'))
+          continue;
+
+        auto* mesh_part_node = this->domain_level.get_mesh_node()->find_mesh_part_node(name);
 
         // found it?
         if (mesh_part_node == nullptr)
-          throw InternalError("Mesh Part Node 'bnd:" + stringify(i) + "' not found!");
+          throw InternalError("Mesh Part Node 'boundary' not found!");
 
         // let's see if we have that mesh part
         // if it is nullptr, then our patch is not adjacent to that boundary part
         auto* mesh_part = mesh_part_node->get_mesh();
-        if (mesh_part == nullptr)
-          continue;
+        if (mesh_part != nullptr)
+        {
 
         // add to boundary assembler
         unit_asm.add_mesh_part(*mesh_part);
+        }
       }
 
       // finally, assemble the filter
@@ -496,6 +499,8 @@ namespace PoissonDirichlet2D
     args.support("vtk");
     args.support("statistics");
     args.support("mem");
+    args.support("part_min_elems");
+    args.support("meshfile");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -529,7 +534,23 @@ namespace PoissonDirichlet2D
       TimeStamp stamp1;
 
       // let's create our domain
-      Control::Domain::UnitCubeDomainControl<MeshType> domain(rank, nprocs, lvl_max, lvl_min);
+      if (rank == 0)
+      {
+        std::cout << "Preparing domain..." << std::endl;
+      }
+      int min_elems_partitioner(5);
+      String meshfile;
+      args.parse("part_min_elems", min_elems_partitioner);
+      args.parse("meshfile", meshfile);
+#ifdef FEAST_HAVE_PARMETIS
+      Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
+#else
+#ifndef SERIAL
+      Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
+#else
+      Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
+#endif
+#endif
 
       // plot our levels
       if (rank == 0)
