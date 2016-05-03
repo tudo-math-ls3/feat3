@@ -2,3 +2,4 @@ This folder contains FEniCS sample code for mesh optimisation/smoothing. The cla
 
 These scripts have been used with the following versions of FEniCS:
 1.4.0
+1.6.0

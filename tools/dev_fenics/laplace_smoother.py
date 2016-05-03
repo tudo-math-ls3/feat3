@@ -5,6 +5,7 @@
 # Laplace smoother using FEniCS. Original implementation by Steffen Basting,
 # modified and enhanced for computing on the deformed domain by Jordi Paul
 import sys
+import math
 from dolfin import *
 import mesh_deformation
 from mesh_deformation import gen_mesh, Top, NotTop
@@ -108,7 +109,7 @@ def main():
   # Optimization options for the form compiler
   parameters["form_compiler"]["cpp_optimize"] = True
   parameters["form_compiler"]["optimize"] = True
-  parameters.linear_algebra_backend = "uBLAS"
+  parameters.linear_algebra_backend = "PETSc"
 
   dim = 2
   mesh = gen_mesh(32, dim)
