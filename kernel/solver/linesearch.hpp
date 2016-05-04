@@ -129,6 +129,21 @@ namespace FEAST
         }
 
         /**
+         * \brief Resets various member variables in case the solver is reused
+         */
+        virtual void reset()
+        {
+          _fval_min = Math::huge<DataType>();
+          _fval_0 = Math::huge<DataType>();
+          _alpha_min = DataType(0);
+          _norm_dir = DataType(0);
+          _norm_sol = DataType(0);
+
+          if(iterates != nullptr)
+            iterates->clear();
+        }
+
+        /**
          * \brief Get the relative update of the solver application
          *
          * The linesearch updates the solution according to
@@ -775,6 +790,18 @@ namespace FEAST
           return "StrongWolfeLinesearch";
         }
 
+        /// \copydoc BaseClass::reset()
+        virtual void reset() override
+        {
+          BaseClass::reset();
+          _alpha_0 = DataType(1);
+          _alpha_hard_max = DataType(0);
+          _alpha_hard_min = DataType(0);
+          _alpha_soft_max = DataType(0);
+          _alpha_soft_min = DataType(0);
+          _delta_0 = Math::huge<DataType>();
+        }
+
         /**
          * \brief Applies the solver, setting the initial guess to zero.
          *
@@ -815,7 +842,6 @@ namespace FEAST
 
           // apply
           Status st =_apply_intern(vec_sol, normed_dir);
-
 
           return st;
         }
@@ -1119,8 +1145,14 @@ namespace FEAST
 
           Status st(Status::progress);
           int iter(0);
-          while(st == Status::progress && iter < 100)
+          while(st == Status::progress)
           {
+            if(iter > 20)
+            {
+              st =Status::max_iter;
+              break;
+            }
+
             ++iter;
 
             // Find new trial step
@@ -1158,20 +1190,35 @@ namespace FEAST
             //std::cout << "  alpha_new " << stringify_fp_sci(alpha_new) << " f_new " << stringify_fp_sci(f_new) << " delta_new " << stringify_fp_sci(delta_new) << std::endl;
             //std::cout << "  alpha_lo  " << stringify_fp_sci(alpha_lo) << " f_lo  " << stringify_fp_sci(f_lo) << " delta_lo  " << stringify_fp_sci(delta_lo) << std::endl;
             //std::cout << "  alpha_hi  " << stringify_fp_sci(alpha_hi) << " f_hi  " << stringify_fp_sci(f_hi) << " delta_hi  " << stringify_fp_sci(delta_hi) << std::endl;
-
+            //std::cout << "ftol " << this->_fval_0 +_tol_decrease*alpha_new*_delta_0 << " gtol " <<-_tol_curvature*_delta_0 << std::endl;
             // Update of interval of uncertainity. We might already be successful.
 
             // Check if the sufficient decrease condition is violated
-            if(f_new > this->_fval_0 +_tol_decrease*alpha_new*_delta_0 || ( (f_new > f_lo) && iter > 1) )
+            if(f_new >= this->_fval_0 +_tol_decrease*alpha_new*_delta_0 || ( (f_new > f_lo) && iter > 1) )
             {
               //std::cout << "  sufficient decrease violated" << std::endl;
               //std::cout << "  f_0 + tol_decrease*alpha_new*_delta_0 " <<
               //  stringify_fp_sci(this->_fval_0 +_tol_decrease*alpha_new*_delta_0)
               //  << " f_lo = " << stringify_fp_sci(f_lo) << "f_new = " << stringify_fp_sci(f_new) << std::endl;
 
-              alpha_hi = alpha_new;
-              f_hi = f_new;
-              delta_hi = delta_new;
+              if(f_new > f_hi)
+              {
+                alpha_hi = alpha_new;
+                f_hi = f_new;
+                delta_hi = delta_new;
+              }
+              else
+              {
+                if(delta_new*delta_lo < DataType(0))
+                {
+                  alpha_hi = alpha_lo;
+                  f_hi = f_lo;
+                  delta_hi = delta_lo;
+                }
+                alpha_lo = alpha_new;
+                f_lo = f_new;
+                delta_lo = delta_new;
+              }
             }
             // If we have a sufficient decrease, we need to check the curvature condition
             else
@@ -1301,9 +1348,9 @@ namespace FEAST
           //std::cout << "  alpha    = " << stringify_fp_sci(alpha) << " f    = "<< stringify_fp_sci(f)
           //<< " df    = " << stringify_fp_sci(df) << std::endl;
 
-          // Default: Quadratic interpolant using f_lo, df_lo and df
-          DataType alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, true);
+          // We always need the cubic step
           DataType alpha_c = _argmin_cubic(alpha_lo, alpha, f_lo, f, df_lo, df);
+          DataType alpha_q(0);
 
           // Case 1: This basically means that alpha was the new step and the function value increased.
           if( ((alpha_lo-alpha) < DataType(0)) && df_was_negative )
@@ -1313,7 +1360,8 @@ namespace FEAST
             min_in_interval = true;
             drive_to_bndry = true;
             //std::cout << "  Case 1 : ";
-            // use diffent 2nd order approximation to mimick ALGLIB
+            // Use 2nd order approximation NOT using the derivative df because it might be garbage (i.e. if we hit a
+            // singularity) because the function value increased
             alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, false);
             // If the cubic minimum is closer to the old best step length, take it. Otherwise, take the mean
             if(Math::abs(alpha_c - alpha_lo) < Math::abs(alpha_q - alpha_lo))
@@ -1330,6 +1378,8 @@ namespace FEAST
             // current interval
             min_in_interval = true;
             drive_to_bndry = false;
+            // Default: Quadratic interpolant using f_lo, df_lo and df
+            alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, true);
             //std::cout << "  Case 2 : ";
             // Take the step closer to the new step alpha
             Math::abs(alpha - alpha_c) > Math::abs(alpha - alpha_q) ? alpha_new = alpha_q : alpha_new = alpha_c;
@@ -1341,6 +1391,8 @@ namespace FEAST
           else if(Math::abs(df) > Math::abs(df_lo))
           {
             drive_to_bndry = true;
+            // Default: Quadratic interpolant using f_lo, df_lo and df
+            alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, true);
             //std::cout << "  Case 3";
             // If the cubic step is closer to the trial step
             if(Math::abs(alpha - alpha_c) < Math::abs(alpha - alpha_q))
@@ -1367,7 +1419,8 @@ namespace FEAST
           }
 
           //std::cout << "alpha_new = " << stringify_fp_sci(alpha_new) <<
-          //" alpha_c = " << stringify_fp_sci(alpha_c) << " alpha_q = " << stringify_fp_sci(alpha_q) << " min_in_interval " << min_in_interval << std::endl;
+          // alpha_c = " << stringify_fp_sci(alpha_c) << " alpha_q = " << stringify_fp_sci(alpha_q) <<
+          //" min_in_interval " << min_in_interval << std::endl;
 
           return Status::success;
         }

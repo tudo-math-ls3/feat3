@@ -144,6 +144,11 @@ namespace FEAST
           _op.prepare(vec_state);
         }
 
+        virtual void init_numeric() override
+        {
+          _op.init_numeric();
+        }
+
         /// \copydoc BaseClass::apply()
         virtual Solver::Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {

@@ -365,6 +365,9 @@ namespace FEAST
          */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
+          // Reset member variables in the LineSearch
+          _linesearch->reset();
+
           if(iterates != nullptr)
             iterates->push_back(std::move(vec_sol.clone()));
 
