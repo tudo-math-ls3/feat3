@@ -129,7 +129,7 @@ namespace FEAST
               Index num_elements(root_mesh->get_num_entities(MeshType_::shape_dim));
               while(num_elements < min_elems_partitioner)
               {
-                ++num_refines;
+                ++lvl;
                 MeshNodeType* coarse_node = base_mesh_node;
                 base_mesh_node = coarse_node->refine();
                 delete coarse_node;
@@ -138,7 +138,7 @@ namespace FEAST
               }
               while(num_elements < Foundation::Comm::size())
               {
-                ++num_refines;
+                ++lvl;
                 MeshNodeType* coarse_node = base_mesh_node;
                 base_mesh_node = coarse_node->refine();
                 delete coarse_node;
