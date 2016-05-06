@@ -92,6 +92,8 @@ namespace FEAST
             // create root mesh node
             MeshNodeType* mesh_node = nullptr;
             std::vector<Index> ranks, ctags;
+            // This is the raw refinement level
+            int lvl(0);
             {
               //ALL
               Geometry::MeshAtlas<MeshType_>* atlas(new Geometry::MeshAtlas<MeshType_>());
@@ -127,6 +129,7 @@ namespace FEAST
               Index num_elements(root_mesh->get_num_entities(MeshType_::shape_dim));
               while(num_elements < min_elems_partitioner)
               {
+                ++num_refines;
                 MeshNodeType* coarse_node = base_mesh_node;
                 base_mesh_node = coarse_node->refine();
                 delete coarse_node;
@@ -135,6 +138,7 @@ namespace FEAST
               }
               while(num_elements < Foundation::Comm::size())
               {
+                ++num_refines;
                 MeshNodeType* coarse_node = base_mesh_node;
                 base_mesh_node = coarse_node->refine();
                 delete coarse_node;
@@ -246,7 +250,6 @@ namespace FEAST
             else
               lvl_min = Math::min(lvl_min, lvl_max);
 
-            int lvl = 2;
             // refine up to desired minimum level
             for(; lvl < lvl_min; ++lvl)
             {
@@ -259,11 +262,11 @@ namespace FEAST
             this->_levels.push_back(new typename BaseClass::LevelType(lvl, mesh_node));
 
             // refine up to desired maximum level
-            for(; lvl < lvl_max;)
+            for(; lvl < lvl_max; ++lvl)
             {
               MeshNodeType* coarse_node = mesh_node;
               mesh_node = coarse_node->refine();
-              this->_levels.push_back(new typename BaseClass::LevelType(++lvl, mesh_node));
+              this->_levels.push_back(new typename BaseClass::LevelType(lvl+1, mesh_node));
             }
           }
       };

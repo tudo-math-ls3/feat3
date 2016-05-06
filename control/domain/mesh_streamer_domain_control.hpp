@@ -79,14 +79,14 @@ namespace FEAST
           }
 
           // add coarse mesh node
-          this->_levels.push_back(new LevelType(lvl, mesh_node));
+          this->_levels.push_back(new LevelType(lvl_min, mesh_node));
 
           // refine up to desired maximum level
-          for(; lvl < lvl_max;)
+          for(; lvl < lvl_max; ++lvl)
           {
             MeshNodeType* coarse_node = mesh_node;
             mesh_node = coarse_node->refine();
-            this->_levels.push_back(new LevelType(++lvl, mesh_node));
+            this->_levels.push_back(new LevelType(lvl+1, mesh_node));
           }
         }
       }; // class MeshStreamerDomainControl<...>
