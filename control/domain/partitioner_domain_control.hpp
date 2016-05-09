@@ -2,12 +2,15 @@
 #ifndef CONTROL_DOMAIN_PARTITIONER_DOMAIN_CONTROL_HPP
 #define CONTROL_DOMAIN_PARTITIONER_DOMAIN_CONTROL_HPP 1
 
+#include <kernel/base_header.hpp>
+
 #include <kernel/foundation/comm_base.hpp>
 #include <kernel/foundation/pexecutor.hpp>
 #include <kernel/foundation/pgraph.hpp>
 #include <kernel/foundation/psynch.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/util/runtime.hpp>
 
 #include <control/domain/domain_control.hpp>
 
