@@ -109,7 +109,7 @@ namespace FEAST
     template<typename T_>
     Random& operator>>(T_& x)
     {
-      x = Intern::RandomNumber<T_>::gen(*this);
+      x = FEAST::Intern::RandomNumber<T_>::gen(*this);
       return *this;
     }
 
@@ -133,7 +133,7 @@ namespace FEAST
     template<typename T_>
     T_ operator()(T_ a, T_ b)
     {
-      return Intern::RandomNumber<T_>::gen_ranged(*this, std::min(a, b), std::max(a, b));
+      return FEAST::Intern::RandomNumber<T_>::gen_ranged(*this, std::min(a, b), std::max(a, b));
     }
   }; // class Random
 
