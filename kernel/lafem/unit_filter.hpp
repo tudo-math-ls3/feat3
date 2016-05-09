@@ -231,15 +231,15 @@ namespace FEAST
         if(_sv.size() != matrix.rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
 
-        const Index* row_ptr(matrix.row_ptr());
-        const Index* col_idx(matrix.col_ind());
+        const IndexType* row_ptr(matrix.row_ptr());
+        const IndexType* col_idx(matrix.col_ind());
         DT_* v(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
           Index ix(_sv.indices()[i]);
           // replace by unit row
-          for(Index j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
+          for(IndexType j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
             v[j] = (col_idx[j] == ix) ? DT_(1) : DT_(0);
           }
@@ -251,14 +251,14 @@ namespace FEAST
         if(_sv.size() != matrix.rows())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
 
-        const Index* row_ptr(matrix.row_ptr());
+        const IndexType* row_ptr(matrix.row_ptr());
         DT_* v(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
           Index ix(_sv.indices()[i]);
           // replace by null row
-          for(Index j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
+          for(IndexType j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
             v[j] = DT_(0);
           }
@@ -276,13 +276,13 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
 
         const Index tused_elements(matrix.used_elements());
-        const Index* row_idx(matrix.row_indices());
-        const Index* col_idx(matrix.column_indices());
+        const IndexType* row_idx(matrix.row_indices());
+        const IndexType* col_idx(matrix.column_indices());
         DT_* v(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          Index ix(_sv.indices()[i]);
+          IndexType ix(_sv.indices()[i]);
           // replace by unit row
           Index j(0);
           while(row_idx[j] < ix)
@@ -308,7 +308,7 @@ namespace FEAST
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          Index ix(_sv.indices()[i]);
+          IndexType ix(_sv.indices()[i]);
           // replace by null row
           Index j(0);
           while(row_idx[j] < ix)
@@ -334,15 +334,15 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
 
         const Index tC(matrix.C());
-        const Index * pcs(matrix.cs());
-        const Index * pcol_ind(matrix.col_ind());
+        const IndexType * pcs(matrix.cs());
+        const IndexType * pcol_ind(matrix.col_ind());
         DT_* pval(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          Index ix(_sv.indices()[i]);
+          IndexType ix(_sv.indices()[i]);
           // replace by unit row
-          for(Index j(pcs[ix/tC] + ix%tC); j < pcs[ix/tC + 1]; j += tC)
+          for(IndexType j(pcs[ix/tC] + ix%tC); j < pcs[ix/tC + 1]; j += tC)
           {
             pval[j] = (pcol_ind[j] == ix) ? DT_(1) : DT_(0);
           }
@@ -355,14 +355,14 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix size does not match!");
 
         const Index tC(matrix.C());
-        const Index * pcs(matrix.cs());
+        const IndexType * pcs(matrix.cs());
         DT_* pval(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          Index ix(_sv.indices()[i]);
+          IndexType ix(_sv.indices()[i]);
           // replace by null row
-          for(Index j(pcs[ix/tC] + ix%tC); j < pcs[ix/tC + 1]; j += tC)
+          for(IndexType j(pcs[ix/tC] + ix%tC); j < pcs[ix/tC + 1]; j += tC)
           {
             pval[j] = DT_(0);
           }

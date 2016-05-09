@@ -181,6 +181,8 @@ public:
   }
 };
 
-UnitFilterMatrixTest<Mem::Main, float, Index> unit_filter_matrix_test_generic_fi;
-UnitFilterMatrixTest<Mem::Main, double, Index> unit_filter_matrix_test_generic_di;
+UnitFilterMatrixTest<Mem::Main, float, unsigned long> unit_filter_matrix_test_generic_ful;
+UnitFilterMatrixTest<Mem::Main, double, unsigned long> unit_filter_matrix_test_generic_dul;
+UnitFilterMatrixTest<Mem::Main, float, unsigned int> unit_filter_matrix_test_generic_fui;
+UnitFilterMatrixTest<Mem::Main, double, unsigned int> unit_filter_matrix_test_generic_dui;
 ///TODO cuda tests?
