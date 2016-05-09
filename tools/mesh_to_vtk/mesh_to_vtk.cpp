@@ -156,8 +156,8 @@ int main(int argc, char* argv[])
   String chart_file_name("");
   String mesh_file_name("");
 
-  int lvl_min(0);
-  int lvl_max(0);
+  Index lvl_min(0);
+  Index lvl_max(0);
 
   Geometry::MeshFileReader* mesh_reader(nullptr);
   Geometry::MeshFileReader* chart_reader(nullptr);
