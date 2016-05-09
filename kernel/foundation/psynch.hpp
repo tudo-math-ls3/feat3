@@ -96,7 +96,7 @@ namespace FEAST
           if(me == 0)
           {
             str = (iss.str());
-            size = str.length();
+            size = Index(str.length());
           }
           // synchronize length
           Comm::bcast(&size, 1, 0, comm);

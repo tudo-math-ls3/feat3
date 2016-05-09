@@ -202,7 +202,7 @@ namespace PoissonDirichlet2D
     std::deque<AssemblerLevelType*> asm_levels;
     std::deque<TransferLevelType*> transfer_levels;
 
-    const Index num_levels = domain_levels.size();
+    const Index num_levels = Index(domain_levels.size());
 
     //Lin-Solve phase related typedefs
     //Main-CSR or CUDA-ELL

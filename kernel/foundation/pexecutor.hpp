@@ -119,11 +119,11 @@ namespace FEAST
 
             Adjacency::Graph rank_at_element()
             {
-              Index*  ptr(new Index[_size + 1]);
+              Index*  ptr(new Index[std::size_t(_size + 1)]);
               for(Index i(0) ; i < Index(_size) + 1 ; ++i)
                 ptr[i] = i;
 
-              Index* part(new Index[_size]);
+              Index* part(new Index[std::size_t(_size)]);
               for(Index i(0) ; i < Index(_size) ; ++i)
                 part[i] = Index(_part[i]);
 
@@ -144,7 +144,7 @@ namespace FEAST
             {
               delete[] _part;
               _part = nullptr;
-              _part = new IT_[s];
+              _part = new IT_[std::size_t(s)];
               _size = s;
             }
 
