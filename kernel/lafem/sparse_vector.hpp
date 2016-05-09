@@ -7,7 +7,6 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/lafem/vector_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/adjacency/permutation.hpp>
@@ -39,7 +38,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>
-    class SparseVector : public Container<Mem_, DT_, IT_>, public VectorBase
+    class SparseVector : public Container<Mem_, DT_, IT_>
     {
     private:
       template <typename T1_, typename T2_>

@@ -11,7 +11,6 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
-#include<time.h>
 
 namespace FEAST
 {

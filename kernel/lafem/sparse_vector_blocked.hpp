@@ -7,7 +7,6 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/lafem/vector_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/math.hpp>
@@ -58,7 +57,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
-    class SparseVectorBlocked : public Container<Mem_, DT_, IT_>, public VectorBase
+    class SparseVectorBlocked : public Container<Mem_, DT_, IT_>
     {
     private:
       template <typename T1_, typename T2_>

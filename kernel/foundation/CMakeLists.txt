@@ -10,36 +10,15 @@ endif (FEAST_HAVE_PARMETIS)
 
 ADD_LIBRARY(kernel-foundation STATIC
   environment.cpp
-  attribute_error.cpp
-  functor_error.cpp
   communication_error.cpp
-  mesh_error.cpp
 )
 TARGET_LINK_LIBRARIES (kernel-foundation kernel-util kernel-lafem)
 
 # list of foundation tests
 SET (test_list
-  attribute-test
-  aura-test
-  buffer-test
-  data-test
-  dense_data_wrapper-test
-  functor-test
-  halo-test
-  halo_control-test
   have_parmetis-test
-  load_balancing-test
-  mesh-test
-  mesh_control-test
-  mesh_util-test
-  partitioning-test
   pexecutor-test
   pgraph-test
-  refinement_1D-test
-  refinement_2D-test
-  refinement_3D-test
-  sub_mesh-test
-  topology-test
 )
 
 # create all tests

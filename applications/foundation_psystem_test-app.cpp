@@ -3,7 +3,6 @@
 #include <kernel/foundation/comm_base.hpp>
 
 #include <kernel/archs.hpp>
-#include <kernel/foundation/communication.hpp>
 #include <kernel/foundation/psynch.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>

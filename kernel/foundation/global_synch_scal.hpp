@@ -3,7 +3,6 @@
 #define FOUNDATION_GUARD_GLOBAL_SYNCH_SCAL_HPP 1
 
 #include<kernel/foundation/comm_base.hpp>
-#include<kernel/foundation/communication.hpp>
 #include<kernel/lafem/arch/scale.hpp>
 #include<kernel/lafem/arch/component_product.hpp>
 #include<kernel/lafem/arch/dot_product.hpp>

@@ -3,7 +3,6 @@
 #define FOUNDATION_GUARD_GLOBAL_SYNCH_VEC_HPP 1
 
 #include<kernel/foundation/comm_base.hpp>
-#include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/environment.hpp>
 #include<kernel/util/time_stamp.hpp>
 #include<kernel/util/statistics.hpp>

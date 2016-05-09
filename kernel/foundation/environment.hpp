@@ -3,7 +3,7 @@
 #define FOUNDATION_GUARD_ENVIRONMENT_HPP 1
 
 #include<kernel/base_header.hpp>
-#include<kernel/foundation/communication.hpp>
+#include<kernel/foundation/comm_base.hpp>
 
 #ifndef SERIAL
 #include<mpi.h>

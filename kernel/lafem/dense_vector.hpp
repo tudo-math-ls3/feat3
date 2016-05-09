@@ -9,7 +9,6 @@
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/lafem/vector_base.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/edi.hpp>
 #include <kernel/lafem/arch/sum.hpp>
@@ -53,7 +52,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>
-    class DenseVector : public Container<Mem_, DT_, IT_>, public VectorBase
+    class DenseVector : public Container<Mem_, DT_, IT_>
     {
     public:
       /**
@@ -1212,34 +1211,6 @@ namespace FEAST
       }
 
       /**
-       * \brief Calculate \f$r \leftarrow this \cdot x\f$
-       *
-       * \param[out] r The dot product result.
-       * \param[in] x The other vector.
-       * \param[in] gate The gateway to be used for the global operation.
-       *
-       */
-      DataType dot(const DenseVector & x, const Arch::DotGatewayBase<Mem_, DenseVector>* gate) const
-      {
-        if (x.size() != this->size())
-          throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-
-        return gate->value(*this, x);
-      }
-
-      /**
-       * \brief Calculates and returns the euclid norm of this vector, global version.
-       *
-       * \return The computed norm.
-       *
-       */
-      DT_ norm2(const Arch::Norm2GatewayBase<Mem_, DenseVector>* gate) const
-      {
-        Statistics::add_flops(this->size() * 2);
-        return gate->value(*this);
-      }
-
-      /**
        * \brief Calculates and returns the euclid norm of this vector.
        *
        */
@@ -1256,15 +1227,6 @@ namespace FEAST
       }
 
       /**
-       * \brief Calculates and returns the euclid norm of this vector, global version.
-       *
-       */
-      DT_ norm2sqr(const Arch::Norm2SquaredGatewayBase<Mem_, DenseVector>* gate) const
-      {
-        return gate->value(*this);
-      }
-
-      /**
        * \brief Calculates and returns the squared euclid norm of this vector.
        *
        * \return The computed norm.
@@ -1276,23 +1238,6 @@ namespace FEAST
         return Math::sqr(this->norm2());
       }
 
-      /**
-       * \brief Synchronise type-0 vector
-       *
-       */
-      DenseVector& synch0(const Arch::SynchVec0GatewayBase<Mem_, DenseVector>* gate)
-      {
-        return gate->value(*this);
-      }
-
-      /**
-       * \brief Synchronise type-1 vector
-       *
-       */
-      DenseVector& synch1(const Arch::SynchVec1GatewayBase<Mem_, DenseVector>* gate)
-      {
-        return gate->value(*this);
-      }
       ///@}
 
       /// Permutate vector according to the given Permutation

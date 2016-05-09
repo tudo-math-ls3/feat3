@@ -2,6 +2,7 @@
 #ifndef KERNEL_FOUNDATION_PGRAPH_HPP
 #define KERNEL_FOUNDATION_PGRAPH_HPP 1
 
+#include<memory>
 #include<kernel/base_header.hpp>
 #include<kernel/foundation/comm_base.hpp>
 #include<kernel/geometry/conformal_mesh.hpp>

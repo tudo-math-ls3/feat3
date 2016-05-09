@@ -10,7 +10,6 @@
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/vector_base.hpp>
 #include <kernel/lafem/arch/sum.hpp>
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
@@ -70,7 +69,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_, int BlockSize_>
-    class DenseVectorBlocked : public Container<Mem_, DT_, IT_>, public VectorBase
+    class DenseVectorBlocked : public Container<Mem_, DT_, IT_>
     {
     public:
       /// Our datatype
