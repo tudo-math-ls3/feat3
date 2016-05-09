@@ -120,17 +120,6 @@ namespace FEAST
     class VelocityAnalyser
     {
     private:
-      /// \cond internal
-      struct TrafoConfig : public Trafo::ConfigBase
-      {
-        static constexpr bool need_jac_det = true;
-      };
-      struct SpaceConfig : public Space::ConfigBase
-      {
-        static constexpr bool need_value = true;
-        static constexpr bool need_grad = true;
-      };
-
       template<typename DT_, int sm_, int sn_>
       static DT_ calc_vorticity(const Tiny::Matrix<DT_, 2, 2, sm_, sn_>& ders)
       {
@@ -179,7 +168,7 @@ namespace FEAST
         typedef LAFEM::PowerVector<LAFEM::DenseVector<Mem::Main, DataType_, IndexType_>, dim_> VectorType;
 
         /// assembly traits
-        typedef AsmTraits1<DataType_, SpaceType, TrafoConfig, SpaceConfig> AsmTraits;
+        typedef AsmTraits1<DataType_, SpaceType, TrafoTags::jac_det, SpaceTags::value|SpaceTags::grad> AsmTraits;
 
         /// data type
         typedef typename AsmTraits::DataType DataType;

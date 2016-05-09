@@ -19,20 +19,6 @@ namespace FEAST
      */
     class GridTransfer
     {
-    private:
-      /// \cond internal
-      struct AsmSpaceConfig :
-        public Space::ConfigBase
-      {
-        static constexpr bool need_value = true;
-      };
-      struct AsmTrafoConfig :
-        public Trafo::ConfigBase
-      {
-        static constexpr bool need_jac_det = true;
-      };
-      /// \endcond
-
     public:
       /**
        * \brief Assembles a prolongation matrix and its corresponding weight vector.
@@ -90,20 +76,20 @@ namespace FEAST
         typedef typename CoarseSpace_::template Evaluator<CoarseTrafoEvaluator>::Type CoarseSpaceEvaluator;
 
         // define fine and coarse mesh trafo configurations
-        typedef typename FineSpaceEvaluator::template ConfigTraits<AsmSpaceConfig>::TrafoConfig FineSpaceTrafoConfig;
-        typedef typename CoarseSpaceEvaluator::template ConfigTraits<AsmSpaceConfig>::TrafoConfig CoarseSpaceTrafoConfig;
-        typedef Trafo::ConfigOr<AsmTrafoConfig, FineSpaceTrafoConfig> FineTrafoConfig;
-        typedef Trafo::ConfigOr<AsmTrafoConfig, CoarseSpaceTrafoConfig> CoarseTrafoConfig;
+        typedef typename FineSpaceEvaluator::template ConfigTraits<SpaceTags::value> FineSpaceConfigTraits;
+        typedef typename CoarseSpaceEvaluator::template ConfigTraits<SpaceTags::value> CoarseSpaceConfigTraits;
+        static constexpr TrafoTags fine_trafo_config = TrafoTags::jac_det | FineSpaceConfigTraits::trafo_config;
+        static constexpr TrafoTags coarse_trafo_config = TrafoTags::jac_det | CoarseSpaceConfigTraits::trafo_config;
 
         // typedefs for trafo data
-        typedef typename FineTrafoEvaluator::template ConfigTraits<FineTrafoConfig>::EvalDataType FineTrafoEvalData;
-        typedef typename CoarseTrafoEvaluator::template ConfigTraits<CoarseTrafoConfig>::EvalDataType CoarseTrafoEvalData;
+        typedef typename FineTrafoEvaluator::template ConfigTraits<fine_trafo_config>::EvalDataType FineTrafoEvalData;
+        typedef typename CoarseTrafoEvaluator::template ConfigTraits<coarse_trafo_config>::EvalDataType CoarseTrafoEvalData;
         FineTrafoEvalData fine_trafo_data;
         CoarseTrafoEvalData coarse_trafo_data;
 
         // typedef for space data
-        typedef typename FineSpaceEvaluator::template ConfigTraits<AsmSpaceConfig>::EvalDataType FineSpaceEvalData;
-        typedef typename CoarseSpaceEvaluator::template ConfigTraits<AsmSpaceConfig>::EvalDataType CoarseSpaceEvalData;
+        typedef typename FineSpaceEvaluator::template ConfigTraits<SpaceTags::value>::EvalDataType FineSpaceEvalData;
+        typedef typename CoarseSpaceEvaluator::template ConfigTraits<SpaceTags::value>::EvalDataType CoarseSpaceEvalData;
         FineSpaceEvalData fine_space_data;
         CoarseSpaceEvalData coarse_space_data;
 

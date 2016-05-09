@@ -71,31 +71,19 @@ namespace FEAST
         /// data type
         typedef typename SpaceEvalTraits::DataType DataType;
 
-        /// can compute function values
-        static constexpr bool can_value = true;
+        static constexpr SpaceTags eval_caps = (SpaceTags::value | SpaceTags::grad | SpaceTags::hess);
 
-        /// can compute gradients
-        static constexpr bool can_grad = true;
-
-        /// can compute hessians
-        static constexpr bool can_hess = true;
-
-        template<typename Cfg_>
+        template<SpaceTags cfg_>
         struct ConfigTraits
         {
           /// evaluation data configuration
-          typedef Cfg_ EvalDataConfig;
+          static constexpr SpaceTags config = cfg_;
 
           /// trafo configuration
-          struct TrafoConfig :
-            public Trafo::ConfigBase
-          {
-            /// we always need image point coordinates
-            static constexpr bool need_img_point = true;
-          };
+          static constexpr TrafoTags trafo_config = TrafoTags::img_point;
 
           /// evaluation data typedef
-          typedef Space::EvalData<SpaceEvalTraits, EvalDataConfig> EvalDataType;
+          typedef Space::EvalData<SpaceEvalTraits, config> EvalDataType;
         };
 
       protected:
@@ -103,13 +91,6 @@ namespace FEAST
         Tiny::Matrix<DataType, 21, 21> _coeff;
         // triangle barycentre
         ImagePointType _barycentre;
-
-        /// trafo config for coefficient computation
-        struct CoeffTrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_img_point = true;
-        };
 
       public:
         /**
@@ -264,10 +245,10 @@ namespace FEAST
           _coeff.set_inverse(node_mat);
         }
 
-        template<typename SpaceCfg_, typename TrafoCfg_>
+        template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
         void eval_values(
-          EvalData<SpaceEvalTraits, SpaceCfg_>& phi,
-          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& tau) const
+          EvalData<SpaceEvalTraits, space_cfg_>& phi,
+          const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& tau) const
         {
           // initialise monomial powers
           Tiny::Vector<DataType, 6> vx, vy;
@@ -290,10 +271,10 @@ namespace FEAST
           }
         }
 
-        template<typename SpaceCfg_, typename TrafoCfg_>
+        template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
         void eval_gradients(
-          EvalData<SpaceEvalTraits, SpaceCfg_>& phi,
-          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& tau) const
+          EvalData<SpaceEvalTraits, space_cfg_>& phi,
+          const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& tau) const
         {
           // initialise monomial powers
           Tiny::Vector<DataType, 6> vx, vy;
@@ -324,10 +305,10 @@ namespace FEAST
           }
         }
 
-        template<typename SpaceCfg_, typename TrafoCfg_>
+        template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
         void eval_hessians(
-          EvalData<SpaceEvalTraits, SpaceCfg_>& phi,
-          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& tau) const
+          EvalData<SpaceEvalTraits, space_cfg_>& phi,
+          const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& tau) const
         {
           // initialise monomial powers
           Tiny::Vector<DataType, 6> vx, vy;

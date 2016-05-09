@@ -20,10 +20,10 @@ namespace FEAST
     class LinearFunctional
     {
     public:
-      /// use 'base' trafo configuration
-      typedef Trafo::ConfigBase TrafoConfig;
-      /// use 'base' test space configuration
-      typedef Space::ConfigBase TestConfig;
+#ifdef DOXYGEN
+      static constexpr TrafoTags trafo_config = ...;
+      static constexpr SpaceTags test_config = ...;
+#endif // DOXYGEN
 
       /**
        * \brief Linear Functional Evaluator class template

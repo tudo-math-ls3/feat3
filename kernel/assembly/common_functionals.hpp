@@ -33,20 +33,10 @@ namespace FEAST
         static_assert(Function_::can_value, "function can't compute values");
 
         /// trafo config tag
-        struct TrafoConfig :
-          public Trafo::ConfigBase
-        {
-          /// we need image point coordinates
-          static constexpr bool need_img_point = true;
-        };
+        static constexpr TrafoTags trafo_config = TrafoTags::img_point;
 
         /// test space config tag
-        struct TestConfig :
-          public Space::ConfigBase
-        {
-          /// we need basis function values
-          static constexpr bool need_value = true;
-        };
+        static constexpr SpaceTags test_config = SpaceTags::value;
 
         /**
          * \brief Force Functional Evaluator class template
@@ -145,20 +135,10 @@ namespace FEAST
         static_assert(Function_::can_hess, "function can't compute hessians");
 
         /// trafo config tag
-        struct TrafoConfig :
-          public Trafo::ConfigBase
-        {
-          /// we need image point coordinates
-          static constexpr bool need_img_point = true;
-        };
+        static constexpr TrafoTags trafo_config = TrafoTags::img_point;
 
         /// test space config tag
-        struct TestConfig :
-          public Space::ConfigBase
-        {
-          /// we need basis function values
-          static constexpr bool need_value = true;
-        };
+        static constexpr SpaceTags test_config = SpaceTags::value;
 
         /**
          * \brief Force Functional Evaluator class template

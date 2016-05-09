@@ -70,9 +70,9 @@ namespace FEAST
           typename MatrixType::DataType,
           TestSpaceType,
           TrialSpaceType,
-          typename OperatorType::TrafoConfig,
-          typename OperatorType::TestConfig,
-          typename OperatorType::TrialConfig> AsmTraits;
+          OperatorType::trafo_config,
+          OperatorType::test_config,
+          OperatorType::trial_config> AsmTraits;
 
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = test_space.get_trafo();
@@ -224,10 +224,8 @@ namespace FEAST
         typedef AsmTraits1<
           typename MatrixType::DataType,
           SpaceType,
-          typename OperatorType::TrafoConfig,
-          Space::ConfigOr<
-            typename OperatorType::TestConfig,
-            typename OperatorType::TrialConfig> > AsmTraits;
+          OperatorType::trafo_config,
+          OperatorType::test_config | OperatorType::trial_config> AsmTraits;
 
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
@@ -388,8 +386,8 @@ namespace FEAST
           typename MatrixType::DataType,
           OperatorValueType,
           SpaceType,
-          typename OperatorType::TrafoConfig,
-          Space::ConfigOr<typename OperatorType::TestConfig, typename OperatorType::TrialConfig>
+          OperatorType::trafo_config,
+          OperatorType::test_config | OperatorType::trial_config
         > AsmTraits;
 
         // fetch the trafo
@@ -548,8 +546,8 @@ namespace FEAST
           <
             typename VectorType::DataType,
             SpaceType,
-            typename OperatorType::TrafoConfig,
-            Space::ConfigOr<typename OperatorType::TestConfig, typename OperatorType::TrialConfig>
+            OperatorType::trafo_config,
+            OperatorType::test_config | OperatorType::trial_config
           > AsmTraits;
 
           // fetch the trafo
@@ -720,9 +718,9 @@ namespace FEAST
             typename VectorType::DataType,
             TestSpaceType,
             TrialSpaceType,
-            typename OperatorType::TrafoConfig,
-            typename OperatorType::TestConfig,
-            typename OperatorType::TrialConfig
+            OperatorType::trafo_config,
+            OperatorType::test_config,
+            OperatorType::trial_config
           > AsmTraits;
 
           // fetch the trafo

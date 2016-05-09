@@ -73,8 +73,8 @@ namespace FEAST
     template<
       typename DataType_,
       typename Space_,
-      typename TrafoConfig_ = Trafo::ConfigBase,
-      typename SpaceConfig_ = Space::ConfigBase>
+      TrafoTags trafo_config_,
+      SpaceTags space_config_>
     class AsmTraits1 :
       public Intern::EvalPolicyFetcher<Space_, DataType_>::EvalPolicy
     {
@@ -116,34 +116,27 @@ namespace FEAST
       typedef SpaceEvalTraits MultEvalTraits;
 
       // define test- and trial-space configs
-      typedef SpaceConfig_ SpaceConfig;
-      typedef SpaceConfig TestConfig;
-      typedef SpaceConfig TrialConfig;
-      typedef SpaceConfig MultConfig;
+      static constexpr SpaceTags space_config = space_config_;
+      static constexpr SpaceTags test_config = space_config_;
+      static constexpr SpaceTags trial_config = space_config_;
+      static constexpr SpaceTags mult_config = space_config_;
 
       // now fetch the trafo config from the space
-      typedef typename SpaceEvaluator::template ConfigTraits<SpaceConfig>::TrafoConfig SpaceTrafoConfig;
-      typedef SpaceTrafoConfig TestTrafoConfig;
-      typedef SpaceTrafoConfig TrialTrafoConfig;
-      typedef SpaceTrafoConfig MultTrafoConfig;
+      typedef typename SpaceEvaluator::template ConfigTraits<space_config> SpaceConfigTraits;
+      static constexpr TrafoTags space_trafo_config = SpaceConfigTraits::trafo_config;
+      static constexpr TrafoTags test_trafo_config = SpaceConfigTraits::trafo_config;
+      static constexpr TrafoTags trial_trafo_config = SpaceConfigTraits::trafo_config;
+      static constexpr TrafoTags mult_trafo_config = SpaceConfigTraits::trafo_config;
 
       /// assembly trafo config: derive from user-defined trafo config
-      struct AsmTrafoConfig :
-        public TrafoConfig_
-      {
-        /// we need jacobian determinants for integration
-        static constexpr bool need_jac_det = true;
-      };
-
-      /// trafo config: combine space and assembly trafo configs
-      typedef Trafo::ConfigOr<AsmTrafoConfig, SpaceTrafoConfig> TrafoConfig;
+      static constexpr TrafoTags trafo_config = trafo_config_ | space_trafo_config | TrafoTags::jac_det;
 
       /// trafo evaluation data type
-      typedef typename TrafoEvaluator::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+      typedef typename TrafoEvaluator::template ConfigTraits<trafo_config>::EvalDataType TrafoEvalData;
       typedef TrafoEvalData TrafoData;
 
       /// space evaluation data types
-      typedef typename SpaceEvaluator::template ConfigTraits<SpaceConfig>::EvalDataType SpaceEvalData;
+      typedef typename SpaceEvaluator::template ConfigTraits<space_config>::EvalDataType SpaceEvalData;
       typedef SpaceEvalData TestEvalData;
       typedef SpaceEvalData TrialEvalData;
       typedef SpaceEvalData MultEvalData;
@@ -212,9 +205,9 @@ namespace FEAST
       typename DataType_,
       typename TestSpace_,
       typename TrialSpace,
-      typename TrafoConfig_ = Trafo::ConfigBase,
-      typename TestConfig_ = Space::ConfigBase,
-      typename TrialConfig_ = Space::ConfigBase>
+      TrafoTags trafo_config_,
+      SpaceTags test_config_,
+      SpaceTags trial_config_>
     class AsmTraits2 :
       public Intern::EvalPolicyFetcher<TestSpace_, DataType_>::EvalPolicy
     {
@@ -252,36 +245,27 @@ namespace FEAST
       typedef TrialEvalTraits MultEvalTraits;
 
       // define test- and trial-space configs
-      typedef TestConfig_ TestConfig;
-      typedef TrialConfig_ TrialConfig;
-      typedef TrialConfig_ MultConfig;
+      static constexpr SpaceTags test_config = test_config_;
+      static constexpr SpaceTags trial_config = trial_config_;
+      static constexpr SpaceTags mult_config = trial_config_;
 
       // now fetch the trafo configs from the spaces
-      typedef typename TestEvaluator::template ConfigTraits<TestConfig>::TrafoConfig TestTrafoConfig;
-      typedef typename TrialEvaluator::template ConfigTraits<TrialConfig>::TrafoConfig TrialTrafoConfig;
-      typedef TrialTrafoConfig MultTrafoConfig;
-
-      // combine the space trafo configurations
-      typedef Trafo::ConfigOr<TestTrafoConfig, TrialTrafoConfig> SpaceTrafoConfig;
-
-      /// assembly trafo config: derive from  user-defined trafo config
-      struct AsmTrafoConfig :
-        public TrafoConfig_
-      {
-        /// we need jacobian determinants for integration
-        static constexpr bool need_jac_det = true;
-      };
+      typedef typename TestEvaluator::template ConfigTraits<test_config> TestConfigTraits;
+      typedef typename TrialEvaluator::template ConfigTraits<trial_config> TrialConfigTraits;
+      static constexpr TrafoTags test_trafo_config = TestConfigTraits::trafo_config;
+      static constexpr TrafoTags trial_trafo_config = TrialConfigTraits::trafo_config;
+      static constexpr TrafoTags mult_trafo_config = TrialConfigTraits::trafo_config;
 
       /// trafo config: combine space and assembly trafo configs
-      typedef Trafo::ConfigOr<AsmTrafoConfig, SpaceTrafoConfig> TrafoConfig;
+      static constexpr TrafoTags trafo_config = trafo_config_ | test_trafo_config | trial_trafo_config | TrafoTags::jac_det;
 
       /// trafo evaluation data type
-      typedef typename TrafoEvaluator::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+      typedef typename TrafoEvaluator::template ConfigTraits<trafo_config>::EvalDataType TrafoEvalData;
       typedef TrafoEvalData TrafoData;
 
       /// space evaluation data types
-      typedef typename TestEvaluator::template ConfigTraits<TestConfig>::EvalDataType TestEvalData;
-      typedef typename TrialEvaluator::template ConfigTraits<TrialConfig>::EvalDataType TrialEvalData;
+      typedef typename TestEvaluator::template ConfigTraits<test_config>::EvalDataType TestEvalData;
+      typedef typename TrialEvaluator::template ConfigTraits<trial_config>::EvalDataType TrialEvalData;
       typedef TrialEvalData MultEvalData;
 
       /// basis function data types
@@ -347,8 +331,8 @@ namespace FEAST
       typename DataType_,
       typename OperatorValueType_,
       typename Space_,
-      typename TrafoConfig_ = Trafo::ConfigBase,
-      typename SpaceConfig_ = Space::ConfigBase>
+      TrafoTags trafo_config_,
+      SpaceTags space_config_>
     class AsmTraits1Blocked :
       public Intern::EvalPolicyFetcher<Space_, DataType_>::EvalPolicy
     {
@@ -396,34 +380,27 @@ namespace FEAST
       typedef SpaceEvalTraits MultEvalTraits;
 
       // define test- and trial-space configs
-      typedef SpaceConfig_ SpaceConfig;
-      typedef SpaceConfig TestConfig;
-      typedef SpaceConfig TrialConfig;
-      typedef SpaceConfig MultConfig;
+      static constexpr SpaceTags space_config = space_config_;
+      static constexpr SpaceTags test_config = space_config_;
+      static constexpr SpaceTags trial_config = space_config_;
+      static constexpr SpaceTags mult_config = space_config_;
 
       // now fetch the trafo config from the space
-      typedef typename SpaceEvaluator::template ConfigTraits<SpaceConfig>::TrafoConfig SpaceTrafoConfig;
-      typedef SpaceTrafoConfig TestTrafoConfig;
-      typedef SpaceTrafoConfig TrialTrafoConfig;
-      typedef SpaceTrafoConfig MultTrafoConfig;
+      typedef typename SpaceEvaluator::template ConfigTraits<space_config> SpaceConfigTraits;
+      static constexpr TrafoTags space_trafo_config = SpaceConfigTraits::trafo_config;
+      static constexpr TrafoTags test_trafo_config = SpaceConfigTraits::trafo_config;
+      static constexpr TrafoTags trial_trafo_config = SpaceConfigTraits::trafo_config;
+      static constexpr TrafoTags mult_trafo_config = SpaceConfigTraits::trafo_config;
 
       /// assembly trafo config: derive from user-defined trafo config
-      struct AsmTrafoConfig :
-        public TrafoConfig_
-      {
-        /// we need jacobian determinants for integration
-        static constexpr int need_jac_det = 1;
-      };
-
-      /// trafo config: combine space and assembly trafo configs
-      typedef Trafo::ConfigOr<AsmTrafoConfig, SpaceTrafoConfig> TrafoConfig;
+      static constexpr TrafoTags trafo_config = trafo_config_ | space_trafo_config | TrafoTags::jac_det;
 
       /// trafo evaluation data type
-      typedef typename TrafoEvaluator::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+      typedef typename TrafoEvaluator::template ConfigTraits<trafo_config>::EvalDataType TrafoEvalData;
       typedef TrafoEvalData TrafoData;
 
       /// space evaluation data types
-      typedef typename SpaceEvaluator::template ConfigTraits<SpaceConfig>::EvalDataType SpaceEvalData;
+      typedef typename SpaceEvaluator::template ConfigTraits<space_config>::EvalDataType SpaceEvalData;
       typedef SpaceEvalData TestEvalData;
       typedef SpaceEvalData TrialEvalData;
       typedef SpaceEvalData MultEvalData;

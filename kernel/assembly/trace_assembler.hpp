@@ -48,13 +48,6 @@ namespace FEAST
       static constexpr int shape_dim = ShapeType::dimension;
       static constexpr int facet_dim = shape_dim-1;
 
-      struct FacetTrafoConfig :
-        public Trafo::ConfigBase
-      {
-        /// we need jacobian determinants for integration
-        static constexpr bool need_jac_det = true;
-      };
-
     protected:
       const TrafoType& _trafo;
       std::vector<int> _facet_mask, _cell_facet, _facet_ori;
@@ -170,9 +163,9 @@ namespace FEAST
           typename MatrixType::DataType,
           TestSpaceType,
           TrialSpaceType,
-          typename OperatorType::TrafoConfig,
-          typename OperatorType::TestConfig,
-          typename OperatorType::TrialConfig> AsmTraits;
+          OperatorType::trafo_config,
+          OperatorType::test_config,
+          OperatorType::trial_config> AsmTraits;
 
         typedef typename AsmTraits::DataType DataType;
         typedef typename AsmTraits::TrafoType TrafoType;
@@ -191,7 +184,7 @@ namespace FEAST
         typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
         TrafoFacetEvaluator trafo_facet_eval(trafo);
 
-        typedef typename TrafoFacetEvaluator::template ConfigTraits<FacetTrafoConfig>::EvalDataType TrafoFacetEvalData;
+        typedef typename TrafoFacetEvaluator::template ConfigTraits<TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
 
         // create space evaluators
         typename AsmTraits::TestEvaluator test_eval(test_space);
@@ -348,8 +341,8 @@ namespace FEAST
         typedef AsmTraits1<
           typename VectorType::DataType,
           SpaceType,
-          typename FunctionalType::TrafoConfig,
-          typename FunctionalType::TestConfig> AsmTraits;
+          FunctionalType::trafo_config,
+          FunctionalType::test_config> AsmTraits;
 
         typedef typename AsmTraits::DataType DataType;
         typedef typename AsmTraits::TrafoType TrafoType;
@@ -368,7 +361,7 @@ namespace FEAST
         typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
         TrafoFacetEvaluator trafo_facet_eval(trafo);
 
-        typedef typename TrafoFacetEvaluator::template ConfigTraits<FacetTrafoConfig>::EvalDataType TrafoFacetEvalData;
+        typedef typename TrafoFacetEvaluator::template ConfigTraits<TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
 
         // create a space evaluator and evaluation data
         typename AsmTraits::TestEvaluator test_eval(space);

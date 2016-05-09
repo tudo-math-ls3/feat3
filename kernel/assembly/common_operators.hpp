@@ -26,21 +26,9 @@ namespace FEAST
         public BilinearOperator
       {
       public:
-        /// test space configuration
-        struct TestConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires test-function gradients
-          static constexpr bool need_grad = true;
-        };
-
-        /// trial space configuration
-        struct TrialConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires trial-function gradients
-          static constexpr bool need_grad = true;
-        };
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::grad;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
 
         /**
          * \brief Laplace evaluator class template
@@ -112,21 +100,9 @@ namespace FEAST
         public BilinearOperator
       {
       public:
-        /// test space configuration
-        struct TestConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires test-function values
-          static constexpr bool need_value = true;
-        };
-
-        /// trial space configuration
-        struct TrialConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires trial-function values
-          static constexpr bool need_value = true;
-        };
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::value;
+        static constexpr SpaceTags trial_config = SpaceTags::value;
 
         /**
          * \brief Bilinear scalar Identity evaluator class template
@@ -201,21 +177,9 @@ namespace FEAST
         /// the desired derivative
         int deriv;
 
-        /// test space configuration
-        struct TestConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires test-function gradients
-          static constexpr bool need_grad = true;
-        };
-
-        /// trial space configuration
-        struct TrialConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires trial-function values
-          static constexpr bool need_value = true;
-        };
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::grad;
+        static constexpr SpaceTags trial_config = SpaceTags::value;
 
         /**
          * \brief Test-Derivative evaluator class template
@@ -318,21 +282,9 @@ namespace FEAST
         /// Column index
         int ic;
 
-        /// test space configuration
-        struct TestConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires test-function gradients
-          static constexpr bool need_grad = true;
-        };
-
-        /// trial space configuration
-        struct TrialConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires trial-function gradients
-          static constexpr bool need_grad = true;
-        };
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::grad;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
 
         /**
          * \brief Du : Dv evaluator class template
@@ -435,21 +387,10 @@ namespace FEAST
         static constexpr int BlockHeight = dimension_;
         /// Every block is a dimension x dimension matrix
         static constexpr int BlockWidth = dimension_;
-        /// test space configuration
-        struct TestConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires test-function gradients
-          static constexpr bool need_grad = true;
-        };
 
-        /// trial space configuration
-        struct TrialConfig :
-          public Space::ConfigBase
-        {
-          /// this operator requires trial-function gradients
-          static constexpr bool need_grad = true;
-        };
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::grad;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
 
         /**
          * \brief Du : Dv evaluator class template

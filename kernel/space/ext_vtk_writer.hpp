@@ -96,30 +96,6 @@ namespace FEAST
     protected:
       typedef typename TrafoType::template Evaluator<>::Type TrafoEval;
 
-      struct TrafoVertexConfig :
-        public Trafo::ConfigBase
-      {
-        static constexpr bool need_img_point = true;
-      };
-
-      struct SpaceValueConfig :
-        public Space::ConfigBase
-      {
-        static constexpr bool need_value = true;
-      };
-
-      struct SpaceGradConfig :
-        public Space::ConfigBase
-      {
-        static constexpr bool need_grad = true;
-      };
-
-      struct SpaceHessConfig :
-        public Space::ConfigBase
-      {
-        static constexpr bool need_hess = true;
-      };
-
     protected:
       const TrafoType& _trafo;
       std::ofstream _ofs;
@@ -213,9 +189,10 @@ namespace FEAST
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
         static_assert(SpaceEval::can_value != 0, "space cannot evalute basis function values!");
         typedef typename SpaceType::DofMappingType DofMappingType;
-        typedef typename SpaceEval::template ConfigTraits<SpaceValueConfig>::EvalDataType SpaceData;
-        typedef typename SpaceEval::template ConfigTraits<SpaceValueConfig>::TrafoConfig TrafoValueConfig;
-        typedef typename TrafoEval::template ConfigTraits<TrafoValueConfig>::EvalDataType TrafoData;
+        typedef typename SpaceEval::template ConfigTraits<SpaceTags::value> SpaceConfigTraits;
+        typedef typename SpaceConfigTraits::EvalDataType SpaceData;
+        static constexpr SpaceTags trafo_value_config = SpaceConfigTraits::trafo_config;
+        typedef typename TrafoEval::template ConfigTraits<trafo_value_config>::EvalDataType TrafoData;
         typedef typename VectorType_::ValueType ValueType;
         Tiny::Vector<ValueType, SpaceEval::max_local_dofs> loc_vec;
 
@@ -295,11 +272,12 @@ namespace FEAST
         ASSERT_(data != nullptr);
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
-        static_assert(SpaceEval::can_value != 0, "space cannot evalute basis function values!");
+        static_assert(*(SpaceEval::eval_caps & SpaceTags::value), "space cannot evalute basis function values!");
         typedef typename SpaceType::DofMappingType DofMappingType;
-        typedef typename SpaceEval::template ConfigTraits<SpaceValueConfig>::EvalDataType SpaceData;
-        typedef typename SpaceEval::template ConfigTraits<SpaceValueConfig>::TrafoConfig TrafoValueConfig;
-        typedef typename TrafoEval::template ConfigTraits<TrafoValueConfig>::EvalDataType TrafoData;
+        typedef typename SpaceEval::template ConfigTraits<SpaceTags::value> SpaceConfigTraits;
+        typedef typename SpaceConfigTraits::EvalDataType SpaceData;
+        static constexpr TrafoTags trafo_value_config = SpaceConfigTraits::trafo_config;
+        typedef typename TrafoEval::template ConfigTraits<trafo_value_config>::EvalDataType TrafoData;
         typedef typename SpaceEval::DataType DataType;
         Tiny::Vector<DataType, SpaceEval::max_local_dofs> loc_vec;
 
@@ -375,11 +353,12 @@ namespace FEAST
         ASSERT_(data != nullptr);
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
-        static_assert(SpaceEval::can_grad != 0, "space cannot evalute basis function gradients!");
+        static_assert(*(SpaceEval::eval_caps & SpaceTags::grad), "space cannot evalute basis function gradients!");
         typedef typename SpaceType::DofMappingType DofMappingType;
-        typedef typename SpaceEval::template ConfigTraits<SpaceGradConfig>::EvalDataType SpaceData;
-        typedef typename SpaceEval::template ConfigTraits<SpaceGradConfig>::TrafoConfig TrafoGradConfig;
-        typedef typename TrafoEval::template ConfigTraits<TrafoGradConfig>::EvalDataType TrafoData;
+        typedef typename SpaceEval::template ConfigTraits<SpaceTags::grad> SpaceConfigTraits;
+        typedef typename SpaceConfigTraits::EvalDataType SpaceData;
+        static constexpr TrafoTags trafo_grad_config = SpaceConfigTraits::trafo_config;
+        typedef typename TrafoEval::template ConfigTraits<trafo_grad_config>::EvalDataType TrafoData;
         typedef typename SpaceEval::DataType DataType;
         typedef typename SpaceEval::SpaceEvalTraits SpaceEvalTraits;
         typedef typename SpaceEvalTraits::BasisGradientType BasisGradientType;
@@ -463,11 +442,12 @@ namespace FEAST
         ASSERT_(data != nullptr);
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
-        static_assert(SpaceEval::can_hess != 0, "space cannot evalute basis function hessians!");
+        static_assert(*(SpaceEval::eval_caps & SpaceTags::hess), "space cannot evalute basis function hessians!");
         typedef typename SpaceType::DofMappingType DofMappingType;
-        typedef typename SpaceEval::template ConfigTraits<SpaceHessConfig>::EvalDataType SpaceData;
-        typedef typename SpaceEval::template ConfigTraits<SpaceHessConfig>::TrafoConfig TrafoHessConfig;
-        typedef typename TrafoEval::template ConfigTraits<TrafoHessConfig>::EvalDataType TrafoData;
+        typedef typename SpaceEval::template ConfigTraits<SpaceTags::hess> SpaceConfigTraits;
+        typedef typename SpaceConfigTraits::EvalDataType SpaceData;
+        static constexpr TrafoTags trafo_hess_config = SpaceConfigTraits::trafo_config;
+        typedef typename TrafoEval::template ConfigTraits<trafo_hess_config>::EvalDataType TrafoData;
         typedef typename SpaceEval::DataType DataType;
         typedef typename SpaceEval::SpaceEvalTraits SpaceEvalTraits;
         typedef typename SpaceEvalTraits::BasisHessianType BasisHessianType;
@@ -557,7 +537,7 @@ namespace FEAST
         // create trafo evaluator and data
         typedef typename TrafoType::template Evaluator<>::Type TrafoEval;
         typedef typename TrafoEval::DomainPointType DomainPointType;
-        typedef typename TrafoEval::template ConfigTraits<TrafoVertexConfig>::EvalDataType TrafoData;
+        typedef typename TrafoEval::template ConfigTraits<TrafoTags::img_point>::EvalDataType TrafoData;
         DomainPointType dom_point;
         TrafoEval trafo_eval(trafo);
         TrafoData trafo_data;

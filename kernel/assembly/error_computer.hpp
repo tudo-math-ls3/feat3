@@ -263,26 +263,16 @@ namespace FEAST
       /// \cond internal
       /**
        * \brief Trafo configuration tag class
-       *
-       * \see Trafo::ConfigBase
        */
-      struct TrafoConfig : public Trafo::ConfigBase
-      {
-        static constexpr bool need_img_point = true;
-        static constexpr bool need_jac_det = true;
-      };
+      static constexpr TrafoTags trafo_config = TrafoTags::img_point | TrafoTags::jac_det;
 
       /**
        * \brief Space configuration tag class
-       *
-       * \see Space::ConfigBase
        */
-      struct SpaceConfig : public Space::ConfigBase
-      {
-        static constexpr bool need_value = (max_norm_ >= 0);
-        static constexpr bool need_grad  = (max_norm_ >= 1);
-        static constexpr bool need_hess  = (max_norm_ >= 2);
-      };
+      static constexpr SpaceTags space_config =
+        ((max_norm_ >= 0) ? SpaceTags::value : SpaceTags::none) |
+        ((max_norm_ >= 1) ? SpaceTags::grad : SpaceTags::none) |
+        ((max_norm_ >= 2) ? SpaceTags::hess : SpaceTags::none);
       /// \endcond
 
     public:
@@ -332,7 +322,7 @@ namespace FEAST
         // space type
         typedef Space_ SpaceType;
         // assembly traits
-        typedef AsmTraits1<typename Vector_::DataType, SpaceType, TrafoConfig, SpaceConfig> AsmTraits;
+        typedef AsmTraits1<typename Vector_::DataType, SpaceType, trafo_config, space_config> AsmTraits;
         // data type
         typedef typename AsmTraits::DataType DataType;
 

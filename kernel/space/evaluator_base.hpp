@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/space/eval_data.hpp>
+#include <kernel/trafo/eval_data.hpp>
 
 namespace FEAST
 {
@@ -60,45 +61,22 @@ namespace FEAST
       /// maximum number of local DOFs
       static constexpr int max_local_dofs = SpaceEvalTraits::max_local_dofs;
 
-      template<typename Cfg_>
+      template<SpaceTags cfg_>
       struct ConfigTraits
       {
         /// evaluation data configuration
-        typedef Cfg_ EvalDataConfig;
+        static constexpr SpaceTags config = cfg_;
 
         /// trafo configuration
-        typedef Trafo::ConfigBase TrafoConfig;
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
 
         /// evaluation data typedef
-        typedef Space::EvalData<SpaceEvalTraits, EvalDataConfig> EvalDataType;
+        typedef Space::EvalData<SpaceEvalTraits, config> EvalDataType;
       };
 
-      /**
-       * \brief Basis Function-Values capability
-       *
-       * This entry specifies whether the evaluator is capable of computing basis function values.\n
-       * If this value is non-zero, the evaluator implements the #eval_values member function.\n
-       * See #eval_values for details.
-       */
-      static constexpr bool can_value = false;
-
-      /**
-       * \brief Basis Gradients capability
-       *
-       * This entry specifies whether the evaluator is capable of computing basis function gradients.\n
-       * If this value is non-zero, the evaluator implements the #eval_gradients member function.\n
-       * See #eval_gradients for details.
-       */
-      static constexpr bool can_grad = false;
-
-      /**
-       * \brief Basis Hessians capability
-       *
-       * This entry specifies whether the evaluator is capable of computing basis function hessian matrices.\n
-       * If this value is non-zero, the evaluator implements the #eval_hessians member function.\n
-       * See #eval_hessians for details.
-       */
-      static constexpr bool can_hess = false;
+#ifdef DOXYGEN
+      static constexpr SpaceTags eval_caps = ...;
+#endif
 
     protected:
       /// \cond internal
@@ -144,77 +122,81 @@ namespace FEAST
        * \param[in] trafo_data
        * The trafo evaluation data containing information about the evaluation point.
        */
-      template<typename SpaceCfg_, typename TrafoCfg_>
+      template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
       void operator()(
-        EvalData<SpaceEvalTraits, SpaceCfg_>& space_data,
-        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
+        EvalData<SpaceEvalTraits, space_cfg_>& space_data,
+        const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& trafo_data) const
       {
         // typedef mumbo-jumbo
-        typedef EvalData<SpaceEvalTraits, SpaceCfg_> EvalDataType;
+        typedef EvalData<SpaceEvalTraits, space_cfg_> EvalDataType;
 
         // compute basis values
-        Intern::BasisEvalHelper<EvalDataType::have_value>::eval_values(space_data, cast(), trafo_data);
+        Intern::BasisEvalHelper<*(EvalDataType::config & SpaceTags::value)>::eval_values(space_data, cast(), trafo_data);
         // compute basis gradients
-        Intern::BasisEvalHelper<EvalDataType::have_grad>::eval_gradients(space_data, cast(), trafo_data);
+        Intern::BasisEvalHelper<*(EvalDataType::config & SpaceTags::grad)>::eval_gradients(space_data, cast(), trafo_data);
         // compute basis hessians
-        Intern::BasisEvalHelper<EvalDataType::have_hess>::eval_hessians(space_data, cast(), trafo_data);
+        Intern::BasisEvalHelper<*(EvalDataType::config & SpaceTags::hess)>::eval_hessians(space_data, cast(), trafo_data);
       }
 
-      // Note:
-      // The following block serves as an element interface documentation and is therefore only
-      // visible to doxygen. The actual functionality has to be supplied by the implementation.
-#ifdef DOXYGEN
       /**
        * \brief Evaluates the basis function values on the real cell.
        *
-       * \tparam SpaceCfg_, TrafoCfg_
-       * The space and trafo configuration classes. These are determined automatically by the compiler.
+       * \tparam space_cfg_, trafo_cfg_
+       * The space and trafo configuration tags. These are determined automatically by the compiler.
        *
-       * \param[out] data
+       * \param[out] space_data
        * A reference to an evaluation data structure that shall receive the basis function values.
        *
        * \param[in] trafo_data
        * The trafo evaluation data containing information about the evaluation point.
        */
-      template<typename SpaceCfg_, typename TrafoCfg_>
+      template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
       void eval_values(
-        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
-        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
+        EvalData<SpaceEvalTraits, space_cfg_>& DOXY(space_data),
+        const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& DOXY(trafo_data)) const
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function values");
+      }
 
       /**
        * \brief Evaluates the basis function gradients on the real cell.
        *
-       * \tparam SpaceCfg_, TrafoCfg_
-       * The space and trafo configuration classes. These are determined automatically by the compiler.
+       * \tparam space_cfg_, trafo_cfg_
+       * The space and trafo configuration tags. These are determined automatically by the compiler.
        *
-       * \param[out] data
+       * \param[out] space_data
        * A reference to an evaluation data structure that shall receive the basis function gradients.
        *
        * \param[in] trafo_data
        * The trafo evaluation data containing information about the evaluation point.
        */
-      template<typename SpaceCfg_, typename TrafoCfg_>
+      template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
       void eval_gradients(
-        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
-        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const;
+        EvalData<SpaceEvalTraits, space_cfg_>& DOXY(space_data),
+        const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& DOXY(trafo_data)) const
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function gradients");
+      }
 
       /**
        * \brief Evaluates the basis function hessians on the real cell.
        *
-       * \tparam SpaceCfg_, TrafoCfg_
-       * The space and trafo configuration classes. These are determined automatically by the compiler.
+       * \tparam space_cfg_, trafo_cfg_
+       * The space and trafo configuration tags. These are determined automatically by the compiler.
        *
-       * \param[out] data
+       * \param[out] space_data
        * A reference to an evaluation data structure that shall receive the basis function hessian matrices.
        *
        * \param[in] trafo_data
        * The trafo evaluation data containing information about the evaluation point.
        */
-      template<typename SpaceCfg_, typename TrafoCfg_>
+      template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
       void eval_hessians(
-        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
-        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const;
-#endif // DOXYGEN
+        EvalData<SpaceEvalTraits, space_cfg_>& DOXY(space_data),
+        const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& DOXY(trafo_data)) const
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function hessians");
+      }
     }; // class EvaluatorBase<...>
 
     /// \cond internal
@@ -239,21 +221,24 @@ namespace FEAST
         template<typename SpaceData_, typename Evaluator_, typename TrafoData_>
         static void eval_values(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
-          static_assert(Evaluator_::can_value, "space evaluator does not support basis function values");
+          if(!*(Evaluator_::eval_caps & SpaceTags::value))
+            throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function values");
           evaluator.eval_values(space_data, trafo_data);
         }
 
         template<typename SpaceData_, typename Evaluator_, typename TrafoData_>
         static void eval_gradients(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
-          static_assert(Evaluator_::can_grad, "space evaluator does not support basis function gradients");
+          if(!*(Evaluator_::eval_caps & SpaceTags::grad))
+            throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function gradients");
           evaluator.eval_gradients(space_data, trafo_data);
         }
 
         template<typename SpaceData_, typename Evaluator_, typename TrafoData_>
         static void eval_hessians(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
-          static_assert(Evaluator_::can_hess, "space evaluator does not support basis function hessians");
+          if(!*(Evaluator_::eval_caps & SpaceTags::hess))
+            throw InternalError(__func__, __FILE__, __LINE__, "space evaluator does not support basis function hessians");
           evaluator.eval_hessians(space_data, trafo_data);
         }
       };

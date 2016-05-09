@@ -12,24 +12,9 @@ template<typename DataType_>
 class BognerFoxSchmitTest
   : public TestSystem::TaggedTest<Archs::None, DataType_>
 {
+  static constexpr TrafoTags unit_trafo_config = TrafoTags::jac_det | TrafoTags::jac_inv;
 
-  struct UnitTrafoConfig : public Trafo::ConfigBase
-  {
-    enum
-    {
-      need_jac_det = 1,
-      need_jac_inv = 1
-    };
-  };
-
-  struct UnitSpaceConfig : public Space::ConfigBase
-  {
-    enum
-    {
-      need_value = 1,
-      need_grad = 1
-    };
-  };
+  static constexpr SpaceTags unit_space_config = SpaceTags::value | SpaceTags::grad;
 
 public:
   BognerFoxSchmitTest() :
@@ -68,12 +53,12 @@ public:
     // create a trafo evaluator
     typedef typename TrafoType::template Evaluator<ShapeType, DataType_>::Type TrafoEvaluator;
     TrafoEvaluator trafo_eval(trafo);
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_trafo_config>::EvalDataType trafo_data;
 
     // create a space evaluator
     typedef typename SpaceType::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
     SpaceEvaluator space_eval(space);
-    typename SpaceEvaluator::template ConfigTraits<UnitSpaceConfig>::EvalDataType space_data;
+    typename SpaceEvaluator::template ConfigTraits<unit_space_config>::EvalDataType space_data;
 
     // create a 4x4 Gauss-Legendre cubature formula
     CubatureRule cubature_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:4"));

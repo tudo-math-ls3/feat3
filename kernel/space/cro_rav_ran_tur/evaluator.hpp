@@ -4,7 +4,6 @@
 
 // includes, FEAST
 #include <kernel/space/parametric_evaluator.hpp>
-#include <kernel/trafo/eval_data.hpp>
 
 namespace FEAST
 {
@@ -17,15 +16,7 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      struct ReferenceCapabilities
-      {
-        /// can compute reference function values
-        static constexpr bool can_ref_value = true;
-        /// can compute reference gradients
-        static constexpr bool can_ref_grad = true;
-        /// can't compute reference hessians
-        static constexpr bool can_ref_hess = false;
-      };
+      static constexpr SpaceTags ref_caps = SpaceTags::ref_value | SpaceTags::ref_grad;
 
       /**
        * \brief Crouzeix-Raviart / Rannacher-Turek Element Evaluator class template declaration.
@@ -57,11 +48,11 @@ namespace FEAST
             Shape::Simplex<2> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ReferenceCapabilities>
+          ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -160,11 +151,11 @@ namespace FEAST
         Shape::Simplex<3> >,
         TrafoEvaluator_,
         SpaceEvalTraits_,
-        ReferenceCapabilities>
+        ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -308,42 +299,27 @@ namespace FEAST
         /// jacobian inverse matrix type
         typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
 
-        /// can compute function values
-        static constexpr bool can_value = true;
+        static constexpr SpaceTags eval_caps = SpaceTags::value | SpaceTags::grad;
 
-        /// can compute gradients
-        static constexpr bool can_grad = true;
-
-        template<typename Cfg_>
+        template<SpaceTags cfg_>
         struct ConfigTraits
         {
           /// evaluation data configuration
-          typedef Cfg_ EvalDataConfig;
+          static constexpr SpaceTags config = cfg_;
 
           /// trafo configuration
-          struct TrafoConfig :
-            public Trafo::ConfigBase
-          {
-            /// we always need image point coordinates
-            static constexpr bool need_img_point = true;
-          };
+          static constexpr TrafoTags trafo_config = TrafoTags::img_point;
 
           /// evaluation data typedef
-          typedef Space::EvalData<SpaceEvalTraits, EvalDataConfig> EvalDataType;
+          typedef Space::EvalData<SpaceEvalTraits, config> EvalDataType;
         };
 
       protected:
         /// inverse linearised trafo config
-        struct InvLinTrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_dom_point = true;
-          static constexpr bool need_img_point = true;
-          static constexpr bool need_jac_inv = true;
-        };
+        static constexpr TrafoTags inv_lin_trafo_config = TrafoTags::dom_point | TrafoTags::img_point | TrafoTags::jac_inv;
 
         /// inverse linearised trafo data
-        typedef typename TrafoEvaluator::template ConfigTraits<InvLinTrafoConfig>::EvalDataType InvLinTrafoData;
+        typedef typename TrafoEvaluator::template ConfigTraits<inv_lin_trafo_config>::EvalDataType InvLinTrafoData;
 
         /// trafo evaluator for facets (=edges)
         typedef typename TrafoType::template Evaluator<Shape::Hypercube<1>, DataType>::Type FacetTrafoEvaluator;
@@ -351,15 +327,10 @@ namespace FEAST
         typedef typename FacetTrafoEvaluator::EvalTraits FacetEvalTraits;
 
         /// trafo config for facet trafo
-        struct FacetTrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_img_point = true;
-          static constexpr bool need_jac_det = true;
-        };
+        static constexpr TrafoTags facet_trafo_config = TrafoTags::img_point | TrafoTags::jac_det;
 
         /// facet trafo data
-        typedef typename FacetTrafoEvaluator::template ConfigTraits<FacetTrafoConfig>::EvalDataType FacetTrafoData;
+        typedef typename FacetTrafoEvaluator::template ConfigTraits<facet_trafo_config>::EvalDataType FacetTrafoData;
 
         /// basis function coefficient matrix
         typedef Tiny::Matrix<DataType, 4, 4> CoeffMatrixType;
@@ -492,10 +463,10 @@ namespace FEAST
         }
 
         /** \copydoc Space::EvaluatorBase::eval_values() */
-        template<typename SpaceCfg_, typename TrafoCfg_>
+        template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
         void eval_values(
-          EvalData<SpaceEvalTraits, SpaceCfg_>& data,
-          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
+          EvalData<SpaceEvalTraits, space_cfg_>& data,
+          const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& trafo_data) const
         {
           // transform image point
           DomainPointType pt;
@@ -514,10 +485,10 @@ namespace FEAST
         }
 
         /** \copydoc Space::EvaluatorBase::Eval_gradients */
-        template<typename SpaceCfg_, typename TrafoCfg_>
+        template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
         void eval_gradients(
-          EvalData<SpaceEvalTraits, SpaceCfg_>& data,
-          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
+          EvalData<SpaceEvalTraits, space_cfg_>& data,
+          const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& trafo_data) const
         {
           // transform image point to local coordinate system
           DomainPointType pt, loc_grad;
@@ -593,42 +564,27 @@ namespace FEAST
         /// jacobian inverse matrix type
         typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
 
-        /// can compute function values
-        static constexpr bool can_value = true;
+        static constexpr SpaceTags eval_caps = SpaceTags::value | SpaceTags::grad;
 
-        /// can compute gradients
-        static constexpr bool can_grad = true;
-
-        template<typename Cfg_>
+        template<SpaceTags cfg_>
         struct ConfigTraits
         {
           /// evaluation data configuration
-          typedef Cfg_ EvalDataConfig;
+          static constexpr SpaceTags config = cfg_;
 
           /// trafo configuration
-          struct TrafoConfig :
-            public Trafo::ConfigBase
-          {
-            /// we always need image point coordinates
-            static constexpr bool need_img_point = true;
-          };
+          static constexpr TrafoTags trafo_config = TrafoTags::img_point;
 
           /// evaluation data typedef
-          typedef Space::EvalData<SpaceEvalTraits, EvalDataConfig> EvalDataType;
+          typedef Space::EvalData<SpaceEvalTraits, config> EvalDataType;
         };
 
       protected:
         /// inverse linearised trafo config
-        struct InvLinTrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_dom_point = true;
-          static constexpr bool need_img_point = true;
-          static constexpr bool need_jac_inv = true;
-        };
+        static constexpr TrafoTags inv_lin_trafo_config = TrafoTags::dom_point | TrafoTags::img_point | TrafoTags::jac_inv;
 
         /// inverse linearised trafo data
-        typedef typename TrafoEvaluator::template ConfigTraits<InvLinTrafoConfig>::EvalDataType InvLinTrafoData;
+        typedef typename TrafoEvaluator::template ConfigTraits<inv_lin_trafo_config>::EvalDataType InvLinTrafoData;
 
         /// trafo evaluator for facets
         typedef typename TrafoType::template Evaluator<Shape::Hypercube<2>, DataType>::Type FacetTrafoEvaluator;
@@ -636,15 +592,10 @@ namespace FEAST
         typedef typename FacetTrafoEvaluator::EvalTraits FacetEvalTraits;
 
         /// trafo config for facet trafo
-        struct FacetTrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_img_point = true;
-          static constexpr bool need_jac_det = true;
-        };
+        static constexpr TrafoTags facet_trafo_config = TrafoTags::img_point | TrafoTags::jac_det;
 
         /// facet trafo data
-        typedef typename FacetTrafoEvaluator::template ConfigTraits<FacetTrafoConfig>::EvalDataType FacetTrafoData;
+        typedef typename FacetTrafoEvaluator::template ConfigTraits<facet_trafo_config>::EvalDataType FacetTrafoData;
 
         /// basis function coefficient matrix
         typedef Tiny::Matrix<DataType, 6, 6> CoeffMatrixType;
@@ -799,10 +750,10 @@ namespace FEAST
         }
 
         /** \copydoc Space::EvaluatorBase::eval_values() */
-        template<typename SpaceCfg_, typename TrafoCfg_>
+        template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
         void eval_values(
-          EvalData<SpaceEvalTraits, SpaceCfg_>& data,
-          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
+          EvalData<SpaceEvalTraits, space_cfg_>& data,
+          const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& trafo_data) const
         {
           // transform image point
           DomainPointType pt;
@@ -824,10 +775,10 @@ namespace FEAST
         }
 
         /** \copydoc Space::EvaluatorBase::Eval_gradients */
-        template<typename SpaceCfg_, typename TrafoCfg_>
+        template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
         void eval_gradients(
-          EvalData<SpaceEvalTraits, SpaceCfg_>& data,
-          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
+          EvalData<SpaceEvalTraits, space_cfg_>& data,
+          const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& trafo_data) const
         {
           // transform image point to local coordinate system
           DomainPointType pt, loc_grad;

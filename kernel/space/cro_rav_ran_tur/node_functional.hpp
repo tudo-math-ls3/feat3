@@ -4,7 +4,6 @@
 
 // includes, FEAST
 #include <kernel/space/node_functional_base.hpp>
-#include <kernel/trafo/eval_data.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 
 namespace FEAST
@@ -61,13 +60,7 @@ namespace FEAST
 
         static constexpr int image_dim = TrafoEvalTraits::image_dim;
 
-        struct TrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_img_point = true;
-        };
-
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+        typedef typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point>::EvalDataType TrafoEvalData;
 
         TrafoEvalType _trafo_eval;
         DomainPointType _barycentre;
@@ -153,14 +146,7 @@ namespace FEAST
 
         static constexpr int image_dim = TrafoEvalTraits::image_dim;
 
-        struct TrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_img_point = true;
-          static constexpr bool need_jac_det = true;
-        };
-
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+        typedef typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point | TrafoTags::jac_det>::EvalDataType TrafoEvalData;
 
         typedef Cubature::Rule<FacetType, DataType_, DataType_, DomainPointType> CubRuleType;
 

@@ -95,12 +95,7 @@ namespace FEAST
     {
     private:
       /// \cond internal
-      struct TrafoConfig :
-        public Trafo::ConfigBase
-      {
-        static constexpr bool need_img_point = true;
-        static constexpr bool need_jac_det = true;
-      };
+      static constexpr TrafoTags trafo_config = TrafoTags::img_point | TrafoTags::jac_det;
       /// \endcond
 
     public:
@@ -181,7 +176,7 @@ namespace FEAST
 
         // create a trafo evaluator
         typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-        typedef typename TrafoEvaluator::template ConfigTraits<TrafoConfig> TrafoConfigTraits;
+        typedef typename TrafoEvaluator::template ConfigTraits<trafo_config> TrafoConfigTraits;
         typename TrafoConfigTraits::EvalDataType trafo_data;
 
         // create a trafo evaluator

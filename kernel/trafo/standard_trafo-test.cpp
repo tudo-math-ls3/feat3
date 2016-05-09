@@ -22,25 +22,11 @@ using namespace FEAST::TestSystem;
  */
 template<typename DataType_>
 class StandardTrafoTest
-: public TestSystem::TaggedTest<Archs::None, DataType_>
+  : public TestSystem::TaggedTest<Archs::None, DataType_>
 {
+  static constexpr TrafoTags unit_config = static_cast<TrafoTags>(~0);
 
-  struct UnitTrafoConfig : public Trafo::ConfigBase
-  {
-    enum
-    {
-      need_dom_point = 1,
-      need_img_point = 1,
-      need_jac_mat = 1,
-      need_jac_inv = 1,
-      need_jac_det = 1,
-      need_hess_ten = 1,
-      need_hess_inv = 1
-    };
-  };
-
-
-  public:
+public:
   StandardTrafoTest() :
     TestSystem::TaggedTest<Archs::None, DataType_>("StandardTrafoTest")
     {
@@ -84,7 +70,7 @@ class StandardTrafoTest
     TrafoEvaluator trafo_eval(trafo);
 
     // create a trafo evaluation data
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_config>::EvalDataType trafo_data;
 
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
@@ -145,7 +131,7 @@ class StandardTrafoTest
     TrafoEvaluator trafo_eval(trafo);
 
     // create a trafo evaluation data
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_config>::EvalDataType trafo_data;
 
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
@@ -207,7 +193,7 @@ class StandardTrafoTest
     TrafoEvaluator trafo_eval(trafo);
 
     // create a trafo evaluation data
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_config>::EvalDataType trafo_data;
 
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
@@ -275,7 +261,7 @@ class StandardTrafoTest
     TrafoEvaluator trafo_eval(trafo);
 
     // create a trafo evaluation data
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_config>::EvalDataType trafo_data;
 
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
@@ -370,7 +356,7 @@ class StandardTrafoTest
     TrafoEvaluator trafo_eval(trafo);
 
     // create a trafo evaluation data
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_config>::EvalDataType trafo_data;
 
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
@@ -437,7 +423,7 @@ class StandardTrafoTest
     TrafoEvaluator trafo_eval(trafo);
 
     // create a trafo evaluation data
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_config>::EvalDataType trafo_data;
 
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
@@ -507,7 +493,7 @@ class StandardTrafoTest
     TrafoEvaluator trafo_eval(trafo);
 
     // create a trafo evaluation data
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_config>::EvalDataType trafo_data;
 
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
@@ -581,7 +567,7 @@ class StandardTrafoTest
     TrafoEvaluator trafo_eval(trafo);
 
     // create a trafo evaluation data
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_config>::EvalDataType trafo_data;
 
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;

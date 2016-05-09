@@ -23,7 +23,7 @@
   <!-- ************************************************************************************************************* -->
   <!-- Header File List -->
   <ItemGroup>
-    <ClInclude Include="**\*.hpp" />
+    <ClInclude Include="eval_tags.hpp" />
   </ItemGroup>
   <!-- Source File List -->
   <ItemGroup>
@@ -35,7 +35,6 @@
     <CudaCompile Include="**\*.cu" Exclude="@(FeastKernelExcludeCuda)" />
     <CudaCompile Include="@(FeastKernelIncludeCuda)" Condition="'@(FeastKernelIncludeCuda)'!=''" />
   </ItemGroup>
-
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>

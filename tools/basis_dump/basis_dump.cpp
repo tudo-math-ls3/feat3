@@ -188,9 +188,9 @@ void dump_basis(String vtk_name, Index num_refines)
   // write basis functions
   typedef typename TrafoType::template Evaluator<>::Type TrafoEval;
   typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
-  DumpWrapper<SpaceEval::can_value != 0>::write_values(vtk_writer, space);
-  DumpWrapper<SpaceEval::can_grad  != 0>::write_gradients(vtk_writer, space);
-  DumpWrapper<SpaceEval::can_hess  != 0>::write_hessians(vtk_writer, space);
+  DumpWrapper<*(SpaceEval::eval_caps & SpaceTags::value)>::write_values(vtk_writer, space);
+  DumpWrapper<*(SpaceEval::eval_caps & SpaceTags::grad)>::write_gradients(vtk_writer, space);
+  DumpWrapper<*(SpaceEval::eval_caps & SpaceTags::hess)>::write_hessians(vtk_writer, space);
 
   // okay
   vtk_writer.close();

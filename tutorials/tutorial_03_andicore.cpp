@@ -137,36 +137,22 @@ namespace Tutorial03
     {
     }
 
-    // The first thing that is required from a bilinear operator are three so-called 'config tag'
-    // classes, which tell the assembly routines which information from the trafo, the test- and the
+    // The first thing that is required from a bilinear operator are three so-called 'config tags',
+    // which tell the assembly routines which information from the trafo, the test- and the
     // trial-spaces are required for this operator.
 
-    // We start off with the trafo configuration. Our operator does not require any information
-    // from the trafo, so we can use the pre-defined 'base' config from the 'kernel/trafo/base.hpp'
-    // header.
-    typedef Trafo::ConfigBase TrafoConfig;
+    // We start off with the trafo configuration, which is a constexpr TrafoTags member variable
+    // named 'trafo_config'. Our operator does not require any information from the trafo,
+    // so we simply set it to TrafoTags::none:
+    static constexpr TrafoTags trafo_config = TrafoTags::none;
 
-    // For the space configurations, it's not that easy. We have to write our own test- and
-    // trial-space configurations, as our bilinear operator requires both test/trial function
-    // values and gradients.
-    // For this, we derive our 'TestConfig' class/struct from the 'Space::ConfigBase' class...
-    struct TestConfig :
-      public Space::ConfigBase
-    {
-      // We can now express our wishes.
+    // Test- and trial-space configurations are specified in the same way as trafo configurations.
+    // Our bilinear operator requires both test-/trial-function values and gradients, so we
+    // need to combine the corresponding value with the OR operator:
+    static constexpr SpaceTags test_config = SpaceTags::value | SpaceTags::grad;
 
-      // Our bilinear operator requires test function values for the convection and rection terms:
-      static constexpr bool need_value = true;
-
-      // Moreover, we require the test function gradients for the diffusion term:
-      static constexpr bool need_grad = true;
-
-      // And that's it, all the other possibilities in 'kernel/trafo/base.hpp' are defaulted to false.
-    };
-
-    // Now we should do the same for the trial-space configuration 'TrialConfig'. However, as it
-    // is identical to the test space configuration, we'll simply use a typedef here...
-    typedef TestConfig TrialConfig;
+    // And we specify the very same thing for the trial space:
+    static constexpr SpaceTags trial_config = SpaceTags::value | SpaceTags::grad;
 
     // Up to now, we have a reference to our data and have expressed our wishes to the assembler,
     // but we still need to implement the actual operator somewhere. For this purpose, we need to
@@ -287,23 +273,12 @@ namespace Tutorial03
     // In analogy to the bilinear operator, we first need to provide a configuration for the trafo
     // and one for the test space (there exists no trial space for functionals).
     // We will need to evaluate our solution function and for this, we must tell the trafo
-    // that we require image point coordinates, so let's state this by deriving our TrafoConfig
-    // from the 'Trafo::ConfigBase' and then expressing our wishes:
-    struct TrafoConfig :
-      public Trafo::ConfigBase
-    {
-      // We (more precise: our solution function) need image point coordinates
-      static constexpr bool need_img_point = true;
-    };
+    // that we require image point coordinates, so let's state this:
+    static constexpr TrafoTags trafo_config = TrafoTags::img_point;
 
     // Now for the test-space configuration. For a linear functional, we usually require test
-    // function values for the evaluation, so build a corresponding test-space config:
-    struct TestConfig :
-      public Space::ConfigBase
-    {
-      // Give us test function values
-      static constexpr bool need_value = true;
-    };
+    // function values for the evaluation, so define a corresponding test-space config:
+    static constexpr SpaceTags test_config = SpaceTags::value;
 
     // In analogy to operators, functionals are evaluated using 'evaluator' class templates as well,
     // so let's declare one of those and derive it from the base-class evaluator:

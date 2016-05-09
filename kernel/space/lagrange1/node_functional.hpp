@@ -4,7 +4,6 @@
 
 // includes, FEAST
 #include <kernel/space/node_functional_base.hpp>
-#include <kernel/trafo/eval_data.hpp>
 
 namespace FEAST
 {
@@ -49,14 +48,8 @@ namespace FEAST
         typedef typename TrafoEvalTraits::DataType DataType;
         typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
 
-        struct TrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_img_point = true;
-        };
-
         // declare trafo evaluation data
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+        typedef typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point>::EvalDataType TrafoEvalData;
 
         TrafoEvalType _trafo_eval;
 

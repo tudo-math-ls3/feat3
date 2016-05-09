@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/shape.hpp>
+#include <kernel/eval_tags.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
 namespace FEAST
@@ -64,60 +65,7 @@ namespace FEAST
       typedef Tiny::Tensor3<DataType, image_dim, domain_dim, domain_dim> HessianTensorType;
       /// inverse hessian tensor type
       typedef Tiny::Tensor3<DataType, image_dim, domain_dim, domain_dim> HessianInverseType;
-
     }; // class StandardEvalPolicy<...>
-
-    /**
-     * \brief Base class for trafo config tags
-     *
-     * \author Peter Zajac
-     */
-    struct ConfigBase
-    {
-      /// specifies whether the trafo should supply domain point coordinates
-      static constexpr bool need_dom_point = false;
-      /// specifies whether the trafo should supply image point coordinates
-      static constexpr bool need_img_point = false;
-      /// specifies whether the trafo should supply jacobian matrices
-      static constexpr bool need_jac_mat   = false;
-      /// specifies whether the trafo should supply inverse jacobian matrices
-      static constexpr bool need_jac_inv   = false;
-      /// specifies whether the trafo should supply jacobian determinants
-      static constexpr bool need_jac_det   = false;
-      /// specifies whether the trafo should supply hessian tensors
-      static constexpr bool need_hess_ten  = false;
-      /// specifies whether the trafo should supply inverse hessian tensors
-      static constexpr bool need_hess_inv  = false;
-    }; // struct ConfigBase
-
-    /**
-     * \brief Boolean OR operator class template for trafo config tags
-     *
-     * This templates applies a boolean OR operator on two trafo config tags.
-     *
-     * \tparam Cfg1_, Cfg2_
-     * The two trafo config tags that shall be OR'ed.
-     *
-     * \author Peter Zajac
-     */
-    template<typename Cfg1_, typename Cfg2_>
-    struct ConfigOr
-    {
-      /// specifies whether the trafo should supply domain point coordinates
-      static constexpr bool need_dom_point = Cfg1_::need_dom_point || Cfg2_::need_dom_point;
-      /// specifies whether the trafo should supply image point coordinates
-      static constexpr bool need_img_point = Cfg1_::need_img_point || Cfg2_::need_img_point;
-      /// specifies whether the trafo should supply jacobian matrices
-      static constexpr bool need_jac_mat   = Cfg1_::need_jac_mat   || Cfg2_::need_jac_mat;
-      /// specifies whether the trafo should supply inverse jacobian matrices
-      static constexpr bool need_jac_inv   = Cfg1_::need_jac_inv   || Cfg2_::need_jac_inv;
-      /// specifies whether the trafo should supply jacobian determinants
-      static constexpr bool need_jac_det   = Cfg1_::need_jac_det   || Cfg2_::need_jac_det;
-      /// specifies whether the trafo should supply hessian tensors
-      static constexpr bool need_hess_ten  = Cfg1_::need_hess_ten  || Cfg2_::need_hess_ten;
-      /// specifies whether the trafo should supply inverse hessian tensors
-      static constexpr bool need_hess_inv  = Cfg1_::need_hess_inv  || Cfg2_::need_hess_inv;
-    }; // struct ConfigOr<...>
   } // namespace Trafo
 } // namespace FEAST
 

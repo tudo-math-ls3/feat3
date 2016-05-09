@@ -20,12 +20,11 @@ namespace FEAST
     class BilinearOperator
     {
     public:
-      /// use 'base' trafo configuration
-      typedef Trafo::ConfigBase TrafoConfig;
-      /// use 'base' test space configuration
-      typedef Space::ConfigBase TestConfig;
-      /// use 'base' trial space configuration
-      typedef Space::ConfigBase TrialConfig;
+#ifdef DOXYGEN
+      static constexpr TrafoTags trafo_config = ...;
+      static constexpr SpaceTags test_config = ...;
+      static constexpr SpaceTags trial_config = ...;
+#endif // DOXYGEN
 
       /**
        * \brief Bilinear Operator Evaluator class template

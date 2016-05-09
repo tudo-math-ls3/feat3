@@ -36,40 +36,11 @@ class Lagrange1Test
 
   typedef Cubature::Rule<ShapeType, DataType_, DataType_, Tiny::Vector<DataType_, 2> > CubatureRule;
 
-  struct UnitTrafoConfig : public Trafo::ConfigBase
-  {
-    enum
-    {
-      need_jac_det = 1,
-      need_jac_inv = 1
-    };
-  };
+  static constexpr TrafoTags unit_trafo_config = TrafoTags::jac_det | TrafoTags::jac_inv;
+  static constexpr SpaceTags unit_space_config = SpaceTags::value | SpaceTags::grad;
 
-  struct UnitSpaceConfig : public Space::ConfigBase
-  {
-    enum
-    {
-      need_value = 1,
-      need_grad = 1
-    };
-  };
-
-  struct TetrisTrafoConfig : public Trafo::ConfigBase
-  {
-    enum
-    {
-      need_jac_det = 1,
-      need_jac_inv = 1
-    };
-  };
-
-  struct TetrisSpaceConfig : public Space::ConfigBase
-  {
-    enum
-    {
-      need_grad = 1
-    };
-  };
+  static constexpr TrafoTags tetris_trafo_config = TrafoTags::jac_det | TrafoTags::jac_inv;
+  static constexpr SpaceTags tetris_space_config = SpaceTags::grad;
 
 public:
   Lagrange1Test() :
@@ -104,12 +75,12 @@ public:
     // create a trafo evaluator
     typedef typename QuadTrafo::template Evaluator<ShapeType, DataType_>::Type TrafoEvaluator;
     TrafoEvaluator trafo_eval(trafo);
-    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<unit_trafo_config>::EvalDataType trafo_data;
 
     // create a space evaluator
     typedef typename QuadSpaceQ1::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
     SpaceEvaluator space_eval(space);
-    typename SpaceEvaluator::template ConfigTraits<UnitSpaceConfig>::EvalDataType space_data;
+    typename SpaceEvaluator::template ConfigTraits<unit_space_config>::EvalDataType space_data;
 
     // create a 2x2 Gauss-Legendre cubature formula
     CubatureRule cubature_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:2"));
@@ -362,12 +333,12 @@ public:
     // create a trafo evaluator
     typedef typename QuadTrafo::template Evaluator<ShapeType, DataType_>::Type TrafoEvaluator;
     TrafoEvaluator trafo_eval(trafo);
-    typename TrafoEvaluator::template ConfigTraits<TetrisTrafoConfig>::EvalDataType trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<tetris_trafo_config>::EvalDataType trafo_data;
 
     // create a space evaluator
     typedef typename QuadSpaceQ1::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
     SpaceEvaluator space_eval(space);
-    typename SpaceEvaluator::template ConfigTraits<TetrisSpaceConfig>::EvalDataType space_data;
+    typename SpaceEvaluator::template ConfigTraits<tetris_space_config>::EvalDataType space_data;
 
     // create a dof-mapper
     DofMapping dof_mapping(space);

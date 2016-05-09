@@ -16,15 +16,7 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      struct ReferenceCapabilities
-      {
-        /// can compute reference function values
-        static constexpr bool can_ref_value = true;
-        /// can compute reference gradients
-        static constexpr bool can_ref_grad = true;
-        /// can compute reference hessians
-        static constexpr bool can_ref_hess = true;
-      };
+      static constexpr SpaceTags ref_caps = SpaceTags::ref_value | SpaceTags::ref_grad | SpaceTags::ref_hess;
 
       /// \cond internal
       namespace Intern
@@ -138,11 +130,11 @@ namespace FEAST
             Shape::Hypercube<1> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ReferenceCapabilities>
+          ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -165,13 +157,6 @@ namespace FEAST
       protected:
         /// first-order derivative transform coefficient
         DataType _coeff;
-
-        /// trafo config for coefficient computation
-        struct CoeffTrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_jac_mat = true;
-        };
 
       public:
         /**
@@ -207,7 +192,7 @@ namespace FEAST
           DomainPointType dom_point(DataType(0));
 
           // evaluate trafo in interval midpoint
-          typedef typename TrafoEvaluator::template ConfigTraits<CoeffTrafoConfig>::EvalDataType CoeffEvalData;
+          typedef typename TrafoEvaluator::template ConfigTraits<TrafoTags::jac_mat>::EvalDataType CoeffEvalData;
           CoeffEvalData coeff_data;
           trafo_eval(coeff_data, dom_point);
 
@@ -306,11 +291,11 @@ namespace FEAST
             Shape::Hypercube<2> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ReferenceCapabilities>
+          ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -333,13 +318,6 @@ namespace FEAST
       protected:
         /// first-order derivative transform coefficients
         Tiny::Matrix<DataType, 2, 2> _coeff_fod[4];
-
-        /// trafo config for coefficient computation
-        struct CoeffTrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_jac_mat = true;
-        };
 
         /**
          * \brief Transforms the X-derivative basis function
@@ -409,7 +387,7 @@ namespace FEAST
           DomainPointType dom_point(DataType(0));
 
           // evaluate trafo in interval midpoint
-          typedef typename TrafoEvaluator::template ConfigTraits<CoeffTrafoConfig>::EvalDataType CoeffEvalData;
+          typedef typename TrafoEvaluator::template ConfigTraits<TrafoTags::jac_mat>::EvalDataType CoeffEvalData;
           CoeffEvalData coeff_data;
 
           // loop over all four vertices of the quad
@@ -690,11 +668,11 @@ namespace FEAST
             Shape::Simplex<2> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ReferenceCapabilities>
+          ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -717,13 +695,6 @@ namespace FEAST
       protected:
         /// first-order derivative transform coefficients
         Tiny::Matrix<DataType, 2, 2> _coeff_fod;
-
-        /// trafo config for coefficient computation
-        struct CoeffTrafoConfig :
-          public Trafo::ConfigBase
-        {
-          static constexpr bool need_jac_mat = true;
-        };
 
         /**
          * \brief Transforms the X-derivative basis function
@@ -788,7 +759,7 @@ namespace FEAST
           dom_point[0] = dom_point[1] = DataType(1) / DataType(3);
 
           // evaluate trafo in interval midpoint
-          typedef typename TrafoEvaluator::template ConfigTraits<CoeffTrafoConfig>::EvalDataType CoeffEvalData;
+          typedef typename TrafoEvaluator::template ConfigTraits<TrafoTags::jac_mat>::EvalDataType CoeffEvalData;
           CoeffEvalData coeff_data;
 
           // evaluate trafo data

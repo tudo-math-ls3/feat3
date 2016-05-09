@@ -70,20 +70,8 @@ namespace FEAST
         /// image dimension
         static constexpr int image_dim = EvalPolicy::image_dim;
 
-        /// can compute domain points
-        static constexpr bool can_dom_point = true;
-        /// can compute image points
-        static constexpr bool can_img_point = true;
-        /// can compute jacobian matrices
-        static constexpr bool can_jac_mat = false;
-        /// can compute jacobian inverse matrices if domain and image dimensions coincide
-        static constexpr bool can_jac_inv = false;
-        /// can compute jacobian determinants
-        static constexpr bool can_jac_det = false;
-        /// can compute hessian tensors
-        static constexpr bool can_hess_ten = false;
-        /// can compute inverse hessian tensors if domain and image dimensions coincide
-        static constexpr bool can_hess_inv = false;
+        /// we can compute domain and image points
+        static constexpr TrafoTags eval_caps = TrafoTags::dom_point | TrafoTags::img_point;
 
       protected:
         /// the coefficients of the trafo
@@ -197,20 +185,12 @@ namespace FEAST
         /// image dimension
         static constexpr int image_dim = EvalPolicy::image_dim;
 
-        /// can compute domain points
-        static constexpr bool can_dom_point = true;
-        /// can compute image points
-        static constexpr bool can_img_point = true;
-        /// can compute jacobian matrices
-        static constexpr bool can_jac_mat = true;
-        /// can compute jacobian inverse matrices if domain and image dimensions coincide
-        static constexpr bool can_jac_inv = (domain_dim == image_dim);
-        /// can compute jacobian determinants
-        static constexpr bool can_jac_det = true;
-        /// can compute hessian tensors
-        static constexpr bool can_hess_ten = true;
-        /// can compute inverse hessian tensors if domain and image dimensions coincide
-        static constexpr bool can_hess_inv = (domain_dim == image_dim);
+        /// we can compute domain and image points,
+        /// jacobian matrices and determinants as well as hessian tensors.
+        static constexpr TrafoTags eval_caps =
+          TrafoTags::dom_point | TrafoTags::img_point |
+          TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::hess_ten |
+          (domain_dim == image_dim ? (TrafoTags::jac_inv | TrafoTags::hess_inv) : TrafoTags::none);
 
       protected:
         /// the coefficients of the trafo
@@ -359,20 +339,12 @@ namespace FEAST
         /// image dimension
         static constexpr int image_dim = EvalPolicy::image_dim;
 
-        /// can compute domain points
-        static constexpr bool can_dom_point = true;
-        /// can compute image points
-        static constexpr bool can_img_point = true;
-        /// can compute jacobian matrices
-        static constexpr bool can_jac_mat = true;
-        /// can compute jacobian inverse matrices if domain and image dimensions coincide
-        static constexpr bool can_jac_inv = (domain_dim == image_dim);
-        /// can compute jacobian determinants
-        static constexpr bool can_jac_det = true;
-        /// can compute hessian tensors
-        static constexpr bool can_hess_ten = true;
-        /// can compute inverse hessian tensors if domain and image dimensions coincide
-        static constexpr bool can_hess_inv = (domain_dim == image_dim);
+        /// we can compute domain and image points,
+        /// jacobian matrices and determinants as well as hessian tensors.
+        static constexpr TrafoTags eval_caps =
+          TrafoTags::dom_point | TrafoTags::img_point |
+          TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::hess_ten |
+          (domain_dim == image_dim ? (TrafoTags::jac_inv | TrafoTags::hess_inv) : TrafoTags::none);
 
       protected:
         /// the coefficients of the trafo
@@ -525,20 +497,12 @@ namespace FEAST
         /// image dimension
         static constexpr int image_dim = EvalPolicy::image_dim;
 
-        /// can compute domain points
-        static constexpr bool can_dom_point = true;
-        /// can compute image points
-        static constexpr bool can_img_point = true;
-        /// can compute jacobian matrices
-        static constexpr bool can_jac_mat = true;
-        /// can compute jacobian inverse matrices if domain and image dimensions coincide
-        static constexpr bool can_jac_inv = (domain_dim == image_dim);
-        /// can compute jacobian determinants
-        static constexpr bool can_jac_det = true;
-        /// can compute hessian tensors
-        static constexpr bool can_hess_ten = true;
-        /// can compute inverse hessian tensors if domain and image dimensions coincide
-        static constexpr bool can_hess_inv = (domain_dim == image_dim);
+        /// we can compute domain and image points,
+        /// jacobian matrices and determinants as well as hessian tensors.
+        static constexpr TrafoTags eval_caps =
+          TrafoTags::dom_point | TrafoTags::img_point |
+          TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::hess_ten |
+          (domain_dim == image_dim ? (TrafoTags::jac_inv | TrafoTags::hess_inv) : TrafoTags::none);
 
       protected:
         /// the coefficients of the trafo
@@ -697,20 +661,12 @@ namespace FEAST
         /// image dimension
         static constexpr int image_dim = EvalPolicy::image_dim;
 
-        /// can compute domain points
-        static constexpr bool can_dom_point = true;
-        /// can compute image points
-        static constexpr bool can_img_point = true;
-        /// can compute jacobian matrices
-        static constexpr bool can_jac_mat = true;
-        /// can compute jacobian inverse matrices if domain and image dimensions coincide
-        static constexpr bool can_jac_inv = (domain_dim == image_dim);
-        /// can compute jacobian determinants
-        static constexpr bool can_jac_det = true;
-        /// can compute hessian tensors
-        static constexpr bool can_hess_ten = true;
-        /// can compute inverse hessian tensors if domain and image dimensions coincide
-        static constexpr bool can_hess_inv = (domain_dim == image_dim);
+        /// we can compute domain and image points,
+        /// jacobian matrices and determinants as well as hessian tensors.
+        static constexpr TrafoTags eval_caps =
+          TrafoTags::dom_point | TrafoTags::img_point |
+          TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::hess_ten |
+          (domain_dim == image_dim ? (TrafoTags::jac_inv | TrafoTags::hess_inv) : TrafoTags::none);
 
       protected:
         /// the coefficients of the trafo
@@ -859,20 +815,12 @@ namespace FEAST
         /// image dimension
         static constexpr int image_dim = EvalPolicy::image_dim;
 
-        /// can compute domain points
-        static constexpr bool can_dom_point = true;
-        /// can compute image points
-        static constexpr bool can_img_point = true;
-        /// can compute jacobian matrices
-        static constexpr bool can_jac_mat = true;
-        /// can compute jacobian inverse matrices if domain and image dimensions coincide
-        static constexpr bool can_jac_inv = (domain_dim == image_dim);
-        /// can compute jacobian determinants
-        static constexpr bool can_jac_det = true;
-        /// can compute hessian tensors
-        static constexpr bool can_hess_ten = true;
-        /// can compute inverse hessian tensors if domain and image dimensions coincide
-        static constexpr bool can_hess_inv = (domain_dim == image_dim);
+        /// we can compute domain and image points,
+        /// jacobian matrices and determinants as well as hessian tensors.
+        static constexpr TrafoTags eval_caps =
+          TrafoTags::dom_point | TrafoTags::img_point |
+          TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::hess_ten |
+          (domain_dim == image_dim ? (TrafoTags::jac_inv | TrafoTags::hess_inv) : TrafoTags::none);
 
       protected:
         /// the coefficients of the trafo
@@ -1030,20 +978,12 @@ namespace FEAST
         /// image dimension
         static constexpr int image_dim = EvalPolicy::image_dim;
 
-        /// can compute domain points
-        static constexpr bool can_dom_point = true;
-        /// can compute image points
-        static constexpr bool can_img_point = true;
-        /// can compute jacobian matrices
-        static constexpr bool can_jac_mat = true;
-        /// can compute jacobian inverse matrices if domain and image dimensions coincide
-        static constexpr bool can_jac_inv = (domain_dim == image_dim);
-        /// can compute jacobian determinants
-        static constexpr bool can_jac_det = true;
-        /// can compute hessian tensors
-        static constexpr bool can_hess_ten = true;
-        /// can compute inverse hessian tensors if domain and image dimensions coincide
-        static constexpr bool can_hess_inv = (domain_dim == image_dim);
+        /// we can compute domain and image points,
+        /// jacobian matrices and determinants as well as hessian tensors.
+        static constexpr TrafoTags eval_caps =
+          TrafoTags::dom_point | TrafoTags::img_point |
+          TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::hess_ten |
+          (domain_dim == image_dim ? (TrafoTags::jac_inv | TrafoTags::hess_inv) : TrafoTags::none);
 
       protected:
         /// the coefficients of the trafo

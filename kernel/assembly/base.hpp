@@ -3,6 +3,7 @@
 #define KERNEL_ASSEMBLY_BASE_HPP 1
 
 // includes, FEAST
+#include <kernel/eval_tags.hpp>
 #include <kernel/space/eval_data.hpp>
 #include <kernel/trafo/eval_data.hpp>
 

@@ -23,21 +23,6 @@ namespace FEAST
      */
     class RewProjector
     {
-    private:
-      /// \cond internal
-      struct AsmSpaceConfig :
-        public Space::ConfigBase
-      {
-        static constexpr bool need_value = true;
-      };
-      struct AsmTrafoConfig :
-        public Trafo::ConfigBase
-      {
-        static constexpr bool need_img_point = true;
-        static constexpr bool need_jac_det = true;
-      };
-      /// \endcond
-
     public:
       /**
        * \brief Weighting type enumeration
@@ -89,7 +74,7 @@ namespace FEAST
         static_assert(Function_::can_value, "analytic function can't compute function values");
 
         // define assembly traits
-        typedef AsmTraits1<DT_, SpaceType, AsmTrafoConfig, AsmSpaceConfig> AsmTraits;
+        typedef AsmTraits1<DT_, SpaceType, TrafoTags::img_point|TrafoTags::jac_det, SpaceTags::value> AsmTraits;
         typedef typename AsmTraits::DataType DataType;
 
         // define the cubature rule

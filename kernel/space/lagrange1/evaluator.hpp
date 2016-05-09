@@ -17,15 +17,7 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      struct ReferenceCapabilities
-      {
-        /// can compute reference function values
-        static constexpr bool can_ref_value = true;
-        /// can compute reference gradients
-        static constexpr bool can_ref_grad = true;
-        /// can't compute reference hessians
-        static constexpr bool can_ref_hess = false;
-      };
+      static constexpr SpaceTags ref_caps = SpaceTags::ref_value | SpaceTags::ref_grad;
 
       /**
        * \brief Lagrange-1 Element Evaluator class template declaration.
@@ -57,11 +49,11 @@ namespace FEAST
             Shape::Simplex<2> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ReferenceCapabilities>
+          ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -160,11 +152,11 @@ namespace FEAST
             Shape::Simplex<3> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ReferenceCapabilities>
+          ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -270,11 +262,11 @@ namespace FEAST
             Shape::Hypercube<1> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ReferenceCapabilities>
+          ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -368,11 +360,11 @@ namespace FEAST
             Shape::Hypercube<2> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ReferenceCapabilities>
+          ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -474,11 +466,11 @@ namespace FEAST
             Shape::Hypercube<3> >,
           TrafoEvaluator_,
           SpaceEvalTraits_,
-          ReferenceCapabilities>
+          ref_caps>
       {
       public:
         /// base-class typedef
-        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ref_caps> BaseClass;
 
         /// space type
         typedef Space_ SpaceType;

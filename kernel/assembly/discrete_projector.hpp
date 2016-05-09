@@ -21,15 +21,6 @@ namespace FEAST
      */
     class DiscreteVertexProjector
     {
-    private:
-      /// \cond internal
-      struct SpaceConfig :
-        public Space::ConfigBase
-      {
-        static constexpr bool need_value = true;
-      };
-      /// \endcond
-
     public:
       /**
        * \brief Projects a discrete function into the vertices.
@@ -61,7 +52,7 @@ namespace FEAST
         static constexpr int nverts = Shape::FaceTraits<ShapeType, 0>::count;
 
         // define assembly traits
-        typedef AsmTraits1<typename VectorOut_::DataType, Space_, Trafo::ConfigBase, SpaceConfig> AsmTraits;
+        typedef AsmTraits1<typename VectorOut_::DataType, Space_, TrafoTags::none, SpaceTags::value> AsmTraits;
         typedef typename AsmTraits::DataType DataType;
 
         // get our value type
@@ -200,20 +191,6 @@ namespace FEAST
      */
     class DiscreteCellProjector
     {
-    private:
-      /// \cond internal
-      struct TrafoConfig :
-        public Trafo::ConfigBase
-      {
-        static constexpr bool need_jac_det = true;
-      };
-      struct SpaceConfig :
-        public Space::ConfigBase
-      {
-        static constexpr bool need_value = true;
-      };
-      /// \endcond
-
     public:
       /**
        * \brief Projects a discrete function into the cells using the barycentre cubature rule.
@@ -272,7 +249,7 @@ namespace FEAST
         typedef typename MeshType::ShapeType ShapeType;
 
         // define assembly traits
-        typedef AsmTraits1<typename VectorOut_::DataType, SpaceType, TrafoConfig, SpaceConfig> AsmTraits;
+        typedef AsmTraits1<typename VectorOut_::DataType, SpaceType, TrafoTags::jac_det, SpaceTags::value> AsmTraits;
         typedef typename AsmTraits::DataType DataType;
 
         // get our value type
