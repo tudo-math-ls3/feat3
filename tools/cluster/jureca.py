@@ -32,7 +32,7 @@ for i in range(1, 5):
     f.write("export SCOREP_ENABLE_TRACING=true" + os.linesep)
     f.write("export SCOREP_FILTERING_FILE=stokes_poiseuille_2d.filt" + os.linesep)
     f.write("cd ~/feast/applications/" + os.linesep)
-    f.write("srun parti_poisson_dirichlet_2d  --level " +  str(9+i) + " 4 --part_min_elems 500" + os.linesep)
+    f.write("srun poisson_dirichlet_2d  --level " +  str(9+i) + " 4 --part_min_elems 500" + os.linesep)
 
   #sbatch
   subprocess.call(["sbatch", "temp"])

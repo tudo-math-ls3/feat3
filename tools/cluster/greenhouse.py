@@ -9,11 +9,12 @@ import time
 
 sys.dont_write_bytecode = True
 
-for i in range(1, 25):
+for i in range(1, 5):
   with open("temp", "w") as f:
     f.write("#!/bin/bash" + os.linesep)
-    f.write("#PBS -q short" + os.linesep)
-    f.write("#PBS -l vmem=15000mb,nodes=" + str(i) + ":ppn=4:ib" + os.linesep)
+    f.write("#PBS -q batch" + os.linesep)
+    f.write("#PBS -l vmem=100gb,nodes=" + str(i) + ":ppn=16:bttf-cpu" + os.linesep)
+    #f.write("#PBS -l vmem=100gb,nodes=" + str(i) + ":ppn=4:gpus=1:shared:h5-cpu-ib-gpu" + os.linesep)
     f.write("#PBS -l walltime=01:00:00" + os.linesep)
     f.write("#PBS -N feast" + os.linesep)
     f.write("#PBS -j oe" + os.linesep)
@@ -21,7 +22,7 @@ for i in range(1, 25):
     f.write("export OMP_NUM_THREADS=1" + os.linesep)
     f.write("source ~/.bashrc &>/dev/null" + os.linesep)
     f.write("cd ~/feast/trunk/applications/" + os.linesep)
-    f.write("mpirun -np " + str(i*4) + " --map-by node poisson_dirichlet_2d  --level " +  str(9) + " 4 --part_min_elems 500" + os.linesep)
+    f.write("mpirun -np " + str(i*16) + " --map-by node poisson_dirichlet_2d  --level " +  str(9) + " 3 --part_min_elems 500" + os.linesep)
 
   #sbatch
   subprocess.call(["cat", "temp"])
