@@ -539,17 +539,22 @@ namespace PoissonDirichlet2D
         std::cout << "Preparing domain..." << std::endl;
       }
       int min_elems_partitioner(5);
-      String meshfile;
       args.parse("part_min_elems", min_elems_partitioner);
-      args.parse("meshfile", meshfile);
+
+      // fetch the mandatory mesh filename
+      String meshfile;
+      if(args.parse("meshfile", meshfile) <= 0)
+      {
+        if(rank == 0)
+          std::cerr << "ERROR: Mandatory option --meshfile is missing!" << std::endl;
+        FEAST::Runtime::abort();
+      }
 #ifdef FEAST_HAVE_PARMETIS
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
-#else
-#ifndef SERIAL
+#elif !defined(SERIAL)
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
 #else
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
-#endif
 #endif
 
       // plot our levels
