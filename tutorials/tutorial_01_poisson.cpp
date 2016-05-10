@@ -112,6 +112,9 @@ namespace Tutorial01
   // We want double precision.
   typedef double DataType;
 
+  // We use the default 'Index' type for indexing:
+  typedef Index IndexType;
+
   // Moreover, we use main memory (aka "RAM") for our containers. FEAST supports GPUs and other
   // architectures, but we do not want to make use of anything that does not reside in host memory.
   typedef Mem::Main MemType;
@@ -206,28 +209,23 @@ namespace Tutorial01
 
     // The next step is defining the types of vectors and matrices which we want to use.
 
-    // Based on the two data and memory typedefs, we now define the vector type.
+    // Based on the three data, index and memory typedefs, we now define the vector type.
     // Since we have a scalar problem, we require a dense vector, which is simply FEAST's name for
     // contiguous storage.
-    typedef LAFEM::DenseVector<MemType, DataType> VectorType;
+    typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
 
     // Furthermore, for the discretised Poisson operator, we require a sparse matrix type.
     // We choose the CSR format here, because it is pretty much standard.
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType> MatrixType;
+    typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
 
     // Moreover, we need a boundary condition filter. Filters can be used to apply boundary conditions
     // in matrices and vectors. Since we are using Dirichlet boundary conditions for our problem, we
     // need a so-called "unit filter".
-    typedef LAFEM::UnitFilter<MemType, DataType> FilterType;
+    typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
-    std::cout << "Allocating and initialising vectors and matrix..." << std::endl;
-
-    // First, allocate two vectors: the solution vector and the right-hand-side vector.
-    // The lengths of these vectors generally coincide with the number of DOFs of the space:
-    VectorType vec_sol(space.get_num_dofs());
-    VectorType vec_rhs(space.get_num_dofs());
+    std::cout << "Allocating matrix and vectors..." << std::endl;
 
     // Now we need to perform the symbolic matrix assembly, i.e., the computation of the nonzero
     // pattern and the allocation of storage for the three CSR arrays.
@@ -240,6 +238,15 @@ namespace Tutorial01
     // "assemble2", which takes two (possibly different) finite element spaces as
     // test- and trial-spaces, but we're not going to use it for now. However, this is
     // required for more complex PDEs like, e.g., the Stokes equations.
+
+    // Now that the matrix structure is assembled, we can easily create two vector objects
+    // for the solution and the right-hand-side vector by the create_vector_l/r member function
+    // of the matrix object. This member function creates a vector of the corresponding
+    // type and dimension, so that the vector can acts as a left or right multiplicant
+    // in a matrix-vector multiply operation. Our matrix is square, so it does not matter
+    // whether we call 'create_vector_l' or 'create_vector_r' here:
+    VectorType vec_sol = matrix.create_vector_r();
+    VectorType vec_rhs = matrix.create_vector_l();
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: matrix (bilinear forms)
@@ -317,7 +324,7 @@ namespace Tutorial01
         force_functional, // the functional that is to be assembled
         space,            // the finite element space in use
         cubature_factory, // the cubature factory to be used for integration
-        2.0 * Math::sqr(Math::pi<DataType>()) // this is our factor 2*pi^2
+        DataType(2) * Math::sqr(Math::pi<DataType>()) // this is our factor 2*pi^2
         );
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -372,24 +379,34 @@ namespace Tutorial01
 
     std::cout << "Solving linear system..." << std::endl;
 
-    // Create a SSOR preconditioner
+    // First, we need to create a SSOR preconditioner. Most of the solver implementations
+    // have corresponding 'Solver::new_***' functions, which take care of the nasty type deduction
+    // process. The returned object is a 'std::shared_ptr<SolverType>', where 'SolverType' is
+    // an instance of the actual solver class template with the corresponding template arguments
+    // that are deducted from the input arguments of the following function call:
     auto precond = Solver::new_ssor_precond(matrix, filter);
 
-    // Create a PCG solver
+    // Now we create a PCG solver and pass the preconditioner as an additional argument:
     auto solver = Solver::new_pcg(matrix, filter, precond);
 
-    // Enable convergence plot
+    // PCG is an iterative solver, so we want to enable plotting of the convergence process,
+    // as otherwise our solver would not print anything to the console:
     solver->set_plot(true);
 
-    // Initialise the solver
+    // Next, we need to initialise the solver. During this call, the solver and all of its
+    // sub-solvers and preconditioners allocate required temporary vectors, perform factorisation
+    // and all the other stuff that our solvers need to do before they can actually start
+    // solving anything.
     solver->init();
 
     // Solve our linear system; for this, we pass our solver object as well as the initial solution
     // vector, the right-hand-side vector, the matrix and the filter defining the linear system
-    // that we intend to solve.
+    // that we intend to solve to the 'Solver::solve' function:
     Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
 
-    // Release the solver
+    // Once we do not require the solver anymore, we have to release it. This is done my calling
+    // the 'done' member function, which is the counterpart of the 'init' member function, i.e.
+    // this will release all temporary vectors and factorisations.
     solver->done();
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

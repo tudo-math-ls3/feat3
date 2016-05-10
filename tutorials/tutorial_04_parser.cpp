@@ -148,6 +148,8 @@ namespace Tutorial04
     typedef Shape::Quadrilateral ShapeType;
     // We want double precision.
     typedef double DataType;
+    // Use the default index type.
+    typedef Index IndexType;
     // Moreover, we use main memory for our containers.
     typedef Mem::Main MemType;
 
@@ -523,13 +525,13 @@ namespace Tutorial04
     // Allocate linear system and perform symbolic assembly
 
     // Define the vector type
-    typedef LAFEM::DenseVector<MemType, DataType> VectorType;
+    typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
 
     // Define the matrix type
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType> MatrixType;
+    typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
 
     // Define the filter type
-    typedef LAFEM::UnitFilter<MemType, DataType> FilterType;
+    typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
 
     // Allocate matrix and assemble its structure
     MatrixType matrix;

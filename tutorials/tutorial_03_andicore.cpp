@@ -91,6 +91,8 @@ namespace Tutorial03
   typedef Shape::Quadrilateral ShapeType;
   // We want double precision.
   typedef double DataType;
+  // Use the default index type.
+  typedef Index IndexType;
   // Moreover, we use main memory (aka "RAM") for our containers.
   typedef Mem::Main MemType;
 
@@ -484,23 +486,23 @@ namespace Tutorial03
     // Allocate linear system and perform symbolic assembly
 
     // Define the vector type
-    typedef LAFEM::DenseVector<MemType, DataType> VectorType;
+    typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
 
     // Define the matrix type
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType> MatrixType;
+    typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
 
     // Define the filter type
-    typedef LAFEM::UnitFilter<MemType, DataType> FilterType;
+    typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
 
-    std::cout << "Allocating vectors and matrix..." << std::endl;
+    std::cout << "Allocating matrix and vectors..." << std::endl;
 
-    // Allocate vectors
-    VectorType vec_sol(space.get_num_dofs());
-    VectorType vec_rhs(space.get_num_dofs());
-
-    // Allocate matrix
+    // Allocate matrix and assemble its structure
     MatrixType matrix;
     Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, space);
+
+    // Allocate vectors
+    VectorType vec_sol = matrix.create_vector_r();
+    VectorType vec_rhs = matrix.create_vector_l();
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Perform numerical matrix assembly

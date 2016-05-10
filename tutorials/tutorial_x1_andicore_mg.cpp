@@ -53,7 +53,7 @@
 
 // FEAST-Solver includes
 #include <kernel/solver/jacobi_precond.hpp>                // for JacobiPrecond
-#include <kernel/solver/bicgstab.hpp>                      // for BiCGStab
+#include <kernel/solver/richardson.hpp>                    // for Richardson
 
 // we need std::vector as a container for our level hierarchy
 #include <vector>
@@ -70,6 +70,8 @@ namespace TutorialX1
   typedef Shape::Quadrilateral ShapeType;
   // We want double precision.
   typedef double DataType;
+  // Use the default index type.
+  typedef Index IndexType;
   // Moreover, we use main memory (aka "RAM") for our containers.
   typedef Mem::Main MemType;
 
@@ -416,11 +418,11 @@ namespace TutorialX1
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
     // Define the vector type
-    typedef LAFEM::DenseVector<MemType, DataType> VectorType;
+    typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
     // Define the matrix type
-    typedef LAFEM::SparseMatrixCSR<MemType, DataType> MatrixType;
+    typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
     // Define the filter type
-    typedef LAFEM::UnitFilter<MemType, DataType> FilterType;
+    typedef LAFEM::UnitFilter<MemType, DataType, IndexType> FilterType;
 
     // Define the smoother; this is the base-class for all solvers and preconditioners
     typedef Solver::SolverBase<VectorType> SmootherType;
@@ -456,11 +458,6 @@ namespace TutorialX1
       boundary(boundary_factory),
       trafo(mesh),
       space(trafo),
-      vec_sol(space.get_num_dofs()),
-      vec_rhs(space.get_num_dofs()),
-      vec_def(space.get_num_dofs()),
-      vec_cor(space.get_num_dofs()),
-      filter(space.get_num_dofs()),
       smoother(nullptr)
     {
     }
@@ -486,6 +483,12 @@ namespace TutorialX1
     {
       // create matrix structure
       Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
+
+      // create vectors
+      vec_sol = mat_sys.create_vector_r();
+      vec_rhs = mat_sys.create_vector_r();
+      vec_def = mat_sys.create_vector_r();
+      vec_cor = mat_sys.create_vector_r();
 
       // Create a cubature factory
       Cubature::DynamicFactory cubature_factory("auto-degree:5");
@@ -704,11 +707,12 @@ namespace TutorialX1
     }
 
     // now let's create a coarse-grid solver
-    // we use a BiCGStab solver and utilise the Jacobi smoother on the coarse grid as a preconditioner
+    // we use a Richardson solver and utilise the Jacobi smoother on the coarse grid as a preconditioner
     // Note: We need to create the coarse grid solver on the heap because it references data which
     // is owned by our level objects. These are going to be deleted at the end of this function and,
     // if we created the solver on the stack, it would have orphaned references afterwards.
-    auto coarse_solver = Solver::new_bicgstab(levels.front()->mat_sys, levels.front()->filter, levels.front()->smoother);
+    auto coarse_solver = Solver::new_richardson(levels.front()->mat_sys, levels.front()->filter,
+      DataType(1), levels.front()->smoother);
 
     // configure the coarse grid solver
     coarse_solver->set_tol_rel(1E-5);
@@ -716,6 +720,12 @@ namespace TutorialX1
 
     // let's initialise the coarse grid solver
     coarse_solver->init();
+
+    // initialise smoothers
+    for(auto it(++levels.begin()); it != levels.end(); ++it)
+    {
+      (*it)->smoother->init();
+    }
 
     // assemble rhs/sol on finest level
     levels.back()->assemble_rhs_sol(andicore_data);
@@ -791,7 +801,7 @@ int main(int argc, char* argv[])
   std::cout << "Welcome to FEAST's tutorial #X1: Andicore-MG" << std::endl;
 
   // The desired mesh refinement level.
-  Index level_min(2), level_max(6);
+  Index level_min(1), level_max(5);
 
   // First of all, let's see if we have command line parameters.
   if(argc > 1)
