@@ -538,7 +538,7 @@ namespace PoissonDirichlet2D
       {
         std::cout << "Preparing domain..." << std::endl;
       }
-      int min_elems_partitioner(5);
+      int min_elems_partitioner(1);
       args.parse("part_min_elems", min_elems_partitioner);
 
       // fetch the mandatory mesh filename
