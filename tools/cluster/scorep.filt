@@ -1,0 +1,19 @@
+SCOREP_FILE_NAMES_BEGIN
+        EXCLUDE
+        */util/tiny_algebra.*
+        */util/math.*
+        */kernel/adjacency/*
+        */kernel/analytic/*
+        */kernel/assembly/*
+        */kernel/cubature/*
+        */kernel/geometry/*
+        */kernel/space/*
+        */kernel/trafo/*
+SCOREP_FILE_NAMES_END
+
+SCOREP_REGION_NAMES_BEGIN
+        EXCLUDE
+        std::*
+        *metis*
+        __gnu*
+SCOREP_REGION_NAMES_END

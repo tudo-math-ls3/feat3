@@ -21,8 +21,7 @@ for i in range(1, 5):
 
     f.write("export OMP_NUM_THREADS=1" + os.linesep)
     f.write("source ~/.bashrc &>/dev/null" + os.linesep)
-    f.write("cd ~/feast/trunk/applications/" + os.linesep)
-    f.write("mpirun -np " + str(i*16) + " --map-by node poisson_dirichlet_2d  --level " +  str(9) + " 3 --part_min_elems 500" + os.linesep)
+    f.write("mpirun -np " + str(i*16) + " --map-by node ~/feast/trunk/applications/poisson_dirichlet_2d  --level " +  str(9) + " 3 --part_min_elems 500" + os.linesep)
 
   #sbatch
   subprocess.call(["cat", "temp"])

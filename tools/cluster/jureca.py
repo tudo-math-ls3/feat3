@@ -27,12 +27,12 @@ for i in range(1, 5):
     f.write("export OMP_NUM_THREADS=1" + os.linesep)
     #f.write("export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}" + os.linesep)
     f.write("source ~/.bashrc &>/dev/null" + os.linesep)
-    f.write("export SCOREP_TOTAL_MEMORY=7g" + os.linesep)
+    f.write("export SCOREP_TOTAL_MEMORY=3g" + os.linesep)
     f.write("export SCOREP_PROFILING_MAX_CALLPATH_DEPTH=40" + os.linesep)
+    #f.write("export SCOREP_ENABLE_PROFILING=true" + os.linesep)
     f.write("export SCOREP_ENABLE_TRACING=true" + os.linesep)
-    f.write("export SCOREP_FILTERING_FILE=stokes_poiseuille_2d.filt" + os.linesep)
-    f.write("cd ~/feast/applications/" + os.linesep)
-    f.write("srun poisson_dirichlet_2d  --level " +  str(9+i) + " 4 --part_min_elems 500" + os.linesep)
+    f.write("export SCOREP_FILTERING_FILE=" + os.getcwd() + "/scorep.filt" + os.linesep)
+    f.write("srun ~/feast/applications/poisson_dirichlet_2d  --level " +  str(9+i) + " 4 --part_min_elems 1000" + os.linesep)
 
   #sbatch
   subprocess.call(["sbatch", "temp"])
