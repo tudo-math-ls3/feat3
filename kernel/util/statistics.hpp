@@ -315,7 +315,7 @@ namespace FEAST
           throw InternalError("Accumulated op time (" + stringify(measured_time.sum) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
 
         result += "\n";
-        result += "Accumulated op time :" + stringify(measured_time.sum) + "\n";
+        result += "Accumulated op time: " + stringify(measured_time.sum) + "\n";
 
         result += "\n";
         result += "Reductions: " + stringify(get_time_reduction() / total_time * 100.) + "%\n";
