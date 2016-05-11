@@ -2,6 +2,10 @@ SCOREP_FILE_NAMES_BEGIN
         EXCLUDE
         */util/tiny_algebra.*
         */util/math.*
+        */util/time_stamp.*
+        */util/string.*
+        */util/statistics.*
+        */kernel/util/memory_pool.*
         */kernel/adjacency/*
         */kernel/analytic/*
         */kernel/assembly/*
@@ -13,7 +17,33 @@ SCOREP_FILE_NAMES_END
 
 SCOREP_REGION_NAMES_BEGIN
         EXCLUDE
-        std::*
+        FEAST::Foundation::Request::mpi_request
+        FEAST::Foundation::Status::mpi_status
+        FEAST::Foundation::Communicator::mpi_comm
+        FEAST::Foundation::Status::Status
+        FEAST::Foundation::Comm::test
+        FEAST::Kahan*
+        *::rows*
+        *::columns*
+        *::size*
+        *::elements*
+        *::get_elements*
+        *::used_elements*
+        *::_used_elements*
+        *std::*
         *metis*
-        __gnu*
+        *METIS*
+        *__gnu*
+        gk_randint32
+        gk_gkmcoreAdd
+        gk_gkmcoreDel
+        gk_malloc
+        gk_mcoreAdd
+        gk_free
+        gk_mcoreMalloc
+        gk_idxset
+        gk_idxsmalloc
+        gk_mcorePop
+        gk_mcorePush
+        *__gthread_active_p
 SCOREP_REGION_NAMES_END
