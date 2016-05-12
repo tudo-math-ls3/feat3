@@ -397,6 +397,8 @@ namespace FEAST
 
           // compute initial gamma
           DataType gamma = this->_vec_def.dot(this->_vec_dir);
+          if(this->_def_init <= this->_tol_rel)
+            return Status::success;
 
           Index its_since_restart(0);
           _num_subs_restarts = Index(0);
@@ -414,7 +416,16 @@ namespace FEAST
             _linesearch->set_grad_from_defect(this->_vec_def);
 
             // Call the linesearch to update vec_sol
-            status = _linesearch->correct(vec_sol, this->_vec_dir);
+            Status linesearch_status = _linesearch->correct(vec_sol, this->_vec_dir);
+
+            // If the linesearch failed to make progress, the new iterate is too close to the old iterate to compute
+            // a new search direction etc. so we have to abort without updating the solution
+            if( (_linesearch->get_rel_update() < this->_tol_step) && (Math::abs(_beta) < Math::eps<DataType>())
+                && (linesearch_status != Status::success ))
+            {
+              vec_sol.clone(_linesearch->get_initial_sol());
+              return Status::stagnated;
+            }
 
             // Copy back information from the linesearch
             this->_fval = _linesearch->get_final_fval();
@@ -440,27 +451,32 @@ namespace FEAST
             if(this->_precond != nullptr)
               this->_precond->prepare(vec_sol, this->_filter);
 
-            // Compute the new beta for the search direction update. This also checks if the computed beta is valid
-            // (e.g. leads to a decrease) and applies the preconditioner to the new defect vector
-            status = compute_beta(_beta, gamma, at);
-
-            // Something might have gone wrong in applying the preconditioner, so check status again.
-            if(status != Status::progress)
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              return status;
-            }
-
             // If a restart is scheduled, reset beta to 0
-            if(restart_freq > 0 && its_since_restart%restart_freq == 0)
+            if( (restart_freq > 0 && its_since_restart%restart_freq == 0) ||
+                linesearch_status != Status::success)
             {
               _beta = DataType(0);
               its_since_restart++;
             }
+            else
+            {
+              // Compute the new beta for the search direction update. This also checks if the computed beta is valid
+              // (e.g. leads to a decrease) and applies the preconditioner to the new defect vector
+              status = compute_beta(_beta, gamma, at);
+
+              // Something might have gone wrong in applying the preconditioner, so check status again.
+              if(status != Status::progress)
+              {
+                TimeStamp bt;
+                Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+                return status;
+              }
+
+            }
 
             /// Restarting means discarding the new search direction and setting the new search direction to the
             // (preconditioned) steepest descent direction
+            // We need to check beta again here because some variants might set it to 0 in compute_beta
             if(_beta == DataType(0))
             {
               // Uncomment the line below to deviate from the ALGLIBMinCG behaviour
@@ -550,6 +566,18 @@ namespace FEAST
           // increase iteration count
           ++this->_num_iter;
 
+          // Check for convergence wrt. the function value improvement if _tol_fval says so
+          if(_tol_fval > DataType(0))
+          {
+            // This is the factor for the relative function value
+            DataType scale(Math::max(this->_fval, _fval_prev));
+            // Make sure it is at least 1
+            scale = Math::max(scale, DataType(1));
+            // Check for success
+            if(Math::abs(_fval_prev - this->_fval) <= _tol_fval*scale)
+              return Status::success;
+          }
+
           // first, let's see if we have to compute the defect at all
           bool calc_def = false;
           calc_def = calc_def || (this->_min_iter < this->_max_iter);
@@ -587,23 +615,6 @@ namespace FEAST
           // Check for convergence of the gradient norm
           if(this->is_converged())
             return Status::success;
-
-          // Check for convergence wrt. the function value improvement if _tol_fval says so
-          if(_tol_fval > DataType(0))
-          {
-            // This is the factor for the relative funciton value
-            DataType scale(Math::max(_fval, _fval_prev));
-            // Make sure it is at least 1
-            scale = Math::max(scale, DataType(1));
-            // Check for success
-            if(Math::abs(_fval - _fval_prev)/scale < _tol_fval)
-              return Status::success;
-          }
-
-          // If the linesearch failed to make progress, the new iterate is too close to the old iterate to compute
-          // a new search direction etc. so we have to abort.
-          if(_linesearch->get_rel_update() < this->_tol_step && Math::abs(_beta) < Math::eps<DataType>())
-            return Status::stagnated;
 
           // If there were too many subsequent restarts, the solver is stagnated
           if(_num_subs_restarts > max_num_subs_restarts)

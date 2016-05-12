@@ -218,6 +218,49 @@ namespace FEAST
           this->_vec_grad.scale(vec_def, DataType(-1));
         }
 
+        /**
+         * \brief Gets the initial solution the linesearch started with
+         *
+         * \returns A const reference to the initial solution vector.
+         *
+         * This is useful for rejecting steps that are too small in the calling solver, like NLCG or NLSD.
+         */
+        const VectorType& get_initial_sol() const
+        {
+          return _vec_initial_sol;
+        }
+
+        /**
+         * \brief Trims the function value and gradient according to some threshhold
+         *
+         * \param[in,out] func
+         * Function value.
+         *
+         * This sets
+         * \f[
+         *   trim(f, \nabla f) =
+         *     \begin{cases}
+         *       (f, \nabla f), & f \leq f_t \\
+         *       (f_t, 0 ), & f > f_t
+         *     \end{cases},
+         * \f]
+         * where \f$ f_t : = 10*(|f_0|+1) \f$.
+         *
+         * This is useful and even mandatory when \f$ f \f$ has singularities, so that if the linesearch steps into
+         * a singularity the very high function and gradient values do not pollute the solution process, since they
+         * get rejected by the linesearch anyway but might be used in computations.
+         *
+         */
+        virtual void trim_func_grad(DataType& func)
+        {
+          DataType trim_threshold(DataType(10)*(Math::abs(_fval_0) + DataType(1)));
+          if(func > trim_threshold)
+          {
+            func = trim_threshold;
+            this->_vec_grad.format(DataType(0));
+          }
+        }
+
     }; // class Linesearch
 
     /**
@@ -368,9 +411,9 @@ namespace FEAST
             ++this->_num_iter;
 
             this->_op.prepare(sol, this->_filter);
+            DataType fval = this->_op.compute_func();
             this->_op.compute_grad(this->_vec_grad);
             this->_filter.filter_def(this->_vec_grad);
-            DataType fval = this->_op.compute_func();
 
             if(fval < this->_fval_min)
             {
@@ -758,10 +801,10 @@ namespace FEAST
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
          *
-         * \param[in] tol_decrease
+         * \param[in] tol_decrease_
          * Tolerance for sufficient decrease in function value.
          *
-         * \param[in] tol_curvature
+         * \param[in] tol_curvature_
          * Tolerance for the curvature condition.
          *
          */
@@ -941,6 +984,7 @@ namespace FEAST
 
             // Compute and filter the gradient
             this->_op.compute_grad(this->_vec_grad);
+            this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
 
             // New directional derivative and new defect. Note that we did not normalise vec_dir, so we have to take
@@ -986,7 +1030,8 @@ namespace FEAST
               this->_fval_min = fval;
 
               // Save the last successful step length for the next call
-              _alpha_0 = this->_alpha_min;
+              if(status == Status::success)
+                _alpha_0 = this->_alpha_min;
 
             }
 
@@ -1027,6 +1072,7 @@ namespace FEAST
               // Save minimum parameters
               this->_alpha_min = alpha;
               this->_fval_min = fval;
+
               // Save the last successful step length for the next call
               _alpha_0 = this->_alpha_min;
 
@@ -1042,8 +1088,10 @@ namespace FEAST
               // Save minimum parameters
               this->_alpha_min = alpha;
               this->_fval_min = fval;
+
               // Save the last successful step length for the next call
-              _alpha_0 = this->_alpha_min;
+              if(status == Status::success)
+                _alpha_0 = this->_alpha_min;
 
               return status;
             }
@@ -1144,16 +1192,10 @@ namespace FEAST
           DataType delta_new(0);
 
           Status st(Status::progress);
-          int iter(0);
           while(st == Status::progress)
           {
-            if(iter > 20)
-            {
-              st =Status::max_iter;
-              break;
-            }
 
-            ++iter;
+            ++this->_num_iter;
 
             // Find new trial step
             st = _polynomial_fit(alpha_new, alpha_lo, alpha_hi, f_lo, f_hi, delta_lo, delta_hi, min_in_interval,
@@ -1184,6 +1226,9 @@ namespace FEAST
 
             f_new = this->_op.compute_func();
             this->_op.compute_grad(this->_vec_grad);
+            this->trim_func_grad(f_new);
+            this->_filter.filter_def(this->_vec_grad);
+
             delta_new = this->_vec_grad.dot(vec_dir);
 
             //std::cout << "Bracket iter " << iter <<std::endl; //<< " sol = " << vec_sol << " dir = " << vec_dir //<< " grad = " << this->_vec_grad << std::endl;
@@ -1194,7 +1239,8 @@ namespace FEAST
             // Update of interval of uncertainity. We might already be successful.
 
             // Check if the sufficient decrease condition is violated
-            if(f_new >= this->_fval_0 +_tol_decrease*alpha_new*_delta_0 || ( (f_new > f_lo) && iter > 1) )
+            if( (f_new >= this->_fval_0 +_tol_decrease*alpha_new*_delta_0) ||
+                ( (f_new > f_lo) && this->_num_iter > 1) )
             {
               //std::cout << "  sufficient decrease violated" << std::endl;
               //std::cout << "  f_0 + tol_decrease*alpha_new*_delta_0 " <<
@@ -1262,6 +1308,22 @@ namespace FEAST
               delta_lo = delta_new;
 
             }
+
+            this->_def_cur = Math::abs(delta_lo);
+
+            // plot?
+            if(this->_plot)
+            {
+              std::cout << this->_plot_name
+              <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
+              << " : " << stringify_fp_sci(this->_def_cur)
+              << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
+              << std::endl;
+            }
+
+            if(this->_num_iter >= this->_max_iter)
+              st = Status::max_iter;
+
           }
 
           // The bracketing iterations ends
@@ -1273,10 +1335,6 @@ namespace FEAST
 
             this->_op.prepare(vec_sol, this->_filter);
             this->_op.compute_grad(this->_vec_grad);
-          }
-          else
-          {
-            _alpha_0 = alpha_lo;
           }
 
           //std::cout << "Bracket stops at sol = " << vec_sol << " grad = " << this->_vec_grad << std::endl;

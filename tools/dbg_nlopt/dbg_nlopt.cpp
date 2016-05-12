@@ -253,7 +253,7 @@ int main(int argc, char* argv[])
   Runtime::initialise(argc, argv);
 
   typedef Mem::Main MemType;
-  typedef double DataType;
+  typedef float DataType;
   typedef unsigned int IndexType;
 
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.

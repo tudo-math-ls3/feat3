@@ -83,10 +83,10 @@ class NLCGTest:
       //auto my_precond = nullptr;
       auto solver = new_nlcg(my_op, my_filter, my_linesearch, _update, false, my_precond);
       solver->init();
+      solver->set_tol_abs(Math::eps<DT_>());
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
       solver->set_max_iter(250);
-      solver->set_direction_update(_update);
 
       // This will hold the solution
       auto sol = my_op.create_vector_r();
@@ -128,11 +128,11 @@ NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
 nlcg_hb_f(float(0.8),"NewtonRaphsonLinesearch","ApproximateHessian", NLCGDirectionUpdate::PolakRibiere);
 
 // The same with Secant linesearch, without preconditioner and with Fletcher-Reeves update
-NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction> nlcg_hb_d(double(0.6),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
+NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction> nlcg_hb_d(double(0.5),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
 
 // The Rosenbrock function's steep valley is bad for secant linesearch, so use Newton Raphson
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
-nlcg_rb_d(float(0.7),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::DaiYuan);
+nlcg_rb_d(float(0.5),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
 
 // Do it again with the StrongWolfeLinesearch and the approximate hessian preconditioner
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
