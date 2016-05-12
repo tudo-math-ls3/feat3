@@ -4,7 +4,6 @@
 
 // includes, FEAST
 #include <kernel/geometry/mesh_part.hpp>
-//#include <kernel/util/mesh_streamer.hpp> // for MeshDataContainer
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/xml_scanner.hpp>
 

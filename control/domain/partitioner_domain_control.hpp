@@ -37,11 +37,16 @@ namespace FEAST
           /// The the root meshnode will have
           typedef Geometry::RootMeshNode<MeshType_> MeshNodeType;
 
+        private:
+          Geometry::AdaptMode _adapt_mode;
+
+        public:
           /**
            * \brief Constructor that reads the base mesh from a file
            */
           explicit PartitionerDomainControl(int lvl_max, int lvl_min, Index min_elems_partitioner,
-          const String& meshfile)
+          const String& meshfile, const Geometry::AdaptMode adapt_mode = Geometry::AdaptMode::chart) :
+            _adapt_mode(adapt_mode)
           {
             std::vector<Index> ranks, ctags;
             std::stringstream synchstream;
@@ -77,7 +82,9 @@ namespace FEAST
            * synchronised before it was passes to it.
            */
           explicit PartitionerDomainControl(int lvl_max, int lvl_min, Index min_elems_partitioner,
-          Geometry::MeshFileReader& mesh_file_reader)
+          Geometry::MeshFileReader& mesh_file_reader,
+          const Geometry::AdaptMode adapt_mode = Geometry::AdaptMode::chart) :
+            _adapt_mode(adapt_mode)
           {
             _create(lvl_max, lvl_min, min_elems_partitioner, mesh_file_reader);
           }
@@ -134,7 +141,7 @@ namespace FEAST
               {
                 ++lvl;
                 MeshNodeType* coarse_node = base_mesh_node;
-                base_mesh_node = coarse_node->refine();
+                base_mesh_node = coarse_node->refine(_adapt_mode);
                 delete coarse_node;
 
                 num_elements = base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim);
@@ -143,7 +150,7 @@ namespace FEAST
               {
                 ++lvl;
                 MeshNodeType* coarse_node = base_mesh_node;
-                base_mesh_node = coarse_node->refine();
+                base_mesh_node = coarse_node->refine(_adapt_mode);
                 delete coarse_node;
 
                 num_elements = base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim);
@@ -257,7 +264,7 @@ namespace FEAST
             for(; lvl < lvl_min; ++lvl)
             {
               MeshNodeType* coarse_node = mesh_node;
-              mesh_node = coarse_node->refine();
+              mesh_node = coarse_node->refine(_adapt_mode);
               delete coarse_node;
             }
 
@@ -268,7 +275,7 @@ namespace FEAST
             for(; lvl < lvl_max; ++lvl)
             {
               MeshNodeType* coarse_node = mesh_node;
-              mesh_node = coarse_node->refine();
+              mesh_node = coarse_node->refine(_adapt_mode);
               this->_levels.push_back(new typename BaseClass::LevelType(lvl+1, mesh_node));
             }
           }
