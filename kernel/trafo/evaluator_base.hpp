@@ -215,6 +215,8 @@ namespace FEAST
        *
        * \param[in] dom_point
        * A reference to the domain point on the reference cell in which the trafo is to be evaluated.
+       *
+       * \compilerhack GCC 6.1 template compiler bug
        */
       template<TrafoTags cfg_>
       void operator()(Trafo::EvalData<EvalTraits, cfg_>& trafo_data, const DomainPointType& dom_point) const
@@ -222,20 +224,31 @@ namespace FEAST
         // typedef mumbo-jumbo
         typedef Trafo::EvalData<EvalTraits, cfg_> TrafoData;
 
+        // Note:
+        // The following static constexpr bool variables are required to
+        // circumvent a compiler bug in GCC 6.1
+
         // store domain point
-        Intern::TrafoEvalHelper<*(TrafoData::config & TrafoTags::dom_point)>::set_dom_point(trafo_data, dom_point);
+        static constexpr bool want_dom_point = *(TrafoData::config & TrafoTags::dom_point);
+        Intern::TrafoEvalHelper<want_dom_point>::set_dom_point(trafo_data, dom_point);
         // map image point
-        Intern::TrafoEvalHelper<*(TrafoData::config & TrafoTags::img_point)>::map_img_point(trafo_data, cast());
+        static constexpr bool want_img_point = *(TrafoData::config & TrafoTags::img_point);
+        Intern::TrafoEvalHelper<want_img_point>::map_img_point(trafo_data, cast());
         // calculate jacobian matrix
-        Intern::TrafoEvalHelper<*(TrafoData::config & TrafoTags::jac_mat)>::calc_jac_mat(trafo_data, cast());
+        static constexpr bool want_jac_mat = *(TrafoData::config & TrafoTags::jac_mat);
+        Intern::TrafoEvalHelper<want_jac_mat>::calc_jac_mat(trafo_data, cast());
         // calculate inverse jacobian matrix
-        Intern::TrafoEvalHelper<*(TrafoData::config & TrafoTags::jac_inv)>::calc_jac_inv(trafo_data, cast());
+        static constexpr bool want_jac_inv = *(TrafoData::config & TrafoTags::jac_inv);
+        Intern::TrafoEvalHelper<want_jac_inv>::calc_jac_inv(trafo_data, cast());
         // calculate jacobian determinants
-        Intern::TrafoEvalHelper<*(TrafoData::config & TrafoTags::jac_det)>::calc_jac_det(trafo_data, cast());
+        static constexpr bool want_jac_det = *(TrafoData::config & TrafoTags::jac_det);
+        Intern::TrafoEvalHelper<want_jac_det>::calc_jac_det(trafo_data, cast());
         // calculate hessian tensor
-        Intern::TrafoEvalHelper<*(TrafoData::config & TrafoTags::hess_ten)>::calc_hess_ten(trafo_data, cast());
+        static constexpr bool want_hess_ten = *(TrafoData::config & TrafoTags::hess_ten);
+        Intern::TrafoEvalHelper<want_hess_ten>::calc_hess_ten(trafo_data, cast());
         // calculate inverse hessian tensor
-        Intern::TrafoEvalHelper<*(TrafoData::config & TrafoTags::hess_inv)>::calc_hess_inv(trafo_data, cast());
+        static constexpr bool want_hess_inv = *(TrafoData::config & TrafoTags::hess_inv);
+        Intern::TrafoEvalHelper<want_hess_inv>::calc_hess_inv(trafo_data, cast());
       }
 
       // Note:
