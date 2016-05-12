@@ -448,7 +448,8 @@ namespace StokesPoiseuille2D
       std::cout<<flops<<std::endl<<std::endl;
       std::cout<<Statistics::get_formated_times(bt.elapsed(at))<<std::endl<<std::endl;
       std::cout<<"Domain size: " << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
-      std::cout<<"LA size: " << double(la_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
+      std::cout<<"LA size: " << double(la_size) / (1024. * 1024.) << " MByte" << std::endl;
+      std::cout<<"MPI size: " << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
       if (args.check("statistics") > 0) // provided parameter full or whatever
       {
         std::cout<<Statistics::get_formated_solvers();
