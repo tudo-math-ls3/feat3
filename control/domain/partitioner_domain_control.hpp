@@ -4,7 +4,7 @@
 
 #include <kernel/base_header.hpp>
 
-#include <kernel/foundation/comm_base.hpp>
+#include <kernel/util/comm_base.hpp>
 #include <kernel/foundation/pexecutor.hpp>
 #include <kernel/foundation/pgraph.hpp>
 #include <kernel/foundation/psynch.hpp>
@@ -52,7 +52,7 @@ namespace FEAST
             std::stringstream synchstream;
 
             //MASTER
-            if(Foundation::Comm::rank() == 0)
+            if(Comm::rank() == 0)
             {
               std::ifstream ifs(meshfile.c_str(), std::ios::binary);
               if(!ifs.is_open())
@@ -142,13 +142,13 @@ namespace FEAST
               catch(std::exception& exc)
               {
                 std::cerr << "ERROR: " << exc.what() << std::endl;
-                if(Foundation::Comm::rank() == 0)
+                if(Comm::rank() == 0)
                   std::cout << "FAILED: " << exc.what() << " when parsing." << std::endl;
               }
               catch(...)
               {
                 std::cerr << "ERROR: unknown exception" << std::endl;
-                if(Foundation::Comm::rank() == 0)
+                if(Comm::rank() == 0)
                   std::cout << "FAILED: unknown exception" << std::endl;
               }
 #endif
@@ -168,7 +168,7 @@ namespace FEAST
 
                 num_elements = base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim);
               }
-              while(num_elements < Foundation::Comm::size())
+              while(num_elements < Comm::size())
               {
                 ++lvl;
                 MeshNodeType* coarse_node = base_mesh_node;
@@ -184,7 +184,7 @@ namespace FEAST
 #ifndef SERIAL
               Index num_global_elements(root_mesh->get_num_entities(MeshType_::shape_dim));
               typename PartT::PGraphT global_dual(
-                *root_mesh, num_global_elements, Foundation::Communicator(MPI_COMM_WORLD));
+                *root_mesh, num_global_elements, Communicator(MPI_COMM_WORLD));
 
               /*for(Index i(0) ; i < Index(global_dual.get_num_vtx()) ; ++i)
                 {
@@ -263,7 +263,7 @@ namespace FEAST
               // create patch mesh node
 #ifndef SERIAL
               mesh_node = base_mesh_node->extract_patch(
-                Index(Foundation::Comm::rank(synched_part.get_comm())), ranks_at_elem, ranks);
+                Index(Comm::rank(synched_part.get_comm())), ranks_at_elem, ranks);
 #else
               mesh_node = base_mesh_node->extract_patch(Index(0), ranks_at_elem, ranks);
 #endif

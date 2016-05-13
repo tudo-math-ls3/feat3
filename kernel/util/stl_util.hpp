@@ -7,11 +7,9 @@
 
 namespace FEAST
 {
-  namespace Foundation
+  struct STLUtil
   {
-    struct STLUtil
-    {
-      template<template<typename, typename> class ST_, typename DT_>
+    template<template<typename, typename> class ST_, typename DT_>
       static ST_<DT_, std::allocator<DT_> > set_union(ST_<DT_, std::allocator<DT_> >& a, ST_<DT_, std::allocator<DT_> >& b)
       {
         ST_<DT_, std::allocator<DT_> > r(a.size() + b.size());
@@ -25,7 +23,7 @@ namespace FEAST
         return r;
       }
 
-      template<template<typename, typename> class ST_, typename DT_>
+    template<template<typename, typename> class ST_, typename DT_>
       static ST_<DT_, std::allocator<DT_> > set_intersection(ST_<DT_, std::allocator<DT_> >& a, ST_<DT_, std::allocator<DT_> >& b)
       {
         ST_<DT_, std::allocator<DT_> > r(std::max(a.size(), b.size()));
@@ -39,7 +37,7 @@ namespace FEAST
         return r;
       }
 
-      template<template<typename, typename> class ST_, typename DT_>
+    template<template<typename, typename> class ST_, typename DT_>
       static ST_<DT_, std::allocator<DT_> > set_difference(ST_<DT_, std::allocator<DT_> >& a, ST_<DT_, std::allocator<DT_> >& b)
       {
         ST_<DT_, std::allocator<DT_> > r(a.size());
@@ -53,7 +51,7 @@ namespace FEAST
         return r;
       }
 
-      template<template<typename, typename> class ST_, typename DT_>
+    template<template<typename, typename> class ST_, typename DT_>
       static ST_<DT_, std::allocator<DT_> > sorted_seq_union(const ST_<DT_, std::allocator<DT_> >& a, const ST_<DT_, std::allocator<DT_> >& b)
       {
         ST_<DT_, std::allocator<DT_> > r(a.size() + b.size());
@@ -64,7 +62,7 @@ namespace FEAST
         return r;
       }
 
-      template<template<typename, typename> class ST_, typename DT_>
+    template<template<typename, typename> class ST_, typename DT_>
       static ST_<DT_, std::allocator<DT_> > sorted_seq_intersection(const ST_<DT_, std::allocator<DT_> >& a, const ST_<DT_, std::allocator<DT_> >& b)
       {
         ST_<DT_, std::allocator<DT_> > r(std::max(a.size(), b.size()));
@@ -75,7 +73,7 @@ namespace FEAST
         return r;
       }
 
-      template<template<typename, typename> class ST_, typename DT_>
+    template<template<typename, typename> class ST_, typename DT_>
       static ST_<DT_, std::allocator<DT_> > sorted_seq_difference(const ST_<DT_, std::allocator<DT_> >& a, const ST_<DT_, std::allocator<DT_> >& b)
       {
         ST_<DT_, std::allocator<DT_> > r(a.size());
@@ -85,7 +83,6 @@ namespace FEAST
 
         return r;
       }
-    };
-  }
+  };
 }
 #endif

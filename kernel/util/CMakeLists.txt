@@ -6,6 +6,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # list of util source files
 ADD_LIBRARY(kernel-util STATIC
   exception.cpp
+  environment.cpp
   kahan_summation.cpp
   memory_pool.cpp
   property_map.cpp

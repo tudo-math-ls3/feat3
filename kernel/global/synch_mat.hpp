@@ -14,12 +14,12 @@
 
 namespace FEAST
 {
-  namespace ScaRC
+  namespace Global
   {
 #ifndef SERIAL
     ///type-0 to type-1 matrix conversion
     template<typename Mem_>
-    struct MatrixConversion
+    struct SynchMat0
     {
       template<typename DT_,
                typename IT_,
@@ -164,7 +164,7 @@ namespace FEAST
 
 #else
     template<typename Mem_>
-    struct MatrixConversion
+    struct SynchMat0
     {
       template<typename DT_,
                typename IT_,

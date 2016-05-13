@@ -9,7 +9,6 @@ if (FEAST_HAVE_PARMETIS)
 endif (FEAST_HAVE_PARMETIS)
 
 ADD_LIBRARY(kernel-foundation STATIC
-  environment.cpp
   communication_error.cpp
 )
 TARGET_LINK_LIBRARIES (kernel-foundation kernel-util kernel-lafem)

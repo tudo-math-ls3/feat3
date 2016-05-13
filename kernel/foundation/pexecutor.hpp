@@ -4,7 +4,7 @@
 
 #include<kernel/base_header.hpp>
 #include<kernel/foundation/base.hpp>
-#include<kernel/foundation/comm_base.hpp>
+#include<kernel/util/comm_base.hpp>
 #include<kernel/foundation/pgraph.hpp>
 
 #ifdef FEAST_HAVE_PARMETIS

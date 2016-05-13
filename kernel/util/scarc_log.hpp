@@ -3,14 +3,12 @@
 #define SCARC_GUARD_SCARC_LOG_HPP 1
 
 #include<kernel/base_header.hpp>
-#include<kernel/foundation/communication.hpp>
-#include<kernel/foundation/environment.hpp>
+#include<kernel/util/comm_base.hpp>
+#include<kernel/util/environment.hpp>
 
 namespace FEAST
 {
-  namespace ScaRC
-  {
-    template<template<typename, typename> class ST_ = std::vector>
+  template<template<typename, typename> class ST_ = std::vector>
     struct ScaRCLog
     {
       Index basetag;
@@ -33,10 +31,10 @@ namespace FEAST
         Index* len_rb = new Index[Foundation::Comm::size(c)];
 
         Foundation::Comm::allgather(&len_sb,
-                        1,
-                        &len_rb[0],
-                        1,
-                        c);
+            1,
+            &len_rb[0],
+            1,
+            c);
 
         ST_<Foundation::Request, std::allocator<Foundation::Request> >recv_req(Foundation::Comm::size(c));
         ST_<Foundation::Request, std::allocator<Foundation::Request> >send_req(Foundation::Comm::size(c));
@@ -52,11 +50,11 @@ namespace FEAST
           recvbufs[i] = new char[len_rb[i]];
 
           Foundation::Comm::irecv(recvbufs[i],
-                      len_rb[i],
-                      i,
-                      recv_req.at(i),
-                      basetag + i,
-                      c);
+              len_rb[i],
+              i,
+              recv_req.at(i),
+              basetag + i,
+              c);
         }
 
         for(Index i(0) ; i < Foundation::Comm::size(c) ; ++i)
@@ -66,11 +64,11 @@ namespace FEAST
           std::copy(msg.c_str(), msg.c_str() + len_sb, sendbuf);
 
           Foundation::Comm::isend(sendbuf,
-                      len_sb,
-                      i,
-                      send_req.at(i),
-                      basetag + Foundation::Comm::rank(c),
-                      c);
+              len_sb,
+              i,
+              send_req.at(i),
+              basetag + Foundation::Comm::rank(c),
+              c);
         }
 
         int* recvflags = new int[recv_req.size()];
@@ -129,21 +127,19 @@ namespace FEAST
 #endif
 
       template<typename...DT_>
-      int checkin_line(DT_&...data)
-      {
-        stream << Foundation::Comm::rank() << "| " ;
-        int r0[sizeof...(data)] = {(stream << data, 0)...};
+        int checkin_line(DT_&...data)
+        {
+          stream << Foundation::Comm::rank() << "| " ;
+          int r0[sizeof...(data)] = {(stream << data, 0)...};
 
-        stream << std::endl;
+          stream << std::endl;
 
-        if(sizeof...(data) >= 0)
-          return r0[0];
-        else
-          return 0;
-      }
+          if(sizeof...(data) >= 0)
+            return r0[0];
+          else
+            return 0;
+        }
     };
-
-  }
 }
 
 #endif

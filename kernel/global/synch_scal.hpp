@@ -2,7 +2,7 @@
 #ifndef FOUNDATION_GUARD_GLOBAL_SYNCH_SCAL_HPP
 #define FOUNDATION_GUARD_GLOBAL_SYNCH_SCAL_HPP 1
 
-#include<kernel/foundation/comm_base.hpp>
+#include<kernel/util/comm_base.hpp>
 #include<kernel/lafem/arch/scale.hpp>
 #include<kernel/lafem/arch/component_product.hpp>
 #include<kernel/lafem/arch/dot_product.hpp>
@@ -11,11 +11,11 @@
 
 namespace FEAST
 {
-  namespace Foundation
+  namespace Global
   {
       /// \todo add communicators
       template <typename Mem_>
-      struct GlobalSynchScal0
+      struct SynchScal0
       {
         public:
 #ifndef SERIAL

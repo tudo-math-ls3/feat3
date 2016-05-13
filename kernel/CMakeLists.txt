@@ -8,7 +8,6 @@ ADD_SUBDIRECTORY( adjacency )
 ADD_SUBDIRECTORY( assembly )
 ADD_SUBDIRECTORY( cubature )
 ADD_SUBDIRECTORY( foundation )
-ADD_SUBDIRECTORY( scarc )
 ADD_SUBDIRECTORY( geometry )
 ADD_SUBDIRECTORY( lafem )
 ADD_SUBDIRECTORY( meshopt )
@@ -26,7 +25,6 @@ TARGET_LINK_LIBRARIES (feast
 # kernel-assembly
 # kernel-cubature
   kernel-foundation
-  kernel-scarc
 # kernel-geometry
   kernel-lafem
 # kernel-space

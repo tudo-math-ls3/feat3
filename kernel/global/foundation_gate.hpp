@@ -5,8 +5,8 @@
 #include <kernel/global/gate.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/foundation/global_synch_scal.hpp>
-#include <kernel/foundation/global_synch_vec.hpp>
+#include <kernel/global/synch_scal.hpp>
+#include <kernel/global/synch_vec.hpp>
 
 #include <vector>
 
@@ -15,7 +15,7 @@ namespace FEAST
   namespace Global
   {
     /**
-     * \brief Foundation-based global Gate implementation
+     * \brief 'Foundation-based' global Gate implementation
      *
      * \author Peter Zajac
      */
@@ -133,7 +133,7 @@ namespace FEAST
           _recv_bufs.at(i) = _mirrors.at(i).create_buffer_vector();
         }
 
-        Foundation::GlobalSynchVec0<MemType>::exec(
+          Global::SynchVec0<MemType>::exec(
           vector, _mirrors, _ranks, _send_bufs, _recv_bufs, _ctags);
       }
 
@@ -149,7 +149,7 @@ namespace FEAST
           _recv_bufs.at(i) = _mirrors.at(i).create_buffer_vector();
         }
 
-        Foundation::GlobalSynchVec1<MemType>::exec(
+          Global::SynchVec1<MemType>::exec(
           vector, _mirrors, _freqs, _ranks, _send_bufs, _recv_bufs, _ctags);
       }
 
@@ -165,7 +165,7 @@ namespace FEAST
         if(_ranks.empty())
           return x;
         else
-          return Foundation::GlobalSynchScal0<MemType>::value(x, x);
+          return Global::SynchScal0<MemType>::value(x, x);
       }
 
       DataType norm2(DataType x) const override

@@ -4,7 +4,7 @@
 
 #include<memory>
 #include<kernel/base_header.hpp>
-#include<kernel/foundation/comm_base.hpp>
+#include<kernel/util/comm_base.hpp>
 #include<kernel/geometry/conformal_mesh.hpp>
 #include<kernel/adjacency/graph.hpp>
 #include<kernel/shape.hpp>

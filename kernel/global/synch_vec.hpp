@@ -2,18 +2,17 @@
 #ifndef FOUNDATION_GUARD_GLOBAL_SYNCH_VEC_HPP
 #define FOUNDATION_GUARD_GLOBAL_SYNCH_VEC_HPP 1
 
-#include<kernel/foundation/comm_base.hpp>
-#include<kernel/foundation/environment.hpp>
+#include<kernel/util/comm_base.hpp>
 #include<kernel/util/time_stamp.hpp>
 #include<kernel/util/statistics.hpp>
 
 namespace FEAST
 {
-  namespace Foundation
+  namespace Global
   {
       /// \todo add communicators
       template <typename Mem_>
-      struct GlobalSynchVec0
+      struct SynchVec0
       {
         public:
 
@@ -131,7 +130,7 @@ namespace FEAST
       };
 
       template <typename Mem_>
-      struct GlobalSynchVec1
+      struct SynchVec1
       {
         public:
 
@@ -151,7 +150,7 @@ namespace FEAST
             if(mirrors.size() == 0)
               return;
 
-            GlobalSynchVec0<Mem_>::exec(target, mirrors, other_ranks, sendbufs, recvbufs, tags, communicator);
+            SynchVec0<Mem_>::exec(target, mirrors, other_ranks, sendbufs, recvbufs, tags, communicator);
 
             // scale target vector by frequencies
             target.component_product(target, frequencies);

@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/foundation/global_synch_scal.hpp>
+#include <kernel/global/synch_scal.hpp>
 
 namespace FEAST
 {
@@ -66,7 +66,7 @@ namespace FEAST
         if(!_vec_freq.empty())
         {
           _volume = _vec_freq.triple_dot(_vec_prim, _vec_dual);
-          Foundation::GlobalSynchScal0<Mem::Main>::value(_volume, _volume);
+          Global::SynchScal0<Mem::Main>::value(_volume, _volume);
         }
         else
           _volume = _vec_prim.dot(_vec_dual);
@@ -184,7 +184,7 @@ namespace FEAST
         else
         {
           integ = _vec_freq.triple_dot(vector, _vec_prim);
-          Foundation::GlobalSynchScal0<Mem::Main>::value(integ, integ);
+          Global::SynchScal0<Mem::Main>::value(integ, integ);
         }
         // subtract mean
         vector.axpy(_vec_dual, vector, -integ / _volume);
@@ -205,7 +205,7 @@ namespace FEAST
         else
         {
           integ = _vec_freq.triple_dot(vector, _vec_dual);
-          Foundation::GlobalSynchScal0<Mem::Main>::value(integ, integ);
+          Global::SynchScal0<Mem::Main>::value(integ, integ);
         }
         // subtract mean
         vector.axpy(_vec_prim, vector, -integ / _volume);

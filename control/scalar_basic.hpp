@@ -2,7 +2,7 @@
 #ifndef CONTROL_SCALAR_BASIC_HPP
 #define CONTROL_SCALAR_BASIC_HPP 1
 
-#include <kernel/foundation/comm_base.hpp>
+#include <kernel/util/comm_base.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -370,7 +370,7 @@ namespace FEAST
       template <typename VectorType_>
       static void configure_iterative_solver(PropertyMap * section, std::shared_ptr<Solver::PreconditionedIterativeSolver<VectorType_> > solver)
       {
-        Index rank = Foundation::Comm::rank();
+        Index rank = Comm::rank();
 
         auto plot_p = section->get_entry("plot");
         if (plot_p.second)

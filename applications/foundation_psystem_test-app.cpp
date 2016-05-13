@@ -1,7 +1,6 @@
 #include <kernel/base_header.hpp>
 
-#include <kernel/foundation/comm_base.hpp>
-
+#include <kernel/util/comm_base.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/psynch.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
