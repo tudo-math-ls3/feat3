@@ -159,7 +159,7 @@ NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
 nlcg_hb_f_cuda(float(0.6),"StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-nlcg_bs_d_cuda(double(0.25),"SecantLinesearch", "none", NLCGDirectionUpdate::FletcherReeves);
+nlcg_bs_d_cuda(double(0.25),"SecantLinesearch", "none", NLCGDirectionUpdate::DaiYuan);
 #endif
 
 /**
