@@ -18,8 +18,8 @@ TARGET_LINK_LIBRARIES(tutorial-03-andicore feast)
 ADD_EXECUTABLE(tutorial-04-parser tutorial_04_parser.cpp)
 TARGET_LINK_LIBRARIES(tutorial-04-parser feast)
 
-ADD_EXECUTABLE(tutorial-x1-andicore-mg tutorial_x1_andicore_mg.cpp)
-TARGET_LINK_LIBRARIES(tutorial-x1-andicore-mg feast)
+ADD_EXECUTABLE(tutorial-05-multigrid tutorial_05_multigrid.cpp)
+TARGET_LINK_LIBRARIES(tutorial-05-multigrid feast)
 
 # tutorials target
 ADD_CUSTOM_TARGET(tutorials DEPENDS
@@ -27,5 +27,5 @@ ADD_CUSTOM_TARGET(tutorials DEPENDS
   tutorial-02-laplace
   tutorial-03-andicore
   tutorial-04-parser
-  tutorial-x1-andicore-mg
+  tutorial-05-multigrid
 )
