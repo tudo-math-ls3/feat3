@@ -248,6 +248,51 @@ namespace FEAST
           // go for next coarse mesh cell
         }
       }
+
+      /**
+       * \brief Assembles a prolongation matrix.
+       *
+       * \attention
+       * This function <b>must not</b> be used to assemble prolongation matrices for
+       * parallel (i.e. global) simulations, as it will be scaled incorrectly due to
+       * missing weight synchronisation!\n
+       * Use this function only in serial simulations!
+       *
+       * \param[in,out] matrix
+       * A reference to the prolongation matrix that is to be assembled.
+       *
+       * \param[in] cubature_factory
+       * The cubature factory to be used for integration.
+       *
+       * \param[in] fine_space
+       * A reference to the fine-mesh test-space to be used.
+       *
+       * \param[in] coarse_space
+       * A reference to the coarse-mesh trial-space to be used.
+       */
+      template<
+        typename Matrix_,
+        typename FineSpace_,
+        typename CoarseSpace_,
+        typename CubatureFactory_>
+      static void assemble_prolongation_direct(
+        Matrix_& matrix,
+        const FineSpace_& fine_space,
+        const CoarseSpace_& coarse_space,
+        const CubatureFactory_& cubature_factory)
+      {
+        // create a weight vector
+        auto weight = matrix.create_vector_l();
+        matrix.format();
+        weight.format();
+
+        // assemble matrix and weight
+        assemble_prolongation(matrix, weight, fine_space, coarse_space, cubature_factory);
+
+        // scale prolongation matrix rows by inverse weights
+        weight.component_invert(weight);
+        matrix.scale_rows(matrix, weight);
+      }
     }; // class GridTransfer<...>
   } // namespace Assembly
 } // namespace FEAST
