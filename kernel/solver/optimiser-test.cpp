@@ -156,7 +156,7 @@ nlcg_bs_q(__float128(0.2),"StrongWolfeLinesearch", "ApproximateHessian", NLCGDir
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAST_BACKENDS_CUDA
 NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlcg_hb_f_cuda(float(0.6),"StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
+nlcg_hb_f_cuda(float(0.6),"StrongWolfeLinesearch", "none", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 nlcg_bs_d_cuda(double(0.25),"SecantLinesearch", "none", NLCGDirectionUpdate::DaiYuan);
