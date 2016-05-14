@@ -216,9 +216,9 @@ namespace FEAST
       }
 
       /// Sets the plot name of the solver.
-      void set_plot_name(const String& name)
+      void set_plot_name(const String& plot_name)
       {
-        _plot_name = name;
+        _plot_name = plot_name;
       }
 
       /// Returns the plot name of the solver.
