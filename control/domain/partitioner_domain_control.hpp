@@ -71,7 +71,7 @@ namespace FEAST
             // Create MeshFileReader using the synched stream
             Geometry::MeshFileReader mesh_file_reader(synchstream);
 
-            _create(lvl_max, lvl_min, min_elems_partitioner, mesh_file_reader);
+            _create(lvl_max, lvl_min, min_elems_partitioner, &mesh_file_reader);
 
           }
 
@@ -82,11 +82,25 @@ namespace FEAST
            * synchronised before it was passes to it.
            */
           explicit PartitionerDomainControl(int lvl_max, int lvl_min, Index min_elems_partitioner,
-          Geometry::MeshFileReader& mesh_file_reader,
+          Geometry::MeshFileReader* mesh_file_reader,
           const Geometry::AdaptMode adapt_mode = Geometry::AdaptMode::chart) :
             _adapt_mode(adapt_mode)
           {
-            _create(lvl_max, lvl_min, min_elems_partitioner, mesh_file_reader);
+            _create(lvl_max, lvl_min, min_elems_partitioner, mesh_file_reader, nullptr);
+          }
+
+          /**
+           * \brief Constructor that parses the base mesh from a MeshFileReader
+           *
+           * \note Since we are talking parallel here, the std::istream the MeshFileReaders uses has to have been
+           * synchronised before it was passes to it.
+           */
+          explicit PartitionerDomainControl(int lvl_max, int lvl_min, Index min_elems_partitioner,
+          Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader,
+          const Geometry::AdaptMode adapt_mode = Geometry::AdaptMode::chart) :
+            _adapt_mode(adapt_mode)
+          {
+            _create(lvl_max, lvl_min, min_elems_partitioner, mesh_file_reader, chart_file_reader);
           }
 
         private:
@@ -97,8 +111,10 @@ namespace FEAST
            * there.
            */
           void _create(int lvl_max, int lvl_min, const Index min_elems_partitioner,
-          Geometry::MeshFileReader& mesh_file_reader)
+          Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader = nullptr)
           {
+            ASSERT_(mesh_file_reader != nullptr);
+
             // create root mesh node
             MeshNodeType* mesh_node = nullptr;
             std::vector<Index> ranks, ctags;
@@ -106,15 +122,21 @@ namespace FEAST
             int lvl(0);
             {
               //ALL
-              Geometry::MeshAtlas<MeshType_>* atlas(new Geometry::MeshAtlas<MeshType_>());
-              Geometry::RootMeshNode<MeshType_>* base_mesh_node(new Geometry::RootMeshNode<MeshType_>(nullptr, atlas));
+              ASSERT_(this->_atlas == nullptr);
+
+              this->_atlas = new Geometry::MeshAtlas<MeshType_>();
+              Geometry::RootMeshNode<MeshType_>* base_mesh_node(new Geometry::RootMeshNode<MeshType_>(nullptr, this->_atlas));
 
               // Try to parse the mesh file
 #ifndef DEBUG
               try
 #endif
               {
-                mesh_file_reader.parse(*base_mesh_node, *atlas);
+                // Try to parse the chart file first
+                if(chart_file_reader != nullptr)
+                  chart_file_reader->parse(*base_mesh_node, *(this->_atlas));
+
+                mesh_file_reader->parse(*base_mesh_node, *(this->_atlas));
               }
 #ifndef DEBUG
               catch(std::exception& exc)
