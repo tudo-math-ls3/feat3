@@ -114,7 +114,7 @@ namespace FEAST
          * \param[in,out] point
          * The world point to be projected
          */
-        void project(WorldPoint& point) const
+        void project_point(WorldPoint& point) const
         {
           // create a const copy of our input point
           const WorldPoint inpoint(point);
@@ -130,13 +130,13 @@ namespace FEAST
             const WorldPoint x = cast().map_on_segment(i, t);
 
             // compute squared distance to original point
-            DataType dist = (x - inpoint).norm_euclid_sqr();
+            DataType distance = (x - inpoint).norm_euclid_sqr();
 
             // is that a new projection candidate?
-            if((i == Index(0)) || (dist < mindist))
+            if((i == Index(0)) || (distance < mindist))
             {
               point = x;
-              mindist = dist;
+              mindist = distance;
             }
           }
         }
@@ -159,8 +159,16 @@ namespace FEAST
 
           for(Index i(0); i < meshpart.get_num_entities(0); ++i)
           {
-            cast().project(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
+            cast().project_point(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
           }
+        }
+
+        /// \copydoc ChartBase::dist()
+        DataType compute_dist(const WorldPoint& point) const
+        {
+          WorldPoint projected(point);
+          project_point(projected);
+          return (projected - point).norm_euclid();
         }
 
       protected:

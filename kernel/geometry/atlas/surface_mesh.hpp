@@ -6,6 +6,8 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/index_calculator.hpp>
 
+#include <kernel/util/math.hpp>
+
 #include <deque>
 
 namespace FEAST
@@ -82,22 +84,35 @@ namespace FEAST
         SurfaceMeshType* _surface_mesh;
 
       public:
+        /**
+         * \brief Empty default constructor
+         */
         explicit SurfaceMesh() :
           _surface_mesh(nullptr)
         {
         }
 
+        /**
+         * \brief Constructor getting an object
+         */
         explicit SurfaceMesh(SurfaceMeshType* surf_mesh) :
           _surface_mesh(surf_mesh)
         {
         }
 
+        /// Explicitly delete move constructor
+        SurfaceMesh(SurfaceMeshType&&) = delete;
+
+        /**
+         * \brief Virtual destructor
+         */
         virtual ~SurfaceMesh()
         {
           if(_surface_mesh != nullptr)
             delete _surface_mesh;
         }
 
+        /// \copydoc ChartBase::bytes
         virtual std::size_t bytes() const override
         {
           if(_surface_mesh != nullptr)
@@ -109,11 +124,11 @@ namespace FEAST
         /** \copydoc ChartBase::get_type() */
         virtual String get_type() const override
         {
-          return "discrete";
+          return "SurfaceMesh";
         }
 
         /** \copydoc ChartBase::write */
-        virtual void write(std::ostream&, const String&) const override
+        virtual void write(std::ostream& DOXY(os), const String& DOXY(sindent)) const override
         {
           throw InternalError(__func__, __FILE__, __LINE__, "XML export of SurfaceMesh not implemented yet");
         }
@@ -121,46 +136,76 @@ namespace FEAST
         /**
          * \brief Projects a single point to the surface given by the surface mesh
          *
-         * \warning Dumb and inefficient: This just moves the point to the nearest point of the surface mesh. This
-         * means it is somewhat likely that different points get moved together and for every single point, and the
-         * complexity is O(# surface_mesh_vertices) FOR EVERY SINGLE POINT PROJECTED.
-         *
-         * If possible, use project(Mesh_&, MeshPart&) version.
-         *
          * \param[in,out] point
          * The point that gets projected.
-         *
          */
-        void project(WorldPoint& point) const
+        void project_point(WorldPoint& point) const
         {
-          Index min_index(0);
-          CoordType min_dist(Math::Limits<CoordType>::max());
+          // Type of the vertex at cell index set
+          typedef typename SurfaceMeshType::template IndexSet<SurfaceMeshType::shape_dim, 0>::Type VertAtCellIdxType;
+          // Number of vertices per cell
+          static constexpr int num_vert_loc = VertAtCellIdxType::num_indices;
+          static constexpr int world_dim = SurfaceMeshType::world_dim;
 
-          typename SurfaceMeshType::VertexSetType& vtx(_surface_mesh->get_vertex_set());
-          CoordType tol(Math::pow(Math::eps<CoordType>(), CoordType(0.5)));
+          // Vertex at cell information
+          const VertAtCellIdxType& idx(_surface_mesh->template get_index_set<SurfaceMeshType::shape_dim, 0>());
+          // The mesh's vertex set so we can get at the coordinates
+          const auto& vtx(_surface_mesh->get_vertex_set());
 
-          for(Index i(0); i < _surface_mesh->get_num_entities(0); ++i)
+          // This will contain all vertices making up a cell in the mesh. Since the mesh is of shape
+          // Simplex<shape_dim>, there are shape_dim+1 vertices.
+          Tiny::Matrix<CoordType, num_vert_loc, world_dim> coords(CoordType(0));
+          // This will hold the coefficients of the transformation mapping
+          Tiny::Vector<CoordType, SurfaceMeshType::shape_dim+1> coeffs(CoordType(0));
+
+          Index min_index = Index(~0);
+          CoordType min_dist(Math::huge<CoordType>());
+
+          for(Index cell(0); cell < _surface_mesh->get_num_entities(SurfaceMeshType::shape_dim); ++cell)
           {
-            typename SurfaceMeshType::VertexSetType::VertexType tmp(point);
-            tmp -= vtx[i];
-
-            CoordType current_dist(tmp.norm_euclid());
-
-            if(current_dist <= tol)
+            // Collect all vertices that make up the surface mesh cell in the coords matrix
+            for(int j(0); j < SurfaceMeshType::shape_dim+1; ++j)
             {
-              min_index = i;
-              break;
+              Index i(idx(cell, Index(j)));
+              coords[j] = vtx[i];
             }
 
-            if(current_dist < min_dist)
-            {
-              min_dist = current_dist;
-              min_index = i;
-            }
+            // Compute the coefficients of the inverse coordinate transformation. The last coefficient is the
+            // signed distance of x to the facet made up by coords
+            compute_inverse_coeffs(coeffs, point, coords);
 
+            // From the coefficients, we can compute the barycentric coordinates (as the surface mesh is of Simplex
+            // shape) so we get an idea about in which direction we need to search first
+            Tiny::Vector<CoordType, SurfaceMeshType::shape_dim+1> bary(CoordType(1));
+            CoordType ortho_dist = compute_bary_and_dist(bary, coeffs);
+
+            if(ortho_dist < min_dist)
+              min_index = cell;
           }
 
-          point = vtx[min_index];
+          // Now that we have the surface mesh cell with the lowest distance, we can compute the projected point
+          WorldPoint projected_point(CoordType(0));
+
+          // Collect all vertices that make up the surface mesh cell in the coords matrix
+          for(int j(0); j < SurfaceMeshType::shape_dim+1; ++j)
+          {
+            Index i(idx(min_index, Index(j)));
+            coords[j] = vtx[i];
+          }
+
+          // Evaluate the surface mesh trafo for the computed coefficients
+          CoordType coeff0(CoordType(1));
+          for(int j(0); j < SurfaceMeshType::shape_dim; ++j)
+          {
+            // Index of the local vertex i in the SurfaceMesh
+            Index i(idx(min_index, Index(j+1)));
+            projected_point += coeffs[j]*vtx[i];
+            coeff0 -= coeffs[j];
+          }
+
+          projected_point += coeff0*vtx[idx(min_index, Index(0))];
+
+          point = projected_point;
 
         } // void project()
 
@@ -333,6 +378,14 @@ namespace FEAST
           delete[] vert_todo;
           delete[] guesses;
           delete[] traversed;
+        }
+
+        /// \copydoc ChartBase::dist()
+        CoordType compute_dist(const WorldPoint& point) const
+        {
+          WorldPoint projected(point);
+          project_point(projected);
+          return (projected - point).norm_euclid();
         }
 
       private:

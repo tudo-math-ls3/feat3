@@ -123,6 +123,25 @@ Index lvl_min, Index lvl_max)
         vtx_data[trg[i]] = 0.0;
     }
 
+    // For every chart in the atlas, compute the distance of every mesh vertex to it
+    if(atlas != nullptr)
+    {
+      const auto& vtx = node->get_mesh()->get_vertex_set();
+
+      typename Mesh_::CoordType* distances
+        (new typename Mesh_::CoordType[vtx.get_num_vertices()]);
+
+      for(const auto& it:atlas->get_mesh_chart_map())
+      {
+        String fieldname("dist_"+it.first);
+        for(Index i(0); i < vtx.get_num_vertices(); ++i)
+          distances[i] = it.second->dist(vtx[i]);
+
+        exporter.add_scalar_vertex(fieldname, distances);
+      }
+      delete[] distances;
+    }
+
     exporter.write(vtkname);
   }
 

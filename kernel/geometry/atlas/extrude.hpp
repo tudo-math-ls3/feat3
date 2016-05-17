@@ -35,7 +35,7 @@ namespace FEAST
         /// The CRTP base class
         typedef ChartCRTP<Extrude<Mesh_, SubChart_>, Mesh_, ExtrudeTraits<SubChart_>> BaseClass;
         /// Floating point type
-        typedef typename BaseClass::CoordType DataType;
+        typedef typename BaseClass::CoordType CoordType;
         /// Vector type for world points, aka image points
         typedef typename BaseClass::WorldPoint WorldPoint;
         /// Vector type for parametrisation points, aka domain points
@@ -77,13 +77,13 @@ namespace FEAST
           return _sub_chart->can_explicit();
         }
 
-        void project(WorldPoint& point) const
+        void project_point(WorldPoint& point) const
         {
           // extract sub-world
           SubWorldPoint sub_point;
           sub_point[0] = point[0];
           sub_point[1] = point[1];
-          _sub_chart->project(sub_point);
+          _sub_chart->project_point(sub_point);
           point[0] = sub_point[0];
           point[1] = sub_point[1];
         }
@@ -94,7 +94,7 @@ namespace FEAST
           const auto& target_vtx = meshpart.template get_target_set<0>();
           for(Index i(0); i < meshpart.get_num_entities(0); ++i)
           {
-            project(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
+            project_point(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
           }
         }
 
@@ -107,6 +107,14 @@ namespace FEAST
           point[0] = sub_point[0];
           point[1] = sub_point[1];
           point[2] = param[1]; // Z-coord
+        }
+
+        /// \copydoc ChartBase::dist()
+        CoordType compute_dist(const WorldPoint& point) const
+        {
+          WorldPoint projected(point);
+          project_point(projected);
+          return (point - projected).norm_euclid();
         }
 
         virtual String get_type() const override

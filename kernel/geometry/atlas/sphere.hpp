@@ -43,7 +43,7 @@ namespace FEAST
         /// CRTP base class
         typedef ChartCRTP<Sphere<Mesh_>, Mesh_, SphereTraits> BaseClass;
         /// Floating point type
-        typedef typename BaseClass::CoordType DataType;
+        typedef typename BaseClass::CoordType CoordType;
         /// Vector type for world points, aka image points
         typedef typename BaseClass::WorldPoint WorldPoint;
         /// Vector type for parameter points, aka domain points
@@ -53,7 +53,7 @@ namespace FEAST
         /// the sphere's midpoint
         WorldPoint _midpoint;
         /// the sphere's radius
-        DataType _radius;
+        CoordType _radius;
 
       public:
         /**
@@ -65,10 +65,10 @@ namespace FEAST
          * \param[in] radius
          * The radius of the sphere. Must be positive.
          */
-        explicit Sphere(DataType mid_x, DataType mid_y, DataType mid_z, DataType radius) :
+        explicit Sphere(CoordType mid_x, CoordType mid_y, CoordType mid_z, CoordType radius) :
           _radius(radius)
         {
-          ASSERT_(radius > DataType(0));
+          ASSERT_(radius > CoordType(0));
           _midpoint[0] = mid_x;
           _midpoint[1] = mid_y;
           _midpoint[2] = mid_z;
@@ -87,11 +87,11 @@ namespace FEAST
          * The world point to be projected
          *
          */
-        void project(WorldPoint& point) const
+        void project_point(WorldPoint& point) const
         {
           point -= _midpoint;
-          DataType dist = point.norm_euclid();
-          point *= (_radius / dist);
+          CoordType distance = point.norm_euclid();
+          point *= (_radius / distance);
           point += _midpoint;
         }
 
@@ -112,8 +112,20 @@ namespace FEAST
 
           for(Index i(0); i < meshpart.get_num_entities(0); ++i)
           {
-            project(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
+            project_point(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
           }
+        }
+
+        /// \copydoc ChartBase::dist()
+        CoordType compute_dist(const WorldPoint& point) const
+        {
+          return Math::abs(_signed_dist(point));
+        }
+
+        /// \copydoc ChartBase::signed_dist()
+        CoordType compute_signed_dist(const WorldPoint& point) const
+        {
+          return (point - _midpoint).norm_euclid() - _radius;
         }
 
         /** \copydoc ChartBase::write */

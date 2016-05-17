@@ -51,7 +51,7 @@ namespace FEAST
         /// The CRTP base class
         typedef ChartCRTP<Circle<Mesh_>, Mesh_, CircleTraits> BaseClass;
         /// Floating point type
-        typedef typename BaseClass::CoordType DataType;
+        typedef typename BaseClass::CoordType CoordType;
         /// Vector type for world points, aka image points
         typedef typename BaseClass::WorldPoint WorldPoint;
         /// Vector type for parametrisation points, aka domain points
@@ -61,13 +61,13 @@ namespace FEAST
         /// the circle's midpoint
         WorldPoint _midpoint;
         /// the circle's radius
-        DataType _radius;
+        CoordType _radius;
         /// Specifies whether the circle mapping has a domain
         bool _have_domain;
         /// Left parametrisation domain boundary
-        DataType _trafo_a;
+        CoordType _trafo_a;
         /// Right parametrisation domain boundary
-        DataType _trafo_b;
+        CoordType _trafo_b;
 
       public:
         /**
@@ -79,13 +79,13 @@ namespace FEAST
          * \param[in] radius
          * The radius of the circle. Must be positive.
          */
-        explicit Circle(DataType mid_x, DataType mid_y, DataType radius) :
+        explicit Circle(CoordType mid_x, CoordType mid_y, CoordType radius) :
           _radius(radius),
           _have_domain(false),
           _trafo_a(0.0),
           _trafo_b(0.0)
         {
-          ASSERT_(radius > DataType(0));
+          ASSERT_(radius > CoordType(0));
           _midpoint[0] = mid_x;
           _midpoint[1] = mid_y;
         }
@@ -103,14 +103,14 @@ namespace FEAST
          * Specifies the domain of the parameter interval.
          * See the documentation of this class template for details.
          */
-        explicit Circle(DataType mid_x, DataType mid_y, DataType radius,
-          DataType param_l, DataType param_r) :
+        explicit Circle(CoordType mid_x, CoordType mid_y, CoordType radius,
+          CoordType param_l, CoordType param_r) :
           _radius(radius),
           _have_domain(true),
           _trafo_a(-param_l),
-          _trafo_b((DataType(2) * Math::pi<DataType>()) / (param_r - param_l))
+          _trafo_b((CoordType(2) * Math::pi<CoordType>()) / (param_r - param_l))
         {
-          ASSERT_(radius > DataType(0));
+          ASSERT_(radius > CoordType(0));
           _midpoint[0] = mid_x;
           _midpoint[1] = mid_y;
         }
@@ -127,12 +127,24 @@ namespace FEAST
          * The world point to be projected
          *
          */
-        void project(WorldPoint& point) const
+        void project_point(WorldPoint& point) const
         {
           point -= _midpoint;
-          DataType dist = point.norm_euclid();
-          point *= (_radius / dist);
+          CoordType distance = point.norm_euclid();
+          point *= (_radius / distance);
           point += _midpoint;
+        }
+
+        /// \copydoc ChartBase::dist()
+        CoordType compute_dist(const WorldPoint& point) const
+        {
+          return Math::abs(compute_signed_dist(point));
+        }
+
+        /// \copydoc ChartBase::signed_dist()
+        CoordType compute_signed_dist(const WorldPoint& point) const
+        {
+          return (point - _midpoint).norm_euclid() - _radius;
         }
 
         /**
@@ -152,7 +164,7 @@ namespace FEAST
 
           for(Index i(0); i < meshpart.get_num_entities(0); ++i)
           {
-            project(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
+            project_point(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
           }
         }
 
@@ -169,7 +181,7 @@ namespace FEAST
         void map(WorldPoint& point, const ParamPoint& param) const
         {
           // transform parameter to interval [0, 2*pi)
-          DataType x = (param[0] + _trafo_a) * _trafo_b;
+          CoordType x = (param[0] + _trafo_a) * _trafo_b;
           point[0] = this->_midpoint[0] + this->_radius * Math::cos(x);
           point[1] = this->_midpoint[1] + this->_radius * Math::sin(x);
         }
@@ -189,8 +201,8 @@ namespace FEAST
           // reconstruct domain from trafo
           if(_have_domain)
           {
-            DataType param_l(-_trafo_a);
-            DataType param_r(param_l + DataType(2) * Math::pi<DataType>() / _trafo_b);
+            CoordType param_l(-_trafo_a);
+            CoordType param_r(param_l + CoordType(2) * Math::pi<CoordType>() / _trafo_b);
             os << " domain=\"" << param_l << " " << param_r << "\"";
           }
           os << " />" << std::endl;
@@ -203,7 +215,7 @@ namespace FEAST
       {
       private:
         typedef Circle<Mesh_> ChartType;
-        typedef typename ChartType::DataType DataType;
+        typedef typename ChartType::CoordType CoordType;
         ChartReturn_*& _chart;
 
       public:
@@ -227,17 +239,17 @@ namespace FEAST
           const std::map<String, String>& attrs,
           bool) override
         {
-          DataType radius = DataType(0);
-          DataType mid_x = DataType(0);
-          DataType mid_y = DataType(0);
-          DataType dom_0 = DataType(0);
-          DataType dom_1 = DataType(1);
+          CoordType radius = CoordType(0);
+          CoordType mid_x = CoordType(0);
+          CoordType mid_y = CoordType(0);
+          CoordType dom_0 = CoordType(0);
+          CoordType dom_1 = CoordType(1);
           bool have_domain(false);
 
           // try to parse the radius
           if(!attrs.find("radius")->second.parse(radius))
             throw Xml::GrammarError(iline, sline, "Failed to parse circle radius");
-          if(radius < DataType(1E-5))
+          if(radius < CoordType(1E-5))
             throw Xml::GrammarError(iline, sline, "Invalid circle radius");
 
           // try to parse midpoind

@@ -34,6 +34,8 @@ namespace FEAST
         typedef MeshPart<Mesh_> PartType;
         /// our vertex set type
         typedef typename MeshType::VertexSetType VertexSetType;
+        /// Type of a single vertex
+        typedef typename VertexSetType::VertexType WorldPoint;
         /// out coordinate type
         typedef typename VertexSetType::CoordType CoordType;
 
@@ -68,6 +70,16 @@ namespace FEAST
          * The mesh part that describes the part to adapt.
          */
         virtual void adapt(PartType& mesh, const PartType& part) const = 0;
+
+        /**
+         * \brief Computes the distance of a point to this chart
+         *
+         * \param[in] point
+         * The world point to compute the distance for
+         *
+         * \returns The distance to this chart
+         */
+        virtual CoordType dist(const WorldPoint& point) const = 0;
 
         /**
          * \brief Writes the type as String
@@ -238,7 +250,8 @@ namespace FEAST
         static constexpr int param_dim = TraitsType::param_dim;
 
         /// our world point type
-        typedef Tiny::Vector<CoordType, world_dim> WorldPoint;
+        //typedef Tiny::Vector<CoordType, world_dim> WorldPoint;
+        typedef typename BaseClass::WorldPoint WorldPoint;
         /// out parameter type
         typedef Tiny::Vector<CoordType, param_dim> ParamPoint;
 
@@ -321,6 +334,12 @@ namespace FEAST
         virtual void adapt(PartType& DOXY(parent_meshpart), const PartType& DOXY(meshpart)) const override
         {
           throw InternalError("Adaption of MeshPart not possible yet");
+        }
+
+        /// \copydoc BaseClass::dist()
+        virtual CoordType dist(const WorldPoint& point) const override
+        {
+          return (this->cast()).compute_dist(point);
         }
 
       }; // class ChartCRTP<...>

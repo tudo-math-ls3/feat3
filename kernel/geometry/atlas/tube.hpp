@@ -114,7 +114,7 @@ namespace FEAST
          * The world point to be projected
          *
          */
-        void project(WorldPoint& point) const
+        void project_point(WorldPoint& point) const
         {
           // subtract tube midpoint
           point -= _midpoint;
@@ -143,8 +143,16 @@ namespace FEAST
 
           for(Index i(0); i < meshpart.get_num_entities(0); ++i)
           {
-            project(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
+            project_point(reinterpret_cast<WorldPoint&>(vtx[target_vtx[i]]));
           }
+        }
+
+        /// \copydoc ChartBase::dist()
+        DataType compute_dist(const WorldPoint& point) const
+        {
+          WorldPoint projected(point);
+          project_point(projected);
+          return (projected - point).norm_euclid();
         }
 
       }; // class Tube<...>
