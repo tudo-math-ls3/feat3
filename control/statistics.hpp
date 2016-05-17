@@ -4,6 +4,7 @@
 
 #include <kernel/util/comm_base.hpp>
 #include <kernel/util/statistics.hpp>
+#include <kernel/util/memory_usage.hpp>
 
 namespace FEAST
 {
@@ -50,6 +51,7 @@ namespace FEAST
             std::cout<<"Domain size: " << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
             std::cout<<"LA size: " << double(la_size) / (1024. * 1024.) << " MByte" << std::endl;
             std::cout<<"MPI size: " << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
+            std::cout<<Util::get_formated_memory_usage()<<std::endl;
             std::cout<<"#Mesh cells: min " << domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension)<<
               ", max " << domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension)<<std::endl;
             std::cout<<"#DOFs: min " << system_levels.front()->matrix_sys.columns()<<", max " << system_levels.back()->matrix_sys.columns() << std::endl;
