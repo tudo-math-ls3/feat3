@@ -76,6 +76,11 @@ namespace FEAST
               }
             }
 
+        MeshAttribute(const MeshAttribute&) = delete;
+        MeshAttribute(MeshAttribute&&) = delete;
+        MeshAttribute& operator=(const MeshAttribute&) = delete;
+        MeshAttribute& operator=(MeshAttribute&&) = delete;
+
         ///**
         // * \brief Copy Constructor
         // *

@@ -491,13 +491,14 @@ namespace FEAST
        * \param[in] quad_attrib
        * The quadrilateral mesh attribute to be extruded.
        */
-      void extrude_attribute(HexaAttrib& hexa_attrib, const QuadAttrib& quad_attrib) const
+      void extrude_attribute(HexaAttrib*& hexa_attrib, const QuadAttrib& quad_attrib) const
       {
         const Index quad_num_verts = quad_attrib.get_num_vertices();
         const int quad_num_coords = quad_attrib.get_num_coords();
 
         // create attribute
-        hexa_attrib = HexaAttrib(quad_num_verts * (_slices+1), quad_num_coords+1, 0);
+        ASSERT_(hexa_attrib == nullptr);
+        hexa_attrib = new HexaAttrib(quad_num_verts * (_slices+1), quad_num_coords+1, 0);
 
         // loop over all slices
         for(Index j(0); j <= _slices; ++j)
@@ -513,9 +514,9 @@ namespace FEAST
           {
             for(int k(0); k < quad_num_coords; ++k)
             {
-              hexa_attrib[vo+i][k] = quad_attrib[i][k];
+              (*hexa_attrib)[vo+i][k] = quad_attrib[i][k];
             }
-            hexa_attrib[vo+i][quad_num_coords] = z;
+            (*hexa_attrib)[vo+i][quad_num_coords] = z;
           }
         }
       }
@@ -735,8 +736,8 @@ namespace FEAST
         // extrude attributes
         for(const auto& quad_attrib : _quad_part.get_mesh_attributes())
         {
-          HexaAttribute* hexa_attrib = new HexaAttribute(Index(0), 0);
-          _mesh_extruder.extrude_attribute(*hexa_attrib, *(quad_attrib.second));
+          HexaAttribute* hexa_attrib = nullptr;
+          _mesh_extruder.extrude_attribute(hexa_attrib, *(quad_attrib.second));
           attribute_container.insert(std::make_pair(quad_attrib.first, hexa_attrib));
         }
       }
