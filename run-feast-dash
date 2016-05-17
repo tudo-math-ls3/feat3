@@ -423,12 +423,6 @@ shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"fparser", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"parmetis", True)
 
-icc_version = get_output("icpc -dM -E - ")
-icc_version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in icc_version]))
-icc_major = int(icc_version["__INTEL_COMPILER"][0:2])
-icc_minor = int(icc_version["__INTEL_COMPILER"][-2:])
-icc_minor2 = int(icc_version["__INTEL_COMPILER_UPDATE"])
-
 #delete even the thirdparty package files to trigger new download
 if download3party:
   for root, dirs, files in os.walk(src_dirname+os.sep+"thirdparty"):
@@ -439,8 +433,7 @@ if download3party:
 if (not nothirdparty):
   addition = addition + "-umfpack"
   addition = addition + "-fparser"
-  if icc_major >= 15:
-    addition = addition + "-alglib"
+  addition = addition + "-alglib"
 
 if (not nomkl):
   addition = addition + "-mkl"

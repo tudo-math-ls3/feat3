@@ -498,12 +498,7 @@ namespace FEAST
     {
       T_ r(0);
 
-      /// \compilerhack Intel C++ 14 loop vectorisation bug
-#if defined(FEAST_COMPILER_INTEL) && (FEAST_COMPILER_INTEL < 1500)
-      for(int i(0); (i+1) < n_+1; ++i)
-#else
       for(int i(0); i < n_; ++i)
-#endif
       {
         r += a.v[i] * b.v[i];
       }

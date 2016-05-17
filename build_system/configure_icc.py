@@ -9,8 +9,8 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
   minor2 = int(version["__INTEL_COMPILER_UPDATE"])
   print ("Detected icc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
-  if major < 14  or (major == 14 and minor == 0 and minor2 <= 1):
-    print ("Error: Intel Compiler version less then 14.0.2 is not supported, please update your compiler!")
+  if major < 15:
+    print ("Error: Intel Compiler version less then 15 is not supported, please update your compiler!")
     sys.exit(1)
 
   cxxflags = "-std=c++11 -g -Wall -Wextra -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -diag-disable 2304,2305"

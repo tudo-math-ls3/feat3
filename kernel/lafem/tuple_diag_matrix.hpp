@@ -537,15 +537,9 @@ namespace FEAST
        * \param[in] a A matrix to compare with.
        * \param[in] b A matrix to compare with.
        *
-       * \compilerhack Intel C++ 14 variadic template bug
        */
-#if defined(FEAST_COMPILER_INTEL) && (FEAST_COMPILER_INTEL < 1500)
-      template<typename F2_, typename... R2_>
-      friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix<F2_, R2_...>& b)
-#else
       template <typename Mem2_>
       friend bool operator== (const TupleDiagMatrix & a, const ContainerType<Mem2_> & b)
-#endif
       {
         CONTEXT("When comparing TupleDiagMatrices");
 
