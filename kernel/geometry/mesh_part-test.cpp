@@ -66,7 +66,7 @@ public:
 
     BoundaryFactory<MeshType>my_boundary_factory(my_mesh);
     MeshPartType mesh_part_reference(my_boundary_factory);
-    MeshPartType mesh_part_to_test(mesh_part_reference);
+    MeshPartType mesh_part_to_test(my_boundary_factory);
 
     // Test bottom to top deduction
     // Delete parent information for all shape types except for edges

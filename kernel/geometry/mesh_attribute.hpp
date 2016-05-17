@@ -82,37 +82,6 @@ namespace FEAST
         MeshAttribute& operator=(MeshAttribute&&) = delete;
 
         ///**
-        // * \brief Copy Constructor
-        // *
-        // * \param[in] other
-        // * The vertex set that is to be copied.
-        // */
-        ////template<typename Coord2_>
-        ////MeshAttribute(const MeshAttribute<Coord2_>& other) :
-        //MeshAttribute(const MeshAttribute& other) :
-        //  _num_vertices(other.get_num_vertices()),
-        //  _num_coords(other.get_num_coords()),
-        //  _stride(other.get_stride()),
-        //  _vertices(nullptr)
-        //  {
-        //    if((_num_vertices > 0) && (_num_coords > 0))
-        //    {
-        //      _vertices = new CoordType[_num_vertices * Index(_stride)];
-        //      for(Index i(0); i < _num_vertices; ++i)
-        //      {
-        //        for(Index j(0); j < Index(_num_coords); ++j)
-        //        {
-        //          _vertices[i * Index(_stride) + j] = CoordType(other[i][j]);
-        //        }
-        //        for(Index j = Index(_num_coords); j < Index(_stride); ++j)
-        //        {
-        //          _vertices[i * Index(_stride) + j] = CoordType(0);
-        //        }
-        //      }
-        //    }
-        //  }
-
-        ///**
         // * \brief Move Constructor
         // *
         // * \param[in] other
@@ -142,44 +111,6 @@ namespace FEAST
             delete [] _vertices;
           }
         }
-
-        ///**
-        // * \brief Copy assignment operator
-        // *
-        // * This is needed for replacing one MeshAttribute by another when inserting into a \ref MeshAttributeHolder.
-        // *
-        // * \param[in] other
-        // * Other MeshAttribute to copy from.
-        // */
-        //MeshAttribute& operator=(const MeshAttribute& other)
-        //{
-        //  if(&other != this)
-        //  {
-        //    _num_vertices = other.get_num_vertices();
-        //    _num_coords = other.get_num_coords();
-        //    _stride = other.get_stride();
-
-        //    if(_vertices != nullptr)
-        //      delete[] _vertices;
-
-        //    if(other._vertices != nullptr)
-        //    {
-        //      if((_num_vertices > 0) && (_num_coords > 0))
-        //      {
-        //        _vertices = new CoordType[_num_vertices * Index(_stride)];
-        //        for(Index i(0); i < _num_vertices; ++i)
-        //        {
-        //          for(Index j(0); j < Index(_num_coords); ++j)
-        //            _vertices[i * Index(_stride) + j] = other[i][j];
-
-        //          for(Index j = Index(_num_coords); j < Index(_stride); ++j)
-        //            _vertices[i * Index(_stride) + j] = CoordType(0);
-        //        }
-        //      }
-        //    }
-        //  }
-        //  return *this;
-        //}
 
         /// \returns The size of dynamically allocated memory in bytes.
         std::size_t bytes() const

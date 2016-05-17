@@ -242,6 +242,10 @@ namespace FEAST
 
           }
 
+        /// Explicitly delete move constructor
+        // This is just to avoid anyone using the implicitly generated one - it could be implemented if needed.
+        MeshPart(MeshPart&&) = delete;
+
         /// Virtual destructor
         virtual ~MeshPart()
         {
