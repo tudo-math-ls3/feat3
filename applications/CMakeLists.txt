@@ -306,30 +306,30 @@ if (FEAST_MPI)
 #    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/stokes_poiseuille_2d --level 5 1 --part_min_elems 250 ${MPIEXEC_POSTFLAGS})
 #  SET_PROPERTY(TEST stokes_poiseuille_2d_mpi_6 PROPERTY LABELS "mpi")
 #  SET_PROPERTY(TEST stokes_poiseuille_2d_mpi_6 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#else (FEAST_MPI)
-#  ADD_TEST(stokes_poiseuille_2d_serial ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target stokes_poiseuille_2d
-#    --build-nocmake
-#    --build-noclean
-#    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/stokes_poiseuille_2d --level 5 1)
-#  SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY LABELS "serial")
-#  SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-#endif (FEAST_MPI)
-#
-#if (FEAST_MPI)
-#  ADD_TEST(parti_poisson_dirichlet_2d_mpi ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target parti_poisson_dirichlet_2d
-#    --build-nocmake
-#    --build-noclean
-#    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 5 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/parti_poisson_dirichlet_2d --level 5 3 --part_min_elems 64 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
-#  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY LABELS "mpi")
-#  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+else (FEAST_MPI)
+  ADD_TEST(stokes_poiseuille_2d_serial ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target stokes_poiseuille_2d
+    --build-nocmake
+    --build-noclean
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/stokes_poiseuille_2d --level 5 1)
+  SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY LABELS "serial")
+  SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+endif (FEAST_MPI)
+
+if (FEAST_MPI)
+  ADD_TEST(parti_poisson_dirichlet_2d_mpi ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target parti_poisson_dirichlet_2d
+    --build-nocmake
+    --build-noclean
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 5 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/parti_poisson_dirichlet_2d --level 5 3 --part_min_elems 64 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
+  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY LABELS "mpi")
+  SET_PROPERTY(TEST parti_poisson_dirichlet_2d_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
   ADD_TEST(parti_poisson_dirichlet_2d_serial ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
