@@ -1,30 +1,30 @@
-#include <kernel/util/string.hpp>                          // for String
-#include <kernel/util/runtime.hpp>                         // for Runtime
-#include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
-#include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
-#include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
-#include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
-#include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
-#include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
-#include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
-#include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
-#include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
-#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
-#include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
-#include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
-#include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
-#include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
-#include <kernel/assembly/common_functionals.hpp>          // for ForceFunctional
+#include <kernel/util/string.hpp>
+#include <kernel/util/runtime.hpp>
+#include <kernel/geometry/boundary_factory.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/conformal_factories.hpp>
+#include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_part.hpp>
+#include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/space/lagrange1/element.hpp>
+#include <kernel/cubature/dynamic_factory.hpp>
+#include <kernel/analytic/common.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
+#include <kernel/assembly/error_computer.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
+#include <kernel/assembly/discrete_projector.hpp>
+#include <kernel/assembly/common_operators.hpp>
+#include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
-#include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
-#include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
-#include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/none_filter.hpp>
-#include <kernel/solver/ssor_precond.hpp>                  // for SSORPrecond
+#include <kernel/solver/ssor_precond.hpp>
 #include <kernel/solver/ilu_precond.hpp>
-#include <kernel/solver/pcg.hpp>                           // for PCG
+#include <kernel/solver/pcg.hpp>
 
 
 // We are using FEAST
@@ -106,7 +106,7 @@ namespace Tutorial01
 
     std::cout << "Allocating and initialising vectors and matrix..." << std::endl;
     MatrixType matrix;
-    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, space);
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
     VectorType vec_sol(space.get_num_dofs());
     VectorType vec_rhs(space.get_num_dofs());
 

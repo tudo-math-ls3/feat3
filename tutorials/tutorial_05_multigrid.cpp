@@ -60,7 +60,7 @@
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
 
 // FEAST-Assembly includes
-#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
+#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
@@ -213,7 +213,7 @@ namespace Tutorial05
       Level& lvl = *levels.at(std::size_t(ilevel - level_min));
 
       // Assemble the Laplace matrix:
-      Assembly::SymbolicMatrixAssembler<>::assemble1(lvl.matrix, lvl.space);
+      Assembly::SymbolicAssembler::assemble_matrix_std1(lvl.matrix, lvl.space);
       Assembly::Common::LaplaceOperator laplace_operator;
       lvl.matrix.format();
       Assembly::BilinearOperatorAssembler::assemble_matrix1(lvl.matrix, laplace_operator, lvl.space, cubature_factory);
@@ -241,7 +241,7 @@ namespace Tutorial05
         // assemble the matrix structure and then the matrix content.
 
         // Assemble the prolongation matrix structure:
-        Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(
+        Assembly::SymbolicAssembler::assemble_matrix_2lvl(
           lvl.mat_prol,       // the prolongation matrix that is to be assembled
           lvl.space,          // the fine-mesh space
           lvl_coarse.space    // the coarse-mesh space

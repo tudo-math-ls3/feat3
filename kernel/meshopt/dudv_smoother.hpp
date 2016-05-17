@@ -6,7 +6,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
 #include <kernel/assembly/common_operators.hpp>            // for DuDvOperator
-#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
+#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
@@ -190,7 +190,7 @@ namespace FEAST
           // Assemble the homogeneous slip filter
           _slip_asm.assemble(_filter.template at<0>(), _trafo_space);
           // Symbolically assemble the system matrix
-          Assembly::SymbolicMatrixAssembler<>::assemble1(_sys_matrix, _trafo_space);
+          Assembly::SymbolicAssembler::assemble_matrix_std1(_sys_matrix, _trafo_space);
         }
 
         /// \brief Optimises the mesh according to the criteria implemented in the mesh smoother.

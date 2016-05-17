@@ -416,7 +416,7 @@ namespace FEAST
         if(mat_loc_a1.empty())
         {
           // assemble matrix structure for A11
-          Assembly::SymbolicMatrixAssembler<>::assemble1(mat_loc_a1, space_velo);
+          Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc_a1, space_velo);
 
           // clone layout for A22,...,Ann
           for(int i(1); i < mat_loc_a.num_row_blocks; ++i)
@@ -454,7 +454,7 @@ namespace FEAST
         // assemble matrix structure?
         if(mat_loc_b1.empty())
         {
-          Assembly::SymbolicMatrixAssembler<>::assemble2(mat_loc_b1, space_velo, space_pres);
+          Assembly::SymbolicAssembler::assemble_matrix_std2(mat_loc_b1, space_velo, space_pres);
           for(int i(1); i < mat_loc_b.num_row_blocks; ++i)
             mat_loc_b.get(i,0) = mat_loc_b1.clone(LAFEM::CloneMode::Layout);
         }
@@ -487,7 +487,7 @@ namespace FEAST
         // assemble matrix structure?
         if(mat_loc_s.empty())
         {
-          Assembly::SymbolicMatrixAssembler<>::assemble1(mat_loc_s, space_pres);
+          Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc_s, space_pres);
         }
 
         // assemble schur matrix
@@ -529,8 +529,7 @@ namespace FEAST
         // assemble structure?
         if(loc_prol_vx.empty())
         {
-          Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(
-            loc_prol_vx, this->space_velo, level_coarse.space_velo);
+          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol_vx, this->space_velo, level_coarse.space_velo);
 
           for(int i(1); i < loc_prol_v.num_row_blocks; ++i)
             loc_prol_v.get(i,i) = loc_prol_vx.clone(LAFEM::CloneMode::Layout);
@@ -589,8 +588,7 @@ namespace FEAST
         // assemble structure?
         if(loc_prol_p.empty())
         {
-          Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(
-            loc_prol_p, this->space_pres, level_coarse.space_pres);
+          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol_p, this->space_pres, level_coarse.space_pres);
         }
 
         // create a global pressure weight vector

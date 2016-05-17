@@ -73,7 +73,7 @@ public:
     // assemble matrix structure
     MatrixType_ prol_matrix;
     VectorType weight_vector(space_f.get_num_dofs());
-    Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(prol_matrix, space_f, space_c);
+    Assembly::SymbolicAssembler::assemble_matrix_2lvl(prol_matrix, space_f, space_c);
 
     // check matrix dimensions
     TEST_CHECK_EQUAL(prol_matrix.rows(), 9u);
@@ -152,7 +152,7 @@ public:
     // assemble matrix structure
     MatrixType_ prol_matrix;
     VectorType weight_vector(space_f.get_num_dofs());
-    Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(prol_matrix, space_f, space_c);
+    Assembly::SymbolicAssembler::assemble_matrix_2lvl(prol_matrix, space_f, space_c);
 
     // check matrix dimensions
     TEST_CHECK_EQUAL(prol_matrix.rows(), 12u);

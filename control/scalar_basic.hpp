@@ -329,8 +329,7 @@ namespace FEAST
         // assemble structure?
         if (loc_prol.empty())
         {
-          Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(
-            loc_prol, this->space, level_coarse.space);
+          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, this->space, level_coarse.space);
         }
 
         // create a global pressure weight vector

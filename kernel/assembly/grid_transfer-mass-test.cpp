@@ -72,8 +72,8 @@ public:
 
     // assemble fine/coarse mesh mass matrix
     MatrixType mass_f, mass_c;
-    Assembly::SymbolicMatrixAssembler<>::assemble1(mass_f, space_f);
-    Assembly::SymbolicMatrixAssembler<>::assemble1(mass_c, space_c);
+    Assembly::SymbolicAssembler::assemble_matrix_std1(mass_f, space_f);
+    Assembly::SymbolicAssembler::assemble_matrix_std1(mass_c, space_c);
     mass_f.format();
     mass_c.format();
     Assembly::Common::IdentityOperator operat;
@@ -83,7 +83,7 @@ public:
     // assemble prolongation matrix
     MatrixType prol_matrix;
     VectorType weight_vector(space_f.get_num_dofs());
-    Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(prol_matrix, space_f, space_c);
+    Assembly::SymbolicAssembler::assemble_matrix_2lvl(prol_matrix, space_f, space_c);
     prol_matrix.format();
     weight_vector.format();
     Assembly::GridTransfer::assemble_prolongation(prol_matrix, weight_vector, space_f, space_c, cubature_factory);

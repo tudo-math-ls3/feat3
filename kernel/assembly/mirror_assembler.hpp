@@ -198,9 +198,9 @@ namespace FEAST
       template<typename MemType_, typename DataType_, typename IndexType_>
       static void assemble_mirror(LAFEM::VectorMirror<MemType_, DataType_, IndexType_>& vec_mirror, const Adjacency::Graph& graph)
       {
-        SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_gather_prim(), graph);
-        SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_scatter_prim(),
-          Adjacency::Graph(Adjacency::rt_transpose, graph));
+        typedef typename LAFEM::VectorMirror<MemType_, DataType_, IndexType_>::MirrorMatrixType MirrorMatrixType;
+        vec_mirror.get_gather_prim() = MirrorMatrixType(graph);
+        vec_mirror.get_scatter_prim() = vec_mirror.get_gather_prim().transpose();
 
         vec_mirror.get_gather_prim().format(DataType_(1));
         vec_mirror.get_scatter_prim().format(DataType_(1));
@@ -244,9 +244,9 @@ namespace FEAST
         LAFEM::VectorMirrorBlocked<MemType_, DataType_, IndexType_, BlockSize_>& vec_mirror,
         const Adjacency::Graph& graph)
       {
-        SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_gather_prim(), graph);
-        SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_scatter_prim(),
-          Adjacency::Graph(Adjacency::rt_transpose, graph));
+        typedef typename LAFEM::VectorMirrorBlocked<MemType_, DataType_, IndexType_, BlockSize_>::MirrorMatrixType MirrorMatrixType;
+        vec_mirror.get_gather_prim() = MirrorMatrixType(graph);
+        vec_mirror.get_scatter_prim() = vec_mirror.get_gather_prim().transpose();
 
         vec_mirror.get_gather_prim().format(DataType_(1));
         vec_mirror.get_scatter_prim().format(DataType_(1));
@@ -335,7 +335,8 @@ namespace FEAST
         const LAFEM::MatrixMirror<VectorMirror_>& matrix_mirror,
         const MT_& template_matrix)
       {
-        SymbolicMatrixAssemblerBase::assemble(buffer_matrix, assemble_buffer_graph(matrix_mirror, template_matrix));
+        buffer_matrix = LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_, IndexTypeA_>
+          (assemble_buffer_graph(matrix_mirror, template_matrix));
       }
 
       /**

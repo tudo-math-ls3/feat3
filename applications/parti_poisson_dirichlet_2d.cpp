@@ -69,7 +69,7 @@ namespace PoissonDirichlet2D
       // assemble matrix structure?
       if (mat_loc.empty())
       {
-        Assembly::SymbolicMatrixAssembler<>::assemble1(mat_loc, this->space);
+        Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc, this->space);
       }
 
       // assemble velocity laplace matrix

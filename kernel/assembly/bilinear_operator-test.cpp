@@ -79,7 +79,7 @@ public:
 
     // create a matrix
     MatrixType_ matrix;
-    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, my_space);
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, my_space);
     matrix.format();
 
     // create a cubature factory
@@ -134,7 +134,7 @@ public:
 
     // create a matrix
     MatrixType_ matrix;
-    Assembly::SymbolicMatrixAssembler<>::assemble2(matrix, my_test_space, my_trial_space);
+    Assembly::SymbolicAssembler::assemble_matrix_std2(matrix, my_test_space, my_trial_space);
     matrix.format();
 
     // create a cubature factory
@@ -195,7 +195,7 @@ public:
 
     // create a matrix
     MatrixType_ matrix;
-    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, space);
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
     matrix.format();
 
     // create a cubature factory
@@ -234,8 +234,8 @@ public:
 
     // create two matrices
     MatrixType_ matrix_1, matrix_2;
-    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix_1, space);
-    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix_2, space);
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_1, space);
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_2, space);
     matrix_1.format();
     matrix_2.format();
 

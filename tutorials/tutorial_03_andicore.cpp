@@ -63,7 +63,7 @@
 // FEAST-Assembly includes
 #include <kernel/assembly/linear_functional.hpp>           // NEW: for LinearOperator
 #include <kernel/assembly/bilinear_operator.hpp>           // NEW: for BilinearOperator
-#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
+#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
@@ -473,7 +473,7 @@ namespace Tutorial03
 
     // Allocate matrix and assemble its structure
     MatrixType matrix;
-    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, space);
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
 
     // Allocate vectors
     VectorType vec_sol = matrix.create_vector_r();

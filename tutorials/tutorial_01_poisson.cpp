@@ -70,7 +70,7 @@
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
 
 // FEAST-Assembly includes
-#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicMatrixAssembler
+#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
@@ -229,13 +229,13 @@ namespace Tutorial01
 
     // Now we need to perform the symbolic matrix assembly, i.e., the computation of the nonzero
     // pattern and the allocation of storage for the three CSR arrays.
-    // The class which performs this task is the SymbolicMatrixAssembler class.
+    // The class which performs this task is the SymbolicAssembler class:
     MatrixType matrix;
-    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, space);
-    // Note: The "1" at the end of the function name "assemble1" indicates, that there
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
+    // Note: The "1" at the end of the function name "assemble_matrix_std1" indicates, that there
     // is only one finite element space involved in the assembly, i.e. the test- and trial-
-    // spaces are identical. The symbolic and numeric operator assemblers also contain function named
-    // "assemble2", which takes two (possibly different) finite element spaces as
+    // spaces are identical. The symbolic assembler also contains a function named
+    // "assemble_matrix_std2", which takes two (possibly different) finite element spaces as
     // test- and trial-spaces, but we're not going to use it for now. However, this is
     // required for more complex PDEs like, e.g., the Stokes equations.
 
@@ -281,6 +281,9 @@ namespace Tutorial01
     Assembly::Common::LaplaceOperator laplace_operator;
 
     // Next, we call the bilinear operator assembler to assemble the operator into a matrix.
+    // In analogy to the SymbolicAssembler class, the corresponding assemble function of the
+    // BilinearOperatorAssembler class also has a "1" suffix indicating that there is only one
+    // finite element space involved:
     Assembly::BilinearOperatorAssembler::assemble_matrix1(
         matrix,           // the matrix that receives the assembled operator
         laplace_operator, // the operator that is to be assembled

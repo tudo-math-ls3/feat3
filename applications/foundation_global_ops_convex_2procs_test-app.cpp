@@ -1729,7 +1729,7 @@ void check_global_product_mat_vec_1D(Index rank)
   auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
-  Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
+  Assembly::SymbolicAssembler::assemble_matrix_std1(mat_sys, space);
   mat_sys.format();
   Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
   Assembly::Common::LaplaceOperator laplace;
@@ -1859,7 +1859,7 @@ void check_global_defect_1D(Index rank)
   auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
-  Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
+  Assembly::SymbolicAssembler::assemble_matrix_std1(mat_sys, space);
   mat_sys.format();
   Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
   Assembly::Common::LaplaceOperator laplace;
@@ -5018,7 +5018,7 @@ void check_global_product_mat_vec_1D_gateway(Index rank)
   auto frequencies(HaloFrequencies<Mem::Main>::value(mirrors, mirror_buffers, fbuf));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
-  Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
+  Assembly::SymbolicAssembler::assemble_matrix_std1(mat_sys, space);
   mat_sys.format();
   Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
   Assembly::Common::LaplaceOperator laplace;

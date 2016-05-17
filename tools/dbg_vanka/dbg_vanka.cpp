@@ -134,7 +134,7 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
   // assemble A, B and D
   {
     ScalarMatrixType mat;
-    Assembly::SymbolicMatrixAssembler<>::assemble1(mat, space_v);
+    Assembly::SymbolicAssembler::assemble_matrix_std1(mat, space_v);
     mat_a = MatrixTypeA(mat.layout());
     mat_a.format();
     if(defo)
@@ -159,7 +159,7 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
   }
   {
     ScalarMatrixType mat;
-    Assembly::SymbolicMatrixAssembler<>::assemble2(mat, space_v, space_p);
+    Assembly::SymbolicAssembler::assemble_matrix_std2(mat, space_v, space_p);
     mat_b = MatrixTypeB(mat.layout());
     mat_b.format();
     Assembly::Common::TestDerivativeOperator oper_x(0);

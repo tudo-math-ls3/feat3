@@ -108,7 +108,7 @@ public:
     // assemble A, B and D
     {
       ScalarMatrixType mat;
-      Assembly::SymbolicMatrixAssembler<>::assemble1(mat, space_v);
+      Assembly::SymbolicAssembler::assemble_matrix_std1(mat, space_v);
       mat_a = MatrixTypeA(mat.layout());
       mat_a.format();
       Assembly::Common::LaplaceOperator oper;
@@ -117,7 +117,7 @@ public:
     }
     {
       ScalarMatrixType mat;
-      Assembly::SymbolicMatrixAssembler<>::assemble2(mat, space_v, space_p);
+      Assembly::SymbolicAssembler::assemble_matrix_std2(mat, space_v, space_p);
       mat_b = MatrixTypeB(mat.layout());
       mat_b.format();
       Assembly::Common::TestDerivativeOperator oper_x(0);
@@ -237,7 +237,7 @@ public:
     // assemble A, B and D
     {
       ScalarMatrixType mat;
-      Assembly::SymbolicMatrixAssembler<>::assemble1(mat, space_v);
+      Assembly::SymbolicAssembler::assemble_matrix_std1(mat, space_v);
       mat_a = MatrixTypeA(mat.layout());
       mat_a.format();
       Assembly::Common::DuDvOperator dudv00(0,0);
@@ -251,7 +251,7 @@ public:
     }
     {
       ScalarMatrixType mat;
-      Assembly::SymbolicMatrixAssembler<>::assemble2(mat, space_v, space_p);
+      Assembly::SymbolicAssembler::assemble_matrix_std2(mat, space_v, space_p);
       mat_b = MatrixTypeB(mat.layout());
       mat_b.format();
       Assembly::Common::TestDerivativeOperator oper_x(0);
