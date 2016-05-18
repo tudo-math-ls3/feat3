@@ -688,6 +688,11 @@ namespace FEAST
       {
       }
 
+      const MeshAtlasType* get_atlas() const
+      {
+        return _atlas;
+      }
+
       /**
        * \brief Creates mesh-parts for all base cells of this root mesh.
        *

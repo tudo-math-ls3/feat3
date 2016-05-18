@@ -201,8 +201,8 @@ int run(Solver_& solver, Operator_& op)
 
   // Write the mesh
   Geometry::ExportVTK<MeshType> writer(*mesh);
-  writer.add_scalar_vertex("f", vtx_vec.elements());
-  writer.add_field_vertex_blocked_vector("grad", vtx_grad);
+  writer.add_vertex_scalar("f", vtx_vec.elements());
+  writer.add_vertex_vector("grad", vtx_grad);
   writer.write(filename);
 
   // Clean up

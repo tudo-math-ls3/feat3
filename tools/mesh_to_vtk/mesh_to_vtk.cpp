@@ -116,7 +116,7 @@ Index lvl_min, Index lvl_max)
         vtx_data[trg[i]] = 1.0;
 
       // add variable
-      exporter.add_scalar_vertex(*it, vtx_data.data());
+      exporter.add_vertex_scalar(*it, vtx_data.data());
 
       // unmark vertices
       for(Index i(0); i < trg.get_num_entities(); ++i)
@@ -134,11 +134,9 @@ Index lvl_min, Index lvl_max)
       for(const auto& it:atlas->get_mesh_chart_map())
       {
         for(Index i(0); i < vtx.get_num_vertices(); ++i)
-        {
           distances[i] = it.second->dist(vtx[i]);
-        }
 
-        exporter.add_scalar_vertex("dist_"+it.first, distances);
+        exporter.add_vertex_scalar("dist_"+it.first, distances);
       }
       delete[] distances;
     }

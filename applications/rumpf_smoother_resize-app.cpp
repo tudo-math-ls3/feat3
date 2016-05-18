@@ -124,9 +124,9 @@ template
     // Write initial state to file
     filename = "pre_" + helperclass<ShapeType>::print_typename();
     Geometry::ExportVTK<MeshType> writer_initial_pre(*mesh);
-    writer_initial_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-    writer_initial_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
-    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_initial_pre.add_cell_vector("h", rumpflpumpfl._h);
+    writer_initial_pre.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+    writer_initial_pre.add_vertex_vector("grad", rumpflpumpfl._grad);
     writer_initial_pre.write(filename);
 
     // Smooth the mesh
@@ -143,9 +143,9 @@ template
     // Write optimised initial mesh
     filename = "post_" + helperclass<ShapeType>::print_typename();
     Geometry::ExportVTK<MeshType> writer_initial_post(*mesh);
-    writer_initial_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-    writer_initial_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
-    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_initial_post.add_cell_vector("h", rumpflpumpfl._h);
+    writer_initial_post.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+    writer_initial_post.add_vertex_vector("grad", rumpflpumpfl._grad);
     writer_initial_post.write(filename);
 
     // Clean up

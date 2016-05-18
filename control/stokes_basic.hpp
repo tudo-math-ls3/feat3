@@ -647,12 +647,12 @@ namespace FEAST
         {
           Assembly::DiscreteVertexProjector::project(vtx_vz, vector.template at<0>().get(2), this->space_velo);
           // write 3D velocity
-          exporter.add_field_vertex("velocity", vtx_vx.elements(), vtx_vy.elements(), vtx_vz.elements());
+          exporter.add_vertex_vector("velocity", vtx_vx.elements(), vtx_vy.elements(), vtx_vz.elements());
         }
         else
         {
           // write 2D velocity
-          exporter.add_field_vertex("velocity", vtx_vx.elements(), vtx_vy.elements());
+          exporter.add_vertex_vector("velocity", vtx_vx.elements(), vtx_vy.elements());
         }
 
         // project pressure
@@ -660,7 +660,7 @@ namespace FEAST
         Assembly::DiscreteCellProjector::project(vtx_p, vector.template at<1>(), this->space_pres, this->cubature);
 
         // write pressure
-        exporter.add_scalar_cell("pressure", vtx_p.elements());
+        exporter.add_cell_scalar("pressure", vtx_p.elements());
 
         // finally, write the VTK file
         exporter.write(vtk_name, rank, nprocs);

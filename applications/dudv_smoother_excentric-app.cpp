@@ -289,7 +289,7 @@ struct DuDvSmootherExcentricApp
       // Write pre-optimisation mesh
       filename = "pre_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_pre(*mesh);
-      writer_pre.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
+      writer_pre.add_vertex_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_pre.write(filename);
 
@@ -317,7 +317,7 @@ struct DuDvSmootherExcentricApp
       // Write post-optimisation mesh
       filename = "post_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_post(*mesh);
-      writer_post.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
+      writer_post.add_vertex_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_post.write(filename);
 

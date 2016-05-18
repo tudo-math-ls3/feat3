@@ -124,13 +124,13 @@ namespace FEAST
       /// number of cells in mesh
       Index _num_cells;
       /// vertex variable list
-      VarDeque _vars_vertex;
+      VarDeque _vertex_scalars;
       /// vertex field list
-      VarDeque _fields_vertex;
+      VarDeque _vertex_vectors;
       /// cell variable list
-      VarDeque _vars_cell;
+      VarDeque _cell_scalars;
       /// cell field list
-      VarDeque _fields_cell;
+      VarDeque _cell_vectors;
       /// precision of variables
       int _var_prec;
 
@@ -163,10 +163,10 @@ namespace FEAST
        */
       void clear()
       {
-        _vars_cell.clear();
-        _vars_vertex.clear();
-        _fields_vertex.clear();
-        _fields_cell.clear();
+        _cell_scalars.clear();
+        _vertex_scalars.clear();
+        _vertex_vectors.clear();
+        _cell_vectors.clear();
       }
 
       /**
@@ -184,7 +184,7 @@ namespace FEAST
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_scalar_vertex(const String& name, const T_* data)
+      void add_vertex_scalar(const String& name, const T_* data)
       {
         ASSERT_(data != nullptr);
         std::vector<double> d(_num_verts);
@@ -192,7 +192,7 @@ namespace FEAST
         {
           d[i] = double(data[i]);
         }
-        _vars_vertex.push_back(std::make_pair(name, std::move(d)));
+        _vertex_scalars.push_back(std::make_pair(name, std::move(d)));
       }
 
       /**
@@ -212,7 +212,7 @@ namespace FEAST
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_field_vertex(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
+      void add_vertex_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
       {
         ASSERT_(x != nullptr);
         std::vector<double> d(3*_num_verts);
@@ -244,7 +244,7 @@ namespace FEAST
             d[3*i+2] = 0.0;
           }
         }
-        _fields_vertex.push_back(std::make_pair(name, std::move(d)));
+        _vertex_vectors.push_back(std::make_pair(name, std::move(d)));
       }
 
       /**
@@ -265,7 +265,7 @@ namespace FEAST
        * This function creates a (deep) copy of the vector data.
        */
       template<typename VectorType_>
-      void add_field_vertex_blocked_vector(const String& name, const VectorType_& v)
+      void add_vertex_vector(const String& name, const VectorType_& v)
       {
         std::vector<double> d(3*_num_verts);
 
@@ -278,7 +278,7 @@ namespace FEAST
             d[Index(3)*i+Index(j)] = v(i)[j];
 
         }
-        _fields_vertex.push_back(std::make_pair(name, std::move(d)));
+        _vertex_vectors.push_back(std::make_pair(name, std::move(d)));
       }
 
       /**
@@ -296,7 +296,7 @@ namespace FEAST
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_scalar_cell(const String& name, const T_* data)
+      void add_cell_scalar(const String& name, const T_* data)
       {
         ASSERT_(data != nullptr);
         std::vector<double> d(_num_cells);
@@ -304,7 +304,7 @@ namespace FEAST
         {
           d[i] = double(data[i]);
         }
-        _vars_cell.push_back(std::make_pair(name, std::move(d)));
+        _cell_scalars.push_back(std::make_pair(name, std::move(d)));
       }
 
       /**
@@ -324,7 +324,7 @@ namespace FEAST
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_field_cell(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
+      void add_cell_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
       {
         ASSERT_(x != nullptr);
         std::vector<double> d(3*_num_cells);
@@ -356,7 +356,7 @@ namespace FEAST
             d[3*i+2] = 0.0;
           }
         }
-        _fields_cell.push_back(std::make_pair(name, std::move(d)));
+        _cell_vectors.push_back(std::make_pair(name, std::move(d)));
       }
 
       /**
@@ -377,7 +377,7 @@ namespace FEAST
        * This function creates a (deep) copy of the vector data.
        */
       template<typename VectorType_>
-      void add_field_cell_blocked_vector(const String& name, const VectorType_& v)
+      void add_cell_vector(const String& name, const VectorType_& v)
       {
         std::vector<double> d(3*_num_cells);
 
@@ -390,7 +390,7 @@ namespace FEAST
             d[Index(3)*i+Index(j)] = v(i)[j];
 
         }
-        _fields_cell.push_back(std::make_pair(name, std::move(d)));
+        _cell_vectors.push_back(std::make_pair(name, std::move(d)));
       }
 
       /**
@@ -451,7 +451,7 @@ namespace FEAST
         for(Index i(0); i < _num_cells; ++i)
           rank_array[i] = double(rank);
 
-        add_scalar_cell("rank", rank_array);
+        add_cell_scalar("rank", rank_array);
         delete[] rank_array;
 
         // compute number of non-zero digits in (nparts-1) for padding
@@ -503,14 +503,14 @@ namespace FEAST
         os << "<Piece NumberOfPoints=\"" << _num_verts << "\" NumberOfCells=\"" << _num_cells << "\">" << std::endl;
 
         // write point data
-        if((!_vars_vertex.empty()) || (!_fields_vertex.empty()))
+        if((!_vertex_scalars.empty()) || (!_vertex_vectors.empty()))
         {
           os << "<PointData>" << std::endl;
 
           // write vertex variables
-          for(Index i(0); i < Index(_vars_vertex.size()); ++i)
+          for(Index i(0); i < Index(_vertex_scalars.size()); ++i)
           {
-            const auto& var(_vars_vertex[i]);
+            const auto& var(_vertex_scalars[i]);
             os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">" << std::endl;
             for(Index j(0); j < _num_verts; ++j)
             {
@@ -519,9 +519,9 @@ namespace FEAST
             os << "</DataArray>" << std::endl;
           }
           // write vertex fields
-          for(Index i(0); i < Index(_fields_vertex.size()); ++i)
+          for(Index i(0); i < Index(_vertex_vectors.size()); ++i)
           {
-            const auto& var(_fields_vertex[i]);
+            const auto& var(_vertex_vectors[i]);
             os << "<DataArray type=\"Float64\" Name=\"" << var.first;
             os <<"\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
             for(Index j(0); j < _num_verts; ++j)
@@ -537,14 +537,14 @@ namespace FEAST
         }
 
         // write cell data
-        if(!_vars_cell.empty() || !_fields_cell.empty())
+        if(!_cell_scalars.empty() || !_cell_vectors.empty())
         {
           os << "<CellData>" << std::endl;
-          if(!_vars_cell.empty())
+          if(!_cell_scalars.empty())
           {
-            for(Index i(0); i < Index(_vars_cell.size()); ++i)
+            for(Index i(0); i < Index(_cell_scalars.size()); ++i)
             {
-              const auto& var(_vars_cell[i]);
+              const auto& var(_cell_scalars[i]);
               os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">" << std::endl;
               for(Index j(0); j < _num_cells; ++j)
               {
@@ -554,12 +554,12 @@ namespace FEAST
             }
           }
 
-          if(!_fields_cell.empty())
+          if(!_cell_vectors.empty())
           {
             // write cell fields
-            for(Index i(0); i < Index(_fields_cell.size()); ++i)
+            for(Index i(0); i < Index(_cell_vectors.size()); ++i)
             {
-              const auto& var(_fields_cell[i]);
+              const auto& var(_cell_vectors[i]);
               os << "<DataArray type=\"Float64\" Name=\"" << var.first;
               os <<"\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
               for(Index j(0); j < _num_cells; ++j)
@@ -649,19 +649,19 @@ namespace FEAST
         os << "<PUnstructuredGrid GhostLevel=\"0\">" << std::endl;
 
         // write vertex data
-        if((!_vars_vertex.empty()) || (!_fields_vertex.empty()))
+        if((!_vertex_scalars.empty()) || (!_vertex_vectors.empty()))
         {
           os << "<PPointData>" << std::endl;
 
           // write vertex variables
-          for(Index i(0); i < Index(_vars_vertex.size()); ++i)
+          for(Index i(0); i < Index(_vertex_scalars.size()); ++i)
           {
-            os << "<PDataArray type=\"Float64\" Name=\"" << _vars_vertex[i].first <<"\" />" << std::endl;
+            os << "<PDataArray type=\"Float64\" Name=\"" << _vertex_scalars[i].first <<"\" />" << std::endl;
           }
           // write vertex fields
-          for(Index i(0); i < Index(_fields_vertex.size()); ++i)
+          for(Index i(0); i < Index(_vertex_vectors.size()); ++i)
           {
-            os << "<PDataArray type=\"Float64\" Name=\"" << _fields_vertex[i].first;
+            os << "<PDataArray type=\"Float64\" Name=\"" << _vertex_vectors[i].first;
             os <<"\" NumberOfComponents=\"3\" />" << std::endl;
           }
 
@@ -669,12 +669,19 @@ namespace FEAST
         }
 
         // write cell variables
-        if(!_vars_cell.empty())
+        if(!_cell_scalars.empty() || !_cell_vectors.empty())
         {
           os << "<PCellData>" << std::endl;
-          for(Index i(0); i < Index(_vars_cell.size()); ++i)
+          // write cell scalars
+          for(Index i(0); i < Index(_cell_scalars.size()); ++i)
           {
-            os << "<PDataArray type=\"Float64\" Name=\"" << _vars_cell[i].first <<"\" />" << std::endl;
+            os << "<PDataArray type=\"Float64\" Name=\"" << _cell_scalars[i].first <<"\" />" << std::endl;
+          }
+          // write cell fields
+          for(Index i(0); i < Index(_cell_vectors.size()); ++i)
+          {
+            os << "<PDataArray type=\"Float64\" Name=\"" << _cell_vectors[i].first;
+            os <<"\" NumberOfComponents=\"3\" />" << std::endl;
           }
           os << "</PCellData>" << std::endl;
         }

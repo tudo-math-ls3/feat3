@@ -185,13 +185,13 @@ template
 
     // Write initial state to file
     Geometry::ExportVTK<MeshType> writer_pre_initial(*mesh);
-    writer_pre_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-    writer_pre_initial.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-    writer_pre_initial.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-    writer_pre_initial.add_field_vertex_blocked_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
-    writer_pre_initial.add_field_cell("fval", func_norm, func_det, func_rec_det);
-    writer_pre_initial.add_scalar_cell("levelset_constraint", func_lvlset );
-    writer_pre_initial.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_pre_initial.add_cell_scalar("lambda", rumpflpumpfl._lambda.elements() );
+    writer_pre_initial.add_cell_vector("h", rumpflpumpfl._h);
+    writer_pre_initial.add_vertex_scalar("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
+    writer_pre_initial.add_vertex_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
+    writer_pre_initial.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+    writer_pre_initial.add_cell_scalar("levelset_constraint", func_lvlset );
+    writer_pre_initial.add_vertex_vector("grad", rumpflpumpfl._grad);
     writer_pre_initial.write("pre_initial");
 
     // Optimise the mesh
@@ -207,13 +207,13 @@ template
 
     // Write optimised initial mesh
     Geometry::ExportVTK<MeshType> writer_post_initial(*mesh);
-    writer_post_initial.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-    writer_post_initial.add_field_cell_blocked_vector("h", rumpflpumpfl._h );
-    writer_post_initial.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-    writer_post_initial.add_field_vertex_blocked_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
-    writer_post_initial.add_field_cell("fval", func_norm, func_det, func_rec_det);
-    writer_post_initial.add_scalar_cell("levelset_constraint", func_lvlset );
-    writer_post_initial.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_post_initial.add_cell_scalar("lambda", rumpflpumpfl._lambda.elements() );
+    writer_post_initial.add_cell_vector("h", rumpflpumpfl._h );
+    writer_post_initial.add_vertex_scalar("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
+    writer_post_initial.add_vertex_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
+    writer_post_initial.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+    writer_post_initial.add_cell_scalar("levelset_constraint", func_lvlset );
+    writer_post_initial.add_vertex_vector("grad", rumpflpumpfl._grad);
     writer_post_initial.write("post_initial");
 
     DataType time(0);
@@ -251,13 +251,13 @@ template
       // Write pre-optimisation mesh
       filename = "pre_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_pre(*mesh);
-      writer_pre.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-      writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-      writer_pre.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-      writer_pre.add_field_vertex_blocked_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
-      writer_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_pre.add_scalar_cell("levelset_constraint", func_lvlset );
-      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+      writer_pre.add_cell_scalar("lambda", rumpflpumpfl._lambda.elements() );
+      writer_pre.add_cell_vector("h", rumpflpumpfl._h);
+      writer_pre.add_vertex_scalar("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
+      writer_pre.add_vertex_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
+      writer_pre.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+      writer_pre.add_cell_scalar("levelset_constraint", func_lvlset );
+      writer_pre.add_vertex_vector("grad", rumpflpumpfl._grad);
       writer_pre.write(filename);
 
       // Optimise the mesh
@@ -285,16 +285,16 @@ template
 
       filename = "post_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_post(*mesh);
-      writer_post.add_scalar_cell("norm", func_norm);
-      writer_post.add_scalar_cell("det", func_det);
-      writer_post.add_scalar_cell("rec_det", func_rec_det);
-      writer_post.add_scalar_cell("lambda", rumpflpumpfl._lambda.elements() );
-      writer_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h );
-      writer_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-      writer_post.add_scalar_vertex("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
-      writer_post.add_field_vertex_blocked_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
-      writer_post.add_scalar_cell("levelset_constraint", func_lvlset );
-      writer_post.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
+      writer_post.add_cell_scalar("norm", func_norm);
+      writer_post.add_cell_scalar("det", func_det);
+      writer_post.add_cell_scalar("rec_det", func_rec_det);
+      writer_post.add_cell_scalar("lambda", rumpflpumpfl._lambda.elements() );
+      writer_post.add_cell_vector("h", rumpflpumpfl._h );
+      writer_post.add_vertex_vector("grad", rumpflpumpfl._grad);
+      writer_post.add_vertex_scalar("levelset", rumpflpumpfl._lvlset_vtx_vec.elements());
+      writer_post.add_vertex_vector("lvlset_grad", rumpflpumpfl._lvlset_grad_vtx_vec);
+      writer_post.add_cell_scalar("levelset_constraint", func_lvlset );
+      writer_post.add_vertex_vector("mesh_velocity", mesh_velocity);
       writer_post.write(filename);
 
       n++;

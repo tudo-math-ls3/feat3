@@ -167,9 +167,9 @@ template
       // Write initial state to file
       filename = "refinement_pre_"+stringify(lvl);
       Geometry::ExportVTK<MeshType> writer_refinement_pre(*(rmn->get_mesh()));
-      writer_refinement_pre.add_field_cell_blocked_vector("h", refinement_smoother._h);
-      writer_refinement_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_refinement_pre.add_field_vertex_blocked_vector("grad", refinement_smoother._grad);
+      writer_refinement_pre.add_cell_vector("h", refinement_smoother._h);
+      writer_refinement_pre.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+      writer_refinement_pre.add_vertex_vector("grad", refinement_smoother._grad);
       writer_refinement_pre.write(filename);
 
       refinement_smoother.optimise();
@@ -181,9 +181,9 @@ template
       refinement_smoother.compute_gradient();
       filename = "refinement_post_"+stringify(lvl);
       Geometry::ExportVTK<MeshType> writer_refinement_post(*(rmn->get_mesh()));
-      writer_refinement_post.add_field_cell_blocked_vector("h", refinement_smoother._h);
-      writer_refinement_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_refinement_post.add_field_vertex_blocked_vector("grad", refinement_smoother._grad);
+      writer_refinement_post.add_cell_vector("h", refinement_smoother._h);
+      writer_refinement_post.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+      writer_refinement_post.add_vertex_vector("grad", refinement_smoother._grad);
       writer_refinement_post.write(filename);
 
       auto* old = rmn;
@@ -236,9 +236,9 @@ template
 
     // Write initial state to file
     Geometry::ExportVTK<MeshType> writer_initial_pre(*mesh);
-    writer_initial_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-    writer_initial_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
-    writer_initial_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_initial_pre.add_cell_vector("h", rumpflpumpfl._h);
+    writer_initial_pre.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+    writer_initial_pre.add_vertex_vector("grad", rumpflpumpfl._grad);
     writer_initial_pre.write("pre_initial");
 
     // Smooth the mesh
@@ -254,9 +254,9 @@ template
 
     // Write optimised initial mesh
     Geometry::ExportVTK<MeshType> writer_initial_post(*mesh);
-    writer_initial_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-    writer_initial_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
-    writer_initial_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
+    writer_initial_post.add_cell_vector("h", rumpflpumpfl._h);
+    writer_initial_post.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+    writer_initial_post.add_vertex_vector("grad", rumpflpumpfl._grad);
     writer_initial_post.write("post_initial");
 
     // For saving the old coordinates
@@ -428,10 +428,10 @@ template
       // Write pre-optimisation mesh
       filename = "pre_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_pre(*mesh);
-      writer_pre.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-      writer_pre.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_pre.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-      writer_pre.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
+      writer_pre.add_cell_vector("h", rumpflpumpfl._h);
+      writer_pre.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+      writer_pre.add_vertex_vector("grad", rumpflpumpfl._grad);
+      writer_pre.add_vertex_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_pre.write(filename);
 
@@ -461,10 +461,10 @@ template
       // Write post-optimisation mesh
       filename = "post_" + stringify(n);
       Geometry::ExportVTK<MeshType> writer_post(*mesh);
-      writer_post.add_field_cell_blocked_vector("h", rumpflpumpfl._h);
-      writer_post.add_field_cell("fval", func_norm, func_det, func_rec_det);
-      writer_post.add_field_vertex_blocked_vector("grad", rumpflpumpfl._grad);
-      writer_post.add_field_vertex_blocked_vector("mesh_velocity", mesh_velocity);
+      writer_post.add_cell_vector("h", rumpflpumpfl._h);
+      writer_post.add_cell_vector("fval", func_norm, func_det, func_rec_det);
+      writer_post.add_vertex_vector("grad", rumpflpumpfl._grad);
+      writer_post.add_vertex_vector("mesh_velocity", mesh_velocity);
       std::cout << "Writing " << filename << std::endl;
       writer_post.write(filename);
 

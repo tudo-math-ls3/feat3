@@ -395,8 +395,8 @@ namespace PoissonNeumann2D
       Assembly::DiscreteVertexProjector::project(vtx_rhs, (*vec_rhs), the_asm_level.space);
 
       // write velocity
-      exporter.add_scalar_vertex("sol", vtx_sol.elements());
-      exporter.add_scalar_vertex("rhs", vtx_rhs.elements());
+      exporter.add_vertex_scalar("sol", vtx_sol.elements());
+      exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
 
       // finally, write the VTK file
       exporter.write(vtk_name, rank, nprocs);
