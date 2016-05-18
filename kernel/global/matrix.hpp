@@ -85,6 +85,43 @@ namespace FEAST
         return VectorTypeR(_col_gate, _matrix.create_vector_r());
       }
 
+      /**
+       * \brief Returns the total number of rows in this matrix.
+       *
+       * \returns Matrix row count if perspective_ = false.
+       * \returns Raw matrix row count if perspective_ = true.
+       */
+      template <LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
+      Index rows() const
+      {
+        return _matrix.template rows<perspective_>();
+
+      }
+
+      /**
+       * \brief Returns the total number of columns in this matrix.
+       *
+       * \returns Matrix column count if perspective_ = false.
+       * \returns Raw matrix column count if perspective_ = true.
+       */
+      template <LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
+      Index columns() const
+      {
+        return _matrix.template columns<perspective_>();
+      }
+
+      /**
+       * \brief Returns the total number of non-zeros in this matrix.
+       *
+       * \returns Matrix non zero element count if perspective_ = false.
+       * \returns Raw matrix non zero element count if perspective_ = true.
+       */
+      template <LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
+      Index used_elements() const
+      {
+        return _matrix.template used_elements<perspective_>();
+      }
+
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
