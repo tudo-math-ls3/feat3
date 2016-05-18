@@ -133,11 +133,12 @@ Index lvl_min, Index lvl_max)
 
       for(const auto& it:atlas->get_mesh_chart_map())
       {
-        String fieldname("dist_"+it.first);
         for(Index i(0); i < vtx.get_num_vertices(); ++i)
+        {
           distances[i] = it.second->dist(vtx[i]);
+        }
 
-        exporter.add_scalar_vertex(fieldname, distances);
+        exporter.add_scalar_vertex("dist_"+it.first, distances);
       }
       delete[] distances;
     }
