@@ -198,9 +198,9 @@ namespace FEAST
           _direction_update(du_),
           _tol_fval(DataType(0)),
           _tol_step(Math::sqrt(Math::eps<DataType>())),
+          _beta(0),
           _num_subs_restarts(0),
           _max_num_subs_restarts(0),
-          _beta(0),
           restart_freq(0),
           iterates(nullptr)
           {
