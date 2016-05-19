@@ -115,8 +115,6 @@ namespace FEAST
         typedef PreconditionedIterativeSolver<VectorType> BaseClass;
         /// Generic preconditioner
         typedef NLOptPrecond<typename Operator_::VectorTypeL, Filter_> PrecondType;
-        /// Maximum number of subsequent restarts (meaning steepest descent steps) before aborting
-        static constexpr Index max_num_subs_restarts = Index(10);
         /// Default search direction update
         static constexpr NLCGDirectionUpdate direction_update_default = NLCGDirectionUpdate::DYHSHybrid;
 
@@ -131,7 +129,7 @@ namespace FEAST
         /// prepare() routine through the SolverBase pointer in our BaseClass
         std::shared_ptr<PrecondType> _precond;
 
-        /// Method to update the search direction, defaults to PolakRibiere
+        /// Method to update the search direction
         NLCGDirectionUpdate _direction_update;
 
         /// defect vector
@@ -157,6 +155,8 @@ namespace FEAST
 
         /// Number of subsequent steepest descent steps
         Index _num_subs_restarts;
+        /// Maximum number of subsequent restarts (meaning steepest descent steps) before aborting
+        Index _max_num_subs_restarts;
 
       public:
         /// Restart frequency, defaults to problemsize+1
@@ -198,6 +198,8 @@ namespace FEAST
           _direction_update(du_),
           _tol_fval(DataType(0)),
           _tol_step(Math::sqrt(Math::eps<DataType>())),
+          _num_subs_restarts(0),
+          _max_num_subs_restarts(0),
           _beta(0),
           restart_freq(0),
           iterates(nullptr)
@@ -213,6 +215,8 @@ namespace FEAST
             // This is to make the restarts to occur at the same iterations as ALGLIB
             if(_direction_update == NLCGDirectionUpdate::DYHSHybrid)
               restart_freq = _op.columns() + Index(4);
+
+            this->_min_stag_iter = 0;
 
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
@@ -617,7 +621,7 @@ namespace FEAST
             return Status::success;
 
           // If there were too many subsequent restarts, the solver is stagnated
-          if(_num_subs_restarts > max_num_subs_restarts)
+          if(_max_num_subs_restarts > Index(0) && _num_subs_restarts > _max_num_subs_restarts)
             return Status::stagnated;
 
           // If there were too many stagnated iterations, the solver is stagnated
