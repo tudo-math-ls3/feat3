@@ -164,6 +164,12 @@ namespace FEAT
        * and post-smoothers are to be used as the peak-smoother.
        */
       virtual std::shared_ptr<SolverType> get_smoother_peak() = 0;
+
+      /**
+       * \brief Returns the scaling for adaptive coarse correction.
+       *
+       */
+     virtual typename SystemMatrixType::DataType get_alpha_adaptive_coarse_correction() = 0;
     }; // class MultiGridLevelBase<...>
 
     /**
@@ -233,6 +239,8 @@ namespace FEAT
       std::shared_ptr<SolverType> smoother_post;
       /// the peak-smoother
       std::shared_ptr<SolverType> smoother_peak;
+      /// the adaptive coarse correction parameter
+      typename BaseClass::SystemMatrixType::DataType alpha_adaptive_coarse_correction;
 
     public:
       /**
@@ -261,7 +269,8 @@ namespace FEAT
         coarse_solver(crs_solver),
         smoother_pre(),
         smoother_post(),
-        smoother_peak()
+        smoother_peak(),
+        alpha_adaptive_coarse_correction(typename BaseClass::SystemMatrixType::DataType(1))
       {
       }
 
@@ -304,7 +313,8 @@ namespace FEAT
         std::shared_ptr<SolverType> smooth_pre,
         std::shared_ptr<SolverType> smooth_post,
         std::shared_ptr<SolverType> smooth_peak,
-        std::shared_ptr<SolverType> crs_solver = nullptr)
+        std::shared_ptr<SolverType> crs_solver = nullptr,
+        typename BaseClass::SystemMatrixType::DataType alpha = typename BaseClass::SystemMatrixType::DataType(1))
          :
         system_matrix(sys_matrix),
         system_filter(sys_filter),
@@ -313,7 +323,8 @@ namespace FEAT
         coarse_solver(crs_solver),
         smoother_pre(smooth_pre),
         smoother_post(smooth_post),
-        smoother_peak(smooth_peak)
+        smoother_peak(smooth_peak),
+        alpha_adaptive_coarse_correction(alpha)
       {
       }
 
@@ -369,6 +380,12 @@ namespace FEAT
       {
         return smoother_peak;
       }
+
+      /// \copydocy MultiGridLevelBase::get_alpha_adaptive_coarse_correction()
+      virtual typename BaseClass::SystemMatrixType::DataType get_alpha_adaptive_coarse_correction() override
+      {
+        return alpha_adaptive_coarse_correction;
+      }
     }; // class MultiGridLevelStd<...>
 
     // forward declaration
@@ -379,6 +396,12 @@ namespace FEAT
       typename RestOperator_>
     class MultiGrid;
 
+    template<
+      typename SystemMatrix_,
+      typename SystemFilter_,
+      typename ProlOperator_,
+      typename RestOperator_>
+    class ScaRCMultiGrid;
     /**
      * \brief Multigrid hierarchy management class template
      *
@@ -408,6 +431,7 @@ namespace FEAT
     public:
       /// MultiGrid is our friend
       friend class MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>;
+      friend class ScaRCMultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>;
 
       /// the level base class type
       typedef MultiGridLevelBase<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_> LevelType;
@@ -662,11 +686,13 @@ namespace FEAT
         std::shared_ptr<SolverType> smoother_pre,
         std::shared_ptr<SolverType> smoother_post,
         std::shared_ptr<SolverType> smoother_peak,
-        std::shared_ptr<SolverType> coarse_solver = nullptr)
+        std::shared_ptr<SolverType> coarse_solver = nullptr,
+        typename SystemMatrixType::DataType alpha = typename SystemMatrixType::DataType(1)
+        )
       {
         XASSERTM(!_levels.empty(), "cannot push level, no coarse level exists yet");
         push_level(std::make_shared<StdLevelType>(system_matrix, system_filter, prol_operator, rest_operator,
-          smoother_pre, smoother_post, smoother_peak, coarse_solver));
+          smoother_pre, smoother_post, smoother_peak, coarse_solver, alpha));
       }
 
       /**
@@ -1611,7 +1637,7 @@ namespace FEAT
        * \param[in] cur_smooth
        * Specifies whether to apply the post-smoother on the current level.
        */
-      Status _apply_prol(const Index cur_lvl, bool cur_smooth)
+      virtual Status _apply_prol(const Index cur_lvl, bool cur_smooth)
       {
         // prolongation loop: from coarse level to current level
         for(Index i(_crs_level+1); i <= cur_lvl; ++i)
@@ -1639,7 +1665,7 @@ namespace FEAT
           system_filter_f.filter_cor(lvl_f.vec_cor);
 
           // update our solution vector
-          lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol);
+          lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol, lvl_f.level->get_alpha_adaptive_coarse_correction());
 
           // get our post-smoother
           std::shared_ptr<SolverType> smoother = lvl_f.level->get_smoother_post();
@@ -1709,6 +1735,114 @@ namespace FEAT
       return std::make_shared<MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>>
         (hierarchy, cycle, top_level, crs_level);
     }
+
+    template<
+      typename SystemMatrix_,
+      typename SystemFilter_,
+      typename ProlOperator_,
+      typename RestOperator_>
+    class ScaRCMultiGrid :
+      public MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>
+    {
+      ///Use MultiGrid's CTORs
+      using MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>::MultiGrid;
+
+      public:
+      typedef MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_> BaseClass;
+
+      /**
+       * \brief Prolongates from the coarse level onto the current level
+       *
+       * \param[in] cur_lvl
+       * The level onto which to prolongate.
+       *
+       * \param[in] cur_smooth
+       * Specifies whether to apply the post-smoother on the current level.
+       */
+      virtual Status _apply_prol(const Index cur_lvl, bool cur_smooth) override
+      {
+        // prolongation loop: from coarse level to current level
+        for(Index i(this->_crs_level+1); i <= cur_lvl; ++i)
+        {
+          TimeStamp at;
+          double mpi_exec_start(Statistics::get_time_mpi_execute());
+          double mpi_wait_start(Statistics::get_time_mpi_wait());
+
+          // get our level and the coarse level
+          typename BaseClass::LevelInfo& lvl_f = this->_hierarchy->_get_level_info(i);
+          typename BaseClass::LevelInfo& lvl_c = this->_hierarchy->_get_level_info(i-1);
+
+          // get system matrix and filters
+          const typename BaseClass::MatrixType& system_matrix   = lvl_f.level->get_system_matrix();
+          const typename BaseClass::FilterType& system_filter_f = lvl_f.level->get_system_filter();
+
+          // get our prolongation operator
+          const typename BaseClass::ProlOperatorType* prol_operator = lvl_f.level->get_prol_operator();
+          XASSERTM(prol_operator != nullptr, "prolongation operator is missing");
+
+          // prolongate coarse grid solution
+          prol_operator->apply(lvl_f.vec_cor, lvl_c.vec_sol);
+
+          // apply correction filter
+          system_filter_f.filter_cor(lvl_f.vec_cor);
+
+          // update our solution vector
+          auto alpha(lvl_f.level->get_alpha_adaptive_coarse_correction());
+          decltype(lvl_f.vec_cor) tmp;
+          tmp.clone(lvl_f.vec_cor);
+          lvl_f.level->get_system_matrix().apply(tmp, lvl_f.vec_cor);
+          alpha = lvl_f.vec_cor.dot(lvl_f.vec_def) / lvl_f.vec_cor.dot(tmp);
+          lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol, alpha);
+
+          // get our post-smoother
+          std::shared_ptr<typename BaseClass::SolverType> smoother = lvl_f.level->get_smoother_post();
+
+          // apply post-smoother if we have one
+          if(smoother && (cur_smooth || (i < cur_lvl)))
+          {
+            // compute new defect
+            system_matrix.apply(lvl_f.vec_def, lvl_f.vec_sol, lvl_f.vec_rhs, -typename BaseClass::DataType(1));
+
+            // apply defect filter
+            system_filter_f.filter_def(lvl_f.vec_def);
+
+            // apply post-smoother
+            if(!status_success(smoother->apply(lvl_f.vec_cor, lvl_f.vec_def)))
+              return Status::aborted;
+
+            // update solution vector
+            lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol);
+          }
+
+          TimeStamp bt;
+          this->_toes.at((size_t)i) += bt.elapsed(at);
+          double mpi_exec_stop(Statistics::get_time_mpi_execute());
+          double mpi_wait_stop(Statistics::get_time_mpi_wait());
+          this->_mpi_execs.at((size_t)i) += mpi_exec_stop - mpi_exec_start;
+          this->_mpi_waits.at((size_t)i) += mpi_wait_stop - mpi_wait_start;
+
+          // ascend to next level
+        }
+
+        return Status::success;
+      }
+    };
+
+    template<
+      typename SystemMatrix_,
+      typename SystemFilter_,
+      typename ProlOperator_,
+      typename RestOperator_>
+    std::shared_ptr<MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>> new_scarcmultigrid(
+      std::shared_ptr<MultiGridHierarchy<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>> hierarchy,
+      MultiGridCycle cycle = MultiGridCycle::V,
+      int top_level = -1,
+      int crs_level = 0)
+    {
+      return std::make_shared<ScaRCMultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>>
+        (hierarchy, cycle, top_level, crs_level);
+    }
+
   } // namespace Solver
 } // namespace FEAT
 
