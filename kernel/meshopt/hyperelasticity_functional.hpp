@@ -383,11 +383,9 @@ namespace FEAST
           exporter.add_cell_vector("h", this->_h);
           exporter.add_cell_scalar("lambda", this->_lambda.elements());
 
-          auto grad = create_vector_r();
-          compute_grad(grad);
-          exporter.add_vertex_vector("grad", grad);
-
-          std::cout << "norm_grad " << grad.norm2() << std::endl;
+          //auto grad = create_vector_r();
+          //compute_grad(grad);
+          //exporter.add_vertex_vector("grad", grad);
 
           DataType* func_norm(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
           DataType* func_det(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
@@ -436,26 +434,29 @@ namespace FEAST
          * Needs to be called whenever any data like the mesh, the levelset function etc. changed.
          *
          */
-        virtual void prepare(VectorTypeR& vec_state, FilterType& filter)
+        virtual void prepare(const VectorTypeR& vec_state, FilterType& filter)
         {
           this->_coords.convert(vec_state);
           this->set_coords();
 
-          auto& dirichlet_filters = filter.template at<1>();
+          //auto& dirichlet_filters = filter.template at<1>();
 
-          for(auto& it : dirichlet_filters)
-          {
-            const auto& assembler = _dirichlet_asm.find(it.first);
+          //for(auto& it : dirichlet_filters)
+          //{
+          //  const auto& assembler = _dirichlet_asm.find(it.first);
 
-            if(assembler == _dirichlet_asm.end())
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Could not find unit filter assembler for filter with key "+it.first);
+          //  if(assembler == _dirichlet_asm.end())
+          //    throw InternalError(__func__,__FILE__,__LINE__,
+          //    "Could not find unit filter assembler for filter with key "+it.first);
 
-            assembler->second->assemble(it.second, _trafo_space);
-          }
+          //  assembler->second->assemble(it.second, _trafo_space);
+          //}
 
           // The slip filter contains the outer unit normal, so reassemble it
           auto& slip_filters = filter.template at<0>();
+
+          for(const auto& it:slip_filters)
+            this->_mesh_node->adapt_by_name(it.first);
 
           for(auto& it : slip_filters)
           {
@@ -467,9 +468,6 @@ namespace FEAST
 
             assembler->second->assemble(it.second, _trafo_space);
           }
-
-          for(const auto& it:slip_filters)
-            this->_mesh_node->adapt_by_name(it.first);
 
           this->get_coords();
         }
@@ -583,7 +581,8 @@ namespace FEAST
         virtual void compute_lambda_chart_dist()
         {
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
-          _lambda.format(Math::huge<CoordType>());
+          //_lambda.format(Math::huge<CoordType>());
+          _lambda.format(CoordType(0));
 
           const auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension, 0>();
           const auto& vtx = this->get_mesh()->get_vertex_set();
@@ -601,7 +600,6 @@ namespace FEAST
             }
             midpoint *= (DataType(1))/DataType(Shape::FaceTraits<ShapeType,0>::count);
 
-
             for(const auto& it:_distance_charts)
             {
               auto* chart = this->_mesh_node->get_atlas()->find_mesh_chart(it);
@@ -610,7 +608,7 @@ namespace FEAST
 
               CoordType midpoint_dist(chart->dist(midpoint));
 
-              _lambda(cell, Math::min(midpoint_dist, _lambda(cell)));
+              _lambda(cell, midpoint_dist + _lambda(cell));
               sum_lambda += _lambda(cell);
             }
           }

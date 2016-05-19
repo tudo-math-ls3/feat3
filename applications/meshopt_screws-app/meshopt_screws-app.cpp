@@ -1,5 +1,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
+#include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
@@ -114,7 +115,7 @@ struct MeshoptScrewsApp
     TimeStamp at;
 
     // Minimum number of cells we want to have in each patch
-    Index part_min_elems(Comm::size()*4);
+    const Index part_min_elems(Comm::size()*4);
 
     DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader);
 
@@ -145,18 +146,14 @@ struct MeshoptScrewsApp
     // This is the centre point of the rotation of the inner screw
     ImgPointType x_inner(DataType(0));
     x_inner.v[0] = -excentricity_inner;
+    const String inner_str(dom_ctrl.get_atlas()->find_mesh_chart("inner")->get_type());
 
     // Get outer boundary MeshPart
     auto* outer_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer");
     Geometry::TargetSet& outer_indices = outer_boundary->template get_target_set<0>();
     // This is the centre point of the rotation of the outer screw
     ImgPointType x_outer(DataType(0));
-
-    // A copy of the old vertex coordinates is kept here
-    auto old_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
-
-    // The mesh velocity is 1/delta_t*(coords_new - coords_old) and computed in each time step
-    auto mesh_velocity = meshopt_ctrl->get_coords().clone();
+    const String outer_str(dom_ctrl.get_atlas()->find_mesh_chart("outer")->get_type());
 
     // Write initial vtk output
     if(write_vtk)
@@ -170,12 +167,48 @@ struct MeshoptScrewsApp
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        // Add everything from the MeshoptControl
+        meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.get_levels().back()->get_level_index());
         exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+      }
+
+      if(Comm::rank()==0)
+      {
+        if(inner_str == "polyline")
+        {
+          typedef Geometry::ConformalMesh<Shape::Hypercube<1>,2,2,DataType> PolylineMesh;
+
+          auto* inner_chart = reinterpret_cast< Geometry::Atlas::Polyline<MeshType>*>
+            (dom_ctrl.get_atlas()->find_mesh_chart("inner"));
+
+          Geometry::PolylineFactory<2,2, DataType> pl_factory(inner_chart->get_world_points());
+          PolylineMesh polyline(pl_factory);
+
+          Geometry::ExportVTK<PolylineMesh> polyline_writer(polyline);
+          polyline_writer.write(file_basename+"_inner");
+
+        }
+
+        if(outer_str == "polyline")
+        {
+          typedef Geometry::ConformalMesh<Shape::Hypercube<1>,2,2,DataType> PolylineMesh;
+
+          auto* outer_chart = reinterpret_cast< Geometry::Atlas::Polyline<MeshType>*>
+            (dom_ctrl.get_atlas()->find_mesh_chart("outer"));
+
+          Geometry::PolylineFactory<2,2, DataType> pl_factory(outer_chart->get_world_points());
+          PolylineMesh polyline(pl_factory);
+
+          Geometry::ExportVTK<PolylineMesh> polyline_writer(polyline);
+          polyline_writer.write(file_basename+"_outer");
+        }
       }
     }
 
     // Copy the vertex coordinates to the buffer and get them via get_coords()
     meshopt_ctrl->mesh_to_buffer();
+    // A copy of the old vertex coordinates is kept here
+    auto old_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
     auto new_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
 
     // Prepare the functional
@@ -183,6 +216,7 @@ struct MeshoptScrewsApp
     // Optimise the mesh
     meshopt_ctrl->optimise();
 
+    meshopt_ctrl->prepare(meshopt_ctrl->get_coords());
     // Write vtk output
     if(write_vtk)
     {
@@ -195,6 +229,8 @@ struct MeshoptScrewsApp
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        // Add everything from the MeshoptControl
+        meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.get_levels().back()->get_level_index());
         exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
       }
     }
@@ -208,10 +244,18 @@ struct MeshoptScrewsApp
     // Need some pi for all the angles
     DataType pi(Math::pi<DataType>());
 
+    // The mesh velocity is 1/delta_t*(coords_new - coords_old) and computed in each time step
+    auto mesh_velocity = meshopt_ctrl->get_coords().clone();
+
     while(time < t_end)
     {
       n++;
       time+= delta_t;
+
+      DataType alpha_old = alpha;
+      alpha = -DataType(2)*pi*time;
+      DataType delta_alpha = alpha - alpha_old;
+
 
       if(Comm::rank() == 0)
         std::cout << "Timestep " << n << ": t = " << stringify_fp_fix(time) <<
@@ -224,11 +268,6 @@ struct MeshoptScrewsApp
       // Get coords for modification
       auto& coords = (meshopt_ctrl->get_coords());
       auto& coords_loc = *coords;
-
-      // Update both boundary charts
-      DataType alpha_old = alpha;
-      alpha = -DataType(2)*pi*time;
-      DataType delta_alpha = alpha - alpha_old;
 
       // Update boundary of the inner screw
       // This is the 2x2 matrix representing the turning by the angle delta_alpha of the inner screw
@@ -254,19 +293,51 @@ struct MeshoptScrewsApp
       }
 
       // Rotate the chart. This has to use an evil downcast for now
-      auto* inner_chart = reinterpret_cast< Geometry::Atlas::Polyline<MeshType>*>
-        (dom_ctrl.get_atlas()->find_mesh_chart("inner"));
-
-      auto& vtx_inner = inner_chart->get_world_points();
-
-      for(auto& it : vtx_inner)
+      if(inner_str == "polyline")
       {
-        tmp = it - x_inner;
-        // Rotate
-        tmp2.set_vec_mat_mult(tmp, rot);
-        // Translate the point by the new centre of rotation
-        it = x_inner + tmp2;
+        auto* inner_chart = reinterpret_cast< Geometry::Atlas::Polyline<MeshType>*>
+          (dom_ctrl.get_atlas()->find_mesh_chart("inner"));
+
+        auto& vtx_inner = inner_chart->get_world_points();
+
+        for(auto& it : vtx_inner)
+        {
+          tmp = it - x_inner;
+          // Rotate
+          tmp2.set_vec_mat_mult(tmp, rot);
+          // Translate the point by the new centre of rotation
+          it = x_inner + tmp2;
+        }
       }
+      else if(inner_str == "bezier")
+      {
+        auto* inner_chart = reinterpret_cast< Geometry::Atlas::Bezier<MeshType>*>
+          (dom_ctrl.get_atlas()->find_mesh_chart("inner"));
+
+        auto& vtx_inner = inner_chart->get_world_points();
+
+        for(auto& it : vtx_inner)
+        {
+          tmp = it - x_inner;
+          // Rotate
+          tmp2.set_vec_mat_mult(tmp, rot);
+          // Translate the point by the new centre of rotation
+          it = x_inner + tmp2;
+        }
+
+        auto& vtx_control = inner_chart->get_control_points();
+
+        for(auto& it : vtx_control)
+        {
+          tmp = it - x_inner;
+          // Rotate
+          tmp2.set_vec_mat_mult(tmp, rot);
+          // Translate the point by the new centre of rotation
+          it = x_inner + tmp2;
+        }
+      }
+      else
+        throw InternalError(__func__,__FILE__,__LINE__,"Unhandled inner chart type string "+inner_str);
 
       // The outer screw has 7 teeth as opposed to the inner screw with 6, and it rotates at 6/7 of the speed
       rot(0,0) = Math::cos(delta_alpha);
@@ -287,65 +358,49 @@ struct MeshoptScrewsApp
       }
 
       // Rotate the outer chart. This has to use an evil downcast for now
-      auto* outer_chart = reinterpret_cast<Geometry::Atlas::Polyline<MeshType>*>
-        (dom_ctrl.get_atlas()->find_mesh_chart("outer"));
-      auto& vtx_outer = outer_chart->get_world_points();
-
-      for(auto& it :vtx_outer)
+      if(outer_str == "polyline")
       {
-        tmp = it - x_outer;
-        // Rotate
-        tmp2.set_vec_mat_mult(tmp, rot);
-        it = x_outer + tmp2;
+        auto* outer_chart = reinterpret_cast<Geometry::Atlas::Polyline<MeshType>*>
+          (dom_ctrl.get_atlas()->find_mesh_chart("outer"));
+        auto& vtx_outer = outer_chart->get_world_points();
+
+        for(auto& it :vtx_outer)
+        {
+          tmp = it - x_outer;
+          // Rotate
+          tmp2.set_vec_mat_mult(tmp, rot);
+          it = x_outer + tmp2;
+        }
       }
+      else if(outer_str == "bezier")
+      {
+        auto* outer_chart = reinterpret_cast<Geometry::Atlas::Bezier<MeshType>*>
+          (dom_ctrl.get_atlas()->find_mesh_chart("outer"));
+        auto& vtx_outer = outer_chart->get_world_points();
+
+        for(auto& it :vtx_outer)
+        {
+          tmp = it - x_outer;
+          // Rotate
+          tmp2.set_vec_mat_mult(tmp, rot);
+          it = x_outer + tmp2;
+        }
+
+        auto& vtx_control = outer_chart->get_control_points();
+
+        for(auto& it :vtx_control)
+        {
+          tmp = it - x_outer;
+          // Rotate
+          tmp2.set_vec_mat_mult(tmp, rot);
+          it = x_outer + tmp2;
+        }
+      }
+      else
+        throw InternalError(__func__,__FILE__,__LINE__,"Unhandled outer chart type string "+outer_str);
 
       // Now prepare the functional
       meshopt_ctrl->prepare(coords);
-
-      // For every cell in the mesh, compute its distance to the inner and outer boundary
-      auto& mesh(dom_ctrl.get_levels().back()->get_mesh());
-      const auto& idx = mesh.template get_index_set<ShapeType::dimension, 0>();
-      const auto& vtx = mesh.get_vertex_set();
-
-      typename LAFEM::DenseVector<Mem::Main, DataType, Index> tmp_lambda(mesh.get_num_entities(ShapeType::dimension));
-      DataType sum_lambda(0);
-
-      for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
-      {
-        // Compute midpoint of current cell
-        ImgPointType midpoint(DataType(0));
-        for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-        {
-          Index i(idx(cell, Index(j)));
-          midpoint += vtx[i];
-        }
-        midpoint *= (DataType(1))/DataType(Shape::FaceTraits<ShapeType,0>::count);
-
-        DataType dist_inner(Math::Limits<DataType>::max());
-        for(Index j(0); j < inner_indices.get_num_entities(); ++j)
-        {
-          Index i(inner_indices[j]);
-          DataType my_dist = (midpoint - vtx[i]).norm_euclid();
-          if(my_dist < dist_inner)
-            dist_inner = my_dist;
-        }
-
-        DataType dist_outer(Math::Limits<DataType>::max());
-        for(Index j(0); j < outer_indices.get_num_entities(); ++j)
-        {
-          Index i(outer_indices[j]);
-          DataType my_dist = (midpoint - vtx[i]).norm_euclid();
-          if(my_dist < dist_outer)
-            dist_outer = my_dist;
-        }
-
-        tmp_lambda(cell, dist_inner+dist_outer);
-        sum_lambda+=tmp_lambda(cell);
-
-      }
-      tmp_lambda.scale(tmp_lambda, DataType(1)/sum_lambda);
-      //meshopt_ctrl->_system_levels.back()->op_sys._lambda.convert(tmp_lambda);
-      //meshopt_ctrl->_system_levels.back()->op_sys.compute_h();
 
       meshopt_ctrl->optimise();
 

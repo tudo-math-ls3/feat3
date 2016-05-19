@@ -113,6 +113,14 @@ struct MeshRefinementOptimiserApp
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
       dom_ctrl, meshopt_section_key, meshopt_config, solver_config);
 
+    // Adapt the finest level
+    dom_ctrl.get_levels().back()->get_mesh_node()->adapt();
+
+    meshopt_ctrl->mesh_to_buffer();
+    auto new_coords = meshopt_ctrl->get_coords().clone();
+
+    meshopt_ctrl->prepare(new_coords);
+
     // Write initial vtk output
     if(write_vtk)
     {
@@ -132,13 +140,6 @@ struct MeshRefinementOptimiserApp
       }
     }
 
-    // Adapt the finest level
-    dom_ctrl.get_levels().back()->get_mesh_node()->adapt();
-
-    meshopt_ctrl->mesh_to_buffer();
-    auto new_coords = meshopt_ctrl->get_coords().clone();
-
-    meshopt_ctrl->prepare(new_coords);
 
     TimeStamp pre_opt;
     meshopt_ctrl->optimise();

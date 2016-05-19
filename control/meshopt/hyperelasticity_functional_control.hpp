@@ -224,11 +224,16 @@ namespace FEAST
           {
             const auto& sys_lvl = this->_system_levels.at(size_t(deque_position));
 
+            auto grad = sys_lvl->op_sys.create_vector_r();
+            sys_lvl->op_sys.compute_grad(grad);
+            sys_lvl->filter_sys.filter_def(grad);
+            exporter.add_vertex_vector("grad", *grad);
+
             (*(sys_lvl->op_sys)).add_to_vtk_exporter(exporter);
 
             for(auto& it:(*(sys_lvl->filter_sys)).template at<0>())
             {
-              String field_name("nu_"+it.first);
+              const String field_name("nu_"+it.first);
               exporter.add_vertex_vector(field_name, it.second.get_nu());
             }
           }
@@ -254,8 +259,8 @@ namespace FEAST
               typename SystemLevelType::GlobalCoordsBuffer
                 global_vec_level( &(_system_levels.at(level)->gate_sys), vec_buf, ndofs, Index(0));
 
-              (*(_system_levels.at(level)->op_sys)).prepare
-                ((*global_vec_level), *(_system_levels.at(level)->filter_sys));
+              _system_levels.at(level)->op_sys.prepare
+                (global_vec_level, _system_levels.at(level)->filter_sys);
 
               (*(_system_levels.at(level)->op_sys)).init();
             }
@@ -288,18 +293,7 @@ namespace FEAST
             Solver::Status st = solver->correct(vec_sol, vec_rhs);
             TimeStamp bt;
 
-            auto filtered_grad = the_system_level.op_sys.create_vector_r();
-            auto unfiltered_grad = the_system_level.op_sys.create_vector_r();
-            the_system_level.op_sys.compute_grad(filtered_grad);
-            the_system_level.op_sys.compute_grad(unfiltered_grad);
-
-            the_system_level.filter_sys.filter_def(filtered_grad);
-
-            std::cout << " |grad_f| = " << stringify_fp_sci(filtered_grad.norm2()) <<
-              "|grad| = " << stringify_fp_sci(unfiltered_grad.norm2()) << std::endl;
-            unfiltered_grad.axpy(filtered_grad, unfiltered_grad, DataType(-1));
-
-            std::cout << " |grad_f - grad| = " << stringify_fp_sci(unfiltered_grad.norm2()) << std::endl;
+            prepare(vec_sol);
 
             // Print solver summary
             if(Comm::rank() == 0)
