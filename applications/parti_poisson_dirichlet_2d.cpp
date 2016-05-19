@@ -30,6 +30,7 @@
 
 #include <control/domain/partitioner_domain_control.hpp>
 #include <control/scalar_basic.hpp>
+#include <control/statistics.hpp>
 
 #include<kernel/foundation/pgraph.hpp>
 #include<kernel/foundation/psynch.hpp>
@@ -338,24 +339,18 @@ namespace PoissonDirichlet2D
     // initialise
     solver->init();
 
-    Statistics::reset_flops();
-    Statistics::reset_times();
-    Statistics::reset_solver_statistics();
+    Statistics::reset();
 
     TimeStamp at;
 
     // solve
     Solver::solve(*solver, vec_sol, vec_rhs, matrix, filter);
-    TimeStamp bt;
 
-    if (rank == 0 && args.check("statistics") >= 0)
-    {
-      String flops = Statistics::get_formated_flops(bt.elapsed(at), nprocs);
-      std::cout<<"\nComplete solver TOE: "<<bt.elapsed(at)<<std::endl;
-      std::cout<<flops<<std::endl;
-      std::cout<<Statistics::get_formated_times(bt.elapsed(at))<<std::endl;
-      std::cout<<Statistics::get_formated_solvers()<<std::endl;
-    }
+    TimeStamp bt;
+    double solver_toe(bt.elapsed(at));
+
+    FEAST::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
+      system_levels, transfer_levels, solver, domain);
 
     // release solver
     if(!solver->is_converged())

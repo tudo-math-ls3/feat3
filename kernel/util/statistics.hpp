@@ -107,6 +107,14 @@ namespace FEAST
 
     public:
 
+      /// Reset all internal counters (flops/times/solver_statistics)
+      static void reset()
+      {
+        reset_flops();
+        reset_times();
+        reset_solver_statistics();
+      }
+
       /// Add an amount of flops to the global flop counter
       static void add_flops(Index flops)
       {
@@ -120,7 +128,7 @@ namespace FEAST
       }
 
       /// Retrieve formated flops per second string
-      static String get_formated_flops(double seconds, int ranks = 1)
+      static String get_formated_flops(double seconds, Index ranks = 1)
       {
         double flops((double)_flops);
         flops /= seconds;
@@ -345,7 +353,7 @@ namespace FEAST
         _time_mpi_wait.correction = 0.;
       }
 
-      static void write_out_solver_statistics(int rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, String filename = "solver_stats")
+      static void write_out_solver_statistics(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, String filename = "solver_stats")
       {
         filename += ".";
         filename += stringify(rank);

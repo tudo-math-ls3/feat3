@@ -21,6 +21,7 @@
 
 #include <control/domain/unit_cube_domain_control.hpp>
 #include <control/stokes_basic.hpp>
+#include <control/statistics.hpp>
 
 namespace StokesPoiseuille2D
 {
@@ -425,42 +426,18 @@ namespace StokesPoiseuille2D
     // initialise
     solver->init();
 
-    Statistics::reset_flops();
-    Statistics::reset_times();
-    Statistics::reset_solver_statistics();
+    Statistics::reset();
 
     TimeStamp at;
 
     // solve
     Solver::solve(*solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
-    TimeStamp bt;
 
-    std::size_t la_size(0);
-    std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { la_size += n->bytes(); });
-    std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (TransferLevelType * n) { la_size += n->bytes(); });
-    std::size_t mpi_size(0);
-    std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType * n) { mpi_size += n->gate_sys.bytes(); });
-    if (rank == 0 && args.check("statistics") >= 0)
-    {
-      std::cout<<std::endl<<solver->get_formated_solver_tree().trim()<<std::endl;
-      String flops = Statistics::get_formated_flops(bt.elapsed(at), nprocs);
-      std::cout<<"\nComplete solver TOE: "<<bt.elapsed(at)<<std::endl;
-      std::cout<<flops<<std::endl<<std::endl;
-      std::cout<<Statistics::get_formated_times(bt.elapsed(at))<<std::endl<<std::endl;
-      std::cout<<"Domain size: " << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
-      std::cout<<"LA size: " << double(la_size) / (1024. * 1024.) << " MByte" << std::endl;
-      std::cout<<"MPI size: " << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
-      std::cout<<"#Mesh cells: min " << domain.get_levels().front()->get_mesh().get_num_entities(MeshType::ShapeType::dimension)<<
-        ", max " << domain.get_levels().back()->get_mesh().get_num_entities(MeshType::ShapeType::dimension)<<std::endl;
-      std::cout<<"#DOFs: min " << system_levels.front()->matrix_sys.columns()<<", max " << system_levels.back()->matrix_sys.columns() << std::endl;
-      std::cout<<"#NZEs: min " << system_levels.front()->matrix_sys.used_elements()<<", max " << system_levels.back()->matrix_sys.used_elements() << std::endl << std::endl;
-      if (args.check("statistics") > 0) // provided parameter full or whatever
-      {
-        std::cout<<Statistics::get_formated_solvers();
-      }
-    }
-    if (args.check("statistics") > 0) // provided parameter full or whatever
-      Statistics::write_out_solver_statistics(rank, la_size, domain.bytes(), mpi_size);
+    TimeStamp bt;
+    double solver_toe(bt.elapsed(at));
+
+    FEAST::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
+      system_levels, transfer_levels, solver, domain);
 
     // release solver
     solver->done();
