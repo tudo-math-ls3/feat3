@@ -190,8 +190,6 @@ namespace FEAST
       explicit DenseVectorBlocked() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating DenseVectorBlocked");
-
         this->_scalar_index.push_back(0);
       }
 
@@ -209,8 +207,6 @@ namespace FEAST
       explicit DenseVectorBlocked(Index size_in, bool pinned_allocation = false) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating DenseVectorBlocked");
-
         ASSERT(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Error: Pinned memory allocation only possible in main memory!");
 
         this->_scalar_index.push_back(0);
@@ -246,8 +242,6 @@ namespace FEAST
       explicit DenseVectorBlocked(Index size_in, DT_ value) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating DenseVectorBlocked");
-
         this->_scalar_index.push_back(0);
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size<Perspective::pod>()));
         this->_elements_size.push_back(size<Perspective::pod>());
@@ -266,8 +260,6 @@ namespace FEAST
       explicit DenseVectorBlocked(Index size_in, DT_ * data) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating DenseVectorBlocked");
-
         this->_scalar_index.push_back(0);
         this->_elements.push_back(data);
         this->_elements_size.push_back(size<Perspective::pod>());
@@ -288,8 +280,6 @@ namespace FEAST
       explicit DenseVectorBlocked(const DenseVector<Mem_, DT_, IT_> & other) :
         Container<Mem_, DT_, IT_>(other.size() / Index(BlockSize_))
       {
-        CONTEXT("When creating DenseVectorBlocked");
-
         this->_scalar_index.push_back(0);
         convert(other);
       }
@@ -308,8 +298,6 @@ namespace FEAST
       explicit DenseVectorBlocked(const DenseVectorBlocked & dv_in, Index size_in, Index offset_in) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating DenseVectorBlocked");
-
         this->_scalar_index.push_back(1);
         DT_ * te(const_cast<DT_*>(dv_in.template elements<Perspective::pod>()));
         this->_elements.push_back(te + offset_in * Index(BlockSize_));
@@ -327,8 +315,6 @@ namespace FEAST
       explicit DenseVectorBlocked(FileMode mode, String filename) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating DenseVectorBlocked");
-
         read_from(mode, filename);
       }
 
@@ -343,8 +329,6 @@ namespace FEAST
       explicit DenseVectorBlocked(FileMode mode, std::istream& file) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating DenseVectorBlocked");
-
         read_from(mode, file);
       }
 
@@ -359,7 +343,6 @@ namespace FEAST
       explicit DenseVectorBlocked(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating DenseVectorBlocked");
         deserialise<DT2_, IT2_>(input);
       }
 
@@ -373,7 +356,6 @@ namespace FEAST
       DenseVectorBlocked(DenseVectorBlocked && other) :
         Container<Mem_, DT_, IT_>(std::forward<DenseVectorBlocked>(other))
       {
-        CONTEXT("When moving DenseVectorBlocked");
       }
 
       /**
@@ -383,8 +365,6 @@ namespace FEAST
        */
       virtual ~DenseVectorBlocked()
       {
-        CONTEXT("When destroying DenseVectorBlocked");
-
         // avoid releasing memory by base class destructor, because we do not own the referenced memory
         if (this->_scalar_index.size() > 0 && this->_scalar_index.at(1) == 1)
         {
@@ -406,8 +386,6 @@ namespace FEAST
        */
       DenseVectorBlocked & operator= (DenseVectorBlocked && other)
       {
-        CONTEXT("When moving DenseVectorBlocked");
-
         this->move(std::forward<DenseVectorBlocked>(other));
 
         return *this;
@@ -423,7 +401,6 @@ namespace FEAST
        */
       DenseVectorBlocked shared() const
       {
-        CONTEXT("When sharing DenseVectorBlocked");
         DenseVectorBlocked r;
         r.assign(*this);
         return r;
@@ -439,7 +416,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const DenseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other)
       {
-        CONTEXT("When converting DenseVectorBlocked");
         this->assign(other);
       }
 
@@ -453,8 +429,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const DenseVector<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting DenseVectorBlocked");
-
         ASSERT(other.size() % Index(BlockSize_) == 0, "Error: DenseVector cannot be partionated with given blocksize!");
 
         this->clear();
@@ -552,8 +526,6 @@ namespace FEAST
        */
       const Tiny::Vector<DT_, BlockSize_> operator()(Index index) const
       {
-        CONTEXT("When retrieving DenseVectorBlocked element");
-
         ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector blocked size " + stringify(this->size()) + " !");
         Tiny::Vector<DT_, BlockSize_> t;
         MemoryPool<Mem_>::download(t.v, this->_elements.at(0) + index * Index(BlockSize_), Index(BlockSize_));
@@ -568,8 +540,6 @@ namespace FEAST
        */
       void operator()(Index index, const Tiny::Vector<DT_, BlockSize_> & value)
       {
-        CONTEXT("When setting DenseVectorBlocked element");
-
         ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector blocked size " + stringify(this->size()) + " !");
         MemoryPool<Mem_>::upload(this->_elements.at(0) + index * Index(BlockSize_), value.v, Index(BlockSize_));
       }
@@ -615,8 +585,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in DenseVectorBlocked");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -644,8 +612,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in DenseVectorBlocked");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -838,8 +804,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out DenseVectorBlocked");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -867,8 +831,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out DenseVectorBlocked");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -1196,8 +1158,6 @@ namespace FEAST
        */
       template <typename Mem2_> friend bool operator== (const DenseVectorBlocked & a, const DenseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & b)
       {
-        CONTEXT("When comparing DenseVectorBlockeds");
-
         if (a.size() != b.size())
           return false;
         if (a.get_elements().size() != b.get_elements().size())

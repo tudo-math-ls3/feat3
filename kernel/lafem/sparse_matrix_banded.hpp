@@ -410,7 +410,6 @@ namespace FEAST
       explicit SparseMatrixBanded() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating SparseMatrixBanded");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -428,7 +427,6 @@ namespace FEAST
       explicit SparseMatrixBanded(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
         Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
       {
-        CONTEXT("When creating SparseMatrixBanded");
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
@@ -461,7 +459,6 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Size of values does not match to number of offsets and row count!");
         }
 
-        CONTEXT("When creating SparseMatrixBanded");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
 
@@ -504,8 +501,6 @@ namespace FEAST
       explicit SparseMatrixBanded(const Adjacency::Graph & graph) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixBanded");
-
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
 
@@ -550,8 +545,6 @@ namespace FEAST
       explicit SparseMatrixBanded(FileMode mode, String filename) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixBanded");
-
         read_from(mode, filename);
       }
 
@@ -566,8 +559,6 @@ namespace FEAST
       explicit SparseMatrixBanded(FileMode mode, std::istream& file) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixBanded");
-
         read_from(mode, file);
       }
 
@@ -582,7 +573,6 @@ namespace FEAST
       explicit SparseMatrixBanded(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixBanded");
         deserialise<DT2_, IT2_>(input);
       }
 
@@ -596,7 +586,6 @@ namespace FEAST
       SparseMatrixBanded(SparseMatrixBanded && other) :
         Container<Mem_, DT_, IT_>(std::forward<SparseMatrixBanded>(other))
       {
-        CONTEXT("When moving SparseMatrixBanded");
       }
 
       /**
@@ -608,8 +597,6 @@ namespace FEAST
        */
       SparseMatrixBanded & operator= (SparseMatrixBanded && other)
       {
-        CONTEXT("When moving SparseMatrixBanded");
-
         this->move(std::forward<SparseMatrixBanded>(other));
 
         return *this;
@@ -624,7 +611,6 @@ namespace FEAST
        */
       SparseMatrixBanded shared() const
       {
-        CONTEXT("When sharing SparseMatrixBanded");
         SparseMatrixBanded r;
         r.assign(*this);
         return r;
@@ -640,7 +626,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixBanded<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixBanded");
         this->assign(other);
       }
 
@@ -653,8 +638,6 @@ namespace FEAST
        */
       SparseMatrixBanded & operator= (const SparseLayout<Mem_, IT_, layout_id> & layout_in)
       {
-        CONTEXT("When assigning SparseMatrixBanded");
-
         for (Index i(0) ; i < this->_elements.size() ; ++i)
           MemoryPool<Mem_>::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
@@ -690,8 +673,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out SparseMatrixBanded");
-
         switch(mode)
         {
         case FileMode::fm_bm:
@@ -713,8 +694,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out SparseMatrixBanded");
-
         switch(mode)
         {
         case FileMode::fm_bm:
@@ -765,8 +744,6 @@ namespace FEAST
        */
       DT_ operator()(Index row, Index col) const
       {
-        CONTEXT("When retrieving SparseMatrixBanded element");
-
         ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix banded row size " + stringify(rows()) + " !");
         ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix banded column size " + stringify(columns()) + " !");
 
@@ -1126,8 +1103,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in SparseMatrixELL");
-
         switch(mode)
         {
         case FileMode::fm_bm:
@@ -1149,8 +1124,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in SparseMatrixELL");
-
         switch(mode)
         {
         case FileMode::fm_bm:
@@ -1247,7 +1220,6 @@ namespace FEAST
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        CONTEXT("Graph::image_end()");
         ASSERT(domain_node < rows(), "Domain node index out of range");
 
         const IT_ * toffsets(offsets());
@@ -1273,8 +1245,6 @@ namespace FEAST
        */
       template <typename Mem2_> friend bool operator== (const SparseMatrixBanded & a, const SparseMatrixBanded<Mem2_, DT_, IT_> & b)
       {
-        CONTEXT("When comparing SparseMatrixBandeds");
-
         if (a.rows() != b.rows())
           return false;
         if (a.columns() != b.columns())

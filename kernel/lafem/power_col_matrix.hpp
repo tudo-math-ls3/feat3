@@ -110,8 +110,6 @@ namespace FEAST
        */
       explicit PowerColMatrix(FileMode mode, String filename)
       {
-        CONTEXT("When creating PowerColMatrix");
-
         read_from(mode, filename);
       }
 
@@ -127,8 +125,6 @@ namespace FEAST
        */
       explicit PowerColMatrix(FileMode mode, std::istream& file, String directory = "")
       {
-        CONTEXT("When creating PowerColMatrix");
-
         String line;
         do {
           if (file.eof())
@@ -152,8 +148,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in PowerColMatrix");
-
         String directory;
         auto found = filename.rfind("/");
         if (found != std::string::npos)
@@ -207,8 +201,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out PowerColMatrix");
-
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
@@ -538,8 +530,6 @@ namespace FEAST
       template <typename SubType2_>
       void convert(const PowerColMatrix<SubType2_, blocks_> & other)
       {
-        CONTEXT("When converting PowerColMatrix");
-
         this->first().convert(other.first());
         this->rest().convert(other.rest());
       }
@@ -553,8 +543,6 @@ namespace FEAST
       template <typename Mem2_>
       friend bool operator== (const PowerColMatrix & a, const ContainerType<Mem2_> & b)
       {
-        CONTEXT("When comparing PowerColMatrices");
-
         return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
       }
     };
@@ -614,16 +602,12 @@ namespace FEAST
       /// file-input ctor
       explicit PowerColMatrix(FileMode mode, String filename)
       {
-        CONTEXT("When creating PowerColMatrix");
-
         read_from(mode, filename);
       }
 
       /// filestream-input ctor
       explicit PowerColMatrix(FileMode mode, std::istream& file, String directory = "")
       {
-        CONTEXT("When creating PowerColMatrix");
-
         String line;
         do {
           if (file.eof())
@@ -638,8 +622,6 @@ namespace FEAST
 
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in PowerColMatrix");
-
         String directory;
         auto found = filename.rfind("/");
         if (found != std::string::npos)
@@ -680,8 +662,6 @@ namespace FEAST
 
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out PowerColMatrix");
-
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
@@ -870,8 +850,6 @@ namespace FEAST
       template <typename SubType2_>
       void convert(const PowerColMatrix<SubType2_, 1> & other)
       {
-        CONTEXT("When converting PowerColMatrix");
-
         this->first().convert(other.first());
       }
 
@@ -884,8 +862,6 @@ namespace FEAST
       template <typename Mem2_>
       friend bool operator== (const PowerColMatrix & a, const ContainerType<Mem2_> & b)
       {
-        CONTEXT("When comparing PowerColMatrices");
-
         return (a.name() == b.name()) && (a.first() == b.first());
       }
     };

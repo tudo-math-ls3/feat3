@@ -27,8 +27,6 @@ public:
 
   bool test_f(Graph& f) const
   {
-    CONTEXT("GraphTest::test_f()");
-
     // fetch the graph's arrays
     Index* f_pp = f.get_domain_ptr();
     Index* f_di = f.get_image_idx();
@@ -89,8 +87,6 @@ public:
 
   bool test_fg(Graph& fg) const
   {
-    CONTEXT("GraphTest::test_fg()");
-
     // fetch the graph's arrays
     Index* fg_pp = fg.get_domain_ptr();
     Index* fg_di = fg.get_image_idx();
@@ -151,8 +147,6 @@ public:
 
   bool test_gf(Graph& gf) const
   {
-    CONTEXT("GraphTest::test_gf()");
-
     // fetch the graph's arrays
     Index* gf_pp = gf.get_domain_ptr();
     Index* gf_di = gf.get_image_idx();
@@ -209,8 +203,6 @@ public:
 
   bool test_constr_perm(Graph& f) const
   {
-    CONTEXT("GraphTest::test_constr_perm()");
-
     // fetch the graph's arrays
     Index* domain_ptr = f.get_domain_ptr();
     Index* image_ptr = f.get_image_idx();
@@ -258,8 +250,6 @@ public:
 
   bool test_constr_colour(Graph& f) const
   {
-    CONTEXT("GraphTest::test_constr_colour()");
-
     // fetch the graph's arrays
     Index* domain_ptr = f.get_domain_ptr();
     Index* image_ptr = f.get_image_idx();

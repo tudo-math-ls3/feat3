@@ -156,8 +156,6 @@ namespace FEAST
        */
       explicit SaddlePointMatrix(FileMode mode, String filename)
       {
-        CONTEXT("When creating SaddlePointMatrix");
-
         read_from(mode, filename);
       }
 
@@ -169,8 +167,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in SaddlePointMatrix");
-
         String directory;
         auto found = filename.rfind("/");
         if (found != std::string::npos)
@@ -234,8 +230,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out SaddlePointMatrix");
-
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
@@ -547,8 +541,6 @@ namespace FEAST
       template <typename MatrixA2_, typename MatrixB2_, typename MatrixD2_>
       void convert(const SaddlePointMatrix<MatrixA2_, MatrixB2_, MatrixD2_> & other)
       {
-        CONTEXT("When converting SaddlePointMatrix");
-
         this->block_a().convert(other.block_a());
         this->block_b().convert(other.block_b());
         this->block_d().convert(other.block_d());
@@ -563,8 +555,6 @@ namespace FEAST
       template <typename Mem2_>
       friend bool operator== (const SaddlePointMatrix & a, const ContainerType<Mem2_> & b)
       {
-        CONTEXT("When comparing SaddlePointMatrices");
-
         return (a.name() == b.name()) && (a.block_a() == b.block_a())
           && (a.block_b() == b.block_b()) && (a.block_d() == b.block_d());
       }

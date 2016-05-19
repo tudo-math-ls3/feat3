@@ -415,8 +415,6 @@ namespace FEAST
        */
       const DataType operator()(Index index) const
       {
-        CONTEXT("When retrieving PowerVector element");
-
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
 
         if (index < first().size())
@@ -437,8 +435,6 @@ namespace FEAST
        */
       void operator()(Index index, DataType value)
       {
-        CONTEXT("When retrieving PowerVector element");
-
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
 
         if (index < first().size())
@@ -477,8 +473,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting PowerVector");
-
         this->first().convert(other.first());
         this->rest().convert(other.rest());
       }
@@ -497,8 +491,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in PowerVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -517,8 +509,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in PowerVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -570,8 +560,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out PowerVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -590,8 +578,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out PowerVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -879,8 +865,6 @@ namespace FEAST
 
       const DataType operator()(Index index) const
       {
-        CONTEXT("When retrieving PowerVector element");
-
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
 
         return first()(index);
@@ -888,8 +872,6 @@ namespace FEAST
 
       void operator()(Index index, DataType value)
       {
-        CONTEXT("When retrieving PowerVector element");
-
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
 
         first()(index, value);
@@ -915,8 +897,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const ContainerType<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting PowerVector");
-
         this->first().convert(other.first());
       }
 
@@ -934,8 +914,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in PowerVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -954,8 +932,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in PowerVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -1007,8 +983,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out PowerVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -1027,8 +1001,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out PowerVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:

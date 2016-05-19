@@ -8,12 +8,10 @@ namespace FEAST
   PropertyMap::PropertyMap(PropertyMap* parent) :
     _parent(parent)
   {
-    CONTEXT("PropertyMap::PropertyMap()");
   }
 
   PropertyMap::~PropertyMap()
   {
-    CONTEXT("PropertyMap::~PropertyMap()");
     // delete all sub-sections
     SectionMap::iterator it(_sections.begin());
     SectionMap::iterator jt(_sections.end());
@@ -28,8 +26,6 @@ namespace FEAST
 
   bool PropertyMap::add_entry(String key, String value, bool replace)
   {
-    CONTEXT("PropertyMap::add_entry()");
-
     // try to insert the key-value-pair
     std::pair<EntryMap::iterator, bool> rtn(_values.insert(std::make_pair(key,value)));
     if(!rtn.second)
@@ -49,8 +45,6 @@ namespace FEAST
 
   PropertyMap* PropertyMap::add_section(String name)
   {
-    CONTEXT("PropertyMap::add_section()");
-
     // try to find the entry
     SectionMap::iterator it(_sections.find(name));
 
@@ -68,8 +62,6 @@ namespace FEAST
 
   bool PropertyMap::erase_entry(String key)
   {
-    CONTEXT("PropertyMap::erase_entry()");
-
     EntryMap::iterator it(_values.find(key));
     if(it != _values.end())
     {
@@ -81,8 +73,6 @@ namespace FEAST
 
   bool PropertyMap::erase_section(String name)
   {
-    CONTEXT("PropertyMap::erase_section()");
-
     SectionMap::iterator it(_sections.find(name));
     if(it != _sections.end())
     {
@@ -169,8 +159,6 @@ namespace FEAST
 
   String PropertyMap::query(String key_path, String default_value) const
   {
-    CONTEXT("PropertyMap::query()");
-
     // use the other query function to search for the value
     std::pair<String, bool> sb = this->query(key_path);
 
@@ -180,8 +168,6 @@ namespace FEAST
 
   std::pair<String, bool> PropertyMap::get_entry(String key) const
   {
-    CONTEXT("PropertyMap::get_entry()");
-
     EntryMap::const_iterator iter(_values.find(key));
     if(iter == _values.end())
     {
@@ -192,7 +178,6 @@ namespace FEAST
 
   const PropertyMap* PropertyMap::get_sub_section(String name) const
   {
-    CONTEXT("PropertyMap::get_sub_section() [const]");
     SectionMap::const_iterator iter(_sections.find(name));
     if(iter == _sections.end())
     {
@@ -203,7 +188,6 @@ namespace FEAST
 
   PropertyMap* PropertyMap::get_sub_section(String name)
   {
-    CONTEXT("PropertyMap::get_sub_section()");
     SectionMap::iterator iter(_sections.find(name));
     if(iter == _sections.end())
     {
@@ -214,8 +198,6 @@ namespace FEAST
 
   void PropertyMap::parse(String filename, bool replace)
   {
-    CONTEXT("PropertyMap::parse(String)");
-
     // try to open the file
     std::ifstream ifs(filename.c_str(), std::ios::in);
 
@@ -249,8 +231,6 @@ namespace FEAST
 
   void PropertyMap::parse(std::istream& ifs, bool replace)
   {
-    CONTEXT("PropertyMap::parse(std::ifstream&)");
-
     // a stack to keep track of all currently open sections
     std::stack<PropertyMap*> stack;
 
@@ -471,8 +451,6 @@ namespace FEAST
 
   void PropertyMap::merge(const PropertyMap& section, bool replace)
   {
-    CONTEXT("PropertyMap::merge()");
-
     EntryMap::const_iterator valiter(section._values.begin());
     EntryMap::const_iterator valend(section._values.end());
 
@@ -495,8 +473,6 @@ namespace FEAST
 
   void PropertyMap::dump(String filename) const
   {
-    CONTEXT("PropertyMap::dump(String)");
-
     // open stream
     std::ofstream ofs(filename.c_str(), std::ios_base::out | std::ios_base::trunc);
     if(!ofs.is_open())
@@ -513,7 +489,6 @@ namespace FEAST
 
   void PropertyMap::dump(std::ostream& os, String::size_type indent) const
   {
-    CONTEXT("PropertyMap::dump(std::ostream&)");
     // prefix string: 2*indent spaces
     String prefix(2*indent, ' ');
 

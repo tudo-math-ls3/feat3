@@ -75,7 +75,6 @@ namespace FEAST
         _num_vertices(num_vertices),
         _vertices(nullptr)
       {
-        CONTEXT(name() + "::VertexSet()");
         if(num_vertices > 0)
         {
           _vertices = new VertexType[num_vertices];
@@ -91,7 +90,6 @@ namespace FEAST
         _num_vertices(num_vertices),
         _vertices(nullptr)
       {
-        CONTEXT(name() + "::VertexSet()");
         if(num_vertices > 0)
         {
           _vertices = new VertexType[num_vertices];
@@ -127,7 +125,6 @@ namespace FEAST
       /// virtual destructor
       virtual ~VertexSet()
       {
-        CONTEXT(name() + "::~VertexSet()");
         if(_vertices != nullptr)
         {
           delete [] _vertices;
@@ -143,21 +140,18 @@ namespace FEAST
       /// Returns the number of coordinates per vertex.
       int get_num_coords() const
       {
-        CONTEXT(name() + "::get_num_coords()");
         return num_coords_;
       }
 
       /// Returns the vertex stride.
       int get_stride() const
       {
-        CONTEXT(name() + "::get_num_stride()");
         return stride_;
       }
 
       /// Returns the number of vertices in the vertex set.
       Index get_num_vertices() const
       {
-        CONTEXT(name() + "::get_num_vertices()");
         return _num_vertices;
       }
 
@@ -172,7 +166,6 @@ namespace FEAST
        */
       VertexReference operator[](Index i)
       {
-        CONTEXT(name() + "::operator[]()");
         ASSERT_(_vertices != nullptr);
         ASSERT_(i < _num_vertices);
         return _vertices[i];
@@ -181,7 +174,6 @@ namespace FEAST
       /** \copydoc operator[]() */
       ConstVertexReference operator[](Index i) const
       {
-        CONTEXT(name() + "::operator[]() [const]");
         ASSERT_(_vertices != nullptr);
         ASSERT_(i < _num_vertices);
         return _vertices[i];

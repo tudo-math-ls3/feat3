@@ -414,7 +414,6 @@ namespace FEAST
       explicit SparseMatrixELL(const Index C_in = 32) :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating SparseMatrixELL");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(C_in);
@@ -439,7 +438,6 @@ namespace FEAST
       explicit SparseMatrixELL(Index rows_in, Index columns_in, const Index C_in = 32) :
         Container<Mem_, DT_, IT_> (rows_in * columns_in)
       {
-        CONTEXT("When creating SparseMatrixELL");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(C_in);
@@ -459,7 +457,6 @@ namespace FEAST
       explicit SparseMatrixELL(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
         Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
       {
-        CONTEXT("When creating SparseMatrixELL");
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
@@ -486,8 +483,6 @@ namespace FEAST
       explicit SparseMatrixELL(const MT_ & other, const Index C_in = 32) :
         SparseMatrixELL(C_in)
       {
-        CONTEXT("When creating SparseMatrixELL");
-
         convert(other);
       }
 
@@ -516,8 +511,6 @@ namespace FEAST
                                const Index C_in = 32) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        CONTEXT("When creating SparseMatrixELL");
-
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(C_in);
@@ -559,8 +552,6 @@ namespace FEAST
       explicit SparseMatrixELL(const Adjacency::Graph & graph, const Index C_in = 32) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixELL");
-
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
         Index num_nnze = graph.get_num_indices();
@@ -638,8 +629,6 @@ namespace FEAST
       explicit SparseMatrixELL(FileMode mode, String filename, const Index C_in = 32) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixELL");
-
         this->assign(SparseMatrixELL(C_in));
         read_from(mode, filename);
       }
@@ -656,8 +645,6 @@ namespace FEAST
       explicit SparseMatrixELL(FileMode mode, std::istream& file, const Index C_in = 32) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixELL");
-
         this->assign(SparseMatrixELL(C_in));
         read_from(mode, file);
       }
@@ -673,7 +660,6 @@ namespace FEAST
       explicit SparseMatrixELL(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixELL");
         deserialise<DT2_, IT2_>(input);
       }
 
@@ -687,7 +673,6 @@ namespace FEAST
       SparseMatrixELL(SparseMatrixELL && other) :
         Container<Mem_, DT_, IT_>(std::forward<SparseMatrixELL>(other))
       {
-        CONTEXT("When moving SparseMatrixELL");
       }
 
       /**
@@ -699,8 +684,6 @@ namespace FEAST
        */
       SparseMatrixELL & operator= (SparseMatrixELL && other)
       {
-        CONTEXT("When moving SparseMatrixELL");
-
         this->move(std::forward<SparseMatrixELL>(other));
 
         return *this;
@@ -715,7 +698,6 @@ namespace FEAST
        */
       SparseMatrixELL shared() const
       {
-        CONTEXT("When sharing SparseMatrixELL");
         SparseMatrixELL r;
         r.assign(*this);
         return r;
@@ -731,7 +713,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixELL<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixELL");
         this->assign(other);
       }
 
@@ -745,8 +726,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixBanded<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixELL");
-
         const Index tC(this->_C());
         this->clear();
 
@@ -895,8 +874,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixELL");
-
         const Index tC(this->_C());
         this->clear();
 
@@ -1001,8 +978,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixELL");
-
         const Index tC(this->_C());
         this->clear();
 
@@ -1119,8 +1094,6 @@ namespace FEAST
       template <typename MT_>
       void convert(const MT_ & a)
       {
-        CONTEXT("When converting SparseMatrixELL");
-
         typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
         ta.convert(a);
 
@@ -1184,8 +1157,6 @@ namespace FEAST
        */
       SparseMatrixELL & operator= (const SparseLayout<Mem_, IT_, layout_id> & layout_in)
       {
-        CONTEXT("When assigning SparseMatrixELL");
-
         for (Index i(0) ; i < this->_elements.size() ; ++i)
           MemoryPool<Mem_>::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
@@ -1249,8 +1220,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in SparseMatrixELL");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -1275,8 +1244,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in SparseMatrixELL");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -1488,8 +1455,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out SparseMatrixELL");
-
         switch(mode)
         {
         case FileMode::fm_ell:
@@ -1514,8 +1479,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out SparseMatrixELL");
-
         switch(mode)
         {
         case FileMode::fm_ell:
@@ -1614,8 +1577,6 @@ namespace FEAST
        */
       DT_ operator()(Index row, Index col) const
       {
-        CONTEXT("When retrieving SparseMatrixELL element");
-
         ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix ell row size " + stringify(rows()) + " !");
         ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix ell column size " + stringify(columns()) + " !");
 
@@ -2236,11 +2197,9 @@ namespace FEAST
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        CONTEXT("Graph::image_end()");
         ASSERT(domain_node < rows(), "Domain node index out of range");
         return ImageIterator(&col_ind()[cs()[domain_node/C()] + domain_node%C() + rl()[domain_node] * C()], C());
       }
-
 
       /**
        * \brief SparseMatrixELL comparison operator
@@ -2250,8 +2209,6 @@ namespace FEAST
        */
       template <typename Mem2_> friend bool operator== (const SparseMatrixELL & a, const SparseMatrixELL<Mem2_, DT_, IT_> & b)
       {
-        CONTEXT("When comparing SparseMatrixELLs");
-
         if (a.rows() != b.rows())
           return false;
         if (a.columns() != b.columns())

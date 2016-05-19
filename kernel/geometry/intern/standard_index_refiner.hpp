@@ -2886,8 +2886,6 @@ namespace FEAST
           const Index num_entities[],
           const IndexSetHolderType& index_set_holder_in)
         {
-          CONTEXT(name() + "::refine()");
-
           // recursive call of IndexRefineFaceWrapper
           IndexRefineFaceWrapper<Shape_, cell_dim_, face_dim_ - 1>
             ::refine(index_set_wrapper_out, num_entities, index_set_holder_in);
@@ -2929,8 +2927,6 @@ namespace FEAST
           const Index num_entities[],
           const IndexSetHolderType& index_set_holder_in)
         {
-          CONTEXT(name() + "::refine()");
-
           // fetch output index set
           IndexSetType& index_set_out = index_set_wrapper_out.template get_index_set<0>();
 
@@ -2970,8 +2966,6 @@ namespace FEAST
           const Index num_entities[],
           const IndexSetHolderType& index_set_holder_in)
         {
-          CONTEXT(name() + "::refine()");
-
           // recursive call of IndexRefineWrapper
           IndexRefineWrapper<Shape_, cell_dim_ - 1>
             ::refine(index_set_holder_out, num_entities, index_set_holder_in);
@@ -3006,8 +3000,6 @@ namespace FEAST
           const Index num_entities[],
           const IndexSetHolderType& index_set_holder_in)
         {
-          CONTEXT(name() + "::refine()");
-
           // fetch output index set wrapper
           IndexSetWrapperType& index_set_wrapper_out = index_set_holder_out.template get_index_set_wrapper<1>();
 

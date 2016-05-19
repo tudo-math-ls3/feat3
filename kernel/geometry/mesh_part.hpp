@@ -207,7 +207,6 @@ namespace FEAST
           _target_set_holder(num_entities),
           _mesh_attributes()
           {
-            CONTEXT(name() + "::MeshPart()");
             for(int i(0); i <= shape_dim; ++i)
               _num_entities[i] = num_entities[i];
 
@@ -226,8 +225,6 @@ namespace FEAST
           _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
           _mesh_attributes()
           {
-            CONTEXT(name() + "::MeshPart() [factory]");
-
             // Compute entity counts
             Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
 
@@ -249,8 +246,6 @@ namespace FEAST
         /// Virtual destructor
         virtual ~MeshPart()
         {
-          CONTEXT(name() + "::~MeshPart()");
-
           if(_index_set_holder != nullptr)
             delete _index_set_holder;
 
@@ -298,7 +293,6 @@ namespace FEAST
          */
         Index get_num_entities(int dim) const
         {
-          CONTEXT(name() + "::get_num_entities()");
           ASSERT_(dim >= 0);
           ASSERT_(dim <= shape_dim);
           return _num_entities[dim];
@@ -317,7 +311,6 @@ namespace FEAST
          */
         MeshAttributeType* find_attribute(const String& identifier)
         {
-          CONTEXT(name() + "::find_mesh_part_node()");
           MeshAttributeIterator it(_mesh_attributes.find(identifier));
           return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
         }
@@ -325,7 +318,6 @@ namespace FEAST
         /** \copydoc find_attribute() */
         const MeshAttributeType* find_attribute(const String& identifier) const
         {
-          CONTEXT(name() + "::find_mesh_part_node()[const]");
           MeshAttributeConstIterator it(_mesh_attributes.find(identifier));
           return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
         }
@@ -366,7 +358,6 @@ namespace FEAST
          */
         virtual bool add_attribute(MeshAttributeType* attribute, const String& identifier)
         {
-          CONTEXT(name() + "::add_attribute()");
           if(attribute != nullptr || (attribute->get_num_vertices() != get_num_entities(0)) )
           {
             return (_mesh_attributes.insert( std::make_pair(identifier, attribute))).second;
@@ -390,7 +381,6 @@ namespace FEAST
         template<int cell_dim_, int face_dim_>
         typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set()
         {
-          CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">()");
           return _index_set_holder->template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
         }
 
@@ -398,7 +388,6 @@ namespace FEAST
         template<int cell_dim_, int face_dim_>
         const typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set() const
         {
-          CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">() [const]");
           ASSERT(has_topology(), "Requested index_set of MeshPart without topology!");
           return _index_set_holder->template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
         }
@@ -408,14 +397,12 @@ namespace FEAST
         /// Returns a reference to the index set holder of the mesh.
         IndexSetHolderType* get_topology()
         {
-          CONTEXT(name() + "::get_topology()");
           return _index_set_holder;
         }
 
         /// \copydoc get_topology()
         const IndexSetHolderType* get_topology() const
         {
-          CONTEXT(name() + "::get_topology() [const]");
           return _index_set_holder;
         }
         /// \endcond
@@ -432,7 +419,6 @@ namespace FEAST
         template<int cell_dim_>
         typename TargetSet<cell_dim_>::Type& get_target_set()
         {
-          CONTEXT(name() + "::get_target_set<" + stringify(cell_dim_) + ">()");
           static_assert(cell_dim_ >= 0, "invalid cell dimension");
           static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
           return _target_set_holder.template get_target_set<cell_dim_>();
@@ -442,7 +428,6 @@ namespace FEAST
         template<int cell_dim_>
         const typename TargetSet<cell_dim_>::Type& get_target_set() const
         {
-          CONTEXT(name() + "::get_target_set<" + stringify(cell_dim_) + ">() [const]");
           static_assert(cell_dim_ >= 0, "invalid cell dimension");
           static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
           return _target_set_holder.template get_target_set<cell_dim_>();
@@ -455,14 +440,12 @@ namespace FEAST
          */
         TargetSetHolderType& get_target_set_holder()
         {
-          CONTEXT(name() + "::get_target_set_holder()");
           return _target_set_holder;
         }
 
         /// \copydoc get_target_set_holder()
         const TargetSetHolderType& get_target_set_holder() const
         {
-          CONTEXT(name() + "::get_target_set_holder() [const]");
           return _target_set_holder;
         }
         /// \endcond

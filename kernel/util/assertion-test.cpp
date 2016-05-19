@@ -39,9 +39,6 @@ public:
 
   virtual void run() const override
   {
-    CONTEXT("When breaching the surface");
-    CONTEXT("When going deeper");
-    CONTEXT("When reaching the ground");
     TEST_CHECK_THROWS(ASSERT(false, "Should throw!"), Assertion);
 
     bool no_exception_thrown(true);

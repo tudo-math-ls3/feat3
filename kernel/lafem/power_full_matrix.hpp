@@ -115,8 +115,6 @@ namespace FEAST
        */
       explicit PowerFullMatrix(FileMode mode, String filename)
       {
-        CONTEXT("When creating PowerFullMatrix");
-
         ContClass other(mode, filename);
         _container = std::move(other);
       }
@@ -131,8 +129,6 @@ namespace FEAST
        */
       explicit PowerFullMatrix(FileMode mode, std::istream& file, String directory = "")
       {
-        CONTEXT("When creating PowerFullMatrix");
-
         ContClass other(mode, file, directory);
         _container = std::move(other);
       }
@@ -145,8 +141,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in PowerFullMatrix");
-
         ContClass other(mode, filename);
         _container = std::move(other);
       }
@@ -179,8 +173,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out PowerFullMatrix");
-
         _container.write_out(mode, filename);
       }
 
@@ -378,7 +370,6 @@ namespace FEAST
       template <typename SubType2_>
       void convert(const PowerFullMatrix<SubType2_, width_, height_> & other)
       {
-        CONTEXT("When converting PowerFullMatrix");
         _container.convert(other._container);
       }
 
@@ -391,8 +382,6 @@ namespace FEAST
       template <typename Mem2_>
       friend bool operator== (const PowerFullMatrix & a, const ContainerType<Mem2_> & b)
       {
-        CONTEXT("When comparing PowerFullMatrices");
-
         return a._container == b._container;
       }
     }; // class PowerFullMatrix

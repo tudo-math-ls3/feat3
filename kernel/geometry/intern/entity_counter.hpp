@@ -38,7 +38,6 @@ namespace FEAST
 
         static Index count(const Index num_entities[])
         {
-          CONTEXT(name() + "::count()");
           typedef typename Shape::FaceTraits<Shape_, cell_dim_>::ShapeType CellType;
           return EntityCounter<RefineTraits_, Shape_, face_dim_, cell_dim_-1>::count(num_entities) +
             RefineTraits_<CellType, face_dim_>::count * num_entities[cell_dim_];
@@ -67,7 +66,6 @@ namespace FEAST
 
         static Index count(const Index num_entities[])
         {
-          CONTEXT(name() + "::count()");
           typedef typename Shape::FaceTraits<Shape_, cell_dim_>::ShapeType CellType;
           return RefineTraits_<CellType, cell_dim_>::count * num_entities[cell_dim_];
         }
@@ -115,7 +113,6 @@ namespace FEAST
           */
         static void query(Index num_entities[])
         {
-          CONTEXT(name() + "::query()");
           EntityCountWrapper<RefineTraits_, Shape_, face_dim_-1>::query(num_entities);
           num_entities[face_dim_] = EntityCounter<RefineTraits_, Shape_, face_dim_>::count(num_entities);
         }
@@ -133,7 +130,6 @@ namespace FEAST
 
         static void query(Index num_entities[])
         {
-          CONTEXT(name() + "::query()");
           num_entities[0] = EntityCounter<RefineTraits_, Shape_, 0>::count(num_entities);
         }
       }; // struct EntityCountWrapper<Shape_, 0>

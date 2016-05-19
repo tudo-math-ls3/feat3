@@ -449,7 +449,6 @@ namespace FEAST
       explicit SparseMatrixCOO() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating SparseMatrixCOO");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -469,7 +468,6 @@ namespace FEAST
       explicit SparseMatrixCOO(Index dimensions) :
         Container<Mem_, DT_, IT_>(dimensions * dimensions)
       {
-        CONTEXT("When creating SparseMatrixCOO");
         this->_scalar_index.push_back(dimensions);
         this->_scalar_index.push_back(dimensions);
         this->_scalar_index.push_back(0);
@@ -490,7 +488,6 @@ namespace FEAST
       explicit SparseMatrixCOO(Index rows_in, Index columns_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        CONTEXT("When creating SparseMatrixCOO");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(0);
@@ -510,7 +507,6 @@ namespace FEAST
       explicit SparseMatrixCOO(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
         Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
       {
-        CONTEXT("When creating SparseMatrixCOO");
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
@@ -534,8 +530,6 @@ namespace FEAST
       explicit SparseMatrixCOO(const MT_ & other) :
         Container<Mem_, DT_, IT_>(other.size())
       {
-        CONTEXT("When creating SparseMatrixCOO");
-
         convert(other);
       }
 
@@ -554,7 +548,6 @@ namespace FEAST
                                DenseVector<Mem_, IT_, IT_> & col_ind, DenseVector<Mem_, DT_, IT_> & val_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        CONTEXT("When creating SparseMatrixCOO");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(val_in.size());
@@ -586,8 +579,6 @@ namespace FEAST
       explicit SparseMatrixCOO(const Adjacency::Graph & graph) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixCOO");
-
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
         Index num_nnze = graph.get_num_indices();
@@ -627,8 +618,6 @@ namespace FEAST
       explicit SparseMatrixCOO(FileMode mode, String filename) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixCOO");
-
         read_from(mode, filename);
       }
 
@@ -643,8 +632,6 @@ namespace FEAST
       explicit SparseMatrixCOO(FileMode mode, std::istream& file) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixCOO");
-
         read_from(mode, file);
       }
 
@@ -659,7 +646,6 @@ namespace FEAST
       explicit SparseMatrixCOO(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixCOO");
         deserialise<DT2_, IT2_>(input);
       }
 
@@ -673,7 +659,6 @@ namespace FEAST
       SparseMatrixCOO(SparseMatrixCOO && other) :
         Container<Mem_, DT_, IT_>(std::forward<SparseMatrixCOO>(other))
       {
-        CONTEXT("When moving SparseMatrixCOO");
       }
 
       /**
@@ -685,8 +670,6 @@ namespace FEAST
        */
       SparseMatrixCOO & operator= (SparseMatrixCOO && other)
       {
-        CONTEXT("When moving SparseMatrixCOO");
-
         this->move(std::forward<SparseMatrixCOO>(other));
 
         return *this;
@@ -702,7 +685,6 @@ namespace FEAST
        */
       SparseMatrixCOO shared() const
       {
-        CONTEXT("When sharing SparseMatrixCOO");
         SparseMatrixCOO r;
         r.assign(*this);
         return r;
@@ -720,7 +702,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixCOO");
         this->clone(other);
       }
 
@@ -734,8 +715,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixCOO");
-
         this->clear();
 
         this->_scalar_index.push_back(other.size());
@@ -806,8 +785,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixELL<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixCOO");
-
         this->clear();
 
         this->_scalar_index.push_back(other.size());
@@ -883,8 +860,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixBanded<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixCOO");
-
         this->clear();
 
         this->_scalar_index.push_back(other.size());
@@ -984,8 +959,6 @@ namespace FEAST
       template <typename MT_>
       void convert(const MT_ & a)
       {
-        CONTEXT("When converting SparseMatrixCOO");
-
         typename MT_::template ContainerType<Mem::Main, DT_, IT_> ta;
         ta.convert(a);
 
@@ -1073,8 +1046,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in SparseMatrixCOO");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -1099,8 +1070,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in SparseMatrixCOO");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -1276,8 +1245,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out SparseMatrixCOO");
-
         if (sorted() == 0)
           const_cast<SparseMatrixCOO *>(this)->sort();
 
@@ -1306,8 +1273,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out SparseMatrixCOO");
-
         if (sorted() == 0)
           const_cast<SparseMatrixCOO *>(this)->sort();
 
@@ -1396,8 +1361,6 @@ namespace FEAST
        */
       void operator()(Index row, Index col, DT_ value)
       {
-        CONTEXT("When setting SparseMatrixCOO element");
-
         ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->rows()) + " !");
         ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->columns()) + " !");
 
@@ -1522,8 +1485,6 @@ namespace FEAST
        */
       DT_ operator()(Index row, Index col) const
       {
-        CONTEXT("When retrieving SparseMatrixCOO element");
-
         ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->rows()) + " !");
         ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->columns()) + " !");
 
@@ -2056,7 +2017,6 @@ namespace FEAST
        */
       template <typename Mem2_> friend bool operator== (const SparseMatrixCOO & a, const SparseMatrixCOO<Mem2_, DT_, IT_> & b)
       {
-        CONTEXT("When comparing SparseMatrixCOOs");
         if (a.rows() != b.rows())
           return false;
         if (a.columns() != b.columns())

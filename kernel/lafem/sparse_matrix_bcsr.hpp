@@ -265,7 +265,6 @@ namespace FEAST
       explicit SparseMatrixBCSR() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating SparseMatrixBCSR");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -282,7 +281,6 @@ namespace FEAST
       explicit SparseMatrixBCSR(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
         Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
       {
-        CONTEXT("When creating SparseMatrixBCSR");
         this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
@@ -305,8 +303,6 @@ namespace FEAST
       explicit SparseMatrixBCSR(const Adjacency::Graph & graph) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixCSR");
-
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
         Index num_nnze = graph.get_num_indices();
@@ -346,8 +342,6 @@ namespace FEAST
       explicit SparseMatrixBCSR(FileMode mode, String filename) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixBCSR");
-
         read_from(mode, filename);
       }
 
@@ -362,8 +356,6 @@ namespace FEAST
       explicit SparseMatrixBCSR(FileMode mode, std::istream& file) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixBCSR");
-
         read_from(mode, file);
       }
 
@@ -383,7 +375,6 @@ namespace FEAST
                                       DenseVector<Mem_, IT_, IT_> & col_ind_in, DenseVector<Mem_, DT_, IT_> & val_in, DenseVector<Mem_, IT_, IT_> & row_ptr_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        CONTEXT("When creating SparseMatrixBCSR");
         ASSERT(val_in.size() % (BlockHeight_ * BlockWidth_) == 0, "Error: " + stringify(val_in.size()) + " not multiple of container blocksize!");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
@@ -414,7 +405,6 @@ namespace FEAST
       explicit SparseMatrixBCSR(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseMatrixBCSR");
         deserialise<DT2_, IT2_>(input);
       }
 
@@ -428,7 +418,6 @@ namespace FEAST
       SparseMatrixBCSR(SparseMatrixBCSR && other) :
         Container<Mem_, DT_, IT_>(std::forward<SparseMatrixBCSR>(other))
       {
-        CONTEXT("When moving SparseMatrixBCSR");
       }
 
       /**
@@ -440,8 +429,6 @@ namespace FEAST
        */
       SparseMatrixBCSR & operator= (SparseMatrixBCSR && other)
       {
-        CONTEXT("When moving SparseMatrixBCSR");
-
         this->move(std::forward<SparseMatrixBCSR>(other));
 
         return *this;
@@ -456,7 +443,6 @@ namespace FEAST
        */
       SparseMatrixBCSR shared() const
       {
-        CONTEXT("When sharing SparseMatrixBCSR");
         SparseMatrixBCSR r;
         r.assign(*this);
         return r;
@@ -472,7 +458,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseMatrixBCSR<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
       {
-        CONTEXT("When converting SparseMatrixBCSR");
         this->assign(other);
       }
 
@@ -485,8 +470,6 @@ namespace FEAST
        */
       SparseMatrixBCSR & operator= (const SparseLayout<Mem_, IT_, layout_id> & layout_in)
       {
-        CONTEXT("When assigning SparseMatrixBCSR");
-
         for (Index i(0) ; i < this->_elements.size() ; ++i)
           MemoryPool<Mem_>::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
@@ -550,8 +533,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in SparseMatrixBCSR");
-
         switch(mode)
         {
         /// \todo read_from_mtx
@@ -577,8 +558,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in SparseMatrixBCSR");
-
         switch(mode)
         {
         /*case FileMode::fm_mtx:
@@ -774,8 +753,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out SparseMatrixBCSR");
-
         switch(mode)
         {
         case FileMode::fm_bcsr:
@@ -800,8 +777,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out SparseMatrixBCSR");
-
         switch(mode)
         {
         case FileMode::fm_bcsr:
@@ -899,8 +874,6 @@ namespace FEAST
        */
       Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> operator()(Index row, Index col) const
       {
-        CONTEXT("When retrieving SparseMatrixBCSR element");
-
         ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(rows()) + " !");
         ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(columns()) + " !");
 
@@ -1661,8 +1634,6 @@ namespace FEAST
       template <typename Mem2_>
       friend bool operator== (const SparseMatrixBCSR & a, const SparseMatrixBCSR<Mem2_, DT_, IT_, BlockHeight_, BlockWidth_> & b)
       {
-        CONTEXT("When comparing SparseMatrixBCSRs");
-
         if (a.rows() != b.rows())
           return false;
         if (a.columns() != b.columns())

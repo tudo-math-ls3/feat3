@@ -27,7 +27,6 @@
    */                                                             \
   TContainer clone(CloneMode clone_mode = CloneMode::Weak) const  \
   {                                                               \
-    CONTEXT("When cloning TContainer");                           \
     TContainer t;                                                 \
     t.clone(*this, clone_mode);                                   \
     return t;                                                     \
@@ -44,7 +43,6 @@
    */                                                                   \
   TContainer clone(CloneMode clone_mode = CloneMode::Deep) const        \
   {                                                                     \
-    CONTEXT("When cloning TContainer");                                 \
     TContainer t;                                                       \
     t.clone(*this, clone_mode);                                         \
     return t;                                                           \
@@ -233,8 +231,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void assign(const Container<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When assigning Container");
-
         for (Index i(0) ; i < this->_elements.size() ; ++i)
           MemoryPool<Mem_>::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < this->_indices.size() ; ++i)
@@ -597,7 +593,6 @@ namespace FEAST
        */
       explicit Container(Index size_in)
       {
-        CONTEXT("When creating Container");
         _scalar_index.push_back(size_in);
       }
 
@@ -608,8 +603,6 @@ namespace FEAST
        */
       virtual ~Container()
       {
-        CONTEXT("When destroying Container");
-
         for (Index i(0) ; i < _elements.size() ; ++i)
           MemoryPool<Mem_>::release_memory(_elements.at(i));
         for (Index i(0) ; i < _indices.size() ; ++i)
@@ -631,7 +624,6 @@ namespace FEAST
         _scalar_index(std::move(other._scalar_index)),
         _scalar_dt(std::move(other._scalar_dt))
       {
-        CONTEXT("When moving Container");
         other._elements.clear();
         other._indices.clear();
         other._elements_size.clear();
@@ -648,8 +640,6 @@ namespace FEAST
        */
       void format(DT_ value = DT_(0))
       {
-        CONTEXT("When formating Container");
-
         for (Index i(0) ; i < _elements.size() ; ++i)
           MemoryPool<Mem_>::set_memory(_elements.at(i), value, _elements_size.at(i));
       }
@@ -660,8 +650,6 @@ namespace FEAST
        */
       virtual void clear()
       {
-        CONTEXT("When clearing Container");
-
         for (Index i(0) ; i < _elements.size() ; ++i)
           MemoryPool<Mem_>::release_memory(this->_elements.at(i));
         for (Index i(0) ; i < _indices.size() ; ++i)
@@ -685,8 +673,6 @@ namespace FEAST
        */
       void clone(const Container & other, CloneMode clone_mode = CloneMode::Weak)
       {
-        CONTEXT("When cloning Container");
-
         if (this == &other)
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Trying to self-clone a lafem container!");
@@ -756,7 +742,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void clone(const Container<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)
       {
-        CONTEXT("When cloning Container");
         Container t(other.size());
         t.assign(other);
         clone(t, clone_mode);
@@ -771,8 +756,6 @@ namespace FEAST
        */
       void move(Container && other)
       {
-        CONTEXT("When moving Container");
-
         if (this == &other)
           return;
 

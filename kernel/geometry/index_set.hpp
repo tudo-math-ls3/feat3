@@ -78,7 +78,6 @@ namespace FEAST
         _index_bound(index_bound),
         _indices(nullptr)
       {
-        CONTEXT(name() + "::IndexSet()");
         if(num_entities > 0)
         {
           _indices = new IndexVectorType[num_entities];
@@ -112,7 +111,6 @@ namespace FEAST
       /// virtual destructor
       virtual ~IndexSet()
       {
-        CONTEXT(name() + "::~IndexSet()");
         if(_indices != nullptr)
         {
           delete [] _indices;
@@ -159,7 +157,6 @@ namespace FEAST
        */
       Index get_num_entities() const
       {
-        CONTEXT(name() + "::get_num_entities()");
         return _num_entities;
       }
 
@@ -170,7 +167,6 @@ namespace FEAST
        */
       Index get_index_bound() const
       {
-        CONTEXT(name() + "::get_index_bound()");
         return _index_bound;
       }
 
@@ -181,14 +177,12 @@ namespace FEAST
        */
       IndexVectorType* get_indices()
       {
-        CONTEXT(name() + "::get_indices()");
         return _indices;
       }
 
       /** \copydoc get_indices() */
       const IndexVectorType* get_indices() const
       {
-        CONTEXT(name() + "::get_indices() [const]");
         return _indices;
       }
 
@@ -203,7 +197,6 @@ namespace FEAST
        */
       IndexVectorReference operator[](Index i)
       {
-        CONTEXT(name() + "::operator[]()");
         ASSERT_(_indices != nullptr);
         ASSERT_(i < _num_entities);
         return _indices[i];
@@ -212,7 +205,6 @@ namespace FEAST
       /** \copydoc operator[]() */
       ConstIndexVectorReference operator[](Index i) const
       {
-        CONTEXT(name() + "::operator[]() [const]");
         ASSERT_(_indices != nullptr);
         ASSERT_(i < _num_entities);
         return _indices[i];
@@ -232,7 +224,6 @@ namespace FEAST
        */
       Index& operator()(Index i, Index j)
       {
-        CONTEXT(name() + "::operator()()");
         ASSERT_(_indices != nullptr);
         ASSERT_(i < _num_entities);
         ASSERT_(j < Index(num_indices));
@@ -254,7 +245,6 @@ namespace FEAST
        */
       const Index& operator()(Index i, Index j) const
       {
-        CONTEXT(name() + "::operator()()");
         ASSERT_(_indices != nullptr);
         ASSERT_(i < _num_entities);
         ASSERT_(j < Index(num_indices));
@@ -269,7 +259,6 @@ namespace FEAST
        */
       void set_index_bound(Index bound)
       {
-        CONTEXT(name() + "::set_index_bound()");
         _index_bound = bound;
       }
 
@@ -301,7 +290,6 @@ namespace FEAST
       /** \copydoc Adjacency::Adjactor::image_begin() */
       ImageIterator image_begin(Index domain_node) const
       {
-        CONTEXT(name() + "::image_begin()");
         ASSERT_(_indices != nullptr);
         ASSERT_(domain_node < _num_entities);
         return &_indices[domain_node][0];
@@ -310,7 +298,6 @@ namespace FEAST
       /** \copydoc Adjacency::Adjactor::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
-        CONTEXT(name() + "::image_end()");
         ASSERT_(_indices != nullptr);
         ASSERT_(domain_node < _num_entities);
         return &_indices[domain_node][num_indices];
@@ -345,32 +332,27 @@ namespace FEAST
           num_entities[Shape_::dimension],
           num_entities[face_dim_])
       {
-        CONTEXT(name() + "::IndexSetWrapper(const Index*)");
       }
 
       explicit IndexSetWrapper() :
         BaseClass(),
         _index_set()
       {
-        CONTEXT(name() + "::IndexSetWrapper()");
       }
 
       IndexSetWrapper(const IndexSetWrapper& other) :
         BaseClass(other),
         _index_set(other._index_set)
       {
-        CONTEXT(name() + "::IndexSetWrapper(const IndexSetWrapper&)");
       }
 
       virtual ~IndexSetWrapper()
       {
-        CONTEXT(name() + "::~IndexSetWrapper()");
       }
 
       template<int face_dim__>
       IndexSet<Shape::FaceTraits<Shape_, face_dim__>::count>& get_index_set()
       {
-        CONTEXT(name() + "::get_index_set()");
         static_assert(face_dim__ >= 0, "invalid face dimension");
         static_assert(face_dim__ < Shape_::dimension, "invalid face dimension");
         return IndexSetWrapper<Shape_, face_dim__>::_index_set;
@@ -379,7 +361,6 @@ namespace FEAST
       template<int face_dim__>
       const IndexSet<Shape::FaceTraits<Shape_, face_dim__>::count>& get_index_set() const
       {
-        CONTEXT(name() + "::get_index_set() [const]");
         static_assert(face_dim__ >= 0, "invalid face dimension");
         static_assert(face_dim__ < Shape_::dimension, "invalid face dimension");
         return IndexSetWrapper<Shape_, face_dim__>::_index_set;
@@ -413,30 +394,25 @@ namespace FEAST
           num_entities[Shape_::dimension],
           num_entities[0])
       {
-        CONTEXT(name() + "::IndexSetWrapper(const Index*)");
       }
 
       IndexSetWrapper(const IndexSetWrapper& other) :
         _index_set(other._index_set)
       {
-        CONTEXT(name() + "::IndexSetWrapper(const IndexSetWrapper&)");
       }
 
       explicit IndexSetWrapper() :
         _index_set()
       {
-        CONTEXT(name() + "::IndexSetWrapper()");
       }
 
       virtual ~IndexSetWrapper()
       {
-        CONTEXT(name() + "::~IndexSetWrapper()");
       }
 
       template<int face_dim__>
       IndexSet<Shape::FaceTraits<Shape_, face_dim__>::count>& get_index_set()
       {
-        CONTEXT(name() + "::get_index_set<" + stringify(face_dim__) + ">()");
         static_assert(face_dim__ == 0, "invalid face dimension");
         return IndexSetWrapper<Shape_, face_dim__>::_index_set;
       }
@@ -444,7 +420,6 @@ namespace FEAST
       template<int face_dim__>
       const IndexSet<Shape::FaceTraits<Shape_, face_dim__>::count>& get_index_set() const
       {
-        CONTEXT(name() + "::get_index_set<" + stringify(face_dim__) + ">() [const]");
         static_assert(face_dim__ == 0, "invalid face dimension");
         return IndexSetWrapper<Shape_, face_dim__>::_index_set;
       }
@@ -524,32 +499,27 @@ namespace FEAST
         BaseClass(num_entities),
         _index_set_wrapper(num_entities)
       {
-        CONTEXT(name() + "::IndexSetHolder(Index*)");
       }
 
       IndexSetHolder(const IndexSetHolder& other) :
         BaseClass(other),
         _index_set_wrapper(other._index_set_wrapper)
       {
-        CONTEXT(name() + "::IndexSetHolder(IndexSetHolder&)");
       }
 
       explicit IndexSetHolder() :
         BaseClass(),
         _index_set_wrapper()
-        {
-          CONTEXT(name() + "::IndexSetHolder()");
-        }
+      {
+      }
 
       virtual ~IndexSetHolder()
       {
-        CONTEXT(name() + "::~IndexSetHolder()");
       }
 
       template<int shape_dim_>
       IndexSetWrapper<typename Shape::FaceTraits<Shape_, shape_dim_>::ShapeType>& get_index_set_wrapper()
       {
-        CONTEXT(name() + "::get_index_set_wrapper<" + stringify(shape_dim_) + ">()");
         static_assert(shape_dim_ > 0, "invalid shape dimension");
         static_assert(shape_dim_ <= Shape_::dimension, "invalid shape dimension");
         typedef typename Shape::FaceTraits<Shape_, shape_dim_>::ShapeType ShapeType;
@@ -559,7 +529,6 @@ namespace FEAST
       template<int shape_dim_>
       const IndexSetWrapper<typename Shape::FaceTraits<Shape_, shape_dim_>::ShapeType>& get_index_set_wrapper() const
       {
-        CONTEXT(name() + "::get_index_set_wrapper<" + stringify(shape_dim_) + ">() [const]");
         static_assert(shape_dim_ > 0, "invalid shape dimension");
         static_assert(shape_dim_ <= Shape_::dimension, "invalid shape dimension");
         typedef typename Shape::FaceTraits<Shape_, shape_dim_>::ShapeType ShapeType;
@@ -579,7 +548,6 @@ namespace FEAST
         ::count>&
       get_index_set()
       {
-        CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">");
         static_assert(cell_dim_ <= Shape_::dimension, "invalid cell dimension");
         static_assert(face_dim_ < cell_dim_, "invalid face/cell dimension");
         static_assert(face_dim_ >= 0, "invalid face dimension");
@@ -599,7 +567,6 @@ namespace FEAST
         ::count>&
       get_index_set() const
       {
-        CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + "> [const]");
         static_assert(cell_dim_ <= Shape_::dimension, "invalid cell dimension");
         static_assert(face_dim_ < cell_dim_, "invalid face/cell dimension");
         static_assert(face_dim_ >= 0, "invalid face dimension");
@@ -623,22 +590,18 @@ namespace FEAST
     public:
       explicit IndexSetHolder(const Index* /*num_entities*/)
       {
-        CONTEXT(name() + "::IndexSetHolder(Index*)");
       }
 
       IndexSetHolder(const IndexSetHolder&)
       {
-        CONTEXT(name() + "::IndexSetHolder(IndexSetHolder&)");
       }
 
       explicit IndexSetHolder()
       {
-        CONTEXT(name() + "::IndexSetHolder()");
       }
 
       virtual ~IndexSetHolder()
       {
-        CONTEXT(name() + "::~IndexSetHolder()");
       }
 
       static String name()

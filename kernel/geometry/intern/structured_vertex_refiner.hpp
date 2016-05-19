@@ -33,8 +33,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const Index num_slices_coarse[])
         {
-          CONTEXT("StructuredVertexRefiner<Hypercube<1>,...>::refine");
-
           // create a vertex-abacus object
           VertexAbacus<VertexSetType> abacus(vertex_set_in);
 
@@ -73,8 +71,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const Index num_slices_coarse[])
         {
-          CONTEXT("StructuredVertexRefiner<Hypercube<2>,...>::refine");
-
           // create a vertex-abacus object
           VertexAbacus<VertexSetType> abacus(vertex_set_in);
 
@@ -145,8 +141,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const Index num_slices_coarse[])
         {
-          CONTEXT("StructuredVertexRefiner<Hypercube<3>,...>::refine");
-
           // create a vertex-abacus object
           VertexAbacus<VertexSetType> abacus(vertex_set_in);
 

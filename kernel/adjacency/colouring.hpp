@@ -144,14 +144,12 @@ namespace FEAST
        */
       Index* get_colouring()
       {
-        CONTEXT("Colouring::get_colouring()");
         return _colouring;
       }
 
       /** \copydoc get_colouring() */
       const Index* get_colouring() const
       {
-        CONTEXT("Colouring::get_colouring()");
         return _colouring;
       }
 
@@ -162,7 +160,6 @@ namespace FEAST
        */
       Index get_num_nodes() const
       {
-        CONTEXT("Colouring::get_num_nodes()");
         return _num_nodes;
       }
 
@@ -173,7 +170,6 @@ namespace FEAST
        */
       Index get_max_colour() const
       {
-        CONTEXT("Colouring::get_max_colours()");
         return _num_colours - 1;
       }
     }; // class Colouring

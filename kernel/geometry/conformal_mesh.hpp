@@ -115,7 +115,6 @@ namespace FEAST
         _index_set_holder(num_entities),
         _neighbours(num_entities[shape_dim])
       {
-        CONTEXT(name() + "::ConformalMesh(const Index[])");
         for(int i(0); i <= shape_dim; ++i)
         {
           //ASSERT(num_entities[i] > 0, "Number of entities must not be zero!");
@@ -136,8 +135,6 @@ namespace FEAST
         _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
         _neighbours(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities[shape_dim])
       {
-        CONTEXT(name() + "::ConformalMesh() [factory]");
-
         // Compute entity counts
         Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
 
@@ -170,7 +167,6 @@ namespace FEAST
         _index_set_holder(other.get_index_set_holder()),
         _neighbours(other.get_neighbours())
       {
-        CONTEXT(name() + "::ConformalMesh() [copy]");
         for(int i(0); i <= shape_dim; ++i)
         {
           _num_entities[i] = other.get_num_entities(i);
@@ -180,7 +176,6 @@ namespace FEAST
       /// virtual destructor
       virtual ~ConformalMesh()
       {
-        CONTEXT(name() + "::~ConformalMesh()");
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
@@ -200,7 +195,6 @@ namespace FEAST
        */
       Index get_num_entities(int dim) const
       {
-        CONTEXT(name() + "::get_num_entities()");
         ASSERT_(dim >= 0);
         ASSERT_(dim <= shape_dim);
         return _num_entities[dim];
@@ -237,14 +231,12 @@ namespace FEAST
       /// Returns a reference to the vertex set of the mesh.
       VertexSetType& get_vertex_set()
       {
-        CONTEXT(name() + "::get_vertex_set()");
         return _vertex_set;
       }
 
       /** \copydoc get_vertex_set() */
       const VertexSetType& get_vertex_set() const
       {
-        CONTEXT(name() + "::get_vertex_set() [const]");
         return _vertex_set;
       }
 
@@ -265,7 +257,6 @@ namespace FEAST
         int face_dim_>
       typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set()
       {
-        CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">()");
         return _index_set_holder.template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
       }
 
@@ -275,32 +266,27 @@ namespace FEAST
         int face_dim_>
       const typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set() const
       {
-        CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">() [const]");
         return _index_set_holder.template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
       }
 
       /// \cond internal
       IndexSetHolderType& get_index_set_holder()
       {
-        CONTEXT(name() + "::get_index_set_holder()");
         return _index_set_holder;
       }
 
       const IndexSetHolderType& get_index_set_holder() const
       {
-        CONTEXT(name() + "::get_index_set_holder() [const]");
         return _index_set_holder;
       }
 
       IndexSetHolderType* get_topology()
       {
-        CONTEXT(name() + "::get_topology()");
         return &_index_set_holder;
       }
 
       const IndexSetHolderType* get_topology() const
       {
-        CONTEXT(name() + "::get_topology() [const]");
         return &_index_set_holder;
       }
       /// \endcond

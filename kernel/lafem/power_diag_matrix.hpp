@@ -108,8 +108,6 @@ namespace FEAST
        */
       explicit PowerDiagMatrix(FileMode mode, String filename)
       {
-        CONTEXT("When creating PowerDiagMatrix");
-
         read_from(mode, filename);
       }
 
@@ -125,8 +123,6 @@ namespace FEAST
        */
       explicit PowerDiagMatrix(FileMode mode, std::istream& file, String directory = "")
       {
-        CONTEXT("When creating PowerDiagMatrix");
-
         String line;
         do {
           if (file.eof())
@@ -150,8 +146,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in PowerDiagMatrix");
-
         String directory;
         auto found = filename.rfind("/");
         if (found != std::string::npos)
@@ -205,8 +199,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out PowerDiagMatrix");
-
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
@@ -569,8 +561,6 @@ namespace FEAST
       template <typename SubType2_>
       void convert(const PowerDiagMatrix<SubType2_, blocks_> & other)
       {
-        CONTEXT("When converting PowerDiagMatrix");
-
         this->first().convert(other.first());
         this->rest().convert(other.rest());
       }
@@ -584,8 +574,6 @@ namespace FEAST
       template <typename Mem2_>
       friend bool operator== (const PowerDiagMatrix & a, const ContainerType<Mem2_> & b)
       {
-        CONTEXT("When comparing PowerDiagMatrices");
-
         return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
       }
     };
@@ -655,16 +643,12 @@ namespace FEAST
       /// file-input ctor
       explicit PowerDiagMatrix(FileMode mode, String filename)
       {
-        CONTEXT("When creating PowerDiagMatrix");
-
         read_from(mode, filename);
       }
 
       /// filestream-input ctor
       explicit PowerDiagMatrix(FileMode mode, std::istream& file, String directory = "")
       {
-        CONTEXT("When creating PowerDiagMatrix");
-
         String line;
         do {
           if (file.eof())
@@ -679,8 +663,6 @@ namespace FEAST
 
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in PowerDiagMatrix");
-
         String directory;
         auto found = filename.rfind("/");
         if (found != std::string::npos)
@@ -711,8 +693,6 @@ namespace FEAST
 
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out PowerDiagMatrix");
-
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
@@ -921,8 +901,6 @@ namespace FEAST
       template <typename SubType2_>
       void convert(const PowerDiagMatrix<SubType2_, 1> & other)
       {
-        CONTEXT("When converting PowerDiagMatrix");
-
         this->first().convert(other.first());
       }
 
@@ -935,8 +913,6 @@ namespace FEAST
       template <typename Mem2_>
       friend bool operator== (const PowerDiagMatrix & a, const ContainerType<Mem2_> & b)
       {
-        CONTEXT("When comparing PowerDiagMatrices");
-
         return (a.name() == b.name()) && (a.first() == b.first());
       }
     };

@@ -35,8 +35,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const IndexSetType& index_set_in)
         {
-          CONTEXT("ShapeConvertVertex<...>::refine()");
-
           typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
           typedef typename VertexSetType::VertexReference VertexReference;
           typedef typename VertexSetType::CoordType CoordType;
@@ -92,8 +90,6 @@ namespace FEAST
           VertexSetType& vertex_set_out,
           const VertexSetType& vertex_set_in)
         {
-          CONTEXT("ShapeConvertVertex<Vertex,...>::refine()");
-
           // get the number of coarse mesh vertices
           Index num_verts = vertex_set_in.get_num_vertices();
           ASSERT_(vertex_set_out.get_num_vertices() >= num_verts);
@@ -131,8 +127,6 @@ namespace FEAST
           const VertexSetType& /*vertex_set_in*/,
           const IndexSetType& /*index_set_in*/)
         {
-          CONTEXT("ShapeConvertVertex<Hypercube<1>,...>::refine()");
-
           // Hypercube edges do not generate new vertices
           return 0;
         }
@@ -161,7 +155,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const IndexSetHolderType& index_set_holder_in)
         {
-          CONTEXT("ShapeConvertVertexWrapper<...>::refine()");
           typedef typename Shape::FaceTraits<Shape_, Shape_::dimension-1>::ShapeType FacetType;
 
           // recursive call of ShapeConvertVertexWrapper
@@ -196,8 +189,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const IndexSetHolderType& /*index_set_holder_in*/)
         {
-          CONTEXT("ShapeConvertVertexWrapper<Vertex,...>::refine()");
-
           // call VertexRefiner
           Index num_verts =  ShapeConvertVertex<Shape::Vertex,VertexSet_>
             ::refine(0, vertex_set_out, vertex_set_in);

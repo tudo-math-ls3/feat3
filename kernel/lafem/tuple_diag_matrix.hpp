@@ -109,8 +109,6 @@ namespace FEAST
        */
       explicit TupleDiagMatrix(FileMode mode, String filename)
       {
-        CONTEXT("When creating TupleDiagMatrix");
-
         read_from(mode, filename);
       }
 
@@ -126,8 +124,6 @@ namespace FEAST
        */
       explicit TupleDiagMatrix(FileMode mode, std::istream& file, String directory = "")
       {
-        CONTEXT("When creating TupleDiagMatrix");
-
         String line;
         do {
           if (file.eof())
@@ -148,8 +144,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in TupleDiagMatrix");
-
         String directory;
         auto found = filename.rfind("/");
         if (found != std::string::npos)
@@ -203,8 +197,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out TupleDiagMatrix");
-
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
@@ -525,8 +517,6 @@ namespace FEAST
       template <typename First2_, typename... Rest2_>
       void convert(const TupleDiagMatrix<First2_, Rest2_...>& other)
       {
-        CONTEXT("When converting TupleDiagMatrix");
-
         this->first().convert(other.first());
         this->rest().convert(other.rest());
       }
@@ -541,8 +531,6 @@ namespace FEAST
       template <typename Mem2_>
       friend bool operator== (const TupleDiagMatrix & a, const ContainerType<Mem2_> & b)
       {
-        CONTEXT("When comparing TupleDiagMatrices");
-
         return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
       }
     };
@@ -597,16 +585,12 @@ namespace FEAST
       /// file-input ctor
       explicit TupleDiagMatrix(FileMode mode, String filename)
       {
-        CONTEXT("When creating TupleDiagMatrix");
-
         read_from(mode, filename);
       }
 
       /// filestream-input ctor
       explicit TupleDiagMatrix(FileMode mode, std::istream& file, String directory = "")
       {
-        CONTEXT("When creating TupleDiagMatrix");
-
         String line;
         do {
           if (file.eof())
@@ -620,8 +604,6 @@ namespace FEAST
 
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in TupleDiagMatrix");
-
         String directory;
         auto found = filename.rfind("/");
         if (found != std::string::npos)
@@ -662,8 +644,6 @@ namespace FEAST
 
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out TupleDiagMatrix");
-
         std::ofstream file(filename.c_str(), std::ofstream::out);
         if (! file.is_open())
           throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
@@ -832,8 +812,6 @@ namespace FEAST
       template <typename First2_>
       void convert(const TupleDiagMatrix<First2_>& other)
       {
-        CONTEXT("When converting TupleDiagMatrix");
-
         this->first().convert(other.first());
       }
 
@@ -846,8 +824,6 @@ namespace FEAST
       template <typename Mem2_>
       friend bool operator== (const TupleDiagMatrix & a, const ContainerType<Mem2_> & b)
       {
-        CONTEXT("When comparing TupleDiagMatrices");
-
         return (a.name() == b.name()) && (a.first() == b.first());
       }
     };

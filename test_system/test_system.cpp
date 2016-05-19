@@ -91,7 +91,6 @@ int main(int argc, char** argv)
   for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
       i != i_end ; )
   {
-    CONTEXT("When running test case '" + (*i)->id() + ":");
     try
     {
       std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id()

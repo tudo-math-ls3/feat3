@@ -25,8 +25,6 @@ public:
 
   bool test_c(Colouring& c) const
   {
-    CONTEXT("ColouringTest::test_c()");
-
     // check against analytic solution
     Index col_ref[7] = {0, 0, 1, 1, 1, 2, 2};
 
@@ -46,8 +44,6 @@ public:
 
   bool test_c_ordered(Colouring& c) const
   {
-    CONTEXT("ColouringTest::test_c_ordered()");
-
     // check against analytic solution
     Index col_ref[7] = {2, 2, 1, 1, 0, 0, 0};
 

@@ -263,70 +263,60 @@ namespace FEAST
      */
     EntryMap& get_entry_map()
     {
-      CONTEXT("PropertyMap::get_entry_map()");
       return _values;
     }
 
     /** \copydoc get_entry_map() */
     const EntryMap& get_entry_map() const
     {
-      CONTEXT("PropertyMap::get_entry_map() [const]");
       return _values;
     }
 
     /// Returns the first entry iterator.
     EntryIterator begin_entry()
     {
-      CONTEXT("PropertyMap::begin_entry()");
       return _values.begin();
     }
 
     /** \copydoc begin_entry() */
     ConstEntryIterator begin_entry() const
     {
-      CONTEXT("PropertyMap::begin_entry() [const]");
       return _values.begin();
     }
 
     /// Returns the last entry iterator.
     EntryIterator end_entry()
     {
-      CONTEXT("PropertyMap::end_entry()");
       return _values.end();
     }
 
     /** \copydoc end_entry() */
     ConstEntryIterator end_entry() const
     {
-      CONTEXT("PropertyMap::end_entry() const");
       return _values.end();
     }
 
     /// Returns the first section iterator.
     SectionIterator begin_section()
     {
-      CONTEXT("PropertyMap::begin_section()");
       return _sections.begin();
     }
 
     /** \copydoc begin_section() */
     ConstSectionIterator begin_section() const
     {
-      CONTEXT("PropertyMap::begin_section() [const]");
       return _sections.begin();
     }
 
     /// Returns the last section iterator
     SectionIterator end_section()
     {
-      CONTEXT("PropertyMap::end_section()");
       return _sections.end();
     }
 
     /** \copydoc end_section() */
     ConstSectionIterator end_section() const
     {
-      CONTEXT("PropertyMap::end_section() [const]");
       return _sections.end();
     }
 

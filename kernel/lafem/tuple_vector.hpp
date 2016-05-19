@@ -337,8 +337,6 @@ namespace FEAST
       template <typename First2_, typename... Rest2_>
       void convert(const TupleVector<First2_, Rest2_...>& other)
       {
-        CONTEXT("When converting TupleVector");
-
         this->first().convert(other.first());
         this->rest().convert(other.rest());
       }
@@ -357,8 +355,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in TupleVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -377,8 +373,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in TupleVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -430,8 +424,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out TupleVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -450,8 +442,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out TupleVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -708,16 +698,12 @@ namespace FEAST
 
       const typename First_::DataType operator()(Index index) const
       {
-        CONTEXT("When retrieving TupleVector element");
-
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
         return first()(index);
       }
 
       void operator()(Index index, typename First_::DataType value)
       {
-        CONTEXT("When retrieving TupleVector element");
-
         ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
         first()(index, value);
       }
@@ -742,8 +728,6 @@ namespace FEAST
       template <typename First2_>
       void convert(const TupleVector<First2_>& other)
       {
-        CONTEXT("When converting TupleVector");
-
         this->first().convert(other.first());
       }
 
@@ -761,8 +745,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in TupleVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -781,8 +763,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in TupleVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -834,8 +814,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out TupleVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:
@@ -854,8 +832,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out TupleVector");
-
         switch(mode)
         {
         case FileMode::fm_binary:

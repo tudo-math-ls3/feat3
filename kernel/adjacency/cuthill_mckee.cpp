@@ -15,8 +15,6 @@ namespace FEAST
       CuthillMcKee::RootType root_type,
       CuthillMcKee::SortType sort_type)
     {
-      CONTEXT("CuthillMcKee::CuthillMcKee() [graph]");
-
       // get the number of nodes
       Index num_nodes = graph.get_num_nodes_domain();
 

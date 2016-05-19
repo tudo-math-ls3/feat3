@@ -16,7 +16,6 @@ namespace FEAST
       _image_idx(nullptr),
       _shared(false)
     {
-      CONTEXT("Graph::Graph() [default]");
     }
 
     // allocation constructor
@@ -34,7 +33,6 @@ namespace FEAST
       _image_idx(nullptr),
       _shared(false)
     {
-      CONTEXT("Graph::Graph() [alloc]");
       _domain_ptr = new Index[_num_nodes_domain+1];
       if(alloc_domain_end)
       {
@@ -61,7 +59,6 @@ namespace FEAST
       _image_idx(image_idx),
       _shared(shared)
     {
-      CONTEXT("Graph::Graph() [using-arrays]");
     }
 
     // "Copy-Arrays" Constructor
@@ -81,8 +78,6 @@ namespace FEAST
       _image_idx(nullptr),
       _shared(false)
     {
-      CONTEXT("Graph::Graph() [copy-arrays]");
-
       _domain_ptr = new Index[num_nodes_domain+1];
       for(Index i(0); i <= num_nodes_domain; ++i)
       {
@@ -113,7 +108,6 @@ namespace FEAST
       _image_idx(other._image_idx),
       _shared(other._shared)
     {
-      CONTEXT("Graph::Graph() [move]");
       other._num_nodes_domain = other._num_nodes_image = other._num_indices_image = Index(0);
       other._domain_ptr = other._domain_end = nullptr;
       other._image_idx = nullptr;
@@ -123,8 +117,6 @@ namespace FEAST
     /// move assignment
     Graph& Graph::operator=(Graph&& other)
     {
-      CONTEXT("Graph::operator=() [move]");
-
       // avoid self-move
       if(this == &other)
         return *this;
@@ -197,7 +189,6 @@ namespace FEAST
     // destructor
     Graph::~Graph()
     {
-      CONTEXT("Graph::~Graph()");
       if(!_shared)
       {
         if(_image_idx != nullptr)
@@ -211,7 +202,6 @@ namespace FEAST
 
     Index Graph::degree() const
     {
-      CONTEXT("Graph::degree()");
       Index deg = 0;
       if(_domain_end != nullptr)
       {
@@ -232,7 +222,6 @@ namespace FEAST
 
     void Graph::sort_indices()
     {
-      CONTEXT("Graph::sort_indices()");
       ASSERT_(_domain_ptr != nullptr);
       ASSERT_(_image_idx != nullptr);
 

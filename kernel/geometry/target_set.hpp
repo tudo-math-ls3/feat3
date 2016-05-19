@@ -40,7 +40,6 @@ namespace FEAST
         _num_entities(num_entities),
         _indices(nullptr)
       {
-        CONTEXT("TargetSet::TargetSet(Index)");
         if(num_entities > 0)
         {
           _indices = new Index[num_entities];
@@ -70,7 +69,6 @@ namespace FEAST
       /// virtual destructor
       virtual ~TargetSet()
       {
-        CONTEXT("TargetSet::~TargetSet()");
         if(_indices != nullptr)
         {
           delete [] _indices;
@@ -190,7 +188,6 @@ namespace FEAST
         BaseClass(num_entities),
         _target_set(num_entities[shape_dim])
       {
-        CONTEXT(name() + "::TargetSetHolder(const Index[])");
       }
 
       TargetSetHolder(const TargetSetHolder& other) :
@@ -201,7 +198,6 @@ namespace FEAST
 
       virtual ~TargetSetHolder()
       {
-        CONTEXT(name() + "::~TargetSetHolder()");
       }
 
       std::size_t bytes() const
@@ -212,7 +208,6 @@ namespace FEAST
       template<int dim_>
       TargetSet& get_target_set()
       {
-        CONTEXT(name() + "::get_target_set()");
         static_assert(dim_ >= 0, "invalid dimension");
         static_assert(dim_ <= shape_dim, "invalid dimension");
         typedef typename Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
@@ -222,7 +217,6 @@ namespace FEAST
       template<int dim_>
       const TargetSet& get_target_set() const
       {
-        CONTEXT(name() + "::get_target_set() [const]");
         static_assert(dim_ >= 0, "invalid dimension");
         static_assert(dim_ <= shape_dim, "invalid dimension");
         typedef typename Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
@@ -231,7 +225,6 @@ namespace FEAST
 
       Index get_num_entities(int dim) const
       {
-        CONTEXT(name() + "::get_num_entities()");
         ASSERT(dim <= shape_dim, "invalid dimension parameter");
         if(dim == shape_dim)
         {
@@ -263,13 +256,11 @@ namespace FEAST
       TargetSetHolder() :
         _target_set()
       {
-        CONTEXT(name() + "::TargetSetHolder()");
       }
 
       explicit TargetSetHolder(const Index num_entities[]) :
         _target_set(num_entities[0])
       {
-        CONTEXT(name() + "::TargetSetHolder(const Index[])");
       }
 
       TargetSetHolder(const TargetSetHolder& other) :
@@ -279,7 +270,6 @@ namespace FEAST
 
       virtual ~TargetSetHolder()
       {
-        CONTEXT(name() + "::~TargetSetHolder()");
       }
 
       std::size_t bytes() const
@@ -290,7 +280,6 @@ namespace FEAST
       template<int dim_>
       TargetSet& get_target_set()
       {
-        CONTEXT(name() + "::get_target_set()");
         static_assert(dim_ == 0, "invalid dimension");
         return _target_set;
       }
@@ -298,14 +287,12 @@ namespace FEAST
       template<int dim_>
       const TargetSet& get_target_set() const
       {
-        CONTEXT(name() + "::get_target_set() [const]");
         static_assert(dim_ == 0, "invalid dimension");
         return _target_set;
       }
 
       Index get_num_entities(int dim) const
       {
-        CONTEXT(name() + "::get_num_entities()");
 #if defined DEBUG
         ASSERT(dim == 0, "invalid dimension parameter");
 #else

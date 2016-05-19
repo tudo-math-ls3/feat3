@@ -151,7 +151,6 @@ namespace FEAST
         _mesh(mesh),
         _mesh_part_nodes()
       {
-        CONTEXT(name() + "::MeshNode()");
       }
 
     public:
@@ -162,8 +161,6 @@ namespace FEAST
        */
       virtual ~MeshNode()
       {
-        CONTEXT(name() + "::~MeshNode()");
-
         // loop over all submesh nodes in reverse order and delete them
         MeshPartNodeReverseIterator it(_mesh_part_nodes.rbegin());
         MeshPartNodeReverseIterator jt(_mesh_part_nodes.rend());
@@ -251,7 +248,6 @@ namespace FEAST
         const String chart_name = "",
         const MeshChartType* chart = nullptr)
       {
-        CONTEXT(name() + "::add_mesh_part_node()");
         if(mesh_part_node != nullptr)
         {
           if(_mesh_part_nodes.insert(
@@ -284,7 +280,6 @@ namespace FEAST
         const String chart_name = "",
         const MeshChartType* chart = nullptr)
       {
-        CONTEXT(name() + "::add_mesh_part()");
         MeshPartNodeType* part_node = new MeshPartNodeType(mesh_part);
         if(add_mesh_part_node(part_name, part_node, chart_name, chart) == nullptr)
         {
@@ -328,7 +323,6 @@ namespace FEAST
        */
       MeshPartNodeType* find_mesh_part_node(const String& part_name)
       {
-        CONTEXT(name() + "::find_mesh_part_node()");
         MeshPartNodeIterator it(_mesh_part_nodes.find(part_name));
         return (it != _mesh_part_nodes.end()) ? it->second.node : nullptr;
       }
@@ -336,7 +330,6 @@ namespace FEAST
       /** \copydoc find_mesh_part_node() */
       const MeshPartNodeType* find_mesh_part_node(const String& part_name) const
       {
-        CONTEXT(name() + "::find_mesh_part_node() [const]");
         MeshPartNodeConstIterator it(_mesh_part_nodes.find(part_name));
         return (it != _mesh_part_nodes.end()) ? it->second.node : nullptr;
       }
@@ -352,7 +345,6 @@ namespace FEAST
        */
       MeshPartType* find_mesh_part(const String& part_name)
       {
-        CONTEXT(name() + "::find_mesh_part()");
         MeshPartNodeType* node = find_mesh_part_node(part_name);
         return (node != nullptr) ? node->get_mesh() : nullptr;
       }
@@ -360,7 +352,6 @@ namespace FEAST
       /** \copydoc find_mesh_part() */
       const MeshPartType* find_mesh_part(const String& part_name) const
       {
-        CONTEXT(name() + "::find_mesh_part() [const]");
         const MeshPartNodeType* node = find_mesh_part_node(part_name);
         return (node != nullptr) ? node->get_mesh() : nullptr;
       }
@@ -377,7 +368,6 @@ namespace FEAST
        */
       const MeshChartType* find_mesh_part_chart(const String& part_name) const
       {
-        CONTEXT(name() + "::find_mesh_part_chart() [const]");
         MeshPartNodeConstIterator it(_mesh_part_nodes.find(part_name));
         return (it != _mesh_part_nodes.end()) ? it->second.chart : nullptr;
       }
@@ -394,7 +384,6 @@ namespace FEAST
        */
       String find_mesh_part_chart_name(const String& part_name) const
       {
-        CONTEXT(name() + "::find_mesh_part_chart_name() [const]");
         MeshPartNodeConstIterator it(_mesh_part_nodes.find(part_name));
         return (it != _mesh_part_nodes.end()) ? it->second.chart_name : String();
       }
@@ -410,8 +399,6 @@ namespace FEAST
        */
       void adapt(bool recursive = true)
       {
-        CONTEXT(name() + "::adapt()");
-
         // loop over all mesh_part nodes
         MeshPartNodeIterator it(_mesh_part_nodes.begin());
         MeshPartNodeIterator jt(_mesh_part_nodes.end());
@@ -454,8 +441,6 @@ namespace FEAST
        */
       bool adapt_by_name(const String& part_name, bool recursive = false)
       {
-        CONTEXT(name() + "::adapt_by_name()");
-
         // try to find the corresponding mesh_part node
         MeshPartNodeIterator it(_mesh_part_nodes.find(part_name));
         if(it == _mesh_part_nodes.end())
@@ -556,13 +541,11 @@ namespace FEAST
       explicit MeshPartNode(MeshPartType* mesh_part) :
         BaseClass(mesh_part)
       {
-        CONTEXT(name() + "::MeshPartNode()");
       }
 
       /// virtual destructor
       virtual ~MeshPartNode()
       {
-        CONTEXT(name() + "::~MeshPartNode()");
       }
 
       /**
@@ -577,8 +560,6 @@ namespace FEAST
       template<typename ParentType_>
       MeshPartNode* refine(const ParentType_& parent) const
       {
-        CONTEXT(name() + "::refine()");
-
         // the mesh part may be a nullptr; in this case also return a node containing a nullptr
         if(this->_mesh == nullptr)
         {
@@ -620,8 +601,6 @@ namespace FEAST
        */
       void refine_mesh_parts(MeshPartNode& refined_node) const
       {
-        CONTEXT(name() + "::refine_mesh_parts()");
-
         typename BaseClass::MeshPartNodeConstIterator it(this->_mesh_part_nodes.begin());
         typename BaseClass::MeshPartNodeConstIterator jt(this->_mesh_part_nodes.end());
         for(; it != jt; ++it)

@@ -93,7 +93,6 @@ namespace FEAST
       explicit SparseVector() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating SparseVector");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(Math::min<Index>(0, 1000));
@@ -111,7 +110,6 @@ namespace FEAST
       explicit SparseVector(Index size_in) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating SparseVector");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(Math::min<Index>(size_in, 1000));
@@ -133,8 +131,6 @@ namespace FEAST
                             DenseVector<Mem_, IT_, IT_> & indices_in, bool is_sorted = true) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating SparseVector");
-
         if (indices_in.size() != elements_in.size())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
 
@@ -166,7 +162,6 @@ namespace FEAST
       explicit SparseVector(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseVector");
         deserialise<DT2_, IT2_>(input);
       }
 
@@ -180,7 +175,6 @@ namespace FEAST
       SparseVector(SparseVector && other) :
         Container<Mem_, DT_, IT_>(std::forward<SparseVector>(other))
       {
-        CONTEXT("When moving SparseVector");
       }
 
       /**
@@ -194,8 +188,6 @@ namespace FEAST
       explicit SparseVector(FileMode mode, String filename) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseVector");
-
         read_from(mode, filename);
       }
 
@@ -210,8 +202,6 @@ namespace FEAST
       explicit SparseVector(FileMode mode, std::istream& file) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating SparseVector");
-
         read_from(mode, file);
       }
 
@@ -224,8 +214,6 @@ namespace FEAST
        */
       SparseVector & operator= (SparseVector && other)
       {
-        CONTEXT("When moving SparseVector");
-
         this->move(std::forward<SparseVector>(other));
 
         return *this;
@@ -240,7 +228,6 @@ namespace FEAST
        */
       SparseVector shared() const
       {
-        CONTEXT("When sharing SparseVector");
         SparseVector r;
         r.assign(*this);
         return r;
@@ -259,7 +246,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseVector<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting SparseVector");
         this->clone(other);
       }
 
@@ -310,8 +296,6 @@ namespace FEAST
        */
       const DT_ operator()(Index index) const
       {
-        CONTEXT("When retrieving SparseVector element");
-
         ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds sparse vector size " + stringify(this->_scalar_index.at(0)) + " !");
 
         if (this->_elements.size() == 0)
@@ -343,8 +327,6 @@ namespace FEAST
        */
       void operator()(Index index, DT_ val)
       {
-        CONTEXT("When setting SparseVector element");
-
         ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds sparse vector size " + stringify(this->_scalar_index.at(0)) + " !");
 
         // flag container as not sorted anymore
@@ -472,8 +454,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in SparseVector");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -492,8 +472,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in SparseVector");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -613,8 +591,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out SparseVector");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -633,8 +609,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out SparseVector");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -775,8 +749,6 @@ namespace FEAST
        */
       template <typename Mem2_> friend bool operator== (const SparseVector & a, const SparseVector<Mem2_, DT_, IT_> & b)
       {
-        CONTEXT("When comparing SparseVectors");
-
         if (a.size() != b.size())
           return false;
         if (a.get_elements().size() != b.get_elements().size())

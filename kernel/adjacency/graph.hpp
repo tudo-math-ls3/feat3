@@ -197,7 +197,6 @@ namespace FEAST
         _image_idx(nullptr),
         _shared(false)
       {
-        CONTEXT("Graph::Graph() [render]");
         switch(render_type)
         {
         case rt_as_is:
@@ -251,7 +250,6 @@ namespace FEAST
         _image_idx(nullptr),
         _shared(false)
       {
-        CONTEXT("Graph::Graph() [composite render]");
         switch(render_type)
         {
         case rt_as_is:
@@ -330,7 +328,6 @@ namespace FEAST
        */
       Index degree(Index domain_node) const
       {
-        CONTEXT("Graph::degree()");
         ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
         if(_domain_end != nullptr)
           return _domain_end[domain_node] - _domain_ptr[domain_node];
@@ -360,14 +357,12 @@ namespace FEAST
        */
       Index* get_domain_ptr()
       {
-        CONTEXT("Graph::get_domain_ptr()");
         return _domain_ptr;
       }
 
       /** \copydoc get_domain_ptr() */
       const Index* get_domain_ptr() const
       {
-        CONTEXT("Graph::get_domain_ptr()");
         return _domain_ptr;
       }
 
@@ -381,14 +376,12 @@ namespace FEAST
        */
       Index* get_domain_end()
       {
-        CONTEXT("Graph::get_domain_end()");
         return _domain_end;
       }
 
       /** \copydoc get_domain_end() */
       const Index* get_domain_end() const
       {
-        CONTEXT("Graph::get_domain_end()");
         return _domain_end;
       }
 
@@ -398,14 +391,12 @@ namespace FEAST
        */
       Index* get_image_idx()
       {
-        CONTEXT("Graph::get_image_idx()");
         return _image_idx;
       }
 
       /** \copydoc get_image_idx() */
       const Index* get_image_idx() const
       {
-        CONTEXT("Graph::get_image_idx()");
         return _image_idx;
       }
 
@@ -416,7 +407,6 @@ namespace FEAST
        */
       Index get_num_indices() const
       {
-        CONTEXT("Graph::get_num_indices()");
         return _num_indices_image;
       }
 
@@ -427,7 +417,6 @@ namespace FEAST
        */
       bool is_shared() const
       {
-        CONTEXT("Graph::is_shared()");
         return _shared;
       }
 
@@ -444,8 +433,6 @@ namespace FEAST
       template<typename Adjactor_>
       static Index _aux_inj(const Adjactor_& adj, Index i, Index idx[])
       {
-        CONTEXT("Graph::_aux_inj()");
-
         Index num_idx = 0;
         typename Adjactor_::ImageIterator cur(adj.image_begin(i));
         typename Adjactor_::ImageIterator end(adj.image_end(i));
@@ -474,8 +461,6 @@ namespace FEAST
       template<typename Adjactor_>
       void _render_as_is(const Adjactor_& adj)
       {
-        CONTEXT("Graph::_render_as_is()");
-
         typedef typename Adjactor_::ImageIterator AImIt;
 
         // get counts
@@ -519,8 +504,6 @@ namespace FEAST
       template<typename Adjactor_>
       void _render_injectify(const Adjactor_& adj)
       {
-        CONTEXT("Graph::_render_injectify()");
-
         // get counts
         _num_nodes_domain = adj.get_num_nodes_domain();
         _num_nodes_image = adj.get_num_nodes_image();
@@ -557,8 +540,6 @@ namespace FEAST
       template<typename Adjactor_>
       void _render_transpose(const Adjactor_& adj)
       {
-        CONTEXT("Graph::_render_transpose()");
-
         typedef typename Adjactor_::ImageIterator AImIt;
 
         // get counts
@@ -620,8 +601,6 @@ namespace FEAST
       template<typename Adjactor_>
       void _render_injectify_transpose(const Adjactor_& adj)
       {
-        CONTEXT("Graph::_render_injectify_transpose()");
-
         // get counts
         _num_nodes_domain = adj.get_num_nodes_image();
         _num_nodes_image = adj.get_num_nodes_domain();
@@ -682,8 +661,6 @@ namespace FEAST
         typename Adjactor2_>
       static Index _aux_inj(const Adjactor1_& adj1, const Adjactor2_& adj2, Index i, Index idx[])
       {
-        CONTEXT("Graph::_aux_inj() [composite]");
-
         Index num_idx = 0;
         typename Adjactor1_::ImageIterator cur1(adj1.image_begin(i));
         typename Adjactor1_::ImageIterator end1(adj1.image_end(i));
@@ -726,8 +703,6 @@ namespace FEAST
         const Adjactor1_& adj1,
         const Adjactor2_& adj2)
       {
-        CONTEXT("Graph::_render_as_is() [composite]");
-
         // validate adjactor dimensions
         ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
@@ -789,8 +764,6 @@ namespace FEAST
         const Adjactor1_& adj1,
         const Adjactor2_& adj2)
       {
-        CONTEXT("Graph::_render_injectify() [composite]");
-
         // validate adjactor dimensions
         ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
@@ -834,8 +807,6 @@ namespace FEAST
         const Adjactor1_& adj1,
         const Adjactor2_& adj2)
       {
-        CONTEXT("Graph::_render_transpose() [composite]");
-
         // validate adjactor dimensions
         ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
@@ -915,8 +886,6 @@ namespace FEAST
         const Adjactor1_& adj1,
         const Adjactor2_& adj2)
       {
-        CONTEXT("Graph::_render_injectify_transpose() [composite]");
-
         // validate adjactor dimensions
         ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
@@ -982,21 +951,18 @@ namespace FEAST
       /** \copydoc Adjactor::get_num_nodes_domain() */
       inline Index get_num_nodes_domain() const
       {
-        CONTEXT("Graph::get_num_nodes_domain()");
         return _num_nodes_domain;
       }
 
       /** \copydoc Adjactor::get_num_nodes_image() */
       inline Index get_num_nodes_image() const
       {
-        CONTEXT("Graph::get_num_nodes_image()");
         return _num_nodes_image;
       }
 
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        CONTEXT("Graph::image_begin()");
         ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
         return &_image_idx[_domain_ptr[domain_node]];
       }
@@ -1004,7 +970,6 @@ namespace FEAST
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        CONTEXT("Graph::image_end()");
         ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
 
         if(_domain_end != nullptr)

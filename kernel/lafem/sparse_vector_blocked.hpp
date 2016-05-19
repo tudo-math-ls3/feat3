@@ -117,7 +117,6 @@ namespace FEAST
       explicit SparseVectorBlocked() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating SparseVectorBlocked");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(Math::min<Index>(0, 1000));
@@ -135,7 +134,6 @@ namespace FEAST
       explicit SparseVectorBlocked(Index size_in) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating SparseVectorBlocked");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(Math::min<Index>(size_in, 1000));
@@ -153,7 +151,6 @@ namespace FEAST
       SparseVectorBlocked(SparseVectorBlocked && other) :
         Container<Mem_, DT_, IT_>(std::forward<SparseVectorBlocked>(other))
       {
-        CONTEXT("When moving SparseVectorBlocked");
       }
 
       /**
@@ -165,8 +162,6 @@ namespace FEAST
        */
       SparseVectorBlocked & operator= (SparseVectorBlocked && other)
       {
-        CONTEXT("When moving SparseVectorBlocked");
-
         this->move(std::forward<SparseVectorBlocked>(other));
 
         return *this;
@@ -181,7 +176,6 @@ namespace FEAST
        */
       SparseVectorBlocked clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        CONTEXT("When cloning TContainer");
         SparseVectorBlocked t;
         t.clone(*this, clone_mode);
         return t;
@@ -214,7 +208,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const SparseVectorBlocked<Mem2_, DT2_, IT2_, BlockSize_> & other)
       {
-        CONTEXT("When converting SparseVectorBlocked");
         this->clone(other);
       }
 
@@ -295,8 +288,6 @@ namespace FEAST
        */
       const Tiny::Vector<DT_, BlockSize_> operator()(Index index) const
       {
-        CONTEXT("When retrieving SparseVectorBlocked element");
-
         ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds sparse vector size " + stringify(this->_scalar_index.at(0)) + " !");
 
         if (this->_elements.size() == 0)
@@ -332,8 +323,6 @@ namespace FEAST
        */
       void operator()(Index index, const Tiny::Vector<DT_, BlockSize_>& val)
       {
-        CONTEXT("When setting SparseVectorBlocked element");
-
         ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds sparse vector size " + stringify(this->_scalar_index.at(0)) + " !");
 
         // flag container as not sorted anymore
@@ -501,8 +490,6 @@ namespace FEAST
        */
       template <typename Mem2_> friend bool operator== (const SparseVectorBlocked & a, const SparseVectorBlocked<Mem2_, DT_, IT_, BlockSize_> & b)
       {
-        CONTEXT("When comparing SparseVectorBlockeds");
-
         if (a.size() != b.size())
           return false;
         if (a.get_elements().size() != b.get_elements().size())

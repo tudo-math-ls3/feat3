@@ -98,7 +98,6 @@ namespace FEAST
         _vertex_set(Intern::StructNumEntities<shape_dim_, 0>::compute(num_slices)),
         _index_set_holder(num_slices)
       {
-        CONTEXT(name() + "::StructuredMesh()");
         ASSERT_(num_slices != nullptr);
 
         // store slice counts
@@ -124,8 +123,6 @@ namespace FEAST
             Intern::NumSlicesWrapper<shape_dim>(factory).num_slices)),
         _index_set_holder(Intern::NumSlicesWrapper<shape_dim>(factory).num_slices)
       {
-        CONTEXT(name() + "::StructuredMesh() [factory]");
-
         // store slice count
         Intern::NumSlicesWrapper<shape_dim>::apply(factory, _num_slices);
 
@@ -160,7 +157,6 @@ namespace FEAST
       /// virtual destructor
       virtual ~StructuredMesh()
       {
-        CONTEXT(name() + "::~StructuredMesh()");
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
@@ -180,7 +176,6 @@ namespace FEAST
        */
       Index get_num_slices(int dir) const
       {
-        CONTEXT(name() + "::get_num_slices()");
         ASSERT_(dir >= 0);
         ASSERT_(dir < shape_dim);
         return _num_slices[dir];
@@ -203,7 +198,6 @@ namespace FEAST
        */
       Index get_num_entities(int dim) const
       {
-        CONTEXT(name() + "::get_num_entities()");
         ASSERT_(dim >= 0);
         ASSERT_(dim <= shape_dim);
         return _num_entities[dim];
@@ -212,14 +206,12 @@ namespace FEAST
       /// Returns a reference to the vertex set of the mesh.
       VertexSetType& get_vertex_set()
       {
-        CONTEXT(name() + "::get_vertex_set()");
         return _vertex_set;
       }
 
       /** \copydoc get_vertex_set() */
       const VertexSetType& get_vertex_set() const
       {
-        CONTEXT(name() + "::get_vertex_set() [const]");
         return _vertex_set;
       }
 
@@ -240,7 +232,6 @@ namespace FEAST
         int face_dim_>
       const StructIndexSet<shape_dim_, cell_dim_, face_dim_>& get_index_set() const
       {
-        CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">()");
         return _index_set_holder.template get_index_set<cell_dim_, face_dim_>();
       }
 

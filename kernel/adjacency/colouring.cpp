@@ -16,7 +16,6 @@ namespace FEAST
       _num_colours(0),
       _colouring(nullptr)
     {
-      CONTEXT("Colouring::Colouring() [default]");
     }
 
     // Allocation Constructor.
@@ -28,7 +27,6 @@ namespace FEAST
       _num_colours(num_colours),
       _colouring(nullptr)
     {
-      CONTEXT("Colouring::Colouring() [alloc]");
       _colouring = new Index[_num_nodes];
     }
 
@@ -37,7 +35,6 @@ namespace FEAST
       Index num_nodes,
       Index* colouring)
     {
-      CONTEXT("Colouring::Colouring() [array]");
       _num_nodes = num_nodes;
       _colouring = new Index[_num_nodes];
       _num_colours = 0;
@@ -276,7 +273,6 @@ namespace FEAST
     // virtual destructor
     Colouring::~Colouring()
     {
-      CONTEXT("Colouring::~Colouring()");
       if(_colouring != nullptr)
         delete [] _colouring;
     }

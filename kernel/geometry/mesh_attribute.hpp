@@ -58,23 +58,22 @@ namespace FEAST
          * The vertex stride. If = 0, then num_coords will be used for the vertex stride.
          */
         explicit MeshAttribute( Index num_vertices, int num_coords, int stride = 0) :
-            _num_vertices(num_vertices),
-            _num_coords(num_coords),
-            _stride(stride > 0 ? stride : num_coords),
-            _vertices(nullptr)
-            {
-              CONTEXT(name() + "::MeshAttribute()");
-              ASSERT_(_num_coords >= 0);
-              ASSERT_(_stride >= _num_coords);
-              if((_num_vertices > 0) && (_num_coords > 0))
-              {
-                _vertices = new CoordType[_num_vertices * Index(_stride)];
+          _num_vertices(num_vertices),
+          _num_coords(num_coords),
+          _stride(stride > 0 ? stride : num_coords),
+          _vertices(nullptr)
+        {
+          ASSERT_(_num_coords >= 0);
+          ASSERT_(_stride >= _num_coords);
+          if((_num_vertices > 0) && (_num_coords > 0))
+          {
+            _vertices = new CoordType[_num_vertices * Index(_stride)];
 
-                for(Index i(0); i < _num_vertices*Index(_stride); ++i)
-                  _vertices[i] = CoordType(0);
+            for(Index i(0); i < _num_vertices*Index(_stride); ++i)
+              _vertices[i] = CoordType(0);
 
-              }
-            }
+          }
+        }
 
         MeshAttribute(const MeshAttribute&) = delete;
         MeshAttribute(MeshAttribute&&) = delete;
@@ -105,7 +104,6 @@ namespace FEAST
         /// virtual destructor
         virtual ~MeshAttribute()
         {
-          CONTEXT(name() + "::~MeshAttribute()");
           if(_vertices != nullptr)
           {
             delete [] _vertices;
@@ -125,7 +123,6 @@ namespace FEAST
          */
         int get_num_coords() const
         {
-          CONTEXT(name() + "::get_num_coords()");
           return _num_coords;
         }
 
@@ -136,14 +133,12 @@ namespace FEAST
          */
         int get_stride() const
         {
-          CONTEXT(name() + "::get_stride()");
           return _stride;
         }
 
         /// Returns the number of vertices
         Index get_num_vertices() const
         {
-          CONTEXT(name() + "::get_num_vertices()");
           return _num_vertices;
         }
 
@@ -158,7 +153,6 @@ namespace FEAST
          */
         VertexReference operator[](Index i)
         {
-          CONTEXT(name() + "::operator[]()");
           ASSERT_(_vertices != nullptr);
           ASSERT_(i < _num_vertices);
           return &_vertices[Index(_stride) * i];
@@ -167,7 +161,6 @@ namespace FEAST
         /** \copydoc operator[]() */
         ConstVertexReference operator[](Index i) const
         {
-          CONTEXT(name() + "::operator[]() [const]");
           ASSERT_(_vertices != nullptr);
           ASSERT(i < _num_vertices, "i = "+stringify(i)+" >= "+stringify(_num_vertices)+" = num_vertices");
           return &_vertices[Index(_stride) * i];
@@ -185,7 +178,6 @@ namespace FEAST
          */
         void operator()(Index i, ConstVertexReference v)
         {
-          CONTEXT(name() + "::operator()()");
           ASSERT(_vertices != nullptr, "_vertices == nullptr");
           ASSERT(i < _num_vertices, "i = "+stringify(i)+" >= "+stringify(_num_vertices)+" = num_vertices");
 

@@ -61,7 +61,6 @@ namespace FEAST
         _num_nodes_image(num_nodes_image),
         _indices(num_nodes_domain)
       {
-        CONTEXT("DynamicGraph::DynamicGraph()");
       }
 
       /**
@@ -84,7 +83,6 @@ namespace FEAST
         _num_nodes_image(0),
         _indices()
       {
-        CONTEXT("DynamicGraph::DynamicGraph() [render]");
         switch(render_type)
         {
         case rt_as_is:
@@ -125,7 +123,6 @@ namespace FEAST
         _num_nodes_image(0),
         _indices()
       {
-        CONTEXT("DynamicGraph::DynamicGraph() [composite render]");
         switch(render_type)
         {
         case rt_as_is:
@@ -167,7 +164,6 @@ namespace FEAST
       /// virtual destructor
       virtual ~DynamicGraph()
       {
-        CONTEXT("DynamicGraph::~DynamicGraph()");
       }
 
       /**
@@ -196,7 +192,6 @@ namespace FEAST
        */
       Index degree(Index domain_node) const
       {
-        CONTEXT("DynamicGraph::degree()");
         ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
         return Index(_indices[domain_node].size());
       }
@@ -214,7 +209,6 @@ namespace FEAST
        */
       Index degree() const
       {
-        CONTEXT("DynamicGraph::degree()");
         Index deg(0);
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
@@ -230,7 +224,6 @@ namespace FEAST
        */
       void clear()
       {
-        CONTEXT("DynamicGraph::clear()");
         for(Index i(0); i < _num_nodes_domain; ++i)
         {
           _indices[i].clear();
@@ -251,7 +244,6 @@ namespace FEAST
        */
       bool exists(Index domain_node, Index image_node) const
       {
-        CONTEXT("DynamicGraph::exists()");
         ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
         ASSERT(image_node < _num_nodes_image, "Image node index out of range");
         return _indices[domain_node].find(image_node) != _indices[domain_node].end();
@@ -271,7 +263,6 @@ namespace FEAST
        */
       bool insert(Index domain_node, Index image_node)
       {
-        CONTEXT("DynamicGraph::insert()");
         ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
         ASSERT(image_node < _num_nodes_image, "Image node index out of range");
         return _indices[domain_node].insert(image_node).second;
@@ -291,7 +282,6 @@ namespace FEAST
        */
       bool erase(Index domain_node, Index image_node)
       {
-        CONTEXT("DynamicGraph::erase()");
         ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
         ASSERT(image_node < _num_nodes_image, "Image node index out of range");
         // note: std::set.erase() returns the number of deleted elements
@@ -307,7 +297,6 @@ namespace FEAST
       template<typename Adjactor_>
       void compose(const Adjactor_& adjactor)
       {
-        CONTEXT("DynamicGraph::compose()");
         ASSERT(_num_nodes_image <= adjactor.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor_::ImageIterator AImIt;
@@ -360,8 +349,6 @@ namespace FEAST
       template<typename Adjactor_>
       void _render_as_is(const Adjactor_& adj)
       {
-        CONTEXT("DynamicGraph::_render_as_is()");
-
         typedef typename Adjactor_::ImageIterator AImIt;
 
         // set counts
@@ -385,8 +372,6 @@ namespace FEAST
       template<typename Adjactor_>
       void _render_transpose(const Adjactor_& adj)
       {
-        CONTEXT("DynamicGraph::_render_transpose()");
-
         typedef typename Adjactor_::ImageIterator AImIt;
 
         // set counts
@@ -414,8 +399,6 @@ namespace FEAST
         const Adjactor1_& adj1,
         const Adjactor2_& adj2)
       {
-        CONTEXT("DynamicGraph::_render_as_is() [composite]");
-
         // validate adjactor dimensions
         ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
@@ -451,8 +434,6 @@ namespace FEAST
         const Adjactor1_& adj1,
         const Adjactor2_& adj2)
       {
-        CONTEXT("DynamicGraph::_render_transpose() [composite]");
-
         // validate adjactor dimensions
         ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
@@ -489,21 +470,18 @@ namespace FEAST
       /** \copydoc Adjactor::get_num_nodes_domain() */
       inline Index get_num_nodes_domain() const
       {
-        CONTEXT("DynamicGraph::get_num_nodes_domain()");
         return _num_nodes_domain;
       }
 
       /** \copydoc Adjactor::get_num_nodes_image() */
       inline Index get_num_nodes_image() const
       {
-        CONTEXT("DynamicGraph::get_num_nodes_image()");
         return _num_nodes_image;
       }
 
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        CONTEXT("DynamicGraph::image_begin()");
         ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
         return _indices[domain_node].begin();
       }
@@ -511,7 +489,6 @@ namespace FEAST
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        CONTEXT("DynamicGraph::image_end()");
         ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
         return _indices[domain_node].end();
       }

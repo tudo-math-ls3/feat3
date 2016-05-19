@@ -1476,8 +1476,6 @@ namespace FEAST
           const Index num_entities[],
           const IndexSetHolderTypeIn& index_set_holder_in)
         {
-          CONTEXT(name() + "::refine()");
-
           // recursive call of IndexRefineWrapper
           ShapeConvertIndexWrapper<Shape_, cell_dim_ - 1>
             ::refine(index_set_holder_out, num_entities, index_set_holder_in);
@@ -1517,8 +1515,6 @@ namespace FEAST
           const Index num_entities[],
           const IndexSetHolderTypeIn& index_set_holder_in)
         {
-          CONTEXT(name() + "::refine()");
-
           // fetch output index set
           IndexSetType& index_set_out = index_set_holder_out.template get_index_set<1, 0>();
 

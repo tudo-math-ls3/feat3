@@ -96,26 +96,22 @@ namespace FEAST
       explicit IndexTree(Index num_vertices)
         : _rep_set_vec(num_vertices)
       {
-        CONTEXT(name() + "::IndexTree()");
       }
 
       /// Destructor
       virtual ~IndexTree()
       {
-        CONTEXT(name() + "::~IndexTree()");
       }
 
       /// returns number of indices of an index-representative
       Index get_num_indices() const
       {
-        CONTEXT(name() + "::get_num_indices()");
         return Shape::FaceTraits<Shape_, 0>::count;
       }
 
       /// returns size of the i-th representative set
       Index get_set_size(Index i) const
       {
-        CONTEXT(name() + "::get_set_size()");
         ASSERT_(i < _rep_set_vec.size());
         return Index(_rep_set_vec.at(i).size());
       }
@@ -123,7 +119,6 @@ namespace FEAST
       /// returns the value of the k-th component of the j-th index-representative in the i-th set
       Index get_index(Index i, Index j, Index k) const
       {
-        CONTEXT(name() + "::get_index()");
         typename RepSet::const_iterator iter = _rep_set_vec[i].begin();
         advance(iter, j);
         return (*iter)[k];
@@ -148,8 +143,6 @@ namespace FEAST
       template<typename IndexVectorType_>
       std::pair<bool,Index> find(const IndexVectorType_& index_vector) const
       {
-        CONTEXT(name() + "::find()");
-
         // calculate representative
         IndexVector representative;
         Intern::IndexRepresentative<Shape_>::compute(representative, index_vector);
@@ -177,8 +170,6 @@ namespace FEAST
       template<typename IndexVectorType_>
       void insert(const IndexVectorType_& index_vector, Index id)
       {
-        CONTEXT(name() + "::insert<...>()");
-
         // calculate representative
         IndexVector representative;
         Intern::IndexRepresentative<Shape_>::compute(representative, index_vector);
@@ -200,8 +191,6 @@ namespace FEAST
       template<typename IndexSet_>
       void parse(const IndexSet_& index_set)
       {
-        CONTEXT(name() + "::parse()");
-
         static_assert(int(IndexSet_::num_indices) == int(num_indices), "index count mismatch");
 
         // fetch number of entities
@@ -307,8 +296,6 @@ namespace FEAST
         const IndexSetIn_& index_set_in,
         IndexSetOut_& index_set_out)
       {
-        CONTEXT(name() + "::compute()");
-
         // index vector reference
         typedef typename IndexSetIn_::ConstIndexVectorReference ConstIndexVectorRefIn;
         typedef Intern::FaceIndexMapping<Shape_, face_dim_, 0> FimType;
@@ -352,8 +339,6 @@ namespace FEAST
       template<typename IndexSetIn_, typename IndexSetOut_>
       static void compute_vertex_subshape( const IndexSetIn_& index_set_in, IndexSetOut_& index_set_out)
       {
-        CONTEXT(name() + "::compute()");
-
         // Type for shape to vertex@subshape mapping
         typedef Intern::FaceIndexMapping<Shape_, face_dim_, 0> FimType;
         // Number of shapes

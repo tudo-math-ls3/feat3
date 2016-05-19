@@ -75,8 +75,6 @@ namespace FEAST
       explicit DenseMatrix() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating DenseMatrix");
-
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
       }
@@ -92,8 +90,6 @@ namespace FEAST
       explicit DenseMatrix(Index rows_in, Index columns_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        CONTEXT("When creating DenseMatrix");
-
         this->_scalar_index.at(0) = rows_in * columns_in;
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
@@ -114,8 +110,6 @@ namespace FEAST
       explicit DenseMatrix(Index rows_in, Index columns_in, DT_ value) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        CONTEXT("When creating DenseMatrix");
-
         this->_scalar_index.at(0) = rows_in * columns_in;
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
@@ -135,7 +129,6 @@ namespace FEAST
       explicit DenseMatrix(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating DenseMatrix");
         deserialise<DT2_, IT2_>(input);
       }
 
@@ -149,7 +142,6 @@ namespace FEAST
       DenseMatrix(DenseMatrix && other) :
         Container<Mem_, DT_, IT_>(std::forward<DenseMatrix>(other))
       {
-        CONTEXT("When moving DenseMatrix");
       }
 
       /**
@@ -161,8 +153,6 @@ namespace FEAST
        */
       DenseMatrix & operator= (DenseMatrix && other)
       {
-        CONTEXT("When moving DenseMatrix");
-
         this->move(std::forward<DenseMatrix>(other));
 
         return *this;
@@ -177,7 +167,6 @@ namespace FEAST
        */
       DenseMatrix shared() const
       {
-        CONTEXT("When sharing DenseMatrix");
         DenseMatrix r;
         r.assign(*this);
         return r;
@@ -194,7 +183,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const DenseMatrix<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting DenseMatrix");
         this->assign(other);
       }
 
@@ -223,8 +211,6 @@ namespace FEAST
        */
       const DT_ operator()(Index row, Index col) const
       {
-        CONTEXT("When retrieving DenseMatrix element");
-
         ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
         ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
         return MemoryPool<Mem_>::get_element(this->_elements.at(0), row * this->columns() + col);
@@ -239,8 +225,6 @@ namespace FEAST
        */
       void operator()(Index row, Index col, DT_ value)
       {
-        CONTEXT("When setting DenseMatrix element");
-
         ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
         ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
         MemoryPool<Mem_>::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
@@ -463,8 +447,6 @@ namespace FEAST
        */
       template <typename Mem2_> friend bool operator== (const DenseMatrix & a, const DenseMatrix<Mem2_, DT_, IT_> & b)
       {
-        CONTEXT("When comparing DenseMatrices");
-
         if (a.size() != b.size())
           return false;
         if (a.get_elements().size() != b.get_elements().size())

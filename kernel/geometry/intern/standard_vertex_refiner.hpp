@@ -33,8 +33,6 @@ namespace FEAST
           VertexSetType& vertex_set_out,
           const VertexSetType& vertex_set_in)
         {
-          CONTEXT("StandardVertexRefiner<Vertex,...>::refine()");
-
           // get the number of coarse mesh vertices
           Index num_verts = vertex_set_in.get_num_vertices();
           ASSERT_(vertex_set_out.get_num_vertices() >= num_verts);
@@ -74,8 +72,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const IndexSetType& index_set_in)
         {
-          CONTEXT("StandardVertexRefiner<Hypercube<...>,...>::refine()");
-
           typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
           typedef typename VertexSetType::VertexReference VertexReference;
           typedef typename VertexSetType::CoordType CoordType;
@@ -135,8 +131,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const IndexSetType& index_set_in)
         {
-          CONTEXT("StandardVertexRefiner<Simplex<1>,...>::refine()");
-
           typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
           typedef typename VertexSetType::VertexReference VertexReference;
           typedef typename VertexSetType::CoordType CoordType;
@@ -196,8 +190,6 @@ namespace FEAST
           const VertexSetType& /*vertex_set_in*/,
           const IndexSetType& /*index_set_in*/)
         {
-          CONTEXT("StandardVertexRefiner<Simplex<2>,...>::refine()");
-
           // return number of created vertices
           return 0;
         }
@@ -222,8 +214,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const IndexSetType& index_set_in)
         {
-          CONTEXT("StandardVertexRefiner<Simplex<3>,...>::refine()");
-
           typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
           typedef typename VertexSetType::VertexReference VertexReference;
           typedef typename VertexSetType::CoordType CoordType;
@@ -283,7 +273,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const IndexSetHolderType& index_set_holder_in)
         {
-          CONTEXT("StandardVertexRefineWrapper<...>::refine()");
           typedef typename Shape::FaceTraits<Shape_, Shape_::dimension-1>::ShapeType FacetType;
 
           // recursive call of VertexRefineWrapper
@@ -318,8 +307,6 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const IndexSetHolderType& /*index_set_holder_in*/)
         {
-          CONTEXT("StandardVertexRefineWrapper<Vertex,...>::refine()");
-
           // call VertexRefiner
           Index num_verts =  StandardVertexRefiner<Shape::Vertex,VertexSet_>
             ::refine(0, vertex_set_out, vertex_set_in);

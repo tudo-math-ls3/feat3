@@ -723,8 +723,6 @@ namespace FEAST
           const IndexSetHolderType& index_set_holder_src,
           const IndexSetHolderType& index_set_holder_trg)
         {
-          CONTEXT(name() + "::refine()");
-
           // recursive call of TargetRefineShapeWrapper
           typedef typename Shape::FaceTraits<ShapeType, shape_dim_ - 1>::ShapeType FacetType;
           Index offset = TargetRefineShapeWrapper<FacetType, cell_dim_>::refine(
@@ -774,8 +772,6 @@ namespace FEAST
           const IndexSetHolderType& index_set_holder_src,
           const IndexSetHolderType& index_set_holder_trg)
         {
-          CONTEXT(name() + "::refine()");
-
           // call target refiner
           StandardTargetRefiner<ShapeType, cell_dim_>::refine(
             target_set_out,
@@ -850,8 +846,6 @@ namespace FEAST
           const IndexSetHolderType& index_set_holder_src,
           const IndexSetHolderType& index_set_holder_trg)
         {
-          CONTEXT(name() + "::refine()");
-
           // recursive call of TargetRefineWrapper
           TargetRefineWrapper<ShapeType, cell_dim_ - 1>::refine(
             target_set_holder_out,
@@ -897,8 +891,6 @@ namespace FEAST
           const IndexSetHolderType& index_set_holder_src,
           const IndexSetHolderType& index_set_holder_trg)
         {
-          CONTEXT(name() + "::refine()");
-
           // calculate index offsets
           Index index_offsets[Shape_::dimension+1];
           Intern::EntityCounter<Intern::StandardRefinementTraits, ShapeType, 0>::offset(index_offsets, num_entities_trg);

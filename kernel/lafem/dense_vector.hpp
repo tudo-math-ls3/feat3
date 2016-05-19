@@ -231,7 +231,6 @@ namespace FEAST
       explicit DenseVector() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating DenseVector");
         this->_scalar_index.push_back(0);
       }
 
@@ -248,8 +247,6 @@ namespace FEAST
       explicit DenseVector(Index size_in, bool pinned_allocation = false) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating DenseVector");
-
         ASSERT(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Error: Pinned memory allocation only possible in main memory!");
 
         this->_scalar_index.push_back(0);
@@ -282,8 +279,6 @@ namespace FEAST
       explicit DenseVector(Index size_in, DT_ value) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating DenseVector");
-
         this->_scalar_index.push_back(0);
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(size_in));
         this->_elements_size.push_back(size_in);
@@ -304,8 +299,6 @@ namespace FEAST
       explicit DenseVector(Index size_in, DT_ * data) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating DenseVector");
-
         this->_scalar_index.push_back(0);
         this->_elements.push_back(data);
         this->_elements_size.push_back(size_in);
@@ -330,8 +323,6 @@ namespace FEAST
       explicit DenseVector(const DenseVector & dv_in, Index size_in, Index offset_in) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        CONTEXT("When creating DenseVector");
-
         ASSERT(size_in + offset_in <= dv_in.size(), "Ranged vector part exceeds orig vector size!");
 
         this->_scalar_index.push_back(1);
@@ -351,8 +342,6 @@ namespace FEAST
       explicit DenseVector(const DenseVectorBlocked<Mem_, DT_, IT_, BS_> & other) :
         Container<Mem_, DT_, IT_>(other.template size<Perspective::pod>())
       {
-        CONTEXT("When creating DenseVector");
-
         this->_scalar_index.push_back(0);
         convert(other);
       }
@@ -368,8 +357,6 @@ namespace FEAST
       explicit DenseVector(FileMode mode, String filename) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating DenseVector");
-
         read_from(mode, filename);
       }
 
@@ -384,8 +371,6 @@ namespace FEAST
       explicit DenseVector(FileMode mode, std::istream& file) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating DenseVector");
-
         read_from(mode, file);
       }
 
@@ -400,7 +385,6 @@ namespace FEAST
       explicit DenseVector(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        CONTEXT("When creating DenseVector");
         deserialise<DT2_, IT2_>(input);
       }
 
@@ -414,7 +398,6 @@ namespace FEAST
       DenseVector(DenseVector && other) :
         Container<Mem_, DT_, IT_>(std::forward<DenseVector>(other))
       {
-        CONTEXT("When moving DenseVector");
       }
 
       /**
@@ -424,8 +407,6 @@ namespace FEAST
        */
       virtual ~DenseVector()
       {
-        CONTEXT("When destroying DenseVector");
-
         // avoid releasing memory by base class destructor, because we do not own the referenced memory
         if (this->_scalar_index.size() > 0 && this->_scalar_index.at(1) == 1)
         {
@@ -445,8 +426,6 @@ namespace FEAST
        */
       DenseVector & operator= (DenseVector && other)
       {
-        CONTEXT("When moving DenseVector");
-
         this->move(std::forward<DenseVector>(other));
 
         return *this;
@@ -461,7 +440,6 @@ namespace FEAST
        */
       DenseVector shared() const
       {
-        CONTEXT("When sharing DenseVector");
         DenseVector r;
         r.assign(*this);
         return r;
@@ -477,7 +455,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const DenseVector<Mem2_, DT2_, IT2_> & other)
       {
-        CONTEXT("When converting DenseVector");
         this->assign(other);
       }
 
@@ -491,8 +468,6 @@ namespace FEAST
       template <typename Mem2_, typename DT2_, typename IT2_, int BS2_>
       void convert(const DenseVectorBlocked<Mem2_, DT2_, IT2_, BS2_> & other)
       {
-        CONTEXT("When converting DenseVector");
-
         this->clear();
 
         this->_scalar_index.push_back(other.template size<Perspective::pod>());
@@ -516,8 +491,6 @@ namespace FEAST
       template <typename VT_>
       void convert(const VT_ & a)
       {
-        CONTEXT("When converting DenseVector");
-
         this->template _convert<VT_>(a);
       }
 
@@ -586,8 +559,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, String filename)
       {
-        CONTEXT("When reading in DenseVector");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -615,8 +586,6 @@ namespace FEAST
        */
       void read_from(FileMode mode, std::istream& file)
       {
-        CONTEXT("When reading in DenseVector");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -808,8 +777,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, String filename) const
       {
-        CONTEXT("When writing out DenseVector");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -837,8 +804,6 @@ namespace FEAST
        */
       void write_out(FileMode mode, std::ostream& file) const
       {
-        CONTEXT("When writing out DenseVector");
-
         switch(mode)
         {
         case FileMode::fm_mtx:
@@ -984,8 +949,6 @@ namespace FEAST
        */
       const DT_ operator()(Index index) const
       {
-        CONTEXT("When retrieving DenseVector element");
-
         ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->size()) + " !");
         return MemoryPool<Mem_>::get_element(this->_elements.at(0), index);
       }
@@ -998,8 +961,6 @@ namespace FEAST
        */
       void operator()(Index index, DT_ value)
       {
-        CONTEXT("When setting DenseVector element");
-
         ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->size()) + " !");
         MemoryPool<Mem_>::set_memory(this->_elements.at(0) + index, value);
       }
@@ -1276,8 +1237,6 @@ namespace FEAST
        */
       template <typename Mem2_> friend bool operator== (const DenseVector & a, const DenseVector<Mem2_, DT_, IT_> & b)
       {
-        CONTEXT("When comparing DenseVectors");
-
         if (a.size() != b.size())
           return false;
         if (a.get_elements().size() != b.get_elements().size())

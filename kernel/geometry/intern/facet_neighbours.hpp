@@ -39,8 +39,6 @@ namespace FEAST
         template<typename NeighbourIndexSetType_, typename FacetIndexSetType_>
         static void compute(NeighbourIndexSetType_& neighbours, const FacetIndexSetType_& facet_idx)
         {
-          CONTEXT(name() +"::compute()");
-
           Index num_cells(facet_idx.get_num_entities());
           Index num_facets(facet_idx.get_index_bound());
 

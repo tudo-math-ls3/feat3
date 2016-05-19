@@ -265,15 +265,6 @@ If undefined, the kernel base-header will include the header <code>feast_config.
 at the beginning of the file.
 
 <hr>
-\subsection ppm_feast_no_context FEAST_NO_CONTEXT
-This macro can be defined to disable the context stack for the exception system.
-
-\note This macro is automatically defined by the Visual Studio build system.
-
-<b>Effects:</b><br>
-If defined, the context back-trace for the exception and assertion system is disabled.
-
-<hr>
 \subsection ppm_feast_stdc_assert FEAST_STDC_ASSERT
 If this macro is defined, the \c ASSERT macro is defined to call the \c assert macro from the standard C libary.
 
@@ -283,13 +274,6 @@ from within the debugger directly.
 
 \note This macro is automatically defined by the Visual Studio build system, as this allows the user to attach the
 Visual Studio debugger to a program which fired an assertion.
-
-<hr>
-\subsection ppm_feast_trace_context FEAST_TRACE_CONTEXT
-This macro can be defined to enable live-tracing of the context stack.
-
-<b>Effects:</b><br>
-If defined, the context live-trace system is enabled.
 
 <hr>
 \subsection ppm_feast_unroll_banded FEAST_UNROLL_BANDED
