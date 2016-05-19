@@ -19,6 +19,15 @@ namespace FEAST
 {
   namespace Geometry
   {
+
+    /// \cond internal
+    // Forward declaration
+    template<typename RootMesh_, int world_dim>
+    struct DimensionalChartHelper;
+    /// \endcond
+
+
+
     template<typename RootMesh_>
     class ChartParser :
       public Xml::MarkupParser
@@ -83,19 +92,9 @@ namespace FEAST
 
       virtual std::shared_ptr<MarkupParser> markup(int, const String&, const String& name) override
       {
-        // What have we here?
-        if(name == "Bezier")       return std::make_shared<Atlas::BezierChartParser<RootMesh_>>(_chart);
-        if(name == "Circle")       return std::make_shared<Atlas::CircleChartParser<RootMesh_>>(_chart);
-        if(name == "Polyline")     return std::make_shared<Atlas::PolylineChartParser<RootMesh_>>(_chart);
-        // \todo: Implement SphereChartParser
-        //if(name == "Sphere")       return std::make_shared<Atlas::SphereChartParser<RootMesh_>>(_chart);
-        if(name == "SurfaceMesh")  return std::make_shared<Atlas::SurfaceMeshChartParser<RootMesh_>>(_chart);
-        // \todo: Implement TubeChartParser
-        //if(name == "Tube")       return std::make_shared<Atlas::TubeChartParser<RootMesh_>>(_chart);
-        if(name == "Extrude")      return std::make_shared<Atlas::ExtrudeChartParser<RootMesh_>>(_chart);
-
-        return nullptr;
+        return DimensionalChartHelper<RootMesh_, RootMesh_::world_dim>::markup(name, _chart);
       }
+
     }; // class ChartParser<...>
 
     template<int num_coords_, int stride_, typename Coord_>
@@ -1164,6 +1163,80 @@ namespace FEAST
         _scanner.scan();
       }
     }; // class MeshFileReader
+
+    /**
+     * \brief World dimension dependent helper class for parsing charts
+     *
+     * \tparam RootMesh_
+     * Type of the mesh the chart is supposed to work with.
+     *
+     * \tparam world_dim
+     * World dimension of the RootMesh_. This is separate because it is used for explicit specialisation.
+     *
+     * This class filters which chart(-parser) classes will be instantiated for each world_dim value, because (all?)
+     * charts are tied to a certain dimension. This is the generic implementation for values of world_dim which do
+     * not have any charts, and serves as an interface documentation.
+     *
+     */
+    template<typename RootMesh_, int world_dim>
+    struct DimensionalChartHelper
+    {
+      static_assert(RootMesh_::world_dim == world_dim, "Nonmatching world_dim.");
+      /**
+       * \brief Creates a parser for a chart, its type identified by a name String
+       *
+       * \param[in] name
+       * Type name of the chart to parse
+       *
+       * \param[out] chart
+       * Where to parse the chart to
+       *
+       */
+      static std::shared_ptr<Xml::MarkupParser> markup(const String& DOXY(name),
+      Atlas::ChartBase<RootMesh_>*& DOXY(chart))
+      {
+        return nullptr;
+      }
+    };
+
+    /// \cond internal
+    template<typename RootMesh_>
+    struct DimensionalChartHelper<RootMesh_,2>
+    {
+      static std::shared_ptr<Xml::MarkupParser> markup(const String& name,
+      Atlas::ChartBase<RootMesh_>*& chart)
+      {
+        if(name == "Bezier")
+          return std::make_shared<Atlas::BezierChartParser<RootMesh_>>(chart);
+        if(name == "Circle")
+          return std::make_shared<Atlas::CircleChartParser<RootMesh_>>(chart);
+        if(name == "Polyline")
+          return std::make_shared<Atlas::PolylineChartParser<RootMesh_>>(chart);
+
+        return nullptr;
+      }
+    };
+
+    template<typename RootMesh_>
+    struct DimensionalChartHelper<RootMesh_,3>
+    {
+      static std::shared_ptr<Xml::MarkupParser> markup(const String& name,
+      Atlas::ChartBase<RootMesh_>*& chart)
+      {
+        // \todo: Implement SphereChartParser
+        //if(name == "Sphere")       return std::make_shared<Atlas::SphereChartParser<RootMesh_>>(chart);
+        if(name == "SurfaceMesh")
+          return std::make_shared<Atlas::SurfaceMeshChartParser<RootMesh_>>(chart);
+        // \todo: Implement TubeChartParser
+        //if(name == "Tube")       return std::make_shared<Atlas::TubeChartParser<RootMesh_>>(chart);
+        if(name == "Extrude")
+          return std::make_shared<Atlas::ExtrudeChartParser<RootMesh_>>(chart);
+
+        return nullptr;
+      }
+    };
+    /// \endcond
+
   } // namespace Geometry
 } // namespace FEAST
 
