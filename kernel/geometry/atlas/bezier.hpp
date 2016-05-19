@@ -55,6 +55,11 @@ namespace FEAST
           _control.push_back(xc2);
         }
 
+        std::deque<WorldPoint>& get_control_points()
+        {
+          return _control;
+        }
+
         /**
          * \brief Maps a local segment parameter point
          *
