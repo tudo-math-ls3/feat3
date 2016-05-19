@@ -450,8 +450,8 @@ namespace StokesPoiseuille2D
       std::cout<<"Domain size: " << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
       std::cout<<"LA size: " << double(la_size) / (1024. * 1024.) << " MByte" << std::endl;
       std::cout<<"MPI size: " << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
-      std::cout<<"#Mesh cells: min " << domain.get_levels().front()->get_mesh_node()->get_mesh()->get_num_entities(MeshType::ShapeType::dimension)<<
-        ", max " << domain.get_levels().back()->get_mesh_node()->get_mesh()->get_num_entities(MeshType::ShapeType::dimension)<<std::endl;
+      std::cout<<"#Mesh cells: min " << domain.get_levels().front()->get_mesh().get_num_entities(MeshType::ShapeType::dimension)<<
+        ", max " << domain.get_levels().back()->get_mesh().get_num_entities(MeshType::ShapeType::dimension)<<std::endl;
       std::cout<<"#DOFs: min " << system_levels.front()->matrix_sys.columns()<<", max " << system_levels.back()->matrix_sys.columns() << std::endl;
       std::cout<<"#NZEs: min " << system_levels.front()->matrix_sys.used_elements()<<", max " << system_levels.back()->matrix_sys.used_elements() << std::endl << std::endl;
       if (args.check("statistics") > 0) // provided parameter full or whatever
@@ -459,7 +459,6 @@ namespace StokesPoiseuille2D
         std::cout<<Statistics::get_formated_solvers();
       }
     }
-    /// \todo add mpi related allocation size
     if (args.check("statistics") > 0) // provided parameter full or whatever
       Statistics::write_out_solver_statistics(rank, la_size, domain.bytes(), mpi_size);
 
