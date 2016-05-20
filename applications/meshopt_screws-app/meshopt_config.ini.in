@@ -1,7 +1,8 @@
 [HyperelasticityDefault]
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
-dirichlet_boundaries = inner outer
+dirichlet_boundaries = outer
+slip_boundaries = inner
 
 [DuDvDefault]
 type = DuDvSmoother

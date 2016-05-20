@@ -1,6 +1,6 @@
 [ApplicationSettings]
 mesh_file = ./screws_2d_mesh_tria_360_1.xml
-chart_file = ./screws_2d_chart_polyline_3600.xml
+chart_file = ./screws_2d_chart_bezier_24_28.xml
 meshopt_config_file = ./meshopt_config.ini
 solver_config_file = ./solver_config.ini
 mesh_optimiser = HyperelasticityDefault

@@ -230,7 +230,7 @@ struct MeshoptScrewsApp
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         // Add everything from the MeshoptControl
-        meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.get_levels().back()->get_level_index());
+        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
         exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
       }
     }
@@ -428,7 +428,7 @@ struct MeshoptScrewsApp
         // Add mesh velocity
         exporter.add_vertex_vector("mesh_velocity", *mesh_velocity);
         // Add everything from the MeshoptControl
-        meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.get_levels().back()->get_level_index());
+        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
         // Write the file
         exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
       }
