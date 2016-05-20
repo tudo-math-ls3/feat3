@@ -107,6 +107,15 @@ struct MeshRefinementOptimiserApp
 
     // Create the DomainControl
     DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader, Geometry::AdaptMode::none);
+    // Print level information
+    if(Comm::rank() == 0)
+    {
+      std::cout << name() << " settings: " << std::endl;
+      std::cout << "LVL-MAX: " <<
+        dom_ctrl.get_levels().back()->get_level_index() << " [" << lvl_max << "]";
+      std::cout << " LVL-MIN: " <<
+        dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
+    }
 
     // Create the MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
@@ -181,12 +190,13 @@ int main(int argc, char* argv[])
 
   // This is the list of all supported meshes that could appear in the mesh file
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, Real> S2M2D;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> H2M2D;
+  // These mesh types do exist, but no MeshQuality functional is implemented for them
   //typedef Geometry::ConformalMesh<Shape::Simplex<2>, 3, 3, Real> S2M3D;
   //typedef Geometry::ConformalMesh<Shape::Simplex<3>, 3, 3, Real> S3M3D;
   //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 1, 1, Real> H1M1D;
   //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 2, 2, Real> H1M2D;
   //typedef Geometry::ConformalMesh<Shape::Hypercube<1>, 3, 3, Real> H1M3D;
-  typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, Real> H2M2D;
   //typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 3, 3, Real> H2M3D;
   //typedef Geometry::ConformalMesh<Shape::Hypercube<3>, 3, 3, Real> H3M3D;
 
@@ -195,12 +205,6 @@ int main(int argc, char* argv[])
 
   int rank(0);
   int nprocs(0);
-
-  int lvl_min(-1);
-  int lvl_max(-1);
-  String mesh_optimiser_key("");
-
-  bool write_vtk(false);
 
   // initialise
   FEAST::Runtime::initialise(argc, argv, rank, nprocs);
@@ -211,15 +215,25 @@ int main(int argc, char* argv[])
   }
 #endif
 
-  // Creata a parser for command line arguments.
+  // Mininum refinement level, parsed from the application config file
+  int lvl_min(-1);
+  // Maximum refinement level, parsed from the application config file
+  int lvl_max(-1);
+  // Do we want to write vtk files. Read from the command line arguments
+  bool write_vtk(false);
+
+  // Streams for synchronising information read from files
+  std::stringstream synchstream_mesh;
+  std::stringstream synchstream_chart;
+  std::stringstream synchstream_app_config;
+  std::stringstream synchstream_meshopt_config;
+  std::stringstream synchstream_solver_config;
+
+  // Create a parser for command line arguments.
   SimpleArgParser args(argc, argv);
-  args.support("help");
-  args.support("level");
-  args.support("meshfile");
-  args.support("meshopt_config");
-  args.support("mesh_optimiser");
-  args.support("solver_config");
+  args.support("application_config");
   args.support("vtk");
+  args.support("help");
 
   if( args.check("help") > -1 || args.num_args()==1)
   {
@@ -235,36 +249,65 @@ int main(int argc, char* argv[])
       std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
   }
 
-  args.parse("level", lvl_max, lvl_min);
-  args.parse("mesh_optimiser", mesh_optimiser_key);
-
   // Check if we want to write vtk files
   if(args.check("vtk") >= 0 )
   {
     write_vtk = true;
   }
 
-  std::stringstream synchstream_mesh;
-  std::stringstream synchstream_chart;
-  std::stringstream synchstream_meshopt_config;
-  std::stringstream synchstream_solver_config;
+  // Read the application config file on rank 0
+  if(Comm::rank() == 0)
+  {
+    // Input application configuration file name, required
+    String application_config_filename("");
+    // Check and parse --application_config
+    if(args.check("application_config") != 1 )
+    {
+      std::cout << "You need to specify a application configuration file with --application_config.";
+      throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --application_config");
+    }
+    else
+    {
+      args.parse("application_config", application_config_filename);
+      std::cout << "Reading application configuration from file " << application_config_filename << std::endl;
+      std::ifstream ifs(application_config_filename);
+      if(!ifs.good())
+        throw InternalError(__func__, __FILE__, __LINE__, "config file "+application_config_filename+" not found!");
+      else
+        synchstream_app_config << ifs.rdbuf();
+    }
+  }
 
-  // Only read files on rank 0
+#ifndef SERIAL
+  // If we are in parallel mode, we need to synchronise the stream
+  synch_stringstream(synchstream_app_config);
+#endif
+
+  // Parse the application config from the (synchronised) stream
+  PropertyMap* application_config = new PropertyMap;
+  application_config->parse(synchstream_app_config, true);
+
+  // Get the application settings section
+  auto app_settings_section = application_config->query_section("ApplicationSettings");
+  if(app_settings_section == nullptr)
+    throw InternalError(__func__,__FILE__,__LINE__,
+    "Application config is missing the mandatory ApplicationSettings section!");
+
+  // We read the files only on rank 0. After reading, we synchronise the streams like above.
   if(Comm::rank() == 0)
   {
     String mesh_filename("");
     String chart_filename("");
-    String meshopt_config_filename("");
-    String solver_config_filename("");
-
     // Read the mesh file to stream
-    if(args.check("meshfile") != 1 )
+    auto mesh_filename_p = app_settings_section->query("mesh_file");
+    if(!mesh_filename_p.second)
     {
-      throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --meshfile");
+      throw InternalError(__func__,__FILE__,__LINE__,
+      "ApplicationSettings section is missing the mandatory mesh_file entry!");
     }
     else
     {
-      args.parse("meshfile",mesh_filename);
+      mesh_filename = mesh_filename_p.first;
       std::ifstream ifs(mesh_filename);
       if(!ifs.good())
         throw InternalError(__func__, __FILE__, __LINE__, "mesh file "+mesh_filename+" not found!");
@@ -276,9 +319,10 @@ int main(int argc, char* argv[])
     }
 
     // Read the chart file to stream
-    if(args.check("chartfile") == 1 )
+    auto chart_filename_p = app_settings_section->query("chart_file");
+    if(chart_filename_p.second)
     {
-      args.parse("chartfile",chart_filename);
+      chart_filename = chart_filename_p.first;
       std::ifstream ifs(chart_filename);
       if(!ifs.good())
         throw InternalError(__func__, __FILE__, __LINE__, "chart file "+chart_filename+" not found!");
@@ -288,43 +332,47 @@ int main(int argc, char* argv[])
         synchstream_chart << ifs.rdbuf();
       }
     }
-    // Get meshopt_config
-    if(args.check("meshopt_config") != 1 )
+
+    // Read configuration for mesh optimisation to stream
+    auto meshopt_config_filename_p = app_settings_section->query("meshopt_config_file");
+    if(!meshopt_config_filename_p.second)
     {
-      std::cout << "You need to specify a mesh optimiser configuration file with --meshopt_config.";
-      throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --meshopt_config");
+      throw InternalError(__func__,__FILE__,__LINE__,
+      "ApplicationConfig section is missing the mandatory meshopt_config_file entry!");
     }
     else
     {
-      args.parse("meshopt_config", meshopt_config_filename);
-      std::cout << "Reading application configuration from file " << meshopt_config_filename << std::endl;
-
-      std::ifstream ifs(meshopt_config_filename);
+      std::ifstream ifs(meshopt_config_filename_p.first);
       if(!ifs.good())
         throw InternalError(__func__, __FILE__, __LINE__,
-        "config file "+meshopt_config_filename+" not found!");
+        "config file "+meshopt_config_filename_p.first+" not found!");
       else
+      {
+        std::cout << "Reading mesh optimisation config from file " <<meshopt_config_filename_p.first << std::endl;
         synchstream_meshopt_config << ifs.rdbuf();
+      }
     }
 
-    if(args.check("solver_config") != 1 )
+    // Read solver configuration to stream
+    auto solver_config_filename_p = app_settings_section->query("solver_config_file");
+    if(!solver_config_filename_p.second)
     {
-      std::cout << "You need to specify a solver configuration file with --solver_config.";
-      throw InternalError(__func__, __FILE__, __LINE__, "Invalid option for --solver_config");
+      throw InternalError(__func__,__FILE__,__LINE__,
+      "ApplicationConfig section is missing the mandatory solver_config_file entry!");
     }
     else
     {
-      args.parse("solver_config", solver_config_filename);
-      std::cout << "Reading application configuration from file " << solver_config_filename << std::endl;
-
-      std::ifstream ifs(solver_config_filename);
+      std::ifstream ifs(solver_config_filename_p.first);
       if(!ifs.good())
         throw InternalError(__func__, __FILE__, __LINE__,
-        "config file "+solver_config_filename+" not found!");
+        "config file "+solver_config_filename_p.first+" not found!");
       else
+      {
+        std::cout << "Reading solver config from file " << solver_config_filename_p.first << std::endl;
         synchstream_solver_config << ifs.rdbuf();
+      }
     }
-  }
+  } // Comm::rank() == 0
 
 #ifndef SERIAL
   // Synchronise all those streams in parallel mode
@@ -333,13 +381,6 @@ int main(int argc, char* argv[])
   synch_stringstream(synchstream_meshopt_config);
   synch_stringstream(synchstream_solver_config);
 #endif
-
-  // Create PropertyMaps and parse the configuration streams
-  PropertyMap* meshopt_config = new PropertyMap;
-  meshopt_config->parse(synchstream_meshopt_config, true);
-
-  PropertyMap* solver_config = new PropertyMap;
-  solver_config->parse(synchstream_solver_config, true);
 
   // Create a MeshFileReader and parse the mesh stream
   Geometry::MeshFileReader* mesh_file_reader(new Geometry::MeshFileReader(synchstream_mesh));
@@ -350,6 +391,32 @@ int main(int argc, char* argv[])
   if(!synchstream_chart.str().empty())
     chart_file_reader = new Geometry::MeshFileReader(synchstream_chart);
 
+  // Create PropertyMaps and parse the configuration streams
+  PropertyMap* meshopt_config = new PropertyMap;
+  meshopt_config->parse(synchstream_meshopt_config, true);
+
+  PropertyMap* solver_config = new PropertyMap;
+  solver_config->parse(synchstream_solver_config, true);
+
+  // Get the coarse mesh and finest mesh levels from the application settings
+  auto lvl_min_p = app_settings_section->query("lvl_min");
+  if(!lvl_min_p.second)
+    lvl_min = 0;
+  else
+    lvl_min = std::stoi(lvl_min_p.first);
+
+  auto lvl_max_p = app_settings_section->query("lvl_max");
+  if(!lvl_max_p.second)
+    lvl_max = 0;
+  else
+    lvl_max = std::stoi(lvl_max_p.first);
+
+  // Get the mesh optimiser key from the application settings
+  auto mesh_optimiser_key_p = app_settings_section->query("mesh_optimiser");
+  if(!mesh_optimiser_key_p.second)
+    throw InternalError(__func__,__FILE__,__LINE__,
+    "ApplicationConfig section is missing the mandatory mesh_optimiser entry!");
+
   // Get the mesh type sting from the parsed mesh so we know with which template parameter to call the application
   const String mesh_type(mesh_file_reader->get_meshtype_string());
 
@@ -359,13 +426,13 @@ int main(int argc, char* argv[])
   if(mesh_type == "conformal:hypercube:2:2")
   {
     ret = MeshRefinementOptimiserApp<MemType, DataType, IndexType, H2M2D>::run(
-      mesh_optimiser_key, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
+      mesh_optimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
       lvl_max, lvl_min, write_vtk);
   }
   else if(mesh_type == "conformal:simplex:2:2")
   {
     ret = MeshRefinementOptimiserApp<MemType, DataType, IndexType, S2M2D>::run(
-      mesh_optimiser_key, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
+      mesh_optimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
       lvl_max, lvl_min, write_vtk);
   }
   else
@@ -392,11 +459,7 @@ static void display_help()
     std::cout << "meshopt_refinement-app: This refines a mesh without boundary adaption, then just adapts the finest mesh and uses a mesh optimiser on this"
     << std::endl;
     std::cout << "Mandatory arguments:" << std::endl;
-    std::cout << " --meshfile: Path to the mesh file" << std::endl;
-    std::cout << " --mesh_optimiser: Which mesh quality functional to use" << std::endl;
-    std::cout << " --meshopt_config: Path to the mesh optimiser configuration file" << std::endl;
-    std::cout << " --solver_config: Path to the solver configuration file" << std::endl;
-    std::cout << " --level [LVL-MAX, LVL-MIN]: Maximum refinement level and coarses level" << std::endl;
+    std::cout << " --application_config: Path to application configuration file" << std::endl;
       std::cout << "Optional arguments:" << std::endl;
     std::cout << " --vtk: If this is set, vtk files are written" << std::endl;
     std::cout << " --help: Displays this text" << std::endl;

@@ -121,7 +121,7 @@ struct MeshoptBoundaryApp
     // Print level information
     if(Comm::rank() == 0)
     {
-      std::cout << name() << "settings: " << std::endl;
+      std::cout << name() << " settings: " << std::endl;
       std::cout << "Timestep size: " << stringify_fp_fix(delta_t) << ", end time: " <<
         stringify_fp_fix(t_end) << std::endl;
       std::cout << "LVL-MAX: " <<

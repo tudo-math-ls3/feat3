@@ -11,6 +11,7 @@ if (FEAST_HAVE_PARMETIS)
 endif (FEAST_HAVE_PARMETIS)
 
 ADD_SUBDIRECTORY( meshopt_boundary-app )
+ADD_SUBDIRECTORY( meshopt_refinement-app )
 ADD_SUBDIRECTORY( meshopt_screws-app )
 
 # applications to build
@@ -21,7 +22,6 @@ SET (app_list
   #  foundation_global_ops_concave_4procs_test-app
   #  foundation_global_ops_synch_scal_test-app
   foundation_psystem_test-app
-  meshopt_refinement-app
   meshopt_hyperelasticity_resize-app
   parti_poisson_dirichlet_2d
   poisson_dirichlet_2d
