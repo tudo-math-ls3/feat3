@@ -140,20 +140,21 @@ NLCGTest<Mem::Main, double, Index, Analytic::Common::BazaraaShettyFunction>
 nlcg_sw_bs_d(double(0.15),Index(25),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlcg_s_hb_d(double(0.6),Index(10),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
+nlcg_s_hb_d(float(0.6),Index(10),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 nlcg_s_bs_d(double(0.15), Index(20), "SecantLinesearch", "none", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
-nlcg_nr_rb_d(float(0.6), Index(35),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
+nlcg_nr_rb_d(float(0.6), Index(21),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
-nlcg_sw_hessian_rb_d(double(0.7), Index(36),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
+nlcg_sw_hessian_rb_d(double(0.7), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
 #ifdef FEAST_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
-nlcg_nr_rb_q(__float128(0.8), Index(45), "NewtonRaphsonLinesearch", "ApproximateHessian", NLCGDirectionUpdate::PolakRibiere);
+nlcg_nr_rb_q(__float128(0.6), Index(33), "NewtonRaphsonLinesearch", "ApproximateHessian",
+NLCGDirectionUpdate::PolakRibiere);
 
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::BazaraaShettyFunction>
 nlcg_sw_bs_q(__float128(0.175), Index(30), "StrongWolfeLinesearch", "none", NLCGDirectionUpdate::HestenesStiefel);
@@ -283,7 +284,7 @@ class NLSDTest:
 };
 
 NLSDTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f(float(0.5), Index(12), "SecantLinesearch", "ApproximateHessian");
+nlsd_hb_f(float(0.5), Index(13), "SecantLinesearch", "ApproximateHessian");
 
 NLSDTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
 nlsd_rb_d(double(0.75), Index(20), "StrongWolfeLinesearch", "Hessian");
@@ -291,10 +292,9 @@ nlsd_rb_d(double(0.75), Index(20), "StrongWolfeLinesearch", "Hessian");
 NLSDTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
 nlsd_rb_d_sw(double(0.6), Index(10), "NewtonRaphsonLinesearch", "none");
 
-// Rosenbrock with secant linesearch and preconditioning  in quad precision
 #ifdef FEAST_HAVE_QUADMATH
 NLSDTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
-nlsd_rb_q(__float128(1), Index(20), "SecantLinesearch", "Hessian");
+nlsd_rb_q(__float128(1), Index(19), "SecantLinesearch", "Hessian");
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in

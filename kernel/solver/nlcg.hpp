@@ -431,33 +431,26 @@ namespace FEAST
             if(this->_precond != nullptr)
               this->_precond->prepare(vec_sol, this->_filter);
 
+            status = compute_beta(_beta, gamma, at);
+
+            // Something might have gone wrong in applying the preconditioner, so check status again.
+            if(status != Status::progress)
+            {
+              TimeStamp bt;
+              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+              return status;
+            }
+
             // If a restart is scheduled, reset beta to 0
             if( (restart_freq > 0 && its_since_restart%restart_freq == 0) ||
                 linesearch_status != Status::success)
             {
               _beta = DataType(0);
               its_since_restart++;
-              this->_vec_tmp.clone(this->_vec_def);
-            }
-            else
-            {
-              // Compute the new beta for the search direction update. This also checks if the computed beta is valid
-              // (e.g. leads to a decrease) and applies the preconditioner to the new defect vector
-              status = compute_beta(_beta, gamma, at);
-
-              // Something might have gone wrong in applying the preconditioner, so check status again.
-              if(status != Status::progress)
-              {
-                TimeStamp bt;
-                Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-                return status;
-              }
-
             }
 
             /// Restarting means discarding the new search direction and setting the new search direction to the
             // (preconditioned) steepest descent direction
-            // We need to check beta again here because some variants might set it to 0 in compute_beta
             if(_beta == DataType(0))
             {
               // Uncomment the line below to deviate from the ALGLIBMinCG behaviour
