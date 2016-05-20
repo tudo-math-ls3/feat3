@@ -18,7 +18,6 @@ namespace FEAST
     enum class NLCGDirectionUpdate
     {
       undefined = 0,
-      automatic,
       DaiYuan,
       DYHSHybrid,
       FletcherReeves,
@@ -36,8 +35,6 @@ namespace FEAST
       {
         case NLCGDirectionUpdate::undefined:
           return os << "undefined";
-        case NLCGDirectionUpdate::automatic:
-          return os << "automatic";
         case NLCGDirectionUpdate::DaiYuan:
           return os << "DaiYuan";
         case NLCGDirectionUpdate::DYHSHybrid:
@@ -57,8 +54,6 @@ namespace FEAST
     {
         if(update_name == "undefined")
           update = NLCGDirectionUpdate::undefined;
-        else if(update_name == "automatic")
-          update = NLCGDirectionUpdate::automatic;
         else if(update_name == "DaiYuan")
           update = NLCGDirectionUpdate::DaiYuan;
         else if(update_name == "DYHSHybrid")
@@ -154,9 +149,9 @@ namespace FEAST
         DataType _fval_prev;
 
         /// Number of subsequent steepest descent steps
-        Index _num_subs_restarts;
+        Index _num_restarts;
         /// Maximum number of subsequent restarts (meaning steepest descent steps) before aborting
-        Index _max_num_subs_restarts;
+        Index _max_num_restarts;
 
       public:
         /// Restart frequency, defaults to problemsize+1
@@ -199,8 +194,8 @@ namespace FEAST
           _tol_fval(DataType(0)),
           _tol_step(Math::sqrt(Math::eps<DataType>())),
           _beta(0),
-          _num_subs_restarts(0),
-          _max_num_subs_restarts(0),
+          _num_restarts(0),
+          _max_num_restarts(0),
           restart_freq(_op.columns() + Index(4)),
           iterates(nullptr)
           {
@@ -386,7 +381,7 @@ namespace FEAST
             return Status::success;
 
           Index its_since_restart(0);
-          _num_subs_restarts = Index(0);
+          _num_restarts = Index(0);
           // start iterating
           while(status == Status::progress)
           {
@@ -467,13 +462,13 @@ namespace FEAST
             {
               // Uncomment the line below to deviate from the ALGLIBMinCG behaviour
               // its_since_restart = Index(1);
-              _num_subs_restarts++;
-
+              _num_restarts++;
+              // Discard the old search direction and perform (preconditioned) steepest descent
               this->_vec_dir.clone(this->_vec_tmp);
             }
             else
             {
-              _num_subs_restarts = Index(0);
+              _num_restarts = Index(0);
               this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, _beta);
             }
 
@@ -603,7 +598,7 @@ namespace FEAST
             return Status::success;
 
           // If there were too many subsequent restarts, the solver is stagnated
-          if(_max_num_subs_restarts > Index(0) && _num_subs_restarts > _max_num_subs_restarts)
+          if(_max_num_restarts > Index(0) && _num_restarts > _max_num_restarts)
             return Status::stagnated;
 
           // If there were too many stagnated iterations, the solver is stagnated

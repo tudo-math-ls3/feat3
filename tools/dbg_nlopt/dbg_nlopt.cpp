@@ -245,7 +245,7 @@ static void display_help()
   std::cout <<
     "                              Available search direction updates for ALGLIBMinCG are DaiYuan,"
     << std::endl <<
-    "                              DYHSHybrid and automatic (default)."
+    "                              and DYHSHybrid."
     << std::endl;
 #endif // FEAST_HAVE_ALGLIB
 }
@@ -345,7 +345,7 @@ int main(int argc, char* argv[])
     else if(precon_name != "none")
       throw InternalError("Got invalid precon_name: "+precon_name);
 
-    NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::PolakRibiere);
+    NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::DYHSHybrid);
     auto* update_pair(args.query("direction_update"));
     if(update_pair != nullptr)
     {
@@ -428,14 +428,12 @@ int main(int argc, char* argv[])
   }
   else if (solver_name == "ALGLIBMinCG")
   {
-    NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::automatic);
+    NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::DYHSHybrid);
     auto* update_pair(args.query("direction_update"));
     if(update_pair != nullptr)
     {
       String update_name(update_pair->second.front());
-      if(update_name == "automatic")
-        my_direction_update = NLCGDirectionUpdate::automatic;
-      else if(update_name == "DaiYuan")
+      if(update_name == "DaiYuan")
         my_direction_update = NLCGDirectionUpdate::DaiYuan;
       else if(update_name == "DYHSHybrid")
         my_direction_update = NLCGDirectionUpdate::DYHSHybrid;

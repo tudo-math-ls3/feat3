@@ -497,7 +497,7 @@ namespace FEAST
         typedef SolverBase<VectorType> PrecondType;
 
         /// Default NLCG search direction update
-        static constexpr NLCGDirectionUpdate direction_update_default = NLCGDirectionUpdate::automatic;
+        static constexpr NLCGDirectionUpdate direction_update_default = NLCGDirectionUpdate::DYHSHybrid;
 
       protected:
         /// Our nonlinear operator
@@ -505,7 +505,7 @@ namespace FEAST
         /// The filter we apply to the gradient
         Filter_& _filter;
 
-        /// Method to update the search direction, defaults to ALGLIB's automatic setting
+        /// Method to update the search direction, defaults to DYHSHybrid
         NLCGDirectionUpdate _direction_update;
 
         /// defect vector
@@ -597,9 +597,6 @@ namespace FEAST
         {
           switch(update_)
           {
-            case NLCGDirectionUpdate::automatic:
-                alglib::mincgsetcgtype(_state, -1);
-                break;
             case NLCGDirectionUpdate::DaiYuan:
                 alglib::mincgsetcgtype(_state, 0);
                 break;
@@ -897,7 +894,8 @@ namespace FEAST
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
     template<typename Operator_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinCG<Operator_, Filter_>> new_alglib_mincg(
-      Operator_& op_, Filter_& filter_, NLCGDirectionUpdate du_ = NLCGDirectionUpdate::automatic,
+      Operator_& op_, Filter_& filter_,
+      NLCGDirectionUpdate du_ = ALGLIBMinCG<Operator_, Filter_>::direction_update_default,
       bool keep_iterates_ = false)
       {
         return std::make_shared<ALGLIBMinCG<Operator_, Filter_>>(op_, filter_, du_, keep_iterates_);
