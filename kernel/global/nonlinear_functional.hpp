@@ -159,6 +159,7 @@ namespace FEAST
               {
                 // Temporary DenseVector for syncing
                 LocalVectorTypeR tmp(slip_filter_vector.size(), DataType(0));
+
                 auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
                 auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
 

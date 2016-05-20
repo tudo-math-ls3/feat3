@@ -13,6 +13,7 @@
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/meshopt/mesh_quality_functional.hpp>
 #include <kernel/meshopt/rumpf_trafo.hpp>
+#include <kernel/util/comm_base.hpp>
 
 #include <map>
 
@@ -21,6 +22,9 @@ namespace FEAST
   namespace Meshopt
   {
 
+    /**
+     * \brief Enum class for different types of scale computations
+     */
     enum class ScaleComputation
     {
       undefined = 0,
@@ -537,15 +541,29 @@ namespace FEAST
           switch(_scale_computation)
           {
             case ScaleComputation::uniform:
-              return compute_lambda_uniform();
+              compute_lambda_uniform();
+              break;
             case ScaleComputation::current:
-              return compute_lambda_current();
+              compute_lambda_current();
+              break;
             case ScaleComputation::chart_distance:
-              return compute_lambda_chart_dist();
+              compute_lambda_chart_dist();
+              break;
             default:
               throw InternalError(__func__,__FILE__,__LINE__,
               "Unhandled scale computation"+stringify(_scale_computation));
           }
+
+          /// Rescale so that sum lambda == 1
+          CoordType sum_lambda(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+            sum_lambda += _lambda(cell);
+
+          Comm::allreduce(&sum_lambda, 1, &sum_lambda);
+
+          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
+
         }
 
         /// \brief Computes the uniformly distributed weights _lambda.
@@ -557,17 +575,8 @@ namespace FEAST
           typename LAFEM::DenseVector<Mem::Main, CoordType, Index> tmp(
             this->get_mesh()->get_num_entities(ShapeType::dimension));
 
-          CoordType sum_lambda(0);
           for(Index cell(0); cell < ncells; ++cell)
-          {
             tmp(cell, this->_trafo.template compute_vol<ShapeType, CoordType>(cell));
-            sum_lambda+=tmp(cell);
-          }
-
-          // Scale so that sum(lambda) = 1
-          tmp.scale(tmp, CoordType(1)/sum_lambda);
-          _lambda.convert(tmp);
-
         }
 
         /// \brief Computes the uniformly distributed weights _lambda.
@@ -588,7 +597,6 @@ namespace FEAST
           const auto& vtx = this->get_mesh()->get_vertex_set();
 
           Tiny::Vector<CoordType, MeshType::world_dim> midpoint(CoordType(0));
-          CoordType sum_lambda(0);
 
           for(Index cell(0); cell < ncells; ++cell)
           {
@@ -609,16 +617,17 @@ namespace FEAST
               CoordType midpoint_dist(chart->dist(midpoint));
 
               _lambda(cell, midpoint_dist + _lambda(cell));
-              sum_lambda += _lambda(cell);
             }
           }
-          _lambda.scale(_lambda, DataType(1)/sum_lambda);
         }
 
         /// \brief Computes the weights mu
         virtual void compute_mu()
         {
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
+
+          Comm::allreduce(&ncells, 1, &ncells);
+
           _mu.format(CoordType(1)/CoordType(ncells));
         }
 
@@ -808,9 +817,6 @@ namespace FEAST
             func_det_tot += func_det[cell];
             func_rec_det_tot += func_rec_det[cell];
           }
-
-          std::cout << "fval = " << stringify_fp_sci(fval) << " func_norm = " << stringify_fp_sci(func_norm_tot)
-          << ", func_det = " << stringify_fp_sci(func_det_tot) << ", func_rec_det = " << stringify_fp_sci(func_rec_det_tot) << std::endl;
 
           return fval;
         } // compute_func
