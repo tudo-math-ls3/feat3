@@ -21,6 +21,31 @@ namespace FEAST
   {
     namespace Meshopt
     {
+      /**
+       * \brief Control class for HyperelasticityFunctionals
+       *
+       * \tparam Mem_
+       * The memory architecture of the local HyperelasticityFunctional
+       *
+       * \tparam DT_
+       * The floating point precision for the solver
+       *
+       * \tparam IT_
+       * Index type
+       *
+       * \tparam DomainControl_
+       * The domain control type this is based on
+       *
+       * \tparam Trafo_
+       * The mesh's underlying transformation. At the time of writing, there is only Trafo::Standard, which means
+       * P1/Q1 transformation.
+       *
+       * \tparam Hyperelasticity_
+       * The (patch-) local HyperelasticityFunctional to use.
+       *
+       * \note Local Hyperelastiticy functionals are only implemented for Mem::Main,
+       * \see FEAST::Meshopt::HyperElasticityFunctionalBase
+       */
       template
       <
         typename Mem_, typename DT_, typename IT_, typename DomainControl_, typename Trafo_,
@@ -57,13 +82,25 @@ namespace FEAST
           /// Inter level transfer matrix
           typedef TransferMatrixBlocked<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
 
-          typedef MeshoptSystemLevel<Mem_, DT_, IT_, LocalQualityFunctionalType, Global::NonlinearFunctional> SystemLevelType;
+          /// The system level type, holding all information about the nonlinear system of equations
+          typedef MeshoptSystemLevel
+          <
+            Mem_, DT_, IT_,
+            LocalQualityFunctionalType,
+            Global::NonlinearFunctional
+          > SystemLevelType;
+          /// Type for holding inter level transfer information
           typedef MeshoptTransferLevel<SystemLevelType, TransferMatrixType> TransferLevelType;
 
+          /// Domain layers
           typedef typename DomainControl_::LayerType DomainLayerType;
+          /// Domain levels
           typedef typename DomainControl_::LevelType DomainLevelType;
+          /// Type for assembling FE space based quantities like filters, gates etc.
           typedef MeshoptAssemblerLevel<TrafoSpace> AssemblerLevelType;
 
+          /// Preconditioner type. Becaus the preconditioner is expensive to assemble symbolically and numerically,
+          /// it is kept and recycled between nonlinear solver calls, so we have to keep it.
           typedef Solver::NLOptPrecond
           <
             typename SystemLevelType::GlobalSystemVector,
@@ -90,7 +127,23 @@ namespace FEAST
           std::shared_ptr<PrecondType> precond;
 
           /**
-           * Constructor
+           * \brief Variadic template constructor
+           *
+           * \param[in] dom_ctrl
+           * The domaincontrol holding all geometry information for all levels
+           *
+           * \param[in] dirichlet_list
+           * List of meshpart identifiers for Dirichlet boundary conditions
+           *
+           * \param[in] slip_list
+           * List of meshpart identifiers for slip boundary conditions
+           *
+           * \param[in] solver_name_
+           * Name of the solver to select from the solver_config_
+           *
+           * \param[in] solver_config_
+           * PropertyMap holding the solver configuration
+           *
            */
           template<typename... Args_>
           explicit HyperelasticityFunctionalControl(
@@ -234,7 +287,9 @@ namespace FEAST
             for(auto& it:(*(sys_lvl->filter_sys)).template at<0>())
             {
               const String field_name("nu_"+it.first);
-              exporter.add_vertex_vector(field_name, it.second.get_nu());
+              // WARNING: This explicitly assumes that the filter vector belong to a P1/Q1 space and thus "lives"
+              // in the mesh's vertices
+              exporter.add_vertex_vector(field_name, it.second.get_filter_vector());
             }
           }
 
