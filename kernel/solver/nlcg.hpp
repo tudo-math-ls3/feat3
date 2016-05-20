@@ -201,20 +201,10 @@ namespace FEAST
           _beta(0),
           _num_subs_restarts(0),
           _max_num_subs_restarts(0),
-          restart_freq(0),
+          restart_freq(_op.columns() + Index(4)),
           iterates(nullptr)
           {
             ASSERT_(_linesearch != nullptr);
-
-            // If we use Fletcher-Reeves, frequent restarts are needed
-            if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
-              restart_freq = _op.columns() + Index(1);
-            // This is to make the restarts to occur at the same iterations as ALGLIB
-            if(_direction_update == NLCGDirectionUpdate::DaiYuan)
-              restart_freq = _op.columns() + Index(4);
-            // This is to make the restarts to occur at the same iterations as ALGLIB
-            if(_direction_update == NLCGDirectionUpdate::DYHSHybrid)
-              restart_freq = _op.columns() + Index(4);
 
             this->_min_stag_iter = 0;
 
@@ -342,15 +332,6 @@ namespace FEAST
         void set_direction_update(NLCGDirectionUpdate update_)
         {
           _direction_update = update_;
-          // If we use Fletcher-Reeves, frequent restarts are needed
-          if(_direction_update == NLCGDirectionUpdate::FletcherReeves)
-            restart_freq = _op.columns() + Index(1);
-          // This is to make the restarts to occur at the same iterations as ALGLIB
-          if(_direction_update == NLCGDirectionUpdate::DaiYuan)
-            restart_freq = _op.columns() + Index(4);
-          // This is to make the restarts to occur at the same iterations as ALGLIB
-          if(_direction_update == NLCGDirectionUpdate::DYHSHybrid)
-            restart_freq = _op.columns() + Index(4);
         }
 
       protected:
@@ -461,6 +442,7 @@ namespace FEAST
             {
               _beta = DataType(0);
               its_since_restart++;
+              this->_vec_tmp.clone(this->_vec_def);
             }
             else
             {

@@ -57,6 +57,8 @@ namespace FEAST
         DataType _fval_min;
         /// Initial functional value
         DataType _fval_0;
+        /// Threshold for trimming function value and gradient
+        DataType _trim_threshold;
 
         /// Line search parameter
         DataType _alpha_min;
@@ -92,6 +94,7 @@ namespace FEAST
           _filter(filter_),
           _fval_min(Math::huge<DataType>()),
           _fval_0(Math::huge<DataType>()),
+          _trim_threshold(Math::huge<DataType>()),
           _alpha_min(DataType(0)),
           _norm_dir(DataType(0)),
           _norm_sol(DataType(0)),
@@ -135,6 +138,7 @@ namespace FEAST
         {
           _fval_min = Math::huge<DataType>();
           _fval_0 = Math::huge<DataType>();
+          _trim_threshold = Math::huge<DataType>();
           _alpha_min = DataType(0);
           _norm_dir = DataType(0);
           _norm_sol = DataType(0);
@@ -187,6 +191,8 @@ namespace FEAST
         void set_initial_fval(DataType f0)
         {
           _fval_0 = f0;
+          if(_trim_threshold == Math::huge<DataType>())
+            _trim_threshold = DataType(10)*(Math::abs(_fval_0) + DataType(1));
         }
 
         /**
@@ -253,10 +259,9 @@ namespace FEAST
          */
         virtual void trim_func_grad(DataType& func)
         {
-          DataType trim_threshold(DataType(10)*(Math::abs(_fval_0) + DataType(1)));
-          if(func > trim_threshold)
+          if(func > _trim_threshold)
           {
-            func = trim_threshold;
+            func = _trim_threshold;
             this->_vec_grad.format(DataType(0));
           }
         }
@@ -928,9 +933,6 @@ namespace FEAST
           // The functional value from the best step so far
           DataType fval_prev(fval);
 
-          //std::cout << "SWLinesearch start: sol = " << *(this->_vec_initial_sol) << std::endl;
-          //std::cout << "                    dir = " << *vec_dir << std::endl;
-          //std::cout << "                   grad = " << *(this->_vec_grad) << std::endl;
           //std::cout << "SWLinesearch start: f_0 = " << stringify_fp_sci(this->_fval_0) << " delta_0 = "
           //<< stringify_fp_sci(_delta_0) << std::endl;
 
@@ -994,14 +996,6 @@ namespace FEAST
 
             Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
-            //std::cout << "SWLinesearch:   sol = " << vec_sol << " grad = " << this->_vec_grad << std::endl;
-            //std::cout << "SWLinesearch: alpha = " << stringify_fp_sci(alpha) << " f   = " <<
-            //  stringify_fp_sci(fval) << " delta = " << stringify_fp_sci(delta) << std::endl;
-            //std::cout << "       _prev: alpha = " << stringify_fp_sci(alpha_prev) << " f   = " <<
-            //  stringify_fp_sci(fval_prev) << " delta = " << stringify_fp_sci(delta_prev) << std::endl;
-            //std::cout << " soft limits = [" << stringify_fp_sci(_alpha_soft_min) << ", " <<
-            //  stringify_fp_sci(_alpha_soft_max) << "]" <<std::endl;
-
             // Check if the sufficient decrease condition is violated. If so, one call to _bracket gets the solution
             if( (fval > this->_fval_0 + _tol_decrease*alpha*_delta_0) || (fval > fval_prev && this->_num_iter > 1) )
             {
@@ -1012,7 +1006,6 @@ namespace FEAST
               //    stringify_fp_sci(this->_fval_0 + _tol_decrease*alpha*_delta_0) <<
               //    " = _f_0 + _tol_decrease*_alpha*_delta_0)" << std::endl;
               //}
-
               //if(fval > fval_prev)
               //{
               //  std::cout << "  f = " << stringify_fp_sci(fval) << " > " << stringify_fp_sci(fval_prev ) << " = f_prev" << std::endl;
@@ -1231,11 +1224,12 @@ namespace FEAST
 
             delta_new = this->_vec_grad.dot(vec_dir);
 
-            //std::cout << "Bracket iter " << iter <<std::endl; //<< " sol = " << vec_sol << " dir = " << vec_dir //<< " grad = " << this->_vec_grad << std::endl;
+            //std::cout << "Bracket iter " << this->_num_iter <<std::endl; //<< " sol = " << vec_sol << " dir = " << vec_dir //<< " grad = " << this->_vec_grad << std::endl;
             //std::cout << "  alpha_new " << stringify_fp_sci(alpha_new) << " f_new " << stringify_fp_sci(f_new) << " delta_new " << stringify_fp_sci(delta_new) << std::endl;
             //std::cout << "  alpha_lo  " << stringify_fp_sci(alpha_lo) << " f_lo  " << stringify_fp_sci(f_lo) << " delta_lo  " << stringify_fp_sci(delta_lo) << std::endl;
             //std::cout << "  alpha_hi  " << stringify_fp_sci(alpha_hi) << " f_hi  " << stringify_fp_sci(f_hi) << " delta_hi  " << stringify_fp_sci(delta_hi) << std::endl;
-            //std::cout << "ftol " << this->_fval_0 +_tol_decrease*alpha_new*_delta_0 << " gtol " <<-_tol_curvature*_delta_0 << std::endl;
+            //std::cout << "  ftol      " << stringify_fp_sci(this->_fval_0 +_tol_decrease*alpha_new*_delta_0) << " gtol " << stringify_fp_sci(-_tol_curvature*_delta_0) << std::endl;
+
             // Update of interval of uncertainity. We might already be successful.
 
             // Check if the sufficient decrease condition is violated
@@ -1477,7 +1471,7 @@ namespace FEAST
           }
 
           //std::cout << "alpha_new = " << stringify_fp_sci(alpha_new) <<
-          // alpha_c = " << stringify_fp_sci(alpha_c) << " alpha_q = " << stringify_fp_sci(alpha_q) <<
+          //" alpha_c = " << stringify_fp_sci(alpha_c) << " alpha_q = " << stringify_fp_sci(alpha_q) <<
           //" min_in_interval " << min_in_interval << std::endl;
 
           return Status::success;
