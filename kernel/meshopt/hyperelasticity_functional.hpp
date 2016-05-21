@@ -604,16 +604,17 @@ namespace FEAST
             }
             midpoint *= (DataType(1))/DataType(Shape::FaceTraits<ShapeType,0>::count);
 
+            CoordType midpoint_dist(0);
             for(const auto& it:_distance_charts)
             {
               auto* chart = this->_mesh_node->get_atlas()->find_mesh_chart(it);
               if(chart == nullptr)
                 throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
 
-              CoordType midpoint_dist(chart->dist(midpoint));
+              midpoint_dist += chart->dist(midpoint);
 
-              _lambda(cell, midpoint_dist + _lambda(cell));
             }
+            _lambda(cell, midpoint_dist);
           }
         }
 
