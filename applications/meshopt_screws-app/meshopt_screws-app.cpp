@@ -158,6 +158,7 @@ struct MeshoptScrewsApp
     // Write initial vtk output
     if(write_vtk)
     {
+      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         String vtk_name = String(file_basename+"_pre_inital_lvl_"+stringify((*it)->get_level_index()));
@@ -168,8 +169,10 @@ struct MeshoptScrewsApp
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         // Add everything from the MeshoptControl
-        meshopt_ctrl->add_to_vtk_exporter(exporter, dom_ctrl.get_levels().back()->get_level_index());
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
         exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+
+        ++deque_position;
       }
 
       if(Comm::rank()==0)
@@ -216,10 +219,10 @@ struct MeshoptScrewsApp
     // Optimise the mesh
     meshopt_ctrl->optimise();
 
-    meshopt_ctrl->prepare(meshopt_ctrl->get_coords());
     // Write vtk output
     if(write_vtk)
     {
+      int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         String vtk_name = String(file_basename+"_post_inital_lvl_"+stringify((*it)->get_level_index()));
@@ -230,8 +233,10 @@ struct MeshoptScrewsApp
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         // Add everything from the MeshoptControl
-        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
         exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+
+        ++deque_position;
       }
     }
 
@@ -435,8 +440,11 @@ struct MeshoptScrewsApp
 
     } // time loop
 
-    TimeStamp bt;
-    std::cout << "Elapsed time: " << bt.elapsed(at) << std::endl;
+    if(Comm::rank() == 0)
+    {
+      TimeStamp bt;
+      std::cout << "Elapsed time: " << bt.elapsed(at) << std::endl;
+    }
 
     return 0;
 
