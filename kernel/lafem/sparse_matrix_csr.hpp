@@ -391,7 +391,7 @@ namespace FEAST
         this->_indices_size.push_back(_used_elements());
 
         this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_rows() + 1));
-        this->_indices_size.push_back(_used_elements());
+        this->_indices_size.push_back(_rows() + 1);
 
         this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_used_elements()));
         this->_elements_size.push_back(_used_elements());

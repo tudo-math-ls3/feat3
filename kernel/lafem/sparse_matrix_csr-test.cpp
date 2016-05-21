@@ -52,6 +52,28 @@ public:
     TEST_CHECK_EQUAL(zero3.columns(), 11);
     TEST_CHECK_EQUAL(zero3.size(), 110);
 
+
+    SparseMatrixCSR<Mem_, DT_, IT_> empty1(11, 12, 111);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> empty2;
+    SparseMatrixCSR<Mem_, DT_, IT_> empty3;
+    empty2.convert(empty1);
+    empty3.convert(empty2);
+    TEST_CHECK_EQUAL(empty1.rows(), empty3.rows());
+    TEST_CHECK_EQUAL(empty1.columns(), empty3.columns());
+    TEST_CHECK_EQUAL(empty1.used_elements(), empty3.used_elements());
+
+    SparseMatrixCSR<Mem::Main, DT_, IT_> empty4(empty2.layout());
+    SparseMatrixCSR<Mem_, DT_, IT_> empty5(empty3.layout());
+    empty4.convert(empty1);
+    empty5.convert(empty4);
+    TEST_CHECK_EQUAL(empty5.rows(), empty5.rows());
+    TEST_CHECK_EQUAL(empty5.columns(), empty5.columns());
+    TEST_CHECK_EQUAL(empty5.used_elements(), empty5.used_elements());
+    empty5.convert(zero1);
+    TEST_CHECK_EQUAL(empty5.rows(), 0);
+    TEST_CHECK_EQUAL(empty5.columns(), 0);
+    TEST_CHECK_EQUAL(empty5.used_elements(), 0);
+
     SparseMatrixCOO<Mem::Main, DT_, IT_> a(10, 10);
     a(1,2,7);
     a.format();
