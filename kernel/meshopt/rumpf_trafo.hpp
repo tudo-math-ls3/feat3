@@ -4,6 +4,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/util/comm_base.hpp>
 
 namespace FEAST
 {
@@ -271,6 +272,7 @@ namespace FEAST
 
             sum_det += compute_det(x);
           }
+          Comm::allreduce(&sum_det, 1, &sum_det);
           return sum_det;
         }
 
@@ -429,6 +431,7 @@ namespace FEAST
 
             sum_det += compute_det(x);
           }
+          Comm::allreduce(&sum_det, 1, &sum_det);
           return sum_det;
         }
 

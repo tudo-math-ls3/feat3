@@ -387,10 +387,6 @@ namespace FEAST
           exporter.add_cell_vector("h", this->_h);
           exporter.add_cell_scalar("lambda", this->_lambda.elements());
 
-          //auto grad = create_vector_r();
-          //compute_grad(grad);
-          //exporter.add_vertex_vector("grad", grad);
-
           DataType* func_norm(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
           DataType* func_det(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
           DataType* func_rec_det(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
