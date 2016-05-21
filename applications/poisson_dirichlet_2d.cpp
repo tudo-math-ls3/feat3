@@ -28,6 +28,7 @@
 #include <control/domain/partitioner_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 #include <control/statistics.hpp>
+#include <control/scalar_solver.hpp>
 
 namespace PoissonDirichlet2D
 {
@@ -205,15 +206,6 @@ namespace PoissonDirichlet2D
 
     const Index num_levels = Index(domain_levels.size());
 
-    //Lin-Solve phase related typedefs
-    //Main-CSR or CUDA-ELL
-    typedef typename TargetMatrixSolve_::MemType MemTypeSolve;
-    typedef Control::ScalarUnitFilterSystemLevel<MemTypeSolve, DataType, IndexType, TargetMatrixSolve_> SystemLevelTypeSolve;
-    typedef Control::ScalarBasicTransferLevel<SystemLevelTypeSolve> TransferLevelTypeSolve;
-
-    std::deque<SystemLevelTypeSolve*> system_levels_solve;
-    std::deque<TransferLevelTypeSolve*> transfer_levels_solve;
-
     // create stokes and system levels
     for (Index i(0); i < num_levels; ++i)
     {
@@ -265,7 +257,7 @@ namespace PoissonDirichlet2D
 
     if (rank == 0)
     {
-      std::cout << "Assembling transfer matrices..." << std::endl;
+    std::cout << "Assembling transfer matrices..." << std::endl;
     }
 
     for (Index i(0); (i + 1) < num_levels; ++i)
@@ -287,76 +279,27 @@ namespace PoissonDirichlet2D
     GlobalSystemVector vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level, sol_func);
     GlobalSystemVector vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
 
-    ////////////////// solver type conversion ////////////////////////
-
-    // get our global solver system types
-    typedef typename SystemLevelTypeSolve::GlobalSystemVector GlobalSystemVectorSolve;
-    typedef typename SystemLevelTypeSolve::GlobalSystemMatrix GlobalSystemMatrixSolve;
-    typedef typename SystemLevelTypeSolve::GlobalSystemFilter GlobalSystemFilterSolve;
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
 
     if (rank == 0)
     {
       std::cout << "Converting assembled linear system from " + SystemLevelType::LocalScalarMatrix::name() <<
-        ", Mem:" << MemType::name() << " to " << SystemLevelTypeSolve::LocalScalarMatrix::name() << ", Mem:" <<
-        MemTypeSolve::name() << "..." << std::endl;
+        ", Mem:" << MemType::name() << " to " << TargetMatrixSolve_::name() << ", Mem:" <<
+        TargetMatrixSolve_::MemType::name() << "..." << std::endl;
     }
 
-    //convert system and transfer levels
-    for (Index i(0); i < num_levels; ++i)
+    // create system levels, transfer levels and vectors for linear solver
+    Control::ScalarSolver<TargetMatrixSolve_, SystemLevelType, TransferLevelType> scalar_solver(system_levels, transfer_levels, vec_sol, vec_rhs);
+
+    if (rank == 0)
     {
-      //system levels must be converted first, because transfer levels use their converted gates
-      system_levels_solve.push_back(new SystemLevelTypeSolve());
-      system_levels_solve.back()->convert(*system_levels.at(i));
-      if (i > 0)
-      {
-        transfer_levels_solve.push_back(new TransferLevelTypeSolve());
-        transfer_levels_solve.back()->convert(*system_levels_solve.at(i-1), *system_levels_solve.at(i), *transfer_levels.at(i-1));
-      }
+      std::cout<<"Solving linear system..."<<std::endl;
     }
 
-    // get our global solve matrix and filter
-    GlobalSystemMatrixSolve& matrix_solve = (*system_levels_solve.back()).matrix_sys;
-    GlobalSystemFilterSolve& filter_solve = (*system_levels_solve.back()).filter_sys;
-
-    //convert rhs and sol vectors
-    GlobalSystemVectorSolve vec_rhs_solve;
-    vec_rhs_solve.convert(&system_levels_solve.back()->gate_sys, vec_rhs);
-    GlobalSystemVectorSolve vec_sol_solve;
-    vec_sol_solve.convert(&system_levels_solve.back()->gate_sys, vec_sol);
-
-    /* ***************************************************************************************** */
-    /* ***************************************************************************************** */
-    /* ***************************************************************************************** */
-
-    // create a multigrid cycle
-    auto mgv = std::make_shared<
-      Solver::BasicVCycle<
-      GlobalSystemMatrixSolve,
-      GlobalSystemFilterSolve,
-      typename TransferLevelTypeSolve::GlobalSystemTransferMatrix
-      > >();
-
-    // scaling factor
-    DataType omega = DataType(0.2);
-
-    // create coarse grid solver
-    auto coarse_solver = Solver::new_scale_precond(system_levels_solve.front()->filter_sys, omega);
-    mgv->set_coarse_level(system_levels_solve.front()->matrix_sys, system_levels_solve.front()->filter_sys, coarse_solver);
-
-    // push levels into MGV
-    auto jt = transfer_levels_solve.begin();
-    for (auto it = ++system_levels_solve.begin(); it != system_levels_solve.end(); ++it, ++jt)
-    {
-      auto smoother = Solver::new_scale_precond((*it)->filter_sys, omega);
-      mgv->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother);
-    }
-
-    // create our solver
-    //auto solver = Control::SolverFactory::create_scalar_solver(system_levels_solver, transfer_levels_solver, Runtime::global_property(), "linsolver");
-    auto solver = Solver::new_pcg(matrix_solve, filter_solve, mgv);
-    //auto solver = Solver::new_bicgstab(matrix_solve, filter_solve, mgv);
-    //auto solver = Solver::new_fgmres(matrix_solve, filter_solve, 8, 0.0, mgv);
-    //auto solver = Solver::new_richardson(matrix_solve, filter_solve, 1.0, mgv);
+    // retrieve solver
+    auto solver = *scalar_solver;
 
     // enable plotting
     solver->set_plot(rank == 0);
@@ -373,7 +316,7 @@ namespace PoissonDirichlet2D
     TimeStamp at;
 
     // solve
-    Solver::Status result = Solver::solve(*solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
+    Solver::Status result = scalar_solver.solve();
 
     if (!Solver::status_success(result))
     {
@@ -384,13 +327,13 @@ namespace PoissonDirichlet2D
     double solver_toe(bt.elapsed(at));
 
     FEAST::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
-      system_levels, transfer_levels, solver, domain);
+    system_levels, transfer_levels, solver, domain);
 
     // release solver
     solver->done();
 
     // download solution
-    vec_sol.convert(&system_levels.back()->gate_sys, vec_sol_solve);
+    vec_sol.convert(&system_levels.back()->gate_sys, scalar_solver.get_vec_sol_solve());
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -450,17 +393,6 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
 
     // clean up
-    while (!transfer_levels_solve.empty())
-    {
-      delete transfer_levels_solve.back();
-      transfer_levels_solve.pop_back();
-    }
-    while (!system_levels_solve.empty())
-    {
-      delete system_levels_solve.back();
-      system_levels_solve.pop_back();
-    }
-
     while (!transfer_levels.empty())
     {
       delete transfer_levels.back();

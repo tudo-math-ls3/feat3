@@ -2,6 +2,7 @@
 #ifndef CONTROL_STOKES_BASIC_HPP
 #define CONTROL_STOKES_BASIC_HPP 1
 
+#include <kernel/base_header.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/power_vector.hpp>

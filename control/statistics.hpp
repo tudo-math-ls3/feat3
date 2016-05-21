@@ -2,6 +2,7 @@
 #ifndef CONTROL_STATISTICS_HPP
 #define CONTROL_STATISTICS_HPP 1
 
+#include <kernel/base_header.hpp>
 #include <kernel/util/comm_base.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/memory_usage.hpp>
