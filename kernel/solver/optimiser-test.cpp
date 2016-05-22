@@ -146,7 +146,7 @@ NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunctio
 nlcg_s_bs_d(double(0.15), Index(20), "SecantLinesearch", "none", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
-nlcg_nr_rb_d(float(0.6), Index(28),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
+nlcg_nr_rb_d(float(0.6), Index(32),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_hessian_rb_d(double(0.7), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
