@@ -91,10 +91,12 @@ namespace FEAST
           {
             // Compute total number of rows and columns
             _columns = _nonlinear_functional.columns();
-            Comm::allreduce(&_columns, 1, &_columns);
+            Index columns_send(_columns);
+            Comm::allreduce(&_columns, 1, &columns_send);
 
             _rows = _nonlinear_functional.rows();
-            Comm::allreduce(&_rows, 1, &_rows);
+            Index rows_send(_rows);
+            Comm::allreduce(&_rows, 1, &rows_send);
           }
 
         /// Explicitly delete default constructor
@@ -266,7 +268,8 @@ namespace FEAST
         DataType compute_func()
         {
           DataType my_fval(_nonlinear_functional.compute_func());
-          Comm::allreduce(&my_fval, 1, &my_fval);
+          DataType my_fval_send;
+          Comm::allreduce(&my_fval, 1, &my_fval_send);
           return my_fval;
         }
 

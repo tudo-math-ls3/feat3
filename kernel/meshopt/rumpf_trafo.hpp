@@ -272,7 +272,9 @@ namespace FEAST
 
             sum_det += compute_det(x);
           }
-          Comm::allreduce(&sum_det, 1, &sum_det);
+
+          DataType sum_det_send(sum_det);
+          Comm::allreduce(&sum_det, 1, &sum_det_send);
           return sum_det;
         }
 
@@ -431,7 +433,9 @@ namespace FEAST
 
             sum_det += compute_det(x);
           }
-          Comm::allreduce(&sum_det, 1, &sum_det);
+
+          DataType sum_det_send(sum_det);
+          Comm::allreduce(&sum_det, 1, &sum_det_send);
           return sum_det;
         }
 
