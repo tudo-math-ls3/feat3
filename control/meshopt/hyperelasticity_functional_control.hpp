@@ -4,9 +4,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-#include <kernel/assembly/grid_transfer.hpp>
-#include <kernel/assembly/mirror_assembler.hpp>
-#include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/nonlinear_functional.hpp>
 #include <kernel/global/vector.hpp>
@@ -72,7 +69,7 @@ namespace FEAST
           /// The FE space the transformation lives in
           typedef typename FEAST::Meshopt::Intern::TrafoFE<Trafo_>::Space TrafoSpace;
 
-          /// Our bas class
+          /// Our base class
           typedef MeshoptControlBase<DomainControl_, Trafo_> BaseClass;
 
           /// Type of the "system matrix" for the solver
@@ -103,7 +100,7 @@ namespace FEAST
           /// it is kept and recycled between nonlinear solver calls, so we have to keep it.
           typedef Solver::NLOptPrecond
           <
-            typename SystemLevelType::GlobalSystemVector,
+            typename SystemLevelType::GlobalSystemVectorR,
             typename SystemLevelType::GlobalSystemFilter
           > PrecondType;
 
@@ -122,7 +119,7 @@ namespace FEAST
           /// Name of the solver configuration from solver_config we want
           const String solver_name;
           /// The solver
-          std::shared_ptr<Solver::IterativeSolver<typename SystemLevelType::GlobalSystemVector>> solver;
+          std::shared_ptr<Solver::IterativeSolver<typename SystemLevelType::GlobalSystemVectorR>> solver;
           /// The preconditioner. As this might involve a matrix to be assembled, we keep it between solves.
           std::shared_ptr<PrecondType> precond;
 
@@ -294,7 +291,7 @@ namespace FEAST
           }
 
           /// \copydoc BaseClass::prepare()
-          virtual void prepare(const typename SystemLevelType::GlobalSystemVector& vec_state) override
+          virtual void prepare(const typename SystemLevelType::GlobalSystemVectorR& vec_state) override
           {
 
             for(size_t level(num_levels); level > 0; )
@@ -302,7 +299,7 @@ namespace FEAST
               --level;
               Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
 
-              LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, MeshType::world_dim> vec_buf;
+              typename SystemLevelType::LocalCoordsBuffer vec_buf;
               vec_buf.convert(*vec_state);
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
@@ -330,8 +327,8 @@ namespace FEAST
             AssemblerLevelType& the_asm_level = *_assembler_levels.back();
 
             // create our RHS and SOL vectors
-            typename SystemLevelType::GlobalSystemVector vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
-            typename SystemLevelType::GlobalSystemVector vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
+            typename SystemLevelType::GlobalSystemVectorR vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
+            typename SystemLevelType::GlobalSystemVectorL vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
 
             Statistics::reset_flops();
             Statistics::reset_times();

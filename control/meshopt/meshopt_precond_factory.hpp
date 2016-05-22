@@ -23,7 +23,7 @@ namespace FEAST
         <
           typename MeshoptCtrl_,
           typename DomCtrl_ = typename MeshoptCtrl_::DomainControlType,
-          typename SolverVectorType_ = typename MeshoptCtrl_::SystemLevelType::GlobalSystemVector,
+          typename SolverVectorType_ = typename MeshoptCtrl_::SystemLevelType::GlobalSystemVectorR,
           typename FilterType_ = typename MeshoptCtrl_::SystemLevelType::GlobalSystemFilter
         >
         static std::shared_ptr<Solver::NLOptPrecond<SolverVectorType_, FilterType_>>

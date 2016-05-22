@@ -6,8 +6,6 @@
 
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/grid_transfer.hpp>
-#include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
@@ -54,15 +52,14 @@ namespace FEAST
           typedef typename FEAST::Meshopt::Intern::TrafoFE<Trafo_>::Space TrafoSpace;
 
           typedef MeshoptControlBase<DomainControl_, Trafo_> BaseClass;
-          //template<typename A, typename B, typename C>
-          //using MeshQualityFunctional = FEAST::Meshopt::DuDvFunctional<A, B, C, Trafo_>;
-          //typedef MeshoptSystemLevel<Mem_, DT_, IT_, MeshQualityFunctional> SystemLevelType;
 
-          typedef FEAST::Meshopt::DuDvFunctional<Mem_, DT_, IT_, Trafo_> MeshQualityFunctional;
-          //template<typename A, typename B, typename C>
-          //using OperatorType =  FEAST::Meshopt::DuDvFunctional<A, B, C, Trafo_>;
+          //typedef FEAST::Meshopt::DuDvFunctional<Mem_, DT_, IT_, Trafo_> MeshQualityFunctional;
+          //typedef MeshoptSystemLevel<Mem_, DT_, IT_, MeshQualityFunctional::template MatrixTemplate, Global::Matrix>
+          //  SystemLevelType;
 
-          typedef MeshoptSystemLevel<Mem_, DT_, IT_, MeshQualityFunctional::template MatrixTemplate, Global::Matrix>
+          template<typename A, typename B, typename C>
+          using OperatorType =  FEAST::Meshopt::DuDvFunctional<A, B, C, Trafo_>;
+          typedef MeshoptSystemLevel<Mem_, DT_, IT_, OperatorType, Global::Matrix>
             SystemLevelType;
 
           typedef TransferMatrixBlocked<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
@@ -72,7 +69,8 @@ namespace FEAST
           typedef typename DomainControl_::LevelType DomainLevelType;
           typedef DuDvFunctionalAssemblerLevel<TrafoSpace> AssemblerLevelType;
 
-          typedef typename SystemLevelType::GlobalSystemVector VectorType;
+          typedef typename SystemLevelType::GlobalSystemVectorL GlobalSystemVectorL;
+          typedef typename SystemLevelType::GlobalSystemVectorR GlobalSystemVectorR;
 
           std::deque<AssemblerLevelType*> _assembler_levels;
           std::deque<SystemLevelType*> _system_levels;
@@ -83,7 +81,7 @@ namespace FEAST
           PropertyMap& solver_config;
           String solver_name;
 
-          std::shared_ptr<Solver::SolverBase<VectorType>> solver;
+          std::shared_ptr<Solver::SolverBase<GlobalSystemVectorR>> solver;
 
           explicit DuDvFunctionalControl(
             DomainControl_& dom_ctrl, const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
@@ -102,7 +100,11 @@ namespace FEAST
               for(Index i(0); i < num_levels; ++i)
               {
                 _assembler_levels.push_back(new AssemblerLevelType(*domain_levels.at(i), dirichlet_list, slip_list));
-                _system_levels.push_back(new SystemLevelType(dirichlet_list, slip_list));
+                _system_levels.push_back(new SystemLevelType(dirichlet_list, slip_list,
+                  domain_levels.at(i)->get_mesh_node(),
+                  &(_assembler_levels.at(i)->trafo_space),
+                  &(_assembler_levels.at(i)->dirichlet_asm),
+                  &(_assembler_levels.at(i)->slip_asm)));
                 if(i > 0)
                 {
                   _transfer_levels.push_back(new TransferLevelType(*_system_levels.at(i-1), *_system_levels.at(i)));
@@ -210,14 +212,14 @@ namespace FEAST
           }
 
           /// \copydoc BaseClass::prepare()
-          virtual void prepare(const typename SystemLevelType::GlobalSystemVector& vec_state) override
+          virtual void prepare(const GlobalSystemVectorR& vec_state) override
           {
             for(size_t level(num_levels); level > 0; )
             {
               --level;
               Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
 
-              LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, MeshType::world_dim> vec_buf(ndofs, DT_(0));
+              typename SystemLevelType::LocalCoordsBuffer vec_buf(ndofs, DT_(0));
               vec_buf.convert(*vec_state);
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
@@ -236,7 +238,7 @@ namespace FEAST
 
           }
 
-          virtual Solver::Status apply(VectorType& vec_sol, const VectorType& vec_rhs)
+          virtual Solver::Status apply(GlobalSystemVectorR& vec_sol, const GlobalSystemVectorL& vec_rhs)
           {
             // get our global solve matrix and filter
             typename SystemLevelType::GlobalQualityFunctional& op_sys = (*_system_levels.back()).op_sys;
@@ -252,8 +254,8 @@ namespace FEAST
             AssemblerLevelType& the_asm_level = *_assembler_levels.back();
 
             // create our RHS and SOL vectors
-            typename SystemLevelType::GlobalSystemVector vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
-            typename SystemLevelType::GlobalSystemVector vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
+            GlobalSystemVectorR vec_rhs = the_asm_level.assemble_rhs_vector(the_system_level);
+            GlobalSystemVectorL vec_sol = the_asm_level.assemble_sol_vector(the_system_level);
             // solve
             this->apply(vec_sol, vec_rhs);
 
@@ -289,7 +291,7 @@ namespace FEAST
             // assemble matrix structure?
             if (mat_loc.empty())
             {
-              Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc, this->trafo_space);
+              Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc.sys_matrix, this->trafo_space);
             }
 
             // Assemble local system matrix
@@ -297,7 +299,7 @@ namespace FEAST
               mat_loc.format();
               Assembly::Common::DuDvOperatorBlocked<shape_dim> dudv_op;
               Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
-                mat_loc, dudv_op, this->trafo_space, this->cubature);
+                mat_loc.sys_matrix, dudv_op, this->trafo_space, this->cubature);
             }
           }
       }; // class DuDvFunctionalAssemblerLevel

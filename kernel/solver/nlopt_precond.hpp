@@ -99,17 +99,17 @@ namespace FEAST
     class NonlinearOperatorPrecondWrapper
     : public Solver::NLOptPrecond
     <
-      typename NonlinearOperator_::SystemLevelType::GlobalSystemVector,
+      typename NonlinearOperator_::SystemLevelType::GlobalSystemVectorR,
       typename NonlinearOperator_::SystemLevelType::GlobalSystemFilter
     >
     {
       public:
         /// The vector type the preconditioner can be applied to
-        typedef typename NonlinearOperator_::SystemLevelType::GlobalSystemVector VectorType;
+        typedef typename NonlinearOperator_::SystemLevelType::GlobalSystemVectorR VectorType;
         /// The filter type
         typedef typename NonlinearOperator_::SystemLevelType::GlobalSystemFilter FilterType;
         /// Our base class
-        typedef Solver::NLOptPrecond < VectorType, FilterType> BaseClass;
+        typedef Solver::NLOptPrecond<VectorType, FilterType> BaseClass;
 
       private:
         /// The operator that defines the preconditioner

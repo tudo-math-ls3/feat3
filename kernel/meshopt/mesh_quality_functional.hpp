@@ -45,14 +45,13 @@ namespace FEAST
         /// The shape type
         typedef typename MeshType::ShapeType ShapeType;
         /// Type for the vectors to hold coordinates etc.
-        typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, MeshType::world_dim> VertexVectorType;
-
+        typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, MeshType::world_dim> CoordsBufferType;
 
       public:
         /// The mesh for the underlying transformation
         Geometry::RootMeshNode<MeshType>* _mesh_node;
         /// Coordinates, used for setting new boundary values etc.
-        VertexVectorType _coords;
+        CoordsBufferType _coords;
 
       protected:
         /// Counter for number of function evaluations
@@ -80,6 +79,15 @@ namespace FEAST
             get_coords();
           }
 
+        explicit MeshQualityFunctional():
+          _mesh_node(nullptr),
+          _coords(),
+          _num_func_evals(0),
+          _num_grad_evals(0),
+          _num_hess_evals(0)
+          {
+          }
+
         /// \brief Virtual destructor
         virtual ~MeshQualityFunctional()
         {
@@ -101,12 +109,14 @@ namespace FEAST
         /// \returns The root mesh
         MeshType* get_mesh()
         {
+          ASSERT_(_mesh_node != nullptr);
           return _mesh_node->get_mesh();
         }
 
         /// \returns The root mesh as const pointer
         const MeshType* get_mesh() const
         {
+          ASSERT_(_mesh_node != nullptr);
           return _mesh_node->get_mesh();
         }
 

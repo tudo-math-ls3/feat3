@@ -174,15 +174,15 @@ namespace FEAST
         /// Vector type for coordinate vectors etc.
         typedef LAFEM::DenseVectorBlocked<MemType, CoordType, IndexType, MeshType::world_dim> VectorType;
         /// Filter for Dirichlet boundary conditions
-        typedef LAFEM::UnitFilterBlocked<MemType, CoordType, IndexType, MeshType::world_dim> DirichletFilterType;
+        typedef LAFEM::UnitFilterBlocked<MemType, DT_, IT_, MeshType::world_dim> DirichletFilterType;
+        /// Sequence of Dirichlet filters for several different boundary parts
+        typedef LAFEM::FilterSequence<DirichletFilterType> DirichletFilterSequence;
         /// Filter for slip boundary conditions
-        typedef LAFEM::SlipFilter<MemType, CoordType, IndexType, MeshType::world_dim> SlipFilterType;
+        typedef LAFEM::SlipFilter<MemType, DT_, IT_, MeshType::world_dim> SlipFilterType;
+        /// Sequence of Slip filters for several different boundary parts
+        typedef LAFEM::FilterSequence<SlipFilterType> SlipFilterSequence;
         /// Combined filter
-        typedef LAFEM::FilterChain
-        <
-          LAFEM::FilterSequence<SlipFilterType>,
-          LAFEM::FilterSequence<DirichletFilterType>
-        > FilterType;
+        typedef LAFEM::FilterChain<SlipFilterSequence, DirichletFilterSequence> FilterType;
 
         /// Finite Element space for the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
@@ -193,6 +193,8 @@ namespace FEAST
         typedef LAFEM::DenseVectorBlocked<MemType, DT_, IT_, MeshType::world_dim> VectorTypeR;
         /// Type of the gradient vector
         typedef VectorTypeR GradientType;
+        /// Type for exchanging information between state variable and mesh
+        typedef typename BaseClass::CoordsBufferType CoordsBufferType;
 
         /// Since the functional contains a ShapeType, these have to be the same
         static_assert(std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
@@ -675,7 +677,19 @@ namespace FEAST
         typedef typename BaseClass::VectorTypeL VectorTypeR;
         /// Type of the gradient vector
         typedef typename BaseClass::GradientType GradientType;
+        /// Type for exchanging information between state variable and mesh
+        typedef typename BaseClass::CoordsBufferType CoordsBufferType;
 
+        /// Filter for Dirichlet boundary conditions
+        typedef typename BaseClass::DirichletFilterType DirichletFilterType;
+        /// Sequence of Dirichlet filters for several different boundary parts
+        typedef typename BaseClass::DirichletFilterSequence DirichletFilterSequence;
+        /// Filter for slip boundary conditions
+        typedef typename BaseClass::SlipFilterType SlipFilterType;
+        /// Sequence of Slip filters for several different boundary parts
+        typedef typename BaseClass::SlipFilterSequence SlipFilterSequence;
+        /// Combined filter
+        typedef typename BaseClass::FilterType FilterType;
         /// Since the functional contains a ShapeType, these have to be the same
         static_assert( std::is_same<ShapeType, typename FunctionalType::ShapeType>::value,
         "ShapeTypes of the transformation / functional have to agree" );

@@ -61,33 +61,42 @@ namespace FEAST
         typedef TrafoType_ TrafoType;
         /// The mesh the transformation is defined on
         typedef typename TrafoType::MeshType MeshType;
+
         /// Type for the system matrix
         typedef MatrixType_<Mem_, DT_, IT_, MeshType::world_dim, MeshType::world_dim> MatrixType;
+        /// Blockheight of the system matrix
         static constexpr int BlockHeight = MatrixType::BlockHeight;
+        /// Blockwidth of the system matrix
         static constexpr int BlockWidth = MatrixType::BlockWidth;
 
-        template<typename A, typename B, typename C>
-        using MatrixTemplate = MatrixType_<A, B, C, MeshType::world_dim, MeshType::world_dim>;
+        /// Our base class
+        typedef MeshQualityFunctional<MeshType> BaseClass;
+        /// Type for exchanging information between state variable and mesh
+        typedef typename BaseClass::CoordsBufferType CoordsBufferType;
 
         /// The precision of the mesh coordinates
         typedef typename MeshType::CoordType CoordType;
 
-        /// Our base class
-        typedef MeshQualityFunctional<MeshType> BaseClass;
+        //template<typename A, typename B, typename C>
+        //using MatrixTemplate = MatrixType_<A, B, C, MeshType::world_dim, MeshType::world_dim>;
+
+        /// Type for vectors from the dual space
+        typedef typename MatrixType::VectorTypeL VectorTypeL;
+        /// Type for vectors from the primal space
+        typedef typename MatrixType::VectorTypeR VectorTypeR;
+        /// Type for i.e. cell vectors
+        typedef LAFEM::DenseVector<Mem_, DT_, IT_> ScalarVectorType;
 
         /// Filter for Dirichlet boundary conditions
         typedef LAFEM::UnitFilterBlocked<Mem_, DT_, IT_, MeshType::world_dim> DirichletFilterType;
+        /// Sequence of Dirichlet filters for several different boundary parts
+        typedef LAFEM::FilterSequence<DirichletFilterType> DirichletFilterSequence;
         /// Filter for slip boundary conditions
         typedef LAFEM::SlipFilter<Mem_, DT_, IT_, MeshType::world_dim> SlipFilterType;
+        /// Sequence of Slip filters for several different boundary parts
+        typedef LAFEM::FilterSequence<SlipFilterType> SlipFilterSequence;
         /// Combined filter
-        typedef LAFEM::FilterChain
-        <
-          LAFEM::FilterSequence<SlipFilterType>,
-          LAFEM::FilterSequence<DirichletFilterType>
-        > FilterType;
-
-        typedef LAFEM::DenseVectorBlocked<MemType, DT_, IT_, MeshType::world_dim> VectorTypeL;
-        typedef LAFEM::DenseVectorBlocked<MemType, DT_, IT_, MeshType::world_dim> VectorTypeR;
+        typedef LAFEM::FilterChain<SlipFilterSequence, DirichletFilterSequence> FilterType;
 
         /// Finite Element space for the transformation
         typedef typename Intern::TrafoFE<TrafoType>::Space TrafoSpace;
@@ -96,17 +105,18 @@ namespace FEAST
         // This could be decreased by the degree of the operator, i.e. 2 for Du:Dv
         static constexpr int _local_degree = 4*TrafoSpace::local_degree + 1;
 
+        /// The system matrix
+        MatrixType sys_matrix;
+
       protected:
         /// The transformation defining the physical mesh
-        TrafoType& _trafo;
+        TrafoType* _trafo;
         /// The FE space for the transformation, needed for filtering
-        TrafoSpace& _trafo_space;
+        TrafoSpace* _trafo_space;
         /// Assembler for Dirichlet boundary conditions
-        std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>& _dirichlet_asm;
+        std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>* _dirichlet_asm;
         /// Assembler for slip boundary conditions
-        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>& _slip_asm;
-        /// Reference to the system matrix
-        MatrixType& _sys_matrix;
+        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>* _slip_asm;
         /// Cubature factory, for P1/Q1 transformations in 2d degree 5 is enough
         Cubature::DynamicFactory _cubature_factory;
 
@@ -126,69 +136,60 @@ namespace FEAST
          */
         explicit DuDvFunctional(
           Geometry::RootMeshNode<MeshType>* rmn_,
-          TrafoSpace& trafo_space_,
-          std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>& dirichlet_asm_,
-          std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>& slip_asm_,
-          MatrixType& sys_matrix_) :
+          TrafoSpace* trafo_space_,
+          std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>* dirichlet_asm_,
+          std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>* slip_asm_) :
           BaseClass(rmn_),
-          _trafo(trafo_space_.get_trafo()),
+          sys_matrix(),
+          _trafo(&(trafo_space_->get_trafo())),
           _trafo_space(trafo_space_),
           _dirichlet_asm(dirichlet_asm_),
           _slip_asm(slip_asm_),
-          _sys_matrix(sys_matrix_),
           _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
           {
           }
 
+        explicit DuDvFunctional() :
+          BaseClass(),
+          sys_matrix(),
+          _trafo(nullptr),
+          _trafo_space(nullptr),
+          _dirichlet_asm(nullptr),
+          _slip_asm(nullptr),
+          _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
+          {
+          }
+
+        explicit DuDvFunctional(DuDvFunctional&& other) :
+          sys_matrix(std::move(other.sys_matrix)),
+          _trafo(other._trafo),
+          _trafo_space(other._trafo_space),
+          _dirichlet_asm(other._dirichlet_asm),
+          _slip_asm(other._slip_asm),
+          _cubature_factory(other.cubature_factory)
+          {
+            if(this != &other)
+            {
+              other._trafo = nullptr;
+              other._trafo_space = nullptr;
+              other._dirichlet_asm = nullptr;
+              other._slip_asm = nullptr;
+            }
+          }
+
+        DuDvFunctional(const DuDvFunctional&) = delete;
+
         /// \brief Virtual destructor
         virtual ~DuDvFunctional()
         {
+          _trafo = nullptr;
+          _trafo_space = nullptr;
+          _dirichlet_asm = nullptr;
+          _slip_asm = nullptr;
         }
 
-        /**
-         * \brief Checks if the functional is empty (= the null functional
-         *
-         * \returns True if the number of DoFs is zero.)
-         */
-        bool empty() const
+        virtual void init() override
         {
-          return (_trafo_space.get_num_dofs() == Index(0));
-        }
-
-        /**
-         * \brief Creates an L-vector for the functional's gradient
-         */
-        VectorTypeL create_vector_l() const
-        {
-          return VectorTypeL(_trafo_space.get_num_dofs());
-        }
-
-        /**
-         * \brief Creates an R-vector for the functional and its gradient
-         */
-        VectorTypeR create_vector_r() const
-        {
-          return VectorTypeR(_trafo_space.get_num_dofs());
-        }
-
-        /**
-         * \brief Returns the number of columns
-         *
-         * \returns The number of columns.
-         */
-        const Index& columns() const
-        {
-          return _sys_matrix.columns();
-        }
-
-        /**
-         * \brief Returns the number of rows
-         *
-         * \returns The number of rows.
-         */
-        const Index& rows() const
-        {
-          return _sys_matrix.rows();
         }
 
         /**
@@ -209,19 +210,22 @@ namespace FEAST
          */
         virtual void init_symbolic() //override
         {
-          Assembly::SymbolicAssembler::assemble_matrix_std1(_sys_matrix, _trafo_space);
+          ASSERT_(_trafo_space != nullptr);
+          Assembly::SymbolicAssembler::assemble_matrix_std1(sys_matrix, *_trafo_space);
         }
 
         virtual void init_numeric() //override
         {
-          _sys_matrix.format();
+          ASSERT_(_trafo_space != nullptr);
+
+          sys_matrix.format();
 
           Assembly::Common::DuDvOperatorBlocked<MeshType::world_dim> my_operator;
 
           Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
-            _sys_matrix,           // the matrix that receives the assembled operator
+            sys_matrix,           // the matrix that receives the assembled operator
             my_operator, // the operator that is to be assembled
-            _trafo_space,            // the finite element space in use
+            *_trafo_space,            // the finite element space in use
             _cubature_factory  // the cubature factory to be used for integration
             );
         }
@@ -237,14 +241,17 @@ namespace FEAST
         {
           auto& dirichlet_filters = filter.template at<1>();
 
+          ASSERT_(_dirichlet_asm != nullptr);
+          ASSERT_(_slip_asm != nullptr);
+
           for(auto& it : dirichlet_filters)
           {
-            const auto& assembler = _dirichlet_asm.find(it.first);
-            if(assembler == _dirichlet_asm.end())
+            const auto& assembler = _dirichlet_asm->find(it.first);
+            if(assembler == _dirichlet_asm->end())
               throw InternalError(__func__,__FILE__,__LINE__,
               "Could not find dirichlet assembler for filter with key "+it.first);
 
-            assembler->second->assemble(it.second, _trafo_space, vec_state);
+            assembler->second->assemble(it.second, *_trafo_space, vec_state);
           }
 
           // The slip filter contains the outer unit normal, so reassemble it
@@ -252,17 +259,89 @@ namespace FEAST
 
           for(auto& it : slip_filters)
           {
-            const auto& assembler = _slip_asm.find(it.first);
-            if(assembler == _slip_asm.end())
+            const auto& assembler = _slip_asm->find(it.first);
+            if(assembler == _slip_asm->end())
               throw InternalError(__func__,__FILE__,__LINE__,
               "Could not find slip filter assembler for filter with key "+it.first);
 
-            assembler->second->assemble(it.second, _trafo_space);
+            assembler->second->assemble(it.second, *_trafo_space);
           }
 
           for(const auto& it:slip_filters)
             this->_mesh_node->adapt_by_name(it.first);
 
+        }
+
+        /**
+         * \brief Checks if the functional is empty (= the null functional
+         *
+         * \returns True if the number of DoFs is zero.)
+         */
+        bool empty() const
+        {
+          return sys_matrix.empty();
+        }
+
+        /**
+         * \brief Creates an L-vector for the functional's gradient
+         */
+        VectorTypeL create_vector_l() const
+        {
+          return sys_matrix.create_vector_l();
+        }
+
+        /**
+         * \brief Creates an R-vector for the functional and its gradient
+         */
+        VectorTypeR create_vector_r() const
+        {
+          return sys_matrix.create_vector_r();
+        }
+
+        /**
+         * \brief Returns the number of columns
+         *
+         * \returns The number of columns.
+         */
+        const Index& columns() const
+        {
+          return sys_matrix.columns();
+        }
+
+        /**
+         * \brief Returns the number of rows
+         *
+         * \returns The number of rows.
+         */
+        const Index& rows() const
+        {
+          return sys_matrix.rows();
+        }
+
+        /// \copydoc MatrixType::apply()
+        void apply(VectorTypeL& r, const VectorTypeR& x) const
+        {
+          sys_matrix.apply(r, x);
+        }
+
+        /// \copydoc MatrixType::apply()
+        void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const
+        {
+          // copy y to r
+          r.copy(y);
+          sys_matrix.apply(r, x, r, alpha);
+        }
+
+        /// \copydoc MatrixType::extract_diag()
+        void extract_diag(VectorTypeL& diag) const
+        {
+          sys_matrix.extract_diag(diag);
+        }
+
+        /// \copydoc MatrixType::format()
+        void format(DataType value = DataType(0))
+        {
+          sys_matrix.format(value);
         }
 
         //virtual void prepare(VectorTypeR& vec_state)
@@ -277,12 +356,12 @@ namespace FEAST
         //  // Assemble homogeneous slip boundary conditions, as the outer normal could have changed
         //  //_slip_asm.assemble(_filter.template at<0>(), _trafo_space);
 
-        //  //_sys_matrix.format();
+        //  //sys_matrix.format();
 
         //  //Assembly::Common::DuDvOperatorBlocked<MeshType::world_dim> my_operator;
 
         //  //Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
-        //  //  _sys_matrix,           // the matrix that receives the assembled operator
+        //  //  sys_matrix,           // the matrix that receives the assembled operator
         //  //  my_operator, // the operator that is to be assembled
         //  //  _trafo_space,            // the finite element space in use
         //  //  _cubature_factory  // the cubature factory to be used for integration

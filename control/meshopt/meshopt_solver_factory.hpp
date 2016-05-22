@@ -132,10 +132,10 @@ namespace FEAST
         }
 
         template <typename Evaluator_, typename SystemLevelType_, typename TransferLevelType_>
-        static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVector> >
+        static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVectorR> >
         create_schwarz_precon(std::deque<SystemLevelType_*> & system_levels, std::deque<TransferLevelType_*> & transfer_levels, PropertyMap * base, String solver_name, PropertyMap * section, typename Evaluator_::GateType *)
         {
-          typedef typename SystemLevelType_::GlobalSystemVector SolverVectorType;
+          typedef typename SystemLevelType_::GlobalSystemVectorR SolverVectorType;
           std::shared_ptr<Solver::SolverBase<typename SolverVectorType::LocalVectorType> > precon_schwarz;
           auto schwarz_p = section->query("solver");
           if (schwarz_p.second)
@@ -149,7 +149,7 @@ namespace FEAST
         }
 
         template <typename Evaluator_, typename SystemLevelType_, typename TransferLevelType_>
-        static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVector::LocalVectorType> >
+        static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVectorR::LocalVectorType> >
         create_schwarz_precon(std::deque<SystemLevelType_*> & /*system_levels*/, std::deque<TransferLevelType_*> & /*transfer_levels*/, PropertyMap * /*base*/, String /*solver_name*/,
         PropertyMap * /*section*/, ...)
         {
@@ -158,7 +158,7 @@ namespace FEAST
         }
 
         //template <typename Evaluator_, typename SystemLevelType_>
-        //static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVector> >
+        //static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVectorR> >
         //create_ilu_precon(std::deque<SystemLevelType_*> & /*system_levels*/, typename Evaluator_::GateType *)
         //{
         //  throw InternalError(__func__, __FILE__, __LINE__, "ilu precon section is only allowed in local context!");
@@ -166,7 +166,7 @@ namespace FEAST
         //}
 
         //template <typename Evaluator_, typename SystemLevelType_>
-        //static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVector::LocalVectorType> >
+        //static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVectorR::LocalVectorType> >
         //create_ilu_precon(std::deque<SystemLevelType_*> & system_levels, ...)
         //{
         //  auto result = Solver::new_ilu_precond(*system_levels.back()->op_sys, *system_levels.back()->filter_sys, 0ul);
@@ -174,7 +174,7 @@ namespace FEAST
         //}
 
         //template <typename Evaluator_, typename SystemLevelType_>
-        //static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVector> >
+        //static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVectorR> >
         //create_ssor_precon(std::deque<SystemLevelType_*> & /*system_levels*/, PropertyMap * /*section*/, typename Evaluator_::GateType *)
         //{
         //  throw InternalError(__func__, __FILE__, __LINE__, "ssor precon section is only allowed in local context!");
@@ -182,7 +182,7 @@ namespace FEAST
         //}
 
         //template <typename Evaluator_, typename SystemLevelType_>
-        //static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVector::LocalVectorType> >
+        //static std::shared_ptr<Solver::SolverBase<typename SystemLevelType_::GlobalSystemVectorR::LocalVectorType> >
         //create_ssor_precon(std::deque<SystemLevelType_*> & system_levels, PropertyMap * section, ...)
         //{
         //  auto omega_p = section->get_entry("omega");
@@ -208,7 +208,7 @@ namespace FEAST
          * \param[in] base A pointer to the PropertyMap that contains all solver related informations
          * \param[in] solver_name The name of the solver tree's root section
          */
-        template <typename SystemLevelType_, typename TransferLevelType_, typename SolverVectorType_ = typename SystemLevelType_::GlobalSystemVector>
+        template <typename SystemLevelType_, typename TransferLevelType_, typename SolverVectorType_ = typename SystemLevelType_::GlobalSystemVectorR>
         static std::shared_ptr<Solver::SolverBase<SolverVectorType_> >
         create_linear_solver(std::deque<SystemLevelType_*> & system_levels,
         std::deque<TransferLevelType_*> & transfer_levels, PropertyMap * base, String solver_name)
@@ -367,7 +367,7 @@ namespace FEAST
         <
           typename SystemLevelType_,
           /*typename TransferLevelType_,*/
-          typename SolverVectorType_ = typename SystemLevelType_::GlobalSystemVector
+          typename SolverVectorType_ = typename SystemLevelType_::GlobalSystemVectorR
         >
         static std::shared_ptr<Solver::Linesearch<typename SystemLevelType_::GlobalQualityFunctional, typename SystemLevelType_::GlobalSystemFilter> >
         create_linesearch( std::deque<SystemLevelType_*> & system_levels,
@@ -459,7 +459,7 @@ namespace FEAST
         <
           typename SystemLevelType_,
           typename TransferLevelType_,
-          typename SolverVectorType_ = typename SystemLevelType_::GlobalSystemVector
+          typename SolverVectorType_ = typename SystemLevelType_::GlobalSystemVectorR
         >
         static std::shared_ptr<Solver::IterativeSolver<SolverVectorType_>>
         create_nonlinear_optimiser( std::deque<SystemLevelType_*> & system_levels,

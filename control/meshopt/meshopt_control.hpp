@@ -7,11 +7,6 @@
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/slip_filter_assembler.hpp>
-#include <kernel/lafem/filter_chain.hpp>
-#include <kernel/lafem/filter_sequence.hpp>
-#include <kernel/lafem/none_filter.hpp>
-#include <kernel/lafem/slip_filter.hpp>
-#include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
@@ -214,7 +209,7 @@ namespace FEAST
       <
         typename Mem_, typename DT_, typename IT_,
         template<typename, typename, typename> class Op_,
-        template<typename> class GlobalOp_ = Global::Matrix
+        template<typename> class GlobalOp_
       >
       class MeshoptSystemLevel
       {
@@ -228,31 +223,26 @@ namespace FEAST
           typedef Op_<Mem_, DT_, IT_> LocalQualityFunctional;
 
           /// define local system vector type
-          typedef LAFEM::DenseVectorBlocked<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> LocalSystemVector;
-          typedef LAFEM::VectorMirrorBlocked<MemType, DataType, IndexType, LocalQualityFunctional::BlockHeight> SystemMirror;
-          typedef Global::FoundationGate<LocalSystemVector, SystemMirror> SystemGate;
+          typedef typename LocalQualityFunctional::VectorTypeL LocalSystemVectorL;
+          typedef typename LocalQualityFunctional::VectorTypeR LocalSystemVectorR;
+          typedef typename LocalQualityFunctional::ScalarVectorType LocalScalarVector;
+          typedef typename LocalQualityFunctional::CoordsBufferType LocalCoordsBuffer;
 
-          /// define local scalar vector type
-          typedef typename LAFEM::DenseVector<Mem_, DT_, IT_> LocalScalarVector;
+          typedef typename LocalQualityFunctional::FilterType LocalSystemFilter;
+          typedef typename LocalQualityFunctional::SlipFilterSequence LocalSlipFilterSequence;
+          typedef typename LocalQualityFunctional::DirichletFilterSequence LocalDirichletFilterSequence;
+
+          typedef LAFEM::VectorMirrorBlocked<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> SystemMirror;
+          typedef Global::FoundationGate<LocalSystemVectorR, SystemMirror> SystemGate;
           typedef LAFEM::VectorMirror<Mem_, DT_, IT_> ScalarMirror;
           typedef Global::FoundationGate<LocalScalarVector, ScalarMirror> ScalarGate;
-
-          /// Filter for Dirichlet boundary conditions
-          typedef LAFEM::UnitFilterBlocked<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> DirichletFilterType;
-          typedef LAFEM::FilterSequence<DirichletFilterType> DirichletFilterSequence;
-          /// Filter for slip boundary conditions
-          typedef LAFEM::SlipFilter<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> SlipFilterType;
-          typedef LAFEM::FilterSequence<SlipFilterType> SlipFilterSequence;
-          /// Combined filter
-          typedef LAFEM::FilterChain<SlipFilterSequence, DirichletFilterSequence> LocalSystemFilter;
 
           /// Define global filter type
           typedef Global::Filter<LocalSystemFilter> GlobalSystemFilter;
           typedef GlobalOp_<LocalQualityFunctional> GlobalQualityFunctional;
-          typedef Global::Vector<LocalSystemVector> GlobalSystemVector;
+          typedef Global::Vector<LocalSystemVectorL> GlobalSystemVectorL;
+          typedef Global::Vector<LocalSystemVectorR> GlobalSystemVectorR;
           typedef Global::Vector<LocalScalarVector> GlobalScalarVector;
-
-          typedef LAFEM::DenseVectorBlocked<Mem::Main, DT_, Index, LocalQualityFunctional::BlockHeight> LocalCoordsBuffer;
 
           typedef Global::Vector<LocalCoordsBuffer> GlobalCoordsBuffer;
 
@@ -277,8 +267,8 @@ namespace FEAST
             op_sys(&gate_sys, &gate_sys, /*filter_sys,*/ std::forward<Args_>(args)...)
             {
 
-              DirichletFilterSequence dirichlet_sequence(dirichlet_list);
-              SlipFilterSequence slip_sequence(slip_list);
+              LocalSlipFilterSequence slip_sequence(slip_list);
+              LocalDirichletFilterSequence dirichlet_sequence(dirichlet_list);
 
               LocalSystemFilter local_filter (std::move(slip_sequence), std::move(dirichlet_sequence));
 
@@ -466,7 +456,7 @@ namespace FEAST
                 if(slip_filter_vector.used_elements() > 0)
                 {
                   // Temporary DenseVector for syncing
-                  typename SystemLevel_::LocalSystemVector tmp(slip_filter_vector.size());
+                  typename SystemLevel_::LocalSystemVectorL tmp(slip_filter_vector.size());
                   auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
                   auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
 
@@ -493,14 +483,14 @@ namespace FEAST
           }
 
           template<typename SystemLevel_>
-          void assemble_system_filter(SystemLevel_& sys_level, /* const */ typename SystemLevel_::GlobalSystemVector& vec)
+          void assemble_system_filter(SystemLevel_& sys_level, /* const */ typename SystemLevel_::GlobalSystemVectorR& vec)
           {
             // get our global system filter
             typename SystemLevel_::GlobalSystemFilter& fil_glob = sys_level.filter_sys;
             // get our local system filter
             typename SystemLevel_::LocalSystemFilter& fil_loc = *fil_glob;
 
-            typename SystemLevel_::LocalSystemVector& vec_loc = *vec;
+            typename SystemLevel_::LocalSystemVectorR& vec_loc = *vec;
 
             // Assemble Dirichlet boundary conditions from sol, as this->_coords contains the new boundary
             // coordinates
@@ -539,7 +529,7 @@ namespace FEAST
                 if(slip_filter_vector.used_elements() > 0)
                 {
                   // Temporary DenseVector for syncing
-                  typename SystemLevel_::LocalSystemVector tmp(slip_filter_vector.size());
+                  typename SystemLevel_::LocalSystemVectorL tmp(slip_filter_vector.size());
                   auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
                   auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
 
@@ -566,11 +556,11 @@ namespace FEAST
           }
 
           template<typename SystemLevel_>
-          typename SystemLevel_::GlobalSystemVector assemble_rhs_vector(SystemLevel_& sys_level)
+          typename SystemLevel_::GlobalSystemVectorL assemble_rhs_vector(SystemLevel_& sys_level)
           {
             ASSERT(!(*sys_level.op_sys).empty(), "assemble_rhs_vector for empty operator");
             // create new vector
-            typename SystemLevel_::GlobalSystemVector vec_rhs = sys_level.op_sys.create_vector_r();
+            typename SystemLevel_::GlobalSystemVectorL vec_rhs = sys_level.op_sys.create_vector_l();
 
             vec_rhs.format();
 
@@ -583,10 +573,10 @@ namespace FEAST
           }
 
           template<typename SystemLevel_>
-          typename SystemLevel_::GlobalSystemVector assemble_sol_vector(SystemLevel_& sys_level)
+          typename SystemLevel_::GlobalSystemVectorR assemble_sol_vector(SystemLevel_& sys_level)
           {
             ASSERT(!(*sys_level.op_sys).empty(), "assemble_sol_vector for empty operator");
-            typename SystemLevel_::GlobalSystemVector vec_sol(sys_level.coords_buffer.clone());
+            typename SystemLevel_::GlobalSystemVectorR vec_sol(sys_level.coords_buffer.clone());
 
             return vec_sol;
           }
@@ -626,7 +616,7 @@ namespace FEAST
             }
 
             // create local template vectors
-            typename SystemLevel_::LocalSystemVector tmp_sys(trafo_space.get_num_dofs());
+            typename SystemLevel_::LocalSystemVectorR tmp_sys(trafo_space.get_num_dofs());
             typename SystemLevel_::LocalScalarVector tmp_scalar(trafo_space.get_num_dofs());
 
             // compile gates
