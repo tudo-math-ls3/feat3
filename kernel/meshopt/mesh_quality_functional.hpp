@@ -51,7 +51,7 @@ namespace FEAST
         /// The mesh for the underlying transformation
         Geometry::RootMeshNode<MeshType>* _mesh_node;
         /// Coordinates, used for setting new boundary values etc.
-        CoordsBufferType _coords;
+        CoordsBufferType _coords_buffer;
 
       protected:
         /// Counter for number of function evaluations
@@ -71,17 +71,17 @@ namespace FEAST
          */
         explicit MeshQualityFunctional(Geometry::RootMeshNode<MeshType>* mesh_node_) :
           _mesh_node(mesh_node_),
-          _coords(mesh_node_->get_mesh()->get_num_entities(0), CoordType(0)),
+          _coords_buffer(mesh_node_->get_mesh()->get_num_entities(0), CoordType(0)),
           _num_func_evals(0),
           _num_grad_evals(0),
           _num_hess_evals(0)
           {
-            get_coords();
+            mesh_to_buffer();
           }
 
         explicit MeshQualityFunctional():
           _mesh_node(nullptr),
-          _coords(),
+          _coords_buffer(),
           _num_func_evals(0),
           _num_grad_evals(0),
           _num_hess_evals(0)
@@ -93,7 +93,7 @@ namespace FEAST
         {
           // Just set it to nullptr since we did not allocate the memory for this
           _mesh_node = nullptr;
-          _coords.clear();
+          _coords_buffer.clear();
         }
 
         /**
@@ -120,22 +120,42 @@ namespace FEAST
           return _mesh_node->get_mesh();
         }
 
-        /// \brief Gets the coordinates from the underlying mesh and saves them in _coords.
-        virtual void get_coords()
+        /// \brief Gets the coordinates from the underlying mesh and saves them in _coords_buffer.
+        virtual void mesh_to_buffer()
         {
           const typename MeshType::VertexSetType& vertex_set = get_mesh()->get_vertex_set();
 
           for(Index i(0); i < get_mesh()->get_num_entities(0); ++i)
-            _coords(i, vertex_set[i]);
+            _coords_buffer(i, vertex_set[i]);
         }
 
-        /// \brief Sets the coordinates in the underlying mesh to _coords.
-        virtual void set_coords()
+        /// \brief Sets the coordinates in the underlying mesh to _coords_buffer.
+        virtual void buffer_to_mesh()
         {
           typename MeshType::VertexSetType& vertex_set = get_mesh()->get_vertex_set();
 
           for(Index i(0); i < get_mesh()->get_num_entities(0); ++i)
-            vertex_set[i] = _coords(i);
+            vertex_set[i] = _coords_buffer(i);
+        }
+
+        /**
+         * \brief Gets the coords buffer
+         *
+         * \returns A reference to the coords buffer for manipulation.
+         */
+        CoordsBufferType& get_coords()
+        {
+          return _coords_buffer;
+        }
+
+        /**
+         * \brief Gets the coords buffer
+         *
+         * \returns A const reference to the coords buffer for manipulation.
+         */
+        const CoordsBufferType& get_coords() const
+        {
+          return _coords_buffer;
         }
 
         /**

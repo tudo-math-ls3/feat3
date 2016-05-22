@@ -188,8 +188,19 @@ namespace FEAST
           _slip_asm = nullptr;
         }
 
+        /**
+         * \brief Performs one-time initialisations
+         *
+         * This is not done in the constructor for the case that the system matrix gets overwritten by a derived
+         * class, so the unused system matrix of THIS class is not assembled symbolically
+         */
         virtual void init() override
         {
+          ASSERT_(_trafo != nullptr);
+          ASSERT_(_trafo_space != nullptr);
+          ASSERT_(_dirichlet_asm != nullptr);
+          ASSERT_(_slip_asm != nullptr);
+          Assembly::SymbolicAssembler::assemble_matrix_std1(sys_matrix, *_trafo_space);
         }
 
         /**
@@ -202,19 +213,8 @@ namespace FEAST
           return "DuDvFunctional<"+MeshType::name()+">";
         }
 
-        /**
-         * \brief Performs one-time initialisations
-         *
-         * This is not done in the constructor for the case that the system matrix gets overwritten by a derived
-         * class, so the unused system matrix of THIS class is not assembled symbolically
-         */
-        virtual void init_symbolic() //override
-        {
-          ASSERT_(_trafo_space != nullptr);
-          Assembly::SymbolicAssembler::assemble_matrix_std1(sys_matrix, *_trafo_space);
-        }
 
-        virtual void init_numeric() //override
+        virtual void assemble_system_matrix()
         {
           ASSERT_(_trafo_space != nullptr);
 

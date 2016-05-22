@@ -282,25 +282,7 @@ namespace FEAST
           template<typename SystemLevel_>
           void assemble_system_matrix(SystemLevel_& sys_level)
           {
-            // get the global matrix
-            typename SystemLevel_::GlobalQualityFunctional& mat_glob = sys_level.op_sys;
-
-            // get the local matrix
-            typename SystemLevel_::LocalQualityFunctional& mat_loc = (*mat_glob);
-
-            // assemble matrix structure?
-            if (mat_loc.empty())
-            {
-              Assembly::SymbolicAssembler::assemble_matrix_std1(mat_loc.sys_matrix, this->trafo_space);
-            }
-
-            // Assemble local system matrix
-            {
-              mat_loc.format();
-              Assembly::Common::DuDvOperatorBlocked<shape_dim> dudv_op;
-              Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
-                mat_loc.sys_matrix, dudv_op, this->trafo_space, this->cubature);
-            }
+            (*(sys_level.op_sys)).assemble_system_matrix();
           }
       }; // class DuDvFunctionalAssemblerLevel
 

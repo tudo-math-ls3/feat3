@@ -420,7 +420,7 @@ namespace FEAST
         virtual void init() override
         {
           // Write any potential changes to the mesh
-          this->set_coords();
+          this->buffer_to_mesh();
 
           // Compute desired element size distribution
           this->compute_lambda();
@@ -438,8 +438,8 @@ namespace FEAST
          */
         virtual void prepare(const VectorTypeR& vec_state, FilterType& filter)
         {
-          this->_coords.convert(vec_state);
-          this->set_coords();
+          this->_coords_buffer.convert(vec_state);
+          this->buffer_to_mesh();
 
           //auto& dirichlet_filters = filter.template at<1>();
 
@@ -471,7 +471,7 @@ namespace FEAST
             assembler->second->assemble(it.second, _trafo_space);
           }
 
-          this->get_coords();
+          this->mesh_to_buffer();
         }
 
         /**
@@ -530,7 +530,7 @@ namespace FEAST
          */
         virtual void compute_h()
         {
-          RefCellTrafo_::compute_h(_h, this->_coords, _lambda, this->_trafo);
+          RefCellTrafo_::compute_h(_h, this->_coords_buffer, _lambda, this->_trafo);
         }
 
         /// \brief Computes the weights _lambda.
@@ -760,7 +760,7 @@ namespace FEAST
           {
             h = this->_h(cell);
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
-              x[j] = this->_coords(idx(cell,Index(j)));
+              x[j] = this->_coords_buffer(idx(cell,Index(j)));
 
             fval += this->_mu(cell) * this->_functional->compute_local_functional(x,h);
           }
@@ -818,7 +818,7 @@ namespace FEAST
             h = this->_h(cell);
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; j++)
-              x[j] = this->_coords(idx(cell,Index(j)));
+              x[j] = this->_coords_buffer(idx(cell,Index(j)));
 
             // Scale local functional value with lambda
             fval += this->_mu(cell) * this->_functional->compute_local_functional(x,h, norm_A, det_A, rec_det_A);
@@ -869,7 +869,7 @@ namespace FEAST
             h = this->_h(cell);
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-              x[j] = this->_coords(idx(cell,Index(j)));
+              x[j] = this->_coords_buffer(idx(cell,Index(j)));
 
             this->_functional->compute_local_grad(x, h, grad_loc);
 

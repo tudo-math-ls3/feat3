@@ -107,7 +107,7 @@ template
 
       // Set optimal scale
       DataType target_scaling(DataType(5.5));
-      helperclass<ShapeType>::set_coords(new_coords, target_scaling);
+      helperclass<ShapeType>::buffer_to_mesh(new_coords, target_scaling);
       // init() sets the coordinates in the mesh and computes h
       rumpflpumpfl.init();
       // Now set
@@ -116,7 +116,7 @@ template
 
       // Transform the cell to the initial state
       DataType scaling(DataType(1.25));
-      helperclass<ShapeType>::set_coords(new_coords, scaling);
+      helperclass<ShapeType>::buffer_to_mesh(new_coords, scaling);
       rumpflpumpfl.prepare(new_coords, my_filter);
 
       // For saving parts of the functional value
@@ -206,7 +206,7 @@ struct helperclass< FEAST::Shape::Hypercube<shape_dim_> >
 {
   /// \brief Sets coordinates so we deal the the reference element
   template<typename VectorType_, typename DataType_>
-  static void set_coords(VectorType_& coords_, const DataType_& scaling)
+  static void buffer_to_mesh(VectorType_& coords_, const DataType_& scaling)
   {
     for(Index i(0); i < Index(1 << shape_dim_); ++i)
     {
@@ -226,7 +226,7 @@ struct helperclass< FEAST::Shape::Simplex<2> >
 {
   /// \brief Sets coordinates so we deal the the Rumpf reference element
   template<typename VectorType_, typename DataType_>
-  static void set_coords(VectorType_& coords_, const DataType_& scaling)
+  static void buffer_to_mesh(VectorType_& coords_, const DataType_& scaling)
   {
     Tiny::Vector<DataType_, 2, 2> tmp(0);
     coords_(0, tmp);
