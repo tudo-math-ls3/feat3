@@ -51,18 +51,22 @@ namespace FEAST
           /// The FE space the transformation lives in
           typedef typename FEAST::Meshopt::Intern::TrafoFE<Trafo_>::Space TrafoSpace;
 
+          /// Our base class
           typedef MeshoptControlBase<DomainControl_, Trafo_> BaseClass;
 
           //typedef FEAST::Meshopt::DuDvFunctional<Mem_, DT_, IT_, Trafo_> MeshQualityFunctional;
           //typedef MeshoptSystemLevel<Mem_, DT_, IT_, MeshQualityFunctional::template MatrixTemplate, Global::Matrix>
           //  SystemLevelType;
 
+          /// Template-alias away the Trafo so the SystemLevel can take it as a template template parameter
           template<typename A, typename B, typename C>
           using OperatorType =  FEAST::Meshopt::DuDvFunctional<A, B, C, Trafo_>;
-          typedef MeshoptSystemLevel<Mem_, DT_, IT_, OperatorType, Global::Matrix>
-            SystemLevelType;
+          /// Linear system of equations on one refinement level
+          typedef MeshoptSystemLevel<Mem_, DT_, IT_, OperatorType, Global::Matrix> SystemLevelType;
 
+          /// Inter-level transfer matrix
           typedef TransferMatrixBlocked<Mem_, DT_, IT_, MeshType::world_dim> TransferMatrixType;
+          /// Type to do all inter level information transfer
           typedef MeshoptTransferLevel<SystemLevelType, TransferMatrixType> TransferLevelType;
 
           typedef typename DomainControl_::LayerType DomainLayerType;
@@ -72,13 +76,19 @@ namespace FEAST
           typedef typename SystemLevelType::GlobalSystemVectorL GlobalSystemVectorL;
           typedef typename SystemLevelType::GlobalSystemVectorR GlobalSystemVectorR;
 
+          /// For every level of refinement we have one assembler level
           std::deque<AssemblerLevelType*> _assembler_levels;
+          /// For every level of refinement, we have one system level
           std::deque<SystemLevelType*> _system_levels;
+          /// Two subsequent levels can communicate through their transfer level
           std::deque<TransferLevelType*> _transfer_levels;
 
         public:
+          /// Number of refinement levels
           const Index num_levels;
+          /// Solver configuration
           PropertyMap& solver_config;
+          /// The name of the section from solver_config we want to use
           String solver_name;
 
           std::shared_ptr<Solver::SolverBase<GlobalSystemVectorR>> solver;
@@ -94,6 +104,8 @@ namespace FEAST
             solver_name(solver_name_),
             solver(nullptr)
             {
+              ASSERT_(num_levels > Index(0));
+
               const DomainLayerType& layer = *dom_ctrl.get_layers().back();
               const std::deque<DomainLevelType*>& domain_levels = dom_ctrl.get_levels();
 
@@ -105,6 +117,10 @@ namespace FEAST
                   &(_assembler_levels.at(i)->trafo_space),
                   &(_assembler_levels.at(i)->dirichlet_asm),
                   &(_assembler_levels.at(i)->slip_asm)));
+
+                // This assembles the system matrix symbolically
+                (*(_system_levels.at(i)->op_sys)).init();
+
                 if(i > 0)
                 {
                   _transfer_levels.push_back(new TransferLevelType(*_system_levels.at(i-1), *_system_levels.at(i)));
@@ -180,14 +196,32 @@ namespace FEAST
           /// \copydoc BaseClass::buffer_to_mesh()
           virtual void buffer_to_mesh() override
           {
+            // Write from control object to local mesh quality functional
+            (*(_system_levels.back()->op_sys)).get_coords().clone(*(_system_levels.back()->coords_buffer));
+            // Write finest level
+            (*(_system_levels.back()->op_sys)).buffer_to_mesh();
+
+            // Get the coords buffer on the finest level
             const typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
             const auto& coords_buffer_loc = *coords_buffer;
 
-            for(size_t level(0); level < _assembler_levels.size(); ++level)
+            // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
+            for(size_t level(num_levels-1); level > 0; )
             {
-              auto& vertex_set = _assembler_levels.at(level)->mesh.get_vertex_set();
-              for(Index i(0); i < vertex_set.get_num_vertices(); ++i)
-                vertex_set[i] = coords_buffer_loc(i);
+              --level;
+              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+
+              // At this point, what we really need is a primal restriction operator that restricts the FE function
+              // representing the coordinate distribution to the coarser level. This is very simple for continuous
+              // Lagrange elements (just discard the additional information from the fine level), but not clear in
+              // the generic case. So we use an evil hack here:
+              // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
+              // the fine level vector.
+              typename SystemLevelType::LocalCoordsBuffer
+                vec_level(coords_buffer_loc, ndofs, Index(0));
+
+              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level, LAFEM::CloneMode::Deep);
+              (*(_system_levels.at(level)->op_sys)).buffer_to_mesh();
             }
 
           }
@@ -195,12 +229,34 @@ namespace FEAST
           /// \copydoc BaseClass::mesh_to_buffer()
           virtual void mesh_to_buffer() override
           {
-            typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
-            auto& coords_buffer_loc = *coords_buffer;
+            // Write finest level
+            (*(_system_levels.back()->op_sys)).mesh_to_buffer();
+            // Write from local mesh quality functional to control object
+            (*(_system_levels.back()->coords_buffer)).clone(
+              (*(_system_levels.back()->op_sys)).get_coords(), LAFEM::CloneMode::Deep);
 
-            const auto& vertex_set = _assembler_levels.back()->mesh.get_vertex_set();
-            for(Index i(0); i < vertex_set.get_num_vertices(); ++i)
-              coords_buffer_loc(i, vertex_set[i]);
+            // Get the coords buffer on the finest level
+            const typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
+            const auto& coords_buffer_loc = *coords_buffer;
+
+            // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
+            for(size_t level(num_levels-1); level > 0; )
+            {
+              --level;
+              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+
+              // At this point, what we really need is a primal restriction operator that restricts the FE function
+              // representing the coordinate distribution to the coarser level. This is very simple for continuous
+              // Lagrange elements (just discard the additional information from the fine level), but not clear in
+              // the generic case. So we use an evil hack here:
+              // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
+              // the fine level vector.
+              typename SystemLevelType::LocalCoordsBuffer
+                vec_level(coords_buffer_loc, ndofs, Index(0));
+
+              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level, LAFEM::CloneMode::Deep);
+            }
+
           }
 
           virtual void init_numeric()

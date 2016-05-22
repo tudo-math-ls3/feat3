@@ -192,19 +192,47 @@ namespace FEAST
            */
           virtual GlobalCoordsBuffer& get_coords() = 0;
 
+          /**
+           * \brief Returns a descriptive String
+           *
+           * \returns The class name as String
+           */
           virtual String name() const = 0;
 
           /**
            * \brief Adds quantities of the underlying mesh quality functional to a given exporter object
-           *
            */
           virtual void add_to_vtk_exporter
             (Geometry::ExportVTK<typename Trafo_::MeshType>& DOXY(exporter), const int DOXY(lvl_index)) const
           {
           }
 
-      };
+      }; // class MeshoptControlBase
 
+      /**
+       * \brief (Non)linear system of equations on one mesh refinement level
+       *
+       * \tparam Mem_
+       * Memory architecture for the system of equations wrt. the solver
+       *
+       * \tparam DT_
+       * Floating point type
+       *
+       * \tparam IT_
+       * Index type
+       *
+       * \tparam Op_
+       * The (patch-) local (non-)linear mesh quality functional
+       *
+       * \tparam GlobalOp_
+       * The global wrapper class around Op_
+       *
+       * Examples for Op_ are Meshopt::DuDvFunctional or MeshOpt::Hyperelasticityfunctional. If the mesh quality
+       * functional is quadratic, its gradient gives the linear system of equations to solve, so GlobalOp_ is
+       * Global::Matrix. If the mesh quality functional is not quadratic, the gradient is nonlinear and GlobalOp_
+       * has to be Global::NonlinearFunctional.
+       *
+       */
       template
       <
         typename Mem_, typename DT_, typename IT_,
@@ -214,36 +242,52 @@ namespace FEAST
       class MeshoptSystemLevel
       {
         public:
-          // basic types
+          /// Memory architecture for the solver
           typedef Mem_ MemType;
+          /// Floating point precision for the solver
           typedef DT_ DataType;
+          /// Index type for the solver
           typedef IT_ IndexType;
 
-          /// define local scalar matrix type
+          /// (Patch-) Local mesh quality functional type
           typedef Op_<Mem_, DT_, IT_> LocalQualityFunctional;
 
-          /// define local system vector type
+          /// Local left-vectors (dual space)
           typedef typename LocalQualityFunctional::VectorTypeL LocalSystemVectorL;
+          /// Local right-vectors (primal space)
           typedef typename LocalQualityFunctional::VectorTypeR LocalSystemVectorR;
+          /// Local vectors of scalar quantities
           typedef typename LocalQualityFunctional::ScalarVectorType LocalScalarVector;
+          /// Local coordinates buffer type for passing information to or from the mesh
           typedef typename LocalQualityFunctional::CoordsBufferType LocalCoordsBuffer;
 
+          /// Filter for the local system
           typedef typename LocalQualityFunctional::FilterType LocalSystemFilter;
+          /// This is comprised of a sequence of SlipFilters...
           typedef typename LocalQualityFunctional::SlipFilterSequence LocalSlipFilterSequence;
+          /// ... and a sequence of UnitFilters
           typedef typename LocalQualityFunctional::DirichletFilterSequence LocalDirichletFilterSequence;
 
+          /// Mirrors for system vectors
           typedef LAFEM::VectorMirrorBlocked<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> SystemMirror;
+          /// Gates for the system
           typedef Global::FoundationGate<LocalSystemVectorR, SystemMirror> SystemGate;
+          /// Mirrors for scalar vectors
           typedef LAFEM::VectorMirror<Mem_, DT_, IT_> ScalarMirror;
+          /// Gates for scalar vectors
           typedef Global::FoundationGate<LocalScalarVector, ScalarMirror> ScalarGate;
 
-          /// Define global filter type
-          typedef Global::Filter<LocalSystemFilter> GlobalSystemFilter;
+          /// Global mesh quality functional type
           typedef GlobalOp_<LocalQualityFunctional> GlobalQualityFunctional;
-          typedef Global::Vector<LocalSystemVectorL> GlobalSystemVectorL;
-          typedef Global::Vector<LocalSystemVectorR> GlobalSystemVectorR;
+          /// Global system filter type
+          typedef Global::Filter<LocalSystemFilter> GlobalSystemFilter;
+          /// Global scalar vector type
           typedef Global::Vector<LocalScalarVector> GlobalScalarVector;
-
+          /// Global left-vectors
+          typedef Global::Vector<LocalSystemVectorL> GlobalSystemVectorL;
+          /// Global right-vectors
+          typedef Global::Vector<LocalSystemVectorR> GlobalSystemVectorR;
+          /// Global coordinates buffer
           typedef Global::Vector<LocalCoordsBuffer> GlobalCoordsBuffer;
 
           /// The scalar gate
@@ -341,17 +385,27 @@ namespace FEAST
           typedef Control::Domain::DomainLayer<MeshType> DomainLayerType;
 
         public:
+          /// The domain level holding the RootMeshNode this refers to
           DomainLevelType& domain_level;
+          /// The mesh the transformation and our FE spaces live on
           MeshType& mesh;
+          /// The transformation
           TrafoType trafo;
+          /// The FE space we solve our problem on
           SpaceType trafo_space;
+          /// Cubature factory for integration
           Cubature::DynamicFactory cubature;
 
+          /// All UnitFilterAssemblers for mesh optimisation
           std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> dirichlet_asm;
+          /// All SlipFilterAssemblers for mesh optimisation
           std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> slip_asm;
 
         public:
-          explicit MeshoptAssemblerLevel( DomainLevelType& dom_lvl, const std::deque<String>& dirichlet_list,
+          /**
+           * \brief
+           */
+          explicit MeshoptAssemblerLevel(DomainLevelType& dom_lvl, const std::deque<String>& dirichlet_list,
           const std::deque<String>& slip_list) :
             domain_level(dom_lvl),
             mesh(domain_level.get_mesh()),
@@ -399,6 +453,16 @@ namespace FEAST
 
             }
 
+          /// Explicitly delete default constructor
+          MeshoptAssemblerLevel() = delete;
+          /// Explicitly delete the copy constructor
+          MeshoptAssemblerLevel(const MeshoptAssemblerLevel&) = delete;
+          /// Explicitly delete the move constructor. This could be useful to have, though.
+          MeshoptAssemblerLevel(MeshoptAssemblerLevel&&) = delete;
+
+          /**
+           * \brief Empty virtual destructor
+           */
           virtual ~MeshoptAssemblerLevel()
           {
           }

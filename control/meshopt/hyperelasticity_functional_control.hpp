@@ -246,26 +246,67 @@ namespace FEAST
           /// \copydoc BaseClass::buffer_to_mesh()
           virtual void buffer_to_mesh() override
           {
+            // Write from control object to local mesh quality functional
+            (*(_system_levels.back()->op_sys)).get_coords().clone(*(_system_levels.back()->coords_buffer));
+            // Write finest level
+            (*(_system_levels.back()->op_sys)).buffer_to_mesh();
+
+            // Get the coords buffer on the finest level
             const typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
             const auto& coords_buffer_loc = *coords_buffer;
 
-            for(size_t level(0); level < _assembler_levels.size(); ++level)
+            // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
+            for(size_t level(num_levels-1); level > 0; )
             {
-              auto& vertex_set = _assembler_levels.at(level)->mesh.get_vertex_set();
-              for(Index i(0); i < vertex_set.get_num_vertices(); ++i)
-                vertex_set[i] = coords_buffer_loc(i);
+              --level;
+              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+
+              // At this point, what we really need is a primal restriction operator that restricts the FE function
+              // representing the coordinate distribution to the coarser level. This is very simple for continuous
+              // Lagrange elements (just discard the additional information from the fine level), but not clear in
+              // the generic case. So we use an evil hack here:
+              // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
+              // the fine level vector.
+              typename SystemLevelType::LocalCoordsBuffer
+                vec_level(coords_buffer_loc, ndofs, Index(0));
+
+              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level, LAFEM::CloneMode::Deep);
+              (*(_system_levels.at(level)->op_sys)).buffer_to_mesh();
             }
+
           }
 
           /// \copydoc BaseClass::mesh_to_buffer()
           virtual void mesh_to_buffer() override
           {
-            typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
-            auto& coords_buffer_loc = *coords_buffer;
+            // Write finest level
+            (*(_system_levels.back()->op_sys)).mesh_to_buffer();
+            // Write from local mesh quality functional to control object
+            (*(_system_levels.back()->coords_buffer)).clone(
+              (*(_system_levels.back()->op_sys)).get_coords(), LAFEM::CloneMode::Deep);
 
-            const auto& vertex_set = _assembler_levels.back()->mesh.get_vertex_set();
-            for(Index i(0); i < vertex_set.get_num_vertices(); ++i)
-              coords_buffer_loc(i, vertex_set[i]);
+            // Get the coords buffer on the finest level
+            const typename SystemLevelType::GlobalCoordsBuffer& coords_buffer(_system_levels.back()->coords_buffer);
+            const auto& coords_buffer_loc = *coords_buffer;
+
+            // Transfer fine coords buffer to coarser levels and perform buffer_to_mesh
+            for(size_t level(num_levels-1); level > 0; )
+            {
+              --level;
+              Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
+
+              // At this point, what we really need is a primal restriction operator that restricts the FE function
+              // representing the coordinate distribution to the coarser level. This is very simple for continuous
+              // Lagrange elements (just discard the additional information from the fine level), but not clear in
+              // the generic case. So we use an evil hack here:
+              // Because of the underlying two level ordering, we just need to copy the first ndofs entries from
+              // the fine level vector.
+              typename SystemLevelType::LocalCoordsBuffer
+                vec_level(coords_buffer_loc, ndofs, Index(0));
+
+              (*(_system_levels.at(level)->op_sys)).get_coords().clone(vec_level, LAFEM::CloneMode::Deep);
+            }
+
           }
 
           /// \copydoc BaseClass::add_to_vtk_exporter()
