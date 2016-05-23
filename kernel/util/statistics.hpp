@@ -326,13 +326,13 @@ namespace FEAST
         result += "Accumulated op time: " + stringify(measured_time.sum) + "\n";
 
         result += "\n";
-        result += "Reductions: " + stringify(get_time_reduction() / total_time * 100.) + "%\n";
-        result += "Blas-1: " + stringify(get_time_axpy() / total_time * 100.) + "%\n";
-        result += "Blas-2: " + stringify(get_time_spmv() / total_time * 100.) + "%\n";
-        result += "Precon Kernels: " + stringify(get_time_precon() / total_time * 100.) + "%\n";
-        result += "MPI Execution: " + stringify(get_time_mpi_execute() / total_time * 100.) + "%\n";
-        result += "MPI Wait: " + stringify(get_time_mpi_wait() / total_time * 100.) + "%\n";
-        result += "Not covered: " + stringify( (total_time - measured_time.sum) / total_time * 100.) + "%";
+        result += String("Reductions:").pad_back(17) + stringify(get_time_reduction() / total_time * 100.) + "%\n";
+        result += String("Blas-1:").pad_back(17) + stringify(get_time_axpy() / total_time * 100.) + "%\n";
+        result += String("Blas-2:").pad_back(17) + stringify(get_time_spmv() / total_time * 100.) + "%\n";
+        result += String("Precon Kernels:").pad_back(17) + stringify(get_time_precon() / total_time * 100.) + "%\n";
+        result += String("MPI Execution:").pad_back(17) + stringify(get_time_mpi_execute() / total_time * 100.) + "%\n";
+        result += String("MPI Wait:").pad_back(17) + stringify(get_time_mpi_wait() / total_time * 100.) + "%\n";
+        result += String("Not covered:").pad_back(17) + stringify( (total_time - measured_time.sum) / total_time * 100.) + "%";
         return result;
       }
 

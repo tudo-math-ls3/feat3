@@ -149,11 +149,11 @@ namespace FEAST
     {
       String r;
       auto m = get_memory_usage();
-      r += "Current real: " + stringify(m.current_physical / 1024 / 1024) + " MByte\n";
-      r += "Peak real: " + stringify(m.peak_physical / 1024 / 1024) + " MByte\n";
-      r += "Current virtual: " + stringify(m.current_virtual / 1024 / 1024) + " MByte\n";
-      r += "Peak virtual: " + stringify(m.peak_virtual / 1024 / 1024) + " MByte\n";
-      r += "Current swap: " + stringify(m.current_swap / 1024 / 1024) + " MByte\n";
+      r += String("Current real:").pad_back(17) + stringify(m.current_physical / 1024 / 1024) + " MByte\n";
+      r += String("Peak real:").pad_back(17) + stringify(m.peak_physical / 1024 / 1024) + " MByte\n";
+      r += String("Current virtual:").pad_back(17) + stringify(m.current_virtual / 1024 / 1024) + " MByte\n";
+      r += String("Peak virtual:").pad_back(17) + stringify(m.peak_virtual / 1024 / 1024) + " MByte\n";
+      r += String("Current swap:").pad_back(17) + stringify(m.current_swap / 1024 / 1024) + " MByte\n";
 
       return r;
     }
