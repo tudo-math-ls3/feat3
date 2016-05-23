@@ -171,7 +171,7 @@ struct MeshRefinementOptimiserApp
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-        meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
         exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
         ++deque_position;
       }
