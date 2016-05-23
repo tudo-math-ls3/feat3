@@ -34,8 +34,8 @@ namespace FEAST
         SolverType_ & solver,
         DomainType_ & domain)
         {
-          Index rank(Comm::rank());
-          Index nranks(Comm::size());
+          Index rank(Util::Comm::rank());
+          Index nranks(Util::Comm::size());
 
           std::size_t la_size(0);
           std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType_ * n) { la_size += n->bytes(); });

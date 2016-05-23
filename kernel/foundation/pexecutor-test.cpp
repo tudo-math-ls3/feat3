@@ -25,7 +25,7 @@ class PExecutorParmetisTest:
 
     virtual void run() const override
     {
-      Communicator comm( Communicator(MPI_COMM_WORLD) );
+      Util::Communicator comm( Util::Communicator(MPI_COMM_WORLD) );
       PGraphParmetis pg(2, 1, 2, comm);
 
       //evoke-test creator function for dual graph
@@ -42,7 +42,7 @@ class PExecutorParmetisTest:
       target_vertex_at_edge[1][0] = 1;
       target_vertex_at_edge[1][1] = 2;
 
-      PGraphParmetis global_dual(mesh, 2, Communicator(MPI_COMM_WORLD));
+      PGraphParmetis global_dual(mesh, 2, Util::Communicator(MPI_COMM_WORLD));
       std::shared_ptr<PGraphBase<idx_t> > local_dual(global_dual.create_local());
 
       auto part(PExecutorParmetis<ParmetisModePartKway>::part(*((PGraphParmetis*)local_dual.get())));

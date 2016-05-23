@@ -389,7 +389,7 @@ namespace FEAST
             prepare(vec_sol);
 
             // Print solver summary
-            if(Comm::rank() == 0)
+            if(Util::Comm::rank() == 0)
             {
               std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
               std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());

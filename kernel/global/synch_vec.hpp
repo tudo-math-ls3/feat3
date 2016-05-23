@@ -26,7 +26,7 @@ namespace FEAST
                            StorageT_<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType>, std::allocator<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType> > >& sendbufs,
                            StorageT_<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType>, std::allocator<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType> > >& recvbufs,
                            const StorageT_<Index, std::allocator<Index> >& tags,
-                           Communicator communicator = Communicator(MPI_COMM_WORLD)
+                           Util::Communicator communicator = Util::Communicator(MPI_COMM_WORLD)
                            )
           {
             if(mirrors.size() == 0)
@@ -35,15 +35,15 @@ namespace FEAST
             TimeStamp ts_start;
 
             //start recv
-            StorageT_<Request, std::allocator<Request> > recvrequests(mirrors.size());
-            StorageT_<Status, std::allocator<Status> > recvstatus;
+            StorageT_<Util::CommRequest, std::allocator<Util::CommRequest> > recvrequests(mirrors.size());
+            StorageT_<Util::CommStatus, std::allocator<Util::CommStatus> > recvstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
-              Status rs;
+              Util::CommStatus rs;
 
               recvstatus.push_back(std::move(rs));
 
-              Comm::irecv(recvbufs.at(i).elements(),
+              Util::Comm::irecv(recvbufs.at(i).elements(),
                           recvbufs.at(i).size(),
                           other_ranks.at(i),
                           recvrequests.at(i),
@@ -54,17 +54,17 @@ namespace FEAST
             }
 
             //gather and start send
-            StorageT_<Request, std::allocator<Request> > sendrequests(mirrors.size());
-            StorageT_<Status, std::allocator<Status> > sendstatus;
+            StorageT_<Util::CommRequest, std::allocator<Util::CommRequest> > sendrequests(mirrors.size());
+            StorageT_<Util::CommStatus, std::allocator<Util::CommStatus> > sendstatus;
             for(Index i(0) ; i < mirrors.size() ; ++i)
             {
               mirrors.at(i).gather_dual(sendbufs.at(i), target);
 
-              Status ss;
+              Util::CommStatus ss;
 
               sendstatus.push_back(std::move(ss));
 
-              Comm::isend(sendbufs.at(i).elements(),
+              Util::Comm::isend(sendbufs.at(i).elements(),
                           sendbufs.at(i).size(),
                           other_ranks.at(i),
                           sendrequests.at(i),
@@ -90,7 +90,7 @@ namespace FEAST
               {
                 if(taskflags[i] == 0)
                 {
-                  Comm::test(recvrequests.at(i), recvflags[i], recvstatus.at(i));
+                  Util::Comm::test(recvrequests.at(i), recvflags[i], recvstatus.at(i));
                   if(recvflags[i] != 0)
                   {
                     mirrors.at(i).scatter_axpy_dual(target, recvbufs.at(i));
@@ -103,8 +103,8 @@ namespace FEAST
 
             for(Index i(0) ; i < sendrequests.size() ; ++i)
             {
-              Status ws;
-              Comm::wait(sendrequests.at(i), ws);
+              Util::CommStatus ws;
+              Util::Comm::wait(sendrequests.at(i), ws);
             }
 
             delete[] recvflags;
@@ -122,7 +122,7 @@ namespace FEAST
                            StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
                            StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
                            const StorageT_<Index, std::allocator<Index> >&,
-                           Communicator = Communicator(0)
+                           Util::Communicator = Util::Communicator(0)
                            )
           {
           }
@@ -144,7 +144,7 @@ namespace FEAST
                            StorageT_<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType>, std::allocator<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType> > >& sendbufs,
                            StorageT_<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType>, std::allocator<LAFEM::DenseVector<Mem::Main, typename TargetVectorT_::DataType, typename TargetVectorT_::IndexType> > >& recvbufs,
                            const StorageT_<Index, std::allocator<Index> >& tags,
-                           Communicator communicator = Communicator(MPI_COMM_WORLD)
+                           Util::Communicator communicator = Util::Communicator(MPI_COMM_WORLD)
                            )
           {
             if(mirrors.size() == 0)
@@ -165,7 +165,7 @@ namespace FEAST
                            StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
                            StorageT_<BufferVectorT_, std::allocator<BufferVectorT_> >&,
                            const StorageT_<Index, std::allocator<Index> >&,
-                           Communicator = Communicator(0)
+                           Util::Communicator = Util::Communicator(0)
                            )
           {
           }

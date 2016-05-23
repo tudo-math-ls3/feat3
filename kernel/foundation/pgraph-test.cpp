@@ -24,7 +24,7 @@ class PGraphParmetisTest:
 
     virtual void run() const override
     {
-      Communicator comm( Communicator(MPI_COMM_WORLD) );
+      Util::Communicator comm( Util::Communicator(MPI_COMM_WORLD) );
       PGraphParmetis pg(2, 1, 2, comm);
 
       //evoke-test creator function for dual graph
@@ -41,7 +41,7 @@ class PGraphParmetisTest:
       target_vertex_at_edge[1][0] = 1;
       target_vertex_at_edge[1][1] = 2;
 
-      PGraphParmetis dual_graph(mesh, 2, Communicator(MPI_COMM_WORLD));
+      PGraphParmetis dual_graph(mesh, 2, Util::Communicator(MPI_COMM_WORLD));
       auto* result_xadj(dual_graph.get_xadj());
       auto* result_adjncy(dual_graph.get_adjncy());
 
@@ -104,7 +104,7 @@ class PGraphParmetisTest:
       typename ConfmeshType2D::template IndexSet<2, 1>::Type& target_edge_at_face2(mesh2.template get_index_set<2, 1>());
       Geometry::IndexCalculator<face_type, face_type::dimension - 1>::compute(it, target_vertex_at_face2, target_edge_at_face2);
 
-      PGraphParmetis dual_graph2(mesh2, 2, Communicator(MPI_COMM_WORLD));
+      PGraphParmetis dual_graph2(mesh2, 2, Util::Communicator(MPI_COMM_WORLD));
       auto* result_xadj2(dual_graph2.get_xadj());
       auto* result_adjncy2(dual_graph2.get_adjncy());
       TEST_CHECK_EQUAL(dual_graph2.get_num_vtx(), 2);
@@ -215,7 +215,7 @@ class PGraphParmetisTest:
       Geometry::IndexCalculator<face_type, face_type::dimension - 1>::compute(it_edge, target_vertex_at_face3, target_edge_at_face3);
       Geometry::IndexCalculator<poly_type, poly_type::dimension - 2>::compute(it_edge, target_vertex_at_poly3, target_edge_at_poly3);
 
-      PGraphParmetis dual_graph3(mesh3, 1, Communicator(MPI_COMM_WORLD));
+      PGraphParmetis dual_graph3(mesh3, 1, Util::Communicator(MPI_COMM_WORLD));
       auto* result_xadj3(dual_graph3.get_xadj());
       auto* result_adjncy3(dual_graph3.get_adjncy());
       TEST_CHECK_EQUAL(dual_graph3.get_num_vtx(), 1);

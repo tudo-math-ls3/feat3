@@ -27,13 +27,13 @@ namespace FEAST
 
             DT_ sendbuf(x), recvbuf;
 
-            Status stat;
+            Util::CommStatus stat;
 
-            Request req;
+            Util::CommRequest req;
 
-            Comm::iallreduce(&sendbuf, Index(1), &recvbuf, req);
+            Util::Comm::iallreduce(&sendbuf, Index(1), &recvbuf, req);
 
-            Comm::wait(req, stat);
+            Util::Comm::wait(req, stat);
 
             r = recvbuf;
 

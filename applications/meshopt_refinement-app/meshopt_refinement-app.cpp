@@ -12,9 +12,9 @@ using namespace FEAST;
 static void display_help();
 
 #ifndef SERIAL
-static void synch_stringstream(std::stringstream& iss, Communicator comm = Communicator(MPI_COMM_WORLD))
+static void synch_stringstream(std::stringstream& iss, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD))
 {
-  Index me(Comm::rank(comm));
+  Index me(Util::Comm::rank(comm));
   Index size;
   std::string str;
 
@@ -25,7 +25,7 @@ static void synch_stringstream(std::stringstream& iss, Communicator comm = Commu
     size = str.length();
   }
   // synchronize length
-  Comm::bcast(&size, 1, 0, comm);
+  Util::Comm::bcast(&size, 1, 0, comm);
 
   //allocate
   char* buf = new char[size + 1];
@@ -37,7 +37,7 @@ static void synch_stringstream(std::stringstream& iss, Communicator comm = Commu
   }
 
   //bcast data
-  Comm::bcast(buf, size, 0, comm);
+  Util::Comm::bcast(buf, size, 0, comm);
 
   //convert
   if(me != 0)
@@ -100,15 +100,15 @@ struct MeshRefinementOptimiserApp
   int lvl_max, int lvl_min, const bool write_vtk)
   {
     // Base for vtk filenames, we attach some more information to that
-    String file_basename(name()+"_n"+stringify(Comm::size()));
+    String file_basename(name()+"_n"+stringify(Util::Comm::size()));
 
     // Minimum number of cells we want to have in each patch
-    Index part_min_elems(Comm::size()*4);
+    Index part_min_elems(Util::Comm::size()*4);
 
     // Create the DomainControl
     DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader, Geometry::AdaptMode::none);
     // Print level information
-    if(Comm::rank() == 0)
+    if(Util::Comm::rank() == 0)
     {
       std::cout << name() << " settings: " << std::endl;
       std::cout << "LVL-MAX: " <<
@@ -138,13 +138,13 @@ struct MeshRefinementOptimiserApp
       {
         String vtk_name = String(file_basename+"_pre_lvl_"+stringify((*it)->get_level_index()));
 
-        if(Comm::rank() == 0)
+        if(Util::Comm::rank() == 0)
           std::cout << "Writing " << vtk_name << std::endl;
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
         ++deque_position;
       }
     }
@@ -154,7 +154,7 @@ struct MeshRefinementOptimiserApp
     meshopt_ctrl->optimise();
     TimeStamp post_opt;
 
-    if(Comm::rank() == 0)
+    if(Util::Comm::rank() == 0)
       std::cout << "Solve time: " << post_opt.elapsed(pre_opt) << std::endl;
 
     // Write initial vtk output
@@ -166,13 +166,13 @@ struct MeshRefinementOptimiserApp
         int lvl_index((*it)->get_level_index());
         String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
 
-        if(Comm::rank() == 0)
+        if(Util::Comm::rank() == 0)
           std::cout << "Writing " << vtk_name << std::endl;
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
         ++deque_position;
       }
     }
@@ -256,7 +256,7 @@ int main(int argc, char* argv[])
   }
 
   // Read the application config file on rank 0
-  if(Comm::rank() == 0)
+  if(Util::Comm::rank() == 0)
   {
     // Input application configuration file name, required
     String application_config_filename("");
@@ -294,7 +294,7 @@ int main(int argc, char* argv[])
     "Application config is missing the mandatory ApplicationSettings section!");
 
   // We read the files only on rank 0. After reading, we synchronise the streams like above.
-  if(Comm::rank() == 0)
+  if(Util::Comm::rank() == 0)
   {
     String mesh_filename("");
     String chart_filename("");
@@ -372,7 +372,7 @@ int main(int argc, char* argv[])
         synchstream_solver_config << ifs.rdbuf();
       }
     }
-  } // Comm::rank() == 0
+  } // Util::Comm::rank() == 0
 
 #ifndef SERIAL
   // Synchronise all those streams in parallel mode
@@ -445,7 +445,7 @@ int main(int argc, char* argv[])
   // Measure total execution time
   TimeStamp ts_end;
 
-  if(Comm::rank() == 0)
+  if(Util::Comm::rank() == 0)
     std::cout << "Total time: " << ts_end.elapsed(ts_start) << std::endl;
 
   FEAST::Runtime::finalise();
@@ -454,7 +454,7 @@ int main(int argc, char* argv[])
 
 static void display_help()
 {
-  if(Comm::rank() == 0)
+  if(Util::Comm::rank() == 0)
   {
     std::cout << "meshopt_refinement-app: This refines a mesh without boundary adaption, then just adapts the finest mesh and uses a mesh optimiser on this"
     << std::endl;

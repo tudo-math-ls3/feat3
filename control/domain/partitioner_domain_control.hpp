@@ -52,7 +52,7 @@ namespace FEAST
             std::stringstream synchstream;
 
             //MASTER
-            if(Comm::rank() == 0)
+            if(Util::Comm::rank() == 0)
             {
               std::ifstream ifs(meshfile.c_str(), std::ios::binary);
               if(!ifs.is_open())
@@ -142,13 +142,13 @@ namespace FEAST
               catch(std::exception& exc)
               {
                 std::cerr << "ERROR: " << exc.what() << std::endl;
-                if(Comm::rank() == 0)
+                if(Util::Comm::rank() == 0)
                   std::cout << "FAILED: " << exc.what() << " when parsing." << std::endl;
               }
               catch(...)
               {
                 std::cerr << "ERROR: unknown exception" << std::endl;
-                if(Comm::rank() == 0)
+                if(Util::Comm::rank() == 0)
                   std::cout << "FAILED: unknown exception" << std::endl;
               }
 #endif
@@ -168,7 +168,7 @@ namespace FEAST
 
                 num_elements = base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim);
               }
-              while(num_elements < Comm::size())
+              while(num_elements < Util::Comm::size())
               {
                 ++lvl;
                 MeshNodeType* coarse_node = base_mesh_node;
@@ -184,24 +184,24 @@ namespace FEAST
 #ifndef SERIAL
               Index num_global_elements(root_mesh->get_num_entities(MeshType_::shape_dim));
               typename PartT::PGraphT global_dual(
-                *root_mesh, num_global_elements, Communicator(MPI_COMM_WORLD));
+                *root_mesh, num_global_elements, Util::Communicator(MPI_COMM_WORLD));
 
               /*for(Index i(0) ; i < Index(global_dual.get_num_vtx()) ; ++i)
                 {
-                std::cout << Comm::rank() << " global dual " << i << "->";
+                std::cout << Util::Comm::rank() << " global dual " << i << "->";
                 for(Index j(Index(global_dual.get_xadj()[i])) ; j < Index(global_dual.get_xadj()[i+1]) ; ++j)
                 std::cout << " " << global_dual.get_adjncy()[j];
 
                 std::cout << std::endl;
                 }*/
 
-              /*std::cout << Comm::rank() << ": APP: vtxdist global " << std::endl;
-                for(Index i(0) ; i < Comm::size() + 1 ; ++i)
-                std::cout << Comm::rank() << ": APP: vtxdist global[" << i << "] " << global_dual.get_vtxdist()[i] << std::endl;*/
+              /*std::cout << Util::Comm::rank() << ": APP: vtxdist global " << std::endl;
+                for(Index i(0) ; i < Util::Comm::size() + 1 ; ++i)
+                std::cout << Util::Comm::rank() << ": APP: vtxdist global[" << i << "] " << global_dual.get_vtxdist()[i] << std::endl;*/
 
               //local input for k-way partitioning
               auto local_dual(global_dual.create_local());
-              /*std::cout << Comm::rank() << " local dual xadj: " << std::endl;
+              /*std::cout << Util::Comm::rank() << " local dual xadj: " << std::endl;
                 for(Index i(0) ; i < Index(local_dual->get_num_vtx() + 1); ++i)
                 {
                 std::cout << " " << local_dual->get_xadj()[i];
@@ -209,8 +209,8 @@ namespace FEAST
                 std::cout << std::endl;
                 }*/
 
-              /*for(Index i(0) ; i < Comm::size() + 1 ; ++i)
-                std::cout << Comm::rank() << ": APP: vtxdist local[" << i << "] " << local_dual->get_vtxdist()[i] << std::endl;*/
+              /*for(Index i(0) ; i < Util::Comm::size() + 1 ; ++i)
+                std::cout << Util::Comm::rank() << ": APP: vtxdist local[" << i << "] " << local_dual->get_vtxdist()[i] << std::endl;*/
 
               auto part(PartT::part(*((typename PartT::PGraphT*)local_dual.get())));
 
@@ -220,13 +220,13 @@ namespace FEAST
               PartT::fill_comm_structs_global(synched_part, global_dual);
 
               /*for(Index i(0) ; i <  base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim); ++i)
-                std::cout << Comm::rank() << ": APP: PART[" << i << "] " << synched_part.get()[i] << std::endl;
+                std::cout << Util::Comm::rank() << ": APP: PART[" << i << "] " << synched_part.get()[i] << std::endl;
 
                 for(auto cr_i : synched_part.get_comm_ranks())
-                std::cout << Comm::rank() << ": APP: COMM_RANKS " << cr_i << std::endl;
+                std::cout << Util::Comm::rank() << ": APP: COMM_RANKS " << cr_i << std::endl;
 
                 for(auto ct_i : synched_part.get_comm_tags())
-                std::cout << Comm::rank() << ": APP: COMM_TAGS " << ct_i << std::endl;*/
+                std::cout << Util::Comm::rank() << ": APP: COMM_TAGS " << ct_i << std::endl;*/
 
               Adjacency::Graph ranks_at_elem(synched_part.rank_at_element());
 #else
@@ -244,26 +244,26 @@ namespace FEAST
                 ptr_serial, nullptr, part_serial);
 #endif
               /*for(Index i(0) ; i <  base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim) + 1; ++i)
-                std::cout << Comm::rank() << ": APP: ranks_at_elem ptr[" << i << "] " << (ranks_at_elem.get_domain_ptr())[i] << std::endl;
+                std::cout << Util::Comm::rank() << ": APP: ranks_at_elem ptr[" << i << "] " << (ranks_at_elem.get_domain_ptr())[i] << std::endl;
                 for(Index i(0) ; i <  base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim) ; ++i)
-                std::cout << Comm::rank() << ": APP: ranks_at_elem idx[" << i << "] " << (ranks_at_elem.get_image_idx())[i] << std::endl;*/
+                std::cout << Util::Comm::rank() << ": APP: ranks_at_elem idx[" << i << "] " << (ranks_at_elem.get_image_idx())[i] << std::endl;*/
 
 #ifndef SERIAL
               ranks = synched_part.get_comm_ranks();
               ctags = synched_part.get_comm_tags();
 #endif
               /*for(auto& ranks_i : ranks)
-                std::cout << Comm::rank() << ": APP: COMM_ranks " << ranks_i << std::endl;
+                std::cout << Util::Comm::rank() << ": APP: COMM_ranks " << ranks_i << std::endl;
 
                 for(auto& tags_i : ctags)
-                std::cout << Comm::rank() << ": APP: COMM_tags " << tags_i << std::endl;*/
+                std::cout << Util::Comm::rank() << ": APP: COMM_tags " << tags_i << std::endl;*/
 
               // <<<<< partitioner code
 
               // create patch mesh node
 #ifndef SERIAL
               mesh_node = base_mesh_node->extract_patch(
-                Index(Comm::rank(synched_part.get_comm())), ranks_at_elem, ranks);
+                Index(Util::Comm::rank(synched_part.get_comm())), ranks_at_elem, ranks);
 #else
               mesh_node = base_mesh_node->extract_patch(Index(0), ranks_at_elem, ranks);
 #endif

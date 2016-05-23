@@ -39,7 +39,7 @@ namespace FEAST
             }
             else if (plot == 1)
             {
-              solver->set_plot(Comm::rank()== 0);
+              solver->set_plot(Util::Comm::rank()== 0);
             }
             else
             {
@@ -77,7 +77,7 @@ namespace FEAST
             }
             else if (plot == 1)
             {
-              solver->set_plot(Comm::rank() == 0);
+              solver->set_plot(Util::Comm::rank() == 0);
             }
             else
             {
@@ -490,7 +490,7 @@ namespace FEAST
             "ALGLIBMinLBFGS is only available if FEAST was built with the alglib token in the buildid.");
 #else
 
-            if( Comm::size() != 1)
+            if( Util::Comm::size() != 1)
               throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinLBFGS is only available with 1 process!");
 
             // Default LBFGS update dimension is 0 so the constructor can choose is automatically.
@@ -522,7 +522,7 @@ namespace FEAST
             throw InternalError(__func__,__FILE__,__LINE__,
             "ALGLIBMinCG is only available if FEAST was built with the alglib token in the buildid.");
 #else
-            if( Comm::size() != 1)
+            if( Util::Comm::size() != 1)
               throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinCG is only available with 1 process!");
 
             // Get default direction update

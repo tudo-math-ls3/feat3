@@ -27,7 +27,7 @@ namespace FEAST
         template <typename VectorType_>
         static void configure_iterative_solver(PropertyMap * section, std::shared_ptr<Solver::PreconditionedIterativeSolver<VectorType_> > solver)
         {
-          Index rank = Comm::rank();
+          Index rank = Util::Comm::rank();
 
           auto plot_p = section->get_entry("plot");
           if (plot_p.second)

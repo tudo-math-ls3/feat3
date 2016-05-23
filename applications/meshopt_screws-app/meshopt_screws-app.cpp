@@ -17,9 +17,9 @@ using namespace FEAST;
 static void display_help();
 
 #ifndef SERIAL
-static void synch_stringstream(std::stringstream& iss, Communicator comm = Communicator(MPI_COMM_WORLD))
+static void synch_stringstream(std::stringstream& iss, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD))
 {
-  Index me(Comm::rank(comm));
+  Index me(Util::Comm::rank(comm));
   Index size;
   std::string str;
 
@@ -30,7 +30,7 @@ static void synch_stringstream(std::stringstream& iss, Communicator comm = Commu
     size = str.length();
   }
   // synchronize length
-  Comm::bcast(&size, 1, 0, comm);
+  Util::Comm::bcast(&size, 1, 0, comm);
 
   //allocate
   char* buf = new char[size + 1];
@@ -42,7 +42,7 @@ static void synch_stringstream(std::stringstream& iss, Communicator comm = Commu
   }
 
   //bcast data
-  Comm::bcast(buf, size, 0, comm);
+  Util::Comm::bcast(buf, size, 0, comm);
 
   //convert
   if(me != 0)
@@ -115,7 +115,7 @@ struct MeshoptScrewsApp
     TimeStamp at;
 
     // Minimum number of cells we want to have in each patch
-    const Index part_min_elems(Comm::size()*4);
+    const Index part_min_elems(Util::Comm::size()*4);
 
     DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader);
 
@@ -124,7 +124,7 @@ struct MeshoptScrewsApp
       dom_ctrl, meshopt_section_key, meshopt_config, solver_config);
 
     // Print level information
-    if(Comm::rank() == 0)
+    if(Util::Comm::rank() == 0)
     {
       std::cout << name() << "settings: " << std::endl;
       std::cout << "Timestep size: " << stringify_fp_fix(delta_t) << ", end time: " <<
@@ -135,7 +135,7 @@ struct MeshoptScrewsApp
         dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
     }
 
-    String file_basename(name()+"_n"+stringify(Comm::size()));
+    String file_basename(name()+"_n"+stringify(Util::Comm::size()));
 
     // This is the centre reference point
     ImgPointType x_0(DataType(0));
@@ -163,19 +163,19 @@ struct MeshoptScrewsApp
       {
         String vtk_name = String(file_basename+"_pre_inital_lvl_"+stringify((*it)->get_level_index()));
 
-        if(Comm::rank() == 0)
+        if(Util::Comm::rank() == 0)
           std::cout << "Writing " << vtk_name << std::endl;
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         // Add everything from the MeshoptControl
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
 
         ++deque_position;
       }
 
-      if(Comm::rank()==0)
+      if(Util::Comm::rank()==0)
       {
         if(inner_str == "polyline")
         {
@@ -227,14 +227,14 @@ struct MeshoptScrewsApp
       {
         String vtk_name = String(file_basename+"_post_inital_lvl_"+stringify((*it)->get_level_index()));
 
-        if(Comm::rank() == 0)
+        if(Util::Comm::rank() == 0)
           std::cout << "Writing " << vtk_name << std::endl;
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
         // Add everything from the MeshoptControl
         meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
 
         ++deque_position;
       }
@@ -262,7 +262,7 @@ struct MeshoptScrewsApp
       DataType delta_alpha = alpha - alpha_old;
 
 
-      if(Comm::rank() == 0)
+      if(Util::Comm::rank() == 0)
         std::cout << "Timestep " << n << ": t = " << stringify_fp_fix(time) <<
           ", angle = " << stringify_fp_fix(alpha/(DataType(2)*pi)*DataType(360))  << " degrees" <<std::endl;
 
@@ -418,14 +418,14 @@ struct MeshoptScrewsApp
       for(IT_ i(0); i < (*mesh_velocity).size(); ++i)
         max_mesh_velocity = Math::max(max_mesh_velocity, (*mesh_velocity)(i).norm_euclid());
 
-      if(Comm::rank() == 0)
+      if(Util::Comm::rank() == 0)
         std::cout << "max. mesh velocity: " << stringify_fp_sci(max_mesh_velocity) << std::endl;
 
       if(write_vtk)
       {
         String vtk_name(file_basename+"_post_"+stringify(n));
 
-        if(Comm::rank() == 0)
+        if(Util::Comm::rank() == 0)
           std::cout << "Writing " << vtk_name << std::endl;
 
         // Create a VTK exporter for our mesh
@@ -435,12 +435,12 @@ struct MeshoptScrewsApp
         // Add everything from the MeshoptControl
         meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
         // Write the file
-        exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
       }
 
     } // time loop
 
-    if(Comm::rank() == 0)
+    if(Util::Comm::rank() == 0)
     {
       TimeStamp bt;
       std::cout << "Elapsed time: " << bt.elapsed(at) << std::endl;
@@ -536,7 +536,7 @@ int main(int argc, char* argv[])
 
 
   // Read the application config file on rank 0
-  if(Comm::rank() == 0)
+  if(Util::Comm::rank() == 0)
   {
     // Input application configuration file name, required
     String application_config_filename("");
@@ -574,7 +574,7 @@ int main(int argc, char* argv[])
     "Application config is missing the mandatory ApplicationSettings section!");
 
   // We read the files only on rank 0. After reading, we synchronise the streams like above.
-  if(Comm::rank() == 0)
+  if(Util::Comm::rank() == 0)
   {
     // Read the mesh file to stream
     auto mesh_filename_p = app_settings_section->query("mesh_file");
@@ -650,7 +650,7 @@ int main(int argc, char* argv[])
         synchstream_solver_config << ifs.rdbuf();
       }
     }
-  } // Comm::rank() == 0
+  } // Util::Comm::rank() == 0
 
 #ifndef SERIAL
   // Synchronise all those streams in parallel mode
@@ -740,7 +740,7 @@ int main(int argc, char* argv[])
 
 static void display_help()
 {
-  if(Comm::rank() == 0)
+  if(Util::Comm::rank() == 0)
   {
     std::cout << "meshopt_screws-app: Two excentrically rotating screws"
     << std::endl;

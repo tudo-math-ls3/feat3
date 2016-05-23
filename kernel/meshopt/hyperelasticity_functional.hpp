@@ -559,7 +559,7 @@ namespace FEAST
             sum_lambda += _lambda(cell);
 
           CoordType sum_lambda_send(sum_lambda);
-          Comm::allreduce(&sum_lambda, 1, &sum_lambda_send);
+          Util::Comm::allreduce(&sum_lambda, 1, &sum_lambda_send);
 
           _lambda.scale(_lambda, CoordType(1)/sum_lambda);
 
@@ -627,7 +627,7 @@ namespace FEAST
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           Index ncells_send(ncells);
-          Comm::allreduce(&ncells, 1, &ncells_send);
+          Util::Comm::allreduce(&ncells, 1, &ncells_send);
 
           _mu.format(CoordType(1)/CoordType(ncells));
         }

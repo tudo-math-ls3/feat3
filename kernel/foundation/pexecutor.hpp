@@ -32,13 +32,13 @@ namespace FEAST
 
             ///Alloc CTOR
 #ifndef SERIAL
-            PResult(IT_ s, Communicator comm = Communicator(MPI_COMM_WORLD)) :
+            PResult(IT_ s, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD)) :
 #else
-            PResult(IT_ s, Communicator comm = Communicator(0)) :
+            PResult(IT_ s, Util::Communicator comm = Util::Communicator(0)) :
 #endif
               _size(s),
               _part(new IT_[Index(s)]),
-              _vtxdist(new IT_[Comm::size(comm) + 1]),
+              _vtxdist(new IT_[Util::Comm::size(comm) + 1]),
               _comm(comm),
               _comm_ranks(),
               _comm_tags()
@@ -55,7 +55,7 @@ namespace FEAST
               return _vtxdist;
             }
 
-            Communicator get_comm() const
+            Util::Communicator get_comm() const
             {
               return _comm;
             }
@@ -72,7 +72,7 @@ namespace FEAST
               for(Index i(0) ; i < Index(_size) ; ++i)
                 result.get()[i] = _part[i];
 
-              for(Index i(0) ; i < Index(Comm::size(_comm) + 1) ; ++i)
+              for(Index i(0) ; i < Index(Util::Comm::size(_comm) + 1) ; ++i)
                 result.get_vtxdist()[i] = _vtxdist[i];
 
               result._comm_ranks = _comm_ranks;
@@ -127,7 +127,7 @@ namespace FEAST
               for(Index i(0) ; i < Index(_size) ; ++i)
                 part[i] = Index(_part[i]);
 
-              Adjacency::Graph result(Index(_size), Comm::size(_comm), Index(_size), ptr, nullptr, part);
+              Adjacency::Graph result(Index(_size), Util::Comm::size(_comm), Index(_size), ptr, nullptr, part);
 
               delete[] ptr;
               delete[] part;
@@ -174,7 +174,7 @@ namespace FEAST
             IT_* _part;
             IT_* _vtxdist;
 
-            Communicator _comm;
+            Util::Communicator _comm;
 
             std::vector<Index> _comm_ranks;
             std::vector<Index> _comm_tags;
@@ -222,11 +222,11 @@ namespace FEAST
           {
             PResult result(g.get_num_vtx(), g.get_comm());
             ///fill secondary data needed for synch later
-            for(Index i(0) ; i < Comm::size(g.get_comm()) + 1 ; ++i)
+            for(Index i(0) ; i < Util::Comm::size(g.get_comm()) + 1 ; ++i)
               result.get_vtxdist()[i] = g.get_vtxdist()[i];
 
-            for(Index i(0) ; i < g.get_vtxdist()[Comm::rank(g.get_comm()) + 1] - g.get_vtxdist()[Comm::rank(g.get_comm())]; ++i)
-              result.get()[i] = Comm::rank(g.get_comm());
+            for(Index i(0) ; i < g.get_vtxdist()[Util::Comm::rank(g.get_comm()) + 1] - g.get_vtxdist()[Util::Comm::rank(g.get_comm())]; ++i)
+              result.get()[i] = Util::Comm::rank(g.get_comm());
 
             return result;
           }
@@ -234,8 +234,8 @@ namespace FEAST
           static PResult& fill_comm_structs_global(PResult& synched_part, const PGraphT& base)
           {
             /// determine elems on this process (rank p)
-            const Index commsize(Comm::size(synched_part.get_comm()));
-            Index p(Comm::rank(synched_part.get_comm()));
+            const Index commsize(Util::Comm::size(synched_part.get_comm()));
+            Index p(Util::Comm::rank(synched_part.get_comm()));
             std::vector<Index> e_p;
             for(Index i(0) ; i < Index(synched_part.size()) ; ++i)
             {
@@ -266,13 +266,13 @@ namespace FEAST
             Index* part_sizes_recvbuf(new Index[commsize]);
             Index part_sizes_sendbuf(Index(e_p.size()));
 
-            Comm::allgather(&part_sizes_sendbuf, 1, part_sizes_recvbuf, 1, synched_part.get_comm());
+            Util::Comm::allgather(&part_sizes_sendbuf, 1, part_sizes_recvbuf, 1, synched_part.get_comm());
 
             //second, synchronize cr sizes
             Index* cr_sizes_recvbuf(new Index[commsize]);
             Index cr_sizes_sendbuf(Index(cr_p.size()));
 
-            Comm::allgather(&cr_sizes_sendbuf, 1, cr_sizes_recvbuf, 1, synched_part.get_comm());
+            Util::Comm::allgather(&cr_sizes_sendbuf, 1, cr_sizes_recvbuf, 1, synched_part.get_comm());
 
             //then, synchronize cr
             Index* sendbuf = cr_p.data();
@@ -304,7 +304,7 @@ namespace FEAST
               rdispls[i] = int(write_count);
             }
 
-            Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, synched_part.get_comm());
+            Util::Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, synched_part.get_comm());
 
             std::vector<Index> p0;
             std::vector<Index> p1;
@@ -376,7 +376,7 @@ namespace FEAST
         {
           PResult result(g.get_num_vtx(), g.get_comm());
           ///fill secondary data needed for synch later
-          for(Index i(0) ; i < Comm::size(g.get_comm()) + 1 ; ++i)
+          for(Index i(0) ; i < Util::Comm::size(g.get_comm()) + 1 ; ++i)
             result.get_vtxdist()[i] = g.get_vtxdist()[i];
 
           ///main partitioning algorithm
@@ -412,13 +412,13 @@ namespace FEAST
               Index local_edge_count(0);
 
               Index k(Index(g.get_adjncy()[j]));
-              if(!(k >= Index(g.get_vtxdist()[Comm::rank(result.get_comm())]) && k < Index(g.get_vtxdist()[Comm::rank(result.get_comm()) + 1])))
+              if(!(k >= Index(g.get_vtxdist()[Util::Comm::rank(result.get_comm())]) && k < Index(g.get_vtxdist()[Util::Comm::rank(result.get_comm()) + 1])))
               {
                 // other rank
                 result.get_comm_ranks().push_back(k);
 
                 // commlink global id
-                Index offset_into_global(Index(g.get_vtxdist()[Comm::rank(result.get_comm())]));
+                Index offset_into_global(Index(g.get_vtxdist()[Util::Comm::rank(result.get_comm())]));
                 Index global_dual_edge_index(Index(base.get_adjncy()[base.get_xadj()[offset_into_global + local_edge_count]]));
                 result.get_comm_tags().push_back(global_dual_edge_index);
               }
@@ -431,8 +431,8 @@ namespace FEAST
         static PResult& fill_comm_structs_global(PResult& synched_part, const PGraphParmetis& base)
         {
           /// determine elems on this process (rank p)
-          const Index commsize(Comm::size(synched_part.get_comm()));
-          Index p(Comm::rank(synched_part.get_comm()));
+          const Index commsize(Util::Comm::size(synched_part.get_comm()));
+          Index p(Util::Comm::rank(synched_part.get_comm()));
           std::vector<Index> e_p;
           for(Index i(0) ; i < Index(synched_part.size()) ; ++i)
           {
@@ -463,13 +463,13 @@ namespace FEAST
           Index* part_sizes_recvbuf(new Index[commsize]);
           Index part_sizes_sendbuf(Index(e_p.size()));
 
-          Comm::allgather(&part_sizes_sendbuf, 1, part_sizes_recvbuf, 1, synched_part.get_comm());
+          Util::Comm::allgather(&part_sizes_sendbuf, 1, part_sizes_recvbuf, 1, synched_part.get_comm());
 
           //second, synchronize cr sizes
           Index* cr_sizes_recvbuf(new Index[commsize]);
           Index cr_sizes_sendbuf(Index(cr_p.size()));
 
-          Comm::allgather(&cr_sizes_sendbuf, 1, cr_sizes_recvbuf, 1, synched_part.get_comm());
+          Util::Comm::allgather(&cr_sizes_sendbuf, 1, cr_sizes_recvbuf, 1, synched_part.get_comm());
 
           //then, synchronize cr
           Index* sendbuf = cr_p.data();
@@ -501,7 +501,7 @@ namespace FEAST
             rdispls[i] = int(write_count);
           }
 
-          Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, synched_part.get_comm());
+          Util::Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, synched_part.get_comm());
 
           std::vector<Index> p0;
           std::vector<Index> p1;

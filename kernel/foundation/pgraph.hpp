@@ -31,18 +31,18 @@ namespace FEAST
       public:
         typedef IT_ IndexType;
 
-        PGraphBase(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_global_vtx, const Communicator& comm) :
+        PGraphBase(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_global_vtx, const Util::Communicator& comm) :
           ready_forexec(false),
           ready_fordist(false),
           _num_local_dualvtx(num_local_dualvtx),
           _num_local_dualedges(num_local_dualedges),
-          _vtxdist(new IndexType[Index(Comm::size(comm) + 1)]),
+          _vtxdist(new IndexType[Index(Util::Comm::size(comm) + 1)]),
           _xadj(new IndexType[Index(num_local_dualvtx + 1)]),
           _adjncy(new IndexType[Index(2 * num_local_dualedges)]),
           _part(new IndexType[Index(num_local_dualvtx)]),
           _comm(comm)
         {
-          IndexType k = IndexType(Comm::size(comm));
+          IndexType k = IndexType(Util::Comm::size(comm));
           IndexType vtxdist_end(k + 1);
           IndexType n_local_avg((num_global_vtx - (num_global_vtx % k))/k);
           for(IndexType i(0) ; i < vtxdist_end - 1 ; ++i)
@@ -127,16 +127,16 @@ namespace FEAST
         virtual IndexType* get_part() const = 0;
 
         ///communicator used for (parallel) partitioning
-        virtual Communicator get_comm() const = 0;
+        virtual Util::Communicator get_comm() const = 0;
 
         bool ready_forexec;
         bool ready_fordist;
 
         PGraphBase() :
 #ifndef SERIAL
-          _comm(Communicator(MPI_COMM_WORLD))
+          _comm(Util::Communicator(MPI_COMM_WORLD))
 #else
-          _comm(Communicator(0))
+          _comm(Util::Communicator(0))
 #endif
         {
         }
@@ -153,7 +153,7 @@ namespace FEAST
         IndexType* _xadj;
         IndexType* _adjncy;
         IndexType* _part;
-        Communicator _comm;
+        Util::Communicator _comm;
     };
 
     template<typename DT_, typename IT_>
@@ -163,7 +163,7 @@ namespace FEAST
         typedef IT_ IndexType;
         typedef DT_ DataType;
 
-        PGraphNONE(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Communicator& comm) :
+        PGraphNONE(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Util::Communicator& comm) :
           PGraphBase<IndexType>(num_local_dualvtx, num_local_dualedges, num_globalvtx, comm)
         {
         }
@@ -209,8 +209,8 @@ namespace FEAST
           result._num_local_dualvtx = this->_num_local_dualvtx;
           result._num_local_dualedges = this->_num_local_dualedges;
 
-          result._vtxdist = new IndexType[Index(Comm::size(this->_comm) + 1)];
-          for(Index i(0) ; i < Index(Comm::size(this->_comm) + 1) ; ++i)
+          result._vtxdist = new IndexType[Index(Util::Comm::size(this->_comm) + 1)];
+          for(Index i(0) ; i < Index(Util::Comm::size(this->_comm) + 1) ; ++i)
             result._vtxdist[i] = this->_vtxdist[i];
 
           result._xadj = new IndexType[Index(this->_num_local_dualvtx + 1)];
@@ -231,7 +231,7 @@ namespace FEAST
         }
 
         template<typename SourceMeshT_>
-        PGraphNONE(const SourceMeshT_& source, Index num_globalvtx, Communicator comm)
+        PGraphNONE(const SourceMeshT_& source, Index num_globalvtx, Util::Communicator comm)
         {
           ///get sizes of the dual graph to create
           IndexType num_dualvtx(IndexType(source.get_num_entities(SourceMeshT_::shape_dim)));
@@ -350,12 +350,12 @@ namespace FEAST
           return this->_part;
         }
 
-        virtual Communicator get_comm()
+        virtual Util::Communicator get_comm()
         {
           return this->_comm;
         }
 
-        virtual Communicator get_comm() const override
+        virtual Util::Communicator get_comm() const override
         {
           return this->_comm;
         }
@@ -376,7 +376,7 @@ namespace FEAST
         typedef IT_ IndexType;
         typedef DT_ DataType;
 
-        PGraphFallback(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Communicator& comm) :
+        PGraphFallback(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Util::Communicator& comm) :
           PGraphBase<IndexType>(num_local_dualvtx, num_local_dualedges, num_globalvtx, comm)
         {
         }
@@ -422,8 +422,8 @@ namespace FEAST
           result._num_local_dualvtx = this->_num_local_dualvtx;
           result._num_local_dualedges = this->_num_local_dualedges;
 
-          result._vtxdist = new IndexType[Index(Comm::size(this->_comm) + 1)];
-          for(Index i(0) ; i < Index(Comm::size(this->_comm) + 1) ; ++i)
+          result._vtxdist = new IndexType[Index(Util::Comm::size(this->_comm) + 1)];
+          for(Index i(0) ; i < Index(Util::Comm::size(this->_comm) + 1) ; ++i)
             result._vtxdist[i] = this->_vtxdist[i];
 
           result._xadj = new IndexType[Index(this->_num_local_dualvtx + 1)];
@@ -444,7 +444,7 @@ namespace FEAST
         }
 
         template<typename SourceMeshT_>
-        PGraphFallback(const SourceMeshT_& source, Index num_globalvtx, Communicator comm)
+        PGraphFallback(const SourceMeshT_& source, Index num_globalvtx, Util::Communicator comm)
         {
           ///get sizes of the dual graph to create
           IndexType num_dualvtx(IndexType(source.get_num_entities(SourceMeshT_::shape_dim)));
@@ -512,7 +512,7 @@ namespace FEAST
         std::shared_ptr<PGraphBase<IndexType> > create_local() const override
         {
           ///get sizes of the dual graph to create
-          Index me(Comm::rank(this->get_comm()));
+          Index me(Util::Comm::rank(this->get_comm()));
           Index start(Index(this->get_vtxdist()[me]));
           Index end(Index(this->get_vtxdist()[me + 1]));
           Index num_local_dualvtx(end - start);
@@ -610,12 +610,12 @@ namespace FEAST
           return this->_part;
         }
 
-        virtual Communicator get_comm()
+        virtual Util::Communicator get_comm()
         {
           return this->_comm;
         }
 
-        virtual Communicator get_comm() const override
+        virtual Util::Communicator get_comm() const override
         {
           return this->_comm;
         }
@@ -636,13 +636,13 @@ namespace FEAST
         typedef PGraphBase<idx_t> BaseClass;
         typedef real_t DataType;
 
-        PGraphParmetis(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Communicator& comm) :
+        PGraphParmetis(IndexType num_local_dualvtx, IndexType num_local_dualedges, IndexType num_globalvtx, const Util::Communicator& comm) :
           PGraphBase(num_local_dualvtx, num_local_dualedges, num_globalvtx, comm),
           _vwgt(new IndexType[Index(num_local_dualvtx)]),
           _adjwgt(new IndexType[Index(2 * num_local_dualedges)]),
           _options(new IndexType[Index(3)]),
           _ncon(1),
-          _nparts(IndexType(Comm::size(comm))),
+          _nparts(IndexType(Util::Comm::size(comm))),
           _wgtflag(0),
           _numflag(0),
           _tpwgts(new DataType[Index(_ncon * _nparts)]),
@@ -727,8 +727,8 @@ namespace FEAST
           result._num_local_dualvtx = _num_local_dualvtx;
           result._num_local_dualedges = _num_local_dualedges;
 
-          result._vtxdist = new IndexType[Index(Comm::size(_comm) + 1)];
-          for(Index i(0) ; i < Index(Comm::size(_comm) + 1) ; ++i)
+          result._vtxdist = new IndexType[Index(Util::Comm::size(_comm) + 1)];
+          for(Index i(0) ; i < Index(Util::Comm::size(_comm) + 1) ; ++i)
             result._vtxdist[i] = _vtxdist[i];
 
           result._xadj = new IndexType[Index(_num_local_dualvtx + 1)];
@@ -774,7 +774,7 @@ namespace FEAST
         }
 
         template<typename SourceMeshT_>
-        PGraphParmetis(const SourceMeshT_& source, Index num_globalvtx, Communicator comm)
+        PGraphParmetis(const SourceMeshT_& source, Index num_globalvtx, Util::Communicator comm)
         {
           ///get sizes of the dual graph to create
           IndexType num_dualvtx(IndexType(source.get_num_entities(SourceMeshT_::shape_dim)));
@@ -846,7 +846,7 @@ namespace FEAST
         std::shared_ptr<PGraphBase> create_local() const override
         {
           ///get sizes of the dual graph to create
-          Index me(Comm::rank(this->get_comm()));
+          Index me(Util::Comm::rank(this->get_comm()));
           Index start(Index(this->get_vtxdist()[me]));
           Index end(Index(this->get_vtxdist()[me + 1]));
           Index num_local_dualvtx(end - start);
@@ -945,12 +945,12 @@ namespace FEAST
           return this->_part;
         }
 
-        virtual Communicator get_comm()
+        virtual Util::Communicator get_comm()
         {
           return this->_comm;
         }
 
-        virtual Communicator get_comm() const override
+        virtual Util::Communicator get_comm() const override
         {
           return this->_comm;
         }

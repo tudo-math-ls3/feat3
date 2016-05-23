@@ -231,7 +231,7 @@ namespace PoissonDirichlet2D
 
     if (rank == 0)
     {
-      std::cout << Comm::rank() << " Creating gates..." << std::endl;
+      std::cout << Util::Comm::rank() << " Creating gates..." << std::endl;
     }
 
     for (Index i(0); i < num_levels; ++i)
@@ -243,7 +243,7 @@ namespace PoissonDirichlet2D
 
     if (rank == 0)
     {
-      std::cout << Comm::rank() << " Assembling system matrices..." << std::endl;
+      std::cout << Util::Comm::rank() << " Assembling system matrices..." << std::endl;
     }
 
     for (Index i(0); i < num_levels; ++i)
@@ -255,7 +255,7 @@ namespace PoissonDirichlet2D
 
     if (rank == 0)
     {
-      std::cout << Comm::rank() << " Assembling system filters..." << std::endl;
+      std::cout << Util::Comm::rank() << " Assembling system filters..." << std::endl;
     }
 
     for (Index i(0); i < num_levels; ++i)
@@ -267,7 +267,7 @@ namespace PoissonDirichlet2D
 
     if (rank == 0)
     {
-      std::cout << Comm::rank() << " Assembling transfer matrices..." << std::endl;
+      std::cout << Util::Comm::rank() << " Assembling transfer matrices..." << std::endl;
     }
 
     for (Index i(0); (i + 1) < num_levels; ++i)

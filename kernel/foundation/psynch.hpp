@@ -36,14 +36,14 @@ namespace FEAST
 
           typename PExecutorT_::PResult::IndexType* sendbuf = local_partitioning_result.get();
 
-          const Index commsize(Comm::size(local_partitioning_result.get_comm()));
+          const Index commsize(Util::Comm::size(local_partitioning_result.get_comm()));
 
           int* sendcounts = new int[commsize];
           for(Index i(0) ; i < commsize ; ++i)
           {
             sendcounts[i] = int(local_partitioning_result.size());
           }
-          //sendcounts[Comm::rank(local_partitioning_result.get_comm())] = int(0);
+          //sendcounts[Util::Comm::rank(local_partitioning_result.get_comm())] = int(0);
 
           int* sdispls = new int[commsize];
           for(Index i(0) ; i < commsize ; ++i)
@@ -58,7 +58,7 @@ namespace FEAST
           {
             recvcounts[i] = int(local_partitioning_result.get_vtxdist()[i + 1] - local_partitioning_result.get_vtxdist()[i]);
           }
-          //recvcounts[Comm::rank(local_partitioning_result.get_comm())] = int(0);
+          //recvcounts[Util::Comm::rank(local_partitioning_result.get_comm())] = int(0);
 
           int* rdispls = new int[commsize];
           for(Index i(0) ; i < commsize ; ++i)
@@ -66,7 +66,7 @@ namespace FEAST
             rdispls[i] = int(local_partitioning_result.get_vtxdist()[i]);
           }
 
-          int err(Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, local_partitioning_result.get_comm()));
+          int err(Util::Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, local_partitioning_result.get_comm()));
 
           if(err != MPI_SUCCESS)
             throw(InternalError("Synch during partitioning failed!"));
@@ -86,9 +86,9 @@ namespace FEAST
         }
 
 #ifndef SERIAL
-        static void exec(std::stringstream& iss, Communicator comm = Communicator(MPI_COMM_WORLD))
+        static void exec(std::stringstream& iss, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD))
         {
-          Index me(Comm::rank(comm));
+          Index me(Util::Comm::rank(comm));
           Index size;
           std::string str;
 
@@ -99,7 +99,7 @@ namespace FEAST
             size = Index(str.length());
           }
           // synchronize length
-          Comm::bcast(&size, 1, 0, comm);
+          Util::Comm::bcast(&size, 1, 0, comm);
 
           //allocate
           char* buf = new char[size + 1];
@@ -111,7 +111,7 @@ namespace FEAST
           }
 
           //bcast data
-          Comm::bcast(buf, size, 0, comm);
+          Util::Comm::bcast(buf, size, 0, comm);
 
           //convert
           if(me != 0)
