@@ -2,6 +2,8 @@
 #ifndef KERNEL_UTIL_COMM_BASE_HPP
 #define KERNEL_UTIL_COMM_BASE_HPP 1
 
+#include<kernel/base_header.hpp>
+
 #ifndef SERIAL
 #include<mpi.h>
 #include<memory>
