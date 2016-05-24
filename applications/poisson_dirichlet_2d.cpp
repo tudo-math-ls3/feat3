@@ -427,6 +427,23 @@ namespace PoissonDirichlet2D
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
+    if (args.check("test_iter") >= 0)
+    {
+      int num_iter = solver->get_num_iter();
+      int iter_target;
+      args.parse("test_iter", iter_target);
+      if (num_iter < iter_target - 1 || num_iter > iter_target + 1)
+      {
+        std::cout<<"FAILED"<<std::endl;
+        throw InternalError(__func__, __FILE__, __LINE__, "iter count deviation! " + stringify(num_iter) + " vs " + stringify(iter_target));
+      }
+
+    }
+
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+
     // clean up
     while (!transfer_levels_solve.empty())
     {
@@ -481,6 +498,7 @@ namespace PoissonDirichlet2D
     args.support("mem");
     args.support("part_min_elems");
     args.support("meshfile");
+    args.support("test_iter");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
