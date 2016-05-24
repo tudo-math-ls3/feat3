@@ -88,7 +88,6 @@ int run(Solver_& solver, Operator_& op)
   solver->set_max_iter(50);
   solver->set_tol_fval(DataType(0));
   solver->set_tol_step(Math::eps<DataType>());
-  solver->set_tol_abs(Math::eps<DataType>());
   solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
   std::cout << "Using solver " << solver->get_formated_solver_tree() << std::endl;

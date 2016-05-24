@@ -132,6 +132,11 @@ namespace FEAST
 
             if(_lbfgs_dim == alglib::ae_int_t(0))
               _lbfgs_dim = alglib::ae_int_t(Math::min(Index(7), _op.columns()));
+
+            // ALGLIB's optimiser only know an absolute tolerance. We usually want to work with a relative one, which
+            // is done through minlbfgsrequesttermination() from the _log callback function. So we set tol_abs to
+            // zero, which can be overwritten with the set_tol_abs function of this class.
+            set_tol_abs(DataType(0));
           }
 
         /**
@@ -160,8 +165,8 @@ namespace FEAST
 
           alglib::minlbfgscreate(_lbfgs_dim, _opt_var, _state);
           alglib::minlbfgssetxrep(_state, true);
-          // Set stopping criteria: Relative tolerance, function improvement, length of update step, max iterations
-          alglib::minlbfgssetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          // Set stopping criteria: absolute tolerance, function improvement, length of update step, max iterations
+          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
           // Set the direction update
         }
@@ -186,7 +191,7 @@ namespace FEAST
         void set_max_iter(Index max_iter)
         {
           this->_max_iter = max_iter;
-          alglib::minlbfgssetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -202,21 +207,21 @@ namespace FEAST
         void set_tol_fval(DataType tol_fval)
         {
           _tol_fval = tol_fval;
-          alglib::minlbfgssetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
         /**
          * \brief Sets the relative tolerance for the norm of the defect vector
          *
-         * \param[in] tol_rel
+         * \param[in] tol_abs
          * New relative tolerance for the norm of the defect vector.
          *
          */
-        void set_tol_rel(DataType tol_rel)
+        void set_tol_abs(DataType tol_abs)
         {
-          this->_tol_rel = tol_rel;
-          alglib::minlbfgssetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          this->_tol_abs = tol_abs;
+          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -233,7 +238,7 @@ namespace FEAST
         void set_tol_step(DataType tol_step)
         {
           _tol_step = tol_step;
-          alglib::minlbfgssetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::minlbfgssetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -331,6 +336,9 @@ namespace FEAST
             case(7):
               //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
               return Status::stagnated;
+            case(8):
+              //std::cout << "ALGLIB: Stopped by user" << std::endl;
+              return Status::success;
             default:
               return Status::undefined;
           }
@@ -382,6 +390,11 @@ namespace FEAST
               auto tmp = me->_vec_tmp.clone();
               me->iterates->push_back(std::move(tmp));
             }
+
+            // Because ALGLIB knows no relative tolerance, we have to do it here
+            if(me->_def_cur <= (me->_tol_rel * me->_def_init))
+              alglib::minlbfgsrequesttermination(me->_state);
+
           }
 
           // increase iteration count
@@ -555,6 +568,11 @@ namespace FEAST
           {
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
+
+            // ALGLIB's optimiser only know an absolute tolerance. We usually want to work with a relative one, which
+            // is done through mincgrequesttermination() from the _log callback function. So we set tol_abs to zero,
+            // which can be overwritten with the set_tol_abs function of this class.
+            set_tol_abs(DataType(0));
           }
 
         /**
@@ -583,8 +601,8 @@ namespace FEAST
 
           alglib::mincgcreate(_opt_var, _state);
           alglib::mincgsetxrep(_state, true);
-          // Set stopping criteria: Relative tolerance, function improvement, length of update step, max iterations
-          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          // Set stopping criteria: Absolute tolerance, function improvement, length of update step, max iterations
+          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
           // Set the direction update
           set_direction_update(this->_direction_update);
@@ -630,7 +648,7 @@ namespace FEAST
         void set_max_iter(Index max_iter)
         {
           this->_max_iter = max_iter;
-          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -646,21 +664,21 @@ namespace FEAST
         void set_tol_fval(DataType tol_fval)
         {
           _tol_fval = tol_fval;
-          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
         /**
          * \brief Sets the relative tolerance for the norm of the defect vector
          *
-         * \param[in] tol_rel
+         * \param[in] tol_abs
          * New relative tolerance for the norm of the defect vector.
          *
          */
-        void set_tol_rel(DataType tol_rel)
+        void set_tol_abs(DataType tol_abs)
         {
-          this->_tol_rel = tol_rel;
-          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          this->_tol_abs = tol_abs;
+          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -671,13 +689,13 @@ namespace FEAST
          * New tolerance for the linesearch step size.
          *
          * If the linesearch fails to find a new iterate because its relative update is too small, the direction
-         * update will fail to produce a new search direction so the NLCG has to be terminated.
+         * update will fail to produce a new search direction so ALGLIBMinCG has to be terminated.
          *
          */
         void set_tol_step(DataType tol_step)
         {
           _tol_step = tol_step;
-          alglib::mincgsetcond(_state, double(this->_tol_rel), double(_tol_fval), double(_tol_step),
+          alglib::mincgsetcond(_state, double(this->_tol_abs), double(_tol_fval), double(_tol_step),
           alglib::ae_int_t(this->_max_iter));
         }
 
@@ -775,6 +793,9 @@ namespace FEAST
             case(7):
               //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
               return Status::stagnated;
+            case(8):
+              //std::cout << "ALGLIB: Stopped by user" << std::endl;
+              return Status::success;
             default:
               return Status::undefined;
           }
@@ -826,6 +847,11 @@ namespace FEAST
               auto tmp = me->_vec_tmp.clone();
               me->iterates->push_back(std::move(tmp));
             }
+
+            // Because ALGLIB knows no relative tolerance, we have to do it here
+            if(me->_def_cur <= (me->_tol_rel * me->_def_init))
+              alglib::mincgrequesttermination(me->_state);
+
           }
 
           // increase iteration count

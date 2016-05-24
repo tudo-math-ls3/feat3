@@ -90,7 +90,7 @@ class NLCGTest:
       solver->set_tol_abs(Math::sqrt(Math::eps<DT_>()));
       solver->set_tol_rel(Math::sqrt(Math::eps<DT_>()));
       solver->set_plot(false);
-      solver->set_max_iter(250);
+      solver->set_max_iter(100);
 
       // This will hold the solution
       auto sol = my_op.create_vector_r();
@@ -242,7 +242,7 @@ class NLSDTest:
       solver->init();
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
-      solver->set_max_iter(250);
+      solver->set_max_iter(100);
 
       // This will hold the solution
       auto sol = my_op.create_vector_r();
@@ -350,7 +350,7 @@ class ALGLIBMinLBFGSTest:
       solver->init();
       solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
-      solver->set_max_iter(250);
+      solver->set_max_iter(100);
 
       // This will hold the solution
       auto sol = my_op.create_vector_r();
@@ -445,11 +445,10 @@ class ALGLIBMinCGTest:
       std::shared_ptr<Solver::IterativeSolver<typename OperatorType::VectorTypeR>> solver;
       solver = new_alglib_mincg(my_op, my_filter, _direction_update, false);
 
-      solver->set_tol_abs(Math::sqrt(Math::eps<DT_>()));
-      solver->set_tol_rel(Math::sqrt(Math::eps<DT_>()));
       solver->init();
+      solver->set_tol_rel(Math::eps<DT_>());
       solver->set_plot(false);
-      solver->set_max_iter(250);
+      solver->set_max_iter(100);
 
       // This will hold the solution
       auto sol = my_op.create_vector_r();
@@ -462,7 +461,7 @@ class ALGLIBMinCGTest:
       sol(0,starting_point);
 
       // Solve the optimisation problem
-      solver->correct(sol, rhs);
+      std::cout << solver->correct(sol, rhs) << std::endl;
 
       solver->done();
 
@@ -487,15 +486,12 @@ class ALGLIBMinCGTest:
     }
 };
 
-// The Himmelblau function is not too difficult, so low tolerance
 ALGLIBMinCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
 alg_mincg_hb_f(float(0.6), Index(12), NLCGDirectionUpdate::DaiYuan);
 
-// The Rosenbrock function's steep valley is bad
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFunction>
 alg_mincg_rb_d(double(0.6), Index(40), NLCGDirectionUpdate::DYHSHybrid);
 
-//// The Hessian of the Bazaraa/Shetty function is singular at the optimal point
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 alg_mincg_bs_d(double(0.15), Index(25), NLCGDirectionUpdate::DaiYuan);
 #endif // FEAST_HAVE_ALGLIB
