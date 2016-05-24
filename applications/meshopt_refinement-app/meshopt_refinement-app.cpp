@@ -1,6 +1,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_quality_heuristic.hpp>
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <control/domain/partitioner_domain_control.hpp>
@@ -115,6 +116,10 @@ struct MeshRefinementOptimiserApp
         dom_ctrl.get_levels().back()->get_level_index() << " [" << lvl_max << "]";
       std::cout << " LVL-MIN: " <<
         dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
+      std::cout << "Cells: " << dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim) <<
+        " vertices: " << dom_ctrl.get_levels().back()->get_mesh().get_num_entities(0) <<
+        " DoF: " << MeshType::world_dim*dom_ctrl.get_levels().back()->get_mesh().get_num_entities(0) << std::endl;
+
     }
 
     // Create the MeshoptControl
@@ -130,25 +135,44 @@ struct MeshRefinementOptimiserApp
 
     meshopt_ctrl->prepare(new_coords);
 
-    // Write initial vtk output
-    if(write_vtk)
     {
       int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
-        String vtk_name = String(file_basename+"_pre_lvl_"+stringify((*it)->get_level_index()));
+        int lvl_index((*it)->get_level_index());
 
+        // Write initial vtk output
+        if(write_vtk)
+        {
+          String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
+          if(Util::Comm::rank() == 0)
+            std::cout << "Writing " << vtk_name << std::endl;
+
+          // Create a VTK exporter for our mesh
+          Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+          meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+          exporter.write(vtk_name, int(Util::Comm::rank()), int(Utill::Comm::size()));
+        }
+
+        auto quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
+
+        auto angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
+
+        auto min_quality(quality);
+        auto min_angle(angle);
+#ifdef FEAST_HAVE_MPI
+        Util::Comm::allreduce(&quality, Index(1), &min_quality, MPI_MIN);
+        Util::Comm::allreduce(&angle, Index(1), &min_angle, MPI_MIN);
+#endif
         if(Util::Comm::rank() == 0)
-          std::cout << "Writing " << vtk_name << std::endl;
+          std::cout << "Pre: Level " << lvl_index << ": Quality indicator " << " " <<
+            stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
 
-        // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
         ++deque_position;
       }
     }
-
 
     TimeStamp pre_opt;
     meshopt_ctrl->optimise();
@@ -157,22 +181,41 @@ struct MeshRefinementOptimiserApp
     if(Util::Comm::rank() == 0)
       std::cout << "Solve time: " << post_opt.elapsed(pre_opt) << std::endl;
 
-    // Write initial vtk output
-    if(write_vtk)
     {
       int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
-        String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
 
+        if(write_vtk)
+        {
+          String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
+
+          if(Util::Comm::rank() == 0)
+            std::cout << "Writing " << vtk_name << std::endl;
+
+          // Create a VTK exporter for our mesh
+          Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+          meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+          exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+        }
+
+        auto quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
+
+        auto angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
+
+        auto min_quality(quality);
+        auto min_angle(angle);
+#ifdef FEAST_HAVE_MPI
+        Util::Comm::allreduce(&quality, Index(1), &min_quality, MPI_MIN);
+        Util::Comm::allreduce(&angle, Index(1), &min_angle, MPI_MIN);
+#endif
         if(Util::Comm::rank() == 0)
-          std::cout << "Writing " << vtk_name << std::endl;
+          std::cout << "Post: Level " << lvl_index << ": Quality indicator " << " " <<
+            stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
 
-        // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
         ++deque_position;
       }
     }
