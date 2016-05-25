@@ -429,7 +429,7 @@ namespace PoissonDirichlet2D
 
     if (args.check("test_iter") >= 0)
     {
-      int num_iter = solver->get_num_iter();
+      int num_iter = (int)solver->get_num_iter();
       int iter_target;
       args.parse("test_iter", iter_target);
       if (num_iter < iter_target - 1 || num_iter > iter_target + 1)
