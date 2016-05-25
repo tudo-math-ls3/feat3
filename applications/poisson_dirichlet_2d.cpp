@@ -514,6 +514,9 @@ namespace PoissonDirichlet2D
       {
         for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
           std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
+
+        std::cerr << "Supported options are:" << std::endl;
+        std::cerr << args.get_supported_help() << std::endl;
       }
       // abort
       FEAST::Runtime::abort();
