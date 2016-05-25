@@ -373,7 +373,12 @@ namespace PoissonDirichlet2D
     TimeStamp at;
 
     // solve
-    Solver::solve(*solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
+    Solver::Status result = Solver::solve(*solver, vec_sol_solve, vec_rhs_solve, matrix_solve, filter_solve);
+
+    if (Solver::status_success(result))
+    {
+      std::cout<<"Solver execution FAILED, with status: " << result << std::endl;
+    }
 
     TimeStamp bt;
     double solver_toe(bt.elapsed(at));
