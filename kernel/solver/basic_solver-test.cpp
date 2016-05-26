@@ -11,6 +11,7 @@
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/pcg.hpp>
+#include <kernel/solver/pcr.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/ilu_precond.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
@@ -110,7 +111,7 @@ public:
     {
       // create a Jacobi preconditioner
       auto precon = Solver::new_jacobi_precond(matrix, filter);
-      // create a CG solver
+      // create a PCG solver
       PCG<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
     }
@@ -119,9 +120,34 @@ public:
     {
       // create a SSOR preconditioner
       auto precon = Solver::new_ssor_precond(matrix, filter);
-      // create a CG solver
+      // create a PCG solver
       PCG<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("PCG-SSOR", solver, vec_sol, vec_ref, vec_rhs, 19);
+    }
+
+    // test plain CR
+    {
+      // create a CR solver
+      PCR<MatrixType, FilterType> solver(matrix, filter);
+      test_solver("CR", solver, vec_sol, vec_ref, vec_rhs, 28);
+    }
+
+    // test PCR-JAC
+    {
+      // create a Jacobi preconditioner
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      // create a PCR solver
+      PCR<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("PCR-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
+    }
+
+    // test PCR-SSOR
+    {
+      // create a SSOR preconditioner
+      auto precon = Solver::new_ssor_precond(matrix, filter);
+      // create a PCR solver
+      PCR<MatrixType, FilterType> solver(matrix, filter, precon);
+      test_solver("PCR-SSOR", solver, vec_sol, vec_ref, vec_rhs, 19);
     }
 
     // test FGMRES-SPAI
