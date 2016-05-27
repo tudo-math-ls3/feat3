@@ -5,9 +5,16 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/solver/base.hpp>
-#include <kernel/solver/bicgstab.hpp>
-#include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/basic_vcycle.hpp>
+#include <kernel/solver/pcg.hpp>
+#include <kernel/solver/bicgstab.hpp>
+#include <kernel/solver/richardson.hpp>
+#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/jacobi_precond.hpp>
+#include <kernel/solver/scale_precond.hpp>
+#include <kernel/solver/ilu_precond.hpp>
+#include <kernel/solver/ssor_precond.hpp>
+#include <kernel/solver/schwarz_precond.hpp>
 
 namespace FEAST
 {
@@ -323,7 +330,7 @@ namespace FEAST
      * The optionally created linear solver will be based on the provided ParamSection.
      * If no ParamSection is provided, the solver will read as follows:
      *
-     * BiCGStab ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
+     * PCG ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
      *
      * with 4 pre- and postmoothing steps each and 4 jacobi calls as the coarse level 'solver'.
      */
@@ -456,7 +463,7 @@ namespace FEAST
                 smoother->set_max_iter(4);
                 mgv->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother);
               }
-              _solver = Solver::new_bicgstab(_system_levels_solve.back()->matrix_sys, _system_levels_solve.back()->filter_sys, mgv);
+              _solver = Solver::new_pcg(_system_levels_solve.back()->matrix_sys, _system_levels_solve.back()->filter_sys, mgv);
             }
             else
             {

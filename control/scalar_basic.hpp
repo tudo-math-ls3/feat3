@@ -22,15 +22,6 @@
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
 #include <kernel/util/property_map.hpp>
-#include <kernel/solver/pcg.hpp>
-#include <kernel/solver/bicgstab.hpp>
-#include <kernel/solver/richardson.hpp>
-#include <kernel/solver/fgmres.hpp>
-#include <kernel/solver/jacobi_precond.hpp>
-#include <kernel/solver/scale_precond.hpp>
-#include <kernel/solver/ilu_precond.hpp>
-#include <kernel/solver/ssor_precond.hpp>
-#include <kernel/solver/schwarz_precond.hpp>
 
 #include <control/domain/domain_control.hpp>
 

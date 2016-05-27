@@ -198,7 +198,7 @@ if (FEAST_MPI)
     --build-target poisson_dirichlet_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 10 --level 5 0 --part_min_elems 10 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 5 --level 5 0 --part_min_elems 10 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_4 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -210,7 +210,7 @@ if (FEAST_MPI)
       --build-target poisson_dirichlet_2d
       --build-nocmake
       --build-noclean
-      --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 10 --level 5 0 --mem cuda --part_min_elems 10 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
+      --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 5 --level 5 0 --mem cuda --part_min_elems 10 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
     SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_4_cuda PROPERTY LABELS "mpi")
     SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_4_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   endif(FEAST_BACKENDS_CUDA)
@@ -222,7 +222,7 @@ if (FEAST_MPI)
     --build-target poisson_dirichlet_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 17 --level 5 0 --part_min_elems 100 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 9 --level 5 0 --part_min_elems 100 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_3 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -233,7 +233,7 @@ if (FEAST_MPI)
     --build-target poisson_dirichlet_2d
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 17 --level 5 0 --part_min_elems 250 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 9 --level 5 0 --part_min_elems 250 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_6 PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_dirichlet_2d_mpi_6 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
@@ -244,7 +244,7 @@ else (FEAST_MPI)
     --build-target poisson_dirichlet_2d
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 9 --level 5 0 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 4 --level 5 0 --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
   SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST poisson_dirichlet_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -256,7 +256,7 @@ else (FEAST_MPI)
       --build-target poisson_dirichlet_2d
       --build-nocmake
       --build-noclean
-      --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 9 --level 5 0 --mem cuda --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
+      --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/poisson_dirichlet_2d --test_iter 4 --level 5 0 --mem cuda --meshfile ${FEAST_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
     SET_PROPERTY(TEST poisson_dirichlet_2d_serial_cuda PROPERTY LABELS "serial")
     SET_PROPERTY(TEST poisson_dirichlet_2d_serial_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   endif (FEAST_BACKENDS_CUDA)
