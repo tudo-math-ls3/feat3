@@ -28,9 +28,12 @@ namespace FEAST
     enum class ScaleComputation
     {
       undefined = 0,
-      uniform,
-      current,
-      chart_distance
+      once_uniform,
+      once_initial,
+      once_chart_distance,
+      current_initial,
+      current_chart_distance,
+      iter_concentration,
     };
 
     /// \cond internal
@@ -43,12 +46,18 @@ namespace FEAST
       {
         case ScaleComputation::undefined:
           return os << "undefined";
-        case ScaleComputation::uniform:
-          return os << "uniform";
-        case ScaleComputation::current:
-          return os << "current";
-        case ScaleComputation::chart_distance:
-          return os << "chart_distance";
+        case ScaleComputation::once_uniform:
+          return os << "once_uniform";
+        case ScaleComputation::once_initial:
+          return os << "once_initial";
+        case ScaleComputation::once_chart_distance:
+          return os << "once_chart_distance";
+        case ScaleComputation::current_initial:
+          return os << "current_initial";
+        case ScaleComputation::current_chart_distance:
+          return os << "current_chart_distance";
+        case ScaleComputation::iter_concentration:
+          return os << "iter_concentration";
         default:
           return os << "-unknown-";
       }
@@ -58,12 +67,18 @@ namespace FEAST
     {
       if(sc_name == "undefined")
         scale_computation = ScaleComputation::undefined;
-      else if(sc_name == "uniform")
-        scale_computation = ScaleComputation::uniform;
-      else if(sc_name == "current")
-        scale_computation = ScaleComputation::current;
-      else if(sc_name == "chart_distance")
-        scale_computation = ScaleComputation::chart_distance;
+      else if(sc_name == "once_uniform")
+        scale_computation = ScaleComputation::once_uniform;
+      else if(sc_name == "once_initial")
+        scale_computation = ScaleComputation::once_initial;
+      else if(sc_name == "once_chart_distance")
+        scale_computation = ScaleComputation::once_chart_distance;
+      else if(sc_name == "current_initial")
+        scale_computation = ScaleComputation::current_initial;
+      else if(sc_name == "current_chart_distance")
+        scale_computation = ScaleComputation::current_chart_distance;
+      else if(sc_name == "iter_concentration")
+        scale_computation = ScaleComputation::iter_concentration;
       else
         throw InternalError(__func__, __FILE__, __LINE__, "Unknown ScaleComputation identifier string "
             +sc_name);
@@ -267,9 +282,13 @@ namespace FEAST
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _columns(_trafo_space.get_num_dofs()),
           _rows(_trafo_space.get_num_dofs()),
-          _scale_computation(ScaleComputation::uniform),
+          _scale_computation(ScaleComputation::once_uniform),
           _distance_charts()
           {
+            // Compute desired element size distribution
+            this->compute_scales_once();
+            // Compute element weights
+            this->compute_mu();
           }
 
         explicit HyperelasticityFunctionalBase(
@@ -297,9 +316,17 @@ namespace FEAST
             for(const auto& it:distance_charts_)
               _distance_charts.push_back(it);
 
-            if(_scale_computation == ScaleComputation::chart_distance && _distance_charts.empty())
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Scale computation set to "+stringify(_scale_computation)+", but no charts were given");
+            if(_scale_computation == ScaleComputation::once_chart_distance ||
+                _scale_computation == ScaleComputation::current_chart_distance)
+                {
+                  if(_distance_charts.empty())
+                    throw InternalError(__func__,__FILE__,__LINE__,
+                    "Scale computation set to "+stringify(_scale_computation)+", but no charts were given");
+                }
+            // Perform one time scal computation
+            compute_scales_once();
+            // Compute the cell weights
+            compute_mu();
           }
 
         /// Explicitly delete default constructor
@@ -410,24 +437,13 @@ namespace FEAST
           _distance_charts.push_back(chart_name);
         }
 
-        /**
-         * \brief Performs one-time initialisations
-         *
-         * These are not done in the constructor as compute_lambda() etc. could be overwritten in a derived class,
-         * potentially using uninitialised members.
-         *
-         */
         virtual void init() override
         {
           // Write any potential changes to the mesh
           this->buffer_to_mesh();
 
           // Compute desired element size distribution
-          this->compute_lambda();
-          // Compute target scales
-          this->compute_h();
-          // Compute element weights
-          this->compute_mu();
+          this->compute_scales_init();
         }
 
         /**
@@ -470,6 +486,8 @@ namespace FEAST
 
             assembler->second->assemble(it.second, _trafo_space);
           }
+
+          compute_scales_iter();
 
           this->mesh_to_buffer();
         }
@@ -533,26 +551,17 @@ namespace FEAST
           RefCellTrafo_::compute_h(_h, this->_coords_buffer, _lambda, this->_trafo);
         }
 
-        /// \brief Computes the weights _lambda.
-        virtual void compute_lambda()
+        virtual void compute_scales_iter()
         {
           switch(_scale_computation)
           {
-            case ScaleComputation::uniform:
-              compute_lambda_uniform();
-              break;
-            case ScaleComputation::current:
-              compute_lambda_current();
-              break;
-            case ScaleComputation::chart_distance:
-              compute_lambda_chart_dist();
+            case ScaleComputation::iter_concentration:
               break;
             default:
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Unhandled scale computation"+stringify(_scale_computation));
+              return;
           }
 
-          /// Rescale so that sum lambda == 1
+          // Rescale so that sum lambda == 1
           CoordType sum_lambda(0);
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
@@ -563,19 +572,84 @@ namespace FEAST
 
           _lambda.scale(_lambda, CoordType(1)/sum_lambda);
 
+          compute_h();
         }
 
-        /// \brief Computes the uniformly distributed weights _lambda.
-        virtual void compute_lambda_current()
+        virtual void compute_scales_init()
+        {
+          switch(_scale_computation)
+          {
+            case ScaleComputation::once_uniform:
+            case ScaleComputation::once_initial:
+            case ScaleComputation::once_chart_distance:
+              return;
+            case ScaleComputation::current_initial:
+              compute_lambda_initial();
+              break;
+            case ScaleComputation::current_chart_distance:
+              compute_lambda_chart_dist();
+              break;
+            default:
+              throw InternalError(__func__,__FILE__,__LINE__,
+              "Unhandled scale computation"+stringify(_scale_computation));
+          }
+
+          // Rescale so that sum lambda == 1
+          CoordType sum_lambda(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+            sum_lambda += _lambda(cell);
+
+          CoordType sum_lambda_send(sum_lambda);
+          Util::Comm::allreduce(&sum_lambda, 1, &sum_lambda_send);
+
+          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
+
+          // Compute the scales
+          compute_h();
+        }
+
+        /// \brief Computes the weights _lambda.
+        virtual void compute_scales_once()
+        {
+          switch(_scale_computation)
+          {
+            case ScaleComputation::once_uniform:
+              compute_lambda_uniform();
+              break;
+            case ScaleComputation::once_initial:
+              compute_lambda_initial();
+              break;
+            case ScaleComputation::once_chart_distance:
+              compute_lambda_chart_dist();
+              break;
+            default:
+              return;
+          }
+
+          // Rescale so that sum lambda == 1
+          CoordType sum_lambda(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+            sum_lambda += _lambda(cell);
+
+          CoordType sum_lambda_send(sum_lambda);
+          Util::Comm::allreduce(&sum_lambda, 1, &sum_lambda_send);
+
+          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
+
+          // Compute the scales
+          compute_h();
+        }
+
+        /// \brief Computes the weights _lambda according to the initial mesh
+        virtual void compute_lambda_initial()
         {
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
-          // As this uses the transformation, it is always carried out in Mem::Main
-          typename LAFEM::DenseVector<Mem::Main, CoordType, Index> tmp(
-            this->get_mesh()->get_num_entities(ShapeType::dimension));
-
           for(Index cell(0); cell < ncells; ++cell)
-            tmp(cell, this->_trafo.template compute_vol<ShapeType, CoordType>(cell));
+            _lambda(cell, this->_trafo.template compute_vol<ShapeType, CoordType>(cell));
+
         }
 
         /// \brief Computes the uniformly distributed weights _lambda.

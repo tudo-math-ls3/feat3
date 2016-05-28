@@ -253,8 +253,8 @@ namespace FEAST
             throw InternalError(__func__,__FILE__,__LINE__,
             "Hyperelasticity config section is missing global_functional entry!");
 
-          // Get scale computation type, default is uniform
-          FEAST::Meshopt::ScaleComputation scale_computation(FEAST::Meshopt::ScaleComputation::uniform);
+          // Get scale computation type, default is once_uniform
+          FEAST::Meshopt::ScaleComputation scale_computation(FEAST::Meshopt::ScaleComputation::once_uniform);
           auto scale_computation_p = hyperelasticity_config_section->query("scale_computation");
           if(scale_computation_p.second)
             scale_computation << scale_computation_p.first;

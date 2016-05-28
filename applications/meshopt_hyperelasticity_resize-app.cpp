@@ -111,7 +111,7 @@ template
     // Create the functional with these parameters
     auto my_functional = std::make_shared<FunctionalType>(fac_norm, fac_det, fac_cof, fac_reg);
 
-    // Create the smoother
+    // Create the mesh quality functional
     HyperelasticityFunctionalType rumpflpumpfl(rmn, trafo_space, dirichlet_asm, slip_asm, my_functional);
     // Print information
     rumpflpumpfl.print();

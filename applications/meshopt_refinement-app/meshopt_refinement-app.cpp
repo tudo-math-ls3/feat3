@@ -151,7 +151,7 @@ struct MeshRefinementOptimiserApp
           // Create a VTK exporter for our mesh
           Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
           meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-          exporter.write(vtk_name, int(Util::Comm::rank()), int(Utill::Comm::size()));
+          exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
         }
 
         auto quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
@@ -197,7 +197,7 @@ struct MeshRefinementOptimiserApp
           // Create a VTK exporter for our mesh
           Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
           meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-          exporter.write(vtk_name, int(Comm::rank()), int(Comm::size()));
+          exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
         }
 
         auto quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(

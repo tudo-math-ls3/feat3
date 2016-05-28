@@ -90,12 +90,12 @@ template
       // Create the root mesh node
       Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
 
-      // Parameters for the Rumpf functional
+      // Parameters for the local Rumpf functional
       DataType fac_norm = DataType(1e0),fac_det = DataType(1), fac_cof = DataType(0), fac_reg(DataType(0e0));
       // Create the functional with these parameters
       auto my_functional = std::make_shared<FunctionalType>(fac_norm, fac_det, fac_cof, fac_reg);
 
-      // Create the smoother
+      // Create the mesh quality functional
       MeshQualityFunctional rumpflpumpfl(rmn, trafo_space, dirichlet_asm, slip_asm, my_functional);
 
       // Vector for setting coordinates
@@ -164,6 +164,7 @@ template
       fval_pre = rumpflpumpfl.compute_func();
 
       // Optimise again
+      rumpflpumpfl.init();
       rumpflpumpfl.prepare(new_coords, my_filter);
       solver->correct(new_coords, rhs);
 
