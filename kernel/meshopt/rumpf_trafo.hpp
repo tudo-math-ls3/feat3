@@ -65,14 +65,14 @@ namespace FEAT
        * \param[in] coords_
        * Vector of vertex coordinates
        *
-       * \param[in] trafo_
-       * The underlying transformation for accessing mesh information
+       * \param[in] mesh_
+       * The underlying mesh.
        *
        * \returns The sum of all local transformation's determinants
        *
        **/
       template<typename Tcoords_>
-      static DataType_ compute_sum_det(const Tcoords_& coords_, const TrafoType& trafo_);
+      static DataType_ compute_sum_det(const Tcoords_& coords_, const MeshType& mesh_);
 
       /**
        * \brief Computes the optimal local mesh size
@@ -99,12 +99,12 @@ namespace FEAT
        * \param[in] lambda_
        * Vector of element weights
        *
-       * \param[in] trafo_
-       * The underlying transformation for accessing mesh information
+       * \param[in] mesh_
+       * The underlying mesh.
        *
        **/
       template<typename Th_, typename Tcoords_, typename Tlambda_>
-      static void compute_h(Th_& h_, const Tcoords_& coords_, const Tlambda_& lambda_, const TrafoType& trafo_);
+      static void compute_h(Th_& h_, const Tcoords_& coords_, const Tlambda_& lambda_, const MeshType& mesh_);
 
       /**
        * \brief Computes the transformation's determinant's gradient on a cell
@@ -145,12 +145,12 @@ namespace FEAT
        * \param[in] coords_
        * Global vector of vertex coordinates
        *
-       * \param[in] trafo_
-       * The underlying transformation for accessing mesh information
+       * \param[in] mesh_
+       * The underlying mesh_.
        *
        **/
       template<typename Tcoords_>
-      static void compute_grad_sum_det(Tcoords_& grad_, const Tcoords_& coords_, const TrafoType& trafo_);
+      static void compute_grad_sum_det(Tcoords_& grad_, const Tcoords_& coords_, const MeshType& mesh_);
     }; // struct RumpfTrafo;
 #endif
 
@@ -231,14 +231,12 @@ namespace FEAT
          * \brief Computes the optimal local mesh size
          */
         template<typename Th_, typename Tcoords_, typename Tlambda_>
-        static void compute_h(Th_& h_, const Tcoords_& coords_, const Tlambda_& lambda_, const TrafoType& trafo_)
+        static void compute_h(Th_& h_, const Tcoords_& coords_, const Tlambda_& lambda_, const MeshType& mesh_)
         {
-          Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
-
-          DataType_ sum_det = compute_sum_det(coords_, trafo_);
+          DataType_ sum_det = compute_sum_det(coords_, mesh_);
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
-          for(Index cell(0); cell < ncells; ++cell)
+          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp;
             for(int d(0); d < MeshType::world_dim; ++d)
@@ -253,18 +251,16 @@ namespace FEAT
          * \brief Computes the sum of the local transformation's determinants
          **/
         template<typename Tcoords_>
-        static DataType_ compute_sum_det(const Tcoords_& coords_, const TrafoType& trafo_)
+        static DataType_ compute_sum_det(const Tcoords_& coords_, const MeshType& mesh_)
         {
-          Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
-
           // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
-          auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
+          const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
           DataType sum_det(0);
-          for(Index cell(0); cell < ncells; ++cell)
+          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
@@ -282,22 +278,20 @@ namespace FEAT
          * \brief Computes the gradient of sum of the local transformation's determinants
          **/
         template<typename Tcoords_>
-        static void compute_grad_sum_det(Tcoords_& grad_, const Tcoords_& coords_, const TrafoType& trafo_)
+        static void compute_grad_sum_det(Tcoords_& grad_, const Tcoords_& coords_, const MeshType& mesh_)
         {
-          Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
-
           // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
-          auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
+          const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
-          FEAT::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
+          Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
             local_grad(DataType_(0));
 
           grad_.format();
 
-          for(Index cell(0); cell < ncells; ++cell)
+          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
@@ -375,9 +369,9 @@ namespace FEAT
          * \brief Computes the transformation's determinant's gradient on a cell
          **/
         template<typename Tgrad_, typename Tx_>
-        static void compute_grad_det(Tgrad_& grad, const Tx_& x)
+        static inline void compute_grad_det(Tgrad_& grad, const Tx_& x)
         {
-          DataType fac(DataType(2) / Math::sqrt(DataType(3)));
+          const DataType fac(DataType(2) / Math::sqrt(DataType(3)));
 
           grad(0,0) = fac * ( x(1,1) - x(2,1));
           grad(0,1) = fac * (-x(1,0) + x(2,0));
@@ -392,17 +386,15 @@ namespace FEAT
          * \brief Computes the optimal local mesh size
          **/
         template<typename Th_, typename Tcoords_, typename Tlambda_>
-        static void compute_h(Th_& h_, const Tcoords_& coords_, const Tlambda_& lambda_, const TrafoType& trafo_)
+        static void compute_h(Th_& h_, const Tcoords_& coords_, const Tlambda_& lambda_, const MeshType& mesh_)
         {
-          Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
-
           // This will hold the coordinates for one element for passing to other routines
           FEAT::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
 
-          DataType_ sum_det = compute_sum_det(coords_, trafo_);
+          DataType_ sum_det = compute_sum_det(coords_, mesh_);
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
-          for(Index cell(0); cell < ncells; ++cell)
+          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim>
               tmp(Math::pow(lambda_(cell)*sum_det,exponent));
@@ -414,18 +406,16 @@ namespace FEAT
          * \brief Computes the sum of the local transformation's determinants
          **/
         template<typename Tcoords_>
-        static DataType_ compute_sum_det(const Tcoords_& coords_, const TrafoType& trafo_)
+        static DataType_ compute_sum_det(const Tcoords_& coords_, const MeshType& mesh_)
         {
-          Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
-
           // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
-          auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
+          const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
           DataType sum_det(0);
-          for(Index cell(0); cell < ncells; ++cell)
+          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
@@ -443,22 +433,20 @@ namespace FEAT
          * \brief Computes the gradient of sum of the local transformation's determinants
          **/
         template<typename Tcoords_>
-        static void compute_grad_sum_det(Tcoords_& grad_, const Tcoords_& coords_, const TrafoType& trafo_)
+        static void compute_grad_sum_det(Tcoords_& grad_, const Tcoords_& coords_, const MeshType& mesh_)
         {
-          Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
-
           // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
-          auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
+          const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
-          FEAT::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
+          Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
             local_grad(DataType_(0));
 
           grad_.format();
 
-          for(Index cell(0); cell < ncells; ++cell)
+          for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)

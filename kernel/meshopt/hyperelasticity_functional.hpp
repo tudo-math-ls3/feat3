@@ -11,6 +11,7 @@
 #include <kernel/lafem/filter_sequence.hpp>
 #include <kernel/lafem/slip_filter.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
+#include <kernel/meshopt/mesh_concentration_function.hpp>
 #include <kernel/meshopt/mesh_quality_functional.hpp>
 #include <kernel/meshopt/rumpf_trafo.hpp>
 #include <kernel/util/comm_base.hpp>
@@ -30,9 +31,9 @@ namespace FEAT
       undefined = 0,
       once_uniform,
       once_initial,
-      once_chart_distance,
+      once_concentration,
       current_initial,
-      current_chart_distance,
+      current_concentration,
       iter_concentration,
     };
 
@@ -50,12 +51,12 @@ namespace FEAT
           return os << "once_uniform";
         case ScaleComputation::once_initial:
           return os << "once_initial";
-        case ScaleComputation::once_chart_distance:
-          return os << "once_chart_distance";
+        case ScaleComputation::once_concentration:
+          return os << "once_concentration";
         case ScaleComputation::current_initial:
           return os << "current_initial";
-        case ScaleComputation::current_chart_distance:
-          return os << "current_chart_distance";
+        case ScaleComputation::current_concentration:
+          return os << "current_concentration";
         case ScaleComputation::iter_concentration:
           return os << "iter_concentration";
         default:
@@ -71,12 +72,12 @@ namespace FEAT
         scale_computation = ScaleComputation::once_uniform;
       else if(sc_name == "once_initial")
         scale_computation = ScaleComputation::once_initial;
-      else if(sc_name == "once_chart_distance")
-        scale_computation = ScaleComputation::once_chart_distance;
+      else if(sc_name == "once_concentration")
+        scale_computation = ScaleComputation::once_concentration;
       else if(sc_name == "current_initial")
         scale_computation = ScaleComputation::current_initial;
-      else if(sc_name == "current_chart_distance")
-        scale_computation = ScaleComputation::current_chart_distance;
+      else if(sc_name == "current_concentration")
+        scale_computation = ScaleComputation::current_concentration;
       else if(sc_name == "iter_concentration")
         scale_computation = ScaleComputation::iter_concentration;
       else
@@ -90,15 +91,15 @@ namespace FEAT
       typename Mem_,
       typename DT_,
       typename IT_,
-      typename TrafoType_,
+      typename Trafo_,
       typename FunctionalType_,
-      typename RefCellTrafo_ = RumpfTrafo<TrafoType_, typename TrafoType_::MeshType::CoordType>
+      typename RefCellTrafo_ = RumpfTrafo<Trafo_, typename Trafo_::MeshType::CoordType>
     >
     class HyperelasticityFunctionalBase;
     /**
      * \brief Baseclass for a family of variational mesh optimisation algorithms.
      *
-     * \tparam TrafoType_
+     * \tparam Trafo_
      * Type of the underlying transformation.
      *
      * \tparam FunctionalType_
@@ -149,22 +150,25 @@ namespace FEAT
     <
       typename DT_,
       typename IT_,
-      typename TrafoType_,
+      typename Trafo_,
       typename FunctionalType_,
       typename RefCellTrafo_
     >
-    class HyperelasticityFunctionalBase<Mem::Main, DT_, IT_, TrafoType_, FunctionalType_, RefCellTrafo_>:
-      public MeshQualityFunctional<typename TrafoType_::MeshType>
+    class HyperelasticityFunctionalBase<Mem::Main, DT_, IT_, Trafo_, FunctionalType_, RefCellTrafo_>:
+      public MeshQualityFunctional<typename Trafo_::MeshType>
     {
       public :
         /// Type for the transformation
-        typedef TrafoType_ TrafoType;
+        typedef Trafo_ TrafoType;
         /// The mesh the transformation is defined on
         typedef typename TrafoType::MeshType MeshType;
         /// The precision of the mesh coordinates
         typedef typename MeshType::CoordType CoordType;
         /// Type for the functional
         typedef FunctionalType_ FunctionalType;
+
+        /// Type of the reference cell trafo for the mesh quality
+        typedef RefCellTrafo_ RefCellTrafo;
 
         /// Only Mem::Main is supported atm
         typedef Mem::Main MemType;
@@ -226,6 +230,8 @@ namespace FEAT
         /// The functional for determining mesh quality
         std::shared_ptr<FunctionalType> _functional;
 
+        std::shared_ptr<MeshConcentrationFunction<Trafo_, RefCellTrafo_>> _mesh_conc;
+
         // This is public for debugging purposes
       public:
         /// Weights for the local contributions to the global functional value.
@@ -243,7 +249,6 @@ namespace FEAT
         const Index _rows;
 
         ScaleComputation _scale_computation;
-        std::deque<String> _distance_charts;
 
       public:
         /**
@@ -277,13 +282,13 @@ namespace FEAT
           _dirichlet_asm(dirichlet_asm_),
           _slip_asm(slip_asm_),
           _functional(functional_),
+          _mesh_conc(nullptr),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _columns(_trafo_space.get_num_dofs()),
           _rows(_trafo_space.get_num_dofs()),
-          _scale_computation(ScaleComputation::once_uniform),
-          _distance_charts()
+          _scale_computation(ScaleComputation::once_uniform)
           {
             // Compute desired element size distribution
             this->compute_scales_once();
@@ -298,31 +303,32 @@ namespace FEAT
           std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>& slip_asm_,
           std::shared_ptr<FunctionalType_> functional_,
           ScaleComputation scale_computation_,
-          const std::deque<String>& distance_charts_)
+          std::shared_ptr<MeshConcentrationFunction<Trafo_, RefCellTrafo_>> mesh_conc_ = nullptr)
           : BaseClass(rmn_),
           _trafo(trafo_space_.get_trafo()),
           _trafo_space(trafo_space_),
           _dirichlet_asm(dirichlet_asm_),
           _slip_asm(slip_asm_),
           _functional(functional_),
+          _mesh_conc(mesh_conc_),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _columns(_trafo_space.get_num_dofs()),
           _rows(_trafo_space.get_num_dofs()),
-          _scale_computation(scale_computation_),
-          _distance_charts()
+          _scale_computation(scale_computation_)
           {
-            for(const auto& it:distance_charts_)
-              _distance_charts.push_back(it);
 
-            if(_scale_computation == ScaleComputation::once_chart_distance ||
-                _scale_computation == ScaleComputation::current_chart_distance)
-                {
-                  if(_distance_charts.empty())
-                    throw InternalError(__func__,__FILE__,__LINE__,
-                    "Scale computation set to "+stringify(_scale_computation)+", but no charts were given");
-                }
+            if(( _scale_computation == ScaleComputation::once_concentration ||
+                  _scale_computation == ScaleComputation::current_concentration ||
+                  _scale_computation == ScaleComputation::iter_concentration ) &&
+                _mesh_conc == nullptr)
+              throw InternalError(__func__,__FILE__,__LINE__,
+              "Scale computation set to "+stringify(_scale_computation)+", but no concentration funtion was given");
+
+            if(_mesh_conc != nullptr)
+              _mesh_conc->set_mesh_node(rmn_);
+
             // Perform one time scal computation
             compute_scales_once();
             // Compute the cell weights
@@ -411,7 +417,7 @@ namespace FEAT
           _functional->print();
         }
 
-        virtual void add_to_vtk_exporter(Geometry::ExportVTK<typename TrafoType_::MeshType>& exporter) const
+        virtual void add_to_vtk_exporter(Geometry::ExportVTK<typename Trafo_::MeshType>& exporter) const
         {
           exporter.add_cell_vector("h", this->_h);
           exporter.add_cell_scalar("lambda", this->_lambda.elements());
@@ -427,14 +433,6 @@ namespace FEAT
           delete [] func_det;
           delete [] func_rec_det;
 
-        }
-
-        void add_distance_chart(const String& chart_name)
-        {
-          if(this->_mesh_node->get_atlas()->find_chart(chart_name) == nullptr)
-            throw InternalError(__func__,__FILE__,__LINE__,"Chart "+chart_name+" not found in atlas");
-
-          _distance_charts.push_back(chart_name);
         }
 
         virtual void init() override
@@ -530,8 +528,10 @@ namespace FEAT
          * \returns
          * The functional value
          *
-         **/
+         */
         virtual CoordType compute_func() const = 0;
+
+        /// \copydoc compute_func()
         virtual CoordType compute_func(CoordType*, CoordType*, CoordType*) const = 0;
 
         /**
@@ -548,13 +548,14 @@ namespace FEAT
          */
         virtual void compute_h()
         {
-          RefCellTrafo_::compute_h(_h, this->_coords_buffer, _lambda, this->_trafo);
+          RefCellTrafo_::compute_h(_h, this->_coords_buffer, _lambda, *(this->get_mesh()));
         }
 
         virtual void compute_scales_iter()
         {
           switch(_scale_computation)
           {
+            // \todo; Implement this
             case ScaleComputation::iter_concentration:
               break;
             default:
@@ -581,13 +582,13 @@ namespace FEAT
           {
             case ScaleComputation::once_uniform:
             case ScaleComputation::once_initial:
-            case ScaleComputation::once_chart_distance:
+            case ScaleComputation::once_concentration:
               return;
             case ScaleComputation::current_initial:
               compute_lambda_initial();
               break;
-            case ScaleComputation::current_chart_distance:
-              compute_lambda_chart_dist();
+            case ScaleComputation::current_concentration:
+              compute_lambda_conc();
               break;
             default:
               throw InternalError(__func__,__FILE__,__LINE__,
@@ -620,8 +621,8 @@ namespace FEAT
             case ScaleComputation::once_initial:
               compute_lambda_initial();
               break;
-            case ScaleComputation::once_chart_distance:
-              compute_lambda_chart_dist();
+            case ScaleComputation::once_concentration:
+              compute_lambda_conc();
               break;
             default:
               return;
@@ -660,39 +661,17 @@ namespace FEAT
           _lambda.format(CoordType(1)/CoordType(ncells));
         }
 
-        virtual void compute_lambda_chart_dist()
+        virtual void compute_lambda_conc()
         {
-          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
-          //_lambda.format(Math::huge<CoordType>());
-          _lambda.format(CoordType(0));
+          if(_mesh_conc == nullptr)
+            throw InternalError(__func__,__FILE__,__LINE__,
+            "Scale computation set to "+stringify(_scale_computation)+", but no concentration funtion was given");
 
-          const auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension, 0>();
-          const auto& vtx = this->get_mesh()->get_vertex_set();
+          _mesh_conc->compute_dist();
+          _mesh_conc->compute_conc();
+          _mesh_conc->compute_grad_h(this->get_coords());
 
-          Tiny::Vector<CoordType, MeshType::world_dim> midpoint(CoordType(0));
-
-          for(Index cell(0); cell < ncells; ++cell)
-          {
-            midpoint.format(CoordType(0));
-            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-            {
-              Index i(idx(cell, Index(j)));
-              midpoint += vtx[i];
-            }
-            midpoint *= (DataType(1))/DataType(Shape::FaceTraits<ShapeType,0>::count);
-
-            CoordType midpoint_dist(0);
-            for(const auto& it:_distance_charts)
-            {
-              auto* chart = this->_mesh_node->get_atlas()->find_mesh_chart(it);
-              if(chart == nullptr)
-                throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
-
-              midpoint_dist += chart->dist(midpoint);
-
-            }
-            _lambda(cell, midpoint_dist);
-          }
+          _lambda.clone(_mesh_conc->get_conc(), LAFEM::CloneMode::Deep);
         }
 
         /// \brief Computes the weights mu
@@ -714,24 +693,16 @@ namespace FEAT
       typename Mem_,
       typename DT_,
       typename IT_,
-      typename TrafoType_,
+      typename Trafo_,
       typename FunctionalType_,
-      typename RefCellTrafo_ = RumpfTrafo<TrafoType_, typename TrafoType_::MeshType::CoordType>
+      typename RefCellTrafo_ = RumpfTrafo<Trafo_, typename Trafo_::MeshType::CoordType>
     >
     class HyperelasticityFunctional:
-      public HyperelasticityFunctionalBase<Mem_, DT_, IT_, TrafoType_, FunctionalType_, RefCellTrafo_>
+      public HyperelasticityFunctionalBase<Mem_, DT_, IT_, Trafo_, FunctionalType_, RefCellTrafo_>
     {
       public :
         /// Our base class
-        typedef HyperelasticityFunctionalBase<Mem_, DT_, IT_, TrafoType_, FunctionalType_, RefCellTrafo_> BaseClass;
-
-        /// Type for the transformation
-        typedef TrafoType_ TrafoType;
-
-        /// The mesh the transformation is defined on
-        typedef typename TrafoType::MeshType MeshType;
-        /// The precision of the mesh coordinates
-        typedef typename MeshType::CoordType CoordType;
+        typedef HyperelasticityFunctionalBase<Mem_, DT_, IT_, Trafo_, FunctionalType_, RefCellTrafo_> BaseClass;
 
         /// Only Mem::Main is supported atm
         typedef Mem_ MemType;
@@ -740,10 +711,19 @@ namespace FEAT
         /// We always use Index for now
         typedef IT_ IndexType;
 
+        /// Type for the transformation
+        typedef Trafo_ TrafoType;
         /// Type for the functional
         typedef FunctionalType_ FunctionalType;
+        /// Type of the reference cell trafo for the mesh quality
+        typedef RefCellTrafo_ RefCellTrafo;
+
+        /// The mesh the transformation is defined on
+        typedef typename TrafoType::MeshType MeshType;
         /// ShapeType of said mesh
         typedef typename MeshType::ShapeType ShapeType;
+        /// The precision of the mesh coordinates
+        typedef typename MeshType::CoordType CoordType;
 
         /// Output vector type of the operator
         typedef typename BaseClass::VectorTypeL VectorTypeL;
@@ -779,7 +759,6 @@ namespace FEAT
         HyperelasticityFunctional() = delete;
         /// Explicitly delete copy constructor
         HyperelasticityFunctional(const HyperelasticityFunctional&) = delete;
-
 
         /// \brief Destructor
         virtual ~HyperelasticityFunctional()

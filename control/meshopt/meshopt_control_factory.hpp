@@ -5,6 +5,7 @@
 #include <kernel/archs.hpp>
 
 #include <kernel/meshopt/hyperelasticity_functional.hpp>
+#include <kernel/meshopt/mesh_concentration_function.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1split.hpp>
@@ -195,7 +196,7 @@ namespace FEAT
               std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
                 (fac_norm, fac_det, fac_cof, fac_reg);
               result = create_hyperelasticity_control_with_functional
-                (dom_ctrl, hyperelasticity_config_section, solver_config, my_functional, dirichlet_list, slip_list);
+                (dom_ctrl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
             }
             else
             {
@@ -204,7 +205,7 @@ namespace FEAT
                 (fac_norm, fac_det, fac_cof, fac_reg);
 
               result = create_hyperelasticity_control_with_functional
-                (dom_ctrl, hyperelasticity_config_section, solver_config, my_functional, dirichlet_list, slip_list);
+                (dom_ctrl, hyperelasticity_config_section, meshopt_config, solver_config, my_functional, dirichlet_list, slip_list);
             }
           }
           else if(local_functional_p.first == "RumpfFunctional_D2")
@@ -221,7 +222,7 @@ namespace FEAT
 
               std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
                 (fac_norm, fac_det, fac_cof, fac_reg);
-              result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section,
+              result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section, meshopt_config,
               solver_config, my_functional, dirichlet_list, slip_list);
             }
             else
@@ -229,7 +230,7 @@ namespace FEAT
               typedef FEAT::Meshopt::RumpfFunctional_D2<DT_, typename MeshType::ShapeType> FunctionalType;
               std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
                 (fac_norm, fac_det, fac_cof, fac_reg);
-              result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section,
+              result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section, meshopt_config,
               solver_config, my_functional, dirichlet_list, slip_list);
             }
           }
@@ -241,7 +242,7 @@ namespace FEAT
         template<typename DomCtrl_, typename FunctionalType_>
         static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
         create_hyperelasticity_control_with_functional( DomCtrl_& dom_ctrl,
-        PropertyMap* hyperelasticity_config_section, PropertyMap* solver_config,
+        PropertyMap* hyperelasticity_config_section, PropertyMap* meshopt_config, PropertyMap* solver_config,
         std::shared_ptr<FunctionalType_> my_functional,
         const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list)
         {
@@ -255,14 +256,10 @@ namespace FEAT
 
           // Get scale computation type, default is once_uniform
           FEAT::Meshopt::ScaleComputation scale_computation(FEAT::Meshopt::ScaleComputation::once_uniform);
+
           auto scale_computation_p = hyperelasticity_config_section->query("scale_computation");
           if(scale_computation_p.second)
             scale_computation << scale_computation_p.first;
-
-          std::deque<String> distance_charts;
-          auto distance_charts_p = hyperelasticity_config_section->query("distance_charts");
-          if(distance_charts_p.second)
-            distance_charts_p.first.split_by_charset(distance_charts, " ");
 
           // Get the solver config section
           auto solver_p = hyperelasticity_config_section->query("solver_config");
@@ -272,11 +269,25 @@ namespace FEAT
 
           if(global_functional_p.first == "HyperelasticityFunctional")
           {
+            typedef typename FEAT::Meshopt::HyperelasticityFunctional<Mem_, DT_, IT_, Trafo_, FunctionalType_>::RefCellTrafo RefCellTrafo;
+
+            std::shared_ptr<FEAT::Meshopt::MeshConcentrationFunction<Trafo_, RefCellTrafo>> mesh_conc_func(nullptr);
+
+            if( scale_computation == FEAT::Meshopt::ScaleComputation::current_concentration ||
+              scale_computation == FEAT::Meshopt::ScaleComputation::iter_concentration)
+              {
+                auto conc_func_section_p = hyperelasticity_config_section->query("conc_function");
+                XASSERTM(conc_func_section_p.second, "conc_function missing!");
+                mesh_conc_func = FEAT::Meshopt::MeshConcentrationFunctionFactory<Trafo_, RefCellTrafo>::
+                  create(conc_func_section_p.first, meshopt_config);
+              }
+
+
             result = std::make_shared<Control::Meshopt::HyperelasticityFunctionalControl
             <Mem_, DT_, IT_, DomCtrl_, Trafo_,
             SetFunctional<FEAT::Meshopt::HyperelasticityFunctional, FunctionalType_>::template Functional>>
               (dom_ctrl, dirichlet_list, slip_list, solver_p.first, *solver_config, my_functional,
-              scale_computation, distance_charts);
+              scale_computation, mesh_conc_func);
           }
           else
             throw InternalError(__func__,__FILE__,__LINE__,
@@ -327,11 +338,8 @@ namespace FEAT
             result = create_hyperelasticity_control(dom_ctrl, section_key, meshopt_config, solver_config);
           }
 
-          //if(result == nullptr)
-          //{
-          //  throw InternalError(__func__,__FILE__,__LINE__,
-          //  "MeshOptimiser section has unhandled type "+type);
-          //}
+          if(result == nullptr)
+            throw InternalError(__func__,__FILE__,__LINE__, "MeshOptimiser section has unhandled type "+type);
 
           return result;
         }

@@ -5,7 +5,7 @@ dirichlet_boundaries = outer
 slip_boundaries = inner
 
 [DuDvDefault]
-type = DuDvSmoother
+type = DuDvFunctional
 config_section = DuDvDefaultParameters
 dirichlet_boundaries = inner outer
 
@@ -20,5 +20,9 @@ fac_norm = 1.0
 fac_det = 1.0
 fac_cof = 0.0
 fac_reg = 1e-8
-scale_computation = current_chart_dist
-distance_charts = inner outer
+scale_computation = current_concentration
+conc_function = GapWidth
+
+[GapWidth]
+type = ChartDistance
+chart_list = inner outer
