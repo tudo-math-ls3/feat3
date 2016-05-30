@@ -285,7 +285,7 @@ namespace PoissonDirichlet2D
     }
 
     // retrieve solver
-    auto solver = *scalar_solver;
+    auto solver = scalar_solver.create_default_solver();
 
     // enable plotting
     solver->set_plot(rank == 0);

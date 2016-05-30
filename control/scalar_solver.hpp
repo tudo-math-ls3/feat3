@@ -338,27 +338,33 @@ namespace FEAT
     class ScalarSolver
     {
       public:
+        /// The solvers lgs scalar matrix type
         using MatrixTypeSolve = MatrixTypeSolve_;
+        /// The solvers lgs memory type
         using MemTypeSolve = typename MatrixTypeSolve_::MemType;
+        /// The solvers lgs data type
         using DataTypeSolve = typename MatrixTypeSolve_::DataType;
+        /// The solvers lgs index type
         using IndexTypeSolve = typename MatrixTypeSolve_::IndexType;
+        /// The solvers lgs system level type
         using SystemLevelTypeSolve =  typename SystemLevelType_::template BaseType<MemTypeSolve, DataTypeSolve, IndexTypeSolve, MatrixTypeSolve_>;
+        /// The solvers lgs transfer level type
         using TransferLevelTypeSolve = typename TransferLevelType_::template BaseType<SystemLevelTypeSolve>;
+        /// The solvers lgs global system vector type
         using GlobalSystemVectorSolve = typename SystemLevelTypeSolve::GlobalSystemVector;
+        /// The solvers lgs global system matrix type
         using GlobalSystemMatrixSolve = typename SystemLevelTypeSolve::GlobalSystemMatrix;
+        /// The solvers lgs global system filter type
         using GlobalSystemFilterSolve = typename SystemLevelTypeSolve::GlobalSystemFilter;
 
 
       private:
-        std::shared_ptr<Solver::IterativeSolver<GlobalSystemVectorSolve> > _solver;
+        std::shared_ptr<Solver::SolverBase<GlobalSystemVectorSolve> > _solver;
         std::deque<SystemLevelTypeSolve*> _system_levels_solve;
         std::deque<TransferLevelTypeSolve*> _transfer_levels_solve;
 
         GlobalSystemVectorSolve _vec_sol_solve;
         GlobalSystemVectorSolve _vec_rhs_solve;
-
-        PropertyMap * _pmbase;
-        String _pmbase_name;
 
       public:
 
@@ -374,14 +380,10 @@ namespace FEAT
          * \param[in] transfer_levels The assembled transfer_levels
          * \param[in] vec_sol The initialised solution vector
          * \param[in] vec_rhs The assembled right hand side
-         * \param[in] pmbase Optional: a pointer to the solver describing PropertyMap
-         * \param[in] pmbase_name Optional: the name of the solver tree's root section
          */
         explicit ScalarSolver(std::deque<SystemLevelType_*> & system_levels, std::deque<TransferLevelType_*> & transfer_levels,
-          typename SystemLevelType_::GlobalSystemVector & vec_sol, typename SystemLevelType_::GlobalSystemVector & vec_rhs,
-          PropertyMap * pmbase = nullptr, String pmbase_name = "") :
-          _pmbase(pmbase),
-          _pmbase_name(pmbase_name)
+          typename SystemLevelType_::GlobalSystemVector & vec_sol, typename SystemLevelType_::GlobalSystemVector & vec_rhs) :
+          _solver(nullptr)
         {
           for (Index i(0); i < system_levels.size(); ++i)
           {
@@ -422,24 +424,22 @@ namespace FEAT
           return t;
         }*/
 
-        /// \copydoc ScalarSolver::solver()
-        std::shared_ptr<Solver::IterativeSolver<GlobalSystemVectorSolve> > operator*()
+        /// Returns an already created solver, or nullptr
+        std::shared_ptr<Solver::SolverBase<GlobalSystemVectorSolve> > operator*()
         {
-          return solver();
+          return _solver;
         }
 
         /**
-         * \brief Retrieve out solver pointer
+         * \brief Retrieve our solver pointer
          *
          * \note The solver will be created the first time this method is called.
          * \note The user is responsible to call init and done methods of the solver object where necessary.
          */
-        std::shared_ptr<Solver::IterativeSolver<GlobalSystemVectorSolve> > solver()
+        std::shared_ptr<Solver::IterativeSolver<GlobalSystemVectorSolve> > create_default_solver()
         {
           if (_solver == nullptr)
           {
-            if (_pmbase == nullptr)
-            {
               //BiCGStab ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
               auto mgv = std::make_shared<
                 Solver::BasicVCycle<
@@ -463,14 +463,23 @@ namespace FEAT
                 smoother->set_max_iter(4);
                 mgv->push_level((*it)->matrix_sys, (*it)->filter_sys, (*jt)->prol_sys, (*jt)->rest_sys, smoother, smoother);
               }
-              _solver = Solver::new_pcg(_system_levels_solve.back()->matrix_sys, _system_levels_solve.back()->filter_sys, mgv);
-            }
-            else
-            {
-              /// \todo iterative solver vs solver base
-              //_solver = Control::SolverFactory::create_scalar_solver(_system_levels_solve, _transfer_levels_solve, _pmbase, _pmbase_name);
-            }
+              auto solver = Solver::new_pcg(_system_levels_solve.back()->matrix_sys, _system_levels_solve.back()->filter_sys, mgv);
+              _solver = solver;
+              return solver;
           }
+          else
+            throw InternalError(__func__, __FILE__, __LINE__, "cannot create solver object twice!");
+        }
+
+        /**
+         * \brief Create solver tree based on PropertyMap
+         *
+         * \param[in] pmbase A pointer to the PropertyMap that contains all solver related informations
+         * \param[in] pmbase_name The name of the solver tree's root section
+         */
+        std::shared_ptr<Solver::SolverBase<GlobalSystemVectorSolve> > create_solver(PropertyMap * pmbase, String pmbase_name)
+        {
+          _solver = Control::SolverFactory::create_scalar_solver(_system_levels_solve, _transfer_levels_solve, pmbase, pmbase_name);
           return _solver;
         }
 
@@ -501,7 +510,10 @@ namespace FEAT
         /// execute the instances own solver
         Solver::Status solve()
         {
-          return solver()->correct(_vec_sol_solve, _vec_rhs_solve);
+          if (_solver)
+            return Solver::solve(*_solver, _vec_sol_solve, _vec_rhs_solve, _system_levels_solve.back()->matrix_sys, _system_levels_solve.back()->filter_sys);
+          else
+            throw InternalError(__func__, __FILE__, __LINE__, "calling solve with no solver allocated!");
         }
 
     }; // ScalarSolver
