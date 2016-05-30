@@ -60,7 +60,7 @@ def run_test(build_id, branch, myDB, extra_opts):
     dump_filename_full = "not set"
 
   if scratch != "":
-    build_dirname = scratch + os.sep + "feat-build"
+    build_dirname = scratch + os.sep + "feat-regression-build"
   else:
     build_dirname = src_dirname + os.sep + "build"
 
