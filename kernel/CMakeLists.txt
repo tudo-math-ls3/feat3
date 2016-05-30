@@ -17,10 +17,10 @@ ADD_SUBDIRECTORY( trafo )
 ADD_SUBDIRECTORY( util )
 
 # list of kernel source files
-ADD_LIBRARY(feast STATIC archs.cpp)
+ADD_LIBRARY(feat STATIC archs.cpp)
 
-# list of libraries to include in feast lib
-TARGET_LINK_LIBRARIES (feast
+# list of libraries to include in feat lib
+TARGET_LINK_LIBRARIES (feat
   kernel-adjacency
 # kernel-assembly
 # kernel-cubature
@@ -33,26 +33,26 @@ TARGET_LINK_LIBRARIES (feast
   kernel-util
 )
 
-if (FEAST_HAVE_ALGLIB)
-  TARGET_LINK_LIBRARIES (feast thirdparty-alglib)
-endif(FEAST_HAVE_ALGLIB)
+if (FEAT_HAVE_ALGLIB)
+  TARGET_LINK_LIBRARIES (feat thirdparty-alglib)
+endif(FEAT_HAVE_ALGLIB)
 
-if (FEAST_HAVE_FPARSER)
-  TARGET_LINK_LIBRARIES (feast thirdparty-fparser)
-endif(FEAST_HAVE_FPARSER)
+if (FEAT_HAVE_FPARSER)
+  TARGET_LINK_LIBRARIES (feat thirdparty-fparser)
+endif(FEAT_HAVE_FPARSER)
 
-if (FEAST_HAVE_UMFPACK)
-  TARGET_LINK_LIBRARIES (feast thirdparty-umfpack)
-endif(FEAST_HAVE_UMFPACK)
+if (FEAT_HAVE_UMFPACK)
+  TARGET_LINK_LIBRARIES (feat thirdparty-umfpack)
+endif(FEAT_HAVE_UMFPACK)
 
-if (FEAST_HAVE_PARMETIS)
-  TARGET_LINK_LIBRARIES (feast thirdparty-parmetis)
-endif (FEAST_HAVE_PARMETIS)
+if (FEAT_HAVE_PARMETIS)
+  TARGET_LINK_LIBRARIES (feat thirdparty-parmetis)
+endif (FEAT_HAVE_PARMETIS)
 
 #libquadmath needs to be the last library linked against
-if (FEAST_HAVE_QUADMATH)
-  TARGET_LINK_LIBRARIES (feast -lquadmath)
-endif (FEAST_HAVE_QUADMATH)
+if (FEAT_HAVE_QUADMATH)
+  TARGET_LINK_LIBRARIES (feat -lquadmath)
+endif (FEAT_HAVE_QUADMATH)
 
 
 # list of kernel tests
@@ -63,25 +63,25 @@ SET (test_list
 # create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} feast test_system)
+  TARGET_LINK_LIBRARIES(${test} feat test_system)
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/${test} none)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/${test} none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
 
   ADD_TEST(${test}_main ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/${test} main)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/${test} main)
   SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
 ENDFOREACH(test)
 

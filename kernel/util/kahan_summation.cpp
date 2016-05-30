@@ -1,8 +1,8 @@
 #include <kernel/util/kahan_summation.hpp>
 
-using namespace FEAST;
+using namespace FEAT;
 
-KahanAccumulation FEAST::KahanSum(KahanAccumulation accumulation, double value)
+KahanAccumulation FEAT::KahanSum(KahanAccumulation accumulation, double value)
 {
   KahanAccumulation result;
   double y = value - accumulation.correction;

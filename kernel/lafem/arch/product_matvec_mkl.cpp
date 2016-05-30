@@ -1,12 +1,12 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/arch/product_matvec.hpp>
 
 #include <mkl.h>
 #include <mkl_spblas.h>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 void ProductMatVec<Mem::Main>::csr_mkl(float * r, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const float * const x, const Index rows, const Index, const Index)
 {

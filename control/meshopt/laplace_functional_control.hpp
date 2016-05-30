@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FEAST_CONTROL_MESHOPT_LAPLACE_FUNCTIONAL_CONTROL_HPP
-#define FEAST_CONTROL_MESHOPT_LAPLACE_FUNCTIONAL_CONTROL_HPP 1
+#ifndef FEAT_CONTROL_MESHOPT_LAPLACE_FUNCTIONAL_CONTROL_HPP
+#define FEAT_CONTROL_MESHOPT_LAPLACE_FUNCTIONAL_CONTROL_HPP 1
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
@@ -23,7 +23,7 @@
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_solver_factory.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -65,6 +65,6 @@ namespace FEAST
       }; // class LaplaceSmootherAssemblerLevel
     } // namespace Meshopt
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
-#endif// FEAST_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP
+#endif// FEAT_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP

@@ -2,7 +2,7 @@
 #ifndef KERNEL_SOLVER_SCHUR_PRECOND_HPP
 #define KERNEL_SOLVER_SCHUR_PRECOND_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/base.hpp>
 #include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/lafem/tuple_filter.hpp>
@@ -11,7 +11,7 @@
 #include <kernel/global/vector.hpp>
 #include <kernel/global/filter.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -617,7 +617,7 @@ namespace FEAST
      * A shared pointer to a new SchurPrecond object.
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_, typename SolverA_, typename SolverS_>
     inline std::shared_ptr<SchurPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>> new_schur_precond(
       const MatrixA_& matrix_a, const MatrixB_& matrix_b, const MatrixD_& matrix_d,
@@ -645,6 +645,6 @@ namespace FEAST
     }
 #endif
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_SCHUR_PRECOND_HPP

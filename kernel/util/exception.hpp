@@ -5,7 +5,7 @@
 // The following line is necessary - otherwise doxygen won't document the #define's in this file.
 /** \file */
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/instantiation_policy.hpp>
 #include <kernel/util/string.hpp>
@@ -15,7 +15,7 @@
 #include <iostream>
 #include <list>
 
-namespace FEAST
+namespace FEAT
 {
   /**
   * \brief Base exception class.
@@ -114,7 +114,7 @@ namespace FEAST
   /**
    * \brief Syntax Error exception class
    *
-   * This class derives from FEAST::Exception and is thrown by the parser classes when a syntax error
+   * This class derives from FEAT::Exception and is thrown by the parser classes when a syntax error
    * is detected.
    *
    * \author Constantin Christof
@@ -156,6 +156,6 @@ namespace FEAST
       return _filename;
     }
   }; // class SyntaxError
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_EXCEPTION_HPP

@@ -2,10 +2,10 @@
 #ifndef KERNEL_GEOMETRY_INDEX_SET_HPP
 #define KERNEL_GEOMETRY_INDEX_SET_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/shape.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Geometry namespace
@@ -780,6 +780,6 @@ namespace FEAST
     };
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_INDEX_SET_HPP

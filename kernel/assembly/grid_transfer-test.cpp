@@ -8,8 +8,8 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/math.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 template<typename MatrixType_>
 class GridTransferTest :
@@ -234,7 +234,7 @@ GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, float, unsigned long> > grid_
 GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned int> > grid_transfer_test_ell_double_uint;
 GridTransferTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned long> > grid_transfer_test_ell_double_ulong;
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned int> > grid_transfer_test_csr_float128_uint;
 GridTransferTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned long> > grid_transfer_test_csr_float128_ulong;
 

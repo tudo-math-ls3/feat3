@@ -8,7 +8,7 @@
 #include <kernel/geometry/atlas/bezier.hpp>
 #include <kernel/geometry/atlas/polyline.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -219,6 +219,6 @@ namespace FEAST
       }; // class ExtrudeChartParser<...>
     } // namespace Atlas
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_ATLAS_EXTRUDE_HPP

@@ -6,7 +6,7 @@
 #include <kernel/shape.hpp>
 #include <kernel/meshopt//rumpf_functional.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Meshopt
   {
@@ -163,6 +163,6 @@ namespace FEAST
     }; // class RumpfFunctional
     /// \endcond
   } // namespace Meshopt
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_MESHOPT_RUMPF_FUNCTIONALS_2D_P1_D1_HPP

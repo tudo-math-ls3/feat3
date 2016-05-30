@@ -8,17 +8,17 @@
 
 #include <functional>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Util
   {
     /// Run cout if condition evaluates to true
-    void mpi_cout(FEAST::String string,
+    void mpi_cout(FEAT::String string,
         std::function<bool (Index, Index)> func =
         [](Index r, Index /*rs*/) -> bool{ return (r == 0); });
 
   } // namespace Util
-} // namespace FEAST
+} // namespace FEAT
 
 
 #endif // UTIL_GUARD_MPI_COUT_HPP

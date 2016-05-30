@@ -11,7 +11,7 @@
 
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -89,5 +89,5 @@ namespace FEAST
       };
     } // namespace Meshopt
   } // namespace Control
-} //namespace FEAST
+} //namespace FEAT
 #endif // CONTROL_MESHOPT_MESHOPT_PRECOND_FACTORY_HPP

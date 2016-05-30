@@ -2,10 +2,10 @@
 #ifndef KERNEL_UTIL_FILE_ERROR_HPP
 #define KERNEL_UTIL_FILE_ERROR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/exception.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Base class for file related errors
@@ -53,6 +53,6 @@ namespace FEAST
     {
     }
   }; // class FileNotFound
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_FILE_ERROR_HPP

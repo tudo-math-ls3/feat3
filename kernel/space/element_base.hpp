@@ -2,11 +2,11 @@
 #ifndef KERNEL_SPACE_ELEMENT_BASE_HPP
 #define KERNEL_SPACE_ELEMENT_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/dof_mapping_base.hpp>
 #include <kernel/space/evaluator_base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -207,6 +207,6 @@ namespace FEAST
       }
     }; // class ElementBase<...>
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_ELEMENT_BASE_HPP

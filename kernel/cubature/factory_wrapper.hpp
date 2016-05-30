@@ -2,7 +2,7 @@
 #ifndef KERNEL_CUBATURE_FACTORY_WRAPPER_HPP
 #define KERNEL_CUBATURE_FACTORY_WRAPPER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/driver_factory.hpp>
 #include <kernel/cubature/refine_factory.hpp>
 #include <kernel/cubature/barycentre_driver.hpp>
@@ -15,7 +15,7 @@
 #include <kernel/cubature/tensor_product_factory.hpp>
 #include <kernel/cubature/scalar/factory_wrapper.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -701,6 +701,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_FACTORY_WRAPPER_HPP

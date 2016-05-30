@@ -4,15 +4,15 @@
 
 /**
  * \file
- * \brief FEAST Kernel base header.
+ * \brief FEAT Kernel base header.
  *
- * This file is the base header for the FEAST kernel, which is included by all other FEAST header and source files.
+ * This file is the base header for the FEAT kernel, which is included by all other FEAT header and source files.
  * It defines macros and data types which are frequently used in other files.
  */
 
-// Include FEAST configuration header.
-#ifndef FEAST_NO_CONFIG
-#  include <feast_config.hpp>
+// Include FEAT configuration header.
+#ifndef FEAT_NO_CONFIG
+#  include <feat_config.hpp>
 #endif
 
 // Make sure the DOXYGEN macro is not defined at compile-time;
@@ -25,12 +25,12 @@
 
 /// \cond nodoxy
 // Activate DEBUG macro if the build system tells us to do so.
-#if defined(FEAST_DEBUG_MODE) && !defined(DEBUG)
+#if defined(FEAT_DEBUG_MODE) && !defined(DEBUG)
 #  define DEBUG 1
 #endif
 
 // Activate SERIAL macro if the build system tells us to do so.
-#if defined(FEAST_SERIAL_MODE) && !defined(SERIAL)
+#if defined(FEAT_SERIAL_MODE) && !defined(SERIAL)
 #  define SERIAL 1
 #endif
 /// \endcond
@@ -61,42 +61,42 @@
 #endif
 
 // If the compiler does not support a loop vectorisation specifier, we'll define it as an empty macro.
-#ifndef FEAST_IVDEP
-#define FEAST_IVDEP
+#ifndef FEAT_IVDEP
+#define FEAT_IVDEP
 #endif
 
 // If the compiler does not support disabling/restoring warnings, we'll define the corresponding
 // macros as empty.
-#ifndef FEAST_DISABLE_WARNINGS
-#define FEAST_DISABLE_WARNINGS
+#ifndef FEAT_DISABLE_WARNINGS
+#define FEAT_DISABLE_WARNINGS
 #endif
-#ifndef FEAST_RESTORE_WARNINGS
-#define FEAST_RESTORE_WARNINGS
+#ifndef FEAT_RESTORE_WARNINGS
+#define FEAT_RESTORE_WARNINGS
 #endif
 
 ///\endcond
 // end of block hidden from doxygen
 
 /**
- * \brief FEAST namespace
+ * \brief FEAT namespace
  */
-namespace FEAST
+namespace FEAT
 {
-  /// FEAST version enum
+  /// FEAT version enum
   enum
   {
-    /// FEAST major version number
+    /// FEAT major version number
     version_major = 0,
-    /// FEAST minor version number
+    /// FEAT minor version number
     version_minor = 1,
-    /// FEAST patch version number
+    /// FEAT patch version number
     version_patch = 1
   };
 
   /**
    * \brief Index data type.
    */
-#ifdef FEAST_INDEX_ULL
+#ifdef FEAT_INDEX_ULL
   typedef unsigned long long Index;
 #else
   typedef unsigned long Index;
@@ -106,6 +106,6 @@ namespace FEAST
    * \brief Real data type.
    */
   typedef double Real;
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_BASE_HEADER_HPP

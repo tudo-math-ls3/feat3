@@ -2,11 +2,11 @@
 #ifndef KERNEL_TRAFO_STANDARD_VOLUME_HPP
 #define KERNEL_TRAFO_STANDARD_VOLUME_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/math.hpp>
 #include <kernel/util/meta_math.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Trafo
   {
@@ -178,7 +178,7 @@ namespace FEAST
           {
             // A consist of all vectors of type [v_(d+1) - v_0, ..., v_1 - v_0], where v_0, ... , v_(d+1) are
             // the world_dim_ vectors of the vertices comprising the shape_dim_ simplex.
-            FEAST::Tiny::Matrix< DataType_,
+            FEAT::Tiny::Matrix< DataType_,
             TrafoType_::MeshType::world_dim, shape_dim_,
             TrafoType_::MeshType::world_dim, shape_dim_ > A(0.);
 
@@ -200,6 +200,6 @@ namespace FEAST
 
     } // namespace Standard
   } // namespace Trafo
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_TRAFO_STANDARD_VOLUME_HPP

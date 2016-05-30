@@ -10,9 +10,9 @@
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
 #include <kernel/solver/test_aux/function_traits.hpp>
 
-using namespace FEAST;
-using namespace FEAST::Solver;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::Solver;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class template for the nonlinear CG optimiser
@@ -151,7 +151,7 @@ nlcg_nr_rb_d(float(0.6), Index(32),"NewtonRaphsonLinesearch","Hessian", NLCGDire
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_hessian_rb_d(double(0.7), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
 nlcg_nr_rb_q(__float128(0.6), Index(33), "NewtonRaphsonLinesearch", "ApproximateHessian",
 NLCGDirectionUpdate::PolakRibiere);
@@ -162,7 +162,7 @@ nlcg_sw_bs_q(__float128(0.175), Index(30), "StrongWolfeLinesearch", "none", NLCG
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
 nlcg_sw_hb_f_cuda(float(0.8), Index(8), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
@@ -292,19 +292,19 @@ nlsd_rb_d(double(0.75), Index(20), "StrongWolfeLinesearch", "Hessian");
 NLSDTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
 nlsd_rb_d_sw(double(0.6), Index(10), "NewtonRaphsonLinesearch", "none");
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 NLSDTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
 nlsd_rb_q(__float128(1), Index(19), "SecantLinesearch", "Hessian");
 #endif
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
 nlsd_hb_f_cuda(float(0.9), Index(8), "StrongWolfeLinesearch", "Hessian");
 #endif
 
-#ifdef FEAST_HAVE_ALGLIB
+#ifdef FEAT_HAVE_ALGLIB
 /**
  * \brief Test class template for ALGLIB's lBFGS optimiser
  *
@@ -494,4 +494,4 @@ alg_mincg_rb_d(double(0.6), Index(40), NLCGDirectionUpdate::DYHSHybrid);
 
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 alg_mincg_bs_d(double(0.15), Index(25), NLCGDirectionUpdate::DaiYuan);
-#endif // FEAST_HAVE_ALGLIB
+#endif // FEAT_HAVE_ALGLIB

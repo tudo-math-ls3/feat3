@@ -9,7 +9,7 @@
 #include <kernel/util/math.hpp>
 #include <cmath>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -28,6 +28,6 @@ namespace FEAST
       }
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_ARCH_NORM_GENERIC_HPP

@@ -7,8 +7,8 @@
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/runtime.hpp>
 
-using namespace FEAST;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::Geometry;
 
 static void display_help()
 {
@@ -94,7 +94,7 @@ Index lvl_min, Index lvl_max)
       continue;
 
     // Create a VTK exporter for our mesh
-    FEAST::String vtkname = get_file_title(filename) + "." + stringify(lvl);
+    FEAT::String vtkname = get_file_title(filename) + "." + stringify(lvl);
     std::cout << "Writing file '" << vtkname << ".vtu'..." << std::endl;
     Geometry::ExportVTK<Mesh_> exporter(*node->get_mesh());
 

@@ -6,7 +6,7 @@
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -96,6 +96,6 @@ namespace FEAST
     } // namespace TestAux
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_TEST_AUX_VALIDATE_NEIGHBOURS_HPP

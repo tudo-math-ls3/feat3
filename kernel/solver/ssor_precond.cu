@@ -1,7 +1,7 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 
-#ifdef FEAST_HAVE_CUSOLVER
+#ifdef FEAT_HAVE_CUSOLVER
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
@@ -11,9 +11,9 @@
 
 #include "cusparse_v2.h"
 
-using namespace FEAST;
+using namespace FEAT;
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -71,7 +71,7 @@ namespace FEAST
           row_offset += rows_per_color[i];
         }
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
@@ -97,7 +97,7 @@ namespace FEAST
           row_offset += rows_per_color[i];
         }
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
@@ -109,4 +109,4 @@ namespace FEAST
     }
   }
 }
-#endif // FEAST_HAVE_CUSOLVER
+#endif // FEAT_HAVE_CUSOLVER

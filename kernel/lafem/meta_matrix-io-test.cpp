@@ -1,9 +1,9 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/meta_matrix_test_base.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Meta-Matrix i/o test class

@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/slip_filter.hpp>
@@ -6,7 +6,7 @@
 #include <kernel/util/memory_pool.hpp>
 
 /// \cond internal
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -60,11 +60,11 @@ namespace FEAST
 
     } // namespace Intern
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_, typename IT_, int BlockSize_>
 void SlipFilter<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
@@ -75,8 +75,8 @@ void SlipFilter<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, c
   block.x = blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_slip_filter_rhs<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_slip_filter_rhs<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -102,8 +102,8 @@ void SlipFilter<Mem::CUDA>::filter_def(DT_ * v, const DT_ * const sv_elements, c
   block.x = blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_slip_filter_def<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_slip_filter_def<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

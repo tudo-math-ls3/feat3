@@ -2,10 +2,10 @@
 #ifndef KERNEL_LAFEM_MEAN_FILTER_HPP
 #define KERNEL_LAFEM_MEAN_FILTER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/dense_vector.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -207,7 +207,7 @@ namespace FEAST
       }
     }; // class MeanFilter<...>
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 
 #endif // KERNEL_LAFEM_MEAN_FILTER_HPP

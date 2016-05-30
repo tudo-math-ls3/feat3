@@ -10,7 +10,7 @@
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/meshopt/rumpf_smoother.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Meshopt
   {
@@ -236,11 +236,11 @@ namespace FEAST
           auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <CoordType, MeshType::world_dim> h;
+          FEAT::Tiny::Vector <CoordType, MeshType::world_dim> h;
           // This will hold the levelset values at the mesh vertices for one element
-          FEAST::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
+          FEAT::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
 
           // Reset last levelset constraint
           this->lvlset_constraint_last = CoordType(0);
@@ -299,11 +299,11 @@ namespace FEAST
           auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <CoordType,MeshType::world_dim> h;
+          FEAT::Tiny::Vector <CoordType,MeshType::world_dim> h;
           // This will hold the levelset values at the mesh vertices for one element
-          FEAST::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
+          FEAT::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
 
           CoordType norm_A(0), det_A(0), rec_det_A(0), lvlset_penalty(0);
 
@@ -361,15 +361,15 @@ namespace FEAST
           auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <CoordType,MeshType::world_dim> h;
+          FEAT::Tiny::Vector <CoordType,MeshType::world_dim> h;
           // This will hold the local gradient for one element for passing to other routines
-          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
           // This will hold the levelset values at the mesh vertices for one element
-          FEAST::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
+          FEAT::Tiny::Vector <CoordType, Shape::FaceTraits<ShapeType,0>::count> lvlset_vals;
           // This will hold the levelset gradient values for one element for passing to other routines
-          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> lvlset_grad_vals;
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> lvlset_grad_vals;
 
           // Clear gradient vector
           this->_grad.format();
@@ -578,10 +578,10 @@ namespace FEAST
           this->_slip_asm.assemble(this->_filter.template at<0>(), this->_trafo_space);
 
           // Project the levelset function to a grid vector on the new grid and...
-          FEAST::Assembly::DiscreteVertexProjector::project(_lvlset_vtx_vec, _lvlset_vec, _lvlset_space);
+          FEAT::Assembly::DiscreteVertexProjector::project(_lvlset_vtx_vec, _lvlset_vec, _lvlset_space);
 
           // ... do the same for its gradient
-          FEAST::Assembly::DiscreteVertexProjector::project(
+          FEAT::Assembly::DiscreteVertexProjector::project(
             this->_lvlset_grad_vtx_vec, this->_lvlset_grad_vec, this->_lvlset_space);
 
           // As the levelset might be used for r-adaptivity and it's vertex vector might have changed, re-compute
@@ -617,9 +617,9 @@ namespace FEAST
           auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector <CoordType, MeshType::world_dim> h;
+          FEAT::Tiny::Vector <CoordType, MeshType::world_dim> h;
 
           CoordType sum_lambda(0);
           for(Index cell(0); cell < ncells; ++cell)
@@ -784,10 +784,10 @@ namespace FEAST
           Assembly::Interpolator::project(this->_lvlset_grad_vec, _analytic_lvlset_grad, this->_lvlset_space);
 
           // Project the levelset function to a grid vector on the new grid and...
-          FEAST::Assembly::AnalyticVertexProjector::project( this->_lvlset_vtx_vec, _analytic_lvlset, this->_trafo);
+          FEAT::Assembly::AnalyticVertexProjector::project( this->_lvlset_vtx_vec, _analytic_lvlset, this->_trafo);
 
           // ... do the same for its gradient
-          FEAST::Assembly::AnalyticVertexProjector::project( this->_lvlset_grad_vtx_vec, _analytic_lvlset_grad, this->_trafo);
+          FEAT::Assembly::AnalyticVertexProjector::project( this->_lvlset_grad_vtx_vec, _analytic_lvlset_grad, this->_trafo);
 
           // As the levelset might be used for r-adaptivity and it's vertex vector might have changed, re-compute
           if(this->_update_h && this->_r_adaptivity)
@@ -799,5 +799,5 @@ namespace FEAST
     }; // class RumpfSmootherLevelsetAnalytic
 
   } // namespace Meshopt
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_MESHOPT_RUMPF_SMOOTHER_LVLSET_HPP

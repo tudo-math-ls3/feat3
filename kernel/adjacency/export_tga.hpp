@@ -2,7 +2,7 @@
 #ifndef KERNEL_ADJACENCY_EXPORT_TGA_HPP
 #define KERNEL_ADJACENCY_EXPORT_TGA_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/adjacency/adjactor.hpp>
 
 // includes, system
@@ -11,7 +11,7 @@
 #include <fstream>
 #include <cstdint>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Adjacency
   {
@@ -133,6 +133,6 @@ namespace FEAST
       }
     }; // class ExportTGA
   } // namespace Adjacency
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ADJACENCY_EXPORT_TGA_HPP

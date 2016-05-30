@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_MATRIX_MIRROR_HPP
 #define KERNEL_LAFEM_MATRIX_MIRROR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
@@ -10,7 +10,7 @@
 //#include <kernel/adjacency/dynamic_graph.hpp>
 //#include <kernel/adjacency/graph.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -808,6 +808,6 @@ namespace FEAST
       }
     }; // class MatrixMirror<...>
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_MATRIX_MIRROR_HPP

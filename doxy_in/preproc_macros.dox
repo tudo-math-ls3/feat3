@@ -9,12 +9,12 @@ This section enlists the macros defined directly by the buildsystem, specifying 
 For macros specifying the available third-party libraries and backends, see \ref preproc_sec_backends
 
 <hr>
-\subsection ppm_feast_debug_mode FEAST_DEBUG_MODE
+\subsection ppm_feat_debug_mode FEAT_DEBUG_MODE
 This macro is defined if the corresponding build is a debug build.
 If defined, the kernel base-header defines the <c>DEBUG</c> macro.
 
 <hr>
-\subsection ppm_feast_serial_mode FEAST_SERIAL_MODE
+\subsection ppm_feat_serial_mode FEAT_SERIAL_MODE
 This macro is defined if the corresponding build is a serial build.
 If defined, the kernel base-header defines the <c>SERIAL</c> macro.
 
@@ -24,27 +24,27 @@ This macro is defined as 1 by the <i>hand-made</i> Visual Studio project files. 
 and any other build system, independent of whether the MS VC++ compiler is used or not.
 
 <hr>
-\subsection ppm_feast_src_dir FEAST_SRC_DIR
+\subsection ppm_feat_src_dir FEAT_SRC_DIR
 This macro contains a string literal specifying the full absolute path to the root source directory.
 
 <hr>
-\subsection ppm_feast_binary_dir FEAST_BINARY_DIR
+\subsection ppm_feat_binary_dir FEAT_BINARY_DIR
 This macro contains a string literal specifying the full absolute path to the root binary directory.
 
 <hr>
-\subsection ppm_feast_build_id FEAST_BUILD_ID
-This macro contains a string literal specifying the user provided build id string, that was passed to the configure_feast script.
+\subsection ppm_feat_build_id FEAT_BUILD_ID
+This macro contains a string literal specifying the user provided build id string, that was passed to the configure_feat script.
 
 <hr>
-\subsection ppm_feast_cpu_type FEAST_CPU_TYPE
+\subsection ppm_feat_cpu_type FEAT_CPU_TYPE
 This macro contains a string literal describing the detected target cpu type.
 
 <hr>
-\subsection ppm_feast_system_host_compiler FEAST_SYSTEM_HOST_COMPILER
+\subsection ppm_feat_system_host_compiler FEAT_SYSTEM_HOST_COMPILER
 The system compiler the actual host compiler will rely on, e.g. using its header files etc.
 
 <hr>
-\subsection ppm_feast_cuda_host_compiler FEAST_CUDA_HOST_COMPILER
+\subsection ppm_feat_cuda_host_compiler FEAT_CUDA_HOST_COMPILER
 The host compiler that will be used by nvcc for host code compilation.
 
 <hr>
@@ -52,8 +52,8 @@ The host compiler that will be used by nvcc for host code compilation.
 Descriptive compiler name, as detected by cmake.
 
 <hr>
-\subsection ppm_feast_compiler_id FEAST_COMPILER_ID
-Descriptive compiler name, as set by the configure_feast script.
+\subsection ppm_feat_compiler_id FEAT_COMPILER_ID
+Descriptive compiler name, as set by the configure_feat script.
 
 <hr>
 \subsection ppm_cmake_cxx_compiler_version CMAKE_CXX_COMPILER_VERSION
@@ -64,8 +64,8 @@ Compiler version, as detected by cmake.
 Path to the used host compiler.
 
 <hr>
-\subsection ppm_feast_compiler_wrapper FEAST_USE_COMPILER_WRAPPER
-This macro indicates, if defined, that a compiler wrapper like ccache or distcc is used to compile FEAST.
+\subsection ppm_feat_compiler_wrapper FEAT_USE_COMPILER_WRAPPER
+This macro indicates, if defined, that a compiler wrapper like ccache or distcc is used to compile FEAT.
 
 <hr>
 \subsection ppm_cmake_cxx_compiler_arg1 CMAKE_CXX_COMPILER_ARG1
@@ -93,7 +93,7 @@ The CXXFLAGS of the nvcc compiler.
 Version of the cuda SDK.
 
 <hr>
-\subsection ppm_cuda_arch FEAST_CUDA_ARCH
+\subsection ppm_cuda_arch FEAT_CUDA_ARCH
 Compile for this CUDA device architecture
 
 <hr>
@@ -109,7 +109,7 @@ Absolute path to mpi execution wrapper.
 MPI Library version.
 
 <hr>
-\subsection ppm_feast_hostname FEAST_HOSTNAME
+\subsection ppm_feat_hostname FEAT_HOSTNAME
 Hostname of the computer in use.
 
 <hr>
@@ -128,7 +128,7 @@ and its version being in use.
 For macros specifying the compiler's C++ language capabilities, see \ref preproc_sec_cpp_features
 
 <hr>
-\subsection ppm_feast_compiler FEAST_COMPILER
+\subsection ppm_feat_compiler FEAT_COMPILER
 This macro is defined by the compiler detection system and its value is a string literal specifying the name and
 possibly the version of the compiler in use, e.g. <code>"Microsoft Visual C++ 2012"</code>.
 
@@ -136,7 +136,7 @@ possibly the version of the compiler in use, e.g. <code>"Microsoft Visual C++ 20
 compiler detection system.
 
 <hr>
-\subsection ppm_feast_compiler_gnu FEAST_COMPILER_GNU
+\subsection ppm_feat_compiler_gnu FEAT_COMPILER_GNU
 This macro is defined if the GNU C++ compiler is detected. Its value is defined as
 \verbatim
 (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
@@ -145,19 +145,19 @@ which is a constant integral expression identifying the compiler version, e.g. t
 G++ 4.7.2 compiler. See the compiler's documentation for details.
 
 <hr>
-\subsection ppm_feast_compiler_intel FEAST_COMPILER_INTEL
+\subsection ppm_feat_compiler_intel FEAT_COMPILER_INTEL
 This macro is defined if the Intel C++ compiler is detected. Its value coindices with the compiler's internal macro
 <c>__INTEL_COMPILER</c>, which is a constant integral expression identifying the compiler version, e.g. the value
 <c>1210</c> identifies the Intel C++ 12.1 compiler. See the compiler's documentation for details on this macro.
 
 <hr>
-\subsection ppm_feast_compiler_microsoft FEAST_COMPILER_MICROSOFT
+\subsection ppm_feat_compiler_microsoft FEAT_COMPILER_MICROSOFT
 This macro is defined if the Microsoft Visual C++ compiler is detected. Its value coincides with the compiler's internal
 macro <c>_MSC_VER</c>, which is an constant integral expression identifying the compiler version, e.g. the value
 <code>1700</code> identifies the Visual C++ 2012 compiler. See the compiler's documentation for details on this macro.
 
 <hr>
-\subsection ppm_feast_compiler_open64 FEAST_COMPILER_OPEN64
+\subsection ppm_feat_compiler_open64 FEAT_COMPILER_OPEN64
 This macro is defined if the Open64 C++ compiler is detected. Its value is defined as
 \verbatim
 (__OPENCC__ * 10000 + __OPENCC_MINOR__ * 100 + __OPENCC_PATCHLEVEL__)
@@ -166,106 +166,106 @@ which is a constant integral expression identifying the compiler version, e.g. t
 Open64 C++ 4.2.4 compiler. See the compiler's documentation for details.
 
 <hr>
-\subsection ppm_feast_compiler_oracle FEAST_COMPILER_ORACLE
+\subsection ppm_feat_compiler_oracle FEAT_COMPILER_ORACLE
 This macro is defined if the OracleStudio/SunStudio C++ compiler is detected. Its value coincides with the compiler's
 internal macro <c>__SUNPRO_CC</c>, which is an constant integral expression identifying the compiler version, e.g. the
 value <code>0x5110</code> identifies the OracleStudio C++ 12.2 compiler. See the compiler's documentation for details
 on this macro.
 
 <hr>
-\subsection ppm_feast_compiler_pgi FEAST_COMPILER_PGI
+\subsection ppm_feat_compiler_pgi FEAT_COMPILER_PGI
 This macro is defined if the PGI C++ compiler is detected. Unfortunately, it is not known if the compiler's version can
 be deduced at compile-time, therefore this macro is simply defined as 1.
 
 <hr>
-\subsection ppm_feast_ivdep FEAST_IVDEP
+\subsection ppm_feat_ivdep FEAT_IVDEP
 This macro can be used to instruct the compiler to ignore assumed vector dependencies. To use this loop pragma, place it
 immediately before - not in - a loop definition. The pragma takes effect for the scope of the loop that follows it.
 
 <hr>
-\subsection ppm_feast_force_inline FORCE_INLINE
+\subsection ppm_feat_force_inline FORCE_INLINE
 This macro can be used to force the compiler to compile a function inline. The semantics of FORCE_INLINE are exactly the
 same as those for the C++ inline keyword.
 
 <hr>
-\subsection ppm_feast_noinline NOINLINE
+\subsection ppm_feat_noinline NOINLINE
 This macro can be used to force the compiler to compile a function without inlining.
 
 <hr><hr>
 \section preproc_sec_backends Backend / Library Macros
 This section enlists macros defined by the build system, which specify what types of third-party libraries and backends
-are available to FEAST.
+are available to FEAT.
 
 <hr>
-\subsection ppm_feast_backends_cuda FEAST_BACKENDS_CUDA
-This macro is defined by the build system if the FEAST kernel is linked against the CUDA library.
+\subsection ppm_feat_backends_cuda FEAT_BACKENDS_CUDA
+This macro is defined by the build system if the FEAT kernel is linked against the CUDA library.
 
-If defined, the LAFEM subsystem of the FEAST kernel will offer corresponding specialisations for the containters and
+If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding specialisations for the containters and
 operations using CUDA as a work-horse.
 
 <hr>
-\subsection ppm_feast_backends_mkl FEAST_BACKENDS_MKL
-This macro is defined by the build system if the FEAST kernel is linked against the Intel MKL library.
+\subsection ppm_feat_backends_mkl FEAT_BACKENDS_MKL
+This macro is defined by the build system if the FEAT kernel is linked against the Intel MKL library.
 
-If defined, the LAFEM subsystem of the FEAST kernel will offer corresponding specialisations for the operations using
+If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding specialisations for the operations using
 the MKL as a work-horse.
 
 <hr>
-\subsection ppm_feast_have_alglib FEAST_HAVE_ALGLIB
-This macro is defined by the build system if the FEAST kernel is linked against the ALGLIB library.
+\subsection ppm_feat_have_alglib FEAT_HAVE_ALGLIB
+This macro is defined by the build system if the FEAT kernel is linked against the ALGLIB library.
 
 <hr>
-\subsection ppm_feast_have_cusolver FEAST_HAVE_CUSOLVER
+\subsection ppm_feat_have_cusolver FEAT_HAVE_CUSOLVER
 This macro is defined by the build system detects a cuda sdk version equal or greater 7, which includes the cusolver library.
 
 <hr>
-\subsection ppm_feast_have_fparser FEAST_HAVE_FPARSER
-This macro is defined by the build system if the FEAST kernel is linked against the fparser library.
+\subsection ppm_feat_have_fparser FEAT_HAVE_FPARSER
+This macro is defined by the build system if the FEAT kernel is linked against the fparser library.
 
 <hr>
-\subsection ppm_feast_have_quadmath FEAST_HAVE_QUADMATH
-This macro is defined by the build system if the FEAST kernel has support for quadmath datatypes.
+\subsection ppm_feat_have_quadmath FEAT_HAVE_QUADMATH
+This macro is defined by the build system if the FEAT kernel has support for quadmath datatypes.
 The datatypes name is __float128.
 
 <hr>
-\subsection ppm_feast_have_umfpack FEAST_HAVE_UMFPACK
-This macro is defined by the build system if the FEAST kernel is linked agains the UMFPACK library, which is part of
+\subsection ppm_feat_have_umfpack FEAT_HAVE_UMFPACK
+This macro is defined by the build system if the FEAT kernel is linked agains the UMFPACK library, which is part of
 the SuiteSparse library package.
 
-If defined, the LAFEM subsystem of the FEAST kernel will implement the "LAFEM::Umfpack" solver class.
+If defined, the LAFEM subsystem of the FEAT kernel will implement the "LAFEM::Umfpack" solver class.
 
 \note The Visual Studio build system detects whether an UMFPACK library suitable for the current build-id
-has been compiled and linked. If so, it will define the FEAST_HAVE_UMFPACK macro automatically.
+has been compiled and linked. If so, it will define the FEAT_HAVE_UMFPACK macro automatically.
 
 <hr>
-\subsection ppm_feast_mpi FEAST_MPI
-This macro is defined by the build system if the FEAST kernel is linked against a MPI library.
+\subsection ppm_feat_mpi FEAT_MPI
+This macro is defined by the build system if the FEAT kernel is linked against a MPI library.
 
 <hr><hr>
 \section preproc_sec_user_def User-Defineable Macros
 This section enlists miscellaneous macros that can be defined by the user via the build-system to affect various parts
-of the FEAST kernel.
+of the FEAT kernel.
 
 <hr>
-\subsection ppm_feast_index_ull FEAST_INDEX_ULL
-This macro can be defined to affect the definition of the <c>FEAST::Index</c> data type in the kernel base-header.
+\subsection ppm_feat_index_ull FEAT_INDEX_ULL
+This macro can be defined to affect the definition of the <c>FEAT::Index</c> data type in the kernel base-header.
 
 <b>Effects:</b><br>
-If undefined, <c>FEAST::Index</c> is a typedef for <c>unsigned long</c>.<br>
-If defined, <c>FEAST::Index</c> is a typedef for <c>unsigned long long</c>.
+If undefined, <c>FEAT::Index</c> is a typedef for <c>unsigned long</c>.<br>
+If defined, <c>FEAT::Index</c> is a typedef for <c>unsigned long long</c>.
 
 <hr>
-\subsection ppm_feast_no_config FEAST_NO_CONFIG
+\subsection ppm_feat_no_config FEAT_NO_CONFIG
 This macro can be defined to avoid config-header inclusion in the kernel base-header.
 
 \note This macro is automatically defined by the Visual Studio build system.
 
 <b>Effects:</b><br>
-If undefined, the kernel base-header will include the header <code>feast_config.hpp</code> from the FEAST root directory
+If undefined, the kernel base-header will include the header <code>feat_config.hpp</code> from the FEAT root directory
 at the beginning of the file.
 
 <hr>
-\subsection ppm_feast_stdc_assert FEAST_STDC_ASSERT
+\subsection ppm_feat_stdc_assert FEAT_STDC_ASSERT
 If this macro is defined, the \c ASSERT macro is defined to call the \c assert macro from the standard C libary.
 
 Depending on the compiler and its corresponding runtime library, the standard \c assert macro can trigger a breakpoint
@@ -276,19 +276,19 @@ from within the debugger directly.
 Visual Studio debugger to a program which fired an assertion.
 
 <hr>
-\subsection ppm_feast_unroll_banded FEAST_UNROLL_BANDED
+\subsection ppm_feat_unroll_banded FEAT_UNROLL_BANDED
 This macro can be defined to enable loop unrolling of the SparseMatrixBanded kernels via template meta programming.
 
 <hr><hr>
 \section preproc_sec_misc Miscellaneous Macros
 This section enlists various macros which do not fit into any other section.
 
-\subsection ppm_feast_warnings FEAST_DISABLE_WARNINGS / FEAST_RESTORE_WARNINGS
+\subsection ppm_feat_warnings FEAT_DISABLE_WARNINGS / FEAT_RESTORE_WARNINGS
 This macro pair can be used to modify the compiler's diagnostics settings to suppress warnings for the inclusion of
 third-party header includes.
 
 \attention This macro pair is meant only for third-party includes and shall \b not be used to suppress warning arising
-from FEAST code!
+from FEAT code!
 
 \note This macro pair may not be supported by all compilers. Furthermore, some warnings cannot be disabled, so there is
 no guarantee that the compiler will remain quiet even if this macro pair is in use.
@@ -298,13 +298,13 @@ no guarantee that the compiler will remain quiet even if this macro pair is in u
 #include <kernel/base_header.hpp>
 
 // suppress warnings for third-party header
-FEAST_DISABLE_WARNINGS
+FEAT_DISABLE_WARNINGS
 
 // include third-party header producing compiler warnings
 #include <thirdparty/some_library/wicked_header.h>
 
 // restore previous diagnostics settings
-FEAST_RESTORE_WARNINGS
+FEAT_RESTORE_WARNINGS
 
 // ...
 \endcode

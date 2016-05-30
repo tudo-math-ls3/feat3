@@ -10,7 +10,7 @@
 
 #include <stack>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -994,6 +994,6 @@ namespace FEAST
     }; // class PointstarFactoryFD2
 
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_POINTSTAR_FACTORY_HPP

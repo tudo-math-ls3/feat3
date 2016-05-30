@@ -2,13 +2,13 @@
 #ifndef KERNEL_GEOMETRY_INTERN_STANDARD_INDEX_REFINER_HPP
 #define KERNEL_GEOMETRY_INTERN_STANDARD_INDEX_REFINER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/index_set.hpp>
 #include <kernel/geometry/intern/entity_counter.hpp>
 #include <kernel/geometry/intern/standard_refinement_traits.hpp>
 #include <kernel/geometry/intern/sub_index_mapping.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -3010,7 +3010,7 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 
 #endif // KERNEL_GEOMETRY_INTERN_STANDARD_INDEX_REFINER_HPP

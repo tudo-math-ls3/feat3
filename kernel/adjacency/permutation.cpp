@@ -1,8 +1,8 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/adjacency/permutation.hpp>
 #include <kernel/util/random.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Adjacency
   {
@@ -168,4 +168,4 @@ namespace FEAST
       operator()(_perm_pos);
     }
   } // namespace Adjacency
-} // namespace FEAST
+} // namespace FEAT

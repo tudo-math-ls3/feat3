@@ -2,11 +2,11 @@
 #ifndef KERNEL_LAFEM_ARCH_NORM_HPP
 #define KERNEL_LAFEM_ARCH_NORM_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -43,14 +43,14 @@ namespace FEAST
         template <typename DT_>
         static DT_ value(const DT_ * const x, const Index size)
         {
-#ifdef FEAST_BACKENDS_MKL
+#ifdef FEAT_BACKENDS_MKL
           return value_mkl(x, size);
 #else
           return value_generic(x, size);
 #endif
         }
 
-#if defined(FEAST_HAVE_QUADMATH) && !defined(__CUDACC__)
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
         static __float128 value(const __float128 * const x, const Index size)
         {
           return value_generic(x, size);
@@ -76,7 +76,7 @@ namespace FEAST
 
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #ifndef  __CUDACC__
 #include <kernel/lafem/arch/norm_generic.hpp>

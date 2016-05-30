@@ -1,11 +1,11 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/arch/norm.hpp>
 
 #include <mkl.h>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 float Norm2<Mem::Main>::value_mkl(const float * const x, const Index size)
 {

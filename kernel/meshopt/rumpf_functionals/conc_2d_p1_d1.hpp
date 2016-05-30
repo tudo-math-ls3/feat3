@@ -5,7 +5,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Meshopt
   {
@@ -79,6 +79,6 @@ namespace FEAST
     }; // class RumpfFunctionalConc
     /// \endcond
   } // namespace Meshopt
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_RUMPF_FUNCTIONAL_CONC_2D_P1_HPP

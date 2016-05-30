@@ -2,12 +2,12 @@
 #ifndef KERNEL_GEOMETRY_STRUCTURED_MESH_HPP
 #define KERNEL_GEOMETRY_STRUCTURED_MESH_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/factory.hpp>
 #include <kernel/geometry/struct_index_set.hpp>
 #include <kernel/geometry/intern/structured_vertex_refiner.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -368,6 +368,6 @@ namespace FEAST
       }
     }; // class StandardRefinery<StructuredMesh<...>>
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_STRUCTURED_MESH_HPP

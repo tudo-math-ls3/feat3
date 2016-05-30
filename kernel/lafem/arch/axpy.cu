@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
@@ -11,7 +11,7 @@
 
 #include "cusparse_v2.h"
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -155,9 +155,9 @@ namespace FEAST
 }
 
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
 void Axpy<Mem::CUDA>::dv(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
@@ -168,8 +168,8 @@ void Axpy<Mem::CUDA>::dv(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * 
   block.x = blocksize;
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_axpy<<<grid, block>>>(r, a, x, y, size);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_axpy<<<grid, block>>>(r, a, x, y, size);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -189,8 +189,8 @@ void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ *
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_axpy_mv_csr<<<grid, block>>>(r, a, x, y, val, col_ind, row_ptr, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_axpy_mv_csr<<<grid, block>>>(r, a, x, y, val, col_ind, row_ptr, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -211,7 +211,7 @@ void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ *
     cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
     DT_ one(1);
-    FEAST::LAFEM::Intern::cusparse_axpy_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
+    FEAT::LAFEM::Intern::cusparse_axpy_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
 
     cusparseDestroyMatDescr(descr);
   }
@@ -225,12 +225,12 @@ void Axpy<Mem::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ *
     cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
     DT_ one(1);
-    FEAST::LAFEM::Intern::cusparse_axpy_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
+    FEAT::LAFEM::Intern::cusparse_axpy_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
 
     cusparseDestroyMatDescr(descr);
   }
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -251,7 +251,7 @@ void Axpy<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, con
     cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
     DT_ one(1);
-    FEAST::LAFEM::Intern::cusparse_axpy_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+    FEAT::LAFEM::Intern::cusparse_axpy_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
         blocksize, x, &one, r);
 
     cusparseDestroyMatDescr(descr);
@@ -266,13 +266,13 @@ void Axpy<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ a, const DT_ * const x, con
     cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
     DT_ one(1);
-    FEAST::LAFEM::Intern::cusparse_axpy_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+    FEAT::LAFEM::Intern::cusparse_axpy_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
         blocksize, x, &one, r);
 
     cusparseDestroyMatDescr(descr);
   }
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -291,8 +291,8 @@ void Axpy<Mem::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ *
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_axpy_mv_ell<<<grid, block>>>(r, a, x, y, val, col_ind, cs, cl, rows, C);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_axpy_mv_ell<<<grid, block>>>(r, a, x, y, val, col_ind, cs, cl, rows, C);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -313,7 +313,7 @@ void Axpy<Mem::CUDA>::banded(DT_ * r, const DT_ * const y, const DT_ alpha, cons
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_axpy_banded<<<grid, block>>>(r, alpha, x, y, val, offsets, num_of_offsets, rows, columns);
+  FEAT::LAFEM::Intern::cuda_axpy_banded<<<grid, block>>>(r, alpha, x, y, val, offsets, num_of_offsets, rows, columns);
 }
 template void Axpy<Mem::CUDA>::banded(float *, const float * const, const float, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
 template void Axpy<Mem::CUDA>::banded(double *, const double * const, const double, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);

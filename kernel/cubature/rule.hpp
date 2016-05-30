@@ -2,13 +2,13 @@
 #ifndef KERNEL_CUBATURE_RULE_HPP
 #define KERNEL_CUBATURE_RULE_HPP
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/shape.hpp>
 
 // includes, system
 #include <utility> // for std::move
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Cubature namespace
@@ -188,6 +188,6 @@ namespace FEAST
       }
     }; // class Rule<...>
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_RULE_HPP

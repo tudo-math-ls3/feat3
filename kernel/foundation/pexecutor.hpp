@@ -7,13 +7,13 @@
 #include<kernel/util/comm_base.hpp>
 #include<kernel/foundation/pgraph.hpp>
 
-#ifdef FEAST_HAVE_PARMETIS
-FEAST_DISABLE_WARNINGS
+#ifdef FEAT_HAVE_PARMETIS
+FEAT_DISABLE_WARNINGS
 #include<parmetis.h>
-FEAST_RESTORE_WARNINGS
+FEAT_RESTORE_WARNINGS
 #endif
 
-namespace FEAST
+namespace FEAT
 {
   namespace Foundation
   {
@@ -360,7 +360,7 @@ namespace FEAST
 #endif
 
 
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
     template<typename Mode_>
     class PExecutorParmetis : public PExecutorBase<idx_t>
     {

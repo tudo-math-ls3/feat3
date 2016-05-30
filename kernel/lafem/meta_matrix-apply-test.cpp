@@ -1,9 +1,9 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/meta_matrix_test_base.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Meta-Matrix apply test class
@@ -109,7 +109,7 @@ public:
 
 MetaMatrixApplyTest<Mem::Main, float, Index> meta_matrix_apply_test_generic_float;
 MetaMatrixApplyTest<Mem::Main, double, Index> meta_matrix_apply_test_generic_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 MetaMatrixApplyTest<Mem::CUDA, float, Index> meta_matrix_apply_test_cuda_float;
 MetaMatrixApplyTest<Mem::CUDA, double, Index> meta_matrix_apply_test_cuda_double;
 #endif

@@ -7,9 +7,9 @@
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 template<
   typename PSF_,
@@ -57,7 +57,7 @@ RichardsonTest<PointstarFactoryFD<double>, SparseMatrixCSR<Mem::Main, double> > 
 RichardsonTest<PointstarFactoryFE<double>, SparseMatrixCSR<Mem::Main, double> > csr_fe_richardson_test_double;
 RichardsonTest<PointstarFactoryFD<double>, SparseMatrixELL<Mem::Main, double> > ell_fd_richardson_test_double;
 RichardsonTest<PointstarFactoryFE<double>, SparseMatrixELL<Mem::Main, double> > ell_fe_richardson_test_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 RichardsonTest<PointstarFactoryFD<double>, SparseMatrixCSR<Mem::CUDA, double> > cuda_csr_fd_richardson_test_double;
 RichardsonTest<PointstarFactoryFE<double>, SparseMatrixCSR<Mem::CUDA, double> > cuda_csr_fe_richardson_test_double;
 RichardsonTest<PointstarFactoryFD<double>, SparseMatrixELL<Mem::CUDA, double> > cuda_ell_fd_richardson_test_double;

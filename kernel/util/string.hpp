@@ -2,7 +2,7 @@
 #ifndef KERNEL_UTIL_STRING_HPP
 #define KERNEL_UTIL_STRING_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 
 // includes, system
@@ -13,20 +13,20 @@
 #include <iomanip>
 #include <cstddef>
 
-#ifdef FEAST_COMPILER_MICROSOFT
+#ifdef FEAT_COMPILER_MICROSOFT
 #  include <string.h> // for _stricmp
 #endif
 
 #ifndef __CUDACC__
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 extern "C"
 {
 #    include <quadmath.h>
 }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 #endif // __CUDACC__
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief String class implementation.
@@ -623,7 +623,7 @@ namespace FEAST
       str.reserve(size());
       for(const_iterator it(begin()); it != end(); ++it)
       {
-#ifdef FEAST_COMPILER_MICROSOFT
+#ifdef FEAT_COMPILER_MICROSOFT
         str.push_back(std::toupper(*it, std::locale::classic()));
 #else
         std::locale loc;
@@ -645,7 +645,7 @@ namespace FEAST
       str.reserve(size());
       for(const_iterator it(begin()); it != end(); ++it)
       {
-#ifdef FEAST_COMPILER_MICROSOFT
+#ifdef FEAT_COMPILER_MICROSOFT
         str.push_back(std::tolower(*it, std::locale::classic()));
 #else
         std::locale loc;
@@ -668,7 +668,7 @@ namespace FEAST
      */
     int compare_no_case(const String& other) const
     {
-#ifdef FEAST_COMPILER_MICROSOFT
+#ifdef FEAT_COMPILER_MICROSOFT
       // The MS C library offers a function for this task.
       return _stricmp(c_str(), other.c_str());
 #else
@@ -831,7 +831,7 @@ namespace FEAST
     }
 
 #ifndef __CUDACC__
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     bool parse(__float128& x) const
     {
       if(this->empty())
@@ -845,7 +845,7 @@ namespace FEAST
       // hope that the quadmath function for __float128 honors this convention...
       return (nptr != endptr);
     }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 #endif // __CUDACC__
     /// \endcond
 
@@ -979,7 +979,7 @@ namespace FEAST
     return String("nullptr");
   }
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
   inline String stringify(__float128 value)
   {
     // get buffer length
@@ -991,7 +991,7 @@ namespace FEAST
     // convert buffer to string
     return String(buffer.data());
   }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 #endif // __CUDACC__
   /// \endcond
 
@@ -1003,7 +1003,7 @@ namespace FEAST
    * i.e. either \c float, \c double or <c>long double</c>.
    *
    * \note
-   * There exists an overload of this function for the \c __float128 data type if FEAST is
+   * There exists an overload of this function for the \c __float128 data type if FEAT is
    * configured and build with support for the \c quadmath library.
    *
    * \param[in] value
@@ -1048,7 +1048,7 @@ namespace FEAST
    * i.e. either \c float, \c double or <c>long double</c>.
    *
    * \note
-   * There exists an overload of this function for the \c __float128 data type if FEAST is
+   * There exists an overload of this function for the \c __float128 data type if FEAT is
    * configured and build with support for the \c quadmath library.
    *
    * \param[in] value
@@ -1086,7 +1086,7 @@ namespace FEAST
   }
 
 #ifndef __CUDACC__
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
   inline String stringify_fp_sci(__float128 value, int precision = 0, int width = 0, bool sign = false)
   {
     String format("%");
@@ -1151,23 +1151,23 @@ namespace FEAST
     }
     return is;
   }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 #endif // __CUDACC__
-} // namespace FEAST
+} // namespace FEAT
 
 // operator<<(__float128) must reside in the std namespace because gcc/icc search the namespace of ostream for a fitting op<< first
 // and would otherwise only find op<< with conversions of __float128 to int/double/long etc, which would lead to ambigue overloads, too.
 #ifndef __CUDACC__
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 namespace std
 {
   inline std::ostream& operator<<(std::ostream& os, __float128 x)
   {
     // write to stream
-    return (os << FEAST::stringify(x));
+    return (os << FEAT::stringify(x));
   }
 }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 #endif // __CUDACC__
 
 #endif // KERNEL_UTIL_STRING_HPP

@@ -13,7 +13,7 @@
 
 #include <vector>
 
-using namespace FEAST;
+using namespace FEAT;
 
 template<typename SpaceType_>
 void dump_basis(String vtk_name, Index num_refines = 5);

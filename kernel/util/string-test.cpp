@@ -1,8 +1,8 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/string.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the String class.

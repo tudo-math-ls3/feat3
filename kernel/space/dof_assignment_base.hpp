@@ -2,17 +2,17 @@
 #ifndef KERNEL_SPACE_DOF_ASSIGNMENT_BASE_HPP
 #define KERNEL_SPACE_DOF_ASSIGNMENT_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
     /**
      * \brief Mapping of mesh entities to FE basis functions associated with them.
      *
-     * In FEAST, every FE basis function is associated with mesh entities of exactly one shape dimension, i.e.
+     * In FEAT, every FE basis function is associated with mesh entities of exactly one shape dimension, i.e.
      * vertices, facets or cells. The DofMapping maps a mesh cell (meaning only the highest-dimensional entities of
      * a mesh) to a set of basis functions with nonempty support on that cell. It does, however, not contain any
      * information about which entities of that cell are associated with which basis function. This is done by the
@@ -182,6 +182,6 @@ namespace FEAST
       }
     };
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_DOF_ASSIGNMENT_BASE_HPP

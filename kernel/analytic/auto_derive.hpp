@@ -2,13 +2,13 @@
 #ifndef KERNEL_ANALYTIC_AUTO_DERIVE_HPP
 #define KERNEL_ANALYTIC_AUTO_DERIVE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/analytic/function.hpp>
 
 // includes, system
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Analytic
   {
@@ -486,6 +486,6 @@ namespace FEAST
       }
     }; // class AutoDerive<...>
   } // namespace Analytic
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ANALYTIC_AUTO_DERIVE_HPP

@@ -1,7 +1,7 @@
 import platform
 import sys
-from build_system.feast_util import get_output
-from build_system.feast_util import find_exe
+from build_system.feat_util import get_output
+from build_system.feat_util import find_exe
 
 def configure_gcc(cpu, buildid, compiler):
   version = get_output(compiler + " -dM -E - ")

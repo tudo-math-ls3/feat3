@@ -2,10 +2,10 @@
 #ifndef KERNEL_ASSEMBLY_BILINEAR_OPERATOR_HPP
 #define KERNEL_ASSEMBLY_BILINEAR_OPERATOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -103,6 +103,6 @@ namespace FEAST
       }; // class BilinearOperator::Evaluator<...>
     }; // class BilinearOperator
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_BILINEAR_OPERATOR_HPP

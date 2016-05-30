@@ -31,8 +31,8 @@
 
 namespace MatrixCond
 {
-  using namespace FEAST;
-  using namespace FEAST::LAFEM;
+  using namespace FEAT;
+  using namespace FEAT::LAFEM;
 
   typedef Mem::Main MemType;
   typedef double DataType;

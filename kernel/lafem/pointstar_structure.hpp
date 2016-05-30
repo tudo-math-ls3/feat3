@@ -8,7 +8,7 @@
 
 #include <stack>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -158,6 +158,6 @@ namespace FEAST
     }; // struct PointstarStructureFD
 
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_POINTSTAR_STRUCTURE_HPP

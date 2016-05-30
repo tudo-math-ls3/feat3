@@ -1,13 +1,13 @@
 #pragma once
-#ifndef FEAST_KERNEL_GEOMETRY_INTERN_FACET_NEIGHBOURS_HPP
-#define FEAST_KERNEL_GEOMETRY_INTERN_FACET_NEIGHBOURS_HPP 1
+#ifndef FEAT_KERNEL_GEOMETRY_INTERN_FACET_NEIGHBOURS_HPP
+#define FEAT_KERNEL_GEOMETRY_INTERN_FACET_NEIGHBOURS_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -100,6 +100,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
-#endif // FEAST_KERNEL_GEOMETRY_INTERN_FACET_NEIGHBOURS_HPP
+#endif // FEAT_KERNEL_GEOMETRY_INTERN_FACET_NEIGHBOURS_HPP

@@ -2,10 +2,10 @@
 #ifndef KERNEL_CUBATURE_SCALAR_DYNAMIC_FACTORY_HPP
 #define KERNEL_CUBATURE_SCALAR_DYNAMIC_FACTORY_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/scalar/factory_wrapper.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -72,6 +72,6 @@ namespace FEAST
       }; // class DynamicFactory
     } // namespace Scalar
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_SCALAR_DYNAMIC_FACTORY_HPP

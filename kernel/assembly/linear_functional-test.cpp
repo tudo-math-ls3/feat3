@@ -9,8 +9,8 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/math.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 template<typename DataType_>
 class LinearFunctionalTest :

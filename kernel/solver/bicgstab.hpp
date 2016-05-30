@@ -2,10 +2,10 @@
 #ifndef KERNEL_SOLVER_BICGSTAB_HPP
 #define KERNEL_SOLVER_BICGSTAB_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/iterative.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -320,7 +320,7 @@ namespace FEAST
      * A shared pointer to a new BiCGStab object.
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const Matrix_& matrix, const Filter_& filter)
@@ -344,6 +344,6 @@ namespace FEAST
     }
 #endif
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_BICGSTAB_HPP

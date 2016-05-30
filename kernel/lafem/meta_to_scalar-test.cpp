@@ -15,9 +15,9 @@
 #include <kernel/lafem/meta_matrix_test_base.hpp>
 #include <kernel/util/random.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 
 /**
@@ -144,7 +144,7 @@ MetaToScalarTest<SparseMatrixELL<Mem::Main, double, unsigned int> > cpu_meta_mat
 MetaToScalarTest<SparseMatrixELL<Mem::Main, float, unsigned long> > cpu_meta_matrix_to_ell_test_generic_float_ulong;
 MetaToScalarTest<SparseMatrixELL<Mem::Main, double, unsigned long> > cpu_meta_matrix_to_ell_test_generic_double_ulong;
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 MetaToScalarTest<SparseMatrixCOO<Mem::Main, __float128, unsigned int> > cpu_meta_matrix_to_coo_test_generic_float128_uint;
 MetaToScalarTest<SparseMatrixCOO<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_coo_test_generic_float128_ulong;
 
@@ -155,7 +155,7 @@ MetaToScalarTest<SparseMatrixELL<Mem::Main, __float128, unsigned int> > cpu_meta
 MetaToScalarTest<SparseMatrixELL<Mem::Main, __float128, unsigned long> > cpu_meta_matrix_to_ell_test_generic_float128_ulong;
 #endif
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 // MetaToScalarTest<SparseMatrixCOO<Mem::CUDA, float, unsigned int> > cuda_meta_matrix_to_coo_test_generic_float_uint;
 // MetaToScalarTest<SparseMatrixCOO<Mem::CUDA, double, unsigned int> > cuda_meta_matrix_to_coo_test_generic_double_uint;
 // MetaToScalarTest<SparseMatrixCOO<Mem::CUDA, float, unsigned long> > cuda_meta_matrix_to_coo_test_generic_float_ulong;
@@ -182,7 +182,7 @@ MetaToScalarTest<SparseMatrixELL<Mem::CUDA, double, unsigned long> > cuda_meta_m
  */
 template<typename MT_>
 class MetaBCSRToScalarTest
-  : public FEAST::TestSystem::FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>
+  : public FEAT::TestSystem::FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>
 {
 public:
   typedef typename MT_::DataType DataType;
@@ -192,7 +192,7 @@ public:
   typedef IndexType IT_;
 
   MetaBCSRToScalarTest()
-    : FEAST::TestSystem::FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>("meta_block_csr_to_scalar_test: " + MT_::name()) {}
+    : FEAT::TestSystem::FullTaggedTest<typename MT_::MemType, typename MT_::DataType, typename MT_::IndexType>("meta_block_csr_to_scalar_test: " + MT_::name()) {}
 
   virtual void run() const override
   {
@@ -273,7 +273,7 @@ MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, double, unsigned int> > cpu_meta
 MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, float, unsigned long> > cpu_meta_bcsr_matrix_to_ell_test_generic_float_ulong;
 MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, double, unsigned long> > cpu_meta_bcsr_matrix_to_ell_test_generic_double_ulong;
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 MetaBCSRToScalarTest<SparseMatrixCOO<Mem::Main, __float128, unsigned int> > cpu_meta_bcsr_matrix_to_coo_test_generic_float128_uint;
 MetaBCSRToScalarTest<SparseMatrixCOO<Mem::Main, __float128, unsigned long> > cpu_meta_bcsr_matrix_to_coo_test_generic_float128_ulong;
 
@@ -284,7 +284,7 @@ MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, __float128, unsigned int> > cpu_
 MetaBCSRToScalarTest<SparseMatrixELL<Mem::Main, __float128, unsigned long> > cpu_meta_bcsr_matrix_to_ell_test_generic_float128_ulong;
 #endif
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 // MetaBCSRToScalarTest<SparseMatrixCOO<Mem::CUDA, float, unsigned int> > cuda_meta_bcsr_matrix_to_coo_test_generic_float_uint;
 // MetaBCSRToScalarTest<SparseMatrixCOO<Mem::CUDA, double, unsigned int> > cuda_meta_bcsr_matrix_to_coo_test_generic_double_uint;
 // MetaBCSRToScalarTest<SparseMatrixCOO<Mem::CUDA, float, unsigned long> > cuda_meta_bcsr_matrix_to_coo_test_generic_float_ulong;
@@ -449,12 +449,12 @@ VecMetaToScalarTest<Mem::Main, float, unsigned long> cpu_vec_meta_to_scalar_test
 VecMetaToScalarTest<Mem::Main, double, unsigned int> cpu_vec_meta_to_scalar_test_generic_double_uint;
 VecMetaToScalarTest<Mem::Main, double, unsigned long> cpu_vec_meta_to_scalar_test_generic_double_ulong;
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 VecMetaToScalarTest<Mem::Main, __float128, unsigned int> cpu_vec_meta_to_scalar_test_generic_float128_uint;
 VecMetaToScalarTest<Mem::Main, __float128, unsigned long> cpu_vec_meta_to_scalar_test_generic_float128_ulong;
 #endif
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 VecMetaToScalarTest<Mem::CUDA, float, unsigned int> cuda_vec_meta_to_scalar_test_generic_float_uint;
 VecMetaToScalarTest<Mem::CUDA, float, unsigned long> cuda_vec_meta_to_scalar_test_generic_float_ulong;
 VecMetaToScalarTest<Mem::CUDA, double, unsigned int> cuda_vec_meta_to_scalar_test_generic_double_uint;

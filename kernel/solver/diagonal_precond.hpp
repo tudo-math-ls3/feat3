@@ -2,10 +2,10 @@
 #ifndef KERNEL_SOLVER_DIAGONAL_PRECOND_HPP
 #define KERNEL_SOLVER_DIAGONAL_PRECOND_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -80,6 +80,6 @@ namespace FEAST
       return std::make_shared<DiagonalPrecond<Vector_, Filter_>>(diag, filter);
     }
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_DIAGONAL_PRECOND_HPP

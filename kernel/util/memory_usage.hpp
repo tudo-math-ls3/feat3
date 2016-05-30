@@ -2,11 +2,11 @@
 #ifndef KERNEL_UTIL_MEMORY_USAGE_HPP
 #define KERNEL_UTIL_MEMORY_USAGE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Util
   {
@@ -42,7 +42,7 @@ namespace FEAST
      *
      * \note This method only works on *ix systems, by parsing /proc/self/status.
      *
-     * \note Backport from FEAST 1 feast1/feast/kernel/arch/sysextra.c 3ccb13f633
+     * \note Backport from FEAT 1 feat1/feat/kernel/arch/sysextra.c 3ccb13f633
      *       and http://stackoverflow.com/questions/1558402/memory-usage-of-current-process-in-c
      *
      */
@@ -51,6 +51,6 @@ namespace FEAST
     /// Retrieve formated memory usage string
     String get_formated_memory_usage();
   } // namespace Util
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_MEMORY_USAGE_HPP

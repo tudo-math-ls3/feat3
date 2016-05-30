@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_RICHARDSON_HPP
 #define KERNEL_LAFEM_RICHARDSON_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
@@ -12,7 +12,7 @@
 
 
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -52,6 +52,6 @@ namespace FEAST
     };
 
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_RICHARDSON_HPP

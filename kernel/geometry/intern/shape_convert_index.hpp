@@ -2,12 +2,12 @@
 #ifndef KERNEL_GEOMETRY_INTERN_SHAPE_CONVERT_INDEX_HPP
 #define KERNEL_GEOMETRY_INTERN_SHAPE_CONVERT_INDEX_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/index_set.hpp>
 #include <kernel/geometry/intern/shape_convert_traits.hpp>
 #include <kernel/geometry/intern/entity_counter.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -1529,6 +1529,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_INTERN_SHAPE_CONVERT_INDEX_HPP

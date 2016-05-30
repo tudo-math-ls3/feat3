@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/adjacency/colouring.hpp>
 #include <kernel/adjacency/graph.hpp>
 
@@ -6,7 +6,7 @@
 #include <vector>
 #include <utility>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Adjacency
   {
@@ -313,4 +313,4 @@ namespace FEAST
     }
 
   } // namespace Adjacency
-} // namespace FEAST
+} // namespace FEAT

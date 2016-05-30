@@ -2,11 +2,11 @@
 #ifndef KERNEL_GEOMETRY_STANDARD_VERTEX_REFINER_HPP
 #define KERNEL_GEOMETRY_STANDARD_VERTEX_REFINER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/intern/vertex_abacus.hpp>
 #include <kernel/geometry/intern/standard_refinement_traits.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -322,6 +322,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_STANDARD_VERTEX_REFINER_HPP

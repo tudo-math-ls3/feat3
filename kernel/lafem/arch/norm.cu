@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/norm.hpp>
@@ -8,7 +8,7 @@
 // includes, CUDA
 #include <cublas_v2.h>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -37,15 +37,15 @@ namespace FEAST
   }
 }
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
 DT_ Norm2<Mem::CUDA>::value(const DT_ * const x, const Index size)
 {
   DT_ result = Intern::cuda_norm2(x, size);
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

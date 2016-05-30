@@ -2,10 +2,10 @@
 #ifndef KERNEL_TRAFO_MAPPING_BASE_HPP
 #define KERNEL_TRAFO_MAPPING_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/trafo/evaluator_base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Trafo
   {
@@ -115,6 +115,6 @@ namespace FEAST
       }
     }; // class MappingBase<...>
   } // namespace Trafo
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_TRAFO_MAPPING_BASE_HPP

@@ -29,7 +29,7 @@
 
 namespace PoissonNeumann2D
 {
-  using namespace FEAST;
+  using namespace FEAT;
 
   template<typename Space_>
   class PoissonNeumannAssemblerLevel :
@@ -441,7 +441,7 @@ namespace PoissonNeumann2D
     int nprocs = 0;
 
     // initialise
-    FEAST::Runtime::initialise(argc, argv, rank, nprocs);
+    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifndef SERIAL
     if (rank == 0)
     {
@@ -469,7 +469,7 @@ namespace PoissonNeumann2D
           std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
       }
       // abort
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
 
     // define our mesh type
@@ -480,7 +480,7 @@ namespace PoissonNeumann2D
     int lvl_min = 0;
     args.parse("level", lvl_max, lvl_min);
 
-    FEAST::String mem_string = "main";
+    FEAT::String mem_string = "main";
     args.parse("mem", mem_string);
 
 #ifndef DEBUG
@@ -504,7 +504,7 @@ namespace PoissonNeumann2D
       {
         run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(rank, nprocs, args, domain);
       }
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
       else if(mem_string == "cuda")
       {
         run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(rank, nprocs, args, domain);
@@ -535,17 +535,17 @@ namespace PoissonNeumann2D
     catch (const std::exception& exc)
     {
       std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
     catch (...)
     {
       std::cerr << "ERROR: unknown exception" << std::endl;
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
 #endif // DEBUG
 
     // okay
-    return FEAST::Runtime::finalise();
+    return FEAT::Runtime::finalise();
   }
 } // namespace PoissonNeumann2D
 

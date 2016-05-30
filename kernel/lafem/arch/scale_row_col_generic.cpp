@@ -1,7 +1,7 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/arch/scale_row_col.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -38,4 +38,4 @@ namespace FEAST
       template void ScaleCols<Mem::Main>::ell_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT

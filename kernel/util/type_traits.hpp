@@ -2,10 +2,10 @@
 #ifndef KERNEL_UTIL_TYPE_TRAITS_HPP
 #define KERNEL_UTIL_TYPE_TRAITS_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/string.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Type namespace
@@ -433,7 +433,7 @@ namespace FEAST
       }
     };
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     /**
      * \brief Type Traits specialisation for <c>__float128</c>
      *
@@ -460,8 +460,8 @@ namespace FEAST
         return "__float128";
       }
     };
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
   } // namespace Type
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_TYPE_TRAITS_HPP

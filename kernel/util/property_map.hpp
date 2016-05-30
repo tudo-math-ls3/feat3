@@ -2,14 +2,14 @@
 #ifndef KERNEL_UTIL_PROPERTY_MAP_HPP
 #define KERNEL_UTIL_PROPERTY_MAP_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/file_error.hpp>
 
 // includes, system
 #include <iostream>
 #include <map>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief A class organising a tree of key-value pairs
@@ -389,6 +389,6 @@ namespace FEAST
      */
     void dump(std::ostream& os, String::size_type indent = 0) const;
   }; // class PropertyMap
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_PROPERTY_MAP_HPP

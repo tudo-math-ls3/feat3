@@ -2,11 +2,11 @@
 #ifndef KERNEL_CUBATURE_TENSOR_PRODUCT_FACTORY_HPP
 #define KERNEL_CUBATURE_TENSOR_PRODUCT_FACTORY_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/scalar/driver_factory.hpp>
 #include <kernel/cubature/rule.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -124,11 +124,11 @@ namespace FEAST
         const Scalar::Rule<Weight_, Coord_>& scalar_rule)
       {
         int num_points = TensorProductDriverType::count(scalar_rule.get_num_points());
-#ifdef FEAST_CUBATURE_TENSOR_PREFIX
+#ifdef FEAT_CUBATURE_TENSOR_PREFIX
         rule = Rule<Shape_, Weight_, Coord_, Point_>(num_points, "tensor:" + scalar_rule.get_name());
 #else
         rule = Rule<Shape_, Weight_, Coord_, Point_>(num_points, scalar_rule.get_name());
-#endif // FEAST_CUBATURE_TENSOR_PREFIX
+#endif // FEAT_CUBATURE_TENSOR_PREFIX
         TensorProductDriverType::fill(rule, scalar_rule);
       }
 
@@ -142,7 +142,7 @@ namespace FEAST
       {
         typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
 
-#ifdef FEAST_CUBATURE_TENSOR_PREFIX
+#ifdef FEAT_CUBATURE_TENSOR_PREFIX
         // try to find a colon within the string
         String::size_type k = name.find_first_of(':');
         if(k == name.npos)
@@ -165,7 +165,7 @@ namespace FEAST
         ScalarRuleType scalar_rule;
         if(!ScalarFactoryType::create(scalar_rule, name))
           return false;
-#endif // FEAST_CUBATURE_TENSOR_PREFIX
+#endif // FEAT_CUBATURE_TENSOR_PREFIX
 
         // convert scalar rule
         create(rule, scalar_rule);
@@ -174,27 +174,27 @@ namespace FEAST
 
       static String name()
       {
-#ifdef FEAST_CUBATURE_TENSOR_PREFIX
+#ifdef FEAT_CUBATURE_TENSOR_PREFIX
         return "tensor:" + ScalarFactoryType::name();
 #else
         return ScalarFactoryType::name();
-#endif // FEAST_CUBATURE_TENSOR_PREFIX
+#endif // FEAT_CUBATURE_TENSOR_PREFIX
       }
 
       template<typename Functor_>
       static void alias(Functor_& functor)
       {
-#ifdef FEAST_CUBATURE_TENSOR_PREFIX
+#ifdef FEAT_CUBATURE_TENSOR_PREFIX
         AliasTensorPrefixFunctor<Functor_> prefix_functor(functor);
         ScalarFactoryType::alias(prefix_functor);
 #else
         ScalarFactoryType::alias(functor);
-#endif // FEAST_CUBATURE_TENSOR_PREFIX
+#endif // FEAT_CUBATURE_TENSOR_PREFIX
       }
 
       /// \cond internal
     private:
-#ifdef FEAST_CUBATURE_TENSOR_PREFIX
+#ifdef FEAT_CUBATURE_TENSOR_PREFIX
       template<typename Functor_>
       class AliasTensorPrefixFunctor
       {
@@ -217,7 +217,7 @@ namespace FEAST
           _functor.alias("tensor:" + name, num_points);
         }
       };
-#endif // FEAST_CUBATURE_TENSOR_PREFIX
+#endif // FEAT_CUBATURE_TENSOR_PREFIX
       /// \endcond
     };
 
@@ -302,6 +302,6 @@ namespace FEAST
       }
     };
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_TENSOR_PRODUCT_FACTORY_HPP

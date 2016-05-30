@@ -2,10 +2,10 @@
 #ifndef KERNEL_TRAFO_EVAL_DATA_HPP
 #define KERNEL_TRAFO_EVAL_DATA_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/trafo/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Trafo
   {
@@ -52,6 +52,6 @@ namespace FEAST
       static constexpr TrafoTags config = cfg_tags_;
     }; // class EvalData<...>
   } // namespace Trafo
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_TRAFO_EVAL_DATA_HPP

@@ -2,7 +2,7 @@
 #ifndef KERNEL_ANALYTIC_COMMON_HPP
 #define KERNEL_ANALYTIC_COMMON_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/analytic/static_wrapper.hpp>
 #include <kernel/util/math.hpp>
 
@@ -10,7 +10,7 @@
 #include <initializer_list>
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Analytic
   {
@@ -1855,6 +1855,6 @@ namespace FEAST
       using RosenbrockFunction = StaticWrapperFunction<2, RosenbrockStatic, true, true, true>;
     } // namespace Common
   } // namespace Analytic
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ANALYTIC_COMMON_HPP

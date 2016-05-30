@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_POWER_FULL_MATRIX_HPP
 #define KERNEL_LAFEM_POWER_FULL_MATRIX_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/power_row_matrix.hpp>
 #include <kernel/lafem/power_col_matrix.hpp>
 #include <kernel/lafem/power_vector.hpp>
@@ -11,7 +11,7 @@
 
 #include <fstream>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -418,6 +418,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_POWER_FULL_MATRIX_HPP

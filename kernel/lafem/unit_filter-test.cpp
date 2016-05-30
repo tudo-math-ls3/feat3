@@ -5,9 +5,9 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/unit_filter.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for UnitFilter class template
@@ -88,7 +88,7 @@ public:
 
 UnitFilterVectorTest<Mem::Main, float, Index> unit_filter_vector_test_generic_fi;
 UnitFilterVectorTest<Mem::Main, double, Index> unit_filter_vector_test_generic_di;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 UnitFilterVectorTest<Mem::CUDA, float, Index> unit_filter_vector_test_cuda_fi;
 UnitFilterVectorTest<Mem::CUDA, double, Index> unit_filter_vector_test_cuda_di;
 #endif

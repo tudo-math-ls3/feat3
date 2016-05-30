@@ -2,8 +2,8 @@
 #include <kernel/util/math.hpp>
 #include <kernel/util/random.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the basic Math functions.
@@ -245,9 +245,9 @@ public:
 };
 
 MathTest<double> math_test_double;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 MathTest<__float128> math_test_float128;
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 
 
 /**
@@ -353,6 +353,6 @@ public:
 };
 
 MatrixInvertTest<double, unsigned int> matrix_invert_test_double_ushort;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 MatrixInvertTest<__float128, int> matrix_invert_test_float128_int;
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH

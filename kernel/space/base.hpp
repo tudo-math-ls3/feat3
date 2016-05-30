@@ -2,12 +2,12 @@
 #ifndef KERNEL_SPACE_BASE_HPP
 #define KERNEL_SPACE_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/eval_tags.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Finite Element Space namespace
@@ -116,6 +116,6 @@ namespace FEAST
       typedef Tiny::Tensor3<DataType, image_dim, image_dim, image_dim> BasisHessianType;
     }; // class StandardScalarEvalTraits<...>
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_BASE_HPP

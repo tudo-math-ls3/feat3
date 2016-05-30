@@ -2,11 +2,11 @@
 #ifndef KERNEL_SOLVER_ITERATIVE_HPP
 #define KERNEL_SOLVER_ITERATIVE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/base.hpp>
 #include <kernel/util/statistics.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -588,6 +588,6 @@ namespace FEAST
       }
     }; // class PreconditionedIterativeSolver<...>
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_ITERATIVE_HPP

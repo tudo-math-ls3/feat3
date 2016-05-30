@@ -2,11 +2,11 @@
 #ifndef KERNEL_SOLVER_PRECON_WRAPPER_HPP
 #define KERNEL_SOLVER_PRECON_WRAPPER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/base.hpp>
 #include <kernel/lafem/preconditioner.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -77,6 +77,6 @@ namespace FEAST
       }
     }; // class PreconWrapper<...>
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_PRECON_WRAPPER_HPP

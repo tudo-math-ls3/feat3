@@ -13,20 +13,20 @@ from build_system.detect_cpu import detect_cpu
 from build_system.configure_gcc import configure_gcc
 from build_system.configure_icc import configure_icc
 from build_system.configure_clang import configure_clang
-from build_system.feast_util import remove_string
-from build_system.feast_util import remove_substring
-from build_system.feast_util import is_found
-from build_system.feast_util import find_exe
-from build_system.feast_util import get_output
+from build_system.feat_util import remove_string
+from build_system.feat_util import remove_substring
+from build_system.feat_util import is_found
+from build_system.feat_util import find_exe
+from build_system.feat_util import get_output
 from build_system.thirdparty_package import *
 
 #TODO help, ? und guess nicht in sys.argv[0] suchen
 
 # output help screen
 if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.argv)):
-  print ("Usage: configure_feast [build_id]/[guess]/[help]")
+  print ("Usage: configure_feat [build_id]/[guess]/[help]")
   print ("")
-  print ("Configure FEAST and set up all necessary environment variables.")
+  print ("Configure FEAT and set up all necessary environment variables.")
   print ("You can execute the script (located in the source directory)  from any folder,")
   print ("that shall contain your object files and executables, and thus become your build directory.")
   print ("")
@@ -38,7 +38,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("")
   print ("============= EXAMPLES ==================")
   print ("")
-  print ("Let configure_feast choose suitable configuration")
+  print ("Let configure_feat choose suitable configuration")
   print ("by inspecting available tools in your $PATH:")
   print ("    %s"%sys.argv[0])
   print ("or")
@@ -50,7 +50,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("    %s gcc-mpi-opt"%sys.argv[0])
   print ("")
   print ("============== BUILD ID ====================")
-  print ("The FEAST build-id is a string of various keywords, delimited by hyphes or whitespaces")
+  print ("The FEAT build-id is a string of various keywords, delimited by hyphes or whitespaces")
   print ("It is used to choose different tools and configurations related to the build process.")
   print ("The keywords, sorted by categories are:")
   print ("  Build Mode: debug, opt, fast")
@@ -96,7 +96,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
   sys.exit()
 
-#get path to feast source trunk
+#get path to feat source trunk
 trunk_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 #clear all related
@@ -183,13 +183,13 @@ else:
 # optimisation/debug mode aka build mode selection
 if "debug" in buildid:
   remove_string(unused_tokens, "debug")
-  cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=ON"
+  cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=ON"
 elif "opt" in buildid:
   remove_string(unused_tokens, "opt")
-  cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=OFF"
+  cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=OFF"
 elif "fast" in buildid:
   remove_string(unused_tokens, "fast")
-  cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=OFF"
+  cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=OFF"
 else:
   print ("Error: No supported build mode (opt/debug/fast) found in build id:")
   print (buildid_string)
@@ -197,12 +197,12 @@ else:
 
 # parallelisation selection
 if "serial" in buildid:
-  cmake_flags += " -DFEAST_SERIAL_MODE:BOOL=ON"
+  cmake_flags += " -DFEAT_SERIAL_MODE:BOOL=ON"
   remove_string(unused_tokens, "serial")
 elif "mpi" in buildid:
   remove_string(unused_tokens, "mpi")
-  cmake_flags += " -DFEAST_SERIAL_MODE:BOOL=OFF"
-  cmake_flags += " -DFEAST_MPI:BOOL=TRUE"
+  cmake_flags += " -DFEAT_SERIAL_MODE:BOOL=OFF"
+  cmake_flags += " -DFEAT_MPI:BOOL=TRUE"
 else:
   print ("Error: No mpi statement nor serial statement found in build id:")
   print (buildid_string)
@@ -228,7 +228,7 @@ for option in extra_options:
       print ("Error: multiple system_host_compiler parameters in\n" + "\n".join(extra_options))
       exit(1)
     system_host_compiler = option.replace("--system_host_compiler=", "", 1)
-    cmake_flags += " -DFEAST_SYSTEM_HOST_COMPILER=" + system_host_compiler
+    cmake_flags += " -DFEAT_SYSTEM_HOST_COMPILER=" + system_host_compiler
 
   if option.startswith("--cuda_host_compiler="):
     if cuda_host_compiler:
@@ -255,11 +255,11 @@ for option in extra_options:
     cmake_flags += " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
 
   if option.startswith("--unroll_banded"):
-    cmake_flags += " -DFEAST_UNROLL_BANDED:BOOL=TRUE"
+    cmake_flags += " -DFEAT_UNROLL_BANDED:BOOL=TRUE"
 
 if not cputype:
   cputype = detect_cpu()
-cmake_flags += " -DFEAST_CPU_TYPE:STRING=" + cputype
+cmake_flags += " -DFEAT_CPU_TYPE:STRING=" + cputype
 
 #compiler selection
 if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
@@ -279,7 +279,7 @@ if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
   if "coverage" in buildid:
     remove_string(unused_tokens, "coverage")
     ldflags += " -fprofile-arcs -ftest-coverage"
-  cmake_flags += " -DFEAST_COMPILER_ID:STRING=gcc"
+  cmake_flags += " -DFEAT_COMPILER_ID:STRING=gcc"
 elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   if not compiler:
     compiler = "icpc"
@@ -293,7 +293,7 @@ elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   os.environ["CXX"] = compiler
   os.environ["LD"] = compiler
   cxxflags += " " + configure_icc (cputype, buildid, compiler, system_host_compiler)
-  cmake_flags += " -DFEAST_COMPILER_ID:STRING=icc"
+  cmake_flags += " -DFEAT_COMPILER_ID:STRING=icc"
 elif "clang" in buildid or "llvm" in buildid:
   if not compiler:
     compiler = "clang++"
@@ -306,7 +306,7 @@ elif "clang" in buildid or "llvm" in buildid:
   os.environ["CXX"] = compiler
   os.environ["LD"] = compiler
   cxxflags += " " + configure_clang (cputype, buildid, compiler, system_host_compiler)
-  cmake_flags += " -DFEAST_COMPILER_ID:STRING=clang"
+  cmake_flags += " -DFEAT_COMPILER_ID:STRING=clang"
 else:
   print ("Error: No supported compiler found in build id:")
   print (buildid_string)
@@ -324,7 +324,7 @@ if "ccache" in buildid:
   remove_string(unused_tokens, "ccache")
   os.environ["CC"] = "ccache " + os.environ["CC"]
   os.environ["CXX"] = "ccache " + os.environ["CXX"]
-  cmake_flags += " -DFEAST_USE_COMPILER_WRAPPER:BOOL=ON"
+  cmake_flags += " -DFEAT_USE_COMPILER_WRAPPER:BOOL=ON"
 
 if "scorep" in buildid:
   if not is_found("scorep"):
@@ -336,7 +336,7 @@ if "scorep" in buildid:
   remove_string(unused_tokens, "scorep")
   os.environ["CC"] = "scorep " + os.environ["CC"]
   os.environ["CXX"] = "scorep " + os.environ["CXX"]
-  cmake_flags += " -DFEAST_USE_COMPILER_WRAPPER:BOOL=ON"
+  cmake_flags += " -DFEAT_USE_COMPILER_WRAPPER:BOOL=ON"
 
 
 
@@ -345,25 +345,25 @@ if "cuda" in buildid:
     print ("Error: Choosen backend compiler binary nvcc not found!")
     sys.exit(1)
   remove_string(unused_tokens, "cuda")
-  cmake_flags += " -DFEAST_BACKENDS_CUDA:BOOL=ON"
+  cmake_flags += " -DFEAT_BACKENDS_CUDA:BOOL=ON"
   if not cuda_arch:
     cuda_arch = "sm_20"
-  cmake_flags += " -DFEAST_CUDA_ARCH:STRING=" + cuda_arch
+  cmake_flags += " -DFEAT_CUDA_ARCH:STRING=" + cuda_arch
 
   if cuda_verbose:
-    cmake_flags += " -DFEAST_CUDA_VERBOSE:BOOL=ON"
+    cmake_flags += " -DFEAT_CUDA_VERBOSE:BOOL=ON"
 
   if "cudamemcheck" in buildid:
     remove_string(unused_tokens, "cudamemcheck")
-    cmake_flags += " -DFEAST_CUDAMEMCHECK:BOOL=ON"
+    cmake_flags += " -DFEAT_CUDAMEMCHECK:BOOL=ON"
 
   if not cuda_host_compiler:
     cuda_host_compiler = find_exe("g++")
-  cmake_flags += " -DFEAST_CUDA_HOST_COMPILER:FILEPATH=" + cuda_host_compiler
+  cmake_flags += " -DFEAT_CUDA_HOST_COMPILER:FILEPATH=" + cuda_host_compiler
 
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")
-  cmake_flags += " -DFEAST_BACKENDS_MKL:BOOL=ON"
+  cmake_flags += " -DFEAT_BACKENDS_MKL:BOOL=ON"
   cxxflags += " -DMKL_ILP64"
 
 if "valgrind" in buildid:
@@ -372,15 +372,15 @@ if "valgrind" in buildid:
     sys.exit(1)
   print("valgrind version: " + get_output("valgrind --version")[0])
   remove_string(unused_tokens, "valgrind")
-  cmake_flags += " -DFEAST_VALGRIND:BOOL=ON"
+  cmake_flags += " -DFEAT_VALGRIND:BOOL=ON"
 
 if "quadmath" in buildid:
   remove_string(unused_tokens, "quadmath")
-  cmake_flags += " -DFEAST_HAVE_QUADMATH:BOOL=ON"
+  cmake_flags += " -DFEAT_HAVE_QUADMATH:BOOL=ON"
 
 if "cotire" in buildid:
   remove_string(unused_tokens, "cotire")
-  cmake_flags += " -DFEAST_COTIRE:BOOL=ON"
+  cmake_flags += " -DFEAT_COTIRE:BOOL=ON"
 
 #prevent parmetis without mpi enabled (needed by parmetis)
 if "mpi" not in buildid and "parmetis" in buildid:
@@ -399,7 +399,7 @@ clean = [ "CMakeCache.txt", trunk_dirname+os.sep+"CMakeCache.txt" ]
 for i in clean:
   if os.path.exists(i):
     os.unlink(i)
-clean = [ "feast_config.hpp", trunk_dirname+os.sep+"feast_config.hpp" ]
+clean = [ "feat_config.hpp", trunk_dirname+os.sep+"feat_config.hpp" ]
 for i in clean:
   if os.path.exists(i):
     os.unlink(i)
@@ -433,7 +433,7 @@ if "icc" in buildid or "intel" in buildid or "icpc" in buildid:
 print("cmake version: " + get_output("cmake --version")[0])
 
 #print out choosen configuration
-print ("============== configure_feast ===========")
+print ("============== configure_feat ===========")
 print ("Build-ID: " + buildid_string)
 if len(unused_tokens) == 0:
   #print ("Unused Build-ID tokens: none")

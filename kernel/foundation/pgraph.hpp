@@ -11,13 +11,13 @@
 
 #include<utility>
 
-#ifdef FEAST_HAVE_PARMETIS
-FEAST_DISABLE_WARNINGS
+#ifdef FEAT_HAVE_PARMETIS
+FEAT_DISABLE_WARNINGS
 #include<parmetis.h>
-FEAST_RESTORE_WARNINGS
+FEAT_RESTORE_WARNINGS
 #endif
 
-namespace FEAST
+namespace FEAT
 {
   using namespace Geometry;
   using namespace Shape;
@@ -107,7 +107,7 @@ namespace FEAST
           delete[] _part;
         }
 
-        ///things all FEAST-conformal pgraphs must minimally provide
+        ///things all FEAT-conformal pgraphs must minimally provide
 
         ///number of elements
         virtual IndexType get_num_vtx() const = 0;
@@ -629,7 +629,7 @@ namespace FEAST
         }
     };
 
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
     class PGraphParmetis : public PGraphBase<idx_t>
     {
       public:

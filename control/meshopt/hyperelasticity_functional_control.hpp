@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FEAST_CONTROL_MESHOPT_HYPERELASTICITY_FUNCTIONAL_CONTROL_HPP
-#define FEAST_CONTROL_MESHOPT_HYPERELASTICITY_FUNCTIONAL_CONTROL_HPP 1
+#ifndef FEAT_CONTROL_MESHOPT_HYPERELASTICITY_FUNCTIONAL_CONTROL_HPP
+#define FEAT_CONTROL_MESHOPT_HYPERELASTICITY_FUNCTIONAL_CONTROL_HPP 1
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
@@ -12,7 +12,7 @@
 #include <control/meshopt/meshopt_precond_factory.hpp>
 #include <control/meshopt/meshopt_solver_factory.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -41,7 +41,7 @@ namespace FEAST
        * The (patch-) local HyperelasticityFunctional to use.
        *
        * \note Local Hyperelastiticy functionals are only implemented for Mem::Main,
-       * \see FEAST::Meshopt::HyperElasticityFunctionalBase
+       * \see FEAT::Meshopt::HyperElasticityFunctionalBase
        */
       template
       <
@@ -67,7 +67,7 @@ namespace FEAST
           /// The floating point type the mesh's coordinates use
           typedef typename MeshType::CoordType CoordType;
           /// The FE space the transformation lives in
-          typedef typename FEAST::Meshopt::Intern::TrafoFE<Trafo_>::Space TrafoSpace;
+          typedef typename FEAT::Meshopt::Intern::TrafoFE<Trafo_>::Space TrafoSpace;
 
           /// Our base class
           typedef MeshoptControlBase<DomainControl_, Trafo_> BaseClass;
@@ -406,6 +406,6 @@ namespace FEAST
       }; // class HyperelasticityFunctionalControl
     } // namespace Meshopt
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
-#endif // FEAST_CONTROL_MESHOPT_HYPERELASTICITY_FUNCTIONAL_CONTROL_HPP
+#endif // FEAT_CONTROL_MESHOPT_HYPERELASTICITY_FUNCTIONAL_CONTROL_HPP

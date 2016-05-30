@@ -1,5 +1,5 @@
-#define FEAST_CUBATURE_TENSOR_PREFIX 1
-#define FEAST_CUBATURE_SCALAR_PREFIX 1
+#define FEAT_CUBATURE_TENSOR_PREFIX 1
+#define FEAT_CUBATURE_SCALAR_PREFIX 1
 #include <kernel/cubature/scalar/dynamic_factory.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 
@@ -8,8 +8,8 @@
 #include <set>
 #include <map>
 
-using namespace FEAST;
-using namespace FEAST::Cubature;
+using namespace FEAT;
+using namespace FEAT::Cubature;
 
 typedef std::set<String> StringSet;
 typedef std::map<String,String> StringMap;
@@ -227,11 +227,11 @@ int main(int argc, char* argv[])
   if(argc < 2)
   {
     // print help message
-    std::cout << "FEAST Dynamic Cubature List Tool" << std::endl << std::endl;
+    std::cout << "FEAT Dynamic Cubature List Tool" << std::endl << std::endl;
     //            ---------1---------2---------3---------4---------5---------6---------7---------8
     //            123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
     std::cout << "This tool can be used to display and debug all cubature rules currently" << std::endl;
-    std::cout << "supported by the FEAST::Cubature::DynamicFactory class." << std::endl;
+    std::cout << "supported by the FEAT::Cubature::DynamicFactory class." << std::endl;
     std::cout << std::endl;
     std::cout << "    USAGE:    cub-list <shape> [<name>]" << std::endl;
     std::cout << std::endl;

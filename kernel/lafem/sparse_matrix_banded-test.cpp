@@ -8,9 +8,9 @@
 #include <kernel/adjacency/permutation.hpp>
 #include <sstream>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 
 /**
@@ -58,7 +58,7 @@ public:
     DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
 
     // create random vector of offsets
-    FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
       tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
@@ -147,7 +147,7 @@ SparseMatrixBandedTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded
 SparseMatrixBandedTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_test_double_ulong;
 SparseMatrixBandedTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_test_float_uint;
 SparseMatrixBandedTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_test_double_uint;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixBandedTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_test_float_ulong;
 SparseMatrixBandedTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_test_double_ulong;
 SparseMatrixBandedTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_test_float_uint;
@@ -203,7 +203,7 @@ public:
     DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows);
 
     // create random vector of offsets
-    FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
       tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
@@ -292,7 +292,7 @@ SparseMatrixBandedApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_b
 SparseMatrixBandedApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong_9(9);
 SparseMatrixBandedApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint_9(9);
 SparseMatrixBandedApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint_9(9);
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixBandedApplyTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_apply_test_float_ulong;
 SparseMatrixBandedApplyTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_apply_test_double_ulong;
 SparseMatrixBandedApplyTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_apply_test_float_uint;
@@ -335,7 +335,7 @@ public:
     DenseVector<Mem_, DT_, IT_> vec_val_ref(num_of_offsets * rows, DT_(1));
 
     // create random vector of offsets
-    FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
       tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
@@ -369,7 +369,7 @@ SparseMatrixBandedScaleTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_b
 SparseMatrixBandedScaleTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_scale_test_double_ulong;
 SparseMatrixBandedScaleTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_scale_test_float_uint;
 SparseMatrixBandedScaleTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_scale_test_double_uint;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixBandedScaleTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_scale_test_float_ulong;
 SparseMatrixBandedScaleTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_scale_test_double_ulong;
 SparseMatrixBandedScaleTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_scale_test_float_uint;

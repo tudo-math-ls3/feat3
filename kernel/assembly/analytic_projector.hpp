@@ -2,13 +2,13 @@
 #ifndef KERNEL_ASSEMBLY_ANALYTIC_PROJECTOR_HPP
 #define KERNEL_ASSEMBLY_ANALYTIC_PROJECTOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/base.hpp>
 #include <kernel/analytic/function.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/trafo/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -231,6 +231,6 @@ namespace FEAST
       }
     }; // class AnalyticCellProjector<...>
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_ANALYTIC_PROJECTOR_HPP

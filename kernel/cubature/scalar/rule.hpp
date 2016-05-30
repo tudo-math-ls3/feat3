@@ -2,13 +2,13 @@
 #ifndef KERNEL_CUBATURE_SCALAR_RULE_HPP
 #define KERNEL_CUBATURE_SCALAR_RULE_HPP
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/assertion.hpp>
 
 // includes, system
 #include <utility> // for std::move
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -185,6 +185,6 @@ namespace FEAST
       }; // class Rule<...>
     } // namespace Scalar
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_SCALAR_RULE_HPP

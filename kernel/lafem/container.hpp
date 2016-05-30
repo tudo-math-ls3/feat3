@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_CONTAINER_HPP
 #define KERNEL_LAFEM_CONTAINER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/archs.hpp>
@@ -62,7 +62,7 @@
   }                                                                     \
 
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief LAFEM namespace
@@ -413,7 +413,7 @@ namespace FEAST
         IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
 
         /// \compilerhack clang/icc seems to use older libc++ without std::underlying_type
-#if defined(FEAST_COMPILER_CLANG) || defined(FEAST_COMPILER_INTEL)
+#if defined(FEAT_COMPILER_CLANG) || defined(FEAT_COMPILER_INTEL)
         uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
 #else
         uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
@@ -509,7 +509,7 @@ namespace FEAST
         IT2_ * itarray(reinterpret_cast<IT2_ *>(array));
 
         // clang/icc seems to use older libc++ without std::underlying_type
-#if defined(FEAST_COMPILER_CLANG) || defined(FEAST_COMPILER_INTEL)
+#if defined(FEAT_COMPILER_CLANG) || defined(FEAT_COMPILER_INTEL)
         uint64_t magic = (uint64_t)static_cast<__underlying_type(FileMode)>(mode);
 #else
         uint64_t magic = (uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
@@ -918,6 +918,6 @@ namespace FEAST
       }
     };
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_CONTAINER_HPP

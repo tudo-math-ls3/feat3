@@ -9,7 +9,7 @@
 #include <vector>
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -265,6 +265,6 @@ namespace FEAST
       }; // class DomainControl<...>
     } // namespace Domain
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_DOMAIN_DOMAIN_CONTROL_HPP

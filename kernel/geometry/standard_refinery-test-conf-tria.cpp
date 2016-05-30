@@ -2,9 +2,9 @@
 #include <kernel/geometry/test_aux/standard_tria.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
 
 typedef ConformalMesh<Shape::Triangle> RootMesh;
 typedef MeshPart<RootMesh> SubMesh;

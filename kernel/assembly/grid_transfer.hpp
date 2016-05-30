@@ -2,11 +2,11 @@
 #ifndef KERNEL_ASSEMBLY_GRID_TRANSFER_HPP
 #define KERNEL_ASSEMBLY_GRID_TRANSFER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/util/math.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -295,6 +295,6 @@ namespace FEAST
       }
     }; // class GridTransfer<...>
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_GRID_TRANSFER_HPP

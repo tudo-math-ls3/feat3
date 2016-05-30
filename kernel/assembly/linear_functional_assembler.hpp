@@ -2,10 +2,10 @@
 #ifndef KERNEL_ASSEMBLY_LINEAR_FUNCTIONAL_ASSEMBLER_HPP
 #define KERNEL_ASSEMBLY_LINEAR_FUNCTIONAL_ASSEMBLER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/asm_traits.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -153,6 +153,6 @@ namespace FEAST
       }
     }; // class LinearFunctionalAssembler
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_LINEAR_FUNCTIONAL_ASSEMBLER_HPP

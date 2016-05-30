@@ -12,7 +12,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Global
   {

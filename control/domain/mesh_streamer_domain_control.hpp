@@ -6,7 +6,7 @@
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -92,6 +92,6 @@ namespace FEAST
       }; // class MeshStreamerDomainControl<...>
     } // namespace Domain
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_DOMAIN_MESH_STREAMER_DOMAIN_CONTROL_HPP

@@ -39,7 +39,7 @@
 
 #include <control/domain/domain_control.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -676,6 +676,6 @@ namespace FEAST
       }
     };
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_STOKES_BASIC_HPP

@@ -2,10 +2,10 @@
 #ifndef KERNEL_TRAFO_STANDARD_EVALUATOR_HPP
 #define KERNEL_TRAFO_STANDARD_EVALUATOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/trafo/evaluator_base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Trafo
   {
@@ -1114,6 +1114,6 @@ namespace FEAST
 
     } // namespace Standard
   } // namespace Trafo
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_TRAFO_STANDARD_EVALUATOR_HPP

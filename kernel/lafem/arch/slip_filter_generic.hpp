@@ -7,7 +7,7 @@
 #endif
 
 /// \cond internal
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -57,7 +57,7 @@ namespace FEAST
 
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 /// \endcond
 
 #endif // KERNEL_LAFEM_ARCH_SLIP_FILTER_GENERIC_HPP

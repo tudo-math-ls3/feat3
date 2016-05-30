@@ -2,12 +2,12 @@
 #ifndef KERNEL_GEOMETRY_PATCH_FACTORY_HPP
 #define KERNEL_GEOMETRY_PATCH_FACTORY_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/intern/patch_index_mapping.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -96,6 +96,6 @@ namespace FEAST
     }; // class PatchFactory<ConformalMesh<Shape_, num_coords_, stride_, Coord_> >
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_PATCH_FACTORY_HPP

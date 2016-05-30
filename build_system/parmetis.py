@@ -11,6 +11,6 @@ class PARMETIS(ThirdpartyPackage):
     self.dirname = "parmetis"
     self.filename = "parmetis-4.0.3.tar.gz"
     self.url = "http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/" + self.filename
-    self.cmake_flags = " -DFEAST_HAVE_PARMETIS:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_PARMETIS:BOOL=ON"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname+os.sep+self.dirname

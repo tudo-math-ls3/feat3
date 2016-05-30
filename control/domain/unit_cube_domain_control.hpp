@@ -5,7 +5,7 @@
 #include <control/domain/domain_control.hpp>
 #include <kernel/geometry/unit_cube_patch_generator.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -67,6 +67,6 @@ namespace FEAST
       }; // class UnitCubeDomainControl<...>
     } // namespace Domain
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_DOMAIN_UNIT_CUBE_DOMAIN_CONTROL_HPP

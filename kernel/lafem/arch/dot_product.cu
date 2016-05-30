@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
@@ -9,7 +9,7 @@
 // includes, CUDA
 #include <cublas_v2.h>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -39,15 +39,15 @@ namespace FEAST
   }
 }
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
 DT_ DotProduct<Mem::CUDA>::value(const DT_ * const x, const DT_ * const y, const Index size)
 {
   DT_ result = Intern::cuda_dot_product(x, y, size);
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -67,7 +67,7 @@ DT_ TripleDotProduct<Mem::CUDA>::value(const DT_ * const x, const DT_ * const y,
   ComponentProduct<Mem::CUDA>::value(temp, y, z, size);
   DT_ result = Intern::cuda_dot_product(x, temp, size);
   cudaFree(temp);
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

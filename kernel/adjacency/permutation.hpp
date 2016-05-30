@@ -2,11 +2,11 @@
 #ifndef KERNEL_ADJACENCY_PERMUTATION_HPP
 #define KERNEL_ADJACENCY_PERMUTATION_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/random.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Adjacency
   {
@@ -251,6 +251,6 @@ namespace FEAST
       }
     }; // class Permutation
   } // namespace Adjacency
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ADJACENCY_PERMUTATION_HPP

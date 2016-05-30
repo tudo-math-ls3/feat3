@@ -9,29 +9,29 @@
  *
  * \author Peter Zajac
  */
-#if !defined(FEAST_COMPILER) && defined(_MSC_VER)
+#if !defined(FEAT_COMPILER) && defined(_MSC_VER)
 
-// define FEAST_COMPILER_MICROSOFT macro
-#  define FEAST_COMPILER_MICROSOFT _MSC_VER
+// define FEAT_COMPILER_MICROSOFT macro
+#  define FEAT_COMPILER_MICROSOFT _MSC_VER
 
-// detect the compiler verson and define the FEAST_COMPILER macro
+// detect the compiler verson and define the FEAT_COMPILER macro
 #  if (_MSC_VER >= 1800)
-#    define FEAST_COMPILER "Microsoft Visual C++ 2015 (or newer)"
+#    define FEAT_COMPILER "Microsoft Visual C++ 2015 (or newer)"
 #  elif (_MSC_VER >= 1800)
-#    define FEAST_COMPILER "Microsoft Visual C++ 2013"
+#    define FEAT_COMPILER "Microsoft Visual C++ 2013"
 #  elif (_MSC_VER >= 1700)
-#    define FEAST_COMPILER "Microsoft Visual C++ 2012"
+#    define FEAT_COMPILER "Microsoft Visual C++ 2012"
 #  elif (_MSC_VER >= 1600)
-#    define FEAST_COMPILER "Microsoft Visual C++ 2010"
+#    define FEAT_COMPILER "Microsoft Visual C++ 2010"
 #  else
-  // this compiler version won't be able to compile Feast anyway...
-#    define FEAST_COMPILER "Microsoft C/C++ compiler"
+  // this compiler version won't be able to compile Feat anyway...
+#    define FEAT_COMPILER "Microsoft C/C++ compiler"
 #  endif
 
-#  define FEAST_IVDEP __pragma(loop(ivdep))
+#  define FEAT_IVDEP __pragma(loop(ivdep))
 
-#  define FEAST_DISABLE_WARNINGS __pragma(warning(push, 0))
-#  define FEAST_RESTORE_WARNINGS __pragma(warning(pop))
+#  define FEAT_DISABLE_WARNINGS __pragma(warning(push, 0))
+#  define FEAT_RESTORE_WARNINGS __pragma(warning(pop))
 
 #  define FORCE_INLINE __forceinline
 
@@ -123,6 +123,6 @@
 #  define _CRT_SECURE_NO_WARNINGS 1
 #endif
 
-#endif // !defined(FEAST_COMPILER) && defined(_MSC_VER)
+#endif // !defined(FEAT_COMPILER) && defined(_MSC_VER)
 
 #endif // KERNEL_UTIL_COMPILER_MICROSOFT_HPP

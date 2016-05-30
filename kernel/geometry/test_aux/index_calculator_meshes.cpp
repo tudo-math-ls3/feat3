@@ -1,7 +1,7 @@
 #include <kernel/geometry/test_aux/index_calculator_meshes.hpp>
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -284,4 +284,4 @@ namespace FEAST
 
     } // namespace TestAux
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT

@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_DENSE_VECTOR_HPP
 #define KERNEL_LAFEM_DENSE_VECTOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/util/assertion.hpp>
@@ -30,14 +30,14 @@
 #include <stdint.h>
 
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
     /**
      * \brief Dense data vector class template.
      *
-     * \tparam Mem_ The \ref FEAST::Mem "memory architecture" to be used.
+     * \tparam Mem_ The \ref FEAT::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indextype to be used.
      *
@@ -253,7 +253,7 @@ namespace FEAST
 
         if (pinned_allocation)
         {
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
           this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size_in));
 #else
           // no cuda support enabled - we cannot serve and do not need pinned memory support
@@ -294,7 +294,7 @@ namespace FEAST
        *
        * Creates a vector with given size and given data.
        *
-       * \note The array must be allocated by FEAST's own memory pool
+       * \note The array must be allocated by FEAT's own memory pool
        */
       explicit DenseVector(Index size_in, DT_ * data) :
         Container<Mem_, DT_, IT_>(size_in)
@@ -515,7 +515,7 @@ namespace FEAST
        *
        * Serialize a complete container entity into a single binary array.
        *
-       * See \ref FEAST::LAFEM::Container::_serialise for details.
+       * See \ref FEAT::LAFEM::Container::_serialise for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       std::vector<char> serialise()
@@ -1301,6 +1301,6 @@ namespace FEAST
       }
     }; // class DenseVector<...>
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_DENSE_VECTOR_HPP

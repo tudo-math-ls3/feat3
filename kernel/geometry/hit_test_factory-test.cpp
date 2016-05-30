@@ -5,9 +5,9 @@
 #include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 #include <kernel/util/string.hpp>                          // for String
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
 
 /**
  * \brief Test class for the HitTestFactoryTest class.

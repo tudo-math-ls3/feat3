@@ -3,12 +3,12 @@
 #define KERNEL_SOLVER_CUSOLVER_HPP 1
 #include <kernel/base_header.hpp>
 
-#if defined(FEAST_HAVE_CUSOLVER) || defined(DOXYGEN)
+#if defined(FEAT_HAVE_CUSOLVER) || defined(DOXYGEN)
 #include <kernel/solver/base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -28,7 +28,7 @@ namespace FEAST
      * direct cuda solver cusolverSpDcsrlsvluHost for doing the actual dirty work.
      *
      * \attention
-     * This class is only declared if FEAST was configured to build and link against
+     * This class is only declared if FEAT was configured to build and link against
      * cuda and the cuda sdk ships with the cusolver library (cuda version >= 7).
      *
      * \note CuSolverLU need its input data in Mem::Main memory
@@ -83,7 +83,7 @@ namespace FEAST
      * direct cuda solver cusolverSpDcsrlsvqr for doing the actual dirty work.
      *
      * \attention
-     * This class is only declared if FEAST was configured to build and link against
+     * This class is only declared if FEAT was configured to build and link against
      * cuda and the cuda sdk ships with the cusolver library (cuda version >= 7).
      */
     class CuSolverQR :
@@ -118,7 +118,7 @@ namespace FEAST
         }
     };
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
-#endif // FEAST_HAVE_CUSOLVER
+#endif // FEAT_HAVE_CUSOLVER
 #endif // KERNEL_SOLVER_CUSOLVER_HPP

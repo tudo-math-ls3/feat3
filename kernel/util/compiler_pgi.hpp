@@ -10,17 +10,17 @@
  * \author Dominik Goeddeke
  */
 
-#if !defined(FEAST_COMPILER) && defined(__PGI)
+#if !defined(FEAT_COMPILER) && defined(__PGI)
 
 // PGI compiler does not make its version number available as a
 // preprocessor macro, unfortunately
 
-// define FEAST_COMPILER_PGI macro
-# define FEAST_COMPILER_PGI 1
-# define FEAST_COMPILER "PGI C/C++ compiler"
+// define FEAT_COMPILER_PGI macro
+# define FEAT_COMPILER_PGI 1
+# define FEAT_COMPILER "PGI C/C++ compiler"
 
 // PGI compiler does not support "nullptr", do not define HAVE_CPP0X_NULLPTR 1
 
-#endif // !defined(FEAST_COMPILER) && defined(__PGI)
+#endif // !defined(FEAT_COMPILER) && defined(__PGI)
 
 #endif // KERNEL_UTIL_COMPILER_PGI_HPP

@@ -1,8 +1,8 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/string_mapped.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 // an enumeration for testing purposes
 enum class MyPrecon

@@ -1,12 +1,12 @@
 #include <test_system/test_system.hpp>
-#ifdef FEAST_HAVE_CUSOLVER
+#ifdef FEAT_HAVE_CUSOLVER
 #include <kernel/lafem/pointstar_factory.hpp>
 #include <kernel/solver/cusolver.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::Solver;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::Solver;
+using namespace FEAT::TestSystem;
 
 class CuSolverLUTest :
   public TestSystem::TaggedTest<Mem::CUDA, double>
@@ -106,4 +106,4 @@ public:
 };
 CuSolverQRTest cusolverqr_test;
 
-#endif // FEAST_HAVE_CUSOLVER
+#endif // FEAT_HAVE_CUSOLVER

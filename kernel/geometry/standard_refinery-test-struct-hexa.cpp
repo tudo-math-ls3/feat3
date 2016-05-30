@@ -2,9 +2,9 @@
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
 
 typedef StructuredMesh<3> StructMesh3d;
 typedef StandardRefinery<StructMesh3d> StructMeshRefinery3d;

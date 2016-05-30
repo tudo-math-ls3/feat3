@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/memory_pool.hpp>
 
 #include <cstdio>
@@ -7,7 +7,7 @@
 #include <cublas_v2.h>
 #include "cusparse_v2.h"
 
-namespace FEAST
+namespace FEAT
 {
   namespace Util
   {
@@ -38,7 +38,7 @@ namespace FEAST
 }
 
 
-using namespace FEAST;
+using namespace FEAT;
 
 // static member initialisation
 std::map<void*, Util::Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pool;
@@ -175,8 +175,8 @@ void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index
   dim3 block;
   block.x = blocksize;
   grid.x = (unsigned)ceil((count)/(double)(block.x));
-  FEAST::Util::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
-#ifdef FEAST_DEBUG
+  FEAT::Util::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
+#ifdef FEAT_DEBUG
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -212,8 +212,8 @@ void MemoryPool<Mem::CUDA>::convert(DT1_ * dest, const DT2_ * src, const Index c
   dim3 block;
   block.x = blocksize;
   grid.x = (unsigned)ceil((count)/(double)(block.x));
-  FEAST::Util::Intern::cuda_convert<<<grid, block>>>(dest, src, count);
-#ifdef FEAST_DEBUG
+  FEAT::Util::Intern::cuda_convert<<<grid, block>>>(dest, src, count);
+#ifdef FEAT_DEBUG
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

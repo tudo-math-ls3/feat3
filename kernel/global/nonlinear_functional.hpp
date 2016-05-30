@@ -5,7 +5,7 @@
 #include <kernel/global/gate.hpp>
 #include <kernel/global/vector.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Global
   {
@@ -331,6 +331,6 @@ namespace FEAST
 
     };
   } // namespace Global
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GLOBAL_NONLINEAR_FUNCTIONAL

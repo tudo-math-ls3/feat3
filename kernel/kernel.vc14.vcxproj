@@ -3,19 +3,19 @@
   <!-- global project properties -->
   <PropertyGroup Label="Globals">
     <ProjectGuid>{98608C16-F806-46BE-BDB4-77BA4023DC38}</ProjectGuid>
-    <FeastAppName>kernel</FeastAppName>
-    <FeastRootPath>$(ProjectDir)..</FeastRootPath>
+    <FeatAppName>kernel</FeatAppName>
+    <FeatRootPath>$(ProjectDir)..</FeatRootPath>
   </PropertyGroup>
   <!-- import common config -->
-  <Import Project="$(FeastRootPath)\visual_studio\vc14-common-config.xml" />
+  <Import Project="$(FeatRootPath)\visual_studio\vc14-common-config.xml" />
   <!-- Kernel Source Exclusion List -->
   <ItemGroup>
     <!-- exclude all test sources -->
-    <FeastKernelExcludeSource Include="**\*-test*.cpp" />
+    <FeatKernelExcludeSource Include="**\*-test*.cpp" />
     <!-- exclude geometry test_aux sources -->
-    <FeastKernelExcludeSource Include="geometry\test_aux\*.cpp" />
+    <FeatKernelExcludeSource Include="geometry\test_aux\*.cpp" />
     <!-- exclude MKL sources unless the MKL backend is enabled -->
-    <FeastKernelExcludeSource Include="**\*_mkl.cpp" Condition="'$(BackendMKL)'!='true'" />
+    <FeatKernelExcludeSource Include="**\*_mkl.cpp" Condition="'$(BackendMKL)'!='true'" />
   </ItemGroup>
   <!-- Kernel Cuda Exclusion List -->
   <!-- ************************************************************************************************************* -->
@@ -27,13 +27,13 @@
   </ItemGroup>
   <!-- Source File List -->
   <ItemGroup>
-    <ClCompile Include="**\*.cpp" Exclude="@(FeastKernelExcludeSource)" />
-    <ClCompile Include="@(FeastKernelIncludeSource)" Condition="'@(FeastKernelIncludeSource)'!=''" />
+    <ClCompile Include="**\*.cpp" Exclude="@(FeatKernelExcludeSource)" />
+    <ClCompile Include="@(FeatKernelIncludeSource)" Condition="'@(FeatKernelIncludeSource)'!=''" />
   </ItemGroup>
   <!-- CUDA Source File List -->
   <ItemGroup Condition="'$(BackendCUDA)'=='true'">
-    <CudaCompile Include="**\*.cu" Exclude="@(FeastKernelExcludeCuda)" />
-    <CudaCompile Include="@(FeastKernelIncludeCuda)" Condition="'@(FeastKernelIncludeCuda)'!=''" />
+    <CudaCompile Include="**\*.cu" Exclude="@(FeatKernelExcludeCuda)" />
+    <CudaCompile Include="@(FeatKernelIncludeCuda)" Condition="'@(FeatKernelIncludeCuda)'!=''" />
   </ItemGroup>
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>
@@ -46,5 +46,5 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <!-- import lib target -->
-  <Import Project="$(FeastRootPath)\visual_studio\vc14-target-lib.xml" />
+  <Import Project="$(FeatRootPath)\visual_studio\vc14-target-lib.xml" />
 </Project>

@@ -27,7 +27,7 @@
 
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -367,6 +367,6 @@ namespace FEAST
     }; // class ScalarBasicAssemblerLevel<...>
 
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_SCALAR_BASIC_HPP

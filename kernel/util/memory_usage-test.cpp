@@ -1,9 +1,9 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/memory_usage.hpp>
 
-using namespace FEAST;
-using namespace FEAST::Util;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::Util;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the memory usage method.

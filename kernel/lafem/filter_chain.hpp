@@ -2,10 +2,10 @@
 #ifndef KERNEL_LAFEM_FILTER_CHAIN_HPP
 #define KERNEL_LAFEM_FILTER_CHAIN_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/meta_element.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -306,6 +306,6 @@ namespace FEAST
     }; // class FilterChain
     /// \endcond
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_FILTER_CHAIN_HPP

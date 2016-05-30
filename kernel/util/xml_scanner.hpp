@@ -13,7 +13,7 @@
 #include <deque>
 #include <map>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Xml namespace
@@ -29,7 +29,7 @@ namespace FEAST
      * \author Peter Zajac
      */
     class Error :
-      public FEAST::Exception
+      public FEAT::Exception
     {
     private:
       /// erroneous line number
@@ -43,7 +43,7 @@ namespace FEAST
 
     public:
       Error(int iline, const String& sline, const String& msg, const String& err_type) :
-        FEAST::Exception("XML Error"),
+        FEAT::Exception("XML Error"),
         my_iline(iline),
         my_sline(sline),
         my_msg(msg),
@@ -567,6 +567,6 @@ namespace FEAST
       void process_content();
     }; // class Scanner
   } // namespace Xml
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_XML_SCANNER_HPP

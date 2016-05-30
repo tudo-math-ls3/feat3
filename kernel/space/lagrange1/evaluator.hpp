@@ -2,11 +2,11 @@
 #ifndef KERNEL_SPACE_LAGRANGE1_EVALUATOR_HPP
 #define KERNEL_SPACE_LAGRANGE1_EVALUATOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/parametric_evaluator.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -582,6 +582,6 @@ namespace FEAST
       }; // class Evaluator<...,Hypercube<3>>
     } // namespace Lagrange1
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_LAGRANGE1_EVALUATOR_HPP

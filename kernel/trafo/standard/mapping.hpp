@@ -2,12 +2,12 @@
 #ifndef KERNEL_TRAFO_STANDARD_MAPPING_HPP
 #define KERNEL_TRAFO_STANDARD_MAPPING_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/trafo/mapping_base.hpp>
 #include <kernel/trafo/standard/evaluator.hpp>
 #include <kernel/trafo/standard/volume.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Trafo
   {
@@ -163,6 +163,6 @@ namespace FEAST
       }; // class Mapping<...>
     } // namespace Standard
   } // namespace Trafo
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_TRAFO_STANDARD_MAPPING_HPP

@@ -9,7 +9,7 @@
 
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -128,6 +128,6 @@ namespace FEAST
       }
     }; // class BaseSplitter<...>
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_BASE_SPLITTER_HPP

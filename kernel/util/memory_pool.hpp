@@ -2,7 +2,7 @@
 #ifndef KERNEL_UTIL_MEMORY_POOL_HPP
 #define KERNEL_UTIL_MEMORY_POOL_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/archs.hpp>
@@ -19,7 +19,7 @@
 #include <cublas_v2.h>
 #endif
 
-namespace FEAST
+namespace FEAT
 {
   namespace Util
   {
@@ -168,7 +168,7 @@ namespace FEAST
           return memory;
         }
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
         /// allocate new pinned memory
         template <typename DT_>
         static DT_ * allocate_pinned_memory(const Index count)
@@ -201,7 +201,7 @@ namespace FEAST
             return;
           }
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
           it = _pinned_pool.find(address);
           if (it != _pinned_pool.end())
           {
@@ -234,7 +234,7 @@ namespace FEAST
             return;
           }
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
           it = _pinned_pool.find(address);
           if (it != _pinned_pool.end())
           {
@@ -326,6 +326,6 @@ namespace FEAST
         }
     };
 
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_MEMORY_POOL_HPP

@@ -2,12 +2,12 @@
 #ifndef KERNEL_TRAFO_BASE_HPP
 #define KERNEL_TRAFO_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/shape.hpp>
 #include <kernel/eval_tags.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Transformation namespace
@@ -67,6 +67,6 @@ namespace FEAST
       typedef Tiny::Tensor3<DataType, image_dim, domain_dim, domain_dim> HessianInverseType;
     }; // class StandardEvalPolicy<...>
   } // namespace Trafo
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_TRAFO_BASE_HPP

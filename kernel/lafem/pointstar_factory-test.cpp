@@ -1,13 +1,13 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 template<typename DataType_, typename IndexType_>
 class PointstarFactoryTest :
-  public FEAST::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>
+  public FEAT::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>
 {
 public:
   typedef DenseVector<Mem::Main, DataType_, IndexType_> VectorType;
@@ -15,7 +15,7 @@ public:
 
 public:
   PointstarFactoryTest() :
-    FEAST::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>("PointstarFactoryTest")
+    FEAT::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>("PointstarFactoryTest")
   {
   }
 
@@ -92,7 +92,7 @@ PointstarFactoryTest<double, unsigned long> pointstar_factory_test_double_ulong;
 
 template<typename DataType_, typename IndexType_>
 class PointstarStructureTest :
-  public FEAST::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>
+  public FEAT::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>
 {
 public:
   typedef DenseVector<Mem::Main, DataType_, IndexType_> VectorType;
@@ -100,7 +100,7 @@ public:
 
 public:
   PointstarStructureTest() :
-    FEAST::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>("PointstarStructureTest")
+    FEAT::TestSystem::FullTaggedTest<Mem::Main, DataType_, IndexType_>("PointstarStructureTest")
   {
   }
 

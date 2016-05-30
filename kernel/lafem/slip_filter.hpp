@@ -2,14 +2,14 @@
 #ifndef KERNEL_LAFEM_SLIP_FILTER_HPP
 #define KERNEL_LAFEM_SLIP_FILTER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
 #include <kernel/lafem/arch/slip_filter.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -294,6 +294,6 @@ namespace FEAST
         }
     }; // class SlipFilter<...>
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_SLIP_FILTER_HPP

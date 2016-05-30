@@ -16,7 +16,7 @@
 #include <kernel/solver/ssor_precond.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -506,6 +506,6 @@ namespace FEAST
 
     }; // ScalarSolver
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_SCALAR_SOLVER_HPP

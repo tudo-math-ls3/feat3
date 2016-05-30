@@ -1,5 +1,5 @@
 //
-// \brief FEAST Tutorial 05: Multgrid solver (TM)
+// \brief FEAT Tutorial 05: Multgrid solver (TM)
 //
 // This file contains a simple prototypical multigrid Poisson solver for the unit square domain.
 //
@@ -35,31 +35,31 @@
 
 // We start our little tutorial with a batch of includes...
 
-// Misc. FEAST includes
+// Misc. FEAT includes
 #include <kernel/util/string.hpp>                          // for String
 #include <kernel/util/runtime.hpp>                         // for Runtime
 
-// FEAST-Geometry includes
+// FEAT-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
 #include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactory
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
 #include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 
-// FEAST-Trafo includes
+// FEAT-Trafo includes
 #include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
 
-// FEAST-Space includes
+// FEAT-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
 #include <kernel/space/lagrange2/element.hpp>              // the Lagrange-2 Element (aka "Q2")
 
-// FEAST-Cubature includes
+// FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
-// FEAST-Analytic includs
+// FEAT-Analytic includs
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
 
-// FEAST-Assembly includes
+// FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
@@ -69,12 +69,12 @@
 #include <kernel/assembly/common_functionals.hpp>          // for ForceFunctional
 #include <kernel/assembly/grid_transfer.hpp>               // NEW: for GridTransfer
 
-// FEAST-LAFEM includes
+// FEAT-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
-// FEAST-Solver includes
+// FEAT-Solver includes
 #include <kernel/solver/pcg.hpp>                           // for PCG
 #include <kernel/solver/richardson.hpp>                    // NEW: for Richardson
 #include <kernel/solver/jacobi_precond.hpp>                // NEW: for JacobiPrecond
@@ -82,8 +82,8 @@
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-// We are using FEAST
-using namespace FEAST;
+// We are using FEAT
+using namespace FEAT;
 
 // We're opening a new namespace for our tutorial.
 namespace Tutorial05
@@ -459,7 +459,7 @@ int main(int argc, char* argv[])
   Runtime::initialise(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAST's tutorial #05: Multigrid" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #05: Multigrid" << std::endl;
 
   Index level_max(3), level_min(1);
 

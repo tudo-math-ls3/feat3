@@ -2,10 +2,10 @@
 #ifndef KERNEL_SPACE_PARAMETRIC_EVALUATOR_HPP
 #define KERNEL_SPACE_PARAMETRIC_EVALUATOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/evaluator_base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -258,6 +258,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_PARAMETRIC_EVALUATOR_HPP

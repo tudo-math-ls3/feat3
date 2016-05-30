@@ -3,7 +3,7 @@
 #include <fstream>
 #include <stack>
 
-namespace FEAST
+namespace FEAT
 {
   PropertyMap::PropertyMap(PropertyMap* parent) :
     _parent(parent)
@@ -516,4 +516,4 @@ namespace FEAST
       os << prefix << "} # end of [" << (*sit).first << "]" << std::endl;
     }
   }
-} //namespace FEAST
+} //namespace FEAT

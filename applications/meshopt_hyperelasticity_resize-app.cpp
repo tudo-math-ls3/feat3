@@ -14,7 +14,7 @@
 #include <kernel/solver/nlcg.hpp>
 #include <kernel/util/runtime.hpp>
 
-using namespace FEAST;
+using namespace FEAT;
 
 /// \cond internal
 // Helper class for resizing tests
@@ -74,7 +74,7 @@ template
     /// The corresponding transformation
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     /// The FE space for the transformation
-    typedef typename FEAST::Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoSpace;
+    typedef typename FEAT::Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoSpace;
     /// Our functional type
     typedef FunctionalType_<DataType, ShapeType> FunctionalType;
     /// The Rumpf smoother
@@ -218,16 +218,16 @@ using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D, E>;
 
 int main(int argc, char** argv)
 {
-  FEAST::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialise(argc, argv);
 
   ResizeApp<double, Shape::Hypercube<2>, MyLocalFunctional, MyQualityFunctional>::run();
 
-  return FEAST::Runtime::finalise();
+  return FEAT::Runtime::finalise();
 }
 
 /// \brief Specialisation for hypercubes
 template<int shape_dim_>
-struct helperclass< FEAST::Shape::Hypercube<shape_dim_> >
+struct helperclass< FEAT::Shape::Hypercube<shape_dim_> >
 {
   /// \brief Sets coordinates so we deal the the reference element
   template<typename VectorType_, typename DataType_>
@@ -252,7 +252,7 @@ struct helperclass< FEAST::Shape::Hypercube<shape_dim_> >
 
 /// \brief Specialisation for 2d simplices
 template<>
-struct helperclass< FEAST::Shape::Simplex<2> >
+struct helperclass< FEAT::Shape::Simplex<2> >
 {
   /// \brief Sets coordinates so we deal the the Rumpf reference element
   template<typename VectorType_, typename DataType_>

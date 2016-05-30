@@ -7,8 +7,8 @@
 #include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/util/random.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 template<typename DT_, typename IT_>
 class BaseSplitterTest :

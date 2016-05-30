@@ -11,9 +11,9 @@
 #include <cstdio>
 #include <sstream>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for sparse matrix conversions.
@@ -209,7 +209,7 @@ public:
 
   }
 };
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixCudaConversionTest<Mem::CUDA, float, unsigned long> sparse_matrix_cuda_conversion_test_float_ulong;
 SparseMatrixCudaConversionTest<Mem::CUDA, double, unsigned long> sparse_matrix_cuda_conversion_test_double_ulong;
 SparseMatrixCudaConversionTest<Mem::CUDA, float, unsigned int> sparse_matrix_cuda_conversion_test_float_uint;
@@ -257,7 +257,7 @@ public:
     DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows);
 
     // create random vector of offsets
-    FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
       tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
@@ -302,7 +302,7 @@ SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::Main, double, unsigned lon
 SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, float, unsigned long> > sparse_matrix_banded_coo_conversion_test_float_ulong;
 SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, double, unsigned long> > sparse_matrix_banded_coo_conversion_test_double_ulong;
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::CUDA, float, unsigned int> > cuda_sparse_matrix_banded_csr_conversion_test_float_uint;
 SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::CUDA, double, unsigned int> > cuda_sparse_matrix_banded_csr_conversion_test_double_uint;
 SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::CUDA, float, unsigned int> > cuda_sparse_matrix_banded_ell_conversion_test_float_uint;

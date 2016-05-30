@@ -7,7 +7,7 @@
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/memory_usage.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -45,10 +45,10 @@ namespace FEAST
           if (rank == 0 && statistics_check >= 0)
           {
             std::cout<<std::endl<<solver->get_formated_solver_tree().trim()<<std::endl;
-            String flops = FEAST::Statistics::get_formated_flops(solver_toe, nranks);
+            String flops = FEAT::Statistics::get_formated_flops(solver_toe, nranks);
             std::cout<<"\nComplete solver TOE: "<<solver_toe<<std::endl;
             std::cout<<flops<<std::endl<<std::endl;
-            std::cout<<FEAST::Statistics::get_formated_times(solver_toe)<<std::endl<<std::endl;
+            std::cout<<FEAT::Statistics::get_formated_times(solver_toe)<<std::endl<<std::endl;
             std::cout<<String("Domain size:").pad_back(17) << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
             std::cout<<String("LA size:").pad_back(17) << double(la_size) / (1024. * 1024.) << " MByte" << std::endl;
             std::cout<<String("MPI size:").pad_back(17) << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
@@ -59,17 +59,17 @@ namespace FEAST
             std::cout<<String("#NZEs:").pad_back(17) << "min " << system_levels.front()->matrix_sys.used_elements()<<", max " << system_levels.back()->matrix_sys.used_elements() << std::endl << std::endl;
             if (statistics_check > 0) // provided parameter full or whatever
             {
-              std::cout<<FEAST::Statistics::get_formated_solvers();
+              std::cout<<FEAT::Statistics::get_formated_solvers();
             }
           }
           if (statistics_check > 0) // provided parameter full or whatever
           {
-            FEAST::Statistics::write_out_solver_statistics_scheduled(rank, la_size, domain.bytes(), mpi_size);
+            FEAT::Statistics::write_out_solver_statistics_scheduled(rank, la_size, domain.bytes(), mpi_size);
           }
         }
 
     }; // StatisticsControl
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_STATISTICS_HPP

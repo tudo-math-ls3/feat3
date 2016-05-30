@@ -2,11 +2,11 @@
 #ifndef KERNEL_SHAPE_HPP
 #define KERNEL_SHAPE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/meta_math.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Shape namespace
@@ -353,6 +353,6 @@ namespace FEAST
 
     /// \endcond
   } // namespace Shape
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SHAPE_HPP

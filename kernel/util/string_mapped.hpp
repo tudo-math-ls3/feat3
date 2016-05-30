@@ -2,14 +2,14 @@
 #ifndef KERNEL_UTIL_STRING_MAPPED_HPP
 #define KERNEL_UTIL_STRING_MAPPED_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/string.hpp>
 
 // includes, system
 #include <map>
 #include <iostream>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief String-Mapped class template
@@ -181,6 +181,6 @@ namespace FEAST
   {
     return string_mapped(value, value_map).lookup(str);
   }
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_STRING_MAPPED_HPP

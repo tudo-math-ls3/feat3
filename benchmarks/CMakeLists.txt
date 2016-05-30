@@ -16,5 +16,5 @@ ADD_CUSTOM_TARGET(benchmarks DEPENDS ${benchmarks})
 
 FOREACH (bench ${benchmarks})
   ADD_EXECUTABLE(${bench} ${bench}.cpp)
-  TARGET_LINK_LIBRARIES(${bench} feast)
+  TARGET_LINK_LIBRARIES(${bench} feat)
 ENDFOREACH(bench)

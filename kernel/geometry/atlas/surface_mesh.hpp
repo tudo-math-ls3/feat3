@@ -10,7 +10,7 @@
 
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -698,7 +698,7 @@ namespace FEAST
 
         /// \cond internal
         /**
-         * \copydoc FEAST::Trafo::Standard::compute_inverse_coeffs()
+         * \copydoc FEAT::Trafo::Standard::compute_inverse_coeffs()
          *
          * This Geometry. We no allowed dem tings from Trafo. So copy-paste.
          */
@@ -737,7 +737,7 @@ namespace FEAST
         }
 
         /**
-         * \copydoc FEAST::Trafo::Standard::compute_inverse_coeffs()
+         * \copydoc FEAT::Trafo::Standard::compute_inverse_coeffs()
          *
          * This Geometry. We no allowed dem tings from Trafo. So copy-paste.
          */
@@ -1001,6 +1001,6 @@ namespace FEAST
       };
     } // namespace Atlas
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_ATLAS_SURFACE_MESH_HPP

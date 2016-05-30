@@ -2,12 +2,12 @@
 #ifndef KERNEL_GEOMETRY_INTERN_MACRO_INDEX_MAPPING_HPP
 #define KERNEL_GEOMETRY_INTERN_MACRO_INDEX_MAPPING_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/index_set.hpp>
 #include <kernel/geometry/target_set.hpp>
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -189,6 +189,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_INTERN_MACRO_INDEX_MAPPING_HPP

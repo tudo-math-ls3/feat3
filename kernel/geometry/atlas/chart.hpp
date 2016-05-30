@@ -2,12 +2,12 @@
 #ifndef KERNEL_GEOMETRY_ATLAS_CHART_HPP
 #define KERNEL_GEOMETRY_ATLAS_CHART_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/xml_scanner.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -346,5 +346,5 @@ namespace FEAST
 
     } // namespace Atlas
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_GEOMETRY_ATLAS_CHART_HPP

@@ -2,11 +2,11 @@
 #ifndef KERNEL_ASSEMBLY_SYMBOLIC_ASSEMBLER_HPP
 #define KERNEL_ASSEMBLY_SYMBOLIC_ASSEMBLER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/space/dof_mapping_renderer.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -370,6 +370,6 @@ namespace FEAST
       }
     }; // class SymbolicAssembler
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_SYMBOLIC_ASSEMBLER_HPP

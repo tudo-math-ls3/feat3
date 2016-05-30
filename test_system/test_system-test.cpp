@@ -1,8 +1,8 @@
-// includes, FEAST
+// includes, FEAT
 #include <test_system/test_system.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 class A
 {

@@ -6,7 +6,7 @@
 #error "Do not include this implementation-only header file directly!"
 #endif
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -126,6 +126,6 @@ namespace FEAST
 
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_ARCH_SCALE_ROW_COL_GENERIC_HPP

@@ -2,7 +2,7 @@
 #ifndef KERNEL_SOLVER_MATRIX_PRECOND_HPP
 #define KERNEL_SOLVER_MATRIX_PRECOND_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/base.hpp>
 #include <kernel/lafem/dense_matrix.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
@@ -14,7 +14,7 @@
 #include <kernel/lafem/tuple_diag_matrix.hpp>
 #include <kernel/global/matrix.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -100,6 +100,6 @@ namespace FEAST
       return std::make_shared<MatrixPrecond<Matrix_, Filter_>>(matrix, filter);
     }
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_MATRIX_PRECOND_HPP

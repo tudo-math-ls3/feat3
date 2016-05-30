@@ -2,7 +2,7 @@
 #ifndef KERNEL_GEOMETRY_MESH_ATTRIBUTE
 #define KERNEL_GEOMETRY_MESH_ATTRIBUTE 1
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -195,5 +195,5 @@ namespace FEAST
         }
     }; // class MeshAttribute<...>
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_GEOMETRY_MESH_ATTRIBUTE

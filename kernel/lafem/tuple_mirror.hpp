@@ -6,7 +6,7 @@
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/meta_element.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -450,6 +450,6 @@ namespace FEAST
     };
     /// \endcond
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_TUPLE_MIRROR_HPP

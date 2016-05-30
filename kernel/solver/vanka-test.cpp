@@ -24,10 +24,10 @@
 
 #include <iomanip>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::Solver;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::Solver;
+using namespace FEAT::TestSystem;
 
 template<typename T_>
 struct VeloFuncX

@@ -17,12 +17,12 @@ SCOREP_FILE_NAMES_END
 
 SCOREP_REGION_NAMES_BEGIN
         EXCLUDE
-        FEAST::Foundation::Request::mpi_request
-        FEAST::Foundation::Status::mpi_status
-        FEAST::Foundation::Communicator::mpi_comm
-        FEAST::Foundation::Status::Status
-        FEAST::Foundation::Comm::test
-        FEAST::Kahan*
+        FEAT::Foundation::Request::mpi_request
+        FEAT::Foundation::Status::mpi_status
+        FEAT::Foundation::Communicator::mpi_comm
+        FEAT::Foundation::Status::Status
+        FEAT::Foundation::Comm::test
+        FEAT::Kahan*
         *::rows*
         *::columns*
         *::size*

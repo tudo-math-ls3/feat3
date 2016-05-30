@@ -1,5 +1,5 @@
 //
-// \brief FEAST Tutorial 03: Andicore solver (TM)
+// \brief FEAT Tutorial 03: Andicore solver (TM)
 //
 // This file contains a simple prototypical Anisotropic Diffusion-Convection-Reaction
 // solver for the unit square domain.
@@ -37,30 +37,30 @@
 
 // We start our little tutorial with a batch of includes...
 
-// Misc. FEAST includes
+// Misc. FEAT includes
 #include <kernel/util/string.hpp>                          // for String
 #include <kernel/util/runtime.hpp>                         // for Runtime
 
-// FEAST-Geometry includes
+// FEAT-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
 #include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
 #include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 
-// FEAST-Trafo includes
+// FEAT-Trafo includes
 #include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
 
-// FEAST-Space includes
+// FEAT-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
 
-// FEAST-Cubature includes
+// FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
-// FEAST-Analytic includs
+// FEAT-Analytic includs
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
 
-// FEAST-Assembly includes
+// FEAT-Assembly includes
 #include <kernel/assembly/linear_functional.hpp>           // NEW: for LinearOperator
 #include <kernel/assembly/bilinear_operator.hpp>           // NEW: for BilinearOperator
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
@@ -70,19 +70,19 @@
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 
-// FEAST-LAFEM includes
+// FEAT-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
-// FEAST-Solver includes
+// FEAT-Solver includes
 #include <kernel/solver/spai_precond.hpp>                  // for SPAIPrrecond
 #include <kernel/solver/bicgstab.hpp>                      // for BiCGStab
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-// We are using FEAST
-using namespace FEAST;
+// We are using FEAT
+using namespace FEAT;
 
 // We're opening a new namespace for our tutorial.
 namespace Tutorial03
@@ -110,7 +110,7 @@ namespace Tutorial03
     // First of all, we need a R^{2x2} matrix. The class for this job is the "Tiny" matrix:
     Tiny::Matrix<Real, 2, 2> a;
 
-    // Note that 'Real' is a FEAST typedef, which equals 'double'.
+    // Note that 'Real' is a FEAT typedef, which equals 'double'.
 
     // Next, the R^2 vector b. For this one we have the "Tiny" vector:
     Tiny::Vector<Real, 2> b;
@@ -613,11 +613,11 @@ namespace Tutorial03
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAST runtime environment:
+  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
   Runtime::initialise(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAST's tutorial #03: Andicore" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #03: Andicore" << std::endl;
 
   // The desired mesh refinement level.
   Index level(3);

@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/arch/axpy.hpp>
 
 #include <cstring>
@@ -6,9 +6,9 @@
 #include <mkl.h>
 #include <mkl_spblas.h>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 void Axpy<Mem::Main>::dv_mkl(float * r, const float a, const float * const x, const float * const y, const Index size)
 {

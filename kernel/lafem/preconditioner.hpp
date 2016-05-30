@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_PRECONDITIONER_HPP
 #define KERNEL_LAFEM_PRECONDITIONER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
@@ -14,7 +14,7 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -4099,6 +4099,6 @@ namespace FEAST
       } // function apply
     };
   }// namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_PRECONDITIONER_HPP

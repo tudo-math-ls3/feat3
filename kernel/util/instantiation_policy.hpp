@@ -2,10 +2,10 @@
 #ifndef KERNEL_UTIL_INSTANTIATION_POLICY_HPP
 #define KERNEL_UTIL_INSTANTIATION_POLICY_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
   * \{
@@ -126,7 +126,7 @@ namespace FEAST
       // The Microsoft compiler warns that creating a local static object is not thread-safe.
       // The corresponding warning is enabled by default, so we'll only disable it for the following
       // code and restore the warning state afterwards.
-#ifdef FEAST_COMPILER_MICROSOFT
+#ifdef FEAT_COMPILER_MICROSOFT
 #  pragma warning(push)
 #  pragma warning(disable: 4640)
 #endif
@@ -134,7 +134,7 @@ namespace FEAST
       static T_ * instance(nullptr);
       static DeleteOnDestruction delete_instance(&instance);
 
-#ifdef FEAST_COMPILER_MICROSOFT
+#ifdef FEAT_COMPILER_MICROSOFT
 #  pragma warning(pop)
 #endif
 
@@ -236,6 +236,6 @@ namespace FEAST
       *_ptr = nullptr;
     }
   };
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_INSTANTIATION_POLICY_HPP

@@ -9,13 +9,13 @@
 #include<kernel/foundation/pgraph.hpp>
 #include<kernel/foundation/pexecutor.hpp>
 
-#ifdef FEAST_HAVE_PARMETIS
-FEAST_DISABLE_WARNINGS
+#ifdef FEAT_HAVE_PARMETIS
+FEAT_DISABLE_WARNINGS
 #include<parmetis.h>
-FEAST_RESTORE_WARNINGS
+FEAT_RESTORE_WARNINGS
 #endif
 
-namespace FEAST
+namespace FEAT
 {
   namespace Foundation
   {

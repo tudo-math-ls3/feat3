@@ -4,9 +4,9 @@
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/util/binary_stream.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the sparse matrix csr blocked class.
@@ -125,11 +125,11 @@ SparseMatrixBCSRTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_tes
 SparseMatrixBCSRTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_test_double_ulong;
 SparseMatrixBCSRTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_test_float_uint;
 SparseMatrixBCSRTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_test_double_uint;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixBCSRTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_test_float128_ulong;
 SparseMatrixBCSRTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_test_float128_uint;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixBCSRTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_test_float_ulong;
 SparseMatrixBCSRTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_test_double_ulong;
 SparseMatrixBCSRTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_test_float_uint;
@@ -261,7 +261,7 @@ SparseMatrixBCSRApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcs
 SparseMatrixBCSRApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_apply_test_double_ulong;
 SparseMatrixBCSRApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_apply_test_float_uint;
 SparseMatrixBCSRApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_apply_test_double_uint;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixBCSRApplyTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_apply_test_float128_ulong;
 SparseMatrixBCSRApplyTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_apply_test_float128_uint;
 #endif
@@ -397,11 +397,11 @@ SparseMatrixBCSRApplySquareTest<Mem::Main, float, unsigned long> cpu_sparse_matr
 SparseMatrixBCSRApplySquareTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_apply_square_test_double_ulong;
 SparseMatrixBCSRApplySquareTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_apply_square_test_float_uint;
 SparseMatrixBCSRApplySquareTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_apply_square_test_double_uint;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixBCSRApplySquareTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_apply_square_test_float128_ulong;
 SparseMatrixBCSRApplySquareTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_apply_square_test_float128_uint;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixBCSRApplySquareTest<Mem::CUDA, float, unsigned int> gpu_sparse_matrix_bcsr_apply_square_test_float_uint;
 SparseMatrixBCSRApplySquareTest<Mem::CUDA, double, unsigned int> gpu_sparse_matrix_bcsr_apply_square_test_double_uint;
 #endif
@@ -448,7 +448,7 @@ SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr
 SparseMatrixBCSRDiagTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_diag_test_double_ulong;
 SparseMatrixBCSRDiagTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_diag_test_float_uint;
 SparseMatrixBCSRDiagTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_diag_test_double_uint;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixBCSRDiagTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_diag_test_float128_ulong;
 SparseMatrixBCSRDiagTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_diag_test_float128_uint;
 #endif
@@ -512,11 +512,11 @@ SparseMatrixBCSRScaleTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcs
 SparseMatrixBCSRScaleTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_scale_test_double_ulong;
 SparseMatrixBCSRScaleTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_scale_test_float_uint;
 SparseMatrixBCSRScaleTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_scale_test_double_uint;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixBCSRScaleTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_scale_test_float128_ulong;
 SparseMatrixBCSRScaleTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_scale_test_float128_uint;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixBCSRScaleTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_scale_test_float_ulong;
 SparseMatrixBCSRScaleTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_scale_test_double_ulong;
 SparseMatrixBCSRScaleTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_scale_test_float_uint;
@@ -572,11 +572,11 @@ SparseMatrixBCSRNormTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr
 SparseMatrixBCSRNormTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_norm_test_double_ulong;
 SparseMatrixBCSRNormTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_norm_test_float_uint;
 SparseMatrixBCSRNormTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_norm_test_double_uint;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixBCSRNormTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_norm_test_float128_ulong;
 SparseMatrixBCSRNormTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_norm_test_float128_uint;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixBCSRNormTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_norm_test_float_ulong;
 SparseMatrixBCSRNormTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_norm_test_double_ulong;
 SparseMatrixBCSRNormTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_norm_test_float_uint;
@@ -677,11 +677,11 @@ SparseMatrixBCSRAxpyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr
 SparseMatrixBCSRAxpyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_axpy_test_double_ulong;
 SparseMatrixBCSRAxpyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_axpy_test_float_uint;
 SparseMatrixBCSRAxpyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_axpy_test_double_uint;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixBCSRAxpyTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_bcsr_axpy_test_float128_ulong;
 SparseMatrixBCSRAxpyTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_bcsr_axpy_test_float128_uint;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixBCSRAxpyTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_axpy_test_float_ulong;
 SparseMatrixBCSRAxpyTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_axpy_test_double_ulong;
 SparseMatrixBCSRAxpyTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_axpy_test_float_uint;

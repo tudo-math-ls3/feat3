@@ -2,10 +2,10 @@
 #ifndef KERNEL_ADJACENCY_BASE_HPP
 #define KERNEL_ADJACENCY_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Adjacency namespace
@@ -59,6 +59,6 @@ namespace FEAST
       rt_injectify_transpose = 3
     }; // enum RenderType
   } // namespace Adjacency
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ADJACENCY_BASE_HPP

@@ -2,11 +2,11 @@
 #ifndef KERNEL_ASSEMBLY_COMMON_FUNCTIONALS_HPP
 #define KERNEL_ASSEMBLY_COMMON_FUNCTIONALS_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/analytic/function.hpp>
 #include <kernel/assembly/linear_functional.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -221,6 +221,6 @@ namespace FEAST
       }; // class LaplaceFunctional
     } // namespace Common
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_COMMON_FUNCTIONALS_HPP

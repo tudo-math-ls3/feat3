@@ -1,11 +1,11 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/adjacency/cuthill_mckee.hpp>
 #include <kernel/adjacency/graph.hpp>
 
 // includes, system
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Adjacency
   {
@@ -229,4 +229,4 @@ namespace FEAST
       return perm;
     }
   } // namespace Adjacency
-} // namespace FEAST
+} // namespace FEAT

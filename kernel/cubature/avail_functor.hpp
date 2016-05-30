@@ -2,14 +2,14 @@
 #ifndef KERNEL_CUBATURE_AVAIL_FUNCTOR_HPP
 #define KERNEL_CUBATURE_AVAIL_FUNCTOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/string.hpp>
 
 // includes, STL
 #include <set>
 #include <map>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -130,6 +130,6 @@ namespace FEAST
     } // namespace internal
     /// \endcond
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_AVAIL_FUNCTOR_HPP

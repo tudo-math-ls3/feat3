@@ -2,13 +2,13 @@
 #ifndef KERNEL_SOLVER_FGMRES_HPP
 #define KERNEL_SOLVER_FGMRES_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/iterative.hpp>
 
-// includes, FEAST
+// includes, FEAT
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -312,7 +312,7 @@ namespace FEAST
      * A shared pointer to a new FGMRES object.
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
       const Matrix_& matrix, const Filter_& filter, Index krylov_dim,
@@ -339,6 +339,6 @@ namespace FEAST
     }
 #endif
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_FGMRES_HPP

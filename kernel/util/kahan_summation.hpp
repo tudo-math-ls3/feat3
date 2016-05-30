@@ -6,7 +6,7 @@
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * This struct holds the intermediate summation result and the calculation error from the previous sum operation
@@ -34,6 +34,6 @@ namespace FEAST
    */
   KahanAccumulation KahanSum(KahanAccumulation accumulation, double value);
 
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_KAHAN_SUMMATION_HPP

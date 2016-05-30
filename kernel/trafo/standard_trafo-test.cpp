@@ -7,8 +7,8 @@
 #include <kernel/trafo/standard/inverse_mapping.hpp>
 #include <kernel/util/math.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Standard Trafo test
@@ -991,9 +991,9 @@ class InverseMappingTest
 
 InverseMappingTest<float> btf;
 InverseMappingTest<double> btd;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 InverseMappingTest<__float128> btq;
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 
 /*
  * \brief Test for cell volume computations

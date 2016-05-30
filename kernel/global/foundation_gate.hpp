@@ -10,7 +10,7 @@
 
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Global
   {
@@ -174,6 +174,6 @@ namespace FEAST
       }
     }; // class FoundationGate<...>
   } // namespace Global
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GLOBAL_FOUNDATION_GATE_HPP

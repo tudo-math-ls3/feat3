@@ -2,11 +2,11 @@
 #ifndef KERNEL_SOLVER_SSOR_PRECOND_HPP
 #define KERNEL_SOLVER_SSOR_PRECOND_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -341,6 +341,6 @@ namespace FEAST
         (matrix, filter, omega);
     }
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_SSOR_PRECOND_HPP

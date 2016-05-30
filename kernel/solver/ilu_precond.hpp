@@ -2,7 +2,7 @@
 #ifndef KERNEL_SOLVER_ILU_PRECOND_HPP
 #define KERNEL_SOLVER_ILU_PRECOND_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/base.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
@@ -11,7 +11,7 @@
 // includes, system
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -1154,6 +1154,6 @@ namespace FEAST
       return std::make_shared<ILUPrecond<Matrix_, Filter_>>(matrix, filter, p);
     }
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_ILU_PRECOND_HPP

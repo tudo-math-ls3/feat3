@@ -6,7 +6,7 @@
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/dense_vector.hpp> // required for LAFEM::CloneMode
 
-namespace FEAST
+namespace FEAT
 {
   namespace Global
   {
@@ -153,6 +153,6 @@ namespace FEAST
       }
     };
   } // namespace Global
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GLOBAL_VECTOR_HPP

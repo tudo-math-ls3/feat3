@@ -5,14 +5,14 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/property_map.hpp>
 
-namespace FEAST
+namespace FEAT
 {
-  /// The class Runtime encapsulates various settings and functionality needed to run FEAST properly
+  /// The class Runtime encapsulates various settings and functionality needed to run FEAT properly
   class Runtime
   {
     private:
 
-      /// Feast's global property map, reads in feast.ini at startup
+      /// Feat's global property map, reads in feat.ini at startup
       static PropertyMap _global_property_map;
 
       /// signals, if initialise was called
@@ -23,13 +23,13 @@ namespace FEAST
 
     public:
 
-    /// Returns global property map, containing initial FEAST configuration, read in from feast.ini file
+    /// Returns global property map, containing initial FEAT configuration, read in from feat.ini file
     static PropertyMap * global_property();
 
     /**
-     * \brief FEAST initialisation
+     * \brief FEAT initialisation
      *
-     * This function performs the basic initialisation of the FEAST library.
+     * This function performs the basic initialisation of the FEAT library.
      *
      * \attention
      * This function should be the first functional called in an application's
@@ -47,7 +47,7 @@ namespace FEAST
     static void initialise(int& argc, char**& argv, int& rank, int& nprocs);
 
     /**
-     * \brief FEAST initialisation
+     * \brief FEAT initialisation
      *
      * This function calls the four-argument initialise function and discards the
      * \p rank and \p nprocs values.
@@ -55,7 +55,7 @@ namespace FEAST
     static void initialise(int& argc, char**& argv);
 
     /**
-     * \brief FEAST abortion
+     * \brief FEAT abortion
      *
      * This function terminates this process and, in a MPI-based run, also
      * all other processes belonging to this group.
@@ -63,9 +63,9 @@ namespace FEAST
     static void abort();
 
     /**
-     * \brief FEAST finalisation
+     * \brief FEAT finalisation
      *
-     * This function finalises the FEAST library.
+     * This function finalises the FEAT library.
      *
      * \attention
      * This function should be the last function called in an application's
@@ -77,6 +77,6 @@ namespace FEAST
     static int finalise();
   };
 
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_RUNTIME_HPP

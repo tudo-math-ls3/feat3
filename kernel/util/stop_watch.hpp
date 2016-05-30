@@ -2,10 +2,10 @@
 #ifndef KERNEL_UTIL_STOP_WATCH_HPP
 #define KERNEL_UTIL_STOP_WATCH_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/time_stamp.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Stop-Watch class
@@ -97,6 +97,6 @@ namespace FEAST
       return TimeStamp::format_micros(elapsed_micros(), format);
     }
   }; // class StopWatch
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_STOP_WATCH_HPP

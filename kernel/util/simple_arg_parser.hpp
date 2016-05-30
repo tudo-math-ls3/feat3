@@ -2,7 +2,7 @@
 #ifndef KERNEL_UTIL_SIMPLE_ARG_PARSER_HPP
 #define KERNEL_UTIL_SIMPLE_ARG_PARSER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/string.hpp>
 #include <kernel/util/string_mapped.hpp>
 
@@ -11,7 +11,7 @@
 #include <map>
 #include <utility>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Simple argument parser implementation
@@ -495,6 +495,6 @@ namespace FEAST
     }
     /// \endcond
   }; // class SimpleArgParser
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_SIMPLE_ARG_PARSER_HPP

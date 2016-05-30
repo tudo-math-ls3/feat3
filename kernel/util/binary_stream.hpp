@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Binary Stream class
@@ -199,5 +199,5 @@ namespace FEAST
       return _buffer.data();
     }
   }; // class BinaryStream
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_UTIL_BINARY_STREAM_HPP

@@ -12,7 +12,7 @@
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_control_factory.hpp>
 
-using namespace FEAST;
+using namespace FEAT;
 
 static void display_help();
 
@@ -82,13 +82,13 @@ struct MeshoptScrewsApp
   /// If we are in serial mode, there is no partitioning
   typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<DT_, IT_>, Mesh_> DomCtrl;
 #else
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
   /// If we have ParMETIS, we can use it for partitioning
   typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, Mesh_> DomCtrl;
 #else
   /// Otherwise we have to use the fallback partitioner
   typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<DT_, IT_>, Mesh_> DomCtrl;
-#endif // FEAST_HAVE_PARMETIS
+#endif // FEAT_HAVE_PARMETIS
 #endif // SERIAL
 
   /**
@@ -476,7 +476,7 @@ int main(int argc, char* argv[])
   int nprocs(0);
 
   // initialise
-  FEAST::Runtime::initialise(argc, argv, rank, nprocs);
+  FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifndef SERIAL
   if (rank == 0)
   {
@@ -734,7 +734,7 @@ int main(int argc, char* argv[])
   if(chart_file_reader != nullptr)
     delete chart_file_reader;
 
-  FEAST::Runtime::finalise();
+  FEAT::Runtime::finalise();
   return ret;
 }
 

@@ -2,13 +2,13 @@
 #ifndef KERNEL_LAFEM_CONTAINER_MAIN_WRAPPER_HPP
 #define KERNEL_LAFEM_CONTAINER_MAIN_WRAPPER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief LAFEM namespace
@@ -70,6 +70,6 @@ namespace FEAST
       }
     }; // class ContainerMainWrapper
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_CONTAINER_MAIN_WRAPPER_HPP

@@ -2,7 +2,7 @@
 #ifndef KERNEL_ASSEMBLY_SLIP_FILTER_ASSEMBLER_HPP
 #define KERNEL_ASSEMBLY_SLIP_FILTER_ASSEMBLER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/base.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/lafem/slip_filter.hpp>
@@ -12,7 +12,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -675,6 +675,6 @@ namespace FEAST
 
 
   } //namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_SLIP_FILTER_ASSEMBLER_HPP

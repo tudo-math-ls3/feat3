@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FEAST_SOLVER_NLSD
-#define FEAST_SOLVER_NLSD 1
+#ifndef FEAT_SOLVER_NLSD
+#define FEAT_SOLVER_NLSD 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
@@ -8,7 +8,7 @@
 #include <kernel/solver/nlopt_precond.hpp>
 
 #include <deque>
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -438,7 +438,7 @@ namespace FEAST
      * A shared pointer to a new NLSD object.
      */
     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
     template<typename Operator_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLSD<Operator_, Filter_>> new_nlsd(
       Operator_& op, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false)
@@ -465,6 +465,6 @@ namespace FEAST
       }
 #endif
   } //namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif

@@ -4,7 +4,7 @@
 
 #include <kernel/geometry/atlas/spline_base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -441,5 +441,5 @@ namespace FEAST
       }; // class BezierChartParser<...>
     } // namespace Atlas
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_GEOMETRY_ATLAS_BEZIER_HPP

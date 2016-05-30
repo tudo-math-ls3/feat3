@@ -8,7 +8,7 @@
 
 #include <functional>
 
-namespace FEAST
+namespace FEAT
 {
   /// Utility collection
   namespace Util
@@ -26,7 +26,7 @@ namespace FEAST
     void schedule_function(std::function<void (void)> func, ScheduleMode mode);
 
   } // namespace Util
-} // namespace FEAST
+} // namespace FEAT
 
 
 #endif // UTIL_GUARD_FUNCTION_SCHEDULER_HPP

@@ -2,12 +2,12 @@
 #ifndef KERNEL_UTIL_TINY_ALGEBRA_HPP
 #define KERNEL_UTIL_TINY_ALGEBRA_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/math.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Tiny namespace
@@ -113,7 +113,7 @@ namespace FEAST
        * \tparam T_
        * The type
        *
-       * This is the end of the recursion where the type is something other than a FEAST::Tiny::... object.
+       * This is the end of the recursion where the type is something other than a FEAT::Tiny::... object.
        **/
       template<typename T_>
       struct DataTypeExtractor
@@ -2340,6 +2340,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Tiny
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_TINY_ALGEBRA_HPP

@@ -2,7 +2,7 @@
 #ifndef KERNEL_ASSEMBLY_UNIT_FILTER_ASSEMBLER_HPP
 #define KERNEL_ASSEMBLY_UNIT_FILTER_ASSEMBLER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/base.hpp>
 #include <kernel/analytic/function.hpp>
 #include <kernel/lafem/unit_filter.hpp>
@@ -15,7 +15,7 @@
 #include <map>
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -623,6 +623,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_UNIT_FILTER_ASSEMBLER_HPP

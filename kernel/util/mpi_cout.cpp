@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-using namespace FEAST;
+using namespace FEAT;
 using namespace Util;
 
-void Util::mpi_cout(FEAST::String string,
+void Util::mpi_cout(FEAT::String string,
 std::function<bool (Index, Index)> func)
 {
   Index rank(Comm::rank());

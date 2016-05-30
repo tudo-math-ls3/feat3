@@ -2,14 +2,14 @@
 #ifndef KERNEL_SPACE_BOGNER_FOX_SCHMIT_ELEMENT_HPP
 #define KERNEL_SPACE_BOGNER_FOX_SCHMIT_ELEMENT_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/element_base.hpp>
 #include <kernel/space/dof_assignment_base.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
 #include <kernel/space/bogner_fox_schmit/dof_traits.hpp>
 #include <kernel/space/bogner_fox_schmit/evaluator.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -128,6 +128,6 @@ namespace FEAST
       }; // class Element<...>
     } // namespace BognerFoxSchmit
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_BOGNER_FOX_SCHMIT_ELEMENT_HPP

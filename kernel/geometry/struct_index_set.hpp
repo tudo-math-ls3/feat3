@@ -2,12 +2,12 @@
 #ifndef KERNEL_GEOMETRY_STRUCT_INDEX_SET_HPP
 #define KERNEL_GEOMETRY_STRUCT_INDEX_SET_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/shape.hpp>
 #include <kernel/geometry/intern/struct_num_entities.hpp>
 #include <kernel/geometry/intern/struct_index_mapping.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -312,6 +312,6 @@ namespace FEAST
     };
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_STRUCT_INDEX_SET_HPP

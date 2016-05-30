@@ -10,7 +10,7 @@
 #include <vector>
 #include <stdexcept>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -859,6 +859,6 @@ namespace FEAST
     }; // UnitCubePatchGenerator<Hypercube<3>>
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_UNIT_CUBE_PATCH_GENERATOR_HPP

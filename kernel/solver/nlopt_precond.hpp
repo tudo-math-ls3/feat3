@@ -4,7 +4,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -176,6 +176,6 @@ namespace FEAST
     }
 
   } // namespace Solver
-}// namespace FEAST
+}// namespace FEAT
 
 #endif // KERNEL_SOLVER_NLOPT_PRECOND

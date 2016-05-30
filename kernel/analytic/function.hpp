@@ -2,11 +2,11 @@
 #ifndef KERNEL_ANALYTIC_FUNCTION_HPP
 #define KERNEL_ANALYTIC_FUNCTION_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Analytic namespace
@@ -249,6 +249,6 @@ namespace FEAST
       }; // class Function::Evaluator<...>
     }; // class Function
   } // namespace Analytic
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ANALYTIC_FUNCTION_HPP

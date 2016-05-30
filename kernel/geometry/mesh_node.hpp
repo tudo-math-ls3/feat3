@@ -2,7 +2,7 @@
 #ifndef KERNEL_GEOMETRY_MESH_NODE_HPP
 #define KERNEL_GEOMETRY_MESH_NODE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
@@ -19,7 +19,7 @@
 #include <deque>
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -850,6 +850,6 @@ namespace FEAST
       }
     }; // class RootMeshNode
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_MESH_NODE_HPP

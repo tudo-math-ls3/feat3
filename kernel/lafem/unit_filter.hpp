@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_UNIT_FILTER_HPP
 #define KERNEL_LAFEM_UNIT_FILTER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -11,7 +11,7 @@
 #include <kernel/lafem/sparse_vector.hpp>
 #include <kernel/lafem/arch/unit_filter.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -428,6 +428,6 @@ namespace FEAST
       }
     }; // class UnitFilter<...>
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_UNIT_FILTER_HPP

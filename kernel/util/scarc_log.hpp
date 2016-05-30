@@ -6,7 +6,7 @@
 #include<kernel/util/comm_base.hpp>
 #include<kernel/util/environment.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   template<template<typename, typename> class ST_ = std::vector>
     struct ScaRCLog

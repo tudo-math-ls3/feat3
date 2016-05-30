@@ -2,7 +2,7 @@
 #ifndef KERNEL_SOLVER_BASE_HPP
 #define KERNEL_SOLVER_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/exception.hpp>
@@ -12,7 +12,7 @@
 // includes, system
 #include <memory>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Solver namespace
@@ -260,7 +260,7 @@ namespace FEAST
        * placing the called object at the root.
        *
        * \note This method makes some simplifications, e.g. stating only one smoother
-       * for the complete FEAST::Solver::BasicVCycle.
+       * for the complete FEAT::Solver::BasicVCycle.
        */
       virtual String get_formated_solver_tree()
       {
@@ -361,6 +361,6 @@ namespace FEAST
       return status;
     }
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_BASE_HPP

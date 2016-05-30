@@ -2,8 +2,8 @@
 #include <kernel/util/binary_stream.hpp>
 #include <stdint.h>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the BinaryStream class.

@@ -9,9 +9,9 @@
 
 #include <iostream>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::Benchmark;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::Benchmark;
 
 template<typename Algo_, SparseLayoutId, typename DT_, typename IT_>
 class BlockProductMatVecBench;
@@ -169,12 +169,12 @@ void run()
 int main(int argc, char ** argv)
 {
   Runtime::initialise(argc, argv);
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
   run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned int>, 2>();
 #endif
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index>, 2>();
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> , 2>();
-#ifdef FEAST_BACKENDS_MKL
+#ifdef FEAT_BACKENDS_MKL
   run<Algo::MKL, SparseMatrixCSR<Mem::Main, double, unsigned long>, 2>();
 #endif
   Runtime::finalise();

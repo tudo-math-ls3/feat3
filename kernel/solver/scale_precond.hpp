@@ -4,7 +4,7 @@
 
 #include <kernel/solver/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -75,6 +75,6 @@ namespace FEAST
       return std::make_shared<ScalePrecond<typename Filter_::VectorType, Filter_>>(filter, omega);
     }
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_SCALE_PRECOND_HPP

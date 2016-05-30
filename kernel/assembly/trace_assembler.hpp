@@ -2,7 +2,7 @@
 #ifndef KERNEL_ASSEMBLY_TRACE_ASSEMBLER_HPP
 #define KERNEL_ASSEMBLY_TRACE_ASSEMBLER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 #include <kernel/geometry/intern/face_ref_trafo.hpp>
@@ -12,7 +12,7 @@
 
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -519,6 +519,6 @@ namespace FEAST
       }
     }; // class TraceAssembler<...>
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_TRACE_ASSEMBLER_HPP

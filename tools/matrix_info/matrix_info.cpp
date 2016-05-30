@@ -8,7 +8,7 @@
 // like Matlab or Maple, but it provides a fast and simple way to get some
 // basic information about a matrix.
 //
-// See the documentation page "The matrix-info Tool" in the FEAST documentation
+// See the documentation page "The matrix-info Tool" in the FEAT documentation
 // for detailed information about this tool and its usage.
 //
 // \author Peter Zajac
@@ -29,8 +29,8 @@
 
 namespace MatrixInfo
 {
-  using namespace FEAST;
-  using namespace FEAST::LAFEM;
+  using namespace FEAT;
+  using namespace FEAT::LAFEM;
 
   typedef Mem::Main MemType;
   typedef double DataType;

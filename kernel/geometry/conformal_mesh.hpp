@@ -2,14 +2,14 @@
 #ifndef KERNEL_GEOMETRY_CONFORMAL_MESH_HPP
 #define KERNEL_GEOMETRY_CONFORMAL_MESH_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/factory.hpp>
 #include <kernel/geometry/intern/facet_neighbours.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
 #include <kernel/geometry/index_calculator.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -71,7 +71,7 @@ namespace FEAST
         static_assert(face_dim_ >= 0, "invalid face dimension");
 
         /// index set type
-        typedef FEAST::Geometry::IndexSet
+        typedef FEAT::Geometry::IndexSet
         <
             Shape::FaceTraits
             <
@@ -473,6 +473,6 @@ namespace FEAST
       }
     }; // class StandardRefinery<ConformalMesh<...>,Nil>
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_CONFORMAL_MESH_HPP

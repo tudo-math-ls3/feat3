@@ -6,7 +6,7 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/comm_base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Meshopt
   {
@@ -258,7 +258,7 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
           auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
@@ -287,12 +287,12 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
           auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
 
-          FEAST::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
+          FEAT::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
             local_grad(DataType_(0));
 
           grad_.format();
@@ -397,7 +397,7 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
+          FEAT::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
 
           DataType_ sum_det = compute_sum_det(coords_, trafo_);
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
@@ -419,7 +419,7 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
           auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
@@ -448,12 +448,12 @@ namespace FEAST
           Index ncells( trafo_.get_mesh().get_num_entities(ShapeType::dimension) );
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
 
           // Index set for local/global numbering
           auto& idx = trafo_.get_mesh().template get_index_set<ShapeType::dimension,0>();
 
-          FEAST::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
+          FEAT::Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
             local_grad(DataType_(0));
 
           grad_.format();
@@ -478,5 +478,5 @@ namespace FEAST
     }; // RumpfTrafo<Simplex<2>>
     /// \endcond
   } // namespace Meshopt
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_MESHOPT_RUMPF_TRAFO_HPP

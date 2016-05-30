@@ -3,9 +3,9 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_matrix.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the dense matrix class.
@@ -78,7 +78,7 @@ public:
 };
 DenseMatrixTest<Mem::Main, float, Index> cpu_dense_matrix_test_float;
 DenseMatrixTest<Mem::Main, double, Index> cpu_dense_matrix_test_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 DenseMatrixTest<Mem::CUDA, float, Index> cuda_dense_matrix_test_float;
 DenseMatrixTest<Mem::CUDA, double, Index> cuda_dense_matrix_test_double;
 #endif

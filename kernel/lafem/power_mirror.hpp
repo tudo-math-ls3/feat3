@@ -5,7 +5,7 @@
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -373,6 +373,6 @@ namespace FEAST
       }
     }; // class PowerMirror<...>
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_POWER_MIRROR_HPP

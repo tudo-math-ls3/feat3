@@ -1,7 +1,7 @@
 #include <kernel/foundation/communication_error.hpp>
 #include <string>
 
-using namespace FEAST;
+using namespace FEAT;
 using namespace Foundation;
 
 CommunicationError::CommunicationError(const std::string & message_in) :

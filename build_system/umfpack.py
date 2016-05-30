@@ -11,6 +11,6 @@ class SuiteSparse(ThirdpartyPackage):
     self.dirname = "SuiteSparse"
     self.filename = "SuiteSparse-4.4.3.tar.gz"
     self.url = "http://faculty.cse.tamu.edu/davis/SuiteSparse/" + self.filename
-    self.cmake_flags = " -DFEAST_HAVE_UMFPACK:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_UMFPACK:BOOL=ON"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname

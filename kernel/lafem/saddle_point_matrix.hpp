@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_SADDLE_POINT_MATRIX_HPP
 #define KERNEL_LAFEM_SADDLE_POINT_MATRIX_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/container.hpp>
@@ -11,7 +11,7 @@
 #include <type_traits>
 #include <fstream>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -604,6 +604,6 @@ namespace FEAST
     };
     /// \endcond
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_SADDLE_POINT_MATRIX_HPP

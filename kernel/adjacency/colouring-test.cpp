@@ -2,9 +2,9 @@
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/adjacency/colouring.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Adjacency;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Adjacency;
 
 /**
  * \brief Test class for the Colouring class.

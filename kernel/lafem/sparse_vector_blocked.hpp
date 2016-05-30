@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_SPARSE_VECTOR_BLOCKED_HPP
 #define KERNEL_LAFEM_SPARSE_VECTOR_BLOCKED_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/type_traits.hpp>
@@ -11,7 +11,7 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/math.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -35,7 +35,7 @@ namespace FEAST
     /**
      * \brief Sparse vector class template.
      *
-     * \tparam Mem_ The \ref FEAST::Mem "memory architecture" to be used.
+     * \tparam Mem_ The \ref FEAT::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
      * \tparam BlockSize_ The size of the represented blocks
@@ -533,6 +533,6 @@ namespace FEAST
       }
     }; // class SparseVectorBlocked<...>
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_SPARSE_VECTOR_BLOCKED_HPP

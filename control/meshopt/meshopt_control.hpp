@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FEAST_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP
-#define FEAST_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP 1
+#ifndef FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP
+#define FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP 1
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
@@ -20,7 +20,7 @@
 #include <control/domain/domain_control.hpp>
 #include <control/meshopt/meshopt_solver_factory.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -740,5 +740,5 @@ namespace FEAST
     } // namespace Meshopt
 
   } // namespace Control
-} //namespace FEAST
-#endif // FEAST_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP
+} //namespace FEAT
+#endif // FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP

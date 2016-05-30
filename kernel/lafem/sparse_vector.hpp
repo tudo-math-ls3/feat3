@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_SPARSE_VECTOR_HPP
 #define KERNEL_LAFEM_SPARSE_VECTOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/type_traits.hpp>
@@ -11,14 +11,14 @@
 #include <kernel/util/math.hpp>
 #include <kernel/adjacency/permutation.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
     /**
      * \brief Sparse vector class template.
      *
-     * \tparam Mem_ The \ref FEAST::Mem "memory architecture" to be used.
+     * \tparam Mem_ The \ref FEAT::Mem "memory architecture" to be used.
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
      *
@@ -438,7 +438,7 @@ namespace FEAST
        *
        * Serialize a complete container entity into a single binary array.
        *
-       * See \ref FEAST::LAFEM::Container::_serialise for details.
+       * See \ref FEAT::LAFEM::Container::_serialise for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       std::vector<char> serialise()
@@ -784,6 +784,6 @@ namespace FEAST
 
 
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_SPARSE_VECTOR_HPP

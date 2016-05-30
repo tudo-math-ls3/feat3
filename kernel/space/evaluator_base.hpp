@@ -2,11 +2,11 @@
 #ifndef KERNEL_SPACE_EVALUATOR_BASE_HPP
 #define KERNEL_SPACE_EVALUATOR_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/eval_data.hpp>
 #include <kernel/trafo/eval_data.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -254,6 +254,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_EVALUATOR_BASE_HPP

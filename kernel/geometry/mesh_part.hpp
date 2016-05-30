@@ -2,7 +2,7 @@
 #ifndef KERNEL_GEOMETRY_MESH_PART_HPP
 #define KERNEL_GEOMETRY_MESH_PART_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/factory.hpp>
 #include <kernel/geometry/index_calculator.hpp>
@@ -14,7 +14,7 @@
 
 #include<map>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -136,7 +136,7 @@ namespace FEAST
           static_assert(face_dim_ >= 0, "invalid face dimension");
 
           /// Index set type
-          typedef FEAST::Geometry::IndexSet
+          typedef FEAT::Geometry::IndexSet
           <
             Shape::FaceTraits
             <
@@ -173,7 +173,7 @@ namespace FEAST
         struct TargetSet
         {
           /// Target set type
-          typedef FEAST::Geometry::TargetSet Type;
+          typedef FEAT::Geometry::TargetSet Type;
         }; // struct TargetSet<...>
 
       protected:
@@ -1054,5 +1054,5 @@ namespace FEAST
     /// \endcond
 
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 #endif

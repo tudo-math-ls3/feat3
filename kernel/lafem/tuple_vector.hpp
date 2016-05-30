@@ -2,14 +2,14 @@
 #ifndef KERNEL_LAFEM_TUPLE_VECTOR_HPP
 #define KERNEL_LAFEM_TUPLE_VECTOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/meta_element.hpp>
 
 // includes, system
 #include <iostream>
 #include <type_traits>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -903,6 +903,6 @@ namespace FEAST
     }
     /// \endcond
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_TUPLE_VECTOR_HPP

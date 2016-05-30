@@ -3,9 +3,9 @@
 #include <kernel/adjacency/permutation.hpp>
 #include <kernel/adjacency/cuthill_mckee.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Adjacency;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Adjacency;
 
 /**
  * \brief Test class for the Cuthill McKee class.

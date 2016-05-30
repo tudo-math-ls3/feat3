@@ -2,13 +2,13 @@
 #ifndef KERNEL_GEOMETRY_PATCH_MESHPART_SPLITTER_HPP
 #define KERNEL_GEOMETRY_PATCH_MESHPART_SPLITTER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/mesh_part.hpp>
 
 // includes, system
 #include <map>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -629,6 +629,6 @@ namespace FEAST
     /// \endcond
 
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_PATCH_MESHPART_SPLITTER_HPP

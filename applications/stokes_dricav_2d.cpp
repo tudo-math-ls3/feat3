@@ -24,7 +24,7 @@
 
 namespace StokesDriCav2D
 {
-  using namespace FEAST;
+  using namespace FEAT;
 
   template<typename T_>
   struct VeloFuncX
@@ -441,7 +441,7 @@ namespace StokesDriCav2D
     int nprocs = 0;
 
     // initialise
-    FEAST::Runtime::initialise(argc, argv, rank, nprocs);
+    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifndef SERIAL
     if (rank == 0)
     {
@@ -468,7 +468,7 @@ namespace StokesDriCav2D
           std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << std::endl;
       }
       // abort
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
 
     // define our mesh type
@@ -518,17 +518,17 @@ namespace StokesDriCav2D
     catch (const std::exception& exc)
     {
       std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
     catch (...)
     {
       std::cerr << "ERROR: unknown exception" << std::endl;
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
 #endif // DEBUG
 
     // okay
-    return FEAST::Runtime::finalise();
+    return FEAT::Runtime::finalise();
   }
 
 } // namespace StokesDriCav2D

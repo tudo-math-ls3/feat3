@@ -12,8 +12,8 @@
 #include <kernel/solver/linesearch.hpp>
 #include <kernel/solver/nlcg.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 /// \cond internal
 
@@ -54,7 +54,7 @@ template
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     /// The FE space for the transformation
-    typedef typename FEAST::Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoSpace;
+    typedef typename FEAT::Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoSpace;
     /// Our functional type
     typedef FunctionalType_<DataType, ShapeType> FunctionalType;
     /// The Rumpf smoother
@@ -203,7 +203,7 @@ HyperelasticityFunctionalTest_2d<double, Shape::Simplex<2>, MyFunctionalQ1Split,
 
 /// \brief Specialisation for hypercubes
 template<int shape_dim_>
-struct helperclass< FEAST::Shape::Hypercube<shape_dim_> >
+struct helperclass< FEAT::Shape::Hypercube<shape_dim_> >
 {
   /// \brief Sets coordinates so we deal the the reference element
   template<typename VectorType_, typename DataType_>
@@ -223,7 +223,7 @@ struct helperclass< FEAST::Shape::Hypercube<shape_dim_> >
 
 /// \brief Specialisation for 2d simplices
 template<>
-struct helperclass< FEAST::Shape::Simplex<2> >
+struct helperclass< FEAT::Shape::Simplex<2> >
 {
   /// \brief Sets coordinates so we deal the the Rumpf reference element
   template<typename VectorType_, typename DataType_>

@@ -4,7 +4,7 @@
 
 #include <kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Meshopt
   {
@@ -225,6 +225,6 @@ namespace FEAST
 
     /// \endcond
   } // namespace Meshopt
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_MESHOPT_RUMPF_FUNCTIONALS_Q1SPLIT_HPP

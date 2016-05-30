@@ -15,7 +15,7 @@
 #include <kernel/geometry/atlas/tube.hpp>
 #include <kernel/util/xml_scanner.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -1238,6 +1238,6 @@ namespace FEAST
     /// \endcond
 
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_MESH_FILE_READER_HPP

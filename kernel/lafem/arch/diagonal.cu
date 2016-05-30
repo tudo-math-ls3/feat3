@@ -1,11 +1,11 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/diagonal.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -59,9 +59,9 @@ namespace FEAST
 }
 
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_, typename IT_>
 void Diagonal<Mem::CUDA>::csr(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
@@ -72,8 +72,8 @@ void Diagonal<Mem::CUDA>::csr(DT_ * diag, const DT_ * const val, const IT_ * con
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_diagonal_csr<<<grid, block>>>(diag, val, col_ind, row_ptr, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_diagonal_csr<<<grid, block>>>(diag, val, col_ind, row_ptr, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -96,8 +96,8 @@ void Diagonal<Mem::CUDA>::ell(DT_ * diag, const DT_ * const val, const IT_ * con
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_diagonal_ell<<<grid, block>>>(diag, val, col_ind, cs, cl, C, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_diagonal_ell<<<grid, block>>>(diag, val, col_ind, cs, cl, C, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

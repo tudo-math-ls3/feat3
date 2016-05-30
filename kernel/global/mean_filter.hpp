@@ -2,11 +2,11 @@
 #ifndef KERNEL_GLOBAL_MEAN_FILTER_HPP
 #define KERNEL_GLOBAL_MEAN_FILTER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/global/synch_scal.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Global
   {
@@ -236,7 +236,7 @@ namespace FEAST
       }
     }; // class MeanFilter<...>
   } // namespace Global
-} // namespace FEAST
+} // namespace FEAT
 
 
 #endif // KERNEL_GLOBAL_MEAN_FILTER_HPP

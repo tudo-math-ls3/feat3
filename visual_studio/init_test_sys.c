@@ -2,7 +2,7 @@
 // Error Handler Installer for Visual Studio test system
 // -----------------------------------------------------
 // This file implements a function named 'InitTestSystem', which configures
-// the Windows structured exception handlers (SEH) for the FEAST test system.
+// the Windows structured exception handlers (SEH) for the FEAT test system.
 //
 // This function will has 3 effects:
 // 1. It disables the popup dialog which appears when an application crashes.

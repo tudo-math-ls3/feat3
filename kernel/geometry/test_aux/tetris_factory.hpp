@@ -4,7 +4,7 @@
 
 #include <kernel/geometry/conformal_mesh.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -16,7 +16,7 @@ namespace FEAST
 
       template<int stride_, typename Coord_>
       class TetrisFactory<ConformalMesh<Shape::Quadrilateral, 2, stride_, Coord_> > :
-        public Factory<ConformalMesh<FEAST::Shape::Quadrilateral, 2, stride_, Coord_> >
+        public Factory<ConformalMesh<FEAT::Shape::Quadrilateral, 2, stride_, Coord_> >
       {
       public:
         /// mesh type
@@ -33,7 +33,7 @@ namespace FEAST
         {
         }
 
-        virtual FEAST::Index get_num_entities(int dim)
+        virtual FEAT::Index get_num_entities(int dim)
         {
           switch(dim)
           {
@@ -145,6 +145,6 @@ namespace FEAST
     } // namespace TestAux
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_TEST_AUX_TETRIS_FACTORY_HPP

@@ -2,10 +2,10 @@
 #ifndef KERNEL_TRAFO_EVALUATOR_BASE_HPP
 #define KERNEL_TRAFO_EVALUATOR_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/trafo/eval_data.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Trafo
   {
@@ -391,6 +391,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Trafo
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_TRAFO_EVALUATOR_BASE_HPP

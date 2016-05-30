@@ -38,7 +38,7 @@
 
 namespace PoissonDirichlet2D
 {
-  using namespace FEAST;
+  using namespace FEAT;
 
   typedef Shape::Hypercube<2> ShapeType;
   typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -349,7 +349,7 @@ namespace PoissonDirichlet2D
     TimeStamp bt;
     double solver_toe(bt.elapsed(at));
 
-    FEAST::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
+    FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
       system_levels, transfer_levels, solver, domain);
 
     // release solver
@@ -423,7 +423,7 @@ namespace PoissonDirichlet2D
     int nprocs = 0;
 
     // initialise
-    FEAST::Runtime::initialise(argc, argv, rank, nprocs);
+    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifndef SERIAL
     if (rank == 0)
     {
@@ -456,7 +456,7 @@ namespace PoissonDirichlet2D
         }
       }
       // abort
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
 
     // define our mesh type
@@ -477,7 +477,7 @@ namespace PoissonDirichlet2D
       String meshfile;
       args.parse("part_min_elems", min_elems_partitioner);
       args.parse("meshfile", meshfile);
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
 #else
 #ifndef SERIAL
@@ -521,7 +521,7 @@ namespace PoissonDirichlet2D
       if(rank == 0)
         std::cout << "FAILED: unhandled exception" << std::endl;
 
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
     catch (...)
     {
@@ -530,12 +530,12 @@ namespace PoissonDirichlet2D
       if(rank == 0)
         std::cout << "FAILED: unknown exception" << std::endl;
 
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
 #endif // DEBUG
 
     // okay
-    return FEAST::Runtime::finalise();
+    return FEAT::Runtime::finalise();
   }
 } // namespace PoissonDirichlet2D
 

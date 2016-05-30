@@ -2,11 +2,11 @@
 #ifndef KERNEL_CUBATURE_BARYCENTRE_DRIVER_HPP
 #define KERNEL_CUBATURE_BARYCENTRE_DRIVER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/driver_base.hpp>
 #include <kernel/util/meta_math.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -114,6 +114,6 @@ namespace FEAST
       }
     }; // class BarycentreDriver<Hypercube<...>>
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_BARYCENTRE_DRIVER_HPP

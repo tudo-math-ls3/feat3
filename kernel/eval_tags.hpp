@@ -4,7 +4,7 @@
 
 #include <kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Trafo configuration tags enum
@@ -145,6 +145,6 @@ namespace FEAST
     // just check the interesting bits
     return (static_cast<int>(a) & 0x3F) != 0;
   }
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_EVAL_TAGS_HPP

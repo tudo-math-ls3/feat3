@@ -1,7 +1,7 @@
 #include <kernel/util/environment.hpp>
 #include <string>
 
-using namespace FEAST;
+using namespace FEAT;
 
 #ifndef SERIAL
     const Index Environment::MIN_TAG_UB = Index(32767); //given by MPI 3 standard

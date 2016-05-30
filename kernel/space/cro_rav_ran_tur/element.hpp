@@ -2,7 +2,7 @@
 #ifndef KERNEL_SPACE_CRO_RAV_RAN_TUR_ELEMENT_HPP
 #define KERNEL_SPACE_CRO_RAV_RAN_TUR_ELEMENT_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/element_base.hpp>
 #include <kernel/space/dof_assignment_base.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
@@ -10,7 +10,7 @@
 #include <kernel/space/cro_rav_ran_tur/evaluator.hpp>
 #include <kernel/space/cro_rav_ran_tur/node_functional.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -158,6 +158,6 @@ namespace FEAST
       }; // class Element
     } // namespace CroRavRanTur
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_CRO_RAV_RAN_TUR_ELEMENT_HPP

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FEAST_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP
-#define FEAST_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP 1
+#ifndef FEAT_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP
+#define FEAT_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP 1
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
@@ -20,7 +20,7 @@
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_solver_factory.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -49,18 +49,18 @@ namespace FEAST
           /// The floating point type the mesh's coordinates use
           typedef typename MeshType::CoordType CoordType;
           /// The FE space the transformation lives in
-          typedef typename FEAST::Meshopt::Intern::TrafoFE<Trafo_>::Space TrafoSpace;
+          typedef typename FEAT::Meshopt::Intern::TrafoFE<Trafo_>::Space TrafoSpace;
 
           /// Our base class
           typedef MeshoptControlBase<DomainControl_, Trafo_> BaseClass;
 
-          //typedef FEAST::Meshopt::DuDvFunctional<Mem_, DT_, IT_, Trafo_> MeshQualityFunctional;
+          //typedef FEAT::Meshopt::DuDvFunctional<Mem_, DT_, IT_, Trafo_> MeshQualityFunctional;
           //typedef MeshoptSystemLevel<Mem_, DT_, IT_, MeshQualityFunctional::template MatrixTemplate, Global::Matrix>
           //  SystemLevelType;
 
           /// Template-alias away the Trafo so the SystemLevel can take it as a template template parameter
           template<typename A, typename B, typename C>
-          using OperatorType =  FEAST::Meshopt::DuDvFunctional<A, B, C, Trafo_>;
+          using OperatorType =  FEAT::Meshopt::DuDvFunctional<A, B, C, Trafo_>;
           /// Linear system of equations on one refinement level
           typedef MeshoptSystemLevel<Mem_, DT_, IT_, OperatorType, Global::Matrix> SystemLevelType;
 
@@ -344,6 +344,6 @@ namespace FEAST
 
     } // namespace Meshopt
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
-#endif// FEAST_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP
+#endif// FEAT_CONTROL_MESHOPT_DUDV_FUNCTIONAL_CONTROL_HPP

@@ -26,7 +26,7 @@ struct PROCESS_MEMORY_COUNTERS
 };
 #endif // _WIN32
 
-namespace FEAST
+namespace FEAT
 {
   namespace Util
   {
@@ -158,4 +158,4 @@ namespace FEAST
       return r;
     }
   } // namespace Util
-} // namespace FEAST
+} // namespace FEAT

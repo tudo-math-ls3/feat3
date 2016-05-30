@@ -23,7 +23,7 @@ class ThirdpartyPackage(object):
     self.url = "NullUrl"
     # Filename
     self.filename = "NullFilename"
-    # Absolute path of the FEAST2 directory. Crude, but works.
+    # Absolute path of the FEAT2 directory. Crude, but works.
     self.trunk_dirname = trunk_dirname
     # Where to extract the archive. Needed because sometimes the archive's files are not in an appropriately named
     # subfolder

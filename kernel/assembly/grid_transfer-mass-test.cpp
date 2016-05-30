@@ -14,8 +14,8 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/math.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 template<typename ShapeType, template<typename> class Element_, Index level_coarse_>
 class GridTransferMassTest :

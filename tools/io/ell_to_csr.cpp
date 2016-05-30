@@ -3,8 +3,8 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <iostream>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
 
 int main(int argc, char ** argv)
 {

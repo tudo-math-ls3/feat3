@@ -29,8 +29,8 @@
 
 namespace ElementRegression
 {
-  using namespace FEAST;
-  using namespace FEAST::TestSystem;
+  using namespace FEAT;
+  using namespace FEAT::TestSystem;
 
   typedef double DataType;
   typedef Index IndexType;

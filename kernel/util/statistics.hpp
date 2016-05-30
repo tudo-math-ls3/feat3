@@ -13,7 +13,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace FEAST
+namespace FEAT
 {
   /// Defect norm and time of execution for all iterations of a solver execution
   struct SolverStatistics
@@ -61,7 +61,7 @@ namespace FEAST
       static KahanAccumulation _time_mpi_wait;
 
       /// map of SolverStatistics and their corresponding solver name
-      static std::map<FEAST::String, SolverStatistics> _solver_statistics;
+      static std::map<FEAT::String, SolverStatistics> _solver_statistics;
 
       static String _format_solver_statistics(String branch, SolverStatistics & stat)
       {
@@ -261,9 +261,9 @@ namespace FEAST
        * - defect norm of each iteration
        * - time of exection of each iteration
        *
-       * \note All FEAST::Solver::IterativeSolver instances contain the initial defect norm as the first iteration defect norm.
+       * \note All FEAT::Solver::IterativeSolver instances contain the initial defect norm as the first iteration defect norm.
        *
-       * \note The FEAST::Solver::BasicVCycle prints its TOE from coarse to fine level.
+       * \note The FEAT::Solver::BasicVCycle prints its TOE from coarse to fine level.
        */
       static String get_formated_solvers()
       {
@@ -432,6 +432,6 @@ namespace FEAST
         file.close();
       }
   };
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_STATISTICS_HPP

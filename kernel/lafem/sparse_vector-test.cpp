@@ -3,9 +3,9 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the sparse vector class.
@@ -113,7 +113,7 @@ public:
 SparseVectorTest<Mem::Main, float, Index> cpu_sparse_vector_test_float;
 SparseVectorTest<Mem::Main, double, Index> cpu_sparse_vector_test_double;
 //SparseVectorTest<Mem::Main, Index> cpu_sparse_vector_test_index;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseVectorTest<Mem::CUDA, float, Index> cuda_sparse_vector_test_float;
 SparseVectorTest<Mem::CUDA, double, Index> cuda_sparse_vector_test_double;
 //SparseVectorTest<Mem::CUDA, Index> cuda_sparse_vector_test_index;

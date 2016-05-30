@@ -12,7 +12,7 @@
 #include <iostream>
 #include <limits>
 
-using namespace FEAST;
+using namespace FEAT;
 using namespace Foundation;
 
 template<typename DT1_, typename DT2_, typename DT3_>
@@ -45,7 +45,7 @@ TestResult<DT1_, DT2_, DT3_> test_check_equal_within_eps(DT1_ l, DT2_ r, DT3_ ep
 
 void check_psynch_presult()
 {
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
   typename PExecutorParmetis<ParmetisModePartKway>::PResult local(1);
   local.get()[0] = Util::Comm::rank() == 0 ? 1 : 0;
 
@@ -77,7 +77,7 @@ void check_psynch_presult()
 
 void check_psynch_stringstream()
 {
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
   std::stringstream synchstream;
 
   if(Util::Comm::rank() == 0)
@@ -96,10 +96,10 @@ void check_psynch_stringstream()
 
 void check_psynch_meshstreamer()
 {
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
 
   std::stringstream synchstream;
-  std::string file_prefix(FEAST_SRC_DIR);
+  std::string file_prefix(FEAT_SRC_DIR);
   std::string filename(file_prefix);
   filename += "/data/meshes/bench1-quad.xml";
 
@@ -132,7 +132,7 @@ void check_psynch_meshstreamer()
 
 void check_pexecutor_rank_at_elem()
 {
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
   typename PExecutorParmetis<ParmetisModePartKway>::PResult local(1);
   local.get()[0] = Util::Comm::rank() == 0 ? 1 : 0;
 

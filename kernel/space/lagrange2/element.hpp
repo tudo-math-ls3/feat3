@@ -2,7 +2,7 @@
 #ifndef KERNEL_SPACE_LAGRANGE2_ELEMENT_HPP
 #define KERNEL_SPACE_LAGRANGE2_ELEMENT_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/element_base.hpp>
 #include <kernel/space/dof_assignment_base.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
@@ -10,7 +10,7 @@
 #include <kernel/space/lagrange2/evaluator.hpp>
 #include <kernel/space/lagrange2/node_functional.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -129,6 +129,6 @@ namespace FEAST
       }; // class Element
     } // namespace Lagrange2
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_LAGRANGE2_ELEMENT_HPP

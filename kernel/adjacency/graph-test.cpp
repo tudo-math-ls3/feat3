@@ -3,9 +3,9 @@
 #include <kernel/adjacency/colouring.hpp>
 #include <kernel/adjacency/permutation.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Adjacency;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Adjacency;
 
 typedef CompositeAdjactor<Graph,Graph> CAGG;
 

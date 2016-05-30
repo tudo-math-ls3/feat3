@@ -18,150 +18,150 @@
   </ImportGroup>
 
   <!-- ********************************************************************* -->
-  <!-- FEAST Paths and Names -->
+  <!-- FEAT Paths and Names -->
   <!-- ********************************************************************* -->
 
-  <!-- define FEAST debug prefix -->
+  <!-- define FEAT debug prefix -->
   <PropertyGroup Condition="'$(DebugMode)'=='true'">
-    <FeastDebugPrefix>dbg</FeastDebugPrefix>
+    <FeatDebugPrefix>dbg</FeatDebugPrefix>
   </PropertyGroup>
   <PropertyGroup Condition="'$(DebugMode)'!='true'">
-    <FeastDebugPrefix>opt</FeastDebugPrefix>
+    <FeatDebugPrefix>opt</FeatDebugPrefix>
   </PropertyGroup>
 
-  <!-- define FEAST platform postfix -->
+  <!-- define FEAT platform postfix -->
   <PropertyGroup Condition="'$(Platform)'=='Win32'">
-    <FeastPlatform>x86</FeastPlatform>
+    <FeatPlatform>x86</FeatPlatform>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)'=='x64'">
-    <FeastPlatform>x64</FeastPlatform>
+    <FeatPlatform>x64</FeatPlatform>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)'=='ARM'">
-    <FeastPlatform>arm</FeastPlatform>
+    <FeatPlatform>arm</FeatPlatform>
   </PropertyGroup>
 
   <!-- set default obj-path if necessary -->
-  <PropertyGroup Condition="'$(FeastObjPath)'==''">
-    <FeastObjPath>$(FeastRootPath)\obj</FeastObjPath>
+  <PropertyGroup Condition="'$(FeatObjPath)'==''">
+    <FeatObjPath>$(FeatRootPath)\obj</FeatObjPath>
   </PropertyGroup>
 
   <!-- set default lib-path if necessary -->
-  <PropertyGroup Condition="'$(FeastLibPath)'==''">
-    <FeastLibPath>$(FeastRootPath)\lib</FeastLibPath>
+  <PropertyGroup Condition="'$(FeatLibPath)'==''">
+    <FeatLibPath>$(FeatRootPath)\lib</FeatLibPath>
   </PropertyGroup>
 
   <!-- set default bin-path if necessary -->
-  <PropertyGroup Condition="'$(FeastBinPath)'==''">
-    <FeastBinPath>$(FeastRootPath)\win</FeastBinPath>
+  <PropertyGroup Condition="'$(FeatBinPath)'==''">
+    <FeatBinPath>$(FeatRootPath)\win</FeatBinPath>
   </PropertyGroup>
 
   <!-- set default build name -->
-  <PropertyGroup Condition="'$(FeastBuildName)'==''">
-    <FeastBuildName>$(FeastAppName).vc14-$(Configuration)-$(FeastPlatform)</FeastBuildName>
+  <PropertyGroup Condition="'$(FeatBuildName)'==''">
+    <FeatBuildName>$(FeatAppName).vc14-$(Configuration)-$(FeatPlatform)</FeatBuildName>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
-  <!-- FEAST Third-Party Library Detection -->
+  <!-- FEAT Third-Party Library Detection -->
   <!-- ********************************************************************* -->
-  <PropertyGroup Condition="Exists('..\lib\umfpack.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
-    <FeastHaveUmfpack>true</FeastHaveUmfpack>
+  <PropertyGroup Condition="Exists('..\lib\umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+    <FeatHaveUmfpack>true</FeatHaveUmfpack>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\lib\alglib.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
-    <FeastHaveAlgLib>true</FeastHaveAlgLib>
+  <PropertyGroup Condition="Exists('..\lib\alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+    <FeatHaveAlgLib>true</FeatHaveAlgLib>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('..\lib\fparser.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
-    <FeastHaveFParser>true</FeastHaveFParser>
+  <PropertyGroup Condition="Exists('..\lib\fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
+    <FeatHaveFParser>true</FeatHaveFParser>
   </PropertyGroup>
     <!-- Note: ParMETIS can only be used in combination with MPI -->
-  <PropertyGroup Condition="Exists('..\lib\parmetis.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib') And '$(SerialMode)'=='false'">
-    <FeastHaveParmetis>true</FeastHaveParmetis>
+  <PropertyGroup Condition="Exists('..\lib\parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
+    <FeatHaveParmetis>true</FeatHaveParmetis>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
-  <!-- FEAST Additional Paths and Dependencies -->
+  <!-- FEAT Additional Paths and Dependencies -->
   <!-- ********************************************************************* -->
 
-  <!-- FEAST pre-processor define list -->
-  <ItemGroup Label="FEAST Defines">
-    <FeastDef Condition="'$(DebugMode)'=='true'"
+  <!-- FEAT pre-processor define list -->
+  <ItemGroup Label="FEAT Defines">
+    <FeatDef Condition="'$(DebugMode)'=='true'"
       Include="DEBUG" />
-    <FeastDef Condition="'$(SerialMode)'=='true'"
+    <FeatDef Condition="'$(SerialMode)'=='true'"
       Include="SERIAL" />
-    <FeastDef Condition="'$(SerialMode)'=='false'"
-      Include="FEAST_MPI" />
-    <FeastDef Condition="'$(BackendCUDA)'=='true'"
-      Include="FEAST_BACKENDS_CUDA" />
-    <FeastDef Condition="'$(BackendMKL)'=='true'"
-      Include="FEAST_BACKENDS_MKL" />
-    <FeastDef Condition="'$(FeastHaveUmfpack)'=='true'"
-      Include="FEAST_HAVE_UMFPACK" />
-    <FeastDef Condition="'$(FeastHaveAlgLib)'=='true'"
-      Include="FEAST_HAVE_ALGLIB" />
-    <FeastDef Condition="'$(FeastHaveFParser)'=='true'"
-      Include="FEAST_HAVE_FPARSER" />
-    <FeastDef Condition="'$(FeastHaveParmetis)'=='true'"
-      Include="FEAST_HAVE_PARMETIS" />
+    <FeatDef Condition="'$(SerialMode)'=='false'"
+      Include="FEAT_MPI" />
+    <FeatDef Condition="'$(BackendCUDA)'=='true'"
+      Include="FEAT_BACKENDS_CUDA" />
+    <FeatDef Condition="'$(BackendMKL)'=='true'"
+      Include="FEAT_BACKENDS_MKL" />
+    <FeatDef Condition="'$(FeatHaveUmfpack)'=='true'"
+      Include="FEAT_HAVE_UMFPACK" />
+    <FeatDef Condition="'$(FeatHaveAlgLib)'=='true'"
+      Include="FEAT_HAVE_ALGLIB" />
+    <FeatDef Condition="'$(FeatHaveFParser)'=='true'"
+      Include="FEAT_HAVE_FPARSER" />
+    <FeatDef Condition="'$(FeatHaveParmetis)'=='true'"
+      Include="FEAT_HAVE_PARMETIS" />
   </ItemGroup>
 
-  <!-- FEAST additional include directory list -->
-  <ItemGroup Label="FEAST Include Paths">
-    <FeastIncDir Condition="'$(SerialMode)'=='false'"
+  <!-- FEAT additional include directory list -->
+  <ItemGroup Label="FEAT Include Paths">
+    <FeatIncDir Condition="'$(SerialMode)'=='false'"
       Include="$(MSMPI_INC)" />
-    <FeastIncDir Condition="'$(BackendMKL)'=='true'"
+    <FeatIncDir Condition="'$(BackendMKL)'=='true'"
       Include="$(MKL_PATH)\include" />
-    <FeastIncDir Condition="'$(FeastHaveAlgLib)'=='true'"
-      Include="$(FeastRootPath)\thirdparty\ALGLIB\src;" />
-    <FeastIncDir Condition="'$(FeastHaveUmfpack)'=='true'"
-      Include="$(FeastRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeastRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeastRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
-    <FeastIncDir Condition="'$(FeastHaveFParser)'=='true'"
-      Include="$(FeastRootPath)\thirdparty\fparser;" />
-    <FeastIncDir Condition="'$(FeastHaveParmetis)'=='true'"
-      Include="$(FeastRootPath)\thirdparty\parmetis\include;$(FeastRootPath)\thirdparty\parmetis\metis\include;" />
+    <FeatIncDir Condition="'$(FeatHaveAlgLib)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\ALGLIB\src;" />
+    <FeatIncDir Condition="'$(FeatHaveUmfpack)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\SuiteSparse\SuiteSparse_config;$(FeatRootPath)\thirdparty\SuiteSparse\AMD\Include;$(FeatRootPath)\thirdparty\SuiteSparse\UMFPACK\Include" />
+    <FeatIncDir Condition="'$(FeatHaveFParser)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\fparser;" />
+    <FeatIncDir Condition="'$(FeatHaveParmetis)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\parmetis\include;$(FeatRootPath)\thirdparty\parmetis\metis\include;" />
   </ItemGroup>
 
-  <!-- FEAST additional library search path list -->
-  <ItemGroup Label="FEAST Library Search Paths">
-    <FeastLibDir Include="$(FeastLibPath)" />
-    <FeastLibDir Condition="'$(SerialMode)'=='false' And '$(Platform)'=='Win32'"
+  <!-- FEAT additional library search path list -->
+  <ItemGroup Label="FEAT Library Search Paths">
+    <FeatLibDir Include="$(FeatLibPath)" />
+    <FeatLibDir Condition="'$(SerialMode)'=='false' And '$(Platform)'=='Win32'"
       Include="$(MSMPI_LIB32)" />
-    <FeastLibDir Condition="'$(SerialMode)'=='false' And '$(Platform)'=='x64'"
+    <FeatLibDir Condition="'$(SerialMode)'=='false' And '$(Platform)'=='x64'"
       Include="$(MSMPI_LIB64)" />
-    <FeastLibDir Condition="'$(BackendCUDA)'=='true'"
+    <FeatLibDir Condition="'$(BackendCUDA)'=='true'"
       Include="$(CudaToolkitLibDir)" />
-    <FeastLibDir Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='Win32'"
+    <FeatLibDir Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='Win32'"
       Include="$(MKL_PATH)\lib\ia32" />
-    <FeastLibDir Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
+    <FeatLibDir Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
       Include="$(MKL_PATH)\lib\intel64" />
   </ItemGroup>
 
-  <!-- FEAST additional library dependencies list -->
-  <ItemGroup Label="FEAST Library Dependencies">
-    <FeastLibDep Condition="'$(SerialMode)'=='false'"
+  <!-- FEAT additional library dependencies list -->
+  <ItemGroup Label="FEAT Library Dependencies">
+    <FeatLibDep Condition="'$(SerialMode)'=='false'"
       Include="msmpi.lib" />
-    <FeastLibDep Condition="'$(BackendCUDA)'=='true'"
+    <FeatLibDep Condition="'$(BackendCUDA)'=='true'"
       Include="cudart.lib;cublas.lib" />
-    <FeastLibDep Condition="'$(BackendMKL)'=='true'"
+    <FeatLibDep Condition="'$(BackendMKL)'=='true'"
       Include="mkl_core.lib;mkl_sequential.lib" />
-    <FeastLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='Win32'"
+    <FeatLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='Win32'"
       Include="mkl_intel_c.lib" />
-    <FeastLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
+    <FeatLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
       Include="mkl_intel_lp64.lib" />
-    <FeastLibDep Condition="'$(FeastHaveUmfpack)'=='true'"
-      Include="umfpack.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
-    <FeastLibDep Condition="'$(FeastHaveAlgLib)'=='true'"
-      Include="alglib.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
-    <FeastLibDep Condition="'$(FeastHaveFParser)'=='true'"
-      Include="fparser.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
-    <FeastLibDep Condition="'$(FeastHaveParmetis)'=='true'"
-      Include="parmetis.vc14-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveUmfpack)'=='true'"
+      Include="umfpack.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveAlgLib)'=='true'"
+      Include="alglib.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveFParser)'=='true'"
+      Include="fparser.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveParmetis)'=='true'"
+      Include="parmetis.vc14-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
   </ItemGroup>
 
   <!-- build properties from item lists -->
   <PropertyGroup>
-    <FeastDefList>@(FeastDef)</FeastDefList>
-    <FeastIncDirList>@(FeastIncDir)</FeastIncDirList>
-    <FeastLibDirList>@(FeastLibDir)</FeastLibDirList>
-    <FeastLibDepList>@(FeastLibDep)</FeastLibDepList>
+    <FeatDefList>@(FeatDef)</FeatDefList>
+    <FeatIncDirList>@(FeatIncDir)</FeatIncDirList>
+    <FeatLibDirList>@(FeatLibDir)</FeatLibDirList>
+    <FeatLibDepList>@(FeatLibDep)</FeatLibDepList>
   </PropertyGroup>
 
 </Project>

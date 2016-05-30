@@ -4,19 +4,19 @@
 
 #include <cstring>
 
-#ifdef FEAST_TESTING_VC
+#ifdef FEAT_TESTING_VC
 // prototype for InitTestSystem defined in "visual_studio\init_test_sys.c"
 extern "C" void __stdcall InitTestSystem();
-#endif // FEAST_TESTING_VC
+#endif // FEAT_TESTING_VC
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 int main(int argc, char** argv)
 {
   Runtime::initialise(argc, argv);
 
-#ifdef FEAST_TESTING_VC
+#ifdef FEAT_TESTING_VC
   // Do not initialise VC test system if '--no-init' is the first option;
   // this way, we can attach the debugger if we run the test by hand
   if((argc < 2) || (0 != strcmp(argv[1], "--no-init")))
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
   }
 #else
   std::cout << "CTEST_FULL_OUTPUT" << std::endl;
-#endif // FEAST_TESTING_VC
+#endif // FEAT_TESTING_VC
 
   int result(EXIT_SUCCESS);
 

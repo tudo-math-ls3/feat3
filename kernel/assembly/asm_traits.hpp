@@ -2,11 +2,11 @@
 #ifndef KERNEL_ASSEMBLY_ASM_TRAITS_HPP
 #define KERNEL_ASSEMBLY_ASM_TRAITS_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/base.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -344,7 +344,7 @@ namespace FEAST
       static constexpr int BlockHeight = OperatorValueType::m;
       static constexpr int BlockWidth = OperatorValueType::n;
       /// type a functional returns
-      typedef FEAST::Tiny::Vector<DataType,BlockWidth> FunctionalDataType;
+      typedef FEAT::Tiny::Vector<DataType,BlockWidth> FunctionalDataType;
       /// space type
       typedef Space_ SpaceType;
       /// test-space type
@@ -438,6 +438,6 @@ namespace FEAST
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
     }; // class AsmTraits1Blocked
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_ASM_TRAITS_HPP

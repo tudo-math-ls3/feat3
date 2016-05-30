@@ -3,7 +3,7 @@
 
 #include <algorithm> // for std::max/min
 
-namespace FEAST
+namespace FEAT
 {
   namespace Adjacency
   {
@@ -245,4 +245,4 @@ namespace FEAST
       }
     }
   } // namespace Adjacency
-} // namespace FEAST
+} // namespace FEAT

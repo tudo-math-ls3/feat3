@@ -20,7 +20,7 @@
 #include <kernel/analytic/common.hpp>
 #include <kernel/util/time_stamp.hpp>
 
-using namespace FEAST;
+using namespace FEAT;
 
 template<typename T_>
 struct VeloFuncX

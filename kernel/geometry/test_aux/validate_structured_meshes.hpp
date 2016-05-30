@@ -2,10 +2,10 @@
 #ifndef KERNEL_GEOMETRY_TEST_AUX_VALIDATE_STRUCTURED_MESHES_HPP
 #define KERNEL_GEOMETRY_TEST_AUX_VALIDATE_STRUCTURED_MESHES_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/structured_mesh.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -19,6 +19,6 @@ namespace FEAST
     } // namespace TestAux
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_TEST_AUX_VALIDATE_STRUCTURED_MESHES_HPP

@@ -11,7 +11,7 @@
 
 namespace MeshExtruderTool
 {
-  using namespace FEAST;
+  using namespace FEAT;
   using namespace Geometry;
 
   typedef ConformalMesh<Shape::Quadrilateral> QuadMesh;

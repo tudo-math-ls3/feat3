@@ -4,7 +4,7 @@
 
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -140,6 +140,6 @@ namespace FEAST
     }; // class FilterSequence
 
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_FILTER_SEQUENCE_HPP

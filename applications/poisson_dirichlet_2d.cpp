@@ -33,7 +33,7 @@
 
 namespace PoissonDirichlet2D
 {
-  using namespace FEAST;
+  using namespace FEAT;
 
   template<typename Space_>
   class PoissonDirichletAssemblerLevel :
@@ -312,7 +312,7 @@ namespace PoissonDirichlet2D
     TimeStamp bt;
     double solver_toe(bt.elapsed(at));
 
-    FEAST::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
+    FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
     system_levels, transfer_levels, solver, domain);
 
     // release solver
@@ -402,7 +402,7 @@ namespace PoissonDirichlet2D
     int nprocs = 0;
 
     // initialise
-    FEAST::Runtime::initialise(argc, argv, rank, nprocs);
+    FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifndef SERIAL
     Util::mpi_cout("NUM-PROCS: " + stringify(nprocs) + "\n");
 #endif
@@ -434,7 +434,7 @@ namespace PoissonDirichlet2D
         std::cerr << args.get_supported_help() << std::endl;
       }
       // abort
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
 
     // define our mesh type
@@ -445,7 +445,7 @@ namespace PoissonDirichlet2D
     int lvl_min = 0;
     args.parse("level", lvl_max, lvl_min);
 
-    FEAST::String mem_string = "main";
+    FEAT::String mem_string = "main";
     args.parse("mem", mem_string);
 
 #ifndef DEBUG
@@ -465,9 +465,9 @@ namespace PoissonDirichlet2D
       {
         if(rank == 0)
           std::cerr << "ERROR: Mandatory option --meshfile is missing!" << std::endl;
-        FEAST::Runtime::abort();
+        FEAT::Runtime::abort();
       }
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
 #elif !defined(SERIAL)
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
@@ -484,7 +484,7 @@ namespace PoissonDirichlet2D
       {
         run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(rank, nprocs, args, domain);
       }
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
       else if(mem_string == "cuda")
       {
         run<MeshType, LAFEM::SparseMatrixELL<Mem::CUDA, double, Index> >(rank, nprocs, args, domain);
@@ -511,17 +511,17 @@ namespace PoissonDirichlet2D
     catch (const std::exception& exc)
     {
       std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
     catch (...)
     {
       std::cerr << "ERROR: unknown exception" << std::endl;
-      FEAST::Runtime::abort();
+      FEAT::Runtime::abort();
     }
 #endif // DEBUG
 
     // okay
-    return FEAST::Runtime::finalise();
+    return FEAT::Runtime::finalise();
   }
 } // namespace PoissonDirichlet2D
 

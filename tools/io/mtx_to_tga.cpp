@@ -3,9 +3,9 @@
 #include <kernel/adjacency/export_tga.hpp>
 #include <iostream>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::Adjacency;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::Adjacency;
 
 int main(int argc, char ** argv)
 {

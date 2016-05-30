@@ -2,7 +2,7 @@
 #ifndef KERNEL_CUBATURE_SCALAR_FACTORY_WRAPPER_HPP
 #define KERNEL_CUBATURE_SCALAR_FACTORY_WRAPPER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/scalar/driver_factory.hpp>
 #include <kernel/cubature/scalar/gauss_legendre_driver.hpp>
 #include <kernel/cubature/scalar/gauss_lobatto_driver.hpp>
@@ -12,7 +12,7 @@
 #include <kernel/cubature/scalar/newton_cotes_open_driver.hpp>
 #include <kernel/cubature/scalar/trapezoidal_driver.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -96,6 +96,6 @@ namespace FEAST
       };
     } // namespace Scalar
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_SCALAR_DRIVER_WRAPPER_HPP

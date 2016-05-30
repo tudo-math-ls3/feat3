@@ -1,9 +1,9 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <test_system/test_system.hpp>
 
-using namespace FEAST;
-using namespace FEAST::Tiny;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::Tiny;
+using namespace FEAT::TestSystem;
 
 using Math::sqr;
 using Math::cub;
@@ -155,6 +155,6 @@ public:
 
 TinyAlgebraTest<float> tagged_tiny_test_f("TinyAlgebraTest<float>");
 TinyAlgebraTest<double> tagged_tiny_test_d("TinyAlgebraTest<double>");
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 TinyAlgebraTest<__float128> tagged_tiny_test_f128("TinyAlgebraTest<__float128>");
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH

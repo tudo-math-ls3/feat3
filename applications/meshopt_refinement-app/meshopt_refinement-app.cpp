@@ -8,7 +8,7 @@
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_control_factory.hpp>
 
-using namespace FEAST;
+using namespace FEAT;
 
 static void display_help();
 
@@ -72,7 +72,7 @@ struct MeshRefinementOptimiserApp
   // If we are in serial mode, there is no partitioning
   typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<DT_, IT_>, Mesh_> DomCtrl;
 #else
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
   // If we have ParMETIS, we can use it for partitioning
   typedef Control::Domain::PartitionerDomainControl
   <
@@ -83,7 +83,7 @@ struct MeshRefinementOptimiserApp
 #else
   // Otherwise we have to use the fallback partitioner
   typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<DT_, IT_>, Mesh_> DomCtrl;
-#endif // FEAST_HAVE_PARMETIS
+#endif // FEAT_HAVE_PARMETIS
 #endif // SERIAL
 
   /**
@@ -162,7 +162,7 @@ struct MeshRefinementOptimiserApp
 
         auto min_quality(quality);
         auto min_angle(angle);
-#ifdef FEAST_HAVE_MPI
+#ifdef FEAT_HAVE_MPI
         Util::Comm::allreduce(&quality, Index(1), &min_quality, MPI_MIN);
         Util::Comm::allreduce(&angle, Index(1), &min_angle, MPI_MIN);
 #endif
@@ -208,7 +208,7 @@ struct MeshRefinementOptimiserApp
 
         auto min_quality(quality);
         auto min_angle(angle);
-#ifdef FEAST_HAVE_MPI
+#ifdef FEAT_HAVE_MPI
         Util::Comm::allreduce(&quality, Index(1), &min_quality, MPI_MIN);
         Util::Comm::allreduce(&angle, Index(1), &min_angle, MPI_MIN);
 #endif
@@ -250,7 +250,7 @@ int main(int argc, char* argv[])
   int nprocs(0);
 
   // initialise
-  FEAST::Runtime::initialise(argc, argv, rank, nprocs);
+  FEAT::Runtime::initialise(argc, argv, rank, nprocs);
 #ifndef SERIAL
   if (rank == 0)
   {
@@ -491,7 +491,7 @@ int main(int argc, char* argv[])
   if(Util::Comm::rank() == 0)
     std::cout << "Total time: " << ts_end.elapsed(ts_start) << std::endl;
 
-  FEAST::Runtime::finalise();
+  FEAT::Runtime::finalise();
   return ret;
 }
 

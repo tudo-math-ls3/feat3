@@ -2,7 +2,7 @@
 #ifndef KERNEL_GEOMETRY_TEST_AUX_COPY_COMP_SET_HPP
 #define KERNEL_GEOMETRY_TEST_AUX_COPY_COMP_SET_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/index_set.hpp>
 #include <kernel/geometry/target_set.hpp>
 #include <kernel/geometry/vertex_set.hpp>
@@ -10,7 +10,7 @@
 // includes, CSL
 #include <cmath>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -107,6 +107,6 @@ namespace FEAST
     } // namespace TestAux
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_TEST_AUX_COPY_COMP_SET_HPP

@@ -8,4 +8,4 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # applications to build
 ADD_EXECUTABLE(meshopt_screws-app meshopt_screws-app)
-TARGET_LINK_LIBRARIES(meshopt_screws-app feast)
+TARGET_LINK_LIBRARIES(meshopt_screws-app feat)

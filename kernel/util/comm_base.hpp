@@ -10,7 +10,7 @@
 #include<kernel/util/time_stamp.hpp>
 #include<kernel/util/statistics.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Util
   {
@@ -500,7 +500,7 @@ namespace FEAST
   }
 }
 #else //SERIAL MODE
-namespace FEAST
+namespace FEAT
 {
   namespace Util
   {

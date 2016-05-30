@@ -18,7 +18,7 @@
 
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -485,9 +485,9 @@ namespace FEAST
 
           if (solver_type == "ALGLIBMinLBFGS")
           {
-#ifndef FEAST_HAVE_ALGLIB
+#ifndef FEAT_HAVE_ALGLIB
             throw InternalError(__func__,__FILE__,__LINE__,
-            "ALGLIBMinLBFGS is only available if FEAST was built with the alglib token in the buildid.");
+            "ALGLIBMinLBFGS is only available if FEAT was built with the alglib token in the buildid.");
 #else
 
             if( Util::Comm::size() != 1)
@@ -514,13 +514,13 @@ namespace FEAST
               keep_iterates);
             configure_iterative_solver(section, solver);
             result = solver;
-#endif // FEAST_HAVE_ALGLIB
+#endif // FEAT_HAVE_ALGLIB
           }
           else if (solver_type == "ALGLIBMinCG")
           {
-#ifndef FEAST_HAVE_ALGLIB
+#ifndef FEAT_HAVE_ALGLIB
             throw InternalError(__func__,__FILE__,__LINE__,
-            "ALGLIBMinCG is only available if FEAST was built with the alglib token in the buildid.");
+            "ALGLIBMinCG is only available if FEAT was built with the alglib token in the buildid.");
 #else
             if( Util::Comm::size() != 1)
               throw InternalError(__func__, __FILE__, __LINE__, "ALGLIBMinCG is only available with 1 process!");
@@ -548,7 +548,7 @@ namespace FEAST
               keep_iterates);
             configure_iterative_solver(section, solver);
             result = solver;
-#endif // FEAST_HAVE_ALGLIB
+#endif // FEAT_HAVE_ALGLIB
           }
           else if (solver_type == "NLCG")
           {
@@ -595,6 +595,6 @@ namespace FEAST
 
     }; // MeshoptSolverFactory
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_MESHOPT_MESHOPT_SOLVER_FACTORY_HPP

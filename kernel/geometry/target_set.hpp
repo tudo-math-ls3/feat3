@@ -2,10 +2,10 @@
 #ifndef KERNEL_GEOMETRY_TARGET_SET_HPP
 #define KERNEL_GEOMETRY_TARGET_SET_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/shape.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -308,6 +308,6 @@ namespace FEAST
     };
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_TARGET_SET_HPP

@@ -9,7 +9,7 @@
 #include<mpi.h>
 #endif
 
-namespace FEAST
+namespace FEAT
 {
   class Environment
   {

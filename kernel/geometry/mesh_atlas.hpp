@@ -2,7 +2,7 @@
 #ifndef KERNEL_GEOMETRY_MESH_ATLAS_HPP
 #define KERNEL_GEOMETRY_MESH_ATLAS_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/atlas/chart.hpp>
@@ -11,7 +11,7 @@
 #include <map>
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -161,6 +161,6 @@ namespace FEAST
 
     }; // class MeshAltas<...>
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_MESH_ATLAS_HPP

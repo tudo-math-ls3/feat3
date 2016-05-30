@@ -6,7 +6,7 @@
 #include <kernel/util/math.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -224,6 +224,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_INTERN_CONGRUENCY_TRAFO_HPP

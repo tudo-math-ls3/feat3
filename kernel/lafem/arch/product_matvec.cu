@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
@@ -7,7 +7,7 @@
 
 #include "cusparse_v2.h"
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -212,9 +212,9 @@ namespace FEAST
 }
 
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
 void ProductMatVec<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
@@ -225,8 +225,8 @@ void ProductMatVec<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const unsigne
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_product_matvec_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_product_matvec_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -246,11 +246,11 @@ void ProductMatVec<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const unsigne
 
   DT_ one(1);
   DT_ zero(0);
-  FEAST::LAFEM::Intern::cusparse_product_matvec_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &one, descr, val, (int*)row_ptr, (int*)col_ind, x, &zero, r);
+  FEAT::LAFEM::Intern::cusparse_product_matvec_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &one, descr, val, (int*)row_ptr, (int*)col_ind, x, &zero, r);
 
   cusparseDestroyMatDescr(descr);
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -270,11 +270,11 @@ void ProductMatVec<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const val, const
 
   DT_ one(1);
   DT_ zero(0);
-  FEAST::LAFEM::Intern::cusparse_product_matvec_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &one, descr, val, (int*)row_ptr, (int*)col_ind, blocksize, x, &zero, r);
+  FEAT::LAFEM::Intern::cusparse_product_matvec_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &one, descr, val, (int*)row_ptr, (int*)col_ind, blocksize, x, &zero, r);
 
   cusparseDestroyMatDescr(descr);
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -294,8 +294,8 @@ void ProductMatVec<Mem::CUDA>::ell(DT_ * r, const DT_ * const val, const IT_ * c
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_product_matvec_ell<<<grid, block>>>(r, x, val, col_ind, cs, cl, C, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_product_matvec_ell<<<grid, block>>>(r, x, val, col_ind, cs, cl, C, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -317,9 +317,9 @@ void ProductMatVec<Mem::CUDA>::banded(DT_ * r, const DT_ * const val, const IT_ 
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   //if (num_of_offsets == 9)
-  //  FEAST::LAFEM::Intern::cuda_product_matvec_q1<<<grid, block, 3 * (block.x + 2) * sizeof(DT_)>>>(r, x, val, offsets, num_of_offsets, rows, columns);
+  //  FEAT::LAFEM::Intern::cuda_product_matvec_q1<<<grid, block, 3 * (block.x + 2) * sizeof(DT_)>>>(r, x, val, offsets, num_of_offsets, rows, columns);
   //else
-  FEAST::LAFEM::Intern::cuda_product_matvec_banded<<<grid, block>>>(r, x, val, offsets, num_of_offsets, rows, columns);
+  FEAT::LAFEM::Intern::cuda_product_matvec_banded<<<grid, block>>>(r, x, val, offsets, num_of_offsets, rows, columns);
 }
 template void ProductMatVec<Mem::CUDA>::banded(float *, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
 template void ProductMatVec<Mem::CUDA>::banded(double *, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);

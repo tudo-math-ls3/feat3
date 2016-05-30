@@ -8,7 +8,7 @@
 
 #include <functional>
 
-namespace FEAST
+namespace FEAT
 {
   /// common benchmarking methods
   namespace Benchmark
@@ -24,7 +24,7 @@ namespace FEAST
     template <typename Mem_>
     void run_bench(std::function<void (void)> func, double flops, double bytes)
     {
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
       throw InternalError("You are running a benchmark in DEBUG mode!");
 #endif
 

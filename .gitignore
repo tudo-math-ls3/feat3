@@ -42,7 +42,7 @@ kernel/util/Testing/
 test_system/CMakeFiles/
 test_system/Testing/
 
-# Ignore FEAST test output files
+# Ignore FEAT test output files
 *test*.log
 
 # Ignore Doxygen output files

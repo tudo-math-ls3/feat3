@@ -1,5 +1,5 @@
 //
-// \brief FEAST Tutorial 02: Laplace solver (TM)
+// \brief FEAT Tutorial 02: Laplace solver (TM)
 //
 // This file contains a simple prototypical Laplace solver for the unit square domain.
 //
@@ -25,30 +25,30 @@
 
 // We start our little tutorial with a batch of includes...
 
-// Misc. FEAST includes
+// Misc. FEAT includes
 #include <kernel/util/string.hpp>                          // for String
 #include <kernel/util/runtime.hpp>                         // for Runtime
 
-// FEAST-Geometry includes
+// FEAT-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
 #include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
 #include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 
-// FEAST-Trafo includes
+// FEAT-Trafo includes
 #include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
 
-// FEAST-Space includes
+// FEAT-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
 
-// FEAST-Cubature includes
+// FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
-// FEAST-Analytic includes
+// FEAT-Analytic includes
 #include <kernel/analytic/function.hpp>                    // NEW: for Analytic::Function
 
-// FEAST-Assembly includes
+// FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
@@ -57,19 +57,19 @@
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 
-// FEAST-LAFEM includes
+// FEAT-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
-// FEAST-Solver includes
+// FEAT-Solver includes
 #include <kernel/solver/ssor_precond.hpp>                  // for SSORPrecond
 #include <kernel/solver/pcg.hpp>                           // for PCG
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-// We are using FEAST
-using namespace FEAST;
+// We are using FEAT
+using namespace FEAT;
 
 // We're opening a new namespace for our tutorial.
 namespace Tutorial02
@@ -393,7 +393,7 @@ int main(int argc, char* argv[])
   Runtime::initialise(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAST's tutorial #02: Laplace" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #02: Laplace" << std::endl;
 
   // The desired mesh refinement level, defaulted to 3
   Index level(3);

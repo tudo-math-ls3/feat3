@@ -1,9 +1,9 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/meta_vector_test_base.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Meta-Vector scale test class
@@ -82,7 +82,7 @@ public:
 
 MetaVectorScaleTest<Mem::Main, float, Index> meta_vector_scale_test_generic_float;
 MetaVectorScaleTest<Mem::Main, double, Index> meta_vector_scale_test_generic_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 MetaVectorScaleTest<Mem::CUDA, float, Index> meta_vector_scale_test_cuda_float;
 MetaVectorScaleTest<Mem::CUDA, double, Index> meta_vector_scale_test_cuda_double;
 #endif

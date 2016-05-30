@@ -2,11 +2,11 @@
 #ifndef KERNEL_ADJACENCY_CUTHILLMCKEE_HPP
 #define KERNEL_ADJACENCY_CUTHILLMCKEE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/adjacency/permutation.hpp>
 #include <kernel/adjacency/graph.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Adjacency
   {
@@ -107,6 +107,6 @@ namespace FEAST
         CuthillMcKee::SortType sort_type = sort_default);
     }; // class CuthillMcKee
   } // namespace Adjacency
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ADJACENCY_CUTHILLMCKEE_HPP

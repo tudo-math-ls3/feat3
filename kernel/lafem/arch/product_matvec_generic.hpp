@@ -9,7 +9,7 @@
 #include <kernel/util/math.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -208,7 +208,7 @@ namespace FEAST
           break;
         default:
 #ifdef DEBUG
-          /// \todo print warning in feast log file
+          /// \todo print warning in feat log file
           std::cout << "Warning: ProductMatVec not optimized for chunk size = " << C << "!" << std::endl;
 #endif
           Intern::ProductMatVecELL::ProductMatVecGeneric<DT_, IT_>::f(r, val, col_ind, cs, cl, x, C, rows);
@@ -293,7 +293,7 @@ namespace FEAST
               Index end  (Math::min(start_offset(j-2, offsets, rows, columns, noo),
                                     end_offset(i-2, offsets, rows, columns, noo) + 1));
 
-              FEAST_IVDEP
+              FEAT_IVDEP
                 for (Index l(start); l < end; ++l)
                 {
                   DT_ tmp(0);
@@ -386,7 +386,7 @@ namespace FEAST
                                                            const IT_ * const offsets, const DT_ * const x,
                                                            const Index num_of_offsets, const Index rows, const Index columns)
       {
-#ifdef FEAST_UNROLL_BANDED
+#ifdef FEAT_UNROLL_BANDED
         switch (num_of_offsets)
         {
         case 3:
@@ -403,14 +403,14 @@ namespace FEAST
           break;
         default:
 #ifdef DEBUG
-          /// \todo print warning in feast log file
+          /// \todo print warning in feat log file
           std::cout << "Warning: ProductMatVec not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
           Intern::ProductMatVecBanded::product_matvec_banded_generic(r, val, offsets, x, num_of_offsets, rows, columns);
         }
 #else
         Intern::ProductMatVecBanded::product_matvec_banded_generic(r, val, offsets, x, num_of_offsets, rows, columns);
-#endif //FEAST_UNROLL_BANDED
+#endif //FEAT_UNROLL_BANDED
       }
 
       template <typename DT_>
@@ -429,6 +429,6 @@ namespace FEAST
 
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_ARCH_PRODUCT_MATVEC_GENERIC_HPP

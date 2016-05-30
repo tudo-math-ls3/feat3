@@ -32,7 +32,7 @@
 #include <iostream>
 #include <limits>
 
-using namespace FEAST;
+using namespace FEAT;
 using namespace Foundation;
 using namespace Geometry;
 using namespace LAFEM;

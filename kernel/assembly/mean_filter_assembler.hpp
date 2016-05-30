@@ -9,7 +9,7 @@
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/analytic/common.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -90,6 +90,6 @@ namespace FEAST
       }
     }; // class MeanFilterAssembler
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_MEAN_FILTER_ASSEMBLER_HPP

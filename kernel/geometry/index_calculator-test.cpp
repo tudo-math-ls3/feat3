@@ -5,10 +5,10 @@
 #include <kernel/geometry/test_aux/tetris_hexa.hpp>
 #include <kernel/geometry/test_aux/standard_tetra.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
-using namespace FEAST::Geometry::TestAux;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
+using namespace FEAT::Geometry::TestAux;
 
 /**
  * \brief Test class for the IndexCalculator class template and the IndexTree class template.

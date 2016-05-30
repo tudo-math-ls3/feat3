@@ -1,15 +1,15 @@
 #include<kernel/base_header.hpp>
 #include<test_system/test_system.hpp>
 
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
 #include<kernel/archs.hpp>
 #include<kernel/foundation/pgraph.hpp>
 #include<kernel/geometry/index_calculator.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Foundation;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Foundation;
+using namespace FEAT::Geometry;
 
 
 template<typename Tag_= Mem::Main, typename IndexType_ = Index, typename DataType = float>

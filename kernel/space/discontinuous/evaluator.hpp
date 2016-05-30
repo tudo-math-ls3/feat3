@@ -2,11 +2,11 @@
 #ifndef KERNEL_SPACE_DISCONTINUOUS_EVALUATOR_HPP
 #define KERNEL_SPACE_DISCONTINUOUS_EVALUATOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/parametric_evaluator.hpp>
 #include <kernel/space/discontinuous/variant.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -347,6 +347,6 @@ namespace FEAST
       }; // Evaluator<..., Variant::StdNonPar, Shape::Quadrilateral>
     } // namespace Discontinuous
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_DISCONTINUOUS_EVALUATOR_HPP

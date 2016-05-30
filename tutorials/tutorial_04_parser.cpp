@@ -1,5 +1,5 @@
 //
-// \brief FEAST Tutorial 04: Parser demonstation
+// \brief FEAT Tutorial 04: Parser demonstation
 //
 // This file contains a simple Poisson/Laplace solver for the unit square domain.
 //
@@ -17,7 +17,7 @@
 //
 // 1. The 'SimpleArgParser' class:
 // -------------------------------
-// This class is a basic light-weight command line argument parser offered by FEAST.
+// This class is a basic light-weight command line argument parser offered by FEAT.
 // Although the features offered by this class are quite limited (thus 'simple'), it
 // can be used to parse simple parameter as e.g. mesh refinement levels, stopping
 // criterions or VTK output filenames.
@@ -36,7 +36,7 @@
 // runtime! Yay!
 //
 // Important Note:
-// The ParsedFunction class is only defined if FEAST was configured with the 'fparser'
+// The ParsedFunction class is only defined if FEAT was configured with the 'fparser'
 // build-id tag, which enables the use of the corresponding third-party library.
 // If you configure without the corresponding token, then this application will compile
 // without support for the ParsedFunction class, therefore seriously limiting the
@@ -88,33 +88,33 @@
 
 // We start our little tutorial with a batch of includes...
 
-// Misc. FEAST includes
+// Misc. FEAT includes
 #include <kernel/util/string.hpp>                          // for String
 #include <kernel/util/runtime.hpp>                         // for Runtime
 #include <kernel/util/simple_arg_parser.hpp>               // NEW: for SimpleArgParser
 
-// FEAST-Geometry includes
+// FEAT-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
 #include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactory
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
 #include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 
-// FEAST-Trafo includes
+// FEAT-Trafo includes
 #include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
 
-// FEAST-Space includes
+// FEAT-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
 
-// FEAST-Cubature includes
+// FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
-// FEAST-Analytic includes
+// FEAT-Analytic includes
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction, ConstantFunction
 #include <kernel/analytic/parsed_function.hpp>             // NEW: for ParsedFunction
 #include <kernel/analytic/auto_derive.hpp>                 // NEW: for AutoDerive
 
-// FEAST-Assembly includes
+// FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
@@ -124,19 +124,19 @@
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/common_functionals.hpp>          // NEW: for LaplaceFunctional
 
-// FEAST-LAFEM includes
+// FEAT-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
-// FEAST-Solver includes
+// FEAT-Solver includes
 #include <kernel/solver/ssor_precond.hpp>                  // for SSORPrecond
 #include <kernel/solver/pcg.hpp>                           // for PCG
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-// We are using FEAST
-using namespace FEAST;
+// We are using FEAT
+using namespace FEAT;
 
 // We're opening a new namespace for our tutorial.
 namespace Tutorial04
@@ -214,10 +214,10 @@ namespace Tutorial04
       "If this option is not specified, no VTK file will be written\n");
 
     // Beside the support for the 'SimpleArgParser' class, which is a build-in feature
-    // of FEAST, this tutorial also demonstrates the usage of the 'ParsedFunction' lateron.
+    // of FEAT, this tutorial also demonstrates the usage of the 'ParsedFunction' lateron.
     // However, this functionality is only available if the 'fparser' library was included,
     // so we need to use an #ifdef here to include the corresponding options.
-#ifdef FEAST_HAVE_FPARSER
+#ifdef FEAT_HAVE_FPARSER
     // Add our options related to the functionality offered by the fparser library.
     args.support("u", "<formula>\nSpecifies the reference solution u.\n");
     args.support("f", "<formula>\nSpecifies the right-hand-side force function f.\n");
@@ -229,10 +229,10 @@ namespace Tutorial04
     std::cout << "This application binary has been configured and build without support for" << std::endl;
     std::cout << "the 'fparser' third-party library, which is required for the specification" << std::endl;
     std::cout << "of custom solution, right-hand-side and boundary condition functions." << std::endl;
-    std::cout << "To enable this functionality, please re-configure your FEAST build" << std::endl;
+    std::cout << "To enable this functionality, please re-configure your FEAT build" << std::endl;
     std::cout << "by specifying 'fparser' as an additional part of your build-id." << std::endl;
     std::cout << std::endl;
-#endif // FEAST_HAVE_FPARSER
+#endif // FEAT_HAVE_FPARSER
 
     // Now that we have added all supported options to the parser, we call the 'query_unsupported'
     // function to check whether the user has supplied any unsupported options in the command line:
@@ -275,7 +275,7 @@ namespace Tutorial04
 
       // In case that we built with support for the fparser library, we also print
       // some additional information regarding the specification of the functions.
-#ifdef FEAST_HAVE_FPARSER
+#ifdef FEAT_HAVE_FPARSER
       std::cout << "Remarks regarding function formulae:" << std::endl;
       std::cout << "The <formula> parameters of the options '--u', '--f' and '--g'" << std::endl;
       std::cout << "are expected to be function formulae in the variables 'x' and 'y'" << std::endl;
@@ -292,7 +292,7 @@ namespace Tutorial04
       std::cout << "csh, cmd) may misinterpret special characters, thus possibly leading to" << std::endl;
       std::cout << "incorrect program behaviour." << std::endl;
 
-#endif // FEAST_HAVE_FPARSER
+#endif // FEAT_HAVE_FPARSER
 
       // We abort program execution here:
       return;
@@ -366,7 +366,7 @@ namespace Tutorial04
 
     // Now we will parse the formulas for our PDE functions if the fparser library in enabled.
 
-#ifdef FEAST_HAVE_FPARSER
+#ifdef FEAT_HAVE_FPARSER
     // Let's initialise our reference solution, the rhs and the dbc function fomulae
     // to empty strings
     String formula_u("");
@@ -691,7 +691,7 @@ int main(int argc, char* argv[])
   Runtime::initialise(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAST's tutorial #04: Parser" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #04: Parser" << std::endl;
 
   // call the tutorial's main function
   Tutorial04::main(argc, argv);

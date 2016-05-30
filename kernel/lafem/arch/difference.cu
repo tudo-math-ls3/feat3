@@ -1,11 +1,11 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -24,9 +24,9 @@ namespace FEAST
 }
 
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
 void Difference<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ * const y, const Index size)
@@ -37,8 +37,8 @@ void Difference<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ * cons
   block.x = blocksize;
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_difference<<<grid, block>>>(r, x, y, size);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_difference<<<grid, block>>>(r, x, y, size);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

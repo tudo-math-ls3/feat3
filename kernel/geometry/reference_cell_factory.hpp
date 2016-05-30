@@ -2,11 +2,11 @@
 #ifndef KERNEL_GEOMETRY_REFERENCE_FACTORY_HPP
 #define KERNEL_GEOMETRY_REFERENCE_FACTORY_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/intern/macro_index_mapping.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -102,6 +102,6 @@ namespace FEAST
     }
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_REFERENCE_FACTORY_HPP

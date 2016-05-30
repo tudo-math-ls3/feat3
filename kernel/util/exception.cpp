@@ -1,7 +1,7 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/exception.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   Exception::Exception(const String & message_in) :
     _message(message_in)
@@ -53,4 +53,4 @@ namespace FEAST
     }
     return _what_str.c_str();
   }
-} // namespace FEAST
+} // namespace FEAT

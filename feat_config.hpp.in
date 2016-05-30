@@ -1,65 +1,65 @@
 // Template file for configuration done by CMAKE
 #pragma once
-#ifndef FEAST_CONFIG_HPP
+#ifndef FEAT_CONFIG_HPP
 /// Header guard
-#define FEAST_CONFIG_HPP 1
+#define FEAT_CONFIG_HPP 1
 
 /// Version of CMAKE used to configure this project
 #define CMAKE_VERSION "${CMAKE_VERSION}"
 
 /// Should the build include DEBUG support?
-#cmakedefine FEAST_DEBUG_MODE
+#cmakedefine FEAT_DEBUG_MODE
 
 /// Should the build include serial support only?
-#cmakedefine FEAST_SERIAL_MODE
+#cmakedefine FEAT_SERIAL_MODE
 
 /// Is an mpi environment available?
-#cmakedefine FEAST_MPI
+#cmakedefine FEAT_MPI
 
-/// Path to the FEAST source dir
-#define FEAST_SRC_DIR "${FEAST_SOURCE_DIR}"
+/// Path to the FEAT source dir
+#define FEAT_SRC_DIR "${FEAT_SOURCE_DIR}"
 
-/// Path to the FEAST binary dir
-#define FEAST_BINARY_DIR "${FEAST_BINARY_DIR}"
+/// Path to the FEAT binary dir
+#define FEAT_BINARY_DIR "${FEAT_BINARY_DIR}"
 
 /// provided BUILD-ID being used
 #define BUILD_ID "${BUILD_ID}"
 
 /// CPU microarchitecture being used
-#define FEAST_CPU_TYPE "${FEAST_CPU_TYPE}"
+#define FEAT_CPU_TYPE "${FEAT_CPU_TYPE}"
 
 /// Do we have CUDA support enabled?
-#cmakedefine FEAST_BACKENDS_CUDA
+#cmakedefine FEAT_BACKENDS_CUDA
 
 /// Do we have CuSolver support enabled?
-#cmakedefine FEAST_HAVE_CUSOLVER
+#cmakedefine FEAT_HAVE_CUSOLVER
 
 /// Do we have MKL support enabled?
-#cmakedefine FEAST_BACKENDS_MKL
+#cmakedefine FEAT_BACKENDS_MKL
 
 /// Do we have QUADMATH support enabled?
-#cmakedefine FEAST_HAVE_QUADMATH
+#cmakedefine FEAT_HAVE_QUADMATH
 
 /// Do we have ALGLIB support enabled?
-#cmakedefine FEAST_HAVE_ALGLIB
+#cmakedefine FEAT_HAVE_ALGLIB
 
 /// Do we have fparser support enabled?
-#cmakedefine FEAST_HAVE_FPARSER
+#cmakedefine FEAT_HAVE_FPARSER
 
 /// Do we have UMFPACK support enabled?
-#cmakedefine FEAST_HAVE_UMFPACK
+#cmakedefine FEAT_HAVE_UMFPACK
 
 /// Do we have PARMETIS support enabled?
-#cmakedefine FEAST_HAVE_PARMETIS
+#cmakedefine FEAT_HAVE_PARMETIS
 
 /// Do we use a compiler wrapper, e.g. ccache or distcc
-#cmakedefine FEAST_USE_COMPILER_WRAPPER
+#cmakedefine FEAT_USE_COMPILER_WRAPPER
 
 /// Descriptive compiler name, as detected by cmake
 #define CMAKE_CXX_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}"
 
-/// Descriptive compiler name, as set by the configure_feast script
-#define FEAST_COMPILER_ID "${FEAST_COMPILER_ID}"
+/// Descriptive compiler name, as set by the configure_feat script
+#define FEAT_COMPILER_ID "${FEAT_COMPILER_ID}"
 
 /// Compiler version, as detected by cmake
 #define CMAKE_CXX_COMPILER_VERSION "${CMAKE_CXX_COMPILER_VERSION}"
@@ -77,12 +77,12 @@
 #define CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"
 
 /// The system compiler the actual host compiler will rely on, e.g. using its header files etc.
-#define FEAST_SYSTEM_HOST_COMPILER "${FEAST_SYSTEM_HOST_COMPILER}"
+#define FEAT_SYSTEM_HOST_COMPILER "${FEAT_SYSTEM_HOST_COMPILER}"
 
 /// The host compiler that will be used by nvcc for host code compilation.
-#define FEAST_CUDA_HOST_COMPILER "${FEAST_CUDA_HOST_COMPILER}"
+#define FEAT_CUDA_HOST_COMPILER "${FEAT_CUDA_HOST_COMPILER}"
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 /// Path to CUDA Compiler
 #define CUDA_NVCC_EXECUTABLE "${CUDA_NVCC_EXECUTABLE}"
 /// CUDA CXX Compiler Flags
@@ -90,10 +90,10 @@
 /// CUDA SDK Version
 #define CUDA_VERSION "${CUDA_VERSION}"
 /// compile for this CUDA device architecture
-#define FEAST_CUDA_ARCH "${FEAST_CUDA_ARCH}"
+#define FEAT_CUDA_ARCH "${FEAT_CUDA_ARCH}"
 #endif
 
-#ifdef FEAST_MPI
+#ifdef FEAT_MPI
 /// absolute path to mpi compiler wrapper
 #define MPI_CXX_COMPILER "${MPI_CXX_COMPILER}"
 /// absolute path to mpi execution wrapper
@@ -103,7 +103,7 @@
 #endif
 
 /// Hostname of the computer in use
-#define FEAST_HOSTNAME "${FEAST_HOSTNAME}"
+#define FEAT_HOSTNAME "${FEAT_HOSTNAME}"
 
 /// full path of the cmake binary
 #define CMAKE_COMMAND "${CMAKE_COMMAND}"
@@ -112,6 +112,6 @@
 #define CMAKE_GENERATOR "${CMAKE_GENERATOR}"
 
 /// Should we unroll all banded matrix kernels via template meta programming?
-#cmakedefine FEAST_UNROLL_BANDED
+#cmakedefine FEAT_UNROLL_BANDED
 
-#endif // FEAST_CONFIG_HPP
+#endif // FEAT_CONFIG_HPP

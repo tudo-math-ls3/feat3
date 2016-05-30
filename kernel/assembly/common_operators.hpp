@@ -2,10 +2,10 @@
 #ifndef KERNEL_ASSEMBLY_COMMON_OPERATORS_HPP
 #define KERNEL_ASSEMBLY_COMMON_OPERATORS_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/bilinear_operator.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -460,6 +460,6 @@ namespace FEAST
       }; // class DuDVOperatorBlocked
     } // namespace Common
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_COMMON_OPERATORS_HPP

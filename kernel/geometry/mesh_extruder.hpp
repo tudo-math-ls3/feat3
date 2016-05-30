@@ -12,7 +12,7 @@
 
 #include <sstream>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -817,6 +817,6 @@ namespace FEAST
       }
     }; // class MeshPartSliceExtruderFactory<ConformalMesh<Shape::Hypercube<2>,...>>
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_MESH_EXTRUDER_HPP

@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Foundation
   {

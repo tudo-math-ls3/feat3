@@ -2,10 +2,10 @@
 #ifndef KERNEL_SPACE_DOF_MAPPING_RENDERER_HPP
 #define KERNEL_SPACE_DOF_MAPPING_RENDERER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/adjacency/graph.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -72,6 +72,6 @@ namespace FEAST
       }
     }; // class DofMappingRenderer
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_DOF_MAPPING_RENDERER_HPP

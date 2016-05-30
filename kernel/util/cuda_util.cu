@@ -1,15 +1,15 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/cuda_util.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
 
 
-void FEAST::Util::cuda_set_device(const int device)
+void FEAT::Util::cuda_set_device(const int device)
 {
   cudaSetDevice(device);
 }
 
-void * FEAST::Util::cuda_malloc_host(const Index bytes)
+void * FEAT::Util::cuda_malloc_host(const Index bytes)
 {
   void * memory(nullptr);
   if (bytes == 0)
@@ -22,7 +22,7 @@ void * FEAST::Util::cuda_malloc_host(const Index bytes)
   return memory;
 }
 
-void FEAST::Util::cuda_free_host(void * address)
+void FEAT::Util::cuda_free_host(void * address)
 {
   if (address == nullptr)
     return;
@@ -31,7 +31,7 @@ void FEAST::Util::cuda_free_host(void * address)
     throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_free_host: cudaFreeHost failed!");
 }
 
-void FEAST::Util::cuda_check_last_error()
+void FEAT::Util::cuda_check_last_error()
 {
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
@@ -39,7 +39,7 @@ void FEAST::Util::cuda_check_last_error()
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
 }
 
-void * FEAST::Util::cuda_get_device_pointer(void * host)
+void * FEAT::Util::cuda_get_device_pointer(void * host)
 {
   void * device(nullptr);
   if (cudaSuccess != cudaHostGetDevicePointer((void**)&device, host, 0))

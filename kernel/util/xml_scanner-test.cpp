@@ -2,8 +2,8 @@
 #include <kernel/util/xml_scanner.hpp>
 #include <sstream>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 // cannot be closed
 class TestParser1 :

@@ -1,12 +1,12 @@
 #include <kernel/base_header.hpp>
 
-#ifdef FEAST_HAVE_UMFPACK
+#ifdef FEAT_HAVE_UMFPACK
 #include <kernel/solver/umfpack.hpp>
-FEAST_DISABLE_WARNINGS
+FEAT_DISABLE_WARNINGS
 #include <umfpack.h>
-FEAST_RESTORE_WARNINGS
+FEAT_RESTORE_WARNINGS
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -410,8 +410,8 @@ namespace FEAST
     }
 
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 #else
 // insert dummy function to suppress linker warnings
 void dummy_function() {}
-#endif // FEAST_HAVE_UMFPACK
+#endif // FEAT_HAVE_UMFPACK

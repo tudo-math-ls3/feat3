@@ -4,7 +4,7 @@
 
 #include <kernel/geometry/atlas/spline_base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -274,5 +274,5 @@ namespace FEAST
       }; // class PolylineChartParser<...>
     } // namespace Atlas
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_GEOMETRY_ATLAS_POLYLINE_HPP

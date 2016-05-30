@@ -1,11 +1,11 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -83,9 +83,9 @@ namespace FEAST
 }
 
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_, typename IT_>
 void ScaleRows<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
@@ -96,8 +96,8 @@ void ScaleRows<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const IT_ * const
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_scale_rows_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_scale_rows_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -118,8 +118,8 @@ void ScaleCols<Mem::CUDA>::csr(DT_ * r, const DT_ * const val, const IT_ * const
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_scale_cols_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_scale_cols_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -142,8 +142,8 @@ void ScaleRows<Mem::CUDA>::ell(DT_ * r, const DT_ * const a, const IT_ * const c
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_scale_rows_ell<<<grid, block>>>(r, a, col_ind, cs, cl, rl, x, C, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_scale_rows_ell<<<grid, block>>>(r, a, col_ind, cs, cl, rl, x, C, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -165,8 +165,8 @@ void ScaleCols<Mem::CUDA>::ell(DT_ * r, const DT_ * const a, const IT_ * const c
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_scale_cols_ell<<<grid, block>>>(r, a, col_ind, cs, cl, rl, x, C, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_scale_cols_ell<<<grid, block>>>(r, a, col_ind, cs, cl, rl, x, C, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

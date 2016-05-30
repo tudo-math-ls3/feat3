@@ -1,53 +1,53 @@
-# Top-Level FEAST CMakeLists.txt
+# Top-Level FEAT CMakeLists.txt
 
 cmake_minimum_required (VERSION 2.8)
 
 #enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-PROJECT( FEAST )
+PROJECT( FEAT )
 
-site_name( FEAST_HOSTNAME )
+site_name( FEAT_HOSTNAME )
 
 include (CTest)
 ENABLE_TESTING()
 
-if (FEAST_COTIRE)
-  include(${FEAST_SOURCE_DIR}/build_system/cotire.cmake)
-endif (FEAST_COTIRE)
+if (FEAT_COTIRE)
+  include(${FEAT_SOURCE_DIR}/build_system/cotire.cmake)
+endif (FEAT_COTIRE)
 
-if (FEAST_BACKENDS_CUDA)
+if (FEAT_BACKENDS_CUDA)
   FIND_PACKAGE(CUDA)
-  set(CUDA_NVCC_FLAGS " -g -lineinfo -arch=${FEAST_CUDA_ARCH} -O3 --restrict --compiler-options -Wall;-g;-std=c++11")
+  set(CUDA_NVCC_FLAGS " -g -lineinfo -arch=${FEAT_CUDA_ARCH} -O3 --restrict --compiler-options -Wall;-g;-std=c++11")
   if(BUILD_ID MATCHES ".*fast.*")
     set(CUDA_NVCC_FLAGS " --use_fast_math ${CUDA_NVCC_FLAGS}")
   endif(BUILD_ID MATCHES ".*fast.*")
-  if (FEAST_CUDA_VERBOSE)
+  if (FEAT_CUDA_VERBOSE)
     set(CUDA_VERBOSE_BUILD ON)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} " -v -Xptxas=-v")
-  endif (FEAST_CUDA_VERBOSE)
-  if (FEAST_DEBUG_MODE)
+  endif (FEAT_CUDA_VERBOSE)
+  if (FEAT_DEBUG_MODE)
     set (CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} " -G --compiler-options=-rdynamic")
-  endif(FEAST_DEBUG_MODE)
-  if (FEAST_CUDA_HOST_COMPILER)
-    set (CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} " -ccbin " ${FEAST_CUDA_HOST_COMPILER})
-  endif (FEAST_CUDA_HOST_COMPILER)
+  endif(FEAT_DEBUG_MODE)
+  if (FEAT_CUDA_HOST_COMPILER)
+    set (CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} " -ccbin " ${FEAT_CUDA_HOST_COMPILER})
+  endif (FEAT_CUDA_HOST_COMPILER)
   set (CUDA_PROPAGATE_HOST_FLAGS OFF)
 
-  if (FEAST_CUDAMEMCHECK)
+  if (FEAT_CUDAMEMCHECK)
     find_program(CUDA_MEMCHECK_EXE cuda-memcheck)
     set(CUDA_MEMCHECK_EXE ${CUDA_MEMCHECK_EXE} --leak-check full)
-  endif (FEAST_CUDAMEMCHECK)
+  endif (FEAT_CUDAMEMCHECK)
 
   if (CUDA_VERSION_MAJOR GREATER 6)
-    set(FEAST_HAVE_CUSOLVER ON)
+    set(FEAT_HAVE_CUSOLVER ON)
   endif (CUDA_VERSION_MAJOR GREATER 6)
-endif(FEAST_BACKENDS_CUDA)
+endif(FEAT_BACKENDS_CUDA)
 
-if (FEAST_MPI)
+if (FEAT_MPI)
   find_package(MPI REQUIRED)
   execute_process(COMMAND "${MPIEXEC}" --version
-    WORKING_DIRECTORY ${FEAST_SOURCE_DIR}
+    WORKING_DIRECTORY ${FEAT_SOURCE_DIR}
     OUTPUT_VARIABLE CMAKE_MPI_VERSION
     ERROR_VARIABLE CMAKE_MPI_VERSION
     )
@@ -59,28 +59,28 @@ if (FEAST_MPI)
 
   ADD_DEFINITIONS( -DOMPI_SKIP_MPICXX )
 
-endif (FEAST_MPI)
+endif (FEAT_MPI)
 
-if (FEAST_VALGRIND)
+if (FEAT_VALGRIND)
   find_program(VALGRIND_EXE valgrind)
-  set (VALGRIND_EXE ${VALGRIND_EXE} --fullpath-after=${FEAST_SOURCE_DIR} --leak-check=full --partial-loads-ok=yes)
+  set (VALGRIND_EXE ${VALGRIND_EXE} --fullpath-after=${FEAT_SOURCE_DIR} --leak-check=full --partial-loads-ok=yes)
   #--track-origins=yes
   #--keep-stacktraces=alloc-and-free
-endif (FEAST_VALGRIND)
+endif (FEAT_VALGRIND)
 
-if (FEAST_HAVE_ALGLIB)
-  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/alglib/cpp/src/")
-endif(FEAST_HAVE_ALGLIB)
+if (FEAT_HAVE_ALGLIB)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/alglib/cpp/src/")
+endif(FEAT_HAVE_ALGLIB)
 
-if (FEAST_HAVE_UMFPACK)
-  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/SuiteSparse_config/")
-  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/AMD/Include/")
-  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse/UMFPACK/Include/")
-endif (FEAST_HAVE_UMFPACK)
+if (FEAT_HAVE_UMFPACK)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/SuiteSparse_config/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/AMD/Include/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/UMFPACK/Include/")
+endif (FEAT_HAVE_UMFPACK)
 
-if (FEAST_HAVE_FPARSER)
-  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/fparser/")
-endif(FEAST_HAVE_FPARSER)
+if (FEAT_HAVE_FPARSER)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/fparser/")
+endif(FEAT_HAVE_FPARSER)
 
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
@@ -88,10 +88,10 @@ ADD_CUSTOM_TARGET (tests)
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-  configure_file(${FEAST_SOURCE_DIR}/doxy_in/doxygen_config.in ${FEAST_BINARY_DIR}/doxy_in/doxygen_config @ONLY)
+  configure_file(${FEAT_SOURCE_DIR}/doxy_in/doxygen_config.in ${FEAT_BINARY_DIR}/doxy_in/doxygen_config @ONLY)
   add_custom_target(doc
-    ${DOXYGEN_EXECUTABLE} ${FEAST_BINARY_DIR}/doxy_in/doxygen_config
-    WORKING_DIRECTORY ${FEAST_BINARY_DIR}
+    ${DOXYGEN_EXECUTABLE} ${FEAT_BINARY_DIR}/doxy_in/doxygen_config
+    WORKING_DIRECTORY ${FEAT_BINARY_DIR}
     COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
 endif(DOXYGEN_FOUND)
@@ -102,7 +102,7 @@ if (CMAKE_CXX_COMPILER_ARG1)
 endif (CMAKE_CXX_COMPILER_ARG1)
 
 # top lvl include dir
-INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
+INCLUDE_DIRECTORIES("${FEAT_BINARY_DIR}" "${FEAT_SOURCE_DIR}")
 
 # directories to scan recursively
 ADD_SUBDIRECTORY( thirdparty )
@@ -115,4 +115,4 @@ ADD_SUBDIRECTORY( tutorials )
 
 # store all variables describing the build in a custom header file
 # to use later on in the real code
-configure_file (${FEAST_SOURCE_DIR}/feast_config.hpp.in ${FEAST_BINARY_DIR}/feast_config.hpp)
+configure_file (${FEAT_SOURCE_DIR}/feat_config.hpp.in ${FEAT_BINARY_DIR}/feat_config.hpp)

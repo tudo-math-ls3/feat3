@@ -3,7 +3,7 @@
 /// Header guard
 #define TEST_SYSTEM_TEST_SYSTEM_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/instantiation_policy.hpp>
@@ -30,7 +30,7 @@
 * Implementation of Test and related classes.
 */
 
-namespace FEAST
+namespace FEAT
 {
   /// TestSystem namespace
   namespace TestSystem
@@ -300,30 +300,30 @@ namespace FEAST
       }
     }; // class FullTaggedTest
   } // namespace TestSystem
-} // namespace FEAST
+} // namespace FEAT
 /// checks if a == b
 #define TEST_CHECK_EQUAL(a, b) \
   do { \
-    CHECK_INTERNAL((a)==(b), this->_id + "\n" +  "Expected '" #a "' to equal \n'" + FEAST::stringify(b) + "'\nbut got\n'" + FEAST::stringify(a) + "'")\
+    CHECK_INTERNAL((a)==(b), this->_id + "\n" +  "Expected '" #a "' to equal \n'" + FEAT::stringify(b) + "'\nbut got\n'" + FEAT::stringify(a) + "'")\
   } while (false)
 
 /// checks if a != b
 #define TEST_CHECK_NOT_EQUAL(a, b) \
   do { \
-    CHECK_INTERNAL(!((a)==(b)), this->_id + "\n" +  "Expected '" #a "' that is'" + FEAST::stringify(a) + "' to equal not '" + FEAST::stringify(b) + "'")\
+    CHECK_INTERNAL(!((a)==(b)), this->_id + "\n" +  "Expected '" #a "' that is'" + FEAT::stringify(a) + "' to equal not '" + FEAT::stringify(b) + "'")\
   } while (false)
 
 /// checks if a <= x <= b
 #define TEST_CHECK_IN_RANGE(x, a, b) \
   do { \
-    CHECK_INTERNAL(((a) <= (x)) && ((x) <= (b)), this->_id + "\n" +  "Expected '" #x "' that is'" + FEAST::stringify(x) + "' to be in range [" + FEAST::stringify(a) + "," + FEAST::stringify(b) + "]")\
+    CHECK_INTERNAL(((a) <= (x)) && ((x) <= (b)), this->_id + "\n" +  "Expected '" #x "' that is'" + FEAT::stringify(x) + "' to be in range [" + FEAT::stringify(a) + "," + FEAT::stringify(b) + "]")\
   } while (false)
 
 /// checks if stringify(a) == stringify(b)
 #define TEST_CHECK_STRINGIFY_EQUAL(a, b) \
   do { \
-    String s_a(FEAST::stringify(a)); \
-    String s_b(FEAST::stringify(b)); \
+    String s_a(FEAT::stringify(a)); \
+    String s_b(FEAT::stringify(b)); \
     CHECK_INTERNAL(s_a == s_b, this->_id + "\n" +  "Expected '" #a "' to equal '" + s_b + "'\nbut got\n'" + s_a + "'")\
   } while (false)
 
@@ -354,7 +354,7 @@ namespace FEAST
       throw; \
     } catch (const std::exception & test_e) { \
       throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
+          "Test threw unexpected exception "+ FEAT::stringify(test_e.what()) + \
           " inside a TEST_CHECK_THROWS block"); \
     } catch (...) { \
       throw TestFailedException(__func__, __FILE__, __LINE__, \
@@ -367,9 +367,9 @@ namespace FEAST
   do { \
     CHECK_INTERNAL(((a) <= ((b) + (eps))) && ((b) <= ((a) + (eps))), \
         this->_id + "\n" + "Expected '|" #a " - " #b \
-        "|' <= '" + FEAST::stringify(eps) + "' but was '" + \
-        FEAST::stringify((a) < (b) ? (b) - (a) : (a) - (b)) + "'" \
-        + ", with " #a "=" + FEAST::stringify(a) + " and " #b "=" + FEAST::stringify(b))\
+        "|' <= '" + FEAT::stringify(eps) + "' but was '" + \
+        FEAT::stringify((a) < (b) ? (b) - (a) : (a) - (b)) + "'" \
+        + ", with " #a "=" + FEAT::stringify(a) + " and " #b "=" + FEAT::stringify(b))\
   } while (false)
 
 /// runs the given test with pre- and postprocessing

@@ -3,9 +3,9 @@
 #include <kernel/geometry/test_aux/standard_quad.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
 
 typedef ConformalMesh<Shape::Quadrilateral> RootMesh;
 typedef MeshPart<RootMesh> SubSet;

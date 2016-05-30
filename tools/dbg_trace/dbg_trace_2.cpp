@@ -28,8 +28,8 @@
 #include <kernel/solver/ilu_precond.hpp>
 #include <kernel/solver/pcg.hpp>
 
-// We are using FEAST
-using namespace FEAST;
+// We are using FEAT
+using namespace FEAT;
 
 // We're opening a new namespace for our tutorial.
 namespace Tutorial01
@@ -168,11 +168,11 @@ namespace Tutorial01
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAST runtime environment:
+  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
   Runtime::initialise(argc, argv);
 
   // Specify the desired mesh refinement level, defaulted to 3.
-  // Note that FEAST uses its own "Index" type rather than a wild mixture of int, uint, long
+  // Note that FEAT uses its own "Index" type rather than a wild mixture of int, uint, long
   // and such.
   Index level(3);
 

@@ -6,7 +6,7 @@
 
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -380,5 +380,5 @@ namespace FEAST
 
     } // namespace Atlas
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_GEOMETRY_ATLAS_SPLINE_BASE_HPP

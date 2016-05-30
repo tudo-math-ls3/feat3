@@ -6,9 +6,9 @@
 #include <kernel/geometry/test_aux/standard_tetra.hpp>
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
 
 typedef ConformalMesh<Shape::Triangle> TriaMesh;
 typedef ConformalMesh<Shape::Quadrilateral> QuadMesh;

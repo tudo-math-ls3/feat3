@@ -1,11 +1,11 @@
-#ifndef FEAST_KERNEL_GEOMETRY_MESH_QUALITY_HEURISTIC
-#define FEAST_KERNEL_GEOMETRY_MESH_QUALITY_HEURISTIC 1
+#ifndef FEAT_KERNEL_GEOMETRY_MESH_QUALITY_HEURISTIC
+#define FEAT_KERNEL_GEOMETRY_MESH_QUALITY_HEURISTIC 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -259,5 +259,5 @@ namespace FEAST
     };
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
-#endif // FEAST_KERNEL_GEOMETRY_MESH_QUALITY_HEURISTIC
+} // namespace FEAT
+#endif // FEAT_KERNEL_GEOMETRY_MESH_QUALITY_HEURISTIC

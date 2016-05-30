@@ -2,14 +2,14 @@
 #ifndef KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP
 #define KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 #include <kernel/geometry/shape_convert_factory.hpp>
 
 #include <deque>
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -803,6 +803,6 @@ namespace FEAST
     };
 
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP

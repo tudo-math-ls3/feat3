@@ -2,7 +2,7 @@
 #ifndef KERNEL_UTIL_TIMESTAMP_HPP
 #define KERNEL_UTIL_TIMESTAMP_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
@@ -12,7 +12,7 @@
 #include <iomanip>
 
 #if defined(__linux) || defined(__unix__)
-#  define FEAST_HAVE_GETTIMEOFDAY 1
+#  define FEAT_HAVE_GETTIMEOFDAY 1
 #  include <sys/time.h>
 #elif defined(_WIN32)
 // Do not include <windows.h> to avoid namespace pollution -- define the necessary prototypes by hand instead.
@@ -22,7 +22,7 @@ extern "C" int __stdcall QueryPerformanceFrequency(long long int*);
 #  include <ctime>
 #endif
 
-namespace FEAST
+namespace FEAT
 {
     /**
      * Supported time string formating.
@@ -52,7 +52,7 @@ namespace FEAST
   {
   private:
     /// Our time-stamp.
-#if defined(FEAST_HAVE_GETTIMEOFDAY)
+#if defined(FEAT_HAVE_GETTIMEOFDAY)
     timeval _time;
 #elif defined(_WIN32)
     long long int _counter;
@@ -76,7 +76,7 @@ namespace FEAST
      */
     TimeStamp& stamp()
     {
-#if defined(FEAST_HAVE_GETTIMEOFDAY)
+#if defined(FEAT_HAVE_GETTIMEOFDAY)
       gettimeofday(&_time, 0);
 #elif defined(_WIN32)
       QueryPerformanceCounter(&_counter);
@@ -97,7 +97,7 @@ namespace FEAST
      */
     double elapsed(const TimeStamp& before) const
     {
-#if defined(FEAST_HAVE_GETTIMEOFDAY)
+#if defined(FEAT_HAVE_GETTIMEOFDAY)
       return double(_time.tv_sec - before._time.tv_sec) + 1E-6 * double(_time.tv_usec - before._time.tv_usec);
 #elif defined(_WIN32)
       long long freq = 0ll;
@@ -119,7 +119,7 @@ namespace FEAST
      */
     long long elapsed_micros(const TimeStamp& before) const
     {
-#if defined(FEAST_HAVE_GETTIMEOFDAY)
+#if defined(FEAT_HAVE_GETTIMEOFDAY)
       return 1000000ll * (long long)(_time.tv_sec - before._time.tv_sec)
         + (long long)(_time.tv_usec - before._time.tv_usec);
 #elif defined(_WIN32)
@@ -242,7 +242,7 @@ namespace FEAST
      */
     bool operator< (const TimeStamp & other) const
     {
-#if defined(FEAST_HAVE_GETTIMEOFDAY)
+#if defined(FEAT_HAVE_GETTIMEOFDAY)
       return (_time.tv_sec < other._time.tv_sec) ||
         ((_time.tv_sec == other._time.tv_sec) && (_time.tv_usec < other._time.tv_usec));
 #elif defined(_WIN32)
@@ -252,6 +252,6 @@ namespace FEAST
 #endif
     }
   }; // class TimeStamp
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_TIMESTAMP_HPP

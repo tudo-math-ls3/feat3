@@ -7,9 +7,9 @@
 
 #include <iostream>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::Benchmark;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::Benchmark;
 
 template<typename Algo_, typename DT_, typename IT_>
 class AxpyBench;
@@ -73,11 +73,11 @@ void run()
 int main(int argc, char ** argv)
 {
   Runtime::initialise(argc, argv);
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
   run<Algo::CUDA, DenseVector<Mem::CUDA, double, Index> >();
 #endif
   run<Algo::Generic, DenseVector<Mem::Main, double, Index> >();
-#ifdef FEAST_BACKENDS_MKL
+#ifdef FEAT_BACKENDS_MKL
   run<Algo::MKL, DenseVector<Mem::Main, double, Index> >();
 #endif
   Runtime::finalise();

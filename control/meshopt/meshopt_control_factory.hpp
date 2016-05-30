@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FEAST_CONTROL_MESHOPT_MESHOPT_CONTROL_FACTORY_HPP
-#define FEAST_CONTROL_MESHOPT_MESHOPT_CONTROL_FACTORY_HPP 1
+#ifndef FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_FACTORY_HPP
+#define FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_FACTORY_HPP 1
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
@@ -16,7 +16,7 @@
 #include <control/meshopt/dudv_functional_control.hpp>
 #include <control/meshopt/hyperelasticity_functional_control.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -31,7 +31,7 @@ namespace FEAST
       {
         public:
           template<typename A, typename B, typename C, typename D>
-          using Functional = Functional_<A, B, C, D, LocalFunctional_, FEAST::Meshopt::RumpfTrafo<D, typename D::CoordType>>;
+          using Functional = Functional_<A, B, C, D, LocalFunctional_, FEAT::Meshopt::RumpfTrafo<D, typename D::CoordType>>;
       };
 
       template<typename Mem_, typename DT_, typename IT_, typename Trafo_>
@@ -185,11 +185,11 @@ namespace FEAST
             if(split_hypercubes)
             {
               // The underlying functional is RumpfFunctional, and this is passed to the Split functional as parameter
-              typedef FEAST::Meshopt::RumpfFunctionalQ1Split
+              typedef FEAT::Meshopt::RumpfFunctionalQ1Split
               <
                 DT_,
                 typename MeshType::ShapeType,
-                FEAST::Meshopt::RumpfFunctional
+                FEAT::Meshopt::RumpfFunctional
               > FunctionalType;
 
               std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
@@ -199,7 +199,7 @@ namespace FEAST
             }
             else
             {
-              typedef FEAST::Meshopt::RumpfFunctional<DT_, typename MeshType::ShapeType> FunctionalType;
+              typedef FEAT::Meshopt::RumpfFunctional<DT_, typename MeshType::ShapeType> FunctionalType;
               std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
                 (fac_norm, fac_det, fac_cof, fac_reg);
 
@@ -212,11 +212,11 @@ namespace FEAST
             if(split_hypercubes)
             {
               // The underlying functional is RumpfFunctional_D2, and this is passed to the Split functional as parameter
-              typedef FEAST::Meshopt::RumpfFunctionalQ1Split
+              typedef FEAT::Meshopt::RumpfFunctionalQ1Split
               <
                 DT_,
                 typename MeshType::ShapeType,
-                FEAST::Meshopt::RumpfFunctional_D2
+                FEAT::Meshopt::RumpfFunctional_D2
               > FunctionalType;
 
               std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
@@ -226,7 +226,7 @@ namespace FEAST
             }
             else
             {
-              typedef FEAST::Meshopt::RumpfFunctional_D2<DT_, typename MeshType::ShapeType> FunctionalType;
+              typedef FEAT::Meshopt::RumpfFunctional_D2<DT_, typename MeshType::ShapeType> FunctionalType;
               std::shared_ptr<FunctionalType> my_functional = std::make_shared<FunctionalType>
                 (fac_norm, fac_det, fac_cof, fac_reg);
               result = create_hyperelasticity_control_with_functional(dom_ctrl, hyperelasticity_config_section,
@@ -254,7 +254,7 @@ namespace FEAST
             "Hyperelasticity config section is missing global_functional entry!");
 
           // Get scale computation type, default is once_uniform
-          FEAST::Meshopt::ScaleComputation scale_computation(FEAST::Meshopt::ScaleComputation::once_uniform);
+          FEAT::Meshopt::ScaleComputation scale_computation(FEAT::Meshopt::ScaleComputation::once_uniform);
           auto scale_computation_p = hyperelasticity_config_section->query("scale_computation");
           if(scale_computation_p.second)
             scale_computation << scale_computation_p.first;
@@ -274,7 +274,7 @@ namespace FEAST
           {
             result = std::make_shared<Control::Meshopt::HyperelasticityFunctionalControl
             <Mem_, DT_, IT_, DomCtrl_, Trafo_,
-            SetFunctional<FEAST::Meshopt::HyperelasticityFunctional, FunctionalType_>::template Functional>>
+            SetFunctional<FEAT::Meshopt::HyperelasticityFunctional, FunctionalType_>::template Functional>>
               (dom_ctrl, dirichlet_list, slip_list, solver_p.first, *solver_config, my_functional,
               scale_computation, distance_charts);
           }
@@ -339,6 +339,6 @@ namespace FEAST
 
     } // namespace Meshopt
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_MESHOPT_MESHOPT_SOLVER_FACTORY_HPP

@@ -1,9 +1,9 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/meta_math.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::MetaMath;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::MetaMath;
 
 /**
  * \brief Test class for the MetaMath class templates.

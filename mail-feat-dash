@@ -192,7 +192,7 @@ for run in failed_runs:
 
 mail_body = "\n" + failed_report + "\n" + passed_report + "\n" + detailed_report
 
-mail_subject = "Subject: [FEAST-DASH] Summary Mail - "
+mail_subject = "Subject: [FEAT-DASH] Summary Mail - "
 if len(failed_runs) == 0:
   mail_subject += "All " + str(runs.count()) + " runs passed"
 else:

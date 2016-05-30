@@ -22,7 +22,7 @@ for i in range(1, 5):
     #f.write("#SBATCH --partition=gpus" + os.linesep)
     # http://www.fz-juelich.de/ias/jsc/EN/Expertise/Supercomputers/JURECA/UserInfo/GpuNodes.html?nn=1803700
     #f.write("#SBATCH --gres=gpu:1" + os.linesep)
-    f.write("#SBATCH --job-name=feast" + os.linesep)
+    f.write("#SBATCH --job-name=feat" + os.linesep)
 
     f.write("export OMP_NUM_THREADS=1" + os.linesep)
     #f.write("export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}" + os.linesep)
@@ -32,7 +32,7 @@ for i in range(1, 5):
     #f.write("export SCOREP_ENABLE_PROFILING=true" + os.linesep)
     f.write("export SCOREP_ENABLE_TRACING=true" + os.linesep)
     f.write("export SCOREP_FILTERING_FILE=" + os.getcwd() + "/scorep.filt" + os.linesep)
-    f.write("srun ~/feast/applications/poisson_dirichlet_2d  --level " +  str(11+i) + " 4 --part_min_elems 1000" + os.linesep)
+    f.write("srun ~/feat/applications/poisson_dirichlet_2d  --level " +  str(11+i) + " 4 --part_min_elems 1000" + os.linesep)
 
   #sbatch
   subprocess.call(["sbatch", "temp"])

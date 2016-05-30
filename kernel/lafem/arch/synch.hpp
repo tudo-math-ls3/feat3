@@ -2,13 +2,13 @@
 #ifndef KERNEL_LAFEM_ARCH_SYNCH_HPP
 #define KERNEL_LAFEM_ARCH_SYNCH_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
 
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -37,6 +37,6 @@ namespace FEAST
       };
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_ARCH_DOT_PRODUCT_HPP

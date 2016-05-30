@@ -3,9 +3,9 @@
 #include <kernel/geometry/test_aux/tetris_hexa.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
 
 typedef ConformalMesh<Shape::Hexahedron> HexaMesh;
 typedef MeshPart<HexaMesh> SubMesh;

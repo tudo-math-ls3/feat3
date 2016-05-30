@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_TUNING_HPP
 #define KERNEL_LAFEM_TUNING_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-#ifdef FEAST_COMPILER_MICROSOFT
+#ifdef FEAT_COMPILER_MICROSOFT
 // Microsoft's STL implementation is not safe for /Wall "by design", see:
 // https://connect.microsoft.com/VisualStudio/feedback/details/1217660/warning-c4265-when-using-functional-header
 // We do not disable the warning C4265 globally in the compiler detection header, as
@@ -22,9 +22,9 @@
 #  pragma warning(pop)
 #else
 #  include <functional>
-#endif // FEAST_COMPILER_MICROSOFT
+#endif // FEAT_COMPILER_MICROSOFT
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -100,7 +100,7 @@ namespace FEAST
             toe = LAFEM::Tuning::_run_bench(func);
             Util::cuda_check_last_error();
           }
-          catch (const FEAST::InternalError & e)
+          catch (const FEAT::InternalError & e)
           {
             //did we get at least one valid configuration?
             if (best_toe < std::numeric_limits<double>::max())
@@ -136,7 +136,7 @@ namespace FEAST
             toe = LAFEM::Tuning::_run_bench(func);
             Util::cuda_check_last_error();
           }
-          catch (const FEAST::InternalError & e)
+          catch (const FEAT::InternalError & e)
           {
             //did we get at least one valid configuration?
             if (best_toe < std::numeric_limits<double>::max())
@@ -160,6 +160,6 @@ namespace FEAST
       }
     };
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_TUNING_HPP

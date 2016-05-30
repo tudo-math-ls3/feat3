@@ -6,7 +6,7 @@
 
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -284,6 +284,6 @@ namespace FEAST
         }
     };
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_TEST_ANALYTIC_FUNCTION_OPERATOR

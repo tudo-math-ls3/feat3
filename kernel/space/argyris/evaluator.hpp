@@ -2,11 +2,11 @@
 #ifndef KERNEL_SPACE_ARGYRIS_EVALUATOR_HPP
 #define KERNEL_SPACE_ARGYRIS_EVALUATOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/evaluator_base.hpp>
 #include <kernel/geometry/intern/sub_index_mapping.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -344,6 +344,6 @@ namespace FEAST
       }; // class Evaluator<...,Simplex<2>>
     } // namespace Argyris
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_ARGYRIS_EVALUATOR_HPP

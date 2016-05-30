@@ -2,11 +2,11 @@
 #ifndef KERNEL_SPACE_NODE_FUNCTIONAL_BASE_HPP
 #define KERNEL_SPACE_NODE_FUNCTIONAL_BASE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/base.hpp>
 #include <kernel/analytic/function.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -147,6 +147,6 @@ namespace FEAST
       }
     }; // class NodeFunctionalNull<...>
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_NODE_FUNCTIONAL_BASE_HPP

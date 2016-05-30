@@ -3,7 +3,7 @@
   <!-- global project properties -->
   <PropertyGroup Label="Globals">
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>$(FeastAppName)</RootNamespace>
+    <RootNamespace>$(FeatAppName)</RootNamespace>
   </PropertyGroup>
 
   <ItemDefinitionGroup>
@@ -24,7 +24,7 @@
 
   <!-- set output path -->
   <PropertyGroup>
-    <OutDir>$(FeastLibPath)\</OutDir>
+    <OutDir>$(FeatLibPath)\</OutDir>
   </PropertyGroup>
 
   <!-- import common targets -->

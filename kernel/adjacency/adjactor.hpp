@@ -2,10 +2,10 @@
 #ifndef KERNEL_ADJACENCY_ADJACTOR_HPP
 #define KERNEL_ADJACENCY_ADJACTOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/assertion.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Adjacency
   {
@@ -483,6 +483,6 @@ namespace FEAST
       }
     }; // class CompositeAdjactor
   } // namespace Adjacency
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ADJACENCY_ADJACTOR_HPP

@@ -20,7 +20,7 @@
 #include <kernel/meshopt/mesh_quality_functional.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Meshopt
   {
@@ -373,5 +373,5 @@ namespace FEAST
     }; // class DuDvFunctional
 
   } // namespace Meshopt
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_MESHOPT_DUDV_FUNCTIONAL_HPP

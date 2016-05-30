@@ -4,9 +4,9 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/container_main_wrapper.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the container main wrapper class.
@@ -49,11 +49,11 @@ ContainerMainWrapperTest<Mem::Main, float, unsigned int> cpu_container_main_wrap
 ContainerMainWrapperTest<Mem::Main, double, unsigned int> cpu_container_main_wrapper_test_double_uint;
 ContainerMainWrapperTest<Mem::Main, float, unsigned long> cpu_container_main_wrapper_test_float_ulong;
 ContainerMainWrapperTest<Mem::Main, double, unsigned long> cpu_container_main_wrapper_test_double_ulong;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 ContainerMainWrapperTest<Mem::Main, __float128, unsigned int> cpu_container_main_wrapper_test_float128_uint;
 ContainerMainWrapperTest<Mem::Main, __float128, unsigned long> cpu_container_main_wrapper_test_float128_ulong;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 ContainerMainWrapperTest<Mem::CUDA, float, unsigned int> cuda_container_main_wrapper_test_float_uint;
 ContainerMainWrapperTest<Mem::CUDA, double, unsigned int> cuda_container_main_wrapper_test_double_uint;
 ContainerMainWrapperTest<Mem::CUDA, float, unsigned long> cuda_container_main_wrapper_test_float_ulong;

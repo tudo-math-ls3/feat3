@@ -2,10 +2,10 @@
 #ifndef KERNEL_CUBATURE_SCALAR_TRAPEZOIDAL_DRIVER_HPP
 #define KERNEL_CUBATURE_SCALAR_TRAPEZOIDAL_DRIVER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/scalar/driver_base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -56,6 +56,6 @@ namespace FEAST
       }; // class TrapezoidalDriver<...>
     } // namespace Scalar
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_SCALAR_TRAPEZOIDAL_DRIVER_HPP

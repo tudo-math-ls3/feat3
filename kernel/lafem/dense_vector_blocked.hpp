@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_DENSE_VECTOR_BLOCKED_HPP
 #define KERNEL_LAFEM_DENSE_VECTOR_BLOCKED_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/util/assertion.hpp>
@@ -28,7 +28,7 @@
 #include <stdint.h>
 
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -213,7 +213,7 @@ namespace FEAST
 
         if (pinned_allocation)
         {
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
           this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size<Perspective::pod>()));
 #else
           // no cuda support enabled - we cannot serve and do not need pinned memory support
@@ -466,7 +466,7 @@ namespace FEAST
        *
        * Serialize a complete container entity into a single binary array.
        *
-       * See \ref FEAST::LAFEM::Container::_serialise for details.
+       * See \ref FEAT::LAFEM::Container::_serialise for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       std::vector<char> serialise()
@@ -1226,6 +1226,6 @@ namespace FEAST
 
 
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_DENSE_VECTOR_BLOCKED_HPP

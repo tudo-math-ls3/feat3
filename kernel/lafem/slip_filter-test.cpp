@@ -12,9 +12,9 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for SlipFilter class template
@@ -136,11 +136,11 @@ SlipFilterVectorTest<Mem::Main, float, Index, 2> component_filter_test_generic_f
 SlipFilterVectorTest<Mem::Main, double, unsigned int, 2> component_filter_test_generic_di_2;
 SlipFilterVectorTest<Mem::Main, float, unsigned int, 3> component_filter_test_generic_fi_3;
 SlipFilterVectorTest<Mem::Main, double, Index, 3> component_filter_test_generic_di_3;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SlipFilterVectorTest<Mem::Main, __float128, unsigned int, 2> component_filter_test_generic_q_2;
 SlipFilterVectorTest<Mem::Main, __float128, Index, 3> component_filter_test_generic_q_3;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SlipFilterVectorTest<Mem::CUDA, float, unsigned int, 2> component_filter_test_cuda_fi_2;
 SlipFilterVectorTest<Mem::CUDA, float, Index, 3> component_filter_test_cuda_fi_3;
 SlipFilterVectorTest<Mem::CUDA, double, Index, 2> component_filter_test_cuda_di_2;
@@ -474,10 +474,10 @@ class SlipFilterAssemblyTest
 
 SlipFilterAssemblyTest<Mem::Main, float, Index> sfat_f;
 SlipFilterAssemblyTest<Mem::Main, double, unsigned int> sfat_d;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SlipFilterAssemblyTest<Mem::Main, __float128, Index> sfat_q;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SlipFilterAssemblyTest<Mem::CUDA, float, unsigned int> sfat_f_cuda;
 SlipFilterAssemblyTest<Mem::CUDA, double, Index> sfat_d_cuda;
 #endif

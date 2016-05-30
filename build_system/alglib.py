@@ -11,6 +11,6 @@ class ALGLIB(ThirdpartyPackage):
     self.dirname = "alglib"
     self.filename = "alglib-3.10.0.cpp.gpl.zip"
     self.url = "http://www.alglib.net/translator/re/" + self.filename
-    self.cmake_flags = " -DFEAST_HAVE_ALGLIB:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_ALGLIB:BOOL=ON"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname+os.sep+self.dirname

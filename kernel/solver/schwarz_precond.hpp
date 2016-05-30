@@ -6,7 +6,7 @@
 #include <kernel/global/vector.hpp>
 #include <kernel/global/filter.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -144,7 +144,7 @@ namespace FEAST
      * A shared pointer to a new SchwarzPrecond object.
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
     template<typename LocalFilter_, typename LocalSolver_>
     inline std::shared_ptr<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType>, Global::Filter<LocalFilter_>>> new_schwarz_precond(
       std::shared_ptr<LocalSolver_> local_solver,
@@ -164,6 +164,6 @@ namespace FEAST
     }
 #endif
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_SCHWARZ_PRECOND_HPP

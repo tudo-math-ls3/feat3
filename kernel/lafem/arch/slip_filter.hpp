@@ -2,12 +2,12 @@
 #ifndef KERNEL_LAFEM_ARCH_SLIP_FILTER_HPP
 #define KERNEL_LAFEM_ARCH_SLIP_FILTER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
 /// \cond internal
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -73,7 +73,7 @@ namespace FEAST
 
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 /// \endcond
 #ifndef  __CUDACC__

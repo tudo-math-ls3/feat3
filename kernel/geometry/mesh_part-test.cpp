@@ -6,9 +6,9 @@
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/target_set.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
 
 bool check_target_set_consistency(const TargetSet& ts_1, const TargetSet& ts_2)
 {

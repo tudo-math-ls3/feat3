@@ -1,13 +1,13 @@
 #include <test_system/test_system.hpp>
 
-#ifdef FEAST_HAVE_UMFPACK
+#ifdef FEAT_HAVE_UMFPACK
 #include <kernel/solver/umfpack.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::Solver;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::Solver;
+using namespace FEAT::TestSystem;
 
 class UmfpackTest :
   public TestSystem::FullTaggedTest<Mem::Main, double, Index>
@@ -135,4 +135,4 @@ public:
 };
 
 UmfpackMeanTest umfpack_mean_test;
-#endif // FEAST_HAVE_UMFPACK
+#endif // FEAT_HAVE_UMFPACK

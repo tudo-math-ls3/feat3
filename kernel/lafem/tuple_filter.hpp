@@ -2,11 +2,11 @@
 #ifndef KERNEL_LAFEM_TUPLE_FILTER_HPP
 #define KERNEL_LAFEM_TUPLE_FILTER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/tuple_vector.hpp>
 #include <kernel/lafem/meta_element.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -317,6 +317,6 @@ namespace FEAST
     }; // class TupleFilter
     /// \endcond
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_TUPLE_FILTER_HPP

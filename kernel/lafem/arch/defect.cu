@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/defect.hpp>
@@ -9,7 +9,7 @@
 
 #include "cusparse_v2.h"
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -144,9 +144,9 @@ namespace FEAST
 }
 
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
 void Defect<Mem::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
@@ -157,8 +157,8 @@ void Defect<Mem::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const va
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_defect_csr<<<grid, block>>>(r, rhs, x, val, col_ind, row_ptr, rows);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_defect_csr<<<grid, block>>>(r, rhs, x, val, col_ind, row_ptr, rows);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -180,7 +180,7 @@ void Defect<Mem::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const va
     cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
     DT_ one(1);
-    FEAST::LAFEM::Intern::cusparse_defect_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
+    FEAT::LAFEM::Intern::cusparse_defect_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
 
     cusparseDestroyMatDescr(descr);
   }
@@ -194,12 +194,12 @@ void Defect<Mem::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const va
     cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
     DT_ one(1);
-    FEAST::LAFEM::Intern::cusparse_defect_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
+    FEAT::LAFEM::Intern::cusparse_defect_csr(CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind, x, &one, r);
 
     cusparseDestroyMatDescr(descr);
   }
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -221,7 +221,7 @@ void Defect<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const rhs, const DT_ * 
     cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
     DT_ one(1);
-    FEAST::LAFEM::Intern::cusparse_defect_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+    FEAT::LAFEM::Intern::cusparse_defect_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
         blocksize, x, &one, r);
 
     cusparseDestroyMatDescr(descr);
@@ -236,13 +236,13 @@ void Defect<Mem::CUDA>::csrb_intern(DT_ * r, const DT_ * const rhs, const DT_ * 
     cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
 
     DT_ one(1);
-    FEAST::LAFEM::Intern::cusparse_defect_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
+    FEAT::LAFEM::Intern::cusparse_defect_csrb(CUSPARSE_DIRECTION_ROW, CUSPARSE_OPERATION_NON_TRANSPOSE, (int)rows, (int)columns, (int)used_elements, &a, descr, val, (int*)row_ptr, (int*)col_ind,
         blocksize, x, &one, r);
 
     cusparseDestroyMatDescr(descr);
   }
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -262,8 +262,8 @@ void Defect<Mem::CUDA>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const va
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_defect_ell<<<grid, block>>>(r, rhs, x, val, col_ind, cs, cl, rows, C);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_defect_ell<<<grid, block>>>(r, rhs, x, val, col_ind, cs, cl, rows, C);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -284,7 +284,7 @@ void Defect<Mem::CUDA>::banded(DT_ * r, const DT_ * const rhs, const DT_ * const
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_defect_banded<<<grid, block>>>(r, rhs, x, val, offsets, num_of_offsets, rows, columns);
+  FEAT::LAFEM::Intern::cuda_defect_banded<<<grid, block>>>(r, rhs, x, val, offsets, num_of_offsets, rows, columns);
 }
 template void Defect<Mem::CUDA>::banded(float *, const float *, const float * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
 template void Defect<Mem::CUDA>::banded(double *, const double *, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);

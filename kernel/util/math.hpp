@@ -2,14 +2,14 @@
 #ifndef KERNEL_UTIL_MATH_HPP
 #define KERNEL_UTIL_MATH_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/type_traits.hpp>
 
 // includes, system
 #include <cmath>
 #include <limits>
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 extern "C"
 {
 #    include <quadmath.h>
@@ -26,7 +26,7 @@ extern "C"
 #  define WRAP_QUAD_MATH1(func)
 #  define WRAP_QUAD_MATH2(func)
 #  define WRAP_QUAD_MATH2PTR(func)
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 
     // single argument function wrapper
 #define WRAP_STD_MATH1(func) \
@@ -52,12 +52,12 @@ extern "C"
     inline bool func(double x) {return std::func(x);} \
     inline bool func(long double x) {return std::func(x);}
 
-namespace FEAST
+namespace FEAT
 {
   /**
-   * \brief FEAST Math namespace
+   * \brief FEAT Math namespace
    *
-   * This namespace encapsulates common mathematical functions used throughout the FEAST kernel.
+   * This namespace encapsulates common mathematical functions used throughout the FEAT kernel.
    * This namespace contains all math functions from the standard <c>cmath</c> header.
    */
   namespace Math
@@ -197,9 +197,9 @@ namespace FEAST
 
     // wrap std::abs
     WRAP_STD_MATH1(abs)
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     inline __float128 abs(__float128 x) {return ::fabsq(x);}
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 
     /**
      * \brief Returns the square-root of a value.
@@ -210,7 +210,7 @@ namespace FEAST
      *
      * \compilerhack disable "warning C4723: potential divide by 0" for MSVC compiler
      */
-#ifdef FEAST_COMPILER_MICROSOFT
+#ifdef FEAT_COMPILER_MICROSOFT
 #pragma warning(push)
 #pragma warning(disable:4723)
 #endif
@@ -236,7 +236,7 @@ namespace FEAST
 
       return y;
     }
-#ifdef FEAST_COMPILER_MICROSOFT
+#ifdef FEAT_COMPILER_MICROSOFT
 #pragma warning(pop)
 #endif
 
@@ -656,13 +656,13 @@ namespace FEAST
       return std::numeric_limits<long double>::epsilon();
     }
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     template<>
     inline __float128 eps<__float128>()
     {
       return FLT128_EPSILON;
     }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
     /// \endcond
 
     /**
@@ -688,7 +688,7 @@ namespace FEAST
     }
 
     /// \cond internal
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     template<>
     inline __float128 huge<__float128>()
     {
@@ -700,7 +700,7 @@ namespace FEAST
     {
       return FLT128_MIN;
     }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
     /// \endcond
 
     /**
@@ -755,13 +755,13 @@ namespace FEAST
 
     WRAP_STD_MATH1BRET(isfinite)
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     inline bool isfinite(__float128 x)
     {
       // https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/finiteq.c
       return (::finiteq(x) != 0);
     }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 
     /**
      * \brief Checks whether a value is infinite.
@@ -777,13 +777,13 @@ namespace FEAST
 
     WRAP_STD_MATH1BRET(isinf)
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     inline bool isinf(__float128 x)
     {
       // https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isinfq.c
       return (::isinfq(x) != 0);
     }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 
     /**
      * \brief Checks whether a value is Not-A-Number.
@@ -799,13 +799,13 @@ namespace FEAST
 
     WRAP_STD_MATH1BRET(isnan)
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     inline bool isnan(__float128 x)
     {
       // https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isnanq.c
       return (::isnanq(x) != 0);
     }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 
     /**
      * \brief Checks whether a value is normal.
@@ -823,7 +823,7 @@ namespace FEAST
 
     WRAP_STD_MATH1BRET(isnormal)
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     inline bool isnormal(__float128 x)
     {
       // check whether the value is finite
@@ -832,7 +832,7 @@ namespace FEAST
       // check whether the value is not below minimal normal value
       return !(::fabsq(x) < FLT128_MIN);
     }
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
 
     /**
      * \brief Calculates the (partial) factorial.
@@ -1105,7 +1105,7 @@ namespace FEAST
     {
     }; // class Limits<...>
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
     template<>
     class Limits<__float128>
     {
@@ -1144,8 +1144,8 @@ namespace FEAST
       static constexpr bool tinyness_before = true;
       static constexpr std::float_round_style round_style = std::round_to_nearest;
     };
-#endif // FEAST_HAVE_QUADMATH
+#endif // FEAT_HAVE_QUADMATH
   } // namespace Math
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_MATH_HPP

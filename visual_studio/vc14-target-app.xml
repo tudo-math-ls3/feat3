@@ -3,7 +3,7 @@
   <!-- global project properties -->
   <PropertyGroup Label="Globals">
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>$(FeastAppName)</RootNamespace>
+    <RootNamespace>$(FeatAppName)</RootNamespace>
   </PropertyGroup>
 
   <ItemDefinitionGroup>
@@ -24,14 +24,14 @@
 
   <!-- set output path -->
   <PropertyGroup>
-    <OutDir>$(FeastBinPath)\</OutDir>
+    <OutDir>$(FeatBinPath)\</OutDir>
   </PropertyGroup>
 
   <!-- add link dependencies -->
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalLibraryDirectories>$(FeastLibDirList)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(FeastLibDepList)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(FeatLibDirList)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(FeatLibDepList)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 

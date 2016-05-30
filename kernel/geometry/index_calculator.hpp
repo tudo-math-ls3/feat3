@@ -2,7 +2,7 @@
 #ifndef KERNEL_GEOMETRY_INDEX_CALCULATOR_HPP
 #define KERNEL_GEOMETRY_INDEX_CALCULATOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/intern/index_representative.hpp>
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 #include <kernel/geometry/index_set.hpp>
@@ -12,7 +12,7 @@
 #include <set>
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -528,6 +528,6 @@ namespace FEAST
       }
     };
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_INDEX_CALCULATOR_HPP

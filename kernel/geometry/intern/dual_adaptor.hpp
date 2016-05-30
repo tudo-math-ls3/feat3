@@ -5,7 +5,7 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/vertex_set.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -76,6 +76,6 @@ namespace FEAST
       };
     } // namespace Intern
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_INTERN_DUAL_ADAPTOR_HPP

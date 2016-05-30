@@ -2,11 +2,11 @@
 #ifndef KERNEL_SPACE_DOF_ASSIGNMENT_COMMON_HPP
 #define KERNEL_SPACE_DOF_ASSIGNMENT_COMMON_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/dof_assignment_base.hpp>
 #include <kernel/adjacency/adjactor.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -164,6 +164,6 @@ namespace FEAST
       }
     };
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_DOF_ASSIGNMENT_COMMON_HPP

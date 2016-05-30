@@ -13,7 +13,7 @@
 #include <vector>
 #include <iostream>
 
-using namespace FEAST;
+using namespace FEAT;
 using namespace Foundation;
 using namespace std;
 

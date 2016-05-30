@@ -1,7 +1,7 @@
 /**
 \page solver_configuration Solver configuration via PropertyMaps
 
-The FEAST::Control::SolverFactory::create_scalar_solver method creates a FEAST::Solver::SolverBase object based on a
+The FEAT::Control::SolverFactory::create_scalar_solver method creates a FEAT::Solver::SolverBase object based on a
 given PropertyMap.
 
 A solver configuration consists of 1+ sections, describing the solver tree.

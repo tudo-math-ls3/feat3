@@ -2,7 +2,7 @@
 
   <ItemDefinitionGroup>
     <BuildLog>
-      <Path>$(IntDir)\$(FeastBuildName).log</Path>
+      <Path>$(IntDir)\$(FeatBuildName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
 
@@ -10,8 +10,8 @@
   <!-- Compiler / Linker Settings -->
   <!-- ************************************************************************************************************* -->
   <PropertyGroup>
-    <IntDir>$(FeastObjPath)\$(FeastBuildName)\</IntDir>
-    <TargetName>$(FeastBuildName)</TargetName>
+    <IntDir>$(FeatObjPath)\$(FeatBuildName)\</IntDir>
+    <TargetName>$(FeatBuildName)</TargetName>
     <LinkIncremental>$(DebugMode)</LinkIncremental>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
@@ -28,8 +28,8 @@
     <ClCompile>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>VISUAL_STUDIO;FEAST_NO_CONFIG;FEAST_STDC_ASSERT;$(FeastDefList)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(FeastRootPath);$(FeastIncDirList)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>VISUAL_STUDIO;FEAT_NO_CONFIG;FEAT_STDC_ASSERT;$(FeatDefList)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(FeatRootPath);$(FeatIncDirList)</AdditionalIncludeDirectories>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointExceptions>true</FloatingPointExceptions>
@@ -78,7 +78,7 @@
 
   <!-- CUDA Backend Settings -->
   <PropertyGroup Condition="'$(BackendCUDA)'=='true'">
-    <CudaIntDir>$(FeastObjPath)\$(FeastBuildName)</CudaIntDir>
+    <CudaIntDir>$(FeatObjPath)\$(FeatBuildName)</CudaIntDir>
   </PropertyGroup>
 
   <ItemDefinitionGroup Condition="'$(BackendCUDA)'=='true'">
@@ -87,9 +87,9 @@
       <HostDebugInfo>$(DebugMode)</HostDebugInfo>
     </CudaCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(BackendCUDA)'=='true' And '$(FeastCudaArch)'!='' And '$(FeastCudaCode)'!=''">
+  <ItemDefinitionGroup Condition="'$(BackendCUDA)'=='true' And '$(FeatCudaArch)'!='' And '$(FeatCudaCode)'!=''">
     <CudaCompile>
-      <CodeGeneration>$(FeastCudaArch),$(FeastCudaCode)</CodeGeneration>
+      <CodeGeneration>$(FeatCudaArch),$(FeatCudaCode)</CodeGeneration>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(BackendCUDA)'=='true' And '$(Platform)'=='Win32'">

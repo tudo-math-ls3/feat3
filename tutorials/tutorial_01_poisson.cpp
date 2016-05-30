@@ -1,5 +1,5 @@
 //
-// \brief FEAST Tutorial 01: Poisson solver (TM)
+// \brief FEAT Tutorial 01: Poisson solver (TM)
 //
 // This file contains a simple prototypical Poisson solver for the unit square domain.
 //
@@ -45,31 +45,31 @@
 
 // We start our little tutorial with a batch of includes...
 
-// Misc. FEAST includes
+// Misc. FEAT includes
 #include <kernel/util/string.hpp>                          // for String
 #include <kernel/util/runtime.hpp>                         // for Runtime
 
-// FEAST-Geometry includes
+// FEAT-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
 #include <kernel/geometry/conformal_factories.hpp>         // for RefinedUnitCubeFactor
 #include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
 #include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
 
-// FEAST-Trafo includes
+// FEAT-Trafo includes
 #include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
 
-// FEAST-Space includes
+// FEAT-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
 #include <kernel/space/lagrange2/element.hpp>            // the Lagrange-2 Element (aka "Q2")
 
-// FEAST-Cubature includes
+// FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
-// FEAST-Analytic includs
+// FEAT-Analytic includs
 #include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
 
-// FEAST-Assembly includes
+// FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
@@ -79,26 +79,26 @@
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/common_functionals.hpp>          // for ForceFunctional
 
-// FEAST-LAFEM includes
+// FEAT-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 #include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
 
-// FEAST-Solver includes
+// FEAT-Solver includes
 #include <kernel/solver/ssor_precond.hpp>                  // for SSORPrecond
 #include <kernel/solver/pcg.hpp>                           // for PCG
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-// We are using FEAST
-using namespace FEAST;
+// We are using FEAT
+using namespace FEAT;
 
 // We're opening a new namespace for our tutorial.
 namespace Tutorial01
 {
   // We start with a set of typedefs, which make up the basic configuration for this
   // tutorial application. The general idea of these typedefs is (1) to avoid typing and
-  // (2) specialise FEAST to do, out of the many possibilities, only what we want to do in
+  // (2) specialise FEAT to do, out of the many possibilities, only what we want to do in
   // this tutorial.
 
   // First, we define the 'shape type' of the mesh that we want to use.
@@ -115,7 +115,7 @@ namespace Tutorial01
   // We use the default 'Index' type for indexing:
   typedef Index IndexType;
 
-  // Moreover, we use main memory (aka "RAM") for our containers. FEAST supports GPUs and other
+  // Moreover, we use main memory (aka "RAM") for our containers. FEAT supports GPUs and other
   // architectures, but we do not want to make use of anything that does not reside in host memory.
   typedef Mem::Main MemType;
 
@@ -141,7 +141,7 @@ namespace Tutorial01
     typedef Geometry::MeshPart<MeshType> BoundaryType;
 
     // In this tutorial, we will generate the mesh and its boundary information by using a so-called
-    // factory instead of reading them from a file. This is a convenient shortcut that FEAST provides,
+    // factory instead of reading them from a file. This is a convenient shortcut that FEAT provides,
     // the more general case is covered in advanced tutorials.
     // For our purpose here, we need to define a RefinedUnitCubeFactory, which will (as the name suggests)
     // generate a refined unit-square mesh for us.
@@ -210,7 +210,7 @@ namespace Tutorial01
     // The next step is defining the types of vectors and matrices which we want to use.
 
     // Based on the three data, index and memory typedefs, we now define the vector type.
-    // Since we have a scalar problem, we require a dense vector, which is simply FEAST's name for
+    // Since we have a scalar problem, we require a dense vector, which is simply FEAT's name for
     // contiguous storage.
     typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
 
@@ -253,7 +253,7 @@ namespace Tutorial01
 
     // Before we start assembling anything, we need create a cubature factory, which will be
     // used to generate cubature rules for integration.
-    // There are several cubature rules available in FEAST, and a complete list can be queried
+    // There are several cubature rules available in FEAT, and a complete list can be queried
     // by compiling and executing the 'cub-list' tool in the 'tools' directory.
     // We choose the 'auto-degree:n' rule here, which will automatically choose an appropriate
     // cubature rule  that can integrate polynomials up to degree n exactly. Some other possible
@@ -275,7 +275,7 @@ namespace Tutorial01
 
     // We want to assemble the 2D "-Laplace" operator -u_xx -u_yy.
     // Note that so far, we did not consider the notion of operators at all.
-    // For this operator, FEAST provides a pre-defined bilinear operator class, of which we first need
+    // For this operator, FEAT provides a pre-defined bilinear operator class, of which we first need
     // to create an instance. Check the implementation of this factory, and additional tutorials, on how
     // to implement more complex operators.
     Assembly::Common::LaplaceOperator laplace_operator;
@@ -487,14 +487,14 @@ namespace Tutorial01
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAST runtime environment:
+  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
   Runtime::initialise(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAST's tutorial #01: Poisson" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #01: Poisson" << std::endl;
 
   // Specify the desired mesh refinement level, defaulted to 3.
-  // Note that FEAST uses its own "Index" type rather than a wild mixture of int, uint, long
+  // Note that FEAT uses its own "Index" type rather than a wild mixture of int, uint, long
   // and such.
   Index level(3);
 

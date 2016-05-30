@@ -2,7 +2,7 @@
 #ifndef KERNEL_SOLVER_VANKA_HPP
 #define KERNEL_SOLVER_VANKA_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/base.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -23,7 +23,7 @@
 #include <set>
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -1919,6 +1919,6 @@ namespace FEAST
         (matrix, filter, type, omega, num_iter);
     }
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_VANKA_HPP

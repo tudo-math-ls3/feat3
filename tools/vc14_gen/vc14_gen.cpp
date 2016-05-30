@@ -1,7 +1,7 @@
 /**
- * \brief FEAST Visual Studio 2015 Project File Generator
+ * \brief FEAT Visual Studio 2015 Project File Generator
  *
- * This tool can be used to generate FEAST application/tool project files for
+ * This tool can be used to generate FEAT application/tool project files for
  * Microsoft (R) Visual Studio 2015.
  *
  * \author Peter Zajac
@@ -396,13 +396,13 @@ public:
     ofs << "  <!-- global project properties -->" << endl;
     ofs << "  <PropertyGroup Label=\"Globals\">" << endl;
     ofs << "    <ProjectGuid>" << project_guid << "</ProjectGuid>" << endl;
-    ofs << "    <FeastAppName>" << project_name << "</FeastAppName>" << endl;
-    ofs << "    <FeastRootPath>$(ProjectDir)" << root_path << "</FeastRootPath>" << endl;
+    ofs << "    <FeatAppName>" << project_name << "</FeatAppName>" << endl;
+    ofs << "    <FeatRootPath>$(ProjectDir)" << root_path << "</FeatRootPath>" << endl;
     ofs << "  </PropertyGroup>" << endl;
 
     // write common config import
     ofs << "  <!-- import common config -->" << endl;
-    ofs << "  <Import Project=\"$(FeastRootPath)\\visual_studio\\vc14-common-config.xml\" />" << endl;
+    ofs << "  <Import Project=\"$(FeatRootPath)\\visual_studio\\vc14-common-config.xml\" />" << endl;
 
     // write header inclusion list
     ofs << "  <!-- ********************************************************************* -->" << endl;
@@ -431,13 +431,13 @@ public:
     ofs << "  <!-- Final Imports -->" << endl;
     ofs << "  <!-- ********************************************************************* -->" << endl;
     ofs << "  <ItemGroup>" << endl;
-    ofs << "    <ProjectReference Include=\"$(FeastRootPath)\\kernel\\kernel.vc14.vcxproj\">" << endl;
+    ofs << "    <ProjectReference Include=\"$(FeatRootPath)\\kernel\\kernel.vc14.vcxproj\">" << endl;
     ofs << "      <Project>" << kernel_guid << "</Project>" << endl;
     ofs << "    </ProjectReference>" << endl;
     ofs << "  </ItemGroup>" << endl;
 
     // write app-target import
-    ofs << "  <Import Project=\"$(FeastRootPath)\\visual_studio\\vc14-target-app.xml\" />" << endl;
+    ofs << "  <Import Project=\"$(FeatRootPath)\\visual_studio\\vc14-target-app.xml\" />" << endl;
 
     // end-of-file
     ofs << "</Project>" << endl;
@@ -673,7 +673,7 @@ public:
 int main(int argc, char** argv)
 {
   // print header
-  cout << endl << "FEAST Visual Studio 2015 Project File Generator" << endl << endl;
+  cout << endl << "FEAT Visual Studio 2015 Project File Generator" << endl << endl;
 
   // check for usage/help
   if(argc > 1)
@@ -683,22 +683,22 @@ int main(int argc, char** argv)
     {
       // print help message
       //       123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
-      cout << "This tool can be used to generate FEAST application project files for" << endl;
+      cout << "This tool can be used to generate FEAT application project files for" << endl;
       cout << "Microsoft (R) Visual Studio 2015." << endl;
       cout << endl;
-      cout << "Important: This tool must be executed from the FEAST root directory, as it" << endl;
+      cout << "Important: This tool must be executed from the FEAT root directory, as it" << endl;
       cout << "           will not be able to resolve references otherwise." << endl;
       cout << endl;
       cout << "USAGE: vc14gen.exe [-test] <path> [<name>] [options]" << endl;
       cout << endl;
       cout << "If the '-test' option is given, then <path> specifies the path to a kernel" << endl;
       cout << "test source file for which a test project is to be generated. A corresponding" << endl;
-      cout << "test project file will be generated in the 'testing' directory of the FEAST" << endl;
+      cout << "test project file will be generated in the 'testing' directory of the FEAT" << endl;
       cout << "root directory." << endl;
       cout << endl;
       cout << "If the '-test' option is not given, then this tool will generate an application" << endl;
       cout << "project file, with the following supported parameters:" << endl;
-      cout << "<path>             The path to the application directory relative to the FEAST" << endl;
+      cout << "<path>             The path to the application directory relative to the FEAT" << endl;
       cout << "                   root directory." << endl;
       cout << endl;
       cout << "<name>             The name of the project; will be used as the filename for" << endl;

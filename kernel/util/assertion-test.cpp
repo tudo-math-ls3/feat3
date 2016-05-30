@@ -4,11 +4,11 @@
 
 #include <string>
 
-// This test needs DEBUG defined, but must not be compiled when FEAST_STDC_ASSERT is defined.
-#if defined(DEBUG) && !defined(FEAST_STDC_ASSERT)
+// This test needs DEBUG defined, but must not be compiled when FEAT_STDC_ASSERT is defined.
+#if defined(DEBUG) && !defined(FEAT_STDC_ASSERT)
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 /**
 * \brief Test class for the assertion class.
@@ -56,4 +56,4 @@ public:
 };
 AssertionTest<Archs::None, Archs::None> assertion_test;
 
-#endif // defined(DEBUG) && !defined(FEAST_STDC_ASSERT)
+#endif // defined(DEBUG) && !defined(FEAT_STDC_ASSERT)

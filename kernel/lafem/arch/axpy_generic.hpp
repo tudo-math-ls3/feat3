@@ -10,7 +10,7 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -227,7 +227,7 @@ namespace FEAST
           break;
         default:
 #ifdef DEBUG
-          /// \todo print warning in feast log file
+          /// \todo print warning in feat log file
           std::cout << "Warning: Axpy not optimized for chunk size = " << C << "!" << std::endl;
 #endif
           Intern::AxpyELL::AxpyGeneric<DT_, IT_>::f(r, a, x, y, val, col_ind, cs, cl, C, rows);
@@ -267,7 +267,7 @@ namespace FEAST
               Index end  (Math::min(Intern::ProductMatVecBanded::start_offset(j-2, offsets, rows, columns, noo),
                                     Intern::ProductMatVecBanded::end_offset(i-2, offsets, rows, columns, noo) + 1));
 
-              FEAST_IVDEP
+              FEAT_IVDEP
                 for (Index l(start); l < end; ++l)
                 {
                   DT_ tmp(0);
@@ -363,7 +363,7 @@ namespace FEAST
                                                   const DT_ * const val, const IT_ * const offsets, const DT_ * const x,
                                                   const Index num_of_offsets, const Index rows, const Index columns)
       {
-#ifdef FEAST_UNROLL_BANDED
+#ifdef FEAT_UNROLL_BANDED
         switch (num_of_offsets)
         {
         case 3:
@@ -380,14 +380,14 @@ namespace FEAST
           break;
         default:
 #ifdef DEBUG
-          /// \todo print warning in feast log file
+          /// \todo print warning in feat log file
           std::cout << "Warning: Axpy not optimized for " << num_of_offsets << " offsets!" << std::endl;
 #endif
           Intern::AxpyBanded::axpy_banded_generic(r, y, alpha, val, offsets, x, num_of_offsets, rows, columns);
         }
 #else
         Intern::AxpyBanded::axpy_banded_generic(r, y, alpha, val, offsets, x, num_of_offsets, rows, columns);
-#endif //FEAST_UNROLL_BANDED
+#endif //FEAT_UNROLL_BANDED
       }
 
       template <typename DT_>
@@ -406,6 +406,6 @@ namespace FEAST
 
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_ARCH_AXPY_GENERIC_HPP

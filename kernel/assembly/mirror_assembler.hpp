@@ -2,10 +2,10 @@
 #ifndef KERNEL_ASSEMBLY_MIRROR_ASSEMBLER_HPP
 #define KERNEL_ASSEMBLY_MIRROR_ASSEMBLER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/symbolic_assembler.hpp>
 
-// includes, FEAST-LAFEM
+// includes, FEAT-LAFEM
 #include <kernel/lafem/matrix_mirror.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/lafem/power_mirror.hpp>
@@ -14,7 +14,7 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -367,6 +367,6 @@ namespace FEAST
       }
     }; // class DofMirror
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_MIRROR_ASSEMBLER_HPP

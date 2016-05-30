@@ -4,7 +4,7 @@
 
 #include<kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Foundation namespace
@@ -105,7 +105,7 @@ namespace FEAST
       static const RequiredNumTopologies required_num_topologies = rnt_3D;
     };
 
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
     struct ParmetisModePartKway
     {
     };

@@ -19,10 +19,10 @@
 #include <kernel/solver/spai_precond.hpp>
 #include <kernel/solver/matrix_precond.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::Solver;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::Solver;
+using namespace FEAT::TestSystem;
 
 template<
   template<typename,typename,typename> class ScalarMatrix_,
@@ -311,7 +311,7 @@ public:
       test_solver("PCG-JAC", solver, vec_sol, vec_ref, vec_rhs, 28);
     }
 
-#ifdef FEAST_HAVE_CUSOLVER
+#ifdef FEAT_HAVE_CUSOLVER
     // test BiCGStab-SOR
     {
       // create a SOR preconditioner
@@ -329,11 +329,11 @@ public:
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon);
       test_solver("BiCGStab-SSOR", solver, vec_sol, vec_ref, vec_rhs, 22);
     }
-#endif // FEAST_HAVE_CUSOLVER
+#endif // FEAT_HAVE_CUSOLVER
   }
 };
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 //CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned long> cuda_solver_csr_generic_double_ulong;
 //CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned long> cuda_solver_ell_generic_double_ulong;
 CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned int> cuda_solver_csr_generic_double_uint;

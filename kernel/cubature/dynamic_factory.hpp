@@ -2,11 +2,11 @@
 #ifndef KERNEL_CUBATURE_DYNAMIC_FACTORY_HPP
 #define KERNEL_CUBATURE_DYNAMIC_FACTORY_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/factory_wrapper.hpp>
 #include <kernel/cubature/auto_alias.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -87,6 +87,6 @@ namespace FEAST
       /// \endcond
     }; // class DynamicFactory<...>
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_DYNAMIC_FACTORY_HPP

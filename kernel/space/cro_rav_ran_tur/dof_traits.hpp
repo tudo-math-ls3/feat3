@@ -2,10 +2,10 @@
 #ifndef KERNEL_SPACE_CRO_RAV_RAN_TUR_DOF_TRAITS_HPP
 #define KERNEL_SPACE_CRO_RAV_RAN_TUR_DOF_TRAITS_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/shape.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -38,6 +38,6 @@ namespace FEAST
       };
     } // namespace CroRavRanTur
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_CRO_RAV_RAN_TUR_DOF_TRAITS_HPP

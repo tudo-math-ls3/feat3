@@ -14,7 +14,7 @@
 
 #include <control/domain/domain_control.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Control
   {
@@ -305,6 +305,6 @@ namespace FEAST
 
     } // namespace Domain
   } // namespace Control
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // CONTROL_DOMAIN_PARTITIONER_DOMAIN_CONTROL_HPP

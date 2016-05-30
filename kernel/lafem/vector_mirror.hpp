@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_VECTOR_MIRROR_HPP
 #define KERNEL_LAFEM_VECTOR_MIRROR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
@@ -11,7 +11,7 @@
 #include <kernel/lafem/arch/scatter_prim.hpp>
 #include <kernel/lafem/arch/scatter_axpy_prim.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -1412,6 +1412,6 @@ namespace FEAST
       }
     }; // class VectorMirrorBlocked<...>
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_VECTOR_MIRROR_HPP

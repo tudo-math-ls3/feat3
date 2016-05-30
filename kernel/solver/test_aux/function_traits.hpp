@@ -6,7 +6,7 @@
 #include <kernel/util/tiny_algebra.hpp>
 
 #include <deque>
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -28,7 +28,7 @@ namespace FEAST
 #else
     struct OptimisationTestTraits
     {
-      /// The AnalyticFunction i.e. from FEAST::Analytic::Common
+      /// The AnalyticFunction i.e. from FEAT::Analytic::Common
       typedef Function_ FunctionType;
       /// The evaluation traits for this function
       typedef Analytic::EvalTraits<DT_, FunctionType> FuncEvalTraits;
@@ -237,6 +237,6 @@ namespace FEAST
 
     /// \endcond
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_TEST_AUX_FUNCTION_TRAITS

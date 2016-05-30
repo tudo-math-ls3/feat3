@@ -2,11 +2,11 @@
 #ifndef KERNEL_ASSEMBLY_ERROR_COMPUTER_HPP
 #define KERNEL_ASSEMBLY_ERROR_COMPUTER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/analytic/function.hpp>
 #include <kernel/assembly/asm_traits.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -431,6 +431,6 @@ namespace FEAST
       }
     }; // class ScalarErrorComputer
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_ERROR_COMPUTER_HPP

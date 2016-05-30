@@ -5,7 +5,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Global linear algebra namespace
@@ -100,6 +100,6 @@ namespace FEAST
       virtual DataType norm2(DataType x) const = 0;
     };
   } // namespace Global
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GLOBAL_GATE_HPP

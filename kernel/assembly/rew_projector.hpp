@@ -2,13 +2,13 @@
 #ifndef KERNEL_ASSEMBLY_REW_PROJECTOR_HPP
 #define KERNEL_ASSEMBLY_REW_PROJECTOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/analytic/function.hpp>
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/math.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -247,6 +247,6 @@ namespace FEAST
       }
     }; // class RewProjector
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_REW_PROJECTOR_HPP

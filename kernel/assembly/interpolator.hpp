@@ -2,12 +2,12 @@
 #ifndef KERNEL_ASSEMBLY_INTERPOLATOR_HPP
 #define KERNEL_ASSEMBLY_INTERPOLATOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/assembly/base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -213,6 +213,6 @@ namespace FEAST
       }
     }; // class Interpolator
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_INTERPOLATOR_HPP

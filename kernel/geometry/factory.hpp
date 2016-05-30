@@ -2,10 +2,10 @@
 #ifndef KERNEL_GEOMETRY_FACTORY_HPP
 #define KERNEL_GEOMETRY_FACTORY_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -117,6 +117,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_FACTORY_HPP

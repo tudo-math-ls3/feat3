@@ -2,11 +2,11 @@
 #ifndef KERNEL_GEOMETRY_TEST_AUX_STANDARD_TRIA_HPP
 #define KERNEL_GEOMETRY_TEST_AUX_STANDARD_TRIA_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -36,6 +36,6 @@ namespace FEAST
     } // namespace TestAux
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_TEST_AUX_STANDARD_TRIA_HPP

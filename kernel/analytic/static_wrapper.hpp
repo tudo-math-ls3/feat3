@@ -2,10 +2,10 @@
 #ifndef KERNEL_ANALYTIC_STATIC_WRAPPER_FUNCTION_HPP
 #define KERNEL_ANALYTIC_STATIC_WRAPPER_FUNCTION_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/analytic/function.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Analytic
   {
@@ -527,6 +527,6 @@ namespace FEAST
       }; // class StaticWrapperFunction::Evaluator<...>
     }; // class StaticWrapperFunction
   } // namespace Analytic
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ANALYTIC_STATIC_WRAPPER_FUNCTION_HPP

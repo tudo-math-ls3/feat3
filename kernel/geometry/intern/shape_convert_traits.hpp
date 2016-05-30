@@ -2,10 +2,10 @@
 #ifndef KERNEL_GEOMETRY_INTER_SHAPE_CONVERT_TRAITS_HPP
 #define KERNEL_GEOMETRY_INTER_SHAPE_CONVERT_TRAITS_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/shape.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -543,6 +543,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_INTER_SHAPE_CONVERT_TRAITS_HPP

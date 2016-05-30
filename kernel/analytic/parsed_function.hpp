@@ -5,12 +5,12 @@
 #include <kernel/analytic/function.hpp>
 
 // The contents of this file require the 'fparser' third-party library.
-#if defined(FEAST_HAVE_FPARSER) || defined(DOXYGEN)
+#if defined(FEAT_HAVE_FPARSER) || defined(DOXYGEN)
 
 #include <vector>
 #include <fparser.hh>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Analytic
   {
@@ -22,7 +22,7 @@ namespace FEAST
      * given as a string at runtime.
      *
      * \attention
-     * This class is only available if FEAST is configured and build with support
+     * This class is only available if FEAT is configured and build with support
      * for the <c>fparser</c> third-party library, which is used for the actual
      * parsing and evaluation.
      *
@@ -175,7 +175,7 @@ namespace FEAST
       }; // class ParsedFunction::Evaluator<...>
     }; // class ParsedFunction
   } // namespace Analytic
-} // namespace FEAST
+} // namespace FEAT
 
-#endif // FEAST_HAVE_FPARSER
+#endif // FEAT_HAVE_FPARSER
 #endif // KERNEL_ANALYTIC_PARSED_FUNCTION_HPP

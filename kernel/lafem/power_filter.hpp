@@ -5,7 +5,7 @@
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/meta_element.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -340,6 +340,6 @@ namespace FEAST
     };
     /// \endcond
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_POWER_FILTER_HPP

@@ -2,17 +2,17 @@
 #ifndef KERNEL_SOLVER_UMFPACK_HPP
 #define KERNEL_SOLVER_UMFPACK_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/mean_filter.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
-#if defined(FEAST_HAVE_UMFPACK) || defined(DOXYGEN)
+#if defined(FEAT_HAVE_UMFPACK) || defined(DOXYGEN)
     /**
      * \brief UMFPACK solver class
      *
@@ -20,7 +20,7 @@ namespace FEAST
      * direct solver UMFPACK for doing the actual dirty work.
      *
      * \attention
-     * This class is only declared if FEAST was configured to build and link against
+     * This class is only declared if FEAT was configured to build and link against
      * the \c UMFPACK third-party library.
      *
      * \author Peter Zajac
@@ -186,8 +186,8 @@ namespace FEAST
        */
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override;
     }; // class UmfpackMean
-#endif // defined(FEAST_HAVE_UMFPACK) || defined(DOXYGEN)
+#endif // defined(FEAT_HAVE_UMFPACK) || defined(DOXYGEN)
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_UMFPACK_HPP

@@ -5,21 +5,21 @@
 // The following line is necessary - otherwise doxygen won't document the #define's in this file.
 /** \file */
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/exception.hpp>
 
 // includes, system
 
 // check for standard C assert usage
-#ifdef FEAST_STDC_ASSERT
+#ifdef FEAT_STDC_ASSERT
 // ensure that NDEBUG is defined unless DEBUG is defined
 #  if !defined(DEBUG) && !defined(NDEBUG)
 #    define NDEBUG
 #  endif
 #  include <cassert>
-#endif // FEAST_STDC_ASSERT
+#endif // FEAT_STDC_ASSERT
 
-namespace FEAST
+namespace FEAT
 {
   /**
   * \brief defining assertion
@@ -85,16 +85,16 @@ namespace FEAST
  *
  * \note This macro will only be compiled in debug mode; it is an empty macro in non-debug mode.
  */
-#if defined (FEAST_STDC_ASSERT)
+#if defined (FEAT_STDC_ASSERT)
 #  define ASSERT(expr, msg) assert(expr)
 #  define ASSERT_(expr) assert(expr)
 //#  endif
 #elif defined (DEBUG)
-// use FEAST::Assertion exception
+// use FEAT::Assertion exception
 #  define ASSERT(expr, msg) \
     do { \
         if (! (expr)) \
-            throw FEAST::Assertion(__func__, __FILE__, __LINE__, msg); \
+            throw FEAT::Assertion(__func__, __FILE__, __LINE__, msg); \
     } while (false)
 #  define ASSERT_(expr) ASSERT(expr, #expr)
 #else
@@ -102,6 +102,6 @@ namespace FEAST
 #  define ASSERT_(expr)
 #endif
 
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_ASSERTION_HPP

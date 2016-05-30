@@ -7,7 +7,7 @@
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Assembly
   {
@@ -355,6 +355,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Assembly
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_ASSEMBLY_VELOCITY_ANALYSER_HPP

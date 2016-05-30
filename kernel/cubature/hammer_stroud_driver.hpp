@@ -2,12 +2,12 @@
 #ifndef KERNEL_CUBATURE_HAMMER_STROUD_DRIVER_HPP
 #define KERNEL_CUBATURE_HAMMER_STROUD_DRIVER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/driver_base.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/meta_math.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -269,6 +269,6 @@ namespace FEAST
       }
     }; // class HammerStroudD5Driver<Simplex<3>,...>
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_HAMMER_STROUD_DRIVER_HPP

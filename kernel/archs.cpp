@@ -2,9 +2,9 @@
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
 
-using namespace FEAST;
+using namespace FEAT;
 
-std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
+std::ostream & FEAT::operator<< (std::ostream & left, Archs::TagValue value)
 {
   switch (value)
   {
@@ -28,7 +28,7 @@ std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
   return left;
 }
 
-std::ostream & FEAST::operator<< (std::ostream & left, Mem::TagValue value)
+std::ostream & FEAT::operator<< (std::ostream & left, Mem::TagValue value)
 {
   switch (value)
   {
@@ -48,7 +48,7 @@ std::ostream & FEAST::operator<< (std::ostream & left, Mem::TagValue value)
   return left;
 }
 
-std::ostream & FEAST::operator<< (std::ostream & left, Algo::TagValue value)
+std::ostream & FEAT::operator<< (std::ostream & left, Algo::TagValue value)
 {
   switch (value)
   {

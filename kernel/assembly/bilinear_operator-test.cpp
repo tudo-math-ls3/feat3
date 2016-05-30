@@ -15,8 +15,8 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/math.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 template<typename Trafo_>
 using MyP0 = Space::Discontinuous::Element<Trafo_, Space::Discontinuous::Variant::StdPolyP<0>>;
@@ -341,7 +341,7 @@ BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, float, unsigned long> > b
 BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned int> > bilinear_operator_test_ell_double_uint;
 BilinearOperatorTest<LAFEM::SparseMatrixELL<Mem::Main, double, unsigned long> > bilinear_operator_test_ell_double_ulong;
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned int> > bilinear_operator_test_csr_float128_uint;
 BilinearOperatorTest<LAFEM::SparseMatrixCSR<Mem::Main, __float128, unsigned long> > bilinear_operator_test_csr_float128_ulong;
 
@@ -552,7 +552,7 @@ BandedBilinearOperatorTest<Mem::Main, float, unsigned long> banded_bilinear_oper
 BandedBilinearOperatorTest<Mem::Main, double, unsigned int> banded_bilinear_operator_test_double_uint;
 BandedBilinearOperatorTest<Mem::Main, double, unsigned long> banded_bilinear_operator_test_double_ulong;
 
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 BandedBilinearOperatorTest<Mem::Main, __float128, unsigned int> banded_bilinear_operator_test_float128_uint;
 BandedBilinearOperatorTest<Mem::Main, __float128, unsigned long> banded_bilinear_operator_test_float128_ulong;
 #endif

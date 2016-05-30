@@ -2,11 +2,11 @@
 #ifndef KERNEL_LAFEM_ARCH_SCATTER_AXPY_PRIM_HPP
 #define KERNEL_LAFEM_ARCH_SCATTER_AXPY_PRIM_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -57,7 +57,7 @@ namespace FEAST
 
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #ifndef  __CUDACC__
 #include <kernel/lafem/arch/scatter_axpy_prim_generic.hpp>

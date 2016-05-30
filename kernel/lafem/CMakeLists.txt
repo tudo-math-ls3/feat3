@@ -15,9 +15,9 @@ SET (kernel-lafem-list
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch kernel-util kernel-adjacency)
 
-if (FEAST_BACKENDS_CUDA)
+if (FEAT_BACKENDS_CUDA)
   TARGET_LINK_LIBRARIES(kernel-lafem kernel-util-cuda)
-endif(FEAST_BACKENDS_CUDA)
+endif(FEAT_BACKENDS_CUDA)
 
 # list of lafem tests
 SET (test_list
@@ -58,50 +58,50 @@ SET (test_list
 # create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} feast test_system)
+  TARGET_LINK_LIBRARIES(${test} feat test_system)
 
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} none)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/lafem/${test} none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
-  if (FEAST_VALGRIND)
+  if (FEAT_VALGRIND)
     SET_PROPERTY(TEST ${test}_none PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
     SET_PROPERTY(TEST ${test}_none PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-  endif (FEAST_VALGRIND)
+  endif (FEAT_VALGRIND)
 
   ADD_TEST(${test}_main ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} main)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/lafem/${test} main)
   SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
-  if (FEAST_VALGRIND)
+  if (FEAT_VALGRIND)
     SET_PROPERTY(TEST ${test}_main PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
     SET_PROPERTY(TEST ${test}_main PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-  endif (FEAST_VALGRIND)
+  endif (FEAT_VALGRIND)
 
   ADD_TEST(${test}_cuda ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${CUDA_MEMCHECK_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} cuda)
+    --test-command ${CUDA_MEMCHECK_EXE} ${FEAT_BINARY_DIR}/kernel/lafem/${test} cuda)
   SET_PROPERTY(TEST ${test}_cuda PROPERTY LABELS "cuda")
-  if (FEAST_CUDAMEMCHECK AND FEAST_BACKENDS_CUDA)
+  if (FEAT_CUDAMEMCHECK AND FEAT_BACKENDS_CUDA)
     SET_PROPERTY(TEST ${test}_cuda PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors")
     SET_PROPERTY(TEST ${test}_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
     SET_PROPERTY(TEST ${test}_cuda PROPERTY FAIL_REGULAR_EXPRESSION "= Leaked")
-  endif (FEAST_CUDAMEMCHECK AND FEAST_BACKENDS_CUDA)
+  endif (FEAT_CUDAMEMCHECK AND FEAT_BACKENDS_CUDA)
 ENDFOREACH(test)
 
 # add all tests to lafem_tests

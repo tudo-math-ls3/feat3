@@ -9,9 +9,9 @@
 #include <sstream>
 #include <cstdio>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the dense vector blocked class.
@@ -150,7 +150,7 @@ public:
 };
 DenseVectorBlockedTest<Mem::Main, float, Index> cpu_dense_vector_blocked_test_float;
 DenseVectorBlockedTest<Mem::Main, double, Index> cpu_dense_vector_blocked_test_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 DenseVectorBlockedTest<Mem::CUDA, float, Index> cuda_dense_vector_blocked_test_float;
 DenseVectorBlockedTest<Mem::CUDA, double, Index> cuda_dense_vector_blocked_test_double;
 #endif
@@ -219,7 +219,7 @@ public:
 };
 DenseVectorBlockedAxpyTest<Mem::Main, float, Index, 2> dv_axpy_test_float;
 DenseVectorBlockedAxpyTest<Mem::Main, double, Index, 2> dv_axpy_test_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 DenseVectorBlockedAxpyTest<Mem::CUDA, float, Index, 2> cuda_dv_axpy_test_float;
 DenseVectorBlockedAxpyTest<Mem::CUDA, double, Index, 2> cuda_dv_axpy_test_double;
 #endif
@@ -280,7 +280,7 @@ public:
 };
 DenseVectorBlockedDotTest<Mem::Main, float, Index, 2> dv_dot_product_test_float;
 DenseVectorBlockedDotTest<Mem::Main, double, Index, 2> dv_dot_product_test_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 DenseVectorBlockedDotTest<Mem::CUDA, float, Index, 2> cuda_dv_dot_product_test_float;
 DenseVectorBlockedDotTest<Mem::CUDA, double, Index, 2> cuda_dv_dot_product_test_double;
 #endif
@@ -352,7 +352,7 @@ public:
 };
 DenseVectorBlockedTripleDotTest<Mem::Main, float, Index, 2> dv_triple_dot_product_test_float;
 DenseVectorBlockedTripleDotTest<Mem::Main, double, Index, 2> dv_triple_dot_product_test_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 DenseVectorBlockedTripleDotTest<Mem::CUDA, float, Index, 2> cuda_dv_triple_dot_product_test_float;
 DenseVectorBlockedTripleDotTest<Mem::CUDA, double, Index, 2> cuda_dv_triple_dot_product_test_double;
 #endif
@@ -429,7 +429,7 @@ public:
 };
 DenseVectorBlockedComponentProductTest<Mem::Main, float, Index, 2> dv_component_product_test_float;
 DenseVectorBlockedComponentProductTest<Mem::Main, double, Index, 2> dv_component_product_test_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 DenseVectorBlockedComponentProductTest<Mem::CUDA, float, Index, 2> cuda_dv_component_product_test_float;
 DenseVectorBlockedComponentProductTest<Mem::CUDA, double, Index, 2> cuda_dv_component_product_test_double;
 #endif
@@ -481,7 +481,7 @@ public:
 };
 DenseVectorBlockedScaleTest<Mem::Main, float, Index, 2> dv_scale_test_float;
 DenseVectorBlockedScaleTest<Mem::Main, double, Index, 2> dv_scale_test_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 DenseVectorBlockedScaleTest<Mem::CUDA, float, Index, 2> cuda_dv_scale_test_float;
 DenseVectorBlockedScaleTest<Mem::CUDA, double, Index, 2> cuda_dv_scale_test_double;
 #endif
@@ -532,7 +532,7 @@ public:
 };
 DenseVectorBlockedNorm2Test<Mem::Main, float, Index, 2> dv_norm2_test_float;
 DenseVectorBlockedNorm2Test<Mem::Main, double, Index, 2> dv_norm2_test_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 DenseVectorBlockedNorm2Test<Mem::CUDA, float, Index, 2> cuda_dv_norm2_test_float;
 DenseVectorBlockedNorm2Test<Mem::CUDA, double, Index, 2> cuda_dv_norm2_test_double;
 #endif

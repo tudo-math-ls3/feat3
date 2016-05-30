@@ -2,10 +2,10 @@
 #ifndef KERNEL_SOLVER_BASIC_VCYCLE_HPP
 #define KERNEL_SOLVER_BASIC_VCYCLE_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -543,6 +543,6 @@ namespace FEAST
       }
     }; // class BasicVCycle<...>
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_BASIC_VCYCLE_HPP

@@ -4,19 +4,19 @@
 
 /**
  * \file
- * \brief FEAST Architecture header.
+ * \brief FEAT Architecture header.
  *
- * This file contains all architecture definitions, used in FEAST.
+ * This file contains all architecture definitions, used in FEAT.
  */
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/instantiation_policy.hpp>
 
-namespace FEAST
+namespace FEAT
 {
     /**
-     * \brief FEAST::Archs namespace
+     * \brief FEAT::Archs namespace
      */
     namespace Archs
     {
@@ -76,7 +76,7 @@ namespace FEAST
 
 
     /**
-     * \brief FEAST::Mem namespace
+     * \brief FEAT::Mem namespace
      */
     namespace Mem
     {
@@ -119,7 +119,7 @@ namespace FEAST
     }
 
     /**
-     * \brief FEAST::Algo namespace
+     * \brief FEAT::Algo namespace
      *
      * \deprecated {The Algo Tag is not used anymore.
      * Only the micro benchmarks are stuck to this to explicitly address the several backends.}

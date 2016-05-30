@@ -1,12 +1,12 @@
 #pragma once
-#ifndef FEAST_KERNEL_SOLVER_LINESEARCH
-#define FEAST_KERNEL_SOLVER_LINESEARCH 1
+#ifndef FEAT_KERNEL_SOLVER_LINESEARCH
+#define FEAT_KERNEL_SOLVER_LINESEARCH 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/iterative.hpp>
 
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -1700,5 +1700,5 @@ namespace FEAST
       }
 
   } // namespace Solver
-} // namespace FEAST
-#endif // FEAST_KERNEL_SOLVER_LINESEARCH
+} // namespace FEAT
+#endif // FEAT_KERNEL_SOLVER_LINESEARCH

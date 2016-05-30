@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 
 #include <kernel/archs.hpp>
@@ -10,9 +10,9 @@
 // http://docs.nvidia.com/cuda/cusparse/#cusparse-lt-t-gt-csrilu02_solve
 
 
-using namespace FEAST;
+using namespace FEAT;
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -112,7 +112,7 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "cusparse_csrv_analysis failed with status code: " + stringify(status));
 
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
@@ -172,7 +172,7 @@ namespace FEAST
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsr2_solve failed with status code: " + stringify(status));
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
@@ -299,7 +299,7 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrv2_analysis failed with status code: " + stringify(status));
 
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
@@ -361,7 +361,7 @@ namespace FEAST
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrsv2_solve failed with status code: " + stringify(status));
 
-#ifdef FEAST_DEBUG_MODE
+#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)

@@ -4,9 +4,9 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
 
 typedef ConformalMesh<Shape::Quadrilateral> RootMesh;
 typedef MeshPart<RootMesh> SubMesh;

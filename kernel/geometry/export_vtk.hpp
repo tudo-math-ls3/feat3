@@ -2,7 +2,7 @@
 #ifndef KERNEL_GEOMETRY_EXPORT_VTK_HPP
 #define KERNEL_GEOMETRY_EXPORT_VTK_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 #include <kernel/util/file_error.hpp>
@@ -13,7 +13,7 @@
 #include <vector>
 #include <deque>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -714,6 +714,6 @@ namespace FEAST
       }
     }; // class ExportVTK
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_EXPORT_VTK_HPP

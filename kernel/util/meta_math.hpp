@@ -4,7 +4,7 @@
 
 #include <kernel/util/assertion.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Template Meta-Program Math namespace
@@ -97,6 +97,6 @@ namespace FEAST
     };
     /// \endcond
   } // namespace MetaMath
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_META_MATH_HPP

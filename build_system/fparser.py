@@ -9,6 +9,6 @@ class FParser(ThirdpartyPackage):
     self.dirname = "fparser"
     self.filename = "fparser4.5.2.zip"
     self.url = "http://warp.povusers.org/FunctionParser/" + self.filename
-    self.cmake_flags = " -DFEAST_HAVE_FPARSER:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_FPARSER:BOOL=ON"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname+os.sep+self.dirname

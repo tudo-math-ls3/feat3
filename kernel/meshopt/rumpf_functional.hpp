@@ -2,7 +2,7 @@
 #ifndef KERNEL_MESHOPT_RUMPF_FUNCTIONAL_HPP
 #define KERNEL_MESHOPT_RUMPF_FUNCTIONAL_HPP 1
 
-namespace FEAST
+namespace FEAT
 {
   namespace Meshopt
   {
@@ -350,7 +350,7 @@ namespace FEAST
        * \brief Computes the additional levelset penalty term for the Rumpf functional
        *
        * \tparam Tl_
-       * Type for the object containing the local levelset values, i.e. FEAST::Tiny::Vector
+       * Type for the object containing the local levelset values, i.e. FEAT::Tiny::Vector
        *
        * \param[in] lvlset_vals
        * The values of the levelset function in the grid vertices for the current element
@@ -366,13 +366,13 @@ namespace FEAST
        * \brief Adds the gradient of the additional levelset penalty term
        *
        * \tparam Tl_
-       * Type for the object containing the local levelset values, i.e. FEAST::Tiny::Vector
+       * Type for the object containing the local levelset values, i.e. FEAT::Tiny::Vector
        *
        * \tparam Tlg_
-       * Type for the object containing the local levelset gradient values, i.e. FEAST::Tiny::Matrix
+       * Type for the object containing the local levelset gradient values, i.e. FEAT::Tiny::Matrix
        *
        * \tparam Tgrad_
-       * Type for the object containing the functional gradient, i.e. FEAST::Tiny::Matrix
+       * Type for the object containing the functional gradient, i.e. FEAT::Tiny::Matrix
        *
        * \param[in] lvlset_vals
        * The values of the levelset function in the grid vertices for the current element
@@ -520,5 +520,5 @@ namespace FEAST
 
   } // namespace Meshopt
 
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_MESHOPT_RUMPF_FUNCTIONAL_HPP

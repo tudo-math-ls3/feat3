@@ -2,9 +2,9 @@
 #include <kernel/geometry/test_aux/validate_structured_meshes.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
 
 /**
  * \brief Test class for the struct_index_mapping formulas

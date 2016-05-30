@@ -5,8 +5,8 @@
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/adjacency/graph.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 template<typename DataType_>
 class BognerFoxSchmitTest

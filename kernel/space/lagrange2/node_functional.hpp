@@ -2,10 +2,10 @@
 #ifndef KERNEL_SPACE_LAGRANGE2_NODE_FUNCTIONAL_HPP
 #define KERNEL_SPACE_LAGRANGE2_NODE_FUNCTIONAL_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/node_functional_base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -249,6 +249,6 @@ namespace FEAST
       };
     } // namespace Lagrange1
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_LAGRANGE2_NODE_FUNCTIONAL_HPP

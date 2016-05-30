@@ -8,7 +8,7 @@
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -19,7 +19,7 @@ namespace FEAST
      */
     template<typename MemType_, typename DataType_, typename IndexType_>
     class MetaVectorTestBase
-      : public FEAST::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
+      : public FEAT::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
     {
     public:
       typedef DataType_ DataType;
@@ -30,7 +30,7 @@ namespace FEAST
       typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
       explicit MetaVectorTestBase(const char* name) :
-        FEAST::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>(name)
+        FEAT::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>(name)
       {
       }
 
@@ -156,6 +156,6 @@ namespace FEAST
       }
     }; // MetaVectorTestBase
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_META_VECTOR_TEST_BASE_HPP

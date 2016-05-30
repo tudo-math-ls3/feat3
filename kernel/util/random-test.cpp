@@ -2,8 +2,8 @@
 #include <test_system/test_system.hpp>
 #include <cstdint>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the Random class.

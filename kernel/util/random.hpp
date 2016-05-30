@@ -2,7 +2,7 @@
 #ifndef KERNEL_UTIL_RANDOM_HPP
 #define KERNEL_UTIL_RANDOM_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/util/type_traits.hpp>
 
 // includes, system
@@ -10,7 +10,7 @@
 #include <limits>
 #include <cstdint>
 
-namespace FEAST
+namespace FEAT
 {
   /// \cond interal
   namespace Intern
@@ -109,7 +109,7 @@ namespace FEAST
     template<typename T_>
     Random& operator>>(T_& x)
     {
-      x = FEAST::Intern::RandomNumber<T_>::gen(*this);
+      x = FEAT::Intern::RandomNumber<T_>::gen(*this);
       return *this;
     }
 
@@ -133,7 +133,7 @@ namespace FEAST
     template<typename T_>
     T_ operator()(T_ a, T_ b)
     {
-      return FEAST::Intern::RandomNumber<T_>::gen_ranged(*this, std::min(a, b), std::max(a, b));
+      return FEAT::Intern::RandomNumber<T_>::gen_ranged(*this, std::min(a, b), std::max(a, b));
     }
   }; // class Random
 
@@ -282,6 +282,6 @@ namespace FEAST
     };
   } // namespace Intern
   /// \endcond
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_UTIL_RANDOM_HPP

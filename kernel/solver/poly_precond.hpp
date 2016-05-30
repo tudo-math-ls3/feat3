@@ -2,10 +2,10 @@
 #ifndef KERNEL_SOLVER_POLY_PRECOND_HPP
 #define KERNEL_SOLVER_POLY_PRECOND_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/solver/precon_wrapper.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -35,6 +35,6 @@ namespace FEAST
         (filter, matrix, std::forward<Args_>(args)...);
     }
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_POLY_PRECOND_HPP

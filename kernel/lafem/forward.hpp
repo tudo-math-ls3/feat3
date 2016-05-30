@@ -2,10 +2,10 @@
 #ifndef KERNEL_LAFEM_FORWARD_HPP
 #define KERNEL_LAFEM_FORWARD_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -41,6 +41,6 @@ namespace FEAST
     class SparseMatrixBanded;
 
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_FORWARD_HPP

@@ -6,14 +6,14 @@
  * \file
  * \brief LAFEM common type definitions.
  *
- * This file is the supplementary header for the LAFEM library kernel, which is included by all other FEAST header and source files.
+ * This file is the supplementary header for the LAFEM library kernel, which is included by all other FEAT header and source files.
  * It defines macros and data types which are frequently used in other files.
  */
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief LAFEM namespace
@@ -80,6 +80,6 @@ namespace FEAST
       pod /**< each entry of a block is treated as one entry on its own (formerly known as 'raw') */
     };
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_BASE_HPP

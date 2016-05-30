@@ -2,8 +2,8 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <iostream>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
 
 int main(int argc, char ** argv)
 {

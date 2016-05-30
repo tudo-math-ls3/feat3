@@ -9,9 +9,9 @@
 #include <cstdio>
 #include <sstream>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the sparse matrix ell class.
@@ -144,11 +144,11 @@ SparseMatrixELLTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_ell_test_
 SparseMatrixELLTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_ell_test_double_ulong;
 SparseMatrixELLTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_ell_test_float_uint;
 SparseMatrixELLTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_ell_test_double_uint;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixELLTest<Mem::Main, __float128, unsigned long> cpu_sparse_matrix_ell_test_float128_ulong;
 SparseMatrixELLTest<Mem::Main, __float128, unsigned int> cpu_sparse_matrix_ell_test_float128_uint;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixELLTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_ell_test_float_ulong;
 SparseMatrixELLTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_ell_test_double_ulong;
 SparseMatrixELLTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_ell_test_float_uint;
@@ -250,11 +250,11 @@ SparseMatrixELLApplyTest<Mem::Main, float, unsigned long> sm_ell_apply_test_floa
 SparseMatrixELLApplyTest<Mem::Main, double, unsigned long> sm_ell_apply_test_double_ulong;
 SparseMatrixELLApplyTest<Mem::Main, float, unsigned int> sm_ell_apply_test_float_uint;
 SparseMatrixELLApplyTest<Mem::Main, double, unsigned int> sm_ell_apply_test_double_uint;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixELLApplyTest<Mem::Main, __float128, unsigned long> sm_ell_apply_test_float128_ulong;
 SparseMatrixELLApplyTest<Mem::Main, __float128, unsigned int> sm_ell_apply_test_float128_uint;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixELLApplyTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_apply_test_float_ulong;
 SparseMatrixELLApplyTest<Mem::CUDA, double, unsigned long> cuda_sm_ell_apply_test_double_ulong;
 SparseMatrixELLApplyTest<Mem::CUDA, float, unsigned int> cuda_sm_ell_apply_test_float_uint;
@@ -318,11 +318,11 @@ SparseMatrixELLScaleTest<Mem::Main, float, unsigned int> sm_ell_scale_test_float
 SparseMatrixELLScaleTest<Mem::Main, double, unsigned int> sm_ell_scale_test_double_uint;
 SparseMatrixELLScaleTest<Mem::Main, float, unsigned long> sm_ell_scale_test_float_ulong;
 SparseMatrixELLScaleTest<Mem::Main, double, unsigned long> sm_ell_scale_test_double_ulong;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixELLScaleTest<Mem::Main, __float128, unsigned int> sm_ell_scale_test_float128_uint;
 SparseMatrixELLScaleTest<Mem::Main, __float128, unsigned long> sm_ell_scale_test_float128_ulong;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixELLScaleTest<Mem::CUDA, float, unsigned int> cuda_sm_ell_scale_test_float_uint;
 SparseMatrixELLScaleTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_scale_test_double_uint;
 SparseMatrixELLScaleTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_scale_test_float_ulong;
@@ -406,11 +406,11 @@ SparseMatrixELLScaleRowColTest<Mem::Main, float, unsigned int> sm_ell_scale_row_
 SparseMatrixELLScaleRowColTest<Mem::Main, double, unsigned int> sm_ell_scale_row_col_test_double_uint;
 SparseMatrixELLScaleRowColTest<Mem::Main, float, unsigned long> sm_ell_scale_row_col_test_float_ulong;
 SparseMatrixELLScaleRowColTest<Mem::Main, double, unsigned long> sm_ell_scale_row_col_test_double_ulong;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixELLScaleRowColTest<Mem::Main, __float128, unsigned int> sm_ell_scale_row_col_test_float128_uint;
 SparseMatrixELLScaleRowColTest<Mem::Main, __float128, unsigned long> sm_ell_scale_row_col_test_float128_ulong;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixELLScaleRowColTest<Mem::CUDA, float, unsigned int> cuda_sm_ell_scale_row_col_test_float_uint;
 SparseMatrixELLScaleRowColTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_scale_row_col_test_double_uint;
 SparseMatrixELLScaleRowColTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_scale_row_col_test_float_ulong;
@@ -493,11 +493,11 @@ SparseMatrixELLTranspositionTest<Mem::Main, float, unsigned int> sm_ell_transpos
 SparseMatrixELLTranspositionTest<Mem::Main, double, unsigned int> sm_ell_transposition_test_double_uint;
 SparseMatrixELLTranspositionTest<Mem::Main, float, unsigned long> sm_ell_transposition_test_float_ulong;
 SparseMatrixELLTranspositionTest<Mem::Main, double, unsigned long> sm_ell_transposition_test_double_ulong;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixELLTranspositionTest<Mem::Main, __float128, unsigned int> sm_ell_transposition_test_float128_uint;
 SparseMatrixELLTranspositionTest<Mem::Main, __float128, unsigned long> sm_ell_transposition_test_float128_ulong;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixELLTranspositionTest<Mem::CUDA, float, unsigned int> cuda_sm_ell_transposition_test_float_uint;
 SparseMatrixELLTranspositionTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_transposition_test_double_uint;
 SparseMatrixELLTranspositionTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_transposition_test_float_ulong;
@@ -553,11 +553,11 @@ SparseMatrixELLDiagTest<Mem::Main, float, unsigned int> sm_ell_diag_test_float_u
 SparseMatrixELLDiagTest<Mem::Main, double, unsigned int> sm_ell_diag_test_double_uint;
 SparseMatrixELLDiagTest<Mem::Main, float, unsigned long> sm_ell_diag_test_float_ulong;
 SparseMatrixELLDiagTest<Mem::Main, double, unsigned long> sm_ell_diag_test_double_ulong;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixELLDiagTest<Mem::Main, __float128, unsigned int> sm_ell_diag_test_float128_uint;
 SparseMatrixELLDiagTest<Mem::Main, __float128, unsigned long> sm_ell_diag_test_float128_ulong;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixELLDiagTest<Mem::CUDA, float, unsigned int> cuda_sm_ell_diag_test_float_uint;
 SparseMatrixELLDiagTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_diag_test_double_uint;
 SparseMatrixELLDiagTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_diag_test_float_ulong;
@@ -650,11 +650,11 @@ SparseMatrixELLAxpyTest<Mem::Main, float, unsigned int> sm_ell_axpy_test_float_u
 SparseMatrixELLAxpyTest<Mem::Main, double, unsigned int> sm_ell_axpy_test_double_uint;
 SparseMatrixELLAxpyTest<Mem::Main, float, unsigned long> sm_ell_axpy_test_float_ulong;
 SparseMatrixELLAxpyTest<Mem::Main, double, unsigned long> sm_ell_axpy_test_double_ulong;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixELLAxpyTest<Mem::Main, __float128, unsigned int> sm_ell_axpy_test_float128_uint;
 SparseMatrixELLAxpyTest<Mem::Main, __float128, unsigned long> sm_ell_axpy_test_float128_ulong;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixELLAxpyTest<Mem::CUDA, float, unsigned int> cuda_sm_ell_axpy_test_float_uint;
 SparseMatrixELLAxpyTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_axpy_test_double_uint;
 SparseMatrixELLAxpyTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_axpy_test_float_ulong;
@@ -705,11 +705,11 @@ SparseMatrixELLFrobeniusTest<Mem::Main, float, unsigned int> sm_ell_frobenius_te
 SparseMatrixELLFrobeniusTest<Mem::Main, double, unsigned int> sm_ell_frobenius_test_double_uint;
 SparseMatrixELLFrobeniusTest<Mem::Main, float, unsigned long> sm_ell_frobenius_test_float_ulong;
 SparseMatrixELLFrobeniusTest<Mem::Main, double, unsigned long> sm_ell_frobenius_test_double_ulong;
-#ifdef FEAST_HAVE_QUADMATH
+#ifdef FEAT_HAVE_QUADMATH
 SparseMatrixELLFrobeniusTest<Mem::Main, __float128, unsigned int> sm_ell_frobenius_test_float128_uint;
 SparseMatrixELLFrobeniusTest<Mem::Main, __float128, unsigned long> sm_ell_frobenius_test_float128_ulong;
 #endif
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 SparseMatrixELLFrobeniusTest<Mem::CUDA, float, unsigned int> cuda_sm_ell_frobenius_test_float_uint;
 SparseMatrixELLFrobeniusTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_frobenius_test_double_uint;
 SparseMatrixELLFrobeniusTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_frobenius_test_float_ulong;

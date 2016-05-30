@@ -8,9 +8,9 @@
 #include <kernel/lafem/sparse_vector_blocked.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for VectorMirror class template

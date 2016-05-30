@@ -2,7 +2,7 @@
 #ifndef KERNEL_CUBATURE_AUTO_ALIAS_HPP
 #define KERNEL_CUBATURE_AUTO_ALIAS_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/shape.hpp>
 #include <kernel/cubature/scalar/gauss_legendre_driver.hpp>
 #include <kernel/cubature/lauffer_driver.hpp>
@@ -13,7 +13,7 @@
 #include <vector>
 #include <algorithm>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -101,7 +101,7 @@ namespace FEAST
 
           // and build the name
           return
-#ifdef FEAST_CUBATURE_SCALAR_PREFIX
+#ifdef FEAT_CUBATURE_SCALAR_PREFIX
             "scalar:" +
 #endif
             Scalar::GaussLegendreDriver::name() + ":" + stringify(k);
@@ -206,7 +206,7 @@ namespace FEAST
 
           // and build the name
           return
-#ifdef FEAST_CUBATURE_TENSOR_PREFIX
+#ifdef FEAT_CUBATURE_TENSOR_PREFIX
             "tensor:" +
 #endif
             Scalar::GaussLegendreDriver::name() + ":" + stringify(k);
@@ -215,6 +215,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_AUTO_ALIAS_HPP

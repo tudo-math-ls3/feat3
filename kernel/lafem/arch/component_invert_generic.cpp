@@ -1,7 +1,7 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/arch/component_invert.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -11,4 +11,4 @@ namespace FEAST
       template void ComponentInvert<Mem::Main>::value_generic(double *, const double * const, const double, const Index);
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT

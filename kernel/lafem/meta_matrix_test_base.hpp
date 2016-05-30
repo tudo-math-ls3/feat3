@@ -17,7 +17,7 @@
 #include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -90,7 +90,7 @@ namespace FEAST
      */
     template<typename MemType_, typename DataType_, typename IndexType_>
     class MetaMatrixTestBase
-      : public FEAST::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
+      : public FEAT::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>
     {
     public:
       typedef DataType_ DataType;
@@ -127,7 +127,7 @@ namespace FEAST
       typedef SaddlePointMatrix<VeloFullMatrix, GradMatrix, DiveMatrix> SystemFullMatrix;
 
       explicit MetaMatrixTestBase(const String & name) :
-        FEAST::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>(name)
+        FEAT::TestSystem::FullTaggedTest<MemType_, DataType_, IndexType_>(name)
       {
       }
 
@@ -229,6 +229,6 @@ namespace FEAST
       }
     }; // MetaVectorTestBase
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_META_MATRIX_TEST_BASE_HPP

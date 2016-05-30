@@ -1,14 +1,14 @@
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
-#ifdef FEAST_HAVE_PARMETIS
+#ifdef FEAT_HAVE_PARMETIS
 #include <kernel/archs.hpp>
-FEAST_DISABLE_WARNINGS
+FEAT_DISABLE_WARNINGS
 #include <parmetis.h>
-FEAST_RESTORE_WARNINGS
+FEAT_RESTORE_WARNINGS
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
 
 
 template<typename Tag_= Mem::Main, typename IndexType_ = Index>

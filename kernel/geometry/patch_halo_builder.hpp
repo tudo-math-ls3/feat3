@@ -8,7 +8,7 @@
 
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -291,6 +291,6 @@ namespace FEAST
       }
     };
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_PATCH_HALO_BUILDER_HPP

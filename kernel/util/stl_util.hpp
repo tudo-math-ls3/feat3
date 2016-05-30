@@ -5,7 +5,7 @@
 #include<kernel/base_header.hpp>
 #include<vector>
 
-namespace FEAST
+namespace FEAT
 {
   struct STLUtil
   {

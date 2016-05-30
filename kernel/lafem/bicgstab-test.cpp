@@ -8,9 +8,9 @@
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 template <SparsePreconType Type_>
 struct Precon;

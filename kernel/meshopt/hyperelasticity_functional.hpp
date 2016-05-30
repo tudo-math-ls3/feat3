@@ -17,7 +17,7 @@
 
 #include <map>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Meshopt
   {
@@ -825,9 +825,9 @@ namespace FEAST
           const auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector<CoordType, MeshType::world_dim> h;
+          FEAT::Tiny::Vector<CoordType, MeshType::world_dim> h;
 
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
@@ -877,9 +877,9 @@ namespace FEAST
           auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector<CoordType, MeshType::world_dim> h;
+          FEAT::Tiny::Vector<CoordType, MeshType::world_dim> h;
 
           CoordType norm_A(0), det_A(0), rec_det_A(0);
 
@@ -928,11 +928,11 @@ namespace FEAST
           auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAST::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
-          FEAST::Tiny::Vector<CoordType, MeshType::world_dim> h;
+          FEAT::Tiny::Vector<CoordType, MeshType::world_dim> h;
           // This will hold the local gradient for one element for passing to other routines
-          FEAST::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
+          FEAT::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
 
           // Clear gradient vector
           grad.format();
@@ -963,5 +963,5 @@ namespace FEAST
     }; // class HyperelasticityFunctional
 
   } // namespace Meshopt
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_MESHOPT_HYPERELASTICITY_FUNCTIONAL_HPP

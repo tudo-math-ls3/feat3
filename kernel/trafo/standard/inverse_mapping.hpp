@@ -4,7 +4,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Trafo
   {
@@ -238,5 +238,5 @@ namespace FEAST
 
     } // namespace Standard
   } // namespace Trafo
-} // namespace FEAST
+} // namespace FEAT
 #endif //KERNEL_TRAFO_STANDARD_INVERSE_MAPPING

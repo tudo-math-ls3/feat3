@@ -9,9 +9,9 @@
 #include <kernel/lafem/power_filter.hpp>
 #include <kernel/lafem/tuple_filter.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 template<typename MemType_, typename DataType_, typename IndexType_>
 class MetaFilterTest :

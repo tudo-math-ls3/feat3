@@ -5,7 +5,7 @@
 #include <kernel/solver/nlopt_precond.hpp>
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Solver
   {
@@ -317,6 +317,6 @@ namespace FEAST
       }
 
   } // namespace Solver
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SOLVER_HESSIAN_PRECOND

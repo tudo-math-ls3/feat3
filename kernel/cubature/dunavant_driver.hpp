@@ -2,11 +2,11 @@
 #ifndef KERNEL_CUBATURE_DUNAVANT_DRIVER_HPP
 #define KERNEL_CUBATURE_DUNAVANT_DRIVER_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/symmetric_simplex_driver.hpp>
 #include <kernel/util/meta_math.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -306,6 +306,6 @@ namespace FEAST
     }; // class DunavantDriver<Simplex<...>,...>
 
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_DUNAVANT_DRIVER_HPP

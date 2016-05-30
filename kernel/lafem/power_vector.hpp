@@ -2,14 +2,14 @@
 #ifndef KERNEL_LAFEM_POWER_VECTOR_HPP
 #define KERNEL_LAFEM_POWER_VECTOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/meta_element.hpp>
 #include <kernel/lafem/container.hpp>
 
 // includes, system
 #include <iostream>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -1072,6 +1072,6 @@ namespace FEAST
     }
     /// \endcond
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_POWER_VECTOR_HPP

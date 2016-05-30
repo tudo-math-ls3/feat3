@@ -2,10 +2,10 @@
 #ifndef KERNEL_UTIL_CUDA_UTIL_HPP
 #define KERNEL_UTIL_CUDA_UTIL_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Util
   {

@@ -18,8 +18,8 @@
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/runtime.hpp>
 
-using namespace FEAST;
-using namespace FEAST::Solver;
+using namespace FEAT;
+using namespace FEAT::Solver;
 
 /**
  * \brief Tool for debugging of nonlinear optimisers
@@ -221,13 +221,13 @@ static void display_help()
   std::cout << "dbg-nlopt: Nonlinear optimiser debugging tool." << std::endl;
   std::cout << "Required arguments:" << std::endl;
   std::cout << " --solver [String]: Available solvers are NLCG, NLSD" << std::endl;
-#ifdef FEAST_HAVE_ALGLIB
+#ifdef FEAT_HAVE_ALGLIB
   std::cout << "                    and ALGLIBMinLBFGS, ALGLIBMinCG" << std::endl;
 #else
   std::cout << "                    Compiling with the alglib token in the buildid "
   << std::endl <<
   "                    will enable ALGLIBMinLBFGS and ALGLIBMinCG" << std::endl;
-#endif // FEAST_HAVE_ALGLIB
+#endif // FEAT_HAVE_ALGLIB
   std::cout << "Optional arguments:" << std::endl;
   std::cout << " --help: Displays this text" << std::endl;
   std::cout << " --linesearch [String]: Available linesearches for NLCG and NLSD are NewtonRaphsonLinesearch,"
@@ -240,13 +240,13 @@ static void display_help()
     " --direction_update [String]: Available search direction updates for NLCG are DaiYuan," << std::endl <<
     "                              DYHSHybrid, FletcherReeves, HestenesStiefel and PolakRibiere (default)."
     << std::endl;
-#ifdef FEAST_HAVE_ALGLIB
+#ifdef FEAT_HAVE_ALGLIB
   std::cout <<
     "                              Available search direction updates for ALGLIBMinCG are DaiYuan,"
     << std::endl <<
     "                              and DYHSHybrid."
     << std::endl;
-#endif // FEAST_HAVE_ALGLIB
+#endif // FEAT_HAVE_ALGLIB
 }
 
 int main(int argc, char* argv[])
@@ -414,7 +414,7 @@ int main(int argc, char* argv[])
     Runtime::finalise();
     return ret;
   }
-#ifdef FEAST_HAVE_ALGLIB
+#ifdef FEAT_HAVE_ALGLIB
   else if (solver_name == "ALGLIBMinLBFGS")
   {
     auto my_solver = new_alglib_minlbfgs(my_op, my_filter);
@@ -448,7 +448,7 @@ int main(int argc, char* argv[])
     Runtime::finalise();
     return ret;
   }
-#endif // FEAST_HAVE_ALGLIB
+#endif // FEAT_HAVE_ALGLIB
   else
     throw InternalError("dbg-nlopt got invalid solver name: "+solver_name);
 }

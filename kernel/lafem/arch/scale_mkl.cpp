@@ -1,12 +1,12 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/lafem/arch/scale.hpp>
 #include <cstring>
 
 #include <mkl.h>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 void Scale<Mem::Main>::value_mkl(float * r, const float * const x, const float s, const Index size)
 {

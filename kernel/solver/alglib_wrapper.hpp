@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FEAST_SOLVER_ALGLIB_WRAPPER
-#define FEAST_SOLVER_ALGLIB_WRAPPER 1
+#ifndef FEAT_SOLVER_ALGLIB_WRAPPER
+#define FEAT_SOLVER_ALGLIB_WRAPPER 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
@@ -8,11 +8,11 @@
 
 #include <deque>
 
-#ifdef FEAST_HAVE_ALGLIB
-FEAST_DISABLE_WARNINGS
+#ifdef FEAT_HAVE_ALGLIB
+FEAT_DISABLE_WARNINGS
 #include <thirdparty/alglib/cpp/src/optimization.h>
-FEAST_RESTORE_WARNINGS
-namespace FEAST
+FEAT_RESTORE_WARNINGS
+namespace FEAT
 {
   namespace Solver
   {
@@ -930,6 +930,6 @@ namespace FEAST
 
 
   } // namespace Solver
-} // namespace FEAST
-#endif // FEAST_HAVE_ALGLIB
-#endif // FEAST_KERNEL_SOLVER_ALGLIB_WRAPPER
+} // namespace FEAT
+#endif // FEAT_HAVE_ALGLIB
+#endif // FEAT_KERNEL_SOLVER_ALGLIB_WRAPPER

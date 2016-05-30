@@ -2,10 +2,10 @@
 #ifndef KERNEL_SPACE_EVAL_DATA_HPP
 #define KERNEL_SPACE_EVAL_DATA_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/base.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -74,6 +74,6 @@ namespace FEAST
       static constexpr SpaceTags config = BasisDataType::config;
     }; // class EvalData<...>
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_EVAL_DATA_HPP

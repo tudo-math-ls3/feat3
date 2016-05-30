@@ -10,7 +10,7 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -38,6 +38,6 @@ namespace FEAST
 
     } // namespace Arch
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_ARCH_SCATTER_AXPY_PRIM_GENERIC_HPP

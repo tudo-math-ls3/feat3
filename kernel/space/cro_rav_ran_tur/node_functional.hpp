@@ -2,11 +2,11 @@
 #ifndef KERNEL_SPACE_CRO_RAV_RAN_TUR_NODE_FUNCTIONAL_HPP
 #define KERNEL_SPACE_CRO_RAV_RAN_TUR_NODE_FUNCTIONAL_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/node_functional_base.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -208,6 +208,6 @@ namespace FEAST
       };
     } // namespace CroRavRanTur
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_CRO_RAV_RAN_TUR_NODE_FUNCTIONAL_HPP

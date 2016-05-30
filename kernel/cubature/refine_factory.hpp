@@ -2,10 +2,10 @@
 #ifndef KERNEL_CUBATURE_REFINE_FACTORY_HPP
 #define KERNEL_CUBATURE_REFINE_FACTORY_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/cubature/rule.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Cubature
   {
@@ -790,6 +790,6 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
   } // namespace Cubature
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_CUBATURE_REFINE_FACTORY_HPP

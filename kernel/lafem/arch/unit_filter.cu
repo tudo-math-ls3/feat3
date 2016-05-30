@@ -1,4 +1,4 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/unit_filter.hpp>
@@ -6,7 +6,7 @@
 #include <kernel/util/memory_pool.hpp>
 
 /// \cond internal
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -34,9 +34,9 @@ namespace FEAST
 }
 
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_, typename IT_>
 void UnitFilter<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
@@ -47,8 +47,8 @@ void UnitFilter<Mem::CUDA>::filter_rhs(DT_ * v, const DT_ * const sv_elements, c
   block.x = blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_unit_filter_rhs<<<grid, block>>>(v, sv_elements, sv_indices, ue);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_unit_filter_rhs<<<grid, block>>>(v, sv_elements, sv_indices, ue);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
@@ -70,8 +70,8 @@ void UnitFilter<Mem::CUDA>::filter_def(DT_ * v, const IT_ * const sv_indices, co
   block.x = blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_unit_filter_def<<<grid, block>>>(v, sv_indices, ue);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_unit_filter_def<<<grid, block>>>(v, sv_indices, ue);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

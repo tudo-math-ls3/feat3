@@ -2,7 +2,7 @@
 #ifndef KERNEL_LAFEM_SPARSE_LAYOUT_HPP
 #define KERNEL_LAFEM_SPARSE_LAYOUT_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/lafem/forward.hpp>
@@ -10,7 +10,7 @@
 
 #include <vector>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -58,7 +58,7 @@ namespace FEAST
      * \tparam Layout_ The Matrix Type, which represented by the layout.
      *
      * This class acts as an data wrapper for all index arrays, describing a specific sparse matrix layout.
-     * It enables FEAST to store layout related data only once per layout per matrix type.
+     * It enables FEAT to store layout related data only once per layout per matrix type.
      * In addition, one is able to create a new matrix with a given layout without assembling it a second time.
      *
      * \todo Enable layout conversion between matrix types
@@ -148,6 +148,6 @@ namespace FEAST
       }
     };
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_SPARSE_LAYOUT_HPP

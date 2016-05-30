@@ -2,13 +2,13 @@
 #ifndef KERNEL_LAFEM_EDI_HPP
 #define KERNEL_LAFEM_EDI_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/archs.hpp>
 
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief LAFEM namespace
@@ -96,6 +96,6 @@ namespace FEAST
       }
     };
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_EDI_HPP

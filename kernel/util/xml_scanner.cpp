@@ -1,7 +1,7 @@
 #include <kernel/util/xml_scanner.hpp>
 #include <cctype>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Xml
   {
@@ -430,4 +430,4 @@ namespace FEAST
         throw_grammar("Invalid content line");
     }
   } // namespace Xml
-} // namespace FEAST
+} // namespace FEAT

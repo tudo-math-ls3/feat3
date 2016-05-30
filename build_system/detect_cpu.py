@@ -1,5 +1,5 @@
 import platform
-from build_system.feast_util import get_output
+from build_system.feat_util import get_output
 
 def detect_cpu():
   cputype = "unknown"

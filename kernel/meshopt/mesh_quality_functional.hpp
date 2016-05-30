@@ -8,7 +8,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   /**
    * \brief Namespace for everything mesh optimiser related
@@ -232,5 +232,5 @@ namespace FEAST
     /// \endcond
 
   } // namespace Meshopt
-} // namespace FEAST
+} // namespace FEAT
 #endif // KERNEL_MESHOPT_MESH_QUALITY_FUNCTIONAL_HPP

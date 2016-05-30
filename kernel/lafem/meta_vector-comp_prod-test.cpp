@@ -1,9 +1,9 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/meta_vector_test_base.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Meta-Vector component-product test class
@@ -78,7 +78,7 @@ public:
 
 MetaVectorCompProdTest<Mem::Main, float, Index> meta_vector_comp_prod_test_generic_float;
 MetaVectorCompProdTest<Mem::Main, double, Index> meta_vector_comp_prod_test_generic_double;
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
 MetaVectorCompProdTest<Mem::CUDA, float, Index> meta_vector_comp_prod_test_cuda_float;
 MetaVectorCompProdTest<Mem::CUDA, double, Index> meta_vector_comp_prod_test_cuda_double;
 #endif

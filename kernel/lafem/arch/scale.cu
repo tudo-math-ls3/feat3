@@ -1,11 +1,11 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -24,9 +24,9 @@ namespace FEAST
 }
 
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
 void Scale<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
@@ -37,8 +37,8 @@ void Scale<Mem::CUDA>::value(DT_ * r, const DT_ * const x, const DT_ s, const In
   block.x = blocksize;
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_scale<<<grid, block>>>(r, x, s, size);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_scale<<<grid, block>>>(r, x, s, size);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

@@ -2,10 +2,10 @@
 #ifndef KERNEL_GEOMETRY_TEST_AUX_INDEX_CALCULATOR_MESHES_HPP
 #define KERNEL_GEOMETRY_TEST_AUX_INDEX_CALCULATOR_MESHES_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/geometry/index_calculator.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Geometry
   {
@@ -54,6 +54,6 @@ namespace FEAST
     } // namespace TestAux
     /// \endcond
   } // namespace Geometry
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_GEOMETRY_TEST_AUX_INDEX_CALCULATOR_MESHES_HPP

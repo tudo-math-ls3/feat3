@@ -2,10 +2,10 @@
 #ifndef KERNEL_SPACE_CRO_RAV_RAN_TUR_EVALUATOR_HPP
 #define KERNEL_SPACE_CRO_RAV_RAN_TUR_EVALUATOR_HPP 1
 
-// includes, FEAST
+// includes, FEAT
 #include <kernel/space/parametric_evaluator.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace Space
   {
@@ -799,6 +799,6 @@ namespace FEAST
       }; // Evaluator<..., Shape::Quadrilateral>
     } // namespace CroRavRanTur
   } // namespace Space
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_SPACE_CRO_RAV_RAN_TUR_EVALUATOR_HPP

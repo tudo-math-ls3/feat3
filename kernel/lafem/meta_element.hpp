@@ -4,7 +4,7 @@
 
 #include <kernel/base_header.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -103,6 +103,6 @@ namespace FEAST
     };
     /// \endcond
   } // namespace LAFEM
-} // namespace FEAST
+} // namespace FEAT
 
 #endif // KERNEL_LAFEM_META_ELEMENT_HPP

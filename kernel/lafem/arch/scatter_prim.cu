@@ -1,11 +1,11 @@
-// includes, FEAST
+// includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/scatter_prim.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 
-namespace FEAST
+namespace FEAT
 {
   namespace LAFEM
   {
@@ -33,9 +33,9 @@ namespace FEAST
   }
 }
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::LAFEM::Arch;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_, typename IT_>
 void ScatterPrim<Mem::CUDA>::dv_csr(DT_ * v, const DT_* b, const IT_* col_ind, const DT_* val, const IT_* row_ptr, const Index size)
@@ -46,8 +46,8 @@ void ScatterPrim<Mem::CUDA>::dv_csr(DT_ * v, const DT_* b, const IT_* col_ind, c
   block.x = blocksize;
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_scatter_prim_dv_csr<<<grid, block>>>(v, b, col_ind, val, row_ptr, size);
-#ifdef FEAST_DEBUG_MODE
+  FEAT::LAFEM::Intern::cuda_scatter_prim_dv_csr<<<grid, block>>>(v, b, col_ind, val, row_ptr, size);
+#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   vector<string> platforms;
   platforms.push_back("Win32");
   platforms.push_back("x64");
-  //platforms.push_back("ARM"); // also offered by VS2015, but currently not used by FEAST
+  //platforms.push_back("ARM"); // also offered by VS2015, but currently not used by FEAT
 
   // create tag set
   vector<tag> tags;

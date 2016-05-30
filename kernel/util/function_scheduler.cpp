@@ -1,9 +1,9 @@
 #include<kernel/util/function_scheduler.hpp>
 
-using namespace FEAST;
-using namespace FEAST::Util;
+using namespace FEAT;
+using namespace FEAT::Util;
 
-void FEAST::Util::schedule_function(std::function<void (void)> func, ScheduleMode mode)
+void FEAT::Util::schedule_function(std::function<void (void)> func, ScheduleMode mode)
 {
   Index rank(Comm::rank());
   Index ranks(Comm::size());
@@ -29,7 +29,7 @@ void FEAST::Util::schedule_function(std::function<void (void)> func, ScheduleMod
 
     case ScheduleMode::clustered:
       {
-        Index concurrent = 100;  /// \todo replace hardcoded number by entry from feast.ini
+        Index concurrent = 100;  /// \todo replace hardcoded number by entry from feat.ini
         Index sweeps = (ranks / concurrent) + 1;
 
         for (Index i(0) ; i < sweeps ; ++i)

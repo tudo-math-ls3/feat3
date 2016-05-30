@@ -3,10 +3,10 @@
 #include <kernel/geometry/test_aux/validate_neighbours.hpp>
 #include <kernel/geometry/mesh_node.hpp>
 
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
-using namespace FEAST::Geometry::TestAux;
+using namespace FEAT;
+using namespace FEAT::TestSystem;
+using namespace FEAT::Geometry;
+using namespace FEAT::Geometry::TestAux;
 
 typedef ConformalMesh<Shape::Quadrilateral> RootMeshType;
 typedef MeshPart<RootMeshType> MeshPartType;

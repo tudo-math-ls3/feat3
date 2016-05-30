@@ -5,11 +5,11 @@
 #include <cstdlib>
 #include <fstream>
 
-#ifdef FEAST_MPI
+#ifdef FEAT_MPI
 #include <mpi.h>
 #endif
 
-using namespace FEAST;
+using namespace FEAT;
 
 // static member initialisation
 PropertyMap Runtime::_global_property_map;
@@ -43,7 +43,7 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
   rank = 0;
   nprocs = 0;
 
-#ifdef FEAST_MPI
+#ifdef FEAT_MPI
   // initialise MPI
   if(::MPI_Init(&argc, &argv) != MPI_SUCCESS)
     abort();
@@ -57,8 +57,8 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
   nprocs = 1;
 #endif
 
-  // read in initial settings from provided ini file via system environment variable FEAST_INI_FILE
-  if (const char* c_file_path = std::getenv("FEAST_INI_FILE"))
+  // read in initial settings from provided ini file via system environment variable FEAT_INI_FILE
+  if (const char* c_file_path = std::getenv("FEAT_INI_FILE"))
   {
     String property_file(c_file_path);
     if (std::ifstream(property_file).good())
@@ -67,13 +67,13 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
     }
     else
     {
-      std::cout<<"Warning: feast ini file " << property_file << " not found!"<<std::endl;
+      std::cout<<"Warning: feat ini file " << property_file << " not found!"<<std::endl;
     }
   }
 
   MemoryPool<Mem::Main>::initialise();
 
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
   MemoryPool<Mem::CUDA>::initialise(rank,
     atoi(_global_property_map.query("MPI.ranks_per_node", "1").c_str()),
     atoi(_global_property_map.query("MPI.ranks_per_uma", "1").c_str()),
@@ -92,7 +92,7 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
 
 void Runtime::abort()
 {
-#ifdef FEAST_MPI
+#ifdef FEAT_MPI
   // abort MPI
   ::MPI_Abort(MPI_COMM_WORLD, 1);
 #endif
@@ -111,11 +111,11 @@ int Runtime::finalise()
   }
 
   MemoryPool<Mem::Main>::finalise();
-#ifdef FEAST_BACKENDS_CUDA
+#ifdef FEAT_BACKENDS_CUDA
   MemoryPool<Mem::CUDA>::finalise();
 #endif
 
-#ifdef FEAST_MPI
+#ifdef FEAT_MPI
   // finalise MPI
   ::MPI_Finalize();
 #endif

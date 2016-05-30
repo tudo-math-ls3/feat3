@@ -4,9 +4,9 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 
-using namespace FEAST;
-using namespace FEAST::LAFEM;
-using namespace FEAST::TestSystem;
+using namespace FEAT;
+using namespace FEAT::LAFEM;
+using namespace FEAT::TestSystem;
 
 /**
  * \brief Test class for the tuning class.
@@ -45,8 +45,8 @@ public:
     Tuning::tune_cuda_blocksize(mat_sys);
   }
 };
-#ifndef FEAST_DEBUG_MODE
-#ifdef FEAST_BACKENDS_CUDA
+#ifndef FEAT_DEBUG_MODE
+#ifdef FEAT_BACKENDS_CUDA
 TuningTest<Mem::CUDA, float, unsigned long> cuda_tuning_test_float_ulong;
 #endif
 #endif
