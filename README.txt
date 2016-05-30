@@ -14,7 +14,7 @@ In its simplest shape, building FEAT is just as easy as
 make all
 This will automagically detect a proper tool/setting setup and build all FEAT components.
 
-'./configure-feat help' reveals a lot more configuration possiblities.
+'./configure help' reveals a lot more configuration possiblities.
 
 === TEST RUN ===
 To check if your system created a correct FEAT binary, you can run a set of unittests with the additional command
