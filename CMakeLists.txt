@@ -44,7 +44,7 @@ if (FEAT_BACKENDS_CUDA)
   endif (CUDA_VERSION_MAJOR GREATER 6)
 endif(FEAT_BACKENDS_CUDA)
 
-if (FEAT_MPI)
+if (FEAT_HAVE_MPI)
   find_package(MPI REQUIRED)
   execute_process(COMMAND "${MPIEXEC}" --version
     WORKING_DIRECTORY ${FEAT_SOURCE_DIR}
@@ -59,7 +59,7 @@ if (FEAT_MPI)
 
   ADD_DEFINITIONS( -DOMPI_SKIP_MPICXX )
 
-endif (FEAT_MPI)
+endif (FEAT_HAVE_MPI)
 
 if (FEAT_VALGRIND)
   find_program(VALGRIND_EXE valgrind)

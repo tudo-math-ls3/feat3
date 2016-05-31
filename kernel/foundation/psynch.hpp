@@ -28,7 +28,7 @@ namespace FEAT
                                                   typename PExecutorT_::PResult::IndexType num_global_elems
                                                   )
         {
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
 
           //typename PExecutorT_::PResult result(num_global_elems);
           typename PExecutorT_::PResult result(local_partitioning_result.clone());
@@ -85,7 +85,7 @@ namespace FEAT
 
         }
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
         static void exec(std::stringstream& iss, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD))
         {
           Index me(Util::Comm::rank(comm));

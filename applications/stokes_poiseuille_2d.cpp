@@ -510,7 +510,7 @@ namespace StokesPoiseuille2D
 
     // initialise
     FEAT::Runtime::initialise(argc, argv, rank, nprocs);
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
     if (rank == 0)
     {
       std::cout << "NUM-PROCS: " << nprocs << std::endl;

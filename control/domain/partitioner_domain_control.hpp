@@ -63,7 +63,7 @@ namespace FEAT
             }
 
             // Synchronise the mesh stream in parallel mode
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
             //MASTER to ALL
             Foundation::PSynch<PartT>::exec(synchstream);
 #endif
@@ -181,7 +181,7 @@ namespace FEAT
               root_mesh = base_mesh_node->get_mesh();
 
               //ALL
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
               Index num_global_elements(root_mesh->get_num_entities(MeshType_::shape_dim));
               typename PartT::PGraphT global_dual(
                 *root_mesh, num_global_elements, Util::Communicator(MPI_COMM_WORLD));
@@ -248,7 +248,7 @@ namespace FEAT
                 for(Index i(0) ; i <  base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim) ; ++i)
                 std::cout << Util::Comm::rank() << ": APP: ranks_at_elem idx[" << i << "] " << (ranks_at_elem.get_image_idx())[i] << std::endl;*/
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
               ranks = synched_part.get_comm_ranks();
               ctags = synched_part.get_comm_tags();
 #endif
@@ -261,7 +261,7 @@ namespace FEAT
               // <<<<< partitioner code
 
               // create patch mesh node
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
               mesh_node = base_mesh_node->extract_patch(
                 Index(Util::Comm::rank(synched_part.get_comm())), ranks_at_elem, ranks);
 #else

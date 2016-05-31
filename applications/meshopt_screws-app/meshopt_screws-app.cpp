@@ -16,7 +16,7 @@ using namespace FEAT;
 
 static void display_help();
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
 static void synch_stringstream(std::stringstream& iss, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD))
 {
   Index me(Util::Comm::rank(comm));
@@ -78,7 +78,7 @@ struct MeshoptScrewsApp
   /// Type for points in the mesh
   typedef Tiny::Vector<DataType, MeshType::world_dim> ImgPointType;
 
-#ifdef SERIAL
+#ifndef FEAT_HAVE_MPI
   /// If we are in serial mode, there is no partitioning
   typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<DT_, IT_>, Mesh_> DomCtrl;
 #else
@@ -89,7 +89,7 @@ struct MeshoptScrewsApp
   /// Otherwise we have to use the fallback partitioner
   typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<DT_, IT_>, Mesh_> DomCtrl;
 #endif // FEAT_HAVE_PARMETIS
-#endif // SERIAL
+#endif // !FEAT_HAVE_MPI
 
   /**
    * \brief Returns a descriptive string
@@ -477,7 +477,7 @@ int main(int argc, char* argv[])
 
   // initialise
   FEAT::Runtime::initialise(argc, argv, rank, nprocs);
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   if (rank == 0)
   {
     std::cout << "NUM-PROCS: " << nprocs << std::endl;
@@ -558,7 +558,7 @@ int main(int argc, char* argv[])
     }
   }
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   // If we are in parallel mode, we need to synchronise the stream
   synch_stringstream(synchstream_app_config);
 #endif
@@ -652,7 +652,7 @@ int main(int argc, char* argv[])
     }
   } // Util::Comm::rank() == 0
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   // Synchronise all those streams in parallel mode
   synch_stringstream(synchstream_mesh);
   synch_stringstream(synchstream_chart);

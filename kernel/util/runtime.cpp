@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <fstream>
 
-#ifdef FEAT_MPI
+#ifdef FEAT_HAVE_MPI
 #include <mpi.h>
 #endif
 
@@ -43,7 +43,7 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
   rank = 0;
   nprocs = 0;
 
-#ifdef FEAT_MPI
+#ifdef FEAT_HAVE_MPI
   // initialise MPI
   if(::MPI_Init(&argc, &argv) != MPI_SUCCESS)
     abort();
@@ -92,7 +92,7 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
 
 void Runtime::abort()
 {
-#ifdef FEAT_MPI
+#ifdef FEAT_HAVE_MPI
   // abort MPI
   ::MPI_Abort(MPI_COMM_WORLD, 1);
 #endif
@@ -115,7 +115,7 @@ int Runtime::finalise()
   MemoryPool<Mem::CUDA>::finalise();
 #endif
 
-#ifdef FEAT_MPI
+#ifdef FEAT_HAVE_MPI
   // finalise MPI
   ::MPI_Finalize();
 #endif

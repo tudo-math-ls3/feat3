@@ -133,7 +133,7 @@ namespace FEAT
         bool ready_fordist;
 
         PGraphBase() :
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
           _comm(Util::Communicator(MPI_COMM_WORLD))
 #else
           _comm(Util::Communicator(0))

@@ -18,7 +18,7 @@ namespace FEAT
       struct SynchScal0
       {
         public:
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
           template<typename DT_>
           static DT_ value(DT_& r,
                            DT_& x)

@@ -10,11 +10,8 @@
 /// Should the build include DEBUG support?
 #cmakedefine FEAT_DEBUG_MODE
 
-/// Should the build include serial support only?
-#cmakedefine FEAT_SERIAL_MODE
-
 /// Is an mpi environment available?
-#cmakedefine FEAT_MPI
+#cmakedefine FEAT_HAVE_MPI
 
 /// Path to the FEAT source dir
 #define FEAT_SRC_DIR "${FEAT_SOURCE_DIR}"

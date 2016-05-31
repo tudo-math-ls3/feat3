@@ -14,11 +14,6 @@ This macro is defined if the corresponding build is a debug build.
 If defined, the kernel base-header defines the <c>DEBUG</c> macro.
 
 <hr>
-\subsection ppm_feat_serial_mode FEAT_SERIAL_MODE
-This macro is defined if the corresponding build is a serial build.
-If defined, the kernel base-header defines the <c>SERIAL</c> macro.
-
-<hr>
 \subsection ppm_visual_studio VISUAL_STUDIO
 This macro is defined as 1 by the <i>hand-made</i> Visual Studio project files. It must be left undefined by the CMake
 and any other build system, independent of whether the MS VC++ compiler is used or not.
@@ -238,7 +233,7 @@ If defined, the LAFEM subsystem of the FEAT kernel will implement the "LAFEM::Um
 has been compiled and linked. If so, it will define the FEAT_HAVE_UMFPACK macro automatically.
 
 <hr>
-\subsection ppm_feat_mpi FEAT_MPI
+\subsection ppm_feat_have_mpi FEAT_HAVE_MPI
 This macro is defined by the build system if the FEAT kernel is linked against a MPI library.
 
 <hr><hr>

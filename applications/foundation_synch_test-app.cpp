@@ -1,4 +1,3 @@
-//#define SERIAL
 #include <kernel/base_header.hpp>
 
 #include <kernel/foundation/comm_base.hpp>
@@ -154,7 +153,7 @@ void check_synch_mirror(int rank)
   SynchVec<com_exchange>::execute(target, target_mirror, sendbuf, recvbuf, rank == 0 ? 1 : 0, rank == 0 ? 1 : 0);
 
   TestResult<double> res[4];
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
     res[0] = test_check_equal_within_eps(target(0), rank == 0 ? double(0) : double(1), std::numeric_limits<double>::epsilon());
     res[1] = test_check_equal_within_eps(target(1), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
     res[2] = test_check_equal_within_eps(target(2), rank == 0 ? double(0) : double(1), std::numeric_limits<double>::epsilon());
@@ -215,7 +214,7 @@ void check_synch_mirrors(int rank)
   SynchVec<com_exchange>::execute(target, mirrors, sendbufs, recvbufs, destranks, sourceranks);
 
   TestResult<double> res[4];
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
     res[0] = test_check_equal_within_eps(target(0), rank == 0 ? double(0) : double(1), std::numeric_limits<double>::epsilon());
     res[1] = test_check_equal_within_eps(target(1), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
     res[2] = test_check_equal_within_eps(target(2), rank == 0 ? double(0) : double(1), std::numeric_limits<double>::epsilon());
@@ -240,7 +239,7 @@ void check_synch_mirrors(int rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_synch-test (Tier-2: vertex-set based exchange (single target, multiple mirrors))" << std::endl;
 }
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
 void check_synch_scal(int rank)
 {
   int size;
@@ -271,7 +270,7 @@ void check_synch_scal(int rank)
 int main(int argc, char* argv[])
 {
   int me(0);
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
 #endif
@@ -281,11 +280,11 @@ int main(int argc, char* argv[])
 
   check_synch_mirror(me);
   check_synch_mirrors(me);
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   check_synch_scal(me);
 #endif
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   MPI_Finalize();
 #endif
 

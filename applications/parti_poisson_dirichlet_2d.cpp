@@ -424,7 +424,7 @@ namespace PoissonDirichlet2D
 
     // initialise
     FEAT::Runtime::initialise(argc, argv, rank, nprocs);
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
     if (rank == 0)
     {
       std::cout << "NUM-PROCS: " << nprocs << std::endl;
@@ -480,7 +480,7 @@ namespace PoissonDirichlet2D
 #ifdef FEAT_HAVE_PARMETIS
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
 #else
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
 #else
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);

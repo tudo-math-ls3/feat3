@@ -1771,7 +1771,7 @@ void check_global_nrm2sqr_2D_gateway(Index rank)
 int main(int argc, char* argv[])
 {
   int me(0);
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
 #endif
@@ -1779,7 +1779,7 @@ int main(int argc, char* argv[])
   (void)argv;
   std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   check_global_dot_2D((Index)me);
   check_global_dot_2D_gateway((Index)me);
   check_global_nrm2_2D((Index)me);
@@ -1793,7 +1793,7 @@ int main(int argc, char* argv[])
   std::cout << "Parallel tests unavailable on sole process " << me << std::endl;
 #endif
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   MPI_Finalize();
 #endif
 

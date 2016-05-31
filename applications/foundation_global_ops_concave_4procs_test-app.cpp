@@ -3766,7 +3766,7 @@ void check_global_synchvec1_3D_gateway_concave(Index rank)
 int main(int argc, char* argv[])
 {
   int me(0);
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
 #endif
@@ -3774,7 +3774,7 @@ int main(int argc, char* argv[])
   (void)argv;
   std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   check_global_dot_3D_concave((Index)me);
   check_global_dot_3D_gateway_concave((Index)me);
   check_global_nrm2_3D_concave((Index)me);
@@ -3788,7 +3788,7 @@ int main(int argc, char* argv[])
   std::cout << "Parallel tests unavailable on sole process " << me << std::endl;
 #endif
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   MPI_Finalize();
 #endif
 

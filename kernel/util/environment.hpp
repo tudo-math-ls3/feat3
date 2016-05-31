@@ -5,7 +5,7 @@
 #include<kernel/base_header.hpp>
 #include<kernel/util/comm_base.hpp>
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
 #include<mpi.h>
 #endif
 
@@ -16,7 +16,7 @@ namespace FEAT
     public:
       static Index reserve_tag()
       {
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
         void* max_tag_loc;
         int flag(0);
         MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, &max_tag_loc, &flag);

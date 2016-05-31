@@ -31,7 +31,7 @@ namespace FEAT
             typedef IT_ IndexType;
 
             ///Alloc CTOR
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
             PResult(IT_ s, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD)) :
 #else
             PResult(IT_ s, Util::Communicator comm = Util::Communicator(0)) :
@@ -210,7 +210,7 @@ namespace FEAT
           }
       };
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
     template<typename DT_, typename IT_>
     class PExecutorFallback : public PExecutorBase<IT_>
       {

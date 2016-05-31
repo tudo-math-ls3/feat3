@@ -16,7 +16,7 @@ namespace FEAT
       {
         public:
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
           ///TODO implement version with active queue of requests
           template<typename TargetVectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
           static void exec(
@@ -134,7 +134,7 @@ namespace FEAT
       {
         public:
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
           template<typename TargetVectorT_, typename VectorMirrorT_, template<typename, typename> class StorageT_>
           static void exec(
                            TargetVectorT_& target,

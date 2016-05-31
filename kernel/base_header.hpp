@@ -28,11 +28,6 @@
 #if defined(FEAT_DEBUG_MODE) && !defined(DEBUG)
 #  define DEBUG 1
 #endif
-
-// Activate SERIAL macro if the build system tells us to do so.
-#if defined(FEAT_SERIAL_MODE) && !defined(SERIAL)
-#  define SERIAL 1
-#endif
 /// \endcond
 
 // include compiler detection headers

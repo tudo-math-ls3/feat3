@@ -4,7 +4,7 @@
 
 #include<kernel/base_header.hpp>
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
 #include<mpi.h>
 #include<memory>
 #include<kernel/util/time_stamp.hpp>

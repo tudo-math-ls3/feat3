@@ -54,7 +54,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("It is used to choose different tools and configurations related to the build process.")
   print ("The keywords, sorted by categories are:")
   print ("  Build Mode: debug, opt, fast")
-  print ("  Parallelisation: serial, mpi")
+  print ("  Cluster Parallelisation: mpi")
   print ("  Compiler: gcc, icc, clang")
   print ("  Compiler frontends: ccache")
   print ("  Backends: cuda, mkl")
@@ -126,8 +126,6 @@ if len(sys.argv) == 1 or "guess" in sys.argv:
   buildid_string = "opt"
   if is_found("mpic++") or is_found("mpicxx"):
     buildid_string += "-mpi"
-  else:
-    buildid_string += "-serial"
   if is_found("g++"):
     buildid_string += "-gcc"
   elif is_found("icpc"):
@@ -196,17 +194,9 @@ else:
   sys.exit(1)
 
 # parallelisation selection
-if "serial" in buildid:
-  cmake_flags += " -DFEAT_SERIAL_MODE:BOOL=ON"
-  remove_string(unused_tokens, "serial")
-elif "mpi" in buildid:
+if "mpi" in buildid:
   remove_string(unused_tokens, "mpi")
-  cmake_flags += " -DFEAT_SERIAL_MODE:BOOL=OFF"
-  cmake_flags += " -DFEAT_MPI:BOOL=TRUE"
-else:
-  print ("Error: No mpi statement nor serial statement found in build id:")
-  print (buildid_string)
-  sys.exit(1)
+  cmake_flags += " -DFEAT_HAVE_MPI:BOOL=TRUE"
 
 #evaluate extra options
 cputype = ""

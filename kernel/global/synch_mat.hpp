@@ -16,7 +16,7 @@ namespace FEAT
 {
   namespace Global
   {
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
     ///type-0 to type-1 matrix conversion
     template<typename Mem_>
     struct SynchMat0

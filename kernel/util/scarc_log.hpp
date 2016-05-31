@@ -22,7 +22,7 @@ namespace FEAT
       {
       }
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
       std::string synch(Foundation::Communicator c = Foundation::Communicator(MPI_COMM_WORLD))
       {
         msg = std::string(stream.str());

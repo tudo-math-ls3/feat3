@@ -1,5 +1,5 @@
 #include <kernel/base_header.hpp>
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
 #  include <mpi.h>
 #endif
 #include <kernel/foundation/base.hpp>
@@ -20,7 +20,7 @@ using namespace std;
 int main(int argc, char* argv[])
 {
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   MPI_Init(&argc, &argv);
 #endif
   (void)argc;
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
   int me(0);
   int size(1);
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
   std::cout << "p_" << me << " about to LB" << std::endl;
   LoadBalancing<LBPUniformCompScaledComm<DT> >::execute(p0);
 
-#ifndef SERIAL
+#ifdef FEAT_HAVE_MPI
   MPI_Finalize();
 #endif
 
