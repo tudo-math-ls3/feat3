@@ -82,16 +82,12 @@
  */
 namespace FEAT
 {
-  /// FEAT version enum
-  enum
-  {
-    /// FEAT major version number
-    version_major = 0,
-    /// FEAT minor version number
-    version_minor = 1,
-    /// FEAT patch version number
-    version_patch = 1
-  };
+  /// FEAT major version number
+  static constexpr int version_major = 3;
+  /// FEAT minor version number
+  static constexpr int version_minor = 0;
+  /// FEAT patch version number
+  static constexpr int version_patch = 0;
 
   /**
    * \brief Index data type.
