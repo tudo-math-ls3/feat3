@@ -78,7 +78,7 @@ public:
 
 MetaVectorCompProdTest<Mem::Main, float, Index> meta_vector_comp_prod_test_generic_float;
 MetaVectorCompProdTest<Mem::Main, double, Index> meta_vector_comp_prod_test_generic_double;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 MetaVectorCompProdTest<Mem::CUDA, float, Index> meta_vector_comp_prod_test_cuda_float;
 MetaVectorCompProdTest<Mem::CUDA, double, Index> meta_vector_comp_prod_test_cuda_double;
 #endif

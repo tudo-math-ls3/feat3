@@ -73,7 +73,7 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
 
   MemoryPool<Mem::Main>::initialise();
 
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
   MemoryPool<Mem::CUDA>::initialise(rank,
     atoi(_global_property_map.query("MPI.ranks_per_node", "1").c_str()),
     atoi(_global_property_map.query("MPI.ranks_per_uma", "1").c_str()),
@@ -111,7 +111,7 @@ int Runtime::finalise()
   }
 
   MemoryPool<Mem::Main>::finalise();
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
   MemoryPool<Mem::CUDA>::finalise();
 #endif
 

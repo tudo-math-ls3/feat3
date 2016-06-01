@@ -113,7 +113,7 @@ public:
 SparseVectorTest<Mem::Main, float, Index> cpu_sparse_vector_test_float;
 SparseVectorTest<Mem::Main, double, Index> cpu_sparse_vector_test_double;
 //SparseVectorTest<Mem::Main, Index> cpu_sparse_vector_test_index;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseVectorTest<Mem::CUDA, float, Index> cuda_sparse_vector_test_float;
 SparseVectorTest<Mem::CUDA, double, Index> cuda_sparse_vector_test_double;
 //SparseVectorTest<Mem::CUDA, Index> cuda_sparse_vector_test_index;

@@ -213,7 +213,7 @@ namespace FEAT
 
         if (pinned_allocation)
         {
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
           this->_elements.push_back(MemoryPool<Mem::Main>::template allocate_pinned_memory<DT_>(size<Perspective::pod>()));
 #else
           // no cuda support enabled - we cannot serve and do not need pinned memory support

@@ -11,7 +11,7 @@ SET (kernel-solver-list
 ADD_LIBRARY(kernel-solver STATIC ${kernel-solver-list})
 TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 
-if (FEAT_BACKENDS_CUDA)
+if (FEAT_HAVE_CUDA)
   CUDA_ADD_LIBRARY(kernel-solver-cuda
     cusolver.cu
     ilu_precond.cu
@@ -26,7 +26,7 @@ if (FEAT_BACKENDS_CUDA)
   endif (FEAT_HAVE_CUSOLVER)
   target_link_libraries(kernel-solver-cuda ${CUDA_cusparse_LIBRARY})
   TARGET_LINK_LIBRARIES(kernel-solver kernel-solver-cuda)
-endif(FEAT_BACKENDS_CUDA)
+endif(FEAT_HAVE_CUDA)
 
 # list of solver tests
 SET (test_list
@@ -79,11 +79,11 @@ FOREACH (test ${test_list} )
     --build-noclean
     --test-command ${CUDA_MEMCHECK_EXE} ${FEAT_BINARY_DIR}/kernel/solver/${test} cuda)
   SET_PROPERTY(TEST ${test}_cuda PROPERTY LABELS "cuda")
-  if (FEAT_CUDAMEMCHECK AND FEAT_BACKENDS_CUDA)
+  if (FEAT_CUDAMEMCHECK AND FEAT_HAVE_CUDA)
     SET_PROPERTY(TEST ${test}_cuda PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors")
     SET_PROPERTY(TEST ${test}_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
     SET_PROPERTY(TEST ${test}_cuda PROPERTY FAIL_REGULAR_EXPRESSION "= Leaked")
-  endif (FEAT_CUDAMEMCHECK AND FEAT_BACKENDS_CUDA)
+  endif (FEAT_CUDAMEMCHECK AND FEAT_HAVE_CUDA)
 ENDFOREACH(test)
 
 # add all tests to lafem_tests

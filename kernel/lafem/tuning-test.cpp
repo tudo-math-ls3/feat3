@@ -46,7 +46,7 @@ public:
   }
 };
 #ifndef FEAT_DEBUG_MODE
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 TuningTest<Mem::CUDA, float, unsigned long> cuda_tuning_test_float_ulong;
 #endif
 #endif

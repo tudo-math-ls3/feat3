@@ -209,7 +209,7 @@ public:
 
   }
 };
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixCudaConversionTest<Mem::CUDA, float, unsigned long> sparse_matrix_cuda_conversion_test_float_ulong;
 SparseMatrixCudaConversionTest<Mem::CUDA, double, unsigned long> sparse_matrix_cuda_conversion_test_double_ulong;
 SparseMatrixCudaConversionTest<Mem::CUDA, float, unsigned int> sparse_matrix_cuda_conversion_test_float_uint;
@@ -302,7 +302,7 @@ SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::Main, double, unsigned lon
 SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, float, unsigned long> > sparse_matrix_banded_coo_conversion_test_float_ulong;
 SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, double, unsigned long> > sparse_matrix_banded_coo_conversion_test_double_ulong;
 
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::CUDA, float, unsigned int> > cuda_sparse_matrix_banded_csr_conversion_test_float_uint;
 SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::CUDA, double, unsigned int> > cuda_sparse_matrix_banded_csr_conversion_test_double_uint;
 SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::CUDA, float, unsigned int> > cuda_sparse_matrix_banded_ell_conversion_test_float_uint;

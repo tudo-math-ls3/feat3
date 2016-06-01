@@ -69,7 +69,7 @@ public:
 };
 SparseVectorBlockedTest<Mem::Main, float, Index> cpu_sparse_vector_blocked_test_float;
 SparseVectorBlockedTest<Mem::Main, double, Index> cpu_sparse_vector_blocked_test_double;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseVectorBlockedTest<Mem::CUDA, float, Index> cuda_sparse_vector_blocked_test_float;
 SparseVectorBlockedTest<Mem::CUDA, double, Index> cuda_sparse_vector_blocked_test_double;
 #endif

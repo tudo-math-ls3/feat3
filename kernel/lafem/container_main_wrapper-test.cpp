@@ -53,7 +53,7 @@ ContainerMainWrapperTest<Mem::Main, double, unsigned long> cpu_container_main_wr
 ContainerMainWrapperTest<Mem::Main, __float128, unsigned int> cpu_container_main_wrapper_test_float128_uint;
 ContainerMainWrapperTest<Mem::Main, __float128, unsigned long> cpu_container_main_wrapper_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 ContainerMainWrapperTest<Mem::CUDA, float, unsigned int> cuda_container_main_wrapper_test_float_uint;
 ContainerMainWrapperTest<Mem::CUDA, double, unsigned int> cuda_container_main_wrapper_test_double_uint;
 ContainerMainWrapperTest<Mem::CUDA, float, unsigned long> cuda_container_main_wrapper_test_float_ulong;

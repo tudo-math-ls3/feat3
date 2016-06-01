@@ -168,7 +168,7 @@ namespace FEAT
           return memory;
         }
 
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
         /// allocate new pinned memory
         template <typename DT_>
         static DT_ * allocate_pinned_memory(const Index count)
@@ -201,7 +201,7 @@ namespace FEAT
             return;
           }
 
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
           it = _pinned_pool.find(address);
           if (it != _pinned_pool.end())
           {
@@ -234,7 +234,7 @@ namespace FEAT
             return;
           }
 
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
           it = _pinned_pool.find(address);
           if (it != _pinned_pool.end())
           {

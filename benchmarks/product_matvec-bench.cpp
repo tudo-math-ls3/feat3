@@ -143,7 +143,7 @@ void run()
 int main(int argc, char ** argv)
 {
   Runtime::initialise(argc, argv);
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
   run<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, Index> >();
   run<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned int> >();
   //run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, Index> >();
@@ -151,12 +151,12 @@ int main(int argc, char ** argv)
 #endif
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> >();
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
   run<Algo::MKL, SparseMatrixCSR<Mem::Main, double, unsigned long> >();
 #endif
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, unsigned int> >();
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
   run<Algo::CUDA, SparseMatrixBanded<Mem::CUDA, double, Index> >();
   run<Algo::CUDA, SparseMatrixBanded<Mem::CUDA, double, unsigned int> >();
 #endif

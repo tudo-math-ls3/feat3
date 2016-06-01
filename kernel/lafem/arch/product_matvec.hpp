@@ -28,7 +28,7 @@ namespace FEAT
         template <typename DT_>
         static void csr(DT_ * r, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
         {
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
           csr_mkl(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
 #else
           csr_generic(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
@@ -45,7 +45,7 @@ namespace FEAT
         template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
         static void csrb(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
         {
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
           if (typeid(IT_) == typeid(unsigned long) && BlockHeight_ == BlockWidth_)
           {
             csrb_mkl(r, val, (unsigned long*)col_ind, (unsigned long*)row_ptr, x, rows, columns, used_elements, BlockHeight_);
@@ -86,7 +86,7 @@ namespace FEAT
         template <typename DT_>
         static void coo(DT_ * r, const DT_ * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements)
         {
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
           coo_mkl(r, val, row_ptr, col_ptr, x, rows, used_elements);
 #else
           coo_generic(r, val, row_ptr, col_ptr, x, rows, used_elements);

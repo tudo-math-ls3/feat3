@@ -192,14 +192,14 @@ This section enlists macros defined by the build system, which specify what type
 are available to FEAT.
 
 <hr>
-\subsection ppm_feat_backends_cuda FEAT_BACKENDS_CUDA
+\subsection ppm_feat_have_cuda FEAT_HAVE_CUDA
 This macro is defined by the build system if the FEAT kernel is linked against the CUDA library.
 
 If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding specialisations for the containters and
 operations using CUDA as a work-horse.
 
 <hr>
-\subsection ppm_feat_backends_mkl FEAT_BACKENDS_MKL
+\subsection ppm_feat_have_mkl FEAT_HAVE_MKL
 This macro is defined by the build system if the FEAT kernel is linked against the Intel MKL library.
 
 If defined, the LAFEM subsystem of the FEAT kernel will offer corresponding specialisations for the operations using

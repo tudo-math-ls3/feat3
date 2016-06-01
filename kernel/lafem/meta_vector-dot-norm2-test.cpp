@@ -76,7 +76,7 @@ public:
 
 MetaVectorDotNorm2Test<Mem::Main, float, Index> meta_vector_dot_norm2_test_generic_float;
 MetaVectorDotNorm2Test<Mem::Main, double, Index> meta_vector_dot_norm2_test_generic_double;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 MetaVectorDotNorm2Test<Mem::CUDA, float, Index> meta_vector_dot_norm2_test_cuda_float;
 MetaVectorDotNorm2Test<Mem::CUDA, double, Index> meta_vector_dot_norm2_test_cuda_double;
 #endif

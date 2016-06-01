@@ -98,7 +98,7 @@ public:
 
 MetaVectorAxpyTest<Mem::Main, float, Index> meta_vector_axpy_test_generic_float;
 MetaVectorAxpyTest<Mem::Main, double, Index> meta_vector_axpy_test_generic_double;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 MetaVectorAxpyTest<Mem::CUDA, float, Index> meta_vector_axpy_test_cuda_float;
 MetaVectorAxpyTest<Mem::CUDA, double, Index> meta_vector_axpy_test_cuda_double;
 #endif

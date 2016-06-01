@@ -22,7 +22,7 @@ namespace FEAT
         template <typename DT_>
         static void value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
         {
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
           value_mkl(r, x, s, size);
 #else
           value_generic(r, x, s, size);

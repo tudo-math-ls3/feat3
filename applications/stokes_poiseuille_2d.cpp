@@ -574,7 +574,7 @@ namespace StokesPoiseuille2D
       {
         run<MeshType, LAFEM::SparseMatrixCSR<Mem::Main, double, Index> >(rank, nprocs, args, domain);
       }
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
       else if(mem_string == "cuda")
       {
         run<MeshType, LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> >(rank, nprocs, args, domain);

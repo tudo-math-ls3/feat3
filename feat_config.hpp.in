@@ -26,13 +26,13 @@
 #define FEAT_CPU_TYPE "${FEAT_CPU_TYPE}"
 
 /// Do we have CUDA support enabled?
-#cmakedefine FEAT_BACKENDS_CUDA
+#cmakedefine FEAT_HAVE_CUDA
 
 /// Do we have CuSolver support enabled?
 #cmakedefine FEAT_HAVE_CUSOLVER
 
 /// Do we have MKL support enabled?
-#cmakedefine FEAT_BACKENDS_MKL
+#cmakedefine FEAT_HAVE_MKL
 
 /// Do we have QUADMATH support enabled?
 #cmakedefine FEAT_HAVE_QUADMATH

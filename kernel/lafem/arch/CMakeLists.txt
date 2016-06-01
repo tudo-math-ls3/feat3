@@ -30,7 +30,7 @@ SET (kernel-lafem-arch-list
   unit_filter_blocked_generic.cpp
   )
 
-if (FEAT_BACKENDS_MKL)
+if (FEAT_HAVE_MKL)
   SET (kernel-lafem-arch-list ${kernel-lafem-arch-list}
     axpy_mkl.cpp
     component_product_mkl.cpp
@@ -42,20 +42,20 @@ if (FEAT_BACKENDS_MKL)
     scale_mkl.cpp
     sum_mkl.cpp
   )
-endif(FEAT_BACKENDS_MKL)
+endif(FEAT_HAVE_MKL)
 
 ADD_LIBRARY(kernel-lafem-arch STATIC ${kernel-lafem-arch-list})
 if (FEAT_COTIRE)
   cotire(kernel-lafem-arch)
 endif (FEAT_COTIRE)
 
-if (FEAT_BACKENDS_MKL)
+if (FEAT_HAVE_MKL)
   TARGET_LINK_LIBRARIES(kernel-lafem-arch
      -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lpthread -lm -ldl
   )
-endif(FEAT_BACKENDS_MKL)
+endif(FEAT_HAVE_MKL)
 
-if (FEAT_BACKENDS_CUDA)
+if (FEAT_HAVE_CUDA)
   CUDA_ADD_LIBRARY(kernel-lafem-arch-cuda
     axpy.cu
     component_invert.cu
@@ -79,4 +79,4 @@ if (FEAT_BACKENDS_CUDA)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-arch-cuda)
   target_link_libraries(kernel-lafem-arch-cuda ${CUDA_cusparse_LIBRARY})
   TARGET_LINK_LIBRARIES(kernel-lafem-arch kernel-lafem-arch-cuda)
-endif(FEAT_BACKENDS_CUDA)
+endif(FEAT_HAVE_CUDA)

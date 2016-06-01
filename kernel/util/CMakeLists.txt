@@ -33,7 +33,7 @@ if(MPI_C_LINK_FLAGS)
     LINK_FLAGS "${MPI_C_LINK_FLAGS}")
 endif()
 
-if (FEAT_BACKENDS_CUDA)
+if (FEAT_HAVE_CUDA)
   CUDA_ADD_LIBRARY(kernel-util-cuda
     cuda_util.cu
     memory_pool.cu
@@ -42,7 +42,7 @@ if (FEAT_BACKENDS_CUDA)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-util-cuda)
   target_link_libraries(kernel-util-cuda ${CUDA_cusparse_LIBRARY})
   TARGET_LINK_LIBRARIES(kernel-util kernel-util-cuda)
-endif(FEAT_BACKENDS_CUDA)
+endif(FEAT_HAVE_CUDA)
 
 # list of util tests
 SET (test_list

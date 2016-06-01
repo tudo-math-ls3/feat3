@@ -82,7 +82,7 @@ public:
 
 MetaVectorScaleTest<Mem::Main, float, Index> meta_vector_scale_test_generic_float;
 MetaVectorScaleTest<Mem::Main, double, Index> meta_vector_scale_test_generic_double;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 MetaVectorScaleTest<Mem::CUDA, float, Index> meta_vector_scale_test_cuda_float;
 MetaVectorScaleTest<Mem::CUDA, double, Index> meta_vector_scale_test_cuda_double;
 #endif

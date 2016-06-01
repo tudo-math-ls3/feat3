@@ -141,7 +141,7 @@ SparseMatrixCOOTest<Mem::Main, double, unsigned long> sparse_matrix_coo_test_dou
 SparseMatrixCOOTest<Mem::Main, __float128, unsigned int> sparse_matrix_coo_test_float128_uint;
 SparseMatrixCOOTest<Mem::Main, __float128, unsigned long> sparse_matrix_coo_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixCOOTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_coo_test_float_uint;
 SparseMatrixCOOTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_coo_test_double_uint;
 SparseMatrixCOOTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_coo_test_float_ulong;
@@ -312,7 +312,7 @@ SparseMatrixCOOScaleTest<Mem::Main, double, unsigned long> sm_coo_scale_test_dou
 SparseMatrixCOOScaleTest<Mem::Main, __float128, unsigned int> sm_coo_scale_test_float128_uint;
 SparseMatrixCOOScaleTest<Mem::Main, __float128, unsigned long> sm_coo_scale_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixCOOScaleTest<Mem::CUDA, float, unsigned int> cuda_sm_coo_scale_test_float_uint;
 SparseMatrixCOOScaleTest<Mem::CUDA, double, unsigned int> cuda_sm_coo_scale_test_double_uint;
 SparseMatrixCOOScaleTest<Mem::CUDA, float, unsigned long> cuda_sm_coo_scale_test_float_ulong;
@@ -396,7 +396,7 @@ SparseMatrixCOOScaleRowColTest<Mem::Main, double, unsigned long> sm_coo_scale_ro
 SparseMatrixCOOScaleRowColTest<Mem::Main, __float128, unsigned int> sm_coo_scale_row_col_test_float128_uint;
 SparseMatrixCOOScaleRowColTest<Mem::Main, __float128, unsigned long> sm_coo_scale_row_col_test_float128_ulong;
 #endif
-// #ifdef FEAT_BACKENDS_CUDA
+// #ifdef FEAT_HAVE_CUDA
 // SparseMatrixCOOScaleRowColTest<Mem::CUDA, float, unsigned int> cuda_sm_coo_scale_row_col_test_float_uint;
 // SparseMatrixCOOScaleRowColTest<Mem::CUDA, double, unsigned int> cuda_sm_coo_scale_row_col_test_double_uint;
 // SparseMatrixCOOScaleRowColTest<Mem::CUDA, float, unsigned long> cuda_sm_coo_scale_row_col_test_float_ulong;
@@ -483,7 +483,7 @@ SparseMatrixCOOTranspositionTest<Mem::Main, double, unsigned long> sm_coo_transp
 SparseMatrixCOOTranspositionTest<Mem::Main, __float128, unsigned int> sm_coo_transposition_test_float128_uint;
 SparseMatrixCOOTranspositionTest<Mem::Main, __float128, unsigned long> sm_coo_transposition_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixCOOTranspositionTest<Mem::CUDA, float, unsigned int> cuda_sm_coo_transposition_test_float_uint;
 SparseMatrixCOOTranspositionTest<Mem::CUDA, double, unsigned int> cuda_sm_coo_transposition_test_double_uint;
 SparseMatrixCOOTranspositionTest<Mem::CUDA, float, unsigned long> cuda_sm_coo_transposition_test_float_ulong;
@@ -583,7 +583,7 @@ SparseMatrixCOOAxpyTest<Mem::Main, double, unsigned long> sm_coo_axpy_test_doubl
 SparseMatrixCOOAxpyTest<Mem::Main, __float128, unsigned int> sm_coo_axpy_test_float128_uint;
 SparseMatrixCOOAxpyTest<Mem::Main, __float128, unsigned long> sm_coo_axpy_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixCOOAxpyTest<Mem::CUDA, float, unsigned int> cuda_sm_coo_axpy_test_float_uint;
 SparseMatrixCOOAxpyTest<Mem::CUDA, double, unsigned int> cuda_sm_coo_axpy_test_double_uint;
 SparseMatrixCOOAxpyTest<Mem::CUDA, float, unsigned long> cuda_sm_coo_axpy_test_float_ulong;
@@ -639,7 +639,7 @@ SparseMatrixCOOFrobeniusTest<Mem::Main, double, unsigned long> sm_coo_frobenius_
 SparseMatrixCOOFrobeniusTest<Mem::Main, __float128, unsigned int> sm_coo_frobenius_test_float128_uint;
 SparseMatrixCOOFrobeniusTest<Mem::Main, __float128, unsigned long> sm_coo_frobenius_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixCOOFrobeniusTest<Mem::CUDA, float, unsigned int> cuda_sm_coo_frobenius_test_float_uint;
 SparseMatrixCOOFrobeniusTest<Mem::CUDA, double, unsigned int> cuda_sm_coo_frobenius_test_double_uint;
 SparseMatrixCOOFrobeniusTest<Mem::CUDA, float, unsigned long> cuda_sm_coo_frobenius_test_float_ulong;

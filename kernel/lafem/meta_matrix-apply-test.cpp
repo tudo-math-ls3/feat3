@@ -109,7 +109,7 @@ public:
 
 MetaMatrixApplyTest<Mem::Main, float, Index> meta_matrix_apply_test_generic_float;
 MetaMatrixApplyTest<Mem::Main, double, Index> meta_matrix_apply_test_generic_double;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 MetaMatrixApplyTest<Mem::CUDA, float, Index> meta_matrix_apply_test_cuda_float;
 MetaMatrixApplyTest<Mem::CUDA, double, Index> meta_matrix_apply_test_cuda_double;
 #endif

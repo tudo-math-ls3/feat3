@@ -162,7 +162,7 @@ nlcg_sw_bs_q(__float128(0.175), Index(30), "StrongWolfeLinesearch", "none", NLCG
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
 nlcg_sw_hb_f_cuda(float(0.8), Index(8), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
@@ -299,7 +299,7 @@ nlsd_rb_q(__float128(1), Index(19), "SecantLinesearch", "Hessian");
 
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
 nlsd_hb_f_cuda(float(0.9), Index(8), "StrongWolfeLinesearch", "Hessian");
 #endif

@@ -88,7 +88,7 @@ public:
 
 UnitFilterVectorTest<Mem::Main, float, Index> unit_filter_vector_test_generic_fi;
 UnitFilterVectorTest<Mem::Main, double, Index> unit_filter_vector_test_generic_di;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 UnitFilterVectorTest<Mem::CUDA, float, Index> unit_filter_vector_test_cuda_fi;
 UnitFilterVectorTest<Mem::CUDA, double, Index> unit_filter_vector_test_cuda_di;
 #endif

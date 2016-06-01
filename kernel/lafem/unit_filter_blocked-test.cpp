@@ -114,7 +114,7 @@ UnitFilterBlockedVectorTest<Mem::Main, float, Index, 3> unit_filter_vector_test_
 UnitFilterBlockedVectorTest<Mem::Main, double, Index, 3> unit_filter_vector_test_generic_di_3;
 UnitFilterBlockedVectorTest<Mem::Main, float, Index, 4> unit_filter_vector_test_generic_fi_4;
 UnitFilterBlockedVectorTest<Mem::Main, double, Index, 4> unit_filter_vector_test_generic_di_4;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 UnitFilterBlockedVectorTest<Mem::CUDA, float, Index, 2> unit_filter_vector_test_cuda_fi_2;
 UnitFilterBlockedVectorTest<Mem::CUDA, float, Index, 3> unit_filter_vector_test_cuda_fi_3;
 UnitFilterBlockedVectorTest<Mem::CUDA, float, Index, 4> unit_filter_vector_test_cuda_fi_4;

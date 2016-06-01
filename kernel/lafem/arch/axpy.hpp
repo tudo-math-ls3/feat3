@@ -23,7 +23,7 @@ namespace FEAT
         template <typename DT_>
         static void dv(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
         {
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
           dv_mkl(r, a, x, y, size);
 #else
           dv_generic(r, a, x, y, size);
@@ -50,7 +50,7 @@ namespace FEAT
                         const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements)
         {
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
           csr_mkl(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements);
 #else
           csr_generic(r, a, x, y, val, col_ind, row_ptr, rows, columns, used_elements);
@@ -71,7 +71,7 @@ namespace FEAT
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
           if (typeid(IT_) == typeid(unsigned long) && BlockHeight_ == BlockWidth_)
             csrb_mkl(r, a, x, y, val, (unsigned long*)col_ind, (unsigned long*)row_ptr, rows, columns, used_elements, BlockHeight_);
           else
@@ -114,7 +114,7 @@ namespace FEAT
         static void coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
                         const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index columns, const Index used_elements)
         {
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
           coo_mkl(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);
 #else
           coo_generic(r, a, x, y, val, row_ptr, col_ptr, rows, columns, used_elements);

@@ -147,7 +147,7 @@ SparseMatrixBandedTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded
 SparseMatrixBandedTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_test_double_ulong;
 SparseMatrixBandedTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_test_float_uint;
 SparseMatrixBandedTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_test_double_uint;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixBandedTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_test_float_ulong;
 SparseMatrixBandedTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_test_double_ulong;
 SparseMatrixBandedTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_test_float_uint;
@@ -292,7 +292,7 @@ SparseMatrixBandedApplyTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_b
 SparseMatrixBandedApplyTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong_9(9);
 SparseMatrixBandedApplyTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint_9(9);
 SparseMatrixBandedApplyTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint_9(9);
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixBandedApplyTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_apply_test_float_ulong;
 SparseMatrixBandedApplyTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_apply_test_double_ulong;
 SparseMatrixBandedApplyTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_apply_test_float_uint;
@@ -369,7 +369,7 @@ SparseMatrixBandedScaleTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_b
 SparseMatrixBandedScaleTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_scale_test_double_ulong;
 SparseMatrixBandedScaleTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_scale_test_float_uint;
 SparseMatrixBandedScaleTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_scale_test_double_uint;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SparseMatrixBandedScaleTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_scale_test_float_ulong;
 SparseMatrixBandedScaleTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_scale_test_double_ulong;
 SparseMatrixBandedScaleTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_scale_test_float_uint;

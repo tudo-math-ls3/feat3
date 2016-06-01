@@ -192,7 +192,7 @@ DenseVectorTest<Mem::Main, double, unsigned long> cpu_dense_vector_test_double_u
 DenseVectorTest<Mem::Main, __float128, unsigned int> cpu_dense_vector_test_float128_uint;
 DenseVectorTest<Mem::Main, __float128, unsigned long> cpu_dense_vector_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 DenseVectorTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_test_float_uint;
 DenseVectorTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_test_double_uint;
 DenseVectorTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_test_float_ulong;
@@ -260,7 +260,7 @@ DenseVectorAxpyTest<Mem::Main, double, unsigned long> dv_axpy_test_double_ulong;
 DenseVectorAxpyTest<Mem::Main, __float128, unsigned int> dv_axpy_test_float128_uint;
 DenseVectorAxpyTest<Mem::Main, __float128, unsigned long> dv_axpy_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 DenseVectorAxpyTest<Mem::CUDA, float, unsigned int> cuda_dv_axpy_test_float_uint;
 DenseVectorAxpyTest<Mem::CUDA, double, unsigned int> cuda_dv_axpy_test_double_uint;
 DenseVectorAxpyTest<Mem::CUDA, float, unsigned long> cuda_dv_axpy_test_float_ulong;
@@ -321,7 +321,7 @@ DenseVectorDotTest<Mem::Main, double, unsigned long> dv_dot_product_test_double_
 DenseVectorDotTest<Mem::Main, __float128, unsigned int> dv_dot_product_test_float128_uint;
 DenseVectorDotTest<Mem::Main, __float128, unsigned long> dv_dot_product_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 DenseVectorDotTest<Mem::CUDA, float, unsigned int> cuda_dv_dot_product_test_float_uint;
 DenseVectorDotTest<Mem::CUDA, double, unsigned int> cuda_dv_dot_product_test_double_uint;
 DenseVectorDotTest<Mem::CUDA, float, unsigned long> cuda_dv_dot_product_test_float_ulong;
@@ -408,7 +408,7 @@ DenseVectorTripleDotTest<Mem::Main, double, unsigned long> dv_triple_dot_product
 DenseVectorTripleDotTest<Mem::Main, __float128, unsigned int> dv_triple_dot_product_test_float128_uint;
 DenseVectorTripleDotTest<Mem::Main, __float128, unsigned long> dv_triple_dot_product_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 DenseVectorTripleDotTest<Mem::CUDA, float, unsigned int> cuda_dv_triple_dot_product_test_float_uint;
 DenseVectorTripleDotTest<Mem::CUDA, double, unsigned int> cuda_dv_triple_dot_product_test_double_uint;
 DenseVectorTripleDotTest<Mem::CUDA, float, unsigned long> cuda_dv_triple_dot_product_test_float_ulong;
@@ -485,7 +485,7 @@ DenseVectorComponentProductTest<Mem::Main, double, unsigned long> dv_component_p
 DenseVectorComponentProductTest<Mem::Main, __float128, unsigned int> dv_component_product_test_float128_uint;
 DenseVectorComponentProductTest<Mem::Main, __float128, unsigned long> dv_component_product_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 DenseVectorComponentProductTest<Mem::CUDA, float, unsigned int> cuda_dv_component_product_test_float_uint;
 DenseVectorComponentProductTest<Mem::CUDA, double, unsigned int> cuda_dv_component_product_test_double_uint;
 DenseVectorComponentProductTest<Mem::CUDA, float, unsigned long> cuda_dv_component_product_test_float_ulong;
@@ -542,7 +542,7 @@ DenseVectorScaleTest<Mem::Main, double, unsigned long> dv_scale_test_double_ulon
 DenseVectorScaleTest<Mem::Main, __float128, unsigned int> dv_scale_test_float128_uint;
 DenseVectorScaleTest<Mem::Main, __float128, unsigned long> dv_scale_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 DenseVectorScaleTest<Mem::CUDA, float, unsigned int> cuda_dv_scale_test_float_uint;
 DenseVectorScaleTest<Mem::CUDA, double, unsigned int> cuda_dv_scale_test_double_uint;
 DenseVectorScaleTest<Mem::CUDA, float, unsigned long> cuda_dv_scale_test_float_ulong;
@@ -597,7 +597,7 @@ DenseVectorNorm2Test<Mem::Main, double, unsigned long> dv_norm2_test_double_ulon
 DenseVectorNorm2Test<Mem::Main, __float128, unsigned int> dv_norm2_test_float128_uint;
 DenseVectorNorm2Test<Mem::Main, __float128, unsigned long> dv_norm2_test_float128_ulong;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 DenseVectorNorm2Test<Mem::CUDA, float, unsigned int> cuda_dv_norm2_test_float_uint;
 DenseVectorNorm2Test<Mem::CUDA, double, unsigned int> cuda_dv_norm2_test_double_uint;
 DenseVectorNorm2Test<Mem::CUDA, float, unsigned long> cuda_dv_norm2_test_float_ulong;
@@ -658,7 +658,7 @@ DenseVectorComponentInvertTest<Mem::Main, double, Index> dv_component_invert_tes
 #ifdef FEAT_HAVE_QUADMATH
 DenseVectorComponentInvertTest<Mem::Main, __float128, Index> dv_component_invert_test_float128;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 DenseVectorComponentInvertTest<Mem::CUDA, float, Index> cuda_dv_component_invert_test_float;
 DenseVectorComponentInvertTest<Mem::CUDA, double, Index> cuda_dv_component_invert_test_double;
 #endif

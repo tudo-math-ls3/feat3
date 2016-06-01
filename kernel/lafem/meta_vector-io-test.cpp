@@ -55,7 +55,7 @@ public:
 
 MetaVectorIOTest<Mem::Main, float, Index> meta_vector_io_test_generic_float;
 MetaVectorIOTest<Mem::Main, double, Index> meta_vector_io_test_generic_double;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 MetaVectorIOTest<Mem::CUDA, float, Index> meta_vector_io_test_cuda_float;
 MetaVectorIOTest<Mem::CUDA, double, Index> meta_vector_io_test_cuda_double;
 #endif

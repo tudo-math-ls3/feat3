@@ -140,7 +140,7 @@ SlipFilterVectorTest<Mem::Main, double, Index, 3> component_filter_test_generic_
 SlipFilterVectorTest<Mem::Main, __float128, unsigned int, 2> component_filter_test_generic_q_2;
 SlipFilterVectorTest<Mem::Main, __float128, Index, 3> component_filter_test_generic_q_3;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SlipFilterVectorTest<Mem::CUDA, float, unsigned int, 2> component_filter_test_cuda_fi_2;
 SlipFilterVectorTest<Mem::CUDA, float, Index, 3> component_filter_test_cuda_fi_3;
 SlipFilterVectorTest<Mem::CUDA, double, Index, 2> component_filter_test_cuda_di_2;
@@ -477,7 +477,7 @@ SlipFilterAssemblyTest<Mem::Main, double, unsigned int> sfat_d;
 #ifdef FEAT_HAVE_QUADMATH
 SlipFilterAssemblyTest<Mem::Main, __float128, Index> sfat_q;
 #endif
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 SlipFilterAssemblyTest<Mem::CUDA, float, unsigned int> sfat_f_cuda;
 SlipFilterAssemblyTest<Mem::CUDA, double, Index> sfat_d_cuda;
 #endif

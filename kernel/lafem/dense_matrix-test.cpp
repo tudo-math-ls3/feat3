@@ -78,7 +78,7 @@ public:
 };
 DenseMatrixTest<Mem::Main, float, Index> cpu_dense_matrix_test_float;
 DenseMatrixTest<Mem::Main, double, Index> cpu_dense_matrix_test_double;
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 DenseMatrixTest<Mem::CUDA, float, Index> cuda_dense_matrix_test_float;
 DenseMatrixTest<Mem::CUDA, double, Index> cuda_dense_matrix_test_double;
 #endif

@@ -21,7 +21,7 @@ namespace FEAT
         template <typename DT_>
         static DT_ value(const DT_ * const x, const Index size)
         {
-#ifdef FEAT_BACKENDS_MKL
+#ifdef FEAT_HAVE_MKL
           return value_mkl(x, size);
 #else
           return value_generic(x, size);

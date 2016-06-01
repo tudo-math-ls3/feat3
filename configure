@@ -335,7 +335,7 @@ if "cuda" in buildid:
     print ("Error: Choosen backend compiler binary nvcc not found!")
     sys.exit(1)
   remove_string(unused_tokens, "cuda")
-  cmake_flags += " -DFEAT_BACKENDS_CUDA:BOOL=ON"
+  cmake_flags += " -DFEAT_HAVE_CUDA:BOOL=ON"
   if not cuda_arch:
     cuda_arch = "sm_20"
   cmake_flags += " -DFEAT_CUDA_ARCH:STRING=" + cuda_arch
@@ -353,7 +353,7 @@ if "cuda" in buildid:
 
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")
-  cmake_flags += " -DFEAT_BACKENDS_MKL:BOOL=ON"
+  cmake_flags += " -DFEAT_HAVE_MKL:BOOL=ON"
   cxxflags += " -DMKL_ILP64"
 
 if "valgrind" in buildid:

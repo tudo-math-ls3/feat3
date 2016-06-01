@@ -359,7 +359,7 @@ public:
   }
 };
 
-#ifdef FEAT_BACKENDS_CUDA
+#ifdef FEAT_HAVE_CUDA
 //CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned long> cuda_solver_csr_generic_double_ulong;
 //CUDASolverTest<SparseMatrixELL, Mem::CUDA, double, unsigned long> cuda_solver_ell_generic_double_ulong;
 CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned int> cuda_solver_csr_generic_double_uint;
