@@ -374,7 +374,7 @@ namespace FEAT
         calc_def = calc_def || (this->_min_stag_iter > Index(0));
 
         // save previous defect
-        DataType def_old = this->_def_cur;
+        const DataType def_old = this->_def_cur;
 
         // compute new defect
         if(calc_def)
@@ -389,6 +389,7 @@ namespace FEAT
             <<  ": " << stringify(this->_num_iter).pad_front(_iter_digits)
             << " : " << stringify_fp_sci(this->_def_cur)
             << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
+            << " / " << stringify_fp_fix(this->_def_cur / def_old)
             << std::endl;
         }
 
