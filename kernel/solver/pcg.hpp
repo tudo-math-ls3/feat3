@@ -20,6 +20,8 @@ namespace FEAT
      * \tparam Filter_
      * The filter class to be used by the solver.
      *
+     * \see Algorithm 9.1 in \cite Saad03
+     *
      * \author Peter Zajac
      */
     template<
@@ -42,12 +44,8 @@ namespace FEAT
       const MatrixType& _system_matrix;
       /// the filter for the solver
       const FilterType& _system_filter;
-      /// defect vector
-      VectorType _vec_def;
-      /// descend direction vector
-      VectorType _vec_dir;
-      /// temporary vector
-      VectorType _vec_tmp;
+      /// temporary vectors
+      VectorType _vec_r, _vec_p, _vec_t;
 
     public:
       /**
@@ -79,24 +77,24 @@ namespace FEAT
       {
         BaseClass::init_symbolic();
         // create three temporary vectors
-        _vec_def = this->_system_matrix.create_vector_r();
-        _vec_dir = this->_system_matrix.create_vector_r();
-        _vec_tmp = this->_system_matrix.create_vector_r();
+        _vec_r = this->_system_matrix.create_vector_r();
+        _vec_p = this->_system_matrix.create_vector_r();
+        _vec_t = this->_system_matrix.create_vector_r();
       }
 
       virtual void done_symbolic() override
       {
-        this->_vec_tmp.clear();
-        this->_vec_dir.clear();
-        this->_vec_def.clear();
+        this->_vec_t.clear();
+        this->_vec_p.clear();
+        this->_vec_r.clear();
         BaseClass::done_symbolic();
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
         // save defect
-        this->_vec_def.copy(vec_def);
-        //this->_system_filter.filter_def(this->_vec_def);
+        this->_vec_r.copy(vec_def);
+        //this->_system_filter.filter_def(this->_vec_r);
 
         // clear solution vector
         vec_cor.format();
@@ -108,8 +106,8 @@ namespace FEAT
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         // compute defect
-        this->_system_matrix.apply(this->_vec_def, vec_sol, vec_rhs, -DataType(1));
-        this->_system_filter.filter_def(this->_vec_def);
+        this->_system_matrix.apply(this->_vec_r, vec_sol, vec_rhs, -DataType(1));
+        this->_system_filter.filter_def(this->_vec_r);
 
         // apply
         return _apply_intern(vec_sol, vec_rhs);
@@ -118,24 +116,34 @@ namespace FEAT
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
-        VectorType& vec_def(this->_vec_def);
-        VectorType& vec_dir(this->_vec_dir);
-        VectorType& vec_tmp(this->_vec_tmp);
         const MatrixType& matrix(this->_system_matrix);
         const FilterType& filter(this->_system_filter);
+        VectorType& vec_r(this->_vec_r);
+        VectorType& vec_p(this->_vec_p);
+        // Note: q and z are temporary vectors whose usage does
+        // not overlap, so we use the same vector for them
+        VectorType& vec_q(this->_vec_t);
+        VectorType& vec_z(this->_vec_t);
 
-        // compute initial defect
-        Status status = this->_set_initial_defect(vec_def, vec_sol);
+        // Note:
+        // In the algorithm below, the following relations hold:
+        // q[k] = A * p[k]
+        // z[k] = M^{-1} * r[k]
+
+        // set initial defect:
+        // r[0] := b - A*x[0]
+        Status status = this->_set_initial_defect(vec_r, vec_sol);
         if(status != Status::progress)
           return status;
 
         // apply preconditioner to defect vector
-        if(!this->_apply_precond(vec_dir, vec_def, filter))
+        // p[0] := M^{-1} * r[0]
+        if(!this->_apply_precond(vec_p, vec_r, filter))
           return Status::aborted;
-        //filter.filter_cor(vec_dir);
 
-        // compute initial gamma
-        DataType gamma = vec_def.dot(vec_dir);
+        // compute initial gamma:
+        // gamma[0] := < r[0], p[0] >
+        DataType gamma = vec_r.dot(vec_p);
 
         // start iterating
         while(status == Status::progress)
@@ -143,21 +151,24 @@ namespace FEAT
           TimeStamp at;
           double mpi_start(Statistics::get_time_mpi_execute());
 
-          // compute A*d
-          matrix.apply(vec_tmp, vec_dir);
-          filter.filter_def(vec_tmp);
+          // q[k] := A*p[k]
+          matrix.apply(vec_q, vec_p);
+          filter.filter_def(vec_q);
 
           // compute alpha
-          DataType alpha = gamma / vec_tmp.dot(vec_dir);
+          // alpha[k] := gamma[k] / < q[k], p[k] >
+          DataType alpha = gamma / vec_q.dot(vec_p);
 
-          // update solution vector
-          vec_sol.axpy(vec_dir, vec_sol, alpha);
+          // update solution vector:
+          // x[k+1] := x[k] + alpha[k] * p[k]
+          vec_sol.axpy(vec_p, vec_sol, alpha);
 
-          // update defect vector
-          vec_def.axpy(vec_tmp, vec_def, -alpha);
+          // update defect vector:
+          // r[k+1] := r[k] - alpha[k] * q[k]
+          vec_r.axpy(vec_q, vec_r, -alpha);
 
           // compute defect norm
-          status = this->_set_new_defect(vec_def, vec_sol);
+          status = this->_set_new_defect(vec_r, vec_sol);
           if(status != Status::progress)
           {
             TimeStamp bt;
@@ -168,7 +179,8 @@ namespace FEAT
           }
 
           // apply preconditioner
-          if(!this->_apply_precond(vec_tmp, vec_def, filter))
+          // z[k+1] := M^{-1} * r[k+1]
+          if(!this->_apply_precond(vec_z, vec_r, filter))
           {
             TimeStamp bt;
             Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
@@ -176,17 +188,19 @@ namespace FEAT
             Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
             return Status::aborted;
           }
-          //filter.filter_cor(vec_tmp);
 
-          // compute new gamma
+          // compute new gamma:
+          // gamma[k+1] := < r[k+1] , z[k+1] >
           DataType gamma2 = gamma;
-          gamma = vec_def.dot(vec_tmp);
+          gamma = vec_r.dot(vec_z);
 
-          // compute beta
+          // compute beta:
+          // beta[k] := gamma[k+1] / gamma[k]
           DataType beta = gamma / gamma2;
 
-          // update direction vector
-          vec_dir.axpy(vec_dir, vec_tmp, beta);
+          // update direction vector:
+          // p[k+1] := z[k+1] + beta[k] * p[k]
+          vec_p.axpy(vec_p, vec_z, beta);
 
           TimeStamp bt;
           Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
