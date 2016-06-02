@@ -27,6 +27,7 @@ SET (test_list
   dense_matrix-test
   dense_vector-test
   dense_vector_blocked-test
+  matrix_mult-test
   meta_filter-test
   meta_matrix-apply-test
   meta_matrix-io-test

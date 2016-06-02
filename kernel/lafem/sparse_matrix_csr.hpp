@@ -2087,6 +2087,115 @@ namespace FEAT
         TimeStamp ts_stop;
         Statistics::add_time_spmv(ts_stop.elapsed(ts_start));
       }
+
+      /**
+       * \brief Adds a double-matrix product onto this matrix
+       *
+       * This function performs the following computation:
+       * \f[ X \leftarrow X + \alpha D\cdot A\cdot B\f]
+       *
+       * where
+       * - \e X denotes this m-by-n matrix
+       * - \e D denotes a m-by-k matrix
+       * - \e A denotes a k-by-l matrix
+       * - \e B denotes a l-by-n matrix
+       *
+       * \attention
+       * This function assumes that the output matrix already contains the
+       * required sparsity pattern. This function will throw an exception
+       * if the sparsity pattern of the output matrix is incomplete.
+       *
+       * \note
+       * This function currently only supports data in main memory.
+       *
+       * \param[in] d, a, b
+       * The three matrices to be multiplied
+       *
+       * \param[in] alpha
+       * The scaling factor for the product.
+       */
+      void add_double_mat_mult(
+        const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& d,
+        const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& a,
+        const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& b,
+        const DT_ alpha = DT_(1))
+      {
+        // validate matrix dimensions
+        if(this->rows() != d.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Size missmatch!");
+        if(d.columns() != a.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Size missmatch!");
+        if(a.columns() != b.rows())
+          throw InternalError(__func__, __FILE__, __LINE__, "Size missmatch!");
+        if(b.columns() != this->columns())
+          throw InternalError(__func__, __FILE__, __LINE__, "Size missmatch!");
+
+        // fetch matrix arrays:
+        DT_* data_x = this->val();
+        const DT_* data_d = d.val();
+        const DT_* data_a = a.val();
+        const DT_* data_b = b.val();
+        const IT_* row_ptr_x = this->row_ptr();
+        const IT_* col_idx_x = this->col_ind();
+        const IT_* row_ptr_d = d.row_ptr();
+        const IT_* col_idx_d = d.col_ind();
+        const IT_* row_ptr_a = a.row_ptr();
+        const IT_* col_idx_a = a.col_ind();
+        const IT_* row_ptr_b = b.row_ptr();
+        const IT_* col_idx_b = b.col_ind();
+
+        // loop over all rows of D and X, resp.
+        for(IT_ i(0); i < IT_(this->rows()); ++i)
+        {
+          // loop over all non-zeros D_ik in row i of D
+          for(IT_ ik(row_ptr_d[i]); ik  < row_ptr_d[i+1]; ++ik)
+          {
+            // get column index k
+            const IT_ k = col_idx_d[ik];
+
+            // loop over all non-zeros A_kl in row k of A
+            for(IT_ kl(row_ptr_a[k]); kl < row_ptr_a[k+1]; ++kl)
+            {
+              // get column index l
+              const IT_ l = col_idx_a[kl];
+
+              // pre-compute factor (alpha * D_ik * A_kl)
+              const DT_ omega = alpha *  data_d[ik] * data_a[kl];
+
+              // loop over all non-zeros B_lj in row j of B and
+              // loop over all non-zeros X_ij in row i of X and
+              // perform a "sparse axpy" of B_l onto X_i, i.e.:
+              //   X_i. += (alpha * D_ik * A_kl) * B_l.
+              IT_ ij = row_ptr_x[i];
+              IT_ lj = row_ptr_b[l];
+              while((ij < row_ptr_x[i+1]) && (lj < row_ptr_b[l+1]))
+              {
+                if(col_idx_x[ij] == col_idx_b[lj])
+                {
+                  // okay: B_lj contributes to X_ij
+                  data_x[ij] += omega * data_b[lj];
+                  ++ij;
+                  ++lj;
+                }
+                else if(col_idx_x[ij] < col_idx_b[lj])
+                {
+                  // entry X_ij exists, but B_lj is missing:
+                  // this is a perfectly valid case, so continue with the next non-zero of X_i
+                  ++ij;
+                }
+                else //if(col_idx_x[ij] > col_idx_b[lj])
+                {
+                  // If we come out here, then the sparsity pattern of X is incomplete:
+                  // B_lj is meant to be added onto X_ij, but the entry X_ij is missing
+                  throw InternalError(__func__, __FILE__, __LINE__, "Incomplete output matrix structure");
+                  //++lj;
+                }
+              }
+            }
+          }
+        }
+      }
+
       ///@}
 
       /// \copydoc extract_diag()
