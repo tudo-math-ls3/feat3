@@ -66,7 +66,7 @@ namespace FEAT
         if(!_vec_freq.empty())
         {
           _volume = _vec_freq.triple_dot(_vec_prim, _vec_dual);
-          Global::SynchScal0<Mem::Main>::value(_volume, _volume);
+          _volume = Global::SynchScal0::value(_volume);
         }
         else
           _volume = _vec_prim.dot(_vec_dual);
@@ -184,7 +184,7 @@ namespace FEAT
         else
         {
           integ = _vec_freq.triple_dot(vector, _vec_prim);
-          Global::SynchScal0<Mem::Main>::value(integ, integ);
+          integ = Global::SynchScal0::value(integ);
         }
         // subtract mean
         vector.axpy(_vec_dual, vector, -integ / _volume);
@@ -205,7 +205,7 @@ namespace FEAT
         else
         {
           integ = _vec_freq.triple_dot(vector, _vec_dual);
-          Global::SynchScal0<Mem::Main>::value(integ, integ);
+          integ = Global::SynchScal0::value(integ);
         }
         // subtract mean
         vector.axpy(_vec_prim, vector, -integ / _volume);

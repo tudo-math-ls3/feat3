@@ -7,6 +7,7 @@
 #include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/lafem/tuple_filter.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
+#include <kernel/lafem/tuple_mirror.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/vector.hpp>
 #include <kernel/global/filter.hpp>
@@ -64,7 +65,7 @@ namespace FEAT
      * The types of the filters for the velocity and pressure components, respectively.
      *
      * \note
-     * This class template is specialised for Global::Matrix and Global::Filter instances.
+     * This class template is specialised for Global::Matrix and Global::Filter instances below.
      *
      * \author Peter Zajac
      */
@@ -336,42 +337,58 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_>
+    template<
+      typename MatrixA_, typename MatrixB_, typename MatrixD_,
+      typename FilterV_, typename FilterP_,
+      typename MirrorV_, typename MirrorP_>
     class SchurPrecond
       <
-        Global::Matrix<MatrixA_>, Global::Matrix<MatrixB_>, Global::Matrix<MatrixD_>,
-        Global::Filter<FilterV_>, Global::Filter<FilterP_>
+        Global::Matrix<MatrixA_, MirrorV_, MirrorV_>,
+        Global::Matrix<MatrixB_, MirrorV_, MirrorP_>,
+        Global::Matrix<MatrixD_, MirrorP_, MirrorV_>,
+        Global::Filter<FilterV_, MirrorV_>,
+        Global::Filter<FilterP_, MirrorP_>
       > :
-      public Solver::SolverBase<Global::Vector<LAFEM::TupleVector<typename MatrixB_::VectorTypeL, typename MatrixD_::VectorTypeL>>>
+      public Solver::SolverBase<
+        Global::Vector<
+          LAFEM::TupleVector<
+            typename MatrixB_::VectorTypeL,
+            typename MatrixD_::VectorTypeL>,
+          LAFEM::TupleMirror<
+            MirrorV_,
+            MirrorP_>
+          >
+        >
     {
     public:
       typedef LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_> LocalMatrixType;
       typedef LAFEM::TupleFilter<FilterV_, FilterP_> LocalFilterType;
       typedef LAFEM::TupleVector<typename MatrixB_::VectorTypeL, typename MatrixD_::VectorTypeL> LocalVectorType;
+      typedef LAFEM::TupleMirror<MirrorV_, MirrorP_> MirrorType;
 
-      typedef Global::Matrix<LocalMatrixType> GlobalMatrixType;
-      typedef Global::Filter<LocalFilterType> GlobalFilterType;
-      typedef Global::Vector<LocalVectorType> GlobalVectorType;
+      typedef Global::Matrix<LocalMatrixType, MirrorType, MirrorType> GlobalMatrixType;
+      typedef Global::Filter<LocalFilterType, MirrorType> GlobalFilterType;
+      typedef Global::Vector<LocalVectorType, MirrorType> GlobalVectorType;
 
-      typedef typename GlobalMatrixType::DataType DataType;
+      typedef typename GlobalVectorType::DataType DataType;
 
       typedef Solver::SolverBase<GlobalVectorType> BaseClass;
 
-      typedef Global::Matrix<MatrixA_> GlobalMatrixTypeA;
-      typedef Global::Matrix<MatrixB_> GlobalMatrixTypeB;
-      typedef Global::Matrix<MatrixD_> GlobalMatrixTypeD;
+      typedef Global::Matrix<MatrixA_, MirrorV_, MirrorV_> GlobalMatrixTypeA;
+      typedef Global::Matrix<MatrixB_, MirrorV_, MirrorP_> GlobalMatrixTypeB;
+      typedef Global::Matrix<MatrixD_, MirrorP_, MirrorV_> GlobalMatrixTypeD;
+
+      typedef Global::Filter<FilterV_, MirrorV_> GlobalFilterTypeV;
+      typedef Global::Filter<FilterP_, MirrorP_> GlobalFilterTypeP;
 
       typedef typename MatrixB_::VectorTypeL LocalVectorTypeV;
       typedef typename MatrixD_::VectorTypeL LocalVectorTypeP;
 
-      typedef Global::Vector<LocalVectorTypeV> GlobalVectorTypeV;
-      typedef Global::Vector<LocalVectorTypeP> GlobalVectorTypeP;
+      typedef Global::Vector<LocalVectorTypeV, MirrorV_> GlobalVectorTypeV;
+      typedef Global::Vector<LocalVectorTypeP, MirrorP_> GlobalVectorTypeP;
 
-      typedef Global::Filter<FilterV_> GlobalFilterTypeV;
-      typedef Global::Filter<FilterP_> GlobalFilterTypeP;
-
-      typedef Global::Gate<LocalVectorTypeV> GateTypeV;
-      typedef Global::Gate<LocalVectorTypeP> GateTypeP;
+      typedef Global::Gate<LocalVectorTypeV, MirrorV_> GateTypeV;
+      typedef Global::Gate<LocalVectorTypeP, MirrorP_> GateTypeP;
 
       typedef Solver::SolverBase<GlobalVectorTypeV> SolverA;
       typedef Solver::SolverBase<GlobalVectorTypeP> SolverS;

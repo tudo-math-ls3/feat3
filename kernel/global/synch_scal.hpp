@@ -8,46 +8,57 @@
 #include<kernel/lafem/arch/dot_product.hpp>
 #include<kernel/util/time_stamp.hpp>
 #include<kernel/util/statistics.hpp>
+#include<kernel/global/ticket.hpp>
 
 namespace FEAT
 {
   namespace Global
   {
       /// \todo add communicators
-      template <typename Mem_>
+      struct SynchScal0Async
+      {
+        public:
+#ifdef FEAT_HAVE_MPI
+          template<typename DT_>
+          static std::shared_ptr<ScalTicket<DT_>> value(DT_ & x)
+          {
+            TimeStamp ts_start;
+
+            auto ticket = std::make_shared<ScalTicket<DT_>>(x);
+
+            Util::Comm::iallreduce(&(ticket->x), Index(1), &(ticket->r), *ticket->req);
+
+            TimeStamp ts_stop;
+            Statistics::add_time_mpi_execute(ts_stop.elapsed(ts_start));
+
+            return ticket;
+          }
+#else
+          template<typename DT_>
+          static std::shared_ptr<ScalTicket<DT_>> value(DT_& x)
+          {
+            auto ticket = std::make_shared<ScalTicket<DT_>>(x);
+            ticket->r = x;
+            return ticket;
+          }
+#endif
+      };
+
+      /// \todo add communicators
       struct SynchScal0
       {
         public:
 #ifdef FEAT_HAVE_MPI
           template<typename DT_>
-          static DT_ value(DT_& r,
-                           DT_& x)
+          static DT_ value(DT_& x)
           {
-            TimeStamp ts_start;
-
-            DT_ sendbuf(x), recvbuf;
-
-            Util::CommStatus stat;
-
-            Util::CommRequest req;
-
-            Util::Comm::iallreduce(&sendbuf, Index(1), &recvbuf, req);
-
-            Util::Comm::wait(req, stat);
-
-            r = recvbuf;
-
-            TimeStamp ts_stop;
-            Statistics::add_time_mpi_execute(ts_stop.elapsed(ts_start));
-            return r;
+            return SynchScal0Async::value(x)->wait();
           }
 #else
           template<typename DT_>
-          static DT_ value(DT_& r,
-                           DT_& x)
+          static DT_ value(DT_& x)
           {
-            r = x;
-            return r;
+            return x;
           }
 #endif
       };

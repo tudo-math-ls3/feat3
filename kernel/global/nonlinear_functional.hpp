@@ -17,7 +17,7 @@ namespace FEAT
      *
      * \author Jordi Paul
      */
-    template<typename LocalNonlinearFunctional_>
+    template<typename LocalNonlinearFunctional_, typename RowMirrorType_, typename ColMirrorType_>
     class NonlinearFunctional
     {
       public:
@@ -36,16 +36,16 @@ namespace FEAT
         typedef typename LocalNonlinearFunctional_::FilterType LocalFilterType;
 
         /// The associated global left-vector type
-        typedef Vector<LocalVectorTypeL> VectorTypeL;
+        typedef Vector<LocalVectorTypeL, RowMirrorType_> VectorTypeL;
         /// The associated global right-vector type
-        typedef Vector<LocalVectorTypeR> VectorTypeR;
+        typedef Vector<LocalVectorTypeR, ColMirrorType_> VectorTypeR;
         /// The associated global filter type
-        typedef Filter<LocalFilterType> FilterType;
+        typedef Filter<LocalFilterType, RowMirrorType_> FilterType;
 
         /// Global Gate for left-vectors
-        typedef Gate<LocalVectorTypeL> GateRowType;
+        typedef Gate<LocalVectorTypeL, RowMirrorType_> GateRowType;
         /// Global Gate for right-vectors
-        typedef Gate<LocalVectorTypeR> GateColType;
+        typedef Gate<LocalVectorTypeR, ColMirrorType_> GateColType;
 
         /// The a gradient vector is the output of the operators compute_grad() function and thus a left-vector
         typedef VectorTypeL GradientType;

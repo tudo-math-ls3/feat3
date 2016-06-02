@@ -13,11 +13,13 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename LocalFilter_>
+    template<typename LocalFilter_, typename Mirror_>
     class Filter
     {
     public:
-      typedef Global::Vector<typename LocalFilter_::VectorType> VectorType;
+      typedef Global::Vector<typename LocalFilter_::VectorType, Mirror_> VectorType;
+      typedef Mirror_ MirrorType;
+      typedef LocalFilter_ LocalFilter;
 
     protected:
       LocalFilter_ _filter;
@@ -39,8 +41,8 @@ namespace FEAT
         return _filter;
       }
 
-      template<typename OtherLocalFilter_>
-      void convert(const Global::Filter<OtherLocalFilter_>& other)
+      template<typename OtherGlobalFilter_>
+      void convert(const OtherGlobalFilter_ & other)
       {
         this->_filter.convert(*other);
       }

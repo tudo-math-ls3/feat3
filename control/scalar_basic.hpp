@@ -11,7 +11,7 @@
 #include <kernel/lafem/mean_filter.hpp>
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
-#include <kernel/global/foundation_gate.hpp>
+#include <kernel/global/gate.hpp>
 #include <kernel/global/vector.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/filter.hpp>
@@ -61,13 +61,13 @@ namespace FEAT
       typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
 
       /// define system gate
-      typedef Global::FoundationGate<LocalSystemVector, SystemMirror> SystemGate;
+      typedef Global::Gate<LocalSystemVector, SystemMirror> SystemGate;
 
       /// define global system vector type
-      typedef Global::Vector<LocalSystemVector> GlobalSystemVector;
+      typedef Global::Vector<LocalSystemVector, SystemMirror> GlobalSystemVector;
 
       /// define global system matrix type
-      typedef Global::Matrix<LocalSystemMatrix> GlobalSystemMatrix;
+      typedef Global::Matrix<LocalSystemMatrix, SystemMirror, SystemMirror> GlobalSystemMatrix;
 
       /* ***************************************************************************************** */
 
@@ -106,11 +106,19 @@ namespace FEAT
     public:
       typedef ScalarBasicSystemLevel<MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
 
+      // basic types
+      typedef MemType_ MemType;
+      typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
+
+      /// define system mirror type
+      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
+
       /// define local filter type
       typedef LAFEM::UnitFilter<MemType_, DataType_, IndexType_> LocalSystemFilter;
 
       /// define global filter type
-      typedef Global::Filter<LocalSystemFilter> GlobalSystemFilter;
+      typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
 
       /// Our class base type
       template <typename Mem2_, typename DT2_, typename IT2_, typename ScalarMatrix2_>
@@ -157,11 +165,19 @@ namespace FEAT
     public:
       typedef ScalarBasicSystemLevel<MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
 
+      // basic types
+      typedef MemType_ MemType;
+      typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
+
+      /// define system mirror type
+      typedef LAFEM::VectorMirror<MemType_, DataType, IndexType> SystemMirror;
+
       /// define local filter type
       typedef Global::MeanFilter<MemType_, DataType_, IndexType_> LocalSystemFilter;
 
       /// define global filter type
-      typedef Global::Filter<LocalSystemFilter> GlobalSystemFilter;
+      typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
 
       /// Our class base type
       template <typename Mem2_, typename DT2_, typename IT2_, typename ScalarMatrix2_>
@@ -201,11 +217,14 @@ namespace FEAT
     class ScalarBasicTransferLevel
     {
     public:
+      /// define system mirror type
+      typedef typename SystemLevel_::SystemMirror SystemMirror;
+
       /// our local transfer matrix type
       typedef ScalarMatrix_ LocalSystemTransferMatrix;
 
       /// our global transfer matrix type
-      typedef Global::Matrix<LocalSystemTransferMatrix> GlobalSystemTransferMatrix;
+      typedef Global::Matrix<LocalSystemTransferMatrix, SystemMirror, SystemMirror> GlobalSystemTransferMatrix;
 
       /// Our class base type
       template <typename SystemLevel2_>

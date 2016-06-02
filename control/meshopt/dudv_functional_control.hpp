@@ -10,7 +10,7 @@
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/geometry/export_vtk.hpp>
-#include <kernel/global/foundation_gate.hpp>
+#include <kernel/global/gate.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/nonlinear_functional.hpp>
 #include <kernel/global/vector.hpp>

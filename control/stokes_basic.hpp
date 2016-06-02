@@ -30,7 +30,7 @@
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
-#include <kernel/global/foundation_gate.hpp>
+#include <kernel/global/gate.hpp>
 #include <kernel/global/vector.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/filter.hpp>
@@ -81,21 +81,21 @@ namespace FEAT
       typedef LAFEM::TupleMirror<VeloMirror, PresMirror> SystemMirror;
 
       // define gates
-      typedef Global::FoundationGate<LocalVeloVector, VeloMirror> VeloGate;
-      typedef Global::FoundationGate<LocalPresVector, PresMirror> PresGate;
-      typedef Global::FoundationGate<LocalSystemVector, SystemMirror> SystemGate;
+      typedef Global::Gate<LocalVeloVector, VeloMirror> VeloGate;
+      typedef Global::Gate<LocalPresVector, PresMirror> PresGate;
+      typedef Global::Gate<LocalSystemVector, SystemMirror> SystemGate;
 
       // define global vector types
-      typedef Global::Vector<LocalVeloVector> GlobalVeloVector;
-      typedef Global::Vector<LocalPresVector> GlobalPresVector;
-      typedef Global::Vector<LocalSystemVector> GlobalSystemVector;
+      typedef Global::Vector<LocalVeloVector, VeloMirror> GlobalVeloVector;
+      typedef Global::Vector<LocalPresVector, PresMirror> GlobalPresVector;
+      typedef Global::Vector<LocalSystemVector, SystemMirror> GlobalSystemVector;
 
       // define global matrix types
-      typedef Global::Matrix<LocalMatrixBlockA> GlobalMatrixBlockA;
-      typedef Global::Matrix<LocalMatrixBlockB> GlobalMatrixBlockB;
-      typedef Global::Matrix<LocalMatrixBlockD> GlobalMatrixBlockD;
-      typedef Global::Matrix<LocalScalarMatrix> GlobalScalarMatrix;
-      typedef Global::Matrix<LocalSystemMatrix> GlobalSystemMatrix;
+      typedef Global::Matrix<LocalMatrixBlockA, VeloMirror, VeloMirror> GlobalMatrixBlockA;
+      typedef Global::Matrix<LocalMatrixBlockB, VeloMirror, PresMirror> GlobalMatrixBlockB;
+      typedef Global::Matrix<LocalMatrixBlockD, PresMirror, VeloMirror> GlobalMatrixBlockD;
+      typedef Global::Matrix<LocalScalarMatrix, PresMirror, PresMirror> GlobalSchurMatrix;
+      typedef Global::Matrix<LocalSystemMatrix, SystemMirror, SystemMirror> GlobalSystemMatrix;
 
       /* ***************************************************************************************** */
 
@@ -109,7 +109,7 @@ namespace FEAT
       GlobalMatrixBlockA matrix_a;
       GlobalMatrixBlockB matrix_b;
       GlobalMatrixBlockD matrix_d;
-      GlobalScalarMatrix matrix_s;
+      GlobalSchurMatrix matrix_s;
 
       StokesBasicSystemLevel() :
         matrix_sys(&gate_sys, &gate_sys),
@@ -160,9 +160,9 @@ namespace FEAT
       typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
       // define global filter types
-      typedef Global::Filter<LocalVeloFilter> GlobalVeloFilter;
-      typedef Global::Filter<LocalPresFilter> GlobalPresFilter;
-      typedef Global::Filter<LocalSystemFilter> GlobalSystemFilter;
+      typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
+      typedef Global::Filter<LocalPresFilter, typename BaseClass::PresMirror> GlobalPresFilter;
+      typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
 
       // (global) filters
       GlobalSystemFilter filter_sys;
@@ -214,9 +214,9 @@ namespace FEAT
       typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
 
       // define global filter types
-      typedef Global::Filter<LocalVeloFilter> GlobalVeloFilter;
-      typedef Global::Filter<LocalPresFilter> GlobalPresFilter;
-      typedef Global::Filter<LocalSystemFilter> GlobalSystemFilter;
+      typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
+      typedef Global::Filter<LocalPresFilter, typename BaseClass::PresMirror> GlobalPresFilter;
+      typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
 
       // (global) filters
       GlobalSystemFilter filter_sys;
@@ -261,9 +261,9 @@ namespace FEAT
       typedef LocalScalarMatrix LocalPresTransferMatrix;
       typedef LAFEM::TupleDiagMatrix<LocalVeloTransferMatrix, LocalPresTransferMatrix> LocalSystemTransferMatrix;
 
-      typedef Global::Matrix<LocalVeloTransferMatrix> GlobalVeloTransferMatrix;
-      typedef Global::Matrix<LocalPresTransferMatrix> GlobalPresTransferMatrix;
-      typedef Global::Matrix<LocalSystemTransferMatrix> GlobalSystemTransferMatrix;
+      typedef Global::Matrix<LocalVeloTransferMatrix, typename SystemLevel::VeloMirror, typename SystemLevel::VeloMirror> GlobalVeloTransferMatrix;
+      typedef Global::Matrix<LocalPresTransferMatrix, typename SystemLevel::PresMirror, typename SystemLevel::PresMirror> GlobalPresTransferMatrix;
+      typedef Global::Matrix<LocalSystemTransferMatrix, typename SystemLevel::SystemMirror, typename SystemLevel::SystemMirror> GlobalSystemTransferMatrix;
 
       // (global) transfer matrices
       GlobalVeloTransferMatrix prol_velo, rest_velo;
@@ -481,7 +481,7 @@ namespace FEAT
         typedef typename SystemLevel_::DataType DataType;
 
         // get the global S matrix
-        typename SystemLevel_::GlobalScalarMatrix& mat_glob_s = sys_level.matrix_s;
+        typename SystemLevel_::GlobalSchurMatrix& mat_glob_s = sys_level.matrix_s;
 
         // get the local matrix S
         typename SystemLevel_::LocalScalarMatrix& mat_loc_s = *mat_glob_s;

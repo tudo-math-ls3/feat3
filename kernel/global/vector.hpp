@@ -4,7 +4,7 @@
 
 #include <kernel/global/gate.hpp>
 #include <kernel/util/math.hpp>
-#include <kernel/lafem/dense_vector.hpp> // required for LAFEM::CloneMode
+#include <kernel/lafem/container.hpp> // required for LAFEM::CloneMode
 
 namespace FEAT
 {
@@ -15,11 +15,11 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename LocalVector_>
+    template<typename LocalVector_, typename Mirror_>
     class Vector
     {
     public:
-      typedef Gate<LocalVector_> GateType;
+      typedef Gate<LocalVector_, Mirror_> GateType;
 
       typedef typename LocalVector_::MemType MemType;
       typedef typename LocalVector_::DataType DataType;
@@ -54,8 +54,8 @@ namespace FEAT
         return _vector;
       }
 
-      template<typename OtherLocalVector_>
-      void convert(GateType* gate, const Global::Vector<OtherLocalVector_>& other)
+      template<typename OtherGlobalVector_>
+      void convert(GateType* gate, const OtherGlobalVector_ & other)
       {
         this->_gate = gate;
         this->_vector.convert(*other);
@@ -75,10 +75,22 @@ namespace FEAT
           _gate->sync_0(_vector);
       }
 
+      auto sync_0_async() -> decltype(_gate->sync_0(_vector))
+      //decltype(_gate->sync_0(_vector)) sync_0_async()
+      {
+        return _gate->sync_0(_vector);
+      }
+
       void sync_1()
       {
         if(_gate != nullptr)
           _gate->sync_1(_vector);
+      }
+
+      auto sync_1_async() -> decltype(_gate->sync_1(_vector))
+      //decltype(_gate->sync_1(_vector)) sync_1_async()
+      {
+        return _gate->sync_1(_vector);
       }
 
       Vector clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
@@ -132,14 +144,31 @@ namespace FEAT
         return _vector.dot(*x);
       }
 
+      std::shared_ptr<ScalTicket<DataType>> dot_async(const Vector& x) const
+      {
+        return _gate->dot_async(_vector, *x);
+      }
+
       DataType norm2sqr() const
       {
         return dot(*this);
       }
 
+      std::shared_ptr<ScalTicket<DataType>> norm2sqr_async() const
+      {
+        return dot_async(*this);
+      }
+
       DataType norm2() const
       {
         return Math::sqrt(norm2sqr());
+      }
+
+      std::shared_ptr<ScalTicket<DataType>> norm2_async() const
+      {
+        auto t = norm2sqr_async();
+        t.sqrt = true;
+        return t;
       }
 
       void component_invert(const Vector& x, const DataType alpha = DataType(1))

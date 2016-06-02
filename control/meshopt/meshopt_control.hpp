@@ -12,7 +12,7 @@
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/geometry/mesh_file_writer.hpp>
 #include <kernel/global/filter.hpp>
-#include <kernel/global/foundation_gate.hpp>
+#include <kernel/global/gate.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/nonlinear_functional.hpp>
 #include <kernel/global/vector.hpp>
@@ -107,7 +107,7 @@ namespace FEAT
       template<typename>
       class MeshoptAssemblerLevel;
 
-      template<typename, typename, typename, template<typename, typename, typename> class, template<typename> class>
+      template<typename, typename, typename, template<typename, typename, typename> class, template<typename, typename, typename> class>
       class MeshoptSystemLevel;
 
       template<typename, typename>
@@ -138,8 +138,10 @@ namespace FEAT
           /// Type for buffer vectors exchanging information between mesh and some vector type on which the solvers
           /// operate
           typedef LAFEM::DenseVectorBlocked<Mem::Main, CoordType, Index, world_dim> LocalCoordsBuffer;
+          /// corresponding vector mirror
+          typedef LAFEM::VectorMirrorBlocked<Mem::Main, CoordType, Index, world_dim> CoordsMirror;
           /// The global version of LocalCoordsBuffer, needed for prepare setting the internal state variable
-          typedef Global::Vector<LocalCoordsBuffer> GlobalCoordsBuffer;
+          typedef Global::Vector<LocalCoordsBuffer, CoordsMirror> GlobalCoordsBuffer;
           /// Type of the vtk exporter this (and derived classes) can write to
           typedef Geometry::ExportVTK<typename Trafo_::MeshType> VTKExporterType;
 
@@ -237,7 +239,7 @@ namespace FEAT
       <
         typename Mem_, typename DT_, typename IT_,
         template<typename, typename, typename> class Op_,
-        template<typename> class GlobalOp_
+        template<typename, typename, typename> class GlobalOp_
       >
       class MeshoptSystemLevel
       {
@@ -271,24 +273,24 @@ namespace FEAT
           /// Mirrors for system vectors
           typedef LAFEM::VectorMirrorBlocked<Mem_, DT_, IT_, LocalQualityFunctional::BlockHeight> SystemMirror;
           /// Gates for the system
-          typedef Global::FoundationGate<LocalSystemVectorR, SystemMirror> SystemGate;
+          typedef Global::Gate<LocalSystemVectorR, SystemMirror> SystemGate;
           /// Mirrors for scalar vectors
           typedef LAFEM::VectorMirror<Mem_, DT_, IT_> ScalarMirror;
           /// Gates for scalar vectors
-          typedef Global::FoundationGate<LocalScalarVector, ScalarMirror> ScalarGate;
+          typedef Global::Gate<LocalScalarVector, ScalarMirror> ScalarGate;
 
           /// Global mesh quality functional type
-          typedef GlobalOp_<LocalQualityFunctional> GlobalQualityFunctional;
+          typedef GlobalOp_<LocalQualityFunctional, SystemMirror, SystemMirror> GlobalQualityFunctional;
           /// Global system filter type
-          typedef Global::Filter<LocalSystemFilter> GlobalSystemFilter;
+          typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
           /// Global scalar vector type
-          typedef Global::Vector<LocalScalarVector> GlobalScalarVector;
+          typedef Global::Vector<LocalScalarVector, ScalarMirror> GlobalScalarVector;
           /// Global left-vectors
-          typedef Global::Vector<LocalSystemVectorL> GlobalSystemVectorL;
+          typedef Global::Vector<LocalSystemVectorL, SystemMirror> GlobalSystemVectorL;
           /// Global right-vectors
-          typedef Global::Vector<LocalSystemVectorR> GlobalSystemVectorR;
+          typedef Global::Vector<LocalSystemVectorR, SystemMirror> GlobalSystemVectorR;
           /// Global coordinates buffer
-          typedef Global::Vector<LocalCoordsBuffer> GlobalCoordsBuffer;
+          typedef Global::Vector<LocalCoordsBuffer, SystemMirror> GlobalCoordsBuffer;
 
           /// The scalar gate
           ScalarGate gate_scalar;
@@ -333,7 +335,7 @@ namespace FEAT
           /// Our local transfer matrix type
           typedef TransferMatrix_ LocalSystemTransferMatrix;
           /// Our global transfer matrix type
-          typedef Global::Matrix<LocalSystemTransferMatrix> GlobalSystemTransferMatrix;
+          typedef Global::Matrix<LocalSystemTransferMatrix, typename SystemLevel_::SystemMirror, typename SystemLevel_::SystemMirror> GlobalSystemTransferMatrix;
           /// The AssemblerLevel below needs to know the global scalar vector type
           typedef typename SystemLevel_::GlobalScalarVector GlobalScalarVector;
 

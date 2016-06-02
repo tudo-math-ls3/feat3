@@ -3,8 +3,8 @@
 #define KERNEL_FOUNDATION_PEXECUTOR_HPP 1
 
 #include<kernel/base_header.hpp>
-#include<kernel/foundation/base.hpp>
 #include<kernel/util/comm_base.hpp>
+#include<kernel/foundation/base.hpp>
 #include<kernel/foundation/pgraph.hpp>
 
 #ifdef FEAT_HAVE_PARMETIS

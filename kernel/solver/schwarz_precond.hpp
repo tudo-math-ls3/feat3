@@ -35,19 +35,19 @@ namespace FEAT
      * \tparam LocalVector_
      * The type of the local vector nested in a global vector.
      */
-    template<typename LocalVector_, typename LocalFilter_>
-    class SchwarzPrecond<Global::Vector<LocalVector_>, Global::Filter<LocalFilter_>> :
-      public SolverBase<Global::Vector<LocalVector_>>
+    template<typename LocalVector_, typename LocalFilter_, typename Mirror_>
+    class SchwarzPrecond<Global::Vector<LocalVector_, Mirror_>, Global::Filter<LocalFilter_, Mirror_>> :
+      public SolverBase<Global::Vector<LocalVector_, Mirror_>>
     {
     public:
       /// our local vector type
       typedef LocalVector_ LocalVectorType;
       /// our global vector type
-      typedef Global::Vector<LocalVector_> GlobalVectorType;
+      typedef Global::Vector<LocalVector_, Mirror_> GlobalVectorType;
       /// our global filter type
-      typedef Global::Filter<LocalFilter_> GlobalFilterType;
+      typedef Global::Filter<LocalFilter_, Mirror_> GlobalFilterType;
       /// base-class typedef
-      typedef SolverBase<Global::Vector<LocalVector_>> BaseClass;
+      typedef SolverBase<Global::Vector<LocalVector_, Mirror_>> BaseClass;
 
       /// the local solver interface
       typedef SolverBase<LocalVector_> LocalSolverType;
@@ -145,21 +145,21 @@ namespace FEAT
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename LocalFilter_, typename LocalSolver_>
-    inline std::shared_ptr<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType>, Global::Filter<LocalFilter_>>> new_schwarz_precond(
+    template<typename LocalFilter_, typename LocalSolver_, typename Mirror_>
+    inline std::shared_ptr<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>> new_schwarz_precond(
       std::shared_ptr<LocalSolver_> local_solver,
-      Global::Filter<LocalFilter_>& filter)
+      Global::Filter<LocalFilter_, Mirror_>& filter)
     {
-      return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType>, Global::Filter<LocalFilter_>>>
+      return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
         (local_solver, filter);
     }
 #else
-    template<typename LocalFilter_>
-    inline std::shared_ptr<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType>, Global::Filter<LocalFilter_>>> new_schwarz_precond(
+    template<typename LocalFilter_, typename Mirror_>
+    inline std::shared_ptr<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>> new_schwarz_precond(
       std::shared_ptr<SolverBase<typename LocalFilter_::VectorType>> local_solver,
-      Global::Filter<LocalFilter_>& filter)
+      Global::Filter<LocalFilter_, Mirror_>& filter)
     {
-      return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType>, Global::Filter<LocalFilter_>>>
+      return std::make_shared<SchwarzPrecond<Global::Vector<typename LocalFilter_::VectorType, Mirror_>, Global::Filter<LocalFilter_, Mirror_>>>
         (local_solver, filter);
     }
 #endif

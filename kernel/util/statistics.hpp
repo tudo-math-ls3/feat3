@@ -313,11 +313,7 @@ namespace FEAT
         measured_time = KahanSum(measured_time, get_time_axpy());
         measured_time = KahanSum(measured_time, get_time_precon());
         measured_time = KahanSum(measured_time, get_time_mpi_execute());
-        /// \todo readd mpi_wait time, once wait is no more included in execute
-        // mpi_wait is included in mpi_execute
-        //measured_time = KahanSum(measured_time, get_time_mpi_wait());
-        // subtract wait from execute time, as the later is included in the former accidentaly
-        _time_mpi_execute.sum -= _time_mpi_wait.sum;
+        measured_time = KahanSum(measured_time, get_time_mpi_wait());
 
         if (measured_time.sum > total_time)
           throw InternalError("Accumulated op time (" + stringify(measured_time.sum) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
@@ -380,6 +376,7 @@ namespace FEAT
         file << "spmv " << stringify(get_time_spmv()) << std::endl;
         file << "precon " << stringify(get_time_precon()) << std::endl;
         file << "mpi " << stringify(get_time_mpi_execute()) << std::endl;
+        file << "wait " << stringify(get_time_mpi_wait()) << std::endl;
 
         file << std::endl;
 

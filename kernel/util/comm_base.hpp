@@ -152,6 +152,11 @@ namespace FEAT
           }
         }
 
+        /// Unwanted copy constructor: Do not implement!
+        CommRequest(const CommRequest &) = delete;
+        /// Unwanted copy assignment operator: Do not implement!
+        CommRequest & operator=(const CommRequest &) = delete;
+
       private:
         MPI_Request _r;
     };

@@ -3,6 +3,7 @@
 #define KERNEL_GLOBAL_MATRIX_HPP 1
 
 #include <kernel/global/gate.hpp>
+#include <kernel/lafem/container.hpp> // required for LAFEM::CloneMode
 #include <kernel/global/vector.hpp>
 
 namespace FEAT
@@ -14,10 +15,14 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename LocalMatrix_>
+    template<typename LocalMatrix_, typename RowMirror_, typename ColMirror_>
     class Matrix
     {
     public:
+      typedef LocalMatrix_ LocalMatrix;
+      typedef RowMirror_ RowMirror;
+      typedef ColMirror_ ColMirror;
+
       typedef typename LocalMatrix_::MemType MemType;
       typedef typename LocalMatrix_::DataType DataType;
       typedef typename LocalMatrix_::IndexType IndexType;
@@ -25,11 +30,11 @@ namespace FEAT
       typedef typename LocalMatrix_::VectorTypeL LocalVectorTypeL;
       typedef typename LocalMatrix_::VectorTypeR LocalVectorTypeR;
 
-      typedef Vector<LocalVectorTypeL> VectorTypeL;
-      typedef Vector<LocalVectorTypeR> VectorTypeR;
+      typedef Vector<LocalVectorTypeL, RowMirror_> VectorTypeL;
+      typedef Vector<LocalVectorTypeR, ColMirror_> VectorTypeR;
 
-      typedef Gate<LocalVectorTypeL> GateRowType;
-      typedef Gate<LocalVectorTypeR> GateColType;
+      typedef Gate<LocalVectorTypeL, RowMirror_> GateRowType;
+      typedef Gate<LocalVectorTypeR, ColMirror_> GateColType;
 
     protected:
       GateRowType* _row_gate;
@@ -62,8 +67,8 @@ namespace FEAT
         return _matrix;
       }
 
-      template<typename OtherLocalMatrix_>
-      void convert(GateRowType* row_gate, GateColType* col_gate, const Global::Matrix<OtherLocalMatrix_>& other)
+      template<typename OtherGlobalMatrix_>
+      void convert(GateRowType* row_gate, GateColType* col_gate, const OtherGlobalMatrix_ & other)
       {
         this->_row_gate = row_gate;
         this->_col_gate = col_gate;
@@ -143,7 +148,28 @@ namespace FEAT
         r.sync_0();
       }
 
+      auto apply_async(VectorTypeL& r, const VectorTypeR& x) const -> decltype(r.sync_0())
+      {
+        _matrix.apply(*r, *x);
+        return r.sync_0();
+      }
+
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const
+      {
+        // copy y to r
+        r.copy(y);
+
+        // convert from type-1 to type-0
+        r.from_1_to_0();
+
+        // r <- r + alpha*A*x
+        _matrix.apply(*r, *x, *r, alpha);
+
+        // synchronise r
+        r.sync_0();
+      }
+
+      auto apply_async(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, const DataType alpha = DataType(1)) const -> decltype(r.sync_0())
       {
         // copy y to r
         r.copy(y);
