@@ -9,6 +9,12 @@ namespace FEAT
 {
   namespace Assembly
   {
+    /**
+     * \brief Assembly Common namespace
+     *
+     * This namespace encapsulated commonly used operators and functionals for use with the
+     * various assembly classes, which are often used in standard benchmark problems.
+     */
     namespace Common
     {
       /**
@@ -256,6 +262,92 @@ namespace FEAT
         {
         }
       }; // class TestDerivativeOperator
+
+      /**
+       * \brief div(phi) * div(psi) operator implementation
+       *
+       * \author Peter Zajac
+       */
+      class DivDivOperator :
+        public Assembly::BilinearOperator
+      {
+      public:
+        /// Row index
+        int ir;
+        /// Column index
+        int ic;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::grad;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
+
+        template<typename AsmTraits_>
+        class Evaluator :
+          public Assembly::BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        protected:
+          /// Row index
+          int ir;
+          /// Column index
+          int ic;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] operat
+           * A reference to the operator object.
+           */
+          explicit Evaluator(const DivDivOperator& operat) :
+            ir(operat.ir), ic(operat.ic)
+          {
+          }
+
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear functor.
+           **/
+          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            return phi.grad[ic] * psi.grad[ir];
+          }
+        }; // class DivDivOperator::Evaluator<...>
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] ir_
+         * The row index of the block
+         *
+         * \param[in] ic_
+         * The column index of the block
+         */
+        explicit DivDivOperator(int ir_, int ic_) :
+          ir(ir_), ic(ic_)
+        {
+        }
+      }; // class DivDivOperator
 
       /**
        * \brief Du:Dv operator implementation

@@ -15,10 +15,10 @@ namespace FEAT
   namespace Analytic
   {
     /**
-     * \brief Assembly Common namespace
+     * \brief Analytic Common namespace
      *
-     * This namespace encapsulated commonly used functions, operators and functionals for use
-     * with the various assembly classes, which are often used in standard benchmark problems.
+     * This namespace encapsulated commonly used functions,
+     * which are often used in standard benchmark problems.
      */
     namespace Common
     {
