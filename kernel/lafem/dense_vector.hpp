@@ -19,7 +19,6 @@
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
-#include <kernel/lafem/arch/synch.hpp>
 #include <kernel/adjacency/permutation.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/time_stamp.hpp>

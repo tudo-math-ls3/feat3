@@ -14,17 +14,6 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename Mem_, typename VectorT_>
-      class DotGatewayBase
-      {
-      public:
-        virtual typename VectorT_::DataType value(const VectorT_& x, const VectorT_& y) const = 0;
-
-        virtual ~DotGatewayBase()
-        {
-        }
-      };
-
       // Dot Product
       template <typename Mem_>
       struct DotProduct;
