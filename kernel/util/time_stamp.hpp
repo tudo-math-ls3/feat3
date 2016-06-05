@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/os_windows.hpp>
 
 // includes, system
 #include <sstream>
@@ -14,10 +15,6 @@
 #if defined(__linux) || defined(__unix__)
 #  define FEAT_HAVE_GETTIMEOFDAY 1
 #  include <sys/time.h>
-#elif defined(_WIN32)
-// Do not include <windows.h> to avoid namespace pollution -- define the necessary prototypes by hand instead.
-extern "C" int __stdcall QueryPerformanceCounter(long long int*);
-extern "C" int __stdcall QueryPerformanceFrequency(long long int*);
 #else
 #  include <ctime>
 #endif
@@ -79,7 +76,7 @@ namespace FEAT
 #if defined(FEAT_HAVE_GETTIMEOFDAY)
       gettimeofday(&_time, 0);
 #elif defined(_WIN32)
-      QueryPerformanceCounter(&_counter);
+      _counter = Windows::query_performance_counter();
 #else
       _clock = ::clock();
 #endif
@@ -100,8 +97,7 @@ namespace FEAT
 #if defined(FEAT_HAVE_GETTIMEOFDAY)
       return double(_time.tv_sec - before._time.tv_sec) + 1E-6 * double(_time.tv_usec - before._time.tv_usec);
 #elif defined(_WIN32)
-      long long freq = 0ll;
-      QueryPerformanceFrequency(&freq);
+      long long freq = Windows::query_performance_frequency();
       return (freq == 0ll) ? 0.0 : (double(_counter - before._counter) / double(freq));
 #else
       return double(_clock - before._clock) / double(CLOCKS_PER_SEC);
@@ -123,8 +119,7 @@ namespace FEAT
       return 1000000ll * (long long)(_time.tv_sec - before._time.tv_sec)
         + (long long)(_time.tv_usec - before._time.tv_usec);
 #elif defined(_WIN32)
-      long long freq = 0ll;
-      QueryPerformanceFrequency(&freq);
+      long long freq = Windows::query_performance_frequency();
       return (freq == 0ll) ? 0ll : (1000000ll * (_counter - before._counter)) / freq;
 #else
       return 1000000ll * (long long)(_clock - before._clock) / (long long)CLOCKS_PER_SEC;

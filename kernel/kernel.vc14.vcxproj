@@ -16,6 +16,8 @@
     <FeatKernelExcludeSource Include="geometry\test_aux\*.cpp" />
     <!-- exclude MKL sources unless the MKL backend is enabled -->
     <FeatKernelExcludeSource Include="**\*_mkl.cpp" Condition="'$(BackendMKL)'!='true'" />
+    <!-- exclude OS Windows utility source (this one is included explicitly below) -->
+    <FeatKernelExcludeSource Include="util\os_windows.cpp" />
   </ItemGroup>
   <!-- Kernel Cuda Exclusion List -->
   <!-- ************************************************************************************************************* -->
@@ -23,12 +25,17 @@
   <!-- ************************************************************************************************************* -->
   <!-- Header File List -->
   <ItemGroup>
-    <ClInclude Include="eval_tags.hpp" />
+    <ClInclude Include="**\*.hpp" />
   </ItemGroup>
   <!-- Source File List -->
   <ItemGroup>
     <ClCompile Include="**\*.cpp" Exclude="@(FeatKernelExcludeSource)" />
     <ClCompile Include="@(FeatKernelIncludeSource)" Condition="'@(FeatKernelIncludeSource)'!=''" />
+    <!-- OS Windows utility source file -->
+    <ClCompile Include="util\os_windows.cpp">
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
   </ItemGroup>
   <!-- CUDA Source File List -->
   <ItemGroup Condition="'$(BackendCUDA)'=='true'">

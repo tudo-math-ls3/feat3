@@ -136,6 +136,8 @@
 
   <!-- FEAT additional library dependencies list -->
   <ItemGroup Label="FEAT Library Dependencies">
+    <FeatLibDep
+      Include="DbgHelp.lib" />
     <FeatLibDep Condition="'$(SerialMode)'=='false'"
       Include="msmpi.lib" />
     <FeatLibDep Condition="'$(BackendCUDA)'=='true'"

@@ -59,8 +59,12 @@ namespace FEAT
      *
      * This function terminates this process and, in a MPI-based run, also
      * all other processes belonging to this group.
+     *
+     * \param[in] dump_call_stack
+     * Specifies whether to dump the call-stack to stderr prior to process termination.\n
+     * Note that a call-stack dump may not be available on all platforms.
      */
-    static void abort();
+    static void abort(bool dump_call_stack = true);
 
     /**
      * \brief FEAT finalisation

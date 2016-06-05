@@ -4,28 +4,15 @@
 
 #include <cstring>
 
-#ifdef FEAT_TESTING_VC
-// prototype for InitTestSystem defined in "visual_studio\init_test_sys.c"
-extern "C" void __stdcall InitTestSystem();
-#endif // FEAT_TESTING_VC
-
 using namespace FEAT;
 using namespace FEAT::TestSystem;
 
 int main(int argc, char** argv)
 {
+  // Initialse FEAT runtime
   Runtime::initialise(argc, argv);
 
-#ifdef FEAT_TESTING_VC
-  // Do not initialise VC test system if '--no-init' is the first option;
-  // this way, we can attach the debugger if we run the test by hand
-  if((argc < 2) || (0 != strcmp(argv[1], "--no-init")))
-  {
-    InitTestSystem();
-  }
-#else
   std::cout << "CTEST_FULL_OUTPUT" << std::endl;
-#endif // FEAT_TESTING_VC
 
   int result(EXIT_SUCCESS);
 

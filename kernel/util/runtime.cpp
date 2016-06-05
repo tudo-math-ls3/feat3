@@ -1,6 +1,7 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/memory_pool.hpp>
+#include <kernel/util/os_windows.hpp>
 
 #include <cstdlib>
 #include <fstream>
@@ -18,7 +19,14 @@ bool Runtime::_finished = false;
 
 PropertyMap * Runtime::global_property()
 {
-  ASSERT(_initialised == true, "global_property_map not _initialised! Call initialise first");
+  if (!_initialised)
+  {
+    std::cerr << "ERROR: global_property_map not _initialised!" << std::endl;
+    std::cerr << "       Call Runtime::initialise first!" << std::endl;
+    std::cerr.flush();
+    Runtime::abort();
+  }
+
   return &_global_property_map;
 }
 
@@ -30,13 +38,26 @@ void Runtime::initialise(int& argc, char**& argv)
 
 void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
 {
+  // Note:
+  // On Windows, these two function calls MUST come before anything else,
+  // otherwise one the following calls may cause the automated regression
+  // test system to halt with an error prompt awaiting user interaction.
+#if defined(_WIN32) && defined(FEAT_TESTING_VC)
+  Windows::disable_error_prompts();
+  Windows::install_seh_filter();
+#endif
+
   if (_initialised)
   {
-    throw InternalError(__func__, __FILE__, __LINE__, "Runtime::initialise called twice!");
+    std::cerr << "ERROR: Runtime::initialise called twice!" << std::endl;
+    std::cerr.flush();
+    Runtime::abort();
   }
   if (_finished)
   {
-    throw InternalError(__func__, __FILE__, __LINE__, "Runtime::initialise called after finalise!");
+    std::cerr << "ERROR: Runtime::initialise called after Runtime::finalise!" << std::endl;
+    std::cerr.flush();
+    Runtime::abort();
   }
 
   // reset rank and nprocs
@@ -67,7 +88,7 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
     }
     else
     {
-      std::cout<<"Warning: feat ini file " << property_file << " not found!"<<std::endl;
+      std::cerr << "WARNING: FEAT ini file " << property_file << " not found!" << std::endl;
     }
   }
 
@@ -90,12 +111,19 @@ void Runtime::initialise(int& argc, char**& argv, int& rank, int& nprocs)
   _initialised = true;
 }
 
-void Runtime::abort()
+void Runtime::abort(bool dump_call_stack)
 {
+  if(dump_call_stack)
+  {
+#ifdef _WIN32
+    Windows::dump_call_stack_to_stderr();
+#endif
+  }
+
 #ifdef FEAT_HAVE_MPI
-  // abort MPI
   ::MPI_Abort(MPI_COMM_WORLD, 1);
 #endif
+
   std::abort();
 }
 
@@ -103,11 +131,15 @@ int Runtime::finalise()
 {
   if (!_initialised)
   {
-    throw InternalError(__func__, __FILE__, __LINE__, "Runtime::finalise called before initialise!");
+    std::cerr << "ERROR: Runtime::finalise called before Runtime::initialise!" << std::endl;
+    std::cerr.flush();
+    Runtime::abort();
   }
   if (_finished)
   {
-    throw InternalError(__func__, __FILE__, __LINE__, "Runtime::finalise called twice!");
+    std::cerr << "ERROR: Runtime::finalise called twice!" << std::endl;
+    std::cerr.flush();
+    Runtime::abort();
   }
 
   MemoryPool<Mem::Main>::finalise();

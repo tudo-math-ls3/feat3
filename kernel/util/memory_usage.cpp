@@ -1,30 +1,9 @@
 #include <kernel/util/memory_usage.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/os_windows.hpp>
 
 #include <fstream>
 #include <vector>
-
-// Note:
-// We cannot include the <Windows.h> and <Psapi.h> headers, as these cannot be
-// compiled with disabled compiler extensions. Therefore, we define the required
-// function prototypes and structures by hand:
-#ifdef _WIN32
-extern "C" void* __stdcall GetCurrentProcess(void);
-extern "C" int __stdcall K32GetProcessMemoryInfo(void*, void*, unsigned long);
-struct PROCESS_MEMORY_COUNTERS
-{
-  unsigned long cb;
-  unsigned long PageFaultCount;
-  std::size_t PeakWorkingSetSize;
-  std::size_t WorkingSetSize;
-  std::size_t QuotaPeakPagedPoolUsage;
-  std::size_t QuotaPagedPoolUsage;
-  std::size_t QuotaPeakNonPagedPoolUsage;
-  std::size_t QuotaNonPagedPoolUsage;
-  std::size_t PagefileUsage;
-  std::size_t PeakPagefileUsage;
-};
-#endif // _WIN32
 
 namespace FEAT
 {
@@ -127,19 +106,16 @@ namespace FEAT
 
 #elif defined(_WIN32)
 
-    // initialise memory counters structure
-    PROCESS_MEMORY_COUNTERS pmc;
-    memset(&pmc, 0, sizeof(PROCESS_MEMORY_COUNTERS));
+    unsigned long long work_set_size(0ull), work_set_size_peak(0ull), page_file_usage(0ull), page_file_usage_peak(0ull);
 
-    // get memory info
-    if(K32GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(PROCESS_MEMORY_COUNTERS)) != 0)
-    {
-      info.current_physical = pmc.WorkingSetSize;
-      info.current_virtual  = pmc.PagefileUsage;
-      info.peak_physical    = pmc.PeakWorkingSetSize;
-      info.peak_virtual     = pmc.PeakPagefileUsage;
-      info.current_swap     = std::size_t(0);
-    }
+    Windows::query_memory_usage(work_set_size, work_set_size_peak, page_file_usage, page_file_usage_peak);
+
+    info.current_physical = std::size_t(work_set_size);
+    info.current_virtual  = std::size_t(page_file_usage);
+    info.peak_physical    = std::size_t(work_set_size_peak);
+    info.peak_virtual     = std::size_t(page_file_usage_peak);
+    info.current_swap     = std::size_t(0);
+
 #endif
 
       return info;
@@ -149,11 +125,11 @@ namespace FEAT
     {
       String r;
       auto m = get_memory_usage();
-      r += String("Current real:").pad_back(17) + stringify(m.current_physical / 1024 / 1024) + " MByte\n";
-      r += String("Peak real:").pad_back(17) + stringify(m.peak_physical / 1024 / 1024) + " MByte\n";
-      r += String("Current virtual:").pad_back(17) + stringify(m.current_virtual / 1024 / 1024) + " MByte\n";
-      r += String("Peak virtual:").pad_back(17) + stringify(m.peak_virtual / 1024 / 1024) + " MByte\n";
-      r += String("Current swap:").pad_back(17) + stringify(m.current_swap / 1024 / 1024) + " MByte\n";
+      r += String("Current real...:") + stringify(m.current_physical / 1024 / 1024) + " MByte\n";
+      r += String("Peak real......:") + stringify(m.peak_physical / 1024 / 1024) + " MByte\n";
+      r += String("Current virtual:") + stringify(m.current_virtual / 1024 / 1024) + " MByte\n";
+      r += String("Peak virtual...:") + stringify(m.peak_virtual / 1024 / 1024) + " MByte\n";
+      r += String("Current swap...:") + stringify(m.current_swap / 1024 / 1024) + " MByte\n";
 
       return r;
     }
