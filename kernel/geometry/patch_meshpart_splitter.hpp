@@ -166,7 +166,7 @@ namespace FEAT
          */
         virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
         {
-          ASSERT(index_set_holder == nullptr, "fill_index_sets: index_set_holder != nullptr!");
+          XASSERT(index_set_holder == nullptr);
 
           // If the base MeshPart has a topology, create one for the patch MeshPart, too
           if(_part_holder.has_topology())
@@ -334,7 +334,7 @@ namespace FEAT
          */
         void fill_target_set(TargetSet& target_out) const
         {
-          ASSERT_(target_out.get_num_entities() == size());
+          XASSERT(target_out.get_num_entities() == size());
           for(Index i(0); i < target_out.get_num_entities(); ++i)
           {
             target_out[i] = _indices[i];
@@ -481,7 +481,7 @@ namespace FEAT
          */
         Index get_num_entities(int dim) const
         {
-          ASSERT_(dim <= dim_);
+          XASSERT(dim <= dim_);
           if(dim == dim_)
             return _patch_map.size();
           else
@@ -592,11 +592,7 @@ namespace FEAT
 
         Index get_num_entities(int dim) const
         {
-#ifdef DEBUG
-          ASSERT_(dim == 0);
-#else
-          (void)dim;
-#endif
+          XASSERT(dim == 0);
           return _patch_map.size();
         }
 

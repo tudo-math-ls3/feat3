@@ -88,7 +88,7 @@ namespace FEAT
           {
             bool okay = idx_map.insert(std::make_pair(trg_set[i], i)).second;
 #if defined DEBUG
-            ASSERT_(okay);
+            ASSERT(okay);
 #else
             (void)okay;
 #endif
@@ -101,7 +101,7 @@ namespace FEAT
           for(Index i(0); i < n; ++i)
           {
             std::map<Index, Index>::const_iterator it(ics.find(trg_in[i]));
-            ASSERT_(it != ics.end());
+            ASSERT(it != ics.end());
             trg_out[i] = it->second;
           }
         }

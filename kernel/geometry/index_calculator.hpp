@@ -112,7 +112,7 @@ namespace FEAT
       /// returns size of the i-th representative set
       Index get_set_size(Index i) const
       {
-        ASSERT_(i < _rep_set_vec.size());
+        XASSERT(i < _rep_set_vec.size());
         return Index(_rep_set_vec.at(i).size());
       }
 
@@ -176,7 +176,7 @@ namespace FEAT
 
         // insert representative
         Index first_index = representative[0];
-        ASSERT(first_index < _rep_set_vec.size(), "index out-of-range");
+        ASSERTM(first_index < _rep_set_vec.size(), "index out-of-range");
 
         representative[0] = id;
         _rep_set_vec[first_index].insert(representative);

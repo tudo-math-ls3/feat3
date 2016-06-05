@@ -39,8 +39,8 @@ namespace FEAT
       public:
         static int map(int cell, int face)
         {
-          ASSERT((0 <= cell) && (cell < 3), "invalid cell index");
-          ASSERT((0 <= face) && (face < 2), "invalid face index");
+          ASSERTM((0 <= cell) && (cell < 3), "invalid cell index");
+          ASSERTM((0 <= face) && (face < 2), "invalid face index");
           static const int indices[3][2] =
           {
             {1, 2},
@@ -57,8 +57,8 @@ namespace FEAT
       public:
         static int map(int cell, int face)
         {
-          ASSERT((0 <= cell) && (cell < 6), "invalid cell index");
-          ASSERT((0 <= face) && (face < 2), "invalid face index");
+          ASSERTM((0 <= cell) && (cell < 6), "invalid cell index");
+          ASSERTM((0 <= face) && (face < 2), "invalid face index");
           static const int indices[6][2] =
           {
             {0, 1},
@@ -78,8 +78,8 @@ namespace FEAT
       public:
         static int map(int cell, int face)
         {
-          ASSERT((0 <= cell) && (cell < 4), "invalid cell index");
-          ASSERT((0 <= face) && (face < 3), "invalid face index");
+          ASSERTM((0 <= cell) && (cell < 4), "invalid cell index");
+          ASSERTM((0 <= face) && (face < 3), "invalid face index");
           static const int indices[4][3] =
           {
             {1, 2, 3},
@@ -97,8 +97,8 @@ namespace FEAT
       public:
         static int map(int cell, int face)
         {
-          ASSERT((0 <= cell) && (cell < 4), "invalid cell index");
-          ASSERT((0 <= face) && (face < 3), "invalid face index");
+          ASSERTM((0 <= cell) && (cell < 4), "invalid cell index");
+          ASSERTM((0 <= face) && (face < 3), "invalid face index");
           static const int indices[4][3] =
           {
             {5, 4, 3},
@@ -116,8 +116,8 @@ namespace FEAT
       public:
         static int map(int cell, int face)
         {
-          ASSERT((0 <= cell) && (cell < 4), "invalid cell index");
-          ASSERT((0 <= face) && (face < 2), "invalid face index");
+          ASSERTM((0 <= cell) && (cell < 4), "invalid cell index");
+          ASSERTM((0 <= face) && (face < 2), "invalid face index");
           static const int indices[4][2] =
           {
             {0, 1},
@@ -135,8 +135,8 @@ namespace FEAT
       public:
         static int map(int cell, int face)
         {
-          ASSERT((0 <= cell) && (cell < 12), "invalid cell index");
-          ASSERT((0 <= face) && (face < 2), "invalid face index");
+          ASSERTM((0 <= cell) && (cell < 12), "invalid cell index");
+          ASSERTM((0 <= face) && (face < 2), "invalid face index");
           static const int indices[12][2] =
           {
             {0, 1},
@@ -162,8 +162,8 @@ namespace FEAT
       public:
         static int map(int cell, int face)
         {
-          ASSERT((0 <= cell) && (cell < 6), "invalid cell index");
-          ASSERT((0 <= face) && (face < 4), "invalid face index");
+          ASSERTM((0 <= cell) && (cell < 6), "invalid cell index");
+          ASSERTM((0 <= face) && (face < 4), "invalid face index");
           static const int indices[6][4] =
           {
             {0, 1, 2, 3},
@@ -183,8 +183,8 @@ namespace FEAT
       public:
         static int map(int cell, int face)
         {
-          ASSERT((0 <= cell) && (cell < 6), "invalid cell index");
-          ASSERT((0 <= face) && (face < 4), "invalid face index");
+          ASSERTM((0 <= cell) && (cell < 6), "invalid cell index");
+          ASSERTM((0 <= face) && (face < 4), "invalid face index");
           static const int indices[6][4] =
           {
             {0, 1,  4,  5},

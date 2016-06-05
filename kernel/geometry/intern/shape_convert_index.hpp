@@ -1395,12 +1395,10 @@ namespace FEAT
           Index num_faces = ShapeConvertIndex<Shape_, cell_dim_>
             ::refine(index_set_out, offset, index_offsets, index_set_holder_in);
 
-#ifdef DEBUG
           // validate number of created indices
           Index num_shapes = index_set_holder_in.template get_index_set<shape_dim_, 0>().get_num_entities();
-          ASSERT(num_faces == (ShapeConvertTraits<OtherShapeType, cell_dim_>::count * num_shapes),
+          XASSERTM(num_faces == (ShapeConvertTraits<OtherShapeType, cell_dim_>::count * num_shapes),
             "ShapeConvertIndex output does not match ShapeConvertTraits prediction");
-#endif // DEBUG
 
           // calculate new offset and return
           return offset + num_faces;
@@ -1436,12 +1434,10 @@ namespace FEAT
           Index num_faces = ShapeConvertIndex<Shape_, cell_dim_>
             ::refine(index_set_out, 0, index_offsets, index_set_holder_in);
 
-#ifdef DEBUG
           // validate number of created indices
           Index num_shapes = index_set_holder_in.template get_index_set<cell_dim_, 0>().get_num_entities();
-          ASSERT(num_faces == (ShapeConvertTraits<OtherShapeType, cell_dim_>::count * num_shapes),
+          XASSERTM(num_faces == (ShapeConvertTraits<OtherShapeType, cell_dim_>::count * num_shapes),
             "ShapeConvertIndex output does not match ShapeConvertTraits prediction");
-#endif // DEBUG
 
           // return offset
           return num_faces;

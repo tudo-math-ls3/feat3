@@ -166,16 +166,16 @@ namespace FEAT
        */
       VertexReference operator[](Index i)
       {
-        ASSERT_(_vertices != nullptr);
-        ASSERT_(i < _num_vertices);
+        ASSERT(_vertices != nullptr);
+        ASSERT(i < _num_vertices);
         return _vertices[i];
       }
 
       /** \copydoc operator[]() */
       ConstVertexReference operator[](Index i) const
       {
-        ASSERT_(_vertices != nullptr);
-        ASSERT_(i < _num_vertices);
+        ASSERT(_vertices != nullptr);
+        ASSERT(i < _num_vertices);
         return _vertices[i];
       }
 

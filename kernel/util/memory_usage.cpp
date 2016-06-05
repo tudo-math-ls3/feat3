@@ -1,5 +1,5 @@
 #include <kernel/util/memory_usage.hpp>
-#include <kernel/util/assertion.hpp>
+#include <kernel/util/exception.hpp>
 #include <kernel/util/os_windows.hpp>
 
 #include <fstream>

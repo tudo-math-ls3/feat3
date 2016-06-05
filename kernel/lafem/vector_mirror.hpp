@@ -446,7 +446,7 @@ namespace FEAT
         const IndexType_ * row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
-        ASSERT_(num_rows + buffer_offset <= buffer.size());
+        XASSERTM(num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
 
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -503,7 +503,7 @@ namespace FEAT
         const IndexType_* row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
-        ASSERT_(num_rows + buffer_offset <= buffer.size());
+        XASSERTM(num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
 
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -561,12 +561,8 @@ namespace FEAT
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 
-        ASSERT_(num_cols + buffer_offset <= buffer.size());
-        ASSERT_(num_rows >= vector.indices()[vector.used_elements()-1]);
-#ifndef DEBUG
-        (void)num_cols;
-        (void)num_rows;
-#endif
+        XASSERTM(num_cols + buffer_offset <= buffer.size(), "buffer vector size mismatch");
+        XASSERTM(num_rows >= vector.indices()[vector.used_elements()-1], "vector size mismatch");
 
         for (Index isparse(0); isparse < vector.used_elements(); ++isparse)
         {
@@ -608,12 +604,8 @@ namespace FEAT
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 
-        ASSERT_(num_cols + buffer_offset <= buffer.size());
-        ASSERT_(num_rows >= vector.indices()[vector.used_elements()-1]);
-#ifndef DEBUG
-        (void)num_cols;
-        (void)num_rows;
-#endif
+        XASSERTM(num_cols + buffer_offset <= buffer.size(), "buffer vector size mismatch");
+        XASSERTM(num_rows >= vector.indices()[vector.used_elements()-1], "vector size mismatch");
 
         for (Index isparse(0); isparse < vector.used_elements(); ++isparse)
         {
@@ -886,7 +878,7 @@ namespace FEAT
         const IndexType* row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
-        ASSERT_(Index(BS_)*num_rows + buffer_offset <= buffer.size());
+        XASSERTM(Index(BS_)*num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
 
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -936,7 +928,7 @@ namespace FEAT
         const IndexType* row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
-        ASSERT_(Index(BS_)*num_rows + buffer_offset <= buffer.size());
+        XASSERTM(Index(BS_)*num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
 
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -983,10 +975,7 @@ namespace FEAT
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 
-        ASSERT_(Index(BS_)*num_cols + buffer_offset <= buffer.size());
-#ifndef DEBUG
-        (void)num_cols;
-#endif
+        XASSERTM(Index(BS_)*num_cols + buffer_offset <= buffer.size(), "buffer vector size mismatch");
 
         // loop over all scatter-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -1041,10 +1030,7 @@ namespace FEAT
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 
-        ASSERT_(Index(BS_)*num_cols + buffer_offset <= buffer.size());
-#ifndef DEBUG
-        (void)num_cols;
-#endif
+        XASSERTM(Index(BS_)*num_cols + buffer_offset <= buffer.size(), "buffer vector size mismatch");
 
         // loop over all scatter-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -1175,7 +1161,7 @@ namespace FEAT
         const IndexType* row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
-        ASSERT_(Index(BS_)*num_rows + buffer_offset <= buffer.size());
+        XASSERTM(Index(BS_)*num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
 
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -1236,7 +1222,7 @@ namespace FEAT
         const IndexType* row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
 
-        ASSERT_(Index(BS_)*num_rows + buffer_offset <= buffer.size());
+        XASSERTM(Index(BS_)*num_rows + buffer_offset <= buffer.size(), "buffer vector size mismatch");
 
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -1296,12 +1282,8 @@ namespace FEAT
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 
-        ASSERT_(Index(BS_)*num_cols + buffer_offset <= buffer.size());
-        ASSERT_(num_rows >= vector.indices()[vector.used_elements()-1]);
-#ifndef DEBUG
-        (void)num_cols;
-        (void)num_rows;
-#endif
+        XASSERTM(Index(BS_)*num_cols + buffer_offset <= buffer.size(), "buffer vector size mismatch");
+        XASSERTM(num_rows >= vector.indices()[vector.used_elements()-1], "vector size mismatch");
 
         for (Index isparse(0) ; isparse < vector.used_elements(); ++isparse)
         {
@@ -1343,12 +1325,8 @@ namespace FEAT
         const Index num_rows(_mirror_scatter.rows());
         const Index num_cols(_mirror_scatter.columns());
 
-        ASSERT_(Index(BS_)*num_cols + buffer_offset <= buffer.size());
-        ASSERT_(num_rows >= vector.indices()[vector.used_elements()-1]);
-#ifndef DEBUG
-        (void)num_cols;
-        (void)num_rows;
-#endif
+        XASSERTM(Index(BS_)*num_cols + buffer_offset <= buffer.size(), "buffer vector size mismatch");
+        XASSERTM(num_rows >= vector.indices()[vector.used_elements()-1], "vector size mismatch");
 
         for(Index isparse(0) ; isparse < vector.used_elements() ; ++isparse)
         {

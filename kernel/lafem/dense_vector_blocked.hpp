@@ -207,7 +207,7 @@ namespace FEAT
       explicit DenseVectorBlocked(Index size_in, bool pinned_allocation = false) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        ASSERT(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Error: Pinned memory allocation only possible in main memory!");
+        XASSERTM(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
 
         this->_scalar_index.push_back(0);
 
@@ -429,7 +429,7 @@ namespace FEAT
       template <typename Mem2_, typename DT2_, typename IT2_>
       void convert(const DenseVector<Mem2_, DT2_, IT2_> & other)
       {
-        ASSERT(other.size() % Index(BlockSize_) == 0, "Error: DenseVector cannot be partionated with given blocksize!");
+        XASSERTM(other.size() % Index(BlockSize_) == 0, "DenseVector cannot be converted to given blocksize!");
 
         this->clear();
 
@@ -526,7 +526,7 @@ namespace FEAT
        */
       const Tiny::Vector<DT_, BlockSize_> operator()(Index index) const
       {
-        ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector blocked size " + stringify(this->size()) + " !");
+        ASSERT(index < this->size());
         Tiny::Vector<DT_, BlockSize_> t;
         MemoryPool<Mem_>::download(t.v, this->_elements.at(0) + index * Index(BlockSize_), Index(BlockSize_));
         return t;
@@ -540,7 +540,7 @@ namespace FEAT
        */
       void operator()(Index index, const Tiny::Vector<DT_, BlockSize_> & value)
       {
-        ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector blocked size " + stringify(this->size()) + " !");
+        ASSERT(index < this->size());
         MemoryPool<Mem_>::upload(this->_elements.at(0) + index * Index(BlockSize_), value.v, Index(BlockSize_));
       }
 

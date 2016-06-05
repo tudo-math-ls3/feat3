@@ -269,7 +269,7 @@ namespace FEAT
       template<typename Space_, typename T_>
       void write_values(String name, const Space_& space, const T_* data)
       {
-        ASSERT_(data != nullptr);
+        XASSERT(data != nullptr);
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
         static_assert(*(SpaceEval::eval_caps & SpaceTags::value), "space cannot evalute basis function values!");
@@ -350,7 +350,7 @@ namespace FEAT
       template<typename Space_, typename T_>
       void write_gradients(String name, const Space_& space, const T_* data)
       {
-        ASSERT_(data != nullptr);
+        XASSERT(data != nullptr);
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
         static_assert(*(SpaceEval::eval_caps & SpaceTags::grad), "space cannot evalute basis function gradients!");
@@ -439,7 +439,7 @@ namespace FEAT
       template<typename Space_, typename T_>
       void write_hessians(String name, const Space_& space, const T_* data)
       {
-        ASSERT_(data != nullptr);
+        XASSERT(data != nullptr);
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
         static_assert(*(SpaceEval::eval_caps & SpaceTags::hess), "space cannot evalute basis function hessians!");

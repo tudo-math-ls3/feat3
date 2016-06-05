@@ -31,8 +31,8 @@ namespace FEAT
       PointstarFactoryBase(Index m, Index d) :
         _m(m), _d(d)
       {
-        ASSERT(m >= Index(3), "You need at least 3 inner nodes per dimension");
-        ASSERT(d >= Index(1), "You need at least 1 dimension");
+        XASSERTM(m >= Index(3), "You need at least 3 inner nodes per dimension");
+        XASSERTM(d >= Index(1), "You need at least 1 dimension");
       }
 
       virtual ~PointstarFactoryBase() {}
@@ -701,12 +701,12 @@ namespace FEAT
         _dimensions(dimensions),
         _d(Index(_dimensions.size()))
       {
-        ASSERT(_d >= Index(1), "You need at least 1 dimension");
-        ASSERT(_d + 1 == _num_of_subintervalls.size(), "Vector-sizes do not match (n_1 = n_2 + 1)!");
+        XASSERTM(_d >= Index(1), "You need at least 1 dimension");
+        XASSERTM(_d + 1 == _num_of_subintervalls.size(), "Vector-sizes do not match (n_1 = n_2 + 1)!");
 
         for (Index i(1); i <= _d; ++i)
         {
-          ASSERT(_num_of_subintervalls[i] >= Index(4), "You need at least 4 subintervalls per dimension");
+          XASSERTM(_num_of_subintervalls[i] >= Index(4), "You need at least 4 subintervalls per dimension");
         }
       }
 

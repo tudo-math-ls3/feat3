@@ -288,7 +288,7 @@ namespace FEAT
        */
       const Tiny::Vector<DT_, BlockSize_> operator()(Index index) const
       {
-        ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds sparse vector size " + stringify(this->_scalar_index.at(0)) + " !");
+        ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
 
         if (this->_elements.size() == 0)
           return zero_element();
@@ -323,7 +323,7 @@ namespace FEAT
        */
       void operator()(Index index, const Tiny::Vector<DT_, BlockSize_>& val)
       {
-        ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds sparse vector size " + stringify(this->_scalar_index.at(0)) + " !");
+        ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
 
         // flag container as not sorted anymore
         // CAUTION: do not use any method triggering resorting until we are finished

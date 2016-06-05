@@ -196,10 +196,10 @@ namespace FEAT
          */
         virtual void init() override
         {
-          ASSERT_(_trafo != nullptr);
-          ASSERT_(_trafo_space != nullptr);
-          ASSERT_(_dirichlet_asm != nullptr);
-          ASSERT_(_slip_asm != nullptr);
+          XASSERT(_trafo != nullptr);
+          XASSERT(_trafo_space != nullptr);
+          XASSERT(_dirichlet_asm != nullptr);
+          XASSERT(_slip_asm != nullptr);
           Assembly::SymbolicAssembler::assemble_matrix_std1(sys_matrix, *_trafo_space);
         }
 
@@ -216,7 +216,7 @@ namespace FEAT
 
         virtual void assemble_system_matrix()
         {
-          ASSERT_(_trafo_space != nullptr);
+          XASSERT(_trafo_space != nullptr);
 
           sys_matrix.format();
 
@@ -241,8 +241,8 @@ namespace FEAT
         {
           auto& dirichlet_filters = filter.template at<1>();
 
-          ASSERT_(_dirichlet_asm != nullptr);
-          ASSERT_(_slip_asm != nullptr);
+          XASSERT(_dirichlet_asm != nullptr);
+          XASSERT(_slip_asm != nullptr);
 
           for(auto& it : dirichlet_filters)
           {

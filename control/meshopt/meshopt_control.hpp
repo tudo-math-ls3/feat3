@@ -622,7 +622,7 @@ namespace FEAT
           template<typename SystemLevel_>
           typename SystemLevel_::GlobalSystemVectorL assemble_rhs_vector(SystemLevel_& sys_level)
           {
-            ASSERT(!(*sys_level.op_sys).empty(), "assemble_rhs_vector for empty operator");
+            XASSERTM(!(*sys_level.op_sys).empty(), "assemble_rhs_vector for empty operator");
             // create new vector
             typename SystemLevel_::GlobalSystemVectorL vec_rhs = sys_level.op_sys.create_vector_l();
 
@@ -639,7 +639,7 @@ namespace FEAT
           template<typename SystemLevel_>
           typename SystemLevel_::GlobalSystemVectorR assemble_sol_vector(SystemLevel_& sys_level)
           {
-            ASSERT(!(*sys_level.op_sys).empty(), "assemble_sol_vector for empty operator");
+            XASSERTM(!(*sys_level.op_sys).empty(), "assemble_sol_vector for empty operator");
             typename SystemLevel_::GlobalSystemVectorR vec_sol(sys_level.coords_buffer.clone());
 
             return vec_sol;

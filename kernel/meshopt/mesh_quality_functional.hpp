@@ -109,14 +109,14 @@ namespace FEAT
         /// \returns The root mesh
         MeshType* get_mesh()
         {
-          ASSERT_(_mesh_node != nullptr);
+          XASSERT(_mesh_node != nullptr);
           return _mesh_node->get_mesh();
         }
 
         /// \returns The root mesh as const pointer
         const MeshType* get_mesh() const
         {
-          ASSERT_(_mesh_node != nullptr);
+          XASSERT(_mesh_node != nullptr);
           return _mesh_node->get_mesh();
         }
 

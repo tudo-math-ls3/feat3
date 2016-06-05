@@ -9,6 +9,8 @@
 #include <kernel/util/math.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
+#include <iostream>
+
 namespace FEAT
 {
   namespace LAFEM

@@ -44,11 +44,11 @@ namespace FEAT
         const Index d(Index(num_of_subintervalls.size()));
 
         // output of errors if wrong input
-        ASSERT(d >= IndexType_(1), "You need at least 1 dimension");
+        XASSERTM(d >= IndexType_(1), "You need at least 1 dimension");
 
         for (IndexType_ i(0); i < d; ++i)
         {
-          ASSERT(pnos[i] >= IndexType_(3), "You need at least 3 subintervalls per dimension");
+          XASSERTM(pnos[i] >= IndexType_(3), "You need at least 3 subintervalls per dimension");
         }
 
         // calculate size of matrix and number of offsets

@@ -161,8 +161,8 @@ namespace FEAT
        */
       Index operator()(Index i, Index j) const
       {
-        ASSERT_(i < Index(_num_entities));
-        ASSERT_(j < Index(num_indices));
+        ASSERT(i < Index(_num_entities));
+        ASSERT(j < Index(num_indices));
         return Intern::StructIndexMapping<shape_dim_, cell_dim_, face_dim_>::compute(i, j, _num_slices);
       }
 
@@ -184,14 +184,14 @@ namespace FEAT
       /** \copydoc Adjacency::Adjactor::image_begin() */
       ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT_(domain_node < Index(_num_entities));
+        ASSERT(domain_node < Index(_num_entities));
         return ImageIterator(_num_slices, domain_node, 0);
       }
 
       /** \copydoc Adjacency::Adjactor::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
-        ASSERT_(domain_node < Index(_num_entities));
+        ASSERT(domain_node < Index(_num_entities));
         return ImageIterator(_num_slices, domain_node, num_indices);
       }
     }; // class StructIndexSet<...>

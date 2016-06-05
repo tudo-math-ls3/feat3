@@ -4,6 +4,7 @@
 
 // includes, FEAT
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/string.hpp>
 
 // includes, system
 #include <utility> // for std::move
@@ -157,29 +158,29 @@ namespace FEAT
 
         WeightType& get_weight(int i)
         {
-          ASSERT_(_weights != nullptr);
-          ASSERT(i < _num_points, "index out-of-range");
+          ASSERT(_weights != nullptr);
+          ASSERTM(i < _num_points, "weight index out-of-range");
           return _weights[i];
         }
 
         const WeightType& get_weight(int i) const
         {
-          ASSERT_(_weights != nullptr);
-          ASSERT(i < _num_points, "index out-of-range");
+          ASSERT(_weights != nullptr);
+          ASSERTM(i < _num_points, "weight index out-of-range");
           return _weights[i];
         }
 
         CoordType& get_coord(int i)
         {
-          ASSERT_(_coords != nullptr);
-          ASSERT(i < _num_points, "index out-of-range");
+          ASSERT(_coords != nullptr);
+          ASSERTM(i < _num_points, "point index out-of-range");
           return _coords[i];
         }
 
         const CoordType& get_coord(int i) const
         {
-          ASSERT_(_coords != nullptr);
-          ASSERT(i < _num_points, "index out-of-range");
+          ASSERT(_coords != nullptr);
+          ASSERTM(i < _num_points, "point index out-of-range");
           return _coords[i];
         }
       }; // class Rule<...>

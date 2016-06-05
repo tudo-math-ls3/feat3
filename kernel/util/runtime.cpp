@@ -26,7 +26,6 @@ PropertyMap * Runtime::global_property()
     std::cerr.flush();
     Runtime::abort();
   }
-
   return &_global_property_map;
 }
 

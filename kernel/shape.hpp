@@ -5,6 +5,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/meta_math.hpp>
+#include <kernel/util/string.hpp>
 
 namespace FEAT
 {
@@ -304,8 +305,8 @@ namespace FEAT
        */
       static int orientation(int facet_index)
       {
-        ASSERT((facet_index >= 0), "facet index "+stringify(facet_index)+" out of range!");
-        ASSERT((facet_index < FaceTraits<Simplex<dim_>,dim_-1>::count), "facet index "+stringify(facet_index)+" out of range!");
+        ASSERTM((facet_index >= 0), "facet index out of range!");
+        ASSERTM((facet_index < FaceTraits<Simplex<dim_>,dim_-1>::count), "facet index out of range!");
 #ifndef DEBUG
         (void) facet_index;
 #endif
@@ -343,11 +344,10 @@ namespace FEAT
        */
       static int orientation(int facet_index)
       {
-        ASSERT((facet_index >= 0), "facet index "+stringify(facet_index)+" out of range!");
-        ASSERT((facet_index < FaceTraits<Hypercube<dim_>,dim_-1>::count), "facet index "+stringify(facet_index)+" out of range!");
+        ASSERTM((facet_index >= 0), "facet index out of range!");
+        ASSERTM((facet_index < FaceTraits<Hypercube<dim_>,dim_-1>::count), "facet index out of range!");
 
         return 1 - (( ((facet_index >> 1) ^ facet_index ^ dim_) & 1 ) << 1);
-
       }
     };
 

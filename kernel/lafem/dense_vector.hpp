@@ -92,7 +92,7 @@ namespace FEAT
             {
               // get dof index
               Index dof_idx = mapping.get_index(i, ic);
-              ASSERT_(dof_idx < _num_entries);
+              ASSERT(dof_idx < _num_entries);
 
               // update vector data
               _data[dof_idx] += DT_(mapping.get_weight(i, ic)) * dx;
@@ -139,7 +139,7 @@ namespace FEAT
             {
               // get dof index
               Index dof_idx = mapping.get_index(i, ic);
-              ASSERT_(dof_idx < _num_entries);
+              ASSERT(dof_idx < _num_entries);
 
               // update accumulator
               dx += DT_(mapping.get_weight(i, ic)) * _data[dof_idx];
@@ -246,7 +246,7 @@ namespace FEAT
       explicit DenseVector(Index size_in, bool pinned_allocation = false) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        ASSERT(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Error: Pinned memory allocation only possible in main memory!");
+        XASSERTM(! (pinned_allocation && (typeid(Mem_) != typeid(Mem::Main))), "Pinned memory allocation only possible in main memory!");
 
         this->_scalar_index.push_back(0);
 
@@ -322,7 +322,7 @@ namespace FEAT
       explicit DenseVector(const DenseVector & dv_in, Index size_in, Index offset_in) :
         Container<Mem_, DT_, IT_>(size_in)
       {
-        ASSERT(size_in + offset_in <= dv_in.size(), "Ranged vector part exceeds orig vector size!");
+        XASSERTM(size_in + offset_in <= dv_in.size(), "Ranged vector part exceeds original vector size!");
 
         this->_scalar_index.push_back(1);
         DT_ * te(const_cast<DT_*>(dv_in.elements()));
@@ -948,7 +948,7 @@ namespace FEAT
        */
       const DT_ operator()(Index index) const
       {
-        ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->size()) + " !");
+        ASSERT(index < this->size());
         return MemoryPool<Mem_>::get_element(this->_elements.at(0), index);
       }
 
@@ -960,7 +960,7 @@ namespace FEAT
        */
       void operator()(Index index, DT_ value)
       {
-        ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->size()) + " !");
+        ASSERT(index < this->size());
         MemoryPool<Mem_>::set_memory(this->_elements.at(0) + index, value);
       }
 
@@ -1206,7 +1206,7 @@ namespace FEAT
         if (perm.size() == 0)
           return;
 
-        ASSERT(perm.size() == this->size(), "Error: Container size " + stringify(this->size()) + " does not match permutation size " + stringify(perm.size()) + " !");
+        XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
 
         DenseVector<Mem::Main, DT_, IT_> local;
         local.convert(*this);

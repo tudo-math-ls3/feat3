@@ -91,7 +91,7 @@ namespace FEAT
           CoordType a1 = Math::acos( - Tiny::dot(v3,v1)/(n3*n1));
           CoordType a2 = Math::acos( Tiny::dot(v3,v2)/(n3*n2));
 
-          ASSERT_(Math::abs(a0+a1+a2-Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
+          ASSERT(Math::abs(a0+a1+a2-Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
 
           angle = Math::min(angle,Math::min(a2,Math::min(a0,a1)));
         }
@@ -187,7 +187,7 @@ namespace FEAT
           CoordType a3 = Math::acos( Tiny::dot(v3,v1)/(h3*h1));
           worst_angle = Math::min(worst_angle, Math::abs(a3));
 
-          ASSERT_(Math::abs(a0+a1+a2+a3-CoordType(2)*Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
+          ASSERT(Math::abs(a0+a1+a2+a3-CoordType(2)*Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
         }
         return worst_angle*(CoordType(360))/(CoordType(2)*Math::pi<CoordType>());
       }
@@ -249,7 +249,7 @@ namespace FEAT
           angle = Math::min(angle, Math::abs(a3));
           gamma = Math::max(gamma,  Tiny::dot(v3,v1)/(h3*h1));
 
-          ASSERT_(Math::abs(a0+a1+a2+a3-CoordType(2)*Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
+          ASSERT(Math::abs(a0+a1+a2+a3-CoordType(2)*Math::pi<CoordType>()) < Math::sqrt(Math::eps<CoordType>()));
 
           quality = Math::min(quality, h_min/h_max*Math::sqrt(CoordType(1)-gamma ));
 

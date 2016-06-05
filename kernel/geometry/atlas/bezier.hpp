@@ -71,7 +71,7 @@ namespace FEAT
          */
         WorldPoint map_on_segment(const Index i, const DataType t) const
         {
-          ASSERT_((i+1) < Index(this->_world.size()));
+          ASSERT((i+1) < Index(this->_world.size()));
 
           // compute normalised interpolation factor
           const DataType s = DataType(1) - t;
@@ -107,7 +107,7 @@ namespace FEAT
          */
         DataType project_on_segment(const Index i, const WorldPoint& point) const
         {
-          ASSERT_((i+1) < Index(this->_world.size()));
+          ASSERT((i+1) < Index(this->_world.size()));
 
           // references to the four Bezier points
           const WorldPoint& p0 = this->_world[i];

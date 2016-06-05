@@ -155,8 +155,8 @@ namespace FEAT
       explicit DriverFactory(int num_points) :
         _num_points(num_points)
       {
-        ASSERT_(num_points >= DriverType::min_points);
-        ASSERT_(num_points <= DriverType::max_points);
+        XASSERT(num_points >= DriverType::min_points);
+        XASSERT(num_points <= DriverType::max_points);
       }
 
       /**

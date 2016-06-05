@@ -293,8 +293,8 @@ namespace FEAT
          */
         Index get_num_entities(int dim) const
         {
-          ASSERT_(dim >= 0);
-          ASSERT_(dim <= shape_dim);
+          XASSERT(dim >= 0);
+          XASSERT(dim <= shape_dim);
           return _num_entities[dim];
         }
 
@@ -388,7 +388,7 @@ namespace FEAT
         template<int cell_dim_, int face_dim_>
         const typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set() const
         {
-          ASSERT(has_topology(), "Requested index_set of MeshPart without topology!");
+          XASSERTM(has_topology(), "Requested index_set of MeshPart without topology!");
           return _index_set_holder->template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
         }
 
@@ -740,7 +740,6 @@ namespace FEAT
                 throw InternalError(__func__,__FILE__,__LINE__,"Error refining attribute "+it->first);
             }
           }
-
         }
 
         /**
@@ -751,7 +750,7 @@ namespace FEAT
          */
         virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
         {
-          ASSERT(index_set_holder == nullptr, "fill_index_sets: index_set_holder != nullptr!");
+          XASSERT(index_set_holder == nullptr);
 
           // Only create the topology for the refined mesh if the coarse mesh has a topology
           if(_coarse_mesh.has_topology())

@@ -2802,12 +2802,10 @@ namespace FEAT
           Index num_faces = StandardIndexRefiner<Shape_, cell_dim_, face_dim_>
             ::refine(index_set_out, offset, index_offsets, index_set_holder_in);
 
-#ifdef DEBUG
           // validate number of created indices
           Index num_shapes = index_set_holder_in.template get_index_set<shape_dim_, 0>().get_num_entities();
-          ASSERT(num_faces == (StandardRefinementTraits<ShapeType, cell_dim_>::count * num_shapes),
+          XASSERTM(num_faces == (StandardRefinementTraits<ShapeType, cell_dim_>::count * num_shapes),
             "IndexRefiner output does not match StdRefTraits prediction");
-#endif // DEBUG
 
           // calculate new offset and return
           return offset + num_faces;
@@ -2844,12 +2842,10 @@ namespace FEAT
           Index num_faces = StandardIndexRefiner<Shape_, cell_dim_, face_dim_>
             ::refine(index_set_out, 0, index_offsets, index_set_holder_in);
 
-#ifdef DEBUG
           // validate number of created indices
           Index num_shapes = index_set_holder_in.template get_index_set<cell_dim_, 0>().get_num_entities();
-          ASSERT(num_faces == (StandardRefinementTraits<ShapeType, cell_dim_>::count * num_shapes),
+          XASSERTM(num_faces == (StandardRefinementTraits<ShapeType, cell_dim_>::count * num_shapes),
             "IndexRefiner output does not match StdRefTraits prediction");
-#endif // DEBUG
 
           // return offset
           return num_faces;

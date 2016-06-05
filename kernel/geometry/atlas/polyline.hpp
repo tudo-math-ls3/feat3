@@ -63,8 +63,8 @@ namespace FEAT
           this->_param = param;
 
           // we need at least 2 points
-          ASSERT_(this->_world.size() > std::size_t(1));
-          ASSERT_(this->_param.empty() || (this->_param.size() == this->_world.size()));
+          XASSERTM(this->_world.size() > std::size_t(1), "Polyline needs at least 2 points");
+          XASSERTM(this->_param.empty() || (this->_param.size() == this->_world.size()), "Polyline world/param size mismatch");
         }
 
         /**
@@ -78,7 +78,7 @@ namespace FEAT
          */
         WorldPoint map_on_segment(const Index i, const DataType t) const
         {
-          ASSERT_((i+1) < Index(this->_world.size()));
+          ASSERT((i+1) < Index(this->_world.size()));
           return ((DataType(1) - t) * this->_world[i]) + (t * this->_world[i+1]);
         }
 
@@ -96,7 +96,7 @@ namespace FEAT
          */
         DataType project_on_segment(const Index i, const WorldPoint& point) const
         {
-          ASSERT_((i+1) < Index(this->_world.size()));
+          ASSERT((i+1) < Index(this->_world.size()));
 
           // get the ends of the line segment
           const WorldPoint& x0 = this->_world.at(i);

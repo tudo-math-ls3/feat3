@@ -222,8 +222,8 @@ namespace FEAT
 
     void Graph::sort_indices()
     {
-      ASSERT_(_domain_ptr != nullptr);
-      ASSERT_(_image_idx != nullptr);
+      XASSERTM(_domain_ptr != nullptr, "domain pointer array is missing");
+      XASSERTM(_image_idx != nullptr, "image index array is missing");
 
       // fetch row-end pointer
       Index* domain_end = _domain_end != nullptr ? _domain_end : &_domain_ptr[1];

@@ -42,7 +42,7 @@ namespace FEAT
           Index num_cells(facet_idx.get_num_entities());
           Index num_facets(facet_idx.get_index_bound());
 
-          ASSERT(neighbours.get_num_entities() == num_cells, "neighbours.get_num_entitities() = "+stringify(neighbours.get_num_entities())+ " != " +stringify(num_cells) + " = num_cells");
+          XASSERT(neighbours.get_num_entities() == num_cells);
 
           // A facet is shared by exactly 2 cells if it is interiour, and is present in exactly one cell if it is at
           // the boundary

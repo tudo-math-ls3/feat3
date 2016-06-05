@@ -197,16 +197,16 @@ namespace FEAT
        */
       IndexVectorReference operator[](Index i)
       {
-        ASSERT_(_indices != nullptr);
-        ASSERT_(i < _num_entities);
+        ASSERT(_indices != nullptr);
+        ASSERT(i < _num_entities);
         return _indices[i];
       }
 
       /** \copydoc operator[]() */
       ConstIndexVectorReference operator[](Index i) const
       {
-        ASSERT_(_indices != nullptr);
-        ASSERT_(i < _num_entities);
+        ASSERT(_indices != nullptr);
+        ASSERT(i < _num_entities);
         return _indices[i];
       }
 
@@ -224,9 +224,9 @@ namespace FEAT
        */
       Index& operator()(Index i, Index j)
       {
-        ASSERT_(_indices != nullptr);
-        ASSERT_(i < _num_entities);
-        ASSERT_(j < Index(num_indices));
+        ASSERT(_indices != nullptr);
+        ASSERT(i < _num_entities);
+        ASSERT(j < Index(num_indices));
         return _indices[i][j];
       }
 
@@ -245,9 +245,9 @@ namespace FEAT
        */
       const Index& operator()(Index i, Index j) const
       {
-        ASSERT_(_indices != nullptr);
-        ASSERT_(i < _num_entities);
-        ASSERT_(j < Index(num_indices));
+        ASSERT(_indices != nullptr);
+        ASSERT(i < _num_entities);
+        ASSERT(j < Index(num_indices));
         return _indices[i][j];
       }
 
@@ -290,16 +290,16 @@ namespace FEAT
       /** \copydoc Adjacency::Adjactor::image_begin() */
       ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT_(_indices != nullptr);
-        ASSERT_(domain_node < _num_entities);
+        ASSERT(_indices != nullptr);
+        ASSERT(domain_node < _num_entities);
         return &_indices[domain_node][0];
       }
 
       /** \copydoc Adjacency::Adjactor::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
-        ASSERT_(_indices != nullptr);
-        ASSERT_(domain_node < _num_entities);
+        ASSERT(_indices != nullptr);
+        ASSERT(domain_node < _num_entities);
         return &_indices[domain_node][num_indices];
       }
     }; // class IndexSet<...>

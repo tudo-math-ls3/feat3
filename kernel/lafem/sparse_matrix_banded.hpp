@@ -169,10 +169,8 @@ namespace FEAT
                   // fetch column index
                   Index jx = col_map.get_index(j, jc);
 
-#ifdef DEBUG
                   // ensure that the column pointer is valid for this index
-                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
-#endif
+                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
                   // incorporate data into global matrix
                   _data[_col_ptr[jx]] += (iw * jw) * loc_mat[i][j];
@@ -287,10 +285,8 @@ namespace FEAT
                   // fetch column index
                   Index jx = col_map.get_index(j, jc);
 
-#ifdef DEBUG
                   // ensure that the column pointer is valid for this index
-                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
-#endif
+                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
                   // update accumulator
                   dx += DT_(col_map.get_weight(j, jc)) * _data[_col_ptr[jx]];
@@ -744,8 +740,8 @@ namespace FEAT
        */
       DT_ operator()(Index row, Index col) const
       {
-        ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix banded row size " + stringify(rows()) + " !");
-        ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix banded column size " + stringify(columns()) + " !");
+        ASSERT(row < rows());
+        ASSERT(col < columns());
 
         const Index trows(this->_scalar_index.at(1));
 
@@ -1045,8 +1041,8 @@ namespace FEAT
       /// \copydoc extract_diag()
       void extract_diag(VectorTypeL & diag) const
       {
-        ASSERT(diag.size() == rows(), "Error: diag size does not match matrix row count!");
-        ASSERT(rows() == columns(), "Error: matrix is not square!");
+        XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
+        XASSERTM(rows() == columns(), "matrix is not square!");
 
         for (Index i(0) ; i < num_of_offsets() ; ++i)
         {
@@ -1204,7 +1200,7 @@ namespace FEAT
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT(domain_node < rows(), "Domain node index out of range");
+        XASSERT(domain_node < rows());
 
         const IT_ * toffsets(offsets());
         const IT_ tnum_of_offsets(num_of_offsets());
@@ -1220,7 +1216,7 @@ namespace FEAT
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        ASSERT(domain_node < rows(), "Domain node index out of range");
+        XASSERT(domain_node < rows());
 
         const IT_ * toffsets(offsets());
         const IT_ tnum_of_offsets(num_of_offsets());

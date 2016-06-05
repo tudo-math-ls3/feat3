@@ -149,10 +149,8 @@ namespace FEAT
                   // fetch column index
                   Index jx = col_map.get_index(j, jc);
 
-#ifdef DEBUG
                   // ensure that the column pointer is valid for this index
-                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
-#endif
+                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
                   // incorporate data into global matrix
                   _data[_col_ptr[jx]] += (iw * jw) * loc_mat[i][j];
@@ -261,10 +259,8 @@ namespace FEAT
                   // fetch column index
                   Index jx = col_map.get_index(j, jc);
 
-#ifdef DEBUG
                   // ensure that the column pointer is valid for this index
-                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
-#endif
+                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
                   // update accumulator
                   dx += DT_(col_map.get_weight(j, jc)) * _data[_col_ptr[jx]];
@@ -1419,8 +1415,8 @@ namespace FEAT
        */
       DT_ operator()(Index row, Index col) const
       {
-        ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(rows()) + " !");
-        ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(columns()) + " !");
+        ASSERT(row < rows());
+        ASSERT(col < columns());
 
         for (Index i(Index(MemoryPool<Mem_>::get_element(this->_indices.at(1), row))) ; i < Index(MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1)) ; ++i)
         {
@@ -2201,8 +2197,8 @@ namespace FEAT
       /// \copydoc extract_diag()
       void extract_diag(VectorTypeL & diag) const
       {
-        ASSERT(diag.size() == rows(), "Error: diag size does not match matrix row count!");
-        ASSERT(rows() == columns(), "Error: matrix is not square!");
+        XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
+        XASSERTM(rows() == columns(), "matrix is not square!");
 
         Arch::Diagonal<Mem_>::csr(diag.elements(), val(), col_ind(), row_ptr(), rows());
       }
@@ -2221,8 +2217,8 @@ namespace FEAT
         if (perm_row.size() == 0 && perm_col.size() == 0)
           return;
 
-        ASSERT(perm_row.size() == this->rows(), "Error: Container rows " + stringify(this->rows()) + " does not match permutation size " + stringify(perm_row.size()) + " !");
-        ASSERT(perm_col.size() == this->columns(), "Error: Container columns " + stringify(this->columns()) + " does not match permutation size " + stringify(perm_col.size()) + " !");
+        XASSERTM(perm_row.size() == this->rows(), "Container rows does not match permutation size");
+        XASSERTM(perm_col.size() == this->columns(), "Container columns does not match permutation size");
 
         // http://de.mathworks.com/help/matlab/math/sparse-matrix-operations.html#f6-13070
         SparseMatrixCSR<Mem::Main, DT_, IT_> local;
@@ -2352,14 +2348,14 @@ namespace FEAT
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT(domain_node < rows(), "Domain node index out of range");
+        XASSERTM(domain_node < rows(), "Domain node index out of range");
         return &this->_indices.at(0)[this->_indices.at(1)[domain_node]];
       }
 
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        ASSERT(domain_node < rows(), "Domain node index out of range");
+        XASSERTM(domain_node < rows(), "Domain node index out of range");
         return &this->_indices.at(0)[this->_indices.at(1)[domain_node + 1]];
       }
 

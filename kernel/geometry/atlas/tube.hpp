@@ -80,7 +80,7 @@ namespace FEAT
           DataType radius) :
           _radius(radius)
         {
-          ASSERT_(radius > DataType(0));
+          XASSERTM(radius > DataType(0), "invalid Tube radius");
           _midpoint[0] = mid_x;
           _midpoint[1] = mid_y;
           _midpoint[2] = mid_z;

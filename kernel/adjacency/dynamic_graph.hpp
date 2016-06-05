@@ -192,7 +192,7 @@ namespace FEAT
        */
       Index degree(Index domain_node) const
       {
-        ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
         return Index(_indices[domain_node].size());
       }
 
@@ -244,8 +244,8 @@ namespace FEAT
        */
       bool exists(Index domain_node, Index image_node) const
       {
-        ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
-        ASSERT(image_node < _num_nodes_image, "Image node index out of range");
+        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(image_node < _num_nodes_image, "Image node index out of range");
         return _indices[domain_node].find(image_node) != _indices[domain_node].end();
       }
 
@@ -263,8 +263,8 @@ namespace FEAT
        */
       bool insert(Index domain_node, Index image_node)
       {
-        ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
-        ASSERT(image_node < _num_nodes_image, "Image node index out of range");
+        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(image_node < _num_nodes_image, "Image node index out of range");
         return _indices[domain_node].insert(image_node).second;
       }
 
@@ -282,8 +282,8 @@ namespace FEAT
        */
       bool erase(Index domain_node, Index image_node)
       {
-        ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
-        ASSERT(image_node < _num_nodes_image, "Image node index out of range");
+        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(image_node < _num_nodes_image, "Image node index out of range");
         // note: std::set.erase() returns the number of deleted elements
         return _indices[domain_node].erase(image_node) > 0;
       }
@@ -400,7 +400,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor1_::ImageIterator AImIt1;
         typedef typename Adjactor2_::ImageIterator AImIt2;
@@ -435,7 +435,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor1_::ImageIterator AImIt1;
         typedef typename Adjactor2_::ImageIterator AImIt2;
@@ -482,14 +482,14 @@ namespace FEAT
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
         return _indices[domain_node].begin();
       }
 
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
         return _indices[domain_node].end();
       }
     }; // class DynamicGraph

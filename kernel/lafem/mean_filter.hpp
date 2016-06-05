@@ -52,7 +52,7 @@ namespace FEAT
         _vec_dual(std::forward<VectorType>(vec_dual)),
         _volume(_vec_prim.dot(_vec_dual))
       {
-        ASSERT(_volume > Math::eps<DataType>(), "domain volume must not be zero");
+        XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
       }
 
       /**
@@ -69,7 +69,7 @@ namespace FEAT
         _vec_dual(std::forward<VectorType>(vec_dual)),
         _volume(volume)
       {
-        ASSERT(_volume > Math::eps<DataType>(), "domain volume must not be zero");
+        XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
       }
 
       /// move ctor

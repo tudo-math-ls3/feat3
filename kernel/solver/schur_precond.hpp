@@ -152,8 +152,8 @@ namespace FEAT
         _schur_type(type),
         _auto_init_s(auto_init_s)
       {
-        ASSERT_(solver_a != nullptr);
-        ASSERT_(solver_s != nullptr);
+        XASSERTM(solver_a != nullptr, "A-solver must be given");
+        XASSERTM(solver_s != nullptr, "S-solver must be given");
       }
 
       virtual ~SchurPrecond()

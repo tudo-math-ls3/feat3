@@ -98,12 +98,12 @@ namespace FEAT
         _vertex_set(Intern::StructNumEntities<shape_dim_, 0>::compute(num_slices)),
         _index_set_holder(num_slices)
       {
-        ASSERT_(num_slices != nullptr);
+        XASSERT(num_slices != nullptr);
 
         // store slice counts
         for(int i(0); i < shape_dim; ++i)
         {
-          ASSERT_(num_slices[i] > 0);
+          XASSERT(num_slices[i] > 0);
           _num_slices[i] = num_slices[i];
         }
 
@@ -176,8 +176,8 @@ namespace FEAT
        */
       Index get_num_slices(int dir) const
       {
-        ASSERT_(dir >= 0);
-        ASSERT_(dir < shape_dim);
+        XASSERT(dir >= 0);
+        XASSERT(dir < shape_dim);
         return _num_slices[dir];
       }
 
@@ -198,8 +198,8 @@ namespace FEAT
        */
       Index get_num_entities(int dim) const
       {
-        ASSERT_(dim >= 0);
-        ASSERT_(dim <= shape_dim);
+        XASSERT(dim >= 0);
+        XASSERT(dim <= shape_dim);
         return _num_entities[dim];
       }
 

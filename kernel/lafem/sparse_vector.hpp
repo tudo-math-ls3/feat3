@@ -296,7 +296,7 @@ namespace FEAT
        */
       const DT_ operator()(Index index) const
       {
-        ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds sparse vector size " + stringify(this->_scalar_index.at(0)) + " !");
+        ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
 
         if (this->_elements.size() == 0)
           return zero_element();
@@ -327,7 +327,7 @@ namespace FEAT
        */
       void operator()(Index index, DT_ val)
       {
-        ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds sparse vector size " + stringify(this->_scalar_index.at(0)) + " !");
+        ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
 
         // flag container as not sorted anymore
         // CAUTION: do not use any method triggering resorting until we are finished
@@ -711,7 +711,7 @@ namespace FEAT
       /// Permutate vector according to the given Permutation
       void permute(Adjacency::Permutation & perm)
       {
-        ASSERT(perm.size() == this->size(), "Error: Container size " + stringify(this->size()) + " does not match permutation size " + stringify(perm.size()) + " !");
+        XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
 
         SparseVector<Mem::Main, DT_, IT_> local;
         local.convert(*this);

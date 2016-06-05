@@ -144,7 +144,8 @@ namespace FEAT
          */
         NullImageIterator& operator++()
         {
-          throw InternalError("cannot increment NullImageIterator");
+          XASSERTM(false, "cannot increment NullImageIterator");
+          return *this;
         }
 
         /**
@@ -154,7 +155,8 @@ namespace FEAT
          */
         Index operator*() const
         {
-          throw InternalError("cannot dereference NullImageIterator");
+          XASSERTM(false, "cannot dereference NullImageIterator");
+          return Index(0);
         }
 
         /**
@@ -429,7 +431,7 @@ namespace FEAT
       {
         // Ensure that the number of image nodes in the first adjactor is not greater than the number of domain
         // nodes in the second adjactor; otherwise the composite adjactor is ill-formed.
-        ASSERT(_adj1.get_num_nodes_image() <= _adj2.get_num_nodes_domain(), "Composite Adjuctor is ill-formed");
+        XASSERTM(_adj1.get_num_nodes_image() <= _adj2.get_num_nodes_domain(), "Composite Adjuctor is ill-formed");
       }
 
       /** \copydoc Adjactor::get_num_nodes_domain() */
@@ -451,14 +453,14 @@ namespace FEAT
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT(domain_node < get_num_nodes_domain(), "domain_node out of valid range");
+        ASSERTM(domain_node < get_num_nodes_domain(), "domain_node out of valid range");
         return ImageIterator(&_adj1, &_adj2, domain_node);
       }
 
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        ASSERT(domain_node < get_num_nodes_domain(), "domain_node out of valid range");
+        ASSERTM(domain_node < get_num_nodes_domain(), "domain_node out of valid range");
         return ImageIterator(&_adj1, domain_node);
       }
 

@@ -87,7 +87,7 @@ namespace FEAT
         void fill_target_sets(TargetSetHolder<Shape_>& target_set_holder)
         {
           TargetSet& target_set = target_set_holder.template get_target_set<cell_dim_-1>();
-          ASSERT(target_set.get_num_entities() == Index(_faces.size()), "invalid target set size");
+          XASSERTM(target_set.get_num_entities() == Index(_faces.size()), "invalid target set size");
 
           for(Index i(0); i < target_set.get_num_entities(); ++i)
             target_set[i] = _faces[i];
@@ -137,7 +137,7 @@ namespace FEAT
           for(Index i(0); i < Index(caf.size()); ++i)
           {
             // for each conformal mesh, a facet must be adjacent to either 1 (boundary facet) or 2 (inner facet) cells.
-            ASSERT((caf[i] > 0) && (caf[i] < 3), "invalid number of cells at facet");
+            ASSERTM((caf[i] > 0) && (caf[i] < 3), "invalid number of cells at facet");
             if(caf[i] == Index(1))
               ++count;
           }
@@ -168,7 +168,7 @@ namespace FEAT
         void fill_target_sets(TargetSetHolder<Shape_>& target_set_holder)
         {
           TargetSet& target_set = target_set_holder.template get_target_set<shape_dim_-1>();
-          ASSERT(target_set.get_num_entities() == Index(_faces.size()), "invalid target set size");
+          XASSERTM(target_set.get_num_entities() == Index(_faces.size()), "invalid target set size");
 
           for(Index i(0); i < target_set.get_num_entities(); ++i)
             target_set[i] = _faces[i];

@@ -216,7 +216,7 @@ namespace FEAT
         Index count(0);
         Intern::UniformDofMappingHelper<ShapeType, DofTraits_, DofTag_>
           ::assemble(dof_idx, this->_space.get_mesh(), cell_index, count);
-        ASSERT_(count == Index(dof_count));
+        XASSERTM(count == Index(dof_count), "dof-count mismatch");
       }
 
       /** \copydoc DofMappingBase::get_num_local_dofs() */
@@ -234,7 +234,7 @@ namespace FEAT
       /** \copydoc DofMappingBase::get_index() */
       Index get_index(int local_dof_idx, int /*contrib_idx*/ = 0) const
       {
-        ASSERT( (local_dof_idx >= 0) && (local_dof_idx < dof_count), "dof-index out-of-range");
+        ASSERTM((local_dof_idx >= 0) && (local_dof_idx < dof_count), "local dof-index out-of-range");
         return dof_idx[local_dof_idx];
       }
     };

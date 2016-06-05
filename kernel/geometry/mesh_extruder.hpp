@@ -102,8 +102,8 @@ namespace FEAT
         _zmin_part_name(zmin_part_name),
         _zmax_part_name(zmax_part_name)
       {
-        ASSERT_(slices > Index(0));
-        ASSERT_(z_min < z_max);
+        XASSERT(slices > Index(0));
+        XASSERT(z_min < z_max);
       }
 
       /**
@@ -117,8 +117,8 @@ namespace FEAT
        */
       void extrude_num_entities(Index hexa_num_entities[], const Index quad_num_entities[]) const
       {
-        ASSERT_(hexa_num_entities != nullptr);
-        ASSERT_(quad_num_entities != nullptr);
+        XASSERT(hexa_num_entities != nullptr);
+        XASSERT(quad_num_entities != nullptr);
         hexa_num_entities[0] = quad_num_entities[0] * (_slices + 1);
         hexa_num_entities[1] = quad_num_entities[0] * _slices + quad_num_entities[1] * (_slices + 1);
         hexa_num_entities[2] = quad_num_entities[1] * _slices + quad_num_entities[2] * (_slices + 1);
@@ -178,7 +178,7 @@ namespace FEAT
         {
           // get input chart
           const QuadChart* quad_chart = quad_atlas.find_mesh_chart(name);
-          ASSERT_(quad_chart != nullptr);
+          XASSERT(quad_chart != nullptr);
 
           // extrude chart
           HexaChart* hexa_chart = extrude_chart(*quad_chart);
@@ -204,7 +204,7 @@ namespace FEAT
         const Index quad_num_verts = quad_vtx.get_num_vertices();
 
         // validate vertex count in hexa vertex set
-        ASSERT_(hexa_vtx.get_num_vertices() == (quad_num_verts * (_slices+1)));
+        XASSERT(hexa_vtx.get_num_vertices() == (quad_num_verts * (_slices+1)));
 
         // loop over all slices
         for(Index j(0); j <= _slices; ++j)
@@ -251,10 +251,10 @@ namespace FEAT
         };
 
         // validate dimensions
-        ASSERT_(hexa_edge.get_index_bound()  == (quad_num_entities[0] * (_slices+1)));
-        ASSERT_(hexa_edge.get_num_entities() == (quad_num_entities[0] * _slices + quad_num_entities[1] * (_slices+1)));
-        ASSERT_(hexa_quad.get_num_entities() == (quad_num_entities[1] * _slices + quad_num_entities[2] * (_slices+1)));
-        ASSERT_(hexa_hexa.get_num_entities() == (quad_num_entities[2] * _slices));
+        XASSERT(hexa_edge.get_index_bound()  == (quad_num_entities[0] * (_slices+1)));
+        XASSERT(hexa_edge.get_num_entities() == (quad_num_entities[0] * _slices + quad_num_entities[1] * (_slices+1)));
+        XASSERT(hexa_quad.get_num_entities() == (quad_num_entities[1] * _slices + quad_num_entities[2] * (_slices+1)));
+        XASSERT(hexa_hexa.get_num_entities() == (quad_num_entities[2] * _slices));
 
         // loop over all slices (edges in x/y-direction)
         for(Index j(0); j <= _slices; ++j)
@@ -455,7 +455,7 @@ namespace FEAT
 
       void extrude_slice_mapping(HexaTrgSetHolder& hexa_mapp, const QuadMesh& quad_parent, const Index slice) const
       {
-        ASSERT_(slice <= _slices);
+        XASSERT(slice <= _slices);
 
         const Index nv = quad_parent.get_num_entities(0);
         const Index ne = quad_parent.get_num_entities(1);
@@ -497,7 +497,7 @@ namespace FEAT
         const int quad_num_coords = quad_attrib.get_num_coords();
 
         // create attribute
-        ASSERT_(hexa_attrib == nullptr);
+        XASSERT(hexa_attrib == nullptr);
         hexa_attrib = new HexaAttrib(quad_num_verts * (_slices+1), quad_num_coords+1, 0);
 
         // loop over all slices
@@ -543,7 +543,7 @@ namespace FEAT
       {
         // get root mesh
         const QuadMesh* quad_mesh = quad_root_node.get_mesh();
-        ASSERT_(quad_mesh != nullptr);
+        XASSERT(quad_mesh != nullptr);
 
         // extrude root mesh
         {
@@ -637,7 +637,7 @@ namespace FEAT
 
       virtual Index get_num_entities(int dim) override
       {
-        ASSERT_(dim < 4);
+        XASSERT(dim < 4);
         return _hexa_num_entities[dim];
       }
 
@@ -713,7 +713,7 @@ namespace FEAT
 
       virtual Index get_num_entities(int dim) override
       {
-        ASSERT_(dim < 4);
+        XASSERT(dim < 4);
         return _hexa_num_entities[dim];
       }
 
@@ -798,7 +798,7 @@ namespace FEAT
 
       virtual Index get_num_entities(int dim) override
       {
-        ASSERT_(dim < 4);
+        XASSERT(dim < 4);
         return (dim < 3) ? _quad_parent.get_num_entities(dim) : Index(0);
       }
 

@@ -85,7 +85,7 @@ namespace FEAT
           _trafo_a(0.0),
           _trafo_b(0.0)
         {
-          ASSERT_(radius > CoordType(0));
+          XASSERTM(radius > CoordType(0), "invalid circle radius");
           _midpoint[0] = mid_x;
           _midpoint[1] = mid_y;
         }
@@ -110,7 +110,7 @@ namespace FEAT
           _trafo_a(-param_l),
           _trafo_b((CoordType(2) * Math::pi<CoordType>()) / (param_r - param_l))
         {
-          ASSERT_(radius > CoordType(0));
+          XASSERTM(radius > CoordType(0), "invalid circle radius");
           _midpoint[0] = mid_x;
           _midpoint[1] = mid_y;
         }

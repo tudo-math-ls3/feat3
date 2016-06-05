@@ -98,8 +98,8 @@ namespace FEAT
          */
         virtual Index get_num_entities(int dim) override
         {
-          ASSERT_(dim >= 0);
-          ASSERT_(dim <= shape_dim);
+          XASSERT(dim >= 0);
+          XASSERT(dim <= shape_dim);
 
           return _num_entities[dim];
         }

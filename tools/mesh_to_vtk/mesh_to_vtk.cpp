@@ -46,7 +46,7 @@ Index lvl_min, Index lvl_max)
   Geometry::MeshAtlas<Mesh_>* atlas = new Geometry::MeshAtlas<Mesh_>();
   Geometry::RootMeshNode<Mesh_>* node = new Geometry::RootMeshNode<Mesh_>(nullptr, atlas);
 
-  ASSERT_(mesh_reader != nullptr);
+  XASSERT(mesh_reader != nullptr);
 
   // try to parse the mesh file
 #ifndef DEBUG

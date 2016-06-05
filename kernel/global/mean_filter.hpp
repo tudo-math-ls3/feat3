@@ -71,7 +71,7 @@ namespace FEAT
         else
           _volume = _vec_prim.dot(_vec_dual);
 
-        ASSERT(_volume > Math::eps<DataType>(), "domain volume must not be zero");
+        XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
       }
 
       /// move ctor

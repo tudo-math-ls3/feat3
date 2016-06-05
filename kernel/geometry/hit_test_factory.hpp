@@ -283,7 +283,7 @@ namespace FEAT
         _midpoint(DataType_(0)),
         _radius(radius)
       {
-        ASSERT_(radius > DataType_(0));
+        XASSERTM(radius > DataType_(0), "sphere radius must be > 0");
       }
 
       /**
@@ -299,7 +299,7 @@ namespace FEAT
         _midpoint(midpoint),
         _radius(radius)
       {
-        ASSERT_(radius > DataType_(0));
+        XASSERTM(radius > DataType_(0), "sphere radius must be > 0");
       }
 
       /**

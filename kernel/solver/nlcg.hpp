@@ -199,7 +199,7 @@ namespace FEAT
           restart_freq(_op.columns() + Index(4)),
           iterates(nullptr)
           {
-            ASSERT_(_linesearch != nullptr);
+            XASSERT(_linesearch != nullptr);
 
             this->_min_stag_iter = 0;
 

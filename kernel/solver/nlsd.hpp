@@ -108,7 +108,7 @@ namespace FEAT
           _tol_step(Math::sqrt(Math::eps<DataType>())),
           iterates(nullptr)
           {
-            ASSERT_(_linesearch != nullptr);
+            XASSERT(_linesearch != nullptr);
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
           }

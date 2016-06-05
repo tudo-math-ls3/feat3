@@ -304,14 +304,14 @@ namespace FEAT
        */
       SubMatrixType& get(int i, int j)
       {
-        ASSERT_((i == j) && (0 <= i) && (i < blocks_));
+        XASSERTM((i == j) && (0 <= i) && (i < blocks_), "invalid sub-matrix index");
         return (i == 0) ? _first : _rest.get(i-1, j-1);
       }
 
       /** \copydoc get() */
       const SubMatrixType& get(int i, int j) const
       {
-        ASSERT_((i == j) && (0 <= i) && (i < blocks_));
+        XASSERTM((i == j) && (0 <= i) && (i < blocks_), "invalid sub-matrix index");
         return (i == 0) ? _first : _rest.get(i-1, j-1);
       }
 
@@ -758,21 +758,13 @@ namespace FEAT
 
       SubMatrixType& get(int i, int j)
       {
-#ifndef DEBUG
-        (void)i;
-        (void)j;
-#endif
-        ASSERT_((i == 0) && (j == 0));
+        XASSERTM((i == 0) && (j == 0), "invalid sub-matrix index");
         return _first;
       }
 
       const SubMatrixType& get(int i, int j) const
       {
-#ifndef DEBUG
-        (void)i;
-        (void)j;
-#endif
-        ASSERT_((i == 0) && (j == 0));
+        XASSERTM((i == 0) && (j == 0), "invalid sub-matrix index");
         return _first;
       }
 

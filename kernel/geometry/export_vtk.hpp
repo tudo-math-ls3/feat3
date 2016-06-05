@@ -187,7 +187,7 @@ namespace FEAT
       template<typename T_>
       void add_vertex_scalar(const String& name, const T_* data)
       {
-        ASSERT_(data != nullptr);
+        XASSERTM(data != nullptr, "data array is nullptr");
         std::vector<double> d(_num_verts);
         for(Index i(0); i < _num_verts; ++i)
         {
@@ -215,7 +215,7 @@ namespace FEAT
       template<typename T_>
       void add_vertex_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
       {
-        ASSERT_(x != nullptr);
+        XASSERTM(x != nullptr, "x-data array is nullptr");
         std::vector<double> d(3*_num_verts);
 
         if(z != nullptr)
@@ -299,7 +299,7 @@ namespace FEAT
       template<typename T_>
       void add_cell_scalar(const String& name, const T_* data)
       {
-        ASSERT_(data != nullptr);
+        XASSERTM(data != nullptr, "data array is nullptr");
         std::vector<double> d(_num_cells);
         for(Index i(0); i < _num_cells; ++i)
         {
@@ -327,7 +327,7 @@ namespace FEAT
       template<typename T_>
       void add_cell_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
       {
-        ASSERT_(x != nullptr);
+        XASSERTM(x != nullptr, "x-data array is nullptr");
         std::vector<double> d(3*_num_cells);
 
         if(z != nullptr)

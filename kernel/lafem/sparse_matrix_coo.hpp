@@ -159,10 +159,8 @@ namespace FEAT
                   // fetch column index
                   Index jx = col_map.get_index(j, jc);
 
-#ifdef DEBUG
                   // ensure that the column pointer is valid for this index
-                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
-#endif
+                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
                   // incorporate data into global matrix
                   _data[_col_ptr[jx]] += (iw * jw) * loc_mat[i][j];
@@ -285,10 +283,8 @@ namespace FEAT
                   // fetch column index
                   Index jx = col_map.get_index(j, jc);
 
-#ifdef DEBUG
                   // ensure that the column pointer is valid for this index
-                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
-#endif
+                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
                   // update accumulator
                   dx += DT_(col_map.get_weight(j, jc)) * _data[_col_ptr[jx]];
@@ -1361,8 +1357,8 @@ namespace FEAT
        */
       void operator()(Index row, Index col, DT_ value)
       {
-        ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->rows()) + " !");
-        ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->columns()) + " !");
+        ASSERT(row < this->rows());
+        ASSERT(col < this->columns());
 
         _sorted() = 0;
 
@@ -1485,8 +1481,8 @@ namespace FEAT
        */
       DT_ operator()(Index row, Index col) const
       {
-        ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->rows()) + " !");
-        ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->columns()) + " !");
+        ASSERT(row < this->rows());
+        ASSERT(col < this->columns());
 
         if (this->_elements.size() == 0)
           return zero_element();

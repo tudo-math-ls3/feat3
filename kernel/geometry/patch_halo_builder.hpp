@@ -57,7 +57,7 @@ namespace FEAT
 
         void fill(TargetSet& target_set) const
         {
-          ASSERT_(target_set.get_num_entities() == size());
+          XASSERT(target_set.get_num_entities() == size());
           for(Index i(0); i < size(); ++i)
           {
             target_set[i] = _indices[i];
@@ -132,7 +132,7 @@ namespace FEAT
 
         void fill(TargetSet& target_set) const
         {
-          ASSERT_(target_set.get_num_entities() == size());
+          XASSERT(target_set.get_num_entities() == size());
           for(Index i(0); i < size(); ++i)
           {
             target_set[i] = _indices[i];
@@ -165,7 +165,7 @@ namespace FEAT
 
         Index get_num_entities(int dim) const
         {
-          ASSERT_(dim <= face_dim_);
+          XASSERT(dim <= face_dim_);
           if(dim == face_dim_)
             return Index(_hbuild.size());
           else
@@ -199,11 +199,7 @@ namespace FEAT
 
         Index get_num_entities(int dim) const
         {
-#ifdef DEBUG
-          ASSERT_(dim == 0);
-#else
-          (void)dim;
-#endif
+          XASSERT(dim == 0);
           return Index(_hbuild.size());
         }
 

@@ -179,7 +179,7 @@ namespace FEAT
       template<typename Tx_>
       void operator()(Tx_* x, bool invert = false) const
       {
-        ASSERT_(x != nullptr);
+        XASSERT(x != nullptr);
 
         if(!invert)
         {
@@ -187,7 +187,7 @@ namespace FEAT
           for(Index i(0); i+1 < _num_entries; ++i)
           {
             Index j(_swap_pos[i]);
-            ASSERT((j >= i) && (j < _num_entries), "invalid swap position");
+            ASSERTM((j >= i) && (j < _num_entries), "invalid swap position");
             if(j > i)
             {
               Tx_ t(x[i]);
@@ -202,7 +202,7 @@ namespace FEAT
           for(Index i(_num_entries-1); i > 0; --i)
           {
             Index j(_swap_pos[i-1]);
-            ASSERT((j >= i-1) && (j < _num_entries), "invalid swap position");
+            ASSERTM((j >= i-1) && (j < _num_entries), "invalid swap position");
             if(j > i-1)
             {
               Tx_ t(x[i-1]);
@@ -232,8 +232,8 @@ namespace FEAT
       template<typename Ty_, typename Tx_>
       void operator()(Ty_* y, const Tx_* x, bool invert = false) const
       {
-        ASSERT_(y != nullptr);
-        ASSERT_(x != nullptr);
+        XASSERT(y != nullptr);
+        XASSERT(x != nullptr);
         if(!invert)
         {
           for(Index i(0); i < _num_entries; ++i)

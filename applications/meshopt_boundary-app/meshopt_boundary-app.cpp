@@ -101,8 +101,8 @@ struct MeshoptBoundaryApp
   int lvl_max, int lvl_min, const DataType delta_t, const DataType t_end,
   const bool write_vtk)
   {
-    ASSERT_(delta_t > DataType(0));
-    ASSERT_(t_end >= DataType(0));
+    XASSERT(delta_t > DataType(0));
+    XASSERT(t_end >= DataType(0));
 
     // This is the point we rotate our mesh around
     Tiny::Vector<DataType, MeshType::world_dim> midpoint(DataType(0.5));
@@ -134,7 +134,7 @@ struct MeshoptBoundaryApp
 
     // Get outer boundary MeshPart
     auto* outer_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer");
-    ASSERT_(outer_boundary != nullptr);
+    XASSERT(outer_boundary != nullptr);
 
     // Get vertex target set
     Geometry::TargetSet& boundary_set = outer_boundary->template get_target_set<0>();

@@ -151,39 +151,39 @@ namespace FEAT
 
       WeightType& get_weight(int i)
       {
-        ASSERT(i < _num_points, "index out-of-range");
+        ASSERT(i < _num_points);
         return _weights[i];
       }
 
       const WeightType& get_weight(int i) const
       {
-        ASSERT(i < _num_points, "index out-of-range");
+        ASSERT(i < _num_points);
         return _weights[i];
       }
 
       PointType& get_point(int i)
       {
-        ASSERT(i < _num_points, "index out-of-range");
+        ASSERT(i < _num_points);
         return _points[i];
       }
 
       const PointType& get_point(int i) const
       {
-        ASSERT(i < _num_points, "index out-of-range");
+        ASSERT(i < _num_points);
         return _points[i];
       }
 
       CoordType& get_coord(int i, int j)
       {
-        ASSERT(i >= 0 && i < _num_points, "index i out-of-range");
-        ASSERT(j >= 0 && j < dimension, "index j out-of-range");
+        ASSERTM((i >= 0) && (i < _num_points), "point index i out-of-range");
+        ASSERTM((j >= 0) && (j < dimension), "coord index j out-of-range");
         return _points[i][j];
       }
 
       const CoordType& get_coord(int i, int j) const
       {
-        ASSERT(i >= 0 && i < _num_points, "index i out-of-range");
-        ASSERT(j >= 0 && j < dimension, "index j out-of-range");
+        ASSERTM((i >= 0) && (i < _num_points), "point index i out-of-range");
+        ASSERTM((j >= 0) && (j < dimension), "coord index j out-of-range");
         return _points[i][j];
       }
     }; // class Rule<...>

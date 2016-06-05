@@ -698,13 +698,13 @@ namespace FEAT
 
       const typename First_::DataType operator()(Index index) const
       {
-        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
+        ASSERT(index < size());
         return first()(index);
       }
 
       void operator()(Index index, typename First_::DataType value)
       {
-        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
+        ASSERT(index < size());
         first()(index, value);
       }
 

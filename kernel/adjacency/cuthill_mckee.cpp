@@ -1,6 +1,7 @@
 // includes, FEAT
 #include <kernel/adjacency/cuthill_mckee.hpp>
 #include <kernel/adjacency/graph.hpp>
+#include <kernel/util/exception.hpp>
 
 // includes, system
 #include <vector>

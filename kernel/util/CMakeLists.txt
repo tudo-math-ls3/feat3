@@ -5,6 +5,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of util source files
 ADD_LIBRARY(kernel-util STATIC
+  assertion.cpp
   exception.cpp
   environment.cpp
   function_scheduler.cpp
@@ -46,7 +47,6 @@ endif(FEAT_HAVE_CUDA)
 
 # list of util tests
 SET (test_list
-  assertion-test
   binary_stream-test
   math-test
   memory_usage-test

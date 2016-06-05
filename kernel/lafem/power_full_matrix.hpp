@@ -230,16 +230,16 @@ namespace FEAT
        */
       SubMatrixType& get(int i, int j)
       {
-        ASSERT_((0 <= i) && (i < height_));
-        ASSERT_((0 <= j) && (j < width_));
+        XASSERTM((0 <= i) && (i < height_), "invalid sub-matrix row index");
+        XASSERTM((0 <= j) && (j < width_), "invalid sub-matrix column index");
         return _container.get(i, 0).get(0, j);
       }
 
       /** \copydoc get() */
       const SubMatrixType& get(int i, int j) const
       {
-        ASSERT_((0 <= i) && (i < height_));
-        ASSERT_((0 <= j) && (j < width_));
+        XASSERTM((0 <= i) && (i < height_), "invalid sub-matrix row index");
+        XASSERTM((0 <= j) && (j < width_), "invalid sub-matrix column index");
         return _container.get(i, 0).get(0, j);
       }
 

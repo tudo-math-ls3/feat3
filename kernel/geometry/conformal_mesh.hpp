@@ -117,7 +117,7 @@ namespace FEAT
       {
         for(int i(0); i <= shape_dim; ++i)
         {
-          //ASSERT(num_entities[i] > 0, "Number of entities must not be zero!");
+          //XASSERTM(num_entities[i] > 0, "Number of entities must not be zero!");
           _num_entities[i] = num_entities[i];
         }
       }
@@ -195,8 +195,8 @@ namespace FEAT
        */
       Index get_num_entities(int dim) const
       {
-        ASSERT_(dim >= 0);
-        ASSERT_(dim <= shape_dim);
+        XASSERT(dim >= 0);
+        XASSERT(dim <= shape_dim);
         return _num_entities[dim];
       }
 
@@ -205,9 +205,7 @@ namespace FEAT
         // Facet at cell index set
         auto& facet_idx = get_index_set<shape_dim, shape_dim -1>();
 
-        ASSERT(get_num_entities(shape_dim-1) == facet_idx.get_index_bound(),
-        "mesh num_entities / index_set num_entities mismatch: " +stringify(get_num_entities(shape_dim-1))+
-        " / "+stringify(facet_idx.get_num_entities()));
+        XASSERTM(get_num_entities(shape_dim-1) == facet_idx.get_index_bound(), "mesh num_entities / index_set num_entities mismatch");
 
         if(_neighbours.get_num_indices() == Index(0))
           _neighbours = std::move(typename IndexSet<shape_dim, shape_dim-1>::Type(get_num_entities(shape_dim)));

@@ -158,10 +158,8 @@ namespace FEAT
                   // fetch column index
                   Index jx = col_map.get_index(j, jc);
 
-#ifdef DEBUG
                   // ensure that the column pointer is valid for this index
-                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
-#endif
+                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
                   // incorporate data into global matrix
                   _val[_col_ptr[jx]] += (iw * jw) * loc_mat[i][j];
@@ -274,10 +272,8 @@ namespace FEAT
                   // fetch column index
                   Index jx = col_map.get_index(j, jc);
 
-#ifdef DEBUG
                   // ensure that the column pointer is valid for this index
-                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
-#endif
+                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
                   // update accumulator
                   dx += DT_(col_map.get_weight(j, jc)) * _val[_col_ptr[jx]];
@@ -519,10 +515,10 @@ namespace FEAT
         this->_scalar_index.push_back(used_elements_in);
         this->_scalar_dt.push_back(DT_(0));
 
-        ASSERT(val_in.size() == col_ind_in.size(), "Error: val- and col-arrays must have the same size!");
-        ASSERT(cs_in.size() == num_of_chunks() + 1, "Error: cs-array-size must match to row-count and chunk size!");
-        ASSERT(cl_in.size() == num_of_chunks(), "Error: cl-array-size must match to row-count and chunk size!");
-        ASSERT(rl_in.size() == rows(), "Error: rl-array-size must match to row-count!");
+        XASSERTM(val_in.size() == col_ind_in.size(), "val- and col-arrays must have the same size!");
+        XASSERTM(cs_in.size() == num_of_chunks() + 1, "cs-array-size must match to row-count and chunk size!");
+        XASSERTM(cl_in.size() == num_of_chunks(), "cl-array-size must match to row-count and chunk size!");
+        XASSERTM(rl_in.size() == rows(), "rl-array-size must match to row-count!");
 
         this->_elements.push_back(val_in.elements());
         this->_elements_size.push_back(val_in.size());
@@ -1577,8 +1573,8 @@ namespace FEAT
        */
       DT_ operator()(Index row, Index col) const
       {
-        ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix ell row size " + stringify(rows()) + " !");
-        ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix ell column size " + stringify(columns()) + " !");
+        ASSERT(row < rows());
+        ASSERT(col < columns());
 
         const Index nchunk(Index(floor(row / float(C()))));
         Index start(Index(MemoryPool<Mem_>::get_element(cs(), nchunk)));
@@ -2120,8 +2116,8 @@ namespace FEAT
       /// \copydoc extract_diag()
       void extract_diag(VectorTypeL & diag) const
       {
-        ASSERT(diag.size() == rows(), "Error: diag size does not match matrix row count!");
-        ASSERT(rows() == columns(), "Error: matrix is not square!");
+        XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
+        XASSERTM(rows() == columns(), "matrix is not square!");
 
         Arch::Diagonal<Mem_>::ell(diag.elements(), val(), col_ind(), cs(), cl(), C(), rows());
       }
@@ -2190,14 +2186,14 @@ namespace FEAT
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT(domain_node < rows(), "Domain node index out of range");
+        XASSERTM(domain_node < rows(), "Domain node index out of range");
         return ImageIterator(&col_ind()[cs()[domain_node/C()] + domain_node%C()], C());
       }
 
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        ASSERT(domain_node < rows(), "Domain node index out of range");
+        XASSERTM(domain_node < rows(), "Domain node index out of range");
         return ImageIterator(&col_ind()[cs()[domain_node/C()] + domain_node%C() + rl()[domain_node] * C()], C());
       }
 

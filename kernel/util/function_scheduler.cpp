@@ -1,4 +1,5 @@
-#include<kernel/util/function_scheduler.hpp>
+#include <kernel/util/function_scheduler.hpp>
+#include <kernel/util/exception.hpp>
 
 using namespace FEAT;
 using namespace FEAT::Util;

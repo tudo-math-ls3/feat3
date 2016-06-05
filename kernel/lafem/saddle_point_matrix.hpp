@@ -134,8 +134,8 @@ namespace FEAT
         _matrix_b(std::move(matrix_b)),
         _matrix_d(std::move(matrix_d))
       {
-        ASSERT(_matrix_a.rows() == _matrix_b.rows(), "row count mismatch: A.rows != B.rows");
-        ASSERT(_matrix_a.columns() == _matrix_d.columns(), "row count mismatch: A.cols != D.cols");
+        XASSERT(_matrix_a.rows() == _matrix_b.rows());
+        XASSERT(_matrix_a.columns() == _matrix_d.columns());
       }
 
       /// move ctor

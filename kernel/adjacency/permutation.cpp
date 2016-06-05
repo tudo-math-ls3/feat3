@@ -11,7 +11,7 @@ namespace FEAT
       _perm_pos(new Index[num_entries]),
       _swap_pos(new Index[num_entries])
     {
-      ASSERT_(num_entries > 0);
+      XASSERTM(num_entries > 0, "cannot create empty permutation");
       switch(constr_type)
       {
       case type_none:
@@ -32,7 +32,7 @@ namespace FEAT
       }
 
       // for any other construction type we need an input array
-      ASSERT(v != nullptr, "invalid input array");
+      XASSERTM(v != nullptr, "invalid input array");
 
       switch(constr_type)
       {
@@ -91,7 +91,7 @@ namespace FEAT
       _perm_pos(new Index[num_entries]),
       _swap_pos(new Index[num_entries])
     {
-      ASSERT_(num_entries > 0);
+      XASSERTM(num_entries > 0, "cannot create empty random permutation");
       for(Index i(0); i+1 < _num_entries; ++i)
       {
         _swap_pos[i] = random(i, _num_entries-1);

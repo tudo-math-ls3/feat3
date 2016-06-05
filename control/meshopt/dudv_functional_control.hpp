@@ -104,7 +104,7 @@ namespace FEAT
             solver_name(solver_name_),
             solver(nullptr)
             {
-              ASSERT_(num_levels > Index(0));
+              XASSERT(num_levels > Index(0));
 
               const DomainLayerType& layer = *dom_ctrl.get_layers().back();
               const std::deque<DomainLevelType*>& domain_levels = dom_ctrl.get_levels();

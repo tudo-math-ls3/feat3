@@ -68,7 +68,7 @@ namespace FEAT
         explicit Sphere(CoordType mid_x, CoordType mid_y, CoordType mid_z, CoordType radius) :
           _radius(radius)
         {
-          ASSERT_(radius > CoordType(0));
+          XASSERTM(radius > CoordType(0), "invalid Sphere radius");
           _midpoint[0] = mid_x;
           _midpoint[1] = mid_y;
           _midpoint[2] = mid_z;

@@ -21,7 +21,7 @@ namespace FEAT
       {
         static int value(int dim)
         {
-          ASSERT_((dim <= face_dim_) && (dim >= 0));
+          ASSERT((dim <= face_dim_) && (dim >= 0));
           if(dim == face_dim_)
             return Shape::FaceTraits<Shape_, face_dim_>::count;
           else
@@ -146,7 +146,7 @@ namespace FEAT
           static constexpr Index num_faces = Index(Shape::FaceTraits<Shape_, face_dim_>::count);
 
           // validate size
-          ASSERT(target.get_num_entities() == num_faces, "invalid target set size");
+          XASSERTM(target.get_num_entities() == num_faces, "invalid target set size");
 
           // get the index set
           const IndexSet<int(num_faces)>& idx = ish.template get_index_set<Shape_::dimension, face_dim_>();
@@ -174,7 +174,7 @@ namespace FEAT
           static constexpr Index num_faces = Index(Shape::FaceTraits<Shape_,0>::count);
 
           // validate size
-          ASSERT(target.get_num_entities() == num_faces, "invalid target set size");
+          XASSERTM(target.get_num_entities() == num_faces, "invalid target set size");
 
           // get the index set
           const IndexSet<int(num_faces)>& idx = ish.template get_index_set<Shape_::dimension, 0>();

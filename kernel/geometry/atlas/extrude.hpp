@@ -63,7 +63,7 @@ namespace FEAT
 
         void set_sub_chart(SubChart_* sub_chart)
         {
-          ASSERT_(_sub_chart == nullptr);
+          XASSERTM(_sub_chart == nullptr, "Extrude chart already has a sub-chart");
           _sub_chart = sub_chart;
         }
 

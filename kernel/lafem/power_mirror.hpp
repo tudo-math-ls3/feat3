@@ -271,20 +271,14 @@ namespace FEAT
        */
       SubMirrorType& get(int i)
       {
-#ifndef DEBUG
-        (void)i;
-#endif
-        ASSERT_((0 <= i) && (i < count_));
+        XASSERTM((0 <= i) && (i < count_), "invalid sub-mirror index");
         return _sub_mirror;
       }
 
       /** \copydoc get() */
       const SubMirrorType& get(int i) const
       {
-#ifndef DEBUG
-        (void)i;
-#endif
-        ASSERT_((0 <= i) && (i < count_));
+        XASSERTM((0 <= i) && (i < count_), "invalid sub-mirror index");
         return _sub_mirror;
       }
 

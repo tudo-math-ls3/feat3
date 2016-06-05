@@ -30,7 +30,7 @@ namespace FEAT
           _ranks(std::forward<std::vector<Index>>(ranks)),
           _ctags(std::forward<std::vector<Index>>(ctags))
         {
-          ASSERT_(_ranks.size() == _ctags.size());
+          XASSERT(_ranks.size() == _ctags.size());
         }
 
         virtual ~DomainLayer()

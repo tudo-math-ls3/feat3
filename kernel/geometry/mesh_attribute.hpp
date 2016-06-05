@@ -63,8 +63,8 @@ namespace FEAT
           _stride(stride > 0 ? stride : num_coords),
           _vertices(nullptr)
         {
-          ASSERT_(_num_coords >= 0);
-          ASSERT_(_stride >= _num_coords);
+          XASSERT(_num_coords >= 0);
+          XASSERT(_stride >= _num_coords);
           if((_num_vertices > 0) && (_num_coords > 0))
           {
             _vertices = new CoordType[_num_vertices * Index(_stride)];
@@ -153,16 +153,16 @@ namespace FEAT
          */
         VertexReference operator[](Index i)
         {
-          ASSERT_(_vertices != nullptr);
-          ASSERT_(i < _num_vertices);
+          ASSERT(_vertices != nullptr);
+          ASSERT(i < _num_vertices);
           return &_vertices[Index(_stride) * i];
         }
 
         /** \copydoc operator[]() */
         ConstVertexReference operator[](Index i) const
         {
-          ASSERT_(_vertices != nullptr);
-          ASSERT(i < _num_vertices, "i = "+stringify(i)+" >= "+stringify(_num_vertices)+" = num_vertices");
+          ASSERT(_vertices != nullptr);
+          ASSERT(i < _num_vertices);
           return &_vertices[Index(_stride) * i];
         }
 
@@ -178,8 +178,8 @@ namespace FEAT
          */
         void operator()(Index i, ConstVertexReference v)
         {
-          ASSERT(_vertices != nullptr, "_vertices == nullptr");
-          ASSERT(i < _num_vertices, "i = "+stringify(i)+" >= "+stringify(_num_vertices)+" = num_vertices");
+          ASSERT(_vertices != nullptr);
+          ASSERT(i < _num_vertices);
 
           for(Index j(0); j < Index(_num_coords); ++j)
             _vertices[Index(_stride)*i + j] = v[j];

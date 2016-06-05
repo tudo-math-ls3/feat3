@@ -211,8 +211,8 @@ namespace FEAT
        */
       const DT_ operator()(Index row, Index col) const
       {
-        ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
-        ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
+        ASSERT(row < this->rows());
+        ASSERT(col < this->columns());
         return MemoryPool<Mem_>::get_element(this->_elements.at(0), row * this->columns() + col);
       }
 
@@ -225,8 +225,8 @@ namespace FEAT
        */
       void operator()(Index row, Index col, DT_ value)
       {
-        ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
-        ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
+        ASSERT(row < this->rows());
+        ASSERT(col < this->columns());
         MemoryPool<Mem_>::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
       }
 

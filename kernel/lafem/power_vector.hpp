@@ -226,14 +226,14 @@ namespace FEAT
        */
       SubVectorType& get(int i)
       {
-        ASSERT_((0 <= i) && (i < count_));
+        XASSERTM((0 <= i) && (i < count_), "invalid sub-vector index");
         return (i == 0) ? _first : _rest.get(i-1);
       }
 
       /** \copydoc get() */
       const SubVectorType& get(int i) const
       {
-        ASSERT_((0 <= i) && (i < count_));
+        XASSERTM((0 <= i) && (i < count_), "invalid sub-vector index");
         return (i == 0) ? _first : _rest.get(i-1);
       }
 
@@ -415,7 +415,7 @@ namespace FEAT
        */
       const DataType operator()(Index index) const
       {
-        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
+        ASSERT(index < size());
 
         if (index < first().size())
         {
@@ -435,7 +435,7 @@ namespace FEAT
        */
       void operator()(Index index, DataType value)
       {
-        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
+        ASSERT(index < size());
 
         if (index < first().size())
         {
@@ -760,19 +760,13 @@ namespace FEAT
 
       SubVectorType& get(int i)
       {
-#ifndef DEBUG
-        (void)i;
-#endif
-        ASSERT_(i == 0);
+        XASSERTM(i == 0, "invalid sub-vector index");
         return _first;
       }
 
       const SubVectorType& get(int i) const
       {
-#ifndef DEBUG
-        (void)i;
-#endif
-        ASSERT_(i == 0);
+        XASSERTM(i == 0, "invalid sub-vector index");
         return _first;
       }
 
@@ -865,14 +859,14 @@ namespace FEAT
 
       const DataType operator()(Index index) const
       {
-        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
+        ASSERT(index < size());
 
         return first()(index);
       }
 
       void operator()(Index index, DataType value)
       {
-        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
+        ASSERT(index < size());
 
         first()(index, value);
       }

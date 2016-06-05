@@ -41,7 +41,7 @@ namespace FEAT
         _base_mesh(base_mesh),
         _cell_idx(cell_idx)
       {
-        ASSERT(cell_idx < base_mesh.get_num_entities(Shape_::dimension), "cell index out-of-bounds");
+        XASSERTM(cell_idx < base_mesh.get_num_entities(Shape_::dimension), "cell index out-of-bounds");
       }
 
       virtual Index get_num_entities(int dim) override
@@ -100,7 +100,7 @@ namespace FEAT
         _base_mesh(base_mesh),
         _cell_idx(cell_idx)
       {
-        ASSERT(cell_idx < base_mesh.get_num_entities(ShapeType::dimension), "cell index out-of-bounds");
+        XASSERTM(cell_idx < base_mesh.get_num_entities(ShapeType::dimension), "cell index out-of-bounds");
       }
 
       virtual Index get_num_entities(int dim) override

@@ -225,7 +225,7 @@ namespace FEAT
 
       Index get_num_entities(int dim) const
       {
-        ASSERT(dim <= shape_dim, "invalid dimension parameter");
+        XASSERTM(dim <= shape_dim, "invalid dimension parameter");
         if(dim == shape_dim)
         {
           return _target_set.get_num_entities();
@@ -293,11 +293,7 @@ namespace FEAT
 
       Index get_num_entities(int dim) const
       {
-#if defined DEBUG
-        ASSERT(dim == 0, "invalid dimension parameter");
-#else
-        (void)dim;
-#endif
+        XASSERTM(dim == 0, "invalid dimension parameter");
         return _target_set.get_num_entities();
       }
 

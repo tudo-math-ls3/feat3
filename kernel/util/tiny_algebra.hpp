@@ -260,28 +260,28 @@ namespace FEAT
        */
       T_& operator()(int i)
       {
-        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
+        ASSERTM((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator()() */
       const T_& operator()(int i) const
       {
-        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
+        ASSERTM((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator()() */
       T_& operator[](int i)
       {
-        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
+        ASSERTM((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator[]() */
       const T_& operator[](int i) const
       {
-        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
+        ASSERTM((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
@@ -374,7 +374,7 @@ namespace FEAT
       void normalise()
       {
         DataType norm2(this->norm_euclid());
-        ASSERT(norm2 > Math::eps<DataType>(), "Trying to normalise a zero vector!");
+        ASSERTM(norm2 > Math::eps<DataType>(), "Trying to normalise a zero vector!");
         norm2 = DataType(1)/norm2;
         (*this) *= norm2;
       }
@@ -645,16 +645,16 @@ namespace FEAT
        */
       T_& operator()(int i, int j)
       {
-        ASSERT( (i >= 0) && (i < m_), "index i out-of-bounds");
-        ASSERT( (j >= 0) && (j < n_), "index j out-of-bounds");
+        ASSERTM( (i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERTM( (j >= 0) && (j < n_), "index j out-of-bounds");
         return v[i][j];
       }
 
       /** \copydoc operator()() */
       const T_& operator()(int i, int j) const
       {
-        ASSERT( (i >= 0) && (i < m_), "index i out-of-bounds");
-        ASSERT( (j >= 0) && (j < n_), "index j out-of-bounds");
+        ASSERTM( (i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERTM( (j >= 0) && (j < n_), "index j out-of-bounds");
         return v[i][j];
       }
 
@@ -669,14 +669,14 @@ namespace FEAT
        */
       RowType& operator[](int i)
       {
-        ASSERT( (i >= 0) && (i <m_), "index i out-of-bounds");
+        ASSERTM( (i >= 0) && (i <m_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator[]() */
       const RowType& operator[](int i) const
       {
-        ASSERT( (i >= 0) && (i <m_), "index i out-of-bounds");
+        ASSERTM( (i >= 0) && (i <m_), "index i out-of-bounds");
         return v[i];
       }
 
@@ -1430,18 +1430,18 @@ namespace FEAT
        */
       T_& operator()(int h, int i, int j)
       {
-        ASSERT( (h >= 0) && (h < l_), "index h out-of-bounds");
-        ASSERT( (i >= 0) && (i < m_), "index i out-of-bounds");
-        ASSERT( (j >= 0) && (j < n_), "index j out-of-bounds");
+        ASSERTM( (h >= 0) && (h < l_), "index h out-of-bounds");
+        ASSERTM( (i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERTM( (j >= 0) && (j < n_), "index j out-of-bounds");
         return v[h](i,j);
       }
 
       /** \copydoc operator()() */
       const T_& operator()(int h, int i, int j) const
       {
-        ASSERT( (h >= 0) && (h < l_), "index h out-of-bounds");
-        ASSERT( (i >= 0) && (i < m_), "index i out-of-bounds");
-        ASSERT( (j >= 0) && (j < n_), "index j out-of-bounds");
+        ASSERTM( (h >= 0) && (h < l_), "index h out-of-bounds");
+        ASSERTM( (i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERTM( (j >= 0) && (j < n_), "index j out-of-bounds");
         return v[h](i,j);
       }
 
@@ -1456,14 +1456,14 @@ namespace FEAT
        */
       PlaneType& operator[](int h)
       {
-        ASSERT( (h >= 0) && (h < l_), "index h out-of-bounds");
+        ASSERTM( (h >= 0) && (h < l_), "index h out-of-bounds");
         return v[h];
       }
 
       /** \copydoc operator[]() */
       const PlaneType& operator[](int h) const
       {
-        ASSERT( (h >= 0) && (h < l_), "index h out-of-bounds");
+        ASSERTM( (h >= 0) && (h < l_), "index h out-of-bounds");
         return v[h];
       }
 

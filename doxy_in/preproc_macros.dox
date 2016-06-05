@@ -260,17 +260,6 @@ If undefined, the kernel base-header will include the header <code>feat_config.h
 at the beginning of the file.
 
 <hr>
-\subsection ppm_feat_stdc_assert FEAT_STDC_ASSERT
-If this macro is defined, the \c ASSERT macro is defined to call the \c assert macro from the standard C libary.
-
-Depending on the compiler and its corresponding runtime library, the standard \c assert macro can trigger a breakpoint
-which enables the user to attach a debugger and jump directly into the assertion, even if the program was not started
-from within the debugger directly.
-
-\note This macro is automatically defined by the Visual Studio build system, as this allows the user to attach the
-Visual Studio debugger to a program which fired an assertion.
-
-<hr>
 \subsection ppm_feat_unroll_banded FEAT_UNROLL_BANDED
 This macro can be defined to enable loop unrolling of the SparseMatrixBanded kernels via template meta programming.
 

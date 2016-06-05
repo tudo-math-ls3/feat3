@@ -6,101 +6,116 @@
 /** \file */
 
 // includes, FEAT
-#include <kernel/util/exception.hpp>
-
-// includes, system
-
-// check for standard C assert usage
-#ifdef FEAT_STDC_ASSERT
-// ensure that NDEBUG is defined unless DEBUG is defined
-#  if !defined(DEBUG) && !defined(NDEBUG)
-#    define NDEBUG
-#  endif
-#  include <cassert>
-#endif // FEAT_STDC_ASSERT
+#include <kernel/base_header.hpp>
 
 namespace FEAT
 {
   /**
-  * \brief defining assertion
-  *
-  * An assertion is thrown when a critical condition is not fulfilled. Together with the macro defined below, it
-  * replaces the standard C assert(...).
-  *
-  * \author Dirk Ribbrock
-  */
-  class Assertion
-    : public Exception
-  {
+   * \brief Assertion function
+   *
+   * This function implements the actual assertion that is called by the ASSERT, ASSERTM,
+   * XASSERT and XASSERTM macros.
+   *
+   * The behaviour of this function is as follows:
+   * - If \p expr evaluates to \c true, then this function does nothing.
+   * - If \p expr evaluates to \c false, then this function prints an informative error message
+   *   to stderr and calls Runtime::abort to terminate the process.
+   *
+   * \param[in] expr
+   * The expression that is asserted.
+   *
+   * \param[in] expr_str
+   * The stringified expression, usually <c>#expr</c>.
+   *
+   * \param[in] func
+   * The name of the function that contains the assertion, usually <c>__func__</c>.
+   *
+   * \param[in] file
+   * The name of the source/header file that contains the assertion, usually <c>__FILE__</c>.
+   *
+   * \param[in] line
+   * The line number of the assertion in the source/header file, usually <c>__LINE__</c>.
+   *
+   * \param[in] msg
+   * A custom error message to be displayed in addition to the standard information.
+   * May be \c nullptr if no additional information is available for the assertion.
+   */
+  void assertion(
+    bool expr,
+    const char * const expr_str,
+    const char * const func,
+    const char * const file,
+    const int line,
+    const char * const msg = nullptr);
 
-  public:
-
-    /**
-    * \brief CTOR
-    *
-    * \param[in] function
-    * name of the function in which the assertion failed
-    *
-    * \param[in] file
-    * name of the source file that contains the failed assertion
-    *
-    * \param[in] line
-    * line number of the failed assertion
-    *
-    * \param[in] message_in
-    * message that shall be displayed
-    */
-    Assertion(
-      const char * const function,
-      const char * const file,
-      const long line,
-      const String & message_in)
-      : Exception(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message_in)
-    {
-      std::cout << this->message() << std::endl;
-    }
-  };
-
-/**
- * \def ASSERT
- * \brief Convenience definition that provides a way to throw Assertion exceptions.
- *
- * The thrown Assertion will be automatically provided with the correct filename,
- * line number and function name.
- *
- * \param expr Boolean expression that shall be asserted.
- * \param msg Error message that will be display in case that expr evaluates to false.
- *
- * \note This macro will only be compiled in debug mode; it is an empty macro in non-debug mode.
- */
-/**
- * \def ASSERT_
- * \brief Convenience definition that provides a way to throw Assertion exceptions.
- *
- * The thrown Assertion will be automatically provided with the correct filename, line number and function name.\n
- * In contrast to the #ASSERT macro, this macro has only one parameter, whereas the error message is a stringified
- * version of the expression to be asserted.
- *
- * \param expr Boolean expression that shall be asserted.
- *
- * \note This macro will only be compiled in debug mode; it is an empty macro in non-debug mode.
- */
-#if defined (FEAT_STDC_ASSERT)
-#  define ASSERT(expr, msg) assert(expr)
-#  define ASSERT_(expr) assert(expr)
-//#  endif
-#elif defined (DEBUG)
-// use FEAT::Assertion exception
-#  define ASSERT(expr, msg) \
-    do { \
-        if (! (expr)) \
-            throw FEAT::Assertion(__func__, __FILE__, __LINE__, msg); \
-    } while (false)
-#  define ASSERT_(expr) ASSERT(expr, #expr)
+  /**
+   * \def ASSERT
+   * \brief Debug-Assertion macro definition
+   *
+   * This macro defines a debug-mode assertion that will abort program execution if
+   * the asserted expression evaluates to \c false.
+   *
+   * \param expr
+   * Boolean expression that shall be asserted.
+   *
+   * \note
+   * This macro will only be compiled in debug mode; it is an empty macro in non-debug mode.
+   * Use the XASSERT macro if you want to use the assertion in both debug and non-debug modes.
+   */
+  /**
+   * \def ASSERTM
+   * \brief Debug-Assertion macro definition with custom message
+   *
+   * This macro defines a debug-mode assertion that will abort program execution if
+   * the asserted expression evaluates to \c false.
+   *
+   * \param expr
+   * Boolean expression that shall be asserted.
+   * \param msg
+   * An error message that is to be displayed if the assertion fails.
+   *
+   * \note This macro will only be compiled in debug mode; it is an empty macro in non-debug mode.
+   * Use the XASSERTM macro if you want to use the assertion in both debug and non-debug modes.
+   */
+#if defined(DEBUG)
+#  define ASSERT(expr) assertion(expr, #expr, __func__, __FILE__, __LINE__)
+#  define ASSERTM(expr, msg)  assertion(expr, #expr, __func__, __FILE__, __LINE__, msg)
 #else
-#  define ASSERT(expr, msg)
-#  define ASSERT_(expr)
+#  define ASSERT(expr)
+#  define ASSERTM(expr, msg)
 #endif
+
+  /**
+   * \def XASSERT
+   * \brief Assertion macro definition
+   *
+   * This macro defines an assertion that will abort program execution if
+   * the asserted expression evaluates to \c false.
+   *
+   * \param expr
+   * Boolean expression that shall be asserted.
+   *
+   * \note
+   * This macro will be compiled in both debug and non-debug mode builds.
+   * Use the ASSERT macro if you want to use the assertion ony in debug builds.
+   */
+  /**
+   * \def XASSERTM
+   * \brief Assertion macro definition with custom message
+   *
+   * This macro defines a n assertion that will abort program execution if
+   * the asserted expression evaluates to \c false.
+   *
+   * \param expr
+   * Boolean expression that shall be asserted.
+   * \param msg
+   * An error message that is to be displayed if the assertion fails.
+   *
+   * This macro will be compiled in both debug and non-debug mode builds.
+   * Use the ASSERTM macro if you want to use the assertion ony in debug builds.
+   */
+#define XASSERT(expr) assertion(expr, #expr, __func__, __FILE__, __LINE__)
+#define XASSERTM(expr, msg)  assertion(expr, #expr, __func__, __FILE__, __LINE__, msg)
 
 } // namespace FEAT
 

@@ -92,7 +92,7 @@ namespace FEAT
         {
           // get the number of coarse mesh vertices
           Index num_verts = vertex_set_in.get_num_vertices();
-          ASSERT_(vertex_set_out.get_num_vertices() >= num_verts);
+          XASSERT(vertex_set_out.get_num_vertices() >= num_verts);
 
           // create a vertex-abacus object
           VertexAbacus<VertexSetType> abacus(vertex_set_in);
@@ -170,7 +170,7 @@ namespace FEAT
             ::refine(offset, vertex_set_out, vertex_set_in, index_set_in);
 
           // validate number of created vertices
-          ASSERT(num_verts == (ShapeConvertTraits<Shape_, 0>::count * index_set_in.get_num_entities()),
+          XASSERTM(num_verts == (ShapeConvertTraits<Shape_, 0>::count * index_set_in.get_num_entities()),
             "ShapeConvertVertex output does not match ShapeConvertTraits prediction");
 
           // return new offset
@@ -194,7 +194,7 @@ namespace FEAT
             ::refine(0, vertex_set_out, vertex_set_in);
 
           // validate number of created vertices
-          ASSERT(num_verts == (ShapeConvertTraits<Shape::Vertex, 0>::count * vertex_set_in.get_num_vertices()),
+          XASSERTM(num_verts == (ShapeConvertTraits<Shape::Vertex, 0>::count * vertex_set_in.get_num_vertices()),
             "ShapeConvertVertex output does not match ShapeConvertTraits prediction");
 
           // return new offset

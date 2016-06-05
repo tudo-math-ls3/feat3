@@ -6,6 +6,7 @@
 #include <kernel/adjacency/base.hpp>
 #include <kernel/adjacency/adjactor.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/exception.hpp>
 
 namespace FEAT
 {
@@ -328,7 +329,7 @@ namespace FEAT
        */
       Index degree(Index domain_node) const
       {
-        ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
         if(_domain_end != nullptr)
           return _domain_end[domain_node] - _domain_ptr[domain_node];
         else
@@ -704,7 +705,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor1_::ImageIterator AImIt1;
         typedef typename Adjactor2_::ImageIterator AImIt2;
@@ -765,7 +766,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         // get counts
         _num_nodes_domain = adj1.get_num_nodes_domain();
@@ -808,7 +809,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor1_::ImageIterator AImIt1;
         typedef typename Adjactor2_::ImageIterator AImIt2;
@@ -887,7 +888,7 @@ namespace FEAT
         const Adjactor2_& adj2)
       {
         // validate adjactor dimensions
-        ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+        XASSERTM(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         // get counts
         _num_nodes_domain = adj2.get_num_nodes_image();
@@ -963,14 +964,14 @@ namespace FEAT
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
         return &_image_idx[_domain_ptr[domain_node]];
       }
 
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
 
         if(_domain_end != nullptr)
           return &_image_idx[_domain_end[domain_node]];

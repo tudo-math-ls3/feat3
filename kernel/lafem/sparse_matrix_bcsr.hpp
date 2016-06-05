@@ -207,10 +207,8 @@ namespace FEAT
                   // fetch column index
                   Index jx = col_map.get_index(j, jc);
 
-#ifdef DEBUG
                   // ensure that the column pointer is valid for this index
-                  ASSERT(_col_ptr[jx] != _deadcode, "invalid column index");
-#endif
+                  ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
 
                   // incorporate data into global matrix
                   _data[_col_ptr[jx]] += (iw * jw) * loc_mat[i][j];
@@ -375,7 +373,7 @@ namespace FEAT
                                       DenseVector<Mem_, IT_, IT_> & col_ind_in, DenseVector<Mem_, DT_, IT_> & val_in, DenseVector<Mem_, IT_, IT_> & row_ptr_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
-        ASSERT(val_in.size() % (BlockHeight_ * BlockWidth_) == 0, "Error: " + stringify(val_in.size()) + " not multiple of container blocksize!");
+        XASSERTM(val_in.size() % (BlockHeight_ * BlockWidth_) == 0, "input values size is not a multiple of container blocksize!");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(val_in.size() / Index(BlockHeight_ * BlockWidth_));
@@ -874,8 +872,8 @@ namespace FEAT
        */
       Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> operator()(Index row, Index col) const
       {
-        ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(rows()) + " !");
-        ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(columns()) + " !");
+        ASSERT(row < rows());
+        ASSERT(col < columns());
 
         for (Index i(MemoryPool<Mem_>::get_element(this->_indices.at(1), row)) ; i < MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1) ; ++i)
         {
@@ -1600,8 +1598,8 @@ namespace FEAT
       /// \copydoc extract_diag()
       void extract_diag(VectorTypeL & diag) const
       {
-        ASSERT(diag.size() == rows(), "Error: diag size does not match matrix row count!");
-        ASSERT(rows() == columns(), "Error: matrix is not square!");
+        XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
+        XASSERTM(rows() == columns(), "matrix is not square!");
 
         /// \todo Replace by Arch::kernels
         const Index n = rows();

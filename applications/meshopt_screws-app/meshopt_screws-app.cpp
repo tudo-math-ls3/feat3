@@ -109,8 +109,8 @@ struct MeshoptScrewsApp
   int lvl_max, int lvl_min, const DataType delta_t, const DataType t_end,
   const bool write_vtk)
   {
-    ASSERT_(delta_t > DataType(0));
-    ASSERT_(t_end >= DataType(0));
+    XASSERT(delta_t > DataType(0));
+    XASSERT(t_end >= DataType(0));
 
     TimeStamp at;
 

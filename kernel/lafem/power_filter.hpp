@@ -167,14 +167,14 @@ namespace FEAT
        */
       SubFilterType& get(int i)
       {
-        ASSERT_((0 <= i) && (i < count_));
+        XASSERTM((0 <= i) && (i < count_), "invalid sub-filter index");
         return (i == 0) ? _first : _rest.get(i-1);
       }
 
       /** \copydoc get() */
       const SubFilterType& get(int i) const
       {
-        ASSERT_((0 <= i) && (i < count_));
+        XASSERTM((0 <= i) && (i < count_), "invalid sub-filter index");
         return (i == 0) ? _first : _rest.get(i-1);
       }
 
@@ -302,19 +302,13 @@ namespace FEAT
 
       SubFilterType& get(int i)
       {
-#ifndef DEBUG
-        (void)i;
-#endif
-        ASSERT_(i == 0);
+        XASSERTM(i == 0, "invalid sub-filter index");
         return _first;
       }
 
       const SubFilterType& get(int i) const
       {
-#ifndef DEBUG
-        (void)i;
-#endif
-        ASSERT_(i == 0);
+        XASSERTM(i == 0, "invalid sub-filter index");
         return _first;
       }
 

@@ -72,7 +72,7 @@ namespace FEAT
 
       void add_facet(Index ifacet)
       {
-        ASSERT_(ifacet < Index(_facets.size()));
+        ASSERTM(ifacet < Index(_facets.size()), "invalid facet index");
         _facet_mask.at(ifacet) = 1;
       }
 

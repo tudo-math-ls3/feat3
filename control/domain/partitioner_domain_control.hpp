@@ -113,7 +113,7 @@ namespace FEAT
           void _create(int lvl_max, int lvl_min, const Index min_elems_partitioner,
           Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader = nullptr)
           {
-            ASSERT_(mesh_file_reader != nullptr);
+            XASSERT(mesh_file_reader != nullptr);
 
             // create root mesh node
             MeshNodeType* mesh_node = nullptr;
@@ -122,7 +122,7 @@ namespace FEAT
             int lvl(0);
             {
               //ALL
-              ASSERT_(this->_atlas == nullptr);
+              XASSERT(this->_atlas == nullptr);
 
               this->_atlas = new Geometry::MeshAtlas<MeshType_>();
               Geometry::RootMeshNode<MeshType_>* base_mesh_node(new Geometry::RootMeshNode<MeshType_>(nullptr, this->_atlas));
