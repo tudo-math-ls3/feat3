@@ -6,7 +6,6 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/type_traits.hpp>
-#include <kernel/util/instantiation_policy.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/archs.hpp>
 
@@ -89,10 +88,54 @@ namespace FEAT
 
     /// list of all instantiated tests
     class TestList
-      : public InstantiationPolicy<TestList, Singleton>
     {
-
     private:
+      class DeleteOnDestruction
+      {
+      private:
+        /// Pointer to our managed object
+        TestList * * const _ptr;
+
+      public:
+        /// Constructor
+        DeleteOnDestruction(TestList * * const ptr)
+          : _ptr(ptr)
+        {
+        }
+
+        /// Destructor
+        ~DeleteOnDestruction()
+        {
+          TestList::_delete(*_ptr);
+          *_ptr = nullptr;
+        }
+      };
+
+      /// Returns a pointer to our instance pointer.
+      static TestList * * _instance_ptr()
+      {
+        // The Microsoft compiler warns that creating a local static object is not thread-safe.
+        // The corresponding warning is enabled by default, so we'll only disable it for the following
+        // code and restore the warning state afterwards.
+#ifdef FEAT_COMPILER_MICROSOFT
+#  pragma warning(push)
+#  pragma warning(disable: 4640)
+#endif
+
+        static TestList * instance(nullptr);
+        static DeleteOnDestruction delete_instance(&instance);
+
+#ifdef FEAT_COMPILER_MICROSOFT
+#  pragma warning(pop)
+#endif
+
+        return &instance;
+      }
+
+      static void _delete(TestList * const ptr)
+      {
+        delete ptr;
+      }
 
       /// internal STL list representation of TestList
       std::list<BaseTest*> _tests;
@@ -102,11 +145,35 @@ namespace FEAT
       {
       }
 
+      TestList(const TestList&) = delete;
+      TestList& operator=(const TestList&) = delete;
 
     public:
+      /**
+       * \brief Returns the instance.
+       *
+       * \returns
+       * A pointer to the singleton.
+       */
+      static TestList * instance()
+      {
+        TestList * * instance_ptr = _instance_ptr();
 
-      /// pointer to TestList singleton
-      friend TestList* InstantiationPolicy<TestList, Singleton>::instance();
+        if (nullptr == *instance_ptr)
+        {
+          /// \todo Make thread safe
+          //static Mutex m;
+          //Lock l(m);
+
+          instance_ptr = _instance_ptr();
+
+          if (nullptr == *instance_ptr)
+          {
+            *instance_ptr = new TestList;
+          }
+        }
+        return *instance_ptr;
+      }
 
       /// TestList forward iterator.
       typedef std::list<BaseTest*>::iterator Iterator;

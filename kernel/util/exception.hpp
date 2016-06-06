@@ -7,7 +7,6 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/util/instantiation_policy.hpp>
 #include <kernel/util/string.hpp>
 
 // includes, system

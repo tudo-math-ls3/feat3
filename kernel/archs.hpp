@@ -11,7 +11,6 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
-#include <kernel/util/instantiation_policy.hpp>
 
 namespace FEAT
 {
@@ -34,8 +33,7 @@ namespace FEAT
        * This is an empty tag class which may be used for templates with optional parameters.\n
        * Some template implementations might recognise the usage of a \c None parameter as <em>parameter not given</em>.
        */
-      struct None :
-        public InstantiationPolicy<None, NonCopyable>
+      struct None
       {
         const static TagValue tag_value = tv_none;
         const static TagValue memory_value = tv_none;
@@ -48,8 +46,7 @@ namespace FEAT
       /**
        * Tag-type for serial operations.
        */
-      struct Serial :
-        public InstantiationPolicy<Serial, NonCopyable>
+      struct Serial
       {
         const static TagValue tag_value = tv_serial;
         const static TagValue memory_value = tv_serial;
@@ -62,8 +59,7 @@ namespace FEAT
       /**
        * Tag-type for Parallel operations.
        */
-      struct Parallel :
-        public InstantiationPolicy<Parallel, NonCopyable>
+      struct Parallel
       {
         const static TagValue tag_value = tv_parallel;
         const static TagValue memory_value = tv_parallel;
@@ -92,8 +88,7 @@ namespace FEAT
       /**
        * Tag-type for operations in main (CPU) memory
        */
-      struct Main :
-        public InstantiationPolicy<Main, NonCopyable>
+      struct Main
       {
         const static TagValue tag_value = tv_main;
         const static TagValue memory_value = tv_main;
@@ -106,8 +101,7 @@ namespace FEAT
       /**
        * Tag-type for operations in cuda (GPU) memory
        */
-      struct CUDA :
-        public InstantiationPolicy<CUDA, NonCopyable>
+      struct CUDA
       {
         const static TagValue tag_value = tv_cuda;
         const static TagValue memory_value = tv_cuda;
@@ -142,8 +136,7 @@ namespace FEAT
        * \deprecated {The Algo Tag is not used anymore.
        * Only the micro benchmarks are stuck to this to explicitly address the several backends.}
        */
-      struct Generic :
-        public InstantiationPolicy<Generic, NonCopyable>
+      struct Generic
       {
         typedef Mem::Main MemType;
         const static TagValue tag_value = tv_generic;
@@ -160,8 +153,7 @@ namespace FEAT
        * \deprecated {The Algo Tag is not used anymore.
        * Only the micro benchmarks are stuck to this to explicitly address the several backends.}
        */
-      struct MKL :
-        public InstantiationPolicy<Generic, NonCopyable>
+      struct MKL
       {
         typedef Mem::Main MemType;
         const static TagValue tag_value = tv_mkl;
@@ -178,8 +170,7 @@ namespace FEAT
        * \deprecated {The Algo Tag is not used anymore.
        * Only the micro benchmarks are stuck to this to explicitly address the several backends.}
        */
-      struct CUDA :
-        public InstantiationPolicy<CUDA, NonCopyable>
+      struct CUDA
       {
         typedef Mem::CUDA MemType;
         const static TagValue tag_value = tv_cuda;
