@@ -6,6 +6,10 @@
 #include <cstdlib>
 #include <fstream>
 
+#if defined(__linux) || defined(__unix__)
+#include <execinfo.h>
+#endif
+
 #ifdef FEAT_HAVE_MPI
 #include <mpi.h>
 #endif
@@ -114,7 +118,20 @@ void Runtime::abort(bool dump_call_stack)
 {
   if(dump_call_stack)
   {
-#ifdef _WIN32
+#if defined(__linux) || defined(__unix__)
+    // https://www.gnu.org/software/libc/manual/html_node/Backtraces.html
+    void* buffer[1024];
+    int bt_size = backtrace(buffer, 1024);
+    char** bt_symb = backtrace_symbols(buffer, bt_size);
+    if((bt_size > 0) && (bt_symb != nullptr))
+    {
+      fprintf(stderr, "\nCall-Stack Back-Trace:\n");
+      fprintf(stderr,   "----------------------\n");
+      for(int i(0); i < bt_size; ++i)
+        fprintf(stderr, "%s\n", bt_symb[i]);
+      fflush(stderr);
+    }
+#elif defined(_WIN32)
     Windows::dump_call_stack_to_stderr();
 #endif
   }
