@@ -147,7 +147,9 @@ namespace FEAT
       // query context
       CONTEXT ctx;
       RtlCaptureContext(&ctx);
-      dump_call_stack(ctx, stderr);
+      // make a copy
+      CONTEXT ctx2(ctx);
+      dump_call_stack(ctx2, stderr);
     }
 
     LONG WINAPI FeatWinExceptionFilter(LPEXCEPTION_POINTERS p)
