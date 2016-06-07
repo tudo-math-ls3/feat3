@@ -70,44 +70,6 @@ namespace FEAT
 
         }
 
-#ifdef FEAT_HAVE_MPI
-        static void exec(std::stringstream& iss, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD))
-        {
-          Index me(Util::Comm::rank(comm));
-          Index size;
-          std::string str;
-
-          //bcast size
-          if(me == 0)
-          {
-            str = (iss.str());
-            size = Index(str.length());
-          }
-          // synchronize length
-          Util::Comm::bcast(&size, 1, 0, comm);
-
-          //allocate
-          char* buf = new char[size + 1];
-
-          //fill
-          if(me == 0) //master
-          {
-            std::strcpy(buf, str.c_str());
-          }
-
-          //bcast data
-          Util::Comm::bcast(buf, size, 0, comm);
-
-          //convert
-          if(me != 0)
-          {
-            std::string res_str(buf, size);
-            iss << res_str;
-          }
-
-          delete[] buf;
-        }
-#endif
     };
 
   }

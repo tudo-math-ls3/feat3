@@ -83,7 +83,7 @@ void check_psynch_stringstream()
   if(Util::Comm::rank() == 0)
     synchstream << "MASTER";
 
-  PSynch<PExecutorParmetis<ParmetisModePartKway> >::exec(synchstream);
+  Util::Comm::synch_stringstream(synchstream);
 
   if(synchstream.str() == "MASTER")
     std::cout << "PASSED (rank " << Util::Comm::rank() <<"): foundation_psystem_test (psynch stringstream)" << std::endl;
@@ -113,7 +113,7 @@ void check_psynch_meshstreamer()
     synchstream << ifs.rdbuf();
   }
 
-  PSynch<PExecutorParmetis<ParmetisModePartKway> >::exec(synchstream);
+  Util::Comm::synch_stringstream(synchstream);
   Geometry::MeshFileReader mesh_file_reader(synchstream);
 
   // create an empty atlas and a root mesh node

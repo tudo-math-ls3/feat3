@@ -65,7 +65,7 @@ namespace FEAT
             // Synchronise the mesh stream in parallel mode
 #ifdef FEAT_HAVE_MPI
             //MASTER to ALL
-            Foundation::PSynch<PartT>::exec(synchstream);
+            Util::Comm::synch_stringstream(synchstream);
 #endif
 
             // Create MeshFileReader using the synched stream

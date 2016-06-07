@@ -4,6 +4,9 @@
 
 #include<kernel/base_header.hpp>
 
+#include<iostream> // for std::istream
+#include<cstring>  // for std::strcpy
+
 #ifdef FEAT_HAVE_MPI
 #include<mpi.h>
 #include<memory>
@@ -510,6 +513,53 @@ namespace FEAT
           }
 #endif
 
+        /**
+         * \brief Synchronises a stringstream from rank 0 to all ranks in the communicator
+         *
+         * \param[in,out] iss
+         * The std::stringstream to synchronise, gets overwritten by the output.
+         *
+         * \param[in] comm
+         * Communicator for the synch operation, defaults to MPI_COMM_WORLD.
+         *
+         */
+        static void synch_stringstream(std::stringstream& iss, const Communicator comm = Communicator(MPI_COMM_WORLD))
+        {
+          Index my_rank(Util::Comm::rank(comm));
+          Index size;
+          String str;
+
+          // Get size to broadcast
+          if(my_rank == 0)
+          {
+            str = (iss.str());
+            size = str.length();
+          }
+          // synchronize length
+          Util::Comm::bcast(&size, 1, 0, comm);
+
+          // allocate
+          char* buf = new char[size + 1];
+
+          //fill
+          if(my_rank == 0) //master
+          {
+            std::strcpy(buf, str.c_str());
+          }
+
+          //bcast data
+          Util::Comm::bcast(buf, size, 0, comm);
+
+          //convert
+          if(my_rank != 0)
+          {
+            String res_str(buf, size);
+            iss << res_str;
+          }
+
+          delete[] buf;
+        }
+
         static inline Index rank(Communicator c = Communicator(MPI_COMM_WORLD))
         {
           int r;
@@ -716,6 +766,10 @@ namespace FEAT
         static inline Index size(Communicator = Communicator(0))
         {
           return Index(1);
+        }
+
+        static void synch_stringstream(std::stringstream& DOXY(iss), Communicator DOXY(comm) = Communicator(0))
+        {
         }
         //TODO
     };

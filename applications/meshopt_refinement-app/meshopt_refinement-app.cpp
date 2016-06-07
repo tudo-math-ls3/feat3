@@ -12,46 +12,6 @@ using namespace FEAT;
 
 static void display_help();
 
-#ifdef FEAT_HAVE_MPI
-static void synch_stringstream(std::stringstream& iss, Util::Communicator comm = Util::Communicator(MPI_COMM_WORLD))
-{
-  Index me(Util::Comm::rank(comm));
-  Index size;
-  std::string str;
-
-  //bcast size
-  if(me == 0)
-  {
-    str = (iss.str());
-    size = str.length();
-  }
-  // synchronize length
-  Util::Comm::bcast(&size, 1, 0, comm);
-
-  //allocate
-  char* buf = new char[size + 1];
-
-  //fill
-  if(me == 0) //master
-  {
-    std::strcpy(buf, str.c_str());
-  }
-
-  //bcast data
-  Util::Comm::bcast(buf, size, 0, comm);
-
-  //convert
-  if(me != 0)
-  {
-    std::string res_str(buf, size);
-    iss << res_str;
-  }
-
-  delete[] buf;
-}
-#endif
-
-
 template<typename Mem_, typename DT_, typename IT_, typename Mesh_>
 struct MeshRefinementOptimiserApp
 {
@@ -323,7 +283,7 @@ int main(int argc, char* argv[])
 
 #ifdef FEAT_HAVE_MPI
   // If we are in parallel mode, we need to synchronise the stream
-  synch_stringstream(synchstream_app_config);
+  Util::Comm::synch_stringstream(synchstream_app_config);
 #endif
 
   // Parse the application config from the (synchronised) stream
@@ -419,10 +379,10 @@ int main(int argc, char* argv[])
 
 #ifdef FEAT_HAVE_MPI
   // Synchronise all those streams in parallel mode
-  synch_stringstream(synchstream_mesh);
-  synch_stringstream(synchstream_chart);
-  synch_stringstream(synchstream_meshopt_config);
-  synch_stringstream(synchstream_solver_config);
+  Util::Comm::synch_stringstream(synchstream_mesh);
+  Util::Comm::synch_stringstream(synchstream_chart);
+  Util::Comm::synch_stringstream(synchstream_meshopt_config);
+  Util::Comm::synch_stringstream(synchstream_solver_config);
 #endif
 
   // Create a MeshFileReader and parse the mesh stream
