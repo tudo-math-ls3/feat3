@@ -37,7 +37,7 @@ type = pcg
 max_iter = 250
 tol_rel = 1e-8
 plot = 1
-precon = rich
+precon = mgv
 
 [Richardson-MGV]
 type = richardson
