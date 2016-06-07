@@ -366,7 +366,7 @@ namespace FEAT
           this->_vec_dir.clone(this->_vec_tmp);
 
           // Compute initial eta = <d, r>
-          this->_eta = this->_vec_tmp.dot(this->_vec_def);
+          this->_eta = this->_vec_dir.dot(this->_vec_def);
 
           // If the preconditioner was not pd in the first step, reset the search direction to steepest descent
           if(_eta <= DataType(0))
@@ -376,7 +376,7 @@ namespace FEAT
           }
 
           // compute initial gamma
-          DataType gamma = this->_vec_def.dot(this->_vec_dir);
+          DataType gamma = this->_vec_tmp.dot(this->_vec_def);
           if(this->_def_init <= this->_tol_rel)
             return Status::success;
 
@@ -413,13 +413,12 @@ namespace FEAT
 
             // Log iterates if necessary
             if(iterates != nullptr)
-            {
               iterates->push_back(vec_sol.clone());
-            }
 
             // Compute defect norm. This also performs the convergence/divergence checks.
             status = this->_set_new_defect(this->_vec_def, vec_sol);
 
+            // Something might have gone wrong in applying the preconditioner, so check status again.
             if(status != Status::progress)
             {
               TimeStamp bt;
@@ -431,9 +430,8 @@ namespace FEAT
             if(this->_precond != nullptr)
               this->_precond->prepare(vec_sol, this->_filter);
 
-            status = compute_beta(_beta, gamma, at);
+            status = compute_beta(_beta, gamma);
 
-            // Something might have gone wrong in applying the preconditioner, so check status again.
             if(status != Status::progress)
             {
               TimeStamp bt;
@@ -449,7 +447,7 @@ namespace FEAT
               its_since_restart++;
             }
 
-            /// Restarting means discarding the new search direction and setting the new search direction to the
+            // Restarting means discarding the new search direction and setting the new search direction to the
             // (preconditioned) steepest descent direction
             if(_beta == DataType(0))
             {
@@ -492,31 +490,28 @@ namespace FEAT
          * \param[in, out] gamma
          * This is the scalar product of the defect and the preconditioned defect
          *
-         * \param[in, out] at
-         * Timestamp for solver timings
-         *
          * If the returned \f$ \beta = 0,\f$ the next search direction is the steepest descent direction. Many of the
          * update formulas need the old (preconditioned) defect we keep in _vec_temp, so the preconditioner is always
          * called in these routines.
          *
          * \returns A solver status code.
          */
-        Status compute_beta(DataType& beta, DataType& gamma, TimeStamp& at)
+        Status compute_beta(DataType& beta, DataType& gamma)
         {
           switch(_direction_update)
           {
             case NLCGDirectionUpdate::DaiYuan:
-              return dai_yuan(beta, gamma, at);
+              return dai_yuan(beta, gamma);
             case NLCGDirectionUpdate::DYHSHybrid:
-              return dy_hs_hybrid(beta, gamma, at);
+              return dy_hs_hybrid(beta, gamma);
             case NLCGDirectionUpdate::FletcherReeves:
-              return fletcher_reeves(beta, gamma, at);
+              return fletcher_reeves(beta, gamma);
             case NLCGDirectionUpdate::HestenesStiefel:
-              return hestenes_stiefel(beta, gamma, at);
+              return hestenes_stiefel(beta, gamma);
             case NLCGDirectionUpdate::PolakRibiere:
-              return polak_ribiere(beta, gamma, at);
+              return polak_ribiere(beta, gamma);
             default:
-              return Status::aborted;
+              return Status::undefined;
           }
         }
 
@@ -611,8 +606,8 @@ namespace FEAT
          *
          * The Dai-Yuan update sets
          * \f[
-         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
-         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<s_k, d_k\right>
+         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_{k+1} := \left< r_{k+1}, s_{k+1} \right>,
+         *   \quad \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<r_k, d_k\right>
          * \f]
          * \f[
          *   \beta_{k+1} := \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}} - \eta_k}
@@ -621,20 +616,17 @@ namespace FEAT
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
          */
-        Status dai_yuan(DataType& beta, DataType& gamma, TimeStamp& at)
+        Status dai_yuan(DataType& beta, DataType& gamma)
         {
 
           // _vec_tmp still contais the old (preconditioned) defect
           DataType eta_old(this->_eta);
+          // eta_mid = < r[k+1], d[k] >
           DataType eta_mid(this->_vec_def.dot(this->_vec_dir));
 
           // apply preconditioner
           if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
             return Status::aborted;
-          }
 
           gamma = this->_vec_def.dot(this->_vec_tmp);
 
@@ -650,7 +642,7 @@ namespace FEAT
          * \f[
          *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
          *   \gamma_{k+\frac{1}{2}} := \left< r_k, s_{k+1} \right>, \quad
-         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<s_k, d_k\right>
+         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<r_k, d_k\right>
          * \f]
          * \f[
          *   \beta_{k+1} := \max \left\{0, \min \left\{ \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}+ \eta_k}, \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}}+ \eta_k} \right\} \right\}
@@ -659,7 +651,7 @@ namespace FEAT
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
          */
-        Status dy_hs_hybrid(DataType& beta, DataType& gamma, TimeStamp& at)
+        Status dy_hs_hybrid(DataType& beta, DataType& gamma)
         {
           DataType eta_old = this->_eta;
           // _vec_dir still contains the old search direction
@@ -669,11 +661,7 @@ namespace FEAT
 
           // apply preconditioner
           if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
             return Status::aborted;
-          }
 
           gamma = this->_vec_def.dot(this->_vec_tmp);
 
@@ -690,34 +678,19 @@ namespace FEAT
          *   \gamma_{k+\frac{1}{2}} = \left<r_{k+1}, d_k \right>
          * \f]
          * \f[
-         *   \beta_{k+1} :=
-         *   \begin{cases}
-         *     0, & \gamma_{k+\frac{1}{2}} \leq 0 \\
-         *     \frac{\gamma_{k+1}}{\gamma_k}, & \mathrm{else}
-         *   \end{cases}
+         *   \beta_{k+1} := \frac{\gamma_{k+1}}{\gamma_k}
          * \f]
          */
-        Status fletcher_reeves(DataType& beta, DataType& gamma, TimeStamp& at)
+        Status fletcher_reeves(DataType& beta, DataType& gamma)
         {
+          DataType gamma_old(gamma);
 
           // apply preconditioner
           if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
             return Status::aborted;
-          }
 
-          DataType gamma_old = gamma;
-          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_dir);
-
-          if(gamma_mid < -gamma_old)
-            beta = DataType(0);
-          else
-          {
-            gamma = this->_vec_def.dot(this->_vec_tmp);
-            beta = gamma/gamma_old;
-          }
+          gamma = this->_vec_def.dot(this->_vec_tmp);
+          beta = gamma/gamma_old;
 
           return Status::progress;
         }
@@ -729,7 +702,7 @@ namespace FEAT
          * \f[
          *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
          *   \gamma_{k+\frac{1}{2}} := \left< r_k, s_{k+1} \right>, \quad
-         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<s_k, d_k\right>
+         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<r_k, d_k\right>
          * \f]
          * \f[
          *   \beta_{k+1} := \max \left\{0, \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}
@@ -739,7 +712,7 @@ namespace FEAT
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
          */
-        Status hestenes_stiefel(DataType& beta, DataType& gamma, TimeStamp& at)
+        Status hestenes_stiefel(DataType& beta, DataType& gamma)
         {
           DataType eta_old = this->_eta;
           // _vec_dir still contains the old search direction
@@ -749,11 +722,7 @@ namespace FEAT
 
           // apply preconditioner
           if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
             return Status::aborted;
-          }
 
           gamma = this->_vec_def.dot(this->_vec_tmp);
 
@@ -772,7 +741,7 @@ namespace FEAT
          *   \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
          * \f}
          */
-        Status polak_ribiere(DataType& beta, DataType& gamma, TimeStamp& at)
+        Status polak_ribiere(DataType& beta, DataType& gamma)
         {
           DataType gamma_old(gamma);
           // vec_tmp still contains the old (preconditioned) defect
@@ -780,11 +749,7 @@ namespace FEAT
 
           // apply preconditioner
           if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
             return Status::aborted;
-          }
 
           gamma = this->_vec_def.dot(this->_vec_tmp);
 

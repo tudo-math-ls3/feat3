@@ -167,7 +167,7 @@ nlcg_sw_bs_q(__float128(0.175), Index(30), "StrongWolfeLinesearch", "none", NLCG
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f_cuda(float(0.8), Index(8), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
+nlcg_sw_hb_f_cuda(float(0.7), Index(10), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 nlcg_s_bs_d_cuda(double(0.15), Index(20), "SecantLinesearch", "none", NLCGDirectionUpdate::DaiYuan);
