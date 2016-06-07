@@ -353,15 +353,24 @@ namespace FEAT
        * \brief Du:Dv operator implementation
        *
        * This functor implements the weak formulation of the bilinear Du : Dv operator, i.e.
-       *   \f[ \mathbf{D} \varphi : \mathbf{D} \psi \f] with the operator
-       *   \f[ \mathbf{D} \varphi = \frac{1}{2} \left( \nabla \varphi + \left( \nabla \varphi \right)^T \right) \f]
+       * \f[
+       *   \mathbf{D} \varphi : \mathbf{D} \psi
+       * \f]
+       * with the operator
+       * \f[
+       *   \mathbf{D} \varphi = \frac{1}{2} \left( \nabla \varphi + \left( \nabla \varphi \right)^T \right).
+       * \f]
+       *
+       * Note that
+       * \f[
+       *   \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \psi + \nabla \varphi : \left( \nabla \psi \right)^T \right),
+       * \f]
+       * so the \f$ (k,l) \f$-block consists of entries corresponding to \f$ \partial_k \varphi \partial_l \psi \f$.
+       *
        *
        * This functor can be used with the BilinearOperator assembly class template to assemble one
-       * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the number
-       * of space dimensions.
-       *
-       * Note that \f[ \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \psi + \nabla \varphi : \left( \nabla \psi \right)^T \right) \f],
-       * so the \f$ (k,l) \f$-block consists of entries corresponding to \f$ \partial_k \varphi \partial_l \psi \f$.
+       * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the
+       * number of space dimensions.
        *
        * \author Jordi Paul
        */
@@ -458,14 +467,22 @@ namespace FEAT
        * \brief Du:Dv operator implementation
        *
        * This functor implements the weak formulation of the bilinear Du : Dv operator, i.e.
-       *   \f[ \mathbf{D} \varphi : \mathbf{D} \psi \f] with the operator
-       *   \f[ \mathbf{D} \varphi = \frac{1}{2} \left( \nabla \varphi + \left( \nabla \varphi \right)^T \right) \f]
+       * \f[
+       *   \mathbf{D} \varphi : \mathbf{D} \psi
+       * \f]
+       * with the operator
+       * \f[
+       *   \mathbf{D} \varphi = \frac{1}{2} \left( \nabla \varphi + \left( \nabla \varphi \right)^T \right).
+       * \f]
        *
        * This functor can be used with the BilinearOperator assembly class template to assemble one
-       * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the number
-       * of space dimensions.
+       * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the
+       * number of space dimensions.
        *
-       * Note that \f[ \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \psi + \nabla \varphi : \left( \nabla \psi \right)^T \right) \f],
+       * Note that
+       * \f[
+       *   \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \psi + \nabla \varphi : \left( \nabla \psi \right)^T \right),
+       * \f]
        * so the \f$ (k,l) \f$-block consists of entries corresponding to \f$ \partial_k \varphi \partial_l \psi \f$.
        *
        * \author Jordi Paul
