@@ -436,6 +436,39 @@ namespace FEAT
                   communicator.mpi_comm());
             }
           }
+        template<typename DataType_>
+          static inline int allgatherv(const DataType_ * sendbuf,
+              const int sendcount,
+              DataType_* recvbuf,
+              const int recvcounts[],
+              const int rdispls[],
+              Communicator communicator = Communicator(MPI_COMM_WORLD),
+              bool in_place = false)
+          {
+            if(!in_place)
+            {
+              return MPI_Allgatherv(sendbuf,
+                  sendcount,
+                  MPIType<DataType_>::value(),
+                  recvbuf,
+                  recvcounts,
+                  rdispls,
+                  MPIType<DataType_>::value(),
+                  communicator.mpi_comm());
+            }
+            else
+            {
+              return MPI_Allgatherv(MPI_IN_PLACE,
+                  sendcount,
+                  MPIType<DataType_>::value(),
+                  recvbuf,
+                  recvcounts,
+                  rdispls,
+                  MPIType<DataType_>::value(),
+                  communicator.mpi_comm());
+            }
+          }
+
         template<typename DataType1_>
           static inline void iallreduce(DataType1_ * sendbuf,
               Index num_elements_to_send_and_receive,

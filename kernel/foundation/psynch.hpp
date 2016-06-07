@@ -38,19 +38,6 @@ namespace FEAT
 
           const Index commsize(Util::Comm::size(local_partitioning_result.get_comm()));
 
-          int* sendcounts = new int[commsize];
-          for(Index i(0) ; i < commsize ; ++i)
-          {
-            sendcounts[i] = int(local_partitioning_result.size());
-          }
-          //sendcounts[Util::Comm::rank(local_partitioning_result.get_comm())] = int(0);
-
-          int* sdispls = new int[commsize];
-          for(Index i(0) ; i < commsize ; ++i)
-          {
-            sdispls[i] = int(0);
-          }
-
           typename PExecutorT_::PResult::IndexType* recvbuf(result.get());
 
           int* recvcounts = new int[commsize];
@@ -66,13 +53,11 @@ namespace FEAT
             rdispls[i] = int(local_partitioning_result.get_vtxdist()[i]);
           }
 
-          int err(Util::Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, local_partitioning_result.get_comm()));
+          int err(Util::Comm::allgatherv(sendbuf, int(local_partitioning_result.size()), recvbuf, recvcounts, rdispls, local_partitioning_result.get_comm()));
 
           if(err != MPI_SUCCESS)
             throw(InternalError("Synch during partitioning failed!"));
 
-          delete[] sendcounts;
-          delete[] sdispls;
           delete[] recvcounts;
           delete[] rdispls;
 

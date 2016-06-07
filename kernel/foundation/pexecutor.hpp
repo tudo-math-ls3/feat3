@@ -474,14 +474,6 @@ namespace FEAT
           //then, synchronize cr
           Index* sendbuf = cr_p.data();
 
-          int* sendcounts = new int[commsize];
-          for(Index i(0) ; i < commsize ; ++i)
-            sendcounts[i] = int(cr_p.size());
-
-          int* sdispls = new int[commsize];
-          for(Index i(0) ; i < commsize ; ++i)
-            sdispls[i] = int(0);
-
           Index cr_sizes_sum(0);
           for(Index i(0) ; i < commsize ; ++i)
             cr_sizes_sum += cr_sizes_recvbuf[i];
@@ -501,7 +493,7 @@ namespace FEAT
             rdispls[i] = int(write_count);
           }
 
-          Util::Comm::alltoallv(sendbuf, sendcounts, sdispls, recvbuf, recvcounts, rdispls, synched_part.get_comm());
+          Util::Comm::allgatherv(sendbuf, int(cr_p.size()), recvbuf, recvcounts, rdispls, synched_part.get_comm());
 
           std::vector<Index> p0;
           std::vector<Index> p1;
@@ -546,8 +538,6 @@ namespace FEAT
           delete[] part_sizes_recvbuf;
           delete[] cr_sizes_recvbuf;
           delete[] recvbuf;
-          delete[] sendcounts;
-          delete[] sdispls;
           delete[] recvcounts;
           delete[] rdispls;
 
