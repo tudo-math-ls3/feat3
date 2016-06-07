@@ -1676,6 +1676,93 @@ namespace FEAT
       }; // class BazaraaShettyStatic<...>
       /// \endcond
 
+      /// \cond internal
+      /**
+       * \brief Goldstein/Price function
+       *
+       * \tparam DataType_
+       * Floating point precision
+       *
+       * This class implements the StaticFunction interface representing the function
+       *  \f[
+       *    u(x,y) =(1+(1+x+y)^2 * (19 - 14*x+3*x^2-14*y+6*x*y+3*y^2))
+       *    *(30 + (2*x-3*y)^2 * (18 - 32*x +12*x^2 + 48*y - 36*x*y + 27*y^2))
+       *  \f]
+       *  This function has a global miminum in \f$ x_0 = (0, -0.5)^T, u(x_0) = 3 \f$, three more local minima
+       *  \f[
+       *    x_1 = (-0.6, -0.4)^T, x_2 = (1.2, 0.8)^T, x_3 = (1.8, 0.2),
+       *  \f]
+       *  one saddle point \f$ x_4 = (-0.4, 0.6)^T \f$ and a local maximum in \f$ x_5 = (1.2, -0.2)^T.
+       *
+       *
+       * \author Jordi Paul
+       */
+      template<typename DataType_>
+      class GoldsteinPriceStatic
+      {
+      public:
+        /// function value
+        static DataType_ eval(DataType_ x, DataType_ y)
+        {
+          return (DataType_(1) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19))) * (30 + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18)));
+        }
+
+        /// x-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y)
+        {
+          return (DataType_(2) * (DataType_(1) + x + y) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19)) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(6) * x + DataType_(6) * y - DataType_(14))) * (30 + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18))) + (DataType_(1) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19))) * (DataType_(4) * (DataType_(2) * x - DataType_(3) * y) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18)) + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (DataType_(24) * x - DataType_(36) * y - DataType_(32)));
+        }
+
+        /// y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y)
+        {
+          return (DataType_(2) * (DataType_(1) + x + y) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19)) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(6) * x + DataType_(6) * y - DataType_(14))) * (30 + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18))) + (DataType_(1) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19))) * (-DataType_(6) * (DataType_(2) * x - DataType_(3) * y) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18)) + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (-DataType_(36) * x + DataType_(54) * y + DataType_(48)));
+        }
+
+        /// xx-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ y)
+        {
+          return DataType_((DataType_(6) * Math::pow(x, DataType_(2)) + DataType_(12) * x * y + DataType_(6) * Math::pow(y, DataType_(2)) - DataType_(28) * x - DataType_(28) * y + DataType_(38) + DataType_(4) * (DataType_(1) + x + y) * (DataType_(6) * x + DataType_(6) * y - DataType_(14)) + DataType_(6) * Math::pow(DataType_(1) + x + y, DataType_(2))) * (30 + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18))) + DataType_(2) * (DataType_(2) * (DataType_(1) + x + y) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19)) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(6) * x + DataType_(6) * y - DataType_(14))) * (DataType_(4) * (DataType_(2) * x - DataType_(3) * y) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18)) + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (DataType_(24) * x - DataType_(36) * y - DataType_(32))) + (DataType_(1) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19))) * (DataType_(96) * Math::pow(x, DataType_(2)) - DataType_(288) * x * y + DataType_(216) * Math::pow(y, DataType_(2)) - DataType_(256) * x + DataType_(384) * y + DataType_(144) + DataType_(8) * (DataType_(2) * x - DataType_(3) * y) * (DataType_(24) * x - DataType_(36) * y - DataType_(32)) + DataType_(24) * Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2))));
+        }
+
+        /// yy-derivative
+        static DataType_ der_yy(DataType_ x, DataType_ y)
+        {
+          return (DataType_(6) * Math::pow(x, DataType_(2)) + DataType_(12) * x * y + DataType_(6) * Math::pow(y, DataType_(2)) - DataType_(28) * x - DataType_(28) * y + DataType_(38) + DataType_(4) * (DataType_(1) + x + y) * (DataType_(6) * x + DataType_(6) * y - DataType_(14)) + DataType_(6) * Math::pow(DataType_(1) + x + y, DataType_(2))) * (30 + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18))) + DataType_(2) * (DataType_(2) * (DataType_(1) + x + y) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19)) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(6) * x + DataType_(6) * y - DataType_(14))) * (-DataType_(6) * (DataType_(2) * x - DataType_(3) * y) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18)) + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (-DataType_(36) * x + DataType_(54) * y + DataType_(48))) + (DataType_(1) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19))) * (DataType_(216) * Math::pow(x, DataType_(2)) - DataType_(648) * x * y + DataType_(486) * Math::pow(y, DataType_(2)) - DataType_(576) * x + DataType_(864) * y + DataType_(324) - DataType_(12) * (DataType_(2) * x - DataType_(3) * y) * (-DataType_(36) * x + DataType_(54) * y + DataType_(48)) + DataType_(54) * Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)));
+        }
+
+        /// xy-derivative
+        static DataType_ der_xy(DataType_ x, DataType_ y)
+        {
+          return (DataType_(6) * Math::pow(x, DataType_(2)) + DataType_(12) * x * y + DataType_(6) * Math::pow(y, DataType_(2)) - DataType_(28) * x - DataType_(28) * y + DataType_(38) + DataType_(4) * (DataType_(1) + x + y) * (DataType_(6) * x + DataType_(6) * y - DataType_(14)) + DataType_(6) * Math::pow(DataType_(1) + x + y, DataType_(2))) * (30 + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18))) + (DataType_(2) * (DataType_(1) + x + y) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19)) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(6) * x + DataType_(6) * y - DataType_(14))) * (DataType_(4) * (DataType_(2) * x - DataType_(3) * y) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18)) + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (DataType_(24) * x - DataType_(36) * y - DataType_(32))) + (DataType_(2) * (DataType_(1) + x + y) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19)) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(6) * x + DataType_(6) * y - DataType_(14))) * (-DataType_(6) * (DataType_(2) * x - DataType_(3) * y) * (DataType_(12) * Math::pow(x, DataType_(2)) - DataType_(36) * x * y + DataType_(27) * Math::pow(y, DataType_(2)) - DataType_(32) * x + DataType_(48) * y + DataType_(18)) + Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)) * (-DataType_(36) * x + DataType_(54) * y + DataType_(48))) + (DataType_(1) + Math::pow(DataType_(1) + x + y, DataType_(2)) * (DataType_(3) * Math::pow(x, DataType_(2)) + DataType_(6) * x * y + DataType_(3) * Math::pow(y, DataType_(2)) - DataType_(14) * x - DataType_(14) * y + DataType_(19))) * (-DataType_(144) * Math::pow(x, DataType_(2)) + DataType_(432) * x * y - DataType_(324) * Math::pow(y, DataType_(2)) + DataType_(384) * x - DataType_(576) * y - DataType_(216) - DataType_(6) * (DataType_(2) * x - DataType_(3) * y) * (DataType_(24) * x - DataType_(36) * y - DataType_(32)) + DataType_(4) * (DataType_(2) * x - DataType_(3) * y) * (-DataType_(36) * x + DataType_(54) * y + DataType_(48)) - DataType_(36) * Math::pow(DataType_(2) * x - DataType_(3) * y, DataType_(2)));
+        }
+
+        /// xy-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y)
+        {
+          return der_xy(x, y);
+        }
+
+      }; // class GoldsteinPriceStatic<...>
+      /// \endcond
+
+      /**
+       * \brief Goldstein/Price function
+       *
+       * \tparam DataType_
+       * Floating point precision
+       *
+       * This class implements the StaticFunction interface representing the function
+       *  \f[
+       *    u(x,y) =(1+(1+x+y)^2 * (19 - 14*x+3*x^2-14*y+6*x*y+3*y^2))
+       *    *(30 + (2*x-3*y)^2 * (18 - 32*x +12*x^2 + 48*y - 36*x*y + 27*y^2))
+       *  \f]
+       *  This function has a global miminum in \f$ x_0 = (0, -0.5)^T, u(x_0) = 3 \f$.
+       *
+       * \author Jordi Paul
+       */
+      using GoldsteinPriceFunction = StaticWrapperFunction<2, GoldsteinPriceStatic, true, true, true>;
+
       /**
        * \brief Bazaraa/Shetty function
        *

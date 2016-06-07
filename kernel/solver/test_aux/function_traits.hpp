@@ -136,6 +136,65 @@ namespace FEAT
     };
 
     template<typename DT_>
+    struct OptimisationTestTraits<DT_, Analytic::Common::GoldsteinPriceFunction>
+    {
+      public:
+        typedef Analytic::Common::GoldsteinPriceFunction FunctionType;
+        typedef Analytic::EvalTraits<DT_, FunctionType> FuncEvalTraits;
+        typedef typename FunctionType::template Evaluator<FuncEvalTraits> EvalType;
+        typedef typename EvalType::ValueType ValueType;
+        typedef typename EvalType::PointType PointType;
+
+        static void get_starting_point(PointType& start)
+        {
+          // This is a nice starting point
+          //start(0) = -DT_(0.5);
+          //start(1) = DT_(0.25);
+
+          // Is is a hard starting point
+          start(0) = DT_(1.5);
+          start(1) = DT_(1.17);
+        }
+
+        static void get_minimal_points(std::deque<PointType>& min_points)
+        {
+          min_points.clear();
+          PointType tmp(DT_(0));
+
+          tmp(0) = DT_(0);
+          tmp(1) = -DT_(1);
+          min_points.push_back(tmp);
+
+          tmp(0) = -DT_(0.6);
+          tmp(1) = -DT_(0.4);
+          min_points.push_back(tmp);
+
+          tmp(0) = DT_(1.2);
+          tmp(1) = DT_(0.8);
+          min_points.push_back(tmp);
+
+          tmp(0) = DT_(1.8);
+          tmp(1) = DT_(0.2);
+          min_points.push_back(tmp);
+        }
+
+        template<int sn_>
+        static void get_domain_bounds(Tiny::Vector<DT_, 2, sn_>& domain, int dim)
+        {
+          if( dim < 0 || dim > 2)
+            throw InternalError("get_domain_bounds defined up to dim = 2, but got "+stringify(dim));
+
+          domain(0) = -DT_(0.2);
+          domain(1) = DT_(0.2);
+        }
+
+        static String name()
+        {
+          return "GoldsteinPriceFunction";
+        }
+    };
+
+    template<typename DT_>
     struct OptimisationTestTraits<DT_, Analytic::Common::HimmelblauFunction>
     {
       public:

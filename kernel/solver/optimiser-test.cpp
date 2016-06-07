@@ -151,6 +151,9 @@ nlcg_nr_rb_d(float(0.6), Index(32),"NewtonRaphsonLinesearch","Hessian", NLCGDire
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_hessian_rb_d(double(0.7), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
+NLCGTest<Mem::Main, double, Index, Analytic::Common::GoldsteinPriceFunction>
+nlcg_sw_hessian_gp_d(double(0.6), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
+
 #ifdef FEAT_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
 nlcg_nr_rb_q(__float128(0.6), Index(33), "NewtonRaphsonLinesearch", "ApproximateHessian",
@@ -399,6 +402,9 @@ alg_lbfgs_rb_d(double(0.7), Index(36));
 
 ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 alg_lbfgs_bs_d(double(0.35), Index(29));
+
+ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::GoldsteinPriceFunction>
+alg_lbfgs_gp_d(double(0.6), Index(15));
 
 /**
  * \brief Test class template for ALGLIB's mincg optimiser
