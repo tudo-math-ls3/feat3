@@ -50,7 +50,7 @@ for line in source_file:
   #output_line = re.sub('(?<!_)grad(.)(.)',r"grad(\1,\2)",output_line)
   # Replace pow by FEAT2's Math::pow
   output_line = re.sub('pow',"Math::pow",output_line)
-  # Replace sqrt by FEAT2's Math::sqrt
+  # Replace sqrt by FEAT3's Math::sqrt
   output_line = re.sub('sqrt',"Math::sqrt",output_line)
   # Cast all Maple generated doubles to DataType_. In case of quad precision, this might lose significant bits
   # TODO: Figure out how to change the Maple output to use integers that can be casted to DataType_
