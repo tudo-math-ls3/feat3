@@ -6,7 +6,7 @@
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_node.hpp>
-#include <kernel/util/file_error.hpp>
+#include <kernel/util/exception.hpp>
 
 
 #include <iostream>

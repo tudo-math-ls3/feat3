@@ -5,7 +5,7 @@
 // includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
-#include <kernel/util/file_error.hpp>
+#include <kernel/util/exception.hpp>
 #include <kernel/util/function_scheduler.hpp>
 
 // includes, STL

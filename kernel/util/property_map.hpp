@@ -3,7 +3,7 @@
 #define KERNEL_UTIL_PROPERTY_MAP_HPP 1
 
 // includes, FEAT
-#include <kernel/util/file_error.hpp>
+#include <kernel/util/exception.hpp>
 
 // includes, system
 #include <iostream>
