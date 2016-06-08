@@ -21,6 +21,7 @@ namespace FEAT
       DaiYuan,
       DYHSHybrid,
       FletcherReeves,
+      HagerZhang, // warning: Experimental, inefficient
       HestenesStiefel,
       PolakRibiere
     };
@@ -41,6 +42,8 @@ namespace FEAT
           return os << "DYHSHybrid";
         case NLCGDirectionUpdate::FletcherReeves:
           return os << "FletcherReeves";
+        case NLCGDirectionUpdate::HagerZhang:
+          return os << "HagerZhang";
         case NLCGDirectionUpdate::HestenesStiefel:
           return os << "HestenesStiefel";
         case NLCGDirectionUpdate::PolakRibiere:
@@ -60,6 +63,8 @@ namespace FEAT
           update = NLCGDirectionUpdate::DYHSHybrid;
         else if(update_name == "FletcherReeves")
           update = NLCGDirectionUpdate::FletcherReeves;
+        else if(update_name == "HagerZhang")
+          update = NLCGDirectionUpdate::HagerZhang;
         else if(update_name == "HestenesStiefel")
           update = NLCGDirectionUpdate::HestenesStiefel;
         else if(update_name == "PolakRibiere")
@@ -86,7 +91,7 @@ namespace FEAT
      * See \cite NW06 for an overview of optimisation techniques.
      *
      * Possible update strategies for the search direction are Dai-Yuan \cite DY99, Fletcher-Reeves \cite FR64,
-     * Hestenes-Stiefel \cite HS52 and Polak-Ribière \cite PR64.
+     * Hager-Zhang \cite HZ05, Hestenes-Stiefel \cite HS52 and Polak-Ribiere \cite PR64.
      */
     template<typename Operator_, typename Filter_>
     class NLCG : public PreconditionedIterativeSolver<typename Operator_::VectorTypeR>
@@ -128,20 +133,20 @@ namespace FEAT
         NLCGDirectionUpdate _direction_update;
 
         /// defect vector
-        VectorType _vec_def;
+        VectorType _vec_r;
         /// descend direction vector
-        VectorType _vec_dir;
+        VectorType _vec_p;
         /// temporary vector
-        VectorType _vec_tmp;
+        VectorType _vec_z;
 
         /// Tolerance for function improvement
         DataType _tol_fval;
         /// Tolerance for the length of the update step
         DataType _tol_step;
 
-        /// vec_dir <- vec_def + _beta * vec_dir
+        /// vec_p <- vec_r + _beta * vec_p
         DataType _beta;
-        /// _eta = <vec_def, vec_dir>
+        /// _eta = <vec_r, vec_p>
         DataType _eta;
         /// Current functional value
         DataType _fval;
@@ -221,9 +226,9 @@ namespace FEAT
         {
           BaseClass::init_symbolic();
           // create three temporary vectors
-          _vec_def = this->_op.create_vector_r();
-          _vec_dir = this->_op.create_vector_r();
-          _vec_tmp = this->_op.create_vector_r();
+          _vec_r = this->_op.create_vector_r();
+          _vec_p = this->_op.create_vector_r();
+          _vec_z = this->_op.create_vector_r();
           _linesearch->init_symbolic();
         }
 
@@ -233,9 +238,9 @@ namespace FEAT
           if(iterates != nullptr)
             iterates->clear();
 
-          this->_vec_tmp.clear();
-          this->_vec_dir.clear();
-          this->_vec_def.clear();
+          this->_vec_z.clear();
+          this->_vec_p.clear();
+          this->_vec_r.clear();
           restart_freq = Index(0);
           _linesearch->done_symbolic();
           BaseClass::done_symbolic();
@@ -277,11 +282,11 @@ namespace FEAT
         }
 
         /// \copydoc BaseClass::apply()
-        virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
+        virtual Status apply(VectorType& vec_cor, const VectorType& vec_r) override
         {
           // save defect
-          this->_vec_def.copy(vec_def);
-          //this->_system_filter.filter_def(this->_vec_def);
+          this->_vec_r.copy(vec_r);
+          //this->_system_filter.filter_def(this->_vec_r);
 
           // clear solution vector
           vec_cor.format();
@@ -304,9 +309,9 @@ namespace FEAT
           this->_op.prepare(vec_sol, this->_filter);
 
           // Compute defect
-          this->_op.compute_grad(this->_vec_def);
-          this->_vec_def.scale(this->_vec_def,DataType(-1));
-          this->_filter.filter_def(this->_vec_def);
+          this->_op.compute_grad(this->_vec_r);
+          this->_vec_r.scale(this->_vec_r,DataType(-1));
+          this->_filter.filter_def(this->_vec_r);
 
           // Prepare the preconditioner (if any)
           if(this->_precond != nullptr)
@@ -354,29 +359,29 @@ namespace FEAT
           // Compute intitial function value
           this->_fval = this->_op.compute_func();
           // Compute initial defect
-          Status status = this->_set_initial_defect(this->_vec_def, vec_sol);
+          Status status = this->_set_initial_defect(this->_vec_r, vec_sol);
           if(status != Status::progress)
             return status;
 
           // apply preconditioner to defect vector
-          if(!this->_apply_precond(this->_vec_tmp, this->_vec_def, this->_filter))
+          if(!this->_apply_precond(this->_vec_z, this->_vec_r, this->_filter))
             return Status::aborted;
 
           // The first direction has to be the (preconditioned) steepest descent direction
-          this->_vec_dir.clone(this->_vec_tmp);
+          this->_vec_p.clone(this->_vec_z);
 
-          // Compute initial eta = <d, r>
-          this->_eta = this->_vec_dir.dot(this->_vec_def);
+          // Compute initial eta = < p, r>
+          this->_eta = this->_vec_p.dot(this->_vec_r);
 
           // If the preconditioner was not pd in the first step, reset the search direction to steepest descent
           if(_eta <= DataType(0))
           {
-            this->_vec_dir.clone(this->_vec_def);
-            _eta = this->_vec_dir.dot(this->_vec_def);
+            this->_vec_p.clone(this->_vec_r);
+            _eta = this->_vec_p.dot(this->_vec_r);
           }
 
-          // compute initial gamma
-          DataType gamma = this->_vec_tmp.dot(this->_vec_def);
+          // compute initial gamma = < z, r >
+          DataType gamma = this->_vec_z.dot(this->_vec_r);
           if(this->_def_init <= this->_tol_rel)
             return Status::success;
 
@@ -393,10 +398,10 @@ namespace FEAT
 
             // Copy information to the linesearch
             _linesearch->set_initial_fval(this->_fval);
-            _linesearch->set_grad_from_defect(this->_vec_def);
+            _linesearch->set_grad_from_defect(this->_vec_r);
 
             // Call the linesearch to update vec_sol
-            Status linesearch_status = _linesearch->correct(vec_sol, this->_vec_dir);
+            Status linesearch_status = _linesearch->correct(vec_sol, this->_vec_p);
 
             // If the linesearch failed to make progress, the new iterate is too close to the old iterate to compute
             // a new search direction etc. so we have to abort without updating the solution
@@ -409,14 +414,14 @@ namespace FEAT
 
             // Copy back information from the linesearch
             this->_fval = _linesearch->get_final_fval();
-            _linesearch->get_defect_from_grad(this->_vec_def);
+            _linesearch->get_defect_from_grad(this->_vec_r);
 
             // Log iterates if necessary
             if(iterates != nullptr)
               iterates->push_back(vec_sol.clone());
 
             // Compute defect norm. This also performs the convergence/divergence checks.
-            status = this->_set_new_defect(this->_vec_def, vec_sol);
+            status = this->_set_new_defect(this->_vec_r, vec_sol);
 
             // Something might have gone wrong in applying the preconditioner, so check status again.
             if(status != Status::progress)
@@ -455,23 +460,24 @@ namespace FEAT
               // its_since_restart = Index(1);
               _num_restarts++;
               // Discard the old search direction and perform (preconditioned) steepest descent
-              this->_vec_dir.clone(this->_vec_tmp);
+              this->_vec_p.clone(this->_vec_z);
             }
             else
             {
               _num_restarts = Index(0);
-              this->_vec_dir.axpy(this->_vec_dir, this->_vec_tmp, _beta);
+              this->_vec_p.axpy(this->_vec_p, this->_vec_z, _beta);
             }
 
+
             // Now that we know the new search direction, we can update _eta
-            _eta = this->_vec_dir.dot(this->_vec_def);
+            _eta = this->_vec_p.dot(this->_vec_r);
 
             // Safeguard as this should not happen
             // TODO: Correct the output of the preconditioner if it turns out to not have been positive definite
             if(_eta <= DataType(0))
             {
-              this->_vec_dir.clone(this->_vec_def);
-              _eta = this->_vec_dir.dot(this->_vec_def);
+              this->_vec_p.clone(this->_vec_r);
+              _eta = this->_vec_p.dot(this->_vec_r);
               //return Status::aborted;
             }
 
@@ -485,7 +491,7 @@ namespace FEAT
          * \brief Computes the parameter beta for the search direction update
          *
          * \param[out] beta
-         * Parameter for updating the search direction: \f$ d_{k+1} = s_{k+1} + \beta_{k+1} d_k \f$
+         * Parameter for updating the search direction: \f$ d_{k+1} = z_{k+1} + \beta_{k+1} p_k \f$
          *
          * \param[in, out] gamma
          * This is the scalar product of the defect and the preconditioned defect
@@ -506,6 +512,9 @@ namespace FEAT
               return dy_hs_hybrid(beta, gamma);
             case NLCGDirectionUpdate::FletcherReeves:
               return fletcher_reeves(beta, gamma);
+            case NLCGDirectionUpdate::HagerZhang:
+              // Warning: This update is not very efficient in its current implementation.
+              return hager_zhang(beta, gamma);
             case NLCGDirectionUpdate::HestenesStiefel:
               return hestenes_stiefel(beta, gamma);
             case NLCGDirectionUpdate::PolakRibiere:
@@ -521,7 +530,7 @@ namespace FEAT
          * This function computes the defect vector's norm, increments the iteration count,
          * plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.
          *
-         * \param[in] vec_def
+         * \param[in] vec_r
          * The new defect vector.
          *
          * \param[in] vec_sol
@@ -530,7 +539,7 @@ namespace FEAT
          * \returns
          * A solver status code.
          */
-        virtual Status _set_new_defect(const VectorType& vec_def, const VectorType& vec_sol) override
+        virtual Status _set_new_defect(const VectorType& vec_r, const VectorType& vec_sol) override
         {
           // increase iteration count
           ++this->_num_iter;
@@ -555,7 +564,7 @@ namespace FEAT
 
           // compute new defect
           if(calc_def)
-            this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
+            this->_def_cur = this->_calc_def_norm(vec_r, vec_sol);
 
           Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
@@ -606,8 +615,8 @@ namespace FEAT
          *
          * The Dai-Yuan update sets
          * \f[
-         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_{k+1} := \left< r_{k+1}, s_{k+1} \right>,
-         *   \quad \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<r_k, d_k\right>
+         *   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_{k+1} := \left< r_{k+1}, z_{k+1} \right>,
+         *   \quad \eta_{k+\frac{1}{2}} := \left<r_{k+1}, p_k \right>, \quad \eta_k := \left<r_k, d_k\right>
          * \f]
          * \f[
          *   \beta_{k+1} := \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}} - \eta_k}
@@ -619,16 +628,16 @@ namespace FEAT
         Status dai_yuan(DataType& beta, DataType& gamma)
         {
 
-          // _vec_tmp still contais the old (preconditioned) defect
+          // _vec_z still contais the old (preconditioned) defect
           DataType eta_old(this->_eta);
           // eta_mid = < r[k+1], d[k] >
-          DataType eta_mid(this->_vec_def.dot(this->_vec_dir));
+          DataType eta_mid(this->_vec_r.dot(this->_vec_p));
 
           // apply preconditioner
-          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
             return Status::aborted;
 
-          gamma = this->_vec_def.dot(this->_vec_tmp);
+          gamma = this->_vec_r.dot(this->_vec_z);
 
           beta = gamma/( - eta_mid + eta_old);
 
@@ -640,9 +649,9 @@ namespace FEAT
          *
          * The hybrid Dai-Yuan/Hestenes-Stiefel update sets
          * \f[
-         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
-         *   \gamma_{k+\frac{1}{2}} := \left< r_k, s_{k+1} \right>, \quad
-         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<r_k, d_k\right>
+         *   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} := \left< r_k, z_{k+1} \right>, \quad
+         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, p_k \right>, \quad \eta_k := \left<r_k, d_k\right>
          * \f]
          * \f[
          *   \beta_{k+1} := \max \left\{0, \min \left\{ \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}+ \eta_k}, \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}}+ \eta_k} \right\} \right\}
@@ -654,16 +663,16 @@ namespace FEAT
         Status dy_hs_hybrid(DataType& beta, DataType& gamma)
         {
           DataType eta_old = this->_eta;
-          // _vec_dir still contains the old search direction
-          DataType eta_mid = this->_vec_def.dot(this->_vec_dir);
-          // _vec_tmp still contains the old (preconditioned) defect
-          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_def);
+          // _vec_p still contains the old search direction
+          DataType eta_mid = this->_vec_r.dot(this->_vec_p);
+          // _vec_z still contains the old (preconditioned) defect
+          DataType gamma_mid = this->_vec_z.dot(this->_vec_r);
 
           // apply preconditioner
-          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
             return Status::aborted;
 
-          gamma = this->_vec_def.dot(this->_vec_tmp);
+          gamma = this->_vec_r.dot(this->_vec_z);
 
           beta = Math::max(DataType(0), Math::min(gamma, gamma - gamma_mid)/( -eta_mid + eta_old));
 
@@ -674,8 +683,8 @@ namespace FEAT
          * \copydoc compute_beta()
          * The Fletcher-Reeves update sets
          * \f[
-         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
-         *   \gamma_{k+\frac{1}{2}} = \left<r_{k+1}, d_k \right>
+         *   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} = \left<r_{k+1}, p_k \right>
          * \f]
          * \f[
          *   \beta_{k+1} := \frac{\gamma_{k+1}}{\gamma_k}
@@ -686,11 +695,60 @@ namespace FEAT
           DataType gamma_old(gamma);
 
           // apply preconditioner
-          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
             return Status::aborted;
 
-          gamma = this->_vec_def.dot(this->_vec_tmp);
+          gamma = this->_vec_r.dot(this->_vec_z);
           beta = gamma/gamma_old;
+
+          return Status::progress;
+        }
+
+        /**
+         * \copydoc compute_beta()
+         *
+         * The Hager-Zhang update sets
+         * \f[
+         *   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} := \left< r_k, z_{k+1} \right>, \quad
+         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, p_k \right>, \quad \eta_k := \left<r_k, d_k\right>
+         * \f]
+         * \f[
+         *   \bar{\beta}_{k+1} := \left< r_{k+1} -r_k - \frac{2 \|r_{k+1}\|^2}{\left< r_{k+1} - r_k, p_k \right>}
+         *   p_k, 1/(<r_{k+1} - r_k, p_k>) r_k \right>,
+         * \f]
+         * \f[
+         *   \beta_{k+1} := max\{ \beta, -1/ \left( \| p_k \| min\{ \mathrm{thresh}, \| r_{k+1} \| \} \right) \},
+         * \f]
+         *
+         * where thresh is a predefined threshold parameter (i.e. 0.01).
+         *
+         * Note the sign changes due to this being formulated in terms of the defect rather than the function's
+         * gradient.
+         *
+         * \warning This update strategy needs more precision in the linesearch than all others and is not very
+         * efficient in the current implementation. This serves more as a starting point for further improvement.
+         */
+        Status hager_zhang(DataType& beta, DataType& gamma)
+        {
+          DataType thresh = DataType(0.01);
+          DataType eta_old(this->_eta);
+          // _vec_p still contains the old search direction
+          DataType eta_mid = this->_vec_r.dot(this->_vec_p);
+          // _vec_z still contains the old (preconditioned) defect
+          DataType gamma_mid = this->_vec_z.dot(this->_vec_r);
+
+          // apply preconditioner
+          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
+            return Status::aborted;
+
+          gamma = this->_vec_r.dot(this->_vec_z);
+
+          beta = -( (gamma - gamma_mid)/(eta_mid - eta_old)
+            + DataType(2)*(Math::sqr(gamma) - DataType(2)*gamma*gamma_mid + Math::sqr(gamma_mid))*eta_mid
+            /Math::sqr(eta_mid-eta_old));
+
+          beta = Math::max(beta,-DataType(1)/(this->_vec_p.norm2()*Math::min(thresh, Math::sqrt(gamma))));
 
           return Status::progress;
         }
@@ -700,9 +758,9 @@ namespace FEAT
          *
          * The Hestenes-Stiefel update sets
          * \f[
-         *   r_k := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
-         *   \gamma_{k+\frac{1}{2}} := \left< r_k, s_{k+1} \right>, \quad
-         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, d_k \right>, \quad \eta_k := \left<r_k, d_k\right>
+         *   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} := \left< r_k, z_{k+1} \right>, \quad
+         *   \eta_{k+\frac{1}{2}} := \left<r_{k+1}, p_k \right>, \quad \eta_k := \left<r_k, d_k\right>
          * \f]
          * \f[
          *   \beta_{k+1} := \max \left\{0, \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}
@@ -715,16 +773,16 @@ namespace FEAT
         Status hestenes_stiefel(DataType& beta, DataType& gamma)
         {
           DataType eta_old = this->_eta;
-          // _vec_dir still contains the old search direction
-          DataType eta_mid = this->_vec_def.dot(this->_vec_dir);
-          // _vec_tmp still contains the old (preconditioned) defect
-          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_def);
+          // _vec_p still contains the old search direction
+          DataType eta_mid = this->_vec_r.dot(this->_vec_p);
+          // _vec_z still contains the old (preconditioned) defect
+          DataType gamma_mid = this->_vec_z.dot(this->_vec_r);
 
           // apply preconditioner
-          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
             return Status::aborted;
 
-          gamma = this->_vec_def.dot(this->_vec_tmp);
+          gamma = this->_vec_r.dot(this->_vec_z);
 
           beta = Math::max(DataType(0), (gamma - gamma_mid)/( -eta_mid + eta_old));
 
@@ -736,22 +794,22 @@ namespace FEAT
          *
          * The Polak-Ribière update sets
          * \f{align*}{
-         *   r_k & := -\nabla f(x_k), \quad s_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, s_k \right>, \quad
-         *   \gamma_{k+\frac{1}{2}} := \left<r_{k+1}, s_k \right> \\
+         *   r_k & := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
+         *   \gamma_{k+\frac{1}{2}} := \left<r_{k+1}, z_k \right> \\
          *   \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
          * \f}
          */
         Status polak_ribiere(DataType& beta, DataType& gamma)
         {
           DataType gamma_old(gamma);
-          // vec_tmp still contains the old (preconditioned) defect
-          DataType gamma_mid = this->_vec_tmp.dot(this->_vec_def);
+          // vec_z still contains the old (preconditioned) defect
+          DataType gamma_mid = this->_vec_z.dot(this->_vec_r);
 
           // apply preconditioner
-          if(!this->_apply_precond(_vec_tmp, _vec_def, this->_filter))
+          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
             return Status::aborted;
 
-          gamma = this->_vec_def.dot(this->_vec_tmp);
+          gamma = this->_vec_r.dot(this->_vec_z);
 
           beta = Math::max((gamma - gamma_mid)/gamma_old, DataType(0));
 

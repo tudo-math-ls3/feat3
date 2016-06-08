@@ -238,8 +238,9 @@ static void display_help()
   std::cout <<
     " --precon [String]: Available preconditioners for NLCG and NLSD are Hessian, ApproximateHessian, none(default)"
     << std::endl <<
-    " --direction_update [String]: Available search direction updates for NLCG are DaiYuan," << std::endl <<
-    "                              DYHSHybrid, FletcherReeves, HestenesStiefel and PolakRibiere (default)."
+    " --direction_update [String]: Available search direction updates for NLCG are DaiYuan, DYHSybrid,"
+    << std::endl <<
+    "                              FletcherReeves, HestenesStiefel, HagerZhang and PolakRibiere (default)."
     << std::endl;
 #ifdef FEAT_HAVE_ALGLIB
   std::cout <<
@@ -261,7 +262,7 @@ int main(int argc, char* argv[])
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::GoldsteinPriceFunction AnalyticFunctionType;
+  typedef Analytic::Common::BazaraaShettyFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, IndexType, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;
@@ -346,23 +347,9 @@ int main(int argc, char* argv[])
       throw InternalError("Got invalid precon_name: "+precon_name);
 
     NLCGDirectionUpdate my_direction_update(NLCGDirectionUpdate::DYHSHybrid);
-    auto* update_pair(args.query("direction_update"));
+    auto update_pair(args.query("direction_update"));
     if(update_pair != nullptr)
-    {
-      String update_name(update_pair->second.front());
-      if(update_name == "DaiYuan")
-        my_direction_update = NLCGDirectionUpdate::DaiYuan;
-      else if(update_name == "DYHSHybrid")
-        my_direction_update = NLCGDirectionUpdate::DYHSHybrid;
-      else if(update_name == "FletcherReeves")
-        my_direction_update = NLCGDirectionUpdate::FletcherReeves;
-      else if(update_name == "HestenesStiefel")
-        my_direction_update = NLCGDirectionUpdate::HestenesStiefel;
-      else if(update_name == "PolakRibiere")
-        my_direction_update = NLCGDirectionUpdate::PolakRibiere;
-      else
-        throw InternalError("Got invalid NLCG direction update: "+update_name);
-    }
+      my_direction_update << update_pair->second.front();
 
     auto my_solver = new_nlcg(my_op, my_filter, my_linesearch, my_direction_update, true, my_precond);
 

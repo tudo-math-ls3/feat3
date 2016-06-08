@@ -59,9 +59,9 @@ namespace FEAT
         std::shared_ptr<PrecondType> _precond;
 
         /// defect vector
-        VectorType _vec_def;
+        VectorType _vec_r;
         /// descend direction vector
-        VectorType _vec_dir;
+        VectorType _vec_p;
 
         /// Tolerance for function improvement
         DataType _tol_fval;
@@ -127,8 +127,8 @@ namespace FEAT
         {
           BaseClass::init_symbolic();
           // create three temporary vectors
-          _vec_def = this->_op.create_vector_r();
-          _vec_dir = this->_op.create_vector_r();
+          _vec_r = this->_op.create_vector_r();
+          _vec_p = this->_op.create_vector_r();
           _linesearch->init_symbolic();
         }
 
@@ -139,8 +139,8 @@ namespace FEAT
             iterates->clear();
 
           //this->_vec_tmp.clear();
-          this->_vec_dir.clear();
-          this->_vec_def.clear();
+          this->_vec_p.clear();
+          this->_vec_r.clear();
           _linesearch->done_symbolic();
           BaseClass::done_symbolic();
         }
@@ -181,11 +181,11 @@ namespace FEAT
         }
 
         /// \copydoc BaseClass::apply()
-        virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
+        virtual Status apply(VectorType& vec_cor, const VectorType& vec_r) override
         {
           // save defect
-          this->_vec_def.copy(vec_def);
-          //this->_system_filter.filter_def(this->_vec_def);
+          this->_vec_r.copy(vec_r);
+          //this->_system_filter.filter_def(this->_vec_r);
 
           // clear solution vector
           vec_cor.format();
@@ -205,9 +205,9 @@ namespace FEAT
         {
           this->_op.prepare(vec_sol, this->_filter);
           // compute defect
-          this->_op.compute_grad(this->_vec_def);
-          this->_vec_def.scale(this->_vec_def,DataType(-1));
-          this->_filter.filter_def(this->_vec_def);
+          this->_op.compute_grad(this->_vec_r);
+          this->_vec_r.scale(this->_vec_r,DataType(-1));
+          this->_filter.filter_def(this->_vec_r);
 
           if(this->_precond != nullptr)
             this->_precond->prepare(vec_sol, this->_filter);
@@ -241,27 +241,27 @@ namespace FEAT
             iterates->push_back(std::move(vec_sol.clone()));
 
           // compute initial defect
-          Status status = this->_set_initial_defect(this->_vec_def, vec_sol);
+          Status status = this->_set_initial_defect(this->_vec_r, vec_sol);
           if(status != Status::progress)
             return status;
 
           this->_fval = this->_op.compute_func();
           // The first direction has to be the steepest descent direction
-          this->_vec_dir.clone(this->_vec_def);
+          this->_vec_p.clone(this->_vec_r);
 
           // apply preconditioner to defect vector
-          //if(!this->_apply_precond(this->_vec_tmp, this->_vec_def, this->_filter))
-          if(!this->_apply_precond(this->_vec_dir, this->_vec_def, this->_filter))
+          //if(!this->_apply_precond(this->_vec_tmp, this->_vec_r, this->_filter))
+          if(!this->_apply_precond(this->_vec_p, this->_vec_r, this->_filter))
             return Status::aborted;
 
           // Compute initial eta = <d, r>
-          DataType eta(this->_vec_dir.dot(this->_vec_def));
+          DataType eta(this->_vec_p.dot(this->_vec_r));
 
           // If the preconditioned search direction is not a descent direction, reset it to steepest descent
           // TODO: Correct the output of the preconditioner if it turns out to not have been positive definite
           if(eta <= DataType(0))
           {
-            this->_vec_dir.clone(this->_vec_def);
+            this->_vec_p.clone(this->_vec_r);
           }
 
           // start iterating
@@ -273,14 +273,14 @@ namespace FEAT
 
             // Copy information to the linesearch
             _linesearch->set_initial_fval(this->_fval);
-            _linesearch->set_grad_from_defect(this->_vec_def);
+            _linesearch->set_grad_from_defect(this->_vec_r);
 
             // Call the linesearch to update vec_sol
-            status = _linesearch->correct(vec_sol, this->_vec_dir);
+            status = _linesearch->correct(vec_sol, this->_vec_p);
 
             // Copy back information from the linesearch
             this->_fval = _linesearch->get_final_fval();
-            _linesearch->get_defect_from_grad(this->_vec_def);
+            _linesearch->get_defect_from_grad(this->_vec_r);
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -289,7 +289,7 @@ namespace FEAT
             }
 
             // Compute defect norm. This also performs the convergence/divergence checks.
-            status = this->_set_new_defect(this->_vec_def, vec_sol);
+            status = this->_set_new_defect(this->_vec_r, vec_sol);
 
             if(status != Status::progress)
             {
@@ -303,7 +303,7 @@ namespace FEAT
               this->_precond->prepare(vec_sol, this->_filter);
 
             // apply preconditioner
-            if(!this->_apply_precond(_vec_dir, _vec_def, this->_filter))
+            if(!this->_apply_precond(_vec_p, _vec_r, this->_filter))
             {
               TimeStamp bt;
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
@@ -311,13 +311,13 @@ namespace FEAT
             }
 
             // Compute new eta
-            eta = this->_vec_dir.dot(this->_vec_def);
+            eta = this->_vec_p.dot(this->_vec_r);
 
             // If the preconditioned search direction is not a descent direction, reset it to steepest descent
             // TODO: Correct the output of the preconditioner if it turns out to not have been positive definite
             if(eta <= DataType(0))
             {
-              this->_vec_dir.clone(this->_vec_def);
+              this->_vec_p.clone(this->_vec_r);
             }
           }
 
@@ -331,7 +331,7 @@ namespace FEAT
          * This function computes the defect vector's norm, increments the iteration count,
          * plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.
          *
-         * \param[in] vec_def
+         * \param[in] vec_r
          * The new defect vector.
          *
          * \param[in] vec_sol
@@ -340,7 +340,7 @@ namespace FEAT
          * \returns
          * A solver status code.
          */
-        virtual Status _set_new_defect(const VectorType& vec_def, const VectorType& vec_sol) override
+        virtual Status _set_new_defect(const VectorType& vec_r, const VectorType& vec_sol) override
         {
           // increase iteration count
           ++this->_num_iter;
@@ -353,7 +353,7 @@ namespace FEAT
 
           // compute new defect
           if(calc_def)
-            this->_def_cur = this->_calc_def_norm(vec_def, vec_sol);
+            this->_def_cur = this->_calc_def_norm(vec_r, vec_sol);
 
           Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 

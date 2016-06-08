@@ -143,7 +143,7 @@ NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
 nlcg_s_hb_d(float(0.5),Index(10),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-nlcg_s_bs_d(double(0.15), Index(20), "SecantLinesearch", "none", NLCGDirectionUpdate::DYHSHybrid);
+nlcg_s_bs_d(double(0.175), Index(13), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
 
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
 nlcg_nr_rb_d(float(0.6), Index(32),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
@@ -170,7 +170,7 @@ NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
 nlcg_sw_hb_f_cuda(float(0.7), Index(10), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-nlcg_s_bs_d_cuda(double(0.15), Index(20), "SecantLinesearch", "none", NLCGDirectionUpdate::DaiYuan);
+nlcg_s_bs_d_cuda(double(0.175), Index(13), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
 #endif
 
 /**
