@@ -61,6 +61,11 @@ namespace FEAT
         this->_vector.convert(*other);
       }
 
+      GateType * get_gate()
+      {
+        return _gate;
+      }
+
       void from_1_to_0()
       {
         if(_gate != nullptr)
