@@ -101,7 +101,8 @@ def dat(file_path, file_base, ranks):
               found_timing = True
               continue
 
-          #process mpi_toe, directly following the last section
+          #process mpi_execute, directly following the last section
+          #TODO add mpi_wait
           mpi_timings = []
           for line in f:
             if "-" == line[0]:
@@ -245,7 +246,7 @@ def dat(file_path, file_base, ranks):
         f.readline() # #toe
         line = f.readline()
         level = 0
-        while "#mpi_toe" not in line:
+        while "#mpi_execute" not in line:
           if line[0] == "-":
             level = 0
           else:
@@ -266,6 +267,8 @@ def dat(file_path, file_base, ranks):
             mpi_timings_per_level[level].append(float(line))
             level += 1
           line = f.readline()
+
+          #TODO add mpi_wait
 
         for level in range(0, len(timings_per_level)):
           out.write(str(level) + " " + str(median(timings_per_level[level])) + " " + str(min(timings_per_level[level])) + " " + str(max(timings_per_level[level])) + " "\

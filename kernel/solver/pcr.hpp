@@ -164,7 +164,8 @@ namespace FEAT
         while(status == Status::progress)
         {
           TimeStamp at;
-          double mpi_start(Statistics::get_time_mpi_execute());
+          double mpi_execute_start(Statistics::get_time_mpi_execute());
+          double mpi_wait_start(Statistics::get_time_mpi_wait());
 
           // z[k] := M^{-1} * q[k]
           if(!this->_apply_precond(vec_z, vec_q, filter))
@@ -188,8 +189,10 @@ namespace FEAT
           {
             TimeStamp bt;
             Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
+            double mpi_execute_stop(Statistics::get_time_mpi_execute());
+            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+            double mpi_wait_stop(Statistics::get_time_mpi_wait());
+            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
             return status;
           }
 
@@ -219,8 +222,10 @@ namespace FEAT
 
           TimeStamp bt;
           Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-          double mpi_stop(Statistics::get_time_mpi_execute());
-          Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
+          double mpi_execute_stop(Statistics::get_time_mpi_execute());
+          Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+          double mpi_wait_stop(Statistics::get_time_mpi_wait());
+          Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
         }
 
         // we should never reach this point...

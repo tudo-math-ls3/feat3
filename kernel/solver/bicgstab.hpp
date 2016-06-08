@@ -181,7 +181,8 @@ namespace FEAT
           while(status == Status::progress)
           {
             TimeStamp at;
-            double mpi_start(Statistics::get_time_mpi_execute());
+            double mpi_execute_start(Statistics::get_time_mpi_execute());
+            double mpi_wait_start(Statistics::get_time_mpi_wait());
 
             mat_sys.apply(vec_v, vec_p_tilde);
             fil_sys.filter_def(vec_v);
@@ -190,8 +191,10 @@ namespace FEAT
             {
               TimeStamp bt;
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
+              double mpi_execute_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+              double mpi_wait_stop(Statistics::get_time_mpi_wait());
+              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               return Status::aborted;
             }
             //fil_sys.filter_cor(vec_v_tilde);
@@ -202,8 +205,10 @@ namespace FEAT
             {
               TimeStamp bt;
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
+              double mpi_execute_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+              double mpi_wait_stop(Statistics::get_time_mpi_wait());
+              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               restarted = true;
               //std::cout << "Breakpoint 1" << std::endl;
               break;
@@ -242,8 +247,10 @@ namespace FEAT
             {
               TimeStamp bt;
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
+              double mpi_execute_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+              double mpi_wait_stop(Statistics::get_time_mpi_wait());
+              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               return Status::aborted;
             }
             //fil_sys.filter_cor(vec_t_tilde);
@@ -255,8 +262,10 @@ namespace FEAT
             {
               TimeStamp bt;
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
+              double mpi_execute_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+              double mpi_wait_stop(Statistics::get_time_mpi_wait());
+              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               restarted = true;
               //std::cout << "Breakpoint 4" << std::endl;
               break;
@@ -275,8 +284,10 @@ namespace FEAT
             {
               TimeStamp bt;
               Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
+              double mpi_execute_stop(Statistics::get_time_mpi_execute());
+              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+              double mpi_wait_stop(Statistics::get_time_mpi_wait());
+              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               //std::cout << "Breakpoint 5 (converged)" << std::endl;
               return status;
             }
@@ -294,8 +305,10 @@ namespace FEAT
 
             TimeStamp bt;
             Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
+            double mpi_execute_stop(Statistics::get_time_mpi_execute());
+            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+            double mpi_wait_stop(Statistics::get_time_mpi_wait());
+            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
           }
         }
 

@@ -26,7 +26,10 @@ namespace FEAT
     std::vector<double> toe;
 
     /// Time of mpi execution of each iteration in seconds
-    std::vector<double> mpi_toe;
+    std::vector<double> mpi_execute;
+
+    /// Time of mpi wait of each iteration in seconds
+    std::vector<double> mpi_wait;
   };
 
   /**
@@ -91,15 +94,26 @@ namespace FEAT
             result += stringify_fp_sci(stat.toe.at(i)) + "\n";
         }
 
-        result +="MPI Iteration Timings [s]:\n";
-        for (Index i(0) ; i < stat.mpi_toe.size() ; ++i)
+        result +="MPI Execution Iteration Timings [s]:\n";
+        for (Index i(0) ; i < stat.mpi_execute.size() ; ++i)
         {
-          if (i == 0 && stat.mpi_toe.at(i) == double(-1))
+          if (i == 0 && stat.mpi_execute.at(i) == double(-1))
             continue;
-          if (stat.mpi_toe.at(i) == double(-1))
+          if (stat.mpi_execute.at(i) == double(-1))
             result += "------\n";
           else
-            result += stringify_fp_sci(stat.mpi_toe.at(i)) + "\n";
+            result += stringify_fp_sci(stat.mpi_execute.at(i)) + "\n";
+        }
+
+        result +="MPI Wait Iteration Timings [s]:\n";
+        for (Index i(0) ; i < stat.mpi_wait.size() ; ++i)
+        {
+          if (i == 0 && stat.mpi_wait.at(i) == double(-1))
+            continue;
+          if (stat.mpi_wait.at(i) == double(-1))
+            result += "------\n";
+          else
+            result += stringify_fp_sci(stat.mpi_wait.at(i)) + "\n";
         }
 
         return result;
@@ -211,19 +225,36 @@ namespace FEAT
         }
       }
 
-      /// add mpi toe statistics entry for specific solver (branch name)
-      inline static void add_solver_mpi_toe(String solver, double seconds)
+      /// add mpi execute toe statistics entry for specific solver (branch name)
+      inline static void add_solver_mpi_execute(String solver, double seconds)
       {
         auto it = _solver_statistics.find(solver);
 
         if (it != _solver_statistics.end())
         {
-          it->second.mpi_toe.push_back(seconds);
+          it->second.mpi_execute.push_back(seconds);
         }
         else
         {
           SolverStatistics temp;
-          temp.mpi_toe.push_back(seconds);
+          temp.mpi_execute.push_back(seconds);
+          _solver_statistics[solver] = temp;
+        }
+      }
+
+      /// add mpi execute toe statistics entry for specific solver (branch name)
+      inline static void add_solver_mpi_wait(String solver, double seconds)
+      {
+        auto it = _solver_statistics.find(solver);
+
+        if (it != _solver_statistics.end())
+        {
+          it->second.mpi_wait.push_back(seconds);
+        }
+        else
+        {
+          SolverStatistics temp;
+          temp.mpi_wait.push_back(seconds);
           _solver_statistics[solver] = temp;
         }
       }
@@ -414,15 +445,26 @@ namespace FEAT
               file << stringify_fp_sci(stat.second.toe.at(i)) << std::endl;
           }
 
-          file << "#mpi_toe" << std::endl;
-          for (Index i(0) ; i < stat.second.mpi_toe.size() ; ++i)
+          file << "#mpi_execute" << std::endl;
+          for (Index i(0) ; i < stat.second.mpi_execute.size() ; ++i)
           {
-            if (i == 0 && stat.second.mpi_toe.at(i) == double(-1))
+            if (i == 0 && stat.second.mpi_execute.at(i) == double(-1))
               continue;
-            if (stat.second.mpi_toe.at(i) == double(-1))
+            if (stat.second.mpi_execute.at(i) == double(-1))
               file << "-" << std::endl;
             else
-              file << stringify_fp_sci(stat.second.mpi_toe.at(i)) << std::endl;
+              file << stringify_fp_sci(stat.second.mpi_execute.at(i)) << std::endl;
+          }
+
+          file << "#mpi_wait" << std::endl;
+          for (Index i(0) ; i < stat.second.mpi_wait.size() ; ++i)
+          {
+            if (i == 0 && stat.second.mpi_wait.at(i) == double(-1))
+              continue;
+            if (stat.second.mpi_wait.at(i) == double(-1))
+              file << "-" << std::endl;
+            else
+              file << stringify_fp_sci(stat.second.mpi_wait.at(i)) << std::endl;
           }
         }
 

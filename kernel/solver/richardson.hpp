@@ -118,8 +118,6 @@ namespace FEAT
     protected:
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& vec_rhs)
       {
-        TimeStamp at;
-
         VectorType& vec_def(this->_vec_def);
         VectorType& vec_cor(this->_vec_cor);
         const MatrixType& matrix(this->_system_matrix);
@@ -131,11 +129,19 @@ namespace FEAT
         // start iterating
         while(status == Status::progress)
         {
+          TimeStamp at;
+          double mpi_execute_start(Statistics::get_time_mpi_execute());
+          double mpi_wait_start(Statistics::get_time_mpi_wait());
+
           // apply preconditioner
           if(!this->_apply_precond(vec_cor, vec_def, filter))
           {
             TimeStamp bt;
             Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+            double mpi_execute_stop(Statistics::get_time_mpi_execute());
+            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+            double mpi_wait_stop(Statistics::get_time_mpi_wait());
+            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
             return Status::aborted;
           }
           //filter.filter_cor(vec_cor);
@@ -152,6 +158,10 @@ namespace FEAT
 
           TimeStamp bt;
           Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
+          double mpi_execute_stop(Statistics::get_time_mpi_execute());
+          Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
+          double mpi_wait_stop(Statistics::get_time_mpi_wait());
+          Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
         }
 
         // return our status
