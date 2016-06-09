@@ -526,7 +526,7 @@ static void read_test_mode_application_config(std::stringstream& iss)
   iss << "[ApplicationSettings]" << std::endl;
   iss << "mesh_file = ./unit-circle-tria.xml" << std::endl;
   iss << "meshopt_config_file = ./meshopt_config.ini" << std::endl;
-  iss << "mesh_optimiser = DuDvDefault" << std::endl;
+  iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
   iss << "solver_config_file = ./solver_config.ini" << std::endl;
   iss << "lvl_min = 0" << std::endl;
   iss << "lvl_max = 3" << std::endl;
@@ -577,7 +577,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
 
   iss << "[PCG-MGV]" << std::endl;
   iss << "type = pcg" << std::endl;
-  iss << "max_iter = 20" << std::endl;
+  iss << "max_iter = 2" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "plot = 1" << std::endl;
   iss << "precon = mgv" << std::endl;
@@ -595,7 +595,6 @@ static void read_test_mode_solver_config(std::stringstream& iss)
   iss << "max_iter = 4" << std::endl;
   iss << "min_iter = 4" << std::endl;
   iss << "precon = jac" << std::endl;
-  iss << "plot = 1" << std::endl;
 
   iss << "[jac]" << std::endl;
   iss << "type = jac" << std::endl;
@@ -611,7 +610,6 @@ static void read_test_mode_solver_config(std::stringstream& iss)
   iss << "max_iter = 10" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = jac" << std::endl;
-  iss << "plot = 1" << std::endl;
 }
 
 static void read_test_mode_mesh(std::stringstream& iss)
