@@ -89,14 +89,7 @@ namespace FEAT
           _col_gate(col_gate),
           _nonlinear_functional(std::forward<Args_>(args)...)
           {
-            // Compute total number of rows and columns
-            _columns = _nonlinear_functional.columns();
-            Index columns_send(_columns);
-            Util::Comm::allreduce(&columns_send, 1, &_columns, MPI_SUM);
 
-            _rows = _nonlinear_functional.rows();
-            Index rows_send(_rows);
-            Util::Comm::allreduce(&rows_send, 1, &_rows, MPI_SUM);
           }
 
         /// Explicitly delete default constructor
@@ -245,8 +238,19 @@ namespace FEAT
          *
          * \return A const reference to the number of columns
          */
-        const Index& columns()
+        Index columns()
         {
+          if(_columns == Index(0))
+          {
+            // Compute total number of rows and columns
+            auto vec_r = create_vector_r();
+            vec_r.format(DataType(1));
+
+            _columns = Index(vec_r.norm2sqr());
+            _rows = _columns;
+
+          }
+
           return _columns;
         }
 
@@ -255,9 +259,9 @@ namespace FEAT
          *
          * \return A const reference to the number of columns
          */
-        const Index& rows()
+        Index rows()
         {
-          return _columns;
+          return columns();
         }
 
         /**
@@ -269,6 +273,8 @@ namespace FEAT
         {
           DataType my_fval;
           DataType my_fval_send(_nonlinear_functional.compute_func());
+
+          Util::Comm::barrier();
 
           Util::Comm::allreduce(&my_fval_send, 1, &my_fval, MPI_SUM);
 
