@@ -77,32 +77,6 @@ struct MeshoptRefinementApp
     // Create the DomainControl
     DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader, Geometry::AdaptMode::none);
 
-    Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
-    Index nverts(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(0));
-    Index ndof = Index(MeshType::world_dim)*nverts;
-
-#ifdef FEAT_HAVE_MPI
-      Index my_cells(ncells);
-      Index my_verts(nverts);
-      Index my_dof(ndof);
-
-      Util::Comm::allreduce(&my_cells, Index(1), &ncells);
-      Util::Comm::allreduce(&my_verts, Index(1), &nverts);
-      Util::Comm::allreduce(&my_dof, Index(1), &ndof);
-#endif
-
-    // Print information
-    if(Util::Comm::rank() == 0)
-    {
-      std::cout << name() << " settings: " << std::endl;
-      std::cout << "LVL-MAX: " <<
-        dom_ctrl.get_levels().back()->get_level_index() << " [" << lvl_max << "]";
-      std::cout << " LVL-MIN: " <<
-        dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
-      std::cout << "Cells: " << ncells << ", Vertices: " << nverts << ", DoF: " << ndof << std::endl;
-
-    }
-
     // Create the MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
@@ -115,6 +89,24 @@ struct MeshoptRefinementApp
     auto new_coords = meshopt_ctrl->get_coords().clone();
 
     meshopt_ctrl->prepare(new_coords);
+
+    Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
+#ifdef FEAT_HAVE_MPI
+      Index my_cells(ncells);
+      Util::Comm::allreduce(&my_cells, Index(1), &ncells, MPI_SUM);
+#endif
+
+    // Print level information
+    if(Util::Comm::rank() == 0)
+    {
+      std::cout << name() << " settings: " << std::endl;
+      std::cout << "LVL-MAX: " <<
+        dom_ctrl.get_levels().back()->get_level_index() << " [" << lvl_max << "]";
+      std::cout << " LVL-MIN: " <<
+        dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
+      std::cout << "Cells: " << ncells << std::endl;
+    }
+
 
     DT_ min_quality(0);
     DT_ min_angle(0);

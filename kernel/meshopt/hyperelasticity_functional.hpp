@@ -569,7 +569,7 @@ namespace FEAT
             sum_lambda += _lambda(cell);
 
           CoordType sum_lambda_send(sum_lambda);
-          Util::Comm::allreduce(&sum_lambda, 1, &sum_lambda_send);
+          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
 
           _lambda.scale(_lambda, CoordType(1)/sum_lambda);
 
@@ -602,7 +602,7 @@ namespace FEAT
             sum_lambda += _lambda(cell);
 
           CoordType sum_lambda_send(sum_lambda);
-          Util::Comm::allreduce(&sum_lambda, 1, &sum_lambda_send);
+          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
 
           _lambda.scale(_lambda, CoordType(1)/sum_lambda);
 
@@ -635,7 +635,7 @@ namespace FEAT
             sum_lambda += _lambda(cell);
 
           CoordType sum_lambda_send(sum_lambda);
-          Util::Comm::allreduce(&sum_lambda, 1, &sum_lambda_send);
+          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
 
           _lambda.scale(_lambda, CoordType(1)/sum_lambda);
 
@@ -680,7 +680,7 @@ namespace FEAT
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
           Index ncells_send(ncells);
-          Util::Comm::allreduce(&ncells, 1, &ncells_send);
+          Util::Comm::allreduce(&ncells_send, 1, &ncells, MPI_SUM);
 
           _mu.format(CoordType(1)/CoordType(ncells));
         }

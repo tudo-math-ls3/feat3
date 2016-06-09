@@ -426,12 +426,6 @@ namespace FEAT
               this->_alpha_min = alpha;
             }
 
-            // First let's see if we have to compute the defect at all
-            bool calc_def = false;
-            calc_def = calc_def || (this->_min_iter < this->_max_iter);
-            calc_def = calc_def || this->_plot;
-            calc_def = calc_def || (this->_min_stag_iter > Index(0));
-
             // Update defect
             this->_def_cur = Math::abs(this->_vec_grad.dot(dir));
 
@@ -996,6 +990,16 @@ namespace FEAT
 
             Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
+            // plot?
+            if(this->_plot)
+            {
+              std::cout << this->_plot_name
+              <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
+              << " : " << stringify_fp_sci(this->_def_cur)
+              << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
+              << std::endl;
+            }
+
             // Check if the sufficient decrease condition is violated. If so, one call to _bracket gets the solution
             if( (fval > this->_fval_0 + _tol_decrease*alpha*_delta_0) || (fval > fval_prev && this->_num_iter > 1) )
             {
@@ -1026,16 +1030,6 @@ namespace FEAT
               if(status == Status::success)
                 _alpha_0 = this->_alpha_min;
 
-            }
-
-            // plot?
-            if(this->_plot)
-            {
-              std::cout << this->_plot_name
-              <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-              << " : " << stringify_fp_sci(this->_def_cur)
-              << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-              << std::endl;
             }
 
             // Stop if _bracket was successful or encountered an error
@@ -1127,6 +1121,7 @@ namespace FEAT
             // Update solution: sol <- sol + _alpha*dir
             vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha/this->_norm_dir);
 
+
           }
 
           // We should never come to this point
@@ -1187,7 +1182,6 @@ namespace FEAT
           Status st(Status::progress);
           while(st == Status::progress)
           {
-
             ++this->_num_iter;
 
             // Find new trial step

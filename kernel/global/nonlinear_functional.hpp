@@ -92,11 +92,11 @@ namespace FEAT
             // Compute total number of rows and columns
             _columns = _nonlinear_functional.columns();
             Index columns_send(_columns);
-            Util::Comm::allreduce(&_columns, 1, &columns_send);
+            Util::Comm::allreduce(&columns_send, 1, &_columns, MPI_SUM);
 
             _rows = _nonlinear_functional.rows();
             Index rows_send(_rows);
-            Util::Comm::allreduce(&_rows, 1, &rows_send);
+            Util::Comm::allreduce(&rows_send, 1, &_rows, MPI_SUM);
           }
 
         /// Explicitly delete default constructor
@@ -267,9 +267,11 @@ namespace FEAT
          */
         DataType compute_func()
         {
-          DataType my_fval(_nonlinear_functional.compute_func());
-          DataType my_fval_send;
-          Util::Comm::allreduce(&my_fval, 1, &my_fval_send);
+          DataType my_fval;
+          DataType my_fval_send(_nonlinear_functional.compute_func());
+
+          Util::Comm::allreduce(&my_fval_send, 1, &my_fval, MPI_SUM);
+
           return my_fval;
         }
 

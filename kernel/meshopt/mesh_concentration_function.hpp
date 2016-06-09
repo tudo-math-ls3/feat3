@@ -165,7 +165,7 @@ namespace FEAT
           }
 
           CoordType sum_conc_send(_sum_conc);
-          Util::Comm::allreduce(&_sum_conc, 1, &sum_conc_send);
+          Util::Comm::allreduce(&sum_conc_send, 1, &_sum_conc, MPI_SUM);
         }
 
         /**

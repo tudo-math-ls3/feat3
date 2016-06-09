@@ -270,7 +270,7 @@ namespace FEAT
           }
 
           DataType sum_det_send(sum_det);
-          Util::Comm::allreduce(&sum_det, 1, &sum_det_send);
+          Util::Comm::allreduce(&sum_det_send, 1, &sum_det, MPI_SUM);
           return sum_det;
         }
 
@@ -425,7 +425,7 @@ namespace FEAT
           }
 
           DataType sum_det_send(sum_det);
-          Util::Comm::allreduce(&sum_det, 1, &sum_det_send);
+          Util::Comm::allreduce(&sum_det_send, 1, &sum_det, MPI_SUM);
           return sum_det;
         }
 
