@@ -87,8 +87,8 @@ namespace FEAT
       public:
         Communicator(MPI_Comm comm) :
           _comm(comm)
-      {
-      }
+        {
+        }
 
         MPI_Comm mpi_comm()
         {
@@ -99,6 +99,16 @@ namespace FEAT
         {
           return &_comm;
         }
+
+        Index size()
+        {
+          int r;
+
+          MPI_Comm_size(_comm, &r);
+
+          return Index(r);
+        }
+
 
       private:
         MPI_Comm _comm;
@@ -595,8 +605,13 @@ namespace FEAT
       public:
         explicit Communicator(Index comm) :
           _comm(comm)
-      {
-      }
+        {
+        }
+
+        Index size()
+        {
+          return Index(1);
+        }
 
       private:
         Index _comm;
