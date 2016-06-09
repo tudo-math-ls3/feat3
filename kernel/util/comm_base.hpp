@@ -411,12 +411,24 @@ namespace FEAT
               Operation op = Operation(MPI_SUM),
               Communicator communicator = Communicator(MPI_COMM_WORLD))
           {
-            MPI_Allreduce(sendbuf,
-                recvbuf,
-                (int)num_elements_to_send_and_receive,
-                MPIType<DataType1_>::value(),
-                op.mpi_op(),
-                communicator.mpi_comm());
+            if (sendbuf == recvbuf)
+            {
+              MPI_Allreduce(MPI_IN_PLACE,
+              recvbuf,
+              (int)num_elements_to_send_and_receive,
+              MPIType<DataType1_>::value(),
+              op.mpi_op(),
+              communicator.mpi_comm());
+            }
+            else
+            {
+              MPI_Allreduce(sendbuf,
+              recvbuf,
+              (int)num_elements_to_send_and_receive,
+              MPIType<DataType1_>::value(),
+              op.mpi_op(),
+              communicator.mpi_comm());
+            }
           }
 
         template<typename DataType_>
@@ -495,13 +507,26 @@ namespace FEAT
               Operation op = Operation(MPI_SUM),
               Communicator communicator = Communicator(MPI_COMM_WORLD))
           {
-            MPI_Iallreduce(sendbuf,
-                recvbuf,
-                (int)num_elements_to_send_and_receive,
-                MPIType<DataType1_>::value(),
-                op.mpi_op(),
-                communicator.mpi_comm(),
-                &(r.mpi_request()));
+            if (sendbuf == recvbuf)
+            {
+              MPI_Iallreduce(MPI_IN_PLACE,
+              recvbuf,
+              (int)num_elements_to_send_and_receive,
+              MPIType<DataType1_>::value(),
+              op.mpi_op(),
+              communicator.mpi_comm(),
+              &(r.mpi_request()));
+            }
+            else
+            {
+              MPI_Iallreduce(sendbuf,
+              recvbuf,
+              (int)num_elements_to_send_and_receive,
+              MPIType<DataType1_>::value(),
+              op.mpi_op(),
+              communicator.mpi_comm(),
+              &(r.mpi_request()));
+            }
           }
 
 #ifndef MSMPI_VER
