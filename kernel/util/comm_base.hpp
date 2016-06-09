@@ -538,26 +538,29 @@ namespace FEAT
           // synchronize length
           Util::Comm::bcast(&size, 1, 0, comm);
 
-          // allocate
-          char* buf = new char[size + 1];
-
-          //fill
-          if(my_rank == 0) //master
+          if(size > Index(0))
           {
-            std::strcpy(buf, str.c_str());
+            // allocate
+            char* buf = new char[size + 1];
+
+            //fill
+            if(my_rank == 0) //master
+            {
+              std::strcpy(buf, str.c_str());
+            }
+
+            //bcast data
+            Util::Comm::bcast(buf, size, 0, comm);
+
+            //convert
+            if(my_rank != 0)
+            {
+              String res_str(buf, size);
+              iss << res_str;
+            }
+
+            delete[] buf;
           }
-
-          //bcast data
-          Util::Comm::bcast(buf, size, 0, comm);
-
-          //convert
-          if(my_rank != 0)
-          {
-            String res_str(buf, size);
-            iss << res_str;
-          }
-
-          delete[] buf;
         }
 
         static inline Index rank(Communicator c = Communicator(MPI_COMM_WORLD))
