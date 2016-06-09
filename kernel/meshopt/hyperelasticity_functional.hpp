@@ -291,9 +291,9 @@ namespace FEAT
           _scale_computation(ScaleComputation::once_uniform)
           {
             // Compute desired element size distribution
-            this->compute_scales_once();
+            compute_scales_once();
             // Compute element weights
-            this->compute_mu();
+            compute_mu();
           }
 
         explicit HyperelasticityFunctionalBase(
@@ -656,9 +656,7 @@ namespace FEAT
         /// \brief Computes the uniformly distributed weights _lambda.
         virtual void compute_lambda_uniform()
         {
-          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
-
-          _lambda.format(CoordType(1)/CoordType(ncells));
+          _lambda.format(CoordType(1));
         }
 
         virtual void compute_lambda_conc()
