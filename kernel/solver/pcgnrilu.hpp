@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_SOLVER_PCGNEILU_HPP
-#define KERNEL_SOLVER_PCGNEILU_HPP 1
+#ifndef KERNEL_SOLVER_PCGNRILU_HPP
+#define KERNEL_SOLVER_PCGNRILU_HPP 1
 
 // includes, FEAT
 #include <kernel/solver/iterative.hpp>
@@ -25,7 +25,7 @@ namespace FEAT
      * This solver implementation is experimental. Do not use it unless you know exactly what you are doing!
      *
      * \note
-     * This class implements a special case of the more generic PCGNE solver with the preconditioners
+     * This class implements a special case of the more generic PCGNR solver with the preconditioners
      * \f$M_L = LL^\top\f$ and \f$M_R = U^\top U\f$.
      *
      * \tparam Matrix_
@@ -39,7 +39,7 @@ namespace FEAT
     template<
       typename Matrix_,
       typename Filter_>
-    class PCGNEILU :
+    class PCGNRILU :
       public IterativeSolver<typename Matrix_::VectorTypeR>
     {
     public:
@@ -77,8 +77,8 @@ namespace FEAT
        * \param[in] ilu_p
        * Maximum allowed fill-in for ILU preconditioner. Set to -1 to disable preconditioning.
        */
-      explicit PCGNEILU(const MatrixType& matrix, const FilterType& filter, int ilu_p = -1) :
-        BaseClass("PCGNEILU"),
+      explicit PCGNRILU(const MatrixType& matrix, const FilterType& filter, int ilu_p = -1) :
+        BaseClass("PCGNRILU"),
         _system_matrix(matrix),
         _system_filter(filter),
         _ilu_p(ilu_p)
@@ -87,7 +87,7 @@ namespace FEAT
 
       virtual String name() const override
       {
-        return "PCGNEILU";
+        return "PCGNRILU";
       }
 
       virtual void init_symbolic() override
@@ -287,10 +287,10 @@ namespace FEAT
         // we should never reach this point...
         return Status::undefined;
       }
-    }; // class PCGNEILU<...>
+    }; // class PCGNRILU<...>
 
     /**
-     * \brief Creates a new PCGNEILU solver object
+     * \brief Creates a new PCGNRILU solver object
      *
      * \param[in] matrix
      * The system matrix.
@@ -302,15 +302,15 @@ namespace FEAT
      * Maximum allowed fill-in for ILU preconditioner. Set to -1 to disable preconditioning.
      *
      * \returns
-     * A shared pointer to a new PCGNEILU object.
+     * A shared pointer to a new PCGNRILU object.
      */
     template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<PCGNEILU<Matrix_, Filter_>> new_pcgneilu(
+    inline std::shared_ptr<PCGNRILU<Matrix_, Filter_>> new_pcgnrilu(
       const Matrix_& matrix, const Filter_& filter, int ilu_p = -1)
     {
-      return std::make_shared<PCGNEILU<Matrix_, Filter_>>(matrix, filter, ilu_p);
+      return std::make_shared<PCGNRILU<Matrix_, Filter_>>(matrix, filter, ilu_p);
     }
   } // namespace Solver
 } // namespace FEAT
 
-#endif // KERNEL_SOLVER_PCGNEILU_HPP
+#endif // KERNEL_SOLVER_PCGNRILU_HPP

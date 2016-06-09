@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_SOLVER_PCGNE_HPP
-#define KERNEL_SOLVER_PCGNE_HPP 1
+#ifndef KERNEL_SOLVER_PCGNR_HPP
+#define KERNEL_SOLVER_PCGNR_HPP 1
 
 // includes, FEAT
 #include <kernel/solver/iterative.hpp>
@@ -38,7 +38,7 @@ namespace FEAT
     template<
       typename Matrix_,
       typename Filter_>
-    class PCGNE :
+    class PCGNR :
       public IterativeSolver<typename Matrix_::VectorTypeR>
     {
     public:
@@ -83,10 +83,10 @@ namespace FEAT
        * \note
        * \p precond_l and \p precond_r may point to the same object.
        */
-      explicit PCGNE(const MatrixType& matrix, const FilterType& filter,
+      explicit PCGNR(const MatrixType& matrix, const FilterType& filter,
         std::shared_ptr<PrecondType> precond_l = nullptr,
         std::shared_ptr<PrecondType> precond_r = nullptr) :
-        BaseClass("PCGNE"),
+        BaseClass("PCGNR"),
         _system_matrix(matrix),
         _system_filter(filter),
         _precond_l(precond_l),
@@ -96,7 +96,7 @@ namespace FEAT
 
       virtual String name() const override
       {
-        return "PCGNE";
+        return "PCGNR";
       }
 
       virtual void init_branch(String parent = "") override
@@ -340,10 +340,10 @@ namespace FEAT
         // we should never reach this point...
         return Status::undefined;
       }
-    }; // class PCGNE<...>
+    }; // class PCGNR<...>
 
     /**
-     * \brief Creates a new PCGNE solver object
+     * \brief Creates a new PCGNR solver object
      *
      * \param[in] matrix
      * The system matrix.
@@ -358,35 +358,35 @@ namespace FEAT
      * The right preconditioner. May be \c nullptr.
      *
      * \returns
-     * A shared pointer to a new PCGNE object.
+     * A shared pointer to a new PCGNR object.
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
 #if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
     template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<PCGNE<Matrix_, Filter_>> new_pcgne(
+    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
       const Matrix_& matrix, const Filter_& filter)
     {
-      return std::make_shared<PCGNE<Matrix_, Filter_>>(matrix, filter, nullptr);
+      return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter, nullptr);
     }
     template<typename Matrix_, typename Filter_, typename PrecondL_, typename PrecondR_>
-    inline std::shared_ptr<PCGNE<Matrix_, Filter_>> new_pcgne(
+    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<PrecondL_> precond_l)
       std::shared_ptr<PrecondR_> precond_r)
     {
-      return std::make_shared<PCGNE<Matrix_, Filter_>>(matrix, filter, precond_l, precond_r);
+      return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter, precond_l, precond_r);
     }
 #else
     template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<PCGNE<Matrix_, Filter_>> new_pcgne(
+    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond_l = nullptr,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond_r = nullptr)
     {
-      return std::make_shared<PCGNE<Matrix_, Filter_>>(matrix, filter, precond_l, precond_r);
+      return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter, precond_l, precond_r);
     }
 #endif
   } // namespace Solver
 } // namespace FEAT
 
-#endif // KERNEL_SOLVER_PCGNE_HPP
+#endif // KERNEL_SOLVER_PCGNR_HPP
