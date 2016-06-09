@@ -20,7 +20,7 @@ namespace FEAT
      * \tparam Filter_
      * The filter class to be used by the solver.
      *
-     * \see Algorithm 6.20 in \cite Saad03
+     * \see Chapter 6.8, Algorithm 6.20 in \cite Saad03
      *
      * \author Peter Zajac
      */
