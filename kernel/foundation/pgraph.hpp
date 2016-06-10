@@ -19,9 +19,6 @@ FEAT_RESTORE_WARNINGS
 
 namespace FEAT
 {
-  using namespace Geometry;
-  using namespace Shape;
-
   namespace Foundation
   {
     ///base class for (distributed) graphs used for partitioning
@@ -239,7 +236,7 @@ namespace FEAT
 
           //build up the graph
           auto& source_vertex_at_elem(source.template get_index_set<SourceMeshT_::shape_dim, 0>());
-          Index vtxcount_at_elem(FaceTraits<typename SourceMeshT_::ShapeType, 0>::count);
+          Index vtxcount_at_elem(Shape::FaceTraits<typename SourceMeshT_::ShapeType, 0>::count);
           Index* xadj(new Index[Index(num_dualvtx) * vtxcount_at_elem]);
           for(IndexType i(0) ; i < num_dualvtx + 1; ++i)
           {
@@ -452,7 +449,7 @@ namespace FEAT
 
           //build up the graph
           auto& source_vertex_at_elem(source.template get_index_set<SourceMeshT_::shape_dim, 0>());
-          Index vtxcount_at_elem(FaceTraits<typename SourceMeshT_::ShapeType, 0>::count);
+          Index vtxcount_at_elem(Shape::FaceTraits<typename SourceMeshT_::ShapeType, 0>::count);
           Index* xadj(new Index[Index(num_dualvtx) * vtxcount_at_elem]);
           for(IndexType i(0) ; i < num_dualvtx + 1; ++i)
           {
@@ -782,7 +779,7 @@ namespace FEAT
 
           //build up the graph
           auto& source_vertex_at_elem(source.template get_index_set<SourceMeshT_::shape_dim, 0>());
-          Index vtxcount_at_elem(FaceTraits<typename SourceMeshT_::ShapeType, 0>::count);
+          Index vtxcount_at_elem(Shape::FaceTraits<typename SourceMeshT_::ShapeType, 0>::count);
           Index* xadj(new Index[Index(num_dualvtx) * vtxcount_at_elem]);
           for(IndexType i(0) ; i < num_dualvtx + 1; ++i)
           {
