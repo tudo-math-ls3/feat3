@@ -216,7 +216,7 @@ namespace FEAT
             DataType det = Math::invert_matrix(fine_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
             if(!Math::isnormal(det))
             {
-              throw InternalError("Local Mass Matrix inversion failed!");
+              throw InternalError(__func__,__FILE__,__LINE__,"Local Mass Matrix inversion failed!");
             }
 
             // compute X := M^{-1}*N
