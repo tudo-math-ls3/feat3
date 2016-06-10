@@ -360,6 +360,68 @@ namespace FEAT
       // return status
       return status;
     }
+
+    /**
+     * \brief Helper class for iteration statistics collection
+     *
+     * This helper class collects timings for iterative solvers.
+     * Create an instance (object) of this class at the beginning of
+     * each iteration.
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    class IterationStats
+    {
+    private:
+      const String _branch;
+      TimeStamp _at;
+      TimeStamp _bt;
+      double _mpi_execute_start;
+      double _mpi_execute_stop;
+      double _mpi_wait_start;
+      double _mpi_wait_stop;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * This constructor is called at the beginning of each iteration of
+       * an iterative solver.
+       *
+       * \param[in] solver
+       * The iterative solver object that is to benchmarked.
+       */
+      template<typename Vector_>
+      explicit IterationStats(const SolverBase<Vector_>& solver) :
+        _branch(solver.get_solver_branch())
+      {
+        _mpi_execute_start = Statistics::get_time_mpi_execute();
+        _mpi_wait_start    = Statistics::get_time_mpi_wait();
+        _mpi_execute_stop = _mpi_execute_start;
+        _mpi_wait_stop    = _mpi_wait_start;
+      }
+
+      // delete copy-ctor and assign operator
+      IterationStats(const IterationStats&) = delete;
+      IterationStats& operator=(const IterationStats&) = delete;
+
+      /**
+       * \brief Destructor
+       *
+       * This is called at the end of each iteration. This function computes the
+       * iteration runtimes and commits them to the Statistics collection system.
+       */
+      ~IterationStats()
+      {
+        _bt.stamp();
+        _mpi_execute_stop = Statistics::get_time_mpi_execute();
+        _mpi_wait_stop    = Statistics::get_time_mpi_wait();
+        Statistics::add_solver_toe(this->_branch, _bt.elapsed(_at));
+        Statistics::add_solver_mpi_execute(this->_branch, _mpi_execute_stop - _mpi_execute_start);
+        Statistics::add_solver_mpi_wait(this->_branch, _mpi_wait_stop - _mpi_wait_start);
+      }
+    }; // class IterationStats
   } // namespace Solver
 } // namespace FEAT
 
