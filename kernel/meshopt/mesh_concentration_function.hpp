@@ -164,8 +164,10 @@ namespace FEAT
             _sum_conc+=this->_conc(cell);
           }
 
-          CoordType sum_conc_send(_sum_conc);
-          Util::Comm::allreduce(&sum_conc_send, 1, &_sum_conc, MPI_SUM);
+#ifdef FEAT_HAVE_MPI
+          CoordType sum_conc_snd(_sum_conc);
+          Util::Comm::allreduce(&sum_conc_snd, 1, &_sum_conc, MPI_SUM);
+#endif
         }
 
         /**

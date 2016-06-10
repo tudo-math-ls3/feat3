@@ -107,10 +107,9 @@ struct MeshoptRefinementApp
       std::cout << "Cells: " << ncells << std::endl;
     }
 
-
+    // For test_mode = true
     DT_ min_quality(0);
     DT_ min_angle(0);
-
     {
       int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
@@ -130,15 +129,18 @@ struct MeshoptRefinementApp
           exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
         }
 
-        DT_ quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
           (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
 
-        DT_ angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
           (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
 
 #ifdef FEAT_HAVE_MPI
-        Util::Comm::allreduce(&quality, Index(1), &min_quality, MPI_MIN);
-        Util::Comm::allreduce(&angle, Index(1), &min_angle, MPI_MIN);
+        DT_ min_quality_snd(min_quality);
+        DT_ min_angle_snd(min_angle);
+
+        Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
+        Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
 #endif
         if(Util::Comm::rank() == 0)
           std::cout << "Pre: Level " << lvl_index << ": Quality indicator " << " " <<
@@ -185,15 +187,18 @@ struct MeshoptRefinementApp
           exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
         }
 
-        auto quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
           (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
 
-        auto angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
           (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
 
 #ifdef FEAT_HAVE_MPI
-        Util::Comm::allreduce(&quality, Index(1), &min_quality, MPI_MIN);
-        Util::Comm::allreduce(&angle, Index(1), &min_angle, MPI_MIN);
+        DT_ min_quality_snd(min_quality);
+        DT_ min_angle_snd(min_angle);
+
+        Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
+        Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
 #endif
         if(Util::Comm::rank() == 0)
           std::cout << "Post: Level " << lvl_index << ": Quality indicator " << " " <<

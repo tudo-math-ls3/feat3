@@ -271,13 +271,11 @@ namespace FEAT
          */
         DataType compute_func()
         {
-          DataType my_fval;
-          DataType my_fval_send(_nonlinear_functional.compute_func());
-
-          Util::Comm::barrier();
-
+          DataType my_fval(_nonlinear_functional.compute_func());
+#ifdef FEAT_HAVE_MPI
+          DataType my_fval_send(my_fval);
           Util::Comm::allreduce(&my_fval_send, 1, &my_fval, MPI_SUM);
-
+#endif
           return my_fval;
         }
 

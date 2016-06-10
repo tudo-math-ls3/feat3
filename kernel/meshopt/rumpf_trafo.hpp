@@ -269,8 +269,10 @@ namespace FEAT
             sum_det += compute_det(x);
           }
 
+#ifdef FEAT_HAVE_MPI
           DataType sum_det_send(sum_det);
           Util::Comm::allreduce(&sum_det_send, 1, &sum_det, MPI_SUM);
+#endif
           return sum_det;
         }
 
@@ -424,8 +426,10 @@ namespace FEAT
             sum_det += compute_det(x);
           }
 
+#ifdef FEAT_HAVE_MPI
           DataType sum_det_send(sum_det);
           Util::Comm::allreduce(&sum_det_send, 1, &sum_det, MPI_SUM);
+#endif
           return sum_det;
         }
 
