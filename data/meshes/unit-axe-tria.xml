@@ -1,0 +1,150 @@
+<FeatMeshFile version="1" mesh="conformal:simplex:2:2">
+  <Info>
+   This is the unit axe mesh consisting of eight triangles.
+  </Info>
+  <Chart name="outer">
+    <Bezier dim="2" size="5" type="closed">
+      <Points>
+        0 0
+        1 0
+        1 1
+        0 1
+        0 0
+      </Points>
+      <Params>
+        0
+        1
+        2
+        3
+        4
+      </Params>
+      <Controls>
+        0.25 -0.25   0.75 -0.25
+        0.75  0.25   0.75  0.75
+        0.75  1.25   0.25  1.25
+        0.25  0.75   0.25  0.25
+      </Controls>
+    </Bezier>
+  </Chart>
+  <Mesh type="conformal:simplex:2:2" size="9 16 8">
+    <Vertices>
+      0 0
+      1 0
+      0 1
+      1 1
+      0.5 0
+      0.5 1
+      0 0.5
+      1 0.5
+      0.5 0.5
+    </Vertices>
+    <Topology dim="1">
+      0 4
+      4 1
+      2 5
+      5 3
+      0 6
+      6 2
+      1 7
+      7 3
+      4 8
+      8 5
+      6 8
+      8 7
+      4 7
+      7 5
+      5 6
+      6 4
+    </Topology>
+    <Topology dim="2">
+      0 4 6
+      1 7 4
+      3 5 7
+      2 6 5
+      4 8 6
+      4 7 8
+      5 8 7
+      5 6 8
+    </Topology>
+  </Mesh>
+  <MeshPart name="bottom" parent="root" chart="outer" topology="full" size="3 2">
+    <Mapping dim="0">
+      0
+      4
+      1
+    </Mapping>
+    <Mapping dim="1">
+      0
+      1
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+    </Topology>
+    <Attribute name="param" dim="1">
+      0
+      0.5
+      1
+    </Attribute>
+  </MeshPart>
+  <MeshPart name="right" parent="root" chart="outer" topology="full" size="3 2">
+    <Mapping dim="0">
+      1
+      7
+      3
+    </Mapping>
+    <Mapping dim="1">
+      6
+      7
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+    </Topology>
+    <Attribute name="param" dim="1">
+      1
+      1.5
+      2
+    </Attribute>
+  </MeshPart>
+  <MeshPart name="top" parent="root" chart="outer" topology="full" size="3 2">
+    <Mapping dim="0">
+      3
+      5
+      2
+    </Mapping>
+    <Mapping dim="1">
+      3
+      2
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+    </Topology>
+    <Attribute name="param" dim="1">
+      2
+      2.5
+      3
+    </Attribute>
+  </MeshPart>
+  <MeshPart name="left" parent="root" chart="outer" topology="full" size="3 2">
+    <Mapping dim="0">
+      2
+      6
+      0
+    </Mapping>
+    <Mapping dim="1">
+      5
+      4
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+    </Topology>
+    <Attribute name="param" dim="1">
+      3
+      3.5
+      4
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>
