@@ -1,11 +1,14 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
+
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_quality_heuristic.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
+
 #include <control/domain/partitioner_domain_control.hpp>
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_control_factory.hpp>
@@ -36,23 +39,19 @@ struct MeshoptRefinementApp
   /// The only transformation available is the standard P1 or Q1 transformation
   typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
 
-#ifndef FEAT_HAVE_MPI
-  // If we are in serial mode, there is no partitioning
-  typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<DT_, IT_>, Mesh_> DomCtrl;
-#else
 #ifdef FEAT_HAVE_PARMETIS
   // If we have ParMETIS, we can use it for partitioning
-  typedef Control::Domain::PartitionerDomainControl
-  <
-    Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>,
-    Mesh_
-  >
-  DomCtrl;
+  typedef Control::Domain::PartitionerDomainControl<
+    Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, Mesh_> DomCtrl;
 #else
+#ifdef FEAT_HAVE_MPI
   // Otherwise we have to use the fallback partitioner
   typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<DT_, IT_>, Mesh_> DomCtrl;
+#else
+  // If we are in serial mode, there is no partitioning
+  typedef Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<DT_, IT_>, Mesh_> DomCtrl;
+#endif // FEAT_HAVE_MPI
 #endif // FEAT_HAVE_PARMETIS
-#endif // ! FEAT_HAVE_MPI
 
   /**
    * \brief Returns a descriptive string
@@ -300,7 +299,6 @@ int main(int argc, char* argv[])
 
   // Application settings, has to be created here because it gets filled differently according to test_mode
   PropertyMap* application_config = new PropertyMap;
-
 
   // If we are not in test mode, parse command line arguments, read files, synchronise streams
   if(! test_mode)
