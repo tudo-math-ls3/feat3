@@ -76,6 +76,8 @@ namespace FEAT
           _num_grad_evals(0),
           _num_hess_evals(0)
           {
+            XASSERTM(mesh_node_ != nullptr, "MeshNode must not be nullptr.");
+
             mesh_to_buffer();
           }
 

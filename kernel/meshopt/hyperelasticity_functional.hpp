@@ -269,6 +269,9 @@ namespace FEAT
          * \param[in] functional_
          * The (cell-local) functional used
          *
+         * This is the simple constructor that always sets the scale computation to once_uniform and the mesh
+         * concentration function to nullptr.
+         *
          */
         explicit HyperelasticityFunctionalBase(
           Geometry::RootMeshNode<MeshType>* rmn_,
@@ -290,12 +293,41 @@ namespace FEAT
           _rows(_trafo_space.get_num_dofs()),
           _scale_computation(ScaleComputation::once_uniform)
           {
+
+            XASSERTM(functional_ != nullptr, "Cell functional must not be nullptr");
+
             // Compute desired element size distribution
             compute_scales_once();
             // Compute element weights
             compute_mu();
           }
 
+        /**
+         * \brief Constructor
+         *
+         * \param[in] rmn_
+         * The RootMeshNode representing the tree of root mesh, all of its MeshParts and Charts
+         *
+         * \param[in] trafo_space_
+         * A reference to the Finite Element space used for the transformation
+         *
+         * \param[in] dirichlet_asm_
+         * A map of Strings to UnitFilterAssemblers for all Dirichlet boundaries
+         *
+         * \param[in] slip_asm_
+         * A map of Strings to SlipFilterAssemblers for all slip boundaries
+         *
+         * \param[in] functional_
+         * The (cell-local) functional used
+         *
+         * \param[in] scale_computation_
+         * The type of scale computation to use
+         *
+         * \param[in] mesh_conc_
+         * The mesh concentration function to use. If no scale computation that uses this is set, this may be
+         * nullptr.
+         *
+         */
         explicit HyperelasticityFunctionalBase(
           Geometry::RootMeshNode<MeshType>* rmn_,
           TrafoSpace& trafo_space_,
@@ -310,7 +342,7 @@ namespace FEAT
           _dirichlet_asm(dirichlet_asm_),
           _slip_asm(slip_asm_),
           _functional(functional_),
-          _mesh_conc(mesh_conc_),
+          _mesh_conc(nullptr),
           _mu(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _lambda(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
           _h(rmn_->get_mesh()->get_num_entities(ShapeType::dimension)),
@@ -318,16 +350,18 @@ namespace FEAT
           _rows(_trafo_space.get_num_dofs()),
           _scale_computation(scale_computation_)
           {
-
             if(( _scale_computation == ScaleComputation::once_concentration ||
                   _scale_computation == ScaleComputation::current_concentration ||
                   _scale_computation == ScaleComputation::iter_concentration ) &&
-                _mesh_conc == nullptr)
+                mesh_conc_ == nullptr)
               throw InternalError(__func__,__FILE__,__LINE__,
               "Scale computation set to "+stringify(_scale_computation)+", but no concentration funtion was given");
 
-            if(_mesh_conc != nullptr)
+            if(mesh_conc_ != nullptr)
+            {
+              _mesh_conc = mesh_conc_->create_empty_clone();
               _mesh_conc->set_mesh_node(rmn_);
+            }
 
             // Perform one time scal computation
             compute_scales_once();

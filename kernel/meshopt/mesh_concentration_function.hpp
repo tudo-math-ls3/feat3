@@ -80,6 +80,7 @@ namespace FEAT
           _grad_h()
           {
           }
+
       protected:
         explicit MeshConcentrationFunction(const MeshConcentrationFunction& other) :
           _mesh_node(other._mesh_node),
@@ -91,12 +92,14 @@ namespace FEAT
           _grad_sum_det.clone(other._grad_sum_det, LAFEM::CloneMode::Deep);
           _grad_h.clone(other._grad_h, LAFEM::CloneMode::Deep);
         }
-      public:
 
+      public:
         /// \brief Virtual destructor
         virtual ~MeshConcentrationFunction()
         {
         }
+
+        virtual std::shared_ptr<MeshConcentrationFunction> create_empty_clone() const = 0;
 
         virtual void compute_dist() = 0;
 
@@ -425,6 +428,7 @@ namespace FEAT
         ChartDistanceFunction() = delete;
 
         explicit ChartDistanceFunction(const std::deque<String>& chart_list_):
+          BaseClass(),
           _chart_list()
         {
           XASSERTM(chart_list_.size() > size_t(0), "Empty chart list.");
@@ -441,6 +445,13 @@ namespace FEAT
 
         virtual ~ChartDistanceFunction()
         {
+        }
+
+        virtual std::shared_ptr<BaseClass> create_empty_clone() const override
+        {
+          std::shared_ptr<BaseClass> result(nullptr);
+          result = std::make_shared<ChartDistanceFunction>(_chart_list);
+          return result;
         }
 
         virtual void compute_dist() override
