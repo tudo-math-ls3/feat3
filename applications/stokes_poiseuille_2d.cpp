@@ -11,15 +11,16 @@
 #include <kernel/solver/basic_vcycle.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
-#include <kernel/solver/pcg.hpp>
+#include <kernel/solver/pcr.hpp>
 #include <kernel/solver/ilu_precond.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/schur_precond.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
+#include <kernel/util/mpi_cout.hpp>
 
-#include <control/domain/unit_cube_domain_control.hpp>
+#include <control/domain/partitioner_domain_control.hpp>
 #include <control/stokes_basic.hpp>
 #include <control/statistics.hpp>
 
@@ -77,25 +78,28 @@ namespace StokesPoiseuille2D
       // create unit-filter assembler
       Assembly::UnitFilterAssembler<MeshType> unit_asm;
 
-      // loop over the first three boundary components,
-      // the fourth boundary component is the outflow region
-      for(int i(0); i < 3; ++i)
+      // loop over all boundary parts except for the right one, which is outflow
+      std::deque<String> part_names;
+      part_names.push_back("left");
+      part_names.push_back("top");
+      part_names.push_back("bottom");
+      for(const auto& name : part_names)
       {
         // try to fetch the corresponding mesh part node
-        auto* mesh_part_node = this->domain_level.get_mesh_node()->find_mesh_part_node(String("bnd:") + stringify(i));
+        auto* mesh_part_node = this->domain_level.get_mesh_node()->find_mesh_part_node(name);
 
         // found it?
-        if(mesh_part_node == nullptr)
-          throw InternalError("Mesh Part Node 'bnd:" + stringify(i) + "' not found!");
+        if (mesh_part_node == nullptr)
+          throw InternalError("Mesh Part Node 'boundary' not found!");
 
         // let's see if we have that mesh part
         // if it is nullptr, then our patch is not adjacent to that boundary part
         auto* mesh_part = mesh_part_node->get_mesh();
-        if(mesh_part == nullptr)
-          continue;
-
-        // add our boundary mesh part
-        unit_asm.add_mesh_part(*mesh_part);
+        if (mesh_part != nullptr)
+        {
+          // add to boundary assembler
+          unit_asm.add_mesh_part(*mesh_part);
+        }
       }
 
       // our inflow BC function
@@ -416,7 +420,7 @@ namespace StokesPoiseuille2D
       );
 
     // create our solver
-    auto solver = Solver::new_pcg(matrix_solve, filter_solve, schur);
+    auto solver = Solver::new_pcr(matrix_solve, filter_solve, schur);
 
     // enable plotting
     solver->set_plot(rank == 0);
@@ -526,6 +530,8 @@ namespace StokesPoiseuille2D
     args.support("vtk");
     args.support("statistics");
     args.support("mem");
+    args.support("part_min_elems");
+    args.support("meshfile");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
@@ -559,15 +565,29 @@ namespace StokesPoiseuille2D
       TimeStamp stamp1;
 
       // let's create our domain
-      Control::Domain::UnitCubeDomainControl<MeshType> domain(rank, nprocs, lvl_max, lvl_min);
+      Util::mpi_cout("Preparing domain...\n");
+      int min_elems_partitioner(nprocs * 4);
+      args.parse("part_min_elems", min_elems_partitioner);
 
+      // fetch the mandatory mesh filename
+      String meshfile;
+      if(args.parse("meshfile", meshfile) <= 0)
+      {
+        if(rank == 0)
+          std::cerr << "ERROR: Mandatory option --meshfile is missing!" << std::endl;
+        FEAT::Runtime::abort();
+      }
+#ifdef FEAT_HAVE_PARMETIS
+      Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
+#elif defined(FEAT_HAVE_MPI)
+      Control::Domain::PartitionerDomainControl<Foundation::PExecutorFallback<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
+#else
+      Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
+#endif
 
       // plot our levels
-      if(rank == 0)
-      {
-        std::cout << "LVL-MIN: " << domain.min_level_index() << " [" << lvl_min << "]" << std::endl;
-        std::cout << "LVL-MAX: " << domain.max_level_index() << " [" << lvl_max << "]" << std::endl;
-      }
+      Util::mpi_cout("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]\n");
+      Util::mpi_cout("LVL-MAX: " + stringify(domain.get_levels().back()->get_level_index()) + " [" + stringify(lvl_max) + "]\n");
 
       // run our application
       if (mem_string == "main")
@@ -594,12 +614,8 @@ namespace StokesPoiseuille2D
       long long time2 = time1 * (long long)nprocs;
 
       // print time
-      if(rank == 0)
-      {
-        std::cout << "Run-Time: "
-          << TimeStamp::format_micros(time1, TimeFormat::m_s_m) << " ["
-          << TimeStamp::format_micros(time2, TimeFormat::m_s_m) << "]" << std::endl;
-      }
+      Util::mpi_cout("Run-Time: " + stringify(TimeStamp::format_micros(time1, TimeFormat::m_s_m)) + " [" +
+        stringify(TimeStamp::format_micros(time2, TimeFormat::m_s_m)) + "]\n");
     }
 #ifndef DEBUG
     catch (const std::exception& exc)

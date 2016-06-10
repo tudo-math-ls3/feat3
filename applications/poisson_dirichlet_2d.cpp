@@ -102,9 +102,8 @@ namespace PoissonDirichlet2D
         auto* mesh_part = mesh_part_node->get_mesh();
         if (mesh_part != nullptr)
         {
-
-        // add to boundary assembler
-        unit_asm.add_mesh_part(*mesh_part);
+          // add to boundary assembler
+          unit_asm.add_mesh_part(*mesh_part);
         }
       }
 
