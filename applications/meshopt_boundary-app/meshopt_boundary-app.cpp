@@ -73,6 +73,8 @@ struct MeshoptBoundaryApp
     XASSERT(delta_t > DataType(0));
     XASSERT(t_end >= DataType(0));
 
+    int return_value(0);
+
     TimeStamp at;
 
     // Base string for writing files
@@ -88,6 +90,12 @@ struct MeshoptBoundaryApp
     // Create the DomainControl
     DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader);
 
+    Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
+#ifdef FEAT_HAVE_MPI
+      Index my_cells(ncells);
+      Util::Comm::allreduce(&my_cells, Index(1), &ncells, MPI_SUM);
+#endif
+
     // Print level information
     if(Util::Comm::rank() == 0)
     {
@@ -98,6 +106,7 @@ struct MeshoptBoundaryApp
         dom_ctrl.get_levels().back()->get_level_index() << " [" << lvl_max << "]";
       std::cout << " LVL-MIN: " <<
         dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
+      std::cout << "Cells: " << ncells << std::endl;
     }
 
     // Create the MeshoptControl
@@ -263,7 +272,6 @@ struct MeshoptBoundaryApp
       {
         // Get outer boundary MeshPart
         auto* boundary_meshpart = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part(it);
-        std::cout << "dirichlet " << it << std::endl;
 
         // If the meshpart is not there, our patch does not lie on that boundary, which is fine
         if(boundary_meshpart == nullptr)
@@ -306,6 +314,24 @@ struct MeshoptBoundaryApp
       if(Util::Comm::rank() == 0)
         std::cout << "max. mesh velocity: " << stringify_fp_sci(max_mesh_velocity) << std::endl;
 
+      if(write_vtk)
+      {
+        String vtk_name(file_basename+"_post_"+stringify(n));
+
+        if(Util::Comm::rank() == 0)
+          std::cout << "Writing " << vtk_name << std::endl;
+
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
+        // Add mesh velocity
+        exporter.add_vertex_vector("mesh_velocity", *mesh_velocity);
+        // Add everything from the MeshoptControl
+        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
+        // Write the file
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+      }
+
+
       // Compute mesh quality and worst angle
       const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
 
@@ -326,37 +352,26 @@ struct MeshoptBoundaryApp
         std::cout << "Quality indicator " << stringify_fp_sci(min_quality) <<
           ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
 
-      // Check for the hard coded settings for test mode
-      if(test_mode)
+      if(min_angle < DT_(1))
       {
-        if( min_angle < DT_(27) )
-        {
-          std::cout << min_angle << std::cout;
-          Util::mpi_cout("FAILED:");
-          throw InternalError(__func__,__FILE__,__LINE__,
-          "Post initial min angle should be greater than "+stringify_fp_fix(27)+
-          " but is "+stringify_fp_fix(min_angle));
-        }
-      }
-
-      if(write_vtk)
-      {
-        String vtk_name(file_basename+"_post_"+stringify(n));
-
-        if(Util::Comm::rank() == 0)
-          std::cout << "Writing " << vtk_name << std::endl;
-
-        // Create a VTK exporter for our mesh
-        Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
-        // Add mesh velocity
-        exporter.add_vertex_vector("mesh_velocity", *mesh_velocity);
-        // Add everything from the MeshoptControl
-        meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
-        // Write the file
-        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+        Util::mpi_cout("Mesh deteriorated, stopping.\n");
+        return_value = 1;
+        break;
       }
 
     } // time loop
+
+    // Check for the hard coded settings for test mode
+    if(test_mode)
+    {
+      if( min_angle < DT_(27) )
+      {
+        Util::mpi_cout("FAILED:");
+        throw InternalError(__func__,__FILE__,__LINE__,
+        "Final min angle should be greater than "+stringify_fp_fix(27)+
+        " but is "+stringify_fp_fix(min_angle));
+      }
+    }
 
     delete[] todo_boundary;
 
@@ -366,7 +381,7 @@ struct MeshoptBoundaryApp
       std::cout << "Elapsed time: " << bt.elapsed(at) << std::endl;
     }
 
-    return 0;
+    return return_value;
 
   }
 }; // struct MeshoptBoundaryApp
@@ -422,7 +437,6 @@ int main(int argc, char* argv[])
   bool write_vtk(false);
   // Is the application running as a test? Read from the command line arguments
   bool test_mode(false);
-
 
   // Streams for synchronising information read from files
   std::stringstream synchstream_mesh;
@@ -661,6 +675,9 @@ int main(int argc, char* argv[])
   else
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandlet mesh type "+mesh_type);
 
+  delete application_config;
+  delete meshopt_config;
+  delete solver_config;
   delete mesh_file_reader;
   if(chart_file_reader != nullptr)
     delete chart_file_reader;
@@ -678,6 +695,7 @@ static void display_help()
     std::cout << "Mandatory arguments:" << std::endl;
     std::cout << " --application_config: Path to the application configuration file" << std::endl;
     std::cout << "Optional arguments:" << std::endl;
+    std::cout << " --testmode: Run as a test. Ignores configuration files and uses hard coded settings." << std::endl;
     std::cout << " --vtk: If this is set, vtk files are written" << std::endl;
     std::cout << " --help: Displays this text" << std::endl;
   }
@@ -690,7 +708,7 @@ static void read_test_mode_application_config(std::stringstream& iss)
   iss << "meshopt_config_file = ./meshopt_config.ini" << std::endl;
   iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
   iss << "solver_config_file = ./solver_config.ini" << std::endl;
-  iss << "lvl_min = 0" << std::endl;
+  iss << "lvl_min = 1" << std::endl;
   iss << "lvl_max = 3" << std::endl;
   iss << "delta_t = 1e-2" << std::endl;
   iss << "t_end = 5e-2" << std::endl;
@@ -771,7 +789,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
 
   iss << "[pcg]" << std::endl;
   iss << "type = pcg" << std::endl;
-  iss << "max_iter = 10" << std::endl;
+  iss << "max_iter = 50" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = jac" << std::endl;
 }

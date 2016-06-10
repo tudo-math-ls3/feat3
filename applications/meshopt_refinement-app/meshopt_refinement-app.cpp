@@ -76,19 +76,6 @@ struct MeshoptRefinementApp
     // Create the DomainControl
     DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader, Geometry::AdaptMode::none);
 
-    // Create the MeshoptControl
-    std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
-    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
-      dom_ctrl, meshopt_section_key, meshopt_config, solver_config);
-
-    // Adapt the finest level
-    dom_ctrl.get_levels().back()->get_mesh_node()->adapt();
-
-    meshopt_ctrl->mesh_to_buffer();
-    auto new_coords = meshopt_ctrl->get_coords().clone();
-
-    meshopt_ctrl->prepare(new_coords);
-
     Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
 #ifdef FEAT_HAVE_MPI
       Index my_cells(ncells);
@@ -105,6 +92,18 @@ struct MeshoptRefinementApp
         dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
       std::cout << "Cells: " << ncells << std::endl;
     }
+    // Create the MeshoptControl
+    std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl, TrafoType>> meshopt_ctrl(nullptr);
+    meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
+      dom_ctrl, meshopt_section_key, meshopt_config, solver_config);
+
+    // Adapt the finest level
+    dom_ctrl.get_levels().back()->get_mesh_node()->adapt();
+
+    meshopt_ctrl->mesh_to_buffer();
+    auto new_coords = meshopt_ctrl->get_coords().clone();
+
+    meshopt_ctrl->prepare(new_coords);
 
     // For test_mode = true
     DT_ min_quality(0);
@@ -495,6 +494,9 @@ int main(int argc, char* argv[])
   else
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandled mesh type string "+mesh_type);
 
+  delete application_config;
+  delete meshopt_config;
+  delete solver_config;
   delete mesh_file_reader;
   if(chart_file_reader != nullptr)
     delete chart_file_reader;
@@ -527,7 +529,7 @@ static void display_help()
 static void read_test_mode_application_config(std::stringstream& iss)
 {
   iss << "[ApplicationSettings]" << std::endl;
-  iss << "mesh_file = ./unit-circle-tria.xml" << std::endl;
+  iss << "mesh_file = ./unit-circle-quad.xml" << std::endl;
   iss << "meshopt_config_file = ./meshopt_config.ini" << std::endl;
   iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
   iss << "solver_config_file = ./solver_config.ini" << std::endl;
@@ -610,7 +612,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
 
   iss << "[pcg]" << std::endl;
   iss << "type = pcg" << std::endl;
-  iss << "max_iter = 10" << std::endl;
+  iss << "max_iter = 50" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = jac" << std::endl;
 }
