@@ -309,6 +309,17 @@ namespace FEAT
 
           }
 
+          /// \copydoc BaseClass::get_dirichlet_boundaries()
+          virtual std::deque<String> get_dirichlet_boundaries() const override
+          {
+            std::deque<String> dirichlet_boundaries;
+
+            for(const auto& it:_assembler_levels.back()->dirichlet_asm)
+              dirichlet_boundaries.push_back(it.first);
+
+            return dirichlet_boundaries;
+          }
+
           /// \copydoc BaseClass::add_to_vtk_exporter()
           virtual void add_to_vtk_exporter(
             Geometry::ExportVTK<MeshType>& exporter, const int deque_position) const override

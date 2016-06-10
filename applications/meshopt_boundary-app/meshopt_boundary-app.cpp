@@ -105,12 +105,8 @@ struct MeshoptBoundaryApp
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
       dom_ctrl, meshopt_section_key, meshopt_config, solver_config);
 
-    // Get outer boundary MeshPart
-    auto* outer_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer");
-    XASSERT(outer_boundary != nullptr);
-
-    // Get vertex target set
-    Geometry::TargetSet& boundary_set = outer_boundary->template get_target_set<0>();
+    // Get a list of the dirichlet boundaries for modifying the boundari coordinates
+    std::deque<String> dirichlet_boundaries(meshopt_ctrl->get_dirichlet_boundaries());
 
     // A copy of the old vertex coordinates is kept here
     auto old_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
@@ -164,10 +160,8 @@ struct MeshoptBoundaryApp
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      std::cout << std::setprecision(20);
       if( Math::abs(min_angle - DT_(34.0932077950624545790)) > Math::eps<DT_>())
       {
-        std::cout << min_angle << std::cout;
         Util::mpi_cout("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
         "Initial min angle should be "+stringify_fp_fix(34.0932077950624545790)+
@@ -227,10 +221,8 @@ struct MeshoptBoundaryApp
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      std::cout << std::setprecision(20);
       if( Math::abs(min_angle - DT_(29.2463902682521776910)) > Math::pow(Math::eps<DT_>(), DT_(0.25)))
       {
-        std::cout << min_angle << std::cout;
         Util::mpi_cout("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
         "Post initial min angle should be "+stringify_fp_fix(29.2463902682521776910)+
@@ -267,21 +259,35 @@ struct MeshoptBoundaryApp
         todo_boundary[i] = true;
 
       // Update the boundary
-      for(Index i(0); i < boundary_set.get_num_entities(); ++i)
+      for(const auto& it:dirichlet_boundaries)
       {
-        Index j = boundary_set[i];
-        if(todo_boundary[j])
+        // Get outer boundary MeshPart
+        auto* boundary_meshpart = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part(it);
+        std::cout << "dirichlet " << it << std::endl;
+
+        // If the meshpart is not there, our patch does not lie on that boundary, which is fine
+        if(boundary_meshpart == nullptr)
+          continue;
+
+        // Get vertex target set
+        const Geometry::TargetSet& boundary_set = boundary_meshpart->template get_target_set<0>();
+
+        for(Index i(0); i < boundary_set.get_num_entities(); ++i)
         {
-          todo_boundary[j] = false;
-          Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp0(coords_loc(j));
-          Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp1(tmp0);
+          Index j = boundary_set[i];
+          if(todo_boundary[j])
+          {
+            todo_boundary[j] = false;
+            Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp0(coords_loc(j));
+            Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp1(tmp0);
 
-          tmp1(0) += delta_t * (DataType(1)*(tmp0(0) - midpoint(0))
-              + Math::pow(DataType(1)*(tmp0(1) - midpoint(1)),DataType(3) ) );
-          tmp1(1) -= delta_t * (DataType(1)*(tmp1(0) - midpoint(0))
-              + Math::pow(DataType(1)*(tmp0(0) - midpoint(0)),DataType(3) ) );
+            tmp1(0) += delta_t * (DataType(1)*(tmp0(0) - midpoint(0))
+                + Math::pow(DataType(1)*(tmp0(1) - midpoint(1)),DataType(3) ) );
+            tmp1(1) -= delta_t * (DataType(1)*(tmp1(0) - midpoint(0))
+                + Math::pow(DataType(1)*(tmp0(0) - midpoint(0)),DataType(3) ) );
 
-          coords_loc(j, tmp1);
+            coords_loc(j, tmp1);
+          }
         }
       }
 
@@ -323,7 +329,6 @@ struct MeshoptBoundaryApp
       // Check for the hard coded settings for test mode
       if(test_mode)
       {
-        std::cout << std::setprecision(20);
         if( min_angle < DT_(27) )
         {
           std::cout << min_angle << std::cout;

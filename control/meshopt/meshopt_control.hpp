@@ -195,6 +195,16 @@ namespace FEAT
           virtual GlobalCoordsBuffer& get_coords() = 0;
 
           /**
+           * \brief Gets the names of all Dirichlet boundaries
+           *
+           * Note that each name refers to a boundary, but that boundary does not necessaryly have to be present due
+           * to partitioning etc.
+           *
+           * \returns A deque of Strings with all Dirichlet boundary names
+           */
+          virtual std::deque<String> get_dirichlet_boundaries() const = 0;
+
+          /**
            * \brief Returns a descriptive String
            *
            * \returns The class name as String
@@ -304,8 +314,17 @@ namespace FEAT
           GlobalQualityFunctional op_sys;
 
         public:
+          /**
+           * \brief Variadic template constructor
+           *
+           * \param[in] dirichlet_list
+           * List of the names of all Dirichlet boundaries
+           *
+           * \param[in] slip_list
+           * List of the names of all slip boundaries
+           */
           template<typename... Args_>
-          MeshoptSystemLevel(const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
+          explicit MeshoptSystemLevel(const std::deque<String>& dirichlet_list, const std::deque<String>& slip_list,
           Args_&&... args) :
             gate_sys(),
             filter_sys(),
@@ -322,6 +341,9 @@ namespace FEAT
 
             }
 
+          /**
+           * \brief Empty virtual destructor
+           */
           virtual ~MeshoptSystemLevel()
           {
           }
@@ -549,7 +571,8 @@ namespace FEAT
           }
 
           template<typename SystemLevel_>
-          void assemble_system_filter(SystemLevel_& sys_level, /* const */ typename SystemLevel_::GlobalSystemVectorR& vec)
+          void assemble_system_filter(SystemLevel_& sys_level,
+          /* const */ typename SystemLevel_::GlobalSystemVectorR& vec)
           {
             // get our global system filter
             typename SystemLevel_::GlobalSystemFilter& fil_glob = sys_level.filter_sys;
@@ -663,8 +686,7 @@ namespace FEAT
 
               // try to find our halo
               auto* halo = domain_level.find_halo_part(rank);
-              if(halo == nullptr)
-                throw InternalError("ERROR: Halo not found!");
+              XASSERTM(halo != nullptr, "Halo not found.");
 
               // assemble the system mirror
               typename SystemLevel_::SystemMirror sys_mirror;

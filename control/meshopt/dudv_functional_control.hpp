@@ -259,6 +259,17 @@ namespace FEAT
 
           }
 
+          /// \copydoc BaseClass::get_dirichlet_boundaries()
+          virtual std::deque<String> get_dirichlet_boundaries() const override
+          {
+            std::deque<String> dirichlet_boundaries;
+
+            for(const auto& it:_assembler_levels.back()->dirichlet_asm)
+              dirichlet_boundaries.push_back(it.first);
+
+            return dirichlet_boundaries;
+          }
+
           virtual void init_numeric()
           {
             for(size_t lvl(0); lvl < size_t(num_levels); ++lvl)
@@ -302,6 +313,7 @@ namespace FEAT
             return Solver::solve(*solver, vec_sol, vec_rhs, op_sys, filter_sys);
           }
 
+          /// \copydoc BaseClass()::optimise()
           virtual void optimise() override
           {
             // fetch our finest levels
