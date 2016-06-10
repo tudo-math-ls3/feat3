@@ -82,6 +82,12 @@ if (FEAT_HAVE_FPARSER)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/fparser/")
 endif(FEAT_HAVE_FPARSER)
 
+if (FEAT_HAVE_PARMETIS)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/include/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
+endif (FEAT_HAVE_PARMETIS)
+
+
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 

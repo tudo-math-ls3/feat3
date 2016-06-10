@@ -3,11 +3,6 @@ cmake_minimum_required (VERSION 2.8)
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-if (FEAT_HAVE_PARMETIS)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/include/")
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
-endif (FEAT_HAVE_PARMETIS)
-
 ADD_LIBRARY(kernel-foundation STATIC
   communication_error.cpp
 )
