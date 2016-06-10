@@ -262,7 +262,7 @@ namespace FEAT
        * \note This method makes some simplifications, e.g. stating only one smoother
        * for the complete FEAT::Solver::BasicVCycle.
        */
-      virtual String get_formated_solver_tree()
+      virtual String get_formated_solver_tree() const
       {
         return this->name();
       }
@@ -275,7 +275,7 @@ namespace FEAT
       virtual String name() const = 0;
 
       /// Returns the solvers name with its complete branch in the solver tree.
-      String get_solver_branch()
+      String get_solver_branch() const
       {
         return _branch;
       }

@@ -99,7 +99,7 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      virtual String get_formated_solver_tree() override
+      virtual String get_formated_solver_tree() const override
       {
         String result;
         result += this->name();
@@ -214,7 +214,7 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      virtual String get_formated_solver_tree() override
+      virtual String get_formated_solver_tree() const override
       {
         String result;
         result += this->name();
