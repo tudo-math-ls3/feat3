@@ -548,7 +548,7 @@ namespace FEAT
           if(my_rank == 0)
           {
             str = (iss.str());
-            size = str.length();
+            size = Index(str.length());
           }
           // synchronize length
           Util::Comm::bcast(&size, 1, 0, comm);
