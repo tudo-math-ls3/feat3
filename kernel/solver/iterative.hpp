@@ -5,6 +5,7 @@
 // includes, FEAT
 #include <kernel/solver/base.hpp>
 #include <kernel/util/statistics.hpp>
+#include <kernel/util/comm_base.hpp>
 
 namespace FEAT
 {
@@ -61,6 +62,8 @@ namespace FEAT
       Index _iter_digits;
       /// whether to plot something
       bool _plot;
+      /// does any other rank calc its current defect for plotting
+      bool _other_plot_def;
 
       /**
        * \brief Protected constructor
@@ -96,7 +99,8 @@ namespace FEAT
         _def_init(0),
         _def_cur(0),
         _iter_digits(Math::ilog10(_max_iter)),
-        _plot(false)
+        _plot(false),
+        _other_plot_def(false)
       {
       }
 
@@ -209,10 +213,17 @@ namespace FEAT
        *
        * \param[in] plot
        * If set to \c true, the solver will print a convergence plot to std::cout.
+       *
+       * \note This method triggers a call to mpi_allreduce and thus should not
+       * be used extensivley within loops.
        */
       void set_plot(bool plot)
       {
         _plot = plot;
+        Index send = (Index) _plot;
+        Index result(0);
+        Util::Comm::allreduce(&send, 1, &result);
+        _other_plot_def = result > 0;
       }
 
       /// Sets the plot name of the solver.
@@ -373,6 +384,7 @@ namespace FEAT
         calc_def = calc_def || (this->_min_iter < this->_max_iter);
         calc_def = calc_def || this->_plot;
         calc_def = calc_def || (this->_min_stag_iter > Index(0));
+        calc_def = calc_def || _other_plot_def;
 
         // save previous defect
         const DataType def_old = this->_def_cur;
