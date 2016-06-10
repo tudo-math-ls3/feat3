@@ -533,7 +533,7 @@ static void read_test_mode_application_config(std::stringstream& iss)
   iss << "meshopt_config_file = ./meshopt_config.ini" << std::endl;
   iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
   iss << "solver_config_file = ./solver_config.ini" << std::endl;
-  iss << "lvl_min = 0" << std::endl;
+  iss << "lvl_min = 1" << std::endl;
   iss << "lvl_max = 3" << std::endl;
 }
 
