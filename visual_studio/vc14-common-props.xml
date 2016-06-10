@@ -88,11 +88,11 @@
     <FeatDef Condition="'$(SerialMode)'=='true'"
       Include="SERIAL" />
     <FeatDef Condition="'$(SerialMode)'=='false'"
-      Include="FEAT_MPI" />
+      Include="FEAT_HAVE_MPI" />
     <FeatDef Condition="'$(BackendCUDA)'=='true'"
-      Include="FEAT_BACKENDS_CUDA" />
+      Include="FEAT_HAVE_CUDA" />
     <FeatDef Condition="'$(BackendMKL)'=='true'"
-      Include="FEAT_BACKENDS_MKL" />
+      Include="FEAT_HAVE_MKL" />
     <FeatDef Condition="'$(FeatHaveUmfpack)'=='true'"
       Include="FEAT_HAVE_UMFPACK" />
     <FeatDef Condition="'$(FeatHaveAlgLib)'=='true'"
