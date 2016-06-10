@@ -131,8 +131,7 @@ namespace FEAT
         // start iterating
         while(status == Status::progress)
         {
-          TimeStamp at;
-          double mpi_start(Statistics::get_time_mpi_execute());
+          IterationStats stat(*this);
 
           // apply preconditioner to defect vector
           // z[k] := M^{-1} * r[k]
@@ -156,14 +155,6 @@ namespace FEAT
 
           // compute defect norm
           status = this->_set_new_defect(vec_r, vec_sol);
-
-          TimeStamp bt;
-          Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-          double mpi_stop(Statistics::get_time_mpi_execute());
-          Statistics::add_solver_mpi_toe(this->_branch, mpi_stop - mpi_start);
-
-          if(status != Status::progress)
-            return status;
         }
 
         // we should never reach this point...

@@ -163,9 +163,7 @@ namespace FEAT
         // start iterating
         while(status == Status::progress)
         {
-          TimeStamp at;
-          double mpi_execute_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          IterationStats stat(*this);
 
           // z[k] := M^{-1} * q[k]
           if(!this->_apply_precond(vec_z, vec_q, filter))
@@ -186,15 +184,7 @@ namespace FEAT
           // compute defect norm and check for convergence
           status = this->_set_new_defect(vec_r, vec_sol);
           if(status != Status::progress)
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_execute_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-            double mpi_wait_stop(Statistics::get_time_mpi_wait());
-            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
             return status;
-          }
 
           // update preconditioned residual vector
           // s[k+1] := s[k] - alpha[k] * z[k]
@@ -219,13 +209,6 @@ namespace FEAT
 
           // q[k+1] := y[k+1] + beta[k] * q[k]
           vec_q.axpy(vec_q, vec_y, beta);
-
-          TimeStamp bt;
-          Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-          double mpi_execute_stop(Statistics::get_time_mpi_execute());
-          Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
-          Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
         }
 
         // we should never reach this point...

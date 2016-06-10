@@ -154,9 +154,7 @@ namespace FEAT
         // outer GMRES loop
         while(status == Status::progress)
         {
-          TimeStamp at;
-          double mpi_execute_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          IterationStats stat(*this);
 
           _q.clear();
           _s.clear();
@@ -172,15 +170,7 @@ namespace FEAT
           {
             // apply preconditioner
             if(!this->_apply_precond(this->_vec_z.at(i), this->_vec_v.at(i), filter))
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_execute_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-              double mpi_wait_stop(Statistics::get_time_mpi_wait());
-              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               return Status::aborted;
-            }
             //filter.filter_cor(this->_vec_z.at(i));
 
             // v[i+1] := A*z[i]
@@ -280,13 +270,6 @@ namespace FEAT
 
           // set the current defect
           status = this->_set_new_defect(this->_vec_v.at(0), vec_sol);
-
-          TimeStamp bt;
-          Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-          double mpi_execute_stop(Statistics::get_time_mpi_execute());
-          Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
-          Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
         }
 
         // finished

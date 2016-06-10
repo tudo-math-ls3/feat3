@@ -129,21 +129,11 @@ namespace FEAT
         // start iterating
         while(status == Status::progress)
         {
-          TimeStamp at;
-          double mpi_execute_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          IterationStats stat(*this);
 
           // apply preconditioner
           if(!this->_apply_precond(vec_cor, vec_def, filter))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_execute_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-            double mpi_wait_stop(Statistics::get_time_mpi_wait());
-            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
             return Status::aborted;
-          }
           //filter.filter_cor(vec_cor);
 
           // update solution vector
@@ -155,13 +145,6 @@ namespace FEAT
 
           // compute new defect norm
           status = this->_set_new_defect(vec_def, vec_sol);
-
-          TimeStamp bt;
-          Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-          double mpi_execute_stop(Statistics::get_time_mpi_execute());
-          Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
-          Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
         }
 
         // return our status

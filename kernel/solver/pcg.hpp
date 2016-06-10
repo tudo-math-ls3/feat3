@@ -148,9 +148,7 @@ namespace FEAT
         // start iterating
         while(status == Status::progress)
         {
-          TimeStamp at;
-          double mpi_execute_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          IterationStats stat(*this);
 
           // q[k] := A*p[k]
           matrix.apply(vec_q, vec_p);
@@ -171,28 +169,12 @@ namespace FEAT
           // compute defect norm
           status = this->_set_new_defect(vec_r, vec_sol);
           if(status != Status::progress)
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_execute_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-            double mpi_wait_stop(Statistics::get_time_mpi_wait());
-            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
             return status;
-          }
 
           // apply preconditioner
           // z[k+1] := M^{-1} * r[k+1]
           if(!this->_apply_precond(vec_z, vec_r, filter))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_execute_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-            double mpi_wait_stop(Statistics::get_time_mpi_wait());
-            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
             return Status::aborted;
-          }
 
           // compute new gamma:
           // gamma[k+1] := < r[k+1] , z[k+1] >
@@ -206,13 +188,6 @@ namespace FEAT
           // update direction vector:
           // p[k+1] := z[k+1] + beta[k] * p[k]
           vec_p.axpy(vec_p, vec_z, beta);
-
-          TimeStamp bt;
-          Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-          double mpi_execute_stop(Statistics::get_time_mpi_execute());
-          Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
-          Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
         }
 
         // we should never reach this point...

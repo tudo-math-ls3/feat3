@@ -261,9 +261,7 @@ namespace FEAT
         // start iterating
         while(status == Status::progress)
         {
-          TimeStamp at;
-          double mpi_execute_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          IterationStats stat(*this);
 
           // y[k] := A * q[k]
           matrix.apply(vec_y, vec_q);
@@ -271,15 +269,7 @@ namespace FEAT
 
           // z[k] := M_L^{-1} * y[k]
           if(!this->_apply_precond_l(vec_z, vec_y))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_execute_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-            double mpi_wait_stop(Statistics::get_time_mpi_wait());
-            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
             return Status::aborted;
-          }
 
           // compute alpha
           // alpha[k] := gamma[k] / < y[k], z[k] >
@@ -296,15 +286,7 @@ namespace FEAT
           // compute defect norm and check for convergence
           status = this->_set_new_defect(vec_r, vec_sol);
           if(status != Status::progress)
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_execute_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-            double mpi_wait_stop(Statistics::get_time_mpi_wait());
-            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
             return status;
-          }
 
           // p[k+1] := p[k] - alpha[k] * z[k]
           vec_p.axpy(vec_z, vec_p, -alpha);
@@ -315,15 +297,7 @@ namespace FEAT
 
           // t[k+1] := M_R^{-1} * s[k+1]
           if(!this->_apply_precond_r(vec_t, vec_s))
-          {
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_execute_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-            double mpi_wait_stop(Statistics::get_time_mpi_wait());
-            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
             return Status::aborted;
-          }
 
           // compute new gamma
           // gamma[k+1] := < s[k+1], t[k+1] >
@@ -337,13 +311,6 @@ namespace FEAT
           // update direction vector
           // q[k+1] := t[k+1] + beta * q[k]
           vec_q.axpy(vec_q, vec_t, beta);
-
-          TimeStamp bt;
-          Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-          double mpi_execute_stop(Statistics::get_time_mpi_execute());
-          Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
-          Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
         }
 
         // we should never reach this point...

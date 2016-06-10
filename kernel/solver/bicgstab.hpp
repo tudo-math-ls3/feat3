@@ -180,35 +180,19 @@ namespace FEAT
           // main BiCGStab loop
           while(status == Status::progress)
           {
-            TimeStamp at;
-            double mpi_execute_start(Statistics::get_time_mpi_execute());
-            double mpi_wait_start(Statistics::get_time_mpi_wait());
+            IterationStats stat(*this);
 
             mat_sys.apply(vec_v, vec_p_tilde);
             fil_sys.filter_def(vec_v);
             // apply preconditioner
             if(!this->_apply_precond(vec_v_tilde, vec_v, fil_sys))
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_execute_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-              double mpi_wait_stop(Statistics::get_time_mpi_wait());
-              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               return Status::aborted;
-            }
             //fil_sys.filter_cor(vec_v_tilde);
 
             gamma_tilde = vec_v_tilde.dot(vec_r_tilde_0);
 
             if (Math::abs(gamma_tilde) < Math::abs(rho_tilde)*1e-14)
             {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_execute_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-              double mpi_wait_stop(Statistics::get_time_mpi_wait());
-              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               restarted = true;
               //std::cout << "Breakpoint 1" << std::endl;
               break;
@@ -244,15 +228,7 @@ namespace FEAT
 
             // apply preconditioner
             if(!this->_apply_precond(vec_t_tilde, vec_t, fil_sys))
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_execute_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-              double mpi_wait_stop(Statistics::get_time_mpi_wait());
-              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               return Status::aborted;
-            }
             //fil_sys.filter_cor(vec_t_tilde);
 
             gamma_tilde = vec_t_tilde.dot(vec_t_tilde);
@@ -260,12 +236,6 @@ namespace FEAT
 
             if (Math::abs(gamma_tilde) < Math::abs(omega_tilde) * 1e-14)
             {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_execute_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-              double mpi_wait_stop(Statistics::get_time_mpi_wait());
-              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               restarted = true;
               //std::cout << "Breakpoint 4" << std::endl;
               break;
@@ -282,12 +252,6 @@ namespace FEAT
             status = this->_set_new_defect(vec_r, vec_sol);
             if (status == Status::success)
             {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-              double mpi_execute_stop(Statistics::get_time_mpi_execute());
-              Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-              double mpi_wait_stop(Statistics::get_time_mpi_wait());
-              Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
               //std::cout << "Breakpoint 5 (converged)" << std::endl;
               return status;
             }
@@ -302,13 +266,6 @@ namespace FEAT
             vec_p_tilde.axpy(vec_v_tilde, vec_p_tilde, momega_tilde);
             vec_p_tilde.scale(vec_p_tilde, beta_tilde);
             vec_p_tilde.axpy(vec_p_tilde, vec_r_tilde);
-
-            TimeStamp bt;
-            Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
-            double mpi_execute_stop(Statistics::get_time_mpi_execute());
-            Statistics::add_solver_mpi_execute(this->_branch, mpi_execute_stop - mpi_execute_start);
-            double mpi_wait_stop(Statistics::get_time_mpi_wait());
-            Statistics::add_solver_mpi_wait(this->_branch, mpi_wait_stop - mpi_wait_start);
           }
         }
 
