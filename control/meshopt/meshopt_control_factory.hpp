@@ -35,11 +35,56 @@ namespace FEAT
           using Functional = Functional_<A, B, C, D, LocalFunctional_, FEAT::Meshopt::RumpfTrafo<D, typename D::CoordType>>;
       };
 
+      /**
+       * \brief Factory for MeshoptControl objects
+       *
+       * \tparam Mem_
+       * Memory architecture of the solver.
+       *
+       * \tparam DT_
+       * Floating point type for the solver.
+       *
+       * \tparam IT_
+       * Index type for the solver.
+       *
+       * \tparam Trafo_
+       * Trafo to create the MeshoptControl object for.
+       *
+       * This class can construct MeshoptControl objects of different types at runtime based on PropertyMaps.
+       *
+       * \note Because Meshopt::HyperelasticityFunctional is only implemented for Mem::Main, only Mem::Main will work
+       * for now.
+       *
+       * \note At this time, the only transformation available is Trafo::Standard.
+       *
+       */
       template<typename Mem_, typename DT_, typename IT_, typename Trafo_>
       struct ControlFactory
       {
+        /// The Trafo's underlying MeshType
         typedef typename Trafo_::MeshType MeshType;
 
+        /**
+         * \brief Creates a DuDvFunctionalControl object
+         *
+         * \tparam DomCtrl_
+         * The domain control type.
+         *
+         * \param[in] dom_ctrl
+         * The DomainControl containing meshes on all levels, the atlas etc.
+         *
+         * \param[in] section_key
+         * The name of the parameter section which configures this object.
+         *
+         * \param[in] meshopt_config
+         * Meshopt configuration.
+         *
+         * \param[in] solver_config
+         * Solver configuration.
+         *
+         * \returns
+         * An std::shared_ptr to the new object
+         */
         template<typename DomCtrl_>
         static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
         create_dudv_control(DomCtrl_& dom_ctrl, const String& section_key, PropertyMap* meshopt_config, PropertyMap* solver_config)
@@ -50,18 +95,12 @@ namespace FEAT
 
           // Get Meshopt configuration section
           auto meshopt_section = meshopt_config->query_section(section_key);
-          if(meshopt_section == nullptr)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Application config is missing the mandatory MeshOptimiser section!");
+          XASSERTM(meshopt_section != nullptr, "Application config is missing the mandatory MeshOptimiser section!");
 
           // Verify the type
           auto type_p = meshopt_section->query("type");
-          if(!type_p.second)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "MeshOptimiser section is missing the mandatory type!");
-          else if (type_p.first != "DuDv")
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Invalid type "+type_p.first);
+          XASSERTM(type_p.second, "MeshOptimiser section is missing the mandatory type!");
+          XASSERTM(type_p.first == "DuDv", "Invalid type string!");
 
           // Get list of boundary conditions
           auto dirichlet_list_p = meshopt_section->query("dirichlet_boundaries");
@@ -72,9 +111,7 @@ namespace FEAT
           slip_list_p.first.split_by_charset(slip_list, " ");
 
           auto config_section_p = meshopt_section->query("config_section");
-          if(!config_section_p.second)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "MeshOptimiser config section is missing config_section entry!");
+          XASSERTM(config_section_p.second, "MeshOptimiser config section is missing config_section entry!");
 
           auto dudv_config_section = meshopt_config->query_section(config_section_p.first);
           if(dudv_config_section == nullptr)
@@ -82,9 +119,7 @@ namespace FEAT
             "config_section "+config_section_p.first+" not found!");
 
           auto solver_p = dudv_config_section->query("solver_config");
-          if(!solver_p.second)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "DuDv config section is missing solver entry!");
+          XASSERTM(solver_p.second, "DuDv config section is missing solver entry!");
 
           typedef Control::Meshopt::DuDvFunctionalControl<Mem_, DT_, IT_, DomCtrl_, Trafo_> DuDvCtrl;
           result = std::make_shared<DuDvCtrl>(dom_ctrl, dirichlet_list, slip_list, solver_p.first, *solver_config);
