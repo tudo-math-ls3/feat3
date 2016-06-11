@@ -370,7 +370,7 @@ namespace FEAT
      * A shared pointer to a new PCGNR object.
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
       const Matrix_& matrix, const Filter_& filter)

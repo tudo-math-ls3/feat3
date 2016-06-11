@@ -249,7 +249,7 @@ namespace FEAT
      * A shared pointer to a new PCR object.
      */
      /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAST_COMPILER_GNU) && (FEAST_COMPILER_GNU < 40900)
+#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PCR<Matrix_, Filter_>> new_pcr(
       const Matrix_& matrix, const Filter_& filter)
