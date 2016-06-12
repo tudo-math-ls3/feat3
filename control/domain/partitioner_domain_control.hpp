@@ -242,6 +242,9 @@ namespace FEAT
                 1,
                 base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim),
                 ptr_serial, nullptr, part_serial);
+
+              delete[] ptr_serial;
+              delete[] part_serial;
 #endif
               /*for(Index i(0) ; i <  base_mesh_node->get_mesh()->get_num_entities(MeshType_::shape_dim) + 1; ++i)
                 std::cout << Util::Comm::rank() << ": APP: ranks_at_elem ptr[" << i << "] " << (ranks_at_elem.get_domain_ptr())[i] << std::endl;
