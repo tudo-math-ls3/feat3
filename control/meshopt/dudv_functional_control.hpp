@@ -307,9 +307,10 @@ namespace FEAT
 
           virtual Solver::Status apply(GlobalSystemVectorR& vec_sol, const GlobalSystemVectorL& vec_rhs)
           {
-            // get our global solve matrix and filter
+            // Get our global system matrix and filter
             typename SystemLevelType::GlobalQualityFunctional& op_sys = (*_system_levels.back()).op_sys;
             typename SystemLevelType::GlobalSystemFilter& filter_sys = (*_system_levels.back()).filter_sys;
+
             return Solver::solve(*solver, vec_sol, vec_rhs, op_sys, filter_sys);
           }
 
@@ -331,7 +332,6 @@ namespace FEAT
 
             buffer_to_mesh();
           }
-
 
       };
 

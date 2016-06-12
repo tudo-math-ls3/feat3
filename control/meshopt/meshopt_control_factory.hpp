@@ -23,6 +23,13 @@ namespace FEAT
   {
     namespace Meshopt
     {
+      /// \cond internal
+      /**
+       * \brief Template wrapper for setting two parameters
+       *
+       * This is used to reduce the number of free template parameters of a Meshopt::HyperelasticityFunctional
+       * class template from six to four by setting the (cell-) local Functional and the RefCellTrafo.
+       */
       template
       <
         template<typename, typename, typename, typename, typename, typename> class Functional_,
@@ -34,6 +41,7 @@ namespace FEAT
           template<typename A, typename B, typename C, typename D>
           using Functional = Functional_<A, B, C, D, LocalFunctional_, FEAT::Meshopt::RumpfTrafo<D, typename D::CoordType>>;
       };
+      /// \endcond
 
       /**
        * \brief Factory for MeshoptControl objects
@@ -50,7 +58,8 @@ namespace FEAT
        * \tparam Trafo_
        * Trafo to create the MeshoptControl object for.
        *
-       * This class can construct MeshoptControl objects of different types at runtime based on PropertyMaps.
+       * This class can construct MeshoptControl objects of different types at runtime based on PropertyMaps and
+       * returns them through base class std::shared_ptrs.
        *
        * \note Because Meshopt::HyperelasticityFunctional is only implemented for Mem::Main, only Mem::Main will work
        * for now.
@@ -83,7 +92,7 @@ namespace FEAT
          * Solver configuration.
          *
          * \returns
-         * An std::shared_ptr to the new object
+         * A BaseClass std::shared_ptr to the new object
          */
         template<typename DomCtrl_>
         static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
@@ -127,6 +136,30 @@ namespace FEAT
           return result;
         } // create_dudv_control
 
+        /**
+         * \brief Creates a HyperelasticityFunctionalControl object
+         *
+         * \tparam DomCtrl_
+         * The domain control type.
+         *
+         * \param[in] dom_ctrl
+         * The DomainControl containing meshes on all levels, the atlas etc.
+         *
+         * \param[in] section_key
+         * The name of the parameter section which configures this object.
+         *
+         * \param[in] meshopt_config
+         * Meshopt configuration.
+         *
+         * \param[in] solver_config
+         * Solver configuration.
+         *
+         * \returns
+         * A BaseClass std::shared_ptr to the new object
+         *
+         * This is the first stage, where the (cell-) local functional is determined, configured, created and then
+         * passed to the next stage.
+         */
         template<typename DomCtrl_>
         static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
         create_hyperelasticity_control(DomCtrl_& dom_ctrl, const String& section_key, PropertyMap* meshopt_config,
@@ -146,18 +179,12 @@ namespace FEAT
 
           // Get Meshopt configuration section
           auto meshopt_section = meshopt_config->query_section(section_key);
-          if(meshopt_section == nullptr)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Application config is missing the mandatory MeshOptimiser section!");
+          XASSERTM(meshopt_section != nullptr, "Application config is missing the mandatory MeshOptimiser section!");
 
           // Verify the type
           auto type_p = meshopt_section->query("type");
-          if(!type_p.second)
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "MeshOptimiser section is missing the mandatory type!");
-          else if (type_p.first != "Hyperelasticity")
-            throw InternalError(__func__,__FILE__,__LINE__,
-            "Invalid type "+type_p.first);
+          XASSERTM(type_p.second, "MeshOptimiser section is missing the mandatory type!");
+          XASSERTM(type_p.first == "Hyperelasticity", "Invalid type!");
 
           // Get list of boundary conditions
           auto dirichlet_list_p = meshopt_section->query("dirichlet_boundaries");
@@ -218,6 +245,8 @@ namespace FEAT
           // Get the local functional
           if(local_functional_p.first == "RumpfFunctional")
           {
+            // If hypercubes are to be split into simplices for the evaluation of the functional, their (cell-) local
+            // functional is different
             if(split_hypercubes)
             {
               // The underlying functional is RumpfFunctional, and this is passed to the Split functional as parameter
@@ -274,6 +303,30 @@ namespace FEAT
           return result;
         } // create_hyperelasticity_control
 
+        /**
+         * \brief Creates a HyperelasticityFunctionalControl object
+         *
+         * \tparam DomCtrl_
+         * The domain control type.
+         *
+         * \param[in] dom_ctrl
+         * The DomainControl containing meshes on all levels, the atlas etc.
+         *
+         * \param[in] section_key
+         * The name of the parameter section which configures this object.
+         *
+         * \param[in] meshopt_config
+         * Meshopt configuration.
+         *
+         * \param[in] solver_config
+         * Solver configuration.
+         *
+         * \returns
+         * A BaseClass std::shared_ptr to the new object
+         *
+         * This is the first stage, where the (cell-) local functional is determined, configured, created and then
+         * passed to the next stage.
+         */
         template<typename DomCtrl_, typename FunctionalType_>
         static std::shared_ptr <Control::Meshopt::MeshoptControlBase<DomCtrl_, Trafo_>>
         create_hyperelasticity_control_with_functional( DomCtrl_& dom_ctrl,
