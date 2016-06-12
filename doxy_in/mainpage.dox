@@ -7,4 +7,10 @@ The subsystems are in detail:
 \refitem lafem_design LAFEM
 \refitem meshopt_design Meshopt
 \endsecreflist
+
+\section main_sec_details Details about specific topics:
+\secreflist
+\refitem multigrid_design Multigrid Details
+\endsecreflist
+
 **/

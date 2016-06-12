@@ -78,7 +78,7 @@
 #include <kernel/solver/pcg.hpp>                           // for PCG
 #include <kernel/solver/richardson.hpp>                    // NEW: for Richardson
 #include <kernel/solver/jacobi_precond.hpp>                // NEW: for JacobiPrecond
-#include <kernel/solver/basic_vcycle.hpp>                  // NEW: for BasicVCycle
+#include <kernel/solver/multigrid.hpp>                     // NEW: for MultiGrid
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -313,23 +313,21 @@ namespace Tutorial05
 
     // The solver we want to set up is a "standard" geometric multigrid solver, which
     // 1) uses a simple CG solver as the coarse grid solver
-    // 2) uses 4 steps of damped Jacobi as a pre-smoother
-    // 3) does not use a post-smoother
+    // 2) uses 4 steps of damped Jacobi as a pre-smoother and post-smoother
 
-    // The first object that we require is a "BasicVCycle" object, which represents a single
-    // V-cycle in a multigrid solver (note: no other cycles are implemented yet). In contrast
-    // to most other solvers, we have to create the required Solver object by hand instead of
-    // calling a convenient "Solver::new_***" function for technical reasons.
+    // The first object that we require is a "MultiGridHierarchy" object, which is responsible
+    // for managing the level hierarchy used by a multigrid solver. Note that this hierarchy
+    // object is not a solver/preconditioner -- we will create that one lateron.
 
-    // The BasicVCycle class template has 3 template parameters:
-    auto vcycle = std::make_shared<
-      Solver::BasicVCycle<
-        MatrixType,         // the system matrix type
-        FilterType,         // the system filter type
-        MatrixType          // the grid transfer (prolongation and restriction) matrix type
-      >>();
+    // The MultiGridHierarchy class templates has four template parameters:
+    Solver::MultiGridHierarchy<
+      MatrixType,   // the system matrix type
+      FilterType,   // the system filter type
+      MatrixType,   // the prolongation operator type
+      MatrixType    // the restriction operator type
+    > multigrid_hierarchy;
 
-    // Now we need to fill this empty 'vcycle' object with life, i.e. we have to attach
+    // Now we need to fill this empty hierarchy object with life, i.e. we have to attach
     // all our matrices and filters to it. Moreover, we also need to create the corresponding
     // coarse grid solver and smoother objects.
 
@@ -342,17 +340,17 @@ namespace Tutorial05
       auto coarse_solver = Solver::new_pcg(lvl.matrix, lvl.filter);
 
       // Now we need to attach this solver as well as the system matrix and filter to
-      // the 'vcycle' object. This is done by calling the following member function:
-      vcycle->set_coarse_level(
-        lvl.matrix,     // the coarse-grid system matrix
-        lvl.filter,     // the coarse-grid system filter
-        coarse_solver   // the coarse-grid solver
+      // our multigrid hierarchy. This is done by calling the following member function:
+      multigrid_hierarchy.push_level(
+        lvl.matrix,       // the coarse-level system matrix
+        lvl.filter,       // the coarse-level system filter
+        coarse_solver     // the coarse-level solver
       );
     }
 
     // That's it for the coarse level.
 
-    // For all other levels, we have to create a smoother and attach it to the 'vcycle' object.
+    // For all other levels, we have to create a smoother and attach it to the hierarchy.
     // So let' loop over all levels except for the coarse-most one in *ascending* order:
     for(Index ilevel(level_min+1); ilevel <= level_max; ++ilevel)
     {
@@ -373,38 +371,62 @@ namespace Tutorial05
       smoother->set_min_iter(4);
 
       // Finally, attach our system matrix, system filter, grid transfer matrices and
-      // our smoother to the V-Cycle preconditioner.  This is done by calling the following
+      // our smoother to the multigrid hierarchy. This is done by calling the following
       // member function:
-      vcycle->push_level(
+      multigrid_hierarchy.push_level(
         lvl.matrix,     // the system matrix for this level
         lvl.filter,     // the system filter for this level
         lvl.mat_prol,   // the prolongation matrix for this level
         lvl.mat_rest,   // the restriction matrix for this level
         smoother,       // the pre-smoother
-        nullptr         // the post-smoother (none)
+        smoother,       // the post-smoother
+        smoother        // the peak-smoother
       );
+
+      // Note:
+      // The 'peak-smoother' is the smoother that is applied in an "inner peak"
+      // step within a F- or W-cycle. See the Multigrid page in the documentation
+      // for more details about the different cycles and their smoother calls.
     }
 
-    // Alright, our V-cycle solver object is set up and ready to go.
+    // Next, we need to create a multigrid preconditioner for our hierarhcy. This task
+    // is quite simple, as we can use one of the convenience functions to obtain a
+    // MultiGrid solver object using the hierarchy we have just set up. At this point,
+    // we can also choose which multigrid cycle we want to use. We have the choice
+    // between V-, F- and W-cycle, but we stick to the simple V-cycle in this example:
+    auto multigrid = Solver::new_multigrid(
+      multigrid_hierarchy,          // the multigrid hierarchy object
+      Solver::MultiGridCycle::V     // the desired multigrid cycle
+    );
 
-    // However, the 'vcycle' object we have set up so far is just a *single V-cycle*, i.e.
+    // Alright, now we have a multigrid preconditioner object.
+
+    // However, the 'multigrid' object we have set up so far is just a *single cycle*, i.e.
     // it is merely a preconditiner, so we still need to create a "real solver" around that.
-    // As we want to have a "classical multigrid", we just need to use this V-cycle as a
-    // preconditioner for a Richardson solver:
-    auto solver = Solver::new_richardson(lvl_fine.matrix, lvl_fine.filter, DataType(1), vcycle);
+    // As we want to have a "classical multigrid", we just need to use this multgrid object
+    // as a preconditioner for a Richardson solver:
+    auto solver = Solver::new_richardson(lvl_fine.matrix, lvl_fine.filter, DataType(1), multigrid);
 
     // Change the solver's plot name (that's what is written to the console) to "Multigrid".
     // This is just for the sake os aesthetics: Without this step, our solver would present
     // itself as "Richardson" ;)
     solver->set_plot_name("Multigrid");
 
-    // And that's it - now we have a "real" multigrid ready to go!
-
-    // The remainder of this tutorial is virtually identical to the previous tutorials.
+    // And that's it - now we have a "real" multigrid solver ready to go!
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     std::cout << std::endl << "Solving..." << std::endl;
+
+    // Finally, there is one important point to keep in mind when using a multigrid solver:
+    // The "multigrid" object, which we have created above, does not initialise its smoothers
+    // and coarse grid solver. We have to initialise the multigrid hierarchy by hand *before*
+    // initialising the remaining solver tree by calling its init() function.
+    // This may seem inconvenient, but this is the only way to go when building more complex
+    // multigrid solver configurations like e.g. the ScaRC solver, so we have to live with that.
+
+    // So, initialise the multigrid hierarchy:
+    multigrid_hierarchy.init();
 
     // As always, enable the convergence plot:
     solver->set_plot(true);
@@ -417,6 +439,12 @@ namespace Tutorial05
 
     // Release our solver
     solver->done();
+
+    // Release our multigrid hierarchy; this also needs to be done separately *after*
+    // the remaining solver tree was released in the call directly above.
+    multigrid_hierarchy.done();
+
+    // The remainder of this tutorial is virtually identical to the previous ones.
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Computing L2/H1-Errors

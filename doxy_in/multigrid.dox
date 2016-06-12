@@ -1,0 +1,58 @@
+/**
+\page multigrid_design Description of the geometric MultiGrid solver
+
+\section multigrid_cycles Multigrid Cycles
+The following image gives an overview of the V- and F-cycles on five levels as
+well as the W-cycle on four levels.
+\image html multigrid_cycles.svg
+
+In the image above:
+- The red boxes represent an application of the pre-smoother prior to defect restriction.
+- The blue boxes represent an application of the post-smoother after correction prolongation.
+- The green boxes represent an application of the peak-smoother in an inner level peak
+  inside the F- and W-cycles. Note: The V-cycle does not use the peak-smoother at all,
+  because it has no inner peak levels.
+
+\note
+If no custom peak-smoother is specified for a multigrid hierarchy level, the
+implementation will use both the pre- and post-smoothers (if given) as a peak-smoother.
+
+\section multigrid_wcycle_impl W-Cycle Implementation Details
+This section explains the details of the W-cycle implementation in the
+FEAT::Solver::MultiGrid class.
+
+The W-cycle is tricky to implement without explicitly using recursion.
+To achieve this goal, our implementation manages a <em>peak-level counter</em>
+for each level (above the coarse level) of the W-cycle hierarchy, which
+counts the number of peak-smoothing steps on the corresponding level.
+For the following explanations, we assume that the W-cycle hierarchy consists
+of four levels 0-3.
+\image html multigrid_wcycle.svg
+
+As you can see in the image above, the first step in the W-cycle is to restrict
+from the top level to the coarse level, applying the pre-smoother on each
+level if given (as in any other cycle).
+
+The next part is the actual tricky bit:
+The basic idea behind the implementation of the "inner" W-cycle part is to manage
+the peak-level counters in the following way:
+-# At the beginning of each W-cycle, all peak-counters are reset to 0.
+-# Each time the algorithm reaches the coarse level, it picks the lowest level
+   above the coarse level, whose peak-counter is zero, as the next peak-level.
+   This is indicated by a green square in the image above.
+-# Next, the algorithm prolongates from the coarse level to the peak level
+   and restricts back down to the coarse level, applying pre-, peak- and post-
+   smoothers where required. Afterwards, the the coarse level system is solved.
+-# Finally, the counter of the chosen peak-level is incremented by one, whereas
+   all peak-level counters below the chosen peak-level are reset back to zero.
+   This is indicated by the red zeros in the image above.
+
+The above steps are executed in a loop which has to perform a total number of
+<em>2^(top_level - coarse_level) - 1</em> iterations, which yields the tricky
+inner W-cycle part. Alternatively, one might as well iterate until all
+peak-level counters are 1 (as seen in the image above).
+
+Finally, the last step in the W-cycle is to prolongate from the coarse level
+to the top level, applying the post-smoother on each level if given (also just
+as in any other cycle).
+**/
