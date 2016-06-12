@@ -229,6 +229,8 @@ namespace FEAT
           _vec_r = this->_op.create_vector_r();
           _vec_p = this->_op.create_vector_r();
           _vec_z = this->_op.create_vector_r();
+
+          _vec_z.format();
           _linesearch->init_symbolic();
         }
 
