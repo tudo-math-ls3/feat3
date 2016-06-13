@@ -117,17 +117,23 @@ struct MeshoptScrewsApp
     // This is the centre reference point
     ImgPointType x_0(DataType(0));
 
-    // Get inner boundary MeshPart
+    // Get inner boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
     auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("inner");
-    Geometry::TargetSet& inner_indices = inner_boundary->template get_target_set<0>();
+    Geometry::TargetSet* inner_indices(nullptr);
+    if(inner_boundary != nullptr)
+      inner_indices = &(inner_boundary->template get_target_set<0>());
+
     // This is the centre point of the rotation of the inner screw
     ImgPointType x_inner(DataType(0));
     x_inner.v[0] = -excentricity_inner;
     const String inner_str(dom_ctrl.get_atlas()->find_mesh_chart("inner")->get_type());
 
-    // Get outer boundary MeshPart
+    // Get outer boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
     auto* outer_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer");
-    Geometry::TargetSet& outer_indices = outer_boundary->template get_target_set<0>();
+    Geometry::TargetSet* outer_indices(nullptr);
+    if(outer_boundary != nullptr)
+      outer_indices = &(outer_boundary->template get_target_set<0>());
+
     // This is the centre point of the rotation of the outer screw
     ImgPointType x_outer(DataType(0));
     const String outer_str(dom_ctrl.get_atlas()->find_mesh_chart("outer")->get_type());
@@ -327,16 +333,20 @@ struct MeshoptScrewsApp
 
       ImgPointType tmp(DataType(0));
       ImgPointType tmp2(DataType(0));
-      for(Index i(0); i < inner_indices.get_num_entities(); ++i)
+
+      if(inner_indices != nullptr)
       {
-        // Index of boundary vertex i in the mesh
-        Index j(inner_indices[i]);
-        // Translate the point to the centre of rotation
-        tmp = coords_loc(j) - x_inner;
-        // Rotate
-        tmp2.set_vec_mat_mult(tmp, rot);
-        // Translate the point by the new centre of rotation
-        coords_loc(j, x_inner + tmp2);
+        for(Index i(0); i < inner_indices->get_num_entities(); ++i)
+        {
+          // Index of boundary vertex i in the mesh
+          Index j(inner_indices->operator[](i));
+          // Translate the point to the centre of rotation
+          tmp = coords_loc(j) - x_inner;
+          // Rotate
+          tmp2.set_vec_mat_mult(tmp, rot);
+          // Translate the point by the new centre of rotation
+          coords_loc(j, x_inner + tmp2);
+        }
       }
 
       // Rotate the chart. This has to use an evil downcast for now
@@ -393,15 +403,18 @@ struct MeshoptScrewsApp
       rot(1,1) = rot(0,0);
 
       // The outer screw rotates centrically, so x_outer remains the same at all times
-      for(Index i(0); i < outer_indices.get_num_entities(); ++i)
+      if(outer_indices != nullptr)
       {
-        // Index of boundary vertex i in the mesh
-        Index j(outer_indices[i]);
-        tmp = coords_loc(j) - x_outer;
+        for(Index i(0); i < outer_indices->get_num_entities(); ++i)
+        {
+          // Index of boundary vertex i in the mesh
+          Index j(outer_indices->operator[](i));
+          tmp = coords_loc(j) - x_outer;
 
-        tmp2.set_vec_mat_mult(tmp, rot);
+          tmp2.set_vec_mat_mult(tmp, rot);
 
-        coords_loc(j, x_outer+tmp2);
+          coords_loc(j, x_outer+tmp2);
+        }
       }
 
       // Rotate the outer chart. This has to use an evil downcast for now

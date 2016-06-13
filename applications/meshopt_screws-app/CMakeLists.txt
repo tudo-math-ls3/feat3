@@ -29,7 +29,7 @@ else (FEAT_HAVE_MPI)
     --build-target meshopt_screws-app
     --build-nocmake
     --build-noclean
-    --test-command ${FEAT_BINARY_DIR}/applications/meshopt_screws-app/meshopt_screws-app --testmode )
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_screws-app/meshopt_screws-app --testmode )
   SET_PROPERTY(TEST meshopt_screws_app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST meshopt_screws_app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
