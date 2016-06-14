@@ -343,7 +343,7 @@ namespace FEAT
         if(this->_plot)
         {
           std::cout << this->_plot_name
-            <<  ": " << stringify(0).pad_front(_iter_digits)
+            <<  ": " << stringify(0).pad_front(this->_iter_digits)
             << " : " << stringify_fp_sci(this->_def_init) << std::endl;
         }
 
@@ -399,7 +399,7 @@ namespace FEAT
         if(this->_plot)
         {
           std::cout << this->_plot_name
-            <<  ": " << stringify(this->_num_iter).pad_front(_iter_digits)
+            <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
             << " : " << stringify_fp_sci(this->_def_cur)
             << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
             << " / " << stringify_fp_fix(this->_def_cur / def_old)
@@ -411,7 +411,7 @@ namespace FEAT
           return Status::aborted;
 
         // is diverged?
-        if(is_diverged())
+        if(this->is_diverged())
           return Status::diverged;
 
         // minimum number of iterations performed?
@@ -419,7 +419,7 @@ namespace FEAT
           return Status::progress;
 
         // is converged?
-        if(is_converged())
+        if(this->is_converged())
           return Status::success;
 
         // maximum number of iterations performed?

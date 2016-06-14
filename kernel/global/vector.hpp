@@ -172,7 +172,7 @@ namespace FEAT
       std::shared_ptr<ScalTicket<DataType>> norm2_async() const
       {
         auto t = norm2sqr_async();
-        t.sqrt = true;
+        t->sqrt = true;
         return t;
       }
 
