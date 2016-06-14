@@ -129,10 +129,18 @@ namespace FEAT
          */
         void project_point(WorldPoint& point) const
         {
-          point -= _midpoint;
-          CoordType distance = point.norm_euclid();
-          point *= (_radius / distance);
-          point += _midpoint;
+          WorldPoint dist_vec(point - _midpoint);
+          CoordType distance(dist_vec.norm_euclid());
+
+          if(distance < Math::eps<CoordType>())
+          {
+            dist_vec(0) = _radius;
+            point += dist_vec;
+          }
+          else
+          {
+            point = _midpoint + (_radius / distance)*dist_vec;
+          }
         }
 
         /// \copydoc ChartBase::dist()
