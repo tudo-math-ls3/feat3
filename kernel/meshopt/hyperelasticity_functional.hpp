@@ -25,6 +25,13 @@ namespace FEAT
 
     /**
      * \brief Enum class for different types of scale computations
+     *
+     * - once_*** means the scales are only computed once and remain the same over all calls to the functional
+     * - current_*** means the scales are recomputed with every call to init() (i.e. if they are to be computed for
+     *   every timestep in a transient simulation)
+     * - iter_*** means the scales are recomputed with every call to prepare(), i.e. in every nonlinear solver
+     *   iteration. If the scales explicitly depend on the solution (i.e. the distance of the mesh vertices to some
+     *   surface), this is needed.
      */
     enum class ScaleComputation
     {
@@ -230,7 +237,7 @@ namespace FEAT
         /// The functional for determining mesh quality
         std::shared_ptr<FunctionalType> _functional;
 
-        std::shared_ptr<MeshConcentrationFunction<Trafo_, RefCellTrafo_>> _mesh_conc;
+        std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> _mesh_conc;
 
         // This is public for debugging purposes
       public:
@@ -335,7 +342,7 @@ namespace FEAT
           std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>& slip_asm_,
           std::shared_ptr<FunctionalType_> functional_,
           ScaleComputation scale_computation_,
-          std::shared_ptr<MeshConcentrationFunction<Trafo_, RefCellTrafo_>> mesh_conc_ = nullptr)
+          std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> mesh_conc_ = nullptr)
           : BaseClass(rmn_),
           _trafo(trafo_space_.get_trafo()),
           _trafo_space(trafo_space_),
@@ -463,6 +470,12 @@ namespace FEAT
           compute_func(func_norm, func_det, func_rec_det);
           exporter.add_cell_vector("fval", func_norm, func_det, func_rec_det);
 
+          if(_mesh_conc != nullptr)
+          {
+            exporter.add_vertex_scalar("dist", _mesh_conc->get_dist().elements());
+            exporter.add_vertex_vector("grad_dist", _mesh_conc->get_grad_dist());
+          }
+
           delete [] func_norm;
           delete [] func_det;
           delete [] func_rec_det;
@@ -508,6 +521,8 @@ namespace FEAT
           for(const auto& it:slip_filters)
             this->_mesh_node->adapt_by_name(it.first);
 
+          this->mesh_to_buffer();
+
           for(auto& it : slip_filters)
           {
             const auto& assembler = _slip_asm.find(it.first);
@@ -521,7 +536,6 @@ namespace FEAT
 
           compute_scales_iter();
 
-          this->mesh_to_buffer();
         }
 
         /**
@@ -589,8 +603,8 @@ namespace FEAT
         {
           switch(_scale_computation)
           {
-            // \todo; Implement this
             case ScaleComputation::iter_concentration:
+              compute_lambda_conc();
               break;
             default:
               return;
@@ -623,11 +637,11 @@ namespace FEAT
               compute_lambda_initial();
               break;
             case ScaleComputation::current_concentration:
+            case ScaleComputation::iter_concentration:
               compute_lambda_conc();
               break;
             default:
-              throw InternalError(__func__,__FILE__,__LINE__,
-              "Unhandled scale computation"+stringify(_scale_computation));
+              return;
           }
 
           // Rescale so that sum lambda == 1
@@ -701,13 +715,14 @@ namespace FEAT
         {
           if(_mesh_conc == nullptr)
             throw InternalError(__func__,__FILE__,__LINE__,
-            "Scale computation set to "+stringify(_scale_computation)+", but no concentration funtion was given");
+            "Scale computation set to "+stringify(_scale_computation)+", but no concentration function was given");
 
           _mesh_conc->compute_dist();
           _mesh_conc->compute_conc();
           _mesh_conc->compute_grad_h(this->get_coords());
 
           _lambda.clone(_mesh_conc->get_conc(), LAFEM::CloneMode::Deep);
+
         }
 
         /// \brief Computes the weights mu
@@ -937,6 +952,63 @@ namespace FEAT
         /// \copydoc BaseClass::compute_grad()
         virtual void compute_grad(VectorTypeL& grad) const override
         {
+          if(this->_mesh_conc != nullptr && this->_mesh_conc->use_derivative())
+            compute_grad_with_conc(grad);
+          else
+            compute_grad_without_conc(grad);
+        }
+
+        /// \copydoc BaseClass::compute_grad()
+        virtual void compute_grad_with_conc(VectorTypeL& grad) const
+        {
+          XASSERTM(this->_mesh_conc != nullptr, "You need a mesh concentration function for this.");
+
+          // Total number of cells in the mesh
+          Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
+
+          // Index set for local/global numbering
+          auto& idx = this->get_mesh()->template get_index_set<ShapeType::dimension,0>();
+
+          const auto& grad_h = this->_mesh_conc->get_grad_h();
+
+          // This will hold the coordinates for one element for passing to other routines
+          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          // Local cell dimensions for passing to other routines
+          FEAT::Tiny::Vector<CoordType, MeshType::world_dim> h;
+          // This will hold the local gradient for one element for passing to other routines
+          FEAT::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> grad_loc;
+
+          // Clear gradient vector
+          grad.format();
+
+          // Compute the functional value for each cell
+          for(Index cell(0); cell < ncells; ++cell)
+          {
+            h = this->_h(cell);
+            // Get local coordinates
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+              x[j] = this->_coords_buffer(idx(cell,Index(j)));
+
+            this->_functional->compute_local_grad(x, h, grad_loc);
+            // Add the contribution from the dependence of h on the vertex coordinates
+            this->_functional->add_grad_h_part(grad_loc, x, h, grad_h(cell));
+
+            // Add local contributions to global gradient vector
+            for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
+            {
+              Index i(idx(cell,Index(j)));
+              Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(grad(i));
+              tmp += this->_mu(cell)*grad_loc[j];
+
+              grad(i,tmp);
+            }
+          }
+
+        } // compute_grad_with_conc
+
+        /// \copydoc BaseClass::compute_grad()
+        virtual void compute_grad_without_conc(VectorTypeL& grad) const
+        {
           // Total number of cells in the mesh
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
@@ -974,7 +1046,7 @@ namespace FEAT
             }
           }
 
-        } // compute_grad
+        } // compute_grad_without_conc
 
     }; // class HyperelasticityFunctional
 

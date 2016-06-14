@@ -359,7 +359,8 @@ namespace FEAT
           {
             typedef typename FEAT::Meshopt::HyperelasticityFunctional<Mem_, DT_, IT_, Trafo_, FunctionalType_>::RefCellTrafo RefCellTrafo;
 
-            std::shared_ptr<FEAT::Meshopt::MeshConcentrationFunction<Trafo_, RefCellTrafo>> mesh_conc_func(nullptr);
+            std::shared_ptr<FEAT::Meshopt::MeshConcentrationFunctionBase<Trafo_, RefCellTrafo>>
+              mesh_conc_func(nullptr);
 
             if( scale_computation == FEAT::Meshopt::ScaleComputation::current_concentration ||
               scale_computation == FEAT::Meshopt::ScaleComputation::iter_concentration)

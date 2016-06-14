@@ -6,6 +6,7 @@ cmake_minimum_required (VERSION 2.8)
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 ADD_SUBDIRECTORY( meshopt_boundary-app )
+ADD_SUBDIRECTORY( meshopt_r_adapt-app )
 ADD_SUBDIRECTORY( meshopt_refinement-app )
 ADD_SUBDIRECTORY( meshopt_screws-app )
 

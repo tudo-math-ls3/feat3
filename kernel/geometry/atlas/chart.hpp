@@ -218,7 +218,6 @@ namespace FEAT
 
             // We have the attribute; check whether it matches our chart
             int attrib_dim = attrib->get_num_coords();
-            // invalid attribute dimension
             XASSERTM(attrib_dim == CT_::param_dim, "Invalid chart attribute dimension");
 
             // Get the vertex set of the mesh
@@ -380,7 +379,7 @@ namespace FEAT
          */
         virtual void adapt(PartType& DOXY(parent_meshpart), const PartType& DOXY(meshpart)) const override
         {
-          throw InternalError("Adaption of MeshPart not possible yet");
+          throw InternalError(__func__,__FILE__,__LINE__,"Adaption of MeshPart not possible yet");
         }
 
         /// \copydoc BaseClass::move_by()
