@@ -29,7 +29,7 @@ int main(int argc, char** argv)
       }
 
       //discard any unused parameters, marked by "--"
-      if (strlen(argv[i]) > 1 && argv[i][0] == '-' && argv[i][0] == '-')
+      if (strlen(argv[i]) > 1 && argv[i][0] == '-' && argv[i][1] == '-')
         continue;
 
       labels.push_back(argv[i]);
