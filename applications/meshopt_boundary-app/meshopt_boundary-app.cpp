@@ -169,7 +169,7 @@ struct MeshoptBoundaryApp
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      if( Math::abs(min_angle - DT_(34.0932077950624545790)) > Math::eps<DT_>())
+      if( Math::abs(min_angle - DT_(34.0932077950624545790)) > Math::sqrt(Math::eps<DT_>()))
       {
         Util::mpi_cout("FAILED:");
         throw InternalError(__func__,__FILE__,__LINE__,
