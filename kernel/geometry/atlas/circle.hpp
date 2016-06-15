@@ -129,17 +129,17 @@ namespace FEAT
          */
         void project_point(WorldPoint& point) const
         {
-          WorldPoint dist_vec(point - _midpoint);
-          CoordType distance(dist_vec.norm_euclid());
+          WorldPoint grad_dist(point - _midpoint);
+          CoordType distance(grad_dist.norm_euclid());
 
           if(distance < Math::eps<CoordType>())
           {
-            dist_vec(0) = _radius;
-            point += dist_vec;
+            grad_dist(0) = _radius;
+            point += grad_dist;
           }
           else
           {
-            point = _midpoint + (_radius / distance)*dist_vec;
+            point = _midpoint + (_radius / distance)*grad_dist;
           }
         }
 
@@ -149,10 +149,37 @@ namespace FEAT
           return Math::abs(compute_signed_dist(point));
         }
 
+        /// \copydoc ChartBase::dist()
+        CoordType compute_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        {
+          WorldPoint projected(point);
+          project_point(projected);
+
+          grad_dist = (projected - point);
+          CoordType my_dist(grad_dist.norm_euclid());
+          grad_dist.normalise();
+
+          return my_dist;
+        }
+
         /// \copydoc ChartBase::signed_dist()
         CoordType compute_signed_dist(const WorldPoint& point) const
         {
-          return (point - _midpoint).norm_euclid() - _radius;
+          return _radius - (point - _midpoint).norm_euclid();
+        }
+
+        /// \copydoc ChartBase::dist()
+        CoordType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        {
+          WorldPoint projected(point);
+          project_point(projected);
+
+          CoordType my_dist(_radius - (point - _midpoint).norm_euclid());
+
+          grad_dist = (point - projected)*Math::signum(my_dist);
+          grad_dist.normalise();
+
+          return my_dist;
         }
 
         /**

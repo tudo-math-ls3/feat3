@@ -82,6 +82,25 @@ namespace FEAT
           return ((DataType(1) - t) * this->_world[i]) + (t * this->_world[i+1]);
         }
 
+        WorldPoint get_normal_on_segment(const Index i, const DataType DOXY(t)) const
+        {
+          ASSERT((i+1) < Index(this->_world.size()));
+
+          // get the ends of the line segment
+          const WorldPoint& x0 = this->_world.at(i);
+          const WorldPoint& x1 = this->_world.at(i+1);
+
+          WorldPoint nu(DataType(0));
+
+          DataType d1x = x1(0) - x0(0);
+          DataType d1y = x1(1) - x0(1);
+
+          nu(0) = d1y;
+          nu(1) = -d1x;
+
+          return nu;
+        }
+
         /**
          * \brief Projects a point onto one segment of the polyline.
          *

@@ -127,14 +127,30 @@ namespace FEAT
          */
         void project_point(WorldPoint& point) const
         {
+          CoordType signed_dist(0);
+          WorldPoint grad_dist(CoordType(0));
+
+          project_point(point, signed_dist, grad_dist);
+
+        }
+
+        /**
+         * \brief Projects a single point to the surface given by the surface mesh
+         *
+         * \param[in,out] point
+         * The point that gets projected.
+         *
+         * \param[in,out] signed_distance
+         * The signed distance of the original to the projected point.
+         *
+         * \param[in,out] grad_dist
+         * Gradient of the distance function.
+         */
+        void project_point(WorldPoint& point, CoordType& signed_distance, WorldPoint& grad_dist) const
+        {
           // There is nothing to do if the surface mesh does not have any cells
           if(_surface_mesh->get_num_entities(SurfaceMeshType::shape_dim) == Index(0))
             return;
-
-          // Type of the vertex at cell index set
-          typedef typename SurfaceMeshType::template IndexSet<SurfaceMeshType::shape_dim, 0>::Type VertAtCellIdxType;
-          // Number of vertices per cell
-          static constexpr int num_vert_loc = VertAtCellIdxType::num_indices;
 
           // Vertex at cell information
           const auto& idx(_surface_mesh->template get_index_set<SurfaceMeshType::shape_dim, 0>());
@@ -144,7 +160,6 @@ namespace FEAT
           // When a point is found, this will hold the coefficients of its image under the projection wrt. the
           // standard P1/Q1 transformation
           Tiny::Vector<CoordType, SurfaceMeshType::shape_dim+1> coeffs(CoordType(0));
-          Tiny::Matrix<CoordType, num_vert_loc, SurfaceMeshType::world_dim> coords(CoordType(0));
           // This will hold the coefficients of the transformation mapping
           Tiny::Vector<CoordType, SurfaceMeshType::shape_dim+1> bary(CoordType(0));
 
@@ -175,8 +190,63 @@ namespace FEAT
 
           projected_point += coeff0*vtx[idx(best_facet, Index(0))];
 
+          grad_dist = (projected_point - point);
+          signed_distance = grad_dist.norm_euclid();
+
+          // If the distance is too small, we set the gradient vector to zero
+          if(signed_distance < Math::eps<CoordType>())
+            grad_dist.format(CoordType(0));
+          else
+          {
+            grad_dist.normalise();
+            WorldPoint nu(get_normal_on_tria(best_facet, coeffs));
+            signed_distance *= Math::signum(Tiny::dot(nu, grad_dist));
+          }
+
           point = projected_point;
 
+        }
+
+        /**
+         * \brief Computes the outer normal on a triangle for a single point
+         *
+         * \param[in] facet
+         * Number of the triangle.
+         *
+         * \param[in] coeffs
+         * Coefficients of the point where we want to compute the normal.
+         *
+         * \returns
+         * The outer (unit) normal vector at the given point.
+         */
+        WorldPoint get_normal_on_tria(
+          const Index facet, const Tiny::Vector<CoordType, SurfaceMeshType::shape_dim+1> DOXY(coeffs)) const
+        {
+          // Vertex at cell information
+          const auto& idx(_surface_mesh->template get_index_set<SurfaceMeshType::shape_dim, 0>());
+          // The mesh's vertex set so we can get at the coordinates
+          const auto& vtx(_surface_mesh->get_vertex_set());
+
+          Tiny::Matrix<CoordType, 2, SurfaceMeshType::world_dim> coords(CoordType(0));
+          Tiny::Matrix<CoordType, SurfaceMeshType::world_dim, 2> coords_transpose(CoordType(0));
+
+          Index i0(idx(facet, Index(0)));
+          Index i1(idx(facet, Index(1)));
+          Index i2(idx(facet, Index(2)));
+
+          coords[0] = vtx[i1] - vtx[i0];
+          coords[1] = vtx[i2] - vtx[i0];
+
+          for(int i(0); i < coords.m; ++i)
+          {
+            for(int j(0); j < coords.n; ++j)
+              coords_transpose(j,i) = coords(i,j);
+          }
+
+          WorldPoint nu(Tiny::orthogonal(coords_transpose));
+          nu.normalise();
+
+          return nu;
         }
 
         /**
@@ -349,9 +419,35 @@ namespace FEAT
         /// \copydoc ChartBase::dist()
         CoordType compute_dist(const WorldPoint& point) const
         {
-          WorldPoint projected(point);
-          project_point(projected);
-          return (projected - point).norm_euclid();
+          WorldPoint grad_dist(CoordType(0));
+          return compute_dist(point, grad_dist);
+        }
+
+        /// \copydoc ChartBase::dist()
+        CoordType compute_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        {
+          CoordType signed_dist(0);
+          WorldPoint projected_point(point);
+          project_point(projected_point, signed_dist, grad_dist);
+
+          return Math::abs(signed_dist);
+        }
+
+        /// \copydoc ChartBase::signed_dist()
+        CoordType compute_signed_dist(const WorldPoint& point) const
+        {
+          WorldPoint grad_dist(CoordType(0));
+          return compute_signed_dist(point, grad_dist);
+        }
+
+        /// \copydoc ChartBase::signed_dist()
+        CoordType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        {
+          CoordType signed_dist(0);
+          WorldPoint projected_point(point);
+          project_point(projected_point, signed_dist, grad_dist);
+
+          return signed_dist;
         }
 
       private:

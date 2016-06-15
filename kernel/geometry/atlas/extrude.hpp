@@ -112,9 +112,57 @@ namespace FEAT
         /// \copydoc ChartBase::dist()
         CoordType compute_dist(const WorldPoint& point) const
         {
-          WorldPoint projected(point);
-          project_point(projected);
-          return (point - projected).norm_euclid();
+          SubWorldPoint sub_point;
+          sub_point[0] = point[0];
+          sub_point[1] = point[1];
+          return _sub_chart->compute_dist(sub_point);
+        }
+
+        /// \copydoc ChartBase::dist()
+        CoordType compute_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        {
+          SubWorldPoint sub_point;
+          sub_point[0] = point[0];
+          sub_point[1] = point[1];
+
+          SubWorldPoint sub_grad_dist;
+
+          CoordType my_dist(_sub_chart->compute_dist(sub_point, sub_grad_dist));
+
+          ASSERT(my_dist >= CoordType(0));
+
+          grad_dist[0] = sub_grad_dist[0];
+          grad_dist[1] = sub_grad_dist[1];
+          grad_dist[2] = CoordType(0);
+
+          return my_dist;
+        }
+
+        /// \copydoc ChartBase::signed_dist()
+        CoordType compute_signed_dist(const WorldPoint& point) const
+        {
+          SubWorldPoint sub_point;
+          sub_point[0] = point[0];
+          sub_point[1] = point[1];
+          return _sub_chart->compute_signed_dist(sub_point);
+        }
+
+        /// \copydoc ChartBase::signed_dist()
+        CoordType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        {
+          SubWorldPoint sub_point;
+          sub_point[0] = point[0];
+          sub_point[1] = point[1];
+
+          SubWorldPoint sub_grad_dist;
+
+          CoordType my_dist(_sub_chart->compute_dist(sub_point, sub_grad_dist));
+
+          grad_dist[0] = sub_grad_dist[0];
+          grad_dist[1] = sub_grad_dist[1];
+          grad_dist[2] = CoordType(0);
+
+          return my_dist;
         }
 
         virtual String get_type() const override

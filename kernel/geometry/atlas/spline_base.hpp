@@ -95,8 +95,7 @@ namespace FEAT
          */
         void map(WorldPoint& point, const ParamPoint& param) const
         {
-          if(this->_param.empty())
-            throw InternalError(__func__, __FILE__, __LINE__, "Parameters are missing");
+          XASSERTM(!this->_param.empty(), "Parameter is missing");
 
           // find enclosing segment
           const Index i = Index(this->find_param(param[0]));
@@ -106,6 +105,11 @@ namespace FEAT
 
           // map on segment
           point = cast().map_on_segment(i, t);
+        }
+
+        WorldPoint get_normal_on_segment(const Index i, const DataType t) const
+        {
+          return cast().get_normal_on_segment(i, t);
         }
 
         /**
@@ -171,11 +175,82 @@ namespace FEAT
           return (projected - point).norm_euclid();
         }
 
+        /// \copydoc ChartBase::dist()
+        DataType compute_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        {
+          WorldPoint projected(point);
+          project_point(projected);
+
+          grad_dist = (projected - point);
+
+          return grad_dist.norm_euclid();
+        }
+
+        /// \copydoc ChartBase::signed_dist()
+        DataType compute_signed_dist(const WorldPoint& point) const
+        {
+          WorldPoint grad_dist(DataType(0));
+
+          return compute_signed_dist(point, grad_dist);
+        }
+
+        /// \copydoc ChartBase::signed_dist()
+        DataType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
+        {
+          DataType signed_dist(0.0);
+
+          Index best_segment(0);
+          WorldPoint projected(DataType(0));
+
+          // loop over all line segments
+          for(Index i(0); (i+1) < Index(this->_world.size()); ++i)
+          {
+            // project on current segment
+            const DataType t = cast().project_on_segment(i, point);
+
+            // map point on current segment
+            projected = cast().map_on_segment(i, t);
+
+            // compute squared distance to original point
+            DataType distance = (projected - point).norm_euclid_sqr();
+
+            // is that a new projection candidate?
+            if((i == Index(0)) || (distance < signed_dist))
+            {
+              signed_dist = distance;
+              best_segment = i;
+            }
+          }
+
+          // Project on best segment
+          const DataType t = cast().project_on_segment(best_segment, point);
+          // Map point on best segment
+          projected = cast().map_on_segment(best_segment, t);
+
+          grad_dist = (projected - point);
+          // This has no sign yet
+          signed_dist = grad_dist.norm_euclid();
+
+          // If the distance is too small, we set the gradient vector to zero
+          if(signed_dist <= Math::eps<DataType>())
+            grad_dist.format(DataType(0));
+          else
+          {
+            grad_dist.normalise();
+            WorldPoint nu(get_normal_on_segment(best_segment, t));
+            signed_dist *= Math::signum(Tiny::dot(nu, grad_dist));
+          }
+
+          grad_dist *= Math::signum(signed_dist);
+
+          return signed_dist;
+        }
+
+
       protected:
         std::size_t find_param(const DataType x) const
         {
-          if(_param.empty())
-            throw InternalError(__func__, __FILE__, __LINE__, "Spline has no parameters");
+          XASSERTM(!_param.empty(),"Spline has no parameters");
 
           // check for boundary
           if(x <= _param.front()[0])

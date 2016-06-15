@@ -64,10 +64,12 @@ namespace FEAT
          * \brief Maps a local segment parameter point
          *
          * \param[in] i
-         * The segment index onto which to map
+         * The segment index onto which to map.
          *
          * \param[in] t
-         * The local segment parameter
+         * The local segment parameter.
+         *
+         * \returns The mapped point.
          */
         WorldPoint map_on_segment(const Index i, const DataType t) const
         {
@@ -91,6 +93,40 @@ namespace FEAT
 
           // interpolate world point
           return (s * p02) + (t *p13);
+        }
+
+        /**
+         * \brief Computes the outer unit normal in a single point
+         *
+         * \param[in] i
+         * The segment index onto which to compute the normal.
+         *
+         * \param[in] t
+         * The local segment parameter.
+         *
+         * \returns The outer unit normal in the point given by t.
+         */
+        WorldPoint get_normal_on_segment(const Index i, const DataType t) const
+        {
+          WorldPoint nu(DataType(0));
+
+          // references to the four Bezier points
+          const WorldPoint& p0 = this->_world[i];
+          const WorldPoint& p1 = this->_control[2*i];
+          const WorldPoint& p2 = this->_control[2*i+1];
+          const WorldPoint& p3 = this->_world[i+1];
+
+          DataType d1x = DataType(3) * (((-p0[0] + DataType(3)*p1[0] - DataType(3)*p2[0] + p3[0]) * t +
+                DataType(2) * (p0[0] - DataType(2)*p1[0] + p2[0])) * t + (-p0[0] + p1[0]));
+          DataType d1y = DataType(3) * (((-p0[1] + DataType(3)*p1[1] - DataType(3)*p2[1] + p3[1]) * t +
+                DataType(2) * (p0[1] - DataType(2)*p1[1] + p2[1])) * t + (-p0[1] + p1[1]));
+
+          nu(0) = d1y;
+          nu(1) = -d1x;
+
+          nu.normalise();
+
+          return nu;
         }
 
         /**

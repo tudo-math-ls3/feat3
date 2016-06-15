@@ -82,6 +82,42 @@ namespace FEAT
         virtual CoordType dist(const WorldPoint& point) const = 0;
 
         /**
+         * \brief Computes the distance of a point to this chart
+         *
+         * \param[in] point
+         * The world point to compute the distance for
+         *
+         * \param[in] grad_dist
+         * The connecting vector between point and the closest point on this chart
+         *
+         * \returns The distance to this chart
+         */
+        virtual CoordType dist(const WorldPoint& point, WorldPoint& grad_dist) const = 0;
+
+        /**
+         * \brief Computes the signed distance of a point to this chart
+         *
+         * \param[in] point
+         * The world point to compute the distance for
+         *
+         * \returns The signed distance to this chart
+         */
+        virtual CoordType signed_dist(const WorldPoint& point) const = 0;
+
+        /**
+         * \brief Computes the signed distance of a point to this chart
+         *
+         * \param[in] point
+         * The world point to compute the distance for
+         *
+         * \param[in] grad_dist
+         * The connecting vector between point and the closest point on this chart
+         *
+         * \returns The signed distance to this chart
+         */
+        virtual CoordType signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const = 0;
+
+        /**
          * \brief Writes the type as String
          *
          * Needed for writing this to mesh files.
@@ -340,6 +376,24 @@ namespace FEAT
         virtual CoordType dist(const WorldPoint& point) const override
         {
           return (this->cast()).compute_dist(point);
+        }
+
+        /// \copydoc BaseClass::dist()
+        virtual CoordType dist(const WorldPoint& point, WorldPoint& grad_dist) const override
+        {
+          return (this->cast()).compute_dist(point, grad_dist);
+        }
+
+        /// \copydoc BaseClass::signed_dist()
+        virtual CoordType signed_dist(const WorldPoint& point) const override
+        {
+          return (this->cast()).compute_signed_dist(point);
+        }
+
+        /// \copydoc BaseClass::signed_dist()
+        virtual CoordType signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const override
+        {
+          return (this->cast()).compute_signed_dist(point, grad_dist);
         }
 
       }; // class ChartCRTP<...>
