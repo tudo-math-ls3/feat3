@@ -715,3 +715,56 @@ SparseMatrixELLFrobeniusTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_froben
 SparseMatrixELLFrobeniusTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_frobenius_test_float_ulong;
 SparseMatrixELLFrobeniusTest<Mem::CUDA, double, unsigned long> cuda_sm_ell_frobenius_test_double_ulong;
 #endif
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixELLLumpTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  SparseMatrixELLLumpTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixELLLumpTest")
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    for (Index size(2) ; size < 3e2 ; size*=2)
+    {
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(DT_(col % 100) / DT_(2)));
+          else if((row == col+1) || (row+1 == col))
+            a_local(row, col, DT_(-1));
+        }
+      }
+
+      SparseMatrixELL<Mem_, DT_, IT_> a(a_local);
+      auto lump = a.lump_rows();
+      auto one = a.create_vector_r();
+      auto res = a.create_vector_r();
+      one.format(DT_(-1));
+      a.apply(res, one, lump);
+
+      TEST_CHECK_EQUAL_WITHIN_EPS(res.norm2(), DT_(0), tol);
+    }
+  }
+};
+
+SparseMatrixELLLumpTest<Mem::Main, float, unsigned int> sm_ell_lump_test_float_uint;
+SparseMatrixELLLumpTest<Mem::Main, double, unsigned int> sm_ell_lump_test_double_uint;
+SparseMatrixELLLumpTest<Mem::Main, float, unsigned long> sm_ell_lump_test_float_ulong;
+SparseMatrixELLLumpTest<Mem::Main, double, unsigned long> sm_ell_lump_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixELLLumpTest<Mem::Main, __float128, unsigned int> sm_ell_lump_test_float128_uint;
+SparseMatrixELLLumpTest<Mem::Main, __float128, unsigned long> sm_ell_lump_test_float128_ulong;
+#endif

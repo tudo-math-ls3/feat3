@@ -22,6 +22,7 @@
 #include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/diagonal.hpp>
+#include <kernel/lafem/arch/lumping.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/adjacency/permutation.hpp>
 #include <kernel/util/statistics.hpp>
@@ -2193,6 +2194,30 @@ namespace FEAT
       }
 
       ///@}
+
+      /// \copydoc lump_rows()
+      void lump_rows(VectorTypeL& lump) const
+      {
+        XASSERTM(lump.size() == rows(), "lump vector size does not match matrix row count!");
+
+        Arch::Lumping<Mem_>::csr(lump.elements(), val(), col_ind(), row_ptr(), rows());
+      }
+
+      /**
+       * \brief Returns the lumped rows vector
+       *
+       * Each entry in the returned lumped rows vector contains the
+       * the sum of all matrix elements in the corresponding row.
+       *
+       * \returns
+       * The lumped vector.
+       */
+      VectorTypeL lump_rows() const
+      {
+        VectorTypeL lump = create_vector_l();
+        lump_rows(lump);
+        return lump;
+      }
 
       /// \copydoc extract_diag()
       void extract_diag(VectorTypeL & diag) const

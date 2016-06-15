@@ -16,6 +16,7 @@ SET (kernel-lafem-arch-list
   diagonal_generic.cpp
   difference_generic.cpp
   dot_product_generic.cpp
+  lumping_generic.cpp
   norm_generic.cpp
   product_matvec_generic.cpp
   product_matvec_generic_ell.cpp
