@@ -2118,14 +2118,10 @@ namespace FEAT
         const DT_ alpha = DT_(1))
       {
         // validate matrix dimensions
-        if(this->rows() != d.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Size missmatch!");
-        if(d.columns() != a.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Size missmatch!");
-        if(a.columns() != b.rows())
-          throw InternalError(__func__, __FILE__, __LINE__, "Size missmatch!");
-        if(b.columns() != this->columns())
-          throw InternalError(__func__, __FILE__, __LINE__, "Size missmatch!");
+        XASSERT(this->rows() == d.rows());
+        XASSERT(d.columns() == a.rows());
+        XASSERT(a.columns() == b.rows());
+        XASSERT(b.columns() == this->columns());
 
         // fetch matrix arrays:
         DT_* data_x = this->val();
@@ -2193,6 +2189,103 @@ namespace FEAT
         }
       }
 
+      /**
+       * \brief Adds a double-matrix product onto this matrix
+       *
+       * This function performs the following computation:
+       * \f[ X \leftarrow X + \alpha D\cdot \textnormal{diag}(A)\cdot B\f]
+       *
+       * where
+       * - \e X denotes this m-by-n matrix
+       * - \e D denotes a m-by-l matrix
+       * - \e A denotes a vector representing a l-by-l diagonal matrix
+       * - \e B denotes a l-by-n matrix
+       *
+       * \attention
+       * This function assumes that the output matrix already contains the
+       * required sparsity pattern. This function will throw an exception
+       * if the sparsity pattern of the output matrix is incomplete.
+       *
+       * \note
+       * This function currently only supports data in main memory.
+       *
+       * \param[in] a
+       * The vector representing the diagonal matrix A.
+       *
+       * \param[in] d, b
+       * The left and right multiplicant matrices
+       *
+       * \param[in] alpha
+       * The scaling factor for the product.
+       */
+      void add_double_mat_mult(
+        const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& d,
+        const LAFEM::DenseVector<Mem::Main, DT_, IT_>& a,
+        const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& b,
+        const DT_ alpha = DT_(1))
+      {
+        // validate matrix dimensions
+        XASSERT(this->rows() == d.rows());
+        XASSERT(d.columns() == a.size());
+        XASSERT(a.size() == b.rows());
+        XASSERT(b.columns() == this->columns());
+
+        // fetch matrix arrays:
+        DT_* data_x = this->val();
+        const DT_* data_d = d.val();
+        const DT_* data_a = a.elements();
+        const DT_* data_b = b.val();
+        const IT_* row_ptr_x = this->row_ptr();
+        const IT_* col_idx_x = this->col_ind();
+        const IT_* row_ptr_d = d.row_ptr();
+        const IT_* col_idx_d = d.col_ind();
+        const IT_* row_ptr_b = b.row_ptr();
+        const IT_* col_idx_b = b.col_ind();
+
+        // loop over all rows of D and X, resp.
+        for(IT_ i(0); i < IT_(this->rows()); ++i)
+        {
+          // loop over all non-zeros D_ik in row i of D
+          for(IT_ ik(row_ptr_d[i]); ik  < row_ptr_d[i+1]; ++ik)
+          {
+            // get column index k
+            const IT_ k = col_idx_d[ik];
+
+            // pre-compute factor (alpha * D_ik * A_kk)
+            const DT_ omega = alpha *  data_d[ik] * data_a[k];
+
+            // loop over all non-zeros B_kj in row j of B and
+            // loop over all non-zeros X_ij in row i of X and
+            // perform a "sparse axpy" of B_l onto X_i, i.e.:
+            //   X_i. += (alpha * D_ik * A_kk) * B_k.
+            IT_ ij = row_ptr_x[i];
+            IT_ kj = row_ptr_b[k];
+            while((ij < row_ptr_x[i+1]) && (kj < row_ptr_b[k+1]))
+            {
+              if(col_idx_x[ij] == col_idx_b[kj])
+              {
+                // okay: B_kj contributes to X_ij
+                data_x[ij] += omega * data_b[kj];
+                ++ij;
+                ++kj;
+              }
+              else if(col_idx_x[ij] < col_idx_b[kj])
+              {
+                // entry X_ij exists, but B_kj is missing:
+                // this is a perfectly valid case, so continue with the next non-zero of X_i
+                ++ij;
+              }
+              else //if(col_idx_x[ij] > col_idx_b[kj])
+              {
+                // If we come out here, then the sparsity pattern of X is incomplete:
+                // B_kj is meant to be added onto X_ij, but the entry X_ij is missing
+                throw InternalError(__func__, __FILE__, __LINE__, "Incomplete output matrix structure");
+                //++kj;
+              }
+            }
+          }
+        }
+      }
       ///@}
 
       /// \copydoc lump_rows()
