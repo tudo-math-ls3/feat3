@@ -114,9 +114,56 @@ namespace FEAT
         }
 
         /** \copydoc ChartBase::write */
-        virtual void write(std::ostream& DOXY(os), const String& DOXY(sindent)) const override
+        virtual void write(std::ostream& os, const String& sindent) const override
         {
-          throw InternalError(__func__, __FILE__, __LINE__, "XML export of SurfaceMesh not implemented yet");
+          String indent(sindent);
+
+          os << indent << "<SurfaceMesh";
+          os << " verts=\" " << _surface_mesh->get_num_entities(0) << "\"";
+          os << " trias=\" " << _surface_mesh->get_num_entities(ShapeType::dimension) << "\"";
+          os << ">" << std::endl;
+
+          // increase indent
+          indent.resize(indent.size()+2, ' ');
+
+          const auto& vtx = _surface_mesh->get_vertex_set();
+
+          os << indent << "<Vertices>" << std::endl;
+          indent.resize(indent.size()+2, ' ');
+
+          for(Index i(0); i < vtx.get_num_vertices(); ++i)
+          {
+            const auto& v = vtx[i];
+            os << indent << v[0];
+            for(int j(1); j < SurfaceMeshType::world_dim; ++j)
+              os << ' ' << v[j];
+            os << std::endl;
+          }
+
+          indent.resize(indent.size()-2);
+          os << indent << "</Vertices>" << std::endl;
+
+          // Get vertex at cell index set
+          const auto& idx = _surface_mesh->template get_index_set<ShapeType::dimension, 0>();
+
+          os << indent << "<Triangles>" << std::endl;
+          indent.resize(indent.size()+2, ' ');
+
+          for(Index i(0); i < idx.get_num_entities(); ++i)
+          {
+            const auto& idx_loc = idx[i];
+            os << indent << idx_loc[0];
+            for(int j(1); j < idx.num_indices; ++j)
+              os << ' ' << idx_loc[j];
+            os << std::endl;
+          }
+
+          indent.resize(indent.size()-2);
+          os << indent << "</Triangles>" << std::endl;
+
+          indent.resize(indent.size()-2);
+          os << indent << "</SurfaceMesh>";
+
         }
 
         /**
@@ -856,6 +903,7 @@ namespace FEAT
         /// \endcond
       }; // class SurfaceMesh
 
+      /// \cond internal
       template<typename Mesh_>
       class SurfaceMeshVertsParser :
         public Xml::MarkupParser
@@ -903,7 +951,7 @@ namespace FEAT
         {
           // make sure that we do not read more points than expected
           if(_read >= _vertex_set.get_num_vertices())
-            throw Xml::ContentError(iline, sline, "Invalid content; exprected terminator");
+            throw Xml::ContentError(iline, sline, "Invalid content; expected terminator");
 
           // split line by whitespaces
           std::deque<String> scoords;
@@ -1095,6 +1143,8 @@ namespace FEAT
           return nullptr;
         }
       };
+      /// \endcond
+
     } // namespace Atlas
   } // namespace Geometry
 } // namespace FEAT
