@@ -1223,8 +1223,8 @@ namespace FEAT
       static std::shared_ptr<Xml::MarkupParser> markup(const String& name,
       Atlas::ChartBase<RootMesh_>*& chart)
       {
-        // \todo: Implement SphereChartParser
-        //if(name == "Sphere")       return std::make_shared<Atlas::SphereChartParser<RootMesh_>>(chart);
+        if(name == "Sphere")
+          return std::make_shared<Atlas::SphereChartParser<RootMesh_>>(chart);
         if(name == "SurfaceMesh")
           return std::make_shared<Atlas::SurfaceMeshChartParser<RootMesh_>>(chart);
         // \todo: Implement TubeChartParser

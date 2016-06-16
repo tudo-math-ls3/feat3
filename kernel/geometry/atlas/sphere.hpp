@@ -127,7 +127,7 @@ namespace FEAT
         /// \copydoc ChartBase::dist()
         CoordType compute_dist(const WorldPoint& point) const
         {
-          return Math::abs(_signed_dist(point));
+          return Math::abs(compute_signed_dist(point));
         }
 
         /// \copydoc ChartBase::dist()
@@ -174,6 +174,72 @@ namespace FEAT
           os << " />" << std::endl;
         }
       };
+
+      template<typename Mesh_, typename ChartReturn_ = ChartBase<Mesh_>>
+      class SphereChartParser :
+        public Xml::MarkupParser
+      {
+      private:
+        typedef Sphere<Mesh_> ChartType;
+        typedef typename ChartType::CoordType CoordType;
+        ChartReturn_*& _chart;
+
+      public:
+        explicit SphereChartParser(ChartReturn_*& chart) :
+          _chart(chart)
+        {
+        }
+
+        virtual bool attribs(std::map<String,bool>& attrs) const override
+        {
+          attrs.emplace("radius", true);
+          attrs.emplace("midpoint", true);
+          return true;
+        }
+
+        virtual void create(
+          int iline,
+          const String& sline,
+          const String&,
+          const std::map<String, String>& attrs,
+          bool) override
+        {
+          CoordType radius = CoordType(0);
+          CoordType mid_x = CoordType(0);
+          CoordType mid_y = CoordType(0);
+          CoordType mid_z = CoordType(0);
+
+          // try to parse the radius
+          if(!attrs.find("radius")->second.parse(radius))
+            throw Xml::GrammarError(iline, sline, "Failed to parse sphere radius");
+          if(radius < CoordType(1E-5))
+            throw Xml::GrammarError(iline, sline, "Invalid sphere radius");
+
+          // try to parse midpoind
+          std::deque<String> mids;
+          attrs.find("midpoint")->second.split_by_charset(mids);
+          if(mids.size() != std::size_t(3))
+            throw Xml::GrammarError(iline, sline, "Invalid sphere midpoint string");
+          if(!mids.front().parse(mid_x) || !mids.at(1).parse(mid_y) || !mids.back().parse(mid_z))
+            throw Xml::GrammarError(iline, sline, "'Failed to parse sphere midpoint");
+
+          _chart = new ChartType(mid_x, mid_y, mid_z, radius);
+        }
+
+        virtual void close(int, const String&) override
+        {
+        }
+
+        virtual bool content(int, const String&) override
+        {
+          return false;
+        }
+
+        virtual std::shared_ptr<Xml::MarkupParser> markup(int, const String&, const String&) override
+        {
+          return nullptr;
+        }
+      }; // class SphereChartParser<...>
     } // namespace Atlas
   } // namespace Geometry
 } // namespace FEAT
