@@ -887,6 +887,8 @@ namespace FEAT
       template<int sma_, int sna_>
       Matrix& set_transpose(const Matrix<T_, n_, m_, sma_, sna_>& a)
       {
+        XASSERTM(this != &a, "Matrices must not be the same");
+
         for(int i(0); i < m_; ++i)
         {
           for(int j(0); j < n_; ++j)
