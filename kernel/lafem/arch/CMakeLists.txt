@@ -65,6 +65,7 @@ if (FEAT_HAVE_CUDA)
     difference.cu
     diagonal.cu
     dot_product.cu
+    lumping.cu
     norm.cu
     product_matvec.cu
     scale.cu

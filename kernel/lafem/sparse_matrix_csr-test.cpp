@@ -1068,3 +1068,9 @@ SparseMatrixCSRLumpTest<Mem::Main, double, unsigned long> sm_csr_lump_test_doubl
 SparseMatrixCSRLumpTest<Mem::Main, __float128, unsigned int> sm_csr_lump_test_float128_uint;
 SparseMatrixCSRLumpTest<Mem::Main, __float128, unsigned long> sm_csr_lump_test_float128_ulong;
 #endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixCSRLumpTest<Mem::CUDA, float, unsigned int> cuda_sm_csr_lump_test_float_uint;
+SparseMatrixCSRLumpTest<Mem::CUDA, double, unsigned int> cuda_sm_csr_lump_test_double_uint;
+SparseMatrixCSRLumpTest<Mem::CUDA, float, unsigned long> cuda_sm_csr_lump_test_float_ulong;
+SparseMatrixCSRLumpTest<Mem::CUDA, double, unsigned long> cuda_sm_csr_lump_test_double_ulong;
+#endif

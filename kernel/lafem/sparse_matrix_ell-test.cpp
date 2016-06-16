@@ -768,3 +768,9 @@ SparseMatrixELLLumpTest<Mem::Main, double, unsigned long> sm_ell_lump_test_doubl
 SparseMatrixELLLumpTest<Mem::Main, __float128, unsigned int> sm_ell_lump_test_float128_uint;
 SparseMatrixELLLumpTest<Mem::Main, __float128, unsigned long> sm_ell_lump_test_float128_ulong;
 #endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixELLLumpTest<Mem::CUDA, float, unsigned int> cuda_sm_ell_lump_test_float_uint;
+SparseMatrixELLLumpTest<Mem::CUDA, double, unsigned int> cuda_sm_ell_lump_test_double_uint;
+SparseMatrixELLLumpTest<Mem::CUDA, float, unsigned long> cuda_sm_ell_lump_test_float_ulong;
+SparseMatrixELLLumpTest<Mem::CUDA, double, unsigned long> cuda_sm_ell_lump_test_double_ulong;
+#endif

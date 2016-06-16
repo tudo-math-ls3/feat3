@@ -48,7 +48,7 @@ namespace FEAT
       extern template void Lumping<Mem::Main>::ell_generic(double *, const double * const, const Index * const,
         const Index * const, const Index * const, Index, const Index);
 
-      /*
+
       template <>
       struct Lumping<Mem::CUDA>
       {
@@ -59,7 +59,7 @@ namespace FEAT
         static void ell(DT_ * lump, const DT_ * const val, const IT_ * const col_ind,
           const IT_ * const cs, const IT_ * const cl, const Index C, const Index rows);
       };
-      */
+
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT
