@@ -68,6 +68,7 @@ struct MeshoptBoundaryApp
   static int run(const String& meshopt_section_key, PropertyMap* meshopt_config, PropertyMap* solver_config,
   Geometry::MeshFileReader* mesh_file_reader, Geometry::MeshFileReader* chart_file_reader,
   int lvl_max, int lvl_min, const DataType delta_t, const DataType t_end,
+  Tiny::Vector<DT_, MeshType::world_dim> midpoint,
   const bool write_vtk, const bool test_mode)
   {
     XASSERT(delta_t > DataType(0));
@@ -79,10 +80,6 @@ struct MeshoptBoundaryApp
 
     // Base string for writing files
     String file_basename(name()+"_n"+stringify(Util::Comm::size()));
-
-    // This is the point we rotate our mesh around
-    Tiny::Vector<DataType, MeshType::world_dim> midpoint(DataType(0));
-
 
     // Minimum number of cells we want to have in each patch
     Index part_min_elems(Util::Comm::size()*4);
@@ -107,6 +104,7 @@ struct MeshoptBoundaryApp
       std::cout << " LVL-MIN: " <<
         dom_ctrl.get_levels().front()->get_level_index() << " [" << lvl_min << "]" << std::endl;
       std::cout << "Cells: " << ncells << std::endl;
+      std::cout << "Centre of rotation: " << midpoint << std::endl;
     }
 
     // Create the MeshoptControl
@@ -654,6 +652,13 @@ int main(int argc, char* argv[])
   XASSERTM(meshoptimiser_key_p.second,
   "ApplicationConfig section is missing the mandatory meshoptimiser entry!");
 
+  auto midpoint_p = app_settings_section->query("midpoint");
+  std::deque<String> midpoint_deque;
+  if(midpoint_p.second)
+  {
+    midpoint_p.first.split_by_charset(midpoint_deque," ");
+  }
+
   int ret(1);
 
   // Get the mesh type sting from the parsed mesh so we know with which template parameter to call the application
@@ -662,15 +667,32 @@ int main(int argc, char* argv[])
   // Call the appropriate class' run() function
   if(mesh_type == "conformal:hypercube:2:2")
   {
+    Tiny::Vector<DataType,2> midpoint(DataType(0));
+    if(midpoint_deque.size() > size_t(0))
+    {
+      XASSERTM(midpoint_deque.size() == size_t(2),"midpoint has invalid number of components!");
+      midpoint(0) = DataType(std::stod(midpoint_deque.front()));
+      midpoint(1) = DataType(std::stod(midpoint_deque.back()));
+    }
+
     ret = MeshoptBoundaryApp<MemType, DataType, IndexType, H2M2D>::run(
       meshoptimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, delta_t, t_end, write_vtk, test_mode);
+      lvl_max, lvl_min, delta_t, t_end, midpoint, write_vtk, test_mode);
   }
   else if(mesh_type == "conformal:simplex:2:2")
   {
+    Tiny::Vector<DataType,2> midpoint(DataType(0));
+    if(midpoint_deque.size() > size_t(0))
+    {
+      XASSERTM(midpoint_deque.size() == size_t(2),"midpoint has invalid number of components!");
+      midpoint(0) = DataType(std::stod(midpoint_deque.front()));
+      midpoint(1) = DataType(std::stod(midpoint_deque.back()));
+    }
+
+
     ret = MeshoptBoundaryApp<MemType, DataType, IndexType, S2M2D>::run(
       meshoptimiser_key_p.first, meshopt_config, solver_config, mesh_file_reader, chart_file_reader,
-      lvl_max, lvl_min, delta_t, t_end, write_vtk, test_mode);
+      lvl_max, lvl_min, delta_t, t_end, midpoint, write_vtk, test_mode);
   }
   else
     throw InternalError(__func__,__FILE__,__LINE__,"Unhandlet mesh type "+mesh_type);
@@ -712,6 +734,7 @@ static void read_test_mode_application_config(std::stringstream& iss)
   iss << "lvl_max = 3" << std::endl;
   iss << "delta_t = 1e-2" << std::endl;
   iss << "t_end = 5e-2" << std::endl;
+  iss << "midpoint = 0.0 0.0" << std::endl;
 }
 
 static void read_test_mode_meshopt_config(std::stringstream& iss)
