@@ -39,8 +39,8 @@ String get_file_title(const String& filename)
 }
 
 template<typename Mesh_>
-int run_xml(Geometry::MeshFileReader* mesh_reader, Geometry::MeshFileReader* chart_reader, const String& filename,
-Index lvl_min, Index lvl_max)
+int run_xml(Geometry::MeshFileReader* mesh_reader, Geometry::MeshFileReader* chart_reader,
+  const String& filename, Index lvl_min, Index lvl_max, bool adapt)
 {
   // create an empty atlas and a root mesh node
   Geometry::MeshAtlas<Mesh_>* atlas = new Geometry::MeshAtlas<Mesh_>();
@@ -74,7 +74,11 @@ Index lvl_min, Index lvl_max)
 #endif
 
   // adapt coarse mesh
-  node->adapt();
+  if(adapt)
+    node->adapt();
+
+  // choose adapt mode
+  const AdaptMode adapt_mode = adapt ? AdaptMode::chart : AdaptMode::none;
 
   // get all mesh part names
   std::deque<String> part_names = node->get_mesh_part_names();
@@ -86,7 +90,7 @@ Index lvl_min, Index lvl_max)
     {
       std::cout << "Refining up to level " << lvl << "..." << std::endl;
       auto* old = node;
-      node = old->refine();
+      node = old->refine(adapt_mode);
       delete old;
     }
 
@@ -170,6 +174,7 @@ int main(int argc, char* argv[])
   args.support("meshfile");
   args.support("chartfile");
   args.support("level");
+  args.support("no-adapt");
 
   String chart_file_name("");
   String mesh_file_name("");
@@ -238,25 +243,27 @@ int main(int argc, char* argv[])
     args.parse("level", lvl_max, lvl_min);
   }
 
+  bool adapt = (args.check("no-adapt") < 0);
+
   int ret(1);
   if(mtype == "conformal:hypercube:1:1")
-    ret = run_xml<H1M1D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max);
+    ret = run_xml<H1M1D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:1:2")
-    ret = run_xml<H1M2D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max);
+    ret = run_xml<H1M2D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:1:3")
-    ret = run_xml<H1M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max);
+    ret = run_xml<H1M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:2:2")
-    ret = run_xml<H2M2D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max);
+    ret = run_xml<H2M2D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:2:3")
-    ret = run_xml<H2M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max);
+    ret = run_xml<H2M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:hypercube:3:3")
-    ret = run_xml<H3M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max);
+    ret = run_xml<H3M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:simplex:2:2")
-    ret = run_xml<S2M2D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max);
+    ret = run_xml<S2M2D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:simplex:2:3")
-    ret = run_xml<S2M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max);
+    ret = run_xml<S2M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
   if(mtype == "conformal:simplex:3:3")
-    ret = run_xml<S3M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max);
+    ret = run_xml<S3M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
 
   // Clean up
   delete ifs_chart;
