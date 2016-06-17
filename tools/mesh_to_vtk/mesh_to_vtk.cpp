@@ -12,12 +12,14 @@ using namespace FEAT::Geometry;
 
 static void display_help()
 {
-  std::cout << "mesh2vtk: Reading meshes from files" << std::endl;
+  std::cout << "mesh2vtk: Converts a mesh from FEAT format to VTK format" << std::endl;
+  std::cout << std::endl;
   std::cout << "Mandatory arguments:" << std::endl;
   std::cout << " --meshfile [path to mesh file]" << std::endl;
   std::cout << "Optional arguments:" << std::endl;
   std::cout << " --chartfile [path to chart file]" <<  std::endl;
   std::cout << " --level [lvl_max lvl_min]" << std::endl;
+  std::cout << " --no-adapt" << std::endl;
   std::cout << " --help: Displays this message" << std::endl;
 }
 
@@ -171,6 +173,13 @@ int main(int argc, char* argv[])
 
   SimpleArgParser args(argc, argv);
 
+  // need help?
+  if(args.check("help") > -1)
+  {
+    display_help();
+    return Runtime::finalise();
+  }
+
   args.support("meshfile");
   args.support("chartfile");
   args.support("level");
@@ -187,7 +196,7 @@ int main(int argc, char* argv[])
 
   // check for unsupported options
   auto unsupported = args.query_unsupported();
-  if( !unsupported.empty() || args.check("help") > -1)
+  if( !unsupported.empty() )
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
@@ -195,14 +204,14 @@ int main(int argc, char* argv[])
 
     display_help();
 
-    Runtime::abort();
     return 1;
   }
 
   if(args.check("meshfile")!=1)
   {
+    std::cerr << "ERROR: You have to specify a mesh with --meshfile" << std::endl;
     display_help();
-    throw InternalError(__func__,__FILE__,__LINE__, "You have to specify a mesh with --meshfile");
+    return 1;
   }
 
   args.parse("meshfile", mesh_file_name);
@@ -230,8 +239,7 @@ int main(int argc, char* argv[])
     ifs_chart = new std::ifstream(chart_file_name, std::ios_base::in);
     if(!ifs_chart->is_open() || !ifs_chart->good())
     {
-      std::cerr << "ERROR: Failed to open chart file '" << chart_file_name << "'" << std::endl;
-      Runtime::abort();
+      std::cerr << std::endl << "ERROR: Failed to open chart file '" << chart_file_name << "'" << std::endl;
       return 1;
     }
     std::cout << "Reading chart file from " << chart_file_name << std::endl;
@@ -266,9 +274,12 @@ int main(int argc, char* argv[])
     ret = run_xml<S3M3D>(mesh_reader, chart_reader, mesh_file_name, lvl_min, lvl_max, adapt);
 
   // Clean up
-  delete ifs_chart;
-  delete mesh_reader;
-  delete chart_reader;
+  if(ifs_chart != nullptr)
+    delete ifs_chart;
+  if(mesh_reader != nullptr)
+    delete mesh_reader;
+  if(chart_reader != nullptr)
+    delete chart_reader;
 
   Runtime::finalise();
 
