@@ -495,12 +495,6 @@ namespace FEAT
                 {
                   Index i(idx(cell, Index(j)));
 
-                  //tmp(j*MeshType::world_dim +d) =
-                  //  CoordType(1)/CoordType(MeshType::world_dim)*Math::pow(_conc(cell)/_sum_conc*sum_det,exponent)
-                  //  *( _conc(cell)*(_grad_sum_det(i)(d)*_sum_conc + sum_det*_grad_conc(i)(d) )
-                  //      + grad_loc(j,d) * sum_det *_sum_conc)
-                  //  / Math::sqr(_sum_conc*sum_det);
-
                   tmp(j*MeshType::world_dim +d) =
                     CoordType(1)/CoordType(MeshType::world_dim)*Math::pow(_conc(cell)/_sum_conc*sum_det,exponent)
                     *( _conc(cell)*(_grad_sum_det(i)(d)*_sum_conc + sum_det*_grad_conc(i)(d) )

@@ -231,6 +231,12 @@ namespace FEAT
             solver->done();
           }
 
+          /// \copydoc BaseClass::compute_cell_size_quality()
+          virtual CoordType compute_cell_size_quality() const override
+          {
+            return (*(_system_levels.back()->op_sys)).compute_cell_size_quality();
+          }
+
           /// \copydoc BaseClass::name()
           virtual String name() const override
           {

@@ -187,6 +187,12 @@ namespace FEAT
             return "DuDvFunctionalControl<>";
           }
 
+          /// \copydoc BaseClass::compute_cell_size_quality()
+          virtual CoordType compute_cell_size_quality() const override
+          {
+            return (*(_system_levels.back()->op_sys)).compute_cell_size_quality();
+          }
+
           /// \copydoc BaseClass::get_coords()
           virtual typename SystemLevelType::GlobalCoordsBuffer& get_coords() override
           {

@@ -574,13 +574,12 @@ namespace FEAT
           }
 
           compute_scales_iter();
-
         }
 
         /**
          * \brief Computes a quality indicator concerning the cell sizes
          *
-         * In a truly optimal mesh (consisting ONLY of Rumpf reference cells of the right size), every cell's volume is
+         * In a truly optimal mesh (consisting ONLY of reference cells of the right size), every cell's volume is
          * exactly lambda(cell). This is especially the goal for r-adaptivity.
          * So in an optimal mesh,
          * \f[
@@ -592,21 +591,29 @@ namespace FEAT
          *
          * \returns The relative cell size quality indicator.
          *
-         **/
-        CoordType cell_size_quality()
+         */
+        virtual CoordType compute_cell_size_quality() const override
         {
-          typename LAFEM::DenseVector<Mem::Main, CoordType, Index> tmp(
-            this->get_mesh()->get_num_entities(ShapeType::dimension));
-
           CoordType my_vol(0);
+          CoordType my_quality(0);
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
             my_vol = this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
-            tmp(cell, Math::abs(CoordType(1) - my_vol/this->_lambda(cell)));
+            my_quality += Math::sqr(CoordType(1) - my_vol/this->_lambda(cell));
           }
 
-          return tmp.norm2()/Math::sqrt(CoordType(this->get_mesh()->get_num_entities(ShapeType::dimension)));
+          Index ncells(this->get_mesh()->get_num_entities(MeshType::shape_dim));
+
+#ifdef FEAT_HAVE_MPI
+          Index ncells_snd(ncells);
+          Util::Comm::allreduce(&ncells_snd, Index(1), &ncells, MPI_SUM);
+          CoordType my_quality_snd(my_quality);
+          Util::Comm::allreduce(&my_quality_snd, Index(1), &my_quality, MPI_SUM);
+#endif
+          my_quality = Math::sqrt(my_quality);
+
+          return Math::abs(CoordType(1) - my_quality/CoordType(ncells));
         }
 
         /**

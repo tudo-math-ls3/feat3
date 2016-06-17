@@ -113,6 +113,8 @@ namespace FEAT
         TrafoType* _trafo;
         /// The FE space for the transformation, needed for filtering
         TrafoSpace* _trafo_space;
+        /// Vector saving the cell sizes on the reference mesh
+        ScalarVectorType _cell_sizes;
         /// Assembler for Dirichlet boundary conditions
         std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>* _dirichlet_asm;
         /// Assembler for slip boundary conditions
@@ -143,6 +145,7 @@ namespace FEAT
           sys_matrix(),
           _trafo(&(trafo_space_->get_trafo())),
           _trafo_space(trafo_space_),
+          _cell_sizes(rmn_->get_mesh()->get_num_entities(MeshType::shape_dim)),
           _dirichlet_asm(dirichlet_asm_),
           _slip_asm(slip_asm_),
           _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
@@ -154,6 +157,7 @@ namespace FEAT
           sys_matrix(),
           _trafo(nullptr),
           _trafo_space(nullptr),
+          _cell_sizes(),
           _dirichlet_asm(nullptr),
           _slip_asm(nullptr),
           _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
@@ -164,6 +168,7 @@ namespace FEAT
           sys_matrix(std::move(other.sys_matrix)),
           _trafo(other._trafo),
           _trafo_space(other._trafo_space),
+          _cell_sizes(other._cell_sizes),
           _dirichlet_asm(other._dirichlet_asm),
           _slip_asm(other._slip_asm),
           _cubature_factory(other.cubature_factory)
@@ -177,6 +182,7 @@ namespace FEAT
             }
           }
 
+        /// Explicitly delete copy constructor
         DuDvFunctional(const DuDvFunctional&) = delete;
 
         /// \brief Virtual destructor
@@ -186,6 +192,48 @@ namespace FEAT
           _trafo_space = nullptr;
           _dirichlet_asm = nullptr;
           _slip_asm = nullptr;
+          _cell_sizes.clear();
+        }
+
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes
+         *
+         * For the DuDv functional, the reference mesh is optimal, so we want to keep the cells at the same size.
+         *
+         * So in an optimal mesh,
+         * \f[
+         *   \forall K \in \mathcal{T}_h: \frac{|K_{new}|}{|K_{ref}|} = 1,
+         * \f]
+         * so we compute the Euclidean norm of the vector \f$(v)_i = \frac{1}{N}(1 -  \frac{|K_i|}{|K_{i,ref}|)} \f$.
+         * This is scaled by the number of cells so it is independent of the refinement level. Not sure if the
+         * scaling part is sensible, though.
+         *
+         * \returns The relative cell size quality indicator.
+         *
+         */
+        virtual CoordType compute_cell_size_quality() const override
+        {
+          CoordType my_vol(0);
+          CoordType my_quality(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
+          {
+            my_vol = this->_trafo->template compute_vol<typename MeshType::ShapeType, CoordType>(cell);
+            my_quality += Math::sqr(CoordType(1) - my_vol/_cell_sizes(cell));
+          }
+
+          Index ncells(this->get_mesh()->get_num_entities(MeshType::shape_dim));
+
+#ifdef FEAT_HAVE_MPI
+          Index ncells_snd(ncells);
+          Util::Comm::allreduce(&ncells_snd, Index(1), &ncells, MPI_SUM);
+          CoordType my_quality_snd(my_quality);
+          Util::Comm::allreduce(&my_quality_snd, Index(1), &my_quality, MPI_SUM);
+#endif
+          my_quality = Math::sqrt(my_quality);
+
+          return Math::abs(CoordType(1) - my_quality/CoordType(ncells));
+
         }
 
         /**
@@ -235,10 +283,15 @@ namespace FEAT
         // \todo override
         virtual void prepare(VectorTypeR& vec_state, FilterType& filter)
         {
-          auto& dirichlet_filters = filter.template at<1>();
-
           XASSERT(_dirichlet_asm != nullptr);
           XASSERT(_slip_asm != nullptr);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
+          {
+            _cell_sizes(cell, _trafo->template compute_vol<typename MeshType::ShapeType>(cell));
+          }
+
+          auto& dirichlet_filters = filter.template at<1>();
 
           for(auto& it : dirichlet_filters)
           {

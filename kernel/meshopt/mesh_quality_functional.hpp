@@ -205,6 +205,13 @@ namespace FEAT
         ///// \brief Prepares the mesh optimiser for application
         //virtual void prepare(VectorTypeR&) = 0;
 
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes
+         *
+         * \returns The relative cell size quality indicator.
+         */
+        virtual CoordType compute_cell_size_quality() const = 0;
+
     }; // class MeshQualityFunctional
 
     /// \cond internal

@@ -164,6 +164,15 @@ namespace FEAT
           }
 
           /**
+           * \brief Computes the cell size quality indicator
+           *
+           * This can be different for every MeshQualityFunctional.
+           *
+           * \returns The cell size quality indicator.
+           */
+          virtual CoordType compute_cell_size_quality() const = 0;
+
+          /**
            * \brief Optimises the current mesh
            */
           virtual void optimise() = 0;
