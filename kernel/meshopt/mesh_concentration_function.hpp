@@ -788,8 +788,8 @@ namespace FEAT
 
                 result = real_result;
               }
+              // Default case
               else
-                // Default case
               {
                 typedef ConcentrationFunctionDefault<CoordType> ElementalFunction;
                 ElementalFunction my_func;

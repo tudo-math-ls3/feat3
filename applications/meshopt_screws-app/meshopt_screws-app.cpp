@@ -3,8 +3,10 @@
 
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/mesh_quality_heuristic.hpp>
+#include <kernel/geometry/mesh_extruder.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/mpi_cout.hpp>
 #include <kernel/util/runtime.hpp>
@@ -22,6 +24,65 @@ static void read_test_mode_meshopt_config(std::stringstream&);
 static void read_test_mode_solver_config(std::stringstream&);
 static void read_test_mode_mesh(std::stringstream&);
 static void read_test_mode_chart(std::stringstream&);
+
+template<typename Mesh_>
+struct MeshExtrudeHelper
+{
+  typedef Mesh_ MeshType;
+  typedef Mesh_ ExtrudedMeshType;
+  typedef typename MeshType::CoordType CoordType;
+
+  Geometry::RootMeshNode<MeshType>* extruded_mesh_node;
+
+  explicit MeshExtrudeHelper(Geometry::RootMeshNode<MeshType>* DOXY(rmn), Index DOXY(slices), CoordType DOXY(z_min), CoordType DOXY(z_max), const String& DOXY(z_min_part_name), const String& DOXY(z_max_part_name)) :
+    extruded_mesh_node(nullptr)
+    {
+    }
+
+  ~MeshExtrudeHelper()
+  {
+  }
+
+  void extrude_vertex_set(const typename MeshType::VertexSetType& DOXY(vtx))
+  {
+  }
+
+};
+
+template<typename Coord_>
+struct MeshExtrudeHelper<Geometry::ConformalMesh<Shape::Hypercube<2>,2,2,Coord_>>
+{
+  typedef Geometry::ConformalMesh<Shape::Hypercube<2>,2,2,Coord_> MeshType;
+  typedef Coord_ CoordType;
+  typedef Geometry::ConformalMesh<Shape::Hypercube<3>,3,3,Coord_> ExtrudedMeshType;
+  typedef Geometry::MeshAtlas<ExtrudedMeshType> ExtrudedAtlasType;
+
+  Geometry::MeshExtruder<MeshType> mesh_extruder;
+  ExtrudedAtlasType* extruded_atlas;
+  Geometry::RootMeshNode<ExtrudedMeshType>* extruded_mesh_node;
+
+  explicit MeshExtrudeHelper(Geometry::RootMeshNode<MeshType>* rmn, Index slices, CoordType z_min, CoordType z_max, const String& z_min_part_name, const String& z_max_part_name) :
+    mesh_extruder(slices, z_min, z_max, z_min_part_name, z_max_part_name),
+    extruded_atlas(new ExtrudedAtlasType),
+    extruded_mesh_node(new Geometry::RootMeshNode<ExtrudedMeshType>(nullptr, extruded_atlas))
+  {
+    mesh_extruder.extrude_atlas(*extruded_atlas, *(rmn->get_atlas()));
+    mesh_extruder.extrude_root_node(*extruded_mesh_node, *rmn, extruded_atlas);
+  }
+
+  ~MeshExtrudeHelper()
+  {
+    if(extruded_atlas != nullptr)
+      delete extruded_atlas;
+    if(extruded_mesh_node != nullptr)
+      delete extruded_mesh_node;
+  }
+
+  void extrude_vertex_set(const typename MeshType::VertexSetType& vtx)
+  {
+    mesh_extruder.extrude_vertex_set(extruded_mesh_node->get_mesh()->get_vertex_set(), vtx);
+  }
+};
 
 template<typename Mem_, typename DT_, typename IT_, typename Mesh_>
 struct MeshoptScrewsApp
@@ -60,6 +121,8 @@ struct MeshoptScrewsApp
 #endif // FEAT_HAVE_MPI
 #endif // FEAT_HAVE_PARMETIS
 
+  typedef typename MeshExtrudeHelper<MeshType>::ExtrudedMeshType ExtrudedMeshType;
+
   /**
    * \brief Returns a descriptive string
    *
@@ -90,9 +153,12 @@ struct MeshoptScrewsApp
 
     Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
 #ifdef FEAT_HAVE_MPI
-      Index my_cells(ncells);
-      Util::Comm::allreduce(&my_cells, Index(1), &ncells, MPI_SUM);
+    Index my_cells(ncells);
+    Util::Comm::allreduce(&my_cells, Index(1), &ncells, MPI_SUM);
 #endif
+
+    MeshExtrudeHelper<MeshType> extruder(dom_ctrl.get_levels().back()->get_mesh_node(),
+    Index(10*(lvl_max+1)), DataType(0), DataType(1), "bottom", "top");
 
     // Print level information
     if(Util::Comm::rank() == 0)
@@ -179,6 +245,19 @@ struct MeshoptScrewsApp
 
         ++deque_position;
       }
+
+      if(write_vtk && extruder.extruded_mesh_node != nullptr)
+      {
+        // Create a VTK exporter for our mesh
+        String vtk_name = String(file_basename+"_pre_extruded");
+
+        if(Util::Comm::rank() == 0)
+          std::cout << "Writing " << vtk_name << std::endl;
+
+        Geometry::ExportVTK<ExtrudedMeshType> exporter(*(extruder.extruded_mesh_node->get_mesh()));
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+      }
+
 
       // Write Polyline charts if we have them
       if(Util::Comm::rank()==0)
@@ -276,6 +355,23 @@ struct MeshoptScrewsApp
         ++deque_position;
       }
     }
+
+    if(write_vtk && extruder.extruded_mesh_node != nullptr)
+    {
+      // Compute mesh quality and worst angle
+      const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
+      extruder.extrude_vertex_set(finest_mesh.get_vertex_set());
+
+      // Create a VTK exporter for our mesh
+      String vtk_name = String(file_basename+"_post_extruded");
+
+      if(Util::Comm::rank() == 0)
+        std::cout << "Writing " << vtk_name << std::endl;
+
+      Geometry::ExportVTK<ExtrudedMeshType> exporter(*(extruder.extruded_mesh_node->get_mesh()));
+      exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+    }
+
 
     // Check for the hard coded settings for test mode
     if(test_mode)
@@ -510,6 +606,19 @@ struct MeshoptScrewsApp
         // Add everything from the MeshoptControl
         meshopt_ctrl->add_to_vtk_exporter(exporter, int(dom_ctrl.get_levels().size())-1);
         // Write the file
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
+      }
+
+      if(write_vtk && extruder.extruded_mesh_node != nullptr)
+      {
+        extruder.extrude_vertex_set(finest_mesh.get_vertex_set());
+        // Create a VTK exporter for our mesh
+        String vtk_name = String(file_basename+"_post_extruded_"+stringify(n));
+
+        if(Util::Comm::rank() == 0)
+          std::cout << "Writing " << vtk_name << std::endl;
+
+        Geometry::ExportVTK<ExtrudedMeshType> exporter(*(extruder.extruded_mesh_node->get_mesh()));
         exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
       }
 
@@ -884,6 +993,7 @@ static void read_test_mode_meshopt_config(std::stringstream& iss)
 
   iss << "[GapWidth]" << std::endl;
   iss << "type = ChartDistance" << std::endl;
+  iss << "function_type = default" << std::endl;
   iss << "chart_list = inner outer" << std::endl;
 }
 

@@ -2,6 +2,8 @@
 type = ALGLIBMinLBFGS
 plot = 1
 max_iter = 1000
+tol_rel = 1e-8
+tol_abs = 1e-8
 precon = none
 lbfgs_dim = 10
 keep_iterates = 0

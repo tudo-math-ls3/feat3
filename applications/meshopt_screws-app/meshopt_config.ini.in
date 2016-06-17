@@ -26,6 +26,4 @@ conc_function = GapWidth
 [GapWidth]
 type = ChartDistance
 chart_list = inner outer
-function_type = PowOfDist
-mindist = 1e-2
-exponent = 1
+function_type = default
