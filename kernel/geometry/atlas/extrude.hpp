@@ -78,7 +78,7 @@ namespace FEAT
         }
 
         /// \copydoc ChartBase::move_by()
-        void move_by(const WorldPoint& translation)
+        virtual void move_by(const WorldPoint& translation) override
         {
           ASSERTM(Math::abs(translation[2]) < Math::eps<CoordType>(),
           "Cannot translate ExtrudeChart in z-direction, it is infinite!");

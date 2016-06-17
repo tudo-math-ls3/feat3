@@ -384,7 +384,7 @@ namespace FEAT
         }
 
         /// \copydoc BaseClass::move_by()
-        virtual void move_by(const WorldPoint& translation)
+        virtual void move_by(const WorldPoint& translation) override
         {
           (this->cast()).move_by(translation);
         }

@@ -98,7 +98,7 @@ namespace FEAT
         }
 
         /// \copydoc ChartBase::move_by()
-        void move_by(const WorldPoint& translation)
+        void move_me_by(const WorldPoint& translation)
         {
             _midpoint += translation;
         }

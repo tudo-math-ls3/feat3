@@ -85,7 +85,7 @@ namespace FEAT
         }
 
         /// \copydoc ChartBase::move_by()
-        virtual void move_by(const WorldPoint& translation)
+        virtual void move_by(const WorldPoint& translation) override
         {
           for(auto& it:_world)
             it+=translation;
