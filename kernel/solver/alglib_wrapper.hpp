@@ -308,6 +308,8 @@ namespace FEAT
             _opt_var[i] = vec_sol_elements[i];
 
           alglib::minlbfgsrestartfrom(_state, _opt_var);
+
+          IterationStats stat(*this);
           alglib::minlbfgsoptimize(_state, _func_grad, _log, this);
           alglib::minlbfgsresults(_state, _opt_var, _report);
 
@@ -324,10 +326,10 @@ namespace FEAT
               return Status::aborted;
             case(1):
               //std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
-              return Status::stagnated;
+              return Status::success;
             case(2):
               //std::cout << "ALGLIB: Update step size stagnated." << std::endl;
-              return Status::stagnated;
+              return Status::success;
             case(4):
               //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
               return Status::success;
@@ -380,8 +382,11 @@ namespace FEAT
             {
               std::cout << me->_plot_name
               <<  ": " << stringify(me->_num_iter).pad_front(me->_iter_digits)
+              <<  " (" << stringify(me->_state.c_ptr()->nfev).pad_front(2) << ")"
               << " : " << stringify_fp_sci(me->_def_cur)
               << " / " << stringify_fp_sci(me->_def_cur / me->_def_init)
+              << " : " << stringify_fp_sci(me->_state.c_ptr()->f)
+              << " : " << stringify_fp_sci(me->_state.c_ptr()->stp)
               << std::endl;
             }
             // Log iterates if necessary
@@ -765,6 +770,7 @@ namespace FEAT
             _opt_var[i] = vec_sol_elements[i];
 
           alglib::mincgrestartfrom(_state, _opt_var);
+          IterationStats stat(*this);
           alglib::mincgoptimize(_state, _func_grad, _log, this);
           alglib::mincgresults(_state, _opt_var, _report);
 
@@ -781,10 +787,10 @@ namespace FEAT
               return Status::aborted;
             case(1):
               //std::cout << "ALGLIB: Function value improvement criterion fulfilled." << std::endl;
-              return Status::stagnated;
+              return Status::success;
             case(2):
               //std::cout << "ALGLIB: Update step size stagnated." << std::endl;
-              return Status::stagnated;
+              return Status::success;
             case(4):
               //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
               return Status::success;
@@ -837,10 +843,14 @@ namespace FEAT
             {
               std::cout << me->_plot_name
               <<  ": " << stringify(me->_num_iter).pad_front(me->_iter_digits)
+              <<  " (" << stringify(me->_state.c_ptr()->nfev).pad_front(2) << ")"
               << " : " << stringify_fp_sci(me->_def_cur)
               << " / " << stringify_fp_sci(me->_def_cur / me->_def_init)
+              << " : " << stringify_fp_sci(me->_state.c_ptr()->f)
+              << " : " << stringify_fp_sci(me->_state.c_ptr()->stp)
               << std::endl;
             }
+
             // Log iterates if necessary
             if(me->iterates != nullptr)
             {

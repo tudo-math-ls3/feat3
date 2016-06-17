@@ -267,7 +267,7 @@ namespace FEAT
           // start iterating
           while(status == Status::progress)
           {
-            TimeStamp at;
+            IterationStats stat(*this);
 
             _fval_prev = _fval;
 
@@ -292,11 +292,7 @@ namespace FEAT
             status = this->_set_new_defect(this->_vec_r, vec_sol);
 
             if(status != Status::progress)
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return status;
-            }
 
             // Re-assemble preconditioner if necessary
             if(this->_precond != nullptr)
@@ -304,11 +300,7 @@ namespace FEAT
 
             // apply preconditioner
             if(!this->_apply_precond(_vec_p, _vec_r, this->_filter))
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return Status::aborted;
-            }
 
             // Compute new eta
             eta = this->_vec_p.dot(this->_vec_r);

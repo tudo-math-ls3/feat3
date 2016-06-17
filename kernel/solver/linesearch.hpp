@@ -410,7 +410,7 @@ namespace FEAT
           // start iterating
           while(status == Status::progress)
           {
-            TimeStamp at;
+            IterationStats stat(*this);
 
             // Increase iteration count
             ++this->_num_iter;
@@ -461,13 +461,10 @@ namespace FEAT
             if(this->_num_iter >= this->_max_iter)
               status = Status::max_iter;
 
+            // If we are not successful, update the solution with the best step found so far
             if(status != Status::progress)
             {
-              // If we are not successful, update the solution with the best step found so far
               sol.axpy(dir, this->_vec_initial_sol, this->_alpha_min);
-
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return status;
             }
 
@@ -632,7 +629,7 @@ namespace FEAT
           // start iterating
           while(status == Status::progress)
           {
-            TimeStamp at;
+            IterationStats stat(*this);
 
             // Increase iteration count
             ++this->_num_iter;
@@ -721,13 +718,10 @@ namespace FEAT
             //  }
             //}
 
+              // If we are not successful, update the solution with the best step found so far
             if(status != Status::progress)
             {
-              // If we are not successful, update the solution with the best step found so far
               sol.axpy(dir, this->_vec_initial_sol, this->_alpha_min);
-
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return status;
             }
 
@@ -970,7 +964,8 @@ namespace FEAT
           // start iterating
           while(status == Status::progress)
           {
-            TimeStamp at;
+            IterationStats stat(*this);
+
             // Increase iteration count
             ++this->_num_iter;
 
@@ -1105,11 +1100,7 @@ namespace FEAT
             alpha = alpha_new;
 
             if(status != Status::progress)
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return status;
-            }
 
             // If the maximum number of iterations was performed, return the iterate for the best step so far
             if(this->_num_iter > this->_max_iter)

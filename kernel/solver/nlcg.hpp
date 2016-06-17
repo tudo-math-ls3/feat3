@@ -392,7 +392,7 @@ namespace FEAT
           // start iterating
           while(status == Status::progress)
           {
-            TimeStamp at;
+            IterationStats stat(*this);
 
             ++its_since_restart;
             _fval_prev = _fval;
@@ -411,7 +411,7 @@ namespace FEAT
                 && (linesearch_status != Status::success ))
             {
               vec_sol.clone(_linesearch->get_initial_sol());
-              return Status::stagnated;
+              return Status::success;
             }
 
             // Copy back information from the linesearch
@@ -427,11 +427,7 @@ namespace FEAT
 
             // Something might have gone wrong in applying the preconditioner, so check status again.
             if(status != Status::progress)
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return status;
-            }
 
             // Update preconditioner if necessary
             if(this->_precond != nullptr)
@@ -440,11 +436,7 @@ namespace FEAT
             status = compute_beta(_beta, gamma);
 
             if(status != Status::progress)
-            {
-              TimeStamp bt;
-              Statistics::add_solver_toe(this->_branch, bt.elapsed(at));
               return status;
-            }
 
             // If a restart is scheduled, reset beta to 0
             if( (restart_freq > 0 && its_since_restart%restart_freq == 0) ||
@@ -573,10 +565,16 @@ namespace FEAT
           // plot?
           if(this->_plot)
           {
+
+            Index ls_iter_digits(Math::ilog10(_linesearch->get_max_iter()));
+
             std::cout << this->_plot_name
             <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
+            <<  " (" << stringify(this->_linesearch->get_num_iter()).pad_front(ls_iter_digits) << ")"
             << " : " << stringify_fp_sci(this->_def_cur)
             << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
+            << " : " << stringify_fp_sci(this->_fval)
+            << " : " << stringify_fp_sci(this->_linesearch->get_rel_update())
             << std::endl;
           }
 
