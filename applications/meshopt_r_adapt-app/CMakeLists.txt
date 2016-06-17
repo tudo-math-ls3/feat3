@@ -22,14 +22,14 @@ TARGET_LINK_LIBRARIES(meshopt_r_adapt-app feat)
 #  SET_PROPERTY(TEST meshopt_r_adapt_app_mpi_4 PROPERTY LABELS "mpi")
 #  SET_PROPERTY(TEST meshopt_r_adapt_app_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 #else (FEAT_HAVE_MPI)
-#  ADD_TEST(meshopt_r_adapt_app_serial ${CMAKE_CTEST_COMMAND}
-#    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-#    --build-generator ${CMAKE_GENERATOR}
-#    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-#    --build-target meshopt_r_adapt-app
-#    --build-nocmake
-#    --build-noclean
-#    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_r_adapt-app/meshopt_r_adapt-app --testmode )
-#  SET_PROPERTY(TEST meshopt_r_adapt_app_serial PROPERTY LABELS "serial")
-#  SET_PROPERTY(TEST meshopt_r_adapt_app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+ADD_TEST(meshopt_r_adapt_app_serial ${CMAKE_CTEST_COMMAND}
+  --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+  --build-generator ${CMAKE_GENERATOR}
+  --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+  --build-target meshopt_r_adapt-app
+  --build-nocmake
+  --build-noclean
+  --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_r_adapt-app/meshopt_r_adapt-app --testmode )
+SET_PROPERTY(TEST meshopt_r_adapt_app_serial PROPERTY LABELS "serial")
+SET_PROPERTY(TEST meshopt_r_adapt_app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 #endif (FEAT_HAVE_MPI)

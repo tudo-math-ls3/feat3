@@ -451,6 +451,9 @@ namespace FEAT
         {
           XASSERT(_mesh_node != nullptr);
 
+          if(Util::Comm::size()!=1)
+            throw InternalError(__func__,__FILE__,__LINE__,"In parallel, this requires grad_conc to be a type 1 vector, which is not implemented yet.");
+
           _grad_h.format();
 
           if(_func.use_derivative)

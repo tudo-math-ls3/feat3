@@ -1,13 +1,12 @@
 [HyperelasticityDefault]
 type = Hyperelasticity
 config_section = HyperelasticityDefaultParameters
-dirichlet_boundaries = outer
-slip_boundaries = inner
+dirichlet_boundaries = top bottom left right
 
 [DuDvDefault]
 type = DuDvFunctional
 config_section = DuDvDefaultParameters
-dirichlet_boundaries = inner outer
+dirichlet_boundaries = top bottom left right
 
 [DuDvDefaultParameters]
 solver_config = PCG-MGV
@@ -20,12 +19,12 @@ fac_norm = 1.0
 fac_det = 1.0
 fac_cof = 0.0
 fac_reg = 1e-8
-scale_computation = current_concentration
-conc_function = GapWidth
+scale_computation = iter_concentration
+conc_function = OuterDist
 
-[GapWidth]
+[OuterDist]
 type = ChartDistance
-chart_list = inner outer
+chart_list = moving_circle
 function_type = PowOfDist
-mindist = 1e-2
-exponent = 1
+minval = 1e-2
+exponent = 0.5

@@ -115,6 +115,7 @@ struct MeshoptRAdaptApp
     // For test_mode = true
     DT_ min_quality(0);
     DT_ min_angle(0);
+    DT_ cell_size_quality(0);
     {
       int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
@@ -159,12 +160,12 @@ struct MeshoptRAdaptApp
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      //if( min_angle < DT_(10))
-      //{
-      //  Util::mpi_cout("FAILED:");
-      //  throw InternalError(__func__,__FILE__,__LINE__,
-      //  "Initial min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(min_angle));
-      //}
+      if( Math::abs(min_angle - DT_(45)) > Math::sqrt(Math::eps<DataType>()))
+      {
+        Util::mpi_cout("FAILED:");
+        throw InternalError(__func__,__FILE__,__LINE__,
+        "Initial min angle should be >= "+stringify_fp_fix(45)+ " but is "+stringify_fp_fix(min_angle));
+      }
     }
 
     // Copy the vertex coordinates to the buffer and get them via get_coords()
@@ -175,6 +176,11 @@ struct MeshoptRAdaptApp
 
     // Prepare the functional
     meshopt_ctrl->prepare(old_coords);
+
+    cell_size_quality = meshopt_ctrl->compute_cell_size_quality();
+    if(Util::Comm::rank() == 0)
+      std::cout << "Cell size quality indicator: " << stringify_fp_sci(cell_size_quality) << std::endl;
+
     // Optimise the mesh
     meshopt_ctrl->optimise();
 
@@ -217,25 +223,27 @@ struct MeshoptRAdaptApp
 
         ++deque_position;
       }
+
+      cell_size_quality = meshopt_ctrl->compute_cell_size_quality();
+      if(Util::Comm::rank() == 0)
+        std::cout << "Cell size quality indicator: " << stringify_fp_sci(cell_size_quality) << std::endl;
     }
 
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      //if( min_angle < DT_(10))
-      //{
-      //  Util::mpi_cout("FAILED:");
-      //  throw InternalError(__func__,__FILE__,__LINE__,
-      //  "Post Initial min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(min_angle));
-      //}
+      if( min_angle < DT_(41))
+      {
+        Util::mpi_cout("FAILED:");
+        throw InternalError(__func__,__FILE__,__LINE__,
+        "Post Initial min angle should be >= "+stringify_fp_fix(41)+ " but is "+stringify_fp_fix(min_angle));
+      }
     }
 
     // Initial time
     DataType time(0);
     // Counter for timesteps
     Index n(0);
-    // Need some pi for all the angles
-    //DataType pi(Math::pi<DataType>());
 
     // The mesh velocity is 1/delta_t*(coords_new - coords_old) and computed in each time step
     auto mesh_velocity = meshopt_ctrl->get_coords().clone();
@@ -300,16 +308,20 @@ struct MeshoptRAdaptApp
       min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-      #ifdef FEAT_HAVE_MPI
+#ifdef FEAT_HAVE_MPI
       DT_ min_quality_snd(min_quality);
       DT_ min_angle_snd(min_angle);
 
       Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
       Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
-      #endif
+#endif
+
+      cell_size_quality =meshopt_ctrl->compute_cell_size_quality();
+
       if(Util::Comm::rank() == 0)
         std::cout << "Quality indicator " << " " << stringify_fp_sci(min_quality) <<
-          ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
+          ", minimum angle " << stringify_fp_fix(min_angle) <<
+          ", cell sizes " << stringify_fp_sci(cell_size_quality) << std::endl;
 
       if(write_vtk)
       {
@@ -328,16 +340,16 @@ struct MeshoptRAdaptApp
         exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
       }
 
-      //// Check for the hard coded settings for test mode
-      //if(test_mode)
-      //{
-      //  //if( min_angle < DT_(9.8))
-      //  //{
-      //  //  Util::mpi_cout("FAILED:");
-      //  //  throw InternalError(__func__,__FILE__,__LINE__,
-      //  //  "Final min angle should be >= "+stringify_fp_fix(8)+ " but is "+stringify_fp_fix(min_angle));
-      //  //}
-      //}
+      // Check for the hard coded settings for test mode
+      if(test_mode)
+      {
+        if( min_angle < DT_(27))
+        {
+          Util::mpi_cout("FAILED:");
+          throw InternalError(__func__,__FILE__,__LINE__,
+          "Final min angle should be >= "+stringify_fp_fix(27)+ " but is "+stringify_fp_fix(min_angle));
+        }
+      }
 
     } // time loop
 
@@ -660,15 +672,15 @@ static void display_help()
 static void read_test_mode_application_config(std::stringstream& iss)
 {
   iss << "[ApplicationSettings]" << std::endl;
-  iss << "mesh_file = ./screws_2d_mesh_quad_360_1.xml" << std::endl;
-  iss << "chart_file = ./screws_2d_chart_bezier_24_28.xml" << std::endl;
+  iss << "mesh_file = ./unit-square-tria.xml" << std::endl;
+  iss << "chart_file = ./moving_circle_chart.xml" << std::endl;
   iss << "meshopt_config_file = ./meshopt_config.ini" << std::endl;
-  iss << "mesh_optimiser = DuDvDefault" << std::endl;
+  iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
   iss << "solver_config_file = ./solver_config.ini" << std::endl;
   iss << "lvl_min = 0" << std::endl;
-  iss << "lvl_max = 1" << std::endl;
-  iss << "delta_t = 1e-4" << std::endl;
-  iss << "t_end = 2e-4" << std::endl;
+  iss << "lvl_max = 4" << std::endl;
+  iss << "delta_t = 1e-2" << std::endl;
+  iss << "t_end = 2e-2" << std::endl;
 }
 
 static void read_test_mode_meshopt_config(std::stringstream& iss)
@@ -676,12 +688,12 @@ static void read_test_mode_meshopt_config(std::stringstream& iss)
   iss << "[HyperElasticityDefault]" << std::endl;
   iss << "type = Hyperelasticity" << std::endl;
   iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-  iss << "dirichlet_boundaries = inner outer" << std::endl;
+  iss << "dirichlet_boundaries = bottom top left right" << std::endl;
 
   iss << "[DuDvDefault]" << std::endl;
   iss << "type = DuDv" << std::endl;
   iss << "config_section = DuDvDefaultParameters" << std::endl;
-  iss << "dirichlet_boundaries = inner outer" << std::endl;
+  iss << "dirichlet_boundaries = bottom top left right" << std::endl;
 
   iss << "[DuDvDefaultParameters]" << std::endl;
   iss << "solver_config = PCG-MGV" << std::endl;
@@ -695,18 +707,21 @@ static void read_test_mode_meshopt_config(std::stringstream& iss)
   iss << "fac_cof = 0.0" << std::endl;
   iss << "fac_reg = 1e-8" << std::endl;
   iss << "scale_computation = current_concentration" << std::endl;
-  iss << "conc_function = GapWidth" << std::endl;
+  iss << "conc_function = OuterDist" << std::endl;
 
-  iss << "[GapWidth]" << std::endl;
+  iss << "[OuterDist]" << std::endl;
   iss << "type = ChartDistance" << std::endl;
-  iss << "chart_list = inner outer" << std::endl;
+  iss << "chart_list = moving_circle" << std::endl;
+  iss << "function_type = PowOfDist" << std::endl;
+  iss << "minval = 1e-2" << std::endl;
+  iss << "exponent = 0.5" << std::endl;
 }
 
 static void read_test_mode_solver_config(std::stringstream& iss)
 {
   iss << "[NLCG]" << std::endl;
   iss << "type = NLCG" << std::endl;
-  iss << "precon = DuDvPrecon" << std::endl;
+  iss << "precon = none" << std::endl;
   iss << "plot = 1" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "max_iter = 1000" << std::endl;
@@ -728,7 +743,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
 
   iss << "[strongwolfelinesearch]" << std::endl;
   iss << "type = StrongWolfeLinesearch" << std::endl;
-  iss << "plot = 0" << std::endl;
+  iss << "plot = 1" << std::endl;
   iss << "max_iter = 20" << std::endl;
   iss << "tol_decrease = 1e-3" << std::endl;
   iss << "tol_curvature = 0.3" << std::endl;
@@ -761,7 +776,7 @@ static void read_test_mode_mesh(std::stringstream& iss)
   if(Util::Comm::rank() == 0)
   {
     String mesh_filename(FEAT_SRC_DIR);
-    mesh_filename +="/data/meshes/screws_2d_mesh_quad_360_1.xml";
+    mesh_filename +="/data/meshes/unit-square-tria.xml";
 
     std::ifstream ifs(mesh_filename);
     if(!ifs.good())
@@ -777,18 +792,9 @@ static void read_test_mode_mesh(std::stringstream& iss)
 // This does nothing as for the currently used mesh, there is no separate chart file" << std::endl;
 static void read_test_mode_chart(std::stringstream& iss)
 {
-  if(Util::Comm::rank() == 0)
-  {
-    String chart_filename(FEAT_SRC_DIR);
-    chart_filename+="/data/meshes/screws_2d_chart_bezier_24_28.xml";
-
-    std::ifstream ifs(chart_filename);
-    if(!ifs.good())
-      throw FileNotFound(chart_filename);
-
-    iss << ifs.rdbuf();
-  }
-#ifdef FEAT_HAVE_MPI
-  Util::Comm::synch_stringstream(iss);
-#endif
+  iss << "<FeatMeshFile version=\"1\" mesh=\"conformal:simplex:2:2\">" << std::endl;
+  iss << "  <Chart name=\"moving_circle\">" << std::endl;
+  iss << "    <Circle radius=\"0.15\" midpoint=\"0.75 0.5\" domain=\"0 4\" />" << std::endl;
+  iss << "  </Chart>" << std::endl;
+  iss << "</FeatMeshFile>" << std::endl;
 }
