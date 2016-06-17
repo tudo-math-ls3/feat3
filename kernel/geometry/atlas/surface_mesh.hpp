@@ -113,6 +113,14 @@ namespace FEAT
           return "SurfaceMesh";
         }
 
+        /// \copydoc ChartBase::move_by()
+        void move_by(const WorldPoint& translation) override
+        {
+          auto& vtx = _surface_mesh->get_vertex_set();
+          for(Index i(0); i < vtx.get_num_vertices(); ++i)
+            vtx[i] += translation;
+        }
+
         /** \copydoc ChartBase::write */
         virtual void write(std::ostream& os, const String& sindent) const override
         {

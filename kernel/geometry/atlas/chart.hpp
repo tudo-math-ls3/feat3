@@ -55,10 +55,10 @@ namespace FEAT
          * \param[inout] mesh
          * The mesh that is to be adapted.
          *
-         * \param[in] part
+         * \param[in] meshpart
          * The mesh part that describes the part to adapt.
          */
-        virtual void adapt(MeshType& mesh, const PartType& part) const = 0;
+        virtual void adapt(MeshType& mesh, const PartType& meshpart) const = 0;
 
         /**
          * \brief Adapts a mesh part using this chart.
@@ -66,10 +66,19 @@ namespace FEAT
          * \param[inout] mesh
          * The mesh part that is to be adapted.
          *
-         * \param[in] part
+         * \param[in] meshpart
          * The mesh part that describes the part to adapt.
          */
-        virtual void adapt(PartType& mesh, const PartType& part) const = 0;
+        virtual void adapt(PartType& mesh, const PartType& meshpart) const = 0;
+
+        /**
+         * \brief Moves the whole chart
+         *
+         * \param[in] translation
+         * The translation vector.
+         *
+         */
+        virtual void move_by(const WorldPoint& translation) = 0;
 
         /**
          * \brief Computes the distance of a point to this chart
@@ -88,7 +97,7 @@ namespace FEAT
          * The world point to compute the distance for
          *
          * \param[in] grad_dist
-         * The connecting vector between point and the closest point on this chart
+         * The gradient of the distance function in point.
          *
          * \returns The distance to this chart
          */
@@ -111,7 +120,7 @@ namespace FEAT
          * The world point to compute the distance for
          *
          * \param[in] grad_dist
-         * The connecting vector between point and the closest point on this chart
+         * The gradient of the distance function in point.
          *
          * \returns The signed distance to this chart
          */
@@ -209,11 +218,8 @@ namespace FEAT
 
             // We have the attribute; check whether it matches our chart
             int attrib_dim = attrib->get_num_coords();
-            if(attrib_dim != CT_::param_dim)
-            {
-              // invalid attribute dimension
-              throw InternalError("Invalid chart attribute dimension");
-            }
+            // invalid attribute dimension
+            XASSERTM(attrib_dim == CT_::param_dim, "Invalid chart attribute dimension");
 
             // Get the vertex set of the mesh
             VertexSetType& vtx = mesh.get_vertex_set();
@@ -309,6 +315,9 @@ namespace FEAT
          * This function returns #is_explicit by default, but it may be
          * overridden by the derived class in case that explicit projection
          * can be disabled at runtime (e.g. due to missing parameters).
+         *
+         * \returns
+         * True if explicit projection is possible.
          */
         bool can_explicit() const
         {
@@ -321,6 +330,9 @@ namespace FEAT
          * This function returns #is_implicit by default, but it may be
          * overridden by the derived class in case that implicit projection
          * can be disabled at runtime.
+         *
+         * \returns
+         * True if implicit projection is possible.
          */
         bool can_implicit() const
         {
@@ -339,8 +351,7 @@ namespace FEAT
         virtual void adapt(MeshType& mesh, const PartType& part) const override
         {
           // ensure that the mesh world dimension is compatible
-          if(MeshType::world_dim != world_dim)
-            throw InternalError("Mesh/Chart world dimension mismatch");
+          XASSERTM(MeshType::world_dim == world_dim, "Mesh/Chart world dimension mismatch");
 
           // Try to adapt explicity
           if(Intern::ExplicitChartHelper<is_explicit>::adapt(cast(), mesh, part))
@@ -351,7 +362,7 @@ namespace FEAT
             return;
 
           // If we come out here, we have no way of adaption...
-          throw InternalError("No adaption possible");
+          throw InternalError(__func__,__FILE__,__LINE__,"No adaption possible!");
         }
 
         /**
@@ -372,13 +383,19 @@ namespace FEAT
           throw InternalError("Adaption of MeshPart not possible yet");
         }
 
+        /// \copydoc BaseClass::move_by()
+        virtual void move_by(const WorldPoint& translation)
+        {
+          (this->cast()).move_by(translation);
+        }
+
         /// \copydoc BaseClass::dist()
         virtual CoordType dist(const WorldPoint& point) const override
         {
           return (this->cast()).compute_dist(point);
         }
 
-        /// \copydoc BaseClass::dist()
+        /// \copydoc BaseClass::dist(const WorldPoint&,WorldPoint&)
         virtual CoordType dist(const WorldPoint& point, WorldPoint& grad_dist) const override
         {
           return (this->cast()).compute_dist(point, grad_dist);
@@ -390,7 +407,7 @@ namespace FEAT
           return (this->cast()).compute_signed_dist(point);
         }
 
-        /// \copydoc BaseClass::signed_dist()
+        /// \copydoc BaseClass::signed_dist(const WorldPoint&,WorldPoint&)
         virtual CoordType signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const override
         {
           return (this->cast()).compute_signed_dist(point, grad_dist);

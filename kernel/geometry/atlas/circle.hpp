@@ -115,9 +115,16 @@ namespace FEAT
           _midpoint[1] = mid_y;
         }
 
+        /// \copydoc BaseClass::can_explicit()
         bool can_explicit() const
         {
           return _have_domain;
+        }
+
+        /// \copydoc ChartBase::move_by()
+        void move_by(const WorldPoint& translation)
+        {
+            _midpoint += translation;
         }
 
         /**
@@ -149,7 +156,7 @@ namespace FEAT
           return Math::abs(compute_signed_dist(point));
         }
 
-        /// \copydoc ChartBase::dist()
+        /// \copydoc BaseClass::dist()
         CoordType compute_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
           WorldPoint projected(point);
@@ -162,13 +169,13 @@ namespace FEAT
           return my_dist;
         }
 
-        /// \copydoc ChartBase::signed_dist()
+        /// \copydoc ChartBase::signed_dist(WorldPoint&)
         CoordType compute_signed_dist(const WorldPoint& point) const
         {
           return _radius - (point - _midpoint).norm_euclid();
         }
 
-        /// \copydoc ChartBase::dist()
+        /// \copydoc ChartBase::signed_dist(WorldPoint&,WorldPoint&)
         CoordType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
           WorldPoint projected(point);
@@ -182,16 +189,7 @@ namespace FEAT
           return my_dist;
         }
 
-        /**
-         * \brief Projects all mesh points identified by a meshpart
-         *
-         * \param[in,out] mesh
-         * The mesh whose points will be projected
-         *
-         * \param[in] meshpart
-         * The MeshPart identifying the point to be projected
-         *
-         */
+        /// \copydoc ChartBase::adapt(MeshType&,PartType&)
         void project_meshpart(Mesh_& mesh, const MeshPart<Mesh_>& meshpart) const
         {
           auto& vtx = mesh.get_vertex_set();

@@ -77,6 +77,18 @@ namespace FEAT
           return _sub_chart->can_explicit();
         }
 
+        /// \copydoc ChartBase::move_by()
+        void move_by(const WorldPoint& translation)
+        {
+          ASSERTM(Math::abs(translation[2]) < Math::eps<CoordType>(),
+          "Cannot translate ExtrudeChart in z-direction, it is infinite!");
+
+          SubWorldPoint sub_translation;
+          sub_translation[0] = translation[0];
+          sub_translation[1] = translation[1];
+          _sub_chart->move_by(sub_translation);
+        }
+
         void project_point(WorldPoint& point) const
         {
           // extract sub-world

@@ -84,6 +84,13 @@ namespace FEAT
           return _world;
         }
 
+        /// \copydoc ChartBase::move_by()
+        virtual void move_by(const WorldPoint& translation)
+        {
+          for(auto& it:_world)
+            it+=translation;
+        }
+
         /**
          * \brief Maps a single parameter point
          *

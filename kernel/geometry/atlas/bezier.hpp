@@ -60,6 +60,15 @@ namespace FEAT
           return _control;
         }
 
+        /// \copydoc ChartBase::move_by()
+        void move_by(const WorldPoint& translation)
+        {
+          BaseClass::move_by(translation);
+
+          for(auto& it:_control)
+            it+=translation;
+        }
+
         /**
          * \brief Maps a local segment parameter point
          *

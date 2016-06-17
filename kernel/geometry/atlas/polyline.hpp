@@ -67,6 +67,12 @@ namespace FEAT
           XASSERTM(this->_param.empty() || (this->_param.size() == this->_world.size()), "Polyline world/param size mismatch");
         }
 
+        /// \copydoc ChartBase::move_by()
+        void move_by(const WorldPoint& translation)
+        {
+          BaseClass::move_by(translation);
+        }
+
         /**
          * \brief Maps a local segment parameter point
          *
@@ -82,6 +88,17 @@ namespace FEAT
           return ((DataType(1) - t) * this->_world[i]) + (t * this->_world[i+1]);
         }
 
+        /**
+         * \brief Computes the outer unit normal in a single point
+         *
+         * \param[in] i
+         * The segment index onto which to compute the normal.
+         *
+         * \param[in] t
+         * The local segment parameter.
+         *
+         * \returns The outer unit normal in the point given by t.
+         */
         WorldPoint get_normal_on_segment(const Index i, const DataType DOXY(t)) const
         {
           ASSERT((i+1) < Index(this->_world.size()));
