@@ -103,7 +103,7 @@ namespace FEAT
          *
          * \returns String with the class name
          */
-        static String name()
+        virtual String name() const
         {
           return "MeshQualityFunctional<"+MeshType_::name()+">";
         }

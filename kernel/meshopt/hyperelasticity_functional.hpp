@@ -37,9 +37,9 @@ namespace FEAT
     {
       undefined = 0,
       once_uniform,
-      once_initial,
+      once_cellsize,
       once_concentration,
-      current_initial,
+      current_cellsize,
       current_concentration,
       iter_concentration,
     };
@@ -56,12 +56,12 @@ namespace FEAT
           return os << "undefined";
         case ScaleComputation::once_uniform:
           return os << "once_uniform";
-        case ScaleComputation::once_initial:
-          return os << "once_initial";
+        case ScaleComputation::once_cellsize:
+          return os << "once_cellsize";
         case ScaleComputation::once_concentration:
           return os << "once_concentration";
-        case ScaleComputation::current_initial:
-          return os << "current_initial";
+        case ScaleComputation::current_cellsize:
+          return os << "current_cellsize";
         case ScaleComputation::current_concentration:
           return os << "current_concentration";
         case ScaleComputation::iter_concentration:
@@ -77,12 +77,12 @@ namespace FEAT
         scale_computation = ScaleComputation::undefined;
       else if(sc_name == "once_uniform")
         scale_computation = ScaleComputation::once_uniform;
-      else if(sc_name == "once_initial")
-        scale_computation = ScaleComputation::once_initial;
+      else if(sc_name == "once_cellsize")
+        scale_computation = ScaleComputation::once_cellsize;
       else if(sc_name == "once_concentration")
         scale_computation = ScaleComputation::once_concentration;
-      else if(sc_name == "current_initial")
-        scale_computation = ScaleComputation::current_initial;
+      else if(sc_name == "current_cellsize")
+        scale_computation = ScaleComputation::current_cellsize;
       else if(sc_name == "current_concentration")
         scale_computation = ScaleComputation::current_concentration;
       else if(sc_name == "iter_concentration")
@@ -93,6 +93,36 @@ namespace FEAT
     }
     /// \endcond
 
+    /**
+     * \brief Baseclass for a family of variational mesh optimisation algorithms.
+     *
+     * \tparam Mem_
+     * Memory architecture for solving.
+     *
+     * \tparam DT_
+     * Floating point type for solving.
+     *
+     * \tparam IT_
+     * Index type for solver vectors etc.
+     *
+     * \tparam Trafo_
+     * Type of the underlying transformation.
+     *
+     * \tparam FunctionalType_
+     * Functional used for defining mesh quality. \see RumpfFunctional
+     *
+     * \tparam RefCellTrafo_
+     * Basically choses the reference cell according to which to optimise the mesh quality for.
+     *
+     * Mesh optimisation algorithms derived from Martin Rumpf's paper \cite Rum96.
+     *
+     * \note The evaluation of the nonlinear functional requires operations that are essentially similar to an
+     * assembly of an operator into a matrix. This is implemented for Mem::Main only. This in turn means that this
+     * family of mesh optimisation algorithms is implemented for Mem::Main only.
+     *
+     * See the specialisation for Mem::Main.
+     *
+     */
     template
     <
       typename Mem_,
@@ -106,14 +136,20 @@ namespace FEAT
     /**
      * \brief Baseclass for a family of variational mesh optimisation algorithms.
      *
+     * \tparam DT_
+     * Floating point type for solving.
+     *
+     * \tparam IT_
+     * Index type for solver vectors etc.
+     *
      * \tparam Trafo_
      * Type of the underlying transformation.
      *
      * \tparam FunctionalType_
      * Functional used for defining mesh quality. \see RumpfFunctional
      *
-     * \tparam H_EvalType
-     * Local meshsize evaluator. \see RumpfTrafo
+     * \tparam RefCellTrafo_
+     * Basically choses the reference cell according to which to optimise the mesh quality for.
      *
      * Mesh optimisation algorithms derived from Martin Rumpf's paper \cite Rum96.
      *
@@ -148,7 +184,6 @@ namespace FEAT
      * \f]
      *
      * In the code, \f$ F \f$ is called the RumpfFunctional.
-     *
      *
      * \author Jordi Paul
      *
@@ -236,11 +271,11 @@ namespace FEAT
         std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>>& _slip_asm;
         /// The functional for determining mesh quality
         std::shared_ptr<FunctionalType> _functional;
-
+        /// The mesh concentration function (if any)
         std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> _mesh_conc;
 
         // This is public for debugging purposes
-      public:
+      protected:
         /// Weights for the local contributions to the global functional value.
         ScalarVectorType _mu;
         /// Weights for local mesh size
@@ -254,7 +289,7 @@ namespace FEAT
         const Index _columns;
         /// This is the number of DoFs in the test space (= number of mesh vertices)
         const Index _rows;
-
+        /// How to compute the optimal scales
         ScaleComputation _scale_computation;
 
       public:
@@ -432,12 +467,8 @@ namespace FEAT
           return _rows;
         }
 
-        /**
-         * \brief The class name
-         *
-         * \returns String with the class name
-         */
-        static String name()
+        /// \copydoc BaseClass::name()
+        virtual String name() const override
         {
           return "HyperelasticityFunctionalBase<"+MeshType::name()+">";
         }
@@ -458,6 +489,7 @@ namespace FEAT
           _functional->print();
         }
 
+        /// \copydoc BaseClass::add_to_vtk_exporter()
         virtual void add_to_vtk_exporter(Geometry::ExportVTK<typename Trafo_::MeshType>& exporter) const
         {
           exporter.add_cell_vector("h", this->_h);
@@ -482,6 +514,7 @@ namespace FEAT
 
         }
 
+        /// \copydoc BaseClass::init()
         virtual void init() override
         {
           // Write any potential changes to the mesh
@@ -493,6 +526,12 @@ namespace FEAT
 
         /**
          * \brief Prepares the functional for evaluation.
+         *
+         * \param[in] vec_state
+         * The state to evaluate the functional at.
+         *
+         * \param[in] filter
+         * The filter. We might need to reassemble it.
          *
          * Needs to be called whenever any data like the mesh, the levelset function etc. changed.
          *
@@ -579,8 +618,14 @@ namespace FEAT
          */
         virtual CoordType compute_func() const = 0;
 
-        /// \copydoc compute_func()
-        virtual CoordType compute_func(CoordType*, CoordType*, CoordType*) const = 0;
+        /**
+         * \brief Computes the functional value on the current mesh.
+         *
+         * \returns
+         * The functional value
+         *
+         */
+        virtual CoordType compute_func(CoordType* DOXY(func_norm), CoordType* DOXY(func_det), CoordType* DOXY(func_rec_det)) const = 0;
 
         /**
          * \brief Computes the gradient of the functional with regard to the nodal coordinates.
@@ -599,104 +644,8 @@ namespace FEAT
           RefCellTrafo_::compute_h(_h, this->_coords_buffer, _lambda, *(this->get_mesh()));
         }
 
-        virtual void compute_scales_iter()
-        {
-          switch(_scale_computation)
-          {
-            case ScaleComputation::iter_concentration:
-              compute_lambda_conc();
-              break;
-            default:
-              return;
-          }
-
-          // Rescale so that sum lambda == 1
-          CoordType sum_lambda(0);
-
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-            sum_lambda += _lambda(cell);
-
-#ifdef FEAT_HAVE_MPI
-          CoordType sum_lambda_send(sum_lambda);
-          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
-#endif
-          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
-
-          compute_h();
-        }
-
-        virtual void compute_scales_init()
-        {
-          switch(_scale_computation)
-          {
-            case ScaleComputation::once_uniform:
-            case ScaleComputation::once_initial:
-            case ScaleComputation::once_concentration:
-              return;
-            case ScaleComputation::current_initial:
-              compute_lambda_initial();
-              break;
-            case ScaleComputation::current_concentration:
-            case ScaleComputation::iter_concentration:
-              compute_lambda_conc();
-              break;
-            default:
-              return;
-          }
-
-          // Rescale so that sum lambda == 1
-          CoordType sum_lambda(0);
-
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-            sum_lambda += _lambda(cell);
-
-#ifdef FEAT_HAVE_MPI
-          CoordType sum_lambda_send(sum_lambda);
-          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
-#endif
-
-          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
-
-          // Compute the scales
-          compute_h();
-        }
-
-        /// \brief Computes the weights _lambda.
-        virtual void compute_scales_once()
-        {
-          switch(_scale_computation)
-          {
-            case ScaleComputation::once_uniform:
-              compute_lambda_uniform();
-              break;
-            case ScaleComputation::once_initial:
-              compute_lambda_initial();
-              break;
-            case ScaleComputation::once_concentration:
-              compute_lambda_conc();
-              break;
-            default:
-              return;
-          }
-
-          // Rescale so that sum lambda == 1
-          CoordType sum_lambda(0);
-
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
-            sum_lambda += _lambda(cell);
-
-#ifdef FEAT_HAVE_MPI
-          CoordType sum_lambda_send(sum_lambda);
-          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
-#endif
-          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
-
-          // Compute the scales
-          compute_h();
-        }
-
-        /// \brief Computes the weights _lambda according to the initial mesh
-        virtual void compute_lambda_initial()
+        /// \brief Computes the weights _lambda according to the current mesh
+        virtual void compute_lambda_cellsize()
         {
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
@@ -724,7 +673,6 @@ namespace FEAT
           _lambda.clone(_mesh_conc->get_conc(), LAFEM::CloneMode::Deep);
 
         }
-
         /// \brief Computes the weights mu
         virtual void compute_mu()
         {
@@ -735,6 +683,116 @@ namespace FEAT
           Util::Comm::allreduce(&ncells_send, 1, &ncells, MPI_SUM);
 #endif
           _mu.format(CoordType(1)/CoordType(ncells));
+        }
+
+        /**
+         * \brief Recomputes the optimal scales, every call to the solver
+         *
+         * To be called from init(). This consists of first computing _lambda and then _h.
+         */
+        virtual void compute_scales_init()
+        {
+          switch(_scale_computation)
+          {
+            case ScaleComputation::once_uniform:
+            case ScaleComputation::once_cellsize:
+            case ScaleComputation::once_concentration:
+              return;
+            case ScaleComputation::current_cellsize:
+              compute_lambda_cellsize();
+              break;
+            case ScaleComputation::current_concentration:
+            case ScaleComputation::iter_concentration:
+              compute_lambda_conc();
+              break;
+            default:
+              return;
+          }
+
+          // Rescale so that sum lambda == 1
+          CoordType sum_lambda(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+            sum_lambda += _lambda(cell);
+
+#ifdef FEAT_HAVE_MPI
+          CoordType sum_lambda_send(sum_lambda);
+          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
+#endif
+
+          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
+
+          // Compute the scales
+          compute_h();
+        }
+
+        /**
+         * \brief Recomputes the optimal scales, every iteration
+         *
+         * To be called from prepare(). This consists of first computing _lambda and then _h.
+         */
+        virtual void compute_scales_iter()
+        {
+          switch(_scale_computation)
+          {
+            case ScaleComputation::iter_concentration:
+              compute_lambda_conc();
+              break;
+            default:
+              return;
+          }
+
+          // Rescale so that sum lambda == 1
+          CoordType sum_lambda(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+            sum_lambda += _lambda(cell);
+
+#ifdef FEAT_HAVE_MPI
+          CoordType sum_lambda_send(sum_lambda);
+          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
+#endif
+          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
+
+          compute_h();
+        }
+
+        /**
+         * \brief Computes the scales, just once
+         *
+         * To be called from a constructor. This consists of first computing _lambda and then _h.
+         */
+        virtual void compute_scales_once()
+        {
+          switch(_scale_computation)
+          {
+            case ScaleComputation::once_uniform:
+              compute_lambda_uniform();
+              break;
+            case ScaleComputation::once_cellsize:
+              compute_lambda_cellsize();
+              break;
+            case ScaleComputation::once_concentration:
+              compute_lambda_conc();
+              break;
+            default:
+              return;
+          }
+
+          // Rescale so that sum lambda == 1
+          CoordType sum_lambda(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+            sum_lambda += _lambda(cell);
+
+#ifdef FEAT_HAVE_MPI
+          CoordType sum_lambda_send(sum_lambda);
+          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
+#endif
+          _lambda.scale(_lambda, CoordType(1)/sum_lambda);
+
+          // Compute the scales
+          compute_h();
         }
 
     }; // class HyperelasticityFunctionalBase
@@ -803,7 +861,6 @@ namespace FEAT
       public:
         /**
          * \copydoc HyperelasticityFunctionalBase()
-         *
          */
         using BaseClass::BaseClass;
 
@@ -817,12 +874,8 @@ namespace FEAT
         {
         };
 
-        /**
-         * \brief The class name
-         *
-         * \returns String with the class name
-         */
-        static String name()
+        /// \copydoc BaseClass::name()
+        virtual String name() const override
         {
           return "HyperelasticityFunctional<"+MeshType::name()+">";
         }
@@ -889,7 +942,7 @@ namespace FEAT
          * The functional value
          *
          * Debug variant that saves the different contributions for each cell.
-         **/
+         */
         virtual CoordType compute_func(CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det)
         {
           // Increase number of functional evaluations
@@ -898,6 +951,7 @@ namespace FEAT
           return static_cast<const HyperelasticityFunctional*>(this)->compute_func(func_norm, func_det, func_rec_det);
         }
 
+        /// \copydoc compute_func(CoordType*,CoordType*,CoordType*)
         virtual CoordType compute_func(CoordType* func_norm, CoordType* func_det, CoordType* func_rec_det) const override
         {
           CoordType fval(0);
@@ -939,17 +993,16 @@ namespace FEAT
           return fval;
         } // compute_func
 
-        /// \copydoc BaseClass::compute_grad()
+        /// \copydoc BaseClass::compute_grad(VectorTypeL&)
         virtual void compute_grad(VectorTypeL& grad)
         {
           // Increase number of functional evaluations
           this->_num_grad_evals++;
 
           static_cast<const HyperelasticityFunctional*>(this)->compute_grad(grad);
-
         }
 
-        /// \copydoc BaseClass::compute_grad()
+        /// \copydoc compute_grad()
         virtual void compute_grad(VectorTypeL& grad) const override
         {
           if(this->_mesh_conc != nullptr && this->_mesh_conc->use_derivative())

@@ -203,12 +203,8 @@ namespace FEAT
           Assembly::SymbolicAssembler::assemble_matrix_std1(sys_matrix, *_trafo_space);
         }
 
-        /**
-         * \brief The class name
-         *
-         * \returns String with the class name
-         */
-        static String name()
+        /// \copydoc BaseClass::name()
+        virtual String name() const override
         {
           return "DuDvFunctional<"+MeshType::name()+">";
         }
