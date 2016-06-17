@@ -1,0 +1,90 @@
+<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Chart name="outer">
+    <Bezier dim="2" size="7" type="closed">
+      <Points>
+        0 -0.5
+        1 -0.2
+        3 -0.5
+        3  0.5
+        1  0.2
+        0  0.5
+        0 -0.5
+      </Points>
+      <Controls>
+        0.50 -0.5 0.65 -0.2
+        1.35 -0.2 1.75 -0.5
+        3.00 -0.2 3.00  0.2
+        1.75  0.5 1.35  0.2
+        0.65  0.2 0.50  0.5
+        0.00  0.2 0.00 -0.2
+      </Controls>
+    </Bezier>
+  </Chart>
+  <Mesh type="conformal:hypercube:2:2" size="8 10 3">
+    <Vertices>
+      0 -0.5
+      1 -0.25
+      2 -0.5
+      3 -0.5
+      0  0.5
+      1  0.25
+      2  0.5
+      3  0.5
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      4 5
+      5 6
+      6 7
+      0 4
+      1 5
+      2 6
+      3 7
+    </Topology>
+    <Topology dim="2">
+      0 1 4 5
+      1 2 5 6
+      2 3 6 7
+    </Topology>
+  </Mesh>
+  <MeshPart name="nozzle" parent="root" chart="outer" topology="none" size="8 6">
+    <Mapping dim="0">
+      0
+      1
+      2
+      3
+      4
+      5
+      6
+      7
+    </Mapping>
+    <Mapping dim="1">
+      0
+      1
+      2
+      3
+      4
+      5
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="out" parent="root" chart="outer" topology="none" size="2 1">
+    <Mapping dim="0">
+      3
+      7
+    </Mapping>
+    <Mapping dim="1">
+      9
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="in" parent="root" chart="outer" topology="none" size="2 1">
+    <Mapping dim="0">
+      4
+      0
+    </Mapping>
+    <Mapping dim="1">
+      6
+    </Mapping>
+  </MeshPart>
+</FeatMeshFile>
