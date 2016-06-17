@@ -473,11 +473,11 @@ namespace FEAT
         /// \copydoc ChartBase::dist()
         CoordType compute_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
-          CoordType signed_dist(0);
+          CoordType signed_distance(0);
           WorldPoint projected_point(point);
-          project_point(projected_point, signed_dist, grad_dist);
+          project_point(projected_point, signed_distance, grad_dist);
 
-          return Math::abs(signed_dist);
+          return Math::abs(signed_distance);
         }
 
         /// \copydoc ChartBase::signed_dist()
@@ -490,11 +490,11 @@ namespace FEAT
         /// \copydoc ChartBase::signed_dist()
         CoordType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
-          CoordType signed_dist(0);
+          CoordType signed_distance(0);
           WorldPoint projected_point(point);
-          project_point(projected_point, signed_dist, grad_dist);
+          project_point(projected_point, signed_distance, grad_dist);
 
-          return signed_dist;
+          return signed_distance;
         }
 
       private:

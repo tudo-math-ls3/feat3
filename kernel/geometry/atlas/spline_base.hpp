@@ -197,7 +197,7 @@ namespace FEAT
         /// \copydoc ChartBase::signed_dist()
         DataType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
-          DataType signed_dist(0.0);
+          DataType signed_distance(0.0);
 
           Index best_segment(0);
           WorldPoint projected(DataType(0));
@@ -212,12 +212,12 @@ namespace FEAT
             projected = cast().map_on_segment(i, t);
 
             // compute squared distance to original point
-            DataType distance = (projected - point).norm_euclid_sqr();
+            DataType my_distance = (projected - point).norm_euclid_sqr();
 
             // is that a new projection candidate?
-            if((i == Index(0)) || (distance < signed_dist))
+            if((i == Index(0)) || (my_distance < signed_distance))
             {
-              signed_dist = distance;
+              signed_distance = my_distance;
               best_segment = i;
             }
           }
@@ -229,21 +229,21 @@ namespace FEAT
 
           grad_dist = (projected - point);
           // This has no sign yet
-          signed_dist = grad_dist.norm_euclid();
+          signed_distance = grad_dist.norm_euclid();
 
           // If the distance is too small, we set the gradient vector to zero
-          if(signed_dist <= Math::eps<DataType>())
+          if(signed_distance <= Math::eps<DataType>())
             grad_dist.format(DataType(0));
           else
           {
             grad_dist.normalise();
             WorldPoint nu(get_normal_on_segment(best_segment, t));
-            signed_dist *= Math::signum(Tiny::dot(nu, grad_dist));
+            signed_distance *= Math::signum(Tiny::dot(nu, grad_dist));
           }
 
-          grad_dist *= Math::signum(signed_dist);
+          grad_dist *= Math::signum(signed_distance);
 
-          return signed_dist;
+          return signed_distance;
         }
 
 
