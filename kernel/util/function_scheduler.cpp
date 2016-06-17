@@ -33,7 +33,7 @@ void FEAT::Util::schedule_function(std::function<void (void)> func, ScheduleMode
         Index concurrent = 100;  /// \todo replace hardcoded number by entry from feat.ini
         Index sweeps = (ranks / concurrent) + 1;
 
-        for (Index i(0) ; i < sweeps ; ++i)
+        for (Index i(0) ; i < sweeps && i < ranks ; ++i)
         {
           if (rank >= i * concurrent && rank < (i+1) * concurrent)
           {
