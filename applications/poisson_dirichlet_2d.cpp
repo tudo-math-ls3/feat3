@@ -353,7 +353,7 @@ namespace PoissonDirichlet2D
       exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
 
       // finally, write the VTK file
-      exporter.write_scheduled(vtk_name, rank, nprocs);
+      exporter.write(vtk_name, rank, nprocs);
     }
 
     /* ***************************************************************************************** */
