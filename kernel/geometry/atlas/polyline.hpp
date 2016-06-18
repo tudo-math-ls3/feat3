@@ -303,8 +303,8 @@ namespace FEAT
 
         virtual std::shared_ptr<Xml::MarkupParser> markup(int, const String&, const String& name) override
         {
-          if(name == "Points") return std::make_shared<SplinePointsParser<Polyline<Mesh_>>>(*_polyline, _size);
-          if(name == "Params") return std::make_shared<SplineParamsParser<Polyline<Mesh_>>>(*_polyline, _size);
+          if(name == "Points") return std::make_shared<SplineBasePointsParser<Polyline<Mesh_>>>(*_polyline, _size);
+          if(name == "Params") return std::make_shared<SplineBaseParamsParser<Polyline<Mesh_>>>(*_polyline, _size);
           return nullptr;
         }
       }; // class PolylineChartParser<...>

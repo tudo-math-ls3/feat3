@@ -7,6 +7,7 @@
 #include <kernel/geometry/atlas/circle.hpp>
 #include <kernel/geometry/atlas/bezier.hpp>
 #include <kernel/geometry/atlas/polyline.hpp>
+#include <kernel/geometry/atlas/spline.hpp>
 
 namespace FEAT
 {
@@ -272,6 +273,12 @@ namespace FEAT
             auto* ext = new Extrude<Mesh_, Polyline<SubMeshType>>();
             _chart = ext;
             return std::make_shared<Atlas::PolylineChartParser<SubMeshType, Polyline<SubMeshType>>>(ext->_sub_chart);
+          }
+          if(name == "Spline")
+          {
+            auto* ext = new Extrude<Mesh_, Spline<SubMeshType>>();
+            _chart = ext;
+            return std::make_shared<Atlas::SplineChartParser<SubMeshType, Spline<SubMeshType>>>(ext->_sub_chart);
           }
 
           return nullptr;

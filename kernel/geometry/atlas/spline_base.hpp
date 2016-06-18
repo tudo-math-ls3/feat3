@@ -13,7 +13,7 @@ namespace FEAT
     namespace Atlas
     {
       /// Spline chart traits
-      struct SplineTraits
+      struct SplineBaseTraits
       {
         /// we support explicit map
         static constexpr bool is_explicit = true;
@@ -25,7 +25,7 @@ namespace FEAT
         static constexpr int param_dim = 1;
       };
 
-      template<typename Derived_, typename Mesh_, typename Traits_ = SplineTraits>
+      template<typename Derived_, typename Mesh_, typename Traits_ = SplineBaseTraits>
       class SplineBaseCRTP :
         public ChartCRTP<Derived_, Mesh_, Traits_>
       {
@@ -325,7 +325,7 @@ namespace FEAT
 
 
       template<typename Chart_>
-      class SplinePointsParser :
+      class SplineBasePointsParser :
         public Xml::MarkupParser
       {
         typedef Chart_ ChartType;
@@ -335,7 +335,7 @@ namespace FEAT
         Index _size, _read;
 
       public:
-        explicit SplinePointsParser(ChartType& spline, Index size) :
+        explicit SplineBasePointsParser(ChartType& spline, Index size) :
           _spline(spline), _size(size), _read(0)
         {
         }
@@ -395,11 +395,11 @@ namespace FEAT
 
           return true;
         }
-      }; // SplinePointsParser
+      }; // SplineBasePointsParser
 
 
       template<typename Chart_>
-      class SplineParamsParser :
+      class SplineBaseParamsParser :
         public Xml::MarkupParser
       {
         typedef Chart_ ChartType;
@@ -409,7 +409,7 @@ namespace FEAT
         Index _size, _read;
 
       public:
-        explicit SplineParamsParser(ChartType& spline, Index size) :
+        explicit SplineBaseParamsParser(ChartType& spline, Index size) :
           _spline(spline), _size(size), _read(0)
         {
         }
@@ -458,7 +458,7 @@ namespace FEAT
 
           return true;
         }
-      }; // class SplineParamsParser
+      }; // class SplineBaseParamsParser
 
     } // namespace Atlas
   } // namespace Geometry

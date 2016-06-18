@@ -10,6 +10,7 @@
 #include <kernel/geometry/atlas/circle.hpp>
 #include <kernel/geometry/atlas/extrude.hpp>
 #include <kernel/geometry/atlas/polyline.hpp>
+#include <kernel/geometry/atlas/spline.hpp>
 #include <kernel/geometry/atlas/surface_mesh.hpp>
 #include <kernel/geometry/atlas/sphere.hpp>
 #include <kernel/geometry/atlas/tube.hpp>
@@ -1212,6 +1213,8 @@ namespace FEAT
           return std::make_shared<Atlas::CircleChartParser<RootMesh_>>(chart);
         if(name == "Polyline")
           return std::make_shared<Atlas::PolylineChartParser<RootMesh_>>(chart);
+        if(name == "Spline")
+          return std::make_shared<Atlas::SplineChartParser<RootMesh_>>(chart);
 
         return nullptr;
       }

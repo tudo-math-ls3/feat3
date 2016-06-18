@@ -478,8 +478,8 @@ namespace FEAT
 
         virtual std::shared_ptr<Xml::MarkupParser> markup(int, const String&, const String& name) override
         {
-          if(name == "Points")   return std::make_shared<SplinePointsParser<Bezier<Mesh_>>>(*_spline, _size);
-          if(name == "Params")   return std::make_shared<SplineParamsParser<Bezier<Mesh_>>>(*_spline, _size);
+          if(name == "Points")   return std::make_shared<SplineBasePointsParser<Bezier<Mesh_>>>(*_spline, _size);
+          if(name == "Params")   return std::make_shared<SplineBaseParamsParser<Bezier<Mesh_>>>(*_spline, _size);
           if(name == "Controls") return std::make_shared<BezierControlParser<Mesh_>>(*_spline, _size-1);
           return nullptr;
         }
