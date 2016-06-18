@@ -144,6 +144,8 @@ struct MeshoptScrewsApp
     XASSERT(delta_t > DataType(0));
     XASSERT(t_end >= DataType(0));
 
+    int return_value(0);
+
     TimeStamp at;
 
     // Minimum number of cells we want to have in each patch
@@ -581,17 +583,6 @@ struct MeshoptScrewsApp
       min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-#ifdef FEAT_HAVE_MPI
-      DT_ min_quality_snd(min_quality);
-      DT_ min_angle_snd(min_angle);
-
-      Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
-      Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
-#endif
-      if(Util::Comm::rank() == 0)
-        std::cout << "Quality indicator " << " " << stringify_fp_sci(min_quality) <<
-          ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
-
       if(write_vtk)
       {
         String vtk_name(file_basename+"_post_"+stringify(n));
@@ -622,6 +613,25 @@ struct MeshoptScrewsApp
         exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
       }
 
+#ifdef FEAT_HAVE_MPI
+      DT_ min_quality_snd(min_quality);
+      DT_ min_angle_snd(min_angle);
+
+      Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
+      Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
+#endif
+      if(Util::Comm::rank() == 0)
+        std::cout << "Quality indicator " << " " << stringify_fp_sci(min_quality) <<
+          ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
+
+      if(min_angle < DT_(1))
+      {
+        Util::mpi_cout("Mesh deteriorated, stopping.\n");
+        return_value = 1;
+        break;
+      }
+
+
       // Check for the hard coded settings for test mode
       if(test_mode)
       {
@@ -641,7 +651,7 @@ struct MeshoptScrewsApp
       std::cout << "Elapsed time: " << bt.elapsed(at) << std::endl;
     }
 
-    return 0;
+    return return_value;
 
   }
 }; // struct MeshSmootherApp

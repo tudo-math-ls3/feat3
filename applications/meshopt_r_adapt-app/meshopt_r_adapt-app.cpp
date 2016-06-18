@@ -79,6 +79,8 @@ struct MeshoptRAdaptApp
     XASSERT(delta_t > DataType(0));
     XASSERT(t_end >= DataType(0));
 
+    int return_value(0);
+
     TimeStamp at;
 
     // Minimum number of cells we want to have in each patch
@@ -88,8 +90,8 @@ struct MeshoptRAdaptApp
 
     Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
 #ifdef FEAT_HAVE_MPI
-      Index my_cells(ncells);
-      Util::Comm::allreduce(&my_cells, Index(1), &ncells, MPI_SUM);
+    Index my_cells(ncells);
+    Util::Comm::allreduce(&my_cells, Index(1), &ncells, MPI_SUM);
 #endif
 
     // Print level information
@@ -232,11 +234,13 @@ struct MeshoptRAdaptApp
     // Check for the hard coded settings for test mode
     if(test_mode)
     {
-      if( min_angle < DT_(41))
+      if( min_angle < DT_(21))
       {
-        Util::mpi_cout("FAILED:");
-        throw InternalError(__func__,__FILE__,__LINE__,
-        "Post Initial min angle should be >= "+stringify_fp_fix(41)+ " but is "+stringify_fp_fix(min_angle));
+        Util::mpi_cout("FAILED: Post Initial min angle should be >= "+stringify_fp_fix(21)+
+            " but is "+stringify_fp_fix(min_angle));
+        return_value = 1;
+        return return_value;
+
       }
     }
 
@@ -308,21 +312,6 @@ struct MeshoptRAdaptApp
       min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
         finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-#ifdef FEAT_HAVE_MPI
-      DT_ min_quality_snd(min_quality);
-      DT_ min_angle_snd(min_angle);
-
-      Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
-      Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
-#endif
-
-      cell_size_quality =meshopt_ctrl->compute_cell_size_quality();
-
-      if(Util::Comm::rank() == 0)
-        std::cout << "Quality indicator " << " " << stringify_fp_sci(min_quality) <<
-          ", minimum angle " << stringify_fp_fix(min_angle) <<
-          ", cell sizes " << stringify_fp_sci(cell_size_quality) << std::endl;
-
       if(write_vtk)
       {
         String vtk_name(file_basename+"_post_"+stringify(n));
@@ -340,14 +329,36 @@ struct MeshoptRAdaptApp
         exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
       }
 
+#ifdef FEAT_HAVE_MPI
+      DT_ min_quality_snd(min_quality);
+      DT_ min_angle_snd(min_angle);
+
+      Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
+      Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
+#endif
+
+      cell_size_quality =meshopt_ctrl->compute_cell_size_quality();
+
+      if(Util::Comm::rank() == 0)
+        std::cout << "Quality indicator " << " " << stringify_fp_sci(min_quality) <<
+          ", minimum angle " << stringify_fp_fix(min_angle) <<
+          ", cell sizes " << stringify_fp_sci(cell_size_quality) << std::endl;
+
+      if(min_angle < DT_(1))
+      {
+        Util::mpi_cout("Mesh deteriorated, stopping.\n");
+        return_value = 1;
+        break;
+      }
+
       // Check for the hard coded settings for test mode
       if(test_mode)
       {
-        if( min_angle < DT_(27))
+        if( min_angle < DT_(23))
         {
           Util::mpi_cout("FAILED:");
           throw InternalError(__func__,__FILE__,__LINE__,
-          "Final min angle should be >= "+stringify_fp_fix(27)+ " but is "+stringify_fp_fix(min_angle));
+          "Final min angle should be >= "+stringify_fp_fix(23)+ " but is "+stringify_fp_fix(min_angle));
         }
       }
 
