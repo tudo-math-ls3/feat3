@@ -27,7 +27,7 @@
     </Spline>
   </Chart>
   <Chart name="pipe:b">
-    <Spline dim="2" size="4" type="closed">
+    <Spline dim="2" size="4" type="open">
       <Points>
         2 0 0 5.41339 -0.050702 10.586189 2.05
         2 16 2 21.413395 2.050733 26.586185 -0.05
@@ -43,7 +43,7 @@
     </Spline>
   </Chart>
   <Chart name="pipe:tl">
-    <Spline dim="2" size="2" type="closed">
+    <Spline dim="2" size="2" type="open">
       <Points>
         2 0 5 5.282172 5.053443 10.326587 3.046117
         0 15.6 3.003095
@@ -55,7 +55,7 @@
     </Spline>
   </Chart>
   <Chart name="pipe:tr">
-    <Spline dim="2" size="3" type="closed">
+    <Spline dim="2" size="3" type="open">
       <Points>
         2 16.4 3.003095 21.672235 3.04848 26.719368 5.051817
         0 32 5
@@ -69,7 +69,7 @@
     </Spline>
   </Chart>
   <Chart name="pipe:ul">
-    <Spline dim="2" size="2" type="closed">
+    <Spline dim="2" size="2" type="open">
       <Points>
         0 15.6 3.003095
         0 15.6 5.4
@@ -81,7 +81,7 @@
     </Spline>
   </Chart>
   <Chart name="pipe:ur">
-    <Spline dim="2" size="2" type="closed">
+    <Spline dim="2" size="2" type="open">
       <Points>
         0 16.4 3.003095
         0 16.4 5.4
@@ -93,7 +93,7 @@
     </Spline>
   </Chart>
   <Chart name="pipe:uc">
-    <Spline dim="2" size="2" type="closed">
+    <Spline dim="2" size="2" type="open">
       <Points>
         0 15.6 5.4
         0 16.4 5.4
