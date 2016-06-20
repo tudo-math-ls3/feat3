@@ -555,10 +555,13 @@ namespace FEAT
         auto part_names = quad_root_node.get_mesh_part_names();
         for(const auto& name : part_names)
         {
-          // ge the quad part
+          // get the quad part
           const QuadPart* quad_part = quad_root_node.find_mesh_part(name);
 
-          // ge the chart name
+          if(quad_part == nullptr)
+            continue;
+
+          // get the chart name
           String chart_name = quad_root_node.find_mesh_part_chart_name(name);
           const HexaChart* hexa_chart(nullptr);
 
