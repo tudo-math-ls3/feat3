@@ -66,7 +66,7 @@ namespace FEAT
         {
           TimeStamp ts_start;
 
-          Util::CommStatus stat;
+          Util::CommStatusIgnore stat;
           Util::Comm::wait(*req, stat);
 
           finished = true;
@@ -156,6 +156,7 @@ namespace FEAT
         {
           TimeStamp ts_start;
 
+          Util::CommStatusIgnore s;
           Index count(0);
           //handle receives
           while(count != recvrequests.size())
@@ -165,8 +166,6 @@ namespace FEAT
             {
               if(recvflags.at(i) == 0)
               {
-                /// \todo ugly hack, use MPI_STATUS_IGNORE
-                Util::CommStatus s;
                 Util::Comm::test(*recvrequests.at(i), recvflags.data()[i], s);
                 if(recvflags.at(i) != 0)
                 {
@@ -179,8 +178,6 @@ namespace FEAT
 
           for(Index i(0) ; i < sendrequests.size() ; ++i)
           {
-            /// \todo ugly hack, use MPI_STATUS_IGNORE
-            Util::CommStatus s;
             Util::Comm::wait(*sendrequests.at(i), s);
           }
 

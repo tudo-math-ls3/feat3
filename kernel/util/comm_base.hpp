@@ -205,6 +205,23 @@ namespace FEAT
         MPI_Status _s;
     };
 
+    class CommStatusIgnore : public CommStatus
+    {
+      public:
+        CommStatusIgnore() :
+          _s(*MPI_STATUSES_IGNORE)
+      {
+      }
+
+        MPI_Status& mpi_status()
+        {
+          return _s;
+        }
+
+      private:
+        MPI_Status _s;
+    };
+
     template<template<typename, typename> class ST_>
       class CommStatusSeq
       {
@@ -682,6 +699,23 @@ namespace FEAT
       }
 
         Index mpi_status()
+        {
+          return _s;
+        }
+
+      private:
+        Index _s;
+    };
+
+    class CommStatusIgnore : public CommStatus
+    {
+      public:
+        CommStatusIgnore() :
+          _s(0)
+      {
+      }
+
+        MPI_Status& mpi_status()
         {
           return _s;
         }
