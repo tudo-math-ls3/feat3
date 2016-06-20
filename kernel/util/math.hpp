@@ -131,6 +131,31 @@ namespace FEAT
     }
 
     /**
+     * \brief Updates the minimum and maximum.
+     *
+     * This functions performs:
+     * - a := min(x, a)
+     * - b := max(x, b)
+     *
+     * \param[in] x
+     * The new value for the minimum/maximum update.
+     *
+     * \param[in,out] a
+     * The minimum that is to be updated.
+     *
+     * \param[in,out] b
+     * The maximum that is to be updated.
+     */
+    template<typename T_>
+    inline void minimax(T_ x, T_& a, T_& b)
+    {
+      if(x < a)
+        a = x;
+      if(b < x)
+        b = x;
+    }
+
+    /**
      * \brief Clamps a value to a range.
      *
      * \param[in] x
