@@ -334,6 +334,7 @@ namespace FEAT
               //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
               return Status::success;
             case(5):
+              //std::cout << "ALGLIB: Maximum number of iterations" << std::endl;
               return Status::max_iter;
             case(7):
               //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;
@@ -723,6 +724,7 @@ namespace FEAT
         /// \copydoc BaseClass::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
+
           this->_op.prepare(vec_sol, this->_filter);
           // compute defect
           this->_op.compute_grad(this->_vec_def);
@@ -758,7 +760,6 @@ namespace FEAT
             auto tmp = vec_sol.clone();
             iterates->push_back(std::move(tmp));
           }
-
           // compute initial defect
           Status status = this->_set_initial_defect(this->_vec_def, vec_sol);
           if(status != Status::progress)
@@ -795,6 +796,7 @@ namespace FEAT
               //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << std::endl;
               return Status::success;
             case(5):
+              //std::cout << "ALGLIB: Maximum number of iterations" << std::endl;
               return Status::max_iter;
             case(7):
               //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << std::endl;

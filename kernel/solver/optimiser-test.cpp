@@ -131,7 +131,7 @@ class NLCGTest:
 };
 
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f(float(0.6),Index(12),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_hb_f(float(0.5),Index(12),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_rb_d(double(0.6),Index(40),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
@@ -140,23 +140,23 @@ NLCGTest<Mem::Main, double, Index, Analytic::Common::BazaraaShettyFunction>
 nlcg_sw_bs_d(double(0.15),Index(25),"StrongWolfeLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlcg_s_hb_d(float(0.5),Index(10),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
+nlcg_s_hb_d(float(0.45),Index(10),"SecantLinesearch","none", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 nlcg_s_bs_d(double(0.175), Index(13), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
 
 NLCGTest<Mem::Main, float, unsigned int, Analytic::Common::RosenbrockFunction>
-nlcg_nr_rb_d(float(0.6), Index(32),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
+nlcg_nr_rb_d(float(0.5), Index(35),"NewtonRaphsonLinesearch","Hessian", NLCGDirectionUpdate::HestenesStiefel);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
-nlcg_sw_hessian_rb_d(double(0.7), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
+nlcg_sw_hessian_rb_d(double(0.), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::GoldsteinPriceFunction>
-nlcg_sw_hessian_gp_d(double(0.6), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
+nlcg_sw_hessian_gp_d(double(0.5), Index(25),"StrongWolfeLinesearch","Hessian", NLCGDirectionUpdate::PolakRibiere);
 
 #ifdef FEAT_HAVE_QUADMATH
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::RosenbrockFunction>
-nlcg_nr_rb_q(__float128(0.6), Index(33), "NewtonRaphsonLinesearch", "ApproximateHessian",
+nlcg_nr_rb_q(__float128(0.55), Index(33), "NewtonRaphsonLinesearch", "Hessian",
 NLCGDirectionUpdate::PolakRibiere);
 
 NLCGTest<Mem::Main, __float128, Index, Analytic::Common::BazaraaShettyFunction>
@@ -167,7 +167,7 @@ nlcg_sw_bs_q(__float128(0.175), Index(30), "StrongWolfeLinesearch", "none", NLCG
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f_cuda(float(0.7), Index(10), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
+nlcg_sw_hb_f_cuda(float(0.5), Index(10), "StrongWolfeLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves);
 
 NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
 nlcg_s_bs_d_cuda(double(0.175), Index(13), "SecantLinesearch", "none", NLCGDirectionUpdate::HagerZhang);
@@ -304,7 +304,7 @@ nlsd_rb_q(__float128(1), Index(19), "SecantLinesearch", "Hessian");
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
 NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f_cuda(float(0.9), Index(8), "StrongWolfeLinesearch", "Hessian");
+nlsd_hb_f_cuda(float(0.7), Index(8), "StrongWolfeLinesearch", "Hessian");
 #endif
 
 #ifdef FEAT_HAVE_ALGLIB

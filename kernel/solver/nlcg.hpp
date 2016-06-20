@@ -136,31 +136,31 @@ namespace FEAT
         VectorType _vec_r;
         /// descend direction vector
         VectorType _vec_p;
-        /// temporary vector
+        /// descend direction vector, normalised for better numerical stability
+        VectorType _vec_pn;
+        /// temporary vector: Preconditioned defect
         VectorType _vec_z;
+        /// temporary vector: y[k+1] = r[k+1] - r[k]
+        VectorType _vec_y;
 
         /// Tolerance for function improvement
         DataType _tol_fval;
         /// Tolerance for the length of the update step
         DataType _tol_step;
 
-        /// vec_p <- vec_r + _beta * vec_p
-        DataType _beta;
-        /// _eta = <vec_r, vec_p>
-        DataType _eta;
         /// Current functional value
         DataType _fval;
         /// Functional value from the previous iteration
         DataType _fval_prev;
 
-        /// Number of subsequent steepest descent steps
-        Index _num_restarts;
-        /// Maximum number of subsequent restarts (meaning steepest descent steps) before aborting
+        /// Maximum number of restarts triggered by the strong Wolfe conditions not holding
         Index _max_num_restarts;
+        /// Number of these restarts performed consecutively
+        Index _num_restarts;
+        /// Restart frequency, defaults to problemsize+3
+        Index _restart_freq;
 
       public:
-        /// Restart frequency, defaults to problemsize+1
-        Index restart_freq;
         /// For debugging purposes, all iterates can be logged to here
         std::deque<VectorType>* iterates;
 
@@ -198,15 +198,16 @@ namespace FEAT
           _direction_update(du_),
           _tol_fval(DataType(0)),
           _tol_step(Math::sqrt(Math::eps<DataType>())),
-          _beta(0),
+          _max_num_restarts(10),
           _num_restarts(0),
-          _max_num_restarts(0),
-          restart_freq(_op.columns() + Index(4)),
+          _restart_freq(_op.columns() + Index(3)),
           iterates(nullptr)
           {
             XASSERT(_linesearch != nullptr);
 
             this->_min_stag_iter = 0;
+            if(precond != nullptr)
+              _max_num_restarts = Index(0);
 
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
@@ -228,6 +229,8 @@ namespace FEAT
           // create three temporary vectors
           _vec_r = this->_op.create_vector_r();
           _vec_p = this->_op.create_vector_r();
+          _vec_pn = this->_op.create_vector_r();
+          _vec_y = this->_op.create_vector_r();
           _vec_z = this->_op.create_vector_r();
 
           _vec_z.format();
@@ -240,10 +243,12 @@ namespace FEAT
           if(iterates != nullptr)
             iterates->clear();
 
-          this->_vec_z.clear();
           this->_vec_p.clear();
+          this->_vec_pn.clear();
           this->_vec_r.clear();
-          restart_freq = Index(0);
+          this->_vec_y.clear();
+          this->_vec_z.clear();
+          _restart_freq = Index(0);
           _linesearch->done_symbolic();
           BaseClass::done_symbolic();
         }
@@ -307,6 +312,8 @@ namespace FEAT
         /// \copydoc BaseClass::correct()
         virtual Status correct(VectorType& vec_sol, const VectorType& DOXY(vec_rhs)) override
         {
+          //std::cout << std::scientific;
+          //std::cout << std::setprecision(16);
           // Evaluate the operator at the new state
           this->_op.prepare(vec_sol, this->_filter);
 
@@ -352,6 +359,10 @@ namespace FEAT
          */
         virtual Status _apply_intern(VectorType& vec_sol)
         {
+          /// p[k+1] <- r[k+1] + _beta * p[k+1]
+          DataType beta;
+          /// eta[k] = <r[k], p[k]>
+          DataType eta;
           // Reset member variables in the LineSearch
           _linesearch->reset();
 
@@ -372,51 +383,64 @@ namespace FEAT
           // The first direction has to be the (preconditioned) steepest descent direction
           this->_vec_p.clone(this->_vec_z);
 
+          // First scale so that all entries are |.| < 1
+          this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
+          // Now scale so that normed_dir.norm2() == 1. Note that this will only be approximately true, so we
+          // compute and use its norm later on anyway
+          this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
+
+          ////std::cout << "dir " << *_vec_p << std::endl;
+          //DataType max_elem(this->_vec_p.max_element());
+          //DataType scale1 = DataType(1)/max_elem;
+          //std::cout << "max_elem   " << max_elem << " " << scale1 << std::endl;
+          //this->_vec_pn.scale(this->_vec_p, scale1);
+          //DataType new_norm(_vec_pn.norm2());
+          //DataType scale2(DataType(1)/new_norm);
+          //std::cout << " new norm  " << new_norm << " " << scale2 << std::endl;
+          //this->_vec_pn.scale(_vec_pn, scale2);
+          ////std::cout << "normalised dir " << *_vec_pn << std::endl;
+
           // Compute initial eta = < p, r>
-          this->_eta = this->_vec_p.dot(this->_vec_r);
+          eta = this->_vec_p.dot(this->_vec_r);
 
           // If the preconditioner was not pd in the first step, reset the search direction to steepest descent
-          if(_eta <= DataType(0))
+          if(eta <= DataType(0))
           {
             this->_vec_p.clone(this->_vec_r);
-            _eta = this->_vec_p.dot(this->_vec_r);
+            this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
+            this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
           }
 
-          // compute initial gamma = < z, r >
-          DataType gamma = this->_vec_z.dot(this->_vec_r);
+          // compute initial gamma = < z[0], r[0] >
+          DataType gamma(this->_vec_z.dot(this->_vec_r));
+          DataType gamma_prev(0);
+
           if(this->_def_init <= this->_tol_rel)
             return Status::success;
 
           Index its_since_restart(0);
           _num_restarts = Index(0);
+          Index first_restart(_restart_freq+Index(1));
           // start iterating
           while(status == Status::progress)
           {
             IterationStats stat(*this);
 
-            ++its_since_restart;
             _fval_prev = _fval;
-            _beta = DataType(0);
+
+            this->_vec_y.clone(this->_vec_r);
 
             // Copy information to the linesearch
             _linesearch->set_initial_fval(this->_fval);
             _linesearch->set_grad_from_defect(this->_vec_r);
 
             // Call the linesearch to update vec_sol
-            Status linesearch_status = _linesearch->correct(vec_sol, this->_vec_p);
-
-            // If the linesearch failed to make progress, the new iterate is too close to the old iterate to compute
-            // a new search direction etc. so we have to abort without updating the solution
-            if( (_linesearch->get_rel_update() < this->_tol_step) && (Math::abs(_beta) < Math::eps<DataType>())
-                && (linesearch_status != Status::success ))
-            {
-              vec_sol.clone(_linesearch->get_initial_sol());
-              return Status::success;
-            }
+            Status linesearch_status = _linesearch->correct(vec_sol, this->_vec_pn);
 
             // Copy back information from the linesearch
             this->_fval = _linesearch->get_final_fval();
             _linesearch->get_defect_from_grad(this->_vec_r);
+            this->_vec_y.axpy(this->_vec_y, this->_vec_r, -DataType(1));
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -425,7 +449,6 @@ namespace FEAT
             // Compute defect norm. This also performs the convergence/divergence checks.
             status = this->_set_new_defect(this->_vec_r, vec_sol);
 
-            // Something might have gone wrong in applying the preconditioner, so check status again.
             if(status != Status::progress)
               return status;
 
@@ -433,45 +456,72 @@ namespace FEAT
             if(this->_precond != nullptr)
               this->_precond->prepare(vec_sol, this->_filter);
 
-            status = compute_beta(_beta, gamma);
+            // apply preconditioner
+            if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
+              return Status::aborted;
 
-            if(status != Status::progress)
-              return status;
+            // Save old gamma and compute new
+            gamma_prev = gamma;
+            gamma = this->_vec_r.dot(this->_vec_z);
 
-            // If a restart is scheduled, reset beta to 0
-            if( (restart_freq > 0 && its_since_restart%restart_freq == 0) ||
-                linesearch_status != Status::success)
+            //String info("");
+            bool restart(false);
+            // We need to perform a steepest descent step if the Wolfe conditions do not hold (linesearch status
+            // != success).
+            if(linesearch_status != Status::success)
             {
-              _beta = DataType(0);
-              its_since_restart++;
-            }
-
-            // Restarting means discarding the new search direction and setting the new search direction to the
-            // (preconditioned) steepest descent direction
-            if(_beta == DataType(0))
-            {
-              // Uncomment the line below to deviate from the ALGLIBMinCG behaviour
-              // its_since_restart = Index(1);
+              //info += " Wolfe Conditions do not hold";
+              restart = true;
               _num_restarts++;
-              // Discard the old search direction and perform (preconditioned) steepest descent
-              this->_vec_p.clone(this->_vec_z);
             }
             else
-            {
               _num_restarts = Index(0);
-              this->_vec_p.axpy(this->_vec_p, this->_vec_z, _beta);
-            }
 
+            if(_restart_freq > Index(0) && this->_num_iter >= first_restart && its_since_restart%_restart_freq == 0)
+                {
+                  //info += " Scheduled restart";
+                  restart = true;
+                  its_since_restart = Index(0);
+                }
+            // This needs to be done after all the checks
+            ++its_since_restart;
 
-            // Now that we know the new search direction, we can update _eta
-            _eta = this->_vec_p.dot(this->_vec_r);
+            // Set beta = 0 or compute depending on the restart flag
+            restart ? beta = DataType(0) : beta = compute_beta(gamma, gamma_prev);
+
+            //std::cout << "Beta " << beta << info << std::endl;
+
+            // We need to check beta again here as some direction updates might set it to zero
+            // Discard the old search direction and perform (preconditioned) steepest descent
+            if(beta == DataType(0))
+              this->_vec_p.clone(this->_vec_z);
+            else
+              this->_vec_p.axpy(this->_vec_p, this->_vec_z, beta);
+
+            // First scale so that all entries are |.| < 1
+            this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
+            // Now scale so that normed_dir.norm2() == 1. Note that this will only be approximately true, so we
+            // compute and use its norm later on anyway
+            this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
+
+            //max_elem = this->_vec_p.max_element();
+            //scale1 = DataType(1)/max_elem;
+            //std::cout << "max_elem   " << max_elem << " " << scale1 << std::endl;
+            //this->_vec_pn.scale(this->_vec_p, scale1);
+            //new_norm = this->_vec_pn.norm2();
+            //scale2 = DataType(1)/new_norm;
+            //std::cout << " new norm  " << new_norm << " " << scale2 << std::endl;
+            //this->_vec_pn.scale(_vec_pn, scale2);
+
+            eta = this->_vec_p.dot(this->_vec_r);
 
             // Safeguard as this should not happen
             // TODO: Correct the output of the preconditioner if it turns out to not have been positive definite
-            if(_eta <= DataType(0))
+            if(eta <= DataType(0))
             {
               this->_vec_p.clone(this->_vec_r);
-              _eta = this->_vec_p.dot(this->_vec_r);
+              this->_vec_pn.scale(this->_vec_p, DataType(1)/this->_vec_p.max_element());
+              this->_vec_pn.scale(this->_vec_pn, DataType(1)/this->_vec_pn.norm2());
               //return Status::aborted;
             }
 
@@ -496,25 +546,26 @@ namespace FEAT
          *
          * \returns A solver status code.
          */
-        Status compute_beta(DataType& beta, DataType& gamma)
+        DataType compute_beta(const DataType gamma, const DataType gamma_prev) const
         {
           switch(_direction_update)
           {
             case NLCGDirectionUpdate::DaiYuan:
-              return dai_yuan(beta, gamma);
+              return dai_yuan(gamma);
             case NLCGDirectionUpdate::DYHSHybrid:
-              return dy_hs_hybrid(beta, gamma);
+              return dy_hs_hybrid(gamma);
             case NLCGDirectionUpdate::FletcherReeves:
-              return fletcher_reeves(beta, gamma);
+              return fletcher_reeves(gamma, gamma_prev);
             case NLCGDirectionUpdate::HagerZhang:
               // Warning: This update is not very efficient in its current implementation.
-              return hager_zhang(beta, gamma);
+              return hager_zhang(gamma);
             case NLCGDirectionUpdate::HestenesStiefel:
-              return hestenes_stiefel(beta, gamma);
+              return hestenes_stiefel();
             case NLCGDirectionUpdate::PolakRibiere:
-              return polak_ribiere(beta, gamma);
+              return polak_ribiere(gamma_prev);
             default:
-              return Status::undefined;
+              throw InternalError(__func__,__FILE__,__LINE__,
+              "Unhandled direction update: "+stringify(_direction_update));
           }
         }
 
@@ -537,18 +588,6 @@ namespace FEAT
         {
           // increase iteration count
           ++this->_num_iter;
-
-          // Check for convergence wrt. the function value improvement if _tol_fval says so
-          if(_tol_fval > DataType(0))
-          {
-            // This is the factor for the relative function value
-            DataType scale(Math::max(this->_fval, _fval_prev));
-            // Make sure it is at least 1
-            scale = Math::max(scale, DataType(1));
-            // Check for success
-            if(Math::abs(_fval_prev - this->_fval) <= _tol_fval*scale)
-              return Status::success;
-          }
 
           // first, let's see if we have to compute the defect at all
           bool calc_def = false;
@@ -590,9 +629,32 @@ namespace FEAT
           if(this->_num_iter < this->_min_iter)
             return Status::progress;
 
+          // maximum number of iterations performed?
+          if(this->_num_iter >= this->_max_iter)
+            return Status::max_iter;
+
           // Check for convergence of the gradient norm
           if(this->is_converged())
             return Status::success;
+
+          // Check for convergence wrt. the function value improvement if _tol_fval says so
+          if(_tol_fval > DataType(0))
+          {
+            // This is the factor for the relative function value
+            DataType scale(Math::max(this->_fval, _fval_prev));
+            // Make sure it is at least 1
+            scale = Math::max(scale, DataType(1));
+            // Check for success
+            if(Math::abs(_fval_prev - this->_fval) <= _tol_fval*scale)
+              return Status::success;
+          }
+
+          if( (_linesearch->get_rel_update() <= this->_tol_step))
+          {
+            //std::cout << "update step stagnation: " << _linesearch->get_rel_update() << " <= " << this->_tol_step << std::endl;
+            //vec_sol.clone(_linesearch->get_initial_sol());
+            return Status::success;
+          }
 
           // If there were too many subsequent restarts, the solver is stagnated
           if(_max_num_restarts > Index(0) && _num_restarts > _max_num_restarts)
@@ -601,10 +663,6 @@ namespace FEAT
           // If there were too many stagnated iterations, the solver is stagnated
           if(this->_min_stag_iter > 0 && this->_num_stag_iter > this->_min_stag_iter)
             return Status::stagnated;
-
-          // maximum number of iterations performed?
-          if(this->_num_iter >= this->_max_iter)
-            return Status::max_iter;
 
           // continue iterating
           return Status::progress;
@@ -625,23 +683,13 @@ namespace FEAT
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
          */
-        Status dai_yuan(DataType& beta, DataType& gamma)
+        DataType dai_yuan(const DataType gamma) const
         {
+          // <r[k+1] - r[k], p[k]>
+          DataType eta_dif = this->_vec_p.dot(this->_vec_y);
 
-          // _vec_z still contais the old (preconditioned) defect
-          DataType eta_old(this->_eta);
-          // eta_mid = < r[k+1], d[k] >
-          DataType eta_mid(this->_vec_r.dot(this->_vec_p));
+          return gamma/(-eta_dif);
 
-          // apply preconditioner
-          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
-            return Status::aborted;
-
-          gamma = this->_vec_r.dot(this->_vec_z);
-
-          beta = gamma/( - eta_mid + eta_old);
-
-          return Status::progress;
         }
 
         /**
@@ -660,23 +708,19 @@ namespace FEAT
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
          */
-        Status dy_hs_hybrid(DataType& beta, DataType& gamma)
+        DataType dy_hs_hybrid(const DataType gamma) const
         {
-          DataType eta_old = this->_eta;
-          // _vec_p still contains the old search direction
-          DataType eta_mid = this->_vec_r.dot(this->_vec_p);
-          // _vec_z still contains the old (preconditioned) defect
-          DataType gamma_mid = this->_vec_z.dot(this->_vec_r);
 
-          // apply preconditioner
-          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
-            return Status::aborted;
+          // <r[k+1] - r[k], z[k+1]>
+          DataType gamma_dif = this->_vec_z.dot(this->_vec_y);
+          // <r[k+1] - r[k], p[k]>
+          DataType eta_dif = this->_vec_p.dot(this->_vec_y);
 
-          gamma = this->_vec_r.dot(this->_vec_z);
+          DataType beta(Math::min(gamma/(-eta_dif), gamma_dif/(-eta_dif)));
+          beta = Math::max(DataType(0), beta);
 
-          beta = Math::max(DataType(0), Math::min(gamma, gamma - gamma_mid)/( -eta_mid + eta_old));
+          return beta;
 
-          return Status::progress;
         }
 
         /**
@@ -690,18 +734,9 @@ namespace FEAT
          *   \beta_{k+1} := \frac{\gamma_{k+1}}{\gamma_k}
          * \f]
          */
-        Status fletcher_reeves(DataType& beta, DataType& gamma)
+        DataType fletcher_reeves(const DataType gamma, const DataType gamma_prev) const
         {
-          DataType gamma_old(gamma);
-
-          // apply preconditioner
-          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
-            return Status::aborted;
-
-          gamma = this->_vec_r.dot(this->_vec_z);
-          beta = gamma/gamma_old;
-
-          return Status::progress;
+          return gamma/gamma_prev;
         }
 
         /**
@@ -729,28 +764,24 @@ namespace FEAT
          * \warning This update strategy needs more precision in the linesearch than all others and is not very
          * efficient in the current implementation. This serves more as a starting point for further improvement.
          */
-        Status hager_zhang(DataType& beta, DataType& gamma)
+        DataType hager_zhang(const DataType gamma) const
         {
+
           DataType thresh = DataType(0.01);
-          DataType eta_old(this->_eta);
-          // _vec_p still contains the old search direction
-          DataType eta_mid = this->_vec_r.dot(this->_vec_p);
-          // _vec_z still contains the old (preconditioned) defect
-          DataType gamma_mid = this->_vec_z.dot(this->_vec_r);
 
-          // apply preconditioner
-          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
-            return Status::aborted;
+          // <r[k+1] - r[k], p[k]>
+          DataType eta_dif = this->_vec_p.dot(this->_vec_y);
+          // <r[k+1] - r[k], z[k+1]>
+          DataType gamma_dif = this->_vec_y.dot(this->_vec_z);
+          // <p[k], z[k+1]>
+          DataType omega_mid = this->_vec_p.dot(this->_vec_z);
+          // || r[k+1] - r[k]
+          DataType norm_y = this->_vec_y.norm2();
 
-          gamma = this->_vec_r.dot(this->_vec_z);
-
-          beta = -( (gamma - gamma_mid)/(eta_mid - eta_old)
-            + DataType(2)*(Math::sqr(gamma) - DataType(2)*gamma*gamma_mid + Math::sqr(gamma_mid))*eta_mid
-            /Math::sqr(eta_mid-eta_old));
-
+          DataType beta = -( gamma_dif/(eta_dif) + DataType(2)*(norm_y)*omega_mid/Math::sqr(eta_dif));
           beta = Math::max(beta,-DataType(1)/(this->_vec_p.norm2()*Math::min(thresh, Math::sqrt(gamma))));
 
-          return Status::progress;
+          return beta;
         }
 
         /**
@@ -770,23 +801,14 @@ namespace FEAT
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
          */
-        Status hestenes_stiefel(DataType& beta, DataType& gamma)
+        DataType hestenes_stiefel() const
         {
-          DataType eta_old = this->_eta;
-          // _vec_p still contains the old search direction
-          DataType eta_mid = this->_vec_r.dot(this->_vec_p);
-          // _vec_z still contains the old (preconditioned) defect
-          DataType gamma_mid = this->_vec_z.dot(this->_vec_r);
+          // <r[k+1] - r[k], p[k]>
+          DataType eta_dif = this->_vec_p.dot(this->_vec_y);
+          // <r[k+1] - r[k], z[k+1]>
+          DataType gamma_dif = this->_vec_z.dot(this->_vec_y);
 
-          // apply preconditioner
-          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
-            return Status::aborted;
-
-          gamma = this->_vec_r.dot(this->_vec_z);
-
-          beta = Math::max(DataType(0), (gamma - gamma_mid)/( -eta_mid + eta_old));
-
-          return Status::progress;
+          return gamma_dif/( -eta_dif);
         }
 
         /**
@@ -799,21 +821,13 @@ namespace FEAT
          *   \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
          * \f}
          */
-        Status polak_ribiere(DataType& beta, DataType& gamma)
+        DataType polak_ribiere(const DataType gamma_prev) const
         {
-          DataType gamma_old(gamma);
-          // vec_z still contains the old (preconditioned) defect
-          DataType gamma_mid = this->_vec_z.dot(this->_vec_r);
+          // <r[k+1] - r[k], z[k+1]>
+          DataType gamma_dif = this->_vec_z.dot(this->_vec_y);
 
-          // apply preconditioner
-          if(!this->_apply_precond(_vec_z, _vec_r, this->_filter))
-            return Status::aborted;
+          return  Math::max(gamma_dif/gamma_prev, DataType(0));
 
-          gamma = this->_vec_r.dot(this->_vec_z);
-
-          beta = Math::max((gamma - gamma_mid)/gamma_old, DataType(0));
-
-          return Status::progress;
         }
 
     }; // class NLCG

@@ -85,10 +85,11 @@ int run(Solver_& solver, Operator_& op)
   FunctionType my_function;
 
   solver->init();
-  solver->set_max_iter(50);
+  solver->set_max_iter(100);
   solver->set_tol_fval(DataType(0));
   solver->set_tol_step(Math::eps<DataType>());
-  solver->set_tol_abs(Math::eps<DataType>());
+  //solver->set_tol_abs(Math::eps<DataType>());
+  solver->set_tol_rel(Math::sqrt(Math::eps<DataType>()));
   solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
   std::cout << "Using solver " << solver->get_formated_solver_tree() << std::endl;
@@ -103,6 +104,7 @@ int run(Solver_& solver, Operator_& op)
 
   // Solve the optimisation problem
   Status st = solver->correct(sol, rhs);
+
 
   // Check the distance betwen solution and minimal points
   DataType min_dist(Math::Limits<DataType>::max());
@@ -210,6 +212,16 @@ int run(Solver_& solver, Operator_& op)
   // Clean up
   delete mesh;
 
+  st = solver->correct(sol, rhs);
+
+  // Print solver summary
+  std::cout << solver->get_plot_name() << ": " << st << ", " << solver->get_num_iter();
+  std::cout << " its, defect initial/final: " << stringify_fp_sci(solver->get_def_initial());
+  std::cout << " / " << stringify_fp_sci(solver->get_def_final()) << std::endl;
+  std::cout << "Needed evaluations: " << op.get_num_func_evals() << " (func) / " << op.get_num_grad_evals();
+  std::cout <<  " (grad) / " << op.get_num_hess_evals() << " (hess)" << std::endl;
+
+
   // Finish the solver
   solver->done();
 
@@ -256,13 +268,13 @@ int main(int argc, char* argv[])
   Runtime::initialise(argc, argv);
 
   typedef Mem::Main MemType;
-  typedef float DataType;
+  typedef double DataType;
   typedef unsigned int IndexType;
 
   // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
-  typedef Analytic::Common::BazaraaShettyFunction AnalyticFunctionType;
+  typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
   typedef AnalyticFunctionOperator<MemType, DataType, IndexType, AnalyticFunctionType> OperatorType;
   typedef typename OperatorType::PointType PointType;
   static constexpr int dim = PointType::n;

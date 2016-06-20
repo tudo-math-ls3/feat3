@@ -3,6 +3,7 @@
 #define FEAT_KERNEL_SOLVER_LINESEARCH 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/iterative.hpp>
+#include <bitset>
 
 #include <deque>
 
@@ -67,6 +68,9 @@ namespace FEAT
         /// The 2-norm of the iterate
         DataType _norm_sol;
 
+        /// Tolerance for the update step
+        DataType _tol_step;
+
       public:
         /// For debugging purposes, it is possible to save all iterates to this
         std::deque<VectorType>* iterates;
@@ -98,6 +102,7 @@ namespace FEAT
           _alpha_min(DataType(0)),
           _norm_dir(DataType(0)),
           _norm_sol(DataType(0)),
+          _tol_step(DataType(5e-14)),
           iterates(nullptr)
           {
             if(keep_iterates)
@@ -396,7 +401,7 @@ namespace FEAT
           this->_alpha_min = DataType(0);
 
           DataType alpha(0);
-          DataType alpha_update(alpha);
+          DataType alpha_hidate(alpha);
 
           DataType eta = dir.dot(this->_vec_grad);
           if(eta > DataType(0))
@@ -433,8 +438,8 @@ namespace FEAT
             this->_op.apply_hess(this->_vec_tmp, dir);
             this->_filter.filter_def(this->_vec_tmp);
 
-            alpha_update = - this->_vec_grad.dot(dir)/dir.dot(this->_vec_tmp);
-            alpha += alpha_update;
+            alpha_hidate = - this->_vec_grad.dot(dir)/dir.dot(this->_vec_tmp);
+            alpha += alpha_hidate;
 
             Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
             sol.axpy(dir, this->_vec_initial_sol, alpha);
@@ -613,7 +618,7 @@ namespace FEAT
 
           // The second secant point in the first iteration is x + _sigma_0 * dir
           DataType alpha(_sigma_0/this->_norm_dir);
-          DataType alpha_update(alpha);
+          DataType alpha_hidate(alpha);
 
           _eta = dir.dot(this->_vec_grad);
           if(_eta > DataType(0))
@@ -669,8 +674,8 @@ namespace FEAT
             }
 
             // Update alpha according to secant formula
-            alpha_update *= _eta/(eta_prev - _eta);
-            alpha += alpha_update;
+            alpha_hidate *= _eta/(eta_prev - _eta);
+            alpha += alpha_hidate;
 
             // Update the solution
             sol.axpy(dir, this->_vec_initial_sol, alpha);
@@ -873,11 +878,9 @@ namespace FEAT
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
         {
           this->_op.prepare(vec_sol, this->_filter);
-          auto normed_dir = vec_dir.clone();
-          normed_dir.scale(normed_dir, DataType(1)/vec_dir.norm2());
 
           // apply
-          Status st =_apply_intern(vec_sol, normed_dir);
+          Status st =_apply_intern(vec_sol, vec_dir);
 
           return st;
         }
@@ -885,7 +888,7 @@ namespace FEAT
         /// \copydoc BaseClass::get_rel_update()
         virtual DataType get_rel_update() override
         {
-          return this->_alpha_min/this->_norm_dir;
+          return this->_alpha_min*this->_norm_dir;
         }
 
       protected:
@@ -907,59 +910,58 @@ namespace FEAT
         {
           static constexpr DataType extrapolation_width = DataType(4);
           Status status(Status::progress);
+
           this->_num_iter = Index(0);
 
           // Save the intial state
-          this->_vec_initial_sol = vec_sol.clone();
-          // Norm of the search direction vector
+          this->_vec_initial_sol = vec_sol.clone(LAFEM::CloneMode::Deep);
+          // Norm of the search direction vector. It was normalised befor, but there might be rounding errors
           this->_norm_dir = vec_dir.norm2();
           // Norm of the initial guess
           this->_norm_sol = vec_sol.norm2();
 
-          // It is critical that _f_0 was set from the outside!
-          DataType fval(this->_fval_0);
-          // The functional value from the best step so far
-          DataType fval_prev(fval);
-
-          //std::cout << "SWLinesearch start: f_0 = " << stringify_fp_sci(this->_fval_0) << " delta_0 = "
-          //<< stringify_fp_sci(_delta_0) << std::endl;
-
-          // The step length from the best step so far, so it starts with 0
-          DataType alpha_prev(0);
-          // The first trial step length. The operator gets prepared and evaluated in the first iteration
-          DataType alpha(_alpha_0);
-
-          // Update the solution with the first trial step
-          vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha/this->_norm_dir);
+          // Compute initial defect. We want to minimise <dir^T, grad(_op)>, so everything delta are directional
+          // derivatives
+          _delta_0 = vec_dir.dot(this->_vec_grad);
+          this->_def_init = Math::abs(_delta_0);
+          XASSERTM(_delta_0 < DataType(0),"Initial search direction is not a descent direction!");
 
           // Set hard limits to default values if they have not been set
           _alpha_hard_min = DataType(0);
           if(_alpha_hard_max < Math::eps<DataType>())
-            _alpha_hard_max = Math::huge<DataType>();
+            // todo
+            //_alpha_hard_max = Math::huge<DataType>();
+            _alpha_hard_max = DataType(1e50);
 
           // Set the soft limits. These are important if we know that the minimum is NOT in the current interval of
-          // uncertainity and we need to drive alpha to infinity. See _enforce_step_limits
+          // uncertainity and we need to drive alpha to infinity. See _clamp_step
           _alpha_soft_min = DataType(0);
-          _alpha_soft_max = _alpha_0 + extrapolation_width*alpha;
+          _alpha_soft_max = _alpha_0 + extrapolation_width*_alpha_0;
           _alpha_soft_max = Math::min(_alpha_soft_max, _alpha_hard_max);
 
-          // Compute initial defect. We want to minimise <dir^T, grad(_op)>, so everything delta are directional
-          // derivatives
-          _delta_0 = vec_dir.dot(this->_vec_grad)/this->_norm_dir;
-          this->_def_init = Math::abs(_delta_0);
-          // The current derivative
-          DataType delta(_delta_0);
-          // Derivative from the best step so far
-          DataType delta_prev(delta);
+          //std::cout << "Linesearch initial alpha " << _alpha_0 << std::endl;
 
-          //std::cout << "SWLinesearch start: alpha = " << stringify_fp_sci(alpha) << " alpha_prev = " <<
-          //  stringify_fp_sci(alpha_prev) << " soft limits = [" <<
-          //  stringify_fp_sci(_alpha_soft_min) << ", " << stringify_fp_sci(_alpha_soft_max) << "]" <<std::endl;
+          DataType alpha_lo(0);
+          // It is critical that _f_0 was set from the outside!
+          DataType fval_lo(this->_fval_0);
+          DataType df_lo(_delta_0);
 
-          // This is a sanity check
-          if(_delta_0 > DataType(0))
-            throw InternalError(__func__,__FILE__,__LINE__,"Initial search direction is not a descent direction: "
-                +stringify_fp_sci(_delta_0));
+          DataType alpha_hi(0);
+          DataType fval_hi(this->_fval_0); // = this->_op.compute_func();
+          DataType df_hi(_delta_0); // = this->_vec_grad.dot(vec_dir);
+
+          // Set the first step
+          DataType alpha(_alpha_0);
+          DataType fval(0);
+          DataType df(0);
+
+          // This is the width of the search interval
+          DataType width(Math::abs(_alpha_hard_max - _alpha_hard_min));
+          DataType width_old(DataType(2)*width);
+
+          bool min_in_interval(false);
+          bool drive_to_bndry(false);
+          bool interval_known(false);
 
           // start iterating
           while(status == Status::progress)
@@ -968,6 +970,25 @@ namespace FEAT
 
             // Increase iteration count
             ++this->_num_iter;
+
+            if(min_in_interval)
+            {
+              _alpha_soft_min = Math::min(alpha_lo, alpha_hi);
+              _alpha_soft_max = Math::max(alpha_lo, alpha_hi);
+            }
+            else
+            {
+              _alpha_soft_min = alpha_lo;
+              _alpha_soft_max = alpha + extrapolation_width*Math::abs(alpha - alpha_lo);
+            }
+            //std::cout << "Set alpha_smin " << _alpha_soft_min << " alpha_smax " << _alpha_soft_max << std::endl;
+
+            // Update solution: sol <- initial_sol + _alpha*dir
+            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha);
+            //std::cout << "Linesearch alpha " << alpha << std::endl;
+            //std::cout << "initial_sol " << *(this->_vec_initial_sol) << std::endl;
+            //std::cout << "dir " << *vec_dir << std::endl;
+            //std::cout << "sol " << *vec_sol << std::endl;
 
             // Prepare and evaluate
             this->_op.prepare(vec_sol, this->_filter);
@@ -978,10 +999,9 @@ namespace FEAT
             this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
 
-            // New directional derivative and new defect. Note that we did not normalise vec_dir, so we have to take
-            // care of that here.
-            delta = this->_vec_grad.dot(vec_dir)/this->_norm_dir;
-            this->_def_cur = Math::abs(delta);
+            // New directional derivative and new defect
+            df = this->_vec_grad.dot(vec_dir);
+            this->_def_cur = Math::abs(df);
 
             Statistics::add_solver_defect(this->_branch, double(this->_def_cur));
 
@@ -992,339 +1012,124 @@ namespace FEAT
               <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
               << " : " << stringify_fp_sci(this->_def_cur)
               << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
+              << " : " << stringify_fp_sci(fval) << " : " << stringify_fp_sci(alpha)
               << std::endl;
             }
 
-            // Check if the sufficient decrease condition is violated. If so, one call to _bracket gets the solution
-            if( (fval > this->_fval_0 + _tol_decrease*alpha*_delta_0) || (fval > fval_prev && this->_num_iter > 1) )
-            {
-              //std::cout << "SWLinesearch: sufficient decrease violated" << std::endl;
-              //if(fval > this->_fval_0 + _tol_decrease*alpha*_delta_0)
-              //{
-              //  std::cout << "  f = " << stringify_fp_sci(fval) << " > " <<
-              //    stringify_fp_sci(this->_fval_0 + _tol_decrease*alpha*_delta_0) <<
-              //    " = _f_0 + _tol_decrease*_alpha*_delta_0)" << std::endl;
-              //}
-              //if(fval > fval_prev)
-              //{
-              //  std::cout << "  f = " << stringify_fp_sci(fval) << " > " << stringify_fp_sci(fval_prev ) << " = f_prev" << std::endl;
-              //}
+            status = Status::progress;
 
-              // Call _bracket with alpha_lo = alpha_prev and alpha_hi = _alpha because the old step was better
-              status = _bracket(vec_sol, vec_dir, alpha_prev, alpha, delta_prev, delta, fval_prev, fval);
-
-              // _bracket writes the new values for alpha etc. to the first entries of the corresponding set
-              alpha = alpha_prev;
-              delta = delta_prev;
-              fval = fval_prev;
-
-              this->_alpha_min = alpha;
-              this->_fval_min = fval;
-
-              // Save the last successful step length for the next call
-              if(status == Status::success)
-                _alpha_0 = this->_alpha_min;
-
-            }
-
-            // Stop if _bracket was successful or encountered an error
-            if(status != Status::progress)
-              return status;
-
-            // Ensure that the defect is neither NaN nor infinity
-            if(!Math::isfinite(this->_def_cur))
-              return Status::aborted;
-
-            // Is diverged?
-            if(this->is_diverged())
-              return Status::diverged;
-
-            // If we come to here, the sufficient decrease condition is satisfied and the solver did not encounter
-            // any errors
-
-            // If the curvature condition is satisfied, the current alpha is good and we are successful
-            if( this->_def_cur < -_tol_curvature*_delta_0)
-            {
-              //std::cout << "SWLinesearch: Sufficient decrease condition fulfilled" << std::endl;
-              //std::cout << "   f = " << stringify_fp_sci(fval) << " < " <<
-              //  stringify_fp_sci(this->_fval_0 + _tol_decrease*alpha*_delta_0) << std:: endl;
-              //std::cout << "   and curvature condition satisfied: " << stringify_fp_sci(this->_def_cur)
-              //<< " < " << stringify_fp_sci(-_tol_curvature*_delta_0) << std::endl;
-
-              // Save minimum parameters
-              this->_alpha_min = alpha;
-              this->_fval_min = fval;
-
-              // Save the last successful step length for the next call
-              _alpha_0 = this->_alpha_min;
-
-              return Status::success;
-            }
-
-            // If the derivative changes sign, we are successful as well
-            if(delta >= DataType(0))
-            {
-              //std::cout << "SWLinesearch: derivative is positive! " << stringify_fp_sci(delta) << std::endl;
-              status = _bracket(vec_sol, vec_dir, alpha, alpha_prev, delta, delta_prev, fval, fval_prev);
-
-              // Save minimum parameters
-              this->_alpha_min = alpha;
-              this->_fval_min = fval;
-
-              // Save the last successful step length for the next call
-              if(status == Status::success)
-                _alpha_0 = this->_alpha_min;
-
-              return status;
-            }
-
-            // If we come to here, we do not know if the minimum is in the current interval of uncertainity, so we
-            // need to update it. _polynomial_fit does that for us.
-
-            DataType alpha_new(0);
-
-            bool min_in_interval(false);
-            bool drive_to_bndry(false);
-
-            // We discard the status returned by _polynomial_fit because it means nothing at this point
-            _polynomial_fit(alpha_new, alpha, alpha_prev, fval, fval_prev, delta, delta_prev, min_in_interval,
-            drive_to_bndry, (delta < 0));
-            _enforce_step_limits(alpha_new, alpha, alpha_prev);
-
-            // Since the sufficient decrease condition was satisfied, we update alpha_prev
-            alpha_prev = alpha;
-            fval_prev = fval;
-            delta_prev = delta;
-
-            // Update alpha. fval and delta get updated at the start of the next iteration.
-            alpha = alpha_new;
-
-            if(status != Status::progress)
-              return status;
+            // Stagnation due to rounding errors
+            //if(min_in_interval && (alpha <= _alpha_soft_min || alpha >= _alpha_soft_max))
+            //{
+            //  std::cout << "Rounding errors" << std::endl;
+            //  status = Status::stagnated;
+            //}
+            //if( alpha == _alpha_hard_max)
+            //if( alpha == _alpha_hard_min)
 
             // If the maximum number of iterations was performed, return the iterate for the best step so far
-            if(this->_num_iter > this->_max_iter)
+            if(this->_num_iter >= this->_max_iter)
             {
-              vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha_prev/this->_norm_dir);
-              return Status::max_iter;
+              //std::cout << "nfevmax " << this->_num_iter-1 << " >= " << this->_max_iter-1 << std::endl;
+              status = Status::max_iter;
             }
 
-            // Update solution: sol <- sol + _alpha*dir
-            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha/this->_norm_dir);
-
-
-          }
-
-          // We should never come to this point
-          return Status::undefined;
-        }
-
-        /**
-         * \brief Bracketing iteration that finds a minimum of a 1d function
-         *
-         * \param[in, out] vec_sol
-         * The current solution, gets updated in the iteration
-         *
-         * \param[in] vec_dir
-         * The search direction
-         *
-         * \param[in,out] alpha_lo
-         * The step size for the lower functional value
-         *
-         * \param[in,out] alpha_hi
-         * The step size for the higher functional value
-         *
-         * \param[in,out] delta_lo
-         * Derivative at alpha_lo
-         *
-         * \param[in,out] delta_hi
-         * Derivative at alpha_hi
-         *
-         * \param[in,out] f_lo
-         * Functional value at alpha_lo
-         *
-         * \param[in,out] f_hi
-         * Functional value at alpha_hi
-         *
-         * \returns
-         * Status::success if no abnormal termination (i.e. triggered by _polynomial_fit) occured
-         *
-         */
-        Status _bracket(VectorType& vec_sol, const VectorType& vec_dir, DataType& alpha_lo, DataType& alpha_hi,
-        DataType& delta_lo, DataType& delta_hi, DataType& f_lo, DataType& f_hi)
-        {
-          // Check if the starting point is already good enough. This should have been checked before, anyway.
-          if(f_lo < this->_fval_0 +_tol_decrease*alpha_lo*_delta_0 && Math::abs(delta_lo) < -_tol_curvature*_delta_0)
-            return Status::success;
-
-          // If the derivative at the inital step length with the lower functional value is positive, we are
-          // searching "backwards" and need to pass this information to _polynomial_fit
-          bool df_was_negative(delta_lo < DataType(0));
-          // We need to remember if the minimum is already known to be in the interval of uncertainity for subsequent
-          // calls to _polynomial_fit
-          bool min_in_interval(false);
-          bool drive_to_bndry(false);
-
-          // Trial step and functional value/gradient there
-          DataType alpha_new(0);
-          DataType f_new(0);
-          DataType delta_new(0);
-
-          Status st(Status::progress);
-          while(st == Status::progress)
-          {
-            ++this->_num_iter;
-
-            // Find new trial step
-            st = _polynomial_fit(alpha_new, alpha_lo, alpha_hi, f_lo, f_hi, delta_lo, delta_hi, min_in_interval,
-            drive_to_bndry, df_was_negative);
-
-            // If the polynomial fit was not successful, we need to break from the iteration
-            if(st != Status::success)
-              break;
-            // Otherwise we are making progress
-            st = Status::progress;
-
-            _enforce_step_limits(alpha_new, alpha_lo, alpha_hi);
-
-            // If we know the minimum is in the intervall, we can drive alpha to the corresponding end more quickly
-            if(min_in_interval && drive_to_bndry)
+            if(min_in_interval && (_alpha_soft_max - _alpha_soft_min) <= this->_tol_step*_alpha_soft_max)
             {
-              //std::cout << "Bracketing adjust alpha_new from " << alpha_new;
-              if((alpha_hi-alpha_lo) > DataType(0))
-                alpha_new = Math::min(alpha_lo + DataType(0.66)*(alpha_hi-alpha_lo), alpha_new);
-              else
-                alpha_new = Math::max(alpha_lo + DataType(0.66)*(alpha_hi-alpha_lo), alpha_new);
-              //std::cout << " to " << alpha_new << std::endl;
+              //std::cout << "interval width " << _alpha_soft_max - _alpha_soft_min << " : " << this->_tol_step*_alpha_soft_max << std::endl;
+              status = Status::stagnated;
             }
 
-            // Update the solution and evaluate functional/gradient there
-            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha_new/this->_norm_dir);
-            this->_op.prepare(vec_sol, this->_filter);
-
-            f_new = this->_op.compute_func();
-            this->_op.compute_grad(this->_vec_grad);
-            this->trim_func_grad(f_new);
-            this->_filter.filter_def(this->_vec_grad);
-
-            delta_new = this->_vec_grad.dot(vec_dir);
-
-            //std::cout << "Bracket iter " << this->_num_iter <<std::endl; //<< " sol = " << vec_sol << " dir = " << vec_dir //<< " grad = " << this->_vec_grad << std::endl;
-            //std::cout << "  alpha_new " << stringify_fp_sci(alpha_new) << " f_new " << stringify_fp_sci(f_new) << " delta_new " << stringify_fp_sci(delta_new) << std::endl;
-            //std::cout << "  alpha_lo  " << stringify_fp_sci(alpha_lo) << " f_lo  " << stringify_fp_sci(f_lo) << " delta_lo  " << stringify_fp_sci(delta_lo) << std::endl;
-            //std::cout << "  alpha_hi  " << stringify_fp_sci(alpha_hi) << " f_hi  " << stringify_fp_sci(f_hi) << " delta_hi  " << stringify_fp_sci(delta_hi) << std::endl;
-            //std::cout << "  ftol      " << stringify_fp_sci(this->_fval_0 +_tol_decrease*alpha_new*_delta_0) << " gtol " << stringify_fp_sci(-_tol_curvature*_delta_0) << std::endl;
-
-            // Update of interval of uncertainity. We might already be successful.
-
-            // Check if the sufficient decrease condition is violated
-            if( (f_new >= this->_fval_0 +_tol_decrease*alpha_new*_delta_0) ||
-                ( (f_new > f_lo) && this->_num_iter > 1) )
-            {
-              //std::cout << "  sufficient decrease violated" << std::endl;
-              //std::cout << "  f_0 + tol_decrease*alpha_new*_delta_0 " <<
-              //  stringify_fp_sci(this->_fval_0 +_tol_decrease*alpha_new*_delta_0)
-              //  << " f_lo = " << stringify_fp_sci(f_lo) << "f_new = " << stringify_fp_sci(f_new) << std::endl;
-
-              if(f_new > f_hi)
-              {
-                alpha_hi = alpha_new;
-                f_hi = f_new;
-                delta_hi = delta_new;
-              }
-              else
-              {
-                if(delta_new*delta_lo < DataType(0))
+            // If the strong Wolfe conditions hold, we are successful
+            if(fval < this->_fval_0 +_tol_decrease*alpha*_delta_0
+                && Math::abs(df) < -_tol_curvature*_delta_0)
                 {
-                  alpha_hi = alpha_lo;
-                  f_hi = f_lo;
-                  delta_hi = delta_lo;
+                  status = Status::success;
                 }
-                alpha_lo = alpha_new;
-                f_lo = f_new;
-                delta_lo = delta_new;
-              }
+
+            // Stop if _bracket was successful or encountered an error
+            if(status == Status::success)
+            {
+              this->_vec_tmp.axpy(vec_sol, this->_vec_initial_sol, -DataType(1));
+              if(fval >= this->_fval_0 || this->_vec_tmp.norm2() == DataType(0))
+                status = Status::stagnated;
             }
-            // If we have a sufficient decrease, we need to check the curvature condition
+
+            if(status != Status::progress)
+              break;
+
+            if(!interval_known
+                && (fval < this->_fval_0 + this->_tol_decrease*alpha*_delta_0)
+                && (df >= Math::min(this->_tol_decrease, this->_tol_curvature)))
+                {
+                  interval_known = true;
+                }
+
+            //std::cout << "interval known " << interval_known << std::endl;
+            if(!interval_known && (fval <= fval_lo) && fval > this->_fval_0 + alpha*this->_tol_decrease*_delta_0)
+            {
+              DataType fval_m(fval - alpha*this->_tol_decrease*_delta_0);
+              DataType df_m(df - this->_tol_decrease*_delta_0);
+              DataType fval_lo_m(fval_lo - alpha_lo*this->_tol_decrease*_delta_0);
+              DataType df_lo_m(df_lo - this->_tol_decrease*_delta_0);
+              DataType fval_hi_m(fval_hi - alpha_hi*this->_tol_decrease*_delta_0);
+              DataType df_hi_m(df_hi - this->_tol_decrease*_delta_0);
+
+              _polynomial_fit(
+                alpha, fval_m, df_m, alpha_lo, fval_lo_m, df_lo_m,
+                alpha_hi, fval_hi_m, df_hi_m, min_in_interval, drive_to_bndry);
+
+              fval_lo = fval_lo_m + alpha_lo*this->_tol_decrease*_delta_0;
+              df_lo = df_lo_m + this->_tol_decrease*_delta_0;
+              fval_hi = fval_hi_m * alpha_hi*this->_tol_decrease*_delta_0;
+              df_hi = df_hi_m + this->_tol_decrease*_delta_0;
+
+            }
             else
             {
-              //std::cout << "  bracket: sufficient decrease satisfied:  f = " << stringify_fp_sci(f_new) << " <= "
-              //<< stringify_fp_sci(this->_fval_0 +_tol_decrease*alpha_new*_delta_0) << std::endl;
+              _polynomial_fit(alpha, fval, df, alpha_lo, fval_lo, df_lo, alpha_hi, fval_hi, df_hi, min_in_interval,
+              drive_to_bndry);
 
-              // If the curvature condition is satisfied too, we are successful
-              if(Math::abs(delta_new) < -_tol_curvature*_delta_0)
+              //std::cout << "width " << width << " width_old " << width_old << " min_in_interval " << min_in_interval <<std::endl;
+
+              if(min_in_interval)
               {
-                //std::cout << "           curvature condition satisfied " << stringify_fp_sci(Math::abs(delta_new))
-                //<< " < "  << stringify_fp_sci(-_tol_curvature*_delta_0) << std::endl;
-
-                // Ok, alpha_new contains a better step than alpha_lo
-                alpha_lo = alpha_new;
-                f_lo = f_new;
-                delta_lo = delta_new;
-
-                st = Status::success;
-              }
-              // If the curvature condition is violated, we replace either alpha_lo or alpha_hi by alpha_new
-              else
-              {
-                //std::cout << "  curvature condition violated: " << stringify_fp_sci(Math::abs(delta_new)) << " > "
-                //<< stringify_fp_sci(-_tol_curvature*_delta_0) << std::endl;
-
-                // This is the original condition from GN06
-                //if(delta_new*(alpha_hi - alpha_lo) >= DataType(0))
-                // This seems to work better and is uses in ALGLIB
-                if(delta_new < DataType(0))
+                if(Math::abs(alpha_hi - alpha_lo) >= DataType(0.66)*width_old)
                 {
-                  alpha_hi = alpha_lo;
-                  f_hi = f_lo;
-                  delta_hi = delta_lo;
+                  //std::cout << "Forcing " << alpha << " to ";
+                  alpha = alpha_lo + DataType(0.5)*(alpha_hi - alpha_lo);
+                  //std::cout << alpha << std::endl;
                 }
+                width_old = width;
+                width = Math::abs(alpha_lo - alpha_hi);
               }
-
-              // Since the sufficient decrease condition was satisfied, we have a new alpha_lo
-              alpha_lo = alpha_new;
-              f_lo = f_new;
-              delta_lo = delta_new;
-
             }
-
-            this->_def_cur = Math::abs(delta_lo);
-
-            // plot?
-            if(this->_plot)
-            {
-              std::cout << this->_plot_name
-              <<  ": " << stringify(this->_num_iter).pad_front(this->_iter_digits)
-              << " : " << stringify_fp_sci(this->_def_cur)
-              << " / " << stringify_fp_sci(this->_def_cur / this->_def_init)
-              << std::endl;
-            }
-
-            if(this->_num_iter >= this->_max_iter)
-              st = Status::max_iter;
 
           }
 
-          // The bracketing iterations ends
+          this->_alpha_min = alpha;//*this->_norm_dir;
+          this->_fval_min = fval;
 
-          // If we have not been successful, use the best step size obtained so far.
-          if(st != Status::success)
+          if(status == Status::success)
+            this->_alpha_0 = alpha*this->_norm_dir;
+          else
           {
-            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha_lo/this->_norm_dir);
+            this->_alpha_min = alpha_lo;//*this->_norm_dir;
+            this->_fval_min = fval_lo;
+            //std::cout << "Unusual termination alpha_lo " << alpha_lo << "fval_lo " << fval_lo << std::endl;
+            vec_sol.axpy(vec_dir, this->_vec_initial_sol, alpha_lo);
 
+            // Prepare and evaluate
             this->_op.prepare(vec_sol, this->_filter);
+
+            // Compute and filter the gradient
             this->_op.compute_grad(this->_vec_grad);
+            this->trim_func_grad(fval);
             this->_filter.filter_def(this->_vec_grad);
           }
 
-          //std::cout << "Bracket stops at sol = " << vec_sol << " grad = " << this->_vec_grad << std::endl;
-          //std::cout << "  alpha_lo = " << stringify_fp_sci(alpha_lo) << " f_lo = "<< stringify_fp_sci(f_lo)
-          //<< " delta_lo = " << stringify_fp_sci(delta_lo) << std::endl;
-          //std::cout << "  alpha_hi = " << stringify_fp_sci(alpha_hi) << " f_hi = "<< stringify_fp_sci(f_hi)
-          //<< " delta_hi = " << stringify_fp_sci(delta_hi) << std::endl;
-
-          return st;
-        } // _bracket
+          return status;
+        }
 
         /**
          * \brief The great magick trick to find a minimum of a 1d function
@@ -1344,7 +1149,7 @@ namespace FEAT
          * \param[in] df
          * Derivative at alpha_hi
          *
-         * \param[in] f_lo
+         * \param[in] fval_lo
          * Functional value at alpha_lo
          *
          * \param[in] f
@@ -1358,16 +1163,14 @@ namespace FEAT
          * In the cases 1 and 3 this is set to true, in cases 2 and 4 to false. This determines if convergence can be
          * improved by driving the step size to the appropriate boundary more quickly.
          *
-         * \param[in] df_was_negative
-         * If the first df_lo was POSITIVE, we have some sort of backwards search (decreasing step lengths) and this
-         * changes how the cases get treated (see Case 1).
-         *
+         * \param[in] fval_increased
+         * Did the functional value increase in the last step?
          *
          * \returns
          * Status::success as there is nothing that can fail.
          *
-         * This routine does a quadratic interpolation using f_lo, df_lo and df, and a cubic interpolation using
-         * f_lo, df_lo, f_hi and df_hi. The great magick is to determine which is better, and this depends on a lot
+         * This routine does a quadratic interpolation using fval_lo, df_lo and df, and a cubic interpolation using
+         * fval_lo, df_lo, fval_hi and df_hi. The great magick is to determine which is better, and this depends on a lot
          * of factors, which leads to 4 distinct cases.
          *
          * This is also used if we do not know in advance that the minimum is in the given interval, so it performs
@@ -1375,90 +1178,135 @@ namespace FEAT
          *
          */
         Status _polynomial_fit(
-          DataType& alpha_new, DataType alpha_lo, DataType alpha,
-          DataType f_lo, DataType f,
-          DataType df_lo, DataType df,
-          bool& min_in_interval, bool& drive_to_bndry, bool df_was_negative) const
+          DataType& alpha, DataType& fval, DataType& df,
+          DataType& alpha_lo, DataType& fval_lo, DataType& df_lo,
+          DataType& alpha_hi, DataType& fval_hi, DataType& df_hi,
+          bool& min_in_interval, bool& drive_to_bndry)
         {
-          //std::cout << "Polynomial_fit: min_in_interval = " << min_in_interval << std::endl;
-          //std::cout << "  alpha_lo = " << stringify_fp_sci(alpha_lo) << " f_lo = "<< stringify_fp_sci(f_lo)
-          //<< " df_lo = " << stringify_fp_sci(df_lo) << std::endl;
-          //std::cout << "  alpha    = " << stringify_fp_sci(alpha) << " f    = "<< stringify_fp_sci(f)
-          //<< " df    = " << stringify_fp_sci(df) << std::endl;
-
-          // We always need the cubic step
-          DataType alpha_c = _argmin_cubic(alpha_lo, alpha, f_lo, f, df_lo, df);
+          DataType alpha_c(0);
           DataType alpha_q(0);
+          DataType alpha_new(0);
 
-          // Case 1: This basically means that alpha was the new step and the function value increased.
-          if( ((alpha_lo-alpha) < DataType(0)) && df_was_negative )
+          // Case 1: The function value increased.
+          if( fval > fval_lo)
           {
+            // Computation of cubic step
+            alpha_c  = _argmin_cubic(alpha_lo, fval_lo, df_lo, alpha, fval, df);
             // The first derivative was negative, but the function value increases, so the minimum has to be in this
             // interval (or have been in the original interval, which this interval is a subset of)
             min_in_interval = true;
             drive_to_bndry = true;
-            //std::cout << "  Case 1 : ";
             // Use 2nd order approximation NOT using the derivative df because it might be garbage (i.e. if we hit a
             // singularity) because the function value increased
-            alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, false);
+            alpha_q = _argmin_quadratic(alpha_lo, fval_lo, df_lo, alpha, fval, df, false);
+
             // If the cubic minimum is closer to the old best step length, take it. Otherwise, take the mean
             if(Math::abs(alpha_c - alpha_lo) < Math::abs(alpha_q - alpha_lo))
               alpha_new = alpha_c;
             else
               alpha_new = (alpha_q + alpha_c)/DataType(2);
+            //std::cout << "Case 1: alpha " << alpha_new << " q " << alpha_q << " c " << alpha_c << std::endl;
 
           }
           // Case 2: The first derivative changes sign
           // We also know that the function value increased in the last trial step
           else if( df_lo*df < DataType(0) )
           {
+            alpha_c  = _argmin_cubic(alpha, fval, df, alpha_lo, fval_lo, df_lo);
             // Because the derivative changed sign, it has to be zero somewhere in between, so the minimum is in the
             // current interval
             min_in_interval = true;
             drive_to_bndry = false;
-            // Default: Quadratic interpolant using f_lo, df_lo and df
-            alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, true);
-            //std::cout << "  Case 2 : ";
+            // Default: Quadratic interpolant using fval_lo, df_lo and df
+            alpha_q = _argmin_quadratic(alpha_lo, fval_lo, df_lo, alpha, fval, df, true);
             // Take the step closer to the new step alpha
-            Math::abs(alpha - alpha_c) > Math::abs(alpha - alpha_q) ? alpha_new = alpha_q : alpha_new = alpha_c;
+            Math::abs(alpha - alpha_c) > Math::abs(alpha - alpha_q) ? alpha_new = alpha_c : alpha_new = alpha_q;
+            //std::cout << "Case 2: alpha " << alpha_new << " q " << alpha_q << " c " << alpha_c << std::endl;
           }
           // Case 3: The absolute value of the derivative increases
           // We also know that the function value increased in the last trial step and that the derivative did not
           // change sign.
           // This means we have to further search in the direction of alpha.
-          else if(Math::abs(df) > Math::abs(df_lo))
+          else if(Math::abs(df) < Math::abs(df_lo))
           {
+            alpha_c  = _argmin_cubic_case_3(alpha, fval, df, alpha_lo, fval_lo, df_lo);
             drive_to_bndry = true;
-            // Default: Quadratic interpolant using f_lo, df_lo and df
-            alpha_q = _argmin_quadratic(alpha_lo, alpha, f_lo, f, df_lo, df, true);
-            //std::cout << "  Case 3";
+
+            // Quadratic interpolant using fval_lo, df_lo and df
+            alpha_q = _argmin_quadratic(alpha, fval, df, alpha_lo, fval_lo, df_lo, true);
+
             // If the cubic step is closer to the trial step
             if(Math::abs(alpha - alpha_c) < Math::abs(alpha - alpha_q))
             {
-              //std::cout << "a: ";
               min_in_interval ? alpha_new = alpha_c : alpha_new = alpha_q;
             }
             else
             {
-              //std::cout << "b: ";
               min_in_interval ? alpha_new = alpha_q : alpha_new = alpha_c;
             }
+            //std::cout << "Case 3: alpha " << alpha_new << " q " << alpha_q << " c " << alpha_c << std::endl;
           }
           // Case 4: The absolute value of the derivative did not increase
           // We also know that the function value increased in the last trial step and that the derivative did not
           // change sign.
           else
           {
-            //std::cout << "  Case 4: ";
+            drive_to_bndry = false;
+            // Note that the arguments for argmin_cubic are different in this case
             // Here we can just take the cubic step because the cubic interpolation sets it to the alpha_soft_max
             // if it recognises that the minimum is outside the current interval.
-            alpha_new = alpha_c;
-            drive_to_bndry = false;
+            if(min_in_interval)
+            {
+              alpha_c  = _argmin_cubic(alpha, fval , df, alpha_hi, fval_hi, df_hi);
+              alpha_new = alpha_c;
+            }
+            else
+            {
+              alpha > alpha_lo ? alpha_new = _alpha_soft_max : alpha_new = _alpha_soft_min;
+            }
+            //std::cout << "Case 4: alpha " << alpha_new << std::endl;
           }
 
-          //std::cout << "alpha_new = " << stringify_fp_sci(alpha_new) <<
-          //" alpha_c = " << stringify_fp_sci(alpha_c) << " alpha_q = " << stringify_fp_sci(alpha_q) <<
-          //" min_in_interval " << min_in_interval << std::endl;
+            // Update the inverval of uncertainity. Has to happen befor we clamp the step to the admissable interval.
+            // Check which step(s) we need to replace
+            if(fval > fval_lo)
+            {
+              alpha_hi = alpha;
+              fval_hi = fval;
+              df_hi = df;
+            }
+            else
+            {
+              if(df * df_lo < DataType(0))
+              {
+                alpha_hi = alpha_lo;
+                fval_hi = fval_lo;
+                df_hi = df_lo;
+              }
+              alpha_lo = alpha;
+              fval_lo = fval;
+              df_lo = df;
+            }
+
+            _clamp_step(alpha_new);
+
+            // If we know the minimum is in the interval, we can drive alpha to the corresponding end more quickly
+            if(min_in_interval && drive_to_bndry)
+            {
+              //std::cout << "Bracketing adjust " << alpha_lo << " " << alpha_hi << " " << alpha_new << std::endl;
+              //std::cout << "Bracketing adjust alpha_new from " << alpha_new;
+              if(alpha_lo < alpha_hi)
+                alpha_new = Math::min(alpha_lo + DataType(0.66)*(alpha_hi - alpha_lo), alpha_new);
+              else
+                alpha_new = Math::max(alpha_lo + DataType(0.66)*(alpha_hi - alpha_lo), alpha_new);
+              //std::cout << " to " << alpha_new << std::endl;
+            }
+
+            alpha = alpha_new;
+
+            //std::cout << "Polynomial fit: new " << alpha << " " << fval << " " << df <<std::endl;
+            //std::cout << "Polynomial fit: lo  " << alpha_lo << " " << fval_lo << " " << df_lo <<std::endl;
+            //std::cout << "Polynomial fit: hi  " << alpha_hi << " " << fval_hi << " " << df_hi <<std::endl;
 
           return Status::success;
         }
@@ -1480,30 +1328,21 @@ namespace FEAT
          * make sure that we can increase alpha fast enought that the linesearch does not spend too much time on
          * tiny trial steps.
          */
-        void _enforce_step_limits(DataType& alpha_new, DataType alpha, DataType alpha_prev)
+        void _clamp_step(DataType& alpha_new) const
         {
           alpha_new = Math::max(alpha_new, _alpha_hard_min);
           alpha_new = Math::min(alpha_new, _alpha_hard_max);
 
-          if(alpha_new >= _alpha_soft_max)
-          {
-            alpha_new = _alpha_soft_max;
-            //std::cout << "SWLinesearch: alpha_soft_min: " << stringify_fp_sci(_alpha_soft_min) << " to ";
-            _alpha_soft_min = alpha;
-            //std::cout << stringify_fp_sci(_alpha_soft_min) << std::endl;
-            //std::cout << "SWLinesearch: alpha_soft_max: " << stringify_fp_sci(_alpha_soft_max) << " to ";
-            _alpha_soft_max = alpha + DataType(4)*(alpha_new - alpha_prev);
-            //std::cout << stringify_fp_sci(_alpha_soft_max) << std::endl;
-          }
-
+          alpha_new = Math::max(alpha_new, _alpha_soft_min);
+          alpha_new = Math::min(alpha_new, _alpha_soft_max);
         }
 
         /**
          * \brief Computes the minimum of a quadratic interpolation polynomial
          *
          * This has two variants:
-         *  a) Interpolate f_lo, df_lo and f_hi
-         *  b) Interpolate f_lo, df_lo and df_hi
+         *  a) Interpolate fval_lo, df_lo and fval_hi
+         *  b) Interpolate fval_lo, df_lo and df_hi
          *
          * \param[in] alpha_lo
          * The step size for the lower functional value
@@ -1511,10 +1350,10 @@ namespace FEAT
          * \param[in] alpha_hi
          * The step size for the higher functional value
          *
-         * \param[in] f_lo
+         * \param[in] fval_lo
          * Functional value at alpha_lo
          *
-         * \param[in] f_hi
+         * \param[in] fval_hi
          * Functional value at alpha_hi
          *
          * \param[in] df_lo
@@ -1530,16 +1369,16 @@ namespace FEAT
          * The step corresponding to the minumum
          *
          */
-        DataType _argmin_quadratic(DataType alpha_lo, DataType alpha_hi, DataType f_lo, DataType f_hi, DataType df_lo, DataType df_hi, bool interpolate_derivative) const
+        DataType _argmin_quadratic(const DataType alpha_lo, const DataType fval_lo, const DataType df_lo, const DataType alpha_hi, const DataType fval_hi, const DataType df_hi, const bool interpolate_derivative) const
         {
           DataType alpha(alpha_lo);
 
-          // Quadratic interpolation using f_lo, df_lo, df_hi
+          // Quadratic interpolation using fval_lo, df_lo, df_hi
           if(interpolate_derivative)
-            alpha -= df_lo * (alpha_hi - alpha_lo)/(df_hi - df_lo);
-          // Quadratic interpolation using f_lo, f_hi, df_lo
+            alpha += df_lo /(df_lo - df_hi) * (alpha_hi - alpha_lo);
+          // Quadratic interpolation using fval_lo, fval_hi, df_lo
           else
-            alpha -= df_lo*(alpha_hi - alpha_lo)/(DataType(2)*( (f_hi - f_lo)/(alpha_hi - alpha_lo) - df_lo ) );
+            alpha += df_lo/( (fval_hi - fval_lo)/( alpha_hi - alpha_lo) - df_lo)/DataType(2)*(alpha_lo - alpha_hi);
 
           return alpha;
         }
@@ -1548,8 +1387,8 @@ namespace FEAT
          * \brief Computes the minimum of a cubic interpolation polynomial
          *
          * If the minimum of the cubic interpolation polynomial is in the interiour, it is computed here. If it is
-         * not in the interiour, it lies across from the point with the lower function value. In this case, we set
-         * the return value to _alpha_soft_{min, max} accordingly.
+         * not in the interiour, it lies across one of the endpoints depending on the functional and derivative
+         * values. In this case, we set the return value to _alpha_soft_{min, max} accordingly.
          *
          * \param[in] alpha_lo
          * The step size for the lower functional value
@@ -1557,10 +1396,10 @@ namespace FEAT
          * \param[in] alpha_hi
          * The step size for the higher functional value
          *
-         * \param[in] f_lo
+         * \param[in] fval_lo
          * Functional value at alpha_lo
          *
-         * \param[in] f_hi
+         * \param[in] fval_hi
          * Functional value at alpha_hi
          *
          * \param[in] df_lo
@@ -1572,37 +1411,105 @@ namespace FEAT
          * \returns
          * The step corresponding to the minumum or _alpha_soft_{min, max} if there is no minimum in the interiour.
          *
+         * \note The code is extremely ugly and sensitive.
+         *
          */
-        DataType _argmin_cubic(DataType alpha_lo, DataType alpha_hi, DataType f_lo, DataType f_hi, DataType df_lo, DataType df_hi) const
+        DataType _argmin_cubic(DataType alpha_lo, DataType fval_lo, DataType df_lo,
+        DataType alpha_hi, DataType fval_hi, DataType df_hi) const
         {
           DataType alpha(alpha_lo);
 
-          DataType d1 = - DataType(3)*(f_hi - f_lo)/(alpha_hi - alpha_lo) + (df_hi + df_lo);
-
+          DataType d1 = DataType(3)*(fval_lo - fval_hi)/(alpha_hi - alpha_lo) + df_lo + df_hi;
           // Scale the computation of r for better numerical stability
           DataType scale = Math::max(Math::abs(df_lo), Math::abs(df_hi));
           scale = Math::max(scale, Math::abs(d1));
 
           DataType r = Math::sqr(d1/scale) - (df_lo/scale) * (df_hi/scale);
 
+          //std::cout << "fval_hi " << fval_hi << " fval_lo "<< fval_lo << std::endl;
+          //std::cout << "alpha_hi " << alpha_hi << " alpha_lo "<< alpha_lo << std::endl;
+          //std::cout << "df_hi " << df_hi << " df_lo "<< df_lo << std::endl;
+          //std::cout << "d1 " << d1 << std::endl;
+          //std::cout << "scale " << scale << std::endl;
+
           DataType d2(0);
 
           if(r > DataType(0))
           {
-            d2 = Math::signum(alpha_lo - alpha_hi) * scale *
-              Math::sqrt( Math::sqr(d1/scale) - (df_lo/scale) * (df_hi/scale));
+            d2 = Math::signum(alpha_hi - alpha_lo) * scale * Math::sqrt(r);
 
-            alpha -= (alpha_lo - alpha_hi)*(-d1 + df_lo + d2)/(d2 - df_hi + df_lo + d2);
+            DataType p(d2 - df_lo + d1);
+
+            DataType q(0);
+            // This sorting is done to avoid annihilation
+            df_hi*df_lo > DataType(0) ?  q = d2 +(df_hi-df_lo) + d2 : q = d2 - df_lo + d2 + df_hi;
+
+            //std::cout << "d2 " << d2 << std::endl;
+            //std::cout << "p " << p << " q " << q << std::endl;
+
+            alpha += (alpha_hi - alpha_lo)*(p/q);
           }
           // r <= 0 means that the minimum is not in the interior, so it has to lie across the endpoint with the
           // lower function value
           else
           {
-            (alpha_lo < alpha_hi && df_lo > DataType(0) )? alpha = _alpha_soft_min : alpha = _alpha_soft_max;
+            // todo: delete debug
+            d2 = Math::signum(alpha_hi - alpha_lo) * scale *
+              Math::sqrt(Math::max(r, DataType(0)));
+
+            DataType q(0);
+            if(df_hi*df_lo > 0)
+              q = d2 +(df_hi-df_lo) + d2;
+            else
+              q = d2 - df_lo + d2 +df_hi;
+
+            //std::cout << "d2 " << d2 << std::endl;
+            //std::cout << "p " << (d2 - df_lo + d1) << " q " << q << std::endl;
+
+            (alpha_lo < alpha_hi && df_lo > DataType(0) )? alpha = _alpha_soft_min: alpha = _alpha_soft_max;
           }
 
           return alpha;
         }
+
+          // This is the weird check if the function value does not tend to infinity in the direction of the cubic
+          // step
+        DataType _argmin_cubic_case_3(
+          const DataType alpha_lo, const DataType fval_lo, const DataType df_lo,
+          const DataType alpha_hi, const DataType fval_hi, DataType df_hi) const
+        {
+          DataType alpha_c(alpha_lo);
+
+          DataType d1 = DataType(3)*(fval_hi - fval_lo)/(alpha_lo - alpha_hi) + df_hi + df_lo;
+          DataType scale = Math::max(Math::abs(df_lo), Math::abs(df_hi));
+          scale = Math::max(scale, Math::abs(d1));
+
+          DataType r = Math::sqr(d1/scale) - (df_lo/scale) * (df_hi/scale);
+
+          DataType d2 = Math::signum(alpha_hi - alpha_lo) * scale * Math::sqrt(Math::max(r, DataType(0)));
+
+          DataType p(d2 - df_lo + d1);
+          DataType q(d2 +(df_hi - df_lo) + d2);
+
+          //std::cout << "fval_hi " << fval_hi << " fval_lo "<< fval_lo << std::endl;
+          //std::cout << "alpha_hi " << alpha_hi << " alpha_lo "<< alpha_lo << std::endl;
+          //std::cout << "df_hi " << df_hi << " df_lo "<< df_lo << std::endl;
+          //std::cout << "d1 " << d1 << std::endl;
+          //std::cout << "scale " << scale << std::endl;
+          //std::cout << "d2 " << d2 << std::endl;
+          //std::cout << "p " << (d2 - df_lo + d1) << " q " << q << std::endl;
+
+          if( p/q < DataType(0) && d2 != DataType(0))
+            alpha_c += p/q*(alpha_hi - alpha_lo);
+          else
+          {
+            //std::cout << "Weird ";
+            alpha_lo > alpha_hi ? alpha_c = _alpha_soft_max : alpha_c = _alpha_soft_min;
+          }
+
+          return alpha_c;
+        }
+
     }; // class StrongWolfeLinesearch
 
     /**
