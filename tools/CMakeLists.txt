@@ -34,6 +34,9 @@ TARGET_LINK_LIBRARIES(matrix-info feat)
 ADD_EXECUTABLE(mesh-extruder mesh_extruder/mesh_extruder.cpp)
 TARGET_LINK_LIBRARIES(mesh-extruder feat)
 
+ADD_EXECUTABLE(mesh2eps mesh_to_eps/mesh_to_eps.cpp)
+TARGET_LINK_LIBRARIES(mesh2eps feat)
+
 ADD_EXECUTABLE(mesh2vtk mesh_to_vtk/mesh_to_vtk.cpp)
 TARGET_LINK_LIBRARIES(mesh2vtk feat)
 
