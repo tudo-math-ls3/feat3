@@ -311,6 +311,16 @@ namespace FEAT
         return Math::sqrt(norm2sqr());
       }
 
+      /**
+       * \brief Retrieve the absolute maximum value of this vector.
+       *
+       * \return The largest absolute value.
+       */
+      DataType max_element() const
+      {
+        return Math::max(first().max_element(), rest().max_element());
+      }
+
       /// \cond internal
       /// Writes the vector-entries in an allocated array
       void set_vec(DataType * const pval_set) const
@@ -694,6 +704,11 @@ namespace FEAT
       DataType norm2() const
       {
         return first().norm2();
+      }
+
+      DataType max_element() const
+      {
+        return first().max_element();
       }
 
       const typename First_::DataType operator()(Index index) const

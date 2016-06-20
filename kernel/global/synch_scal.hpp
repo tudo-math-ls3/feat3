@@ -20,13 +20,13 @@ namespace FEAT
         public:
 #ifdef FEAT_HAVE_MPI
           template<typename DT_>
-          static std::shared_ptr<ScalTicket<DT_>> value(DT_ & x)
+          static std::shared_ptr<ScalTicket<DT_>> value(DT_ & x, Util::CommOperation op = Util::CommOperationSum())
           {
             TimeStamp ts_start;
 
             auto ticket = std::make_shared<ScalTicket<DT_>>(x);
 
-            Util::Comm::iallreduce(&(ticket->x), Index(1), &(ticket->r), *ticket->req);
+            Util::Comm::iallreduce(&(ticket->x), Index(1), &(ticket->r), *ticket->req, op);
 
             TimeStamp ts_stop;
             Statistics::add_time_mpi_execute(ts_stop.elapsed(ts_start));
@@ -35,7 +35,7 @@ namespace FEAT
           }
 #else
           template<typename DT_>
-          static std::shared_ptr<ScalTicket<DT_>> value(DT_& x)
+          static std::shared_ptr<ScalTicket<DT_>> value(DT_& x, Util::CommOperation /*op*/ = Util::CommOperationSum())
           {
             auto ticket = std::make_shared<ScalTicket<DT_>>(x);
             ticket->r = x;
@@ -50,13 +50,13 @@ namespace FEAT
         public:
 #ifdef FEAT_HAVE_MPI
           template<typename DT_>
-          static DT_ value(DT_& x)
+          static DT_ value(DT_& x, Util::CommOperation op = Util::CommOperationSum())
           {
-            return SynchScal0Async::value(x)->wait();
+            return SynchScal0Async::value(x, op)->wait();
           }
 #else
           template<typename DT_>
-          static DT_ value(DT_& x)
+          static DT_ value(DT_& x, Util::CommOperation /*op*/ = Util::CommOperationSum())
           {
             return x;
           }

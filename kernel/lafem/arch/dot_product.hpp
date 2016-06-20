@@ -14,7 +14,6 @@ namespace FEAT
   {
     namespace Arch
     {
-      // Dot Product
       template <typename Mem_>
       struct DotProduct;
 
@@ -55,7 +54,6 @@ namespace FEAT
         static DT_ value(const DT_ * const x, const DT_ * const y, const Index size);
       };
 
-      // Triple dot product
       template <typename Mem_>
       struct TripleDotProduct;
 

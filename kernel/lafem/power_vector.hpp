@@ -407,6 +407,16 @@ namespace FEAT
       }
 
       /**
+       * \brief Retrieve the absolute maximum value of this vector.
+       *
+       * \return The largest absolute value.
+       */
+      DataType max_element() const
+      {
+        return Math::max(first().max_element(), rest().max_element());
+      }
+
+      /**
        * \brief Retrieve specific PowerVector element.
        *
        * \param[in] index The index of the vector element.
@@ -855,6 +865,11 @@ namespace FEAT
       DataType norm2() const
       {
         return Math::sqrt(norm2sqr());
+      }
+
+      DataType max_element() const
+      {
+        return first().max_element();
       }
 
       const DataType operator()(Index index) const

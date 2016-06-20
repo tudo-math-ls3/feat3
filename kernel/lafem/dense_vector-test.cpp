@@ -662,3 +662,54 @@ DenseVectorComponentInvertTest<Mem::Main, __float128, Index> dv_component_invert
 DenseVectorComponentInvertTest<Mem::CUDA, float, Index> cuda_dv_component_invert_test_float;
 DenseVectorComponentInvertTest<Mem::CUDA, double, Index> cuda_dv_component_invert_test_double;
 #endif
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class DenseVectorMaxElementTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  DenseVectorMaxElementTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorMaxElementTest")
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_, IT_> a_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+      }
+
+      DenseVector<Mem_, DT_, IT_> a;
+      a.convert(a_local);
+      Random rng;
+      Adjacency::Permutation prm_rnd(a.size(), rng);
+      a.permute(prm_rnd);
+
+      DT_ max = a.max_element();
+
+      TEST_CHECK_EQUAL(max, DT_(size-1));
+    }
+  }
+};
+DenseVectorMaxElementTest<Mem::Main, float, unsigned int> dv_max_element_test_float_uint;
+DenseVectorMaxElementTest<Mem::Main, double, unsigned int> dv_max_element_test_double_uint;
+DenseVectorMaxElementTest<Mem::Main, float, unsigned long> dv_max_element_test_float_ulong;
+DenseVectorMaxElementTest<Mem::Main, double, unsigned long> dv_max_element_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorMaxElementTest<Mem::Main, __float128, unsigned int> dv_max_element_test_float128_uint;
+DenseVectorMaxElementTest<Mem::Main, __float128, unsigned long> dv_max_element_test_float128_ulong;
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorMaxElementTest<Mem::CUDA, float, unsigned int> cuda_dv_max_element_test_float_uint;
+DenseVectorMaxElementTest<Mem::CUDA, double, unsigned int> cuda_dv_max_element_test_double_uint;
+DenseVectorMaxElementTest<Mem::CUDA, float, unsigned long> cuda_dv_max_element_test_float_ulong;
+DenseVectorMaxElementTest<Mem::CUDA, double, unsigned long> cuda_dv_max_element_test_double_ulong;
+#endif

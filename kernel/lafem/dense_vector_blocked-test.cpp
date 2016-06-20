@@ -536,3 +536,50 @@ DenseVectorBlockedNorm2Test<Mem::Main, double, Index, 2> dv_norm2_test_double;
 DenseVectorBlockedNorm2Test<Mem::CUDA, float, Index, 2> cuda_dv_norm2_test_float;
 DenseVectorBlockedNorm2Test<Mem::CUDA, double, Index, 2> cuda_dv_norm2_test_double;
 #endif
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_,
+  Index BS_>
+class DenseVectorBlockedMaxElementTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  DenseVectorBlockedMaxElementTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorBlockedMaxElementTest")
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(1) ; size < 1e4 ; size*=2)
+    {
+      DenseVectorBlocked<Mem::Main, DT_, IT_, BS_> a_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        Tiny::Vector<DT_, BS_> tv1;
+        for (Index j(0) ; j < BS_ ; ++j)
+          tv1.v[j]  = DT_((i * BS_ + j) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        a_local(i, tv1);
+      }
+
+      DenseVectorBlocked<Mem_, DT_, IT_, BS_> a;
+      a.convert(a_local);
+      Random rng;
+      Adjacency::Permutation prm_rnd(a.size() * BS_, rng);
+      a.permute(prm_rnd);
+
+      DT_ max = a.max_element();
+
+      TEST_CHECK_EQUAL(max, DT_((size*BS_) -1));
+    }
+  }
+};
+DenseVectorBlockedMaxElementTest<Mem::Main, float, Index, 2> dv_max_element_test_float;
+DenseVectorBlockedMaxElementTest<Mem::Main, double, Index, 2> dv_max_element_test_double;
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedMaxElementTest<Mem::CUDA, float, Index, 2> cuda_dv_max_element_test_float;
+DenseVectorBlockedMaxElementTest<Mem::CUDA, double, Index, 2> cuda_dv_max_element_test_double;
+#endif

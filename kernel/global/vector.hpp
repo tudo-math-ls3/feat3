@@ -185,6 +185,18 @@ namespace FEAT
       {
         _vector.component_product(*x, *y);
       }
+
+      DataType max_element() const
+      {
+        if (_gate != nullptr)
+          return _gate->max_element(_vector);
+        return _vector.max_element();
+      }
+
+      std::shared_ptr<ScalTicket<DataType>> max_element_async() const
+      {
+        return _gate->max_element_async(_vector);
+      }
     };
   } // namespace Global
 } // namespace FEAT

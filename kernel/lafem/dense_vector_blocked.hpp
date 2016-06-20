@@ -18,9 +18,11 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
 #include <kernel/lafem/arch/component_invert.hpp>
+#include <kernel/lafem/arch/max_element.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/time_stamp.hpp>
+#include <kernel/adjacency/permutation.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -1134,7 +1136,43 @@ namespace FEAT
         // fallback
         return Math::sqr(this->norm2());
       }
+
+      /**
+       * \brief Retrieve the absolute maximum value of this vector.
+       *
+       * \return The largest absolute value.
+       */
+      DT_ max_element() const
+      {
+        TimeStamp ts_start;
+
+        Index max_index = Arch::MaxElement<Mem_>::value(this->elements<Perspective::pod>(), this->size<Perspective::pod>());
+        ASSERT(max_index < this->size<Perspective::pod>());
+        DT_ result;
+        MemoryPool<Mem_>::template download<DT_>(&result, this->elements<Perspective::pod>() + max_index, 1);
+        result = Math::abs(result);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
       ///@}
+
+      /// Permutate vector according to the given Permutation
+      void permute(Adjacency::Permutation & perm)
+      {
+        if (perm.size() == 0)
+          return;
+
+        XASSERTM(perm.size() == this->template size<Perspective::pod>(), "Container size does not match permutation size");
+
+        DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> local;
+        local.convert(*this);
+        perm(local.template elements<Perspective::pod>());
+        this->assign(local);
+      }
 
       /// \cond internal
       /// Writes the vector-entries in an allocated array

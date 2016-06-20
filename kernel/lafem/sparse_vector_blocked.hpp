@@ -10,6 +10,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/lafem/arch/max_element.hpp>
 
 namespace FEAT
 {
@@ -416,6 +417,27 @@ namespace FEAT
             ++junk;
           _used_elements() -= junk;
         }
+      }
+
+      /**
+       * \brief Retrieve the absolute maximum value of this vector.
+       *
+       * \return The largest absolute value.
+       */
+      DT_ max_element() const
+      {
+        TimeStamp ts_start;
+
+        Index max_index = Arch::MaxElement<Mem_>::value(this->elements<Perspective::pod>(), this->size<Perspective::pod>());
+        ASSERT(max_index < this->size<Perspective::pod>());
+        DT_ result;
+        MemoryPool<Mem_>::template download<DT_>(&result, this->elements<Perspective::pod>() + max_index, 1);
+        result = Math::abs(result);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
       }
 
       /**

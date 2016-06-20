@@ -16,6 +16,7 @@
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
 #include <kernel/lafem/arch/norm.hpp>
+#include <kernel/lafem/arch/max_element.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
@@ -1196,6 +1197,24 @@ namespace FEAT
       {
         // fallback
         return Math::sqr(this->norm2());
+      }
+
+      /**
+       * \brief Retrieve the absolute maximum value of this vector.
+       *
+       * \return The largest absolute value.
+       */
+      DT_ max_element() const
+      {
+        TimeStamp ts_start;
+
+        Index max_index = Arch::MaxElement<Mem_>::value(this->elements(), this->size());
+        DT_ result = Math::abs((*this)(max_index));
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
       }
 
       ///@}

@@ -148,7 +148,7 @@ namespace FEAT
         MPI_Op _op;
     };
 
-    class CommOperationMax : CommOperation
+    class CommOperationMax : public CommOperation
     {
       public:
         CommOperationMax() :
@@ -710,31 +710,15 @@ namespace FEAT
           CommOperation(0)
       {
       }
-
-        MPI_Op mpi_op()
-        {
-          return _op;
-        }
-
-      private:
-        MPI_Op _op;
     };
 
-    class CommOperationMax : CommOperation
+    class CommOperationMax : public CommOperation
     {
       public:
         CommOperationMax() :
           CommOperation(0)
       {
       }
-
-        MPI_Op mpi_op()
-        {
-          return _op;
-        }
-
-      private:
-        MPI_Op _op;
     };
 
     class CommRequest

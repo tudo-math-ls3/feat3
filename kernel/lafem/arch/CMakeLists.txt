@@ -17,6 +17,7 @@ SET (kernel-lafem-arch-list
   difference_generic.cpp
   dot_product_generic.cpp
   lumping_generic.cpp
+  max_element_generic.cpp
   norm_generic.cpp
   product_matvec_generic.cpp
   product_matvec_generic_ell.cpp
@@ -38,6 +39,7 @@ if (FEAT_HAVE_MKL)
     defect_mkl.cpp
     difference_mkl.cpp
     dot_product_mkl.cpp
+    max_element_mkl.cpp
     norm_mkl.cpp
     product_matvec_mkl.cpp
     scale_mkl.cpp
@@ -66,6 +68,7 @@ if (FEAT_HAVE_CUDA)
     diagonal.cu
     dot_product.cu
     lumping.cu
+    max_element.cu
     norm.cu
     product_matvec.cu
     scale.cu
