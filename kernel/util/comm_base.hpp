@@ -114,11 +114,45 @@ namespace FEAT
         MPI_Comm _comm;
     };
 
-    class Operation
+    class CommOperation
     {
       public:
-        Operation(MPI_Op op) :
+        CommOperation(MPI_Op op) :
           _op(op)
+      {
+      }
+
+        MPI_Op mpi_op()
+        {
+          return _op;
+        }
+
+      private:
+        MPI_Op _op;
+    };
+
+    class CommOperationSum : public CommOperation
+    {
+      public:
+        CommOperationSum() :
+          CommOperation(MPI_SUM)
+      {
+      }
+
+        MPI_Op mpi_op()
+        {
+          return _op;
+        }
+
+      private:
+        MPI_Op _op;
+    };
+
+    class CommOperationMax : CommOperation
+    {
+      public:
+        CommOperationMax() :
+          CommOperation(MPI_MAX)
       {
       }
 
@@ -395,7 +429,7 @@ namespace FEAT
           static inline void reduce(DataType_ * sendbuf,
               DataType_ * recvbuf,
               Index num_elements_to_send,
-              Operation op,
+              CommOperation op,
               Index root,
               Communicator communicator = Communicator(MPI_COMM_WORLD))
           {
@@ -418,7 +452,7 @@ namespace FEAT
           static inline void allreduce(DataType1_ * sendbuf,
               Index num_elements_to_send_and_receive,
               DataType1_ * recvbuf,
-              Operation op = Operation(MPI_SUM),
+              CommOperation op = CommOperationSum(),
               Communicator communicator = Communicator(MPI_COMM_WORLD))
           {
             if (sendbuf == recvbuf)
@@ -514,7 +548,7 @@ namespace FEAT
               Index num_elements_to_send_and_receive,
               DataType1_ * recvbuf,
               CommRequest& r,
-              Operation op = Operation(MPI_SUM),
+              CommOperation op = CommOperationSum(),
               Communicator communicator = Communicator(MPI_COMM_WORLD))
           {
             if (sendbuf == recvbuf)
@@ -657,16 +691,50 @@ namespace FEAT
         Index _comm;
     };
 
-    class Operation
+    class CommOperation
     {
       public:
-        explicit Operation(Index op) :
+        explicit CommOperation(Index op) :
           _op(op)
       {
       }
 
       private:
         Index _op;
+    };
+
+    class CommOperationSum : public CommOperation
+    {
+      public:
+        CommOperationSum() :
+          CommOperation(0)
+      {
+      }
+
+        MPI_Op mpi_op()
+        {
+          return _op;
+        }
+
+      private:
+        MPI_Op _op;
+    };
+
+    class CommOperationMax : CommOperation
+    {
+      public:
+        CommOperationMax() :
+          CommOperation(0)
+      {
+      }
+
+        MPI_Op mpi_op()
+        {
+          return _op;
+        }
+
+      private:
+        MPI_Op _op;
     };
 
     class CommRequest
@@ -790,7 +858,7 @@ namespace FEAT
           static inline void reduce(DataType_*,
               DataType_*,
               Index,
-              Operation,
+              CommOperation,
               Index,
               Communicator)
           {
@@ -810,7 +878,7 @@ namespace FEAT
           static inline void allreduce(DataType1_*,
               Index,
               DataType1_*,
-              Operation = Operation(0),
+              CommOperation = CommOperation(0),
               Communicator = Communicator(0))
           {
           }
@@ -820,7 +888,7 @@ namespace FEAT
               Index,
               DataType1_ *,
               CommRequest&,
-              Operation,
+              CommOperation,
               Communicator)
           {
           }
