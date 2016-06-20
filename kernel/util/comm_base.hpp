@@ -196,9 +196,9 @@ namespace FEAT
       {
       }
 
-        MPI_Status& mpi_status()
+        MPI_Status * mpi_status()
         {
-          return _s;
+          return &_s;
         }
 
       private:
@@ -208,18 +208,14 @@ namespace FEAT
     class CommStatusIgnore : public CommStatus
     {
       public:
-        CommStatusIgnore() :
-          _s(*MPI_STATUSES_IGNORE)
+        CommStatusIgnore()
       {
       }
 
-        MPI_Status& mpi_status()
+        MPI_Status * mpi_status()
         {
-          return _s;
+          return MPI_STATUSES_IGNORE;
         }
-
-      private:
-        MPI_Status _s;
     };
 
     template<template<typename, typename> class ST_>
@@ -266,7 +262,7 @@ namespace FEAT
                 (int)source_rank,
                 (int)recv_tag,
                 communicator.mpi_comm(),
-                &(s.mpi_status()));
+                s.mpi_status());
           }
 
         template<typename DataType_>
@@ -332,13 +328,13 @@ namespace FEAT
                 (int)src_rank,
                 (int)recv_tag,
                 communicator.mpi_comm(),
-                &(s.mpi_status()));
+                s.mpi_status());
           }
 
         static inline void wait(CommRequest& r, CommStatus& s)
         {
           TimeStamp ts_start;
-          MPI_Wait(&(r.mpi_request()), &(s.mpi_status()));
+          MPI_Wait(&(r.mpi_request()), s.mpi_status());
           TimeStamp ts_stop;
         }
 
@@ -352,7 +348,7 @@ namespace FEAT
 
         static inline void test(CommRequest& r, int& flag, CommStatus& s)
         {
-          MPI_Test(&(r.mpi_request()), &flag, &(s.mpi_status()));
+          MPI_Test(&(r.mpi_request()), &flag, s.mpi_status());
         }
 
         static inline void barrier(Communicator communicator = Communicator(MPI_COMM_WORLD))
@@ -698,9 +694,9 @@ namespace FEAT
       {
       }
 
-        Index mpi_status()
+        Index * mpi_status()
         {
-          return _s;
+          return &_s;
         }
 
       private:
@@ -715,9 +711,9 @@ namespace FEAT
       {
       }
 
-        MPI_Status& mpi_status()
+        Index * mpi_status()
         {
-          return _s;
+          return &_s;
         }
 
       private:
