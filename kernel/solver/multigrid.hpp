@@ -899,7 +899,7 @@ namespace FEAT
 
     protected:
       /// the multigrid hierarchy object
-      HierarchyType& _hierarchy;
+      std::shared_ptr<HierarchyType> _hierarchy;
       /// the multigrid cycle
       MultiGridCycle _cycle;
       /// the top-level of this multigrid
@@ -922,7 +922,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] hierarchy
-       * A reference to the multigrid hierarchy object.
+       * A pointer to the multigrid hierarchy object.
        *
        * \param[in] cycle
        * The desired multigrid cycle.
@@ -938,11 +938,11 @@ namespace FEAT
        * \note
        * The cycle may be changed anytime by using the set_cycle() function.
        */
-      explicit MultiGrid(HierarchyType& hierarchy, MultiGridCycle cycle, int top_level = -1, int crs_level = 0) :
+      explicit MultiGrid(std::shared_ptr<HierarchyType> hierarchy, MultiGridCycle cycle, int top_level = -1, int crs_level = 0) :
         BaseClass(),
         _hierarchy(hierarchy),
         _cycle(cycle),
-        _top_level(top_level >= 0 ? Index(top_level) : hierarchy.get_num_levels()-1),
+        _top_level(top_level >= 0 ? Index(top_level) : hierarchy->get_num_levels()-1),
         _crs_level(Index(crs_level))
       {
         XASSERTM(crs_level >= 0, "invalid coarse level");
@@ -989,7 +989,7 @@ namespace FEAT
       void set_levels(int top_level, int crs_level)
       {
         XASSERTM(crs_level >= 0, "invalid coarse level");
-        _top_level = (top_level >= 0 ? Index(top_level) : _hierarchy.get_num_levels()-1);
+        _top_level = (top_level >= 0 ? Index(top_level) : _hierarchy->get_num_levels()-1);
         _crs_level = Index(crs_level);
         XASSERTM(_top_level >= _crs_level, "invalid top-/coarse-level combination");
       }
@@ -1045,9 +1045,9 @@ namespace FEAT
 
         // ensure that the hierarchy was initialised
         /// \todo does this work in nested multigrid?
-        XASSERTM(_hierarchy.have_symbolic(), "init_symbolic() of multigrid hierarchy was not called yet");
+        XASSERTM(_hierarchy->have_symbolic(), "init_symbolic() of multigrid hierarchy was not called yet");
 
-        const std::size_t num_lvls = _hierarchy.get_num_levels();
+        const std::size_t num_lvls = _hierarchy->get_num_levels();
 
         // allocate counter vector
         _counters.resize(std::size_t(num_lvls), 0);
@@ -1092,7 +1092,7 @@ namespace FEAT
 
         // ensure that the hierarchy was initialised
         /// \todo does this work in nested multigrid?
-        XASSERTM(_hierarchy.have_numeric(), "init_numeric() of multigrid hierarchy was not called yet");
+        XASSERTM(_hierarchy->have_numeric(), "init_numeric() of multigrid hierarchy was not called yet");
       }
 
       /**
@@ -1144,7 +1144,7 @@ namespace FEAT
         }
 
         // get a reference to the finest level
-        LevelInfo& lvl_top = _hierarchy._get_level_info(_top_level);
+        LevelInfo& lvl_top = _hierarchy->_get_level_info(_top_level);
 
         // copy defect to RHS vector
         lvl_top.vec_rhs.copy(vec_def);
@@ -1374,7 +1374,7 @@ namespace FEAT
         double mpi_wait_start(Statistics::get_time_mpi_wait());
 
         // get the coarse level info
-        LevelInfo& lvl_crs = _hierarchy._get_level_info(_crs_level);
+        LevelInfo& lvl_crs = _hierarchy->_get_level_info(_crs_level);
 
         // get the system filter
         const FilterType& system_filter = lvl_crs.level->get_system_filter();
@@ -1410,7 +1410,7 @@ namespace FEAT
       bool _apply_smooth_def(Index cur_lvl, SolverType& smoother)
       {
         // get the level info
-        LevelInfo& lvl = _hierarchy._get_level_info(cur_lvl);
+        LevelInfo& lvl = _hierarchy->_get_level_info(cur_lvl);
 
         // get the system matrix and filter
         const MatrixType& system_matrix = lvl.level->get_system_matrix();
@@ -1449,7 +1449,7 @@ namespace FEAT
         double mpi_wait_start(Statistics::get_time_mpi_wait());
 
         // get the level info
-        LevelInfo& lvl = _hierarchy._get_level_info(cur_lvl);
+        LevelInfo& lvl = _hierarchy->_get_level_info(cur_lvl);
 
         // get the system matrix and filter
         const MatrixType& system_matrix = lvl.level->get_system_matrix();
@@ -1513,8 +1513,8 @@ namespace FEAT
           double mpi_wait_start(Statistics::get_time_mpi_wait());
 
           // get our fine and coarse levels
-          LevelInfo& lvl_f = _hierarchy._get_level_info(i);
-          LevelInfo& lvl_c = _hierarchy._get_level_info(i-1);
+          LevelInfo& lvl_f = _hierarchy->_get_level_info(i);
+          LevelInfo& lvl_c = _hierarchy->_get_level_info(i-1);
 
           // get system matrix and filters
           const MatrixType& system_matrix   = lvl_f.level->get_system_matrix();
@@ -1596,8 +1596,8 @@ namespace FEAT
           double mpi_wait_start(Statistics::get_time_mpi_wait());
 
           // get our level and the coarse level
-          LevelInfo& lvl_f = _hierarchy._get_level_info(i);
-          LevelInfo& lvl_c = _hierarchy._get_level_info(i-1);
+          LevelInfo& lvl_f = _hierarchy->_get_level_info(i);
+          LevelInfo& lvl_c = _hierarchy->_get_level_info(i-1);
 
           // get system matrix and filters
           const MatrixType& system_matrix   = lvl_f.level->get_system_matrix();
@@ -1654,7 +1654,7 @@ namespace FEAT
      * \brief Creates a new Multigrid preconditioner object
      *
      * \param[in] hierarchy
-     * A reference to the multigrid hierarchy object.
+     * A pointer to the multigrid hierarchy object.
      *
      * \param[in] cycle
      * The desired multigrid cycle.
@@ -1676,7 +1676,7 @@ namespace FEAT
       typename ProlOperator_,
       typename RestOperator_>
     std::shared_ptr<MultiGrid<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>> new_multigrid(
-      MultiGridHierarchy<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>& hierarchy,
+      std::shared_ptr<MultiGridHierarchy<SystemMatrix_, SystemFilter_, ProlOperator_, RestOperator_>> hierarchy,
       MultiGridCycle cycle = MultiGridCycle::V,
       int top_level = -1,
       int crs_level = 0)

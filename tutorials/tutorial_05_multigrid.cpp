@@ -320,12 +320,12 @@ namespace Tutorial05
     // object is not a solver/preconditioner -- we will create that one lateron.
 
     // The MultiGridHierarchy class templates has four template parameters:
-    Solver::MultiGridHierarchy<
+    auto multigrid_hierarchy = std::make_shared<Solver::MultiGridHierarchy<
       MatrixType,   // the system matrix type
       FilterType,   // the system filter type
       MatrixType,   // the prolongation operator type
       MatrixType    // the restriction operator type
-    > multigrid_hierarchy;
+      >>();
 
     // Now we need to fill this empty hierarchy object with life, i.e. we have to attach
     // all our matrices and filters to it. Moreover, we also need to create the corresponding
@@ -341,7 +341,7 @@ namespace Tutorial05
 
       // Now we need to attach this solver as well as the system matrix and filter to
       // our multigrid hierarchy. This is done by calling the following member function:
-      multigrid_hierarchy.push_level(
+      multigrid_hierarchy->push_level(
         lvl.matrix,       // the coarse-level system matrix
         lvl.filter,       // the coarse-level system filter
         coarse_solver     // the coarse-level solver
@@ -373,7 +373,7 @@ namespace Tutorial05
       // Finally, attach our system matrix, system filter, grid transfer matrices and
       // our smoother to the multigrid hierarchy. This is done by calling the following
       // member function:
-      multigrid_hierarchy.push_level(
+      multigrid_hierarchy->push_level(
         lvl.matrix,     // the system matrix for this level
         lvl.filter,     // the system filter for this level
         lvl.mat_prol,   // the prolongation matrix for this level
@@ -426,7 +426,7 @@ namespace Tutorial05
     // multigrid solver configurations like e.g. the ScaRC solver, so we have to live with that.
 
     // So, initialise the multigrid hierarchy:
-    multigrid_hierarchy.init();
+    multigrid_hierarchy->init();
 
     // As always, enable the convergence plot:
     solver->set_plot(true);
@@ -442,7 +442,7 @@ namespace Tutorial05
 
     // Release our multigrid hierarchy; this also needs to be done separately *after*
     // the remaining solver tree was released in the call directly above.
-    multigrid_hierarchy.done();
+    multigrid_hierarchy->done();
 
     // The remainder of this tutorial is virtually identical to the previous ones.
 
