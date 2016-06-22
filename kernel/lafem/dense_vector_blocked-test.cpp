@@ -148,11 +148,19 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), 1e-5);*/
   }
 };
-DenseVectorBlockedTest<Mem::Main, float, Index> cpu_dense_vector_blocked_test_float;
-DenseVectorBlockedTest<Mem::Main, double, Index> cpu_dense_vector_blocked_test_double;
+DenseVectorBlockedTest<Mem::Main, float, unsigned int> cpu_dense_vector_blocked_test_float_uint;
+DenseVectorBlockedTest<Mem::Main, double, unsigned int> cpu_dense_vector_blocked_test_double_uint;
+DenseVectorBlockedTest<Mem::Main, float, unsigned long> cpu_dense_vector_blocked_test_float_ulong;
+DenseVectorBlockedTest<Mem::Main, double, unsigned long> cpu_dense_vector_blocked_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedTest<Mem::Main, __float128, unsigned int> cpu_dense_vector_blocked_test_float128_uint;
+DenseVectorBlockedTest<Mem::Main, __float128, unsigned long> cpu_dense_vector_blocked_test_float128_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedTest<Mem::CUDA, float, Index> cuda_dense_vector_blocked_test_float;
-DenseVectorBlockedTest<Mem::CUDA, double, Index> cuda_dense_vector_blocked_test_double;
+DenseVectorBlockedTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_blocked_test_float_uint;
+DenseVectorBlockedTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_blocked_test_double_uint;
+DenseVectorBlockedTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_blocked_test_float_ulong;
+DenseVectorBlockedTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_blocked_test_double_ulong;
 #endif
 
 template<
@@ -217,11 +225,19 @@ public:
     }
   }
 };
-DenseVectorBlockedAxpyTest<Mem::Main, float, Index, 2> dv_axpy_test_float;
-DenseVectorBlockedAxpyTest<Mem::Main, double, Index, 2> dv_axpy_test_double;
+DenseVectorBlockedAxpyTest<Mem::Main, float, unsigned int, 2> dv_axpy_test_float_uint;
+DenseVectorBlockedAxpyTest<Mem::Main, double, unsigned int, 2> dv_axpy_test_double_uint;
+DenseVectorBlockedAxpyTest<Mem::Main, float, unsigned long, 3> dv_axpy_test_float_ulong;
+DenseVectorBlockedAxpyTest<Mem::Main, double, unsigned long, 3> dv_axpy_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedAxpyTest<Mem::Main, __float128, unsigned int, 2> dv_axpy_test_float128_uint;
+DenseVectorBlockedAxpyTest<Mem::Main, __float128, unsigned long, 3> dv_axpy_test_float128_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedAxpyTest<Mem::CUDA, float, Index, 2> cuda_dv_axpy_test_float;
-DenseVectorBlockedAxpyTest<Mem::CUDA, double, Index, 2> cuda_dv_axpy_test_double;
+DenseVectorBlockedAxpyTest<Mem::CUDA, float, unsigned int, 2> cuda_dv_axpy_test_float_uint;
+DenseVectorBlockedAxpyTest<Mem::CUDA, double, unsigned int, 2> cuda_dv_axpy_test_double_uint;
+DenseVectorBlockedAxpyTest<Mem::CUDA, float, unsigned long, 3> cuda_dv_axpy_test_float_ulong;
+DenseVectorBlockedAxpyTest<Mem::CUDA, double, unsigned long, 3> cuda_dv_axpy_test_double_ulong;
 #endif
 
 
@@ -241,7 +257,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
@@ -278,11 +294,19 @@ public:
     }
   }
 };
-DenseVectorBlockedDotTest<Mem::Main, float, Index, 2> dv_dot_product_test_float;
-DenseVectorBlockedDotTest<Mem::Main, double, Index, 2> dv_dot_product_test_double;
+DenseVectorBlockedDotTest<Mem::Main, float, unsigned int, 3> dv_dot_product_test_float_uint;
+DenseVectorBlockedDotTest<Mem::Main, double, unsigned int, 3> dv_dot_product_test_double_uint;
+DenseVectorBlockedDotTest<Mem::Main, float, unsigned long, 2> dv_dot_product_test_float_ulong;
+DenseVectorBlockedDotTest<Mem::Main, double, unsigned long, 2> dv_dot_product_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedDotTest<Mem::Main, __float128, unsigned int, 3> dv_dot_product_test_float128_uint;
+DenseVectorBlockedDotTest<Mem::Main, __float128, unsigned long, 2> dv_dot_product_test_float128_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedDotTest<Mem::CUDA, float, Index, 2> cuda_dv_dot_product_test_float;
-DenseVectorBlockedDotTest<Mem::CUDA, double, Index, 2> cuda_dv_dot_product_test_double;
+DenseVectorBlockedDotTest<Mem::CUDA, float, unsigned int, 3> cuda_dv_dot_product_test_float_uint;
+DenseVectorBlockedDotTest<Mem::CUDA, double, unsigned int, 3> cuda_dv_dot_product_test_double_uint;
+DenseVectorBlockedDotTest<Mem::CUDA, float, unsigned long, 2> cuda_dv_dot_product_test_float_ulong;
+DenseVectorBlockedDotTest<Mem::CUDA, double, unsigned long, 2> cuda_dv_dot_product_test_double_ulong;
 #endif
 
 
@@ -350,11 +374,19 @@ public:
     }
   }
 };
-DenseVectorBlockedTripleDotTest<Mem::Main, float, Index, 2> dv_triple_dot_product_test_float;
-DenseVectorBlockedTripleDotTest<Mem::Main, double, Index, 2> dv_triple_dot_product_test_double;
+DenseVectorBlockedTripleDotTest<Mem::Main, float, unsigned int, 3> dv_triple_dot_product_test_float_uint;
+DenseVectorBlockedTripleDotTest<Mem::Main, double, unsigned int, 3> dv_triple_dot_product_test_double_uint;
+DenseVectorBlockedTripleDotTest<Mem::Main, float, unsigned long, 2> dv_triple_dot_product_test_float_ulong;
+DenseVectorBlockedTripleDotTest<Mem::Main, double, unsigned long, 2> dv_triple_dot_product_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedTripleDotTest<Mem::Main, __float128, unsigned int, 3> dv_triple_dot_product_test_float128_uint;
+DenseVectorBlockedTripleDotTest<Mem::Main, __float128, unsigned long, 2> dv_triple_dot_product_test_float128_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedTripleDotTest<Mem::CUDA, float, Index, 2> cuda_dv_triple_dot_product_test_float;
-DenseVectorBlockedTripleDotTest<Mem::CUDA, double, Index, 2> cuda_dv_triple_dot_product_test_double;
+DenseVectorBlockedTripleDotTest<Mem::CUDA, float, unsigned int, 3> cuda_dv_triple_dot_product_test_float_uint;
+DenseVectorBlockedTripleDotTest<Mem::CUDA, double, unsigned int, 3> cuda_dv_triple_dot_product_test_double_uint;
+DenseVectorBlockedTripleDotTest<Mem::CUDA, float, unsigned long, 2> cuda_dv_triple_dot_product_test_float_ulong;
+DenseVectorBlockedTripleDotTest<Mem::CUDA, double, unsigned long, 2> cuda_dv_triple_dot_product_test_double_ulong;
 #endif
 
 
@@ -427,11 +459,19 @@ public:
     run1();
   }
 };
-DenseVectorBlockedComponentProductTest<Mem::Main, float, Index, 2> dv_component_product_test_float;
-DenseVectorBlockedComponentProductTest<Mem::Main, double, Index, 2> dv_component_product_test_double;
+DenseVectorBlockedComponentProductTest<Mem::Main, float, unsigned int, 3> dv_component_product_test_float_uint;
+DenseVectorBlockedComponentProductTest<Mem::Main, double, unsigned int, 3> dv_component_product_test_double_uint;
+DenseVectorBlockedComponentProductTest<Mem::Main, float, unsigned long, 2> dv_component_product_test_float_ulong;
+DenseVectorBlockedComponentProductTest<Mem::Main, double, unsigned long, 2> dv_component_product_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedComponentProductTest<Mem::Main, __float128, unsigned int, 3> dv_component_product_test_float128_uint;
+DenseVectorBlockedComponentProductTest<Mem::Main, __float128, unsigned long, 2> dv_component_product_test_float128_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedComponentProductTest<Mem::CUDA, float, Index, 2> cuda_dv_component_product_test_float;
-DenseVectorBlockedComponentProductTest<Mem::CUDA, double, Index, 2> cuda_dv_component_product_test_double;
+DenseVectorBlockedComponentProductTest<Mem::CUDA, float, unsigned int, 3> cuda_dv_component_product_test_float_uint;
+DenseVectorBlockedComponentProductTest<Mem::CUDA, double, unsigned int, 3> cuda_dv_component_product_test_double_uint;
+DenseVectorBlockedComponentProductTest<Mem::CUDA, float, unsigned long, 2> cuda_dv_component_product_test_float_ulong;
+DenseVectorBlockedComponentProductTest<Mem::CUDA, double, unsigned long, 2> cuda_dv_component_product_test_double_ulong;
 #endif
 
 template<
@@ -479,11 +519,19 @@ public:
     }
   }
 };
-DenseVectorBlockedScaleTest<Mem::Main, float, Index, 2> dv_scale_test_float;
-DenseVectorBlockedScaleTest<Mem::Main, double, Index, 2> dv_scale_test_double;
+DenseVectorBlockedScaleTest<Mem::Main, float, unsigned int, 3> dv_scale_test_float_uint;
+DenseVectorBlockedScaleTest<Mem::Main, double, unsigned int, 3> dv_scale_test_double_uint;
+DenseVectorBlockedScaleTest<Mem::Main, float, unsigned long, 2> dv_scale_test_float_ulong;
+DenseVectorBlockedScaleTest<Mem::Main, double, unsigned long, 2> dv_scale_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedScaleTest<Mem::Main, __float128, unsigned int, 3> dv_scale_test_float128_uint;
+DenseVectorBlockedScaleTest<Mem::Main, __float128, unsigned long, 2> dv_scale_test_float128_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedScaleTest<Mem::CUDA, float, Index, 2> cuda_dv_scale_test_float;
-DenseVectorBlockedScaleTest<Mem::CUDA, double, Index, 2> cuda_dv_scale_test_double;
+DenseVectorBlockedScaleTest<Mem::CUDA, float, unsigned int, 3> cuda_dv_scale_test_float_uint;
+DenseVectorBlockedScaleTest<Mem::CUDA, double, unsigned int, 3> cuda_dv_scale_test_double_uint;
+DenseVectorBlockedScaleTest<Mem::CUDA, float, unsigned long, 2> cuda_dv_scale_test_float_ulong;
+DenseVectorBlockedScaleTest<Mem::CUDA, double, unsigned long, 2> cuda_dv_scale_test_double_ulong;
 #endif
 
 
@@ -530,11 +578,19 @@ public:
     }
   }
 };
-DenseVectorBlockedNorm2Test<Mem::Main, float, Index, 2> dv_norm2_test_float;
-DenseVectorBlockedNorm2Test<Mem::Main, double, Index, 2> dv_norm2_test_double;
+DenseVectorBlockedNorm2Test<Mem::Main, float, unsigned int, 2> dv_norm2_test_float_uint;
+DenseVectorBlockedNorm2Test<Mem::Main, double, unsigned int, 2> dv_norm2_test_double_uint;
+DenseVectorBlockedNorm2Test<Mem::Main, float, unsigned long, 3> dv_norm2_test_float_ulong;
+DenseVectorBlockedNorm2Test<Mem::Main, double, unsigned long, 3> dv_norm2_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedNorm2Test<Mem::Main, __float128, unsigned int, 2> dv_norm2_test_float128_uint;
+DenseVectorBlockedNorm2Test<Mem::Main, __float128, unsigned long, 3> dv_norm2_test_float128_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedNorm2Test<Mem::CUDA, float, Index, 2> cuda_dv_norm2_test_float;
-DenseVectorBlockedNorm2Test<Mem::CUDA, double, Index, 2> cuda_dv_norm2_test_double;
+DenseVectorBlockedNorm2Test<Mem::CUDA, float, unsigned int, 2> cuda_dv_norm2_test_float_uint;
+DenseVectorBlockedNorm2Test<Mem::CUDA, double, unsigned int, 2> cuda_dv_norm2_test_double_uint;
+DenseVectorBlockedNorm2Test<Mem::CUDA, float, unsigned long, 3> cuda_dv_norm2_test_float_ulong;
+DenseVectorBlockedNorm2Test<Mem::CUDA, double, unsigned long, 3> cuda_dv_norm2_test_double_ulong;
 #endif
 
 
@@ -577,9 +633,17 @@ public:
     }
   }
 };
-DenseVectorBlockedMaxElementTest<Mem::Main, float, Index, 2> dv_max_element_test_float;
-DenseVectorBlockedMaxElementTest<Mem::Main, double, Index, 2> dv_max_element_test_double;
+DenseVectorBlockedMaxElementTest<Mem::Main, float, unsigned int, 2> dv_max_element_test_float_uint;
+DenseVectorBlockedMaxElementTest<Mem::Main, double, unsigned int, 2> dv_max_element_test_double_uint;
+DenseVectorBlockedMaxElementTest<Mem::Main, float, unsigned long, 3> dv_max_element_test_float_ulong;
+DenseVectorBlockedMaxElementTest<Mem::Main, double, unsigned long, 3> dv_max_element_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedMaxElementTest<Mem::Main, __float128, unsigned int, 2> dv_max_element_test_float128_uint;
+DenseVectorBlockedMaxElementTest<Mem::Main, __float128, unsigned long, 3> dv_max_element_test_float128_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedMaxElementTest<Mem::CUDA, float, Index, 2> cuda_dv_max_element_test_float;
-DenseVectorBlockedMaxElementTest<Mem::CUDA, double, Index, 2> cuda_dv_max_element_test_double;
+DenseVectorBlockedMaxElementTest<Mem::CUDA, float, unsigned int, 2> cuda_dv_max_element_test_float_uint;
+DenseVectorBlockedMaxElementTest<Mem::CUDA, double, unsigned int, 2> cuda_dv_max_element_test_double_uint;
+DenseVectorBlockedMaxElementTest<Mem::CUDA, float, unsigned long, 3> cuda_dv_max_element_test_float_ulong;
+DenseVectorBlockedMaxElementTest<Mem::CUDA, double, unsigned long, 3> cuda_dv_max_element_test_double_ulong;
 #endif
