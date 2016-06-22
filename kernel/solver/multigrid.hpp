@@ -1109,10 +1109,35 @@ namespace FEAT
         BaseClass::done_numeric();
       }
 
-      /// \todo implement this correctly
+      /// \todo be more verbosive on different pre/post/peak smoother infos
       virtual String get_formated_solver_tree() const override
       {
-        return BaseClass::get_formated_solver_tree();
+        String result;
+        result += this->name();
+        result += " ( ";
+        std::shared_ptr<SolverType> smoother = _hierarchy->_get_level_info(_top_level).level->get_smoother_pre();
+        if(smoother)
+        {
+          result += "S: " + smoother->get_formated_solver_tree() + " / ";
+        }
+        else
+        {
+          result += "S: None / ";
+        }
+
+        std::shared_ptr<SolverType> coarse_solver = _hierarchy->_get_level_info(_crs_level).level->get_coarse_solver();
+        if(coarse_solver)
+        {
+          result += "C: " + coarse_solver->get_formated_solver_tree();
+
+        }
+        else
+        {
+          result += "C: Idendity";
+        }
+        result += " ) ";
+
+        return result;
       }
 
       /**
