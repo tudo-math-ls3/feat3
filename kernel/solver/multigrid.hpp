@@ -1021,7 +1021,7 @@ namespace FEAT
        */
       virtual String name() const override
       {
-        return "MultiGrid";
+        return "MultiGrid-" + stringify(_cycle);
       }
 
       /// \todo implement this correctly
