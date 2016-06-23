@@ -87,7 +87,7 @@ namespace FEAT
     * \param message_in
     * A short error message.
     */
-    InternalError(const String & message_in) :
+    explicit InternalError(const String & message_in) :
       Exception("Internal error: " + message_in)
     {
     }

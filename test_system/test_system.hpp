@@ -98,7 +98,7 @@ namespace FEAT
 
       public:
         /// Constructor
-        DeleteOnDestruction(TestList * * const ptr)
+        explicit DeleteOnDestruction(TestList * * const ptr)
           : _ptr(ptr)
         {
         }
@@ -242,7 +242,7 @@ namespace FEAT
         * \param[in] id
         * the testcase's id string
         */
-      BaseTest(const String& id_in)
+      explicit BaseTest(const String& id_in)
         : _id(id_in),
         _mem_name(Type::Traits<Archs::None>::name()),
         _prec_name(Type::Traits<Archs::None>::name()),
@@ -320,7 +320,7 @@ namespace FEAT
       * \param[in] id
       * the testcase's id string
       */
-      TaggedTest(const String & id_in)
+      explicit TaggedTest(const String & id_in)
         : BaseTest(id_in)
       {
         _mem_name = Type::Traits<Mem_>::name();
@@ -353,7 +353,7 @@ namespace FEAT
       * \param[in] id
       * the testcase's id string
       */
-      FullTaggedTest(const String & id_in)
+      explicit FullTaggedTest(const String & id_in)
         : BaseTest(id_in)
       {
         _mem_name = Type::Traits<Mem_>::name();

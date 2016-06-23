@@ -16,7 +16,7 @@ class HaveParmetisTest:
   public TaggedTest<Tag_, IndexType_>
 {
   public:
-    HaveParmetisTest(const std::string & tag) :
+    explicit HaveParmetisTest(const std::string & tag) :
       TaggedTest<Tag_, IndexType_>("HaveParmetisTest<" + tag + ">")
     {
     }

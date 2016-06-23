@@ -9,7 +9,7 @@ class A
   public:
   bool flag;
 
-  A(bool f) :
+  explicit A(bool f) :
     flag(f)
   {
   }
@@ -43,7 +43,7 @@ class UnitTest
 {
 public:
   /// Constructor
-  UnitTest(const String & id_in)
+  explicit UnitTest(const String & id_in)
     : BaseTest(id_in)
   {
   }
@@ -83,7 +83,7 @@ class TaggedUnitTest
 {
 public:
   /// Constructor
-  TaggedUnitTest(const String & id_in)
+  explicit TaggedUnitTest(const String & id_in)
     : TaggedTest<Tag_, DT_>(id_in)
   {
   }
@@ -124,7 +124,7 @@ class FullTaggedUnitTest
 {
 public:
   /// Constructor
-  FullTaggedUnitTest(const String & id_in)
+  explicit FullTaggedUnitTest(const String & id_in)
     : FullTaggedTest<Mem_, DT_, IT_>(id_in)
   {
   }

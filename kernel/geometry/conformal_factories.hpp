@@ -749,7 +749,7 @@ namespace FEAT
         /**
          * \brief From deque of Tiny::Vectors constructor
          */
-        PolylineFactory(std::deque<typename VertexSetType::VertexType>& points_) :
+        explicit PolylineFactory(std::deque<typename VertexSetType::VertexType>& points_) :
           _points(points_)
         {
           if(points_.empty())

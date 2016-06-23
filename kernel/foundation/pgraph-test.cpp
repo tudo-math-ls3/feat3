@@ -17,7 +17,7 @@ class PGraphParmetisTest:
   public TaggedTest<Tag_, IndexType_>
 {
   public:
-    PGraphParmetisTest(const std::string & tag) :
+    explicit PGraphParmetisTest(const std::string & tag) :
       TaggedTest<Tag_, IndexType_>("PGraphParmetisTest<" + tag + ">")
     {
     }

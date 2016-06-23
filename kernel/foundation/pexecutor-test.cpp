@@ -18,7 +18,7 @@ class PExecutorParmetisTest:
   public TaggedTest<Tag_, IndexType_>
 {
   public:
-    PExecutorParmetisTest(const std::string & tag) :
+    explicit PExecutorParmetisTest(const std::string & tag) :
       TaggedTest<Tag_, IndexType_>("PExecutorParmetisTest<" + tag + ">")
     {
     }
