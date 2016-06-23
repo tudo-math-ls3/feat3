@@ -308,8 +308,7 @@ namespace PoissonDirichlet2D
       std::cout<<"Solver execution FAILED, with status: " << result << std::endl;
     }
 
-    TimeStamp bt;
-    double solver_toe(bt.elapsed(at));
+    double solver_toe(at.elapsed_now());
 
     FEAT::Control::Statistics::report(solver_toe, args.check("statistics"), MeshType::ShapeType::dimension,
     system_levels, transfer_levels, solver, domain);

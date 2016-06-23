@@ -380,9 +380,9 @@ namespace FEAT
         _time_mpi_wait.correction = 0.;
       }
 
-      static void write_out_solver_statistics_scheduled(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, String filename = "solver_stats");
+      static void write_out_solver_statistics_scheduled(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, Index cells, Index dofs, Index nzes, String filename = "solver_stats");
 
-      static void write_out_solver_statistics(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, String filename = "solver_stats")
+      static void write_out_solver_statistics(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, Index cells, Index dofs, Index nzes, String filename = "solver_stats")
       {
         filename += ".";
         filename += stringify(rank);
@@ -402,6 +402,8 @@ namespace FEAT
         file << std::endl;
 
         file << "#global time" << std::endl;
+        //TODO partition, assembly, solve
+        file << "#solver time" << std::endl;
         file << "reduction " << stringify(get_time_reduction()) << std::endl;
         file << "axpy " << stringify(get_time_axpy()) << std::endl;
         file << "spmv " << stringify(get_time_spmv()) << std::endl;
@@ -412,9 +414,16 @@ namespace FEAT
         file << std::endl;
 
         file << "#global size" << std::endl;
-        file << "la " << stringify(la_bytes) << std::endl;
         file << "domain " << stringify(domain_bytes) << std::endl;
         file << "mpi " << stringify(mpi_bytes) << std::endl;
+        file << "la " << stringify(la_bytes) << std::endl;
+
+        file << std::endl;
+
+        file <<"#problem size" << std::endl;
+        file << "cells " << stringify(cells) << std::endl;
+        file << "dofs " << stringify(dofs) << std::endl;
+        file << "nzes " << stringify(nzes) << std::endl;
 
         file << std::endl;
 

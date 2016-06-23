@@ -50,8 +50,8 @@ namespace FEAT
             std::cout<<flops<<std::endl<<std::endl;
             std::cout<<FEAT::Statistics::get_formated_times(solver_toe)<<std::endl<<std::endl;
             std::cout<<String("Domain size:").pad_back(17) << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
-            std::cout<<String("LA size:").pad_back(17) << double(la_size) / (1024. * 1024.) << " MByte" << std::endl;
-            std::cout<<String("MPI size:").pad_back(17) << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
+            std::cout<<String("MPI size:").pad_back(17) << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl;
+            std::cout<<String("LA size:").pad_back(17) << double(la_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
             std::cout<<Util::get_formated_memory_usage()<<std::endl;
             std::cout<<String("#Mesh cells:").pad_back(17) << "min " << domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension)<<
               ", max " << domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension)<<std::endl;
@@ -64,7 +64,9 @@ namespace FEAT
           }
           if (statistics_check > 0) // provided parameter full or whatever
           {
-            FEAT::Statistics::write_out_solver_statistics_scheduled(rank, la_size, domain.bytes(), mpi_size);
+            FEAT::Statistics::write_out_solver_statistics_scheduled(rank, la_size, domain.bytes(), mpi_size,
+            domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension), system_levels.back()->matrix_sys.columns(),
+            system_levels.back()->matrix_sys.used_elements());
           }
         }
 
