@@ -87,6 +87,37 @@ namespace FEAT
       {
       }
 
+      /**
+       * \brief Formats the velocity information as a string.
+       *
+       * \param[in] precision
+       * The precision for floating point values.
+       *
+       * \param[in] pad_size
+       * The leading string padding size. Should be >= 10 to achieve vertical alignment.
+       *
+       * \paran[in] pad_char
+       * The leading string padding character.
+       *
+       * \returns
+       * A string containing the formatted velocity field info.
+       */
+      String format_string(int precision = 0, std::size_t pad_size = 10u, char pad_char = '.') const
+      {
+        String s;
+        s += String("H0-Norm").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h0, precision) + " [";
+        for(int i(0); i < dim_; ++i)
+          (s += " ") += stringify_fp_sci(norm_h0_comp[i], precision);
+        s += " ]\n";
+        s += String("H1-Norm").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h1, precision) + " [";
+        for(int i(0); i < dim_; ++i)
+          (s += " ") += stringify_fp_sci(norm_h1_comp[i], precision);
+        s += " ]\n";
+        s += String("Divergence").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(divergence, precision) + "\n";
+        s += String("Vorticity").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(vorticity, precision) + "\n";
+        return s;
+      }
+
       /// prints the info to an output stream
       friend std::ostream& operator<<(std::ostream& os, const VelocityInfo& vi)
       {

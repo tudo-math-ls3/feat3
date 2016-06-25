@@ -220,6 +220,33 @@ namespace FEAT
         norm_h2 = DataType_(other.norm_h2);
       }
 
+      /**
+       * \brief Formats the error information as a string.
+       *
+       * \param[in] precision
+       * The precision for floating point values.
+       *
+       * \param[in] pad_size
+       * The leading string padding size. Should be >= 8 to achieve vertical alignment.
+       *
+       * \paran[in] pad_char
+       * The leading string padding character.
+       *
+       * \returns
+       * A string containing the formatted error info.
+       */
+      String format_string(int precision = 0, std::size_t pad_size = 8u, char pad_char = '.') const
+      {
+        String s;
+        if(have_h0)
+          s += String("H0-Error").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h0, precision) + "\n";
+        if(have_h1)
+          s += String("H1-Error").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h1, precision) + "\n";
+        if(have_h2)
+          s += String("H2-Error").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h2, precision) + "\n";
+        return s;
+      }
+
       /// prints the info to an output stream
       friend std::ostream& operator<<(std::ostream& os, const ScalarErrorInfo& sei)
       {
