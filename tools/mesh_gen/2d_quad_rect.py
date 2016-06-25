@@ -1,0 +1,217 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# This tool generates a 2D rectangular mesh representing the domain
+# [x0,x1]x[y0,y1] consisting of m-by-n congruent rectangles.
+# The generated meshfile also contains a chart for the outer boundary
+# named 'bnd' as well as four meshparts representing the four outer
+# edges of the domain named:
+# bnd:l     The left boundary edge meshpart
+# bnd:r     The right boundary edge meshpart
+# bnd:t     The top boundary edge meshpart
+# bnd:b     The bottom boundary edge meshpart
+#
+# USAGE: 2d_rect_quad.py x0 x1 y0 y1 m n filename
+#
+# Options:
+# x0 x1     The X-range of the rectangular domain
+# y0 y1     The Y-range of the rectangular domain
+# m         The number of rectangles in X-direction
+# n         The number of rectangles in Y-direction
+# filename  The name of the meshfile to be created
+#
+# Note: This script is compatible with both Python 2.x and Python 3.x
+#
+# \author Peter Zajc
+#
+import os.path
+import sys
+
+# generate horizontal meshpart content
+def mp_horz(f, ii, m, n, ia, oa):
+  ov = ii*(m+1)
+  oe = ii*(m)
+  f.write("    <Mapping dim=\"0\">\n")
+  for j in range(0, m+1):
+    f.write("      %i\n" % (ov+j))
+  f.write("    </Mapping>\n")
+  f.write("    <Mapping dim=\"1\">\n")
+  for j in range(0, m):
+    f.write("      %i\n" % (oe+j))
+  f.write("    </Mapping>\n")
+  if(ia != 0):
+    f.write("    <Topology dim=\"1\">\n")
+    for j in range(0, m):
+      f.write("      %i %i\n" % (j, j+1))
+    f.write("    </Topology>\n")
+    f.write("    <Attribute dim=\"1\" name=\"param\">\n")
+    for j in range(0, m+1):
+      # Note: our attributes are always integral
+      f.write("      %i\n" % (oa+ia*j))
+    f.write("    </Attribute>\n")
+
+# generate vertical meshpart content
+def mp_vert(f, jj, m, n, ia, oa):
+  ov = jj
+  oe = (n+1)*m + jj*n
+  f.write("    <Mapping dim=\"0\">\n")
+  for i in range(0, n+1):
+    f.write("      %i\n" % (ov+i*(m+1)))
+  f.write("    </Mapping>\n")
+  f.write("    <Mapping dim=\"1\">\n")
+  for i in range(0, n):
+    f.write("      %i\n" % (oe+i))
+  f.write("    </Mapping>\n")
+  if(ia != 0):
+    f.write("    <Topology dim=\"1\">\n")
+    for i in range(0, n):
+      f.write("      %i %i\n" % (i, i+1))
+    f.write("    </Topology>\n")
+    f.write("    <Attribute dim=\"1\" name=\"param\">\n")
+    for i in range(0, n+1):
+      # Note: our attributes are always integral
+      f.write("      %i\n" % (oa+ia*i))
+    f.write("    </Attribute>\n")
+
+####################################################################################################
+####################################################################################################
+####################################################################################################
+
+# get the script filename
+myself = os.path.basename(sys.argv[0])
+
+# do we have enough arguments?
+if len(sys.argv) < 8:
+  print("USAGE: " + myself + " x0 x1 y0 y1 m n filename")
+  print("")
+  print("Options:")
+  print("x0 x1     The X-range of the rectangular domain")
+  print("y0 y1     The Y-range of the rectangular domain")
+  print("m         The number of rectangles in X-direction")
+  print("n         The number of rectangles in Y-direction")
+  print("filename  The name of the meshfile to be created")
+  print("")
+  print("Information:")
+  print("This tool generates a 2D rectangular mesh representing the domain")
+  print("[x0,x1]x[y0,y1] consisting of m-by-n congruent rectangles.")
+  print("The generated meshfile also contains a chart for the outer boundary")
+  print("named 'bnd' as well as four meshparts representing the four outer")
+  print("edges of the domain named:")
+  print("bnd:l     The left boundary edge meshpart")
+  print("bnd:r     The right boundary edge meshpart")
+  print("bnd:t     The top boundary edge meshpart")
+  print("bnd:b     The bottom boundary edge meshpart")
+  sys.exit(0)
+
+# parse input arguments
+x0 = float(sys.argv[1])
+x1 = float(sys.argv[2])
+y0 = float(sys.argv[3])
+y1 = float(sys.argv[4])
+m  = int(sys.argv[5])
+n  = int(sys.argv[6])
+filename = sys.argv[7]
+
+# some basic sanity checks
+if(x0 >= x1):
+  print("ERROR: invalid X-range: x0 must be < x1")
+  sys.exit(1)
+if(y0 >= y1):
+  print("ERROR: invalid Y-range: y0 must be < y1")
+  sys.exit(1)
+if(m <= 0):
+  print("ERROR: 'm' must be positive")
+  sys.exit(1)
+if(n <= 0):
+  print("ERROR: 'n' must be positive")
+  sys.exit(1)
+
+# compute vertex, edge and quad counts
+nv = (m+1)*(n+1)
+ne = m*(n+1) + n*(m+1)
+nq = m*n
+
+# print some basic information
+print("Domain: [%g , %g] x [%g , %g]" % (x0, x1, y0, y1))
+print("Slices: %i x %i" % (m, n))
+print("Rects.: %g x %g" % ((x1-x0)/float(m), (y1-y0)/float(n)))
+#print("Aspect: "
+print("Verts.: %i" % nv)
+print("Edges.: %i" % ne)
+print("Quads.: %i" % nq)
+print("")
+
+# try to create the output file
+print("Creating '" + filename + "'...")
+f = open(filename, "wt")
+# write header
+f.write("<FeatMeshFile version=\"1\" mesh=\"conformal:hypercube:2:2\">\n")
+f.write("  <!-- Generated by the FEAT '" + myself + "' tool -->\n")
+# write tool call as comment
+f.write("  <!-- call: " + myself)
+for i in range(1,8):
+  f.write(" " + sys.argv[i])
+f.write(" -->\n")
+# write chart
+f.write("  <Chart name=\"bnd\">\n")
+f.write("    <Spline dim=\"2\" size=\"5\" type=\"closed\">\n")
+f.write("      <Points>\n")
+f.write("        0 %g %g\n" % (x0, y0))
+f.write("        0 %g %g\n" % (x1, y0))
+f.write("        0 %g %g\n" % (x1, y1))
+f.write("        0 %g %g\n" % (x0, y1))
+f.write("        0 %g %g\n" % (x0, y0))
+f.write("      </Points>\n")
+f.write("      <Params>\n")
+f.write("        0\n")
+f.write("        %i\n" % (m))
+f.write("        %i\n" % (m+n))
+f.write("        %i\n" % (m+m+n))
+f.write("        %i\n" % (m+m+n+n))
+f.write("      </Params>\n")
+f.write("    </Spline>\n")
+f.write("  </Chart>\n")
+# write mesh
+f.write("  <Mesh type=\"conformal:hypercube:2:2\" size=\"%i %i %i\">\n" % (nv, ne, nq))
+f.write("    <Vertices>\n")
+# write vertices in line-wise order
+for i in range(0,n+1):
+  y = y0 + (y1-y0)*(float(i)/float(n))
+  for j in range(0,m+1):
+    x = x0 + (x1-x0)*(float(j)/float(m))
+    f.write("      %g %g\n" % (x, y))
+f.write("    </Vertices>\n")
+f.write("    <Topology dim=\"1\">\n")
+# write horizontal edges
+for i in range(0,n+1):
+  for j in range(0,m):
+    f.write("      %i %i\n" % (i*(m+1)+j, i*(m+1)+j+1))
+# write vertical edges
+for j in range(0,m+1):
+  for i in range(0,n):
+    f.write("      %i %i\n" % (i*(m+1)+j, (i+1)*(m+1)+j))
+f.write("    </Topology>\n")
+f.write("    <Topology dim=\"2\">\n")
+for i in range(0,n):
+  for j in range(0,m):
+    f.write("      %i %i %i %i\n" % (i*(m+1)+j, i*(m+1)+j+1, (i+1)*(m+1)+j, (i+1)*(m+1)+j+1))
+f.write("    </Topology>\n")
+f.write("  </Mesh>\n")
+# write left meshpart
+f.write("  <MeshPart name=\"bnd:l\" parent=\"root\" chart=\"bnd\" topology=\"full\" size=\"%i %i\">\n" % (n+1,n))
+mp_vert(f, 0, m, n, -1, 2*m+2*n)
+f.write("  </MeshPart>\n");
+# write right meshpart
+f.write("  <MeshPart name=\"bnd:r\" parent=\"root\" chart=\"bnd\" topology=\"full\" size=\"%i %i\">\n" % (n+1,n))
+mp_vert(f, m, m, n, +1, m)
+f.write("  </MeshPart>\n");
+# write bottom meshpart
+f.write("  <MeshPart name=\"bnd:b\" parent=\"root\" chart=\"bnd\" topology=\"full\" size=\"%i %i\">\n" % (m+1,m))
+mp_horz(f, 0, m, n, +1, 0)
+f.write("  </MeshPart>\n");
+# write top meshpart
+f.write("  <MeshPart name=\"bnd:t\" parent=\"root\" chart=\"bnd\" topology=\"full\" size=\"%i %i\">\n" % (m+1,m))
+mp_horz(f, n, m, n, -1, 2*m+n)
+f.write("  </MeshPart>\n")
+f.write("</FeatMeshFile>\n")
+
+print("Done!")
