@@ -105,6 +105,20 @@ namespace FEAT
     }
 
     /**
+     * \brief Calculates the time elapsed between the time stamp and now.
+     *
+     * \note
+     * This function does \b not update (stamp) this time stamp.
+     *
+     * \returns
+     * The time elapsed between this time stamp and now in seconds.
+     */
+    double elapsed_now() const
+    {
+      return TimeStamp().elapsed(*this);
+    }
+
+    /**
      * \brief Calculate the time elapsed between two time stamps in microseconds.
      *
      * \param[in] before
@@ -124,6 +138,20 @@ namespace FEAT
 #else
       return 1000000ll * (long long)(_clock - before._clock) / (long long)CLOCKS_PER_SEC;
 #endif
+    }
+
+    /**
+     * \brief Calculates the time elapsed between the time stamp and now in microseconds.
+     *
+     * \note
+     * This function does \b not update (stamp) this time stamp.
+     *
+     * \returns
+     * The time elapsed between this time stamp and now in microseconds.
+     */
+    long long elapsed_micros_now() const
+    {
+      return TimeStamp().elapsed_micros(*this);
     }
 
     /**
@@ -224,6 +252,26 @@ namespace FEAT
     String elapsed_string(const TimeStamp& before, TimeFormat format = TimeFormat::h_m_s_m) const
     {
       return format_micros(elapsed_micros(before), format);
+    }
+
+    /**
+     * \brief Calculates the time elapsed between the time stamp and now as a string.
+     *
+     * \note
+     * This function does \b not update (stamp) this time stamp.
+     *
+     * See TimeStamp::format_micros() for more information about the formatting options.
+     *
+     * \param[in] format
+     * Specifies string formating to be used.
+     *
+     * \returns
+     * The time elapsed between this time stamp and now as a formatted string,
+     * for example <code>h:mm:ss.mm</code>.
+     */
+    String elapsed_string_now(TimeFormat format = TimeFormat::h_m_s_m) const
+    {
+      return TimeStamp().elapsed_string(*this, format);
     }
 
     /**
