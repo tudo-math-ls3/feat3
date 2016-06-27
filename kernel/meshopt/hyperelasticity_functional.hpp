@@ -538,7 +538,7 @@ namespace FEAT
          */
         virtual void prepare(const VectorTypeR& vec_state, FilterType& filter)
         {
-          this->_coords_buffer.convert(vec_state);
+          this->_coords_buffer.clone(vec_state);
           this->buffer_to_mesh();
 
           //auto& dirichlet_filters = filter.template at<1>();
