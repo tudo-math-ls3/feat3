@@ -12,6 +12,9 @@ KahanAccumulation Statistics::_time_precon;
 KahanAccumulation Statistics::_time_mpi_execute;
 KahanAccumulation Statistics::_time_mpi_wait;
 std::map<FEAT::String, SolverStatistics> Statistics::_solver_statistics;
+double Statistics::toe_partition;
+double Statistics::toe_assembly;
+double Statistics::toe_solve;
 
 void Statistics::write_out_solver_statistics_scheduled(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, Index cells, Index dofs, Index nzes, String filename)
 {

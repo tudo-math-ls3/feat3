@@ -121,6 +121,13 @@ namespace FEAT
 
     public:
 
+      /// time of partitioning in seconds, needs initialisation
+      static double toe_partition;
+      /// time of assembly in seconds, needs initialisation
+      static double toe_assembly;
+      /// time of solution in seconds, needs initialisation
+      static double toe_solve;
+
       /// Reset all internal counters (flops/times/solver_statistics)
       static void reset()
       {
@@ -402,7 +409,12 @@ namespace FEAT
         file << std::endl;
 
         file << "#global time" << std::endl;
-        //TODO partition, assembly, solve
+        file << "partition " << stringify(toe_partition) << std::endl;
+        file << "assembly " << stringify(toe_assembly) << std::endl;
+        file << "solve " << stringify(toe_solve) << std::endl;
+
+        file << std::endl;
+
         file << "#solver time" << std::endl;
         file << "reduction " << stringify(get_time_reduction()) << std::endl;
         file << "axpy " << stringify(get_time_axpy()) << std::endl;

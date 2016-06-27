@@ -257,6 +257,8 @@ namespace StokesPoiseuille2D
 
     /* ***************************************************************************************** */
 
+    TimeStamp stamp_ass;
+
     if(rank == 0)
     {
       std::cout << "Creating gates..." << std::endl;
@@ -305,6 +307,8 @@ namespace StokesPoiseuille2D
     {
       asm_levels.at(i+1)->assemble_system_transfer(*transfer_levels.at(i), *asm_levels.at(i));
     }
+
+    Statistics::toe_assembly = stamp_ass.elapsed_now();
 
     /* ***************************************************************************************** */
 
@@ -576,6 +580,8 @@ namespace StokesPoiseuille2D
           std::cerr << "ERROR: Mandatory option --meshfile is missing!" << std::endl;
         FEAT::Runtime::abort();
       }
+
+      TimeStamp stamp_partition;
 #ifdef FEAT_HAVE_PARMETIS
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorParmetis<Foundation::ParmetisModePartKway>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
 #elif defined(FEAT_HAVE_MPI)
@@ -583,6 +589,7 @@ namespace StokesPoiseuille2D
 #else
       Control::Domain::PartitionerDomainControl<Foundation::PExecutorNONE<double, Index>, MeshType> domain(lvl_max, lvl_min, Index(min_elems_partitioner), meshfile);
 #endif
+      Statistics::toe_partition = stamp_partition.elapsed_now();
 
       // plot our levels
       Util::mpi_cout("LVL-MIN: " + stringify(domain.get_levels().front()->get_level_index()) + " [" + stringify(lvl_min) + "]\n");

@@ -37,6 +37,8 @@ namespace FEAT
           Index rank(Util::Comm::rank());
           Index nranks(Util::Comm::size());
 
+          FEAT::Statistics::toe_solve = solver_toe;
+
           std::size_t la_size(0);
           std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType_ * n) { la_size += n->bytes(); });
           std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (TransferLevelType_ * n) { la_size += n->bytes(); });
@@ -44,9 +46,12 @@ namespace FEAT
           std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType_ * n) { mpi_size += n->gate_sys.bytes(); });
           if (rank == 0 && statistics_check >= 0)
           {
-            std::cout<<std::endl<<solver->get_formated_solver_tree().trim()<<std::endl;
+            std::cout<< std::endl;
+            std::cout << String("TOE partition:").pad_back(17) << FEAT::Statistics::toe_partition << std::endl;
+            std::cout << String("TOE assembly:").pad_back(17) << FEAT::Statistics::toe_assembly << std::endl;
+            std::cout << String("TOE solve:").pad_back(17) << FEAT::Statistics::toe_solve << std::endl;
+            std::cout << std::endl << solver->get_formated_solver_tree().trim() << std::endl;
             String flops = FEAT::Statistics::get_formated_flops(solver_toe, nranks);
-            std::cout<<"\nComplete solver TOE: "<<solver_toe<<std::endl;
             std::cout<<flops<<std::endl<<std::endl;
             std::cout<<FEAT::Statistics::get_formated_times(solver_toe)<<std::endl<<std::endl;
             std::cout<<String("Domain size:").pad_back(17) << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
@@ -57,10 +62,10 @@ namespace FEAT
               ", max " << domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension)<<std::endl;
             std::cout<<String("#DOFs:").pad_back(17) <<"min " << system_levels.front()->matrix_sys.columns()<<", max " << system_levels.back()->matrix_sys.columns() << std::endl;
             std::cout<<String("#NZEs:").pad_back(17) << "min " << system_levels.front()->matrix_sys.used_elements()<<", max " << system_levels.back()->matrix_sys.used_elements() << std::endl << std::endl;
-            if (statistics_check > 0) // provided parameter full or whatever
+            /*if (statistics_check > 0) // provided parameter full or whatever
             {
               std::cout<<FEAT::Statistics::get_formated_solvers();
-            }
+            }*/
           }
           if (statistics_check > 0) // provided parameter full or whatever
           {
