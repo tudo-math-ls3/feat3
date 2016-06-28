@@ -27,6 +27,7 @@ TARGET_LINK_LIBRARIES (feat
   kernel-foundation
 # kernel-geometry
   kernel-lafem
+  kernel-meshopt
 # kernel-space
   kernel-solver
 # kernel-trafo

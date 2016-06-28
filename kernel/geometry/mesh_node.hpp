@@ -49,12 +49,12 @@ namespace FEAT
     };
 
     /// \cond internal
-    AdaptMode operator|(AdaptMode x, AdaptMode y)
+    AdaptMode inline operator|(AdaptMode x, AdaptMode y)
     {
       return static_cast<AdaptMode>(int(x) | int(y));
     }
 
-    AdaptMode operator&(AdaptMode x, AdaptMode y)
+    AdaptMode inline operator&(AdaptMode x, AdaptMode y)
     {
       return static_cast<AdaptMode>(int(x) & int(y));
     }

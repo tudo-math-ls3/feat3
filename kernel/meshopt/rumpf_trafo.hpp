@@ -2,7 +2,10 @@
 #ifndef KERNEL_MESHOPT_RUMPF_TRAFO_HPP
 #define KERNEL_MESHOPT_RUMPF_TRAFO_HPP 1
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/comm_base.hpp>
 
@@ -37,13 +40,25 @@ namespace FEAT
     template<typename TrafoType_, typename DataType_>
     struct RumpfTrafo
     {
+        /// Our data type
+        typedef DataType_ DataType;
+        /// Our transformation type
+        typedef TrafoType_ TrafoType;
+        /// Our shape type, as the Rumpf smoother needs to know what we are working with
+        typedef typename TrafoType::ShapeType ShapeType;
+        /// Type of the transformation's underlying mesh
+        typedef typename TrafoType::MeshType MeshType;
+        /// Type for a pack of local vertex coordinates
+        typedef Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> Tx;
+        /// Vector type for element sizes etc.
+        typedef LAFEM::DenseVector<Mem::Main, DataType, Index> ScalarVectorType;
+        /// Vector type for coordinate vectors etc.
+        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, Index, MeshType::world_dim> VectorType;
+
       /**
        * \brief Compute the transformation's determinant on a cell
        *
        * Meaning the determinant of the transformation from the Rumpf reference element onto the current element.
-       *
-       * \tparam Tx_
-       * Type for the cell coordinates x
        *
        * \param[in] x
        * Cell coordinates
@@ -52,15 +67,11 @@ namespace FEAT
        * The transformation's determinant
        *
        **/
-      template<typename Tx_>
-      static DataType compute_det(Tx_& x);
+      static DataType compute_det(Tx& x);
       /**
        * \brief Computes the sum of the local transformation's determinants
        *
        * This is needed to correctly calculate the optimal local scales h.
-       *
-       * \tparam Tcoords_
-       * Type of the vector of coordinates of the mesh vertices
        *
        * \param[in] coords_
        * Vector of vertex coordinates
@@ -71,8 +82,7 @@ namespace FEAT
        * \returns The sum of all local transformation's determinants
        *
        **/
-      template<typename Tcoords_>
-      static DataType_ compute_sum_det(const Tcoords_& coords_, const MeshType& mesh_);
+      static DataType_ compute_sum_det(const VectorType& coords_, const MeshType& mesh_);
 
       /**
        * \brief Computes the optimal local mesh size
@@ -80,15 +90,6 @@ namespace FEAT
        * The optimal local mesh size is calculated from the weights lambda_ such that the volumes of all cells
        * add up to the domain's volume, if each local cell was transformed to a Rumpf reference element with the
        * appropriate size.
-       *
-       * \tparam Th_
-       * Type of the vector of local mesh sizes
-       *
-       * \tparam Tcoords_
-       * Type of the vector of coordinates of the mesh vertices
-       *
-       * \tparam Tlambda_
-       * Type of the vector of (element wise) weights
        *
        * \param[in] h_
        * Vector of local mesh sizes
@@ -103,19 +104,13 @@ namespace FEAT
        * The underlying mesh.
        *
        **/
-      template<typename Th_, typename Tcoords_, typename Tlambda_>
-      static void compute_h(Th_& h_, const Tcoords_& coords_, const Tlambda_& lambda_, const MeshType& mesh_);
+      static void compute_h(VectorType& h_, const VectorType& coords_, const ScalarVectorType& lambda_,
+      const MeshType& mesh_);
 
       /**
        * \brief Computes the transformation's determinant's gradient on a cell
        *
        * Meaning the determinant of the transformation from the Rumpf reference element onto the current element.
-       *
-       * \tparam Tgrad_
-       * Type for the gradient grad
-       *
-       * \tparam Tx_
-       * Type for the cell coordinates x
        *
        * \param[in] x
        * Cell coordinates
@@ -127,17 +122,13 @@ namespace FEAT
        * The gradient of the transformation's determinant
        *
        **/
-      template<typename Tgrad_, typename Tx_>
-      static void compute_grad_det(Tgrad_& grad, const Tx_& x);
+      static void compute_grad_det(Tx& grad, const Tx& x);
 
       /**
        * \brief Computes the gradient of sum of all cell's local transformation determinants
        *
        * This is the sum of all local gradients and needed to correctly calculate the gradient of the optimal local
        * scales h.
-       *
-       * \tparam Tcoords_
-       * Type of the global vector of coordinates of the mesh vertices
        *
        * \param[out] grad_
        * The global gradient wrt. the local vertices
@@ -149,8 +140,7 @@ namespace FEAT
        * The underlying mesh_.
        *
        **/
-      template<typename Tcoords_>
-      static void compute_grad_sum_det(Tcoords_& grad_, const Tcoords_& coords_, const MeshType& mesh_);
+      static void compute_grad_sum_det(VectorType& grad_, const VectorType& coords_, const MeshType& mesh_);
     }; // struct RumpfTrafo;
 #endif
 
@@ -165,46 +155,29 @@ namespace FEAT
      *
      **/
     template<typename DataType_>
-    struct RumpfTrafo
-    <
-      Trafo::Standard::Mapping
-      <
-        Geometry::ConformalMesh
-        <
-          Shape::Hypercube<2>,
-          Shape::Hypercube<2>::dimension,
-          Shape::Hypercube<2>::dimension,
-          DataType_
-        >
-      >,
-      DataType_
-    >
+    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>,2,2,DataType_>>,DataType_>
     {
       public:
         /// Our transformation type
-        typedef typename Trafo::Standard::Mapping
-        <
-          Geometry::ConformalMesh
-          <
-            Shape::Hypercube<2>,
-            Shape::Hypercube<2>::dimension,
-            Shape::Hypercube<2>::dimension,
-            DataType_
-          >
-        > TrafoType;
+        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>,2,2,DataType_>> TrafoType;
         /// Our data type
         typedef DataType_ DataType;
         /// Our shape type, as the Rumpf smoother needs to know what we are working with
         typedef typename TrafoType::ShapeType ShapeType;
         /// Type of the transformation's underlying mesh
         typedef typename TrafoType::MeshType MeshType;
+        /// Type for a pack of local vertex coordinates
+        typedef Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> Tx;
+        /// Vector type for element sizes etc.
+        typedef LAFEM::DenseVector<Mem::Main, DataType, Index> ScalarVectorType;
+        /// Vector type for coordinate vectors etc.
+        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, Index, MeshType::world_dim> VectorType;
 
       private:
         /**
          * \brief Compute the transformation's determinant on a cell
          */
-        template<typename Tx_>
-        static DataType compute_det(Tx_& x)
+        static DataType compute_det(Tx& x)
         {
           return (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(0,1) * x(1,0) + x(0,1) * x(2,0)
               + x(1,0) * x(3,1) - x(1,1) * x(3,0) - x(2,0) * x(3,1) + x(2,1) * x(3,0)) / DataType(2);
@@ -213,8 +186,7 @@ namespace FEAT
         /**
          * \brief Computes the transformation's determinant's gradient on a cell
          */
-        template<typename Tgrad_, typename Tx_>
-        static void compute_grad_det(Tgrad_& grad, const Tx_& x)
+        static void compute_grad_det(Tx& grad, const Tx& x)
         {
           grad(0,0) = ( x(1,1) - x(2,1)) / DataType(2);
           grad(0,1) = (-x(1,0) + x(2,0)) / DataType(2);
@@ -230,8 +202,8 @@ namespace FEAT
         /**
          * \brief Computes the optimal local mesh size
          */
-        template<typename Th_, typename Tcoords_, typename Tlambda_>
-        static void compute_h(Th_& h_, const Tcoords_& coords_, const Tlambda_& lambda_, const MeshType& mesh_)
+        static void compute_h(VectorType& h_, const VectorType& coords_, const ScalarVectorType& lambda_,
+        const MeshType& mesh_)
         {
           DataType_ sum_det = compute_sum_det(coords_, mesh_);
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
@@ -250,8 +222,7 @@ namespace FEAT
         /**
          * \brief Computes the sum of the local transformation's determinants
          **/
-        template<typename Tcoords_>
-        static DataType_ compute_sum_det(const Tcoords_& coords_, const MeshType& mesh_)
+        static DataType_ compute_sum_det(const VectorType& coords_, const MeshType& mesh_)
         {
           // This will hold the coordinates for one element for passing to other routines
           Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -279,17 +250,15 @@ namespace FEAT
         /**
          * \brief Computes the gradient of sum of the local transformation's determinants
          **/
-        template<typename Tcoords_>
-        static void compute_grad_sum_det(Tcoords_& grad_, const Tcoords_& coords_, const MeshType& mesh_)
+        static void compute_grad_sum_det(VectorType& grad_, const VectorType& coords_, const MeshType& mesh_)
         {
           // This will hold the coordinates for one element for passing to other routines
-          Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          Tx x(DataType_(0));
 
           // Index set for local/global numbering
           const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
-          Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
-            local_grad(DataType_(0));
+          Tx local_grad(DataType_(0));
 
           grad_.format();
 
@@ -322,46 +291,29 @@ namespace FEAT
      *
      **/
     template<typename DataType_>
-    struct RumpfTrafo
-    <
-      Trafo::Standard::Mapping
-      <
-        Geometry::ConformalMesh
-        <
-          Shape::Simplex<2>,
-          Shape::Simplex<2>::dimension,
-          Shape::Simplex<2>::dimension,
-          DataType_
-        >
-      >,
-      DataType_
-    >
+    struct RumpfTrafo<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>,2,2,DataType_>>,DataType_>
     {
       public:
         /// Our transformation type
-        typedef typename Trafo::Standard::Mapping
-        <
-          Geometry::ConformalMesh
-          <
-            Shape::Simplex<2>,
-            Shape::Simplex<2>::dimension,
-            Shape::Simplex<2>::dimension,
-            DataType_
-          >
-        > TrafoType;
+        typedef Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>,2,2,DataType_>> TrafoType;
         /// Our data type
         typedef DataType_ DataType;
         /// Our shape type, as the Rumpf smoother needs to know what we are working with
         typedef typename TrafoType::ShapeType ShapeType;
         /// Type of the transformation's underlying mesh
         typedef typename TrafoType::MeshType MeshType;
+        /// Type for a pack of local vertex coordinates
+        typedef Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> Tx;
+        /// Vector type for element sizes etc.
+        typedef LAFEM::DenseVector<Mem::Main, DataType, Index> ScalarVectorType;
+        /// Vector type for coordinate vectors etc.
+        typedef LAFEM::DenseVectorBlocked<Mem::Main, DataType, Index, MeshType::world_dim> VectorType;
 
       private:
         /**
          * \brief Compute the transformation's determinant on a cell
          **/
-        template<typename Tx_>
-        static DataType compute_det(Tx_& x)
+        static DataType compute_det(Tx& x)
         {
           return DataType(2) / Math::sqrt(DataType(3)) *
             (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1));
@@ -369,9 +321,8 @@ namespace FEAT
 
         /**
          * \brief Computes the transformation's determinant's gradient on a cell
-         **/
-        template<typename Tgrad_, typename Tx_>
-        static inline void compute_grad_det(Tgrad_& grad, const Tx_& x)
+         */
+        static inline void compute_grad_det(Tx& grad, const Tx& x)
         {
           const DataType fac(DataType(2) / Math::sqrt(DataType(3)));
 
@@ -386,9 +337,9 @@ namespace FEAT
       public:
         /**
          * \brief Computes the optimal local mesh size
-         **/
-        template<typename Th_, typename Tcoords_, typename Tlambda_>
-        static void compute_h(Th_& h_, const Tcoords_& coords_, const Tlambda_& lambda_, const MeshType& mesh_)
+         */
+        static void compute_h(VectorType& h_, const VectorType& coords_, const ScalarVectorType& lambda_,
+        const MeshType& mesh_)
         {
           // This will hold the coordinates for one element for passing to other routines
           FEAT::Tiny::Matrix <DataType_, MeshType::world_dim, Shape::FaceTraits<ShapeType,0>::count> x;
@@ -407,8 +358,7 @@ namespace FEAT
         /**
          * \brief Computes the sum of the local transformation's determinants
          **/
-        template<typename Tcoords_>
-        static DataType_ compute_sum_det(const Tcoords_& coords_, const MeshType& mesh_)
+        static DataType_ compute_sum_det(const VectorType& coords_, const MeshType& mesh_)
         {
           // This will hold the coordinates for one element for passing to other routines
           Tiny::Matrix <DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
@@ -435,18 +385,16 @@ namespace FEAT
 
         /**
          * \brief Computes the gradient of sum of the local transformation's determinants
-         **/
-        template<typename Tcoords_>
-        static void compute_grad_sum_det(Tcoords_& grad_, const Tcoords_& coords_, const MeshType& mesh_)
+         */
+        static void compute_grad_sum_det(VectorType& grad_, const VectorType& coords_, const MeshType& mesh_)
         {
           // This will hold the coordinates for one element for passing to other routines
-          Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          Tx x(DataType_(0));
 
           // Index set for local/global numbering
           const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
-          Tiny::Matrix<DataType_, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim>
-            local_grad(DataType_(0));
+          Tx local_grad(DataType_(0));
 
           grad_.format();
 
@@ -468,6 +416,12 @@ namespace FEAT
         } // compute_grad_sum_det
 
     }; // RumpfTrafo<Simplex<2>>
+
+    extern template struct RumpfTrafo<
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>,2,2, double>>, double >;
+    extern template struct RumpfTrafo<
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>,2,2, double>>, double >;
+
     /// \endcond
   } // namespace Meshopt
 } // namespace FEAT

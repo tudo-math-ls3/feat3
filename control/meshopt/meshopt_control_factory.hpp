@@ -4,13 +4,14 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-#include <kernel/meshopt/hyperelasticity_functional.hpp>
-#include <kernel/meshopt/mesh_concentration_function.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
-#include <kernel/meshopt/rumpf_functionals/2d_q1split.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
 #include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
+
+#include <kernel/meshopt/hyperelasticity_functional.hpp>
+#include <kernel/meshopt/mesh_concentration_function.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1split.hpp>
 
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_solver_factory.hpp>

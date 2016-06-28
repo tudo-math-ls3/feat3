@@ -4,6 +4,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/shape.hpp>
+#include <kernel/util/tiny_algebra.hpp>
 #include <kernel/meshopt/rumpf_functional.hpp>
 
 namespace FEAT
@@ -26,6 +27,12 @@ namespace FEAT
         typedef Shape::Simplex<2> ShapeType;
         /// Our baseclass
         typedef RumpfFunctionalBase<DataType> BaseClass;
+        /// Type for a pack of local vertex coordinates
+        typedef Tiny::Matrix<DataType_, 3, 2> Tx;
+        /// Type for the local cell size
+        typedef Tiny::Vector<DataType_, 2> Th;
+        /// Type for the gradient of the local cell sizes
+        typedef Tiny::Vector<DataType_, 3*2> Tgradh;
 
         /**
          * \brief Constructor
@@ -65,8 +72,7 @@ namespace FEAT
         /**
          * \brief Computes value the Rumpf functional on one element.
          **/
-        template<typename Tx_, typename Th_>
-        DataType compute_local_functional(const Tx_& x, const Th_& h)
+        DataType compute_local_functional(const Tx& x, const Th& h)
         {
           DataType norm_A = compute_norm_A(x,h);
           DataType det_A = compute_det_A(x,h);
@@ -80,9 +86,8 @@ namespace FEAT
 
         /**
          * \copydoc compute_local_functional()
-         **/
-        template<typename Tx_, typename Th_>
-        DataType compute_local_functional(const Tx_& x, const Th_& h,
+         */
+        DataType compute_local_functional(const Tx& x, const Th& h,
         DataType& func_norm,
         DataType& func_det,
         DataType& func_rec_det)
@@ -97,9 +102,13 @@ namespace FEAT
 
         /**
          * \brief Computes the det term on one element
-         **/
-        template<typename Tx_, typename Th_ >
-        DataType NOINLINE compute_det_A( const Tx_& x, const Th_& h)
+         */
+        /// \compilerhack icc < 16.0 gets confused by NOINLINE
+#if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
+        DataType compute_det_A( const Tx& x, const Th& h)
+#else
+        DataType NOINLINE compute_det_A( const Tx& x, const Th& h)
+#endif
         {
           DataType det_;
           det_ = DataType(4) / DataType(3) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4));
@@ -108,9 +117,13 @@ namespace FEAT
 
         /**
          * \brief Computes the 1/det term on one element
-         **/
-        template<typename Tx_, typename Th_ >
-        DataType NOINLINE compute_rec_det_A( const Tx_& x, const Th_& h)
+         */
+        /// \compilerhack icc < 16.0 gets confused by NOINLINE
+#if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
+        DataType compute_rec_det_A( const Tx& x, const Th& h)
+#else
+        DataType NOINLINE compute_rec_det_A( const Tx& x, const Th& h)
+#endif
         {
           DataType rec_det_;
           rec_det_ = Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(2));
@@ -119,9 +132,13 @@ namespace FEAT
 
         /**
          * \brief Computes the Frobenius norm term for one cell
-         **/
-        template<typename Tx_, typename Th_ >
-        DataType NOINLINE compute_norm_A(const Tx_& x, const Th_& h)
+         */
+        /// \compilerhack icc < 16.0 gets confused by NOINLINE
+#if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
+        DataType compute_norm_A(const Tx& x, const Th& h)
+#else
+        DataType NOINLINE compute_norm_A(const Tx& x, const Th& h)
+#endif
         {
           DataType norm_;
           norm_ = DataType(4) / DataType(9) * Math::pow(DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2)), DataType(2)) * Math::pow(h(0), -DataType(4));
@@ -130,9 +147,13 @@ namespace FEAT
 
         /**
          * \brief Computes the functional gradient for one cell
-         **/
-        template<typename Tx_, typename Th_, typename Tgrad_>
-        void NOINLINE compute_local_grad( const Tx_& x, const Th_& h, Tgrad_& grad)
+         */
+        /// \compilerhack icc < 16.0 gets confused by NOINLINE
+#if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
+        void compute_local_grad(const Tx& x, const Th& h, Tx& grad)
+#else
+        void NOINLINE compute_local_grad(const Tx& x, const Th& h, Tx& grad)
+#endif
         {
           grad(0,0) = DataType(8) / DataType(3) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * this->_fac_det * (x(1,1) - x(2,1)) + DataType(8) / DataType(9) * this->_fac_norm * (DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2))) * Math::pow(h(0), -DataType(4)) * (-DataType(4) * x(0,0) + DataType(2) * x(1,0) + DataType(2) * x(2,0)) - DataType(2) * this->_fac_rec_det * Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(3)) * (DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(1,1) - x(2,1)) * Math::pow(h(1), -DataType(2)) + DataType(4) * Math::pow(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0), DataType(2)) * Math::pow(h(1), -DataType(4)), -DataType(1) / DataType(2)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(0,1) * x(2,0) + x(1,0) * x(2,1) - x(1,1) * x(2,0)) * Math::pow(h(1), -DataType(4)) * (x(1,1) - x(2,1)));
 
@@ -151,24 +172,28 @@ namespace FEAT
 
         /**
          * \brief Adds the part coming from the chain rule involving h to the local gradient
-         **/
-        template<typename Tgrad_, typename Tx_, typename Th_, typename Tgradh_>
-        void NOINLINE add_grad_h_part(Tgrad_& grad, const Tx_& x, const Th_& h, const Tgradh_& grad_h)
+         */
+        /// \compilerhack icc < 16.0 gets confused by NOINLINE
+#if defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600)
+        void add_grad_h_part(Tx& grad, const Tx& x, const Th& h, const Tgradh& grad_h)
+#else
+        void NOINLINE add_grad_h_part(Tx& grad, const Tx& x, const Th& h, const Tgradh& grad_h)
+#endif
         {
           DataType der_h_(0);
           der_h_ = this->_fac_norm * (DataType(16) / DataType(3) * (DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2))) * Math::pow(h(0), -DataType(3)) - DataType(16) / DataType(9) * Math::pow(DataType(3) * Math::pow(h(0), DataType(2)) - DataType(2) * Math::pow(x(0,0), DataType(2)) + DataType(2) * x(0,0) * x(1,0) + DataType(2) * x(0,0) * x(2,0) - DataType(2) * Math::pow(x(0,1), DataType(2)) + DataType(2) * x(0,1) * x(1,1) + DataType(2) * x(0,1) * x(2,1) - DataType(2) * Math::pow(x(1,0), DataType(2)) + DataType(2) * x(1,0) * x(2,0) - DataType(2) * Math::pow(x(1,1), DataType(2)) + DataType(2) * x(1,1) * x(2,1) - DataType(2) * Math::pow(x(2,0), DataType(2)) - DataType(2) * Math::pow(x(2,1), DataType(2)), DataType(2)) * Math::pow(h(0), -DataType(5))) - DataType(16) / DataType(3) * this->_fac_det * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1), DataType(2)) * Math::pow(h(1), -DataType(5)) - DataType(2) * this->_fac_rec_det * Math::pow(DataType(2) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1)) * Math::pow(h(1), -DataType(2)) + Math::sqrt(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1), DataType(2)) * Math::pow(h(1), -DataType(4))) / DataType(3), -DataType(3)) * (-DataType(4) / DataType(3) * Math::sqrt(DataType(3)) * (x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1)) * Math::pow(h(1), -DataType(3)) - DataType(8) * Math::pow(DataType(9) * this->_fac_reg * this->_fac_reg + DataType(12) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1), DataType(2)) * Math::pow(h(1), -DataType(4)), -DataType(1) / DataType(2)) * Math::pow(x(0,0) * x(1,1) - x(0,0) * x(2,1) - x(1,0) * x(0,1) + x(2,0) * x(0,1) + x(1,0) * x(2,1) - x(2,0) * x(1,1), DataType(2)) * Math::pow(h(1), -DataType(5)));
 
-          for(int i(0); i < Tgrad_::m; ++i)
+          for(int i(0); i < Tx::m; ++i)
           {
-            for(int d(0); d < Tgrad_::n; ++d)
+            for(int d(0); d < Tx::n; ++d)
             {
-              grad(i,d) += der_h_*grad_h(i*Tgrad_::n + d);
+              grad(i,d) += der_h_*grad_h(i*Tx::n + d);
             }
           }
         } // add_grad_h_part
 
-
     }; // class RumpfFunctional_D2
+    extern template class RumpfFunctional_D2<double, Shape::Simplex<2> >;
     /// \endcond
   } // namespace Meshopt
 } // namespace FEAT

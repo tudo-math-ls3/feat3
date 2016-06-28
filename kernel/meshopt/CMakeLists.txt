@@ -3,8 +3,15 @@ cmake_minimum_required (VERSION 2.8)
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-# ADD_LIBRARY(kernel-control STATIC)
-# TARGET_LINK_LIBRARIES (kernel-control kernel-util)
+# list of meshopt tests
+SET (kernel-meshopt-list
+    dudv_functional.cpp
+    hyperelasticity_functional.cpp
+    rumpf_functional.cpp
+    rumpf_trafo.cpp
+    )
+
+ADD_LIBRARY(kernel-meshopt STATIC ${kernel-meshopt-list})
 
 # list of meshopt tests
 SET (test_list

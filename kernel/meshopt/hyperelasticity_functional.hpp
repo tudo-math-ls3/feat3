@@ -13,6 +13,11 @@
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/meshopt/mesh_concentration_function.hpp>
 #include <kernel/meshopt/mesh_quality_functional.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1split.hpp>
 #include <kernel/meshopt/rumpf_trafo.hpp>
 #include <kernel/util/comm_base.hpp>
 
@@ -42,7 +47,7 @@ namespace FEAT
       current_cellsize,
       current_concentration,
       iter_concentration,
-    };
+      };
 
     /// \cond internal
     /**
@@ -197,7 +202,7 @@ namespace FEAT
       typename RefCellTrafo_
     >
     class HyperelasticityFunctionalBase<Mem::Main, DT_, IT_, Trafo_, FunctionalType_, RefCellTrafo_>:
-      public MeshQualityFunctional<typename Trafo_::MeshType>
+    public MeshQualityFunctional<typename Trafo_::MeshType>
     {
       public :
         /// Type for the transformation
@@ -482,8 +487,8 @@ namespace FEAT
           if(!_dirichlet_asm.empty())
           {
             std::cout << "Dirichlet boundaries:";
-              for(const auto& it:_dirichlet_asm)
-                std::cout << " " << it.first;
+            for(const auto& it:_dirichlet_asm)
+              std::cout << " " << it.first;
             std::cout << std::endl;
           }
           _functional->print();
@@ -1032,7 +1037,7 @@ namespace FEAT
           const auto& grad_h = this->_mesh_conc->get_grad_h();
 
           // This will hold the coordinates for one element for passing to other routines
-          FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
+          FEAT::Tiny::Matrix<CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> x;
           // Local cell dimensions for passing to other routines
           FEAT::Tiny::Vector<CoordType, MeshType::world_dim> h;
           // This will hold the local gradient for one element for passing to other routines
@@ -1109,6 +1114,62 @@ namespace FEAT
         } // compute_grad_without_conc
 
     }; // class HyperelasticityFunctional
+
+    extern template class HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, 2, double >>,
+      Meshopt::RumpfFunctional<double,Shape::Simplex<2>>
+    >;
+
+    extern template class FEAT::Meshopt::HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, double>>,
+      Meshopt::RumpfFunctional<double,Shape::Hypercube<2>>
+    >;
+
+    extern template class FEAT::Meshopt::HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, double>>,
+      Meshopt::RumpfFunctional_D2<double,Shape::Simplex<2>>
+    >;
+
+    extern template class FEAT::Meshopt::HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, double>>,
+      Meshopt::RumpfFunctional_D2<double,Shape::Hypercube<2>>
+    >;
+
+    extern template class FEAT::Meshopt::HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, 2, double >>,
+      Meshopt::RumpfFunctionalQ1Split<double, Shape::Simplex<2>, FEAT::Meshopt::RumpfFunctional>
+    >;
+
+    extern template class FEAT::Meshopt::HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Simplex<2>, 2, 2, double >>,
+      Meshopt::RumpfFunctionalQ1Split<double, Shape::Simplex<2>, FEAT::Meshopt::RumpfFunctional_D2>
+    >;
+
+    extern template class FEAT::Meshopt::HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, 2, double >>,
+      Meshopt::RumpfFunctionalQ1Split<double, Shape::Hypercube<2>, FEAT::Meshopt::RumpfFunctional>
+    >;
+
+    extern template class FEAT::Meshopt::HyperelasticityFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh< Shape::Hypercube<2>, 2, 2, double >>,
+      Meshopt::RumpfFunctionalQ1Split<double, Shape::Hypercube<2>, FEAT::Meshopt::RumpfFunctional_D2>
+    >;
 
   } // namespace Meshopt
 } // namespace FEAT

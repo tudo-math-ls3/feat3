@@ -3,6 +3,11 @@
 #define KERNEL_MESHOPT_RUMPF_FUNCTIONALS_Q1SPLIT_HPP 1
 
 #include <kernel/base_header.hpp>
+#include <kernel/meshopt/rumpf_functional.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1_d1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_d1.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_p1_d2.hpp>
+#include <kernel/meshopt/rumpf_functionals/2d_q1_d2.hpp>
 
 namespace FEAT
 {
@@ -56,8 +61,18 @@ namespace FEAT
         const int perm[4][3];
         /// Factors for scaling the simplex reference cells
         const DataType hcoeffs[ShapeType::dimension];
+        /// Type for a pack of local vertex coordinates
+        typedef Tiny::Matrix<DataType_, 4, 2> Tx;
+        /// Type for the local cell sizes
+        typedef Tiny::Vector<DataType_, 2> Th;
+        /// Type for the gradient of the local cell sizes
+        typedef Tiny::Vector<DataType_, 4*2> Tgradh;
 
       private:
+        /// Buffer in which to collect the vertex coordinates of the simplices
+        Tiny::Matrix<DataType, ShapeType::dimension+1, ShapeType::dimension> _grad_split;
+        /// Buffer in which to collect the gradient of h
+        Tiny::Vector<DataType, (ShapeType::dimension+1)*ShapeType::dimension> _gradhsplit;
         /// Rescaled local optimal scale
         Tiny::Vector<DataType, ShapeType::dimension> _hsplit;
         /// Buffer in which to collect the vertex coordinates of the simplices
@@ -74,6 +89,7 @@ namespace FEAT
           const DataType fac_reg_) : BaseClass(fac_norm_, fac_det_, fac_cof_, fac_reg_),
           perm{ {0, 1, 2}, {1, 3, 2}, {0, 3, 2}, {0, 1, 3} },
           hcoeffs{ DataType(2)/Math::sqrt(DataType(3)), Math::sqrt(DataType(2)/Math::sqrt(DataType(3)))},
+          _gradhsplit(DataType(0)),
           _hsplit(DataType(0)),
           _xsplit(DataType(0))
           {
@@ -85,8 +101,7 @@ namespace FEAT
         /**
          * \brief Computes value the Rumpf functional on one element.
          */
-        template<typename Tx_, typename Th_>
-        DataType compute_local_functional(const Tx_& x, const Th_& h)
+        DataType compute_local_functional(const Tx& x, const Th& h)
         {
 
           DataType norm_A(0);
@@ -117,8 +132,7 @@ namespace FEAT
         /**
          * \brief Computes value the Rumpf functional on one element.
          */
-        template<typename Tx_, typename Th_>
-        DataType compute_local_functional(const Tx_& x, const Th_& h,
+        DataType compute_local_functional(const Tx& x, const Th& h,
         DataType& func_norm,
         DataType& func_det,
         DataType& func_rec_det)
@@ -151,14 +165,13 @@ namespace FEAT
               + this->_fac_rec_det*rec_det_A)/DataType(n_perms);
 
         }
+
         /**
          * \brief Computes the functional gradient for one cell
-         **/
-        template<typename Tx_, typename Th_, typename Tgrad_>
-        void NOINLINE compute_local_grad( const Tx_& x, const Th_& h, Tgrad_& grad)
+         */
+        void NOINLINE compute_local_grad(const Tx& x, const Th& h, Tx& grad)
         {
           grad.format(DataType(0));
-          Tiny::Matrix<DataType, ShapeType::dimension+1, Tx_::n> grad_split(DataType(0));
 
           // Compute rescaled h for the split
           _hsplit = h;
@@ -170,15 +183,49 @@ namespace FEAT
             for(int j(0); j < ShapeType::dimension+1; ++j)
               _xsplit[j] = x[perm[p][j]];
 
-            BaseClass::compute_local_grad( _xsplit, _hsplit, grad_split);
+            BaseClass::compute_local_grad( _xsplit, _hsplit, _grad_split);
 
             for(int j(0); j < ShapeType::dimension+1; ++j)
-              grad[perm[p][j]] += grad_split[j];
+              grad[perm[p][j]] += _grad_split[j];
           }
 
           grad*=(DataType(1)/DataType(n_perms));
 
         }
+
+        /**
+         * \brief Adds the part coming from the chain rule involving h to the local gradient
+         */
+        void NOINLINE add_grad_h_part(Tx& grad, const Tx& x, const Th& h, const Tgradh& grad_h)
+        {
+          static constexpr DataType fac_perm = DataType(1)/DataType(n_perms);
+          // Compute rescaled h for the split
+          _hsplit = h;
+
+          for(int i(0); i < ShapeType::dimension; ++i)
+            _hsplit(i)*=hcoeffs[i];
+
+          for(int p(0); p < n_perms; ++p)
+          {
+            for(int j(0); j < ShapeType::dimension+1; ++j)
+              _xsplit[j] = x[perm[p][j]];
+
+            for(int i(0); i < ShapeType::dimension; ++i)
+            {
+              for(int d(0); d < Tx::n; ++d)
+                _gradhsplit(i*ShapeType::dimension + d) = grad_h(perm[p][i]*4 + d);
+            }
+
+            _grad_split.format(DataType(0));
+
+            BaseClass::add_grad_h_part(_grad_split, _xsplit, _hsplit, _gradhsplit);
+
+            for(int j(0); j < ShapeType::dimension+1; ++j)
+              grad[perm[p][j]] += fac_perm*_grad_split[j];
+          }
+
+        }
+
         /**
          * \brief The class name
          *
@@ -222,6 +269,15 @@ namespace FEAT
         using BaseClass::BaseClass;
         RumpfFunctionalQ1Split() = delete;
     };
+
+    /// \compilerhack icc < 16.0 seems to be unable to deal with template template parameters and extern
+#if !(defined(FEAT_COMPILER_INTEL) && (FEAT_COMPILER_INTEL < 1600))
+    extern template class RumpfFunctionalQ1Split<double, Shape::Hypercube<2>, RumpfFunctional>;
+    extern template class RumpfFunctionalQ1Split<double, Shape::Hypercube<2>, RumpfFunctional_D2>;
+
+    extern template class RumpfFunctionalQ1Split<double, Shape::Simplex<2>, RumpfFunctional>;
+    extern template class RumpfFunctionalQ1Split<double, Shape::Simplex<2>, RumpfFunctional_D2>;
+#endif
 
     /// \endcond
   } // namespace Meshopt

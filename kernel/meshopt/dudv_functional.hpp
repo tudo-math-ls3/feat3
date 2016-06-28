@@ -19,6 +19,7 @@
 #include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/meshopt/mesh_quality_functional.hpp>
 #include <kernel/space/lagrange1/element.hpp>
+#include <kernel/util/comm_base.hpp>
 
 namespace FEAT
 {
@@ -168,10 +169,10 @@ namespace FEAT
           sys_matrix(std::move(other.sys_matrix)),
           _trafo(other._trafo),
           _trafo_space(other._trafo_space),
-          _cell_sizes(other._cell_sizes),
+          _cell_sizes(std::move(other._cell_sizes)),
           _dirichlet_asm(other._dirichlet_asm),
           _slip_asm(other._slip_asm),
-          _cubature_factory(other.cubature_factory)
+          _cubature_factory(other._cubature_factory)
           {
             if(this != &other)
             {
@@ -352,7 +353,7 @@ namespace FEAT
          *
          * \returns The number of columns.
          */
-        const Index& columns() const
+        Index columns() const
         {
           return sys_matrix.columns();
         }
@@ -362,7 +363,7 @@ namespace FEAT
          *
          * \returns The number of rows.
          */
-        const Index& rows() const
+        Index rows() const
         {
           return sys_matrix.rows();
         }
@@ -420,6 +421,20 @@ namespace FEAT
         //}
 
     }; // class DuDvFunctional
+
+    extern template class DuDvFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Simplex<2>, 2, 2, double>>,
+      LAFEM::SparseMatrixBCSR
+    >;
+
+    extern template class DuDvFunctional
+    <
+      Mem::Main, double, Index,
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, 2, double>>,
+      LAFEM::SparseMatrixBCSR
+    >;
 
   } // namespace Meshopt
 } // namespace FEAT

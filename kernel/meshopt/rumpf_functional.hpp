@@ -2,6 +2,11 @@
 #ifndef KERNEL_MESHOPT_RUMPF_FUNCTIONAL_HPP
 #define KERNEL_MESHOPT_RUMPF_FUNCTIONAL_HPP 1
 
+#include <kernel/base_header.hpp>
+#include <kernel/util/math.hpp>
+#include <kernel/util/tiny_algebra.hpp>
+#include <iostream>
+
 namespace FEAT
 {
   namespace Meshopt
