@@ -127,6 +127,31 @@ namespace FEAT
             _midpoint += translation;
         }
 
+        /// \copydoc ChartBase::rotate()
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
+        {
+          // This is the 2x2 matrix representing the turning by the angle angles(0)
+          Tiny::Matrix<CoordType, 2, 2> rot(CoordType(0));
+
+          rot(0,0) = Math::cos(angles(0));
+          rot(0,1) = - Math::sin(angles(0));
+          rot(1,0) = -rot(0,1);
+          rot(1,1) = rot(0,0);
+
+          WorldPoint tmp0(CoordType(0));
+          WorldPoint tmp1(CoordType(0));
+
+          // Translate the point to the centre of rotation
+          tmp0 = _midpoint - centre;
+          // Rotate
+          tmp1.set_vec_mat_mult(tmp0, rot);
+          // Translate the point by the new centre of rotation
+          _midpoint = centre + tmp1;
+
+          if(_have_domain)
+            _trafo_a += angles(0);
+        }
+
         /**
          * \brief Projects a single world point
          *

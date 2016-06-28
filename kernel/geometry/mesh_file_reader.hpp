@@ -6,10 +6,10 @@
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_node.hpp>
-#include <kernel/geometry/atlas/bezier.hpp>
+//#include <kernel/geometry/atlas/bezier.hpp>
 #include <kernel/geometry/atlas/circle.hpp>
 #include <kernel/geometry/atlas/extrude.hpp>
-#include <kernel/geometry/atlas/polyline.hpp>
+//#include <kernel/geometry/atlas/polyline.hpp>
 #include <kernel/geometry/atlas/spline.hpp>
 #include <kernel/geometry/atlas/surface_mesh.hpp>
 #include <kernel/geometry/atlas/sphere.hpp>
@@ -1207,12 +1207,12 @@ namespace FEAT
       static std::shared_ptr<Xml::MarkupParser> markup(const String& name,
       Atlas::ChartBase<RootMesh_>*& chart)
       {
-        if(name == "Bezier")
-          return std::make_shared<Atlas::BezierChartParser<RootMesh_>>(chart);
+        //if(name == "Bezier")
+        //  return std::make_shared<Atlas::BezierChartParser<RootMesh_>>(chart);
         if(name == "Circle")
           return std::make_shared<Atlas::CircleChartParser<RootMesh_>>(chart);
-        if(name == "Polyline")
-          return std::make_shared<Atlas::PolylineChartParser<RootMesh_>>(chart);
+        //if(name == "Polyline")
+        //  return std::make_shared<Atlas::PolylineChartParser<RootMesh_>>(chart);
         if(name == "Spline")
           return std::make_shared<Atlas::SplineChartParser<RootMesh_>>(chart);
 

@@ -81,6 +81,24 @@ namespace FEAT
         virtual void move_by(const WorldPoint& translation) = 0;
 
         /**
+         * \brief Performs a rigid body rotation of the whole chart
+         *
+         * \param[in] centre
+         * Point around which to rotate.
+         *
+         * \param[in] angles
+         * Angles by which to rotate (in radian).
+         *
+         * Note that in 2d, two angles can be specified but only one is used. This if for interface compatibility for
+         * 3d.
+         *
+         * For 2d, angles(0) defines the rotation around the y-axis. For 3d, angles(0) defines the rotation around
+         * the x-axis, angles(1) the rotation arount the y-axis and angles(2) the rotation around the z-axis.
+         *
+         */
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) = 0;
+
+        /**
          * \brief Computes the distance of a point to this chart
          *
          * \param[in] point
@@ -386,6 +404,12 @@ namespace FEAT
         virtual void move_by(const WorldPoint& translation) override
         {
           (this->cast()).move_by(translation);
+        }
+
+        /// \copydoc BaseClass::rotate()
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
+        {
+          (this->cast()).rotate(centre, angles);
         }
 
         /// \copydoc BaseClass::dist()

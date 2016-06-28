@@ -5,8 +5,8 @@
 #include <kernel/geometry/atlas/chart.hpp>
 // supported sub-charts:
 #include <kernel/geometry/atlas/circle.hpp>
-#include <kernel/geometry/atlas/bezier.hpp>
-#include <kernel/geometry/atlas/polyline.hpp>
+//#include <kernel/geometry/atlas/bezier.hpp>
+//#include <kernel/geometry/atlas/polyline.hpp>
 #include <kernel/geometry/atlas/spline.hpp>
 
 namespace FEAT
@@ -88,6 +88,21 @@ namespace FEAT
           sub_translation[0] = translation[0];
           sub_translation[1] = translation[1];
           _sub_chart->move_by(sub_translation);
+        }
+
+        /// \copydoc ChartBase::rotate()
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
+        {
+          XASSERTM(Math::abs(angles(1)) < Math::eps<CoordType>(), "More than one angle in extruded 2d rotation!");
+          XASSERTM(Math::abs(angles(2)) < Math::eps<CoordType>(), "More than one angle in extruded 2d rotation!");
+          SubWorldPoint sub_centre;
+          sub_centre[0] = centre[0];
+          sub_centre[1] = centre[1];
+
+          SubWorldPoint sub_angles;
+          sub_angles[0] = angles[0];
+          sub_angles[1] = angles[1];
+          _sub_chart->rotate(sub_centre, sub_angles);
         }
 
         void project_point(WorldPoint& point) const
@@ -256,24 +271,24 @@ namespace FEAT
           typedef ConformalMesh<SubShapeType, 2, 2, CoordType> SubMeshType;
 
           // What have we here?
-          if(name == "Bezier")
-          {
-            auto* ext = new Extrude<Mesh_, Bezier<SubMeshType>>();
-            _chart = ext;
-            return std::make_shared<Atlas::BezierChartParser<SubMeshType, Bezier<SubMeshType>>>(ext->_sub_chart);
-          }
+          //if(name == "Bezier")
+          //{
+          //  auto* ext = new Extrude<Mesh_, Bezier<SubMeshType>>();
+          //  _chart = ext;
+          //  return std::make_shared<Atlas::BezierChartParser<SubMeshType, Bezier<SubMeshType>>>(ext->_sub_chart);
+          //}
           if(name == "Circle")
           {
             auto* ext = new Extrude<Mesh_, Circle<SubMeshType>>();
             _chart = ext;
             return std::make_shared<Atlas::CircleChartParser<SubMeshType, Circle<SubMeshType>>>(ext->_sub_chart);
           }
-          if(name == "Polyline")
-          {
-            auto* ext = new Extrude<Mesh_, Polyline<SubMeshType>>();
-            _chart = ext;
-            return std::make_shared<Atlas::PolylineChartParser<SubMeshType, Polyline<SubMeshType>>>(ext->_sub_chart);
-          }
+          //if(name == "Polyline")
+          //{
+          //  auto* ext = new Extrude<Mesh_, Polyline<SubMeshType>>();
+          //  _chart = ext;
+          //  return std::make_shared<Atlas::PolylineChartParser<SubMeshType, Polyline<SubMeshType>>>(ext->_sub_chart);
+          //}
           if(name == "Spline")
           {
             auto* ext = new Extrude<Mesh_, Spline<SubMeshType>>();

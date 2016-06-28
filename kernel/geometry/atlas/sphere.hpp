@@ -86,6 +86,43 @@ namespace FEAT
             _midpoint += translation;
         }
 
+        /// \copydoc ChartBase::rotate()
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
+        {
+          // This is the 3x3 matrix representing the turning by the angle angles(0)
+          Tiny::Matrix<CoordType, 3, 3> rot(CoordType(0));
+
+          CoordType c0 = Math::cos(angles(0));
+          CoordType c1 = Math::cos(angles(1));
+          CoordType c2 = Math::cos(angles(2));
+
+          CoordType s0 = Math::sin(angles(0));
+          CoordType s1 = Math::sin(angles(1));
+          CoordType s2 = Math::sin(angles(2));
+
+          rot(0,0) = c1*c2;
+          rot(0,1) = c0*s2 + s0*s1*c2;
+          rot(0,2) = s0*s2 - c0*s1*c2;
+
+          rot(1,0) = -c1*s2;
+          rot(1,1) = c0*c2 - s0*s1*s2;
+          rot(1,2) = s0*c2 + c0*s1*s2;
+
+          rot(2,0) = s1;
+          rot(2,1) = -s0*c1;
+          rot(2,2) = c0*c1;
+
+          WorldPoint tmp0(CoordType(0));
+          WorldPoint tmp1(CoordType(0));
+
+          // Translate the point to the centre of rotation
+          tmp0 = _midpoint - centre;
+          // Rotate
+          tmp1.set_vec_mat_mult(tmp0, rot);
+          // Translate back
+          _midpoint = centre + tmp1;
+        }
+
         /**
          * \brief Projects a single world point
          *

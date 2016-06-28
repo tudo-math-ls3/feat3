@@ -176,6 +176,31 @@ namespace FEAT
             it += translation;
         }
 
+        /// \copydoc ChartBase::rotate()
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
+        {
+          // This is the 2x2 matrix representing the turning by the angle angles(0)
+          Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
+
+          rot(0,0) = Math::cos(angles(0));
+          rot(0,1) = - Math::sin(angles(0));
+          rot(1,0) = -rot(0,1);
+          rot(1,1) = rot(0,0);
+
+          WorldPoint tmp0(DataType(0));
+          WorldPoint tmp1(DataType(0));
+
+          for(auto& it : _world)
+          {
+            // Translate the point to the centre of rotation
+            tmp0 = it - centre;
+            // Rotate
+            tmp1.set_vec_mat_mult(tmp0, rot);
+            // Translate back
+            it = centre + tmp1;
+          }
+        }
+
         /**
          * \brief Maps a local segment parameter point
          *
