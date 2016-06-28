@@ -33,12 +33,10 @@ namespace FEAT
       func();
       MemoryPool<Mem_>::synchronize();
 
-      TimeStamp at, bt;
-      at.stamp();
+      TimeStamp at;
       func();
       MemoryPool<Mem_>::synchronize();
-      bt.stamp();
-      double test_run_time(bt.elapsed(at));
+      double test_run_time(at.elapsed_now());
       std::cout<<"test time: "<<test_run_time<<std::endl;
       if (test_run_time < 0.1)
         iters = Index(0.1 / test_run_time) + 1;
@@ -53,8 +51,7 @@ namespace FEAT
           func();
         }
         MemoryPool<Mem_>::synchronize();
-        bt.stamp();
-        times.push_back(bt.elapsed(at));
+        times.push_back(at.elapsed_now());
       }
 
       double mean(0);
