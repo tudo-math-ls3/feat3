@@ -105,7 +105,7 @@ struct MeshoptScrewsApp
   /// This is how far the inner screw's centre deviates from the outer screw's
   static constexpr DataType excentricity_inner = DataType(0.2833);
   /// Type for points in the mesh
-  typedef Tiny::Vector<DataType, MeshType::world_dim> ImgPointType;
+  typedef Tiny::Vector<DataType, MeshType::world_dim> WorldPoint;
 
 #ifdef FEAT_HAVE_PARMETIS
   // If we have ParMETIS, we can use it for partitioning
@@ -183,7 +183,7 @@ struct MeshoptScrewsApp
     String file_basename(name()+"_n"+stringify(Util::Comm::size()));
 
     // This is the centre reference point
-    ImgPointType x_0(DataType(0));
+    WorldPoint x_0(DataType(0));
 
     // Get inner boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
     auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("inner");
@@ -192,9 +192,10 @@ struct MeshoptScrewsApp
       inner_indices = &(inner_boundary->template get_target_set<0>());
 
     // This is the centre point of the rotation of the inner screw
-    ImgPointType x_inner(DataType(0));
-    x_inner.v[0] = -excentricity_inner;
-    const String inner_str(dom_ctrl.get_atlas()->find_mesh_chart("inner")->get_type());
+    WorldPoint centre_inner(DataType(0));
+    centre_inner.v[0] = -excentricity_inner;
+    //const String inner_str(dom_ctrl.get_atlas()->find_mesh_chart("inner")->get_type());
+    auto* inner_chart = dom_ctrl.get_atlas()->find_mesh_chart("inner");
 
     // Get outer boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
     auto* outer_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer");
@@ -203,12 +204,14 @@ struct MeshoptScrewsApp
       outer_indices = &(outer_boundary->template get_target_set<0>());
 
     // This is the centre point of the rotation of the outer screw
-    ImgPointType x_outer(DataType(0));
-    const String outer_str(dom_ctrl.get_atlas()->find_mesh_chart("outer")->get_type());
+    WorldPoint centre_outer(DataType(0));
+    //const String outer_str(dom_ctrl.get_atlas()->find_mesh_chart("outer")->get_type());
+    auto* outer_chart = dom_ctrl.get_atlas()->find_mesh_chart("outer");
 
     // For test_mode = true
     DT_ min_quality(0);
     DT_ min_angle(0);
+    // Write initial output
     {
       int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
@@ -259,41 +262,7 @@ struct MeshoptScrewsApp
         Geometry::ExportVTK<ExtrudedMeshType> exporter(*(extruder.extruded_mesh_node->get_mesh()));
         exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
       }
-
-
-      // Write Polyline charts if we have them
-      if(Util::Comm::rank()==0)
-      {
-        if(inner_str == "polyline")
-        {
-          typedef Geometry::ConformalMesh<Shape::Hypercube<1>,2,2,DataType> PolylineMesh;
-
-          auto* inner_chart = reinterpret_cast< Geometry::Atlas::Polyline<MeshType>*>
-            (dom_ctrl.get_atlas()->find_mesh_chart("inner"));
-
-          Geometry::PolylineFactory<2,2, DataType> pl_factory(inner_chart->get_world_points());
-          PolylineMesh polyline(pl_factory);
-
-          Geometry::ExportVTK<PolylineMesh> polyline_writer(polyline);
-          polyline_writer.write(file_basename+"_inner");
-
-        }
-
-        if(outer_str == "polyline")
-        {
-          typedef Geometry::ConformalMesh<Shape::Hypercube<1>,2,2,DataType> PolylineMesh;
-
-          auto* outer_chart = reinterpret_cast< Geometry::Atlas::Polyline<MeshType>*>
-            (dom_ctrl.get_atlas()->find_mesh_chart("outer"));
-
-          Geometry::PolylineFactory<2,2, DataType> pl_factory(outer_chart->get_world_points());
-          PolylineMesh polyline(pl_factory);
-
-          Geometry::ExportVTK<PolylineMesh> polyline_writer(polyline);
-          polyline_writer.write(file_basename+"_outer");
-        }
-      }
-    }
+    } // writing initial output
 
     // Check for the hard coded settings for test mode
     if(test_mode)
@@ -395,6 +364,8 @@ struct MeshoptScrewsApp
     // Need some pi for all the angles
     DataType pi(Math::pi<DataType>());
 
+    WorldPoint rotation_angles(0);
+
     // The mesh velocity is 1/delta_t*(coords_new - coords_old) and computed in each time step
     auto mesh_velocity = meshopt_ctrl->get_coords().clone();
 
@@ -406,7 +377,6 @@ struct MeshoptScrewsApp
       DataType alpha_old = alpha;
       alpha = -DataType(2)*pi*time;
       DataType delta_alpha = alpha - alpha_old;
-
 
       if(Util::Comm::rank() == 0)
         std::cout << "Timestep " << n << ": t = " << stringify_fp_fix(time) <<
@@ -420,142 +390,70 @@ struct MeshoptScrewsApp
       auto& coords = (meshopt_ctrl->get_coords());
       auto& coords_loc = *coords;
 
+      // Rotate the charts
+      rotation_angles(0) = delta_alpha;
+      rotation_angles(1) = DataType(0);
+
+      outer_chart->rotate(centre_inner, rotation_angles);
+
+      rotation_angles(0) *= DataType(7)/DataType(6);
+      inner_chart->rotate(centre_inner, rotation_angles);
+
       // Update boundary of the inner screw
       // This is the 2x2 matrix representing the turning by the angle delta_alpha of the inner screw
-      Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
-
-      rot(0,0) = Math::cos(delta_alpha*DataType(7)/DataType(6));
-      rot(0,1) = - Math::sin(delta_alpha*DataType(7)/DataType(6));
-      rot(1,0) = -rot(0,1);
-      rot(1,1) = rot(0,0);
-
-      ImgPointType tmp(DataType(0));
-      ImgPointType tmp2(DataType(0));
-
-      if(inner_indices != nullptr)
       {
-        for(Index i(0); i < inner_indices->get_num_entities(); ++i)
+        Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
+
+        rot(0,0) = Math::cos(delta_alpha*DataType(7)/DataType(6));
+        rot(0,1) = - Math::sin(delta_alpha*DataType(7)/DataType(6));
+        rot(1,0) = -rot(0,1);
+        rot(1,1) = rot(0,0);
+
+        WorldPoint tmp(DataType(0));
+        WorldPoint tmp2(DataType(0));
+
+        if(inner_indices != nullptr)
         {
-          // Index of boundary vertex i in the mesh
-          Index j(inner_indices->operator[](i));
-          // Translate the point to the centre of rotation
-          tmp = coords_loc(j) - x_inner;
-          // Rotate
-          tmp2.set_vec_mat_mult(tmp, rot);
-          // Translate the point by the new centre of rotation
-          coords_loc(j, x_inner + tmp2);
+          for(Index i(0); i < inner_indices->get_num_entities(); ++i)
+          {
+            // Index of boundary vertex i in the mesh
+            Index j(inner_indices->operator[](i));
+            // Translate the point to the centre of rotation
+            tmp = coords_loc(j) - centre_inner;
+            // Rotate
+            tmp2.set_vec_mat_mult(tmp, rot);
+            // Translate the point by the new centre of rotation
+            coords_loc(j, centre_inner + tmp2);
+          }
         }
       }
-
-      // Rotate the chart. This has to use an evil downcast for now
-      if(inner_str == "polyline")
-      {
-        auto* inner_chart = reinterpret_cast< Geometry::Atlas::Polyline<MeshType>*>
-          (dom_ctrl.get_atlas()->find_mesh_chart("inner"));
-
-        auto& vtx_inner = inner_chart->get_world_points();
-
-        for(auto& it : vtx_inner)
-        {
-          tmp = it - x_inner;
-          // Rotate
-          tmp2.set_vec_mat_mult(tmp, rot);
-          // Translate the point by the new centre of rotation
-          it = x_inner + tmp2;
-        }
-      }
-      else if(inner_str == "bezier")
-      {
-        auto* inner_chart = reinterpret_cast< Geometry::Atlas::Bezier<MeshType>*>
-          (dom_ctrl.get_atlas()->find_mesh_chart("inner"));
-
-        auto& vtx_inner = inner_chart->get_world_points();
-
-        for(auto& it : vtx_inner)
-        {
-          tmp = it - x_inner;
-          // Rotate
-          tmp2.set_vec_mat_mult(tmp, rot);
-          // Translate the point by the new centre of rotation
-          it = x_inner + tmp2;
-        }
-
-        auto& vtx_control = inner_chart->get_control_points();
-
-        for(auto& it : vtx_control)
-        {
-          tmp = it - x_inner;
-          // Rotate
-          tmp2.set_vec_mat_mult(tmp, rot);
-          // Translate the point by the new centre of rotation
-          it = x_inner + tmp2;
-        }
-      }
-      else
-        throw InternalError(__func__,__FILE__,__LINE__,"Unhandled inner chart type string "+inner_str);
 
       // The outer screw has 7 teeth as opposed to the inner screw with 6, and it rotates at 6/7 of the speed
-      rot(0,0) = Math::cos(delta_alpha);
-      rot(0,1) = - Math::sin(delta_alpha);
-      rot(1,0) = -rot(0,1);
-      rot(1,1) = rot(0,0);
-
-      // The outer screw rotates centrically, so x_outer remains the same at all times
-      if(outer_indices != nullptr)
       {
-        for(Index i(0); i < outer_indices->get_num_entities(); ++i)
+        Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
+        rot(0,0) = Math::cos(delta_alpha);
+        rot(0,1) = - Math::sin(delta_alpha);
+        rot(1,0) = -rot(0,1);
+        rot(1,1) = rot(0,0);
+
+        WorldPoint tmp(DataType(0));
+        WorldPoint tmp2(DataType(0));
+
+        // The outer screw rotates centrically, so centre_outer remains the same at all times
+        if(outer_indices != nullptr)
         {
-          // Index of boundary vertex i in the mesh
-          Index j(outer_indices->operator[](i));
-          tmp = coords_loc(j) - x_outer;
+          for(Index i(0); i < outer_indices->get_num_entities(); ++i)
+          {
+            // Index of boundary vertex i in the mesh
+            Index j(outer_indices->operator[](i));
+            tmp = coords_loc(j) - centre_outer;
 
-          tmp2.set_vec_mat_mult(tmp, rot);
+            tmp2.set_vec_mat_mult(tmp, rot);
 
-          coords_loc(j, x_outer+tmp2);
+            coords_loc(j, centre_outer+tmp2);
+          }
         }
       }
-
-      // Rotate the outer chart. This has to use an evil downcast for now
-      if(outer_str == "polyline")
-      {
-        auto* outer_chart = reinterpret_cast<Geometry::Atlas::Polyline<MeshType>*>
-          (dom_ctrl.get_atlas()->find_mesh_chart("outer"));
-        auto& vtx_outer = outer_chart->get_world_points();
-
-        for(auto& it :vtx_outer)
-        {
-          tmp = it - x_outer;
-          // Rotate
-          tmp2.set_vec_mat_mult(tmp, rot);
-          it = x_outer + tmp2;
-        }
-      }
-      else if(outer_str == "bezier")
-      {
-        auto* outer_chart = reinterpret_cast<Geometry::Atlas::Bezier<MeshType>*>
-          (dom_ctrl.get_atlas()->find_mesh_chart("outer"));
-        auto& vtx_outer = outer_chart->get_world_points();
-
-        for(auto& it :vtx_outer)
-        {
-          tmp = it - x_outer;
-          // Rotate
-          tmp2.set_vec_mat_mult(tmp, rot);
-          it = x_outer + tmp2;
-        }
-
-        auto& vtx_control = outer_chart->get_control_points();
-
-        for(auto& it :vtx_control)
-        {
-          tmp = it - x_outer;
-          // Rotate
-          tmp2.set_vec_mat_mult(tmp, rot);
-          it = x_outer + tmp2;
-        }
-      }
-      else
-        throw InternalError(__func__,__FILE__,__LINE__,"Unhandled outer chart type string "+outer_str);
 
       // Now prepare the functional
       meshopt_ctrl->prepare(coords);
