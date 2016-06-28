@@ -641,6 +641,11 @@ namespace FEAT
                 os << " " << _world[k][j];
             os << std::endl;
           }
+          // write last vertex point
+          os << sind2 << 0;
+            for(int j(0); j < BaseClass::world_dim; ++j)
+              os << " " << _world[_vtx_ptr.back()][j];
+          os << std::endl;
           os << sind << "</Points>" << std::endl;
 
           // write parameters
