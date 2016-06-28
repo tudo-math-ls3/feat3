@@ -87,7 +87,7 @@ namespace FEAT
         }
 
         /// \copydoc ChartBase::rotate()
-        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) override
         {
           // This is the 3x3 matrix representing the turning by the angle angles(0)
           Tiny::Matrix<CoordType, 3, 3> rot(CoordType(0));

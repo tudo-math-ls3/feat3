@@ -407,7 +407,7 @@ namespace FEAT
         }
 
         /// \copydoc BaseClass::rotate()
-        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) override
         {
           (this->cast()).rotate(centre, angles);
         }

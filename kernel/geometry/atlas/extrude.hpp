@@ -91,7 +91,7 @@ namespace FEAT
         }
 
         /// \copydoc ChartBase::rotate()
-        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles)
+        virtual void rotate(const WorldPoint& centre, const WorldPoint& angles) override
         {
           XASSERTM(Math::abs(angles(1)) < Math::eps<CoordType>(), "More than one angle in extruded 2d rotation!");
           XASSERTM(Math::abs(angles(2)) < Math::eps<CoordType>(), "More than one angle in extruded 2d rotation!");
