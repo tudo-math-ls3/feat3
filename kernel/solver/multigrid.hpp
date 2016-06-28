@@ -1133,7 +1133,7 @@ namespace FEAT
         }
         else
         {
-          result += "C: Idendity";
+          result += "C: Identity";
         }
         result += " ) ";
 
