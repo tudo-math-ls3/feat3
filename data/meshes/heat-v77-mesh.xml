@@ -3,13 +3,13 @@
     This file describes the heat-v77 mesh.
   </Info>
   <Chart name="outer">
-    <Polyline dim="2" size="5" type="closed">
+    <Spline dim="2" size="5" type="closed">
       <Points>
-        0 0
-        1 0
-        1 1.25
-        0 1.25
-        0 0
+        0 0 0
+        0 1 0
+        0 1 1.25
+        0 0 1.25
+        0 0 0
       </Points>
       <Params>
         0
@@ -18,7 +18,7 @@
         3
         4
       </Params>
-    </Polyline>
+    </Spline>
   </Chart>
   <Chart name="circle">
     <Circle radius="0.1414213562373095" midpoint="0.5 0.5" domain="0.375 -0.625" />

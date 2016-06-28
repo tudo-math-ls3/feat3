@@ -3,13 +3,13 @@
     This is the unit-square mesh consisting of four triangular cells.
   </Info>
   <Chart name="outer">
-    <Polyline dim="2" size="5" type="closed">
+    <Spline dim="2" size="5" type="closed">
       <Points>
-        0 0
-        1 0
-        1 1
-        0 1
-        0 0
+        0 0 0
+        0 1 0
+        0 1 1
+        0 0 1
+        0 0 0
       </Points>
       <Params>
         0
@@ -18,7 +18,7 @@
         3
         4
       </Params>
-    </Polyline>
+    </Spline>
   </Chart>
   <Mesh type="conformal:simplex:2:2" size="5 8 4">
     <Vertices>

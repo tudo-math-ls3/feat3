@@ -4,13 +4,13 @@
     mesh for the famous 2D "flow around a cylinder" benchmark.
   </Info>
   <Chart name="outer">
-    <Polyline dim="2" size="5" type="closed">
+    <Spline dim="2" size="5" type="closed">
       <Points>
-        0 0
-        2.2 0
-        2.2 0.41
-        0 0.41
-        0 0
+        0 0 0
+        0 2.2 0
+        0 2.2 0.41
+        0 0 0.41
+        0 0 0
       </Points>
       <Params>
         0
@@ -19,7 +19,7 @@
         3
         4
       </Params>
-    </Polyline>
+    </Spline>
   </Chart>
   <Chart name="circle">
     <Circle radius="0.05" midpoint="0.2 0.2" domain="0.5 -0.5" />
