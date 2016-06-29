@@ -206,8 +206,6 @@ namespace FEAT
             XASSERT(_linesearch != nullptr);
 
             this->_min_stag_iter = 0;
-            if(precond != nullptr)
-              _max_num_restarts = Index(0);
 
             if(keep_iterates)
               iterates = new std::deque<VectorType>;
@@ -289,10 +287,10 @@ namespace FEAT
         }
 
         /// \copydoc BaseClass::apply()
-        virtual Status apply(VectorType& vec_cor, const VectorType& vec_r) override
+        virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
         {
           // save defect
-          this->_vec_r.copy(vec_r);
+          this->_vec_r.copy(vec_def);
           //this->_system_filter.filter_def(this->_vec_r);
 
           // clear solution vector
@@ -534,19 +532,17 @@ namespace FEAT
         /**
          * \brief Computes the parameter beta for the search direction update
          *
-         * \param[out] beta
-         * Parameter for updating the search direction: \f$ d_{k+1} = z_{k+1} + \beta_{k+1} p_k \f$
+         * \param[in] gamma
+         * <r[k+1], z[k+1]>
          *
-         * \param[in, out] gamma
-         * This is the scalar product of the defect and the preconditioned defect
+         * \param[in] gamma_prev
+         * <r[k], z[k]>
          *
-         * If the returned \f$ \beta = 0,\f$ the next search direction is the steepest descent direction. Many of the
-         * update formulas need the old (preconditioned) defect we keep in _vec_temp, so the preconditioner is always
-         * called in these routines.
+         * If the returned \f$ \beta = 0,\f$ the next search direction is the steepest descent direction.
          *
-         * \returns A solver status code.
+         * \returns The new parameter beta.
          */
-        DataType compute_beta(const DataType gamma, const DataType gamma_prev) const
+        DataType compute_beta(const DataType& gamma, const DataType& gamma_prev) const
         {
           switch(_direction_update)
           {
@@ -669,7 +665,10 @@ namespace FEAT
         }
 
         /**
-         * \copydoc compute_beta()
+         * \brief Dai-Yuan update
+         *
+         * \param[in] gamma
+         * <r[k+1], z[k+1]>
          *
          * The Dai-Yuan update sets
          * \f[
@@ -682,6 +681,8 @@ namespace FEAT
          *
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
+         *
+         * \returns The new \$f \beta_{DY}\f$
          */
         DataType dai_yuan(const DataType gamma) const
         {
@@ -689,11 +690,13 @@ namespace FEAT
           DataType eta_dif = this->_vec_p.dot(this->_vec_y);
 
           return gamma/(-eta_dif);
-
         }
 
         /**
-         * \copydoc compute_beta()
+         * \brief Dai-Yuan-Hestenes-Stiefel update
+         *
+         * \param[in] gamma
+         * <r[k+1], z[k+1]>
          *
          * The hybrid Dai-Yuan/Hestenes-Stiefel update sets
          * \f[
@@ -707,6 +710,8 @@ namespace FEAT
          *
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
+         *
+         * \returns The new \$f \beta_{DYHS}\f$
          */
         DataType dy_hs_hybrid(const DataType gamma) const
         {
@@ -724,7 +729,14 @@ namespace FEAT
         }
 
         /**
-         * \copydoc compute_beta()
+         * \brief Fletcher-Reeves update
+         *
+         * \param[in] gamma
+         * <r[k+1], z[k+1]>
+         *
+         * \param[in] gamma_prev
+         * <r[k], z[k]>
+         *
          * The Fletcher-Reeves update sets
          * \f[
          *   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
@@ -733,6 +745,8 @@ namespace FEAT
          * \f[
          *   \beta_{k+1} := \frac{\gamma_{k+1}}{\gamma_k}
          * \f]
+         *
+         * \returns The new \$f \beta_{FR}\f$
          */
         DataType fletcher_reeves(const DataType gamma, const DataType gamma_prev) const
         {
@@ -740,7 +754,10 @@ namespace FEAT
         }
 
         /**
-         * \copydoc compute_beta()
+         * \brief Hager-Zhang update
+         *
+         * \param[in] gamma
+         * <r[k+1], z[k+1]>
          *
          * The Hager-Zhang update sets
          * \f[
@@ -763,6 +780,8 @@ namespace FEAT
          *
          * \warning This update strategy needs more precision in the linesearch than all others and is not very
          * efficient in the current implementation. This serves more as a starting point for further improvement.
+         *
+         * \returns The new \$f \beta_{HZ}\f$
          */
         DataType hager_zhang(const DataType gamma) const
         {
@@ -785,7 +804,7 @@ namespace FEAT
         }
 
         /**
-         * \copydoc compute_beta()
+         * \brief Hestenes-Stiefel update
          *
          * The Hestenes-Stiefel update sets
          * \f[
@@ -800,6 +819,8 @@ namespace FEAT
          *
          * Note the sign changes due to this being formulated in terms of the defect rather than the function's
          * gradient.
+         *
+         * \returns The new \$f \beta_{HS}\f$
          */
         DataType hestenes_stiefel() const
         {
@@ -812,14 +833,19 @@ namespace FEAT
         }
 
         /**
-         * \copydoc compute_beta()
+         * \brief Modified Polak-Ribiere-Polyak
          *
-         * The Polak-Ribière update sets
+         * \param[in] gamma_prev
+         * <r[k], z[k]>
+         *
+         * The Polak-Ribière-Polyak update sets
          * \f{align*}{
          *   r_k & := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
          *   \gamma_{k+\frac{1}{2}} := \left<r_{k+1}, z_k \right> \\
          *   \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
          * \f}
+         *
+         * \returns The new \$f \beta_{PRP+}\f$
          */
         DataType polak_ribiere(const DataType gamma_prev) const
         {
@@ -827,7 +853,6 @@ namespace FEAT
           DataType gamma_dif = this->_vec_z.dot(this->_vec_y);
 
           return  Math::max(gamma_dif/gamma_prev, DataType(0));
-
         }
 
     }; // class NLCG
