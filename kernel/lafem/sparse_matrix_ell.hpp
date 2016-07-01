@@ -367,12 +367,12 @@ namespace FEAT
       {
       private:
         const IT_* _ai;
-        IT_ _c;
+        Index _c;
 
       public:
         ImageIterator() : _ai(nullptr), _c(IT_(0)) {}
 
-        ImageIterator(const IT_* ai, IT_ c) : _ai(ai), _c(c) {}
+        ImageIterator(const IT_* ai, Index c) : _ai(ai), _c(c) {}
 
         ImageIterator& operator=(const ImageIterator& other)
         {
@@ -1264,7 +1264,7 @@ namespace FEAT
        */
       void read_from_mtx(String filename)
       {
-        IT_ ttC(this->C());
+        Index ttC(this->C());
         this->clear();
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -2311,7 +2311,18 @@ namespace FEAT
 
         return lhs;
       }
-    };
+    }; //class SparseMatrixELL
+
+    extern template class SparseMatrixELL<Mem::Main, float, unsigned int>;
+    extern template class SparseMatrixELL<Mem::Main, double, unsigned int>;
+    extern template class SparseMatrixELL<Mem::Main, float, unsigned long>;
+    extern template class SparseMatrixELL<Mem::Main, double, unsigned long>;
+#ifdef FEAT_HAVE_CUDA
+    extern template class SparseMatrixELL<Mem::Main, float, unsigned int>;
+    extern template class SparseMatrixELL<Mem::Main, double, unsigned int>;
+    extern template class SparseMatrixELL<Mem::Main, float, unsigned long>;
+    extern template class SparseMatrixELL<Mem::Main, double, unsigned long>;
+#endif
 
   } // namespace LAFEM
 } // namespace FEAT

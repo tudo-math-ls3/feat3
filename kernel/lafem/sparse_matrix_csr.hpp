@@ -2602,7 +2602,18 @@ namespace FEAT
 
         return lhs;
       }
-    };
+    }; //SparseMatrixCSR
+
+    extern template class SparseMatrixCSR<Mem::Main, float, unsigned int>;
+    extern template class SparseMatrixCSR<Mem::Main, double, unsigned int>;
+    extern template class SparseMatrixCSR<Mem::Main, float, unsigned long>;
+    extern template class SparseMatrixCSR<Mem::Main, double, unsigned long>;
+#ifdef FEAT_HAVE_CUDA
+    extern template class SparseMatrixCSR<Mem::CUDA, float, unsigned int>;
+    extern template class SparseMatrixCSR<Mem::CUDA, double, unsigned int>;
+    extern template class SparseMatrixCSR<Mem::CUDA, float, unsigned long>;
+    extern template class SparseMatrixCSR<Mem::CUDA, double, unsigned long>;
+#endif
   } // namespace LAFEM
 } // namespace FEAT
 

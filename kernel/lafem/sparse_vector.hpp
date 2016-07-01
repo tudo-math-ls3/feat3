@@ -801,6 +801,17 @@ namespace FEAT
       }
     }; // class SparseVector<...>
 
+    extern template class SparseVector<Mem::Main, float, unsigned int>;
+    extern template class SparseVector<Mem::Main, double, unsigned int>;
+    extern template class SparseVector<Mem::Main, float, unsigned long>;
+    extern template class SparseVector<Mem::Main, double, unsigned long>;
+#ifdef FEAT_HAVE_CUDA
+    extern template class SparseVector<Mem::CUDA, float, unsigned int>;
+    extern template class SparseVector<Mem::CUDA, double, unsigned int>;
+    extern template class SparseVector<Mem::CUDA, float, unsigned long>;
+    extern template class SparseVector<Mem::CUDA, double, unsigned long>;
+#endif
+
 
   } // namespace LAFEM
 } // namespace FEAT

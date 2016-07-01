@@ -1318,6 +1318,17 @@ namespace FEAT
         return lhs;
       }
     }; // class DenseVector<...>
+
+    extern template class DenseVector<Mem::Main, float, unsigned int>;
+    extern template class DenseVector<Mem::Main, double, unsigned int>;
+    extern template class DenseVector<Mem::Main, float, unsigned long>;
+    extern template class DenseVector<Mem::Main, double, unsigned long>;
+#ifdef FEAT_HAVE_CUDA
+    extern template class DenseVector<Mem::CUDA, float, unsigned int>;
+    extern template class DenseVector<Mem::CUDA, double, unsigned int>;
+    extern template class DenseVector<Mem::CUDA, float, unsigned long>;
+    extern template class DenseVector<Mem::CUDA, double, unsigned long>;
+#endif
   } // namespace LAFEM
 } // namespace FEAT
 

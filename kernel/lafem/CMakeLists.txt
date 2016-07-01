@@ -6,13 +6,18 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 ADD_SUBDIRECTORY( arch )
 
 # list of lafem source files
-# currently empty, but neccessary for sub library dependencies
-# TODO remove dummy as soon as possible
 SET (kernel-lafem-list
-  empty.cpp
+  dense_vector.cpp
+  sparse_matrix_csr.cpp
+  sparse_matrix_ell.cpp
+  sparse_vector.cpp
   )
 
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
+if (FEAT_COTIRE)
+  cotire(kernel-lafem)
+endif (FEAT_COTIRE)
+
 TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch kernel-util kernel-adjacency)
 
 if (FEAT_HAVE_CUDA)
