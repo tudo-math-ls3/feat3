@@ -74,10 +74,13 @@ int main(int argc, char ** argv)
 {
   Runtime::initialise(argc, argv);
 #ifdef FEAT_HAVE_CUDA
+  run<Algo::CUDA, DenseVector<Mem::CUDA, float, Index> >();
   run<Algo::CUDA, DenseVector<Mem::CUDA, double, Index> >();
 #endif
+  run<Algo::Generic, DenseVector<Mem::Main, float, Index> >();
   run<Algo::Generic, DenseVector<Mem::Main, double, Index> >();
 #ifdef FEAT_HAVE_MKL
+  run<Algo::MKL, DenseVector<Mem::Main, float, Index> >();
   run<Algo::MKL, DenseVector<Mem::Main, double, Index> >();
 #endif
   Runtime::finalise();
