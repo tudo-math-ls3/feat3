@@ -304,7 +304,7 @@ namespace FEAT
               typename SystemLevelType::GlobalCoordsBuffer
                 global_vec_level( &(_system_levels.at(level)->gate_sys), vec_buf, ndofs, Index(0));
 
-              //_system_levels.at(level)->op_sys.prepare(vec_buf, _system_levels.at(level)->filter_sys);
+              (*(_system_levels.at(level)->op_sys)).prepare(vec_buf, *(_system_levels.at(level)->filter_sys));
 
               _assembler_levels.at(level)->assemble_system_filter(*(_system_levels.at(level)), global_vec_level);
             }
@@ -335,8 +335,10 @@ namespace FEAT
             this->apply(vec_sol, vec_rhs);
 
             (*the_system_level.coords_buffer).convert(*vec_sol);
-
             buffer_to_mesh();
+
+            prepare(vec_sol);
+
           }
 
       };
