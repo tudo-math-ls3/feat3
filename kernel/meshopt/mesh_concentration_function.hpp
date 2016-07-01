@@ -628,6 +628,7 @@ namespace FEAT
       protected:
         /// List of charts to compute the distance to
         std::deque<String> _chart_list;
+        const String _operation;
 
       public:
         /// Explicitly delete the empty default constructor
@@ -643,9 +644,10 @@ namespace FEAT
          * The list of charts to compute the distance from.
          *
          */
-        ChartDistanceFunction(const ElementalFunction& func_, const std::deque<String>& chart_list_):
+        ChartDistanceFunction(const ElementalFunction& func_, const std::deque<String>& chart_list_, const String& operation_):
           DirectBaseClass(func_),
-          _chart_list()
+          _chart_list(),
+          _operation(operation_)
           {
             XASSERTM(chart_list_.size() > size_t(0), "Empty chart list.");
 
@@ -668,12 +670,23 @@ namespace FEAT
         virtual std::shared_ptr<BaseClass> create_empty_clone() const override
         {
           std::shared_ptr<BaseClass> result(nullptr);
-          result = std::make_shared<ChartDistanceFunction>(this->_func, _chart_list);
+          result = std::make_shared<ChartDistanceFunction>(this->_func, _chart_list, _operation);
           return result;
         }
 
         /// \copydoc BaseClass::compute_dist()
         virtual void compute_dist() override
+        {
+          if(_operation == "add")
+            compute_dist_add();
+          else if(_operation == "min")
+            compute_dist_min();
+          else
+            throw InternalError(__func__,__FILE__,__LINE__,"Unknown operation "+_operation);
+        }
+
+        /// \copydoc BaseClass::compute_dist()
+        void compute_dist_add()
         {
           XASSERT(this->_mesh_node != nullptr);
 
@@ -695,6 +708,41 @@ namespace FEAT
 
               my_dist += Math::abs(chart->signed_dist(vtx[i], tmp));
               my_dist_vec += tmp;
+
+            }
+            this->_dist(i, my_dist);
+
+            my_dist_vec.normalise();
+            this->_grad_dist(i, my_dist_vec);
+          }
+        }
+        /// \copydoc BaseClass::compute_dist()
+        void compute_dist_min()
+        {
+          XASSERT(this->_mesh_node != nullptr);
+
+          const auto& vtx = this->_mesh_node->get_mesh()->get_vertex_set();
+
+          WorldPoint my_dist_vec(CoordType(0));
+          WorldPoint tmp(CoordType(0));
+
+          for(Index i(0); i < this->_mesh_node->get_mesh()->get_num_entities(0); ++i)
+          {
+            CoordType my_dist(Math::huge<CoordType>());
+            my_dist_vec.format(CoordType(0));
+
+            for(const auto& it:_chart_list)
+            {
+              auto* chart = this->_mesh_node->get_atlas()->find_mesh_chart(it);
+              if(chart == nullptr)
+                throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
+
+              CoordType this_dist = Math::abs(chart->signed_dist(vtx[i], tmp));
+              if(this_dist < my_dist)
+              {
+                my_dist = this_dist;
+                my_dist_vec = tmp;
+              }
 
             }
             this->_dist(i, my_dist);
@@ -761,6 +809,11 @@ namespace FEAT
               throw InternalError(__func__,__FILE__,__LINE__,
               "Section "+section_key+" is missing the mandatory chart_list key.");
 
+            String operation("min");
+            auto operation_p = my_section->query("operation");
+            if(operation_p.second)
+              operation = operation_p.first;
+
             chart_list_p.first.split_by_charset(chart_list, " ");
 
             auto function_type_p = my_section->query("function_type");
@@ -784,7 +837,7 @@ namespace FEAT
                 ElementalFunction my_func(minval, exponent, true);
 
                 auto real_result = std::make_shared<ChartDistanceFunction<ElementalFunction, Trafo_, RefCellTrafo_>>
-                  (my_func, chart_list);
+                  (my_func, chart_list, operation);
 
                 result = real_result;
               }
@@ -795,7 +848,7 @@ namespace FEAT
                 ElementalFunction my_func;
 
                 auto real_result = std::make_shared<ChartDistanceFunction<ElementalFunction, Trafo_, RefCellTrafo_>>
-                  (my_func, chart_list);
+                  (my_func, chart_list, operation);
 
                 result = real_result;
               }
