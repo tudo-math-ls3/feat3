@@ -289,7 +289,7 @@ struct MeshoptBoundaryApp
 
             tmp1(0) += delta_t * (DataType(1)*(tmp0(0) - midpoint(0))
                 + Math::pow(DataType(1)*(tmp0(1) - midpoint(1)),DataType(3) ) );
-            tmp1(1) -= delta_t * (DataType(1)*(tmp1(0) - midpoint(0))
+            tmp1(1) -= delta_t * (DataType(1)*(tmp1(0) - midpoint(1))
                 + Math::pow(DataType(1)*(tmp0(0) - midpoint(0)),DataType(3) ) );
 
             coords_loc(j, tmp1);

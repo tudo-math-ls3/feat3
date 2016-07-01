@@ -401,7 +401,7 @@ ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::Rosenbrock
 alg_lbfgs_rb_d(double(0.7), Index(36));
 
 ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-alg_lbfgs_bs_d(double(0.35), Index(29));
+alg_lbfgs_bs_d(double(0.35), Index(30));
 
 ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::GoldsteinPriceFunction>
 alg_lbfgs_gp_d(double(0.6), Index(15));
@@ -499,5 +499,5 @@ ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::RosenbrockFun
 alg_mincg_rb_d(double(0.6), Index(40), NLCGDirectionUpdate::DYHSHybrid);
 
 ALGLIBMinCGTest<Mem::Main, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-alg_mincg_bs_d(double(0.15), Index(25), NLCGDirectionUpdate::DaiYuan);
+alg_mincg_bs_d(double(0.15), Index(52), NLCGDirectionUpdate::DaiYuan);
 #endif // FEAT_HAVE_ALGLIB

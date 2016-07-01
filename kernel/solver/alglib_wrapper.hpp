@@ -123,7 +123,7 @@ namespace FEAT
           _op(op_),
           _filter(filter_),
           _tol_fval(DataType(0)),
-          _tol_step(Math::sqrt(Math::eps<DataType>())),
+          _tol_step(Math::eps<DataType>()),
           _lbfgs_dim(lbfgs_dim_),
           iterates(nullptr)
           {
@@ -569,7 +569,7 @@ namespace FEAT
           _filter(filter_),
           _direction_update(du_),
           _tol_fval(DataType(0)),
-          _tol_step(Math::sqrt(Math::eps<DataType>())),
+          _tol_step(Math::eps<DataType>()),
           iterates(nullptr)
           {
             if(keep_iterates)

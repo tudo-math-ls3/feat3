@@ -197,7 +197,7 @@ namespace FEAT
           _precond(precond),
           _direction_update(du_),
           _tol_fval(DataType(0)),
-          _tol_step(Math::sqrt(Math::eps<DataType>())),
+          _tol_step(Math::eps<DataType>()),
           _max_num_restarts(10),
           _num_restarts(0),
           _restart_freq(_op.columns() + Index(3)),
