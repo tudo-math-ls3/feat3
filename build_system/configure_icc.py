@@ -72,6 +72,8 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler):
       cxxflags += " -xCORE-AVX-I"
     elif cpu == "haswell":
       cxxflags += " -xCORE-AVX2"
+    elif cpu == "skylake":
+      cxxflags += " -xCORE-AVX2"
     elif cpu == "itanium":
       # no setting necessary, the itanium version of the intel compiler
       # sets everything automatically

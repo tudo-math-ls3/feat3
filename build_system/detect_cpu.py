@@ -131,6 +131,8 @@ def detect_cpu():
         cputype = "haswell"
       elif model == 69:
         cputype = "haswell"
+      elif model == 94:
+        cputype = "skylake"
     elif cpu_family == 7:
       cputype ="itanium"
     elif cpu_family == 15:
