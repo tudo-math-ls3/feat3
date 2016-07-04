@@ -285,7 +285,7 @@ namespace FEAT
           }
 
           /// \copydoc BaseClass::prepare()
-          virtual void prepare(const GlobalSystemVectorR& vec_state) override
+          virtual void prepare(const GlobalSystemVectorR& DOXY(vec_state)) override
           {
             for(size_t level(num_levels); level > 0; )
             {
@@ -293,7 +293,7 @@ namespace FEAT
               Index ndofs(_assembler_levels.at(level)->trafo_space.get_num_dofs());
 
               typename SystemLevelType::LocalCoordsBuffer vec_buf(ndofs, DT_(0));
-              vec_buf.convert(*vec_state);
+              //vec_buf.convert(*vec_state);
 
               // At this point, what we really need is a primal restriction operator that restricts the FE function
               // representing the coordinate distribution to the coarser level. This is very simple for continuous
@@ -306,7 +306,7 @@ namespace FEAT
 
               (*(_system_levels.at(level)->op_sys)).prepare(vec_buf, *(_system_levels.at(level)->filter_sys));
 
-              _assembler_levels.at(level)->assemble_system_filter(*(_system_levels.at(level)), global_vec_level);
+              _assembler_levels.at(level)->assemble_system_filter(*(_system_levels.at(level)));//, global_vec_level);
             }
 
           }
@@ -334,7 +334,7 @@ namespace FEAT
             // solve
             this->apply(vec_sol, vec_rhs);
 
-            (*the_system_level.coords_buffer).convert(*vec_sol);
+            (*the_system_level.coords_buffer).axpy((*the_system_level.coords_buffer),*vec_sol, DataType(1));
             buffer_to_mesh();
 
             prepare(vec_sol);

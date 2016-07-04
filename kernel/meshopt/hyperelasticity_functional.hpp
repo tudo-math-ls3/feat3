@@ -600,20 +600,22 @@ namespace FEAT
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
             my_vol = this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
-            my_quality += Math::sqr(CoordType(1) - my_vol/this->_lambda(cell));
+            my_quality += Math::sqr(my_vol - this->_lambda(cell));
+            //my_quality += Math::sqr(CoordType(1) - my_vol/this->_lambda(cell));
           }
 
-          Index ncells(this->get_mesh()->get_num_entities(MeshType::shape_dim));
-
-#ifdef FEAT_HAVE_MPI
-          Index ncells_snd(ncells);
-          Util::Comm::allreduce(&ncells_snd, Index(1), &ncells, MPI_SUM);
-          CoordType my_quality_snd(my_quality);
-          Util::Comm::allreduce(&my_quality_snd, Index(1), &my_quality, MPI_SUM);
-#endif
+//          Index ncells(this->get_mesh()->get_num_entities(MeshType::shape_dim));
+//
+//#ifdef FEAT_HAVE_MPI
+//          Index ncells_snd(ncells);
+//          Util::Comm::allreduce(&ncells_snd, Index(1), &ncells, MPI_SUM);
+//          CoordType my_quality_snd(my_quality);
+//          Util::Comm::allreduce(&my_quality_snd, Index(1), &my_quality, MPI_SUM);
+//#endif
           my_quality = Math::sqrt(my_quality);
 
-          return Math::abs(CoordType(1) - my_quality/CoordType(ncells));
+          //return Math::abs(CoordType(1) - my_quality/CoordType(ncells));
+          return my_quality;
         }
 
         /**

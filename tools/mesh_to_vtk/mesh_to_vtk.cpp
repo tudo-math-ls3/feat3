@@ -140,7 +140,7 @@ int run_xml(Geometry::MeshFileReader* mesh_reader, Geometry::MeshFileReader* cha
       for(const auto& it:atlas->get_mesh_chart_map())
       {
         for(Index i(0); i < vtx.get_num_vertices(); ++i)
-          distances[i] = it.second->dist(vtx[i]);
+          distances[i] = it.second->signed_dist(vtx[i]);
 
         exporter.add_vertex_scalar("dist_"+it.first, distances);
       }
