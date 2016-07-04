@@ -139,6 +139,30 @@ namespace FEAT
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrmv failed with status code: " + stringify(status));
       }
+
+      void cublas_defect_dense(cublasOperation_t trans,
+                                       int m, int n,
+                                       const float * alpha,
+                                       const float * val,
+                                       const float * x, const float * beta, float * y)
+      {
+        cublasStatus_t status;
+        status = cublasSgemv(Util::Intern::cublas_handle, trans, m, n, alpha, val, m, x, 1, beta, y, 1);
+        if (status != CUBLAS_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasSgemv failed with status code: " + stringify(status));
+      }
+
+      void cublas_defect_dense(cublasOperation_t trans,
+                                       int m, int n,
+                                       const double * alpha,
+                                       const double * val,
+                                       const double * x, const double * beta, double * y)
+      {
+        cublasStatus_t status;
+        status = cublasDgemv(Util::Intern::cublas_handle, trans, m, n, alpha, val, m, x, 1, beta, y, 1);
+        if (status != CUBLAS_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasDgemv failed with status code: " + stringify(status));
+      }
     }
   }
 }
@@ -290,3 +314,29 @@ template void Defect<Mem::CUDA>::banded(float *, const float *, const float * co
 template void Defect<Mem::CUDA>::banded(double *, const double *, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
 template void Defect<Mem::CUDA>::banded(float *, const float *, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
 template void Defect<Mem::CUDA>::banded(double *, const double *, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+
+template <typename DT_>
+void Defect<Mem::CUDA>::dense(DT_ * r, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
+{
+  const DT_ a(-1.);
+  if (r == rhs)
+  {
+    DT_ one(1);
+    FEAT::LAFEM::Intern::cublas_defect_dense(CUBLAS_OP_N, (int)rows, (int)columns, &a, val, x, &one, r);
+  }
+  else
+  {
+    cudaMemcpy(r, rhs, rows * sizeof(DT_), cudaMemcpyDeviceToDevice);
+    DT_ one(1);
+    FEAT::LAFEM::Intern::cublas_defect_dense(CUBLAS_OP_N, (int)rows, (int)columns, &a, val, x, &one, r);
+  }
+
+#ifdef FEAT_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
+}
+template void Defect<Mem::CUDA>::dense(float *, const float * const, const float * const, const float * const, const Index, const Index);
+template void Defect<Mem::CUDA>::dense(double *, const double * const, const double * const, const double * const, const Index, const Index);

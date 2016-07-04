@@ -158,3 +158,41 @@ void Defect<Mem::Main>::coo_mkl(double * r, const double * const rhs, const doub
     mkl_dcoomv(&trans, &mrows, &mcolumns, &alpha, matdescra, (double*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double*)x, &beta, r);
   }
 }
+
+void Defect<Mem::Main>::dense_mkl(float * r, const float * const rhs, const float * const val, const float * const x, const Index rows, const Index columns)
+{
+  MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
+  float alpha = -1.;
+  float beta = 1.;
+
+  if (r == rhs)
+  {
+    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  }
+  else
+  {
+    MKL_INT one = 1;
+    scopy(&mrows, (float*)rhs, &one, r, &one);
+    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  }
+}
+
+void Defect<Mem::Main>::dense_mkl(double * r, const double * const rhs, const double * const val, const double * const x, const Index rows, const Index columns)
+{
+  MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
+  double alpha = -1.;
+  double beta = 1.;
+
+  if (r == rhs)
+  {
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  }
+  else
+  {
+    MKL_INT one = 1;
+    dcopy(&mrows, (double*)rhs, &one, r, &one);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  }
+}

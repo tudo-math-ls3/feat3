@@ -76,11 +76,19 @@ public:
     TEST_CHECK_EQUAL(k, b);
   }
 };
-DenseMatrixTest<Mem::Main, float, Index> cpu_dense_matrix_test_float;
-DenseMatrixTest<Mem::Main, double, Index> cpu_dense_matrix_test_double;
+DenseMatrixTest<Mem::Main, float, unsigned int> cpu_dense_matrix_test_float_uint;
+DenseMatrixTest<Mem::Main, double, unsigned int> cpu_dense_matrix_test_double_uint;
+DenseMatrixTest<Mem::Main, float, unsigned long> cpu_dense_matrix_test_float_ulong;
+DenseMatrixTest<Mem::Main, double, unsigned long> cpu_dense_matrix_test_double_ulong;
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixTest<Mem::Main, __float128, unsigned int> cpu_dense_matrix_test_float128_uint;
+DenseMatrixTest<Mem::Main, __float128, unsigned long> cpu_dense_matrix_test_float128_ulong;
+#endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixTest<Mem::CUDA, float, Index> cuda_dense_matrix_test_float;
-DenseMatrixTest<Mem::CUDA, double, Index> cuda_dense_matrix_test_double;
+DenseMatrixTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_test_float_uint;
+DenseMatrixTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_test_double_uint;
+DenseMatrixTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_test_float_ulong;
+DenseMatrixTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_test_double_ulong;
 #endif
 
 
@@ -88,12 +96,15 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class SparseMatrixDenseApplyTest
+class DenseMatrixApplyTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixDenseApplyTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixDenseApplyTest")
+  double _eps;
+
+  DenseMatrixApplyTest(double eps)
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixApplyTest"),
+    _eps(eps)
   {
   }
 
@@ -102,7 +113,7 @@ public:
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
-      DenseMatrix<Mem::Main, DT_, IT_> a(size, size, DT_(0));
+      DenseMatrix<Mem::Main, DT_, IT_> a_local(size, size, DT_(0));
       DenseVector<Mem::Main, DT_, IT_> x_local(size);
       DenseVector<Mem::Main, DT_, IT_> y_local(size);
       DenseVector<Mem::Main, DT_, IT_> ref_local(size);
@@ -119,29 +130,31 @@ public:
       y.copy(y_local);
 
       Index ue(0);
-      for (Index row(0) ; row < a.rows() ; ++row)
+      for (Index row(0) ; row < a_local.rows() ; ++row)
       {
-        for (Index col(0) ; col < a.columns() ; ++col)
+        for (Index col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
           {
-            a(row, col, DT_(2));
+            a_local(row, col, DT_(2));
             ++ue;
           }
           else if((row == col+1) || (row+1 == col))
           {
-            a(row, col, DT_(-1));
+            a_local(row, col, DT_(-1));
             ++ue;
           }
         }
       }
+      DenseMatrix<Mem_, DT_, IT_> a(a_local.rows(), a_local.columns());
+      a.copy(a_local);
 
       DenseVector<Mem_, DT_, IT_> r(size);
 
       // apply-test for alpha = 0.0
       a.apply(r, x, y, DT_(0.0));
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), r(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), r(i), _eps);
 
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));
@@ -150,7 +163,7 @@ public:
       ref.axpy(ref, y);
 
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(ref(i), r(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(ref(i), r(i), _eps);
 
       // apply-test for alpha = 4711.1
       //r.axpy(s, a, x, y);
@@ -164,19 +177,29 @@ public:
       ref_local.copy(ref);
 
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), _eps);
 
       a.apply(r, x);
       result_local.copy(r);
       a.apply(ref, x);
       ref_local.copy(ref);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), _eps);
     }
   }
 };
 
-SparseMatrixDenseApplyTest<Mem::Main, float, unsigned long> sm_dense_apply_test_float_ulong;
-SparseMatrixDenseApplyTest<Mem::Main, double, unsigned long> sm_dense_apply_test_double_ulong;
-SparseMatrixDenseApplyTest<Mem::Main, float, unsigned int> sm_dense_apply_test_float_uint;
-SparseMatrixDenseApplyTest<Mem::Main, double, unsigned int> sm_dense_apply_test_double_uint;
+DenseMatrixApplyTest<Mem::Main, float, unsigned int> dense_matrix_apply_test_float_uint(1e-4);
+DenseMatrixApplyTest<Mem::Main, double, unsigned int> dense_matrix_apply_test_double_uint(1e-6);
+DenseMatrixApplyTest<Mem::Main, float, unsigned long> dense_matrix_apply_test_float_ulong(1e-4);
+DenseMatrixApplyTest<Mem::Main, double, unsigned long> dense_matrix_apply_test_double_ulong(1e-6);
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixApplyTest<Mem::Main, __float128, unsigned int> dense_matrix_apply_test_float128_uint(1e-6);
+DenseMatrixApplyTest<Mem::Main, __float128, unsigned long> dense_matrix_apply_test_float128_ulong(1e-6);
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixApplyTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_apply_test_float_uint(1e-1);
+DenseMatrixApplyTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_apply_test_double_uint(1e-6);
+DenseMatrixApplyTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_apply_test_float_ulong(1e-1);
+DenseMatrixApplyTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_apply_test_double_ulong(1e-6);
+#endif

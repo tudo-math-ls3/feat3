@@ -197,3 +197,39 @@ void Axpy<Mem::Main>::coo_mkl(double * r, const double a, const double * const x
     mkl_dcoomv(&trans, &mrows, &mcolumns, (double*)&a, matdescra, (double*)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ptr, &ue, (double*)x, &beta, r);
   }
 }
+
+void Axpy<Mem::Main>::dense_mkl(float * r, const float alpha, const float * const y, const float * const val, const float * const x, const Index rows, const Index columns)
+{
+  MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
+  float beta = 1.;
+
+  if (r == y)
+  {
+    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  }
+  else
+  {
+    MKL_INT one = 1;
+    scopy(&mrows, (float*)y, &one, r, &one);
+    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  }
+}
+
+void Axpy<Mem::Main>::dense_mkl(double * r, const double alpha, const double * const y, const double * const val, const double * const x, const Index rows, const Index columns)
+{
+  MKL_INT mrows = (MKL_INT)rows;
+  MKL_INT mcolumns = (MKL_INT)columns;
+  double beta = 1.;
+
+  if (r == y)
+  {
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  }
+  else
+  {
+    MKL_INT one = 1;
+    dcopy(&mrows, (double*)y, &one, r, &one);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  }
+}

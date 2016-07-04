@@ -108,8 +108,19 @@ namespace FEAT
         template <typename DT_>
         static void dense(DT_ * r, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
         {
+#ifdef FEAT_HAVE_MKL
+          dense_mkl(r, rhs, val, x, rows, columns);
+#else
+          dense_generic(r, rhs, val, x, rows, columns);
+#endif
+        }
+
+#if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
+        static void dense(__float128 * r, const __float128 * const rhs, const __float128 * const val, const __float128 * const x, const Index rows, const Index columns)
+        {
           dense_generic(r, rhs, val, x, rows, columns);
         }
+#endif
 
         template <typename DT_, typename IT_>
         static void csr_generic(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
@@ -140,7 +151,10 @@ namespace FEAT
 
         static void coo_mkl(float * r, const float * const rhs, const float * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements);
         static void coo_mkl(double * r, const double * const rhs, const double * const val, const unsigned long * const row_ptr, const unsigned long * const col_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements);
-      };
+
+        static void dense_mkl(float * r, const float * const rhs, const float * const val, const float * const x, const Index rows, const Index columns);
+        static void dense_mkl(double * r, const double * const rhs, const double * const val, const double * const x, const Index rows, const Index columns);
+      }; //Defect<Main>
 
       extern template void Defect<Mem::Main>::csr_generic(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
       extern template void Defect<Mem::Main>::csr_generic(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
@@ -188,6 +202,9 @@ namespace FEAT
 
         template <typename DT_, typename IT_>
         static void banded(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns);
+
+        template <typename DT_>
+        static void dense(DT_ * r, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
       };
 
     } // namespace Arch

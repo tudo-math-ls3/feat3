@@ -207,6 +207,32 @@ namespace FEAT
           r[idx] = ytemp1;
         }
       }
+
+      void cublas_product_matvec_dense(cublasOperation_t trans,
+                                       int m, int n,
+                                       const float * val,
+                                       const float * x, float * r)
+      {
+        cublasStatus_t status;
+        const float one(1.);
+        const float zero(0.);
+        status = cublasSgemv(Util::Intern::cublas_handle, trans, m, n, &one, val, m, x, 1, &zero, r, 1);
+        if (status != CUBLAS_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasSgemv failed with status code: " + stringify(status));
+      }
+
+      void cublas_product_matvec_dense(cublasOperation_t trans,
+                                       int m, int n,
+                                       const double * val,
+                                       const double * x, double * r)
+      {
+        cublasStatus_t status;
+        const double one(1.);
+        const double zero(0.);
+        status = cublasDgemv(Util::Intern::cublas_handle, trans, m, n, &one, val, m, x, 1, &zero, r, 1);
+        if (status != CUBLAS_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cublasDgemv failed with status code: " + stringify(status));
+      }
     }
   }
 }
@@ -325,3 +351,18 @@ template void ProductMatVec<Mem::CUDA>::banded(float *, const float * const, con
 template void ProductMatVec<Mem::CUDA>::banded(double *, const double * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
 template void ProductMatVec<Mem::CUDA>::banded(float *, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
 template void ProductMatVec<Mem::CUDA>::banded(double *, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+
+template <typename DT_>
+void ProductMatVec<Mem::CUDA>::dense(DT_ * r, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
+{
+  FEAT::LAFEM::Intern::cublas_product_matvec_dense(CUBLAS_OP_N, (int)rows, (int)columns, val, x, r);
+
+#ifdef FEAT_DEBUG_MODE
+  cudaDeviceSynchronize();
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
+#endif
+}
+template void ProductMatVec<Mem::CUDA>::dense(float *, const float * const, const float * const, const Index, const Index);
+template void ProductMatVec<Mem::CUDA>::dense(double *, const double * const, const double * const, const Index, const Index);
