@@ -706,17 +706,13 @@ namespace FEAT
               if(chart == nullptr)
                 throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
 
-              my_dist += chart->signed_dist(vtx[i], tmp);
+              my_dist += Math::abs(chart->signed_dist(vtx[i], tmp));
               my_dist_vec += tmp;
 
             }
             this->_dist(i, my_dist);
 
-            if(Math::abs(my_dist) > Math::eps<CoordType>())
-              my_dist_vec.normalise();
-            else
-              my_dist_vec.format(CoordType(0));
-
+            my_dist_vec.normalise();
             this->_grad_dist(i, my_dist_vec);
           }
         }
@@ -741,8 +737,8 @@ namespace FEAT
               if(chart == nullptr)
                 throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
 
-              CoordType this_dist = chart->signed_dist(vtx[i], tmp);
-              if(Math::abs(this_dist) < my_dist)
+              CoordType this_dist = Math::abs(chart->signed_dist(vtx[i], tmp));
+              if(this_dist < my_dist)
               {
                 my_dist = this_dist;
                 my_dist_vec = tmp;
@@ -751,11 +747,7 @@ namespace FEAT
             }
             this->_dist(i, my_dist);
 
-            if(Math::abs(my_dist) > Math::eps<CoordType>())
-              my_dist_vec.normalise();
-            else
-              my_dist_vec.format(CoordType(0));
-
+            my_dist_vec.normalise();
             this->_grad_dist(i, my_dist_vec);
           }
         }
