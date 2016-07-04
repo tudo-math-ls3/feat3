@@ -286,6 +286,13 @@ namespace FEAT
           WorldPoint vals[max_degree+1];
           WorldPoint der1[max_degree+1];
 
+          // fetch all points on current segment
+          for(std::size_t k(0); k <= n; ++k)
+          {
+            vals[k] = _world[_vtx_ptr[i] + k];
+            der1[k] = DataType(0);
+          }
+
           const DataType t1 = DataType(1) - t;
 
           // apply recursive Bezier interpolation scheme
@@ -592,7 +599,7 @@ namespace FEAT
         /// \copydoc ChartBase::signed_dist()
         DataType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
-          DataType signed_distance(0.0);
+          DataType signed_distance(Math::huge<DataType>());
 
           Index best_segment(0);
           WorldPoint projected(DataType(0));
