@@ -688,8 +688,8 @@ static void read_test_mode_application_config(std::stringstream& iss)
   iss << "meshopt_config_file = ./meshopt_config.ini" << std::endl;
   iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
   iss << "solver_config_file = ./solver_config.ini" << std::endl;
-  iss << "lvl_min = 0" << std::endl;
-  iss << "lvl_max = 4" << std::endl;
+  iss << "lvl_min = 3" << std::endl;
+  iss << "lvl_max = 3" << std::endl;
   iss << "delta_t = 1e-2" << std::endl;
   iss << "t_end = 2e-2" << std::endl;
 }
@@ -717,12 +717,13 @@ static void read_test_mode_meshopt_config(std::stringstream& iss)
   iss << "fac_det = 1.0" << std::endl;
   iss << "fac_cof = 0.0" << std::endl;
   iss << "fac_reg = 1e-8" << std::endl;
-  iss << "scale_computation = current_concentration" << std::endl;
+  iss << "scale_computation = iter_concentration" << std::endl;
   iss << "conc_function = OuterDist" << std::endl;
 
   iss << "[OuterDist]" << std::endl;
   iss << "type = ChartDistance" << std::endl;
   iss << "chart_list = moving_circle" << std::endl;
+  iss << "operation = min" << std::endl;
   iss << "function_type = PowOfDist" << std::endl;
   iss << "minval = 1e-2" << std::endl;
   iss << "exponent = 0.5" << std::endl;
@@ -735,7 +736,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
   iss << "precon = none" << std::endl;
   iss << "plot = 1" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
-  iss << "max_iter = 1000" << std::endl;
+  iss << "max_iter = 500" << std::endl;
   iss << "linesearch = StrongWolfeLinesearch" << std::endl;
   iss << "direction_update = DYHSHybrid" << std::endl;
   iss << "keep_iterates = 0" << std::endl;
@@ -754,7 +755,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
 
   iss << "[strongwolfelinesearch]" << std::endl;
   iss << "type = StrongWolfeLinesearch" << std::endl;
-  iss << "plot = 1" << std::endl;
+  iss << "plot = 0" << std::endl;
   iss << "max_iter = 20" << std::endl;
   iss << "tol_decrease = 1e-3" << std::endl;
   iss << "tol_curvature = 0.3" << std::endl;
