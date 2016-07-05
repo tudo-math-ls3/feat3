@@ -440,7 +440,7 @@ namespace FEAT
         {
           if (_solver == nullptr)
           {
-              //BiCGStab ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
+              //PCG ( VCycle ( S: Richardson ( Jacobi )  / C: Richardson ( Jacobi )  )  )
               auto mgv = std::make_shared<
                 Solver::BasicVCycle<
                 GlobalSystemMatrixSolve,
