@@ -924,7 +924,7 @@ static void read_test_mode_solver_config(std::stringstream& iss)
 
   iss << "[PCG-MGV]" << std::endl;
   iss << "type = pcg" << std::endl;
-  iss << "max_iter = 100" << std::endl;
+  iss << "max_iter = 65" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "plot = 1" << std::endl;
   iss << "precon = mgv" << std::endl;

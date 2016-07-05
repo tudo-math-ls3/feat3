@@ -25,6 +25,7 @@ conc_function = OuterDist
 [OuterDist]
 type = ChartDistance
 chart_list = moving_circle
+operation = min
 function_type = PowOfDist
 minval = 1e-2
 exponent = 0.5
