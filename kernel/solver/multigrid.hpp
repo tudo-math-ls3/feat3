@@ -1788,8 +1788,7 @@ namespace FEAT
 
           // update our solution vector
           auto alpha(lvl_f.level->get_alpha_adaptive_coarse_correction());
-          decltype(lvl_f.vec_cor) tmp;
-          tmp.clone(lvl_f.vec_cor);
+          decltype(lvl_f.vec_cor) tmp(lvl_f.vec_cor.size());
           lvl_f.level->get_system_matrix().apply(tmp, lvl_f.vec_cor);
           alpha = lvl_f.vec_cor.dot(lvl_f.vec_def) / lvl_f.vec_cor.dot(tmp);
           lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol, alpha);

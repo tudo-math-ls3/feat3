@@ -411,7 +411,7 @@ namespace PoissonDirichlet2D
 
       auto inner_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), DataType(1), inner_multigrid);
       inner_solver->init();
-      //inner_solver->set_plot(rank == 0);
+      inner_solver->set_plot(rank == 0);
 
       //auto local_precond = Solver::new_jacobi_precond(local_matrices_solve.at(level), *((*it)->filter_sys), 0.7);
       //auto local_solver = Solver::new_richardson(local_matrices_solve.at(level), *((*it)->filter_sys), 1.0, local_precond);
