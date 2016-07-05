@@ -65,7 +65,7 @@ namespace FEAT
          *
          * \returns The class name as String.
          */
-        virtual String name() const override=0;
+        virtual String name() const override = 0;
 
         /**
          * \brief Applies the preconditioner

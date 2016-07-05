@@ -254,7 +254,18 @@ namespace FEAT
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "NLCG-"+_linesearch->name()+"-"+stringify(_direction_update);
+          return "NLCG";
+        }
+
+        /// \copydoc BaseClass::get_formated_solver_tree()
+        virtual String get_formated_solver_tree() const override
+        {
+          String result(name());
+          result += " ( "+stringify(_direction_update)+", "+_linesearch->get_formated_solver_tree();
+          if(_precond != nullptr)
+            result += " "+_precond->get_formated_solver_tree();
+          result += " )";
+          return result;
         }
 
         /**

@@ -185,6 +185,14 @@ namespace FEAT
           return "ALGLIBMinLBFGS";
         }
 
+        /// \copydoc BaseClass::get_formated_solver_tree()
+        virtual String get_formated_solver_tree() const override
+        {
+          String result(name());
+          result += " ( StrongWolfeLinesearch )";
+          return result;
+        }
+
         /**
          * \copydoc BaseClass::set_max_iter()
          */
@@ -645,7 +653,16 @@ namespace FEAT
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "ALGLIBMinCG-"+stringify(_direction_update);
+          return "ALGLIBMinCG";
+        }
+
+        /// \copydoc BaseClass::get_formated_solver_tree()
+        virtual String get_formated_solver_tree() const override
+        {
+          String result(name());
+          result += " ( "+stringify(_direction_update)+", StrongWolfeLinesearch";
+          result += " )";
+          return result;
         }
 
         /**

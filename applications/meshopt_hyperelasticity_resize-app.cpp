@@ -174,6 +174,7 @@ template
       nullptr*/); // no preconditioner
 
     solver->init();
+    std::cout << "Using solver " << solver->get_formated_solver_tree() << std::endl;
     solver->set_plot(true);
     solver->correct(new_coords, rhs);
     solver->done();

@@ -148,8 +148,20 @@ namespace FEAT
         /// \copydoc BaseClass::name()
         virtual String name() const override
         {
-          return "NLSD-"+_linesearch->name();
+          return "NLSD";
         }
+
+        /// \copydoc BaseClass::get_formated_solver_tree()
+        virtual String get_formated_solver_tree() const override
+        {
+          String result(name());
+          result += "( "+_linesearch->get_formated_solver_tree();
+          if(_precond != nullptr)
+            result += " "+_precond->get_formated_solver_tree();
+          result += " )";
+          return result;
+        }
+
 
         /**
          * \brief Sets the tolerance for function value improvement

@@ -4,9 +4,12 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
+#include <kernel/util/mpi_cout.hpp>
+
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/nonlinear_functional.hpp>
 #include <kernel/global/vector.hpp>
+
 #include <control/domain/domain_control.hpp>
 #include <control/meshopt/meshopt_control.hpp>
 #include <control/meshopt/meshopt_precond_factory.hpp>
@@ -201,6 +204,7 @@ namespace FEAT
               solver = Control::MeshoptSolverFactory::create_nonlinear_optimiser
                 (_system_levels, _transfer_levels, &solver_config, solver_name, precond);
               solver->init();
+              Util::mpi_cout(name()+": Using solver "+solver->get_formated_solver_tree()+"\n");
 
             }
 
@@ -229,6 +233,8 @@ namespace FEAT
             }
 
             solver->done();
+            if(precond != nullptr)
+              precond->done();
           }
 
           /// \copydoc BaseClass::compute_cell_size_quality()

@@ -148,6 +148,7 @@ namespace FEAT
                 (_system_levels, _transfer_levels, &solver_config, solver_name);
               // initialise
               solver->init();
+              Util::mpi_cout(name()+": Using solver "+solver->get_formated_solver_tree()+"\n");
             }
 
           /// Explicitly delete empty default constructor
