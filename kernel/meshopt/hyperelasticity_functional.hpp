@@ -588,37 +588,38 @@ namespace FEAT
          * exactly lambda(cell). This is especially the goal for r-adaptivity.
          * So in an optimal mesh,
          * \f[
-         *   \forall K \in \mathcal{T}_h: \frac{|K|}{\lambda(K)} = 1,
+         *   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
          * \f]
-         * so we compute the Euclidean norm of the vector \f$(v)_i = \frac{1}{N}(1 -  \frac{|K_i|}{\lambda(K_i)} \f$.
-         * This is scaled by the number of cells so it is independant of the refinement level. Not sure if the
-         * scaling part is sensible, though.
+         * so we compute the 1-norm of the vector
+         * \f$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i)} \right| \f$.
          *
          * \returns The relative cell size quality indicator.
          *
          */
         virtual CoordType compute_cell_size_quality() const override
         {
-          CoordType my_vol(0);
           CoordType my_quality(0);
+          CoordType vol(0);
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            my_vol = this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
-            my_quality += Math::sqr(CoordType(1) - my_vol/this->_lambda(cell));
+            vol += this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
           }
 
-          Index ncells(this->get_mesh()->get_num_entities(MeshType::shape_dim));
+#ifdef FEAT_HAVE_MPI
+          CoordType vol_snd(vol);
+          Util::Comm::allreduce(&vol_snd, Index(1), &vol, MPI_SUM);
+#endif
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+          {
+            my_quality += Math::abs(this->_trafo.template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+          }
 
 #ifdef FEAT_HAVE_MPI
-          Index ncells_snd(ncells);
-          Util::Comm::allreduce(&ncells_snd, Index(1), &ncells, MPI_SUM);
-          CoordType my_quality_snd(my_quality);
-          Util::Comm::allreduce(&my_quality_snd, Index(1), &my_quality, MPI_SUM);
+          CoordType quality_snd(my_quality);
+          Util::Comm::allreduce(&quality_snd, Index(1), &vol, MPI_SUM);
 #endif
-          my_quality = Math::sqrt(my_quality);
-
-          return Math::abs(CoordType(1) - my_quality/CoordType(ncells));
+          return my_quality;
         }
 
         /**

@@ -62,6 +62,8 @@ namespace FEAT
         typedef TrafoType_ TrafoType;
         /// The mesh the transformation is defined on
         typedef typename TrafoType::MeshType MeshType;
+        /// The shape type of the mesh
+        typedef typename MeshType::ShapeType ShapeType;
 
         /// Type for the system matrix
         typedef MatrixType_<Mem_, DT_, IT_, MeshType::world_dim, MeshType::world_dim> MatrixType;
@@ -197,47 +199,6 @@ namespace FEAT
         }
 
         /**
-         * \brief Computes a quality indicator concerning the cell sizes
-         *
-         * For the DuDv functional, the reference mesh is optimal, so we want to keep the cells at the same size.
-         *
-         * So in an optimal mesh,
-         * \f[
-         *   \forall K \in \mathcal{T}_h: \frac{|K_{new}|}{|K_{ref}|} = 1,
-         * \f]
-         * so we compute the Euclidean norm of the vector \f$(v)_i = \frac{1}{N}(1 -  \frac{|K_i|}{|K_{i,ref}|)} \f$.
-         * This is scaled by the number of cells so it is independent of the refinement level. Not sure if the
-         * scaling part is sensible, though.
-         *
-         * \returns The relative cell size quality indicator.
-         *
-         */
-        virtual CoordType compute_cell_size_quality() const override
-        {
-          CoordType my_vol(0);
-          CoordType my_quality(0);
-
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
-          {
-            my_vol = this->_trafo->template compute_vol<typename MeshType::ShapeType, CoordType>(cell);
-            my_quality += Math::sqr(CoordType(1) - my_vol/_cell_sizes(cell));
-          }
-
-          Index ncells(this->get_mesh()->get_num_entities(MeshType::shape_dim));
-
-#ifdef FEAT_HAVE_MPI
-          Index ncells_snd(ncells);
-          Util::Comm::allreduce(&ncells_snd, Index(1), &ncells, MPI_SUM);
-          CoordType my_quality_snd(my_quality);
-          Util::Comm::allreduce(&my_quality_snd, Index(1), &my_quality, MPI_SUM);
-#endif
-          my_quality = Math::sqrt(my_quality);
-
-          return Math::abs(CoordType(1) - my_quality/CoordType(ncells));
-
-        }
-
-        /**
          * \brief Performs one-time initialisations
          *
          * This is not done in the constructor for the case that the system matrix gets overwritten by a derived
@@ -321,6 +282,49 @@ namespace FEAT
             this->_mesh_node->adapt_by_name(it.first);
 
         }
+
+        /**
+         * \brief Computes a quality indicator concerning the cell sizes
+         *
+         * In a truly optimal mesh (consisting ONLY of reference cells of the right size), every cell's volume is
+         * exactly lambda(cell). This is especially the goal for r-adaptivity.
+         * So in an optimal mesh,
+         * \f[
+         *   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
+         * \f]
+         * so we compute the 1-norm of the vector
+         * \f$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i)} \right| \f$.
+         *
+         * \returns The relative cell size quality indicator.
+         *
+         */
+        virtual CoordType compute_cell_size_quality() const override
+        {
+          CoordType my_quality(0);
+          CoordType vol(0);
+
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+          {
+            vol += this->_trafo->template compute_vol<ShapeType, CoordType>(cell);
+          }
+
+#ifdef FEAT_HAVE_MPI
+          CoordType vol_snd(vol);
+          Util::Comm::allreduce(&vol_snd, Index(1), &vol, MPI_SUM);
+#endif
+          for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
+          {
+            my_quality += Math::abs(this->_trafo->template compute_vol<ShapeType, CoordType>(cell)/vol
+                - _cell_sizes(cell));
+          }
+
+#ifdef FEAT_HAVE_MPI
+          CoordType quality_snd(my_quality);
+          Util::Comm::allreduce(&quality_snd, Index(1), &vol, MPI_SUM);
+#endif
+          return my_quality;
+        }
+
 
         /**
          * \brief Checks if the functional is empty (= the null functional
