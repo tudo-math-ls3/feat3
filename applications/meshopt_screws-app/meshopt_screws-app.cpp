@@ -394,7 +394,7 @@ struct MeshoptScrewsApp
       rotation_angles(0) = delta_alpha;
       rotation_angles(1) = DataType(0);
 
-      outer_chart->rotate(centre_inner, rotation_angles);
+      outer_chart->rotate(centre_outer, rotation_angles);
 
       rotation_angles(0) *= DataType(7)/DataType(6);
       inner_chart->rotate(centre_inner, rotation_angles);
