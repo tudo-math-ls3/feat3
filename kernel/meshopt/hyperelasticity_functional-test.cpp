@@ -186,10 +186,10 @@ template
 template<typename A, typename B, typename C, typename D, typename E>
 using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D, E>;
 
-HyperelasticityFunctionalTest_2d<float, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_hc_1;
+HyperelasticityFunctionalTest_2d<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_hc_1;
 HyperelasticityFunctionalTest_2d<double, Shape::Hypercube<2>, Meshopt::RumpfFunctional_D2, MyQualityFunctional> test_hc_2;
 HyperelasticityFunctionalTest_2d<double, Shape::Simplex<2>, Meshopt::RumpfFunctional, MyQualityFunctional> test_s_1;
-HyperelasticityFunctionalTest_2d<float, Shape::Simplex<2>, Meshopt::RumpfFunctional_D2, MyQualityFunctional> test_s_2;
+HyperelasticityFunctionalTest_2d<double, Shape::Simplex<2>, Meshopt::RumpfFunctional_D2, MyQualityFunctional> test_s_2;
 
 template<typename A, typename B>
 using MyFunctionalQ1Split = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional>;
@@ -197,7 +197,7 @@ using MyFunctionalQ1Split = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::Rumpf
 template<typename A, typename B>
 using MyFunctionalQ1Split_D2 = Meshopt::RumpfFunctionalQ1Split<A, B, Meshopt::RumpfFunctional_D2>;
 
-HyperelasticityFunctionalTest_2d<float, Shape::Hypercube<2>, MyFunctionalQ1Split, MyQualityFunctional> test_q1hack_f_1;
+HyperelasticityFunctionalTest_2d<double, Shape::Hypercube<2>, MyFunctionalQ1Split, MyQualityFunctional> test_q1hack_f_1;
 HyperelasticityFunctionalTest_2d<double, Shape::Hypercube<2>, MyFunctionalQ1Split_D2, MyQualityFunctional> test_q1hack_d_2;
 HyperelasticityFunctionalTest_2d<double, Shape::Simplex<2>, MyFunctionalQ1Split, MyQualityFunctional> test_q1hack_ds_1;
 
