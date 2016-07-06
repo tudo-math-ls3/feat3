@@ -4,7 +4,7 @@
     12 and 14 Bezier points for the inner and outer screws, resp.
   </Info>
   <Chart name="inner">
-    <Spline dim="2" size="13" type="closed">
+    <Spline dim="2" size="13" type="closed" orientation="-1">
       <Points>
         2  1.455928  0.674602  1.578230  0.87406   1.404389  1.174731
         2  1.170827  1.169148  0.685575  0.973438  0.071764  1.321882

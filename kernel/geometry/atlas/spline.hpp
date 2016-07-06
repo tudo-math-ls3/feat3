@@ -62,12 +62,15 @@ namespace FEAT
         std::deque<ParamPoint> _param;
         /// Specifies whether the spline is closed
         bool _closed;
+        /// Specifies if the chart is to be oriented negatively or not
+        DataType _orientation;
 
       public:
         /// default CTOR
-        explicit Spline(bool closed = false) :
+        explicit Spline(bool closed = false, DataType orientation = DataType(1)) :
           BaseClass(),
-          _closed(closed)
+          _closed(closed),
+          _orientation(orientation)
         {
         }
 
@@ -90,12 +93,13 @@ namespace FEAT
           const std::deque<std::size_t>& vtx_ptr,
           const std::deque<WorldPoint>& world,
           const std::deque<ParamPoint>& param,
-          bool closed) :
+          bool closed, DataType orientation = DataType(1)) :
           BaseClass(),
           _vtx_ptr(vtx_ptr),
           _world(world),
           _param(param),
-          _closed(closed)
+          _closed(closed),
+          _orientation(orientation)
         {
           // we need at least 2 points
           XASSERTM(_vtx_ptr.size() > std::size_t(1), "Spline needs at least 2 points");
@@ -111,6 +115,8 @@ namespace FEAT
             XASSERTM(_vtx_ptr[i] < _vtx_ptr[i+1], "invalid vertex pointer array");
             XASSERTM(int(_vtx_ptr[i+1]-_vtx_ptr[i]) <= max_degree, "invalid spline degree");
           }
+
+          XASSERT(_orientation == DataType(1) || _orientation == -DataType(1));
         }
 
         /** \copydoc ChartBase::get_type() */
@@ -640,7 +646,7 @@ namespace FEAT
           {
             grad_dist.normalise();
             WorldPoint nu(get_normal_on_segment(best_segment, t));
-            signed_distance *= Math::signum(Tiny::dot(nu, grad_dist));
+            signed_distance *= _orientation*Math::signum(Tiny::dot(nu, grad_dist));
           }
 
           grad_dist *= Math::signum(signed_distance);
@@ -659,7 +665,8 @@ namespace FEAT
           }
 
           os << sindent << "<Spline dim=\"2\" size=\"" << this->_vtx_ptr.size() << "\"";
-          os << " type=\"" << (this->_closed ? "closed" : "open") << "\">" << std::endl;
+          os << " type=\"" << (this->_closed ? "closed" : "open");
+          os << (_orientation == -DataType(1) ? "orientation=\"-1\"" : " " )<<"\">" << std::endl;
 
           // write points
           os << sind << "<Points>" << std::endl;
@@ -910,6 +917,7 @@ namespace FEAT
           attrs.emplace("dim", true);
           attrs.emplace("size", true);
           attrs.emplace("type", false);
+          attrs.emplace("orientation", false);
           return true;
         }
 
@@ -950,8 +958,13 @@ namespace FEAT
               throw Xml::ContentError(iline, sline, "Invalid Spline type; must be either 'closed' or 'open'");
           }
 
+          DataType orientation(1);
+          it = attrs.find("orientation");
+          if(it != attrs.end())
+            it->second.parse(orientation);
+
           // up to now, everything's fine
-          _spline = new ChartType(poly_closed);
+          _spline = new ChartType(poly_closed, orientation);
         }
 
         virtual void close(int, const String&) override

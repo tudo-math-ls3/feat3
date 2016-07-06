@@ -3,7 +3,7 @@
     Polyline charts for screws_2d_meshes
   </Info>
   <Chart name="inner">
-    <Spline dim="2" size=" 3601" type="closed">
+    <Spline dim="2" size=" 3601" type="closed" orientation="-1">
       <Points>
         0 0.114167626E+01  0.286526852E-02
         0 0.114160941E+01  0.573032111E-02
