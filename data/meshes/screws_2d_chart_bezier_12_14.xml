@@ -3,7 +3,7 @@
     This file contains the charts for the 2D screws mesh with
     12 and 14 Bezier points for the inner and outer screws, resp.
   </Info>
-  <Chart name="inner">
+  <Chart name="inner_screw">
     <Spline dim="2" size="13" type="closed" orientation="-1">
       <Points>
         2  1.455928  0.674602  1.578230  0.87406   1.404389  1.174731
@@ -22,7 +22,7 @@
       </Points>
     </Spline>
   </Chart>
-  <Chart name="outer">
+  <Chart name="outer_screw">
     <Spline dim="2" size="15" type="closed">
       <Points>
         2   2.154211  0.291809  1.618421  0.363411  1.287480  1.037178

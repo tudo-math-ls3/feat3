@@ -3610,7 +3610,7 @@
       360  719  720 1079
     </Topology>
   </Mesh>
-  <MeshPart name="inner" parent="root" chart="inner" topology="full" size="   360   360">
+  <MeshPart name="inner" parent="root" chart="inner_screw" topology="full" size="   360   360">
     <Mapping dim="0">
       0
       1
@@ -4698,7 +4698,7 @@
       359    0
     </Topology>
   </MeshPart>
-  <MeshPart name="outer" parent="root" chart="outer" topology="full" size="   360   360">
+  <MeshPart name="outer" parent="root" chart="outer_screw" topology="full" size="   360   360">
     <Mapping dim="0">
       720
       721

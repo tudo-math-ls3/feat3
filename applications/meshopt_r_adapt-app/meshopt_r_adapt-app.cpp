@@ -257,6 +257,11 @@ struct MeshoptRAdaptApp
     midpoint(0) = DataType(0.25) *(DataType(2) + Math::cos(time));
     midpoint(1) = DataType(0.25) *(DataType(2) + Math::sin(DataType(3)*time));
 
+    ImgPointType rotation_centre(DataType(0.5));
+    DataType rotation_speed(DataType(2)*Math::pi<DataType>());
+    ImgPointType rotation_angles(DataType(0));
+    rotation_angles(0) = rotation_speed*delta_t;
+
     while(time < t_end)
     {
       n++;
@@ -280,6 +285,12 @@ struct MeshoptRAdaptApp
         {
           std::cout << it.first << " by " << midpoint-old_midpoint << std::endl;
           it.second->move_by(midpoint-old_midpoint);
+        }
+
+        if(it.first.find("rotating_") != String::npos)
+        {
+          std::cout << it.first << " by " << rotation_angles(0) << " around " << rotation_centre << std::endl;
+          it.second->rotate(rotation_centre, rotation_angles);
         }
       }
 

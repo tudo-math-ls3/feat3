@@ -186,7 +186,7 @@ struct MeshoptScrewsApp
     WorldPoint x_0(DataType(0));
 
     // Get inner boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
-    auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("inner");
+    auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("inner_screw");
     Geometry::TargetSet* inner_indices(nullptr);
     if(inner_boundary != nullptr)
       inner_indices = &(inner_boundary->template get_target_set<0>());
@@ -195,18 +195,18 @@ struct MeshoptScrewsApp
     WorldPoint centre_inner(DataType(0));
     centre_inner.v[0] = -excentricity_inner;
     //const String inner_str(dom_ctrl.get_atlas()->find_mesh_chart("inner")->get_type());
-    auto* inner_chart = dom_ctrl.get_atlas()->find_mesh_chart("inner");
+    auto* inner_chart = dom_ctrl.get_atlas()->find_mesh_chart("inner_screw");
 
     // Get outer boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
-    auto* outer_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer");
+    auto* outer_boundary_part = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer_screw");
     Geometry::TargetSet* outer_indices(nullptr);
-    if(outer_boundary != nullptr)
-      outer_indices = &(outer_boundary->template get_target_set<0>());
+    if(outer_boundary_part != nullptr)
+      outer_indices = &(outer_boundary_part->template get_target_set<0>());
 
     // This is the centre point of the rotation of the outer screw
     WorldPoint centre_outer(DataType(0));
     //const String outer_str(dom_ctrl.get_atlas()->find_mesh_chart("outer")->get_type());
-    auto* outer_chart = dom_ctrl.get_atlas()->find_mesh_chart("outer");
+    auto* outer_chart = dom_ctrl.get_atlas()->find_mesh_chart("outer_screw");
 
     // For test_mode = true
     DT_ min_quality(0);
@@ -401,6 +401,7 @@ struct MeshoptScrewsApp
 
       // Update boundary of the inner screw
       // This is the 2x2 matrix representing the turning by the angle delta_alpha of the inner screw
+      if(inner_indices != nullptr)
       {
         Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
 
@@ -412,8 +413,6 @@ struct MeshoptScrewsApp
         WorldPoint tmp(DataType(0));
         WorldPoint tmp2(DataType(0));
 
-        if(inner_indices != nullptr)
-        {
           for(Index i(0); i < inner_indices->get_num_entities(); ++i)
           {
             // Index of boundary vertex i in the mesh
@@ -425,10 +424,10 @@ struct MeshoptScrewsApp
             // Translate the point by the new centre of rotation
             coords_loc(j, centre_inner + tmp2);
           }
-        }
       }
 
       // The outer screw has 7 teeth as opposed to the inner screw with 6, and it rotates at 6/7 of the speed
+      if(outer_indices != nullptr)
       {
         Tiny::Matrix<DataType, 2, 2> rot(DataType(0));
         rot(0,0) = Math::cos(delta_alpha);
@@ -440,18 +439,15 @@ struct MeshoptScrewsApp
         WorldPoint tmp2(DataType(0));
 
         // The outer screw rotates centrically, so centre_outer remains the same at all times
-        if(outer_indices != nullptr)
+        for(Index i(0); i < outer_indices->get_num_entities(); ++i)
         {
-          for(Index i(0); i < outer_indices->get_num_entities(); ++i)
-          {
-            // Index of boundary vertex i in the mesh
-            Index j(outer_indices->operator[](i));
-            tmp = coords_loc(j) - centre_outer;
+          // Index of boundary vertex i in the mesh
+          Index j(outer_indices->operator[](i));
+          tmp = coords_loc(j) - centre_outer;
 
-            tmp2.set_vec_mat_mult(tmp, rot);
+          tmp2.set_vec_mat_mult(tmp, rot);
 
-            coords_loc(j, centre_outer+tmp2);
-          }
+          coords_loc(j, centre_outer+tmp2);
         }
       }
 
@@ -875,67 +871,23 @@ static void read_test_mode_application_config(std::stringstream& iss)
 
 static void read_test_mode_meshopt_config(std::stringstream& iss)
 {
-  iss << "[HyperElasticityDefault]" << std::endl;
-  iss << "type = Hyperelasticity" << std::endl;
-  iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-  iss << "dirichlet_boundaries = inner outer" << std::endl;
-
   iss << "[DuDvDefault]" << std::endl;
   iss << "type = DuDv" << std::endl;
   iss << "config_section = DuDvDefaultParameters" << std::endl;
-  iss << "dirichlet_boundaries = inner outer" << std::endl;
+  iss << "dirichlet_boundaries = inner_screw outer_screw" << std::endl;
 
   iss << "[DuDvDefaultParameters]" << std::endl;
   iss << "solver_config = PCG-MGV" << std::endl;
-
-  iss << "[HyperelasticityDefaultParameters]" << std::endl;
-  iss << "global_functional = HyperelasticityFunctional" << std::endl;
-  iss << "local_functional = RumpfFunctional" << std::endl;
-  iss << "solver_config = NLCG" << std::endl;
-  iss << "fac_norm = 1.0" << std::endl;
-  iss << "fac_det = 1.0" << std::endl;
-  iss << "fac_cof = 0.0" << std::endl;
-  iss << "fac_reg = 1e-8" << std::endl;
-  iss << "scale_computation = current_concentration" << std::endl;
-  iss << "conc_function = GapWidth" << std::endl;
-
-  iss << "[GapWidth]" << std::endl;
-  iss << "type = ChartDistance" << std::endl;
-  iss << "function_type = default" << std::endl;
-  iss << "chart_list = inner outer" << std::endl;
 }
 
 static void read_test_mode_solver_config(std::stringstream& iss)
 {
-  iss << "[NLCG]" << std::endl;
-  iss << "type = NLCG" << std::endl;
-  iss << "precon = DuDvPrecon" << std::endl;
-  iss << "plot = 1" << std::endl;
-  iss << "tol_rel = 1e-8" << std::endl;
-  iss << "max_iter = 1000" << std::endl;
-  iss << "linesearch = StrongWolfeLinesearch" << std::endl;
-  iss << "direction_update = DYHSHybrid" << std::endl;
-  iss << "keep_iterates = 0" << std::endl;
-
-  iss << "[DuDvPrecon]" << std::endl;
-  iss << "type = DuDvPrecon" << std::endl;
-  iss << "dirichlet_boundaries = inner outer" << std::endl;
-  iss << "linear_solver = PCG-MGV" << std::endl;
-
   iss << "[PCG-MGV]" << std::endl;
   iss << "type = pcg" << std::endl;
-  iss << "max_iter = 65" << std::endl;
+  iss << "max_iter = 100" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "plot = 1" << std::endl;
   iss << "precon = mgv" << std::endl;
-
-  iss << "[strongwolfelinesearch]" << std::endl;
-  iss << "type = StrongWolfeLinesearch" << std::endl;
-  iss << "plot = 0" << std::endl;
-  iss << "max_iter = 20" << std::endl;
-  iss << "tol_decrease = 1e-3" << std::endl;
-  iss << "tol_curvature = 0.3" << std::endl;
-  iss << "keep_iterates = 0" << std::endl;
 
   iss << "[rich]" << std::endl;
   iss << "type = richardson" << std::endl;
@@ -967,7 +919,7 @@ static void read_test_mode_mesh(std::stringstream& iss)
     mesh_filename +="/data/meshes/screws_2d_mesh_quad_360_1.xml";
 
     std::ifstream ifs(mesh_filename);
-    if(!ifs.good())
+    if(!ifs.good() || !ifs.is_open())
       throw FileNotFound(mesh_filename);
 
     iss << ifs.rdbuf();
@@ -986,7 +938,7 @@ static void read_test_mode_chart(std::stringstream& iss)
     chart_filename+="/data/meshes/screws_2d_chart_bezier_24_28.xml";
 
     std::ifstream ifs(chart_filename);
-    if(!ifs.good())
+    if(!ifs.good() || !ifs.is_open())
       throw FileNotFound(chart_filename);
 
     iss << ifs.rdbuf();

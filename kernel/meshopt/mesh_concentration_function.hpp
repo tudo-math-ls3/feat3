@@ -706,14 +706,16 @@ namespace FEAT
               if(chart == nullptr)
                 throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
 
-              my_dist += chart->signed_dist(vtx[i], tmp);
+              my_dist += Math::abs(chart->signed_dist(vtx[i], tmp));
               my_dist_vec += tmp;
 
             }
             this->_dist(i, my_dist);
 
-            if(Math::abs(my_dist) >= Math::eps<CoordType>())
-              my_dist_vec.normalise();
+            // Because we added distance function gradient vectors, we have to normalise again if possible
+            CoordType my_norm(my_dist_vec.norm_euclid());
+            if(my_norm > Math::eps<CoordType>())
+              my_dist_vec *= (CoordType(1)/my_norm);
 
             this->_grad_dist(i, my_dist_vec);
           }
@@ -747,11 +749,8 @@ namespace FEAT
               }
 
             }
+
             this->_dist(i, my_dist);
-
-            if(Math::abs(my_dist) >= Math::eps<CoordType>())
-              my_dist_vec.normalise();
-
             this->_grad_dist(i, my_dist_vec);
           }
         }

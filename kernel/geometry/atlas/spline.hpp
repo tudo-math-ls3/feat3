@@ -317,8 +317,8 @@ namespace FEAT
           }
 
           // rotate to obtain normal
-          nu[0] =  der1[0][1];
-          nu[1] = -der1[0][0];
+          nu[0] =  _orientation*der1[0][1];
+          nu[1] = -_orientation*der1[0][0];
           return nu;
         }
 
@@ -605,9 +605,9 @@ namespace FEAT
         /// \copydoc ChartBase::signed_dist()
         DataType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
-          DataType signed_distance(Math::huge<DataType>());
+          DataType best_distance_sqr(Math::huge<DataType>());
+          DataType best_sign(_orientation*Math::huge<DataType>());
 
-          Index best_segment(0);
           WorldPoint projected(DataType(0));
 
           // loop over all line segments
@@ -619,39 +619,80 @@ namespace FEAT
             // map point on current segment
             projected = map_on_segment(i, t);
 
-            // compute squared distance to original point
-            DataType my_distance = (projected - point).norm_euclid_sqr();
+            WorldPoint difference(projected - point);
 
-            // is that a new projection candidate?
-            if((i == Index(0)) || (my_distance < signed_distance))
+            // compute squared distance to original point
+            DataType my_distance_sqr(difference.norm_euclid_sqr());
+
+            // If we have a point inside this segment we are happy and can leave
+            if(my_distance_sqr <= Math::sqr(Math::eps<DataType>()))
             {
-              signed_distance = my_distance;
-              best_segment = i;
+              best_distance_sqr = DataType(0);
+              best_sign = DataType(0);
+              break;
+            }
+
+            DataType my_sign(1);
+            if(_closed)
+            {
+              // Compute normal so we can compute the sign
+              WorldPoint nu(get_normal_on_segment(i, t));
+              my_sign = Math::signum(Tiny::dot(nu, difference));
+
+              // If the sign is 0, the projected point lies in the continuation of the current segment, meaning
+              // t got clamped to 0 or 1. So we compute the sign according to the normal wrt. to the other segment.
+              // If the sign is still 0 then, the projected point lies in the continuation of the next segment,
+              // so the same situation will arise in the next iteration anyway.
+              if(my_sign == DataType(0))
+              {
+                if(Math::abs(t) < Math::eps<DataType>())
+                {
+                  Index other_segment;
+                  (i == Index(0)) ? other_segment = Index(this->_vtx_ptr.size()-2) : other_segment = i-Index(1);
+                  WorldPoint other_nu(get_normal_on_segment(other_segment, DataType(1)));
+                  my_sign = Math::signum(Tiny::dot(difference, other_nu));
+                }
+                else if(Math::abs(t - DataType(1)) < Math::eps<DataType>())
+                {
+                  Index other_segment;
+                  (i == Index(this->_vtx_ptr.size()-2)) ? other_segment = Index(0) : other_segment = i+Index(1);
+                  WorldPoint other_nu(get_normal_on_segment(other_segment, DataType(0)));
+                  my_sign = Math::signum(Tiny::dot(difference, other_nu));
+                }
+                //else
+                //  throw InternalError(__func__,__FILE__,__LINE__,
+                //  "signum == "+stringify_fp_sci(my_sign)+" but t = "+stringify_fp_sci(t));
+              }
+            }
+
+            // Update the projection candidate iff it is the first segment, or the distance is lower. In the case
+            // of a closed polyline, we only accept better points with a lower sign (once outside - always outside)
+            // to avoid problems due to strongly varying normals
+            if(i == Index(0))
+            {
+              best_distance_sqr = my_distance_sqr;
+              grad_dist = difference;
+              best_sign = my_sign;
+            }
+            else if ( (my_distance_sqr <= best_distance_sqr))
+            {
+              best_distance_sqr = my_distance_sqr;
+              grad_dist = difference;
+              best_sign = my_sign;
             }
           }
 
-          // Project on best segment
-          const DataType t = project_on_segment(best_segment, point);
-          // Map point on best segment
-          projected = map_on_segment(best_segment, t);
-
-          grad_dist = (projected - point);
-          // This has no sign yet
-          signed_distance = grad_dist.norm_euclid();
-
-          // If the distance is too small, we set the gradient vector to zero
-          if(signed_distance <= Math::eps<DataType>())
+          // If the distance is too small, we set the gradient vector to zero because we cannot normalise it anyway
+          if(best_distance_sqr <= Math::sqr(Math::eps<DataType>()))
             grad_dist.format(DataType(0));
           else
           {
             grad_dist.normalise();
-            WorldPoint nu(get_normal_on_segment(best_segment, t));
-            signed_distance *= _orientation*Math::signum(Tiny::dot(nu, grad_dist));
+            if(best_sign != DataType(0))
+              grad_dist *= best_sign;
           }
 
-          grad_dist *= Math::signum(signed_distance);
-
-          return signed_distance;
+          return best_sign*Math::sqrt(best_distance_sqr);
         }
 
         /** \copydoc ChartBase::write */
@@ -665,8 +706,8 @@ namespace FEAT
           }
 
           os << sindent << "<Spline dim=\"2\" size=\"" << this->_vtx_ptr.size() << "\"";
-          os << " type=\"" << (this->_closed ? "closed" : "open");
-          os << (_orientation == -DataType(1) ? "orientation=\"-1\"" : " " )<<"\">" << std::endl;
+          os << " type=\"" << (this->_closed ? "closed" : "open") << "\"";
+          os << (_orientation == -DataType(1) ? " orientation=\"-1\"" : "" )<<">" << std::endl;
 
           // write points
           os << sind << "<Points>" << std::endl;
