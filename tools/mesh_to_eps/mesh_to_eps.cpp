@@ -194,6 +194,7 @@ int main(int argc, char* argv[])
     if(!ifs_chart->is_open() || !ifs_chart->good())
     {
       std::cerr << std::endl << "ERROR: Failed to open chart file '" << chart_file_name << "'" << std::endl;
+      delete mesh_reader;
       return 1;
     }
     std::cout << "Reading chart file from " << chart_file_name << std::endl;
