@@ -57,10 +57,10 @@ namespace FEAT
           for(int j(0); j < facet_idx.num_indices; ++j)
           {
             Index other_cell(neigh[k][Index(j)]);
-            bool ok(false);
             // If we have a neighbour...
             if(other_cell != ~Index(0))
             {
+              bool ok(false);
               // ... then this should NOT be the boundary
               if(at_boundary[facet_idx[k][j]])
                 throw String("Facet "+stringify(facet_idx[k][j])+
