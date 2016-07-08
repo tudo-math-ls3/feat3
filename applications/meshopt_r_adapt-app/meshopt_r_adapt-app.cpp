@@ -42,7 +42,7 @@ struct MeshoptRAdaptApp
   typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
 
   /// Type for points in the mesh
-  typedef Tiny::Vector<DataType, MeshType::world_dim> ImgPointType;
+  typedef Tiny::Vector<DataType, MeshType::world_dim> WorldPoint;
 
 #ifdef FEAT_HAVE_PARMETIS
   // If we have ParMETIS, we can use it for partitioning
@@ -151,7 +151,7 @@ struct MeshoptRAdaptApp
         Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
 #endif
         if(Util::Comm::rank() == 0)
-          std::cout << "Pre: Level " << lvl_index << ": Quality indicator " << " " <<
+          std::cout << "Pre: Level " << lvl_index << ": Quality indicator " <<
             stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
 
         ++deque_position;
@@ -220,7 +220,7 @@ struct MeshoptRAdaptApp
         Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
 #endif
         if(Util::Comm::rank() == 0)
-          std::cout << "Post: Level " << lvl_index << ": Quality indicator " << " " <<
+          std::cout << "Post: Level " << lvl_index << ": Quality indicator " <<
             stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
 
         ++deque_position;
@@ -228,7 +228,7 @@ struct MeshoptRAdaptApp
 
       cell_size_quality = meshopt_ctrl->compute_cell_size_quality();
       if(Util::Comm::rank() == 0)
-        std::cout << "Cell size quality indicator: " << stringify_fp_sci(cell_size_quality) << std::endl;
+        std::cout << "Post cell size quality indicator: " << stringify_fp_sci(cell_size_quality) << std::endl;
     }
 
     // Check for the hard coded settings for test mode
@@ -253,21 +253,23 @@ struct MeshoptRAdaptApp
     auto mesh_velocity = meshopt_ctrl->get_coords().clone();
 
     // This is the centre reference point
-    ImgPointType midpoint(DataType(0));
+    WorldPoint midpoint(DataType(0));
     midpoint(0) = DataType(0.25) *(DataType(2) + Math::cos(time));
     midpoint(1) = DataType(0.25) *(DataType(2) + Math::sin(DataType(3)*time));
 
-    ImgPointType rotation_centre(DataType(0.5));
+    WorldPoint rotation_centre(DataType(0.5));
     DataType rotation_speed(DataType(2)*Math::pi<DataType>());
-    ImgPointType rotation_angles(DataType(0));
+    WorldPoint rotation_angles(DataType(0));
     rotation_angles(0) = rotation_speed*delta_t;
+
+    WorldPoint dir(delta_t/Math::sqrt(DataType(2)));
 
     while(time < t_end)
     {
       n++;
       time+= delta_t;
 
-      ImgPointType old_midpoint(midpoint);
+      WorldPoint old_midpoint(midpoint);
 
       midpoint(0) = DataType(0.25) *(DataType(2) + Math::cos(time));
       midpoint(1) = DataType(0.25) *(DataType(2) + Math::sin(DataType(3)*time));
@@ -283,13 +285,25 @@ struct MeshoptRAdaptApp
       {
         if(it.first.find("moving_") != String::npos)
         {
-          std::cout << it.first << " by " << midpoint-old_midpoint << std::endl;
+          Util::mpi_cout(it.first+" by "+stringify(midpoint-old_midpoint)+"\n");
           it.second->move_by(midpoint-old_midpoint);
+        }
+
+        if(it.first.find("pos_merging_") != String::npos)
+        {
+          Util::mpi_cout(it.first+" by "+stringify(dir)+"\n");
+          it.second->move_by(dir);
+        }
+
+        if(it.first.find("neg_merging_") != String::npos)
+        {
+          Util::mpi_cout(it.first+" by "+stringify(DataType(-1)*dir)+"\n");
+          it.second->move_by(DataType(-1)*dir);
         }
 
         if(it.first.find("rotating_") != String::npos)
         {
-          std::cout << it.first << " by " << rotation_angles(0) << " around " << rotation_centre << std::endl;
+          Util::mpi_cout(it.first+" around "+stringify(rotation_centre)+" by "+stringify_fp_fix(rotation_angles(0))+"\n");
           it.second->rotate(rotation_centre, rotation_angles);
         }
       }
@@ -348,10 +362,10 @@ struct MeshoptRAdaptApp
       Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
 #endif
 
-      cell_size_quality =meshopt_ctrl->compute_cell_size_quality();
+      cell_size_quality = meshopt_ctrl->compute_cell_size_quality();
 
       if(Util::Comm::rank() == 0)
-        std::cout << "Quality indicator " << " " << stringify_fp_sci(min_quality) <<
+        std::cout << "Quality indicator " << stringify_fp_sci(min_quality) <<
           ", minimum angle " << stringify_fp_fix(min_angle) <<
           ", cell sizes " << stringify_fp_sci(cell_size_quality) << std::endl;
 

@@ -1,0 +1,8 @@
+<FeatMeshFile version="1" mesh="conformal:simplex:2:2">
+  <Chart name="neg_merging_circle">
+    <Circle radius="0.15" midpoint="0.75 0.75" domain="0 4" />
+  </Chart>
+  <Chart name="pos_merging_circle">
+    <Circle radius="0.15" midpoint="0.25 0.25" domain="0 4" />
+  </Chart>
+</FeatMeshFile>
