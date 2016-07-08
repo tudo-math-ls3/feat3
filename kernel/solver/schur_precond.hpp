@@ -225,12 +225,12 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      virtual String get_formated_solver_tree() const override
+      virtual String get_formatted_solver_tree() const override
       {
         String result;
         result += this->name();
         result += " ( ";
-        result += "S: " + _solver_s->get_formated_solver_tree() + " /  A: " + _solver_a->get_formated_solver_tree();
+        result += "S: " + _solver_s->get_formatted_solver_tree() + " /  A: " + _solver_a->get_formatted_solver_tree();
         result += " ) ";
         return result;
       }
@@ -502,12 +502,12 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      virtual String get_formated_solver_tree() const override
+      virtual String get_formatted_solver_tree() const override
       {
         String result;
         result += this->name();
         result += " ( ";
-        result += "S: " + _solver_s->get_formated_solver_tree() + " /  A: " + _solver_a->get_formated_solver_tree();
+        result += "S: " + _solver_s->get_formatted_solver_tree() + " /  A: " + _solver_a->get_formatted_solver_tree();
         result += " ) ";
         return result;
       }

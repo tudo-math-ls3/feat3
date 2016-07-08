@@ -92,7 +92,7 @@ int run(Solver_& solver, Operator_& op)
   solver->set_tol_rel(Math::sqrt(Math::eps<DataType>()));
   solver->set_tol_rel(Math::eps<DataType>());
   solver->set_plot(true);
-  std::cout << "Using solver " << solver->get_formated_solver_tree() << std::endl;
+  std::cout << "Using solver " << solver->get_formatted_solver_tree() << std::endl;
 
   // This will hold the solution
   auto sol = op.create_vector_r();

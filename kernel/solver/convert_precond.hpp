@@ -99,14 +99,14 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      virtual String get_formated_solver_tree() const override
+      virtual String get_formatted_solver_tree() const override
       {
         String result;
         result += this->name();
         if(_inner_solver)
         {
           result += " ( ";
-          result += _inner_solver->get_formated_solver_tree();
+          result += _inner_solver->get_formatted_solver_tree();
           result += " ) ";
         }
         return result;
@@ -214,14 +214,14 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      virtual String get_formated_solver_tree() const override
+      virtual String get_formatted_solver_tree() const override
       {
         String result;
         result += this->name();
         if(_inner_solver)
         {
           result += " ( ";
-          result += _inner_solver->get_formated_solver_tree();
+          result += _inner_solver->get_formatted_solver_tree();
           result += " ) ";
         }
         return result;

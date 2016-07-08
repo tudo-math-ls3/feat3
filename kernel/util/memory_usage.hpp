@@ -48,8 +48,8 @@ namespace FEAT
      */
     MemUsageInfo get_memory_usage();
 
-    /// Retrieve formated memory usage string
-    String get_formated_memory_usage();
+    /// Retrieve formatted memory usage string
+    String get_formatted_memory_usage();
   } // namespace Util
 } // namespace FEAT
 

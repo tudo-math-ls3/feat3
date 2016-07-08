@@ -1136,7 +1136,7 @@ namespace FEAT
       }
 
       /// \todo be more verbosive on different pre/post/peak smoother infos
-      virtual String get_formated_solver_tree() const override
+      virtual String get_formatted_solver_tree() const override
       {
         String result;
         result += this->name() + "-" + stringify(_cycle);
@@ -1144,7 +1144,7 @@ namespace FEAT
         std::shared_ptr<SolverType> smoother = _hierarchy->_get_level_info(_top_level).level->get_smoother_pre();
         if(smoother)
         {
-          result += "S: " + smoother->get_formated_solver_tree() + " / ";
+          result += "S: " + smoother->get_formatted_solver_tree() + " / ";
         }
         else
         {
@@ -1154,7 +1154,7 @@ namespace FEAT
         std::shared_ptr<SolverType> coarse_solver = _hierarchy->_get_level_info(_crs_level).level->get_coarse_solver();
         if(coarse_solver)
         {
-          result += "C: " + coarse_solver->get_formated_solver_tree();
+          result += "C: " + coarse_solver->get_formatted_solver_tree();
 
         }
         else

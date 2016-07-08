@@ -121,7 +121,7 @@ namespace FEAT
       return info;
     }
 
-    String get_formated_memory_usage()
+    String get_formatted_memory_usage()
     {
       String r;
       auto m = get_memory_usage();

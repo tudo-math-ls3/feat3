@@ -151,13 +151,13 @@ namespace FEAT
           return "NLSD";
         }
 
-        /// \copydoc BaseClass::get_formated_solver_tree()
-        virtual String get_formated_solver_tree() const override
+        /// \copydoc BaseClass::get_formatted_solver_tree()
+        virtual String get_formatted_solver_tree() const override
         {
           String result(name());
-          result += "( "+_linesearch->get_formated_solver_tree();
+          result += "( "+_linesearch->get_formatted_solver_tree();
           if(_precond != nullptr)
-            result += " "+_precond->get_formated_solver_tree();
+            result += " "+_precond->get_formatted_solver_tree();
           result += " )";
           return result;
         }

@@ -185,8 +185,8 @@ namespace FEAT
           return "ALGLIBMinLBFGS";
         }
 
-        /// \copydoc BaseClass::get_formated_solver_tree()
-        virtual String get_formated_solver_tree() const override
+        /// \copydoc BaseClass::get_formatted_solver_tree()
+        virtual String get_formatted_solver_tree() const override
         {
           String result(name());
           result += " ( StrongWolfeLinesearch )";
@@ -656,8 +656,8 @@ namespace FEAT
           return "ALGLIBMinCG";
         }
 
-        /// \copydoc BaseClass::get_formated_solver_tree()
-        virtual String get_formated_solver_tree() const override
+        /// \copydoc BaseClass::get_formatted_solver_tree()
+        virtual String get_formatted_solver_tree() const override
         {
           String result(name());
           result += " ( "+stringify(_direction_update)+", StrongWolfeLinesearch";

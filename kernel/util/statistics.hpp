@@ -148,8 +148,8 @@ namespace FEAT
         return _flops;
       }
 
-      /// Retrieve formated flops per second string
-      static String get_formated_flops(double seconds, Index ranks = 1)
+      /// Retrieve formatted flops per second string
+      static String get_formatted_flops(double seconds, Index ranks = 1)
       {
         double flops((double)_flops);
         flops /= seconds;
@@ -303,7 +303,7 @@ namespace FEAT
        *
        * \note The FEAT::Solver::BasicVCycle prints its TOE from coarse to fine level.
        */
-      static String get_formated_solvers()
+      static String get_formatted_solvers()
       {
         String result;
 
@@ -317,11 +317,11 @@ namespace FEAT
       }
 
       /**
-       * \copydoc get_formated_solvers()
+       * \copydoc get_formatted_solvers()
        *
        * \param[in] branch The solver (as complete branch name) that shall be used as the tree's root.
        */
-      static String get_formated_solver(String branch)
+      static String get_formatted_solver(String branch)
       {
         auto it = _solver_statistics.find(branch);
         if (it == _solver_statistics.end())
@@ -331,15 +331,15 @@ namespace FEAT
       }
 
       /*
-      /// Retrieve formated time consumption overview in percent
-      static String get_formated_times()
+      /// Retrieve formatted time consumption overview in percent
+      static String get_formatted_times()
       {
         double total_time = get_time_reduction() + get_time_spmv() + get_time_axpy() + get_time_precon() + get_time_mpi_execute() + get_time_mpi_wait();
-        return get_formated_times(total_time);
+        return get_formatted_times(total_time);
       }*/
 
-      /// Retrieve formated time consumption overview in percent relative to some provided total time
-      static String get_formated_times(double total_time)
+      /// Retrieve formatted time consumption overview in percent relative to some provided total time
+      static String get_formatted_times(double total_time)
       {
         String result = "Total time: " + stringify(total_time) + "s";
         if (total_time == 0.)

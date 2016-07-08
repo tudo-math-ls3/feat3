@@ -186,7 +186,7 @@ struct MeshoptScrewsApp
     WorldPoint x_0(DataType(0));
 
     // Get inner boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
-    auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("inner_screw");
+    auto* inner_boundary = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("inner");
     Geometry::TargetSet* inner_indices(nullptr);
     if(inner_boundary != nullptr)
       inner_indices = &(inner_boundary->template get_target_set<0>());
@@ -198,7 +198,7 @@ struct MeshoptScrewsApp
     auto* inner_chart = dom_ctrl.get_atlas()->find_mesh_chart("inner_screw");
 
     // Get outer boundary MeshPart. Can be nullptr if this process' patch does not lie on that boundary
-    auto* outer_boundary_part = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer_screw");
+    auto* outer_boundary_part = dom_ctrl.get_levels().back()->get_mesh_node()->find_mesh_part("outer");
     Geometry::TargetSet* outer_indices(nullptr);
     if(outer_boundary_part != nullptr)
       outer_indices = &(outer_boundary_part->template get_target_set<0>());
@@ -874,7 +874,7 @@ static void read_test_mode_meshopt_config(std::stringstream& iss)
   iss << "[DuDvDefault]" << std::endl;
   iss << "type = DuDv" << std::endl;
   iss << "config_section = DuDvDefaultParameters" << std::endl;
-  iss << "dirichlet_boundaries = inner_screw outer_screw" << std::endl;
+  iss << "dirichlet_boundaries = inner outer" << std::endl;
 
   iss << "[DuDvDefaultParameters]" << std::endl;
   iss << "solver_config = PCG-MGV" << std::endl;

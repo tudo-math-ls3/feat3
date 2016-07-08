@@ -204,7 +204,7 @@ namespace FEAT
               solver = Control::MeshoptSolverFactory::create_nonlinear_optimiser
                 (_system_levels, _transfer_levels, &solver_config, solver_name, precond);
               solver->init();
-              Util::mpi_cout(name()+": Using solver "+solver->get_formated_solver_tree()+"\n");
+              Util::mpi_cout(name()+": Using solver "+solver->get_formatted_solver_tree()+"\n");
 
             }
 

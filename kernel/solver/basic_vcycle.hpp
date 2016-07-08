@@ -359,14 +359,14 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      virtual String get_formated_solver_tree() const override
+      virtual String get_formatted_solver_tree() const override
       {
         String result;
         result += this->name();
         result += " ( ";
         if(system_levels.back()->pre_smoother)
         {
-          result += "S: " + system_levels.back()->pre_smoother->get_formated_solver_tree() + " / ";
+          result += "S: " + system_levels.back()->pre_smoother->get_formatted_solver_tree() + " / ";
         }
         else
         {
@@ -375,7 +375,7 @@ namespace FEAT
 
         if(system_levels.front()->coarse_solver)
         {
-          result += "C: " + system_levels.front()->coarse_solver->get_formated_solver_tree();
+          result += "C: " + system_levels.front()->coarse_solver->get_formatted_solver_tree();
         }
         else
         {
