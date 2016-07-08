@@ -48,7 +48,6 @@ namespace FEAT
           const String& meshfile, const Geometry::AdaptMode adapt_mode = Geometry::AdaptMode::chart) :
             _adapt_mode(adapt_mode)
           {
-            std::vector<Index> ranks, ctags;
             std::stringstream synchstream;
 
             //MASTER
