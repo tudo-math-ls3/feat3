@@ -631,10 +631,7 @@ namespace FEAT
           std::deque<Index> cell_stack;
           // We start with our guess
           cell_stack.push_front(guess);
-          // This will be the cell we are currently working on
-          Index current(~Index(0));
 
-          bool success(false);
 
           Index best_approx_cell(~Index(0));
 
@@ -646,7 +643,7 @@ namespace FEAT
           while(!cell_stack.empty())
           {
             // Get new cell
-            current = cell_stack.front();
+            Index current(cell_stack.front());
             cell_stack.pop_front();
             _cell_marker[current] = true;
 
@@ -669,7 +666,7 @@ namespace FEAT
             // From all this, we can now determine if there is an orthogonal projection of x onto this facet. For
             // this, we need to know the traversed information as well and the neighbour information of the current
             // facet
-            success = determine_success(ortho_dist, acceptable_distance, bary, facet_idx[current], _edge_marker);
+            bool success = determine_success(ortho_dist, acceptable_distance, bary, facet_idx[current], _edge_marker);
 
             // Ok, maybe we are done
             if(success && !find_best_approx)
@@ -868,9 +865,9 @@ namespace FEAT
 
           for(int l(0); l < n_; ++l)
           {
-            Index facet(facet_idx[Index(l)]);
             if(bary(l) < - tol)
             {
+              Index facet(facet_idx[Index(l)]);
               ++num_negative;
               if(traversed[facet])
               {
