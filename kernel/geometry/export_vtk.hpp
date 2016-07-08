@@ -218,7 +218,7 @@ namespace FEAT
         XASSERTM(x != nullptr, "x-data array is nullptr");
         std::vector<double> d(3*_num_verts);
 
-        if(z != nullptr)
+        if(y!= nullptr && z != nullptr)
         {
           for(Index i(0); i < _num_verts; ++i)
           {
@@ -330,7 +330,7 @@ namespace FEAT
         XASSERTM(x != nullptr, "x-data array is nullptr");
         std::vector<double> d(3*_num_cells);
 
-        if(z != nullptr)
+        if(y != nullptr && z != nullptr)
         {
           for(Index i(0); i < _num_cells; ++i)
           {
