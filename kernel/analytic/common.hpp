@@ -850,13 +850,13 @@ namespace FEAT
 
       public:
         /// Constructor
-        explicit DistanceFunction(const PointType origin) :
+        explicit DistanceFunction(const PointType& origin) :
           _origin(origin)
         {
         }
 
         /// Sets _point to x0_
-        void set_point(const PointType origin)
+        void set_point(const PointType& origin)
         {
           _origin = origin;
         }
@@ -1071,14 +1071,14 @@ namespace FEAT
 
       public:
         /// Constructor
-        explicit PlaneDistanceFunctionSD(const PointType origin, const DataType_ b_) :
+        explicit PlaneDistanceFunctionSD(const PointType& origin, const DataType_ b_) :
           _origin(origin),
           _b(b_)
         {
         }
 
         /// Sets _point to x0_
-        void set_point(const PointType origin)
+        void set_point(const PointType& origin)
         {
           _origin = origin;
         }
