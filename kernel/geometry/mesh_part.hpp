@@ -243,6 +243,9 @@ namespace FEAT
         // This is just to avoid anyone using the implicitly generated one - it could be implemented if needed.
         MeshPart(MeshPart&&) = delete;
 
+        /// Explicitly delete copy constructor. Objects of this class shall not be copied.
+        MeshPart(const MeshPart&) = delete;
+
         /// Virtual destructor
         virtual ~MeshPart()
         {

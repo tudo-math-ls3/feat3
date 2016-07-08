@@ -1235,7 +1235,7 @@ class StandardTrafoVolumeTest
 
       /* With the edgelengths, check the volume of the sub simplices via Heron's formula */
       // s will be half the circumference of a sub simplex
-      DataType_ s = 0.;
+      DataType_ s(0);
 
       // Face 0 consists of edges 3, 4, 5
       s = DataType_(0.5)*(l[3] + l[4] + l[5]);
