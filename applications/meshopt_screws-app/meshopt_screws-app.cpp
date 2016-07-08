@@ -211,6 +211,7 @@ struct MeshoptScrewsApp
     // For test_mode = true
     DT_ min_quality(0);
     DT_ min_angle(0);
+    DT_ cell_size_quality(0);
     // Write initial output
     {
       int deque_position(0);
@@ -245,11 +246,15 @@ struct MeshoptScrewsApp
         Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
 #endif
         if(Util::Comm::rank() == 0)
-          std::cout << "Pre: Level " << lvl_index << ": Quality indicator " << " " <<
+          std::cout << "Pre: Level " << lvl_index << ": Quality indicator " <<
             stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
 
         ++deque_position;
       }
+
+      cell_size_quality = meshopt_ctrl->compute_cell_size_quality();
+      if(Util::Comm::rank() == 0)
+        std::cout << "Pre cell size quality indicator: " << stringify_fp_sci(cell_size_quality) << std::endl;
 
       if(write_vtk && extruder.extruded_mesh_node != nullptr)
       {
@@ -320,12 +325,15 @@ struct MeshoptScrewsApp
         Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
 #endif
         if(Util::Comm::rank() == 0)
-          std::cout << "Post: Level " << lvl_index << ": Quality indicator " << " " <<
+          std::cout << "Post: Level " << lvl_index << ": Quality indicator " <<
             stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
 
         ++deque_position;
       }
-    }
+      cell_size_quality = meshopt_ctrl->compute_cell_size_quality();
+      if(Util::Comm::rank() == 0)
+        std::cout << "Post cell size quality indicator: " << stringify_fp_sci(cell_size_quality) << std::endl;
+    } // writing of post output
 
     if(write_vtk && extruder.extruded_mesh_node != nullptr)
     {
@@ -514,9 +522,12 @@ struct MeshoptScrewsApp
       Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
       Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
 #endif
+      cell_size_quality = meshopt_ctrl->compute_cell_size_quality();
+
       if(Util::Comm::rank() == 0)
-        std::cout << "Quality indicator " << " " << stringify_fp_sci(min_quality) <<
-          ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
+        std::cout << "Quality indicator " << stringify_fp_sci(min_quality) <<
+          ", minimum angle " << stringify_fp_fix(min_angle) <<
+          ", cell sizes " << stringify_fp_sci(cell_size_quality) << std::endl;
 
       if(min_angle < DT_(1))
       {
