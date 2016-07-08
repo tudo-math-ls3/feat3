@@ -679,6 +679,8 @@ namespace FEAT
         {
           if(_operation == "add")
             compute_dist_add();
+          else if(_operation == "max")
+            compute_dist_min();
           else if(_operation == "min")
             compute_dist_min();
           else
@@ -720,6 +722,41 @@ namespace FEAT
             this->_grad_dist(i, my_dist_vec);
           }
         }
+
+        /// \copydoc BaseClass::compute_dist()
+        void compute_dist_max()
+        {
+          XASSERT(this->_mesh_node != nullptr);
+
+          const auto& vtx = this->_mesh_node->get_mesh()->get_vertex_set();
+
+          WorldPoint my_dist_vec(CoordType(0));
+          WorldPoint tmp(CoordType(0));
+
+          for(Index i(0); i < this->_mesh_node->get_mesh()->get_num_entities(0); ++i)
+          {
+            CoordType my_dist(Math::huge<CoordType>());
+            my_dist_vec.format(CoordType(0));
+
+            for(const auto& it:_chart_list)
+            {
+              auto* chart = this->_mesh_node->get_atlas()->find_mesh_chart(it);
+              if(chart == nullptr)
+                throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
+
+              CoordType this_dist = chart->signed_dist(vtx[i], tmp);
+              if(this_dist > my_dist)
+              {
+                my_dist = this_dist;
+                my_dist_vec = tmp;
+              }
+
+            }
+
+            this->_dist(i, my_dist);
+            this->_grad_dist(i, my_dist_vec);
+          }
+        }
         /// \copydoc BaseClass::compute_dist()
         void compute_dist_min()
         {
@@ -742,7 +779,7 @@ namespace FEAT
                 throw InternalError(__func__,__FILE__,__LINE__,"Could not find chart "+it);
 
               CoordType this_dist = chart->signed_dist(vtx[i], tmp);
-              if(Math::abs(this_dist) < my_dist)
+              if(Math::abs(this_dist) < Math::abs(my_dist))
               {
                 my_dist = this_dist;
                 my_dist_vec = tmp;

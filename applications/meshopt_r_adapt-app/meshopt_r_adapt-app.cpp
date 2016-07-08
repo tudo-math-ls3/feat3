@@ -262,7 +262,7 @@ struct MeshoptRAdaptApp
     WorldPoint rotation_angles(DataType(0));
     rotation_angles(0) = rotation_speed*delta_t;
 
-    WorldPoint dir(delta_t/Math::sqrt(DataType(2)));
+    WorldPoint dir(delta_t/DataType(2));
 
     while(time < t_end)
     {
