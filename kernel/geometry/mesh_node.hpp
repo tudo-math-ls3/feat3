@@ -245,7 +245,7 @@ namespace FEAT
       MeshPartNodeType* add_mesh_part_node(
         const String& part_name,
         MeshPartNodeType* mesh_part_node,
-        const String chart_name = "",
+        const String& chart_name = "",
         const MeshChartType* chart = nullptr)
       {
         if(mesh_part_node != nullptr)
@@ -277,7 +277,7 @@ namespace FEAT
       MeshPartNodeType* add_mesh_part(
         const String& part_name,
         MeshPartType* mesh_part,
-        const String chart_name = "",
+        const String& chart_name = "",
         const MeshChartType* chart = nullptr)
       {
         MeshPartNodeType* part_node = new MeshPartNodeType(mesh_part);
