@@ -47,6 +47,39 @@ namespace FEAT
 
           String op_timings = FEAT::Statistics::get_formatted_times(solver_toe);
 
+          Index cells_coarse_local = domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension);
+          Index cells_coarse_max;
+          Index cells_coarse_min;
+          Util::Comm::allreduce(&cells_coarse_local, 1, &cells_coarse_max, Util::CommOperationMax());
+          Util::Comm::allreduce(&cells_coarse_local, 1, &cells_coarse_min, Util::CommOperationMin());
+          Index cells_fine_local = domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension);
+          Index cells_fine_max;
+          Index cells_fine_min;
+          Util::Comm::allreduce(&cells_fine_local, 1, &cells_fine_max, Util::CommOperationMax());
+          Util::Comm::allreduce(&cells_fine_local, 1, &cells_fine_min, Util::CommOperationMin());
+
+          Index dofs_coarse_local = system_levels.front()->matrix_sys.columns();
+          Index dofs_coarse_max;
+          Index dofs_coarse_min;
+          Util::Comm::allreduce(&dofs_coarse_local, 1, &dofs_coarse_max, Util::CommOperationMax());
+          Util::Comm::allreduce(&dofs_coarse_local, 1, &dofs_coarse_min, Util::CommOperationMin());
+          Index dofs_fine_local = system_levels.back()->matrix_sys.columns();
+          Index dofs_fine_max;
+          Index dofs_fine_min;
+          Util::Comm::allreduce(&dofs_fine_local, 1, &dofs_fine_max, Util::CommOperationMax());
+          Util::Comm::allreduce(&dofs_fine_local, 1, &dofs_fine_min, Util::CommOperationMin());
+
+          Index nzes_coarse_local = system_levels.front()->matrix_sys.used_elements();
+          Index nzes_coarse_max;
+          Index nzes_coarse_min;
+          Util::Comm::allreduce(&nzes_coarse_local, 1, &nzes_coarse_max, Util::CommOperationMax());
+          Util::Comm::allreduce(&nzes_coarse_local, 1, &nzes_coarse_min, Util::CommOperationMin());
+          Index nzes_fine_local = system_levels.back()->matrix_sys.used_elements();
+          Index nzes_fine_max;
+          Index nzes_fine_min;
+          Util::Comm::allreduce(&nzes_fine_local, 1, &nzes_fine_max, Util::CommOperationMax());
+          Util::Comm::allreduce(&nzes_fine_local, 1, &nzes_fine_min, Util::CommOperationMin());
+
           if (rank == 0 && statistics_check >= 0)
           {
             std::cout<< std::endl;
@@ -61,10 +94,10 @@ namespace FEAT
             std::cout<<String("MPI size:").pad_back(17) << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl;
             std::cout<<String("LA size:").pad_back(17) << double(la_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
             std::cout<<Util::get_formatted_memory_usage()<<std::endl;
-            std::cout<<String("#Mesh cells:").pad_back(17) << "min " << domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension)<<
-              ", max " << domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension)<<std::endl;
-            std::cout<<String("#DOFs:").pad_back(17) <<"min " << system_levels.front()->matrix_sys.columns()<<", max " << system_levels.back()->matrix_sys.columns() << std::endl;
-            std::cout<<String("#NZEs:").pad_back(17) << "min " << system_levels.front()->matrix_sys.used_elements()<<", max " << system_levels.back()->matrix_sys.used_elements() << std::endl << std::endl;
+            std::cout<<String("#Mesh cells:").pad_back(17) << "coarse " << cells_coarse_max << "/" << cells_coarse_min << ", fine " << cells_fine_max << "/" << cells_fine_min << std::endl;
+            std::cout<<String("#DOFs:").pad_back(17) << "coarse " << dofs_coarse_max << "/" << dofs_coarse_min << ", fine " << dofs_fine_max << "/" << dofs_fine_min << std::endl;
+            std::cout<<String("#NZEs").pad_back(17) << "coarse " << nzes_coarse_max << "/" << nzes_coarse_min << ", fine " << nzes_fine_max << "/" << nzes_fine_min << std::endl;
+            std::cout<<std::endl;
             /*if (statistics_check > 0) // provided parameter full or whatever
             {
               std::cout<<FEAT::Statistics::get_formatted_solvers();

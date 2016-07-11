@@ -339,7 +339,11 @@ namespace FEAT
         return get_formatted_times(total_time);
       }*/
 
-      /// Retrieve formatted time consumption overview in percent relative to some provided total time
+      /**
+       * \brief Retrieve formatted time consumption overview in percent relative to some provided total time
+       *
+       * \note This method uses mpi collectives and thus needs to be called by all ranks, even if you dont use the result on every rank on your own.
+       */
       static String get_formatted_times(double total_time);
 
       /// Reset all global timer counters
