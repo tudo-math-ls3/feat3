@@ -6,6 +6,7 @@
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/kahan_summation.hpp>
+#include <kernel/util/comm_base.hpp>
 
 #include <list>
 #include <map>
@@ -339,36 +340,7 @@ namespace FEAT
       }*/
 
       /// Retrieve formatted time consumption overview in percent relative to some provided total time
-      static String get_formatted_times(double total_time)
-      {
-        String result = "Total time: " + stringify(total_time) + "s";
-        if (total_time == 0.)
-          return result;
-
-        KahanAccumulation measured_time;
-        measured_time = KahanSum(measured_time, get_time_reduction());
-        measured_time = KahanSum(measured_time, get_time_spmv());
-        measured_time = KahanSum(measured_time, get_time_axpy());
-        measured_time = KahanSum(measured_time, get_time_precon());
-        measured_time = KahanSum(measured_time, get_time_mpi_execute());
-        measured_time = KahanSum(measured_time, get_time_mpi_wait());
-
-        if (measured_time.sum > total_time)
-          throw InternalError("Accumulated op time (" + stringify(measured_time.sum) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
-
-        result += "\n";
-        result += "Accumulated op time: " + stringify(measured_time.sum) + "\n";
-
-        result += "\n";
-        result += String("Reductions:").pad_back(17) + stringify(get_time_reduction() / total_time * 100.) + "%\n";
-        result += String("Blas-1:").pad_back(17) + stringify(get_time_axpy() / total_time * 100.) + "%\n";
-        result += String("Blas-2:").pad_back(17) + stringify(get_time_spmv() / total_time * 100.) + "%\n";
-        result += String("Precon Kernels:").pad_back(17) + stringify(get_time_precon() / total_time * 100.) + "%\n";
-        result += String("MPI Execution:").pad_back(17) + stringify(get_time_mpi_execute() / total_time * 100.) + "%\n";
-        result += String("MPI Wait:").pad_back(17) + stringify(get_time_mpi_wait() / total_time * 100.) + "%\n";
-        result += String("Not covered:").pad_back(17) + stringify( (total_time - measured_time.sum) / total_time * 100.) + "%";
-        return result;
-      }
+      static String get_formatted_times(double total_time);
 
       /// Reset all global timer counters
       static void reset_times()

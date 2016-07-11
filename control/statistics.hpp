@@ -44,6 +44,9 @@ namespace FEAT
           std::for_each(transfer_levels.begin(), transfer_levels.end(), [&] (TransferLevelType_ * n) { la_size += n->bytes(); });
           std::size_t mpi_size(0);
           std::for_each(system_levels.begin(), system_levels.end(), [&] (SystemLevelType_ * n) { mpi_size += n->gate_sys.bytes(); });
+
+          String op_timings = FEAT::Statistics::get_formatted_times(solver_toe);
+
           if (rank == 0 && statistics_check >= 0)
           {
             std::cout<< std::endl;
@@ -53,7 +56,7 @@ namespace FEAT
             std::cout << std::endl << solver->get_formatted_solver_tree().trim() << std::endl;
             String flops = FEAT::Statistics::get_formatted_flops(solver_toe, nranks);
             std::cout<<flops<<std::endl<<std::endl;
-            std::cout<<FEAT::Statistics::get_formatted_times(solver_toe)<<std::endl<<std::endl;
+            std::cout<<op_timings<<std::endl<<std::endl;
             std::cout<<String("Domain size:").pad_back(17) << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
             std::cout<<String("MPI size:").pad_back(17) << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl;
             std::cout<<String("LA size:").pad_back(17) << double(la_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;

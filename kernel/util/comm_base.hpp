@@ -159,6 +159,20 @@ namespace FEAT
         }
     };
 
+    class CommOperationMin : public CommOperation
+    {
+      public:
+        CommOperationMin() :
+          CommOperation(MPI_MIN)
+      {
+      }
+
+        MPI_Op mpi_op()
+        {
+          return _op;
+        }
+    };
+
     class CommRequest
     {
       public:
