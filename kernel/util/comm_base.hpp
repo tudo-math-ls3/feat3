@@ -729,6 +729,15 @@ namespace FEAT
       }
     };
 
+    class CommOperationMin : public CommOperation
+    {
+      public:
+        CommOperationMin() :
+          CommOperation(0)
+      {
+      }
+    };
+
     class CommRequest
     {
       public:
