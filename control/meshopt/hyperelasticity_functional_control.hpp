@@ -237,10 +237,12 @@ namespace FEAT
               precond->done();
           }
 
-          /// \copydoc BaseClass::compute_cell_size_quality()
-          virtual CoordType compute_cell_size_quality() const override
+          /// \copydoc BaseClass::compute_cell_size_defect()
+          virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
+              CoordType& vol_min, CoordType& vol_max) const override
           {
-            return (*(_system_levels.back()->op_sys)).compute_cell_size_quality();
+            return (*(_system_levels.back()->op_sys)).
+              compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
           }
 
           /// \copydoc BaseClass::name()

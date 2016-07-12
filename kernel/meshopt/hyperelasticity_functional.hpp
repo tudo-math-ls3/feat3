@@ -596,30 +596,57 @@ namespace FEAT
          * \returns The relative cell size quality indicator.
          *
          */
-        virtual CoordType compute_cell_size_quality() const override
+        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
+        CoordType& vol_min, CoordType& vol_max) const override
         {
-          CoordType my_quality(0);
+          CoordType size_defect(0);
           CoordType vol(0);
+
+          lambda_min = Math::huge<CoordType>();
+          lambda_max = CoordType(0);
+          vol_min = Math::huge<CoordType>();
+          vol_max = CoordType(0);
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            vol += this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
+            CoordType my_vol = this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
+            vol_min = Math::min(vol_min, my_vol);
+            vol_max = Math::max(vol_min, my_vol);
+            vol += my_vol;
           }
 
 #ifdef FEAT_HAVE_MPI
           CoordType vol_snd(vol);
-          Util::Comm::allreduce(&vol_snd, &vol, 1, Util::CommOperationSum());
+          Util::Comm::allreduce(&vol_snd, &vol, Index(1), Util::CommOperationSum());
+
+          CoordType vol_min_snd(vol_min);
+          Util::Comm::allreduce(&vol_min_snd, &vol_min, Index(1), Util::CommOperationMin());
+
+          CoordType vol_max_snd(vol_max);
+          Util::Comm::allreduce(&vol_max_snd, &vol_max, Index(1), Util::CommOperationMax());
 #endif
+
+          vol_min /= vol;
+          vol_max /= vol;
+
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            my_quality += Math::abs(this->_trafo.template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+            size_defect += Math::abs(this->_trafo.template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+            lambda_min = Math::min(lambda_min, this->_lambda(cell));
+            lambda_max = Math::max(lambda_max, this->_lambda(cell));
           }
 
 #ifdef FEAT_HAVE_MPI
-          CoordType quality_snd(my_quality);
-          Util::Comm::allreduce(&quality_snd, &vol, 1, Util::CommOperationSum());
+          CoordType size_defect_snd(size_defect);
+          Util::Comm::allreduce(&size_defect_snd, &size_defect, Index(1), Util::CommOperationSum());
+
+          CoordType lambda_min_snd(lambda_min);
+          Util::Comm::allreduce(&lambda_min_snd, &lambda_min, Index(1), Util::CommOperationMin());
+
+          CoordType lambda_max_snd(lambda_max);
+          Util::Comm::allreduce(&lambda_max_snd, &lambda_max, Index(1), Util::CommOperationMax());
 #endif
-          return my_quality;
+          return size_defect;
         }
 
         /**

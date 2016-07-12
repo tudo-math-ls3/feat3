@@ -73,13 +73,16 @@ struct MeshoptRefinementApp
     // Minimum number of cells we want to have in each patch
     Index part_min_elems(Util::Comm::size()*4);
 
-    // Create the DomainControl
+    // Create the DomainControl with AdaptMode set to none
     DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader, Geometry::AdaptMode::none);
+    // Mesh on the finest level, mainly for computing quality indicators
+    const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
 
     Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
+
 #ifdef FEAT_HAVE_MPI
-      Index my_cells(ncells);
-      Util::Comm::allreduce(&my_cells, &ncells, 1, Util::CommOperationSum());
+    Index my_cells(ncells);
+    Util::Comm::allreduce(&my_cells, &ncells, 1, Util::CommOperationSum());
 #endif
 
     // Print level information
@@ -105,52 +108,61 @@ struct MeshoptRefinementApp
 
     meshopt_ctrl->prepare(new_coords);
 
-    // For test_mode = true
-    DT_ min_quality(0);
-    DT_ min_angle(0);
-    DT_ cell_size_quality(0);
+    // Write initial vtk output
+    if(write_vtk)
     {
       int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
 
-        // Write initial vtk output
-        if(write_vtk)
-        {
-          String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
-          if(Util::Comm::rank() == 0)
-            std::cout << "Writing " << vtk_name << std::endl;
+        String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
+        Util::mpi_cout("Writing "+vtk_name+"\n");
 
-          // Create a VTK exporter for our mesh
-          Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-          meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-          exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-        }
-
-        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
-          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
-
-        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
-
-#ifdef FEAT_HAVE_MPI
-        DT_ min_quality_snd(min_quality);
-        DT_ min_angle_snd(min_angle);
-
-        Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
-        Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
-#endif
-        if(Util::Comm::rank() == 0)
-          std::cout << "Pre: Level " << lvl_index << ": Quality indicator " <<
-            stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
 
         ++deque_position;
       }
-      cell_size_quality = meshopt_ctrl->compute_cell_size_quality();
+    }
+
+    // For test_mode = true these have to have function global scope
+    DT_ min_quality(0);
+    DT_ min_angle(0);
+    DT_ cell_size_defect(0);
+    // Compute quality indicators
+    {
+      min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+      min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+#ifdef FEAT_HAVE_MPI
+      DT_ min_quality_snd(min_quality);
+      Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+
+      DT_ min_angle_snd(min_angle);
+      Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
+#endif
+
+      DT_ lambda_min;
+      DT_ lambda_max;
+      DT_ vol_min;
+      DT_ vol_max;
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+
       if(Util::Comm::rank() == 0)
-        std::cout << "Pre cell size quality indicator: " << stringify_fp_sci(cell_size_quality) << std::endl;
-    } // writing of initial output
+      {
+        std::cout << "Pre initial quality indicator: " << stringify_fp_sci(min_quality) <<
+          " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
+        std::cout << "Pre initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
+          " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
+          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
+      }
+    }
 
     // Check for the hard coded settings for test mode
     if(test_mode)
@@ -170,48 +182,57 @@ struct MeshoptRefinementApp
     if(Util::Comm::rank() == 0)
       std::cout << "Solve time: " << post_opt.elapsed(pre_opt) << std::endl;
 
+    // Write output again
+    if(write_vtk)
     {
       int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
 
-        if(write_vtk)
-        {
-          String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
+        String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
+        Util::mpi_cout("Writing "+vtk_name+"\n");
 
-          if(Util::Comm::rank() == 0)
-            std::cout << "Writing " << vtk_name << std::endl;
-
-          // Create a VTK exporter for our mesh
-          Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-          meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-          exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-        }
-
-        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
-          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
-
-        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
-
-#ifdef FEAT_HAVE_MPI
-        DT_ min_quality_snd(min_quality);
-        DT_ min_angle_snd(min_angle);
-
-        Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
-        Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
-#endif
-        if(Util::Comm::rank() == 0)
-          std::cout << "Post: Level " << lvl_index << ": Quality indicator " <<
-            stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
 
         ++deque_position;
       }
-      cell_size_quality = meshopt_ctrl->compute_cell_size_quality();
+    }
+
+    // Compute quality indicators
+    {
+      min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+      min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+#ifdef FEAT_HAVE_MPI
+      DT_ min_quality_snd(min_quality);
+      Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+
+      DT_ min_angle_snd(min_angle);
+      Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
+#endif
+
+      DT_ lambda_min;
+      DT_ lambda_max;
+      DT_ vol_min;
+      DT_ vol_max;
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+
       if(Util::Comm::rank() == 0)
-        std::cout << "Post cell size quality indicator: " << stringify_fp_sci(cell_size_quality) << std::endl;
-    } // writing of post output
+      {
+        std::cout << "Post initial quality indicator: " << stringify_fp_sci(min_quality) <<
+          " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
+        std::cout << "Post initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
+          " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
+          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
+      }
+    }
 
     // Check for the hard coded settings for test mode
     if(test_mode)

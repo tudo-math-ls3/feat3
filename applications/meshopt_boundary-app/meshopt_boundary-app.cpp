@@ -86,11 +86,14 @@ struct MeshoptBoundaryApp
 
     // Create the DomainControl
     DomCtrl dom_ctrl(lvl_max, lvl_min, part_min_elems, mesh_file_reader, chart_file_reader);
+    // Mesh on the finest level, mainly for computing quality indicators
+    const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
 
     Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
+
 #ifdef FEAT_HAVE_MPI
-      Index my_cells(ncells);
-      Util::Comm::allreduce(&my_cells, &ncells, 1, Util::CommOperationSum());
+    Index my_cells(ncells);
+    Util::Comm::allreduce(&my_cells, &ncells, 1, Util::CommOperationSum());
 #endif
 
     // Print level information
@@ -112,8 +115,11 @@ struct MeshoptBoundaryApp
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_, TrafoType>::create_meshopt_control(
       dom_ctrl, meshopt_section_key, meshopt_config, solver_config);
 
-    // Get a list of the dirichlet boundaries for modifying the boundari coordinates
+    // Get a list of the dirichlet boundaries for modifying the boundary coordinates
     std::deque<String> dirichlet_boundaries(meshopt_ctrl->get_dirichlet_boundaries());
+
+    // Copy the vertex coordinates to the buffer and get them via get_coords()
+    meshopt_ctrl->mesh_to_buffer();
 
     // A copy of the old vertex coordinates is kept here
     auto old_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
@@ -121,46 +127,64 @@ struct MeshoptBoundaryApp
     // The mesh velocity is 1/delta_t*(coords_new - coords_old) and computed in each time step
     auto mesh_velocity = meshopt_ctrl->get_coords().clone();
 
-    // For test_mode = true
-    DT_ min_quality(0);
-    DT_ min_angle(0);
+    auto new_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
+
+    // Prepare the functional
+    meshopt_ctrl->prepare(old_coords);
+
+    // Write initial vtk output
+    if(write_vtk)
     {
       int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
 
-        // Write initial vtk output
-        if(write_vtk)
-        {
-          String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
-          if(Util::Comm::rank() == 0)
-            std::cout << "Writing " << vtk_name << std::endl;
+        String vtk_name = String(file_basename+"_pre_lvl_"+stringify(lvl_index));
+        Util::mpi_cout("Writing "+vtk_name+"\n");
 
-          // Create a VTK exporter for our mesh
-          Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-          meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-          exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-        }
-
-        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
-          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
-
-        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
-
-#ifdef FEAT_HAVE_MPI
-        DT_ min_quality_snd(min_quality);
-        DT_ min_angle_snd(min_angle);
-
-        Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
-        Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
-#endif
-        if(Util::Comm::rank() == 0)
-          std::cout << "Pre: Level " << lvl_index << ": Quality indicator " << " " <<
-            stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
 
         ++deque_position;
+      }
+    }
+
+    // For test_mode = true these have to have function global scope
+    DT_ min_quality(0);
+    DT_ min_angle(0);
+    DT_ cell_size_defect(0);
+    // Compute quality indicators
+    {
+      min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+      min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+#ifdef FEAT_HAVE_MPI
+      DT_ min_quality_snd(min_quality);
+      Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+
+      DT_ min_angle_snd(min_angle);
+      Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
+#endif
+
+      DT_ lambda_min;
+      DT_ lambda_max;
+      DT_ vol_min;
+      DT_ vol_max;
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+
+      if(Util::Comm::rank() == 0)
+      {
+        std::cout << "Pre initial quality indicator: " << stringify_fp_sci(min_quality) <<
+          " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
+        std::cout << "Pre initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
+          " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
+          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
       }
     }
 
@@ -176,52 +200,58 @@ struct MeshoptBoundaryApp
       }
     }
 
-    // Copy the vertex coordinates to the buffer and get them via get_coords()
-    meshopt_ctrl->mesh_to_buffer();
-    auto new_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep);
-
-    // Prepare the functional
-    meshopt_ctrl->prepare(old_coords);
     // Optimise the mesh
     meshopt_ctrl->optimise();
 
+    // Write output again
+    if(write_vtk)
     {
       int deque_position(0);
       for(auto it = dom_ctrl.get_levels().begin(); it !=  dom_ctrl.get_levels().end(); ++it)
       {
         int lvl_index((*it)->get_level_index());
 
-        if(write_vtk)
-        {
-          String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
+        String vtk_name = String(file_basename+"_post_lvl_"+stringify(lvl_index));
+        Util::mpi_cout("Writing "+vtk_name+"\n");
 
-          if(Util::Comm::rank() == 0)
-            std::cout << "Writing " << vtk_name << std::endl;
-
-          // Create a VTK exporter for our mesh
-          Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
-          meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
-          exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
-        }
-
-        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
-          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
-
-        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-          (*it)->get_mesh().template get_index_set<MeshType::shape_dim, 0>(), (*it)->get_mesh().get_vertex_set());
-
-#ifdef FEAT_HAVE_MPI
-        DT_ min_quality_snd(min_quality);
-        DT_ min_angle_snd(min_angle);
-
-        Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
-        Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
-#endif
-        if(Util::Comm::rank() == 0)
-          std::cout << "Post: Level " << lvl_index << ": Quality indicator " << " " <<
-            stringify_fp_sci(min_quality) << ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(((*it)->get_mesh()));
+        meshopt_ctrl->add_to_vtk_exporter(exporter, deque_position);
+        exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
 
         ++deque_position;
+      }
+    }
+
+    // Compute quality indicators
+    {
+      min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+      min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+
+#ifdef FEAT_HAVE_MPI
+      DT_ min_quality_snd(min_quality);
+      Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+
+      DT_ min_angle_snd(min_angle);
+      Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
+#endif
+
+      DT_ lambda_min;
+      DT_ lambda_max;
+      DT_ vol_min;
+      DT_ vol_max;
+      cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+
+      if(Util::Comm::rank() == 0)
+      {
+        std::cout << "Post initial quality indicator: " << stringify_fp_sci(min_quality) <<
+          " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
+        std::cout << "Post initial cell size defect: " << stringify_fp_sci(cell_size_defect) <<
+          " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
+          " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
       }
     }
 
@@ -316,8 +346,7 @@ struct MeshoptBoundaryApp
       {
         String vtk_name(file_basename+"_post_"+stringify(n));
 
-        if(Util::Comm::rank() == 0)
-          std::cout << "Writing " << vtk_name << std::endl;
+        Util::mpi_cout("Writing "+vtk_name+"\n");
 
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(dom_ctrl.get_levels().back()->get_mesh());
@@ -329,26 +358,37 @@ struct MeshoptBoundaryApp
         exporter.write(vtk_name, int(Util::Comm::rank()), int(Util::Comm::size()));
       }
 
+      // Compute quality indicators
+      {
+        min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
+          finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
-      // Compute mesh quality and worst angle
-      const auto& finest_mesh = dom_ctrl.get_levels().back()->get_mesh();
-
-      min_quality = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::compute(
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
-
-      min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
-        finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
+        min_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
+          finest_mesh.template get_index_set<MeshType::shape_dim, 0>(), finest_mesh.get_vertex_set());
 
 #ifdef FEAT_HAVE_MPI
-      DT_ min_quality_snd(min_quality);
-      DT_ min_angle_snd(min_angle);
+        DT_ min_quality_snd(min_quality);
+        DT_ min_angle_snd(min_angle);
 
-      Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
-      Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
+        Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+        Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
 #endif
-      if(Util::Comm::rank() == 0)
-        std::cout << "Quality indicator " << stringify_fp_sci(min_quality) <<
-          ", minimum angle " << stringify_fp_fix(min_angle) << std::endl;
+
+        DT_ lambda_min;
+        DT_ lambda_max;
+        DT_ vol_min;
+        DT_ vol_max;
+        cell_size_defect = meshopt_ctrl->compute_cell_size_defect(lambda_min, lambda_max, vol_min, vol_max);
+
+        if(Util::Comm::rank() == 0)
+        {
+          std::cout << "Quality indicator: " << stringify_fp_sci(min_quality) <<
+            " minimum angle: " << stringify_fp_fix(min_angle) << std::endl;
+          std::cout << "Cell size defect: " << stringify_fp_sci(cell_size_defect) <<
+            " lambda: " << stringify_fp_sci(lambda_min) << " " << stringify_fp_sci(lambda_max) <<
+            " vol: " << stringify_fp_sci(vol_min) << " " << stringify_fp_sci(vol_max) << std::endl;
+        }
+      }
 
       if(min_angle < DT_(1))
       {

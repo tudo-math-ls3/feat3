@@ -680,7 +680,7 @@ namespace FEAT
           if(_operation == "add")
             compute_dist_add();
           else if(_operation == "max")
-            compute_dist_min();
+            compute_dist_max();
           else if(_operation == "min")
             compute_dist_min();
           else
@@ -735,7 +735,7 @@ namespace FEAT
 
           for(Index i(0); i < this->_mesh_node->get_mesh()->get_num_entities(0); ++i)
           {
-            CoordType my_dist(Math::huge<CoordType>());
+            CoordType my_dist(-Math::huge<CoordType>());
             my_dist_vec.format(CoordType(0));
 
             for(const auto& it:_chart_list)

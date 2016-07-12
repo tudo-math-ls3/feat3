@@ -170,7 +170,8 @@ namespace FEAT
            *
            * \returns The cell size quality indicator.
            */
-          virtual CoordType compute_cell_size_quality() const = 0;
+          virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
+              CoordType& vol_min, CoordType& vol_max) const = 0;
 
           /**
            * \brief Optimises the current mesh

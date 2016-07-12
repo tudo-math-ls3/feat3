@@ -117,7 +117,7 @@ namespace FEAT
         /// The FE space for the transformation, needed for filtering
         TrafoSpace* _trafo_space;
         /// Vector saving the cell sizes on the reference mesh
-        ScalarVectorType _cell_sizes;
+        ScalarVectorType _lambda;
         /// Assembler for Dirichlet boundary conditions
         std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>>* _dirichlet_asm;
         /// Assembler for slip boundary conditions
@@ -148,7 +148,7 @@ namespace FEAT
           sys_matrix(),
           _trafo(&(trafo_space_->get_trafo())),
           _trafo_space(trafo_space_),
-          _cell_sizes(rmn_->get_mesh()->get_num_entities(MeshType::shape_dim)),
+          _lambda(rmn_->get_mesh()->get_num_entities(MeshType::shape_dim)),
           _dirichlet_asm(dirichlet_asm_),
           _slip_asm(slip_asm_),
           _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
@@ -160,7 +160,7 @@ namespace FEAT
           sys_matrix(),
           _trafo(nullptr),
           _trafo_space(nullptr),
-          _cell_sizes(),
+          _lambda(),
           _dirichlet_asm(nullptr),
           _slip_asm(nullptr),
           _cubature_factory("auto-degree:"+stringify(int(_local_degree)))
@@ -171,7 +171,7 @@ namespace FEAT
           sys_matrix(std::move(other.sys_matrix)),
           _trafo(other._trafo),
           _trafo_space(other._trafo_space),
-          _cell_sizes(std::move(other._cell_sizes)),
+          _lambda(std::move(other._lambda)),
           _dirichlet_asm(other._dirichlet_asm),
           _slip_asm(other._slip_asm),
           _cubature_factory(other._cubature_factory)
@@ -195,7 +195,7 @@ namespace FEAT
           _trafo_space = nullptr;
           _dirichlet_asm = nullptr;
           _slip_asm = nullptr;
-          _cell_sizes.clear();
+          _lambda.clear();
         }
 
         /**
@@ -250,7 +250,7 @@ namespace FEAT
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
           {
-            _cell_sizes(cell, _trafo->template compute_vol<typename MeshType::ShapeType>(cell));
+            _lambda(cell, _trafo->template compute_vol<typename MeshType::ShapeType>(cell));
           }
 
           auto& dirichlet_filters = filter.template at<1>();
@@ -298,33 +298,58 @@ namespace FEAT
          * \returns The relative cell size quality indicator.
          *
          */
-        virtual CoordType compute_cell_size_quality() const override
+        virtual CoordType compute_cell_size_defect(CoordType& lambda_min, CoordType& lambda_max,
+        CoordType& vol_min, CoordType& vol_max) const override
         {
-          CoordType my_quality(0);
+          CoordType size_defect(0);
           CoordType vol(0);
+
+          lambda_min = Math::huge<CoordType>();
+          lambda_max = CoordType(0);
+          vol_min = Math::huge<CoordType>();
+          vol_max = CoordType(0);
 
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            vol += this->_trafo->template compute_vol<ShapeType, CoordType>(cell);
+            CoordType my_vol = this->_trafo->template compute_vol<ShapeType, CoordType>(cell);
+            vol_min = Math::min(vol_min, my_vol);
+            vol_max = Math::max(vol_min, my_vol);
+            vol += my_vol;
           }
 
 #ifdef FEAT_HAVE_MPI
           CoordType vol_snd(vol);
-          Util::Comm::allreduce(&vol_snd, &vol, 1, Util::CommOperationSum());
+          Util::Comm::allreduce(&vol_snd, &vol, Index(1), Util::CommOperationSum());
+
+          CoordType vol_min_snd(vol_min);
+          Util::Comm::allreduce(&vol_min_snd, &vol_min, Index(1), Util::CommOperationMin());
+
+          CoordType vol_max_snd(vol_max);
+          Util::Comm::allreduce(&vol_max_snd, &vol_max, Index(1), Util::CommOperationMax());
 #endif
+
+          vol_min /= vol;
+          vol_max /= vol;
+
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            my_quality += Math::abs(this->_trafo->template compute_vol<ShapeType, CoordType>(cell)/vol
-                - _cell_sizes(cell));
+            size_defect += Math::abs(this->_trafo->template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+            lambda_min = Math::min(lambda_min, this->_lambda(cell));
+            lambda_max = Math::max(lambda_max, this->_lambda(cell));
           }
 
 #ifdef FEAT_HAVE_MPI
-          CoordType quality_snd(my_quality);
-          Util::Comm::allreduce(&quality_snd, &vol, 1, Util::CommOperationSum());
-#endif
-          return my_quality;
-        }
+          CoordType size_defect_snd(size_defect);
+          Util::Comm::allreduce(&size_defect_snd, &size_defect, Index(1), Util::CommOperationSum());
 
+          CoordType lambda_min_snd(lambda_min);
+          Util::Comm::allreduce(&lambda_min_snd, &lambda_min, Index(1), Util::CommOperationMin());
+
+          CoordType lambda_max_snd(lambda_max);
+          Util::Comm::allreduce(&lambda_max_snd, &lambda_max, Index(1), Util::CommOperationMax());
+#endif
+          return size_defect;
+        }
 
         /**
          * \brief Checks if the functional is empty (= the null functional
