@@ -86,7 +86,7 @@ namespace FEAT
     class Communicator
     {
       public:
-        Communicator(MPI_Comm comm) :
+        explicit Communicator(MPI_Comm comm) :
           _comm(comm)
         {
         }
@@ -118,7 +118,7 @@ namespace FEAT
     class CommOperation
     {
       public:
-        CommOperation(MPI_Op op) :
+        explicit CommOperation(MPI_Op op) :
           _op(op)
       {
       }
@@ -135,7 +135,7 @@ namespace FEAT
     class CommOperationSum : public CommOperation
     {
       public:
-        CommOperationSum() :
+        explicit CommOperationSum() :
           CommOperation(MPI_SUM)
       {
       }
@@ -149,7 +149,7 @@ namespace FEAT
     class CommOperationMax : public CommOperation
     {
       public:
-        CommOperationMax() :
+        explicit CommOperationMax() :
           CommOperation(MPI_MAX)
       {
       }
@@ -163,7 +163,7 @@ namespace FEAT
     class CommOperationMin : public CommOperation
     {
       public:
-        CommOperationMin() :
+        explicit CommOperationMin() :
           CommOperation(MPI_MIN)
       {
       }
@@ -456,11 +456,10 @@ namespace FEAT
                 recvbuf, (int)num_elements_to_recv, MPIType<DataType2_>::value(), communicator.mpi_comm());
           }
 
-        ///TODO delegate Op to an MPI_Op resolver as in MPI_Type resolver
         template<typename DataType1_>
           static inline void allreduce(DataType1_ * sendbuf,
-              Index num_elements_to_send_and_receive,
               DataType1_ * recvbuf,
+              Index num_elements_to_send_and_receive,
               CommOperation op = CommOperationSum(),
               Communicator communicator = Communicator(MPI_COMM_WORLD))
           {
@@ -554,8 +553,8 @@ namespace FEAT
 
         template<typename DataType1_>
           static inline void iallreduce(DataType1_ * sendbuf,
-              Index num_elements_to_send_and_receive,
               DataType1_ * recvbuf,
+              Index num_elements_to_send_and_receive,
               CommRequest& r,
               CommOperation op = CommOperationSum(),
               Communicator communicator = Communicator(MPI_COMM_WORLD))
@@ -713,7 +712,7 @@ namespace FEAT
     class CommOperationSum : public CommOperation
     {
       public:
-        CommOperationSum() :
+        explicit CommOperationSum() :
           CommOperation(0)
       {
       }
@@ -722,7 +721,7 @@ namespace FEAT
     class CommOperationMax : public CommOperation
     {
       public:
-        CommOperationMax() :
+        explicit CommOperationMax() :
           CommOperation(0)
       {
       }
@@ -731,7 +730,7 @@ namespace FEAT
     class CommOperationMin : public CommOperation
     {
       public:
-        CommOperationMin() :
+        explicit CommOperationMin() :
           CommOperation(0)
       {
       }
@@ -834,15 +833,19 @@ namespace FEAT
           {
           }
 
-        /// \todo implement
         template<typename DataType1_, typename DataType2_>
-          static inline void scatter(DataType1_*,
-              Index,
-              DataType2_*,
-              Index,
+          static inline void scatter(DataType1_* sendbuf,
+              Index num_elements_to_send,
+              DataType2_* recvbuf,
+              Index num_elements_to_recv,
               Index,
               Communicator)
           {
+            XASSERT(num_elements_to_send == num_elements_to_recv);
+            for (Index i(0) ; i < num_elements_to_send ; ++i)
+            {
+              recvbuf[i] = sendbuf[i];
+            }
           }
 
         template<typename DataType1_, typename DataType2_>
@@ -890,8 +893,8 @@ namespace FEAT
 
         template<typename DataType1_>
           static inline void allreduce(DataType1_ * sendbuf,
-              Index num_elements_to_send_and_receive,
               DataType1_ * recvbuf,
+              Index num_elements_to_send_and_receive,
               CommOperation = CommOperation(0),
               Communicator = Communicator(0))
           {
@@ -903,8 +906,8 @@ namespace FEAT
 
         template<typename DataType1_>
           static inline void iallreduce(DataType1_ * sendbuf,
-              Index num_elements_to_send_and_receive,
               DataType1_ * recvbuf,
+              Index num_elements_to_send_and_receive,
               CommRequest&,
               CommOperation,
               Communicator)

@@ -222,7 +222,7 @@ namespace FEAT
         _plot = plot;
         Index send = (Index) _plot;
         Index result(0);
-        Util::Comm::allreduce(&send, 1, &result);
+        Util::Comm::allreduce(&send, &result, 1);
         _other_plot_def = result > 0;
       }
 

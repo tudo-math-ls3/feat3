@@ -608,7 +608,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
           CoordType vol_snd(vol);
-          Util::Comm::allreduce(&vol_snd, Index(1), &vol, MPI_SUM);
+          Util::Comm::allreduce(&vol_snd, &vol, 1, Util::CommOperationSum());
 #endif
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
@@ -617,7 +617,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
           CoordType quality_snd(my_quality);
-          Util::Comm::allreduce(&quality_snd, Index(1), &vol, MPI_SUM);
+          Util::Comm::allreduce(&quality_snd, &vol, 1, Util::CommOperationSum());
 #endif
           return my_quality;
         }
@@ -693,7 +693,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
           Index ncells_send(ncells);
-          Util::Comm::allreduce(&ncells_send, 1, &ncells, MPI_SUM);
+          Util::Comm::allreduce(&ncells_send, &ncells, 1, Util::CommOperationSum());
 #endif
           _mu.format(CoordType(1)/CoordType(ncells));
         }
@@ -730,7 +730,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
           CoordType sum_lambda_send(sum_lambda);
-          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
+          Util::Comm::allreduce(&sum_lambda_send, &sum_lambda, 1, Util::CommOperationSum());
 #endif
 
           _lambda.scale(_lambda, CoordType(1)/sum_lambda);
@@ -763,7 +763,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
           CoordType sum_lambda_send(sum_lambda);
-          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
+          Util::Comm::allreduce(&sum_lambda_send, &sum_lambda, 1, Util::CommOperationSum());
 #endif
           _lambda.scale(_lambda, CoordType(1)/sum_lambda);
 
@@ -800,7 +800,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
           CoordType sum_lambda_send(sum_lambda);
-          Util::Comm::allreduce(&sum_lambda_send, 1, &sum_lambda, MPI_SUM);
+          Util::Comm::allreduce(&sum_lambda_send, &sum_lambda, 1, Util::CommOperationSum());
 #endif
           _lambda.scale(_lambda, CoordType(1)/sum_lambda);
 

@@ -310,7 +310,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
           CoordType vol_snd(vol);
-          Util::Comm::allreduce(&vol_snd, Index(1), &vol, MPI_SUM);
+          Util::Comm::allreduce(&vol_snd, &vol, 1, Util::CommOperationSum());
 #endif
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
@@ -320,7 +320,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
           CoordType quality_snd(my_quality);
-          Util::Comm::allreduce(&quality_snd, Index(1), &vol, MPI_SUM);
+          Util::Comm::allreduce(&quality_snd, &vol, 1, Util::CommOperationSum());
 #endif
           return my_quality;
         }

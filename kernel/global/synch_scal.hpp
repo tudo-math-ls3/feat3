@@ -26,7 +26,7 @@ namespace FEAT
 
             auto ticket = std::make_shared<ScalTicket<DT_>>(x);
 
-            Util::Comm::iallreduce(&(ticket->x), Index(1), &(ticket->r), *ticket->req, op);
+            Util::Comm::iallreduce(&(ticket->x), &(ticket->r), 1, *ticket->req, op);
 
             TimeStamp ts_stop;
             Statistics::add_time_mpi_execute(ts_stop.elapsed(ts_start));

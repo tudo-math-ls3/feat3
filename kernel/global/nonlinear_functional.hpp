@@ -274,7 +274,7 @@ namespace FEAT
           DataType my_fval(_nonlinear_functional.compute_func());
 #ifdef FEAT_HAVE_MPI
           DataType my_fval_send(my_fval);
-          Util::Comm::allreduce(&my_fval_send, 1, &my_fval, MPI_SUM);
+          Util::Comm::allreduce(&my_fval_send, &my_fval, 1, Util::CommOperationSum());
 #endif
           return my_fval;
         }

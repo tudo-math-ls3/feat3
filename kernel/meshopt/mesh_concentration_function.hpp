@@ -404,7 +404,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_MPI
           CoordType sum_conc_snd(_sum_conc);
-          Util::Comm::allreduce(&sum_conc_snd, 1, &_sum_conc, MPI_SUM);
+          Util::Comm::allreduce(&sum_conc_snd, &_sum_conc, 1, Util::CommOperationSum());
 #endif
         }
 

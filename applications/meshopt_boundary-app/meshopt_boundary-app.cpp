@@ -90,7 +90,7 @@ struct MeshoptBoundaryApp
     Index ncells(dom_ctrl.get_levels().back()->get_mesh().get_num_entities(MeshType::shape_dim));
 #ifdef FEAT_HAVE_MPI
       Index my_cells(ncells);
-      Util::Comm::allreduce(&my_cells, Index(1), &ncells, MPI_SUM);
+      Util::Comm::allreduce(&my_cells, &ncells, 1, Util::CommOperationSum());
 #endif
 
     // Print level information
@@ -153,8 +153,8 @@ struct MeshoptBoundaryApp
         DT_ min_quality_snd(min_quality);
         DT_ min_angle_snd(min_angle);
 
-        Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
-        Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
+        Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+        Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
 #endif
         if(Util::Comm::rank() == 0)
           std::cout << "Pre: Level " << lvl_index << ": Quality indicator " << " " <<
@@ -214,8 +214,8 @@ struct MeshoptBoundaryApp
         DT_ min_quality_snd(min_quality);
         DT_ min_angle_snd(min_angle);
 
-        Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
-        Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
+        Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+        Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
 #endif
         if(Util::Comm::rank() == 0)
           std::cout << "Post: Level " << lvl_index << ": Quality indicator " << " " <<
@@ -343,8 +343,8 @@ struct MeshoptBoundaryApp
       DT_ min_quality_snd(min_quality);
       DT_ min_angle_snd(min_angle);
 
-      Util::Comm::allreduce(&min_quality_snd, Index(1), &min_quality, MPI_MIN);
-      Util::Comm::allreduce(&min_angle_snd, Index(1), &min_angle, MPI_MIN);
+      Util::Comm::allreduce(&min_quality_snd, &min_quality, 1, Util::CommOperationMin());
+      Util::Comm::allreduce(&min_angle_snd, &min_angle, 1, Util::CommOperationMin());
 #endif
       if(Util::Comm::rank() == 0)
         std::cout << "Quality indicator " << stringify_fp_sci(min_quality) <<

@@ -50,35 +50,35 @@ namespace FEAT
           Index cells_coarse_local = domain.get_levels().front()->get_mesh().get_num_entities(shape_dimension);
           Index cells_coarse_max;
           Index cells_coarse_min;
-          Util::Comm::allreduce(&cells_coarse_local, 1, &cells_coarse_max, Util::CommOperationMax());
-          Util::Comm::allreduce(&cells_coarse_local, 1, &cells_coarse_min, Util::CommOperationMin());
+          Util::Comm::allreduce(&cells_coarse_local, &cells_coarse_max, 1, Util::CommOperationMax());
+          Util::Comm::allreduce(&cells_coarse_local, &cells_coarse_min, 1, Util::CommOperationMin());
           Index cells_fine_local = domain.get_levels().back()->get_mesh().get_num_entities(shape_dimension);
           Index cells_fine_max;
           Index cells_fine_min;
-          Util::Comm::allreduce(&cells_fine_local, 1, &cells_fine_max, Util::CommOperationMax());
-          Util::Comm::allreduce(&cells_fine_local, 1, &cells_fine_min, Util::CommOperationMin());
+          Util::Comm::allreduce(&cells_fine_local, &cells_fine_max, 1, Util::CommOperationMax());
+          Util::Comm::allreduce(&cells_fine_local, &cells_fine_min, 1, Util::CommOperationMin());
 
           Index dofs_coarse_local = system_levels.front()->matrix_sys.columns();
           Index dofs_coarse_max;
           Index dofs_coarse_min;
-          Util::Comm::allreduce(&dofs_coarse_local, 1, &dofs_coarse_max, Util::CommOperationMax());
-          Util::Comm::allreduce(&dofs_coarse_local, 1, &dofs_coarse_min, Util::CommOperationMin());
+          Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_max, 1, Util::CommOperationMax());
+          Util::Comm::allreduce(&dofs_coarse_local, &dofs_coarse_min, 1, Util::CommOperationMin());
           Index dofs_fine_local = system_levels.back()->matrix_sys.columns();
           Index dofs_fine_max;
           Index dofs_fine_min;
-          Util::Comm::allreduce(&dofs_fine_local, 1, &dofs_fine_max, Util::CommOperationMax());
-          Util::Comm::allreduce(&dofs_fine_local, 1, &dofs_fine_min, Util::CommOperationMin());
+          Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_max, 1, Util::CommOperationMax());
+          Util::Comm::allreduce(&dofs_fine_local, &dofs_fine_min, 1, Util::CommOperationMin());
 
           Index nzes_coarse_local = system_levels.front()->matrix_sys.used_elements();
           Index nzes_coarse_max;
           Index nzes_coarse_min;
-          Util::Comm::allreduce(&nzes_coarse_local, 1, &nzes_coarse_max, Util::CommOperationMax());
-          Util::Comm::allreduce(&nzes_coarse_local, 1, &nzes_coarse_min, Util::CommOperationMin());
+          Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_max, 1, Util::CommOperationMax());
+          Util::Comm::allreduce(&nzes_coarse_local, &nzes_coarse_min, 1, Util::CommOperationMin());
           Index nzes_fine_local = system_levels.back()->matrix_sys.used_elements();
           Index nzes_fine_max;
           Index nzes_fine_min;
-          Util::Comm::allreduce(&nzes_fine_local, 1, &nzes_fine_max, Util::CommOperationMax());
-          Util::Comm::allreduce(&nzes_fine_local, 1, &nzes_fine_min, Util::CommOperationMin());
+          Util::Comm::allreduce(&nzes_fine_local, &nzes_fine_max, 1, Util::CommOperationMax());
+          Util::Comm::allreduce(&nzes_fine_local, &nzes_fine_min, 1, Util::CommOperationMin());
 
           if (rank == 0 && statistics_check >= 0)
           {
