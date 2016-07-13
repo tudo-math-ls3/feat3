@@ -3,6 +3,9 @@
 #define KERNEL_UTIL_COMM_BASE_HPP 1
 
 #include<kernel/base_header.hpp>
+#include<kernel/util/time_stamp.hpp>
+#include<kernel/util/statistics.hpp>
+#include<kernel/util/assertion.hpp>
 
 #include<iostream> // for std::istream
 #include<cstring>  // for std::strcpy
@@ -10,8 +13,6 @@
 #ifdef FEAT_HAVE_MPI
 #include<mpi.h>
 #include<memory>
-#include<kernel/util/time_stamp.hpp>
-#include<kernel/util/statistics.hpp>
 
 namespace FEAT
 {
@@ -672,8 +673,6 @@ namespace FEAT
 
           return Index(r);
         }
-
-        //TODO
     };
   }
 }
@@ -835,6 +834,7 @@ namespace FEAT
           {
           }
 
+        /// \todo implement
         template<typename DataType1_, typename DataType2_>
           static inline void scatter(DataType1_*,
               Index,
@@ -846,52 +846,73 @@ namespace FEAT
           }
 
         template<typename DataType1_, typename DataType2_>
-          static inline void gather(DataType1_*,
-              Index,
-              DataType2_*,
-              Index,
+          static inline void gather(DataType1_ * sendbuf,
+              Index num_elements_to_send,
+              DataType2_ * recvbuf,
+              Index num_elements_to_recv,
               Index,
               Communicator)
           {
+            XASSERT(num_elements_to_send == num_elements_to_recv);
+            for (Index i(0) ; i < num_elements_to_send ; ++i)
+            {
+              recvbuf[i] = sendbuf[i];
+            }
           }
 
         template<typename DataType_>
-          static inline void reduce(DataType_*,
-              DataType_*,
-              Index,
+          static inline void reduce(DataType_ * sendbuf,
+              DataType_ * recvbuf,
+              Index num_elements_to_send,
               CommOperation,
               Index,
               Communicator)
           {
+            for (Index i(0) ; i < num_elements_to_send ; ++i)
+            {
+              recvbuf[i] = sendbuf[i];
+            }
           }
 
         template<typename DataType1_, typename DataType2_>
-          static inline void allgather(DataType1_*,
-              Index,
-              DataType2_*,
-              Index,
+          static inline void allgather(DataType1_ * sendbuf,
+              Index num_elements_to_send,
+              DataType2_ * recvbuf,
+              Index num_elements_to_recv,
               Communicator)
           {
+            XASSERT(num_elements_to_send == num_elements_to_recv);
+            for (Index i(0) ; i < num_elements_to_send ; ++i)
+            {
+              recvbuf[i] = sendbuf[i];
+            }
           }
 
-        ///TODO delegate Op to an MPI_Op resolver as in MPI_Type resolver
         template<typename DataType1_>
-          static inline void allreduce(DataType1_*,
-              Index,
-              DataType1_*,
+          static inline void allreduce(DataType1_ * sendbuf,
+              Index num_elements_to_send_and_receive,
+              DataType1_ * recvbuf,
               CommOperation = CommOperation(0),
               Communicator = Communicator(0))
           {
+            for (Index i(0) ; i < num_elements_to_send_and_receive ; ++i)
+            {
+              recvbuf[i] = sendbuf[i];
+            }
           }
 
         template<typename DataType1_>
-          static inline void iallreduce(DataType1_ *,
-              Index,
-              DataType1_ *,
+          static inline void iallreduce(DataType1_ * sendbuf,
+              Index num_elements_to_send_and_receive,
+              DataType1_ * recvbuf,
               CommRequest&,
               CommOperation,
               Communicator)
           {
+            for (Index i(0) ; i < num_elements_to_send_and_receive ; ++i)
+            {
+              recvbuf[i] = sendbuf[i];
+            }
           }
 
         static inline void wait(CommRequest&, CommStatus&)
