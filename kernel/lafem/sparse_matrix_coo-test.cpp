@@ -235,8 +235,14 @@ public:
 
       a.apply(r, x);
       result_local.copy(r);
-      a.apply(ref, x);
-      ref_local.copy(ref);
+
+      ref_local.format();
+      for (Index i(0) ; i < a_local.used_elements() ; ++i)
+      {
+        DT_ t = ref_local(a_local.row_indices()[i]);
+        t += a_local.val()[i] * x_local(a_local.column_indices()[i]);
+        ref_local(a_local.row_indices()[i], t);
+      }
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 5e-2);
     }

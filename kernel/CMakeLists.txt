@@ -55,7 +55,6 @@ if (FEAT_HAVE_QUADMATH)
   TARGET_LINK_LIBRARIES (feat -lquadmath)
 endif (FEAT_HAVE_QUADMATH)
 
-
 # list of kernel tests
 SET (test_list
   shape-test

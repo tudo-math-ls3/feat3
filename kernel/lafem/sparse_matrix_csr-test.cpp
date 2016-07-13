@@ -343,8 +343,7 @@ public:
 
       a.apply(r, x);
       result_local.copy(r);
-      a.apply(ref, x);
-      ref_local.copy(ref);
+      a_local.apply(ref_local, x_local);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
     }

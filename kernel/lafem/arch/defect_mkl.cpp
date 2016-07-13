@@ -1,4 +1,6 @@
 // includes, FEAT
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/defect.hpp>
 
 #include <mkl.h>
@@ -168,13 +170,13 @@ void Defect<Mem::Main>::dense_mkl(float * r, const float * const rhs, const floa
 
   if (r == rhs)
   {
-    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
   }
   else
   {
     MKL_INT one = 1;
     scopy(&mrows, (float*)rhs, &one, r, &one);
-    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
   }
 }
 
@@ -187,12 +189,12 @@ void Defect<Mem::Main>::dense_mkl(double * r, const double * const rhs, const do
 
   if (r == rhs)
   {
-    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
   }
   else
   {
     MKL_INT one = 1;
     dcopy(&mrows, (double*)rhs, &one, r, &one);
-    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
   }
 }

@@ -1,4 +1,6 @@
 // includes, FEAT
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 
 #include <cstring>
@@ -206,13 +208,13 @@ void Axpy<Mem::Main>::dense_mkl(float * r, const float alpha, const float * cons
 
   if (r == y)
   {
-    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
   }
   else
   {
     MKL_INT one = 1;
     scopy(&mrows, (float*)y, &one, r, &one);
-    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+    cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
   }
 }
 
@@ -224,12 +226,12 @@ void Axpy<Mem::Main>::dense_mkl(double * r, const double alpha, const double * c
 
   if (r == y)
   {
-    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
   }
   else
   {
     MKL_INT one = 1;
     dcopy(&mrows, (double*)y, &one, r, &one);
-    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
   }
 }

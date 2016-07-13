@@ -19,6 +19,7 @@ SET (kernel-lafem-arch-list
   lumping_generic.cpp
   max_element_generic.cpp
   norm_generic.cpp
+  product_matmat_generic.cpp
   product_matvec_generic.cpp
   product_matvec_generic_ell.cpp
   product_matvec_generic_banded.cpp
@@ -41,11 +42,13 @@ if (FEAT_HAVE_MKL)
     dot_product_mkl.cpp
     max_element_mkl.cpp
     norm_mkl.cpp
+    product_matmat_mkl.cpp
     product_matvec_mkl.cpp
     scale_mkl.cpp
     sum_mkl.cpp
   )
 endif(FEAT_HAVE_MKL)
+
 
 ADD_LIBRARY(kernel-lafem-arch STATIC ${kernel-lafem-arch-list})
 if (FEAT_COTIRE)
@@ -70,6 +73,7 @@ if (FEAT_HAVE_CUDA)
     lumping.cu
     max_element.cu
     norm.cu
+    product_matmat.cu
     product_matvec.cu
     scale.cu
     scale_row_col.cu

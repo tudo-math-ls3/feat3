@@ -6,6 +6,7 @@
 #include <kernel/util/memory_pool.hpp>
 
 #include "cusparse_v2.h"
+#include "cublas_v2.h"
 
 namespace FEAT
 {
@@ -216,7 +217,7 @@ namespace FEAT
         cublasStatus_t status;
         const float one(1.);
         const float zero(0.);
-        status = cublasSgemv(Util::Intern::cublas_handle, trans, m, n, &one, val, m, x, 1, &zero, r, 1);
+        status = cublasSgemv(Util::Intern::cublas_handle, trans, n, m, &one, val, n, x, 1, &zero, r, 1);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasSgemv failed with status code: " + stringify(status));
       }
@@ -229,7 +230,7 @@ namespace FEAT
         cublasStatus_t status;
         const double one(1.);
         const double zero(0.);
-        status = cublasDgemv(Util::Intern::cublas_handle, trans, m, n, &one, val, m, x, 1, &zero, r, 1);
+        status = cublasDgemv(Util::Intern::cublas_handle, trans, n, m, &one, val, n, x, 1, &zero, r, 1);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDgemv failed with status code: " + stringify(status));
       }
@@ -355,7 +356,7 @@ template void ProductMatVec<Mem::CUDA>::banded(double *, const double * const, c
 template <typename DT_>
 void ProductMatVec<Mem::CUDA>::dense(DT_ * r, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
 {
-  FEAT::LAFEM::Intern::cublas_product_matvec_dense(CUBLAS_OP_N, (int)rows, (int)columns, val, x, r);
+  FEAT::LAFEM::Intern::cublas_product_matvec_dense(CUBLAS_OP_T, (int)rows, (int)columns, val, x, r);
 
 #ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();

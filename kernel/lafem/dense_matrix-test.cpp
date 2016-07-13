@@ -110,96 +110,185 @@ public:
 
   virtual void run() const override
   {
-    DT_ s(DT_(4711.1));
-    for (Index size(1) ; size < 1e3 ; size*=2)
+    DT_ s(DT_(0.123));
+    for (Index size(1) ; size < 100 ; size*=2)
     {
-      DenseMatrix<Mem::Main, DT_, IT_> a_local(size, size, DT_(0));
-      DenseVector<Mem::Main, DT_, IT_> x_local(size);
+      DenseMatrix<Mem::Main, DT_, IT_> a_local(size, size + 1, DT_(0));
+      DenseVector<Mem::Main, DT_, IT_> x_local(size + 1);
+
       DenseVector<Mem::Main, DT_, IT_> y_local(size);
       DenseVector<Mem::Main, DT_, IT_> ref_local(size);
       DenseVector<Mem_, DT_, IT_> ref(size);
       DenseVector<Mem::Main, DT_, IT_> result_local(size);
-      for (Index i(0) ; i < size ; ++i)
+
+      for (Index i(0) ; i < x_local.size() ; ++i)
       {
-        x_local(i, DT_(i % 100 * DT_(1.234)));
-        y_local(i, DT_(2 - DT_(i % 42)));
+        x_local(i, DT_(DT_(1) / (DT_(1) + DT_(i % 100) * DT_(1.234))));
       }
-      DenseVector<Mem_, DT_, IT_> x(size);
+      for (Index i(0) ; i < y_local.size() ; ++i)
+      {
+        y_local(i, DT_(DT_(2) - DT_(i % 42)));
+      }
+      DenseVector<Mem_, DT_, IT_> x(x_local.size());
       x.copy(x_local);
-      DenseVector<Mem_, DT_, IT_> y(size);
+      DenseVector<Mem_, DT_, IT_> y(y_local.size());
       y.copy(y_local);
 
-      Index ue(0);
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      for (Index i(0) ; i < a_local.size() ; ++i)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
-        {
-          if(row == col)
-          {
-            a_local(row, col, DT_(2));
-            ++ue;
-          }
-          else if((row == col+1) || (row+1 == col))
-          {
-            a_local(row, col, DT_(-1));
-            ++ue;
-          }
-        }
+        a_local.elements()[i] = DT_(DT_(i % 100) * DT_(1.234));
       }
       DenseMatrix<Mem_, DT_, IT_> a(a_local.rows(), a_local.columns());
       a.copy(a_local);
 
-      DenseVector<Mem_, DT_, IT_> r(size);
+      DenseVector<Mem_, DT_, IT_> r(result_local.size());
 
       // apply-test for alpha = 0.0
       a.apply(r, x, y, DT_(0.0));
-      for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), r(i), _eps);
-
-      // apply-test for alpha = -1.0
-      a.apply(r, x, y, DT_(-1.0));
-      a.apply(ref, x);
-      ref.scale(ref, DT_(-1.0));
-      ref.axpy(ref, y);
-
-      for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(ref(i), r(i), _eps);
-
-      // apply-test for alpha = 4711.1
-      //r.axpy(s, a, x, y);
-      a.apply(r, x, y, s);
       result_local.copy(r);
-
-      //ref.product_matvec(a, x);
-      a.apply(ref, x);
-      ref.scale(ref, s);
-      ref.axpy(ref, y);
-      ref_local.copy(ref);
-
-      for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), _eps);
+      for (Index i(0) ; i < r.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(y_local(i), result_local(i), _eps);
 
       a.apply(r, x);
       result_local.copy(r);
+      for (Index i(0) ; i < a_local.rows() ; ++i)
+      {
+        DT_ sum(0);
+        for (Index j(0) ; j < a_local.columns() ; ++j)
+        {
+          sum += a_local(i, j) * x_local(j);
+        }
+        ref_local(i, sum);
+      }
+      for (Index i(0) ; i < r.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), _eps);
+
+      // apply-test for alpha = -1.0
+      a.apply(r, x, y, DT_(-1.0));
+      result_local.copy(r);
+      for (Index i(0) ; i < a_local.rows() ; ++i)
+      {
+        DT_ sum(0);
+        for (Index j(0) ; j < a_local.columns() ; ++j)
+        {
+          sum += a_local(i, j) * x_local(j);
+        }
+        ref_local(i, y(i) - sum);
+      }
+
+      for (Index i(0) ; i < r.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), _eps);
+
+      // apply-test for s = 0.123
+      a.apply(r, x, y, s);
+      result_local.copy(r);
+
       a.apply(ref, x);
+      ref.axpy(ref, y, s);
       ref_local.copy(ref);
-      for (Index i(0) ; i < size ; ++i)
+
+      for (Index i(0) ; i < r.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), _eps);
     }
   }
 };
 
-DenseMatrixApplyTest<Mem::Main, float, unsigned int> dense_matrix_apply_test_float_uint(1e-4);
-DenseMatrixApplyTest<Mem::Main, double, unsigned int> dense_matrix_apply_test_double_uint(1e-6);
-DenseMatrixApplyTest<Mem::Main, float, unsigned long> dense_matrix_apply_test_float_ulong(1e-4);
-DenseMatrixApplyTest<Mem::Main, double, unsigned long> dense_matrix_apply_test_double_ulong(1e-6);
+DenseMatrixApplyTest<Mem::Main, float, unsigned int> dense_matrix_apply_test_float_uint(1e-3);
+DenseMatrixApplyTest<Mem::Main, double, unsigned int> dense_matrix_apply_test_double_uint(1e-5);
+DenseMatrixApplyTest<Mem::Main, float, unsigned long> dense_matrix_apply_test_float_ulong(1e-3);
+DenseMatrixApplyTest<Mem::Main, double, unsigned long> dense_matrix_apply_test_double_ulong(1e-5);
 #ifdef FEAT_HAVE_QUADMATH
 DenseMatrixApplyTest<Mem::Main, __float128, unsigned int> dense_matrix_apply_test_float128_uint(1e-6);
 DenseMatrixApplyTest<Mem::Main, __float128, unsigned long> dense_matrix_apply_test_float128_ulong(1e-6);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixApplyTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_apply_test_float_uint(1e-1);
-DenseMatrixApplyTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_apply_test_double_uint(1e-6);
-DenseMatrixApplyTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_apply_test_float_ulong(1e-1);
-DenseMatrixApplyTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_apply_test_double_ulong(1e-6);
+DenseMatrixApplyTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_apply_test_float_uint(1e-2);
+DenseMatrixApplyTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_apply_test_double_uint(1e-4);
+DenseMatrixApplyTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_apply_test_float_ulong(1e-2);
+DenseMatrixApplyTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_apply_test_double_ulong(1e-4);
+#endif
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class DenseMatrixMultiplyTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+  double _eps;
+
+  DenseMatrixMultiplyTest(double eps)
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixMultiplyTest"),
+    _eps(eps)
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(1) ; size < 100 ; size*=2)
+    {
+      /*DenseMatrix<Mem::Main, DT_, IT_> x_local(size, size, DT_(0));
+      DenseMatrix<Mem::Main, DT_, IT_> y_local(size, size, DT_(0));
+      DenseMatrix<Mem::Main, DT_, IT_> ref_local(size, size, DT_(4711));
+      DenseMatrix<Mem::Main, DT_, IT_> result_local(size, size, DT_(0));
+      DenseMatrix<Mem_, DT_, IT_> result(size, size, DT_(1234));*/
+
+      DenseMatrix<Mem::Main, DT_, IT_> x_local(size, size+2, DT_(0));
+      DenseMatrix<Mem::Main, DT_, IT_> y_local(size+2, size+1, DT_(0));
+      DenseMatrix<Mem::Main, DT_, IT_> ref_local(size, size+1, DT_(4711));
+      DenseMatrix<Mem::Main, DT_, IT_> result_local(size, size+1, DT_(0));
+      DenseMatrix<Mem_, DT_, IT_> result(size, size+1, DT_(1234));
+
+      for (Index i(0) ; i < x_local.size() ; ++i)
+      {
+        x_local.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
+      }
+      for (Index i(0) ; i < y_local.size() ; ++i)
+      {
+        y_local.elements()[i] = DT_(1) / (DT_(1) + DT_(i % 42));
+      }
+      DenseMatrix<Mem_, DT_, IT_> x(x_local.rows(), x_local.columns());
+      DenseMatrix<Mem_, DT_, IT_> y(y_local.rows(), y_local.columns());
+      x.copy(x_local);
+      y.copy(y_local);
+
+      for (Index i(0) ; i < result_local.rows() ; ++i)
+      {
+        for (Index k(0) ; k < result_local.columns() ; ++k)
+        {
+          DT_ sum(0);
+          for (Index j(0) ; j < x_local.columns() ; ++j)
+          {
+            sum += x_local(i, j) * y_local(j, k);
+          }
+          ref_local(i, k, sum);
+        }
+      }
+
+      result.multiply(x, y);
+      result_local.copy(result);
+
+      for (Index i(0) ; i < result.rows() ; ++i)
+      {
+        for (Index j(0) ; j < result.columns() ; ++j)
+          TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i, j), ref_local(i, j), _eps);
+      }
+    }
+  }
+};
+
+DenseMatrixMultiplyTest<Mem::Main, float, unsigned int> dense_matrix_multiply_test_float_uint(1e-3);
+DenseMatrixMultiplyTest<Mem::Main, double, unsigned int> dense_matrix_multiply_test_double_uint(1e-6);
+DenseMatrixMultiplyTest<Mem::Main, float, unsigned long> dense_matrix_multiply_test_float_ulong(1e-3);
+DenseMatrixMultiplyTest<Mem::Main, double, unsigned long> dense_matrix_multiply_test_double_ulong(1e-6);
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixMultiplyTest<Mem::Main, __float128, unsigned int> dense_matrix_multiply_test_float128_uint(1e-6);
+DenseMatrixMultiplyTest<Mem::Main, __float128, unsigned long> dense_matrix_multiply_test_float128_ulong(1e-6);
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixMultiplyTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_multiply_test_float_uint(1e-1);
+DenseMatrixMultiplyTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_multiply_test_double_uint(1e-6);
+DenseMatrixMultiplyTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_multiply_test_float_ulong(1e-1);
+DenseMatrixMultiplyTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_multiply_test_double_ulong(1e-6);
 #endif

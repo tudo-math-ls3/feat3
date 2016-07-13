@@ -1,7 +1,9 @@
 // includes, FEAT
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/scale.hpp>
-#include <cstring>
 
+#include <cstring>
 #include <mkl.h>
 
 using namespace FEAT;

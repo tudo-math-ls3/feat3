@@ -1,4 +1,6 @@
 // includes, FEAT
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/norm.hpp>
 
 #include <mkl.h>

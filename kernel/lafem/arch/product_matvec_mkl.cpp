@@ -1,4 +1,6 @@
 // includes, FEAT
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 
 #include <mkl.h>
@@ -61,7 +63,7 @@ void ProductMatVec<Mem::Main>::dense_mkl(float * r, const float * const val, con
   float alpha = 1.;
   float beta = 0.;
 
-  cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  cblas_sgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
 }
 
 void ProductMatVec<Mem::Main>::dense_mkl(double * r, const double * const val, const double * const x, const Index rows, const Index columns)
@@ -71,5 +73,5 @@ void ProductMatVec<Mem::Main>::dense_mkl(double * r, const double * const val, c
   double alpha = 1.;
   double beta = 0.;
 
-  cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mrows, x, 1, beta, r, 1);
+  cblas_dgemv(CblasRowMajor, CblasNoTrans, mrows, mcolumns, alpha, val, mcolumns, x, 1, beta, r, 1);
 }

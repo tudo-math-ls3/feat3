@@ -11,6 +11,7 @@
 #include <kernel/lafem/arch/norm.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
+#include <kernel/lafem/arch/product_matmat.hpp>
 #include <kernel/lafem/arch/defect.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 
@@ -420,6 +421,17 @@ namespace FEAT
           Arch::Axpy<Mem_>::dense(r.elements(), alpha, y.elements(), this->elements(),
                                   x.elements(), this->rows(), this->columns());
         }
+      }
+
+      void multiply(DenseMatrix & x, DenseMatrix & y)
+      {
+        XASSERTM(x.columns() == y.rows(), "dimension missmatch!");
+        XASSERTM(this->rows() == x.rows(), "dimension missmatch!");
+        XASSERTM(this->columns() == y.columns(), "dimension missmatch!");
+
+        Arch::ProductMatMat<Mem_>::dense(this->elements(), x.elements(),
+                                         y.elements(), this->rows(), this->columns(), x.columns());
+
       }
       ///@}
 

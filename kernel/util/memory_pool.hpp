@@ -14,6 +14,10 @@
 #include <cstdio>
 #include <cstddef>
 
+#ifdef FEAT_HAVE_MKL
+#include <mkl.h>
+#endif
+
 #ifdef __CUDACC__
 #include "cusparse_v2.h"
 #include <cublas_v2.h>
@@ -146,6 +150,10 @@ namespace FEAT
             std::cout << stderr << " Error: MemoryPool<CPU> still contains memory chunks on deconstructor call" << std::endl;
             std::exit(1);
           }
+
+#ifdef FEAT_HAVE_MKL
+          mkl_free_buffers();
+#endif
         }
 
         /// allocate new memory

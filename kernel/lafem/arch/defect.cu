@@ -147,7 +147,7 @@ namespace FEAT
                                        const float * x, const float * beta, float * y)
       {
         cublasStatus_t status;
-        status = cublasSgemv(Util::Intern::cublas_handle, trans, m, n, alpha, val, m, x, 1, beta, y, 1);
+        status = cublasSgemv(Util::Intern::cublas_handle, trans, n, m, alpha, val, n, x, 1, beta, y, 1);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasSgemv failed with status code: " + stringify(status));
       }
@@ -159,7 +159,7 @@ namespace FEAT
                                        const double * x, const double * beta, double * y)
       {
         cublasStatus_t status;
-        status = cublasDgemv(Util::Intern::cublas_handle, trans, m, n, alpha, val, m, x, 1, beta, y, 1);
+        status = cublasDgemv(Util::Intern::cublas_handle, trans, n, m, alpha, val, n, x, 1, beta, y, 1);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDgemv failed with status code: " + stringify(status));
       }
@@ -328,7 +328,7 @@ void Defect<Mem::CUDA>::dense(DT_ * r, const DT_ * const rhs, const DT_ * const 
   {
     cudaMemcpy(r, rhs, rows * sizeof(DT_), cudaMemcpyDeviceToDevice);
     DT_ one(1);
-    FEAT::LAFEM::Intern::cublas_defect_dense(CUBLAS_OP_N, (int)rows, (int)columns, &a, val, x, &one, r);
+    FEAT::LAFEM::Intern::cublas_defect_dense(CUBLAS_OP_T, (int)rows, (int)columns, &a, val, x, &one, r);
   }
 
 #ifdef FEAT_DEBUG_MODE
