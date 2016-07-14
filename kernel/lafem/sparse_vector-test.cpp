@@ -51,7 +51,9 @@ public:
     TEST_CHECK_EQUAL(a(5), DT_(6));
     TEST_CHECK_EQUAL(a(6), DT_(8));
 
-    Random rng;
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    std::cout << "seed: " << seed << std::endl;
+    Random rng(seed);
     Adjacency::Permutation prm_rnd(a.size(), rng);
     SparseVector<Mem_, DT_, IT_> ap(a.clone());
     ap.permute(prm_rnd);

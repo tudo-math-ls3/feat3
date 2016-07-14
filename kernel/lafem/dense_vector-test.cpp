@@ -111,7 +111,9 @@ public:
     DenseVector<Mem_, DT_, IT_> ap(a.clone());
     Adjacency::Permutation prm_nil;
     ap.permute(prm_nil);
-    Random rng;
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    std::cout << "seed: " << seed << std::endl;
+    Random rng(seed);
     Adjacency::Permutation prm_rnd(a.size(), rng);
     ap.permute(prm_rnd);
     prm_rnd = prm_rnd.inverse();
@@ -689,7 +691,9 @@ public:
 
       DenseVector<Mem_, DT_, IT_> a;
       a.convert(a_local);
-      Random rng;
+      Random::SeedType seed(Random::SeedType(time(nullptr)));
+      std::cout << "seed: " << seed << std::endl;
+      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 

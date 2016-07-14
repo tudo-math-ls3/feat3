@@ -89,5 +89,34 @@ public:
       // test bool extraction
       testb(rng);
     }
+
+    // create time seeded RNG
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    std::cout << "seed: " << seed << std::endl;
+    Random rngt(seed);
+
+    // test 10 times
+    for(int i(0); i < 10; ++i)
+    {
+      // test signed int generations
+      testi(rngt, std::int8_t(-71), std::int8_t(39));
+      testi(rngt, std::int16_t(-11549), std::int16_t(17537));
+      testi(rngt, std::int32_t(-715823882), std::int32_t(1431651765));
+      testi(rngt, std::int64_t(-715823882), std::int64_t(1431655765));
+
+      // test unsigned int generations
+      testi(rngt, std::uint8_t(20u), std::uint8_t(190u));
+      testi(rngt, std::uint16_t(300u), std::uint16_t(57000u));
+      testi(rngt, std::uint32_t(5000u), std::uint32_t(3894167296u));
+      testi(rngt, std::uint64_t(70000u), std::uint64_t(13446744073709551616ull));
+
+      // test float extractions
+      testf(rngt, 0.707f, 3.14f); // float
+      testf(rngt, 0.707107, 3.14159265); // double
+      testf(rngt, 0.707107l, 3.14159265l); // long double
+
+      // test bool extraction
+      testb(rngt);
+    }
   }
 } random_test;

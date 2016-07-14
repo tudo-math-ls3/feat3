@@ -37,7 +37,9 @@ public:
     MatrixType d = a.clone();
 
     // fill a, b and d with random values
-    Random rng;
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    std::cout << "seed: " << seed << std::endl;
+    Random rng(seed);
     for(Index i(0); i < a.used_elements(); ++i)
     {
       a.val()[i] = DT_(rng(0.0, 1.0));
