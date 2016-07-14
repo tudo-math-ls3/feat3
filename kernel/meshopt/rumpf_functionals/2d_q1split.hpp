@@ -198,7 +198,7 @@ namespace FEAT
          */
         void NOINLINE add_grad_h_part(Tx& grad, const Tx& x, const Th& h, const Tgradh& grad_h)
         {
-          static constexpr DataType fac_perm = DataType(1)/DataType(n_perms);
+          static const DataType fac_perm = DataType(1)/DataType(n_perms);
           // Compute rescaled h for the split
           _hsplit = h;
 
