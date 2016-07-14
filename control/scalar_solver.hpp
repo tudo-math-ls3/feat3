@@ -490,7 +490,7 @@ namespace FEAT
         }
 
         /// Retrieve transfer_levels_solve
-        std::deque<TransferLevelTypeSolve*> & get_trasnfer_levels_solve()
+        std::deque<TransferLevelTypeSolve*> & get_transfer_levels_solve()
         {
           return _transfer_levels_solve;
         }
