@@ -61,8 +61,11 @@ namespace FEAT
       /// global time of execution for mpi related operations, e.g. send/recv or gather/scatter
       static KahanAccumulation _time_mpi_execute;
 
-      /// global time of execution for mpi related idle/wait tasks
-      static KahanAccumulation _time_mpi_wait;
+      /// global time of execution for mpi related idle/wait tasks of reduction operations
+      static KahanAccumulation _time_mpi_wait_reduction;
+
+      /// global time of execution for mpi related idle/wait tasks of spmv operations
+      static KahanAccumulation _time_mpi_wait_spmv;
 
       /// map of SolverStatistics and their corresponding solver name
       static std::map<FEAT::String, SolverStatistics> _solver_statistics;
@@ -186,9 +189,13 @@ namespace FEAT
       {
         _time_mpi_execute = KahanSum(_time_mpi_execute, seconds);
       }
-      inline static void add_time_mpi_wait(double seconds)
+      inline static void add_time_mpi_wait_reduction(double seconds)
       {
-        _time_mpi_wait = KahanSum(_time_mpi_wait, seconds);
+        _time_mpi_wait_reduction = KahanSum(_time_mpi_wait_reduction, seconds);
+      }
+      inline static void add_time_mpi_wait_spmv(double seconds)
+      {
+        _time_mpi_wait_spmv = KahanSum(_time_mpi_wait_spmv, seconds);
       }
 
       inline static double get_time_reduction()
@@ -211,9 +218,13 @@ namespace FEAT
       {
         return _time_mpi_execute.sum;
       }
-      inline static double get_time_mpi_wait()
+      inline static double get_time_mpi_wait_reduction()
       {
-        return _time_mpi_wait.sum;
+        return _time_mpi_wait_reduction.sum;
+      }
+      inline static double get_time_mpi_wait_spmv()
+      {
+        return _time_mpi_wait_spmv.sum;
       }
 
       /// add toe statistics entry for specific solver (branch name)
@@ -359,8 +370,10 @@ namespace FEAT
         _time_precon.correction = 0.;
         _time_mpi_execute.sum = 0.;
         _time_mpi_execute.correction = 0.;
-        _time_mpi_wait.sum = 0.;
-        _time_mpi_wait.correction = 0.;
+        _time_mpi_wait_reduction.sum = 0.;
+        _time_mpi_wait_reduction.correction = 0.;
+        _time_mpi_wait_spmv.sum = 0.;
+        _time_mpi_wait_spmv.correction = 0.;
       }
 
       static void write_out_solver_statistics_scheduled(Index rank, size_t la_bytes, size_t domain_bytes, size_t mpi_bytes, Index cells, Index dofs, Index nzes, String filename = "solver_stats");
@@ -397,7 +410,8 @@ namespace FEAT
         file << "spmv " << stringify(get_time_spmv()) << std::endl;
         file << "precon " << stringify(get_time_precon()) << std::endl;
         file << "mpi " << stringify(get_time_mpi_execute()) << std::endl;
-        file << "wait " << stringify(get_time_mpi_wait()) << std::endl;
+        file << "wait reduction" << stringify(get_time_mpi_wait_reduction()) << std::endl;
+        file << "wait spmv" << stringify(get_time_mpi_wait_spmv()) << std::endl;
 
         file << std::endl;
 

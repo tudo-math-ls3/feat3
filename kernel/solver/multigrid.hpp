@@ -1422,7 +1422,8 @@ namespace FEAT
         // process the coarse grid level
         TimeStamp at;
         double mpi_exec_start(Statistics::get_time_mpi_execute());
-        double mpi_wait_start(Statistics::get_time_mpi_wait());
+        double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
+        double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
 
         // get the coarse level info
         LevelInfo& lvl_crs = _hierarchy->_get_level_info(_crs_level);
@@ -1451,9 +1452,10 @@ namespace FEAT
         TimeStamp bt;
         _toes.at(std::size_t(_crs_level)) = bt.elapsed(at);
         double mpi_exec_stop(Statistics::get_time_mpi_execute());
-        double mpi_wait_stop(Statistics::get_time_mpi_wait());
+        double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
+        double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
         _mpi_execs.at(std::size_t(_crs_level)) = mpi_exec_stop - mpi_exec_start;
-        _mpi_waits.at(std::size_t(_crs_level)) = mpi_wait_stop - mpi_wait_start;
+        _mpi_waits.at(std::size_t(_crs_level)) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
 
         return Status::success;
       }
@@ -1497,7 +1499,8 @@ namespace FEAT
       {
         TimeStamp at;
         double mpi_exec_start(Statistics::get_time_mpi_execute());
-        double mpi_wait_start(Statistics::get_time_mpi_wait());
+        double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
+        double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
 
         // get the level info
         LevelInfo& lvl = _hierarchy->_get_level_info(cur_lvl);
@@ -1538,9 +1541,10 @@ namespace FEAT
         TimeStamp bt;
         _toes.at(std::size_t(cur_lvl))= bt.elapsed(at);
         double mpi_exec_stop(Statistics::get_time_mpi_execute());
-        double mpi_wait_stop(Statistics::get_time_mpi_wait());
+        double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
+        double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
         _mpi_execs.at(std::size_t(cur_lvl)) = mpi_exec_stop - mpi_exec_start;
-        _mpi_waits.at(std::size_t(cur_lvl)) = mpi_wait_stop - mpi_wait_start;
+        _mpi_waits.at(std::size_t(cur_lvl)) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
 
         return Status::success;
       }
@@ -1561,7 +1565,8 @@ namespace FEAT
         {
           TimeStamp at;
           double mpi_exec_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
 
           // get our fine and coarse levels
           LevelInfo& lvl_f = _hierarchy->_get_level_info(i);
@@ -1618,9 +1623,10 @@ namespace FEAT
           TimeStamp bt;
           _toes.at((size_t)i)= bt.elapsed(at);
           double mpi_exec_stop(Statistics::get_time_mpi_execute());
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
+          double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
           _mpi_execs.at((size_t)i) = mpi_exec_stop - mpi_exec_start;
-          _mpi_waits.at((size_t)i) = mpi_wait_stop - mpi_wait_start;
+          _mpi_waits.at((size_t)i) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
 
           // descent to prior level
         }
@@ -1644,7 +1650,8 @@ namespace FEAT
         {
           TimeStamp at;
           double mpi_exec_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
 
           // get our level and the coarse level
           LevelInfo& lvl_f = _hierarchy->_get_level_info(i);
@@ -1690,9 +1697,10 @@ namespace FEAT
           TimeStamp bt;
           _toes.at((size_t)i) += bt.elapsed(at);
           double mpi_exec_stop(Statistics::get_time_mpi_execute());
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
+          double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
           _mpi_execs.at((size_t)i) += mpi_exec_stop - mpi_exec_start;
-          _mpi_waits.at((size_t)i) += mpi_wait_stop - mpi_wait_start;
+          _mpi_waits.at((size_t)i) += (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
 
           // ascend to next level
         }
@@ -1766,7 +1774,8 @@ namespace FEAT
         {
           TimeStamp at;
           double mpi_exec_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
 
           // get our level and the coarse level
           typename BaseClass::LevelInfo& lvl_f = this->_hierarchy->_get_level_info(i);
@@ -1816,9 +1825,10 @@ namespace FEAT
           TimeStamp bt;
           this->_toes.at((size_t)i) += bt.elapsed(at);
           double mpi_exec_stop(Statistics::get_time_mpi_execute());
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
+          double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
           this->_mpi_execs.at((size_t)i) += mpi_exec_stop - mpi_exec_start;
-          this->_mpi_waits.at((size_t)i) += mpi_wait_stop - mpi_wait_start;
+          this->_mpi_waits.at((size_t)i) += (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
 
           // ascend to next level
         }

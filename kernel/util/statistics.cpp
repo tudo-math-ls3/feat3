@@ -10,7 +10,8 @@ KahanAccumulation Statistics::_time_spmv;
 KahanAccumulation Statistics::_time_axpy;
 KahanAccumulation Statistics::_time_precon;
 KahanAccumulation Statistics::_time_mpi_execute;
-KahanAccumulation Statistics::_time_mpi_wait;
+KahanAccumulation Statistics::_time_mpi_wait_reduction;
+KahanAccumulation Statistics::_time_mpi_wait_spmv;
 std::map<FEAT::String, SolverStatistics> Statistics::_solver_statistics;
 double Statistics::toe_partition;
 double Statistics::toe_assembly;
@@ -34,7 +35,8 @@ String Statistics::get_formatted_times(double total_time)
   measured_time = KahanSum(measured_time, get_time_axpy());
   measured_time = KahanSum(measured_time, get_time_precon());
   measured_time = KahanSum(measured_time, get_time_mpi_execute());
-  measured_time = KahanSum(measured_time, get_time_mpi_wait());
+  measured_time = KahanSum(measured_time, get_time_mpi_wait_reduction());
+  measured_time = KahanSum(measured_time, get_time_mpi_wait_spmv());
 
   if (measured_time.sum > total_time)
     throw InternalError("Accumulated op time (" + stringify(measured_time.sum) + ") is greater as the provided total execution time (" + stringify(total_time) + ") !");
@@ -49,36 +51,41 @@ String Statistics::get_formatted_times(double total_time)
   double t_min;
   Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
   Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
-  result += String("Reductions:").pad_back(17) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("Reductions:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_axpy();
   Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
   Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
-  result += String("Blas-1:").pad_back(17) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("Blas-1:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_spmv();
   Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
   Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
-  result += String("Blas-2:").pad_back(17) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("Blas-2:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_precon();
   Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
   Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
-  result += String("Precon Kernels:").pad_back(17) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("Precon Kernels:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = get_time_mpi_execute();
   Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
   Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
-  result += String("MPI Execution:").pad_back(17) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("MPI Execution:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
-  t_local = get_time_mpi_wait();
+  t_local = get_time_mpi_wait_reduction();
   Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
   Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
-  result += String("MPI Wait:").pad_back(17) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("MPI Wait Reduction:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+
+  t_local = get_time_mpi_wait_spmv();
+  Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
+  Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
+  result += String("MPI Wait Blas-2:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
 
   t_local = total_time - measured_time.sum;
   Util::Comm::allreduce(&t_local, &t_max, 1, Util::CommOperationMax());
   Util::Comm::allreduce(&t_local, &t_min, 1, Util::CommOperationMin());
-  result += String("Not covered:").pad_back(17) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
+  result += String("Not covered:").pad_back(20) + "max: " + stringify(t_max) + ", min: " + stringify(t_min) + ", local: " + stringify(t_local) + "\n";
   return result;
 }

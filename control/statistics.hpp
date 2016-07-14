@@ -83,20 +83,20 @@ namespace FEAT
           if (rank == 0 && statistics_check >= 0)
           {
             std::cout<< std::endl;
-            std::cout << String("TOE partition:").pad_back(17) << FEAT::Statistics::toe_partition << std::endl;
-            std::cout << String("TOE assembly:").pad_back(17) << FEAT::Statistics::toe_assembly << std::endl;
-            std::cout << String("TOE solve:").pad_back(17) << FEAT::Statistics::toe_solve << std::endl;
+            std::cout << String("TOE partition:").pad_back(20) << FEAT::Statistics::toe_partition << std::endl;
+            std::cout << String("TOE assembly:").pad_back(20) << FEAT::Statistics::toe_assembly << std::endl;
+            std::cout << String("TOE solve:").pad_back(20) << FEAT::Statistics::toe_solve << std::endl;
             std::cout << std::endl << solver->get_formatted_solver_tree().trim() << std::endl;
             String flops = FEAT::Statistics::get_formatted_flops(solver_toe, nranks);
             std::cout<<flops<<std::endl<<std::endl;
             std::cout<<op_timings<<std::endl<<std::endl;
-            std::cout<<String("Domain size:").pad_back(17) << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
-            std::cout<<String("MPI size:").pad_back(17) << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl;
-            std::cout<<String("LA size:").pad_back(17) << double(la_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
+            std::cout<<String("Domain size:").pad_back(20) << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << std::endl;
+            std::cout<<String("MPI size:").pad_back(20) << double(mpi_size) / (1024. * 1024.) << " MByte" << std::endl;
+            std::cout<<String("LA size:").pad_back(20) << double(la_size) / (1024. * 1024.) << " MByte" << std::endl << std::endl;
             std::cout<<Util::get_formatted_memory_usage()<<std::endl;
-            std::cout<<String("#Mesh cells:").pad_back(17) << "coarse " << cells_coarse_max << "/" << cells_coarse_min << ", fine " << cells_fine_max << "/" << cells_fine_min << std::endl;
-            std::cout<<String("#DOFs:").pad_back(17) << "coarse " << dofs_coarse_max << "/" << dofs_coarse_min << ", fine " << dofs_fine_max << "/" << dofs_fine_min << std::endl;
-            std::cout<<String("#NZEs").pad_back(17) << "coarse " << nzes_coarse_max << "/" << nzes_coarse_min << ", fine " << nzes_fine_max << "/" << nzes_fine_min << std::endl;
+            std::cout<<String("#Mesh cells:").pad_back(20) << "coarse " << cells_coarse_max << "/" << cells_coarse_min << ", fine " << cells_fine_max << "/" << cells_fine_min << std::endl;
+            std::cout<<String("#DOFs:").pad_back(20) << "coarse " << dofs_coarse_max << "/" << dofs_coarse_min << ", fine " << dofs_fine_max << "/" << dofs_fine_min << std::endl;
+            std::cout<<String("#NZEs").pad_back(20) << "coarse " << nzes_coarse_max << "/" << nzes_coarse_min << ", fine " << nzes_fine_max << "/" << nzes_fine_min << std::endl;
             std::cout<<std::endl;
             /*if (statistics_check > 0) // provided parameter full or whatever
             {

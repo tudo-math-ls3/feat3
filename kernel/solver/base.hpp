@@ -379,8 +379,10 @@ namespace FEAT
       TimeStamp _bt;
       double _mpi_execute_start;
       double _mpi_execute_stop;
-      double _mpi_wait_start;
-      double _mpi_wait_stop;
+      double _mpi_wait_start_reduction;
+      double _mpi_wait_start_spmv;
+      double _mpi_wait_stop_reduction;
+      double _mpi_wait_stop_spmv;
 
     public:
       /**
@@ -397,9 +399,11 @@ namespace FEAT
         _branch(solver.get_solver_branch())
       {
         _mpi_execute_start = Statistics::get_time_mpi_execute();
-        _mpi_wait_start    = Statistics::get_time_mpi_wait();
+        _mpi_wait_start_reduction    = Statistics::get_time_mpi_wait_reduction();
+        _mpi_wait_start_spmv    = Statistics::get_time_mpi_wait_spmv();
         _mpi_execute_stop = _mpi_execute_start;
-        _mpi_wait_stop    = _mpi_wait_start;
+        _mpi_wait_stop_reduction    = _mpi_wait_start_reduction;
+        _mpi_wait_stop_spmv    = _mpi_wait_start_spmv;
       }
 
       // delete copy-ctor and assign operator
@@ -416,10 +420,11 @@ namespace FEAT
       {
         _bt.stamp();
         _mpi_execute_stop = Statistics::get_time_mpi_execute();
-        _mpi_wait_stop    = Statistics::get_time_mpi_wait();
+        _mpi_wait_stop_reduction    = Statistics::get_time_mpi_wait_reduction();
+        _mpi_wait_stop_spmv    = Statistics::get_time_mpi_wait_spmv();
         Statistics::add_solver_toe(this->_branch, _bt.elapsed(_at));
         Statistics::add_solver_mpi_execute(this->_branch, _mpi_execute_stop - _mpi_execute_start);
-        Statistics::add_solver_mpi_wait(this->_branch, _mpi_wait_stop - _mpi_wait_start);
+        Statistics::add_solver_mpi_wait(this->_branch, (_mpi_wait_stop_reduction - _mpi_wait_start_reduction) + (_mpi_wait_stop_spmv - _mpi_wait_start_spmv));
       }
     }; // class IterationStats
   } // namespace Solver

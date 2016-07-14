@@ -410,7 +410,8 @@ namespace FEAT
         {
           TimeStamp at;
           double mpi_execute_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
 
           // get our level and the coarse level
           SystemLevel& lvl = *system_levels.at(std::size_t(i));
@@ -451,8 +452,9 @@ namespace FEAT
           toes.at((size_t)i)= bt.elapsed(at);
           double mpi_execute_stop(Statistics::get_time_mpi_execute());
           mpi_executes.at((size_t)i) = mpi_execute_stop - mpi_execute_start;
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
-          mpi_waits.at((size_t)i) = mpi_wait_stop - mpi_wait_start;
+          double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
+          mpi_waits.at((size_t)i) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
 
           // descent to prior level
         }
@@ -461,7 +463,8 @@ namespace FEAT
         {
           TimeStamp at;
           double mpi_execute_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
 
           SystemLevel& lvl = *system_levels.front();
 
@@ -484,8 +487,9 @@ namespace FEAT
           toes.at(0) = bt.elapsed(at);
           double mpi_execute_stop(Statistics::get_time_mpi_execute());
           mpi_executes.at(0) = mpi_execute_stop - mpi_execute_start;
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
-          mpi_waits.at(0) = mpi_wait_stop - mpi_wait_start;
+          double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
+          mpi_waits.at(0) = (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
         }
 
         // prolongation loop
@@ -493,7 +497,8 @@ namespace FEAT
         {
           TimeStamp at;
           double mpi_execute_start(Statistics::get_time_mpi_execute());
-          double mpi_wait_start(Statistics::get_time_mpi_wait());
+          double mpi_wait_start_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_start_spmv(Statistics::get_time_mpi_wait_spmv());
 
           // get our level and the coarse level
           SystemLevel& lvl = *system_levels.at(std::size_t(i));
@@ -535,8 +540,9 @@ namespace FEAT
           toes.at((size_t)i) += bt.elapsed(at);
           double mpi_execute_stop(Statistics::get_time_mpi_execute());
           mpi_executes.at((size_t)i) += mpi_execute_stop - mpi_execute_start;
-          double mpi_wait_stop(Statistics::get_time_mpi_wait());
-          mpi_waits.at((size_t)i) += mpi_wait_stop - mpi_wait_start;
+          double mpi_wait_stop_reduction(Statistics::get_time_mpi_wait_reduction());
+          double mpi_wait_stop_spmv(Statistics::get_time_mpi_wait_spmv());
+          mpi_waits.at((size_t)i) += (mpi_wait_stop_reduction - mpi_wait_start_reduction) + (mpi_wait_stop_spmv - mpi_wait_start_spmv);
 
           // ascend to next level
         }
